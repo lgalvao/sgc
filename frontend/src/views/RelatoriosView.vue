@@ -54,8 +54,12 @@
         <BCard
             class="h-100"
             data-testid="card-relatorio-mapas"
+            role="button"
             style="cursor: pointer;"
+            tabindex="0"
             @click="abrirModalMapasVigentes"
+            @keydown.enter.prevent="abrirModalMapasVigentes"
+            @keydown.space.prevent="abrirModalMapasVigentes"
         >
           <h5 class="card-title">
             Mapas Vigentes
@@ -70,8 +74,12 @@
         <BCard
             class="h-100"
             data-testid="card-relatorio-gaps"
+            role="button"
             style="cursor: pointer;"
+            tabindex="0"
             @click="abrirModalDiagnosticosGaps"
+            @keydown.enter.prevent="abrirModalDiagnosticosGaps"
+            @keydown.space.prevent="abrirModalDiagnosticosGaps"
         >
           <h5 class="card-title">
             Diagnósticos de Gaps
@@ -86,8 +94,12 @@
         <BCard
             class="h-100"
             data-testid="card-relatorio-andamento"
+            role="button"
             style="cursor: pointer;"
+            tabindex="0"
             @click="abrirModalAndamentoGeral"
+            @keydown.enter.prevent="abrirModalAndamentoGeral"
+            @keydown.space.prevent="abrirModalAndamentoGeral"
         >
           <h5 class="card-title">
             Andamento Geral
