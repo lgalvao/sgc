@@ -292,7 +292,8 @@ public class AtividadeService {
      * Importa atividades de um mapa para outro.
      */
     public void importarAtividadesDeOutroMapa(Long mapaOrigemId, Long mapaDestinoId) {
-        List<Atividade> atividadesOrigem = atividadeRepo.findByMapaCodigo(mapaOrigemId);
+        // ⚡ Bolt: Otimização N+1 - Busca atividades JÁ com os conhecimentos carregados
+        List<Atividade> atividadesOrigem = atividadeRepo.findByMapaCodigoWithConhecimentos(mapaOrigemId);
         List<String> descricoesExistentes = atividadeRepo.findByMapaCodigo(mapaDestinoId).stream()
                 .map(Atividade::getDescricao)
                 .toList();
@@ -310,8 +311,9 @@ public class AtividadeService {
             novaAtividade.setMapa(mapaDestino);
             Atividade atividadeSalva = atividadeRepo.save(novaAtividade);
 
-            List<Conhecimento> conhecimentosOrigem =
-                    conhecimentoRepo.findByAtividadeCodigo(atividadeOrigem.getCodigo());
+            // ⚡ Bolt: Usa a lista já carregada em memória, evitando query N+1
+            List<Conhecimento> conhecimentosOrigem = atividadeOrigem.getConhecimentos();
+
             if (conhecimentosOrigem != null) {
                 for (Conhecimento conhecimentoOrigem : conhecimentosOrigem) {
                     Conhecimento novoConhecimento = new Conhecimento();
