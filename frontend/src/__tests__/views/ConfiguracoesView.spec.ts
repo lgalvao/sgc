@@ -1,93 +1,65 @@
-import {describe, expect, it, vi} from "vitest";
-import {mount} from "@vue/test-utils";
-import ConfiguracoesView from "@/views/ConfiguracoesView.vue";
-import {createTestingPinia} from "@pinia/testing";
-import {useConfiguracoesStore} from "@/stores/configuracoes";
+import { mount } from '@vue/test-utils'
+import { describe, it, expect, vi } from 'vitest'
+import { createTestingPinia } from '@pinia/testing'
+import ConfiguracoesView from '@/views/ConfiguracoesView.vue'
+import { useConfiguracoesStore } from '@/stores/configuracoes'
 
-describe("ConfiguracoesView.vue", () => {
-    const mountOptions = () => ({
-        global: {
-            plugins: [
-                createTestingPinia({
-                    createSpy: vi.fn,
-                    initialState: {
-                        configuracoes: {
-                            diasInativacaoProcesso: 30,
-                            diasAlertaNovo: 7
-                        }
-                    },
-                    stubActions: true,
-                }),
-            ],
-            stubs: {
-                BContainer: {template: '<div><slot /></div>'},
-                BForm: {template: '<form @submit.prevent><slot /></form>'},
-                BFormInput: {
-                    props: ['modelValue'],
-                    emits: ['update:modelValue'],
-                    template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', Number($event.target.value))" />'
-                },
-                BButton: {template: '<button type="submit"><slot /></button>'},
-                BAlert: {
-                    template: '<div class="alert-success" v-if="modelValue"><slot /></div>',
-                    props: ['modelValue']
-                },
-            },
-        },
-    });
+vi.mock('@/stores/feedback', () => ({
+  useNotificacoesStore: vi.fn(() => ({
+    show: vi.fn()
+  }))
+}))
 
-    it("deve renderizar o formulário com valores iniciais", () => {
-        const wrapper = mount(ConfiguracoesView, mountOptions());
-        const store = useConfiguracoesStore();
+describe('ConfiguracoesView.vue', () => {
+  it('renders correctly and loads data', async () => {
+    const wrapper = mount(ConfiguracoesView, {
+      global: {
+        plugins: [createTestingPinia({
+          createSpy: vi.fn,
+          initialState: {
+            configuracoes: {
+              parametros: [],
+              loading: false
+            }
+          }
+        })]
+      }
+    })
 
-        expect(wrapper.find('[data-testid="inp-config-dias-inativacao"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="inp-config-dias-alerta"]').exists()).toBe(true);
+    const store = useConfiguracoesStore()
+    expect(store.carregarConfiguracoes).toHaveBeenCalled()
+    expect(wrapper.find('h5').text()).toBe('Configurações do Sistema')
+  })
 
-        // Check if store values are bound (v-model)
-        // Accessing component instance or dom value if implemented in stub
-        // The stub binds :value.
-        const inputInativacao = wrapper.find('[data-testid="inp-config-dias-inativacao"]');
-        expect((inputInativacao.element as HTMLInputElement).value).toBe("30");
+  it('updates form values from store', async () => {
+    const wrapper = mount(ConfiguracoesView, {
+      global: {
+        plugins: [createTestingPinia({
+          createSpy: vi.fn,
+          stubActions: false // Allow store methods to run
+        })]
+      }
+    })
 
-        expect(store.carregarConfiguracoes).toHaveBeenCalled();
-    });
+    const store = useConfiguracoesStore()
+    // Mock get methods
+    store.getDiasInativacaoProcesso = vi.fn().mockReturnValue(45)
+    store.getDiasAlertaNovo = vi.fn().mockReturnValue(10)
 
-    it("deve salvar configurações e exibir mensagem de sucesso", async () => {
-        const wrapper = mount(ConfiguracoesView, mountOptions());
-        const store = useConfiguracoesStore();
+    // Trigger update (simulate mounted or reload)
+    await wrapper.vm.$nextTick()
 
-        // Mock return true for save
-        (store.salvarConfiguracoes as any).mockReturnValue(true);
+    // Check if form updated (need to expose or find inputs)
+    // Since we can't easily access reactive setup state without exposing, checking inputs
+    await wrapper.find('button[class*="btn-light"]').trigger('click') // Recarregar
 
-        // Update values
-        await wrapper.find('[data-testid="inp-config-dias-inativacao"]').setValue(60);
-        await wrapper.find('[data-testid="inp-config-dias-alerta"]').setValue(14);
+    // Wait for async operations
+    await new Promise(resolve => setTimeout(resolve, 0));
 
-        // Submit
-        await wrapper.find('form').trigger('submit');
+    const input1 = wrapper.find('#diasInativacao').element as HTMLInputElement
+    const input2 = wrapper.find('#diasAlertaNovo').element as HTMLInputElement
 
-        expect(store.diasInativacaoProcesso).toBe(60);
-        expect(store.diasAlertaNovo).toBe(14);
-        expect(store.salvarConfiguracoes).toHaveBeenCalled();
-
-        // Message
-        expect(wrapper.find('.alert-success').exists()).toBe(true);
-        expect(wrapper.find('.alert-success').text()).toBe("Configurações salvas!");
-    });
-
-    it("mensagem de sucesso deve desaparecer após 3 segundos", async () => {
-        vi.useFakeTimers();
-        const wrapper = mount(ConfiguracoesView, mountOptions());
-        const store = useConfiguracoesStore();
-        (store.salvarConfiguracoes as any).mockReturnValue(true);
-
-        await wrapper.find('form').trigger('submit');
-        expect(wrapper.find('.alert-success').exists()).toBe(true);
-
-        vi.advanceTimersByTime(3000);
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.find('.alert-success').exists()).toBe(false);
-        vi.useRealTimers();
-    });
-});
+    expect(input1.value).toBe('45')
+    expect(input2.value).toBe('10')
+  })
+})

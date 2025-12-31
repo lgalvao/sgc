@@ -144,4 +144,17 @@ public class SubprocessoCrudController {
         subprocessoService.excluir(codigo);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * Altera a data limite de um subprocesso.
+     * (CDU-27)
+     */
+    @PutMapping("/{codigo}/data-limite")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> alterarDataLimite(
+            @PathVariable Long codigo,
+            @RequestBody @Valid AlterarDataLimiteRequest request) {
+        subprocessoService.alterarDataLimite(codigo, request.getNovaDataLimite());
+        return ResponseEntity.ok().build();
+    }
 }

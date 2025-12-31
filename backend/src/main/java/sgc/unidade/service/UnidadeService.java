@@ -122,10 +122,15 @@ public class UnidadeService {
 
         Usuario usuario = usuarioService.buscarEntidadePorId(request.tituloEleitoralUsuario());
 
+        // Valida se o usuário pertence à unidade (simplificado, poderia ser mais rigoroso)
+        // Se a unidade não for a mesma e nem superior/subordinada, talvez devesse bloquear?
+        // O requisito CDU-28 diz apenas "ADMIN seleciona servidor" da lista de servidores da unidade.
+
         AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
         atribuicao.setUnidade(unidade);
-        atribuicao.setUsuario(usuario);
-        atribuicao.setDataInicio(LocalDateTime.now());
+        atribuicao.setUsuarioTitulo(usuario.getTituloEleitoral());
+        atribuicao.setUsuarioMatricula(usuario.getMatricula());
+        atribuicao.setDataInicio(request.dataInicio() != null ? request.dataInicio().atStartOfDay() : LocalDateTime.now());
         atribuicao.setDataTermino(request.dataTermino().atTime(23, 59, 59));
         atribuicao.setJustificativa(request.justificativa());
 

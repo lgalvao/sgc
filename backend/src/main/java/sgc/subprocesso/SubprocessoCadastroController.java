@@ -289,6 +289,36 @@ public class SubprocessoCadastroController {
         return Map.of("message", "Atividades importadas.");
     }
 
+    /**
+     * Aceita o cadastro de atividades de múltiplas unidades em bloco.
+     * (CDU-22)
+     */
+    @PostMapping("/{codigo}/aceitar-cadastro-bloco")
+    @PreAuthorize("hasAnyRole('GESTOR', 'ADMIN')")
+    @Operation(summary = "Aceita cadastros em bloco")
+    public void aceitarCadastroEmBloco(@PathVariable Long codigo,
+                                       @RequestBody @Valid ProcessarEmBlocoRequest request,
+                                       @AuthenticationPrincipal Object principal) {
+        String tituloUsuario = extractTituloUsuario(principal);
+        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
+        subprocessoWorkflowService.aceitarCadastroEmBloco(request.getUnidadeCodigos(), codigo, usuario);
+    }
+
+    /**
+     * Homologa o cadastro de atividades de múltiplas unidades em bloco.
+     * (CDU-23)
+     */
+    @PostMapping("/{codigo}/homologar-cadastro-bloco")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Homologa cadastros em bloco")
+    public void homologarCadastroEmBloco(@PathVariable Long codigo,
+                                         @RequestBody @Valid ProcessarEmBlocoRequest request,
+                                         @AuthenticationPrincipal Object principal) {
+        String tituloUsuario = extractTituloUsuario(principal);
+        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
+        subprocessoWorkflowService.homologarCadastroEmBloco(request.getUnidadeCodigos(), codigo, usuario);
+    }
+
     private String extractTituloUsuario(Object principal) {
         if (principal instanceof String string) return string;
         if (principal instanceof sgc.usuario.model.Usuario usuario)

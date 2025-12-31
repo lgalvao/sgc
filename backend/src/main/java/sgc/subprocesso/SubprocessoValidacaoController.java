@@ -186,4 +186,30 @@ public class SubprocessoValidacaoController {
         @AuthenticationPrincipal Usuario usuario) {
         subprocessoMapaWorkflowService.submeterMapaAjustado(codigo, request, usuario);
     }
+
+    /**
+     * Aceita a validação de mapa de competências de múltiplas unidades em bloco.
+     * (CDU-25)
+     */
+    @PostMapping("/{codigo}/aceitar-validacao-bloco")
+    @PreAuthorize("hasRole('GESTOR')")
+    @Operation(summary = "Aceita validação de mapas em bloco")
+    public void aceitarValidacaoEmBloco(@PathVariable Long codigo,
+                                        @RequestBody @Valid ProcessarEmBlocoRequest request,
+                                        @AuthenticationPrincipal Usuario usuario) {
+        subprocessoMapaWorkflowService.aceitarValidacaoEmBloco(request.getUnidadeCodigos(), codigo, usuario);
+    }
+
+    /**
+     * Homologa a validação de mapa de competências de múltiplas unidades em bloco.
+     * (CDU-26)
+     */
+    @PostMapping("/{codigo}/homologar-validacao-bloco")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Homologa validação de mapas em bloco")
+    public void homologarValidacaoEmBloco(@PathVariable Long codigo,
+                                          @RequestBody @Valid ProcessarEmBlocoRequest request,
+                                          @AuthenticationPrincipal Usuario usuario) {
+        subprocessoMapaWorkflowService.homologarValidacaoEmBloco(request.getUnidadeCodigos(), codigo, usuario);
+    }
 }

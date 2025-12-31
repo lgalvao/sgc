@@ -38,18 +38,28 @@
             </div>
           </div>
 
-          <div class="mb-3">
-            <label
-                class="form-label"
-                for="dataTermino"
-            >Data de término</label>
-            <BFormInput
-                id="dataTermino"
-                v-model="dataTermino"
-                data-testid="input-data-termino"
-                required
-                type="date"
-            />
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="dataInicio">Data de Início (Opcional)</label>
+              <BFormInput
+                  id="dataInicio"
+                  v-model="dataInicio"
+                  data-testid="input-data-inicio"
+                  type="date"
+              />
+              <div class="form-text">Se não informada, será considerada a data atual.</div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="dataTermino">Data de Término</label>
+              <BFormInput
+                  id="dataTermino"
+                  v-model="dataTermino"
+                  data-testid="input-data-termino"
+                  required
+                  type="date"
+              />
+            </div>
           </div>
 
           <div class="mb-3">
@@ -133,6 +143,7 @@ const codUnidade = computed(() => props.codUnidade);
 const unidade = ref<Unidade | null>(null);
 const usuarios = ref<Usuario[]>([]);
 const usuarioSelecionado = ref<string | null>(null);
+const dataInicio = ref("");
 const dataTermino = ref("");
 const justificativa = ref("");
 
@@ -163,12 +174,14 @@ async function criarAtribuicao() {
   try {
     await criarAtribuicaoTemporaria(unidade.value.codigo, {
       tituloEleitoralUsuario: usuarioSelecionado.value,
+      dataInicio: dataInicio.value || undefined, // Envia undefined se vazio para usar padrão do backend
       dataTermino: dataTermino.value,
       justificativa: justificativa.value,
     });
     sucesso.value = true;
     // Reset form
     usuarioSelecionado.value = null;
+    dataInicio.value = "";
     dataTermino.value = "";
     justificativa.value = "";
   } catch (error) {

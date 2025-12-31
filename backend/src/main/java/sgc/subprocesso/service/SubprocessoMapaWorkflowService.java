@@ -390,6 +390,39 @@ public class SubprocessoMapaWorkflowService {
                 usuario);
     }
 
+    @Transactional
+    public void disponibilizarMapaEmBloco(java.util.List<Long> unidadeCodigos, Long codSubprocessoBase, DisponibilizarMapaRequest request, Usuario usuario) {
+        unidadeCodigos.forEach(unidadeCodigo -> {
+            Subprocesso base = buscarSubprocesso(codSubprocessoBase);
+            Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para unidade " + unidadeCodigo));
+
+            disponibilizarMapa(target.getCodigo(), request, usuario);
+        });
+    }
+
+    @Transactional
+    public void aceitarValidacaoEmBloco(java.util.List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
+        unidadeCodigos.forEach(unidadeCodigo -> {
+            Subprocesso base = buscarSubprocesso(codSubprocessoBase);
+            Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para unidade " + unidadeCodigo));
+
+            aceitarValidacao(target.getCodigo(), usuario);
+        });
+    }
+
+    @Transactional
+    public void homologarValidacaoEmBloco(java.util.List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
+        unidadeCodigos.forEach(unidadeCodigo -> {
+            Subprocesso base = buscarSubprocesso(codSubprocessoBase);
+            Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para unidade " + unidadeCodigo));
+
+            homologarValidacao(target.getCodigo(), usuario);
+        });
+    }
+
     private Subprocesso buscarSubprocesso(Long codSubprocesso) {
         return subprocessoRepo
                 .findById(codSubprocesso)

@@ -268,7 +268,7 @@ public class ProcessoService {
 
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarFinalizados() {
-        return processoRepo.findBySituacao(SituacaoProcesso.FINALIZADO).stream()
+        return processoRepo.findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso.FINALIZADO).stream()
                 .map(processoMapper::toDto)
                 .toList();
     }

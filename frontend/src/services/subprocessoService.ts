@@ -7,6 +7,11 @@ interface ImportarAtividadesRequest {
     codSubprocessoOrigem: number;
 }
 
+interface ProcessarEmBlocoRequest {
+    unidadeCodigos: number[];
+    dataLimite?: string;
+}
+
 export async function importarAtividades(
     codSubprocessoDestino: number,
     codSubprocessoOrigem: number,
@@ -35,7 +40,7 @@ export async function validarCadastro(codSubprocesso: number): Promise<Validacao
     return response.data;
 }
 
-export async function obterStatus(codSubprocesso: number): Promise<any> { // Using any properly typed with SubprocessoStatus from tipos.ts would be better but SubprocessoStatus IS in tipos.ts, let's import it.
+export async function obterStatus(codSubprocesso: number): Promise<any> {
     const response = await apiClient.get<any>(`/subprocessos/${codSubprocesso}/status`);
     return response.data;
 }
@@ -110,4 +115,41 @@ export async function removerCompetencia(
         `/subprocessos/${codSubprocesso}/competencias/${codCompetencia}/remover`,
     );
     return mapMapaCompletoDtoToModel(response.data);
+}
+
+// Métodos para ações em bloco
+
+export async function aceitarCadastroEmBloco(
+    codSubprocesso: number,
+    payload: ProcessarEmBlocoRequest
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/aceitar-cadastro-bloco`, payload);
+}
+
+export async function homologarCadastroEmBloco(
+    codSubprocesso: number,
+    payload: ProcessarEmBlocoRequest
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/homologar-cadastro-bloco`, payload);
+}
+
+export async function aceitarValidacaoEmBloco(
+    codSubprocesso: number,
+    payload: ProcessarEmBlocoRequest
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/aceitar-validacao-bloco`, payload);
+}
+
+export async function homologarValidacaoEmBloco(
+    codSubprocesso: number,
+    payload: ProcessarEmBlocoRequest
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/homologar-validacao-bloco`, payload);
+}
+
+export async function disponibilizarMapaEmBloco(
+    codSubprocesso: number,
+    payload: ProcessarEmBlocoRequest
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/disponibilizar-mapa-bloco`, payload);
 }

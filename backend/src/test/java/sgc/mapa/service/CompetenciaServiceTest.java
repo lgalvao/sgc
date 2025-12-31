@@ -95,6 +95,7 @@ class CompetenciaServiceTest {
         comp.setAtividades(new HashSet<>(List.of(ativ)));
 
         when(competenciaRepo.findById(compId)).thenReturn(Optional.of(comp));
+        when(atividadeRepo.listarPorCompetencia(comp)).thenReturn(List.of(ativ));
 
         service.removerCompetencia(compId);
 

@@ -1,51 +1,73 @@
-import {defineStore} from "pinia";
-import {ref} from "vue";
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import { apiClient } from "@/axios-setup";
+
+export interface Parametro {
+    id?: number;
+    chave: string;
+    descricao: string;
+    valor: string;
+}
 
 export const useConfiguracoesStore = defineStore("configuracoes", () => {
-    const diasInativacaoProcesso = ref(10);
-    const diasAlertaNovo = ref(7);
+    const parametros = ref<Parametro[]>([]);
+    const loading = ref(false);
+    const error = ref<string | null>(null);
 
-    function carregarConfiguracoes() {
+    async function carregarConfiguracoes() {
+        loading.value = true;
+        error.value = null;
         try {
-            const savedConfig = localStorage.getItem("appConfiguracoes");
-            if (savedConfig) {
-                const parsedConfig = JSON.parse(savedConfig);
-                diasInativacaoProcesso.value = parsedConfig.diasInativacaoProcesso || diasInativacaoProcesso.value;
-                diasAlertaNovo.value = parsedConfig.diasAlertaNovo || diasAlertaNovo.value;
-            }
-        } catch (e) {
-            console.error("Erro ao carregar configurações do localStorage:", e);
+            const response = await apiClient.get<Parametro[]>("/configuracoes");
+            parametros.value = response.data;
+        } catch (e: any) {
+            console.error("Erro ao carregar configurações:", e);
+            error.value = "Não foi possível carregar as configurações.";
+        } finally {
+            loading.value = false;
         }
     }
 
-    function salvarConfiguracoes() {
+    async function salvarConfiguracoes(novosParametros: Parametro[]) {
+        loading.value = true;
+        error.value = null;
         try {
-            const configToSave = {
-                diasInativacaoProcesso: diasInativacaoProcesso.value,
-                diasAlertaNovo: diasAlertaNovo.value,
-            };
-            localStorage.setItem("appConfiguracoes", JSON.stringify(configToSave));
+            const response = await apiClient.put<Parametro[]>("/configuracoes", novosParametros);
+            parametros.value = response.data;
             return true;
-        } catch (e) {
-            console.error("Erro ao salvar configurações no localStorage:", e);
+        } catch (e: any) {
+            console.error("Erro ao salvar configurações:", e);
+            error.value = "Não foi possível salvar as configurações.";
             return false;
+        } finally {
+            loading.value = false;
         }
     }
 
-    function definirDiasInativacaoProcesso(dias: number) {
-        if (dias >= 1) diasInativacaoProcesso.value = dias;
+    function getValor(chave: string, valorPadrao: string = ""): string {
+        const param = parametros.value.find((p) => p.chave === chave);
+        return param ? param.valor : valorPadrao;
     }
 
-    function definirDiasAlertaNovo(dias: number) {
-        if (dias >= 1) diasAlertaNovo.value = dias;
+    // Helpers para compatibilidade e uso fácil
+    function getDiasInativacaoProcesso(): number {
+        const val = getValor("DIAS_INATIVACAO_PROCESSO", "30");
+        return parseInt(val, 10) || 30;
+    }
+
+    function getDiasAlertaNovo(): number {
+        const val = getValor("DIAS_ALERTA_NOVO", "3");
+        return parseInt(val, 10) || 3;
     }
 
     return {
-        diasInativacaoProcesso,
-        diasAlertaNovo,
+        parametros,
+        loading,
+        error,
         carregarConfiguracoes,
         salvarConfiguracoes,
-        definirDiasInativacaoProcesso,
-        definirDiasAlertaNovo,
+        getValor,
+        getDiasInativacaoProcesso,
+        getDiasAlertaNovo
     };
 });

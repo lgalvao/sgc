@@ -310,7 +310,8 @@ class ProcessoServiceTest {
         @DisplayName("Deve listar processos finalizados e ativos")
         void deveListarProcessosFinalizadosEAtivos() {
             // Arrange
-            when(processoRepo.findBySituacao(any())).thenReturn(List.of(ProcessoFixture.processoPadrao()));
+            when(processoRepo.findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso.FINALIZADO)).thenReturn(List.of(ProcessoFixture.processoPadrao()));
+            when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of(ProcessoFixture.processoPadrao()));
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act & Assert
