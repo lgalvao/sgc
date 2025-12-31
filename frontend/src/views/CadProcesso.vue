@@ -77,6 +77,7 @@
 
       <BFormGroup
           class="mb-3"
+          description="Prazo para conclusão da primeira etapa (Mapeamento/Revisão)."
           label="Data limite"
           label-for="dataLimite"
       >
@@ -111,7 +112,8 @@
               @click="salvarProcesso"
           >
             <BSpinner v-if="isLoading" small class="me-1" />
-            <i v-else aria-hidden="true" class="bi bi-save me-1"/> Salvar
+            <i v-else aria-hidden="true" class="bi bi-save me-1"/>
+            {{ isLoading ? 'Salvando...' : 'Salvar' }}
           </BButton>
           <BButton
               v-if="processoEditando"
@@ -169,7 +171,7 @@
             @click="confirmarIniciarProcesso"
         >
           <BSpinner v-if="isLoading" small class="me-1" />
-          <span v-else>Confirmar</span>
+          <span>{{ isLoading ? 'Iniciando...' : 'Confirmar' }}</span>
         </BButton>
       </template>
     </BModal>
