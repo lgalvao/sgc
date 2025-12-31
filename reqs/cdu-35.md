@@ -2,24 +2,23 @@
 
 **Ator:** ADMIN
 
-## Descrição
-Permite a visualização e exportação do status atual de todos os subprocessos de um Processo de Gestão de Competências.
-
-## Regras de Negócio
-- O relatório deve listar todas as unidades participantes do processo selecionado.
-- Para cada unidade, deve ser exibida a situação atual do seu subprocesso.
-- O relatório deve permitir filtragem por unidade ou situação.
-
 ## Fluxo principal
 
-1. O usuário acessa a área de Relatórios.
-2. O usuário seleciona a opção "Relatório de Andamento".
-3. O usuário seleciona o Processo desejado (ex: "Mapeamento 2023").
+1. O usuário acessa Relatórios.
+
+2. O usuário seleciona a opção "Andamento de processo".
+
+3. O usuário seleciona o Processo desejado (ex: "Mapeamento 2027").
+
 4. O sistema exibe o relatório em tela contendo as seguintes colunas:
-    - Sigla da Unidade
-    - Nome da Unidade
-    - Situação Atual (ex: Cadastro em Andamento, Homologado)
+
+    - Sigla da unidade
+    - Nome da unidade
+    - Situação atual do subprocesso da unidade, para o processo selecionado
     - Data da última movimentação
-    - Responsável (Titular)
-5. O usuário pode optar por exportar os dados (CSV, PDF).
+    - Responsável
+    - Titular (Se nao for o responsavel)  
+
+5. O usuário pode optar por exportar os dados para PDF clicando no botao `PDF`.
+
 6. O sistema gera o arquivo selecionado e o disponibiliza para download.
