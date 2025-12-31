@@ -126,6 +126,11 @@ public class UnidadeService {
         // Se a unidade não for a mesma e nem superior/subordinada, talvez devesse bloquear?
         // O requisito CDU-28 diz apenas "ADMIN seleciona servidor" da lista de servidores da unidade.
 
+        // Validação de datas
+        if (request.dataTermino().isBefore(request.dataInicio())) {
+            throw new sgc.comum.erros.ErroValidacao("A data de término deve ser posterior à data de início.");
+        }
+
         AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
         atribuicao.setUnidade(unidade);
         atribuicao.setUsuarioTitulo(usuario.getTituloEleitoral());
