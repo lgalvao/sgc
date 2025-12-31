@@ -221,14 +221,17 @@ class AtividadeServiceTest {
              Atividade ativOrigem = new Atividade();
              ativOrigem.setDescricao("A1");
              ativOrigem.setCodigo(10L);
+             // Setup knowledge directly on the activity, simulating fetch join
+             ativOrigem.setConhecimentos(List.of(new Conhecimento("C1", ativOrigem)));
 
              Mapa mapaDestino = new Mapa();
 
-             when(atividadeRepo.findByMapaCodigo(origem)).thenReturn(List.of(ativOrigem));
+             // Changed mock to expect the optimized query
+             when(atividadeRepo.findByMapaCodigoWithConhecimentos(origem)).thenReturn(List.of(ativOrigem));
              when(atividadeRepo.findByMapaCodigo(destino)).thenReturn(List.of()); // Nenhuma existente
              when(mapaRepo.findById(destino)).thenReturn(Optional.of(mapaDestino));
              when(atividadeRepo.save(any())).thenReturn(new Atividade());
-             when(conhecimentoRepo.findByAtividadeCodigo(10L)).thenReturn(List.of(new Conhecimento()));
+             // Removed mock for conhecimentoRepo.findByAtividadeCodigo since it should not be called
 
              service.importarAtividadesDeOutroMapa(origem, destino);
 
