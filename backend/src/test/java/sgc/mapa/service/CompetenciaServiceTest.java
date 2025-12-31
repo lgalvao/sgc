@@ -99,6 +99,7 @@ class CompetenciaServiceTest {
 
         service.removerCompetencia(compId);
 
+        verify(atividadeRepo).saveAll(anyList());
         verify(competenciaRepo).delete(comp);
         assertThat(ativ.getCompetencias()).isEmpty();
     }
