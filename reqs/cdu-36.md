@@ -5,22 +5,25 @@
 ## Descrição
 Permite a extração consolidada dos mapas de competências (Atividades, Conhecimentos, Competências) das unidades.
 
-## Regras de Negócio
-- O relatório deve consolidar os dados dos mapas de competências vigentes (homologados) ou em elaboração, dependendo do filtro.
-- O relatório deve ser estruturado de forma a permitir a análise de competências transversais (comuns a várias unidades).
-
 ## Fluxo principal
 
-1. O usuário acessa a área de Relatórios.
-2. O usuário seleciona a opção "Relatório de Mapas".
+1. O usuário acessa Relatórios na barra de navegacao.
+
+2. O usuário seleciona a opção "Mapas".
+
 3. O usuário define os filtros:
+
     - Processo (Obrigatório)
     - Unidade (Opcional - se vazio, considera todas as unidades do processo)
-    - Situação do Mapa (Opcional - ex: Apenas Homologados)
-4. O usuário aciona a opção "Gerar Relatório".
-5. O sistema processa os dados e gera um arquivo (ex: planilha Excel ou CSV) contendo as seguintes informações:
+
+4. O usuário aciona a opção "Gerar".
+
+5. O sistema processa os dados e gera um arquivo PDF, contendo, para cada mapa, as seguintes informações:
+
     - Unidade (Sigla e Nome)
-    - Atividade (Descrição)
-    - Conhecimentos associados (Lista concatenada ou linhas separadas)
-    - Competências associadas (Lista concatenada ou linhas separadas)
+    - Para cada competencia: 
+    	- Descricao da competência 
+     	   - Atividades da competencia
+      	      - Conhecimentos da atividade
+
 6. O sistema disponibiliza o arquivo para download.
