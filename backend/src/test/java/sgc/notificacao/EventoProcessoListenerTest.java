@@ -135,8 +135,7 @@ class EventoProcessoListenerTest {
             verify(alertaService, times(1))
                     .criarAlertasProcessoIniciado(
                             processo,
-                            List.of(subprocessoOperacional.getUnidade().getCodigo()),
-                            List.of(subprocessoOperacional));
+                            List.of(subprocessoOperacional.getUnidade()));
 
             verify(notificacaoEmailService, times(1))
                     .enviarEmailHtml(eq(TITULAR_EMAIL), anyString(), anyString());
@@ -154,7 +153,7 @@ class EventoProcessoListenerTest {
             ouvinteDeEvento.aoIniciarProcesso(evento);
 
             // Then
-            verify(alertaService, never()).criarAlertasProcessoIniciado(any(), anyList(), anyList());
+            verify(alertaService, never()).criarAlertasProcessoIniciado(any(), anyList());
             verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
         }
 
@@ -170,7 +169,7 @@ class EventoProcessoListenerTest {
             ouvinteDeEvento.aoIniciarProcesso(evento);
 
             // Then
-            verify(alertaService, never()).criarAlertasProcessoIniciado(any(), anyList(), anyList());
+            verify(alertaService, never()).criarAlertasProcessoIniciado(any(), anyList());
             verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
         }
 
@@ -204,7 +203,7 @@ class EventoProcessoListenerTest {
             ouvinteDeEvento.aoIniciarProcesso(evento);
 
             // Then
-            verify(alertaService, times(1)).criarAlertasProcessoIniciado(any(), anyList(), anyList());
+            verify(alertaService, times(1)).criarAlertasProcessoIniciado(any(), anyList());
             ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
             ArgumentCaptor<String> corpoCaptor = ArgumentCaptor.forClass(String.class);
             verify(notificacaoEmailService, times(1))

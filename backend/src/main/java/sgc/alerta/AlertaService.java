@@ -12,11 +12,9 @@ import sgc.alerta.model.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.model.Processo;
 import sgc.usuario.model.Usuario;
-import sgc.usuario.model.UsuarioRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
-import sgc.unidade.service.UnidadeService;
 import sgc.usuario.UsuarioService;
 
 import java.time.LocalDateTime;
@@ -37,7 +35,6 @@ import static sgc.alerta.model.TipoAlerta.PROCESSO_INICIADO_OPERACIONAL;
 public class AlertaService {
     private final AlertaRepo repositorioAlerta;
     private final AlertaUsuarioRepo alertaUsuarioRepo;
-    private final UnidadeService unidadeService;
     private final UsuarioService usuarioService;
     private final AlertaMapper alertaMapper;
 
@@ -48,12 +45,10 @@ public class AlertaService {
     public Alerta criarAlerta(
             Processo processo,
             TipoAlerta tipoAlerta,
-            Long codUnidadeDestino,
+            Unidade unidadeDestino,
             String descricao) {
 
-        log.debug("Criando alerta tipo={} para unidade {}.", tipoAlerta, codUnidadeDestino);
-
-        Unidade unidadeDestino = unidadeService.buscarEntidadePorId(codUnidadeDestino);
+        log.debug("Criando alerta tipo={} para unidade {}.", tipoAlerta, unidadeDestino.getCodigo());
 
         Alerta alerta = new Alerta()
                 .setProcesso(processo)
@@ -109,31 +104,23 @@ public class AlertaService {
      * - Unidades ancestrais: Recebem o alerta de "unidade(s) subordinada(s)"
      */
     @Transactional
-    public List<Alerta> criarAlertasProcessoIniciado(Processo processo, List<Long> codigosUnidades, List<Subprocesso> subprocessos) {
-        Set<Long> unidadesOperacionais = new HashSet<>();
-        Set<Long> unidadesIntermediarias = new HashSet<>();
+    public List<Alerta> criarAlertasProcessoIniciado(Processo processo, List<Unidade> unidadesParticipantes) {
+        Set<Unidade> unidadesOperacionais = new HashSet<>();
+        Map<Long, Unidade> unidadesIntermediarias = new HashMap<>();
 
-        // Identificar unidades base (participantes)
-        List<Unidade> unidadesBase;
-        if (subprocessos != null && !subprocessos.isEmpty()) {
-            unidadesBase = subprocessos.stream().map(Subprocesso::getUnidade).toList();
-        } else {
-            unidadesBase = unidadeService.buscarEntidadesPorIds(codigosUnidades);
-        }
-
-        for (Unidade unidade : unidadesBase) {
+        for (Unidade unidade : unidadesParticipantes) {
             // Unidades participantes sempre recebem o alerta operacional
-            unidadesOperacionais.add(unidade.getCodigo());
+            unidadesOperacionais.add(unidade);
 
             // Se for Interoperacional, também recebe o de intermediária conforme requisito
             if (unidade.getTipo() == TipoUnidade.INTEROPERACIONAL) {
-                unidadesIntermediarias.add(unidade.getCodigo());
+                unidadesIntermediarias.put(unidade.getCodigo(), unidade);
             }
 
             // Notificar todos os ancestrais
             Unidade pai = unidade.getUnidadeSuperior();
             while (pai != null) {
-                unidadesIntermediarias.add(pai.getCodigo());
+                unidadesIntermediarias.put(pai.getCodigo(), pai);
                 pai = pai.getUnidadeSuperior();
             }
         }
@@ -141,13 +128,13 @@ public class AlertaService {
         List<Alerta> alertasCriados = new ArrayList<>();
 
         // Alertas operacionais
-        for (Long cod : unidadesOperacionais) {
-            alertasCriados.add(criarAlerta(processo, PROCESSO_INICIADO_OPERACIONAL, cod, "Início do processo"));
+        for (Unidade u : unidadesOperacionais) {
+            alertasCriados.add(criarAlerta(processo, PROCESSO_INICIADO_OPERACIONAL, u, "Início do processo"));
         }
 
         // Alertas intermediários (consolidado por unidade)
-        for (Long cod : unidadesIntermediarias) {
-            alertasCriados.add(criarAlerta(processo, PROCESSO_INICIADO_INTERMEDIARIA, cod, "Início do processo em unidade(s) subordinada(s)"));
+        for (Unidade u : unidadesIntermediarias.values()) {
+            alertasCriados.add(criarAlerta(processo, PROCESSO_INICIADO_INTERMEDIARIA, u, "Início do processo em unidade(s) subordinada(s)"));
         }
 
         log.debug("Criados {} alertas para o processo {}", alertasCriados.size(), processo.getCodigo());
@@ -159,26 +146,41 @@ public class AlertaService {
      */
     @Transactional
     public void criarAlertaCadastroDisponibilizado(
-            Processo processo, Long codUnidadeOrigem, Long codUnidadeDestino) {
-
-        Unidade unidadeOrigem = unidadeService.buscarEntidadePorId(codUnidadeOrigem);
+            Processo processo, Unidade unidadeOrigem, Unidade unidadeDestino) {
 
         String descricao = "Cadastro disponibilizado pela unidade %s no processo '%s'. Realize a análise do cadastro."
                 .formatted(unidadeOrigem.getSigla(), processo.getDescricao());
 
-        criarAlerta(processo, TipoAlerta.CADASTRO_DISPONIBILIZADO, codUnidadeDestino, descricao);
+        criarAlerta(processo, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeDestino, descricao);
     }
 
     /**
      * Cria alerta quando cadastro é devolvido para ajustes.
      */
     @Transactional
-    public void criarAlertaCadastroDevolvido(Processo processo, Long codUnidadeDestino, String motivo) {
+    public void criarAlertaCadastroDevolvido(Processo processo, Unidade unidadeDestino, String motivo) {
 
         String desc = "Cadastro devolvido no processo '%s'. Motivo: %s. Realize os ajustes necessários."
                 .formatted(processo.getDescricao(), motivo);
 
-        criarAlerta(processo, TipoAlerta.CADASTRO_DEVOLVIDO, codUnidadeDestino, desc);
+        criarAlerta(processo, TipoAlerta.CADASTRO_DEVOLVIDO, unidadeDestino, desc);
+    }
+
+    @Transactional
+    public void criarAlertaAlteracaoDataLimite(
+            Processo processo, Unidade unidadeDestino, String novaData, int etapa) {
+
+        String descricao = "Data limite da etapa %d alterada para %s"
+                .formatted(etapa, novaData);
+
+        Alerta alerta = new Alerta()
+                .setProcesso(processo)
+                .setDataHora(LocalDateTime.now())
+                .setUnidadeOrigem(null) // SEDOC
+                .setUnidadeDestino(unidadeDestino)
+                .setDescricao(descricao);
+
+        repositorioAlerta.save(alerta);
     }
 
     /**

@@ -280,7 +280,7 @@ class UnidadeServiceTest {
             when(usuarioService.buscarEntidadePorId("123")).thenReturn(new Usuario());
 
             CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
-                    "123", java.time.LocalDate.now(), "Justificativa");
+                    "123", java.time.LocalDate.now(), java.time.LocalDate.now().plusDays(1), "Justificativa");
 
             // Act
             service.criarAtribuicaoTemporaria(1L, req);

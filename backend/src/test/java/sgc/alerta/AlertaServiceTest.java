@@ -16,14 +16,12 @@ import sgc.usuario.UsuarioService;
 import sgc.usuario.model.Usuario;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
-import sgc.unidade.service.UnidadeService;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,8 +32,6 @@ class AlertaServiceTest {
     private AlertaRepo alertaRepo;
     @Mock
     private AlertaUsuarioRepo alertaUsuarioRepo;
-    @Mock
-    private UnidadeService unidadeService;
     @Mock
     private UsuarioService usuarioService;
     @Mock
@@ -52,35 +48,18 @@ class AlertaServiceTest {
         void deveCriarAlertaComSucesso() {
             // Given
             Processo p = new Processo();
-            Long unidadeId = 1L;
             Unidade u = new Unidade();
-            u.setCodigo(unidadeId);
+            u.setCodigo(1L);
 
-            when(unidadeService.buscarEntidadePorId(unidadeId)).thenReturn(u);
             when(alertaRepo.save(any())).thenReturn(new Alerta().setCodigo(100L));
 
             // When
             Alerta resultado = service.criarAlerta(
-                    p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc");
+                    p, TipoAlerta.CADASTRO_DISPONIBILIZADO, u, "desc");
 
             // Then
             assertThat(resultado).isNotNull();
             verify(alertaRepo).save(any());
-        }
-
-        @Test
-        @DisplayName("Deve lançar erro se unidade não existe")
-        void deveLancarErroSeUnidadeNaoExiste() {
-            // Given
-            Processo p = new Processo();
-            Long unidadeId = 999L;
-
-            when(unidadeService.buscarEntidadePorId(unidadeId)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade não encontrada"));
-
-            // When / Then
-            assertThatThrownBy(() ->
-                    service.criarAlerta(p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc"))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
 
@@ -93,18 +72,14 @@ class AlertaServiceTest {
             // Given
             Processo p = new Processo();
             p.setDescricao("Proc");
-            Long unidadeId = 1L;
             Unidade u = new Unidade();
-            u.setCodigo(unidadeId);
+            u.setCodigo(1L);
             u.setTipo(TipoUnidade.OPERACIONAL);
 
-            when(unidadeService.buscarEntidadesPorIds(any())).thenReturn(List.of(u));
-            // findById ainda é usado internamente pelo criarAlerta (chamado pelo criarAlertasProcessoIniciado)
-            when(unidadeService.buscarEntidadePorId(unidadeId)).thenReturn(u);
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
-            service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of());
+            service.criarAlertasProcessoIniciado(p, List.of(u));
 
             // Then
             verify(alertaRepo).save(argThat(a -> "Início do processo".equals(a.getDescricao())));
@@ -123,14 +98,10 @@ class AlertaServiceTest {
             filho.setCodigo(2L);
             filho.setUnidadeSuperior(root);
 
-            when(unidadeService.buscarEntidadesPorIds(any())).thenReturn(List.of(filho));
-            // Mocks para o criarAlerta interno
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(root);
-            when(unidadeService.buscarEntidadePorId(2L)).thenReturn(filho);
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
-            service.criarAlertasProcessoIniciado(p, List.of(2L), List.of());
+            service.criarAlertasProcessoIniciado(p, List.of(filho));
 
             // Then
             // 1 alerta operacional para o filho
@@ -147,16 +118,13 @@ class AlertaServiceTest {
         void deveCriarDoisAlertasInteroperacional() {
             // Given
             Processo p = new Processo();
-            Long unidadeId = 1L;
             Unidade u = Unidade.builder().tipo(TipoUnidade.INTEROPERACIONAL).build();
-            u.setCodigo(unidadeId);
+            u.setCodigo(1L);
 
-            when(unidadeService.buscarEntidadesPorIds(any())).thenReturn(List.of(u));
-            when(unidadeService.buscarEntidadePorId(unidadeId)).thenReturn(u);
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
-            List<Alerta> resultado = service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of());
+            List<Alerta> resultado = service.criarAlertasProcessoIniciado(p, List.of(u));
 
             // Then
             assertThat(resultado).hasSize(2);
@@ -173,17 +141,14 @@ class AlertaServiceTest {
             // Given
             Processo p = new Processo();
             p.setDescricao("P");
-            Long origem = 1L;
-            Long destino = 2L;
             Unidade uOrigem = new Unidade();
             uOrigem.setSigla("UO");
+            Unidade uDestino = new Unidade();
 
-            when(unidadeService.buscarEntidadePorId(origem)).thenReturn(uOrigem);
-            when(unidadeService.buscarEntidadePorId(destino)).thenReturn(new Unidade());
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
-            service.criarAlertaCadastroDisponibilizado(p, origem, destino);
+            service.criarAlertaCadastroDisponibilizado(p, uOrigem, uDestino);
 
             // Then
             verify(alertaRepo).save(any());
@@ -195,13 +160,12 @@ class AlertaServiceTest {
             // Given
             Processo p = new Processo();
             p.setDescricao("P");
-            Long destino = 1L;
+            Unidade uDestino = new Unidade();
 
-            when(unidadeService.buscarEntidadePorId(destino)).thenReturn(new Unidade());
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
-            service.criarAlertaCadastroDevolvido(p, destino, "motivo");
+            service.criarAlertaCadastroDevolvido(p, uDestino, "motivo");
 
             // Then
             verify(alertaRepo).save(any());

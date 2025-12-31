@@ -48,3 +48,6 @@ export const useFeedbackStore = defineStore('feedback', () => {
         close
     };
 });
+
+// Alias for compatibility if needed, or consumers should use useFeedbackStore
+export const useNotificacoesStore = useFeedbackStore;

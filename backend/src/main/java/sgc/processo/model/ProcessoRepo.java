@@ -20,6 +20,8 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
     @Query("SELECT DISTINCT p FROM Processo p LEFT JOIN FETCH p.participantes WHERE p.situacao = :situacao")
     List<Processo> findBySituacao(@Param("situacao") SituacaoProcesso situacao);
 
+    List<Processo> findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso situacao);
+
     Page<Processo> findDistinctByParticipantes_CodigoIn(List<Long> codigos, Pageable pageable);
 
     Page<Processo> findDistinctByParticipantes_CodigoInAndSituacaoNot(

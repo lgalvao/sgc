@@ -1,83 +1,82 @@
-import {mount} from "@vue/test-utils";
-import {BFormCheckbox} from "bootstrap-vue-next";
-import {describe, expect, it} from "vitest";
-import type {UnidadeSelecao} from "../ModalAcaoBloco.vue";
-import ModalAcaoBloco from "../ModalAcaoBloco.vue";
-import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import { mount } from '@vue/test-utils'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { createTestingPinia } from '@pinia/testing'
+import ModalAcaoBloco from '@/components/ModalAcaoBloco.vue'
+import { Modal } from 'bootstrap'
 
-describe("ModalAcaoBloco", () => {
-    const context = setupComponentTest();
+// Mock Bootstrap Modal
+vi.mock('bootstrap', () => ({
+  Modal: vi.fn(() => ({
+    show: vi.fn(),
+    hide: vi.fn(),
+  }))
+}))
 
-    const unidades: UnidadeSelecao[] = [
-        {
-            sigla: "U1",
-            nome: "Unidade 1",
-            situacao: "Pendente",
-            selecionada: false,
-        },
-        {sigla: "U2", nome: "Unidade 2", situacao: "Pendente", selecionada: true},
-    ];
+describe('ModalAcaoBloco.vue', () => {
+  const defaultProps = {
+    id: 'test-modal',
+    titulo: 'Teste',
+    texto: 'Texto teste',
+    rotuloBotao: 'Confirmar',
+    unidades: [
+      { codigo: 1, sigla: 'U1', nome: 'Unidade 1', situacao: 'Situação 1', selecionada: true },
+      { codigo: 2, sigla: 'U2', nome: 'Unidade 2', situacao: 'Situação 2', selecionada: true }
+    ],
+    unidadesPreSelecionadas: [1, 2]
+  }
 
-    const mountOptions = getCommonMountOptions();
-    mountOptions.global.components = {
-        BFormCheckbox,
-    };
+  it('renders correctly', () => {
+    const wrapper = mount(ModalAcaoBloco, {
+      props: defaultProps,
+      global: {
+        plugins: [createTestingPinia({ createSpy: vi.fn })]
+      }
+    })
+    expect(wrapper.find('.modal-title').text()).toBe('Teste')
+    expect(wrapper.find('.modal-body p').text()).toBe('Texto teste')
+    expect(wrapper.findAll('tbody tr')).toHaveLength(2)
+  })
 
-    it("não deve renderizar o modal quando mostrar for falso", () => {
-        context.wrapper = mount(ModalAcaoBloco, {
-            ...mountOptions,
-            props: {mostrar: false, tipo: "aceitar", unidades},
-        });
-        expect(context.wrapper.find(".table").exists()).toBe(false);
-    });
+  it('emits confirmar event with selected ids', async () => {
+    const wrapper = mount(ModalAcaoBloco, {
+      props: defaultProps,
+      global: {
+        plugins: [createTestingPinia({ createSpy: vi.fn })]
+      }
+    })
 
-    it('deve renderizar o título e o botão corretos para o tipo "aceitar"', () => {
-        context.wrapper = mount(ModalAcaoBloco, {
-            ...mountOptions,
-            props: {mostrar: true, tipo: "aceitar", unidades},
-        });
-        expect(context.wrapper.find(".btn-primary").text()).toContain("Aceitar");
-    });
+    await wrapper.find('button.btn-primary').trigger('click')
 
-    it('deve renderizar o título e o botão corretos para o tipo "homologar"', () => {
-        context.wrapper = mount(ModalAcaoBloco, {
-            ...mountOptions,
-            props: {mostrar: true, tipo: "homologar", unidades},
-        });
-        expect(context.wrapper.find(".btn-success").text()).toContain("Homologar");
-    });
+    expect(wrapper.emitted('confirmar')).toBeTruthy()
+    expect(wrapper.emitted('confirmar')![0][0]).toEqual({
+      ids: [1, 2],
+      dataLimite: undefined
+    })
+  })
 
-    it("deve renderizar a lista de unidades", () => {
-        context.wrapper = mount(ModalAcaoBloco, {
-            ...mountOptions,
-            props: {mostrar: true, tipo: "aceitar", unidades},
-        });
-        const rows = context.wrapper.findAll("tbody tr");
-        expect(rows.length).toBe(unidades.length);
-        expect(rows[0].text()).toContain("Unidade 1");
-        expect(rows[1].findComponent(BFormCheckbox).props().modelValue).toBe(true);
-    });
+  it('validates required date limit when configured', async () => {
+    const propsWithDate = { ...defaultProps, mostrarDataLimite: true }
+    const wrapper = mount(ModalAcaoBloco, {
+      props: propsWithDate,
+      global: {
+        plugins: [createTestingPinia({ createSpy: vi.fn })]
+      }
+    })
 
-    it('deve emitir "fechar" ao clicar no botão de cancelar', async () => {
-        context.wrapper = mount(ModalAcaoBloco, {
-            ...mountOptions,
-            props: {mostrar: true, tipo: "aceitar", unidades},
-        });
-        await context.wrapper.find(".btn-secondary").trigger("click");
-        expect(context.wrapper.emitted("fechar")).toBeTruthy();
-    });
+    // Try to confirm without date
+    await wrapper.find('button.btn-primary').trigger('click')
+    expect(wrapper.emitted('confirmar')).toBeFalsy()
+    expect(wrapper.text()).toContain('A data limite é obrigatória')
 
-    it('deve emitir "confirmar" com as unidades selecionadas', async () => {
-        context.wrapper = mount(ModalAcaoBloco, {
-            ...mountOptions,
-            props: {mostrar: true, tipo: "aceitar", unidades},
-        });
-        await context.wrapper.find(".btn-primary").trigger("click");
-        expect(context.wrapper.emitted("confirmar")).toBeTruthy();
-        const emittedUnidades = context.wrapper.emitted(
-            "confirmar",
-        )?.[0][0] as UnidadeSelecao[];
-        expect(emittedUnidades.length).toBe(unidades.length);
-        expect(emittedUnidades[1].selecionada).toBe(true);
-    });
-});
+    // Set date and confirm
+    const dateInput = wrapper.find('input[type="date"]')
+    await dateInput.setValue('2024-12-31')
+    await wrapper.find('button.btn-primary').trigger('click')
+
+    expect(wrapper.emitted('confirmar')).toBeTruthy()
+    expect(wrapper.emitted('confirmar')![0][0]).toEqual({
+      ids: [1, 2],
+      dataLimite: '2024-12-31'
+    })
+  })
+})

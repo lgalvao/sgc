@@ -107,7 +107,10 @@ public class EventoProcessoListener {
                 evento.getCodProcesso());
 
         // 1. Criar alertas diferenciados por tipo de unidade
-        List<Alerta> alertas = servicoAlertas.criarAlertasProcessoIniciado(processo, evento.getCodUnidades(), subprocessos);
+        List<Unidade> unidadesParticipantes = subprocessos.stream()
+                .map(Subprocesso::getUnidade)
+                .toList();
+        List<Alerta> alertas = servicoAlertas.criarAlertasProcessoIniciado(processo, unidadesParticipantes);
         log.debug("Criados {} alertas para o processo {}", alertas.size(), processo.getCodigo());
 
         // 2. Pré-carregar responsáveis e usuários para evitar N+1

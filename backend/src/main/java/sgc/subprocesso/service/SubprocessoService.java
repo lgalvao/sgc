@@ -34,6 +34,7 @@ import sgc.unidade.model.Unidade;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.alerta.AlertaService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,9 @@ public class SubprocessoService {
     private final SubprocessoPermissoesService subprocessoPermissoesService;
     private final SubprocessoDetalheMapper subprocessoDetalheMapper;
     private final MapaAjusteMapper mapaAjusteMapper;
+    private final AlertaService alertaService;
+    // SubprocessoEmailService is not injected to keep scope minimal and avoid potential circular dependencies if any,
+    // assuming alerts are the primary system notification for now.
 
     /**
      * Busca e retorna um subprocesso pelo seu código.
@@ -170,6 +174,36 @@ public class SubprocessoService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
                         "Subprocesso não encontrado para o mapa com código %d".formatted(codMapa))
                 );
+    }
+
+    @Transactional
+    public void alterarDataLimite(Long codSubprocesso, java.time.LocalDate novaDataLimite) {
+        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+
+        SituacaoSubprocesso s = sp.getSituacao();
+        int etapa = 1;
+
+        if (s.name().contains("CADASTRO")) {
+             sp.setDataLimiteEtapa1(novaDataLimite.atStartOfDay());
+             etapa = 1;
+        } else if (s.name().contains("MAPA")) {
+             sp.setDataLimiteEtapa2(novaDataLimite.atStartOfDay());
+             etapa = 2;
+        } else {
+             sp.setDataLimiteEtapa1(novaDataLimite.atStartOfDay());
+        }
+
+        repositorioSubprocesso.save(sp);
+
+        // Notificação e Alerta (CDU-27)
+        try {
+            String novaDataStr = novaDataLimite.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            if (sp.getUnidade() != null) {
+                alertaService.criarAlertaAlteracaoDataLimite(sp.getProcesso(), sp.getUnidade(), novaDataStr, etapa);
+            }
+        } catch (Exception e) {
+            log.error("Erro ao enviar notificações de alteração de prazo: {}", e.getMessage());
+        }
     }
 
     @Transactional(readOnly = true)

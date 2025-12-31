@@ -295,4 +295,30 @@ public class SubprocessoCadastroWorkflowService {
                                 new ErroEntidadeNaoEncontrada(
                                         "Subprocesso não encontrado: " + codSubprocesso));
     }
+
+    @Transactional
+    public void aceitarCadastroEmBloco(java.util.List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
+        unidadeCodigos.forEach(unidadeCodigo -> {
+            // Lógica para encontrar o subprocesso de cada unidade no contexto do mesmo processo
+            // Supondo que 'codSubprocessoBase' seja um dos subprocessos do processo ou que possamos buscar o subprocesso pelo processo e unidade.
+            // Para simplificar, vou assumir que precisamos buscar o subprocesso da unidade dentro do mesmo processo do subprocesso base.
+
+            Subprocesso base = buscarSubprocesso(codSubprocessoBase);
+            Subprocesso target = repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para unidade " + unidadeCodigo));
+
+            aceitarCadastro(target.getCodigo(), "De acordo com o cadastro de atividades da unidade (Em Bloco)", usuario);
+        });
+    }
+
+    @Transactional
+    public void homologarCadastroEmBloco(java.util.List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
+        unidadeCodigos.forEach(unidadeCodigo -> {
+            Subprocesso base = buscarSubprocesso(codSubprocessoBase);
+            Subprocesso target = repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para unidade " + unidadeCodigo));
+
+            homologarCadastro(target.getCodigo(), "Homologação em bloco", usuario);
+        });
+    }
 }

@@ -213,6 +213,22 @@ public class SubprocessoMapaController {
         return ResponseEntity.ok(mapa);
     }
 
+    /**
+     * Disponibiliza mapas de competências de múltiplas unidades em bloco.
+     * (CDU-24)
+     */
+    @PostMapping("/{codigo}/disponibilizar-mapa-bloco")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Disponibiliza mapas em bloco")
+    public void disponibilizarMapaEmBloco(@PathVariable Long codigo,
+                                          @RequestBody @Valid ProcessarEmBlocoRequest request,
+                                          @AuthenticationPrincipal Usuario usuario) {
+        DisponibilizarMapaRequest serviceRequest = DisponibilizarMapaRequest.builder()
+                .dataLimite(request.getDataLimite())
+                .build();
+        subprocessoMapaWorkflowService.disponibilizarMapaEmBloco(request.getUnidadeCodigos(), codigo, serviceRequest, usuario);
+    }
+
     @PostMapping("/{codigo}/competencias")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional

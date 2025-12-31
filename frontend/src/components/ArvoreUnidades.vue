@@ -21,23 +21,23 @@ import UnidadeTreeNode from "./UnidadeTreeNode.vue";
 
 interface Props {
   unidades: Unidade[];
-  modelValue: number[];
+  modelValue: number[]; // V-model: Lista de IDs selecionados
   filtrarPor?: (unidade: Unidade) => boolean;
   ocultarRaiz?: boolean;
+  modoSelecao?: boolean; // Novo prop para ativar/desativar checkboxes (default true)
 }
 
 const props = withDefaults(defineProps<Props>(), {
   filtrarPor: () => true,
   ocultarRaiz: true,
+  modoSelecao: true
 });
 
 const emit = defineEmits<(e: "update:modelValue", value: number[]) => void>();
 
-// Estado local sincronizado com props.modelValue
 const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
 
-// Mapas computados uma única vez para acesso O(1)
-// Bolt Optimization: Pre-calculate maps to avoid O(N^2) lookups during rendering
+// Mapas para acesso rápido (Pai e Unidade)
 const maps = computed(() => {
   const pMap = new Map<number, Unidade>();
   const uMap = new Map<number, Unidade>();
@@ -58,14 +58,12 @@ const maps = computed(() => {
 
 const parentMap = computed(() => maps.value.parentMap);
 
-// Filtrar unidades pela função customizada e ocultar Raiz se configurado
 const unidadesExibidas = computed(() => {
   const filtradas = props.unidades.filter(props.filtrarPor);
   const lista: Unidade[] = [];
 
   for (const u of filtradas) {
     if (props.ocultarRaiz) {
-      // Se ocultarRaiz for true, ignoramos o nó raiz e mostramos suas filhas
       if (u.filhas) lista.push(...u.filhas);
     } else {
       lista.push(u);
@@ -74,10 +72,6 @@ const unidadesExibidas = computed(() => {
   return lista;
 });
 
-
-
-// Obtém todas subunidades recursivamente (retorna objetos para evitar lookups)
-// Bolt Optimization: Return Unidade objects directly to avoid O(N) lookup for each child
 function getTodasSubunidades(unidade: Unidade): Unidade[] {
   const result: Unidade[] = [];
   if (unidade.filhas) {
@@ -91,59 +85,45 @@ function getTodasSubunidades(unidade: Unidade): Unidade[] {
   return result;
 }
 
-// Verifica se está marcada
 function isChecked(codigo: number): boolean {
+  if (!props.modoSelecao) return false;
   return unidadesSelecionadasLocal.value.includes(codigo);
 }
 
-// Verifica se unidade deve estar habilitada (recursivo)
-// Habilitado se: elegível OU tem pelo menos uma filha elegível
-// Bolt Optimization: This could be memoized, but relying on object identity is fast enough for now
 function isHabilitado(unidade: Unidade): boolean {
+  if (!props.modoSelecao) return false;
   if (unidade.isElegivel) return true;
-
   if (!unidade.filhas || unidade.filhas.length === 0) return false;
-
   return unidade.filhas.some(filha => isHabilitado(filha));
 }
 
-// Obtém estado de seleção (true, false ou 'indeterminate')
-// Baseado APENAS no modelValue - fonte única de verdade
 function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
+  if (!props.modoSelecao) return false;
+
   const selfSelected = isChecked(unidade.codigo);
 
-  // 1. Se não tem filhas, retorna se está no modelValue
   if (!unidade.filhas || unidade.filhas.length === 0) {
     return selfSelected;
   }
 
-  // 2. Conta descendentes ELEGÍVEIS
-  // Bolt Optimization: Access objects directly, avoid O(N) lookup
   const descendentesElegiveis = getTodasSubunidades(unidade).filter(desc => desc.isElegivel);
 
-  // 3. Se não tem descendentes elegíveis, retorna próprio estado
   if (descendentesElegiveis.length === 0) {
     return selfSelected;
   }
 
-  // 4. Conta quantas descendentes elegíveis estão no modelValue
   const descendentesSelecionadas = descendentesElegiveis.filter(desc =>
       isChecked(desc.codigo)
   ).length;
 
-  // 5. Todas descendentes selecionadas? → marcada
   if (descendentesSelecionadas === descendentesElegiveis.length) {
     return true;
   }
 
-  // 6. Nenhuma descendente selecionada? → desmarcada (ou marcada se INTEROPERACIONAL)
   if (descendentesSelecionadas === 0) {
-    // INTEROPERACIONAL pode estar marcada sozinha
     return unidade.tipo === "INTEROPERACIONAL" && selfSelected;
   }
 
-  // 7. Algumas descendentes selecionadas → indeterminada (ou marcada se INTEROPERACIONAL)
-  // INTEROPERACIONAL pode estar marcada mesmo sem todas filhas
   if (unidade.tipo === "INTEROPERACIONAL" && selfSelected) {
     return true;
   }
@@ -152,14 +132,12 @@ function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
 }
 
 function toggle(unidade: Unidade, checked: boolean) {
-  const newSelection = new Set(unidadesSelecionadasLocal.value);
+  if (!props.modoSelecao) return;
 
-  // 1. Handle Self and Descendants
-  // Bolt Optimization: Use already available object references
+  const newSelection = new Set(unidadesSelecionadasLocal.value);
   const unitsToToggle = [unidade, ...getTodasSubunidades(unidade)];
 
   if (checked) {
-    // Adiciona apenas unidades elegíveis (filtra INTERMEDIARIA automaticamente)
     unitsToToggle.forEach(u => {
       if (u.isElegivel) {
         newSelection.add(u.codigo);
@@ -169,9 +147,7 @@ function toggle(unidade: Unidade, checked: boolean) {
     unitsToToggle.forEach(u => newSelection.delete(u.codigo));
   }
 
-  // 2. Handle Ancestors (Upwards)
   updateAncestors(unidade, newSelection);
-
   unidadesSelecionadasLocal.value = Array.from(newSelection);
 }
 
@@ -185,14 +161,10 @@ function updateAncestors(node: Unidade, selectionSet: Set<number>) {
     const allChildrenSelected = children.every(child => selectionSet.has(child.codigo));
 
     if (allChildrenSelected) {
-      // Adiciona o pai se ele for elegível
-      // INTERMEDIARIA nunca é elegível, então nunca será adicionada aqui
       if (parent.isElegivel) {
         selectionSet.add(parent.codigo);
       }
     } else {
-      // Se não forem todas as filhas selecionadas, remove o pai
-      // EXCETO se o pai for INTEROPERACIONAL (regra especial)
       if (parent.tipo !== 'INTEROPERACIONAL') {
         selectionSet.delete(parent.codigo);
       }
@@ -204,7 +176,6 @@ function updateAncestors(node: Unidade, selectionSet: Set<number>) {
 watch(
     () => props.modelValue,
     (novoValor) => {
-      // Clone arrays before sorting to avoid mutating props or local state
       const sortedNew = [...novoValor].sort();
       const sortedLocal = [...unidadesSelecionadasLocal.value].sort();
 
@@ -215,12 +186,8 @@ watch(
     {deep: true},
 );
 
-// Estado de expansão das unidades
-// Inicializa com as raízes expandidas
-// Bolt Optimization: Calculate initial set in O(N) once
 const expandedUnits = ref<Set<number>>(new Set());
 
-// Initialize expanded units when units prop changes
 watch(() => props.unidades, (newUnidades) => {
    if (newUnidades && newUnidades.length > 0) {
        expandedUnits.value = new Set(newUnidades.map(u => u.codigo));
@@ -239,11 +206,9 @@ function toggleExpand(unidade: Unidade) {
   }
 }
 
-// Watch para emitir mudanças locais para o pai
 watch(
     unidadesSelecionadasLocal,
     (newValue) => {
-      // Só emite se for diferente do props (evita loop)
       if (JSON.stringify(newValue) !== JSON.stringify(props.modelValue)) {
         emit("update:modelValue", newValue);
       }
