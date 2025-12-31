@@ -36,12 +36,16 @@
 10. Caso positivo, o sistema atua, para cada unidade selecionada, da seguinte forma:
 
     10.1. O sistema registra a informação "Mapa disponibilizado em bloco" na observação de disponibilização do mapa do subprocesso e a informação do campo Data limite para a validação dos mapas de competências na data limite da etapa 2 do subprocesso da unidade.
+
     10.2. O sistema altera a situação do subprocesso da unidade para 'Mapa disponibilizado'.
+
     10.3. O sistema registra uma movimentação para o subprocesso com os campos:
+
         - `Data/hora`: Data/hora atual
         - `Unidade origem`: SEDOC
         - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
         - `Descrição`: 'Disponibilização do mapa de competências'
+
     10.4. O sistema notifica a unidade do subprocesso quanto à disponibilização, com e-mail no modelo abaixo:
 
     ```text
