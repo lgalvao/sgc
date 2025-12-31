@@ -19,7 +19,6 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.mapa.service.MapaService;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;

@@ -11,13 +11,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.test.util.ReflectionTestUtils;
 import sgc.notificacao.dto.EmailDto;
 import sgc.notificacao.model.Notificacao;
 import sgc.notificacao.model.NotificacaoRepo;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,16 +44,6 @@ class NotificacaoEmailServiceTest {
 
     @BeforeEach
     void setUp() {
-        // NotificacaoEmailService no longer has these fields, they moved to executor.
-        // But the service uses them only indirectly via executor.
-        // Wait, the service validation logic is still inside the service, but the sending logic is in executor.
-        // The test was testing full sending flow including properties injection.
-        // Now the service delegates to executor. We should mock the executor.
-
-        // ReflectionTestUtils.setField(notificacaoServico, "remetente", "test@sender.com");
-        // ReflectionTestUtils.setField(notificacaoServico, "nomeRemetente", "Test Sender");
-        // ReflectionTestUtils.setField(notificacaoServico, "prefixoAssunto", "[SGC]");
-
         JavaMailSenderImpl senderReal = new JavaMailSenderImpl();
         mimeMessageReal = senderReal.createMimeMessage();
     }

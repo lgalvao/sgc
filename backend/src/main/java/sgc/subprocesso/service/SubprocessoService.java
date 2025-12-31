@@ -9,7 +9,6 @@ import sgc.mapa.service.AtividadeService;
 import sgc.mapa.model.Conhecimento;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.erros.ErroNegocio;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.model.Mapa;

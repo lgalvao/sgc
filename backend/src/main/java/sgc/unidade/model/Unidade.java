@@ -5,8 +5,6 @@ import lombok.*;
 import org.hibernate.annotations.Immutable;
 import sgc.comum.model.EntidadeBase;
 import sgc.processo.model.Processo;
-import sgc.usuario.model.Usuario;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;

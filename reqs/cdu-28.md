@@ -20,10 +20,10 @@
 
 6. Sistema apresenta um modal com estes campos:
 
-   - Lista de servidores da unidade, pesquisavel
-   - Data de início 
-   - Data de término 
-   - Justificativa 
+   - Dropdown pesquisável `Servidores` com os nomes dos servidores da unidade
+   - `Data de início`
+   - `Data de término`
+   - `Justificativa`
    - Botões `Confirmar` e `Cancelar`
 
 7. ADMIN seleciona o servidor, define as datas e inclui uma justificativa. Todos os campos *são obrigatórios*.
@@ -32,9 +32,9 @@
 
 9. O sistema envia notificação por e-mail para o usuário que recebeu a atribuição temporária:
 
+   ```text
    Assunto: SGC: Atribuição de perfil CHEFE na unidade [SIGLA_UNIDADE]
 
-   ```text
    Prezado(a) [NOME_SERVIDOR],
 
    Foi registrada uma atribuição temporária de perfil de CHEFE para você na unidade [SIGLA_UNIDADE].

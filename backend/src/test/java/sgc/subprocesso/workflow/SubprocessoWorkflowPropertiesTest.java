@@ -6,12 +6,9 @@ import net.jqwik.api.stateful.ActionSequence;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import sgc.analise.AnaliseService;
-import sgc.analise.model.TipoAcaoAnalise;
-import sgc.analise.model.TipoAnalise;
 import sgc.fixture.MapaFixture;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.UnidadeFixture;
-import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.eventos.TipoTransicao;
@@ -23,7 +20,6 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.service.UnidadeService;
 import sgc.usuario.model.Usuario;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 

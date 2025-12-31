@@ -3,8 +3,6 @@ package sgc.seguranca;
 import net.jqwik.api.*;
 import net.jqwik.api.constraints.WithNull;
 
-import java.util.regex.Pattern;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SanitizacaoUtilPropertyTest {

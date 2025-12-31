@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.service.AtividadeService;
-import sgc.mapa.model.Conhecimento;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.service.CompetenciaService;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
@@ -20,7 +19,6 @@ import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.mapa.dto.AtividadeDto;
-import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.mapper.ConhecimentoMapper;
 

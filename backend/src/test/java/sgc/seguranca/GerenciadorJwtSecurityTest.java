@@ -2,11 +2,7 @@ package sgc.seguranca;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.core.env.Environment;
-import org.springframework.mock.env.MockEnvironment;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Teste de Verificação de Segurança do JWT")

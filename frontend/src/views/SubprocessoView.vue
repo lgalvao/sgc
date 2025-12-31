@@ -3,6 +3,9 @@
     <SubprocessoHeader
         v-if="subprocesso"
         :pode-alterar-data-limite="subprocesso.permissoes.podeAlterarDataLimite"
+        :pode-reabrir-cadastro="subprocesso.permissoes.podeReabrirCadastro"
+        :pode-reabrir-revisao="subprocesso.permissoes.podeReabrirRevisao"
+        :pode-enviar-lembrete="subprocesso.permissoes.podeEnviarLembrete"
         :processo-descricao="subprocesso.processoDescricao || ''"
         :responsavel-email="subprocesso.responsavel?.email || ''"
         :responsavel-nome="subprocesso.responsavel?.nome || ''"
@@ -14,6 +17,9 @@
         :unidade-nome="subprocesso.unidade.nome"
         :unidade-sigla="subprocesso.unidade.sigla"
         @alterar-data-limite="abrirModalAlterarDataLimite"
+        @reabrir-cadastro="abrirModalReabrirCadastro"
+        @reabrir-revisao="abrirModalReabrirRevisao"
+        @enviar-lembrete="confirmarEnviarLembrete"
     />
     <div v-else>
       <p>Unidade não encontrada.</p>
@@ -40,10 +46,37 @@
       @fechar-modal="fecharModalAlterarDataLimite"
       @confirmar-alteracao="confirmarAlteracaoDataLimite"
   />
+
+  <!-- Modal para reabrir cadastro/revisão -->
+  <BModal
+      v-model="mostrarModalReabrir"
+      :title="tipoReabertura === 'cadastro' ? 'Reabrir Cadastro' : 'Reabrir Revisão'"
+      centered
+      @ok="confirmarReabertura"
+  >
+    <p>Informe a justificativa para reabrir o {{ tipoReabertura === 'cadastro' ? 'cadastro' : 'revisão de cadastro' }}:</p>
+    <BFormTextarea
+        v-model="justificativaReabertura"
+        data-testid="inp-justificativa-reabrir"
+        placeholder="Justificativa obrigatória..."
+        rows="3"
+    />
+    <template #footer>
+      <BButton variant="secondary" @click="fecharModalReabrir">Cancelar</BButton>
+      <BButton 
+          :disabled="!justificativaReabertura.trim()"
+          data-testid="btn-confirmar-reabrir"
+          variant="warning" 
+          @click="confirmarReabertura"
+      >
+        Confirmar Reabertura
+      </BButton>
+    </template>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
-import {BContainer} from "bootstrap-vue-next";
+import {BButton, BContainer, BFormTextarea, BModal} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import SubprocessoCards from "@/components/SubprocessoCards.vue";
 import SubprocessoHeader from "@/components/SubprocessoHeader.vue";
@@ -51,6 +84,7 @@ import SubprocessoModal from "@/components/SubprocessoModal.vue";
 import TabelaMovimentacoes from "@/components/TabelaMovimentacoes.vue";
 import {useMapasStore} from "@/stores/mapas";
 import {useFeedbackStore} from "@/stores/feedback";
+import {reabrirCadastro, reabrirRevisaoCadastro, enviarLembrete} from "@/services/processoService";
 
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso,} from "@/types/tipos";
@@ -63,6 +97,9 @@ const mapaStore = useMapasStore();
 const feedbackStore = useFeedbackStore();
 
 const mostrarModalAlterarDataLimite = ref(false);
+const mostrarModalReabrir = ref(false);
+const tipoReabertura = ref<'cadastro' | 'revisao'>('cadastro');
+const justificativaReabertura = ref('');
 const codSubprocesso = ref<number | null>(null);
 
 const subprocesso = computed<SubprocessoDetalhe | null>(
@@ -122,6 +159,58 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
     feedbackStore.show("Data limite alterada", "A data limite foi alterada com sucesso!", "success");
   } catch {
     feedbackStore.show("Erro ao alterar data limite", "Não foi possível alterar a data limite.", "danger");
+  }
+}
+
+// CDU-32/33: Reabrir cadastro/revisão
+function abrirModalReabrirCadastro() {
+  tipoReabertura.value = 'cadastro';
+  justificativaReabertura.value = '';
+  mostrarModalReabrir.value = true;
+}
+
+function abrirModalReabrirRevisao() {
+  tipoReabertura.value = 'revisao';
+  justificativaReabertura.value = '';
+  mostrarModalReabrir.value = true;
+}
+
+function fecharModalReabrir() {
+  mostrarModalReabrir.value = false;
+  justificativaReabertura.value = '';
+}
+
+async function confirmarReabertura() {
+  if (!codSubprocesso.value || !justificativaReabertura.value.trim()) {
+    feedbackStore.show("Erro", "Justificativa é obrigatória.", "danger");
+    return;
+  }
+
+  try {
+    if (tipoReabertura.value === 'cadastro') {
+      await reabrirCadastro(codSubprocesso.value, justificativaReabertura.value);
+      feedbackStore.show("Cadastro reaberto", "O cadastro foi reaberto com sucesso.", "success");
+    } else {
+      await reabrirRevisaoCadastro(codSubprocesso.value, justificativaReabertura.value);
+      feedbackStore.show("Revisão reaberta", "A revisão de cadastro foi reaberta com sucesso.", "success");
+    }
+    fecharModalReabrir();
+    // Recarregar dados do subprocesso
+    await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
+  } catch {
+    feedbackStore.show("Erro", "Não foi possível reabrir. Tente novamente.", "danger");
+  }
+}
+
+// CDU-34: Enviar lembrete
+async function confirmarEnviarLembrete() {
+  if (!subprocesso.value) return;
+
+  try {
+    await enviarLembrete(props.codProcesso, subprocesso.value.unidade.codigo);
+    feedbackStore.show("Lembrete enviado", "O lembrete de prazo foi enviado com sucesso.", "success");
+  } catch {
+    feedbackStore.show("Erro", "Não foi possível enviar o lembrete.", "danger");
   }
 }
 </script>

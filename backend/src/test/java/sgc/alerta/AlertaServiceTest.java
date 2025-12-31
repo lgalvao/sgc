@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.dto.AlertaMapper;
 import sgc.alerta.model.*;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.model.Processo;
 import sgc.usuario.UsuarioService;
 import sgc.usuario.model.Usuario;

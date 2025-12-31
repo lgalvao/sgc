@@ -18,4 +18,7 @@ public class SubprocessoPermissoesDto {
     private final boolean podeAlterarDataLimite;
     private final boolean podeVisualizarImpacto;
     private final boolean podeRealizarAutoavaliacao;
+    private final boolean podeReabrirCadastro;
+    private final boolean podeReabrirRevisao;
+    private final boolean podeEnviarLembrete;
 }

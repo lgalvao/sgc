@@ -280,6 +280,10 @@ export interface SubprocessoPermissoes {
     podeVisualizarDiagnostico: boolean;
     podeAlterarDataLimite: boolean;
     podeVisualizarImpacto: boolean;
+    podeRealizarAutoavaliacao?: boolean;
+    podeReabrirCadastro?: boolean;
+    podeReabrirRevisao?: boolean;
+    podeEnviarLembrete?: boolean;
 }
 
 export interface SubprocessoDetalhe {
@@ -389,23 +393,6 @@ export interface SubprocessoElegivel {
     situacao: SituacaoSubprocesso;
 }
 
-
-
-/**
- * Permissões do usuário para um subprocesso.
- */
-export interface SubprocessoPermissoes {
-    podeVerPagina: boolean;
-    podeEditarMapa: boolean;
-    podeVisualizarMapa: boolean;
-    podeDisponibilizarCadastro: boolean; // Confirmação de disponibilidade
-    podeDevolverCadastro: boolean;
-    podeAceitarCadastro: boolean;
-    podeVisualizarDiagnostico: boolean;
-    podeAlterarDataLimite: boolean;
-    podeVisualizarImpacto: boolean;
-    podeRealizarAutoavaliacao: boolean;
-}
 
 export interface ErroValidacao {
     tipo: string;

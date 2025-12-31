@@ -120,3 +120,27 @@ export async function buscarContextoCompleto(codProcesso: number) {
     const response = await apiClient.get(`/processos/${codProcesso}/contexto-completo`);
     return response.data;
 }
+
+// CDU-32: Reabrir cadastro
+export async function reabrirCadastro(
+    codSubprocesso: number,
+    justificativa: string,
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/reabrir-cadastro`, { justificativa });
+}
+
+// CDU-33: Reabrir revisão de cadastro
+export async function reabrirRevisaoCadastro(
+    codSubprocesso: number,
+    justificativa: string,
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/reabrir-revisao-cadastro`, { justificativa });
+}
+
+// CDU-34: Enviar lembrete de prazo
+export async function enviarLembrete(
+    codProcesso: number,
+    unidadeCodigo: number,
+): Promise<void> {
+    await apiClient.post(`/processos/${codProcesso}/enviar-lembrete`, { unidadeCodigo });
+}

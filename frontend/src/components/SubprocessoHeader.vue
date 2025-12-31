@@ -43,18 +43,49 @@
         </p>
       </template>
 
-      <!-- Botão para alterar data limite -->
-      <div
-          v-if="podeAlterarDataLimite"
-          class="mt-3"
-      >
+      <!-- Botões de ação -->
+      <div class="mt-3 d-flex gap-2 flex-wrap">
+        <!-- Botão para alterar data limite -->
         <BButton
+            v-if="podeAlterarDataLimite"
             data-testid="btn-alterar-data-limite"
             variant="outline-primary"
             @click="handleAlterarDataLimite"
         >
           <i class="bi bi-calendar me-1"/>
           Alterar data limite
+        </BButton>
+
+        <!-- CDU-32/33: Botão para reabrir cadastro/revisão -->
+        <BButton
+            v-if="podeReabrirCadastro"
+            data-testid="btn-reabrir-cadastro"
+            variant="outline-warning"
+            @click="handleReabrirCadastro"
+        >
+          <i class="bi bi-arrow-counterclockwise me-1"/>
+          Reabrir Cadastro
+        </BButton>
+
+        <BButton
+            v-if="podeReabrirRevisao"
+            data-testid="btn-reabrir-revisao"
+            variant="outline-warning"
+            @click="handleReabrirRevisao"
+        >
+          <i class="bi bi-arrow-counterclockwise me-1"/>
+          Reabrir Revisão
+        </BButton>
+
+        <!-- CDU-34: Botão para enviar lembrete -->
+        <BButton
+            v-if="podeEnviarLembrete"
+            data-testid="btn-enviar-lembrete"
+            variant="outline-info"
+            @click="handleEnviarLembrete"
+        >
+          <i class="bi bi-bell me-1"/>
+          Enviar Lembrete
         </BButton>
       </div>
     </BCardBody>
@@ -76,15 +107,34 @@ interface Props {
   responsavelRamal?: string;
   responsavelEmail?: string;
   podeAlterarDataLimite: boolean;
+  podeReabrirCadastro?: boolean;
+  podeReabrirRevisao?: boolean;
+  podeEnviarLembrete?: boolean;
 }
 
 defineProps<Props>();
 
 const emit = defineEmits({
   alterarDataLimite: null,
+  reabrirCadastro: null,
+  reabrirRevisao: null,
+  enviarLembrete: null,
 });
 
 const handleAlterarDataLimite = () => {
   emit("alterarDataLimite");
 };
+
+const handleReabrirCadastro = () => {
+  emit("reabrirCadastro");
+};
+
+const handleReabrirRevisao = () => {
+  emit("reabrirRevisao");
+};
+
+const handleEnviarLembrete = () => {
+  emit("enviarLembrete");
+};
+</script>
 </script>

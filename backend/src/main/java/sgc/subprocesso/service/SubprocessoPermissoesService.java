@@ -140,6 +140,9 @@ public class SubprocessoPermissoesService {
                 .podeRealizarAutoavaliacao(acessoEdicao && DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO == sp.getSituacao())
                 .podeAlterarDataLimite(isAdmin)
                 .podeVisualizarImpacto(podeVisualizarImpacto)
+                .podeReabrirCadastro(isAdmin)
+                .podeReabrirRevisao(isAdmin)
+                .podeEnviarLembrete(isAdmin)
                 .build();
     }
 

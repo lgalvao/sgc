@@ -3,9 +3,11 @@
 **Ator:** ADMIN
 
 ## Descrição
+
 Permite o gerenciamento dos usuários que possuem perfil de administrador no sistema.
 
 ## Regras de Negócio
+
 - Apenas usuários cadastrados no sgrh podem ser tornados administradores.
 - Um administrador não pode remover o seu próprio acesso de administrador.
 

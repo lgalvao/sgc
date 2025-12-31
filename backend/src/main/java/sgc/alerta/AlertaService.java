@@ -12,7 +12,6 @@ import sgc.alerta.model.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.model.Processo;
 import sgc.usuario.model.Usuario;
-import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
 import sgc.usuario.UsuarioService;

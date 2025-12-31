@@ -2,16 +2,6 @@
 
 **Ator:** ADMIN
 
-## Descrição
-Se durante as etapas de criação e de validação do mapa de competências, alguma unidade indicar a necessidade tardia de ajuste no cadastro de atividades e conhecimentos, a SEDOC poderá, mediante solicitação da unidade em questão, retorná-la para a etapa de cadastro a fim de que a mesma possa realizar as alterações necessárias.
-
-## Regras de Negócio
-
-- A reabertura do cadastro de atividades e conhecimentos da unidade será notificada para todas unidades hierarquicamente superiores.
-- Após os ajustes realizados, o cadastro de atividades e conhecimentos da unidade precisará passar por nova análise por todas as unidades superiores na hierarquia.
-- A ação altera a situação do subprocesso para "MAPEAMENTO_CADASTRO_EM_ANDAMENTO".
-- Esta ação só pode ser realizada se o subprocesso estiver em uma etapa posterior ao cadastro inicial, mas ainda dentro do processo de Mapeamento.
-
 ## Fluxo principal
 
 1. O usuário (Administrador) acessa o Painel de Controle ou a lista de subprocessos.

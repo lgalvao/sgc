@@ -38,8 +38,28 @@
         - `Data/hora`: [Data/hora atual]
         - `Unidade origem`: "SEDOC"
         - `Unidade destino`: "SEDOC"
-        - `Descrição`: "Cadastro de atividades e conhecimentos homologado"
+        - `Descrição`: "Mapa de competências homologado"
 
-   9.2. O sistema altera a situação do subprocesso da unidade para 'Cadastro homologado'.
+   9.2. O sistema altera a situação do subprocesso da unidade para 'Mapa homologado'.
 
-10. O sistema mostra mensagem de confirmação: "Cadastros homologados em bloco" e redireciona para o Painel.
+   9.3. O sistema cria internamente um alerta:
+
+        - `Descrição`: "Mapa de competências da unidade [SIGLA_UNIDADE_SUBPROCESSO] homologado"
+        - `Processo`: [DESCRIÇÃO_PROCESSO]
+        - `Data/hora`: [Data/hora atual]
+        - `Unidade de origem`: SEDOC
+        - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+
+   9.4. O sistema envia notificação por e-mail para a unidade do subprocesso:
+
+    ```text
+    Assunto: SGC: Mapa de competências homologado
+
+    Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
+
+    O mapa de competências da sua unidade foi homologado no processo [DESCRIÇÃO_PROCESSO].
+
+    Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
+    ```
+
+10. O sistema mostra mensagem de confirmação: "Mapas de competências homologados em bloco" e redireciona para o Painel.
