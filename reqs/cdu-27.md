@@ -22,11 +22,12 @@
 
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
 
-    A data limite da etapa atual no processo [DESCRICAO_PROCESSO] foi alterada para [DATA_LIMITE].
+    A data limite da etapa atual no processo [DESCRICAO_PROCESSO] foi alterada para [NOVA_DATA_LIMITE].
     ```
 
 8. Sistema cria internamente um alerta com as seguintes informações:
-   - `Descrição`: "Data limite da etapa [NÚMERO_ETAPA] alterada para [DATA_LIMITE]"
+
+   - `Descrição`: "Data limite da etapa [NÚMERO_ETAPA] alterada para [NOVA_DATA_LIMITE]"
    - `Processo`: [DESCRICAO_PROCESSO]
    - `Data/hora`: Data/hora atual
    - `Unidade de origem`: 'SEDOC'
