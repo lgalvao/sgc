@@ -21,8 +21,8 @@
 
 5. O sistema abre modal de confirmação, com os elementos a seguir:
    - Título "Aceite de cadastro em bloco";
-   - Texto "Selecione abaixo as unidades cujos cadastros deverão ser aceitos:";
-   - Lista das unidades operacionais ou interoperacionais subordinadas cujos cadastros poderão ser aceitos, sendo apresentados, para cada unidade, um checkbox (selecionado por padrão), a sigla e o nome; e
+   - Texto "Selecione as unidades cujos cadastros deverão ser aceitos:
+   - Lista das unidades operacionais ou interoperacionais subordinadas, cujos cadastros poderão ser aceitos, sendo apresentados, para cada unidade, um checkbox (selecionado por padrão), a sigla e o nome
    - Botões `Cancelar` e `Registrar aceite`.
 
 6. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do processo.
@@ -32,21 +32,18 @@
 8. O sistema atua, para cada unidade selecionada, da seguinte forma:
 
    8.1. O sistema registra uma análise de cadastro para o subprocesso:
-
         - `Data/hora`: [Data/hora atual]
         - `Unidade`: [SIGLA_UNIDADE_ATUAL]
         - `Resultado`: "Aceite"
         - `Observação`: "De acordo com o cadastro de atividades da unidade"
 
    8.2. O sistema registra uma movimentação para o subprocesso:
-
         - `Data/hora`: [Data/hora atual]
         - `Unidade origem`: [SIGLA_UNIDADE_ATUAL]
         - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
         - `Descrição`: "Cadastro de atividades e conhecimentos aceito"
 
    8.3. O sistema cria internamente um alerta:
-
         - `Descrição`: "Cadastro de atividades da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
         - `Processo`: [DESCRIÇÃO_PROCESSO]
         - `Data/hora`: [Data/hora atual]
