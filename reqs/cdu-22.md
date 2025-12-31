@@ -20,7 +20,6 @@
 4. O usuário clica no botão `Aceitar cadastro em bloco`.
 
 5. O sistema abre modal de confirmação, com os elementos a seguir:
-
    - Título "Aceite de cadastro em bloco";
    - Texto "Selecione abaixo as unidades cujos cadastros deverão ser aceitos:";
    - Lista das unidades operacionais ou interoperacionais subordinadas cujos cadastros poderão ser aceitos, sendo apresentados, para cada unidade, um checkbox (selecionado por padrão), a sigla e o nome; e
