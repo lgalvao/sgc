@@ -16,9 +16,9 @@
 
 4. Sistema mostra a pagina `Detalhes da unidade` 
 
-3. ADMIN clica no botão `Criar atribuição`.
+5. ADMIN clica no botão `Criar atribuição`.
 
-4. Sistema apresenta um modal com estes campos:
+6. Sistema apresenta um modal com estes campos:
 
    - Lista de servidores da unidade, pesquisavel
    - Data de início 
@@ -26,10 +26,30 @@
    - Justificativa 
    - Botões `Confirmar` e `Cancelar`
 
-5. ADMIN seleciona o servidor, define as datas e inclui uma justificativa. Todos os campos *são obrigatórios*.
+7. ADMIN seleciona o servidor, define as datas e inclui uma justificativa. Todos os campos *são obrigatórios*.
 
-6. Sistema registra internamente a atribuição temporária e mostra uma confirmação "Atribuição criada".
+8. Sistema registra internamente a atribuição temporária e mostra uma confirmação "Atribuição criada".
 
-7. Sistema cria internamente alerta e dispara uma notificacao. // TODO detalhar.
+9. O sistema envia notificação por e-mail para o usuário que recebeu a atribuição temporária:
 
-8. O usuário que recebe a atribuição temporária passa a ter os mesmos direitos do perfil CHEFE. A atribuição temporária terá prioridade sobre os dados de titularidade lidos do SGRH (atraves das views).
+   Assunto: SGC: Atribuição de perfil CHEFE na unidade [SIGLA_UNIDADE]
+
+   ```text
+   Prezado(a) [NOME_SERVIDOR],
+
+   Foi registrada uma atribuição temporária de perfil de CHEFE para você na unidade [SIGLA_UNIDADE].
+   Período: [DATA_INICIO] a [DATA_TERMINO].
+   Justificativa: [JUSTIFICATIVA].
+
+   Acesse o sistema em: [URL_SISTEMA].
+   ```
+
+10. O sistema cria internamente um alerta para o usuário:
+
+    - `Descrição`: "Atribuição temporária de perfil de CHEFE na unidade [SIGLA_UNIDADE]"
+    - `Processo`: (Vazio)
+    - `Data/hora`: Data/hora atual
+    - `Unidade de origem`: SEDOC
+    - `Usuário destino`: [USUARIO_SERVIDOR]
+
+11. O usuário que recebe a atribuição temporária passa a ter os mesmos direitos do perfil CHEFE. A atribuição temporária terá prioridade sobre os dados de titularidade lidos do SGRH (atraves das views).
