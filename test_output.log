@@ -1,26 +1,19 @@
-Downloading https://services.gradle.org/distributions/gradle-9.2.1-bin.zip
-............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
+Reusing configuration cache.
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
 
-Welcome to Gradle 9.2.1!
-
-Here are the highlights of this release:
- - Windows ARM support
- - Improved publishing APIs
- - Better guidance for dependency verification failures
-
-For more details see https://docs.gradle.org/9.2.1/release-notes.html
-
-Starting a Gradle Daemon (subsequent builds will be faster)
-Calculating task graph as no cached configuration is available for tasks: :backend:test --tests sgc.integracao.CDU22IntegrationTest --tests sgc.integracao.CDU23IntegrationTest --tests sgc.integracao.CDU24IntegrationTest --tests sgc.integracao.CDU25IntegrationTest --tests sgc.integracao.CDU26IntegrationTest
-> Task :backend:processResources
-> Task :backend:processTestResources
-> Task :backend:compileJava
-> Task :backend:classes
 > Task :backend:compileTestJava
+Note: /app/backend/src/test/java/sgc/integracao/CDU28IntegrationTest.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
 > Task :backend:testClasses
 > Task :backend:test
 > Task :backend:jacocoTestReport
 
-BUILD SUCCESSFUL in 3m 5s
-6 actionable tasks: 6 executed
-Configuration cache entry stored.
+[Incubating] Problems report is available at: file:///app/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 1m 48s
+6 actionable tasks: 3 executed, 3 up-to-date
+Configuration cache entry reused.

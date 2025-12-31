@@ -54,6 +54,7 @@ public class ProcessoService {
     private final SubprocessoMapper subprocessoMapper;
     private final UsuarioService usuarioService;
     private final ProcessoInicializador processoInicializador;
+    private final sgc.alerta.AlertaService alertaService;
 
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
         if (authentication == null || !authentication.isAuthenticated() || authentication.getName() == null) {
@@ -330,6 +331,25 @@ public class ProcessoService {
                 new EventoProcessoFinalizado(processo.getCodigo(), LocalDateTime.now()));
 
         log.info("Processo {} finalizado", codigo);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public void enviarLembrete(Long codProcesso, Long unidadeCodigo) {
+        Processo processo = buscarEntidadePorId(codProcesso);
+        Unidade unidade = unidadeService.buscarEntidadePorId(unidadeCodigo);
+
+        // Verifica se unidade participa do processo
+        if (processo.getParticipantes().stream().noneMatch(u -> u.getCodigo().equals(unidadeCodigo))) {
+            throw new ErroProcesso("Unidade não participa deste processo.");
+        }
+
+        // Enviar alerta (CDU-34)
+        String dataLimite = processo.getDataLimite().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String descricao = "Lembrete: Prazo do processo %s encerra em %s"
+                .formatted(processo.getDescricao(), dataLimite);
+
+        alertaService.criarAlerta(processo, sgc.alerta.model.TipoAlerta.PRAZO_EXPIRANDO, unidade, descricao);
     }
 
     // ========== MÉTODOS PRIVADOS DE VALIDAÇÃO (usados apenas em criar/atualizar) ==========

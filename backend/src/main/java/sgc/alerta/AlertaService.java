@@ -267,4 +267,48 @@ public class AlertaService {
                 .findById(new AlertaUsuario.Chave(codigoAlerta, usuarioTitulo))
                 .map(AlertaUsuario::getDataHoraLeitura);
     }
+
+    @Transactional
+    public void criarAlertaReaberturaCadastro(Processo processo, Unidade unidade, String justificativa) {
+        Alerta alerta = new Alerta()
+                .setProcesso(processo)
+                .setDataHora(LocalDateTime.now())
+                .setUnidadeOrigem(null) // SEDOC
+                .setUnidadeDestino(unidade)
+                .setDescricao("Cadastro de atividades reaberto pela SEDOC");
+        repositorioAlerta.save(alerta);
+    }
+
+    @Transactional
+    public void criarAlertaReaberturaCadastroSuperior(Processo processo, Unidade superior, Unidade subordinada, String justificativa) {
+        Alerta alerta = new Alerta()
+                .setProcesso(processo)
+                .setDataHora(LocalDateTime.now())
+                .setUnidadeOrigem(null) // SEDOC
+                .setUnidadeDestino(superior)
+                .setDescricao("Cadastro da unidade %s reaberto pela SEDOC".formatted(subordinada.getSigla()));
+        repositorioAlerta.save(alerta);
+    }
+
+    @Transactional
+    public void criarAlertaReaberturaRevisao(Processo processo, Unidade unidade, String justificativa) {
+        Alerta alerta = new Alerta()
+                .setProcesso(processo)
+                .setDataHora(LocalDateTime.now())
+                .setUnidadeOrigem(null) // SEDOC
+                .setUnidadeDestino(unidade)
+                .setDescricao("Revisão de cadastro reaberta pela SEDOC");
+        repositorioAlerta.save(alerta);
+    }
+
+    @Transactional
+    public void criarAlertaReaberturaRevisaoSuperior(Processo processo, Unidade superior, Unidade subordinada, String justificativa) {
+        Alerta alerta = new Alerta()
+                .setProcesso(processo)
+                .setDataHora(LocalDateTime.now())
+                .setUnidadeOrigem(null) // SEDOC
+                .setUnidadeDestino(superior)
+                .setDescricao("Revisão de cadastro da unidade %s reaberta pela SEDOC".formatted(subordinada.getSigla()));
+        repositorioAlerta.save(alerta);
+    }
 }

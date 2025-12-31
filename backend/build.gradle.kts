@@ -51,6 +51,9 @@ dependencies {
     annotationProcessor("org.mapstruct:mapstruct-processor:${property("mapstruct.version")}")
     annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 
+    // Relatórios
+    implementation("com.github.librepdf:openpdf:1.3.30")
+
     // Segurança
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
     implementation("io.jsonwebtoken:jjwt-api:${property("jjwt.version")}")

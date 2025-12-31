@@ -47,7 +47,7 @@ class ProcessoServicePropertyTest {
         // JQwik não injeta automaticamente mocks a cada sample.
         // Solução: Configurar o mock DENTRO do método da propriedade.
         ProcessoRepo mockRepo = org.mockito.Mockito.mock(ProcessoRepo.class);
-        ProcessoService service = new ProcessoService(mockRepo, null, null, null, null, null, null, null, null);
+        ProcessoService service = new ProcessoService(mockRepo, null, null, null, null, null, null, null, null, null);
 
         when(mockRepo.findById(anyLong())).thenReturn(Optional.of(processoSimulado));
 

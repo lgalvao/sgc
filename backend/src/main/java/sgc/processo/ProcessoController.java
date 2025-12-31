@@ -10,6 +10,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.dto.*;
 import sgc.processo.service.ProcessoService;
 import sgc.subprocesso.dto.SubprocessoDto;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.net.URI;
 import java.util.List;
@@ -234,5 +235,18 @@ public class ProcessoController {
     public ResponseEntity<List<SubprocessoDto>> listarSubprocessos(@PathVariable Long codigo) {
         List<SubprocessoDto> subprocessos = processoService.listarTodosSubprocessos(codigo);
         return ResponseEntity.ok(subprocessos);
+    }
+
+    /**
+     * Envia um lembrete de prazo para uma unidade.
+     * (CDU-34)
+     */
+    @PostMapping("/{codigo}/enviar-lembrete")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Envia lembrete de prazo para unidade")
+    public void enviarLembrete(
+            @PathVariable Long codigo,
+            @RequestBody @Valid EnviarLembreteReq request) {
+        processoService.enviarLembrete(codigo, request.getUnidadeCodigo());
     }
 }

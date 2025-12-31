@@ -57,6 +57,7 @@ public class SubprocessoService {
     private final AnaliseService analiseService;
     private final ConhecimentoMapper conhecimentoMapper;
     private final UsuarioService usuarioService;
+    private final sgc.unidade.service.UnidadeService unidadeService;
     private final SubprocessoPermissoesService subprocessoPermissoesService;
     private final SubprocessoDetalheMapper subprocessoDetalheMapper;
     private final MapaAjusteMapper mapaAjusteMapper;
@@ -627,5 +628,85 @@ public class SubprocessoService {
      */
     public List<Subprocesso> listarSubprocessosHomologados() {
         return repositorioSubprocesso.findBySituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+    }
+
+    @Transactional
+    public void reabrirCadastro(Long codigo, String justificativa) {
+        Subprocesso sp = buscarSubprocesso(codigo);
+
+        // Validação de estado: deve ser posterior a cadastro inicial mas dentro de mapeamento
+        if (sp.getProcesso().getTipo() != TipoProcesso.MAPEAMENTO) {
+            throw new ErroValidacao("Reabertura de cadastro permitida apenas para processos de Mapeamento.", Map.of());
+        }
+
+        // Permitir reabertura se estiver em qualquer estado posterior ao envio para análise
+        // Ex: DISPONIBILIZADO, HOMOLOGADO, MAPA_CRIADO, etc.
+        if (sp.getSituacao().ordinal() <= SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.ordinal()) {
+            throw new ErroValidacao("Subprocesso ainda está em fase de cadastro.", Map.of());
+        }
+
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setDataFimEtapa1(null); // Reabre etapa 1
+        repositorioSubprocesso.save(sp);
+
+        // Movimentação
+        Unidade sedoc = unidadeService.buscarEntidadePorSigla("SEDOC");
+        Movimentacao mov = new Movimentacao();
+        mov.setSubprocesso(sp);
+        mov.setDataHora(java.time.LocalDateTime.now());
+        mov.setUnidadeOrigem(sedoc);
+        mov.setUnidadeDestino(sp.getUnidade());
+        mov.setDescricao("Reabertura de cadastro");
+        repositorioMovimentacao.save(mov);
+
+        // Notificações e Alertas (CDU-32)
+        try {
+            alertaService.criarAlertaReaberturaCadastro(sp.getProcesso(), sp.getUnidade(), justificativa);
+            // Notificar superiores
+            Unidade superior = sp.getUnidade().getUnidadeSuperior();
+            while (superior != null) {
+                alertaService.criarAlertaReaberturaCadastroSuperior(sp.getProcesso(), superior, sp.getUnidade(), justificativa);
+                superior = superior.getUnidadeSuperior();
+            }
+        } catch (Exception e) {
+            log.error("Erro ao enviar notificações de reabertura: {}", e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void reabrirRevisaoCadastro(Long codigo, String justificativa) {
+        Subprocesso sp = buscarSubprocesso(codigo);
+
+        if (sp.getProcesso().getTipo() != TipoProcesso.REVISAO) {
+            throw new ErroValidacao("Reabertura de revisão permitida apenas para processos de Revisão.", Map.of());
+        }
+
+        if (sp.getSituacao().ordinal() <= SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO.ordinal()) {
+            throw new ErroValidacao("Subprocesso ainda está em fase de revisão.", Map.of());
+        }
+
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        sp.setDataFimEtapa1(null);
+        repositorioSubprocesso.save(sp);
+
+        Unidade sedoc = unidadeService.buscarEntidadePorSigla("SEDOC");
+        Movimentacao mov = new Movimentacao();
+        mov.setSubprocesso(sp);
+        mov.setDataHora(java.time.LocalDateTime.now());
+        mov.setUnidadeOrigem(sedoc);
+        mov.setUnidadeDestino(sp.getUnidade());
+        mov.setDescricao("Reabertura de revisão de cadastro");
+        repositorioMovimentacao.save(mov);
+
+        try {
+            alertaService.criarAlertaReaberturaRevisao(sp.getProcesso(), sp.getUnidade(), justificativa);
+             Unidade superior = sp.getUnidade().getUnidadeSuperior();
+            while (superior != null) {
+                alertaService.criarAlertaReaberturaRevisaoSuperior(sp.getProcesso(), superior, sp.getUnidade(), justificativa);
+                superior = superior.getUnidadeSuperior();
+            }
+        } catch (Exception e) {
+            log.error("Erro ao enviar notificações de reabertura revisão: {}", e.getMessage());
+        }
     }
 }
