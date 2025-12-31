@@ -7,8 +7,7 @@ import sgc.seguranca.LimitadorTentativasLogin.ErroMuitasTentativas;
 
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -85,5 +84,26 @@ class LimitadorTentativasLoginTest {
         IntStream.range(0, 10).forEach(i ->
             assertDoesNotThrow(() -> limitador.verificar(ip))
         );
+    }
+
+    @Test
+    void deveLimparCacheAoAtingirLimiteMaximoEntradas() {
+        // Configura um limitador com cache pequeno (100 entradas) para teste rápido
+        int limiteTeste = 100;
+        LimitadorTentativasLogin limitadorTeste = new LimitadorTentativasLogin(environment, limiteTeste);
+
+        // Adiciona entradas únicas até o limite
+        for (int i = 0; i < limiteTeste; i++) {
+            limitadorTeste.verificar("10.0.0." + i);
+        }
+
+        // Verifica se atingiu o limite
+        assertEquals(limiteTeste, limitadorTeste.getCacheSize());
+
+        // Adiciona mais uma entrada, deve acionar a limpeza
+        limitadorTeste.verificar("10.0.0." + limiteTeste);
+
+        // O tamanho deve ter resetado (agora tem 1, o último adicionado)
+        assertEquals(1, limitadorTeste.getCacheSize());
     }
 }

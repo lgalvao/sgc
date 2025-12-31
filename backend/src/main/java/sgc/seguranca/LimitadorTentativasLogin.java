@@ -1,5 +1,6 @@
 package sgc.seguranca;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -14,23 +15,51 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Component
+@Slf4j
 public class LimitadorTentativasLogin {
 
     private final Environment environment;
 
-    // Máximo de tentativas permitidas
+    // Máximo de tentativas permitidas por IP
     private static final int MAX_TENTATIVAS = 5;
     // Janela de tempo em minutos
     private static final int JANELA_MINUTOS = 1;
 
+    // Limite padrão de entradas no cache
+    // Ajustado para 1000 considerando a base de usuários (algumas centenas)
+    private static final int DEFAULT_MAX_CACHE_ENTRIES = 1000;
+
+    private final int maxCacheEntries;
+
     private final Map<String, Deque<LocalDateTime>> tentativasPorIp = new ConcurrentHashMap<>();
 
     public LimitadorTentativasLogin(Environment environment) {
+        this(environment, DEFAULT_MAX_CACHE_ENTRIES);
+    }
+
+    // Construtor para testes permitindo configurar o limite
+    LimitadorTentativasLogin(Environment environment, int maxCacheEntries) {
         this.environment = environment;
+        this.maxCacheEntries = maxCacheEntries;
     }
 
     public void verificar(String ip) {
         if (ip == null || isPerfilTesteAtivo()) return;
+
+        // Proteção contra DoS: Se o mapa estiver muito cheio, limpa tudo.
+        // É uma medida de emergência para evitar OutOfMemoryError.
+        if (tentativasPorIp.size() >= maxCacheEntries) {
+             // Tenta limpar entradas antigas primeiro
+             limparCachePeriodico();
+
+             // Se ainda estiver cheio (ataque ativo ou tráfego muito alto), reseta o cache.
+             // Fail-open para rate limiting é preferível a travar o servidor.
+             if (tentativasPorIp.size() >= maxCacheEntries) {
+                 log.warn("🛡️ Sentinel: Cache de limitador de login atingiu {} entradas. " +
+                         "Limpando cache para prevenir exaustão de memória.", tentativasPorIp.size());
+                 tentativasPorIp.clear();
+             }
+        }
 
         limparTentativasAntigas(ip);
 
@@ -83,6 +112,11 @@ public class LimitadorTentativasLogin {
             // Se ficou vazio, remove a entrada do mapa
             return tentativas.isEmpty();
         });
+    }
+
+    // Método para teste
+    int getCacheSize() {
+        return tentativasPorIp.size();
     }
 
     public static class ErroMuitasTentativas extends ErroNegocioBase {
