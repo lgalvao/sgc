@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static sgc.processo.model.SituacaoProcesso.CRIADO;
 
@@ -131,7 +132,7 @@ public class ProcessoInicializador {
                                     List<sgc.unidade.model.UnidadeMapa> unidadesMapas) {
         
         java.util.Map<Long, sgc.unidade.model.UnidadeMapa> mapaUnidadeMapa = unidadesMapas.stream()
-                .collect(java.util.stream.Collectors.toMap(sgc.unidade.model.UnidadeMapa::getUnidadeCodigo, m -> m));
+                .collect(Collectors.toMap(sgc.unidade.model.UnidadeMapa::getUnidadeCodigo, m -> m));
 
         switch (tipo) {
             case MAPEAMENTO -> {
@@ -140,9 +141,16 @@ public class ProcessoInicializador {
                 }
             }
             case REVISAO -> {
+                // Batch fetch units to avoid N+1 queries
+                List<Unidade> unidades = unidadeRepo.findAllById(codigosUnidades);
+                java.util.Map<Long, Unidade> mapaUnidades = unidades.stream()
+                        .collect(Collectors.toMap(Unidade::getCodigo, u -> u));
+
                 for (Long codUnidade : codigosUnidades) {
-                    Unidade unidade = unidadeRepo.findById(codUnidade)
-                            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codUnidade));
+                    Unidade unidade = mapaUnidades.get(codUnidade);
+                    if (unidade == null) {
+                         throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
+                    }
                     sgc.unidade.model.UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
                     subprocessoFactory.criarParaRevisao(processo, unidade, um);
                 }

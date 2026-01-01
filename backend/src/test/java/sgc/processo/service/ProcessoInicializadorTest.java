@@ -57,9 +57,6 @@ class ProcessoInicializadorTest {
         when(processoRepo.findById(codProcesso)).thenReturn(java.util.Optional.of(processo));
 
         // Simular que não há unidades em processos ativos
-        // O método real usa processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn
-        // Precisamos mockar isso se for chamado.
-        // No caso do ProcessoInicializador, ele chama getMensagemErroUnidadesEmProcessosAtivos
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), anyList()))
             .thenReturn(List.of());
 
@@ -145,8 +142,8 @@ class ProcessoInicializadorTest {
         // Mock para processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), anyList())).thenReturn(List.of());
 
-        // Mock para unidadeRepo.findById dentro do loop de criação
-        when(unidadeRepo.findById(10L)).thenReturn(java.util.Optional.of(u1));
+        // Mock para unidadeRepo.findAllById em vez de findById (para teste da otimização)
+        when(unidadeRepo.findAllById(List.of(10L))).thenReturn(List.of(u1));
 
         // Act
         List<String> erros = inicializador.iniciar(codProcesso, List.of(10L));
