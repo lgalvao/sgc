@@ -20,7 +20,6 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.mapper.AtividadeMapper;
-import sgc.mapa.mapper.ConhecimentoMapper;
 
 import java.util.HashSet;
 import java.util.List;
@@ -37,7 +36,6 @@ public class SubprocessoMapaService {
     private final AtividadeService atividadeService;
     private final CompetenciaService competenciaService;
     private final AtividadeMapper atividadeMapper;
-    private final ConhecimentoMapper conhecimentoMapper;
 
     @Transactional
     public void salvarAjustesMapa(

@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
-import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.processo.model.Processo;
 import sgc.processo.service.ProcessoService;
@@ -29,7 +28,6 @@ public class RelatorioService {
     private final SubprocessoService subprocessoService;
     private final UsuarioService usuarioService;
     private final CompetenciaService competenciaService;
-    private final AtividadeService atividadeService;
 
     @Transactional(readOnly = true)
     public void gerarRelatorioAndamento(Long codProcesso, OutputStream outputStream) {
@@ -46,13 +44,11 @@ public class RelatorioService {
             for (Subprocesso sp : subprocessos) {
                 Unidade unidade = sp.getUnidade();
                 String responsavel = "Não definido";
-                String titular = "Não definido";
 
                 try {
                      var respDto = usuarioService.buscarResponsavelUnidade(unidade.getCodigo());
                      if (respDto.isPresent()) {
                          responsavel = respDto.get().getTitularNome();
-                         titular = respDto.get().getTitularNome();
                      }
                 } catch (Exception e) {
                     // Ignora erro ao buscar responsável
@@ -96,7 +92,6 @@ public class RelatorioService {
 
                 for (Competencia c : competencias) {
                     document.add(new Paragraph("Competência: " + c.getDescricao()));
-                    List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(sp.getMapa().getCodigo());
 
                     if (c.getAtividades() != null) {
                         for (Atividade a : c.getAtividades()) {

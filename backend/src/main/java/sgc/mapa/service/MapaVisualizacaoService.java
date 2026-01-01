@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.ConhecimentoRepo;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
@@ -31,7 +30,6 @@ import java.util.stream.Collectors;
 public class MapaVisualizacaoService {
     private final SubprocessoService subprocessoService;
     private final CompetenciaRepo competenciaRepo;
-    private final ConhecimentoRepo conhecimentoRepo;
     private final AtividadeRepo atividadeRepo;
 
     public MapaVisualizacaoDto obterMapaParaVisualizacao(Long codSubprocesso) {

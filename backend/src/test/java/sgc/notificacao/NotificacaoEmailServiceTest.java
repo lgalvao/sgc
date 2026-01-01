@@ -1,6 +1,5 @@
 package sgc.notificacao;
 
-import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import sgc.notificacao.dto.EmailDto;
 import sgc.notificacao.model.Notificacao;
 import sgc.notificacao.model.NotificacaoRepo;
@@ -40,12 +38,8 @@ class NotificacaoEmailServiceTest {
     @InjectMocks
     private NotificacaoEmailService notificacaoServico;
 
-    private MimeMessage mimeMessageReal;
-
     @BeforeEach
     void setUp() {
-        JavaMailSenderImpl senderReal = new JavaMailSenderImpl();
-        mimeMessageReal = senderReal.createMimeMessage();
     }
 
     @Test

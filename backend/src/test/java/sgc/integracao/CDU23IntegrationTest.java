@@ -68,7 +68,6 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private Unidade unidadeSuperior;
     private Unidade unidade1;
     private Unidade unidade2;
     private Processo processo;
@@ -88,7 +87,6 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
         jdbcTemplate.update(sqlInsertUnidade, idUnidade1, "Unidade Homolog 1", "UNID-HOMOLOG-1", "OPERACIONAL", "ATIVA", idSuperior, null);
         jdbcTemplate.update(sqlInsertUnidade, idUnidade2, "Unidade Homolog 2", "UNID-HOMOLOG-2", "OPERACIONAL", "ATIVA", idSuperior, null);
 
-        unidadeSuperior = unidadeRepo.findById(idSuperior).orElseThrow();
         unidade1 = unidadeRepo.findById(idUnidade1).orElseThrow();
         unidade2 = unidadeRepo.findById(idUnidade2).orElseThrow();
 
@@ -124,7 +122,6 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
         processo = processoRepo.findById(processo.getCodigo()).orElseThrow();
         subprocesso1 = subprocessoRepo.findById(subprocesso1.getCodigo()).orElseThrow();
         subprocesso2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
-        unidadeSuperior = unidadeRepo.findById(idSuperior).orElseThrow();
     }
 
     @Test
