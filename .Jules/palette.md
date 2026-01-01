@@ -4,3 +4,4 @@
 ## 2024-12-31 - [Loading States & Contextual Help]
 **Learning:** Adding loading spinners and changing button text (e.g., "Salvar" -> "Salvando...") provides essential feedback for async operations, preventing user frustration or double-submissions. Also, adding `description` text to `BFormGroup` is a clean way to clarify complex date inputs without cluttering the UI.
 **Action:** Always implement explicit loading states for form submission buttons and use the `description` prop for inputs that require context, rather than relying on external tooltips or lengthy labels.
+## 2026-01-01 - [Bulk Selection in Trees]\n**Learning:** Users often need to select all eligible items in a hierarchical structure. Recursively traversing the tree to find eligible items and toggling them in bulk is a high-value pattern.\n**Action:** When implementing tree selection, always consider adding a 'Select All' action if the list can be long.

@@ -24,10 +24,10 @@
               Dias para inativação de processos (DIAS_INATIVACAO_PROCESSO)
             </label>
             <input
-              type="number"
-              class="form-control"
               id="diasInativacao"
               v-model="form.diasInativacao"
+              type="number"
+              class="form-control"
               min="1"
               required
             />
@@ -41,10 +41,10 @@
               Dias para indicação de alerta como novo (DIAS_ALERTA_NOVO)
             </label>
             <input
-              type="number"
-              class="form-control"
               id="diasAlertaNovo"
               v-model="form.diasAlertaNovo"
+              type="number"
+              class="form-control"
               min="1"
               required
             />

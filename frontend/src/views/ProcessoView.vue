@@ -42,7 +42,7 @@
       />
 
       <!-- Botões de Ação em Bloco -->
-      <div class="mt-3 d-flex gap-2 justify-content-end" v-if="mostrarBotoesBloco">
+      <div v-if="mostrarBotoesBloco" class="mt-3 d-flex gap-2 justify-content-end">
           <button v-if="podeAceitarBloco" class="btn btn-success" @click="abrirModalBloco('aceitar')">
              Aceitar em Bloco
           </button>
@@ -64,8 +64,8 @@
 
     <!-- Modal de Ação em Bloco -->
     <ModalAcaoBloco
-        ref="modalBlocoRef"
         :id="'modal-acao-bloco'"
+        ref="modalBlocoRef"
         :titulo="tituloModalBloco"
         :texto="textoModalBloco"
         :rotulo-botao="rotuloBotaoBloco"
