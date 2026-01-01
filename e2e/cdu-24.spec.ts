@@ -153,11 +153,11 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
             await expect(modal).toBeVisible();
 
             // Verificar elementos específicos do CDU-24
-            await expect(modal.getByText(/Disponibilizar/i)).toBeVisible();
+            await expect(modal.getByRole('heading', {name: /Disponibilizar/i})).toBeVisible();
             await expect(modal.locator('table')).toBeVisible();
             
             // Campo de data limite (obrigatório para CDU-24)
-            const inputData = modal.locator('input[type="date"]');
+            const inputData = modal.getByRole('textbox', {name: /Data Limite/i});
             await expect(inputData).toBeVisible();
 
             await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();

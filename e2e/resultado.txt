@@ -1,0 +1,84 @@
+[1A[2K[WebServer] WARN  sgc.seguranca.GerenciadorJwt.verificarSegurancaChave:34 - ⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão. Isso é aceitável APENAS para ambientes de desenvolvimento/teste (test, e2e, local).
+
+[1A[2K[WebServer]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m280[22m[2m[0m ms[22m
+
+[1A[2K[WebServer]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[WebServer] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+
+
+Running 16 tests using 1 worker
+
+[1A[2K[WebServer] >>> Frontend e Backend no ar!
+
+[1A[2K[1/16] [chromium] › e2e/cdu-27.spec.ts:49:9 › CDU-27 - Alterar data limite de subprocesso › Preparacao: Admin cria e inicia processo
+[1A[2K[WebServer] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: org.springframework.data.repository.CrudRepository.findById levou 53 ms
+
+[1A[2K[WebServer] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: sgc.usuario.UsuarioService.autorizar levou 105 ms
+
+[1A[2K[WebServer] INFO  s.p.service.ProcessoService.criar:182 - Processo 1 criado.
+
+[1A[2K[WebServer] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: sgc.notificacao.NotificacaoModelosService.criarEmailDeProcessoIniciado levou 114 ms
+
+[1A[2K[WebServer] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:268 - E-mail enviado para unidade SECAO_221
+[WebServer] INFO  s.p.s.ProcessoInicializador.iniciar:103 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[WebServer] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: sgc.processo.service.ProcessoService.iniciarProcessoMapeamento levou 134 ms
+
+[1A[2K[2/16] [chromium] › e2e/cdu-27.spec.ts:77:9 › CDU-27 - Alterar data limite de subprocesso › Cenario 1: ADMIN navega para detalhes do subprocesso
+[1A[2K[3/16] [chromium] › e2e/cdu-27.spec.ts:89:9 › CDU-27 - Alterar data limite de subprocesso › Cenario 2: ADMIN visualiza botão Alterar data limite
+[1A[2K[4/16] [chromium] › e2e/cdu-28.spec.ts:32:9 › CDU-28 - Manter atribuição temporária › Cenario 1: ADMIN acessa menu de Unidades
+[1A[2K[5/16] [chromium] › e2e/cdu-28.spec.ts:50:9 › CDU-28 - Manter atribuição temporária › Cenario 2: ADMIN seleciona unidade na árvore
+[1A[2K[6/16] [chromium] › e2e/cdu-28.spec.ts:80:9 › CDU-28 - Manter atribuição temporária › Cenario 3: Verificar botão de criar atribuição
+[1A[2K[7/16] [chromium] › e2e/cdu-29.spec.ts:34:9 › CDU-29 - Consultar histórico de processos › Cenario 1: ADMIN navega para página de histórico
+[1A[2K[8/16] [chromium] › e2e/cdu-29.spec.ts:47:9 › CDU-29 - Consultar histórico de processos › Cenario 2: GESTOR pode acessar histórico
+[1A[2K[9/16] [chromium] › e2e/cdu-29.spec.ts:58:9 › CDU-29 - Consultar histórico de processos › Cenario 3: CHEFE pode acessar histórico
+[1A[2K[10/16] [chromium] › e2e/cdu-29.spec.ts:73:9 › CDU-29 - Consultar histórico de processos › Cenario 4: Tabela apresenta colunas corretas
+[1A[2K[11/16] [chromium] › e2e/cdu-30.spec.ts:31:9 › CDU-30 - Manter Administradores › Cenario 1: ADMIN acessa página de configurações
+[1A[2K[12/16] [chromium] › e2e/cdu-30.spec.ts:44:9 › CDU-30 - Manter Administradores › Cenario 2: Página de configurações contém seção de administradores
+[1A[2K[chromium] › e2e/cdu-30.spec.ts:44:9 › CDU-30 - Manter Administradores › Cenario 2: Página de configurações contém seção de administradores
+Seção Administradores encontrada: [33mfalse[39m
+
+[1A[2K[13/16] [chromium] › e2e/cdu-30.spec.ts:73:9 › CDU-30 - Manter Administradores › Cenario 3: Lista de administradores é exibida
+[1A[2K[14/16] [chromium] › e2e/cdu-31.spec.ts:28:9 › CDU-31 - Configurar sistema › Cenario 1: ADMIN navega para configurações
+[1A[2K[15/16] [chromium] › e2e/cdu-31.spec.ts:45:9 › CDU-31 - Configurar sistema › Cenario 2: Tela exibe configurações editáveis
+[1A[2K[16/16] [chromium] › e2e/cdu-31.spec.ts:65:9 › CDU-31 - Configurar sistema › Cenario 3: ADMIN salva configurações com sucesso
+[1A[2K[chromium] › e2e/cdu-31.spec.ts:65:9 › CDU-31 - Configurar sistema › Cenario 3: ADMIN salva configurações com sucesso
+[BROWSER ERROR] Access to XMLHttpRequest at 'http://localhost:10000/api/configuracoes' from origin 'http://localhost:5173' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+
+[1A[2K[BROWSER ERROR] Failed to load resource: net::ERR_FAILED
+
+[1A[2K[BROWSER ERROR] Erro ao salvar configurações: {"name":"AxiosError"}
+
+[1A[2K  1) [chromium] › e2e/cdu-31.spec.ts:65:9 › CDU-31 - Configurar sistema › Cenario 3: ADMIN salva configurações com sucesso 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/salv|sucesso|confirmação/i)
+    Expected: visible
+    Error: strict mode violation: getByText(/salv|sucesso|confirmação/i) resolved to 2 elements:
+        1) <p class="mb-0">Erro ao salvar configurações.</p> aka getByText('Erro ao salvar configurações.')
+        2) <div class="alert alert-danger">Não foi possível salvar as configurações.</div> aka getByText('Não foi possível salvar as')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/salv|sucesso|confirmação/i)[22m
+
+
+      82 |
+      83 |         // Passo 4: Verificar mensagem de confirmação
+    > 84 |         await expect(page.getByText(/salv|sucesso|confirmação/i)).toBeVisible({timeout: 5000});
+         |                                                                   ^
+      85 |     });
+      86 | });
+      87 |
+        at /Users/leonardo/Projetos/sgc/e2e/cdu-31.spec.ts:84:67
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-31-CDU-31---Configurar-44fd4-a-configurações-com-sucesso-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-31-CDU-31---Configurar-44fd4-a-configurações-com-sucesso-chromium/error-context.md
+
+
+[1A[2K  1 failed
+    [chromium] › e2e/cdu-31.spec.ts:65:9 › CDU-31 - Configurar sistema › Cenario 3: ADMIN salva configurações com sucesso 
+  15 passed (16.8s)

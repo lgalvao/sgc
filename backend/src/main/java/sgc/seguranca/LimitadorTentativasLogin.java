@@ -1,6 +1,7 @@
 package sgc.seguranca;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -33,8 +34,10 @@ public class LimitadorTentativasLogin {
 
     private final Map<String, Deque<LocalDateTime>> tentativasPorIp = new ConcurrentHashMap<>();
 
+    @Autowired
     public LimitadorTentativasLogin(Environment environment) {
-        this(environment, DEFAULT_MAX_CACHE_ENTRIES);
+        this.environment = environment;
+        this.maxCacheEntries = DEFAULT_MAX_CACHE_ENTRIES;
     }
 
     // Construtor para testes permitindo configurar o limite

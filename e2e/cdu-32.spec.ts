@@ -7,18 +7,20 @@ import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 /**
  * CDU-32 - Reabrir cadastro
- * CDU-33 - Reabrir revisão de cadastro
  * 
  * Ator: ADMIN
  * 
+ * Pré-condições:
+ * - Subprocesso com cadastro já disponibilizado ou aceito
+ * 
  * Fluxo principal:
  * 1. ADMIN acessa subprocesso da unidade
- * 2. ADMIN seleciona opção "Reabrir Cadastro/Revisão"
+ * 2. ADMIN seleciona opção "Reabrir Cadastro"
  * 3. Sistema solicita justificativa
- * 4. ADMIN confirma
+ * 4. ADMIN preenche justificativa e confirma
  * 5. Sistema altera situação e envia notificações
  */
-test.describe.serial('CDU-32/33 - Reabrir cadastro e revisão', () => {
+test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     const UNIDADE_1 = 'SECAO_221';
     const USUARIO_CHEFE_1 = USUARIOS.CHEFE_SECAO_221.titulo;
     const SENHA_CHEFE_1 = USUARIOS.CHEFE_SECAO_221.senha;
@@ -42,7 +44,7 @@ test.describe.serial('CDU-32/33 - Reabrir cadastro e revisão', () => {
     });
 
     // ========================================================================
-    // PREPARAÇÃO - Criar processo com cadastro disponibilizado
+    // PREPARAÇÃO
     // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo', async ({page}) => {
@@ -86,45 +88,76 @@ test.describe.serial('CDU-32/33 - Reabrir cadastro e revisão', () => {
     });
 
     // ========================================================================
-    // TESTES PRINCIPAIS - CDU-32
+    // TESTES PRINCIPAIS
     // ========================================================================
 
     test('Cenario 1: ADMIN navega para subprocesso disponibilizado', async ({page}) => {
-        // CDU-32: Passos 1-2
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
-        // Verificar situação do subprocesso
         await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Cadastro disponibilizado/i);
     });
 
-    test('Cenario 2: ADMIN verifica opção de reabrir cadastro', async ({page}) => {
-        // CDU-32: Passo 3
+    test('Cenario 2: ADMIN visualiza botão Reabrir Cadastro', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
-        // Procurar por opção de reabrir (pode estar em menu dropdown ou como botão)
-        const btnReabrir = page.getByRole('button', {name: /Reabrir.*Cadastro/i});
+        const btnReabrir = page.getByTestId('btn-reabrir-cadastro');
         const btnVisivel = await btnReabrir.isVisible().catch(() => false);
+        
+        if (btnVisivel) {
+            await expect(btnReabrir).toBeEnabled();
+        }
+    });
 
-        if (!btnVisivel) {
-            // Verificar no menu "Mais ações"
-            const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
-            if (await btnMaisAcoes.isVisible().catch(() => false)) {
-                await btnMaisAcoes.click();
-                
-                const itemReabrir = page.getByRole('menuitem', {name: /Reabrir/i});
-                const itemVisivel = await itemReabrir.isVisible().catch(() => false);
-                // Se a opção existe, o teste é bem sucedido
-                console.log('Opção Reabrir disponível:', itemVisivel);
-            }
+    test('Cenario 3: ADMIN abre modal de reabertura de cadastro', async ({page}) => {
+        await page.goto('/login');
+        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+
+        await page.getByText(descProcesso).click();
+        await navegarParaSubprocesso(page, UNIDADE_1);
+
+        const btnReabrir = page.getByTestId('btn-reabrir-cadastro');
+        
+        if (await btnReabrir.isVisible().catch(() => false)) {
+            await btnReabrir.click();
+
+            const modal = page.getByRole('dialog');
+            await expect(modal).toBeVisible();
+            await expect(modal.getByText(/Reabrir Cadastro/i)).toBeVisible();
+            await expect(page.getByTestId('inp-justificativa-reabrir')).toBeVisible();
+            await expect(page.getByTestId('btn-confirmar-reabrir')).toBeVisible();
+        }
+    });
+
+    test('Cenario 4: Botão confirmar desabilitado sem justificativa', async ({page}) => {
+        await page.goto('/login');
+        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+
+        await page.getByText(descProcesso).click();
+        await navegarParaSubprocesso(page, UNIDADE_1);
+
+        const btnReabrir = page.getByTestId('btn-reabrir-cadastro');
+        
+        if (await btnReabrir.isVisible().catch(() => false)) {
+            await btnReabrir.click();
+
+            const modal = page.getByRole('dialog');
+            await expect(modal).toBeVisible();
+
+            // Sem justificativa, botão deve estar desabilitado
+            await expect(page.getByTestId('btn-confirmar-reabrir')).toBeDisabled();
+
+            // Preencher justificativa
+            await page.getByTestId('inp-justificativa-reabrir').fill('Justificativa de teste');
+            await expect(page.getByTestId('btn-confirmar-reabrir')).toBeEnabled();
         }
     });
 });

@@ -137,4 +137,3 @@ const handleEnviarLembrete = () => {
   emit("enviarLembrete");
 };
 </script>
-</script>
