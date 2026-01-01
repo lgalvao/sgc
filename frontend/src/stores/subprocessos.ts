@@ -10,6 +10,7 @@ import {
     homologarCadastro,
     homologarRevisaoCadastro,
 } from "@/services/cadastroService";
+import { apiClient } from "@/axios-setup";
 import {
     buscarContextoEdicao as serviceBuscarContextoEdicao,
     buscarSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
@@ -71,8 +72,11 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
     ) {
         lastError.value = null;
         try {
-            const processosStore = useProcessosStore();
-            await processosStore.alterarDataLimiteSubprocesso(id, dados);
+            await apiClient.post(`/subprocessos/${id}/data-limite`, { 
+                novaDataLimite: dados.novaData 
+            });
+            // Recarregar os detalhes para refletir a nova data
+            await buscarSubprocessoDetalhe(id);
         } catch (error) {
             lastError.value = normalizeError(error);
             throw error;

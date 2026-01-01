@@ -81,6 +81,6 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
         await page.getByRole('button', {name: /Salvar/i}).click();
 
         // Passo 4: Verificar mensagem de confirmação
-        await expect(page.getByText(/salv|sucesso|confirmação/i)).toBeVisible({timeout: 5000});
+        await expect(page.getByRole('heading', { name: /sucesso/i })).toBeVisible({timeout: 5000});
     });
 });

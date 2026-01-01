@@ -149,7 +149,7 @@ public class SubprocessoCrudController {
      * Altera a data limite de um subprocesso.
      * (CDU-27)
      */
-    @PutMapping("/{codigo}/data-limite")
+    @PostMapping("/{codigo}/data-limite")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> alterarDataLimite(
             @PathVariable Long codigo,

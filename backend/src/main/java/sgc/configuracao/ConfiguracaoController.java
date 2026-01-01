@@ -25,7 +25,7 @@ public class ConfiguracaoController {
         return parametroService.buscarTodos();
     }
 
-    @PutMapping
+    @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualizar configurações em bloco")
     public List<Parametro> atualizar(@RequestBody List<Parametro> parametros) {

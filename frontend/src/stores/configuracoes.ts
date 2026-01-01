@@ -32,7 +32,7 @@ export const useConfiguracoesStore = defineStore("configuracoes", () => {
         loading.value = true;
         error.value = null;
         try {
-            const response = await apiClient.put<Parametro[]>("/configuracoes", novosParametros);
+            const response = await apiClient.post<Parametro[]>("/configuracoes", novosParametros);
             parametros.value = response.data;
             return true;
         } catch (e: any) {
