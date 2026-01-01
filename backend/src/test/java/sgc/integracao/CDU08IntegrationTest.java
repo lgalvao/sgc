@@ -86,6 +86,9 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private jakarta.persistence.EntityManager entityManager;
+
     private Subprocesso subprocessoOrigem;
     private Subprocesso subprocessoDestino;
 
@@ -138,8 +141,18 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                         LocalDateTime.now().plusDays(30));
         processoRepo.save(processo);
 
+        subprocessoOrigem =
+                new Subprocesso()
+                        .setUnidade(unidadeOrigem)
+                        .setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                        .setDataLimiteEtapa1(LocalDateTime.now().plusDays(10))
+                        .setProcesso(processo);
+        subprocessoRepo.save(subprocessoOrigem);
+
         Mapa mapaOrigem = new Mapa();
+        mapaOrigem.setSubprocesso(subprocessoOrigem);
         mapaRepo.save(mapaOrigem);
+        subprocessoOrigem.setMapa(mapaOrigem); // Manter coerência em memória
 
         Atividade atividade1 = new Atividade(mapaOrigem, "Atividade 1");
         atividadeRepo.save(atividade1);
@@ -150,26 +163,24 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         conhecimentoRepo.save(new Conhecimento("Conhecimento 2.1", atividade2));
         conhecimentoRepo.save(new Conhecimento("Conhecimento 2.2", atividade2));
 
-        subprocessoOrigem =
-                new Subprocesso()
-                        .setUnidade(unidadeOrigem)
-                        .setMapa(mapaOrigem)
-                        .setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
-                        .setDataLimiteEtapa1(LocalDateTime.now().plusDays(10))
-                        .setProcesso(processo);
-
-        subprocessoRepo.save(subprocessoOrigem);
-
-        Mapa mapa = new Mapa(); // Inicializa o mapa para os testes de CRUD
-        mapaRepo.save(mapa);
-
         subprocessoDestino = new Subprocesso();
         subprocessoDestino.setUnidade(unidadeDestino);
-        subprocessoDestino.setMapa(mapa); // Usa o 'mapa' para os testes de CRUD
         subprocessoDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoDestino.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocessoDestino.setProcesso(processo);
         subprocessoRepo.save(subprocessoDestino);
+
+        Mapa mapa = new Mapa(); // Inicializa o mapa para os testes de CRUD
+        mapa.setSubprocesso(subprocessoDestino);
+        mapaRepo.save(mapa);
+        subprocessoDestino.setMapa(mapa); // Manter coerência em memória
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // Recarregar objetos para garantir que estão gerenciados e atualizados
+        subprocessoOrigem = subprocessoRepo.findById(subprocessoOrigem.getCodigo()).orElseThrow();
+        subprocessoDestino = subprocessoRepo.findById(subprocessoDestino.getCodigo()).orElseThrow();
     }
 
     @Nested
@@ -191,6 +202,9 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message", is("Atividades importadas.")));
+
+            entityManager.flush();
+            entityManager.clear();
 
             List<Atividade> atividadesDestino =
                     atividadeRepo.findByMapaCodigo(subprocessoDestino.getMapa().getCodigo());

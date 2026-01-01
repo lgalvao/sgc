@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -102,7 +103,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
 
         // When
         mockMvc.perform(
-                put("/api/subprocessos/{codigo}/data-limite", subprocesso.getCodigo())
+                post("/api/subprocessos/{codigo}/data-limite", subprocesso.getCodigo())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -134,7 +135,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
 
         // When/Then
         mockMvc.perform(
-                put("/api/subprocessos/{codigo}/data-limite", subprocesso.getCodigo())
+                post("/api/subprocessos/{codigo}/data-limite", subprocesso.getCodigo())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
