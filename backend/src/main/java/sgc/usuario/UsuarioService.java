@@ -44,7 +44,6 @@ public class UsuarioService {
     @Value("${aplicacao.ambiente-testes:false}")
     private boolean ambienteTestes;
 
-    // SENTINEL: Cache para controlar autenticações recentes e prevenir bypass
     private final Map<String, java.time.LocalDateTime> autenticacoesRecentes = new java.util.concurrent.ConcurrentHashMap<>();
 
     @Transactional(readOnly = true)
@@ -124,12 +123,12 @@ public class UsuarioService {
 
     @Transactional(readOnly = true)
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
-        return usuarioRepo
-                .findById(titulo)
+        return usuarioRepo                .findById(titulo)
                 .map(usuario -> {
                     carregarAtribuicoes(usuario);
                     // Inicializa a coleção lazy para evitar LazyInitializationException
                     if (usuario.getAtribuicoesTemporarias() != null) {
+                        // TODO isso me parece um 'code smell'
                         Hibernate.initialize(usuario.getAtribuicoesTemporarias());
                     }
                     return usuario.getTodasAtribuicoes().stream()
@@ -354,7 +353,7 @@ public class UsuarioService {
 
     @Transactional(readOnly = true)
     public List<PerfilUnidade> autorizar(String tituloEleitoral) {
-        // SENTINEL: Previne Information Disclosure verificando se usuário se autenticou recentemente
+        // Previne Information Disclosure verificando se usuário se autenticou recentemente
         if (!autenticacoesRecentes.containsKey(tituloEleitoral)) {
             log.warn("Tentativa de autorização sem autenticação prévia para usuário {}", tituloEleitoral);
             throw new ErroAutenticacao("É necessário autenticar-se antes de consultar autorizações.");

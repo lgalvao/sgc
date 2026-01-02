@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
@@ -115,12 +116,42 @@ tasks.withType<Test> {
     finalizedBy(tasks.jacocoTestReport) // Relatório é gerado após os testes
 
     testLogging {
-        events("skipped", "failed")
+        events(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
         exceptionFormat = TestExceptionFormat.FULL
         showStackTraces = true
         showCauses = true
         showStandardStreams = false
     }
+
+    // Exibir resumo ao final dos testes
+    var passedCount = 0
+    var failedCount = 0
+    var skippedCount = 0
+
+    addTestListener(object : TestListener {
+        override fun beforeSuite(suite: TestDescriptor) {}
+        override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+            // Exibir resumo apenas para a suite raiz (nível do projeto)
+            if (suite.parent == null) {
+                val output = """
+                    |
+                    |═══════════════════════════════════════════════════════════════
+                    |  RESUMO DOS TESTES
+                    |═══════════════════════════════════════════════════════════════
+                    |  Resultado: ${result.resultType}
+                    |  Total:     ${result.testCount} testes
+                    |  ✓ Passou:  ${result.successfulTestCount}
+                    |  ✗ Falhou:  ${result.failedTestCount}
+                    |  ○ Ignorados: ${result.skippedTestCount}
+                    |  Tempo:     ${(result.endTime - result.startTime) / 1000.0}s
+                    |═══════════════════════════════════════════════════════════════
+                """.trimMargin()
+                println(output)
+            }
+        }
+        override fun beforeTest(testDescriptor: TestDescriptor) {}
+        override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
+    })
 
     jvmArgs = listOf(
         "-Dmockito.ext.disable=true",

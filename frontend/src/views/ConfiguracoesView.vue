@@ -176,18 +176,18 @@ import { onMounted, reactive, ref, computed } from 'vue';
 import { BModal } from 'bootstrap-vue-next';
 import { useConfiguracoesStore, type Parametro } from '@/stores/configuracoes';
 import { useNotificacoesStore } from '@/stores/feedback';
-import { useAutenticacaoStore } from '@/stores/autenticacao';
+import { usePerfilStore } from '@/stores/perfil';
 import { 
   listarAdministradores, 
   adicionarAdministrador, 
   removerAdministrador,
   type AdministradorDto 
 } from '@/services/administradorService';
-import { normalizeError } from '@/utils/errorHandling';
+import { normalizeError } from '@/utils/apiError';
 
 const store = useConfiguracoesStore();
 const notificacoes = useNotificacoesStore();
-const autenticacaoStore = useAutenticacaoStore();
+const perfilStore = usePerfilStore();
 const salvando = ref(false);
 
 // Administradores
@@ -202,7 +202,7 @@ const novoAdminTitulo = ref('');
 const adicionandoAdmin = ref(false);
 
 const podeGerenciarAdministradores = computed(() => {
-  return autenticacaoStore.usuarioEhAdmin;
+  return perfilStore.isAdmin;
 });
 
 const form = reactive({

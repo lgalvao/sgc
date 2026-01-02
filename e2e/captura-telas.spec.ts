@@ -634,4 +634,311 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '08-responsividade', '04-mobile-375x667', {fullPage: true});
         });
     });
+
+    // ========================================================================
+    // SEÇÃO 09 - OPERAÇÕES EM BLOCO (CDUs 22-26)
+    // ========================================================================
+    test.describe('09 - Operações em Bloco', () => {
+        test('Captura fluxo de aceitar cadastros em bloco', async ({page}) => {
+            // Prepara cenário: criar processo com unidades subordinadas e disponibilizar cadastros
+            await page.goto('/login');
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+
+            const descricao = `Processo Bloco ${Date.now()}`;
+            await criarProcesso(page, {
+                descricao,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: 'SECAO_221',
+                expandir: ['SECRETARIA_2', 'COORD_22'],
+                iniciar: true
+            });
+
+            // Capturar ID para cleanup
+            const processoId = Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
+            if (processoId > 0) cleanup.registrar(processoId);
+
+            // Login como Chefe para disponibilizar cadastro
+            await page.getByTestId('btn-logout').click();
+            await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+
+            await page.getByText(descricao).click();
+            await navegarParaAtividades(page);
+            await adicionarAtividade(page, 'Atividade Bloco 1');
+            await adicionarConhecimento(page, 'Atividade Bloco 1', 'Conhecimento 1');
+            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+            await page.getByTestId('btn-confirmar-disponibilizacao').click();
+            await page.waitForTimeout(500);
+
+            // Login como Gestor para ver botão de aceitar em bloco
+            await page.getByTestId('btn-logout').click();
+            await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+
+            await page.getByText(descricao).click();
+            await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+            await capturarTela(page, '09-operacoes-bloco', '01-detalhes-processo-gestor', {fullPage: true});
+
+            // Capturar botão de aceitar em bloco (se visível)
+            const btnAceitarBloco = page.getByRole('button', {name: /Aceitar.*Bloco/i});
+            if (await btnAceitarBloco.isVisible().catch(() => false)) {
+                await btnAceitarBloco.click();
+                await page.waitForTimeout(300);
+                await capturarTela(page, '09-operacoes-bloco', '02-modal-aceitar-cadastro-bloco');
+                await page.getByRole('button', {name: /Cancelar/i}).click();
+            }
+
+            // Login como Admin para homologar em bloco
+            await page.getByTestId('btn-logout').click();
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+
+            await page.getByText(descricao).click();
+            await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+
+            // Capturar botão de homologar cadastro em bloco (CDU-23)
+            const btnHomologarBloco = page.getByRole('button', {name: /Homologar.*Bloco/i});
+            if (await btnHomologarBloco.isVisible().catch(() => false)) {
+                await btnHomologarBloco.click();
+                await page.waitForTimeout(300);
+                await capturarTela(page, '09-operacoes-bloco', '03-modal-homologar-cadastro-bloco');
+                await page.getByRole('button', {name: /Cancelar/i}).click();
+            }
+
+            // Capturar botão de disponibilizar mapas em bloco (CDU-24)
+            const btnDisponibilizarMapaBloco = page.getByRole('button', {name: /Disponibilizar.*mapa.*Bloco/i});
+            if (await btnDisponibilizarMapaBloco.isVisible().catch(() => false)) {
+                await btnDisponibilizarMapaBloco.click();
+                await page.waitForTimeout(300);
+                await capturarTela(page, '09-operacoes-bloco', '04-modal-disponibilizar-mapa-bloco');
+                await page.getByRole('button', {name: /Cancelar/i}).click();
+            }
+
+            // Capturar botões de aceitar/homologar mapa em bloco (CDU-25 e CDU-26 - se visíveis)
+            const btnAceitarMapaBloco = page.getByRole('button', {name: /Aceitar.*mapa.*Bloco/i});
+            if (await btnAceitarMapaBloco.isVisible().catch(() => false)) {
+                await btnAceitarMapaBloco.click();
+                await page.waitForTimeout(300);
+                await capturarTela(page, '09-operacoes-bloco', '05-modal-aceitar-mapa-bloco');
+                await page.getByRole('button', {name: /Cancelar/i}).click();
+            }
+
+            const btnHomologarMapaBloco = page.getByRole('button', {name: /Homologar.*mapa.*Bloco/i});
+            if (await btnHomologarMapaBloco.isVisible().catch(() => false)) {
+                await btnHomologarMapaBloco.click();
+                await page.waitForTimeout(300);
+                await capturarTela(page, '09-operacoes-bloco', '06-modal-homologar-mapa-bloco');
+                await page.getByRole('button', {name: /Cancelar/i}).click();
+            }
+        });
+    });
+
+    // ========================================================================
+    // SEÇÃO 10 - GESTÃO DE SUBPROCESSOS (CDUs 27, 32-34)
+    // ========================================================================
+    test.describe('10 - Gestão de Subprocessos', () => {
+        test('Captura modais de gestão de subprocesso', async ({page}) => {
+            await page.goto('/login');
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+
+            const descricao = `Processo Gestão ${Date.now()}`;
+            await criarProcesso(page, {
+                descricao,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: 'SECAO_121',
+                expandir: ['SECRETARIA_1', 'COORD_12'],
+                iniciar: true
+            });
+
+            // Registrar para cleanup
+            const processoId = Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
+            if (processoId > 0) cleanup.registrar(processoId);
+
+            // Acessar subprocesso
+            await page.getByRole('row', {name: /SECAO_121/i}).click();
+            await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_121/);
+            await capturarTela(page, '10-gestao-subprocessos', '01-detalhes-subprocesso-admin', {fullPage: true});
+
+            // Modal de alterar data limite (CDU-27)
+            const btnAlterarData = page.getByRole('button', {name: /Alterar.*data.*limite/i});
+            if (await btnAlterarData.isVisible().catch(() => false)) {
+                await btnAlterarData.click();
+                await page.waitForTimeout(300);
+                await capturarTela(page, '10-gestao-subprocessos', '02-modal-alterar-data-limite');
+                await page.getByRole('button', {name: /Cancelar/i}).click();
+            }
+
+            // Modal de reabrir cadastro (CDU-32)
+            const btnReabrirCadastro = page.getByRole('button', {name: /Reabrir.*cadastro/i});
+            if (await btnReabrirCadastro.isVisible().catch(() => false)) {
+                await btnReabrirCadastro.click();
+                await page.waitForTimeout(300);
+                await capturarTela(page, '10-gestao-subprocessos', '03-modal-reabrir-cadastro');
+                await page.getByRole('button', {name: /Cancelar/i}).click();
+            }
+
+            // Modal de enviar lembrete (CDU-34)
+            const btnEnviarLembrete = page.getByRole('button', {name: /Enviar.*lembrete/i});
+            if (await btnEnviarLembrete.isVisible().catch(() => false)) {
+                await btnEnviarLembrete.click();
+                await page.waitForTimeout(300);
+                await capturarTela(page, '10-gestao-subprocessos', '04-modal-enviar-lembrete');
+                await page.getByRole('button', {name: /Cancelar/i}).click();
+            }
+        });
+    });
+
+    // ========================================================================
+    // SEÇÃO 11 - GESTÃO DE UNIDADES E ATRIBUIÇÕES (CDU-28)
+    // ========================================================================
+    test.describe('11 - Gestão de Unidades', () => {
+        test('Captura página de unidades e atribuição temporária', async ({page}) => {
+            await page.goto('/login');
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+
+            // Navegar para página de unidades
+            const linkUnidades = page.getByRole('link', {name: /Unidades/i});
+            if (await linkUnidades.isVisible().catch(() => false)) {
+                await linkUnidades.click();
+                await page.waitForTimeout(500);
+                await capturarTela(page, '11-unidades', '01-arvore-unidades', {fullPage: true});
+
+                // Expandir árvore para ver unidades
+                const btnExpand = page.getByTestId('btn-arvore-expand-SECRETARIA_1');
+                if (await btnExpand.isVisible().catch(() => false)) {
+                    await btnExpand.click();
+                    await page.waitForTimeout(300);
+                    await capturarTela(page, '11-unidades', '02-arvore-unidades-expandida', {fullPage: true});
+                }
+
+                // Clicar em uma unidade para ver detalhes
+                const unidade = page.getByText('SECAO_121').first();
+                if (await unidade.isVisible().catch(() => false)) {
+                    await unidade.click();
+                    await page.waitForTimeout(500);
+                    await capturarTela(page, '11-unidades', '03-detalhes-unidade', {fullPage: true});
+
+                    // Modal de criar atribuição temporária (CDU-28)
+                    const btnCriarAtribuicao = page.getByRole('button', {name: /Criar atribuição|Nova atribuição/i});
+                    if (await btnCriarAtribuicao.isVisible().catch(() => false)) {
+                        await btnCriarAtribuicao.click();
+                        await page.waitForTimeout(300);
+                        await capturarTela(page, '11-unidades', '04-modal-criar-atribuicao');
+                        await page.getByRole('button', {name: /Cancelar/i}).click();
+                    }
+                }
+            }
+        });
+    });
+
+    // ========================================================================
+    // SEÇÃO 12 - HISTÓRICO DE PROCESSOS (CDU-29)
+    // ========================================================================
+    test.describe('12 - Histórico', () => {
+        test('Captura seção de histórico', async ({page}) => {
+            await page.goto('/login');
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+
+            // Acessar seção de histórico
+            const linkHistorico = page.getByRole('link', {name: /Histórico/i});
+            if (await linkHistorico.isVisible().catch(() => false)) {
+                await linkHistorico.click();
+                await page.waitForTimeout(500);
+                await capturarTela(page, '12-historico', '01-pagina-historico', {fullPage: true});
+
+                // Tabela de processos finalizados
+                const tabela = page.locator('table');
+                if (await tabela.isVisible().catch(() => false)) {
+                    await capturarTela(page, '12-historico', '02-tabela-processos-finalizados', {fullPage: true});
+                }
+            }
+        });
+    });
+
+    // ========================================================================
+    // SEÇÃO 13 - CONFIGURAÇÕES E ADMINISTRADORES (CDUs 30-31)
+    // ========================================================================
+    test.describe('13 - Configurações', () => {
+        test('Captura página de configurações e administradores', async ({page}) => {
+            await page.goto('/login');
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+
+            // Acessar configurações
+            await page.getByTestId('btn-configuracoes').click();
+            await page.waitForTimeout(500);
+            await capturarTela(page, '13-configuracoes', '01-pagina-configuracoes', {fullPage: true});
+
+            // Seção de configurações do sistema (CDU-31)
+            const inputDiasInativacao = page.getByTestId('inp-config-dias-inativacao');
+            if (await inputDiasInativacao.isVisible().catch(() => false)) {
+                await capturarTela(page, '13-configuracoes', '02-config-sistema');
+            }
+
+            // Seção de administradores (CDU-30)
+            const secaoAdmins = page.getByText(/Administradores/i);
+            if (await secaoAdmins.isVisible().catch(() => false)) {
+                await secaoAdmins.click();
+                await page.waitForTimeout(300);
+                await capturarTela(page, '13-configuracoes', '03-lista-administradores', {fullPage: true});
+
+                // Botão de adicionar administrador
+                const btnAdicionar = page.getByRole('button', {name: /Adicionar|Novo/i});
+                if (await btnAdicionar.isVisible().catch(() => false)) {
+                    await btnAdicionar.click();
+                    await page.waitForTimeout(300);
+                    await capturarTela(page, '13-configuracoes', '04-modal-adicionar-administrador');
+                    await page.getByRole('button', {name: /Cancelar/i}).click();
+                }
+            }
+        });
+    });
+
+    // ========================================================================
+    // SEÇÃO 14 - RELATÓRIOS (CDUs 35-36)
+    // ========================================================================
+    test.describe('14 - Relatórios', () => {
+        test('Captura página e modais de relatórios', async ({page}) => {
+            await page.goto('/login');
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+
+            // Acessar relatórios
+            const linkRelatorios = page.getByRole('link', {name: /Relatórios/i});
+            if (await linkRelatorios.isVisible().catch(() => false)) {
+                await linkRelatorios.click();
+                await page.waitForTimeout(500);
+                await capturarTela(page, '14-relatorios', '01-pagina-relatorios', {fullPage: true});
+
+                // Card de relatório de andamento (CDU-35)
+                const cardAndamento = page.getByTestId('card-relatorio-andamento');
+                if (await cardAndamento.isVisible().catch(() => false)) {
+                    await cardAndamento.click();
+                    await page.waitForTimeout(300);
+                    await capturarTela(page, '14-relatorios', '02-modal-relatorio-andamento');
+
+                    // Verificar filtros
+                    const filtroTipo = page.getByTestId('sel-filtro-tipo');
+                    if (await filtroTipo.isVisible().catch(() => false)) {
+                        await capturarTela(page, '14-relatorios', '03-filtros-relatorio');
+                    }
+
+                    // Verificar botão de exportação
+                    const btnExportar = page.getByRole('button', {name: /Exportar|PDF|CSV/i});
+                    if (await btnExportar.isVisible().catch(() => false)) {
+                        await capturarTela(page, '14-relatorios', '04-botao-exportacao');
+                    }
+
+                    await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {});
+                    await page.waitForTimeout(300);
+                }
+
+                // Card de relatório de mapas (CDU-36)
+                const cardMapas = page.getByTestId('card-relatorio-mapas');
+                if (await cardMapas.isVisible().catch(() => false)) {
+                    await cardMapas.click();
+                    await page.waitForTimeout(300);
+                    await capturarTela(page, '14-relatorios', '05-modal-relatorio-mapas');
+                    await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {});
+                }
+            }
+        });
+    });
 });

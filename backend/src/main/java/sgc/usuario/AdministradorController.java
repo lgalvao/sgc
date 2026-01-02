@@ -16,22 +16,23 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/administradores")
 @RequiredArgsConstructor
-@Tag(name = "Administradores", description = "Endpoints para gerenciamento de administradores do sistema")
+@Tag(name = "Administradores", description = "Gerenciamento de administradores")
 public class AdministradorController {
     private final AdministradorService administradorService;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Lista todos os administradores do sistema")
+    @Operation(summary = "Lista todos os administradores")
     public ResponseEntity<List<AdministradorDto>> listarAdministradores() {
         return ResponseEntity.ok(administradorService.listarAdministradores());
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Adiciona um novo administrador")
+    @Operation(summary = "Adiciona um administrador")
     public ResponseEntity<AdministradorDto> adicionarAdministrador(
             @RequestBody Map<String, String> request) {
+
         String usuarioTitulo = request.get("usuarioTitulo");
         AdministradorDto administrador = administradorService.adicionarAdministrador(usuarioTitulo);
         return ResponseEntity.ok(administrador);
@@ -39,10 +40,11 @@ public class AdministradorController {
 
     @PostMapping("/{usuarioTitulo}/remover")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Remove um administrador do sistema")
+    @Operation(summary = "Remove um administrador")
     public ResponseEntity<Void> removerAdministrador(
             @PathVariable String usuarioTitulo,
             @AuthenticationPrincipal Usuario usuarioAtual) {
+
         administradorService.removerAdministrador(usuarioTitulo, usuarioAtual.getTituloEleitoral());
         return ResponseEntity.ok().build();
     }
