@@ -1,0 +1,79 @@
+Downloading https://services.gradle.org/distributions/gradle-9.2.1-bin.zip
+............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
+
+Welcome to Gradle 9.2.1!
+
+Here are the highlights of this release:
+ - Windows ARM support
+ - Improved publishing APIs
+ - Better guidance for dependency verification failures
+
+For more details see https://docs.gradle.org/9.2.1/release-notes.html
+
+Starting a Gradle Daemon (subsequent builds will be faster)
+Calculating task graph as no cached configuration is available for tasks: :backend:test --tests sgc.organizacao.UsuarioServiceTest
+> Task :backend:processTestResources
+> Task :backend:processResources
+> Task :backend:compileJava
+> Task :backend:classes
+> Task :backend:compileTestJava
+> Task :backend:testClasses
+
+> Task :backend:test
+
+Testes do Serviço UsuarioService > Gestão de Responsáveis > Deve buscar responsáveis de múltiplas unidades PASSED
+
+Testes do Serviço UsuarioService > Gestão de Responsáveis > Deve buscar unidades onde usuário é responsável PASSED
+
+Testes do Serviço UsuarioService > Gestão de Responsáveis > Deve buscar responsável da unidade PASSED
+
+Testes do Serviço UsuarioService > Autenticação e Autorização > Deve autenticar usuário com sucesso PASSED
+
+Testes do Serviço UsuarioService > Autenticação e Autorização > Deve entrar no sistema com perfil selecionado PASSED
+
+Testes do Serviço UsuarioService > Autenticação e Autorização > Deve autorizar e retornar lista de perfis/unidades PASSED
+
+Testes do Serviço UsuarioService > Autenticação e Autorização > Deve impedir autorização sem autenticação prévia PASSED
+
+Testes do Serviço UsuarioService > Autenticação e Autorização > Deve lançar exceção ao autorizar usuário não encontrado PASSED
+
+Testes do Serviço UsuarioService > Gestão de Perfis > Deve buscar unidades por perfil PASSED
+
+Testes do Serviço UsuarioService > Gestão de Perfis > Deve buscar perfis do usuário PASSED
+
+Testes do Serviço UsuarioService > Gestão de Perfis > Deve verificar se usuário tem perfil PASSED
+
+Testes do Serviço UsuarioService > Consultas de Unidade > Deve buscar subunidades PASSED
+
+Testes do Serviço UsuarioService > Consultas de Unidade > Deve buscar unidades ativas PASSED
+
+Testes do Serviço UsuarioService > Consultas de Unidade > Deve buscar unidade por código PASSED
+
+Testes do Serviço UsuarioService > Consultas de Unidade > Deve construir árvore hierárquica PASSED
+
+Testes do Serviço UsuarioService > Consultas de Usuário > Deve buscar usuário por título PASSED
+
+Testes do Serviço UsuarioService > Consultas de Usuário > Deve buscar usuário por email PASSED
+
+Testes do Serviço UsuarioService > Consultas de Usuário > Deve buscar entidade usuário por login garantindo inicialização PASSED
+
+Testes do Serviço UsuarioService > Consultas de Usuário > Deve buscar usuários ativos PASSED
+
+Testes do Serviço UsuarioService > Consultas de Usuário > Deve buscar usuários por lista de títulos PASSED
+
+═══════════════════════════════════════════════════════════════
+  RESUMO DOS TESTES
+═══════════════════════════════════════════════════════════════
+  Resultado: SUCCESS
+  Total:     20 testes
+  ✓ Passou:  20
+  ✗ Falhou:  0
+  ○ Ignorados: 0
+  Tempo:     24.528s
+═══════════════════════════════════════════════════════════════
+
+> Task :backend:jacocoTestReport
+
+BUILD SUCCESSFUL in 2m 34s
+6 actionable tasks: 6 executed
+Configuration cache entry stored.

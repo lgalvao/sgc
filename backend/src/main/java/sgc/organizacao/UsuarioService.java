@@ -51,13 +51,9 @@ public class UsuarioService {
 
     @Transactional(readOnly = true)
     public Usuario carregarUsuarioParaAutenticacao(String titulo) {
-        Usuario usuario = usuarioRepo.findById(titulo).orElse(null);
+        Usuario usuario = usuarioRepo.findByIdWithAtribuicoes(titulo).orElse(null);
         if (usuario != null) {
             carregarAtribuicoes(usuario);
-            // Inicializa a coleção lazy
-            if (usuario.getAtribuicoesTemporarias() != null) {
-                Hibernate.initialize(usuario.getAtribuicoesTemporarias());
-            }
             // Força a inicialização das authorities
             usuario.getAuthorities();
         }
@@ -99,14 +95,10 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public Usuario buscarUsuarioPorLogin(String login) {
         Usuario usuario = usuarioRepo
-                .findById(login)
+                .findByIdWithAtribuicoes(login)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", login));
 
         carregarAtribuicoes(usuario);
-        // Inicializa a coleção lazy para evitar LazyInitializationException
-        if (usuario.getAtribuicoesTemporarias() != null) {
-            Hibernate.initialize(usuario.getAtribuicoesTemporarias());
-        }
         return usuario;
     }
 
@@ -114,28 +106,24 @@ public class UsuarioService {
     public Usuario buscarResponsavelVigente(String sigla) {
         UnidadeDto unidadeDto = unidadeService.buscarPorSigla(sigla);
 
-        Usuario usuario = usuarioRepo
+        // Primeiro busca o chefe (pode ser lazy)
+        Usuario usuarioSimples = usuarioRepo
                 .chefePorCodUnidade(unidadeDto.getCodigo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Responsável da unidade", sigla));
+
+        // Recarrega com join fetch para garantir as atribuições
+        Usuario usuarioCompleto = usuarioRepo.findByIdWithAtribuicoes(usuarioSimples.getTituloEleitoral())
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", usuarioSimples.getTituloEleitoral()));
         
-        carregarAtribuicoes(usuario);
-        // Inicializa a coleção lazy para evitar LazyInitializationException
-        if (usuario.getAtribuicoesTemporarias() != null) {
-            Hibernate.initialize(usuario.getAtribuicoesTemporarias());
-        }
-        return usuario;
+        carregarAtribuicoes(usuarioCompleto);
+        return usuarioCompleto;
     }
 
     @Transactional(readOnly = true)
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
-        return usuarioRepo                .findById(titulo)
+        return usuarioRepo.findByIdWithAtribuicoes(titulo)
                 .map(usuario -> {
                     carregarAtribuicoes(usuario);
-                    // Inicializa a coleção lazy para evitar LazyInitializationException
-                    if (usuario.getAtribuicoesTemporarias() != null) {
-                        // TODO isso me parece um 'code smell'
-                        Hibernate.initialize(usuario.getAtribuicoesTemporarias());
-                    }
                     return usuario.getTodasAtribuicoes().stream()
                             .map(this::toPerfilDto)
                             .toList();
@@ -197,15 +185,15 @@ public class UsuarioService {
     public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         List<Usuario> todosChefes = usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos);
 
-        todosChefes.forEach(usuario -> {
-            carregarAtribuicoes(usuario);
-            // Inicializa a coleção lazy para evitar LazyInitializationException
-            if (usuario.getAtribuicoesTemporarias() != null) {
-                Hibernate.initialize(usuario.getAtribuicoesTemporarias());
-            }
-        });
+        // Precisamos recarregar as atribuições de cada chefe para evitar LazyInitializationException
+        // Isso não é o ideal em termos de performance (N+1), mas resolve o problema do TODO e LazyInit
+        // Uma solução melhor exigiria um query customizada mais complexa
+        List<Usuario> chefesCompletos = todosChefes.stream()
+            .map(u -> usuarioRepo.findByIdWithAtribuicoes(u.getTituloEleitoral()).orElse(u))
+            .peek(this::carregarAtribuicoes)
+            .toList();
 
-        Map<Long, List<Usuario>> chefesPorUnidade = todosChefes.stream()
+        Map<Long, List<Usuario>> chefesPorUnidade = chefesCompletos.stream()
                 .flatMap(u -> u.getTodasAtribuicoes().stream()
                         .filter(a -> a.getPerfil() == Perfil.CHEFE
                                 && unidadesCodigos.contains(
@@ -234,13 +222,9 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
         return usuarioRepo
-                .findById(titulo)
+                .findByIdWithAtribuicoes(titulo)
                 .map(u -> {
                     carregarAtribuicoes(u);
-                    // Inicializa a coleção lazy para evitar LazyInitializationException
-                    if (u.getAtribuicoesTemporarias() != null) {
-                        Hibernate.initialize(u.getAtribuicoesTemporarias());
-                    }
                     return u.getTodasAtribuicoes().stream()
                             .filter(a -> a.getPerfil() == Perfil.CHEFE)
                             .map(UsuarioPerfil::getUnidadeCodigo)
@@ -252,13 +236,9 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public boolean usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo) {
         return usuarioRepo
-                .findById(titulo)
+                .findByIdWithAtribuicoes(titulo)
                 .map(u -> {
                     carregarAtribuicoes(u);
-                    // Inicializa a coleção lazy para evitar LazyInitializationException
-                    if (u.getAtribuicoesTemporarias() != null) {
-                        Hibernate.initialize(u.getAtribuicoesTemporarias());
-                    }
                     return u.getTodasAtribuicoes().stream()
                             .anyMatch(a -> a.getPerfil().name().equals(perfil)
                                     && a.getUnidadeCodigo().equals(unidadeCodigo));
@@ -269,13 +249,9 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
         return usuarioRepo
-                .findById(titulo)
+                .findByIdWithAtribuicoes(titulo)
                 .map(u -> {
                     carregarAtribuicoes(u);
-                    // Inicializa a coleção lazy para evitar LazyInitializationException
-                    if (u.getAtribuicoesTemporarias() != null) {
-                        Hibernate.initialize(u.getAtribuicoesTemporarias());
-                    }
                     return u.getTodasAtribuicoes().stream()
                             .filter(a -> a.getPerfil().name().equals(perfil))
                             .map(a -> a.getUnidade().getCodigo())
@@ -374,14 +350,10 @@ public class UsuarioService {
     private List<PerfilUnidade> buscarAutorizacoesInterno(String tituloEleitoral) {
         log.debug("Buscando autorizações (perfis e unidades) para o usuário: {}", tituloEleitoral);
         Usuario usuario = usuarioRepo
-                .findById(tituloEleitoral)
+                .findByIdWithAtribuicoes(tituloEleitoral)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloEleitoral));
 
         carregarAtribuicoes(usuario);
-        // Inicializa a coleção lazy para evitar LazyInitializationException
-        if (usuario.getAtribuicoesTemporarias() != null) {
-            Hibernate.initialize(usuario.getAtribuicoesTemporarias());
-        }
 
         return usuario.getTodasAtribuicoes().stream().map(atribuicao -> new PerfilUnidade(
                         atribuicao.getPerfil(),
