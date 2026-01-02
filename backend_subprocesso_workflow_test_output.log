@@ -1,0 +1,44 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:test --tests sgc.subprocesso.service.SubprocessoMapaWorkflowServiceTest
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses UP-TO-DATE
+
+> Task :backend:test
+
+SubprocessoMapaWorkflowServiceTest > submeterMapaAjustado sucesso PASSED
+
+SubprocessoMapaWorkflowServiceTest > aceitarValidacao validado se houver proxima unidade PASSED
+
+SubprocessoMapaWorkflowServiceTest > validarMapa sucesso PASSED
+
+SubprocessoMapaWorkflowServiceTest > devolverValidacao sucesso PASSED
+
+SubprocessoMapaWorkflowServiceTest > disponibilizarMapa falha estado invalido PASSED
+
+SubprocessoMapaWorkflowServiceTest > aceitarValidacao homologado se nao houver proxima unidade PASSED
+
+SubprocessoMapaWorkflowServiceTest > apresentarSugestoes sucesso PASSED
+
+SubprocessoMapaWorkflowServiceTest > homologarValidacao sucesso PASSED
+
+SubprocessoMapaWorkflowServiceTest > disponibilizarMapa sucesso PASSED
+
+═══════════════════════════════════════════════════════════════
+  RESUMO DOS TESTES
+═══════════════════════════════════════════════════════════════
+  Resultado: SUCCESS
+  Total:     9 testes
+  ✓ Passou:  9
+  ✗ Falhou:  0
+  ○ Ignorados: 0
+  Tempo:     5.15s
+═══════════════════════════════════════════════════════════════
+
+> Task :backend:jacocoTestReport
+
+BUILD SUCCESSFUL in 9s
+6 actionable tasks: 2 executed, 4 up-to-date
+Configuration cache entry stored.

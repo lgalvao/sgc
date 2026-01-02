@@ -1,0 +1,1322 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:test
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses UP-TO-DATE
+
+> Task :backend:test
+
+ArchConsistencyTest > controllers_should_not_access_repositories PASSED
+
+ArchConsistencyTest > mapa_controller_should_only_access_mapa_service PASSED
+
+ArchConsistencyTest > processo_controller_should_only_access_processo_service PASSED
+
+ArchConsistencyTest > comum_package_should_not_contain_business_logic PASSED
+
+ArchConsistencyTest > services_should_not_access_other_modules_repositories PASSED
+
+FormatadorDataPropertyTest > formatacaoDeDataNuncaRetornaNuloOuVazio PASSED
+
+FormatadorDataPropertyTest > formatacaoDeDataNulaRetornaHifen PASSED
+
+FormatadorDataPropertyTest > formatacaoDeDataHoraNuncaRetornaNuloOuVazio PASSED
+
+MapaCompletoMapperPropertyTest > toDtoPreservesData PASSED
+
+ProcessoServicePropertyTest > processoNaoPodeSerEditadoSeNaoEstiverCriado PASSED
+
+GerenciadorJwtPropertyTest > gerarEValidarTokenDevePreservarDados PASSED
+
+GerenciadorJwtPropertyTest > validarTokenInvalidoDeveRetornarVazio PASSED
+
+SanitizacaoUtilPropertyTest > nullDeveRetornarNull PASSED
+
+SanitizacaoUtilPropertyTest > tagsHtmlDevemSerRemovidas PASSED
+
+SanitizacaoUtilPropertyTest > sanitizacaoDeveSerIdempotente PASSED
+
+SubprocessoWorkflowPropertiesTest > verificarTransicoesDeEstado PASSED
+
+Testes Unitários: AlertaController > marcarComoLido_quandoSucesso_deveRetornarOk PASSED
+
+Testes Unitários: AlertaController > marcarComoLido_quandoFalhaAlteracaoStatus_deveRetornarConflict PASSED
+
+Testes Unitários: AlertaController > marcarComoLido_quandoAlertaNaoEncontrado_deveRetornarNotFound PASSED
+
+Testes Unitários: AlertaController > marcarComoLido_quandoErroGenerico_deveRetornarInternalServerError PASSED
+
+Testes Unitários: AlertaService > Método: marcarComoLido > Deve marcar como lido com sucesso PASSED
+
+Testes Unitários: AlertaService > Método: criarAlertasProcessoIniciado > Deve criar alerta operacional com texto fixo PASSED
+
+Testes Unitários: AlertaService > Método: criarAlertasProcessoIniciado > Deve criar 2 alertas para interoperacional participante PASSED
+
+Testes Unitários: AlertaService > Método: criarAlertasProcessoIniciado > Deve criar alerta para unidade participante e seus ancestrais PASSED
+
+Testes Unitários: AlertaService > Métodos: criação de alertas específicos > Deve criar alerta de cadastro devolvido com sucesso PASSED
+
+Testes Unitários: AlertaService > Métodos: criação de alertas específicos > Deve criar alerta de cadastro disponibilizado com sucesso PASSED
+
+Testes Unitários: AlertaService > Método: criarAlerta > Deve criar alerta com sucesso PASSED
+
+Testes Unitários: AlertaService > Método: listarAlertasPorUsuario > Deve listar e criar AlertaUsuario (lazy creation) PASSED
+
+Testes Unitários: AlertaService > Método: listarAlertasPorUsuario > Deve listar sem criar novo se já existente PASSED
+
+Testes Unitários: AlertaMapper > formatDataHora deve retornar string vazia se nulo PASSED
+
+Testes Unitários: AlertaMapper > formatDataHora deve retornar string formatada PASSED
+
+Testes do AnaliseController > Testes para listar análises de cadastro > Deve retornar lista de análises de cadastro com status 200 OK PASSED
+
+Testes do AnaliseController > Testes para listar análises de cadastro > Deve retornar 404 Not Found quando subprocesso não encontrado PASSED
+
+Testes do AnaliseController > Testes para listar análises de cadastro > Deve retornar 500 Internal Server Error para erro inesperado PASSED
+
+Testes do AnaliseController > Testes para listar análises de cadastro > Deve retornar lista vazia de análises de cadastro com status 200 OK PASSED
+
+Testes do AnaliseController > Testes para criar análise de validação > Deve retornar 400 Bad Request para parâmetro inválido PASSED
+
+Testes do AnaliseController > Testes para criar análise de validação > Deve retornar 500 Internal Server Error para erro inesperado na criação PASSED
+
+Testes do AnaliseController > Testes para criar análise de validação > Deve retornar 404 Not Found quando subprocesso não encontrado PASSED
+
+Testes do AnaliseController > Testes para criar análise de validação > Deve criar uma análise de validação com observações vazias e retornar 201 Created PASSED
+
+Testes do AnaliseController > Testes para criar análise de validação > Deve criar uma análise de validação e retornar 201 Created PASSED
+
+Testes do AnaliseController > Testes para criar análise de cadastro > Deve retornar 404 Not Found quando subprocesso não encontrado PASSED
+
+Testes do AnaliseController > Testes para criar análise de cadastro > Deve retornar 400 Bad Request para observação muito longa PASSED
+
+Testes do AnaliseController > Testes para criar análise de cadastro > Deve criar uma análise de cadastro com observações vazias e retornar 201 Created PASSED
+
+Testes do AnaliseController > Testes para criar análise de cadastro > Deve retornar 400 Bad Request para parâmetro inválido PASSED
+
+Testes do AnaliseController > Testes para criar análise de cadastro > Deve retornar 500 Internal Server Error para erro inesperado na criação PASSED
+
+Testes do AnaliseController > Testes para criar análise de cadastro > Deve criar uma análise de cadastro e retornar 201 Created PASSED
+
+Testes do AnaliseController > Testes para criar análise de cadastro > Deve criar uma análise de cadastro sem payload e retornar 201 Created PASSED
+
+Testes do AnaliseController > Testes para listar análises de validação > Deve retornar 500 Internal Server Error para erro inesperado PASSED
+
+Testes do AnaliseController > Testes para listar análises de validação > Deve retornar 404 Not Found quando subprocesso não encontrado PASSED
+
+Testes do AnaliseController > Testes para listar análises de validação > Deve retornar lista vazia de análises de validação com status 200 OK PASSED
+
+Testes do AnaliseController > Testes para listar análises de validação > Deve retornar lista de análises de validação com status 200 OK PASSED
+
+Testes para AnaliseService > Testes para listarPorSubprocesso > Deve retornar lista de análises de cadastro PASSED
+
+Testes para AnaliseService > Testes para listarPorSubprocesso > Deve retornar lista de análises de validação PASSED
+
+Testes para AnaliseService > Testes para criarAnalise > Deve criar uma análise de cadastro PASSED
+
+Testes para AnaliseService > Testes para criarAnalise > Deve criar uma análise de validação PASSED
+
+Testes para AnaliseService > Testes para removerPorSubprocesso > Deve remover análises por subprocesso PASSED
+
+CustomExceptionsTest > Deve instanciar ErroEntidadeNaoEncontrada PASSED
+
+CustomExceptionsTest > Deve instanciar ErroAccessoNegado PASSED
+
+RestExceptionHandlerSecurityTest > deveOcultarValorRejeitadoNoErroDeValidacao() PASSED
+
+Testes do RestExceptionHandler > Deve tratar IllegalStateException com status 409 PASSED
+
+Testes do RestExceptionHandler > Deve tratar ErroRequisicaoSemCorpo com status 400 PASSED
+
+Testes do RestExceptionHandler > Deve tratar ErroEntidadeNaoEncontrada com status 404 PASSED
+
+Testes do RestExceptionHandler > Deve tratar ErroAccessoNegado com status 403 PASSED
+
+Testes do RestExceptionHandler > Deve tratar Exception genérica com status 500 PASSED
+
+Testes para HtmlSanitizingDeserializer > Deve permitir texto simples sem HTML PASSED
+
+Testes para HtmlSanitizingDeserializer > Deve remover javascript: protocol de links PASSED
+
+Testes para HtmlSanitizingDeserializer > Deve sanitizar SQL injection em string PASSED
+
+Testes para HtmlSanitizingDeserializer > Deve retornar valores nulos ou vazios sem alteração > [1] input = null PASSED
+
+Testes para HtmlSanitizingDeserializer > Deve retornar valores nulos ou vazios sem alteração > [2] input = "" PASSED
+
+Testes para HtmlSanitizingDeserializer > Deve retornar valores nulos ou vazios sem alteração > [3] input = " " PASSED
+
+Testes para HtmlSanitizingDeserializer > Deve retornar valores nulos ou vazios sem alteração > [4] input = "  " PASSED
+
+Testes para HtmlSanitizingDeserializer > Deve retornar valores nulos ou vazios sem alteração > [5] input = "\t" PASSED
+
+Testes para HtmlSanitizingDeserializer > Deve retornar valores nulos ou vazios sem alteração > [6] input = "\n" PASSED
+
+Testes para HtmlSanitizingDeserializer > Deve remover iframes maliciosos PASSED
+
+Testes para HtmlSanitizingDeserializer > Deve remover script tags do conteúdo HTML PASSED
+
+Testes para HtmlSanitizingDeserializer > Deve remover event handlers de HTML PASSED
+
+Testes de Utilitário: FormatadorData > Deve retornar hífen quando data for null em formatarDataHora PASSED
+
+Testes de Utilitário: FormatadorData > Deve formatar data com zeros à esquerda (padding) PASSED
+
+Testes de Utilitário: FormatadorData > Deve retornar hífen quando data for null em formatarData PASSED
+
+Testes de Utilitário: FormatadorData > Deve formatar data e hora corretamente PASSED
+
+Testes de Utilitário: FormatadorData > Deve formatar data corretamente PASSED
+
+Testes Unitários: ParametroService > Deve atualizar valor de parâmetro existente PASSED
+
+Testes Unitários: ParametroService > Deve buscar todos os parâmetros PASSED
+
+Testes Unitários: ParametroService > Deve lançar exceção ao tentar atualizar parâmetro inexistente PASSED
+
+Testes Unitários: ParametroService > Deve lançar exceção ao buscar chave inexistente PASSED
+
+Testes Unitários: ParametroService > Deve salvar lista de parâmetros PASSED
+
+Testes Unitários: ParametroService > Deve buscar parâmetro por chave com sucesso PASSED
+
+Testes do E2eController (Backend Support) > Deve limpar dados do processo e suas dependências PASSED
+
+Testes do E2eController (Backend Support) > Deve resetar o banco de dados truncando tabelas PASSED
+
+Testes de Endpoint de Fixture E2E > Deve gerar descrição automática quando não fornecida PASSED
+
+Testes de Endpoint de Fixture E2E > Deve permitir criar processo de mapeamento via fixture PASSED
+
+Testes de Endpoint de Fixture E2E > Deve permitir criar e iniciar processo de mapeamento via fixture PASSED
+
+Testes de Endpoint de Fixture E2E > Deve retornar erro quando unidade não existe PASSED
+
+Integração: Fluxo de Atividades (Criação, Exclusão, Validação) > Deve validar cadastro: Mapa sem atividades gera erro SEM_ATIVIDADES PASSED
+
+Integração: Fluxo de Atividades (Criação, Exclusão, Validação) > Deve criar e excluir atividade com sucesso PASSED
+
+Integração: Fluxo de Atividades (Criação, Exclusão, Validação) > Deve validar cadastro: Atividade sem conhecimento gera erro PASSED
+
+CDU-01: Realizar Login > Testes de fluxo de login completo > Deve falhar ao tentar autorizar com unidade inexistente retornada pelo SGRH PASSED
+
+CDU-01: Realizar Login > Testes de fluxo de login completo > Deve realizar login completo para usuário com um único perfil PASSED
+
+CDU-01: Realizar Login > Testes de fluxo de login completo > Deve falhar ao tentar entrar com unidade inexistente PASSED
+
+CDU-01: Realizar Login > Testes de fluxo de login completo > Deve realizar login completo para usuário com múltiplos perfis PASSED
+
+CDU-02: Visualizar Painel > Testes de Visibilidade de Alertas > Usuário deve ver alertas direcionados à sua unidade e às suas subordinadas PASSED
+
+CDU-02: Visualizar Painel > Testes de Visibilidade de Alertas > Usuário não deve ver alertas de outros usuários ou unidades PASSED
+
+CDU-02: Visualizar Painel > Testes de Visibilidade de Alertas > Usuário deve ver alertas direcionados a ele PASSED
+
+CDU-02: Visualizar Painel > Testes de Visibilidade de Processos > GESTOR da unidade raiz deve ver todos os processos da sua unidade e de todas as subordinadas PASSED
+
+CDU-02: Visualizar Painel > Testes de Visibilidade de Processos > Nenhum perfil, exceto ADMIN, deve ver processos com status 'Criado' (Exceto da própria unidade) PASSED
+
+CDU-02: Visualizar Painel > Testes de Visibilidade de Processos > ADMIN deve ver todos os processos, incluindo os com status 'Criado' PASSED
+
+CDU-02: Visualizar Painel > Testes de Visibilidade de Processos > CHEFE da unidade Filha 2 não deve ver processos de outras unidades PASSED
+
+CDU-03: Manter processo > testEditarProcesso_processoNaoEncontrado_falha() PASSED
+
+CDU-03: Manter processo > testCriarProcesso_sucesso() PASSED
+
+CDU-03: Manter processo > testRemoverProcesso_processoNaoEncontrado_falha() PASSED
+
+CDU-03: Manter processo > testRemoverProcesso_sucesso() PASSED
+
+CDU-03: Manter processo > testCriarProcesso_semUnidades_falha() PASSED
+
+CDU-03: Manter processo > testCriarProcesso_descricaoVazia_falha() PASSED
+
+CDU-03: Manter processo > testEditarProcesso_sucesso() PASSED
+
+CDU-04: Iniciar processo de mapeamento > Deve iniciar processo de mapeamento com sucesso e gerar subprocessos, alertas e notificações PASSED
+
+CDU-05: Iniciar processo de revisão > testIniciarProcessoRevisao_processoJaIniciado_falha() PASSED
+
+CDU-05: Iniciar processo de revisão > testIniciarProcessoRevisao_sucesso() PASSED
+
+CDU-05: Iniciar processo de revisão > testIniciarProcessoRevisao_processoNaoEncontrado_falha() PASSED
+
+CDU-05: Iniciar processo de revisão > testIniciarProcessoRevisao_unidadeSemMapaVigente_falha() PASSED
+
+CDU-06: Detalhar processo > Deve mostrar 'podeFinalizar' como true para Admin com subprocessos homologados PASSED
+
+CDU-06: Detalhar processo > Deve mostrar 'podeHomologarCadastro' como true para Gestor com cadastro disponibilizado PASSED
+
+CDU-06: Detalhar processo > Deve detalhar processo para Admin PASSED
+
+CDU-06: Detalhar processo > Deve mostrar 'podeHomologarMapa' como true para Gestor com mapa validado PASSED
+
+CDU-06: Detalhar processo > Deve mostrar 'podeFinalizar' como false para não Admin PASSED
+
+CDU-06: Detalhar processo > Deve retornar 404 para processo inexistente PASSED
+
+CDU-06: Detalhar processo > Deve retornar detalhes da unidade com situação do subprocesso correta PASSED
+
+CDU-07: Detalhar Subprocesso > Testes de Acesso e Visualização > CHEFE pode visualizar o subprocesso da sua unidade PASSED
+
+CDU-07: Detalhar Subprocesso > Testes de Acesso e Visualização > Deve falhar ao buscar subprocesso inexistente PASSED
+
+CDU-07: Detalhar Subprocesso > Testes de Acesso e Visualização > CHEFE NÃO pode visualizar o subprocesso de outra unidade PASSED
+
+CDU-07: Detalhar Subprocesso > Testes de Acesso e Visualização > ADMIN pode visualizar qualquer subprocesso PASSED
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Deve falhar ao importar de subprocesso inexistente PASSED
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Não deve importar nada de subprocesso sem atividades PASSED
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Deve importar atividades e conhecimentos PASSED
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Deve falhar ao importar para subprocesso em estado inválido PASSED
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Deve importar e atualizar status se NAO_INICIADO PASSED
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Deve importar apenas atividades não existentes no destino PASSED
+
+CDU-09: Disponibilizar Cadastro de Atividades e Conhecimentos > Testes de Segurança > Não deve permitir que um CHEFE de outra unidade disponibilize o cadastro PASSED
+
+CDU-09: Disponibilizar Cadastro de Atividades e Conhecimentos > Testes para Disponibilizar Cadastro > Deve disponibilizar o cadastro quando todas as condições são atendidas PASSED
+
+CDU-09: Disponibilizar Cadastro de Atividades e Conhecimentos > Testes para Disponibilizar Cadastro > Não deve disponibilizar se houver atividade sem conhecimento associado PASSED
+
+CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos > Testes de Segurança > Não deve permitir que um CHEFE de outra unidade disponibilize a revisão PASSED
+
+CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos > Cenário 4: Histórico de análise deve ser excluído após nova disponibilização > Deve excluir histórico de análises anteriores quando disponibilizar revisão novamente PASSED
+
+CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos > Testes para Disponibilizar Revisão do Cadastro > Não deve disponibilizar se houver atividade sem conhecimento associado PASSED
+
+CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos > Testes para Disponibilizar Revisão do Cadastro > Deve disponibilizar a revisão do cadastro quando todas as condições são atendidas PASSED
+
+CDU-11: Visualizar cadastro de atividades e conhecimentos > Testes de Cenário de Sucesso > Deve permitir que GESTOR visualize o cadastro de qualquer unidade PASSED
+
+CDU-11: Visualizar cadastro de atividades e conhecimentos > Testes de Cenário de Sucesso > Deve retornar o cadastro completo de atividades e conhecimentos para o Chefe da unidade PASSED
+
+CDU-11: Visualizar cadastro de atividades e conhecimentos > Testes de Cenário de Sucesso > Deve permitir que ADMIN visualize o cadastro de qualquer unidade PASSED
+
+CDU-11: Visualizar cadastro de atividades e conhecimentos > Testes de Cenário de Sucesso > Deve permitir que SERVIDOR visualize o cadastro de qualquer unidade PASSED
+
+CDU-11: Visualizar cadastro de atividades e conhecimentos > Testes de Casos de Borda e Falhas > Deve retornar uma lista de atividades vazia quando o mapa não tem atividades PASSED
+
+CDU-11: Visualizar cadastro de atividades e conhecimentos > Testes de Casos de Borda e Falhas > Deve retornar uma atividade com a lista de conhecimentos vazia PASSED
+
+CDU-11: Visualizar cadastro de atividades e conhecimentos > Testes de Casos de Borda e Falhas > Deve retornar 404 Not Found para um subprocesso inexistente PASSED
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Sucesso > Não deve detectar impactos quando o cadastro de atividades é idêntico ao mapa vigente PASSED
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Sucesso > Deve detectar atividades alteradas como uma remoção e uma inserção PASSED
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Sucesso > Deve detectar atividades inseridas PASSED
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Sucesso > Deve identificar competências impactadas por remoções e alterações PASSED
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Sucesso > Deve detectar atividades removidas e as competências relacionadas PASSED
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Borda e Falhas > Não deve detectar impactos se a unidade não possui mapa vigente PASSED
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Borda e Falhas > Deve retornar 404 para subprocesso inexistente PASSED
+
+CDU-12: Verificar impactos no mapa de competências > Testes de Controle de Acesso por Perfil e Situação > ADMIN pode acessar se subprocesso está em 'Mapa Ajustado' PASSED
+
+CDU-12: Verificar impactos no mapa de competências > Testes de Controle de Acesso por Perfil e Situação > CHEFE pode acessar se subprocesso está em 'Revisão do cadastro em andamento' PASSED
+
+CDU-12: Verificar impactos no mapa de competências > Testes de Controle de Acesso por Perfil e Situação > GESTOR pode acessar se subprocesso está em 'Revisão do cadastro disponibilizada' PASSED
+
+CDU-12: Verificar impactos no mapa de competências > Testes de Controle de Acesso por Perfil e Situação > CHEFE NÃO pode acessar se subprocesso está em situação diferente de 'Revisão do cadastro em andamento' PASSED
+
+CDU-12: Verificar impactos no mapa de competências > Testes de Controle de Acesso por Perfil e Situação > ADMIN pode acessar se subprocesso está em 'Revisão do cadastro homologada' PASSED
+
+CDU-13: Analisar cadastro de atividades e conhecimentos > Fluxo de Aceite > Deve aceitar cadastro, registrar análise e mover para unidade superior PASSED
+
+CDU-13: Analisar cadastro de atividades e conhecimentos > Fluxo de Homologação > Deve homologar cadastro, alterar situação e registrar movimentação da SEDOC PASSED
+
+CDU-13: Analisar cadastro de atividades e conhecimentos > Fluxo de Devolução > Deve devolver cadastro, registrar análise corretamente e alterar situação PASSED
+
+CDU-13: Analisar cadastro de atividades e conhecimentos > Fluxo de Histórico de Análise > Deve retornar o histórico de devoluções e aceites ordenado PASSED
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Endpoints de Consulta > Deve retornar histórico de análise corretamente PASSED
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Endpoints de Consulta > Deve retornar impactos no mapa corretamente PASSED
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Homologação > ADMIN homologa SEM impactos, alterando status para MAPA_HOMOLOGADO PASSED
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Homologação > ADMIN homologa COM impactos, alterando status e criando movimentação PASSED
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Falhas e Segurança > Não pode homologar em estado inválido PASSED
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Falhas e Segurança > CHEFE não pode homologar revisão PASSED
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Aceite > GESTOR deve aceitar, alterando status e criando todos os registros PASSED
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Devolução > GESTOR deve devolver, alterando status e criando registros PASSED
+
+CDU-15: Manter Mapa de Competências > Deve obter o mapa completo do subprocesso PASSED
+
+CDU-15: Manter Mapa de Competências > Deve editar, adicionar e remover competências de um mapa existente PASSED
+
+CDU-15: Manter Mapa de Competências > Deve retornar 400 se tentar salvar mapa para subprocesso em situação inválida PASSED
+
+CDU-15: Manter Mapa de Competências > Deve criar competências em um mapa vazio e mudar situação do subprocesso PASSED
+
+CDU-15: Manter Mapa de Competências > Testes de CRUD de Competência Individual > Deve atualizar uma competência existente PASSED
+
+CDU-15: Manter Mapa de Competências > Testes de CRUD de Competência Individual > Deve remover uma competência existente PASSED
+
+CDU-15: Manter Mapa de Competências > Testes de CRUD de Competência Individual > Deve adicionar uma nova competência a um mapa PASSED
+
+CDU-15: Manter Mapa de Competências > Testes de CRUD de Competência Individual > Deve retornar 409 se tentar editar mapa para subprocesso em situação inválida PASSED
+
+CDU-16: Ajustar mapa de competências > Deve submeter o mapa ajustado e alterar a situação do subprocesso PASSED
+
+CDU-16: Ajustar mapa de competências > Testes de ajuste do mapa > Deve salvar ajustes no mapa e alterar a situação do subprocesso PASSED
+
+CDU-16: Ajustar mapa de competências > Testes de ajuste do mapa > Deve retornar 409 se tentar ajustar mapa em situação inválida PASSED
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Sucesso > Deve disponibilizar mapa quando todos os dados estão corretos PASSED
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa com usuário sem permissão (não ADMIN) PASSED
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa se houver atividade sem competência associada PASSED
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa se houver competência sem atividade associada PASSED
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa se subprocesso não está no estado correto PASSED
+
+CDU-18: Visualizar Mapa de Competências > Deve retornar 404 se o subprocesso não existir PASSED
+
+CDU-18: Visualizar Mapa de Competências > Deve retornar o mapa de competências formatado para visualização PASSED
+
+CDU-19: Validar Mapa de Competências > Testes para o fluxo de 'Validar Mapa' > Deve validar o mapa, alterar status, registrar movimentação e criar alerta PASSED
+
+CDU-19: Validar Mapa de Competências > Testes para o fluxo de 'Apresentar Sugestões' > Deve apresentar sugestões, alterar status, mas não criar movimentação ou alerta PASSED
+
+CDU-20: Analisar validação de mapa de competências > Devolução e aceite da validação do mapa com verificação do histórico PASSED
+
+CDU-20: Analisar validação de mapa de competências > ADMIN deve homologar validação do mapa, alterando status para MAPA_HOMOLOGADO e registrando movimentação e alerta PASSED
+
+CDU-21: Finalizar Processo > Não deve finalizar processo se houver subprocessos pendentes e deve retornar 409 Conflict PASSED
+
+CDU-21: Finalizar Processo > Deve finalizar processo, atualizar status, tornar mapas vigentes e notificar todas as unidades corretamente PASSED
+
+CDU-22: Aceitar cadastros em bloco > Deve aceitar cadastro de múltiplas unidades em bloco PASSED
+
+CDU-23: Homologar cadastros em bloco > Deve homologar cadastro de múltiplas unidades em bloco PASSED
+
+CDU-24: Disponibilizar mapas de competências em bloco > Deve disponibilizar mapas de competências em bloco (sucesso) PASSED
+
+CDU-25: Aceitar validação de mapas em bloco > Deve aceitar validação de mapas em bloco PASSED
+
+CDU-26: Homologar validação de mapas em bloco > Deve homologar validação de mapas em bloco PASSED
+
+CDU-27: Alterar data limite de subprocesso > Deve alterar a data limite e gerar alerta quando ADMIN PASSED
+
+CDU-27: Alterar data limite de subprocesso > Não deve permitir alterar data limite se não for ADMIN PASSED
+
+CDU-28: Manter atribuição temporária > Deve criar uma atribuição temporária com sucesso PASSED
+
+CDU-28: Manter atribuição temporária > Não deve permitir criar atribuição com datas inválidas PASSED
+
+CDU-29: Consultar histórico de processos > Deve retornar detalhes de um processo finalizado PASSED
+
+CDU-29: Consultar histórico de processos > Deve listar apenas processos finalizados PASSED
+
+CDU-30: Manter Administradores > Deve listar administradores existentes PASSED
+
+CDU-30: Manter Administradores > Deve adicionar um novo administrador PASSED
+
+CDU-30: Manter Administradores > Não deve permitir remover o único administrador PASSED
+
+CDU-30: Manter Administradores > Deve remover um administrador PASSED
+
+CDU-30: Manter Administradores > Não deve permitir adicionar administrador já existente PASSED
+
+CDU-31: Configurar sistema > Deve permitir listar e atualizar configurações como ADMIN PASSED
+
+CDU-32: Reabrir cadastro > Não deve permitir reabrir cadastro sem ser ADMIN PASSED
+
+CDU-32: Reabrir cadastro > Não deve permitir reabrir cadastro sem justificativa PASSED
+
+CDU-32: Reabrir cadastro > Deve reabrir cadastro com justificativa válida quando ADMIN PASSED
+
+CDU-33: Reabrir revisão de cadastro > Não deve permitir reabrir revisão de cadastro sem ser ADMIN PASSED
+
+CDU-33: Reabrir revisão de cadastro > Deve reabrir revisão de cadastro com justificativa válida quando ADMIN PASSED
+
+CDU-33: Reabrir revisão de cadastro > Não deve permitir reabrir revisão sem justificativa PASSED
+
+CDU-34: Enviar lembrete de prazo > Não deve permitir enviar lembrete sem ser ADMIN PASSED
+
+CDU-34: Enviar lembrete de prazo > Deve retornar erro ao enviar lembrete para unidade inexistente PASSED
+
+CDU-34: Enviar lembrete de prazo > Deve enviar lembrete de prazo para unidade quando ADMIN PASSED
+
+CDU-35: Gerar relatório de andamento > Deve gerar relatório de andamento em PDF quando ADMIN PASSED
+
+CDU-35: Gerar relatório de andamento > Não deve permitir gerar relatório de andamento sem ser ADMIN PASSED
+
+CDU-35: Gerar relatório de andamento > Deve retornar erro ao gerar relatório de processo inexistente PASSED
+
+CDU-36: Gerar relatório de mapas > Deve gerar relatório de mapas em PDF quando ADMIN PASSED
+
+CDU-36: Gerar relatório de mapas > Deve gerar relatório de mapas filtrado por unidade quando ADMIN PASSED
+
+CDU-36: Gerar relatório de mapas > Deve retornar erro ao gerar relatório de processo inexistente PASSED
+
+CDU-36: Gerar relatório de mapas > Não deve permitir gerar relatório de mapas sem ser ADMIN PASSED
+
+Fluxo Completo: Processo de Mapeamento até Finalização > Deve poder buscar subprocesso após fluxo completo de finalização PASSED
+
+Fluxo de Estados: Processo e Subprocesso > Fluxo de Mapeamento > Fluxo Mapeamento Happy Path: Inicio -> Cadastro -> Mapa -> Finalização PASSED
+
+Fluxo de Estados: Processo e Subprocesso > Fluxo de Mapeamento > Fluxo Mapeamento com Devolução de Cadastro PASSED
+
+Fluxo de Estados: Processo e Subprocesso > Fluxo de Revisão > Fluxo Revisão Happy Path com Impactos e Ajuste de Mapa PASSED
+
+Fluxo de Estados: Processo e Subprocesso > Fluxo de Revisão > Fluxo Revisão Sem Impactos PASSED
+
+Endpoint: /api/processos/{id} > Detalhes do processo com unidades participantes > Deve retornar 404 quando processo não existe PASSED
+
+Endpoint: /api/processos/{id} > Detalhes do processo com unidades participantes > Deve retornar detalhes com unidades para processo FINALIZADO PASSED
+
+Endpoint: /api/processos/{id} > Detalhes do processo com unidades participantes > Deve retornar detalhes com unidades para processo em andamento PASSED
+
+Performance: Processo > Deve listar processos ativos com participantes PASSED
+
+ProcessoSegurancaTest > Não deve permitir que usuário sem ROLE_ADMIN crie um processo PASSED
+
+Security Auth Bypass Test > Should REJECT getting a token without prior authentication PASSED
+
+Endpoint: /api/subprocessos/buscar > Buscar por processo e unidade > Deve retornar subprocesso para processo FINALIZADO PASSED
+
+Endpoint: /api/subprocessos/buscar > Buscar por processo e unidade > Deve retornar subprocesso para processo em andamento PASSED
+
+Endpoint: /api/subprocessos/buscar > Buscar por processo e unidade > Deve retornar 404 quando processo não existe PASSED
+
+Endpoint: /api/subprocessos/buscar > Buscar por processo e unidade > Deve retornar 404 quando sigla de unidade não existe PASSED
+
+Endpoint: /api/subprocessos/buscar > Buscar por processo e unidade > Deve retornar 404 quando unidade existe mas não participa do processo PASSED
+
+Integração: Entidades de Views (SGC) > Deve persistir e consultar VW_VINCULACAO_UNIDADE PASSED
+
+Integração: Entidades de Views (SGC) > Deve persistir e consultar VW_UNIDADE PASSED
+
+Integração: Entidades de Views (SGC) > Deve persistir e consultar VW_USUARIO PASSED
+
+Integração: Entidades de Views (SGC) > Deve persistir e consultar VW_USUARIO_PERFIL_UNIDADE PASSED
+
+Testes do Controller de Mapas > Deve retornar mapa quando existir PASSED
+
+Testes do Controller de Mapas > Deve retornar NotFound quando mapa não existir PASSED
+
+Testes do Controller de Mapas > Deve retornar NotFound ao atualizar mapa inexistente PASSED
+
+Testes do Controller de Mapas > Deve retornar Created ao criar mapa PASSED
+
+Testes do Controller de Mapas > Deve retornar NotFound ao excluir mapa inexistente PASSED
+
+Testes do Controller de Mapas > Deve retornar Ok ao atualizar mapa existente PASSED
+
+Testes do Controller de Mapas > Deve retornar lista de mapas PASSED
+
+Testes do Controller de Mapas > Deve retornar NoContent ao excluir mapa PASSED
+
+MapaCompletoMapperTest > toDto() PASSED
+
+Testes do Serviço de Atividade > Atualização e Exclusão > Deve excluir atividade PASSED
+
+Testes do Serviço de Atividade > Atualização e Exclusão > Deve atualizar atividade PASSED
+
+Testes do Serviço de Atividade > Importação de Atividades > Deve importar atividades de outro mapa PASSED
+
+Testes do Serviço de Atividade > Criação de Atividade > Deve criar atividade com sucesso PASSED
+
+Testes do Serviço de Atividade > Criação de Atividade > Deve negar criação se usuário não for titular PASSED
+
+Testes do Serviço de Atividade > Gestão de Conhecimentos > Deve criar conhecimento PASSED
+
+Testes do Serviço de Atividade > Gestão de Conhecimentos > Deve atualizar conhecimento PASSED
+
+Testes do Serviço de Atividade > Gestão de Conhecimentos > Deve lançar erro se conhecimento não pertencer à atividade PASSED
+
+Testes do Serviço de Competência > Deve atualizar competência e suas associações PASSED
+
+Testes do Serviço de Competência > Deve buscar por ID PASSED
+
+Testes do Serviço de Competência > Deve lançar erro ao buscar inexistente PASSED
+
+Testes do Serviço de Competência > Deve remover competência e limpar associações PASSED
+
+Testes do Serviço de Competência > Deve adicionar competência com atividades PASSED
+
+Testes do Serviço de Cópia de Mapa > Deve copiar mapa com sucesso PASSED
+
+Testes do Serviço de Cópia de Mapa > Deve lidar com listas vazias ou nulas de atividades e competencias PASSED
+
+Testes do Serviço de Cópia de Mapa > Deve lançar erro se mapa origem não existir PASSED
+
+Testes para ImpactoMapaService > Testes de detecção de impactos > Deve detectar impactos quando há diferenças entre mapas PASSED
+
+Testes para ImpactoMapaService > Testes de detecção de impactos > Deve retornar sem impacto se não houver mapa vigente PASSED
+
+Testes para ImpactoMapaService > Testes de verificação de acesso > CHEFE não pode acessar quando situação for diferente de REVISAO_CADASTRO_EM_ANDAMENTO PASSED
+
+Testes para ImpactoMapaService > Testes de verificação de acesso > ADMIN pode acessar quando situação for REVISAO_MAPA_AJUSTADO PASSED
+
+Testes para ImpactoMapaService > Testes de verificação de acesso > GESTOR não pode acessar quando situação for diferente de REVISAO_CADASTRO_DISPONIBILIZADA PASSED
+
+Testes para ImpactoMapaService > Testes de verificação de acesso > ADMIN pode acessar quando situação for REVISAO_CADASTRO_HOMOLOGADA PASSED
+
+Testes para ImpactoMapaService > Testes de verificação de acesso > ADMIN não pode acessar quando situação for diferente das permitidas PASSED
+
+Testes para ImpactoMapaService > Testes de verificação de acesso > CHEFE pode acessar quando situação for REVISAO_CADASTRO_EM_ANDAMENTO PASSED
+
+Testes para ImpactoMapaService > Testes de verificação de acesso > ADMIN pode acessar quando situação for REVISAO_CADASTRO_DISPONIBILIZADA PASSED
+
+Testes para ImpactoMapaService > Testes de verificação de acesso > GESTOR pode acessar quando situação for REVISAO_CADASTRO_DISPONIBILIZADA PASSED
+
+Testes do Serviço de Mapas > CRUD de Mapa > Deve lançar erro ao excluir mapa inexistente PASSED
+
+Testes do Serviço de Mapas > CRUD de Mapa > Deve criar mapa PASSED
+
+Testes do Serviço de Mapas > CRUD de Mapa > Deve atualizar mapa PASSED
+
+Testes do Serviço de Mapas > CRUD de Mapa > Deve excluir mapa PASSED
+
+Testes do Serviço de Mapas > CRUD de Mapa > Deve listar mapas PASSED
+
+Testes do Serviço de Mapas > CRUD de Mapa > Deve lançar erro ao obter mapa inexistente PASSED
+
+Testes do Serviço de Mapas > CRUD de Mapa > Deve lançar erro ao atualizar mapa inexistente PASSED
+
+Testes do Serviço de Mapas > CRUD de Mapa > Deve obter mapa por código PASSED
+
+Testes do Serviço de Mapas > Mapa Completo > Deve lançar erro ao salvar mapa completo se mapa não existe PASSED
+
+Testes do Serviço de Mapas > Mapa Completo > Deve lançar erro ao salvar mapa completo se competência não existe PASSED
+
+Testes do Serviço de Mapas > Mapa Completo > Deve lançar erro ao buscar mapa completo inexistente PASSED
+
+Testes do Serviço de Mapas > Mapa Completo > Deve retornar mapa completo quando existir PASSED
+
+Testes do Serviço de Visualização de Mapa > Deve obter mapa para visualização PASSED
+
+Testes do Serviço de Visualização de Mapa > Deve lançar erro se subprocesso não tem mapa PASSED
+
+Testes Unitários: EventoProcessoListener > Evento: Processo Iniciado > Deve processar evento completo para unidade operacional PASSED
+
+Testes Unitários: EventoProcessoListener > Evento: Processo Iniciado > Não deve enviar e-mail quando tipo de unidade desconhecido PASSED
+
+Testes Unitários: EventoProcessoListener > Evento: Processo Iniciado > Não deve enviar e-mails quando não houver subprocessos PASSED
+
+Testes Unitários: EventoProcessoListener > Evento: Processo Iniciado > Deve capturar exception geral sem interromper execução PASSED
+
+Testes Unitários: EventoProcessoListener > Evento: Processo Iniciado > Não deve enviar e-mail quando subprocesso sem unidade PASSED
+
+Testes Unitários: EventoProcessoListener > Evento: Processo Iniciado > Deve enviar e-mail correto para unidade INTERMEDIARIA PASSED
+
+Testes Unitários: EventoProcessoListener > Evento: Processo Iniciado > Deve enviar e-mail correto para unidade INTEROPERACIONAL PASSED
+
+Testes Unitários: EventoProcessoListener > Evento: Processo Iniciado > Não deve enviar e-mail quando titular sem e-mail PASSED
+
+Testes Unitários: EventoProcessoListener > Evento: Processo Iniciado > Deve prosseguir envio para titular mesmo com erro no envio para substituto PASSED
+
+Testes Unitários: EventoProcessoListener > Evento: Processo Iniciado > Não deve enviar e-mail quando responsável não encontrado PASSED
+
+Testes Unitários: EventoProcessoListener > Evento: Processo Iniciado > Não deve fazer nada quando processo não encontrado PASSED
+
+Testes Unitários: EventoProcessoListener > Evento: Processo Finalizado > Deve processar finalização e enviar e-mail para unidade operacional PASSED
+
+Testes Unitários: NotificacaoEmailAsyncExecutor > Deve realizar retentativas e ter sucesso PASSED
+
+Testes Unitários: NotificacaoEmailAsyncExecutor > Deve enviar email com sucesso na primeira tentativa PASSED
+
+Testes Unitários: NotificacaoEmailAsyncExecutor > Deve falhar após exceder tentativas máximas PASSED
+
+NotificacaoEmailServiceTest > Deve enviar e-mail de texto simples PASSED
+
+NotificacaoEmailServiceTest > Deve truncar conteúdo longo da notificação PASSED
+
+NotificacaoEmailServiceTest > Não deve enviar e-mail para endereço null PASSED
+
+NotificacaoEmailServiceTest > Não deve enviar e-mail para endereço vazio PASSED
+
+NotificacaoEmailServiceTest > Não deve enviar e-mail para endereço inválido PASSED
+
+NotificacaoEmailServiceTest > Deve enviar e-mail HTML PASSED
+
+Testes Unitários: NotificacaoModelosService > Geração de E-mails de Mapa > Deve criar email de mapa validado com os dados corretos PASSED
+
+Testes Unitários: NotificacaoModelosService > Geração de E-mails de Mapa > Deve criar email de mapa disponibilizado com os dados corretos PASSED
+
+Testes Unitários: NotificacaoModelosService > Geração de E-mails de Processo Iniciado > Deve criar email de processo iniciado com os dados corretos PASSED
+
+Testes Unitários: NotificacaoModelosService > Geração de E-mails de Finalização > Deve criar email de processo finalizado por unidade com os dados corretos PASSED
+
+Testes Unitários: NotificacaoModelosService > Geração de E-mails de Finalização > Deve criar email de processo finalizado com os dados corretos PASSED
+
+Testes Unitários: NotificacaoModelosService > Geração de E-mails de Finalização > Deve criar email de processo finalizado para unidades subordinadas PASSED
+
+Testes Unitários: NotificacaoModelosService > Geração de E-mails de Cadastro > Deve criar email de cadastro disponibilizado com os dados corretos PASSED
+
+Testes Unitários: NotificacaoModelosService > Geração de E-mails de Cadastro > Deve criar email de cadastro devolvido com os dados corretos PASSED
+
+Testes do Controller de Unidade > Deve retornar 201 ao criar atribuição temporária PASSED
+
+Testes do Controller de Unidade > Deve retornar unidade por sigla PASSED
+
+Testes do Controller de Unidade > Deve retornar lista ao buscar todas as unidades PASSED
+
+Testes do Controller de Unidade > Deve retornar árvore de elegibilidade PASSED
+
+Testes do Controller de Unidade > Deve retornar lista de usuários por unidade PASSED
+
+Testes do Controller de Unidade > Deve verificar mapa vigente e retornar boolean PASSED
+
+Testes do Controller de Unidade > Deve retornar unidade por ID PASSED
+
+Testes do Serviço UnidadeService > Elegibilidade e Mapas > Deve buscar árvore com elegibilidade PASSED
+
+Testes do Serviço UnidadeService > Elegibilidade e Mapas > Unidade em processo ativo não deve ser elegível PASSED
+
+Testes do Serviço UnidadeService > Elegibilidade e Mapas > Unidade sem mapa não deve ser elegível para REVISÃO PASSED
+
+Testes do Serviço UnidadeService > Elegibilidade e Mapas > Deve buscar árvore com elegibilidade considerando mapa vigente PASSED
+
+Testes do Serviço UnidadeService > Elegibilidade e Mapas > Deve verificar se tem mapa vigente PASSED
+
+Testes do Serviço UnidadeService > Busca de Unidades e Hierarquia > Deve retornar hierarquia ao buscar todas as unidades PASSED
+
+Testes do Serviço UnidadeService > Busca de Unidades e Hierarquia > Deve lançar exceção se unidade não encontrada ao buscar siglas subordinadas PASSED
+
+Testes do Serviço UnidadeService > Busca de Unidades e Hierarquia > Deve buscar unidade por sigla PASSED
+
+Testes do Serviço UnidadeService > Busca de Unidades e Hierarquia > Deve buscar unidade por código PASSED
+
+Testes do Serviço UnidadeService > Busca de Unidades e Hierarquia > Deve retornar null se unidade não tiver superior ao buscar sigla superior PASSED
+
+Testes do Serviço UnidadeService > Busca de Unidades e Hierarquia > Deve buscar árvore de unidades PASSED
+
+Testes do Serviço UnidadeService > Busca de Unidades e Hierarquia > Deve buscar siglas subordinadas PASSED
+
+Testes do Serviço UnidadeService > Busca de Unidades e Hierarquia > Deve buscar sigla da unidade superior PASSED
+
+Testes do Serviço UnidadeService > Gestão de Atribuições e Usuários > Deve buscar usuários por unidade PASSED
+
+Testes do Serviço UnidadeService > Gestão de Atribuições e Usuários > Deve buscar todas as atribuições PASSED
+
+Testes do Serviço UnidadeService > Gestão de Atribuições e Usuários > Deve criar atribuição temporária com sucesso PASSED
+
+Testes de Integração do SgrhController > Deve entrar PASSED
+
+Testes de Integração do SgrhController > Deve autorizar e retornar perfis PASSED
+
+Testes de Integração do SgrhController > Deve autenticar PASSED
+
+Testes do Serviço UsuarioService > Gestão de Responsáveis > Deve buscar responsáveis de múltiplas unidades PASSED
+
+Testes do Serviço UsuarioService > Gestão de Responsáveis > Deve buscar unidades onde usuário é responsável PASSED
+
+Testes do Serviço UsuarioService > Gestão de Responsáveis > Deve buscar responsável da unidade PASSED
+
+Testes do Serviço UsuarioService > Autenticação e Autorização > Deve autenticar usuário com sucesso PASSED
+
+Testes do Serviço UsuarioService > Autenticação e Autorização > Deve entrar no sistema com perfil selecionado PASSED
+
+Testes do Serviço UsuarioService > Autenticação e Autorização > Deve autorizar e retornar lista de perfis/unidades PASSED
+
+Testes do Serviço UsuarioService > Autenticação e Autorização > Deve impedir autorização sem autenticação prévia PASSED
+
+Testes do Serviço UsuarioService > Autenticação e Autorização > Deve lançar exceção ao autorizar usuário não encontrado PASSED
+
+Testes do Serviço UsuarioService > Gestão de Perfis > Deve buscar unidades por perfil PASSED
+
+Testes do Serviço UsuarioService > Gestão de Perfis > Deve buscar perfis do usuário PASSED
+
+Testes do Serviço UsuarioService > Gestão de Perfis > Deve verificar se usuário tem perfil PASSED
+
+Testes do Serviço UsuarioService > Consultas de Unidade > Deve buscar subunidades PASSED
+
+Testes do Serviço UsuarioService > Consultas de Unidade > Deve buscar unidades ativas PASSED
+
+Testes do Serviço UsuarioService > Consultas de Unidade > Deve buscar unidade por código PASSED
+
+Testes do Serviço UsuarioService > Consultas de Unidade > Deve construir árvore hierárquica PASSED
+
+Testes do Serviço UsuarioService > Consultas de Usuário > Deve buscar usuário por título PASSED
+
+Testes do Serviço UsuarioService > Consultas de Usuário > Deve buscar usuário por email PASSED
+
+Testes do Serviço UsuarioService > Consultas de Usuário > Deve buscar entidade usuário por login garantindo inicialização PASSED
+
+Testes do Serviço UsuarioService > Consultas de Usuário > Deve buscar usuários ativos PASSED
+
+Testes do Serviço UsuarioService > Consultas de Usuário > Deve buscar usuários por lista de títulos PASSED
+
+Testes de Mapper: UsuarioMapper > Deve mapear Unidade para UnidadeDto corretamente PASSED
+
+Testes de Mapper: UsuarioMapper > Deve mapear Usuario para UsuarioDto corretamente PASSED
+
+Testes da Entidade Unidade > Deve atualizar matrícula e título do titular quando usuário não for nulo PASSED
+
+Testes para Usuario > Atribuições de Perfil > Deve retornar atribuições configuradas PASSED
+
+Testes para Usuario > Atribuições de Perfil > Deve retornar conjunto vazio quando não há atribuições PASSED
+
+Testes para Usuario > Atribuições Temporárias > Deve incluir atribuição temporária ativa em todas atribuições PASSED
+
+Testes para Usuario > Atribuições Temporárias > Não deve incluir atribuição temporária futura PASSED
+
+Testes para Usuario > Atribuições Temporárias > Deve combinar atribuições permanentes e temporárias PASSED
+
+Testes para Usuario > Atribuições Temporárias > Não deve incluir atribuição temporária expirada PASSED
+
+Testes para Usuario > Spring Security UserDetails > Deve retornar authorities baseadas nos perfis PASSED
+
+Testes para Usuario > Spring Security UserDetails > Deve retornar null como password PASSED
+
+Testes para Usuario > Spring Security UserDetails > Deve retornar titulo eleitoral como username PASSED
+
+Testes para Usuario > Equals e HashCode > Deve considerar usuário diferente de null PASSED
+
+Testes para Usuario > Equals e HashCode > Deve considerar usuário igual a si mesmo PASSED
+
+Testes para Usuario > Equals e HashCode > Deve considerar dois usuários iguais quando têm mesmo titulo eleitoral PASSED
+
+Testes para Usuario > Equals e HashCode > Deve considerar usuário diferente de objeto de outra classe PASSED
+
+Testes para Usuario > Equals e HashCode > Deve considerar dois usuários diferentes quando têm titulos diferentes PASSED
+
+Testes para Usuario > Construtor > Deve criar usuário com construtor completo PASSED
+
+Testes de Integração do PainelService > Listagem de Processos > Deve retornar links corretos quando existem processos finalizados e em andamento PASSED
+
+Testes de Integração do PainelService > Listagem de Processos > Paginação deve incluir todos os processos quando tamanho da página é suficiente PASSED
+
+Testes de Integração do PainelService > Listagem de Processos > Admin deve ver processo de revisão recém-criado na listagem PASSED
+
+ProcessoController > Criação de Processo > Deve retornar 400 Bad Request quando data limite está no passado PASSED
+
+ProcessoController > Criação de Processo > Deve retornar 201 Created quando processo é válido PASSED
+
+ProcessoController > Criação de Processo > Deve retornar 400 Bad Request quando data limite é nula PASSED
+
+ProcessoController > Criação de Processo > Deve retornar 400 Bad Request quando processo é inválido (descrição vazia) PASSED
+
+ProcessoController > Criação de Processo > Deve retornar 400 Bad Request quando lista de unidades é vazia PASSED
+
+ProcessoController > Consulta de Processo > Deve retornar 403 Forbidden ao obter detalhes se acesso negado PASSED
+
+ProcessoController > Consulta de Processo > Deve retornar 404 Not Found ao obter detalhes se processo não encontrado PASSED
+
+ProcessoController > Consulta de Processo > Deve retornar 200 OK quando processo existe PASSED
+
+ProcessoController > Consulta de Processo > Deve retornar detalhes do processo com 200 OK PASSED
+
+ProcessoController > Consulta de Processo > Deve retornar 404 Not Found quando processo não existe PASSED
+
+ProcessoController > Workflow e Operações > Deve retornar 200 OK ao iniciar revisão com sucesso PASSED
+
+ProcessoController > Workflow e Operações > Deve retornar 409 Conflict ao finalizar se estado inválido PASSED
+
+ProcessoController > Workflow e Operações > Deve retornar 200 OK ao iniciar mapeamento com sucesso PASSED
+
+ProcessoController > Workflow e Operações > Deve retornar 404 Not Found ao finalizar se processo não encontrado PASSED
+
+ProcessoController > Workflow e Operações > Deve retornar 200 OK ao finalizar processo com sucesso PASSED
+
+ProcessoController > Workflow e Operações > Deve retornar 400 Bad Request ao iniciar processo com requisição inválida PASSED
+
+ProcessoController > Workflow e Operações > Deve retornar 409 Conflict ao finalizar se validação falhar PASSED
+
+ProcessoController > Listagens > Deve retornar lista de unidades bloqueadas PASSED
+
+ProcessoController > Listagens > Deve retornar lista de subprocessos PASSED
+
+ProcessoController > Listagens > Deve retornar lista de processos finalizados PASSED
+
+ProcessoController > Listagens > Deve retornar lista de subprocessos elegíveis PASSED
+
+ProcessoController > Listagens > Deve retornar lista de processos ativos PASSED
+
+ProcessoController > Listagens > Deve retornar map de status de unidades PASSED
+
+ProcessoController > Atualização de Processo > Deve retornar 404 Not Found ao atualizar se processo não encontrado PASSED
+
+ProcessoController > Atualização de Processo > Deve retornar 200 OK ao atualizar processo existente PASSED
+
+ProcessoController > Atualização de Processo > Deve retornar 409 Conflict ao atualizar se estado inválido PASSED
+
+ProcessoController > Exclusão de Processo > Deve retornar 204 No Content ao excluir processo existente PASSED
+
+ProcessoController > Exclusão de Processo > Deve retornar 404 Not Found ao excluir se processo não encontrado PASSED
+
+ProcessoController > Exclusão de Processo > Deve retornar 409 Conflict ao excluir se estado inválido PASSED
+
+ProcessoService > Criação de Processo > Deve criar processo quando dados válidos PASSED
+
+ProcessoService > Criação de Processo > Deve lançar exceção quando lista de unidades vazia PASSED
+
+ProcessoService > Criação de Processo > Deve lançar exceção quando unidade não encontrada PASSED
+
+ProcessoService > Criação de Processo > Deve lançar exceção quando descrição vazia PASSED
+
+ProcessoService > Exclusão de Processo > Deve lançar exceção quando apagar e processo não está em situação CRIADO PASSED
+
+ProcessoService > Exclusão de Processo > Deve lançar exceção quando apagar e processo não encontrado PASSED
+
+ProcessoService > Exclusão de Processo > Deve apagar processo quando está em situação CRIADO PASSED
+
+ProcessoService > Segurança e Controle de Acesso > Deve negar acesso quando usuário sem permissão adequada PASSED
+
+ProcessoService > Segurança e Controle de Acesso > Deve negar acesso quando usuário não possui unidade associada PASSED
+
+ProcessoService > Segurança e Controle de Acesso > Deve permitir acesso quando gestor é da unidade participante PASSED
+
+ProcessoService > Segurança e Controle de Acesso > Deve negar acesso quando usuário não autenticado PASSED
+
+ProcessoService > Consultas e Detalhes > Deve listar processos finalizados e ativos PASSED
+
+ProcessoService > Consultas e Detalhes > Deve listar subprocessos elegíveis para Admin PASSED
+
+ProcessoService > Consultas e Detalhes > Deve listar subprocessos elegíveis para Gestor PASSED
+
+ProcessoService > Consultas e Detalhes > Deve listar unidades bloqueadas por tipo PASSED
+
+ProcessoService > Consultas e Detalhes > Deve retornar detalhes do processo (DTO) PASSED
+
+ProcessoService > Consultas e Detalhes > Deve retornar vazio ao listar subprocessos se usuário sem unidade PASSED
+
+ProcessoService > Atualização de Processo > Deve lançar exceção quando atualizar e unidade não encontrada PASSED
+
+ProcessoService > Atualização de Processo > Deve atualizar processo quando está em situação CRIADO PASSED
+
+ProcessoService > Atualização de Processo > Deve lançar exceção quando atualizar e processo não está em situação CRIADO PASSED
+
+ProcessoService > Workflow e Inicialização > Deve iniciar mapeamento com sucesso delegando para ProcessoInicializador PASSED
+
+ProcessoService > Workflow e Inicialização > Deve finalizar processo com sucesso quando tudo homologado PASSED
+
+ProcessoService > Workflow e Inicialização > Deve iniciar revisão com sucesso delegando para ProcessoInicializador PASSED
+
+ProcessoService > Workflow e Inicialização > Deve retornar erro ao iniciar mapeamento se unidade já em uso PASSED
+
+ProcessoService > Workflow e Inicialização > Deve falhar ao finalizar se processo não está em andamento PASSED
+
+ProcessoService > Workflow e Inicialização > Deve falhar ao finalizar se houver subprocessos não homologados PASSED
+
+ProcessoService > Workflow e Inicialização > Deve retornar erro ao iniciar revisão se unidade sem mapa PASSED
+
+ProcessoService > Workflow e Inicialização > Deve falhar ao finalizar se subprocesso não tem unidade associada PASSED
+
+Eventos de Processo > Deve retornar valores corretos para EventoProcessoFinalizado PASSED
+
+Eventos de Processo > Deve retornar valores corretos para EventoProcessoCriado PASSED
+
+Eventos de Processo > Deve retornar valores corretos para EventoProcessoIniciado PASSED
+
+Testes para Processo > Datas > Deve configurar data de criação PASSED
+
+Testes para Processo > Datas > Deve configurar data de finalização PASSED
+
+Testes para Processo > Datas > Deve configurar data limite PASSED
+
+Testes para Processo > Descrição > Deve configurar descrição do processo PASSED
+
+Testes para Processo > Situação e Tipo > Deve permitir todas as situações válidas PASSED
+
+Testes para Processo > Situação e Tipo > Deve permitir todos os tipos válidos PASSED
+
+Testes para Processo > Situação e Tipo > Deve configurar situação do processo PASSED
+
+Testes para Processo > Situação e Tipo > Deve configurar tipo do processo PASSED
+
+Testes para Processo > Participantes > Deve adicionar unidades participantes PASSED
+
+Testes para Processo > Participantes > Deve inicializar participantes como conjunto vazio PASSED
+
+Testes para Processo > Participantes > Deve substituir conjunto de participantes PASSED
+
+Testes para Processo > Construtores > Deve criar processo com construtor de 4 parâmetros PASSED
+
+Testes para Processo > Construtores > Deve criar processo com construtor AllArgs PASSED
+
+Testes para Processo > Construtores > Deve criar processo com construtor de 5 parâmetros PASSED
+
+Testes Unitários: ProcessoConsultaService > Deve retornar conjunto vazio se não houver processos ativos PASSED
+
+Testes Unitários: ProcessoConsultaService > Deve buscar IDs de unidades em processos ativos PASSED
+
+ProcessoDetalheBuilder > Deve construir DTO com dados básicos e unidades quando dados válidos PASSED
+
+ProcessoDetalheBuilder > Deve verificar ordenação das unidades PASSED
+
+ProcessoDetalheBuilder > Não deve permitir finalizar quando usuário não é admin PASSED
+
+ProcessoDetalheBuilder > Deve permitir finalizar quando usuário é admin PASSED
+
+ProcessoInicializador > Deve falhar ao iniciar processo se não estiver CRIADO PASSED
+
+ProcessoInicializador > Deve retornar erros se unidades já estiverem em processos ativos PASSED
+
+ProcessoInicializador > Deve retornar erro ao iniciar revisão se unidade sem mapa vigente PASSED
+
+ProcessoInicializador > Deve iniciar processo de revisão com sucesso PASSED
+
+ProcessoInicializador > Deve iniciar processo de mapeamento com sucesso PASSED
+
+Testes de Segurança do Actuator > Deve negar acesso anônimo ao Actuator PASSED
+
+Testes de Segurança do Actuator > Deve permitir acesso de ADMIN ao Actuator PASSED
+
+Testes de Segurança do Actuator > Deve negar acesso de usuário comum ao Actuator PASSED
+
+CorsConfigTest > Should configure CORS source with allowed origins PASSED
+
+Teste de Verificação de Segurança do JWT > Deve iniciar com sucesso em e2e com secret padrão PASSED
+
+Teste de Verificação de Segurança do JWT > Deve iniciar com sucesso em teste com secret padrão PASSED
+
+Teste de Verificação de Segurança do JWT > Deve falhar ao iniciar em produção com secret padrão PASSED
+
+Teste de Verificação de Segurança do JWT > Deve iniciar com sucesso em produção se o secret for seguro PASSED
+
+Teste de Verificação de Segurança do JWT > Deve iniciar com sucesso em local com secret padrão PASSED
+
+LimitadorTentativasLoginTest > deveBloquearAposLimiteExcedido() PASSED
+
+LimitadorTentativasLoginTest > devePermitirAteLimiteDeTentativas() PASSED
+
+LimitadorTentativasLoginTest > deveLimparCacheAoAtingirLimiteMaximoEntradas() PASSED
+
+LimitadorTentativasLoginTest > naoDeveBloquearSePerfilDeTesteEstiverAtivo() PASSED
+
+LimitadorTentativasLoginTest > naoDeveBloquearSePerfilE2eEstiverAtivo() PASSED
+
+LimitadorTentativasLoginTest > naoDeveBloquearIpsDiferentes() PASSED
+
+LimitadorTentativasLoginTest > deveIgnorarIpNulo() PASSED
+
+Testes de Validação: AutenticacaoReq > Deve aceitar inputs normais PASSED
+
+Testes de Validação: AutenticacaoReq > Deve rejeitar inputs excessivamente longos > [1] tamanhoTitulo = "1000", tamanhoSenha = "5000" PASSED
+
+Testes de Validação: AutenticacaoReq > Deve rejeitar inputs excessivamente longos > [2] tamanhoTitulo = "500", tamanhoSenha = "1000" PASSED
+
+Testes de Validação: AutenticacaoReq > Deve rejeitar inputs excessivamente longos > [3] tamanhoTitulo = "2000", tamanhoSenha = "3000" PASSED
+
+Testes de Ações do SubprocessoService > Testes para aceitarCadastro > deveAceitarCadastroComSucesso() PASSED
+
+Testes de Ações do SubprocessoService > Testes para homologarRevisaoCadastro > deveLancarExcecaoSeSubprocessoNaoEncontrado_homologar() PASSED
+
+Testes de Ações do SubprocessoService > Testes para homologarRevisaoCadastro > deveLancarExcecaoSeSituacaoIncorreta_homologar() PASSED
+
+Testes de Ações do SubprocessoService > Testes para homologarRevisaoCadastro > deveHomologarRevisaoComSucessoSemImpactos() PASSED
+
+Testes de Ações do SubprocessoService > Testes para devolverCadastro > deveDevolverCadastroComSucesso() PASSED
+
+Testes de Ações do SubprocessoService > Testes para aceitarRevisaoCadastro > deveLancarExcecaoSeSubprocessoNaoEncontrado() PASSED
+
+Testes de Ações do SubprocessoService > Testes para aceitarRevisaoCadastro > deveAceitarRevisaoComSucesso() PASSED
+
+Testes de Ações do SubprocessoService > Testes para aceitarRevisaoCadastro > deveLancarExcecaoSeSituacaoIncorreta() PASSED
+
+Testes de Ações do SubprocessoService > Testes para homologarCadastro > deveHomologarCadastroComSucesso() PASSED
+
+SubprocessoCrudControllerTest > obterPorCodigo deve retornar detalhe PASSED
+
+SubprocessoCrudControllerTest > excluir deve retornar NoContent PASSED
+
+SubprocessoCrudControllerTest > listar deve retornar lista de subprocessos PASSED
+
+SubprocessoCrudControllerTest > criar deve retornar Created PASSED
+
+SubprocessoCrudControllerTest > atualizar deve retornar Ok PASSED
+
+SubprocessoCrudControllerTest > buscarPorProcessoEUnidade deve retornar DTO PASSED
+
+SubprocessoCrudControllerTest > excluir retorna NotFound se erro PASSED
+
+SubprocessoMapaControllerTest > salvarAjustesMapa PASSED
+
+SubprocessoMapaControllerTest > obterMapa PASSED
+
+SubprocessoMapaControllerTest > adicionarCompetencia - deve retornar 400 quando lista de atividades é null PASSED
+
+SubprocessoMapaControllerTest > salvarMapa PASSED
+
+SubprocessoMapaControllerTest > salvarMapaCompleto PASSED
+
+SubprocessoMapaControllerTest > atualizarCompetencia PASSED
+
+SubprocessoMapaControllerTest > obterMapaCompleto PASSED
+
+SubprocessoMapaControllerTest > verificarImpactos PASSED
+
+SubprocessoMapaControllerTest > removerCompetencia PASSED
+
+SubprocessoMapaControllerTest > adicionarCompetencia - deve retornar 400 quando lista de atividades está vazia PASSED
+
+SubprocessoMapaControllerTest > obterMapaParaAjuste PASSED
+
+SubprocessoMapaControllerTest > adicionarCompetencia PASSED
+
+SubprocessoMapaControllerTest > adicionarCompetencia - deve retornar 400 quando descrição está vazia PASSED
+
+SubprocessoMapaControllerTest > obterMapaVisualizacao PASSED
+
+MapaAjusteDtoTest > Deve criar MapaAjusteDto corretamente via método estático 'of' PASSED
+
+MapaAjusteDtoTest > Deve lidar com listas vazias e nulos PASSED
+
+MapaAjusteDtoTest > Deve verificar builder PASSED
+
+MapperTest > subprocessoMapper_MapsEntityToDtoCorrectly() PASSED
+
+MapperTest > subprocessoMapper_MapsDtoToEntityCorrectly() PASSED
+
+MapperTest > movimentacaoMapper_MapsEntityToDtoCorrectly() PASSED
+
+MapaAjusteMapperTest > toDto() PASSED
+
+SubprocessoDetalheMapperTest > toDto() PASSED
+
+Testes para Subprocesso > Etapa Atual > Deve retornar null quando subprocesso está finalizado > [1] situacao = MAPEAMENTO_MAPA_HOMOLOGADO PASSED
+
+Testes para Subprocesso > Etapa Atual > Deve retornar null quando subprocesso está finalizado > [2] situacao = REVISAO_MAPA_HOMOLOGADO PASSED
+
+Testes para Subprocesso > Etapa Atual > Deve retornar etapa 1 quando subprocesso não está finalizado PASSED
+
+Testes para Subprocesso > Mapa > Deve retornar null quando mapa não está configurado PASSED
+
+Testes para Subprocesso > Mapa > Deve retornar mapa quando configurado PASSED
+
+Testes para Subprocesso > Verificação de Estado > Deve considerar subprocesso em andamento para situações não finalizadas > [1] situacao = MAPEAMENTO_CADASTRO_EM_ANDAMENTO PASSED
+
+Testes para Subprocesso > Verificação de Estado > Deve considerar subprocesso em andamento para situações não finalizadas > [2] situacao = MAPEAMENTO_MAPA_CRIADO PASSED
+
+Testes para Subprocesso > Verificação de Estado > Deve considerar subprocesso em andamento para situações não finalizadas > [3] situacao = REVISAO_CADASTRO_EM_ANDAMENTO PASSED
+
+Testes para Subprocesso > Verificação de Estado > Não deve considerar subprocesso em andamento para situações finalizadas > [1] situacao = NAO_INICIADO PASSED
+
+Testes para Subprocesso > Verificação de Estado > Não deve considerar subprocesso em andamento para situações finalizadas > [2] situacao = MAPEAMENTO_MAPA_HOMOLOGADO PASSED
+
+Testes para Subprocesso > Verificação de Estado > Não deve considerar subprocesso em andamento para situações finalizadas > [3] situacao = REVISAO_MAPA_HOMOLOGADO PASSED
+
+Testes para Subprocesso > Construtores > Deve criar subprocesso com construtor de conveniência PASSED
+
+Testes para Subprocesso > Construtores > Deve criar subprocesso com construtor de 6 parâmetros PASSED
+
+Testes para Subprocesso > Construtores > Deve criar subprocesso com builder PASSED
+
+Testes para Subprocesso > Datas de Etapa > Deve configurar todas as datas de etapa PASSED
+
+SubprocessoCadastroWorkflowServiceTest > aceitarCadastro falha sem unidade superior PASSED
+
+SubprocessoCadastroWorkflowServiceTest > devolverRevisaoCadastro sucesso PASSED
+
+SubprocessoCadastroWorkflowServiceTest > aceitarCadastro sucesso PASSED
+
+SubprocessoCadastroWorkflowServiceTest > disponibilizarRevisao deve rejeitar quando não há atividades cadastradas PASSED
+
+SubprocessoCadastroWorkflowServiceTest > homologarRevisaoCadastro sem impactos PASSED
+
+SubprocessoCadastroWorkflowServiceTest > homologarCadastro falha situacao invalida PASSED
+
+SubprocessoCadastroWorkflowServiceTest > homologarRevisaoCadastro com impactos PASSED
+
+SubprocessoCadastroWorkflowServiceTest > homologarCadastro sucesso PASSED
+
+SubprocessoCadastroWorkflowServiceTest > disponibilizarRevisao sucesso PASSED
+
+SubprocessoCadastroWorkflowServiceTest > disponibilizarCadastro falha acesso PASSED
+
+SubprocessoCadastroWorkflowServiceTest > disponibilizarCadastro falha validação PASSED
+
+SubprocessoCadastroWorkflowServiceTest > devolverCadastro sucesso PASSED
+
+SubprocessoCadastroWorkflowServiceTest > aceitarRevisaoCadastro sucesso PASSED
+
+SubprocessoCadastroWorkflowServiceTest > homologarRevisaoCadastro falha estado invalido PASSED
+
+SubprocessoCadastroWorkflowServiceTest > disponibilizarCadastro sucesso PASSED
+
+SubprocessoCadastroWorkflowServiceTest > disponibilizarCadastro deve rejeitar quando não há atividades cadastradas PASSED
+
+SubprocessoContextoServiceTest > obterContextoEdicao deve retornar mapa nulo se subprocesso não tem mapa PASSED
+
+SubprocessoContextoServiceTest > obterContextoEdicao deve retornar contexto completo quando tudo ok PASSED
+
+SubprocessoContextoServiceTest > obterContextoEdicao deve lançar erro se unidade não encontrada PASSED
+
+SubprocessoFactoryTest > criarParaRevisao erro se copia falha PASSED
+
+SubprocessoFactoryTest > criarParaRevisao erro se unidade nao tem mapa PASSED
+
+SubprocessoFactoryTest > criarParaRevisao sucesso PASSED
+
+SubprocessoFactoryTest > criarParaMapeamento deve ignorar unidade nao elegivel PASSED
+
+SubprocessoFactoryTest > criarParaMapeamento sucesso para unidade OPERACIONAL PASSED
+
+SubprocessoFactoryTest > criarParaDiagnostico sucesso PASSED
+
+SubprocessoMapaWorkflowServiceTest > submeterMapaAjustado sucesso PASSED
+
+SubprocessoMapaWorkflowServiceTest > aceitarValidacao validado se houver proxima unidade PASSED
+
+SubprocessoMapaWorkflowServiceTest > validarMapa sucesso PASSED
+
+SubprocessoMapaWorkflowServiceTest > devolverValidacao sucesso PASSED
+
+SubprocessoMapaWorkflowServiceTest > disponibilizarMapa falha estado invalido PASSED
+
+SubprocessoMapaWorkflowServiceTest > aceitarValidacao homologado se nao houver proxima unidade PASSED
+
+SubprocessoMapaWorkflowServiceTest > apresentarSugestoes sucesso PASSED
+
+SubprocessoMapaWorkflowServiceTest > homologarValidacao sucesso PASSED
+
+SubprocessoMapaWorkflowServiceTest > disponibilizarMapa sucesso PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Gestor de outra unidade (não superior) não deve ter acesso PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Usuário sem permissão de edição nunca vê impacto PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Gestor da mesma unidade deve ter acesso PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Admin não deve ter acesso de edição em situações finalizadas PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Validação de visualização de impacto por situação e tipo > [1] situacao = "NAO_INICIADO", tipo = "REVISAO", esperado = "true" PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Validação de visualização de impacto por situação e tipo > [2] situacao = "NAO_INICIADO", tipo = "MAPEAMENTO", esperado = "false" PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Validação de visualização de impacto por situação e tipo > [3] situacao = "MAPEAMENTO_CADASTRO_HOMOLOGADO", tipo = "MAPEAMENTO", esperado = "true" PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Validação de visualização de impacto por situação e tipo > [4] situacao = "REVISAO_CADASTRO_EM_ANDAMENTO", tipo = "REVISAO", esperado = "true" PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Validação de visualização de impacto por situação e tipo > [5] situacao = "REVISAO_CADASTRO_DISPONIBILIZADA", tipo = "REVISAO", esperado = "true" PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Validação de visualização de impacto por situação e tipo > [6] situacao = "REVISAO_CADASTRO_HOMOLOGADA", tipo = "REVISAO", esperado = "true" PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Validação de visualização de impacto por situação e tipo > [7] situacao = "REVISAO_MAPA_AJUSTADO", tipo = "REVISAO", esperado = "true" PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Validação de visualização de impacto por situação e tipo > [8] situacao = "MAPEAMENTO_MAPA_CRIADO", tipo = "MAPEAMENTO", esperado = "false" PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Gestor de unidade superior deve ter acesso PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Admin deve ter acesso de edição em situações permitidas PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Chefe/Servidor da mesma unidade deve ter acesso PASSED
+
+SubprocessoPermissoesServiceTest > Calcular Permissões > Chefe/Servidor de unidade superior NÃO deve ter acesso (diferente de Gestor) PASSED
+
+SubprocessoPermissoesServiceTest > Validar Ação > Deve lançar erro quando unidade sem acesso PASSED
+
+SubprocessoPermissoesServiceTest > Validar Ação > Deve lançar erro quando situação inválida para ação específica > [1] acao = "ENVIAR_REVISAO" PASSED
+
+SubprocessoPermissoesServiceTest > Validar Ação > Deve lançar erro quando situação inválida para ação específica > [2] acao = "AJUSTAR_MAPA" PASSED
+
+SubprocessoPermissoesServiceTest > Validar Ação > Deve validar ajuste de mapa com sucesso PASSED
+
+SubprocessoPermissoesServiceTest > Validar Ação > Deve validar acesso da unidade com sucesso PASSED
+
+SubprocessoPermissoesServiceTest > Validar Ação > Deve lançar erro quando mapa vazio ao ajustar mapa em situação revisão mapa ajustado PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Escrita (CRUD) > Deve excluir subprocesso com sucesso PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Escrita (CRUD) > Deve criar subprocesso com sucesso PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Escrita (CRUD) > Deve atualizar subprocesso com sucesso PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Escrita (CRUD) > Deve lançar exceção ao excluir subprocesso inexistente PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Leitura > Deve listar entidades por processo PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Leitura > Deve verificar acesso da unidade ao processo PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Leitura > Deve lançar exceção quando subprocesso não existe ao buscar situação PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Leitura > Deve retornar lista vazia se subprocesso não tiver mapa PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Leitura > Deve retornar lista vazia se não houver atividades sem conhecimento PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Leitura > Deve retornar situação quando subprocesso existe PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Leitura > Deve retornar entidade por código do mapa PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Leitura > Deve listar atividades do subprocesso convertidas para DTO PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Transição de Estado > Deve lançar erro se processo não associado PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Transição de Estado > Não deve atualizar se situação não for NAO_INICIADO PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Transição de Estado > Deve atualizar situação para EM ANDAMENTO (Revisão) PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Transição de Estado > Deve atualizar situação para EM ANDAMENTO (Mapeamento) PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Permissões e Detalhes > obterDetalhes falha GESTOR unidade nao subordinada PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Permissões e Detalhes > obterDetalhes falha acesso negado PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Permissões e Detalhes > obterDetalhes sucesso ADMIN PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Permissões e Detalhes > obterPermissoes PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Permissões e Detalhes > obterDetalhes sucesso GESTOR unidade subordinada PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Permissões e Detalhes > obterDetalhes sucesso SERVIDOR mesma unidade PASSED
+
+Testes Unitários para SubprocessoService > Cenários de DTO e Mapeamento > listar PASSED
+
+Testes Unitários para SubprocessoService > Cenários de DTO e Mapeamento > obterSugestoes PASSED
+
+Testes Unitários para SubprocessoService > Cenários de DTO e Mapeamento > obterPorProcessoEUnidade PASSED
+
+Testes Unitários para SubprocessoService > Cenários de DTO e Mapeamento > obterCadastro PASSED
+
+Testes Unitários para SubprocessoService > Cenários de DTO e Mapeamento > obterMapaParaAjuste PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Validação > Deve validar existência de atividades - Falha sem mapa PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Validação > Deve validar existência de atividades - Falha lista vazia PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Validação > Deve validar permissão de edição do mapa - Falha sem unidade PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Validação > Deve validar permissão de edição do mapa - Sucesso PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Validação > Deve validar existência de atividades - Sucesso PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Validação > Deve lançar exceção se atividade não estiver associada PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Validação > validarCadastro falha sem atividades PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Validação > Deve validar permissão de edição do mapa - Falha não titular PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Validação > Deve lançar exceção se competência não estiver associada PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Validação > validarCadastro falha sem mapa PASSED
+
+Testes Unitários para SubprocessoService > Cenários de Validação > validarCadastro sucesso PASSED
+
+═══════════════════════════════════════════════════════════════
+  RESUMO DOS TESTES
+═══════════════════════════════════════════════════════════════
+  Resultado: SUCCESS
+  Total:     648 testes
+  ✓ Passou:  648
+  ✗ Falhou:  0
+  ○ Ignorados: 0
+  Tempo:     143.573s
+═══════════════════════════════════════════════════════════════
+
+> Task :backend:jacocoTestReport
+
+BUILD SUCCESSFUL in 2m 28s
+6 actionable tasks: 2 executed, 4 up-to-date
+Configuration cache entry stored.

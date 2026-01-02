@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid mt-4">
     <!-- Seção de Administradores -->
-    <div class="card mb-4" v-if="podeGerenciarAdministradores">
+    <div v-if="podeGerenciarAdministradores" class="card mb-4">
       <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Administradores do Sistema</h5>
         <button class="btn btn-light btn-sm" @click="abrirModalAdicionarAdmin">
@@ -39,8 +39,8 @@
                 <td class="text-end">
                   <button
                     class="btn btn-sm btn-outline-danger"
-                    @click="confirmarRemocao(admin)"
                     :disabled="removendoAdmin === admin.tituloEleitoral"
+                    @click="confirmarRemocao(admin)"
                   >
                     <span v-if="removendoAdmin === admin.tituloEleitoral" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                     <i v-else class="bi bi-trash"></i>
@@ -160,8 +160,8 @@
         <button 
           type="button" 
           class="btn btn-danger" 
-          @click="removerAdmin"
           :disabled="removendoAdmin !== null"
+          @click="removerAdmin"
         >
           <span v-if="removendoAdmin" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Remover
