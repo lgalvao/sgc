@@ -33,7 +33,7 @@
                 Nenhum processo finalizado encontrado.
               </td>
             </tr>
-            <tr v-else v-for="proc in processos" :key="proc.codigo">
+            <tr v-for="proc in processos" v-else :key="proc.codigo">
               <td>
                 <div class="fw-bold">{{ proc.descricao }}</div>
                 <!-- <small class="text-muted">{{ formatarParticipantes(proc) }}</small> -->

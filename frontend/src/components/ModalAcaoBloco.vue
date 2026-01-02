@@ -1,5 +1,5 @@
 <template>
-  <div class="modal fade" :id="modalId" tabindex="-1" aria-hidden="true" ref="modalElement">
+  <div :id="modalId" ref="modalElement" class="modal fade" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
@@ -13,9 +13,9 @@
             {{ erro }}
           </div>
 
-          <div class="mb-3" v-if="mostrarDataLimite">
+          <div v-if="mostrarDataLimite" class="mb-3">
             <label for="dataLimiteBloco" class="form-label required">Data Limite</label>
-            <input type="date" class="form-control" id="dataLimiteBloco" v-model="dataLimite" required>
+            <input id="dataLimiteBloco" v-model="dataLimite" type="date" class="form-control" required>
           </div>
 
           <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
@@ -23,7 +23,7 @@
               <thead>
                 <tr>
                   <th style="width: 40px">
-                    <input type="checkbox" class="form-check-input" :checked="todosSelecionados" @change="toggleTodos" :disabled="processando">
+                    <input type="checkbox" class="form-check-input" :checked="todosSelecionados" :disabled="processando" @change="toggleTodos">
                   </th>
                   <th>Sigla</th>
                   <th>Nome</th>
@@ -33,7 +33,7 @@
               <tbody>
                 <tr v-for="unidade in unidades" :key="unidade.codigo">
                   <td>
-                    <input type="checkbox" class="form-check-input" :value="unidade.codigo" v-model="selecionadosLocal" :disabled="processando">
+                    <input v-model="selecionadosLocal" type="checkbox" class="form-check-input" :value="unidade.codigo" :disabled="processando">
                   </td>
                   <td>{{ unidade.sigla }}</td>
                   <td>{{ unidade.nome }}</td>
@@ -45,7 +45,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" :disabled="processando">Cancelar</button>
-          <button type="button" class="btn btn-primary" @click="confirmar" :disabled="processando || selecionadosLocal.length === 0">
+          <button type="button" class="btn btn-primary" :disabled="processando || selecionadosLocal.length === 0" @click="confirmar">
             <span v-if="processando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
             {{ rotuloBotao }}
           </button>

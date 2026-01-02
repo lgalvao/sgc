@@ -1,5 +1,24 @@
 <template>
   <div class="arvore-unidades">
+    <div v-if="modoSelecao && unidadesExibidas.length > 0" class="d-flex gap-2 mb-2">
+      <button
+          type="button"
+          class="btn btn-sm btn-outline-primary"
+          aria-label="Selecionar todas as unidades elegíveis"
+          @click="selecionarTodas"
+      >
+        <i class="bi bi-check-all me-1" aria-hidden="true"/> Selecionar todas
+      </button>
+      <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary"
+          aria-label="Desmarcar todas as unidades"
+          @click="deselecionarTodas"
+      >
+        <i class="bi bi-x-lg me-1" aria-hidden="true"/> Limpar seleção
+      </button>
+    </div>
+
     <UnidadeTreeNode
         v-for="unidade in unidadesExibidas"
         :key="unidade.sigla"
@@ -171,6 +190,30 @@ function updateAncestors(node: Unidade, selectionSet: Set<number>) {
     }
     current = parent;
   }
+}
+
+function selecionarTodas() {
+  if (!props.modoSelecao) return;
+  const newSelection = new Set<number>(unidadesSelecionadasLocal.value);
+
+  const traverse = (nodes: Unidade[]) => {
+    nodes.forEach(node => {
+      if (node.isElegivel) {
+        newSelection.add(node.codigo);
+      }
+      if (node.filhas) {
+        traverse(node.filhas);
+      }
+    });
+  };
+
+  traverse(unidadesExibidas.value);
+  unidadesSelecionadasLocal.value = Array.from(newSelection);
+}
+
+function deselecionarTodas() {
+  if (!props.modoSelecao) return;
+  unidadesSelecionadasLocal.value = [];
 }
 
 watch(
