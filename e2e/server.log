@@ -1,7 +1,52 @@
+[BACKEND] Calculating task graph as configuration cache cannot be reused because system property 'idea.io.use.nio2' has changed.
+[BACKEND] Perfil Spring ativado: test
+[BACKEND] Carregando configurações de: .env.test
 [BACKEND] WARN  sgc.seguranca.GerenciadorJwt.verificarSegurancaChave:34 - ⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão. Isso é aceitável APENAS para ambientes de desenvolvimento/teste (test, e2e, local).
-[FRONTEND]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m361[22m[2m[0m ms[22m
+[FRONTEND]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m327[22m[2m[0m ms[22m
 [FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
 [FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
-[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: sgc.usuario.model.UsuarioPerfilRepo.findByUsuarioTitulo levou 52 ms
-[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: sgc.usuario.UsuarioService.autorizar levou 101 ms
-[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: sgc.usuario.UsuarioService.entrar levou 51 ms
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:29 - EXECUCAO LENTA: org.springframework.data.repository.CrudRepository.findById levou 63 ms
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:29 - EXECUCAO LENTA: sgc.organizacao.UsuarioService.autorizar levou 68 ms
+[BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:49 - Erro de negócio (ENTIDADE_NAO_ENCONTRADA): 'Usuário' com codigo '0' não encontrado(a).
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:29 - EXECUCAO LENTA: sgc.organizacao.model.UsuarioPerfilRepo.findByUsuarioTitulo levou 107 ms
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:29 - EXECUCAO LENTA: sgc.organizacao.UsuarioService.autorizar levou 158 ms
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:29 - EXECUCAO LENTA: sgc.organizacao.UsuarioService.entrar levou 97 ms
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:29 - EXECUCAO LENTA: sgc.painel.PainelService.listarProcessos levou 57 ms
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:29 - EXECUCAO LENTA: sgc.organizacao.model.UnidadeRepo.findAllWithHierarquia levou 53 ms
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:29 - EXECUCAO LENTA: sgc.organizacao.UnidadeService.buscarArvoreComElegibilidade levou 66 ms
+[BACKEND] INFO  s.p.service.ProcessoService.criar:182 - Processo 1 criado.
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:29 - EXECUCAO LENTA: sgc.processo.service.ProcessoService.criar levou 54 ms
+[BACKEND] INFO  s.p.service.ProcessoService.criar:182 - Processo 2 criado.
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:29 - EXECUCAO LENTA: sgc.notificacao.NotificacaoModelosService.criarEmailDeProcessoIniciado levou 277 ms
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:263 - E-mail enviado para unidade SECAO_211
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:263 - E-mail enviado para unidade SECAO_212
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 2 iniciado para 2 unidade(s).
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:29 - EXECUCAO LENTA: sgc.processo.service.ProcessoService.iniciarProcessoMapeamento levou 348 ms
+[BACKEND] INFO  s.p.service.ProcessoService.criar:182 - Processo 3 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:263 - E-mail enviado para unidade SECAO_211
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 3 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoService.criar:182 - Processo 4 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:263 - E-mail enviado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 4 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoService.criar:182 - Processo 5 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:263 - E-mail enviado para unidade SECAO_211
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 5 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_21 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.p.service.ProcessoService.criar:182 - Processo 6 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:263 - E-mail enviado para unidade SECAO_212
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 6 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoService.criar:182 - Processo 7 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:263 - E-mail enviado para unidade SECAO_121
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 7 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_12 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para SECAO_121 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:181 - Subprocesso 7 atualizado e mapa disponibilizado.
+[BACKEND] INFO  s.p.service.ProcessoService.criar:182 - Processo 8 criado.
+[BACKEND] INFO  s.p.service.ProcessoService.criar:182 - Processo 9 criado.
+[BACKEND] INFO  s.s.service.SubprocessoFactory.criarParaRevisao:118 - Subprocesso para revisão criado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:263 - E-mail enviado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de revisao 9 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoService.criar:182 - Processo 10 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:263 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 10 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
