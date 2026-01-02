@@ -75,18 +75,18 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
         // Obter Unidade
         unidade = unidadeRepo.findById(1L).orElseThrow();
 
-        // Criar Processo
+        // Criar Processo de REVISAO
         processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
-        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setTipo(TipoProcesso.REVISAO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setDescricao("Processo CDU-33");
         processo = processoRepo.save(processo);
 
-        // Criar Subprocesso em estado que permite reabertura de revisão (REVISAO_CADASTRO_ACEITO)
+        // Criar Subprocesso em estado que permite reabertura de revisão (REVISAO_CADASTRO_HOMOLOGADA)
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
-        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_ACEITO);
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocesso = subprocessoRepo.save(subprocesso);
 
@@ -120,11 +120,11 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
         assertThat(reaberto.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
         // Verificar se foi criada uma movimentação
-        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigo(subprocesso.getCodigo());
+        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
         assertThat(movimentacoes).isNotEmpty();
         boolean movimentacaoExiste = movimentacoes.stream()
                 .anyMatch(m -> m.getDescricao() != null && 
-                        m.getDescricao().contains("Revisão de cadastro reaberta"));
+                        m.getDescricao().contains("Reabertura de revisão de cadastro"));
         assertThat(movimentacaoExiste).isTrue();
 
         // Verificar se foi criado um alerta

@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroNegocio;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
 import sgc.usuario.dto.AdministradorDto;
 import sgc.usuario.mapper.UsuarioMapper;
 import sgc.usuario.model.Administrador;
@@ -45,11 +46,11 @@ public class AdministradorService {
         
         // Verificar se o usuário existe
         Usuario usuario = usuarioRepo.findById(usuarioTitulo)
-                .orElseThrow(() -> new ErroNegocio("Usuário não encontrado"));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", usuarioTitulo));
         
         // Verificar se já é administrador
         if (administradorRepo.existsById(usuarioTitulo)) {
-            throw new ErroNegocio("Usuário já é administrador");
+            throw new ErroValidacao("Usuário já é administrador");
         }
         
         Administrador administrador = new Administrador(usuarioTitulo);
@@ -65,18 +66,18 @@ public class AdministradorService {
         
         // Validar que o administrador existe
         if (!administradorRepo.existsById(usuarioTitulo)) {
-            throw new ErroNegocio("Usuário não é administrador");
+            throw new ErroValidacao("Usuário não é administrador");
         }
         
         // Não permitir que um administrador remova a si mesmo
         if (usuarioTitulo.equals(usuarioAtualTitulo)) {
-            throw new ErroNegocio("Não é permitido remover a si mesmo como administrador");
+            throw new ErroValidacao("Não é permitido remover a si mesmo como administrador");
         }
         
         // Validar que sempre resta pelo menos um administrador
         long totalAdministradores = administradorRepo.count();
         if (totalAdministradores <= 1) {
-            throw new ErroNegocio("Não é permitido remover o único administrador do sistema");
+            throw new ErroValidacao("Não é permitido remover o único administrador do sistema");
         }
         
         administradorRepo.deleteById(usuarioTitulo);

@@ -83,10 +83,10 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
         processo.setDescricao("Processo CDU-32");
         processo = processoRepo.save(processo);
 
-        // Criar Subprocesso em estado que permite reabertura (MAPEAMENTO_CADASTRO_ACEITO)
+        // Criar Subprocesso em estado que permite reabertura (MAPEAMENTO_CADASTRO_HOMOLOGADO)
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_ACEITO);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocesso = subprocessoRepo.save(subprocesso);
 
@@ -120,11 +120,11 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
         assertThat(reaberto.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         // Verificar se foi criada uma movimentação
-        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigo(subprocesso.getCodigo());
+        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
         assertThat(movimentacoes).isNotEmpty();
         boolean movimentacaoExiste = movimentacoes.stream()
                 .anyMatch(m -> m.getDescricao() != null && 
-                        m.getDescricao().contains("Cadastro reaberto"));
+                        m.getDescricao().contains("Reabertura de cadastro"));
         assertThat(movimentacaoExiste).isTrue();
 
         // Verificar se foi criado um alerta

@@ -83,7 +83,6 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
         // Criar Mapa (opcional, mas ajuda a tornar o teste mais realista)
         mapa = new Mapa();
         mapa.setSubprocesso(subprocesso);
-        mapa.setUnidade(unidade);
         mapaRepo.save(mapa);
 
         entityManager.flush();
