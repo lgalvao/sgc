@@ -147,6 +147,27 @@
         </div>
       </form>
     </BModal>
+
+    <!-- Modal: Remover Administrador -->
+    <BModal v-model="mostrarModalRemoverAdmin" title="Confirmar Remoção" hide-footer>
+      <p v-if="adminParaRemover">
+        Deseja realmente remover <strong>{{ adminParaRemover.nome }}</strong> como administrador do sistema?
+      </p>
+      <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-secondary" @click="mostrarModalRemoverAdmin = false">
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-danger" 
+          @click="removerAdmin"
+          :disabled="removendoAdmin !== null"
+        >
+          <span v-if="removendoAdmin" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          Remover
+        </button>
+      </div>
+    </BModal>
   </div>
 </template>
 
@@ -175,6 +196,8 @@ const carregandoAdmins = ref(false);
 const erroAdmins = ref<string | null>(null);
 const removendoAdmin = ref<string | null>(null);
 const mostrarModalAdicionarAdmin = ref(false);
+const mostrarModalRemoverAdmin = ref(false);
+const adminParaRemover = ref<AdministradorDto | null>(null);
 const novoAdminTitulo = ref('');
 const adicionandoAdmin = ref(false);
 
@@ -273,15 +296,20 @@ async function adicionarAdmin() {
 }
 
 async function confirmarRemocao(admin: AdministradorDto) {
-  if (!confirm(`Deseja realmente remover ${admin.nome} como administrador do sistema?`)) {
-    return;
-  }
+  adminParaRemover.value = admin;
+  mostrarModalRemoverAdmin.value = true;
+}
 
-  removendoAdmin.value = admin.tituloEleitoral;
+async function removerAdmin() {
+  if (!adminParaRemover.value) return;
+
+  removendoAdmin.value = adminParaRemover.value.tituloEleitoral;
   try {
-    await removerAdministrador(admin.tituloEleitoral);
+    await removerAdministrador(adminParaRemover.value.tituloEleitoral);
     notificacoes.show('Sucesso', 'Administrador removido com sucesso!', 'success');
     await carregarAdministradores();
+    mostrarModalRemoverAdmin.value = false;
+    adminParaRemover.value = null;
   } catch (error) {
     const erro = normalizeError(error);
     notificacoes.show('Erro', erro.message, 'danger');

@@ -21,7 +21,6 @@ import java.util.List;
 public class AdministradorService {
     private final AdministradorRepo administradorRepo;
     private final UsuarioRepo usuarioRepo;
-    private final UsuarioMapper usuarioMapper;
 
     @Transactional(readOnly = true)
     public List<AdministradorDto> listarAdministradores() {
