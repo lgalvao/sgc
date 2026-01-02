@@ -93,7 +93,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve listar administradores existentes")
     @WithMockAdmin
     void listarAdministradores_sucesso() throws Exception {
-        mockMvc.perform(get("/api/administradores")
+        mockMvc.perform(get("/api/usuarios/administradores")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -106,7 +106,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
     void adicionarAdministrador_sucesso() throws Exception {
         Map<String, String> request = Map.of("usuarioTitulo", usuario2.getTituloEleitoral());
 
-        mockMvc.perform(post("/api/administradores")
+        mockMvc.perform(post("/api/usuarios/administradores")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -132,7 +132,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
         entityManager.clear();
 
         // Remover o segundo administrador
-        mockMvc.perform(post("/api/administradores/{usuarioTitulo}/remover", usuario2.getTituloEleitoral())
+        mockMvc.perform(post("/api/usuarios/administradores/{usuarioTitulo}/remover", usuario2.getTituloEleitoral())
                         .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -151,7 +151,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
     void adicionarAdministrador_jaExiste() throws Exception {
         Map<String, String> request = Map.of("usuarioTitulo", usuario1.getTituloEleitoral());
 
-        mockMvc.perform(post("/api/administradores")
+        mockMvc.perform(post("/api/usuarios/administradores")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -172,7 +172,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
             entityManager.clear();
         }
         
-        mockMvc.perform(post("/api/administradores/{usuarioTitulo}/remover", usuario1.getTituloEleitoral())
+        mockMvc.perform(post("/api/usuarios/administradores/{usuarioTitulo}/remover", usuario1.getTituloEleitoral())
                         .with(csrf()))
                 .andExpect(status().is4xxClientError());
     }
