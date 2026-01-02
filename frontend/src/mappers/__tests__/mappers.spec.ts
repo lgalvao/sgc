@@ -9,7 +9,12 @@ import {
     mapCriarAtividadeRequestToDto,
     mapCriarConhecimentoRequestToDto,
 } from "../atividades";
-import {mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaDtoToModel,} from "../mapas";
+import {
+    mapImpactoMapaDtoToModel,
+    mapMapaAjusteDtoToModel,
+    mapMapaCompletoDtoToModel,
+    mapMapaDtoToModel,
+} from "../mapas";
 import {mapProcessoDetalheDtoToFrontend, mapProcessoDtoToFrontend, mapProcessoResumoDtoToFrontend,} from "../processos";
 import {
     LoginResponseToFrontend,
@@ -101,21 +106,21 @@ describe("mappers/mapas", () => {
     });
 
     // TODO: Fix this test or the mapper. The mapper mapMapaCompletoDtoToModel currently does not map 'atividades' structure from the input DTO, causing this test to fail.
-    // it("mapMapaCompletoDtoToModel should map nested structures", () => {
-    //     const dto = {
-    //         codigo: 1,
-    //         competencias: [
-    //             {
-    //                 codigo: 10,
-    //                 atividades: [{codigo: 100, conhecimentos: [{codigo: 1000}]}],
-    //             },
-    //         ],
-    //     };
-    //     const model = mapMapaCompletoDtoToModel(dto);
-    //     expect(
-    //         (model.competencias[0] as any).atividades[0].conhecimentos[0].codigo,
-    //     ).toBe(1000);
-    // });
+    it("mapMapaCompletoDtoToModel should map nested structures", () => {
+        const dto = {
+            codigo: 1,
+            competencias: [
+                {
+                    codigo: 10,
+                    atividades: [{codigo: 100, conhecimentos: [{codigo: 1000}]}],
+                },
+            ],
+        };
+        const model = mapMapaCompletoDtoToModel(dto);
+        expect(
+            (model.competencias[0] as any).atividades[0].conhecimentos[0].codigo,
+        ).toBe(1000);
+    });
 
     it("mapImpactoMapaDtoToModel deve mapear campos de impacto incluindo mudanças de atividade", () => {
         const dto = {
