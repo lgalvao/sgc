@@ -119,9 +119,21 @@
         class="text-center py-5 border rounded bg-light mb-4 text-muted"
         data-testid="cad-atividades-empty-state"
     >
-      <i class="bi bi-list-check fs-1 d-block mb-3"/>
-      <p class="mb-0">Nenhuma atividade cadastrada.</p>
-      <small>Utilize o campo acima para adicionar novas atividades.</small>
+      <i class="bi bi-list-check fs-1 d-block mb-3 text-secondary"/>
+      <p class="h5 fw-normal mb-2">Nenhuma atividade cadastrada</p>
+      <p class="small mb-3">
+        Comece adicionando uma atividade no campo acima{{ isChefe ? ' ou importe de outro processo' : '' }}.
+      </p>
+
+      <BButton
+          v-if="isChefe"
+          variant="outline-primary"
+          size="sm"
+          data-testid="btn-empty-state-importar"
+          @click="mostrarModalImportar = true"
+      >
+        <i class="bi bi-upload me-2"/> Importar atividades
+      </BButton>
     </div>
 
     <div
