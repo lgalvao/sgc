@@ -200,9 +200,11 @@ public class MapaService {
 
         atividadeRepo.saveAll(atividadesAtuais);
 
-        validarIntegridadeMapa(codMapa);
-
+        // ⚡ Bolt: Otimização
+        // Reutilizamos as listas já em memória (ou recém-fetchadas) para a validação,
+        // evitando 2 queries pesadas adicionais dentro do validador.
         List<Competencia> competenciasFinais = competenciaRepo.findByMapaCodigo(codMapa);
+        validarIntegridadeMapa(codMapa, atividadesAtuais, competenciasFinais);
 
         return mapaCompletoMapper.toDto(mapa, null, competenciasFinais);
     }
@@ -213,11 +215,9 @@ public class MapaService {
 
     /**
      * Valida a integridade de um mapa, verificando se existem atividades ou competências órfãs.
+     * Recebe as listas de atividades e competências para evitar queries repetidas.
      */
-    private void validarIntegridadeMapa(Long codMapa) {
-        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(codMapa);
-        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
-
+    private void validarIntegridadeMapa(Long codMapa, List<Atividade> atividades, List<Competencia> competencias) {
         for (Atividade atividade : atividades) {
             if (atividade.getCompetencias().isEmpty()) {
                 log.warn(
