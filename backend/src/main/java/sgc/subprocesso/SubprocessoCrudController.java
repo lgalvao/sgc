@@ -157,4 +157,32 @@ public class SubprocessoCrudController {
         subprocessoService.alterarDataLimite(codigo, request.getNovaDataLimite());
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * Reabre o cadastro de um subprocesso.
+     * (CDU-32)
+     */
+    @PostMapping("/{codigo}/reabrir-cadastro")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Reabre o cadastro de um subprocesso")
+    public ResponseEntity<Void> reabrirCadastro(
+            @PathVariable Long codigo,
+            @RequestBody @Valid ReabrirProcessoReq request) {
+        subprocessoService.reabrirCadastro(codigo, request.getJustificativa());
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Reabre a revisão de cadastro de um subprocesso.
+     * (CDU-33)
+     */
+    @PostMapping("/{codigo}/reabrir-revisao-cadastro")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Reabre a revisão de cadastro de um subprocesso")
+    public ResponseEntity<Void> reabrirRevisaoCadastro(
+            @PathVariable Long codigo,
+            @RequestBody @Valid ReabrirProcessoReq request) {
+        subprocessoService.reabrirRevisaoCadastro(codigo, request.getJustificativa());
+        return ResponseEntity.ok().build();
+    }
 }
