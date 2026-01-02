@@ -7,11 +7,11 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
-import sgc.usuario.model.Perfil;
-import sgc.usuario.model.Usuario;
-import sgc.usuario.model.UsuarioRepo;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioRepo;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 
 import java.util.Arrays;
 
@@ -44,20 +44,20 @@ public class WithMockCustomUserSecurityContextFactory
             unidade.setCodigo(customUser.unidadeId());
         }
 
-        Usuario principal =
-                new Usuario(
-                        customUser.tituloEleitoral(),
-                        customUser.nome(),
-                        customUser.email(),
-                        "321",
-                        unidade);
+        Usuario principal = Usuario.builder()
+                .tituloEleitoral(customUser.tituloEleitoral())
+                .nome(customUser.nome())
+                .email(customUser.email())
+                .ramal("321")
+                .unidadeLotacao(unidade)
+                .build();
         final Unidade finalUnidade = unidade;
         Arrays.stream(customUser.perfis())
                 .forEach(
                         p -> principal
                                 .getAtribuicoes()
                                 .add(
-                                        sgc.usuario.model.UsuarioPerfil.builder()
+                                        sgc.organizacao.model.UsuarioPerfil.builder()
                                                 .usuario(principal)
                                                 .unidade(finalUnidade)
                                                 .perfil(Perfil.valueOf(p))

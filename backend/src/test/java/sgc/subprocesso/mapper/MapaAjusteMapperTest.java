@@ -7,7 +7,7 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.unidade.model.Unidade;
+import sgc.organizacao.model.Unidade;
 
 import java.util.Collections;
 

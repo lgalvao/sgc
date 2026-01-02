@@ -22,14 +22,14 @@ import sgc.analise.model.TipoAnalise;
 import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.comum.erros.ErroAccessoNegado;
-import sgc.usuario.UsuarioService;
-import sgc.usuario.model.Perfil;
-import sgc.usuario.model.Usuario;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.unidade.model.Unidade;
+import sgc.organizacao.model.Unidade;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -56,7 +56,7 @@ public class SubprocessoService {
     private final AnaliseService analiseService;
     private final ConhecimentoMapper conhecimentoMapper;
     private final UsuarioService usuarioService;
-    private final sgc.unidade.service.UnidadeService unidadeService;
+    private final sgc.organizacao.UnidadeService unidadeService;
     private final SubprocessoPermissoesService subprocessoPermissoesService;
     private final SubprocessoDetalheMapper subprocessoDetalheMapper;
     private final MapaAjusteMapper mapaAjusteMapper;
@@ -458,7 +458,7 @@ public class SubprocessoService {
     }
 
     private boolean isMesmaUnidadeOuSubordinada(Unidade alvo, Unidade superior) {
-        sgc.unidade.model.Unidade atual = alvo;
+        sgc.organizacao.model.Unidade atual = alvo;
         while (atual != null) {
             if (atual.getCodigo().equals(superior.getCodigo())) {
                 return true;

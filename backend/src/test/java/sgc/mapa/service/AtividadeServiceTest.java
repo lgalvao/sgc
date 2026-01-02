@@ -17,9 +17,9 @@ import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.*;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.unidade.model.Unidade;
-import sgc.usuario.UsuarioService;
-import sgc.usuario.model.Usuario;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.Usuario;
 
 import java.util.List;
 import java.util.Optional;

@@ -16,7 +16,7 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.usuario.UsuarioService;
+import sgc.organizacao.UsuarioService;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.evento.EventoMapaAlterado;
 

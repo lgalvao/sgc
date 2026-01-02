@@ -10,8 +10,8 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 
 /**
  * Mapper (usando MapStruct) entre a entidade Subprocesso e seu DTO.

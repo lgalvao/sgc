@@ -15,8 +15,8 @@ import sgc.processo.model.Processo;
 import sgc.processo.service.ProcessoService;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.unidade.model.Unidade;
-import sgc.usuario.UsuarioService;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.UsuarioService;
 
 import java.io.OutputStream;
 import java.util.List;

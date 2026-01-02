@@ -17,7 +17,7 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.Unidade;
+import sgc.organizacao.model.Unidade;
 import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.mapper.AtividadeMapper;
 

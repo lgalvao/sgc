@@ -16,9 +16,9 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.*;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.service.UnidadeService;
-import sgc.usuario.model.Usuario;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.UnidadeService;
+import sgc.organizacao.model.Usuario;
 
 import java.util.Collections;
 import java.util.Optional;

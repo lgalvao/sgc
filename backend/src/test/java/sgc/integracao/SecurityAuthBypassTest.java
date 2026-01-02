@@ -14,11 +14,11 @@ import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.seguranca.dto.EntrarReq;
-import sgc.usuario.model.Perfil;
-import sgc.usuario.model.Usuario;
-import sgc.usuario.model.UsuarioRepo;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioRepo;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 import sgc.util.TestUtil;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;

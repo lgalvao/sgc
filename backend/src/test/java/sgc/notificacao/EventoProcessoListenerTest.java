@@ -16,13 +16,13 @@ import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
-import sgc.usuario.UsuarioService;
-import sgc.usuario.dto.ResponsavelDto;
-import sgc.usuario.dto.UsuarioDto;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UsuarioDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.unidade.model.TipoUnidade;
-import sgc.unidade.model.Unidade;
+import sgc.organizacao.model.TipoUnidade;
+import sgc.organizacao.model.Unidade;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -400,7 +400,7 @@ class EventoProcessoListenerTest {
             Unidade unidade = new Unidade();
             unidade.setCodigo(100L);
             unidade.setSigla(UNID_OP);
-            unidade.setTipo(sgc.unidade.model.TipoUnidade.OPERACIONAL);
+            unidade.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
             processo.setParticipantes(java.util.Set.of(unidade));
 
             ResponsavelDto responsavelDto = new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, null, null);

@@ -11,10 +11,10 @@ import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.dto.AlertaMapper;
 import sgc.alerta.model.*;
 import sgc.processo.model.Processo;
-import sgc.usuario.UsuarioService;
-import sgc.usuario.model.Usuario;
-import sgc.unidade.model.TipoUnidade;
-import sgc.unidade.model.Unidade;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.TipoUnidade;
+import sgc.organizacao.model.Unidade;
 
 import java.time.LocalDateTime;
 import java.util.List;

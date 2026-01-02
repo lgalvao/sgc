@@ -7,8 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.usuario.model.*;
-import sgc.unidade.model.*;
+import sgc.organizacao.model.*;
 
 import java.util.List;
 import java.util.Optional;

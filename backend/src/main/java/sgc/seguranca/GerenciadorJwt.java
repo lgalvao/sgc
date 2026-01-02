@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Component;
-import sgc.usuario.model.Perfil;
+import sgc.organizacao.model.Perfil;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;

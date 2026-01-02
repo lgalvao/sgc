@@ -12,20 +12,20 @@ import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
-import sgc.usuario.UsuarioService;
-import sgc.usuario.dto.ResponsavelDto;
-import sgc.usuario.dto.UsuarioDto;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UsuarioDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.unidade.model.TipoUnidade;
-import sgc.unidade.model.Unidade;
+import sgc.organizacao.model.TipoUnidade;
+import sgc.organizacao.model.Unidade;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static sgc.unidade.model.TipoUnidade.*;
+import static sgc.organizacao.model.TipoUnidade.*;
 
 /**
  * Listener para eventos de processo.
@@ -33,10 +33,6 @@ import static sgc.unidade.model.TipoUnidade.*;
  * <p>Processa eventos de processo iniciado e finalizado, criando alertas e enviando e-mails para as unidades
  * participantes de forma diferenciada, conforme o tipo de unidade.
  *
- * <p>Nota: Este listener permanece no pacote 'notificacao' pois sua responsabilidade principal é
- * orquestrar notificações (alertas e e-mails), não apenas escutar eventos. O pacote 'eventos'
- * contém as definições das classes de evento (EventoProcessoIniciado, etc), enquanto este listener
- * contém a lógica de reação aos eventos.
  */
 @Component
 @RequiredArgsConstructor

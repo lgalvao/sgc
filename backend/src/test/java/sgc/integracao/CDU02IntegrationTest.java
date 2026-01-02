@@ -24,12 +24,12 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
-import sgc.usuario.model.Perfil;
-import sgc.usuario.model.Usuario;
-import sgc.usuario.model.UsuarioPerfil;
-import sgc.usuario.model.UsuarioRepo;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioRepo;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 
 import java.util.HashSet;
 import java.util.Set;

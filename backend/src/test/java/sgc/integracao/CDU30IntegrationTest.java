@@ -13,12 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.usuario.model.Administrador;
-import sgc.usuario.model.AdministradorRepo;
-import sgc.usuario.model.Usuario;
-import sgc.usuario.model.UsuarioRepo;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.organizacao.model.Administrador;
+import sgc.organizacao.model.AdministradorRepo;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioRepo;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.Map;
@@ -62,11 +62,23 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
         Unidade unidade = unidadeRepo.findById(1L).orElseThrow();
 
         // Criar usuário 1 (que será administrador inicial)
-        usuario1 = new Usuario("123456789012", "Admin Inicial", "admin@test.com", "1234", unidade);
+        usuario1 = Usuario.builder()
+                .tituloEleitoral("123456789012")
+                .nome("Admin Inicial")
+                .email("admin@test.com")
+                .ramal("1234")
+                .unidadeLotacao(unidade)
+                .build();
         usuarioRepo.save(usuario1);
 
         // Criar usuário 2 (que será adicionado como administrador)
-        usuario2 = new Usuario("234567890123", "Novo Admin", "novo@test.com", "5678", unidade);
+        usuario2 = Usuario.builder()
+                .tituloEleitoral("234567890123")
+                .nome("Novo Admin")
+                .email("novo@test.com")
+                .ramal("5678")
+                .unidadeLotacao(unidade)
+                .build();
         usuarioRepo.save(usuario2);
 
         // Adicionar admin inicial

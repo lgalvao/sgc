@@ -31,11 +31,11 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.Unidade;
-import sgc.usuario.UsuarioService;
-import sgc.usuario.model.Perfil;
-import sgc.usuario.model.Usuario;
-import sgc.usuario.model.UsuarioPerfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfil;
 
 import java.util.Collections;
 import java.util.List;

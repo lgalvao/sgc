@@ -12,8 +12,8 @@ import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.Unidade;
-import sgc.usuario.model.Usuario;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 
 @Service
 @RequiredArgsConstructor

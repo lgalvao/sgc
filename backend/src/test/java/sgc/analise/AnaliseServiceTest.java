@@ -13,7 +13,7 @@ import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAnalise;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.unidade.service.UnidadeService;
+import sgc.organizacao.UnidadeService;
 
 import java.util.List;
 

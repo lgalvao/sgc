@@ -13,8 +13,8 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.service.SubprocessoFactory;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class ProcessoInicializador {
 
     private final ProcessoRepo processoRepo;
     private final UnidadeRepo unidadeRepo;
-    private final sgc.unidade.model.UnidadeMapaRepo unidadeMapaRepo;
+    private final sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo;
     private final ApplicationEventPublisher publicadorEventos;
     private final SubprocessoFactory subprocessoFactory;
 
@@ -81,7 +81,7 @@ public class ProcessoInicializador {
         }
 
         // Se for REVISAO ou DIAGNOSTICO, precisamos carregar os mapas vigentes em lote para passar para a factory
-        List<sgc.unidade.model.UnidadeMapa> unidadesMapas = List.of();
+        List<sgc.organizacao.model.UnidadeMapa> unidadesMapas = List.of();
         if (tipo == TipoProcesso.REVISAO || tipo == TipoProcesso.DIAGNOSTICO) {
             unidadesMapas = unidadeMapaRepo.findAllById(codigosUnidades);
         }
@@ -129,10 +129,10 @@ public class ProcessoInicializador {
 
     private void criarSubprocessos(Processo processo, TipoProcesso tipo, 
                                     List<Long> codigosUnidades, Set<Unidade> unidadesParaProcessar,
-                                    List<sgc.unidade.model.UnidadeMapa> unidadesMapas) {
+                                    List<sgc.organizacao.model.UnidadeMapa> unidadesMapas) {
         
-        java.util.Map<Long, sgc.unidade.model.UnidadeMapa> mapaUnidadeMapa = unidadesMapas.stream()
-                .collect(Collectors.toMap(sgc.unidade.model.UnidadeMapa::getUnidadeCodigo, m -> m));
+        java.util.Map<Long, sgc.organizacao.model.UnidadeMapa> mapaUnidadeMapa = unidadesMapas.stream()
+                .collect(Collectors.toMap(sgc.organizacao.model.UnidadeMapa::getUnidadeCodigo, m -> m));
 
         switch (tipo) {
             case MAPEAMENTO -> {
@@ -151,13 +151,13 @@ public class ProcessoInicializador {
                     if (unidade == null) {
                          throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
                     }
-                    sgc.unidade.model.UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
+                    sgc.organizacao.model.UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
                     subprocessoFactory.criarParaRevisao(processo, unidade, um);
                 }
             }
             case DIAGNOSTICO -> {
                 for (Unidade unidade : unidadesParaProcessar) {
-                    sgc.unidade.model.UnidadeMapa um = mapaUnidadeMapa.get(unidade.getCodigo());
+                    sgc.organizacao.model.UnidadeMapa um = mapaUnidadeMapa.get(unidade.getCodigo());
                     subprocessoFactory.criarParaDiagnostico(processo, unidade, um);
                 }
             }
@@ -185,7 +185,7 @@ public class ProcessoInicializador {
         }
 
         List<Long> codigosComMapa = unidadeMapaRepo.findAllById(codigosUnidades).stream()
-                .map(sgc.unidade.model.UnidadeMapa::getUnidadeCodigo)
+                .map(sgc.organizacao.model.UnidadeMapa::getUnidadeCodigo)
                 .toList();
         
         List<Long> unidadesSemMapa = codigosUnidades.stream()

@@ -14,11 +14,11 @@ import sgc.Sgc;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
-import sgc.usuario.model.Usuario;
-import sgc.usuario.model.UsuarioRepo;
+import sgc.organizacao.dto.CriarAtribuicaoTemporariaReq;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioRepo;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;

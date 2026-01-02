@@ -1,8 +1,8 @@
 package sgc.seguranca.dto;
 
 import lombok.*;
-import sgc.usuario.model.Perfil;
-import sgc.unidade.dto.UnidadeDto;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.dto.UnidadeDto;
 
 @Getter
 @Setter

@@ -2,7 +2,7 @@ package sgc.subprocesso.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import sgc.usuario.model.Usuario;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.Movimentacao;
@@ -32,7 +32,7 @@ public interface SubprocessoDetalheMapper {
     @Mapping(target = "codigo", source = "codigo")
     @Mapping(target = "sigla", source = "sigla")
     @Mapping(target = "nome", source = "nome")
-    SubprocessoDetalheDto.UnidadeDto toUnidadeDto(sgc.unidade.model.Unidade unidade);
+    SubprocessoDetalheDto.UnidadeDto toUnidadeDto(sgc.organizacao.model.Unidade unidade);
 
     default SubprocessoDetalheDto.ResponsavelDto mapResponsavel(Subprocesso sp, Usuario responsavel) {
         if (responsavel == null) return null;

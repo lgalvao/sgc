@@ -11,11 +11,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
-import sgc.unidade.dto.UnidadeDto;
+import sgc.organizacao.dto.UnidadeDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.unidade.service.UnidadeService;
+import sgc.organizacao.UnidadeService;
 
 import java.util.List;
 

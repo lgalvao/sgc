@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sgc.mapa.service.AtividadeService;
 import sgc.comum.erros.ErroAccessoNegado;
-import sgc.usuario.model.Perfil;
-import sgc.usuario.model.Usuario;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.unidade.model.Unidade;
+import sgc.organizacao.model.Unidade;
 
 import java.util.EnumSet;
 import java.util.Objects;

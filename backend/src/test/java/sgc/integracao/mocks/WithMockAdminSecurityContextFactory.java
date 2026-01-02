@@ -8,10 +8,10 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
-import sgc.usuario.model.Perfil;
-import sgc.usuario.model.Usuario;
-import sgc.usuario.model.UsuarioRepo;
-import sgc.unidade.model.Unidade;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioRepo;
+import sgc.organizacao.model.Unidade;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -45,9 +45,9 @@ public class WithMockAdminSecurityContextFactory
             Unidade u = new Unidade("Unidade Mock", "UM");
             principal.setUnidadeLotacao(u);
 
-            Set<sgc.usuario.model.UsuarioPerfil> atribuicoes = new HashSet<>();
+            Set<sgc.organizacao.model.UsuarioPerfil> atribuicoes = new HashSet<>();
             atribuicoes.add(
-                            sgc.usuario.model.UsuarioPerfil.builder()
+                            sgc.organizacao.model.UsuarioPerfil.builder()
                                     .usuario(principal)
                                     .unidade(u)
                                     .perfil(Perfil.ADMIN)
@@ -55,11 +55,11 @@ public class WithMockAdminSecurityContextFactory
             principal.setAtribuicoes(atribuicoes);
 
         } else {
-            Set<sgc.usuario.model.UsuarioPerfil> atribuicoes = new HashSet<>(principal.getAtribuicoes());
+            Set<sgc.organizacao.model.UsuarioPerfil> atribuicoes = new HashSet<>(principal.getAtribuicoes());
             if (atribuicoes.stream().noneMatch(a -> a.getPerfil() == Perfil.ADMIN)) {
                 Unidade u = new Unidade("Unidade Mock", "UM");
                 atribuicoes.add(
-                                sgc.usuario.model.UsuarioPerfil.builder()
+                                sgc.organizacao.model.UsuarioPerfil.builder()
                                         .usuario(principal)
                                         .unidade(u)
                                         .perfil(Perfil.ADMIN)

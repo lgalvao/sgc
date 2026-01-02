@@ -20,9 +20,9 @@ import sgc.mapa.model.ConhecimentoRepo;
 import sgc.mapa.model.MapaRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.unidade.model.Unidade;
-import sgc.usuario.model.Perfil;
-import sgc.usuario.model.Usuario;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Usuario;
 
 import java.util.List;
 import java.util.Optional;
@@ -87,9 +87,9 @@ class ImpactoMapaServiceTest {
     }
 
     private void addAtribuicao(Usuario u, Perfil p) {
-        java.util.Set<sgc.usuario.model.UsuarioPerfil> attrs = new java.util.HashSet<>();
+        java.util.Set<sgc.organizacao.model.UsuarioPerfil> attrs = new java.util.HashSet<>();
         attrs.add(
-                        sgc.usuario.model.UsuarioPerfil.builder()
+                        sgc.organizacao.model.UsuarioPerfil.builder()
                                 .usuario(u)
                                 .unidade(new Unidade())
                                 .perfil(p)

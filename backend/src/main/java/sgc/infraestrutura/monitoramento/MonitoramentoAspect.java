@@ -3,16 +3,15 @@ package sgc.infraestrutura.monitoramento;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Aspect
 @Component
+@Slf4j
 public class MonitoramentoAspect {
-
-    private static final Logger log = LoggerFactory.getLogger(MonitoramentoAspect.class);
     private static final long LIMITE_ALERTA_MS = 50;
 
     @Around("execution(* sgc..*Service.*(..)) || execution(* sgc..*Repo.*(..))")

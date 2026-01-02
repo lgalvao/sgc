@@ -7,28 +7,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import sgc.comum.json.SanitizarHtml;
 
-/**
- * DTO para Atividade usado nas APIs (entrada/saída). Contém apenas campos primários e referências
- * por codigo para evitar expor entidades JPA.
- */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class AtividadeDto {
-    /**
-     * O código da atividade.
-     */
     private Long codigo;
-
-    /**
-     * O código do mapa ao qual a atividade pertence.
-     */
     private Long mapaCodigo;
 
-    /**
-     * A descrição da atividade.
-     */
     @NotBlank(message = "Descrição não pode ser vazia")
     @SanitizarHtml
     private String descricao;

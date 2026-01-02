@@ -12,10 +12,10 @@ import sgc.mapa.service.CopiaMapaService;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.*;
-import sgc.unidade.model.TipoUnidade;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeMapa;
-import sgc.unidade.model.UnidadeMapaRepo;
+import sgc.organizacao.model.TipoUnidade;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeMapa;
+import sgc.organizacao.model.UnidadeMapaRepo;
 
 import java.time.LocalDateTime;
 

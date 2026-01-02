@@ -10,9 +10,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.seguranca.GerenciadorJwt;
-import sgc.usuario.model.*;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.organizacao.model.*;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,7 +51,13 @@ class ActuatorSecurityTest {
     private void criarUsuario(String titulo, Perfil perfil, Unidade unidade) {
         if (usuarioRepo.existsById(titulo)) return;
 
-        Usuario usuario = new Usuario(titulo, "Usuario " + perfil, "email@test.com", "1234", unidade);
+        Usuario usuario = Usuario.builder()
+                .tituloEleitoral(titulo)
+                .nome("Usuario " + perfil)
+                .email("email@test.com")
+                .ramal("1234")
+                .unidadeLotacao(unidade)
+                .build();
         usuarioRepo.save(usuario);
 
         UsuarioPerfil usuarioPerfil = new UsuarioPerfil();

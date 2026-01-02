@@ -7,10 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import sgc.unidade.dto.UnidadeDto;
+import sgc.organizacao.dto.UnidadeDto;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.unidade.service.UnidadeService;
+import sgc.organizacao.UnidadeService;
 
 import java.net.URI;
 import java.util.List;
@@ -74,7 +74,7 @@ public class SubprocessoCrudController {
     @PreAuthorize("isAuthenticated()")
     public SubprocessoDetalheDto obterPorCodigo(
             @PathVariable Long codigo,
-            @RequestParam(required = false) sgc.usuario.model.Perfil perfil,
+            @RequestParam(required = false) sgc.organizacao.model.Perfil perfil,
             @RequestParam(required = false) Long unidadeUsuario) {
         return subprocessoService.obterDetalhes(codigo, perfil, unidadeUsuario);
     }

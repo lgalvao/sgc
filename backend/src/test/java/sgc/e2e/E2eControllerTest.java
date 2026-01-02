@@ -12,7 +12,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.processo.service.ProcessoService;
-import sgc.usuario.UsuarioService;
+import sgc.organizacao.UsuarioService;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;

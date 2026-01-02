@@ -15,8 +15,8 @@ import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
-import sgc.usuario.UsuarioService;
-import sgc.unidade.dto.UnidadeDto;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.dto.UnidadeDto;
 
 import javax.sql.DataSource;
 import java.io.File;

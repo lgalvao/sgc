@@ -1,8 +1,8 @@
 package sgc.fixture;
 
-import sgc.unidade.model.SituacaoUnidade;
-import sgc.unidade.model.TipoUnidade;
-import sgc.unidade.model.Unidade;
+import sgc.organizacao.model.SituacaoUnidade;
+import sgc.organizacao.model.TipoUnidade;
+import sgc.organizacao.model.Unidade;
 
 public class UnidadeFixture {
 

@@ -20,12 +20,12 @@ import sgc.notificacao.NotificacaoEmailService;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
-import sgc.usuario.model.Usuario;
-import sgc.usuario.model.UsuarioRepo;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioRepo;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 
 import java.util.List;
 import java.util.Optional;

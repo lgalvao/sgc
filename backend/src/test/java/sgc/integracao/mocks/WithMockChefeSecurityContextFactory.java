@@ -5,12 +5,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
-import sgc.usuario.model.Perfil;
-import sgc.usuario.model.Usuario;
-import sgc.usuario.model.UsuarioPerfil;
-import sgc.usuario.model.UsuarioRepo;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioRepo;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -48,9 +48,13 @@ public class WithMockChefeSecurityContextFactory
         }
 
         if (usuario == null) {
-            usuario =
-                    new Usuario(
-                            annotation.value(), "Chefe Teste", "chefe@teste.com", "123", unidade);
+            usuario = Usuario.builder()
+                    .tituloEleitoral(annotation.value())
+                    .nome("Chefe Teste")
+                    .email("chefe@teste.com")
+                    .ramal("123")
+                    .unidadeLotacao(unidade)
+                    .build();
 
             Set<UsuarioPerfil> atribuicoes = new HashSet<>();
             atribuicoes.add(

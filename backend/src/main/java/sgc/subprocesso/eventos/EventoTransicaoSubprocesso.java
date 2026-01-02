@@ -3,8 +3,8 @@ package sgc.subprocesso.eventos;
 import lombok.Builder;
 import lombok.Data;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.unidade.model.Unidade;
-import sgc.usuario.model.Usuario;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 
 /**
  * Evento de domínio publicado quando ocorre uma transição de estado em um subprocesso.

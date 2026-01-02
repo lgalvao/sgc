@@ -10,7 +10,7 @@ import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.service.ProcessoService;
-import sgc.usuario.UsuarioService;
+import sgc.organizacao.UsuarioService;
 import sgc.subprocesso.service.SubprocessoService;
 
 /**

@@ -21,15 +21,15 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.usuario.UsuarioService;
-import sgc.usuario.dto.PerfilDto;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.dto.PerfilDto;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.service.UnidadeService;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.UnidadeService;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -39,7 +39,7 @@ import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
 import static sgc.processo.model.TipoProcesso.REVISAO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
-import static sgc.unidade.model.TipoUnidade.INTERMEDIARIA;
+import static sgc.organizacao.model.TipoUnidade.INTERMEDIARIA;
 
 @Service
 @RequiredArgsConstructor
@@ -77,7 +77,7 @@ public class ProcessoService {
         Long codUnidadeUsuario =
                 perfis.stream()
                         .findFirst()
-                        .map(sgc.usuario.dto.PerfilDto::getUnidadeCodigo)
+                        .map(PerfilDto::getUnidadeCodigo)
                         .orElse(null);
 
         if (codUnidadeUsuario == null) {

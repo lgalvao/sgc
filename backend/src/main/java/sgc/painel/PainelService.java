@@ -16,9 +16,9 @@ import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.service.ProcessoService;
 import sgc.processo.model.SituacaoProcesso;
-import sgc.usuario.model.Perfil;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.service.UnidadeService;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.UnidadeService;
 
 import java.time.LocalDateTime;
 import java.util.*;

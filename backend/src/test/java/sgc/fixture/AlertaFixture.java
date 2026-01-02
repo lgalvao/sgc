@@ -2,8 +2,8 @@ package sgc.fixture;
 
 import sgc.alerta.model.Alerta;
 import sgc.processo.model.Processo;
-import sgc.usuario.model.Usuario;
-import sgc.unidade.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.Unidade;
 
 import java.time.LocalDateTime;
 

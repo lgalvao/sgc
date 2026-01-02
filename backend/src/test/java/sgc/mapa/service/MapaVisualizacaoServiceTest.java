@@ -11,7 +11,7 @@ import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.model.*;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.unidade.model.Unidade;
+import sgc.organizacao.model.Unidade;
 
 import java.util.List;
 import java.util.Set;

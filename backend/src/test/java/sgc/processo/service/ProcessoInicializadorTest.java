@@ -13,7 +13,7 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.service.SubprocessoFactory;
-import sgc.unidade.model.Unidade;
+import sgc.organizacao.model.Unidade;
 
 import java.util.List;
 import java.util.Set;
@@ -30,9 +30,9 @@ class ProcessoInicializadorTest {
     @Mock
     private ProcessoRepo processoRepo;
     @Mock
-    private sgc.unidade.model.UnidadeRepo unidadeRepo;
+    private sgc.organizacao.model.UnidadeRepo unidadeRepo;
     @Mock
-    private sgc.unidade.model.UnidadeMapaRepo unidadeMapaRepo;
+    private sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo;
     @Mock
     private SubprocessoFactory subprocessoFactory;
     @Mock
@@ -135,7 +135,7 @@ class ProcessoInicializadorTest {
         when(processoRepo.findById(codProcesso)).thenReturn(java.util.Optional.of(processo));
 
         // Mock para unidadeMapaRepo.findAllById
-        sgc.unidade.model.UnidadeMapa um1 = new sgc.unidade.model.UnidadeMapa();
+        sgc.organizacao.model.UnidadeMapa um1 = new sgc.organizacao.model.UnidadeMapa();
         um1.setUnidadeCodigo(10L);
         when(unidadeMapaRepo.findAllById(anyList())).thenReturn(List.of(um1));
         

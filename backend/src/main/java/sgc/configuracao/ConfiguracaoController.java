@@ -13,9 +13,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/configuracoes")
 @RequiredArgsConstructor
-@Tag(name = "Configurações", description = "Gerenciamento de configurações do sistema")
+@Tag(name = "Configurações", description = "Gerenciamento de configurações")
 public class ConfiguracaoController {
-
     private final ParametroService parametroService;
 
     @GetMapping

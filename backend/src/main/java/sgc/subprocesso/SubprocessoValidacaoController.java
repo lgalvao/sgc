@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import sgc.analise.dto.AnaliseMapper;
 import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.model.TipoAnalise;
-import sgc.usuario.model.Usuario;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoService;
 import sgc.subprocesso.service.SubprocessoMapaWorkflowService;

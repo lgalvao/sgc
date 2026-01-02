@@ -7,7 +7,7 @@ import org.mapstruct.MappingTarget;
 import sgc.comum.util.FormatadorData;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.Processo;
-import sgc.unidade.model.Unidade;
+import sgc.organizacao.model.Unidade;
 
 import java.util.stream.Collectors;
 

@@ -18,7 +18,7 @@ import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaService;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.eventos.TipoTransicao;
-import sgc.usuario.model.Usuario;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
@@ -26,8 +26,8 @@ import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.service.UnidadeService;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.UnidadeService;
 
 import java.util.stream.Collectors;
 

@@ -19,8 +19,8 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.SubprocessoMapaService;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.usuario.UsuarioService;
-import sgc.usuario.model.Usuario;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.Usuario;
 
 import java.util.List;
 import java.util.Map;
@@ -321,7 +321,7 @@ public class SubprocessoCadastroController {
 
     private String extractTituloUsuario(Object principal) {
         if (principal instanceof String string) return string;
-        if (principal instanceof sgc.usuario.model.Usuario usuario)
+        if (principal instanceof sgc.organizacao.model.Usuario usuario)
             return usuario.getTituloEleitoral();
         return principal != null ? principal.toString() : null;
     }

@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.model.EntidadeBase;
-import sgc.unidade.model.Unidade;
+import sgc.organizacao.model.Unidade;
 import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDateTime;
