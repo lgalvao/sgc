@@ -1,159 +1,209 @@
-import {describe, expect, it, vi} from "vitest";
-import {
-    setupServiceTest,
-    testErrorHandling,
-    testGetEndpoint,
-    testPostEndpoint
-} from "@/test-utils/serviceTestHelpers";
-import {mapMapaCompletoDtoToModel} from "@/mappers/mapas";
-import {mapAtividadeVisualizacaoToModel} from "@/mappers/atividades";
-import * as subprocessoService from "@/services/subprocessoService";
-import type {Competencia} from "@/types/tipos";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import * as subprocessoService from '../subprocessoService';
+import apiClient from '@/axios-setup';
+import * as mapasMapper from '@/mappers/mapas';
+import * as atividadesMapper from '@/mappers/atividades';
 
-vi.mock("@/mappers/mapas");
-vi.mock("@/mappers/atividades");
+vi.mock('@/axios-setup');
+vi.mock('@/mappers/mapas');
+vi.mock('@/mappers/atividades');
 
-describe("subprocessoService", () => {
-    const { mockApi } = setupServiceTest();
+describe('subprocessoService', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
 
-    describe("importarAtividades", () => {
-        testPostEndpoint(
-            () => subprocessoService.importarAtividades(1, 2),
-            "/subprocessos/1/importar-atividades",
-            { codSubprocessoOrigem: 2 },
-            {}
+    it('importarAtividades deve fazer requisição POST', async () => {
+        const codSubprocessoDestino = 1;
+        const codSubprocessoOrigem = 2;
+        await subprocessoService.importarAtividades(codSubprocessoDestino, codSubprocessoOrigem);
+
+        expect(apiClient.post).toHaveBeenCalledWith(
+            `/subprocessos/${codSubprocessoDestino}/importar-atividades`,
+            { codSubprocessoOrigem }
         );
-
-        testErrorHandling(() => subprocessoService.importarAtividades(1, 2), 'post');
     });
 
-    describe("listarAtividades", () => {
-        it("deve chamar o endpoint correto e mapear os resultados", async () => {
-            const mockAtividades = [{ codigo: 1 }];
-            mockApi.get.mockResolvedValue({ data: mockAtividades });
-            vi.mocked(mapAtividadeVisualizacaoToModel).mockImplementation((a: any) => a);
+    it('listarAtividades deve fazer requisição GET e mapear dados', async () => {
+        const codSubprocesso = 1;
+        const mockData = [{ id: 1 }];
+        const mockMapped = { codigo: 1 } as any;
 
-            await subprocessoService.listarAtividades(1);
+        vi.mocked(apiClient.get).mockResolvedValue({ data: mockData });
+        vi.mocked(atividadesMapper.mapAtividadeVisualizacaoToModel).mockReturnValue(mockMapped);
 
-            expect(mockApi.get).toHaveBeenCalledWith("/subprocessos/1/atividades");
-            expect(mapAtividadeVisualizacaoToModel).toHaveBeenCalledTimes(1);
+        const result = await subprocessoService.listarAtividades(codSubprocesso);
+
+        expect(apiClient.get).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/atividades`);
+        expect(atividadesMapper.mapAtividadeVisualizacaoToModel).toHaveBeenCalledTimes(mockData.length);
+        expect(result).toEqual([mockMapped]);
+    });
+
+    it('obterPermissoes deve fazer requisição GET', async () => {
+        const codSubprocesso = 1;
+        const mockData = { podeEditar: true };
+        vi.mocked(apiClient.get).mockResolvedValue({ data: mockData });
+
+        const result = await subprocessoService.obterPermissoes(codSubprocesso);
+
+        expect(apiClient.get).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/permissoes`);
+        expect(result).toEqual(mockData);
+    });
+
+    it('validarCadastro deve fazer requisição GET', async () => {
+        const codSubprocesso = 1;
+        const mockData = { valido: true };
+        vi.mocked(apiClient.get).mockResolvedValue({ data: mockData });
+
+        const result = await subprocessoService.validarCadastro(codSubprocesso);
+
+        expect(apiClient.get).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/validar-cadastro`);
+        expect(result).toEqual(mockData);
+    });
+
+    it('obterStatus deve fazer requisição GET', async () => {
+        const codSubprocesso = 1;
+        const mockData = { status: 'OK' };
+        vi.mocked(apiClient.get).mockResolvedValue({ data: mockData });
+
+        const result = await subprocessoService.obterStatus(codSubprocesso);
+
+        expect(apiClient.get).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/status`);
+        expect(result).toEqual(mockData);
+    });
+
+    it('buscarSubprocessoDetalhe deve fazer requisição GET com query params', async () => {
+        const codSubprocesso = 1;
+        const perfil = 'ADMIN';
+        const unidadeCodigo = 2;
+        const mockData = { detalhe: true };
+        vi.mocked(apiClient.get).mockResolvedValue({ data: mockData });
+
+        const result = await subprocessoService.buscarSubprocessoDetalhe(codSubprocesso, perfil, unidadeCodigo);
+
+        expect(apiClient.get).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}`, {
+            params: { perfil, unidadeUsuario: unidadeCodigo }
         });
-        testErrorHandling(() => subprocessoService.listarAtividades(1));
+        expect(result).toEqual(mockData);
     });
 
-    describe("obterPermissoes", () => {
-        testGetEndpoint(
-            () => subprocessoService.obterPermissoes(1),
-            "/subprocessos/1/permissoes",
-            { podeEditar: true }
+    it('buscarContextoEdicao deve fazer requisição GET com query params', async () => {
+        const codSubprocesso = 1;
+        const perfil = 'ADMIN';
+        const unidadeCodigo = 2;
+        const mockData = { contexto: true };
+        vi.mocked(apiClient.get).mockResolvedValue({ data: mockData });
+
+        const result = await subprocessoService.buscarContextoEdicao(codSubprocesso, perfil, unidadeCodigo);
+
+        expect(apiClient.get).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/contexto-edicao`, {
+            params: { perfil, unidadeUsuario: unidadeCodigo }
+        });
+        expect(result).toEqual(mockData);
+    });
+
+    it('buscarSubprocessoPorProcessoEUnidade deve fazer requisição GET com query params', async () => {
+        const codProcesso = 1;
+        const siglaUnidade = 'U1';
+        const mockData = 123;
+        vi.mocked(apiClient.get).mockResolvedValue({ data: mockData });
+
+        const result = await subprocessoService.buscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
+
+        expect(apiClient.get).toHaveBeenCalledWith("/subprocessos/buscar", {
+            params: { codProcesso, siglaUnidade }
+        });
+        expect(result).toEqual(mockData);
+    });
+
+    it('adicionarCompetencia deve fazer requisição POST e mapear resposta', async () => {
+        const codSubprocesso = 1;
+        const competencia = { descricao: 'Comp', atividadesAssociadas: [1], codigo: 0 } as any;
+        const mockData = { mapa: true };
+        const mockMapped = { mapped: true } as any;
+
+        vi.mocked(apiClient.post).mockResolvedValue({ data: mockData });
+        vi.mocked(mapasMapper.mapMapaCompletoDtoToModel).mockReturnValue(mockMapped);
+
+        const result = await subprocessoService.adicionarCompetencia(codSubprocesso, competencia);
+
+        expect(apiClient.post).toHaveBeenCalledWith(
+            `/subprocessos/${codSubprocesso}/competencias`,
+            { descricao: competencia.descricao, atividadesIds: competencia.atividadesAssociadas }
         );
-        testErrorHandling(() => subprocessoService.obterPermissoes(1));
+        expect(mapasMapper.mapMapaCompletoDtoToModel).toHaveBeenCalledWith(mockData);
+        expect(result).toEqual(mockMapped);
     });
 
-    describe("validarCadastro", () => {
-        testGetEndpoint(
-            () => subprocessoService.validarCadastro(1),
-            "/subprocessos/1/validar-cadastro",
-            { valido: true }
+    it('atualizarCompetencia deve fazer requisição POST e mapear resposta', async () => {
+        const codSubprocesso = 1;
+        const competencia = { descricao: 'Comp', atividadesAssociadas: [1], codigo: 10 } as any;
+        const mockData = { mapa: true };
+        const mockMapped = { mapped: true } as any;
+
+        vi.mocked(apiClient.post).mockResolvedValue({ data: mockData });
+        vi.mocked(mapasMapper.mapMapaCompletoDtoToModel).mockReturnValue(mockMapped);
+
+        const result = await subprocessoService.atualizarCompetencia(codSubprocesso, competencia);
+
+        expect(apiClient.post).toHaveBeenCalledWith(
+            `/subprocessos/${codSubprocesso}/competencias/${competencia.codigo}/atualizar`,
+            { descricao: competencia.descricao, atividadesIds: competencia.atividadesAssociadas }
         );
-        testErrorHandling(() => subprocessoService.validarCadastro(1));
+        expect(mapasMapper.mapMapaCompletoDtoToModel).toHaveBeenCalledWith(mockData);
+        expect(result).toEqual(mockMapped);
     });
 
-    describe("obterStatus", () => {
-        testGetEndpoint(
-            () => subprocessoService.obterStatus(1),
-            "/subprocessos/1/status",
-            { status: "EM_ANDAMENTO" }
+    it('removerCompetencia deve fazer requisição POST e mapear resposta', async () => {
+        const codSubprocesso = 1;
+        const codCompetencia = 10;
+        const mockData = { mapa: true };
+        const mockMapped = { mapped: true } as any;
+
+        vi.mocked(apiClient.post).mockResolvedValue({ data: mockData });
+        vi.mocked(mapasMapper.mapMapaCompletoDtoToModel).mockReturnValue(mockMapped);
+
+        const result = await subprocessoService.removerCompetencia(codSubprocesso, codCompetencia);
+
+        expect(apiClient.post).toHaveBeenCalledWith(
+            `/subprocessos/${codSubprocesso}/competencias/${codCompetencia}/remover`
         );
-        testErrorHandling(() => subprocessoService.obterStatus(1));
+        expect(mapasMapper.mapMapaCompletoDtoToModel).toHaveBeenCalledWith(mockData);
+        expect(result).toEqual(mockMapped);
     });
 
-    describe("buscarSubprocessoPorProcessoEUnidade", () => {
-        it("deve chamar o endpoint correto com query params", async () => {
-            const mockResponse = { codigo: 100 };
-            mockApi.get.mockResolvedValue({ data: mockResponse });
-
-            const result = await subprocessoService.buscarSubprocessoPorProcessoEUnidade(10, "UNID");
-
-            expect(mockApi.get).toHaveBeenCalledWith("/subprocessos/buscar", {
-                params: { codProcesso: 10, siglaUnidade: "UNID" }
-            });
-            expect(result).toEqual(mockResponse);
-        });
-        testErrorHandling(() => subprocessoService.buscarSubprocessoPorProcessoEUnidade(10, "UNID"));
+    it('aceitarCadastroEmBloco deve fazer requisição POST', async () => {
+        const codSubprocesso = 1;
+        const payload = { unidadeCodigos: [1], dataLimite: '2024-12-31' };
+        await subprocessoService.aceitarCadastroEmBloco(codSubprocesso, payload);
+        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/aceitar-cadastro-bloco`, payload);
     });
 
-    describe("buscarSubprocessoDetalhe", () => {
-        it("deve chamar o endpoint correto com os parâmetros corretos", async () => {
-            mockApi.get.mockResolvedValue({ data: {} });
-            await subprocessoService.buscarSubprocessoDetalhe(1, "perfil", 123);
-            expect(mockApi.get).toHaveBeenCalledWith("/subprocessos/1", {
-                params: { perfil: "perfil", unidadeUsuario: 123 },
-            });
-        });
-        testErrorHandling(() => subprocessoService.buscarSubprocessoDetalhe(1, "perfil", 123));
+    it('homologarCadastroEmBloco deve fazer requisição POST', async () => {
+        const codSubprocesso = 1;
+        const payload = { unidadeCodigos: [1], dataLimite: '2024-12-31' };
+        await subprocessoService.homologarCadastroEmBloco(codSubprocesso, payload);
+        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/homologar-cadastro-bloco`, payload);
     });
 
-    describe("Competencia Actions", () => {
-        const mockCompetencia: Competencia = {
-            codigo: 1,
-            descricao: "Teste",
-            atividadesAssociadas: [],
-        };
-        const mockMapaCompleto = { codigo: 1, competencias: [mockCompetencia] };
+    it('aceitarValidacaoEmBloco deve fazer requisição POST', async () => {
+        const codSubprocesso = 1;
+        const payload = { unidadeCodigos: [1], dataLimite: '2024-12-31' };
+        await subprocessoService.aceitarValidacaoEmBloco(codSubprocesso, payload);
+        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/aceitar-validacao-bloco`, payload);
+    });
 
-        it("adicionarCompetencia deve chamar o endpoint correto e mapear a resposta", async () => {
-            vi.mocked(mapMapaCompletoDtoToModel).mockReturnValue(mockMapaCompleto as any);
-            mockApi.post.mockResolvedValue({ data: {} });
+    it('homologarValidacaoEmBloco deve fazer requisição POST', async () => {
+        const codSubprocesso = 1;
+        const payload = { unidadeCodigos: [1], dataLimite: '2024-12-31' };
+        await subprocessoService.homologarValidacaoEmBloco(codSubprocesso, payload);
+        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/homologar-validacao-bloco`, payload);
+    });
 
-            const result = await subprocessoService.adicionarCompetencia(
-                1,
-                mockCompetencia,
-            );
-            expect(mockApi.post).toHaveBeenCalledWith(
-                "/subprocessos/1/competencias",
-                {
-                    descricao: mockCompetencia.descricao,
-                    atividadesIds: mockCompetencia.atividadesAssociadas,
-                },
-            );
-            expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
-            expect(result).toEqual(mockMapaCompleto);
-        });
-
-        it("atualizarCompetencia deve chamar o endpoint correto e mapear a resposta", async () => {
-            vi.mocked(mapMapaCompletoDtoToModel).mockReturnValue(mockMapaCompleto as any);
-            mockApi.post.mockResolvedValue({ data: {} });
-
-            const result = await subprocessoService.atualizarCompetencia(
-                1,
-                mockCompetencia,
-            );
-            expect(mockApi.post).toHaveBeenCalledWith(
-                "/subprocessos/1/competencias/1/atualizar",
-                {
-                    descricao: mockCompetencia.descricao,
-                    atividadesIds: mockCompetencia.atividadesAssociadas,
-                },
-            );
-            expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
-            expect(result).toEqual(mockMapaCompleto);
-        });
-
-        it("removerCompetencia deve chamar o endpoint correto e mapear a resposta", async () => {
-            vi.mocked(mapMapaCompletoDtoToModel).mockReturnValue(mockMapaCompleto as any);
-            mockApi.post.mockResolvedValue({ data: {} });
-
-            const result = await subprocessoService.removerCompetencia(1, 1);
-            expect(mockApi.post).toHaveBeenCalledWith(
-                "/subprocessos/1/competencias/1/remover",
-            );
-            expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
-            expect(result).toEqual(mockMapaCompleto);
-        });
-
-        testErrorHandling(() => subprocessoService.adicionarCompetencia(1, mockCompetencia), 'post');
-        testErrorHandling(() => subprocessoService.atualizarCompetencia(1, mockCompetencia), 'post');
-        testErrorHandling(() => subprocessoService.removerCompetencia(1, 1), 'post');
+    it('disponibilizarMapaEmBloco deve fazer requisição POST', async () => {
+        const codSubprocesso = 1;
+        const payload = { unidadeCodigos: [1], dataLimite: '2024-12-31' };
+        await subprocessoService.disponibilizarMapaEmBloco(codSubprocesso, payload);
+        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/disponibilizar-mapa-bloco`, payload);
     });
 });
