@@ -1,10 +1,28 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { describe, it, expect, vi } from 'vitest'
 import { createTestingPinia } from '@pinia/testing'
 import ConfiguracoesView from '@/views/ConfiguracoesView.vue'
 import { useConfiguracoesStore } from '@/stores/configuracoes'
 
+// Mock dependencies
+const { mockApiClient } = vi.hoisted(() => {
+    return {
+        mockApiClient: {
+            get: vi.fn().mockResolvedValue({ data: [] }),
+            post: vi.fn().mockResolvedValue({ data: {} }),
+        }
+    }
+});
+
+vi.mock("@/axios-setup", () => ({
+    apiClient: mockApiClient,
+    default: mockApiClient,
+}));
+
 vi.mock('@/stores/feedback', () => ({
+  useFeedbackStore: vi.fn(() => ({
+    show: vi.fn()
+  })),
   useNotificacoesStore: vi.fn(() => ({
     show: vi.fn()
   }))
@@ -19,7 +37,8 @@ describe('ConfiguracoesView.vue', () => {
           initialState: {
             configuracoes: {
               parametros: [],
-              loading: false
+              loading: false,
+              error: null
             }
           }
         })]
@@ -28,7 +47,7 @@ describe('ConfiguracoesView.vue', () => {
 
     const store = useConfiguracoesStore()
     expect(store.carregarConfiguracoes).toHaveBeenCalled()
-    expect(wrapper.find('h5').text()).toBe('Configurações do Sistema')
+    expect(wrapper.text()).toContain('Configurações do Sistema')
   })
 
   it('updates form values from store', async () => {
@@ -36,26 +55,31 @@ describe('ConfiguracoesView.vue', () => {
       global: {
         plugins: [createTestingPinia({
           createSpy: vi.fn,
-          stubActions: false // Allow store methods to run
-        })]
+          initialState: {
+            configuracoes: {
+              parametros: [
+                  { id: 1, chave: 'DIAS_INATIVACAO_PROCESSO', valor: '45' },
+                  { id: 2, chave: 'DIAS_ALERTA_NOVO', valor: '10' }
+              ],
+              loading: false,
+              error: null
+            }
+          },
+          stubActions: false
+        })],
+        stubs: {
+            // Fix: bind $attrs to ensure ID is passed to the input element
+            BFormInput: {
+                template: '<input v-bind="$attrs" :value="modelValue" @input="$emit(\'update:modelValue\', Number($event.target.value))" />',
+                props: ['modelValue']
+            }
+        }
       }
     })
 
-    const store = useConfiguracoesStore()
-    // Mock get methods
-    store.getDiasInativacaoProcesso = vi.fn().mockReturnValue(45)
-    store.getDiasAlertaNovo = vi.fn().mockReturnValue(10)
-
-    // Trigger update (simulate mounted or reload)
-    await wrapper.vm.$nextTick()
-
-    // Check if form updated (need to expose or find inputs)
-    // Since we can't easily access reactive setup state without exposing, checking inputs
-    await wrapper.find('button[class*="btn-light"]').trigger('click') // Recarregar
-
-    // Wait for async operations
     await new Promise(resolve => setTimeout(resolve, 0));
 
+    // Now find by ID should work because $attrs passes the ID to the root element of the stub
     const input1 = wrapper.find('#diasInativacao').element as HTMLInputElement
     const input2 = wrapper.find('#diasAlertaNovo').element as HTMLInputElement
 

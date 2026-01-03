@@ -1,16 +1,25 @@
 import { mount } from '@vue/test-utils'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { createTestingPinia } from '@pinia/testing'
 import ModalAcaoBloco from '@/components/ModalAcaoBloco.vue'
-import { Modal } from 'bootstrap'
 
-// Mock Bootstrap Modal
-vi.mock('bootstrap', () => ({
-  Modal: vi.fn(() => ({
-    show: vi.fn(),
-    hide: vi.fn(),
-  }))
-}))
+// Mock Bootstrap Modal globally for this test file
+// Use a factory function that returns the class to avoid hoisting issues
+vi.mock('bootstrap', () => {
+  return {
+    Modal: class {
+      static instances: any[] = [];
+      element: any;
+      show = vi.fn();
+      hide = vi.fn();
+      dispose = vi.fn();
+
+      constructor(element: any) {
+        this.element = element;
+      }
+    }
+  }
+})
 
 describe('ModalAcaoBloco.vue', () => {
   const defaultProps = {
@@ -33,6 +42,7 @@ describe('ModalAcaoBloco.vue', () => {
       }
     })
     expect(wrapper.find('.modal-title').text()).toBe('Teste')
+    // Note: The new component template wraps text in <p class="mb-3">
     expect(wrapper.find('.modal-body p').text()).toBe('Texto teste')
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
   })
@@ -65,7 +75,11 @@ describe('ModalAcaoBloco.vue', () => {
 
     // Try to confirm without date
     await wrapper.find('button.btn-primary').trigger('click')
+
+    // In the new component logic, confirm() sets erro.value but doesn't emit 'confirmar' if validation fails
     expect(wrapper.emitted('confirmar')).toBeFalsy()
+
+    // Check if error message is displayed
     expect(wrapper.text()).toContain('A data limite é obrigatória')
 
     // Set date and confirm

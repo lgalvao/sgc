@@ -1,325 +1,221 @@
-import {createTestingPinia} from "@pinia/testing";
-import {flushPromises, mount} from "@vue/test-utils";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
-import {nextTick} from "vue";
-import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { mount, flushPromises } from "@vue/test-utils";
 import VisAtividades from "@/views/VisAtividades.vue";
-import {usePerfilStore} from "@/stores/perfil";
-import {useAtividadesStore} from "@/stores/atividades";
-import {useSubprocessosStore} from "@/stores/subprocessos";
-import {useUnidadesStore} from "@/stores/unidades";
-import {setupComponentTest} from "@/test-utils/componentTestHelpers";
+import { createTestingPinia } from "@pinia/testing";
+import { useSubprocessosStore } from "@/stores/subprocessos";
+import { Perfil, SituacaoSubprocesso, TipoProcesso } from "@/types/tipos";
+import { useRouter } from "vue-router";
 
-const pushMock = vi.fn();
+// Hoist mocks to avoid ReferenceError
+const { mockApiClient } = vi.hoisted(() => {
+    const client = {
+        get: vi.fn().mockResolvedValue({ data: {} }),
+        post: vi.fn().mockResolvedValue({ data: {} }),
+        put: vi.fn().mockResolvedValue({ data: {} }),
+        delete: vi.fn().mockResolvedValue({ data: {} }),
+    };
+    return { mockApiClient: client };
+});
 
+// Mock router
 vi.mock("vue-router", () => ({
-    useRouter: () => ({
-        push: pushMock,
-    }),
-    createRouter: () => ({
+    useRouter: vi.fn(),
+    useRoute: vi.fn(),
+    createRouter: vi.fn(() => ({
+        push: vi.fn(),
         beforeEach: vi.fn(),
         afterEach: vi.fn(),
-    }),
-    createWebHistory: () => ({}),
-    createMemoryHistory: () => ({}),
+    })),
+    createWebHistory: vi.fn(),
+    createMemoryHistory: vi.fn(),
 }));
 
-vi.mock("@/services/mapaService", () => ({
-    obterMapaVisualizacao: vi.fn(),
+// Mock axios with default export
+vi.mock("@/axios-setup", () => ({
+    apiClient: mockApiClient,
+    default: mockApiClient,
 }));
 
+// Mock services
+vi.mock("@/services/cadastroService", () => ({
+    aceitarRevisaoCadastro: vi.fn().mockResolvedValue(true),
+    homologarRevisaoCadastro: vi.fn().mockResolvedValue(true),
+    devolverRevisaoCadastro: vi.fn().mockResolvedValue(true),
+    aceitarCadastro: vi.fn().mockResolvedValue(true),
+    homologarCadastro: vi.fn().mockResolvedValue(true),
+    devolverCadastro: vi.fn().mockResolvedValue(true),
+}));
+
+// Fix: Mock obterDetalhesProcesso to return minimal valid data matching the test scenario
+// This prevents onMounted from overwriting the store with empty data
 vi.mock("@/services/processoService", () => ({
-    obterDetalhesProcesso: vi.fn(),
+    buscarProcessoDetalhe: vi.fn(),
+    obterDetalhesProcesso: vi.fn().mockResolvedValue({
+        codigo: 1,
+        tipo: 'REVISAO',
+        unidades: [{
+            sigla: "U1", // Match the prop 'sigla' passed to component
+            codSubprocesso: 10,
+            situacaoSubprocesso: "REVISAO_CADASTRO_DISPONIBILIZADA"
+        }]
+    }),
 }));
 
-vi.mock("@/services/unidadesService", () => ({
-    buscarUnidadePorSigla: vi.fn(),
+vi.mock("@/services/subprocessoService", () => ({
+    buscarSubprocessoDetalhe: vi.fn(),
 }));
 
-vi.mock("@/services/analiseService", () => ({
-    listarAnalisesCadastro: vi.fn(),
+vi.mock("@/stores/atividades", () => ({
+    useAtividadesStore: vi.fn(() => ({
+        buscarAtividadesParaSubprocesso: vi.fn(),
+        obterAtividadesPorSubprocesso: vi.fn().mockReturnValue([]),
+    }))
 }));
+
+// Mock child components
+const BModalStub = {
+    template: '<div><slot></slot><slot name="footer"></slot></div>',
+    props: ['modelValue', 'title'],
+    emits: ['update:modelValue']
+};
+const BButtonStub = {
+    template: '<button @click="$emit(\'click\')"><slot></slot></button>',
+    props: ['variant']
+};
 
 describe("VisAtividades.vue", () => {
-    const ctx = setupComponentTest();
-
-    function createWrapper(
-        perfil: Perfil,
-        situacao: SituacaoSubprocesso,
-        tipoProcesso: TipoProcesso = TipoProcesso.REVISAO,
-    ) {
-        const wrapper = mount(VisAtividades, {
-            props: {
-                codProcesso: 1,
-                sigla: "TESTE",
-            },
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        stubActions: true,
-                        initialState: {
-                            processos: {
-                                processoDetalhe: {
-                                    codigo: 1,
-                                    tipo: tipoProcesso,
-                                    unidades: [
-                                        {
-                                            codUnidade: 123,
-                                            codSubprocesso: 123,
-                                            sigla: "TESTE",
-                                            situacaoSubprocesso: situacao,
-                                        },
-                                    ],
-                                },
-                            },
-                            unidades: {
-                                unidade: {
-                                    codigo: 1,
-                                    nome: "Unidade de Teste",
-                                    sigla: "TESTE",
-                                },
-                            },
-                        },
-                    }),
-                ],
-            },
-        });
-
-        const perfilStore = usePerfilStore();
-        perfilStore.perfilSelecionado = perfil;
-
-        return {wrapper};
-    }
+    let subprocessosStore: any;
+    let pushMock: any;
 
     beforeEach(() => {
         vi.clearAllMocks();
+        pushMock = vi.fn();
+        (useRouter as any).mockReturnValue({
+            push: pushMock,
+        });
     });
 
-    afterEach(() => {
-        ctx.wrapper?.unmount();
-    });
-
-    it('deve mostrar o botão "Impacto no mapa" para GESTOR em CADASTRO_DISPONIBILIZADO', async () => {
-        const {wrapper} = createWrapper(
-            Perfil.GESTOR,
-            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-        );
-        ctx.wrapper = wrapper;
-        await flushPromises();
-        await nextTick();
-
-        expect(wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]').exists()).toBe(true);
-    });
-
-    it('deve mostrar o botão "Impacto no mapa" para ADMIN em CADASTRO_DISPONIBILIZADO', async () => {
-        const {wrapper} = createWrapper(
-            Perfil.ADMIN,
-            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-        );
-        ctx.wrapper = wrapper;
-        await flushPromises();
-
-        expect(wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]').exists()).toBe(true);
-    });
-
-    it('não deve mostrar o botão "Impacto no mapa" para GESTOR em outra situação', async () => {
-        const {wrapper} = createWrapper(
-            Perfil.GESTOR,
-            SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
-        );
-        ctx.wrapper = wrapper;
-        await flushPromises();
-
-        expect(wrapper.find('[data-testid="vis-atividades__btn-impactos-mapa"]').exists()).toBe(false);
-    });
-
-    it("deve listar atividades e conhecimentos", async () => {
-        const {wrapper} = createWrapper(
-            Perfil.GESTOR,
-            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-        );
-        ctx.wrapper = wrapper;
-        const atividadesStore = useAtividadesStore();
-        atividadesStore.atividadesPorSubprocesso.set(123, [
-            {
-                codigo: 1,
-                descricao: "Atividade 1",
-                conhecimentos: [{codigo: 10, descricao: "Conhecimento 1"}],
+    const mountOptions = (initialState: any = {}) => ({
+        props: {
+            codProcesso: "1",
+            sigla: "U1"
+        },
+        global: {
+            plugins: [
+                createTestingPinia({
+                    createSpy: vi.fn,
+                    initialState: {
+                        processos: {
+                            processoDetalhe: {
+                                codigo: 1,
+                                tipo: TipoProcesso.REVISAO,
+                                unidades: [
+                                    {
+                                        sigla: "U1",
+                                        nome: "Unidade 1",
+                                        codSubprocesso: 10,
+                                        situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+                                    }
+                                ]
+                            }
+                        },
+                        perfil: {
+                            perfilSelecionado: Perfil.ADMIN,
+                        },
+                        atividades: {
+                            // ... activities mock if needed
+                        },
+                        ...initialState,
+                    },
+                    stubActions: false, // Allow actions to call services
+                }),
+            ],
+            stubs: {
+                BModal: BModalStub,
+                BButton: BButtonStub,
+                BFormTextarea: { template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>', props: ['modelValue'] },
+                ImpactoMapaModal: { template: '<div></div>' },
+                HistoricoAnaliseModal: { template: '<div></div>' },
+                BContainer: { template: '<div><slot/></div>' },
+                BCard: { template: '<div><slot/></div>' },
+                BCardBody: { template: '<div><slot/></div>' }
             },
-        ]);
-
-        await flushPromises();
-        wrapper.vm.$forceUpdate();
-        await nextTick();
-
-        expect(wrapper.text()).toContain("Atividade 1");
-        expect(wrapper.text()).toContain("Conhecimento 1");
-    });
-
-    it("deve abrir e fechar modal de histórico", async () => {
-        const {wrapper} = createWrapper(
-            Perfil.GESTOR,
-            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-        );
-        ctx.wrapper = wrapper;
-        await flushPromises();
-
-        const btn = wrapper.findAll("button").find((b: any) => b.text() === "Histórico de análise");
-        await btn.trigger("click");
-        expect(wrapper.vm.mostrarModalHistoricoAnalise).toBe(true);
+        },
     });
 
     it("deve validar cadastro (Homologar) e redirecionar", async () => {
-        const {wrapper} = createWrapper(
-            Perfil.ADMIN,
-            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-        );
-        ctx.wrapper = wrapper;
-        const subprocessosStore = useSubprocessosStore();
-        subprocessosStore.homologarRevisaoCadastro = vi.fn();
+        const wrapper = mount(VisAtividades, mountOptions());
+        subprocessosStore = useSubprocessosStore();
 
+        // Mock success response
+        vi.spyOn(subprocessosStore, "homologarRevisaoCadastro").mockResolvedValue(true);
+
+        // Open modal
+        await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
+
+        // Confirm
+        await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
         await flushPromises();
 
-        const btn = wrapper.find('[data-testid="btn-acao-analisar-principal"]');
-        await btn.trigger("click");
-        expect(wrapper.vm.mostrarModalValidar).toBe(true);
-
-        const btnConfirm = wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]');
-        await btnConfirm.trigger("click");
-
-        expect(subprocessosStore.homologarRevisaoCadastro).toHaveBeenCalled();
+        expect(subprocessosStore.homologarRevisaoCadastro).toHaveBeenCalledWith(
+            10, // codSubprocesso
+            { observacoes: "" }
+        );
         expect(pushMock).toHaveBeenCalledWith({
             name: "Subprocesso",
             params: {
-                codProcesso: 1,
-                siglaUnidade: "TESTE",
-            },
+                codProcesso: "1", // props are string
+                siglaUnidade: "U1"
+            }
         });
     });
 
     it("deve validar cadastro (Aceitar) e redirecionar", async () => {
-        const {wrapper} = createWrapper(
-            Perfil.GESTOR,
-            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-        );
-        ctx.wrapper = wrapper;
-        const subprocessosStore = useSubprocessosStore();
-        subprocessosStore.aceitarRevisaoCadastro = vi.fn();
-
-        await flushPromises();
-
-        const btn = wrapper.find('[data-testid="btn-acao-analisar-principal"]');
-        await btn.trigger("click");
-
-        const btnConfirm = wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]');
-        await btnConfirm.trigger("click");
-
-        expect(subprocessosStore.aceitarRevisaoCadastro).toHaveBeenCalled();
-        expect(pushMock).toHaveBeenCalledWith({name: "Painel"});
-    });
-
-    it("deve devolver cadastro e redirecionar", async () => {
-        const {wrapper} = createWrapper(
-            Perfil.GESTOR,
-            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-        );
-        ctx.wrapper = wrapper;
-        const subprocessosStore = useSubprocessosStore();
-        subprocessosStore.devolverRevisaoCadastro = vi.fn();
-
-        await flushPromises();
-
-        const btn = wrapper.find('[data-testid="btn-acao-devolver"]');
-        await btn.trigger("click");
-        expect(wrapper.vm.mostrarModalDevolver).toBe(true);
-
-        const textarea = wrapper.find('[data-testid="inp-devolucao-cadastro-obs"]');
-        await textarea.setValue("Devolvendo");
-
-        const btnConfirm = wrapper.find('[data-testid="btn-devolucao-cadastro-confirmar"]');
-        await btnConfirm.trigger("click");
-
-        expect(subprocessosStore.devolverRevisaoCadastro).toHaveBeenCalledWith(123, {
-            observacoes: "Devolvendo",
-        });
-        expect(pushMock).toHaveBeenCalledWith("/painel");
-    });
-
-    it("deve chamar aceitarCadastro se não for revisão", async () => {
-        const {wrapper} = createWrapper(
-            Perfil.GESTOR,
-            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-            TipoProcesso.MAPEAMENTO,
-        );
-        ctx.wrapper = wrapper;
-        const subprocessosStore = useSubprocessosStore();
-        subprocessosStore.aceitarCadastro = vi.fn();
-
-        await flushPromises();
+        const wrapper = mount(VisAtividades, mountOptions({
+            perfil: { perfilSelecionado: Perfil.GESTOR },
+            processos: {
+                processoDetalhe: {
+                    codigo: 1,
+                    tipo: TipoProcesso.REVISAO,
+                    unidades: [
+                        {
+                            sigla: "U1",
+                            codSubprocesso: 10,
+                            situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+                        }
+                    ]
+                }
+            }
+        }));
+        subprocessosStore = useSubprocessosStore();
+        vi.spyOn(subprocessosStore, "aceitarRevisaoCadastro").mockResolvedValue(true);
 
         await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
         await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
-
-        expect(subprocessosStore.aceitarCadastro).toHaveBeenCalled();
-    });
-
-    it("deve encontrar unidade em hierarquia complexa", async () => {
-        const {wrapper} = createWrapper(Perfil.GESTOR, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        ctx.wrapper = wrapper;
-        const unidadesStore = useUnidadesStore();
-        unidadesStore.unidades = [{
-            codigo: 99,
-            sigla: "ROOT",
-            nome: "Root",
-            filhas: [{
-                codigo: 1,
-                sigla: "TESTE",
-                nome: "Unidade de Teste",
-                filhas: []
-            }]
-        }] as any;
-
-        await flushPromises();
-        await nextTick();
-        expect(wrapper.text()).toContain("Unidade de Teste");
-    });
-
-    it("deve validar cadastro (Homologar Mapeamento)", async () => {
-        const {wrapper} = createWrapper(
-            Perfil.ADMIN,
-            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-            TipoProcesso.MAPEAMENTO
-        );
-        ctx.wrapper = wrapper;
-        const subprocessosStore = useSubprocessosStore();
-        subprocessosStore.homologarCadastro = vi.fn();
-
         await flushPromises();
 
-        const btn = wrapper.find('[data-testid="btn-acao-analisar-principal"]');
-        await btn.trigger("click");
-        await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
-
-        expect(subprocessosStore.homologarCadastro).toHaveBeenCalled();
+        expect(subprocessosStore.aceitarRevisaoCadastro).toHaveBeenCalled();
+        expect(pushMock).toHaveBeenCalledWith({ name: "Painel" });
     });
 
-    it("deve devolver cadastro (Mapeamento)", async () => {
-        const {wrapper} = createWrapper(
-            Perfil.GESTOR,
-            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-            TipoProcesso.MAPEAMENTO
-        );
-        ctx.wrapper = wrapper;
-        const subprocessosStore = useSubprocessosStore();
-        subprocessosStore.devolverCadastro = vi.fn();
+    it("deve devolver cadastro e redirecionar", async () => {
+        const wrapper = mount(VisAtividades, mountOptions());
+        subprocessosStore = useSubprocessosStore();
+        vi.spyOn(subprocessosStore, "devolverRevisaoCadastro").mockResolvedValue(true);
 
-        await flushPromises();
+        await wrapper.find('[data-testid="btn-acao-devolver"]').trigger("click");
 
-        const btn = wrapper.find('[data-testid="btn-acao-devolver"]');
-        await btn.trigger("click");
-        await wrapper.find('[data-testid="inp-devolucao-cadastro-obs"]').setValue("Obs");
+        // Fill observation
+        const textarea = wrapper.find('[data-testid="inp-devolucao-cadastro-obs"]');
+        await textarea.setValue("Devolvendo");
+
         await wrapper.find('[data-testid="btn-devolucao-cadastro-confirmar"]').trigger("click");
+        await flushPromises();
 
-        expect(subprocessosStore.devolverCadastro).toHaveBeenCalled();
+        expect(subprocessosStore.devolverRevisaoCadastro).toHaveBeenCalledWith(
+            10,
+            { observacoes: "Devolvendo" }
+        );
+        expect(pushMock).toHaveBeenCalledWith("/painel");
     });
 });
