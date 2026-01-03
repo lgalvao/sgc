@@ -227,14 +227,16 @@ public class AtividadeService {
 
         conhecimentoRepo.findById(codConhecimento)
                 .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
-                .map(existente -> {
-                    atualizarSituacaoSubprocessoSeNecessario(existente.getAtividade().getMapa().getCodigo());
-                    var paraAtualizar = conhecimentoMapper.toEntity(conhecimentoDto);
-                    existente.setDescricao(paraAtualizar.getDescricao());
-                    var atualizado = conhecimentoRepo.save(existente);
-                    return conhecimentoMapper.toDto(atualizado);
-                })
+                .map(existente -> atualizarConhecimentoExistente(conhecimentoDto, existente))
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento));
+    }
+
+    private ConhecimentoDto atualizarConhecimentoExistente(ConhecimentoDto dto, Conhecimento existente) {
+        atualizarSituacaoSubprocessoSeNecessario(existente.getAtividade().getMapa().getCodigo());
+        var paraAtualizar = conhecimentoMapper.toEntity(dto);
+        existente.setDescricao(paraAtualizar.getDescricao());
+        var atualizado = conhecimentoRepo.save(existente);
+        return conhecimentoMapper.toDto(atualizado);
     }
 
     /**
@@ -249,13 +251,15 @@ public class AtividadeService {
         conhecimentoRepo.findById(codConhecimento)
                 .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
                 .ifPresentOrElse(
-                        conhecimento -> {
-                            atualizarSituacaoSubprocessoSeNecessario(conhecimento.getAtividade().getMapa().getCodigo());
-                            conhecimentoRepo.delete(conhecimento);
-                        },
+                        this::executarExclusaoConhecimento,
                         () -> {
                             throw new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento);
                         });
+    }
+
+    private void executarExclusaoConhecimento(Conhecimento conhecimento) {
+        atualizarSituacaoSubprocessoSeNecessario(conhecimento.getAtividade().getMapa().getCodigo());
+        conhecimentoRepo.delete(conhecimento);
     }
 
     private void atualizarSituacaoSubprocessoSeNecessario(Long mapaCodigo) {
@@ -306,25 +310,34 @@ public class AtividadeService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", mapaDestinoId));
 
         for (Atividade atividadeOrigem : atividadesOrigem) {
-            if (descricoesExistentes.contains(atividadeOrigem.getDescricao())) {
-                continue;
-            }
+            importarAtividadeSeNecessario(atividadeOrigem, mapaDestino, descricoesExistentes);
+        }
+    }
 
-            Atividade novaAtividade = new Atividade();
-            novaAtividade.setDescricao(atividadeOrigem.getDescricao());
-            novaAtividade.setMapa(mapaDestino);
-            Atividade atividadeSalva = atividadeRepo.save(novaAtividade);
+    private void importarAtividadeSeNecessario(
+            Atividade atividadeOrigem, Mapa mapaDestino, List<String> descricoesExistentes) {
+        if (descricoesExistentes.contains(atividadeOrigem.getDescricao())) {
+            return;
+        }
 
-            // ⚡ Bolt: Usa a lista já carregada em memória, evitando query N+1
-            List<Conhecimento> conhecimentosOrigem = atividadeOrigem.getConhecimentos();
+        Atividade novaAtividade = new Atividade();
+        novaAtividade.setDescricao(atividadeOrigem.getDescricao());
+        novaAtividade.setMapa(mapaDestino);
+        Atividade atividadeSalva = atividadeRepo.save(novaAtividade);
 
-            if (conhecimentosOrigem != null) {
-                for (Conhecimento conhecimentoOrigem : conhecimentosOrigem) {
-                    Conhecimento novoConhecimento = new Conhecimento();
-                    novoConhecimento.setDescricao(conhecimentoOrigem.getDescricao());
-                    novoConhecimento.setAtividade(atividadeSalva);
-                    conhecimentoRepo.save(novoConhecimento);
-                }
+        importarConhecimentos(atividadeOrigem, atividadeSalva);
+    }
+
+    private void importarConhecimentos(Atividade atividadeOrigem, Atividade atividadeSalva) {
+        // ⚡ Bolt: Usa a lista já carregada em memória, evitando query N+1
+        List<Conhecimento> conhecimentosOrigem = atividadeOrigem.getConhecimentos();
+
+        if (conhecimentosOrigem != null) {
+            for (Conhecimento conhecimentoOrigem : conhecimentosOrigem) {
+                Conhecimento novoConhecimento = new Conhecimento();
+                novoConhecimento.setDescricao(conhecimentoOrigem.getDescricao());
+                novoConhecimento.setAtividade(atividadeSalva);
+                conhecimentoRepo.save(novoConhecimento);
             }
         }
     }

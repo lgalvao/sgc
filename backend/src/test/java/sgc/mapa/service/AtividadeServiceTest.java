@@ -391,5 +391,54 @@ class AtividadeServiceTest {
              verify(atividadeRepo).save(any(Atividade.class));
              verify(conhecimentoRepo).save(any(Conhecimento.class));
         }
+
+        @Test
+        @DisplayName("Deve ignorar atividade existente ao importar")
+        void deveIgnorarAtividadeExistenteAoImportar() {
+            Long origem = 1L;
+            Long destino = 2L;
+
+            Atividade ativOrigem = new Atividade();
+            ativOrigem.setDescricao("A1");
+            ativOrigem.setCodigo(10L);
+
+            Atividade ativExistente = new Atividade();
+            ativExistente.setDescricao("A1"); // Mesma descrição
+
+            Mapa mapaDestino = new Mapa();
+
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(origem)).thenReturn(List.of(ativOrigem));
+            when(atividadeRepo.findByMapaCodigo(destino)).thenReturn(List.of(ativExistente));
+            when(mapaRepo.findById(destino)).thenReturn(Optional.of(mapaDestino));
+
+            service.importarAtividadesDeOutroMapa(origem, destino);
+
+            // Verifica que NÃO salvou nada
+            verify(atividadeRepo, never()).save(any(Atividade.class));
+            verify(conhecimentoRepo, never()).save(any(Conhecimento.class));
+        }
+
+        @Test
+        @DisplayName("Deve importar sem conhecimentos se lista for nula")
+        void deveImportarSemConhecimentos() {
+            Long origem = 1L;
+            Long destino = 2L;
+
+            Atividade ativOrigem = new Atividade();
+            ativOrigem.setDescricao("A1");
+            ativOrigem.setConhecimentos(null); // Lista nula
+
+            Mapa mapaDestino = new Mapa();
+
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(origem)).thenReturn(List.of(ativOrigem));
+            when(atividadeRepo.findByMapaCodigo(destino)).thenReturn(List.of());
+            when(mapaRepo.findById(destino)).thenReturn(Optional.of(mapaDestino));
+            when(atividadeRepo.save(any())).thenReturn(new Atividade());
+
+            service.importarAtividadesDeOutroMapa(origem, destino);
+
+            verify(atividadeRepo).save(any(Atividade.class));
+            verify(conhecimentoRepo, never()).save(any(Conhecimento.class));
+        }
     }
 }
