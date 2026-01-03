@@ -27,9 +27,11 @@ public class AcessoAdClient {
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), 
                         (req, res) -> {
+                            // SENTINEL: Ler o corpo apenas para log interno, nunca propagar para o cliente
                             String body = new String(res.getBody().readAllBytes());
-                            log.error("Erro HTTP {}: {}", res.getStatusCode(), body);
-                            throw new ErroAutenticacao("Erro na autenticação: " + body);
+                            log.error("Erro HTTP {} na autenticação AD: {}", res.getStatusCode(), body);
+                            // Mensagem genérica para o usuário final para evitar vazamento de dados internos
+                            throw new ErroAutenticacao("Falha na autenticação externa.");
                         })
                     .body(String.class);
 
@@ -39,8 +41,10 @@ public class AcessoAdClient {
         } catch (ErroAutenticacao e) {
             throw e;
         } catch (Exception e) {
+            // Log detalhado para admin/dev
             log.error("Erro ao autenticar usuário {} no AD: {}", titulo, e.getMessage(), e);
-            throw new ErroAutenticacao("Falha na autenticação: " + e.getMessage());
+            // Mensagem genérica para o usuário final
+            throw new ErroAutenticacao("Ocorreu um erro inesperado durante a autenticação.");
         }
     }
 
