@@ -52,6 +52,91 @@ class AtividadeServiceTest {
     private AtividadeService service;
 
     @Nested
+    @DisplayName("Cenários de Leitura")
+    class LeituraTests {
+        @Test
+        @DisplayName("Deve listar todas as atividades")
+        void deveListarTodas() {
+             when(atividadeRepo.findAll()).thenReturn(List.of(new Atividade()));
+             when(atividadeMapper.toDto(any())).thenReturn(new AtividadeDto());
+             assertThat(service.listar()).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve obter por código DTO")
+        void deveObterPorCodigoDto() {
+             when(atividadeRepo.findById(1L)).thenReturn(Optional.of(new Atividade()));
+             when(atividadeMapper.toDto(any())).thenReturn(new AtividadeDto());
+             assertThat(service.obterPorCodigo(1L)).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro se obter por código não encontrar")
+        void deveLancarErroObterPorCodigo() {
+             when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
+             assertThatThrownBy(() -> service.obterPorCodigo(1L))
+                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
+
+        @Test
+        @DisplayName("Deve listar entidades por código")
+        void deveListarEntidades() {
+             Atividade ativ = new Atividade();
+             when(atividadeRepo.findById(1L)).thenReturn(Optional.of(ativ));
+             assertThat(service.obterEntidadePorCodigo(1L)).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro entidade não encontrada")
+        void deveLancarErro() {
+             when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
+             assertThatThrownBy(() -> service.obterEntidadePorCodigo(1L))
+                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
+
+        @Test
+        @DisplayName("Deve buscar por mapa")
+        void deveBuscarPorMapa() {
+             when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(List.of(new Atividade()));
+             assertThat(service.buscarPorMapaCodigo(1L)).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve buscar por mapa com conhecimentos")
+        void deveBuscarPorMapaComConhecimentos() {
+             when(atividadeRepo.findByMapaCodigoWithConhecimentos(1L)).thenReturn(List.of(new Atividade()));
+             assertThat(service.buscarPorMapaCodigoComConhecimentos(1L)).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve listar conhecimentos por atividade e mapa")
+        void deveListarConhecimentosEntidade() {
+             when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(List.of(new Conhecimento()));
+             assertThat(service.listarConhecimentosPorAtividade(1L)).hasSize(1);
+
+             when(conhecimentoRepo.findByMapaCodigo(1L)).thenReturn(List.of(new Conhecimento()));
+             assertThat(service.listarConhecimentosPorMapa(1L)).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve listar conhecimentos DTO")
+        void deveListarConhecimentosDto() {
+             when(atividadeRepo.existsById(1L)).thenReturn(true);
+             when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(List.of(new Conhecimento()));
+             when(conhecimentoMapper.toDto(any())).thenReturn(new ConhecimentoDto());
+             assertThat(service.listarConhecimentos(1L)).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro ao listar conhecimentos se atividade inexistente")
+        void deveLancarErroListarConhecimentos() {
+             when(atividadeRepo.existsById(1L)).thenReturn(false);
+             assertThatThrownBy(() -> service.listarConhecimentos(1L))
+                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
+    }
+
+    @Nested
     @DisplayName("Criação de Atividade")
     class Criacao {
         @Test
