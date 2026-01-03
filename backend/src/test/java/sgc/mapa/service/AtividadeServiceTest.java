@@ -282,6 +282,25 @@ class AtividadeServiceTest {
         }
 
         @Test
+        @DisplayName("Deve atualizar atividade sem mapa associado (sem publicar evento)")
+        void deveAtualizarAtividadeSemMapa() {
+            Long id = 1L;
+            AtividadeDto dto = new AtividadeDto();
+            Atividade atividade = new Atividade();
+            atividade.setMapa(null); // Explicitly no map
+
+            when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
+            when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade());
+            when(atividadeRepo.save(any())).thenReturn(atividade);
+            when(atividadeMapper.toDto(any())).thenReturn(dto);
+
+            service.atualizar(id, dto);
+
+            verify(atividadeRepo).save(atividade);
+            verify(eventPublisher, never()).publishEvent(any());
+        }
+
+        @Test
         @DisplayName("Deve excluir atividade")
         void deveExcluirAtividade() {
             Long id = 1L;
