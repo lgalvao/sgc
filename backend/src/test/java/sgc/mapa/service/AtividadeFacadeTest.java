@@ -136,4 +136,104 @@ class AtividadeFacadeTest {
         assertThatThrownBy(() -> facade.excluirAtividade(1L))
             .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
+
+    @Test
+    @DisplayName("Deve criar conhecimento e retornar status")
+    void deveCriarConhecimento() {
+        Long codigoAtividade = 100L;
+        ConhecimentoDto dto = new ConhecimentoDto();
+        ConhecimentoDto salvo = new ConhecimentoDto();
+        salvo.setCodigo(200L);
+
+        Atividade atividadeEntity = new Atividade();
+        atividadeEntity.setCodigo(codigoAtividade);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(1L);
+        atividadeEntity.setMapa(mapa);
+
+        when(atividadeService.criarConhecimento(codigoAtividade, dto)).thenReturn(salvo);
+
+        // Mocks for creating response
+        when(atividadeService.obterEntidadePorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(10L);
+        when(subprocessoService.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
+
+        SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
+        when(subprocessoService.obterStatus(10L)).thenReturn(status);
+
+        AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
+        vis.setCodigo(codigoAtividade);
+        when(subprocessoService.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
+
+        ResultadoOperacaoConhecimento resultado = facade.criarConhecimento(codigoAtividade, dto);
+
+        assertThat(resultado.getNovoConhecimentoId()).isEqualTo(200L);
+        assertThat(resultado.getResponse().getAtividade()).isNotNull();
+        assertThat(resultado.getResponse().getAtividade().getCodigo()).isEqualTo(codigoAtividade);
+    }
+
+    @Test
+    @DisplayName("Deve atualizar conhecimento e retornar status")
+    void deveAtualizarConhecimento() {
+        Long codigoAtividade = 100L;
+        Long codigoConhecimento = 200L;
+        ConhecimentoDto dto = new ConhecimentoDto();
+
+        Atividade atividadeEntity = new Atividade();
+        atividadeEntity.setCodigo(codigoAtividade);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(1L);
+        atividadeEntity.setMapa(mapa);
+
+        // Mocks for creating response
+        when(atividadeService.obterEntidadePorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(10L);
+        when(subprocessoService.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
+
+        SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
+        when(subprocessoService.obterStatus(10L)).thenReturn(status);
+
+        AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
+        vis.setCodigo(codigoAtividade);
+        when(subprocessoService.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
+
+        AtividadeOperacaoResponse response = facade.atualizarConhecimento(codigoAtividade, codigoConhecimento, dto);
+
+        verify(atividadeService).atualizarConhecimento(codigoAtividade, codigoConhecimento, dto);
+        assertThat(response.getAtividade()).isNotNull();
+        assertThat(response.getAtividade().getCodigo()).isEqualTo(codigoAtividade);
+    }
+
+    @Test
+    @DisplayName("Deve excluir conhecimento e retornar status")
+    void deveExcluirConhecimento() {
+        Long codigoAtividade = 100L;
+        Long codigoConhecimento = 200L;
+
+        Atividade atividadeEntity = new Atividade();
+        atividadeEntity.setCodigo(codigoAtividade);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(1L);
+        atividadeEntity.setMapa(mapa);
+
+        // Mocks for creating response
+        when(atividadeService.obterEntidadePorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(10L);
+        when(subprocessoService.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
+
+        SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
+        when(subprocessoService.obterStatus(10L)).thenReturn(status);
+
+        AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
+        vis.setCodigo(codigoAtividade);
+        when(subprocessoService.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
+
+        AtividadeOperacaoResponse response = facade.excluirConhecimento(codigoAtividade, codigoConhecimento);
+
+        verify(atividadeService).excluirConhecimento(codigoAtividade, codigoConhecimento);
+        assertThat(response.getAtividade()).isNotNull();
+    }
 }
