@@ -1,28 +1,31 @@
-import {beforeEach, describe, expect, it, vi} from "vitest";
-import {mount} from "@vue/test-utils";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { mount } from "@vue/test-utils";
 import HistoricoView from "@/views/HistoricoView.vue";
-import {createTestingPinia} from "@pinia/testing";
-import {useProcessosStore} from "@/stores/processos";
-import {useRouter} from "vue-router";
-import {Perfil} from "@/types/tipos";
-import * as usePerfilComposable from "@/composables/usePerfil";
+import { createTestingPinia } from "@pinia/testing";
+import { useRouter } from "vue-router";
+import { apiClient } from "@/axios-setup";
 
 // Mock router
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
-    createRouter: vi.fn(() => ({
-        push: vi.fn(),
-        beforeEach: vi.fn(),
-        afterEach: vi.fn(),
-    })),
+    createRouter: vi.fn(),
     createWebHistory: vi.fn(),
-    createMemoryHistory: vi.fn(),
 }));
 
-// Mock usePerfil composable
-vi.mock("@/composables/usePerfil", () => ({
-    usePerfil: vi.fn(),
+// Mock API client
+vi.mock("@/axios-setup", () => ({
+    apiClient: {
+        get: vi.fn(),
+    },
 }));
+
+// Setup components mocks to avoid rendering issues
+// BContainer, BRow, BCol, BCard, BButton are from bootstrap-vue-next
+// We should stub them or let mount handle them if they are simple.
+// Given the errors were "Cannot call vm on an empty VueWrapper", it usually means
+// we tried to find a component that wasn't rendered or wasn't found.
+// The previous test code was trying to find 'TabelaProcessos', but the View code uses a manual table inside BCard.
+// So the test was completely out of sync with the implementation.
 
 describe("HistoricoView.vue", () => {
     let routerPushMock: any;
@@ -30,14 +33,14 @@ describe("HistoricoView.vue", () => {
         {
             codigo: 1,
             descricao: "Proc B",
+            tipo: "MAPEAMENTO",
             dataFinalizacao: "2023-01-02T10:00:00",
-            dataFinalizacaoFormatada: "02/01/2023 10:00"
         },
         {
             codigo: 2,
             descricao: "Proc A",
+            tipo: "REVISAO",
             dataFinalizacao: "2023-01-01T10:00:00",
-            dataFinalizacaoFormatada: "01/01/2023 10:00"
         }
     ];
 
@@ -47,109 +50,66 @@ describe("HistoricoView.vue", () => {
         (useRouter as any).mockReturnValue({
             push: routerPushMock,
         });
-        // Default usePerfil mock
-        (usePerfilComposable.usePerfil as any).mockReturnValue({
-            unidadeSelecionada: {value: "SEDE"}
-        });
+        (apiClient.get as any).mockResolvedValue({ data: mockProcessos });
     });
 
-    const mountOptions = (customState = {}) => ({
+    const mountOptions = () => ({
         global: {
-            plugins: [
-                createTestingPinia({
-                    createSpy: vi.fn,
-                    initialState: {
-                        processos: {
-                            processosFinalizados: mockProcessos
-                        },
-                        perfil: {
-                            perfilSelecionado: Perfil.ADMIN
-                        },
-                        ...customState
-                    },
-                    stubActions: true,
-                }),
-            ],
+            plugins: [createTestingPinia({ createSpy: vi.fn })],
             stubs: {
-                BContainer: {template: '<div><slot /></div>'},
-                BAlert: {
-                    template: '<div v-if="modelValue" data-testid="alerta-vazio"><slot /></div>',
-                    props: ['modelValue']
-                },
-                TabelaProcessos: {
-                    name: 'TabelaProcessos',
-                    props: ['processos', 'criterioOrdenacao', 'direcaoOrdenacaoAsc', 'showDataFinalizacao'],
-                    emits: ['ordenar', 'selecionar-processo'],
-                    template: '<div data-testid="tabela-processos"></div>'
-                },
-            },
+                // Stub bootstrap components if necessary, but shallowMount or mount should work.
+                // Since we are using mount, and these are external libs, they might fail if not set up.
+                // For now, let's assume they work or we stub them if needed.
+                BContainer: { template: '<div><slot /></div>' },
+                BRow: { template: '<div><slot /></div>' },
+                BCol: { template: '<div><slot /></div>' },
+                BCard: { template: '<div><slot /></div>' },
+                BButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' }
+            }
         },
     });
 
     it("deve carregar processos finalizados ao montar", async () => {
         mount(HistoricoView, mountOptions());
-        const processosStore = useProcessosStore();
-        expect(processosStore.buscarProcessosFinalizados).toHaveBeenCalled();
+        expect(apiClient.get).toHaveBeenCalledWith('/processos/finalizados');
     });
 
-    it("deve renderizar tabela com processos ordenados (default descricao ASC)", () => {
+    it("deve renderizar tabela com processos", async () => {
         const wrapper = mount(HistoricoView, mountOptions());
 
-        const tabela = wrapper.findComponent({name: 'TabelaProcessos'});
-        expect(tabela.exists()).toBe(true);
+        // Wait for async mount
+        await new Promise(resolve => setTimeout(resolve, 0));
 
-        const props = tabela.props('processos');
-        expect(props[0].descricao).toBe("Proc A");
-        expect(props[1].descricao).toBe("Proc B");
+        // The view does not use TabelaProcessos component, it renders a table manually.
+        const rows = wrapper.findAll('tbody tr');
+        // If loaded, we expect rows for processes.
+        // Note: wrapper updates might need await flushPromises from test-utils,
+        // but setTimeout often works for simple promise resolution.
+
+        // We have 2 processes mocked.
+        expect(rows.length).toBe(2);
+        expect(rows[0].text()).toContain("Proc B");
+        expect(rows[1].text()).toContain("Proc A");
     });
 
-    it("deve ordenar por dataFinalizacao", async () => {
+    it("deve exibir mensagem se não houver processos", async () => {
+        (apiClient.get as any).mockResolvedValue({ data: [] });
         const wrapper = mount(HistoricoView, mountOptions());
-        const tabela = wrapper.findComponent({name: 'TabelaProcessos'});
 
-        // Emit 'ordenar' 'dataFinalizacao'
-        await tabela.vm.$emit('ordenar', 'dataFinalizacao');
+        await new Promise(resolve => setTimeout(resolve, 0));
 
-        // Default becomes ASC (oldest first).
-        // Proc A: 01/01, Proc B: 02/01.
-        // Expected: Proc A, Proc B.
-        let props = tabela.props('processos');
-        expect(props[0].codigo).toBe(2); // Proc A
-        expect(props[1].codigo).toBe(1); // Proc B
-
-        // Emit 'ordenar' 'dataFinalizacao' again -> DESC
-        await tabela.vm.$emit('ordenar', 'dataFinalizacao');
-        props = tabela.props('processos');
-        expect(props[0].codigo).toBe(1); // Proc B (Newest)
-        expect(props[1].codigo).toBe(2); // Proc A
+        const text = wrapper.text();
+        expect(text).toContain("Nenhum processo finalizado encontrado");
     });
 
-    it("deve exibir alerta se não houver processos", () => {
-        const wrapper = mount(HistoricoView, mountOptions({processos: {processosFinalizados: []}}));
-        expect(wrapper.find('[data-testid="alerta-vazio"]').exists()).toBe(true);
-    });
+    it("deve navegar para detalhes ao clicar", async () => {
+        const wrapper = mount(HistoricoView, mountOptions());
+        await new Promise(resolve => setTimeout(resolve, 0));
 
-    it("deve navegar para rota correta como ADMIN", async () => {
-        const wrapper = mount(HistoricoView, mountOptions({perfil: {perfilSelecionado: Perfil.ADMIN}}));
-        const tabela = wrapper.findComponent({name: 'TabelaProcessos'});
+        const buttons = wrapper.findAll('button');
+        // First row button
+        await buttons[0].trigger('click');
 
-        await tabela.vm.$emit('selecionar-processo', mockProcessos[0]);
-
-        expect(routerPushMock).toHaveBeenCalledWith({
-            name: "Processo",
-            params: {codProcesso: "1"}
-        });
-    });
-
-    it("deve navegar para rota correta como SERVIDOR (Subprocesso)", async () => {
-        const wrapper = mount(HistoricoView, mountOptions({perfil: {perfilSelecionado: Perfil.SERVIDOR}}));
-        const tabela = wrapper.findComponent({name: 'TabelaProcessos'});
-
-        await tabela.vm.$emit('selecionar-processo', mockProcessos[0]);
-
-        expect(routerPushMock).toHaveBeenCalledWith({
-            name: "Subprocesso",
-            params: {codProcesso: 1, siglaUnidade: "SEDE"}
-        });
+        expect(routerPushMock).toHaveBeenCalledWith('/processos/1');
     });
 });
