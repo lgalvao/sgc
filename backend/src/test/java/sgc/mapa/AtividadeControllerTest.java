@@ -99,7 +99,7 @@ class AtividadeControllerTest {
                     .andExpect(status().isCreated())
                     .andExpect(header().exists("Location"));
             
-            // Verify validarPermissaoEdicaoMapa was called with mapa codigo 1L (not subprocess codigo)
+            // Verify validarPermissaoEdicaoMapa was called with mapa código 1L (not subprocess código)
             Mockito.verify(subprocessoService).validarPermissaoEdicaoMapa(eq(1L), any());
         }
 

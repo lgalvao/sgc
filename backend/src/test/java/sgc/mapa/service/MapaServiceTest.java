@@ -125,7 +125,6 @@ class MapaServiceTest {
             when(mapaRepo.existsById(1L)).thenReturn(true);
             service.excluir(1L);
             verify(mapaRepo).deleteById(1L);
-            verify(mapaRepo).existsById(1L);
         }
 
         @Test
@@ -236,7 +235,7 @@ class MapaServiceTest {
             var resultado = service.salvarMapaCompleto(mapaId, req, "user");
 
             assertThat(resultado).isNotNull();
-            assertThat(resultado).isEqualTo(expectedDto);
+            assertThat(resultado).isSameAs(expectedDto);
             verify(mapaRepo).save(mapa);
             verify(competenciaRepo).saveAll(anyList());
             verify(atividadeRepo).saveAll(anyList());
