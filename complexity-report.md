@@ -436,8 +436,15 @@ Dashboard sugerido:
   - **Melhorias**: VoidMethodCallMutator (+13%), NullReturnValsMutator (+3%), EmptyObjectReturnValsMutator (+6%)
 
 ### Fase 2: Refatorações Críticas (Sprint 3-5)
-- [ ] Decompor ImpactoMapaService
-- [ ] Extrair lógica de AtividadeController
+- ✅ **Refatorar ImpactoMapaService**:
+  - Implementada decomposição em `DetectorAtividadesService` e `AnalisadorCompetenciasService`.
+  - Service principal reduzido para facade de orquestração.
+- ✅ **Extrair lógica de AtividadeController**:
+  - Implementado `AtividadeFacade` para encapsular orquestração.
+  - Controller agora delega lógica de negócio e construção de resposta.
+- ✅ **Refatorar Lambdas em AtividadeService**:
+  - Extraídos métodos `atualizarAtividadeExistente` e `excluirAtividadeEConhecimentos`.
+  - Melhorada legibilidade e testabilidade.
 - [ ] Aumentar mutation score de 65% → 75%
 
 ### Fase 3: Refatorações Massivas (Sprint 6-10)

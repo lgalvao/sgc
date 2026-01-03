@@ -132,26 +132,28 @@ public class AtividadeService {
         try {
             atividadeRepo
                     .findById(codigo)
-                    .map(existente -> {
-                        log.debug("Atividade encontrada: {}, mapa: {}", existente.getCodigo(),
-                                existente.getMapa() != null ? existente.getMapa().getCodigo() : "null");
-
-                        if (existente.getMapa() != null) {
-                            atualizarSituacaoSubprocessoSeNecessario(existente.getMapa().getCodigo());
-                        }
-
-                        var entidadeParaAtualizar = atividadeMapper.toEntity(atividadeDto);
-                        existente.setDescricao(entidadeParaAtualizar.getDescricao());
-
-                        var atualizado = atividadeRepo.save(existente);
-                        log.info("Atividade {} atualizada", codigo);
-                        return atividadeMapper.toDto(atualizado);
-                    })
+                    .map(existente -> atualizarAtividadeExistente(codigo, atividadeDto, existente))
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codigo));
         } catch (Exception e) {
             log.error("Erro ao atualizar atividade {}: {}", codigo, e.getMessage(), e);
             throw e;
         }
+    }
+
+    private AtividadeDto atualizarAtividadeExistente(Long codigo, AtividadeDto atividadeDto, Atividade existente) {
+        log.debug("Atividade encontrada: {}, mapa: {}", existente.getCodigo(),
+                existente.getMapa() != null ? existente.getMapa().getCodigo() : "null");
+
+        if (existente.getMapa() != null) {
+            atualizarSituacaoSubprocessoSeNecessario(existente.getMapa().getCodigo());
+        }
+
+        var entidadeParaAtualizar = atividadeMapper.toEntity(atividadeDto);
+        existente.setDescricao(entidadeParaAtualizar.getDescricao());
+
+        var atualizado = atividadeRepo.save(existente);
+        log.info("Atividade {} atualizada", codigo);
+        return atividadeMapper.toDto(atualizado);
     }
 
     /**
@@ -162,15 +164,17 @@ public class AtividadeService {
      */
     public void excluir(Long codAtividade) {
         atividadeRepo.findById(codAtividade).ifPresentOrElse(
-                atividade -> {
-                    atualizarSituacaoSubprocessoSeNecessario(atividade.getMapa().getCodigo());
-                    var conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
-                    conhecimentoRepo.deleteAll(conhecimentos);
-                    atividadeRepo.delete(atividade);
-                },
+                this::excluirAtividadeEConhecimentos,
                 () -> {
                     throw new ErroEntidadeNaoEncontrada("Atividade", codAtividade);
                 });
+    }
+
+    private void excluirAtividadeEConhecimentos(Atividade atividade) {
+        atualizarSituacaoSubprocessoSeNecessario(atividade.getMapa().getCodigo());
+        var conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
+        conhecimentoRepo.deleteAll(conhecimentos);
+        atividadeRepo.delete(atividade);
     }
 
     /**

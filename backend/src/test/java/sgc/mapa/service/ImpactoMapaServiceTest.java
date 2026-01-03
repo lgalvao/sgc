@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,6 +54,15 @@ class ImpactoMapaServiceTest {
 
     @Mock
     private CompetenciaRepo competenciaRepo;
+
+    @Mock
+    private AtividadeService atividadeService;
+
+    @Mock
+    private DetectorAtividadesService detectorAtividades;
+
+    @Mock
+    private AnalisadorCompetenciasService analisadorCompetencias;
 
     private Usuario chefe;
     private Usuario gestor;
@@ -243,13 +253,30 @@ class ImpactoMapaServiceTest {
             when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
             when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSubprocesso));
-            // Simulate differences to ensure lists are processed and not empty return mutants
+
+            // Setup for new service structure
             sgc.mapa.model.Atividade a1 = new sgc.mapa.model.Atividade();
             a1.setCodigo(100L);
             a1.setDescricao("Ativ 1");
-            when(atividadeRepo.findByMapaCodigoWithConhecimentos(1L)).thenReturn(List.of(a1));
-            when(atividadeRepo.findByMapaCodigoWithConhecimentos(2L)).thenReturn(List.of());
+
+            // Using atividadeService now instead of repo directly
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1)); // Vigente
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(2L)).thenReturn(List.of()); // Subprocesso (vazio, então a1 foi removida)
+
             when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of());
+
+            // Mocking specialized services behavior
+            sgc.mapa.dto.AtividadeImpactadaDto removida = sgc.mapa.dto.AtividadeImpactadaDto.builder()
+                    .codigo(100L)
+                    .descricao("Ativ 1")
+                    .tipoImpacto(sgc.mapa.model.TipoImpactoAtividade.REMOVIDA)
+                    .build();
+
+            when(detectorAtividades.detectarRemovidas(any(), any(), any())).thenReturn(List.of(removida));
+            when(detectorAtividades.detectarInseridas(any(), any())).thenReturn(List.of());
+            when(detectorAtividades.detectarAlteradas(any(), any(), any())).thenReturn(List.of());
+            when(analisadorCompetencias.identificarCompetenciasImpactadas(any(), any(), any(), any())).thenReturn(List.of());
+
 
             ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
 
