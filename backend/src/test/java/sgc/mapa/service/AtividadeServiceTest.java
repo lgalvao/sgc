@@ -59,7 +59,10 @@ class AtividadeServiceTest {
         void deveListarTodas() {
              when(atividadeRepo.findAll()).thenReturn(List.of(new Atividade()));
              when(atividadeMapper.toDto(any())).thenReturn(new AtividadeDto());
-             assertThat(service.listar()).hasSize(1);
+             var resultado = service.listar();
+             assertThat(resultado).isNotNull();
+             assertThat(resultado).isNotEmpty();
+             assertThat(resultado).hasSize(1);
         }
 
         @Test
@@ -98,24 +101,72 @@ class AtividadeServiceTest {
         @DisplayName("Deve buscar por mapa")
         void deveBuscarPorMapa() {
              when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(List.of(new Atividade()));
-             assertThat(service.buscarPorMapaCodigo(1L)).hasSize(1);
+             var resultado = service.buscarPorMapaCodigo(1L);
+             assertThat(resultado).isNotNull();
+             assertThat(resultado).isNotEmpty();
+             assertThat(resultado).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia quando mapa não possui atividades")
+        void deveRetornarListaVaziaQuandoMapaSemAtividades() {
+             when(atividadeRepo.findByMapaCodigo(999L)).thenReturn(List.of());
+             var resultado = service.buscarPorMapaCodigo(999L);
+             assertThat(resultado).isNotNull();
+             assertThat(resultado).isEmpty();
         }
 
         @Test
         @DisplayName("Deve buscar por mapa com conhecimentos")
         void deveBuscarPorMapaComConhecimentos() {
              when(atividadeRepo.findByMapaCodigoWithConhecimentos(1L)).thenReturn(List.of(new Atividade()));
-             assertThat(service.buscarPorMapaCodigoComConhecimentos(1L)).hasSize(1);
+             var resultado = service.buscarPorMapaCodigoComConhecimentos(1L);
+             assertThat(resultado).isNotNull();
+             assertThat(resultado).isNotEmpty();
+             assertThat(resultado).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia quando mapa não possui atividades com conhecimentos")
+        void deveRetornarListaVaziaQuandoMapaSemAtividadesComConhecimentos() {
+             when(atividadeRepo.findByMapaCodigoWithConhecimentos(999L)).thenReturn(List.of());
+             var resultado = service.buscarPorMapaCodigoComConhecimentos(999L);
+             assertThat(resultado).isNotNull();
+             assertThat(resultado).isEmpty();
         }
 
         @Test
         @DisplayName("Deve listar conhecimentos por atividade e mapa")
         void deveListarConhecimentosEntidade() {
              when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(List.of(new Conhecimento()));
-             assertThat(service.listarConhecimentosPorAtividade(1L)).hasSize(1);
+             var resultadoAtividade = service.listarConhecimentosPorAtividade(1L);
+             assertThat(resultadoAtividade).isNotNull();
+             assertThat(resultadoAtividade).isNotEmpty();
+             assertThat(resultadoAtividade).hasSize(1);
 
              when(conhecimentoRepo.findByMapaCodigo(1L)).thenReturn(List.of(new Conhecimento()));
-             assertThat(service.listarConhecimentosPorMapa(1L)).hasSize(1);
+             var resultadoMapa = service.listarConhecimentosPorMapa(1L);
+             assertThat(resultadoMapa).isNotNull();
+             assertThat(resultadoMapa).isNotEmpty();
+             assertThat(resultadoMapa).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia quando atividade não possui conhecimentos")
+        void deveRetornarListaVaziaQuandoAtividadeSemConhecimentos() {
+             when(conhecimentoRepo.findByAtividadeCodigo(999L)).thenReturn(List.of());
+             var resultado = service.listarConhecimentosPorAtividade(999L);
+             assertThat(resultado).isNotNull();
+             assertThat(resultado).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia quando mapa não possui conhecimentos")
+        void deveRetornarListaVaziaQuandoMapaSemConhecimentos() {
+             when(conhecimentoRepo.findByMapaCodigo(999L)).thenReturn(List.of());
+             var resultado = service.listarConhecimentosPorMapa(999L);
+             assertThat(resultado).isNotNull();
+             assertThat(resultado).isEmpty();
         }
 
         @Test
@@ -124,7 +175,20 @@ class AtividadeServiceTest {
              when(atividadeRepo.existsById(1L)).thenReturn(true);
              when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(List.of(new Conhecimento()));
              when(conhecimentoMapper.toDto(any())).thenReturn(new ConhecimentoDto());
-             assertThat(service.listarConhecimentos(1L)).hasSize(1);
+             var resultado = service.listarConhecimentos(1L);
+             assertThat(resultado).isNotNull();
+             assertThat(resultado).isNotEmpty();
+             assertThat(resultado).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia de conhecimentos DTO quando atividade não possui conhecimentos")
+        void deveRetornarListaVaziaConhecimentosDtoQuandoAtividadeSemConhecimentos() {
+             when(atividadeRepo.existsById(1L)).thenReturn(true);
+             when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(List.of());
+             var resultado = service.listarConhecimentos(1L);
+             assertThat(resultado).isNotNull();
+             assertThat(resultado).isEmpty();
         }
 
         @Test
@@ -214,6 +278,7 @@ class AtividadeServiceTest {
             service.atualizar(id, dto);
 
             verify(atividadeRepo).save(atividade);
+            verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
         }
 
         @Test
@@ -228,6 +293,7 @@ class AtividadeServiceTest {
             service.excluir(id);
 
             verify(atividadeRepo).delete(atividade);
+            verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
         }
     }
 
@@ -241,14 +307,16 @@ class AtividadeServiceTest {
             ConhecimentoDto dto = new ConhecimentoDto();
             Atividade atividade = new Atividade();
             atividade.setMapa(new Mapa());
+            Conhecimento conhecimento = new Conhecimento();
 
             when(atividadeRepo.findById(ativId)).thenReturn(Optional.of(atividade));
             when(conhecimentoMapper.toEntity(dto)).thenReturn(new Conhecimento());
-            when(conhecimentoRepo.save(any())).thenReturn(new Conhecimento());
+            when(conhecimentoRepo.save(any())).thenReturn(conhecimento);
             when(conhecimentoMapper.toDto(any())).thenReturn(dto);
 
-            service.criarConhecimento(ativId, dto);
+            var resultado = service.criarConhecimento(ativId, dto);
 
+            assertThat(resultado).isNotNull();
             verify(conhecimentoRepo).save(any());
         }
 

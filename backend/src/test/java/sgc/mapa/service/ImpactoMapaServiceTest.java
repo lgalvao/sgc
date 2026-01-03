@@ -220,7 +220,14 @@ class ImpactoMapaServiceTest {
 
             ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
 
+            assertNotNull(resultado);
             assertFalse(resultado.isTemImpactos());
+            assertNotNull(resultado.getAtividadesInseridas());
+            assertTrue(resultado.getAtividadesInseridas().isEmpty());
+            assertNotNull(resultado.getAtividadesRemovidas());
+            assertTrue(resultado.getAtividadesRemovidas().isEmpty());
+            assertNotNull(resultado.getAtividadesAlteradas());
+            assertTrue(resultado.getAtividadesAlteradas().isEmpty());
         }
 
         @Test
@@ -250,6 +257,10 @@ class ImpactoMapaServiceTest {
             // Killing NullReturnValsMutator
             assertNotNull(resultado.getAtividadesInseridas());
             assertNotNull(resultado.getAtividadesRemovidas());
+            assertNotNull(resultado.getAtividadesAlteradas());
+            assertNotNull(resultado.getCompetenciasImpactadas());
+            // Killing EmptyObjectReturnValsMutator
+            assertFalse(resultado.getAtividadesRemovidas().isEmpty());
         }
     }
 }
