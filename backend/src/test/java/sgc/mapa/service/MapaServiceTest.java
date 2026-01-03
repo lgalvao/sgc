@@ -51,7 +51,19 @@ class MapaServiceTest {
         @DisplayName("Deve listar todos os mapas")
         void deveListarMapas() {
             when(mapaRepo.findAll()).thenReturn(List.of(new Mapa()));
-            assertThat(service.listar()).hasSize(1);
+            var resultado = service.listar();
+            assertThat(resultado).isNotNull();
+            assertThat(resultado).isNotEmpty();
+            assertThat(resultado).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia quando não há mapas")
+        void deveRetornarListaVaziaQuandoNaoHaMapas() {
+            when(mapaRepo.findAll()).thenReturn(List.of());
+            var resultado = service.listar();
+            assertThat(resultado).isNotNull();
+            assertThat(resultado).isEmpty();
         }
 
         @Test
@@ -113,6 +125,7 @@ class MapaServiceTest {
             when(mapaRepo.existsById(1L)).thenReturn(true);
             service.excluir(1L);
             verify(mapaRepo).deleteById(1L);
+            verify(mapaRepo).existsById(1L);
         }
 
         @Test
@@ -131,14 +144,34 @@ class MapaServiceTest {
         @DisplayName("Deve buscar mapa vigente por unidade")
         void deveBuscarMapaVigente() {
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(new Mapa()));
-            assertThat(service.buscarMapaVigentePorUnidade(1L)).isPresent();
+            var resultado = service.buscarMapaVigentePorUnidade(1L);
+            assertThat(resultado).isPresent();
+            assertThat(resultado.get()).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Deve retornar vazio quando não há mapa vigente para unidade")
+        void deveRetornarVazioQuandoNaoHaMapaVigente() {
+            when(mapaRepo.findMapaVigenteByUnidade(999L)).thenReturn(Optional.empty());
+            var resultado = service.buscarMapaVigentePorUnidade(999L);
+            assertThat(resultado).isEmpty();
         }
 
         @Test
         @DisplayName("Deve buscar por código do subprocesso")
         void deveBuscarPorSubprocesso() {
             when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(new Mapa()));
-            assertThat(service.buscarPorSubprocessoCodigo(1L)).isPresent();
+            var resultado = service.buscarPorSubprocessoCodigo(1L);
+            assertThat(resultado).isPresent();
+            assertThat(resultado.get()).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Deve retornar vazio quando não há mapa para subprocesso")
+        void deveRetornarVazioQuandoNaoHaMapaParaSubprocesso() {
+            when(mapaRepo.findBySubprocessoCodigo(999L)).thenReturn(Optional.empty());
+            var resultado = service.buscarPorSubprocessoCodigo(999L);
+            assertThat(resultado).isEmpty();
         }
 
         @Test
@@ -148,7 +181,20 @@ class MapaServiceTest {
             when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(new Competencia()));
             when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(new MapaCompletoDto());
 
-            assertThat(service.obterMapaCompleto(1L, 10L)).isNotNull();
+            var resultado = service.obterMapaCompleto(1L, 10L);
+            assertThat(resultado).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Deve obter mapa completo DTO sem competências")
+        void deveObterMapaCompletoSemCompetencias() {
+            when(mapaRepo.findById(1L)).thenReturn(Optional.of(new Mapa()));
+            when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of());
+            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(new MapaCompletoDto());
+
+            var resultado = service.obterMapaCompleto(1L, 10L);
+            assertThat(resultado).isNotNull();
+            verify(competenciaRepo).findByMapaCodigo(1L);
         }
     }
 
