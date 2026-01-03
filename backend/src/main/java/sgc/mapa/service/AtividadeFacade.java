@@ -16,10 +16,14 @@ import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.List;
 
+// Refactored in Phase 2
+
 /**
  * Facade para orquestrar operações de atividades e conhecimentos,
  * lidando com a interação entre AtividadeService e SubprocessoService.
  * Remove a lógica de negócio do AtividadeController.
+ *
+ * <p>Implementa o padrão Facade para simplificar a interface de uso e centralizar a coordenação de serviços.
  */
 @Service
 @RequiredArgsConstructor
