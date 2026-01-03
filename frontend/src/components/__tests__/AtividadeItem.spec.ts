@@ -23,10 +23,10 @@ describe("AtividadeItem.vue", () => {
        BCardBody: { template: '<div class="card-body"><slot /></div>' },
        BFormInput: {
            template: '<input class="form-control" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-           props: ['modelValue']
+           props: ['modelValue', 'size']
        },
        // Simplified BForm stub to avoid preventDefault issues with manual triggers
-       BForm: { template: '<form @submit.prevent="$emit(\'submit\')"><slot /></form>' },
+       BForm: { template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' },
        BCol: { template: '<div class="col"><slot /></div>' },
   };
 

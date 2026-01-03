@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as processoService from '../processoService';
 import apiClient from '@/axios-setup';
-import { CriarProcessoRequest, AtualizarProcessoRequest } from '@/types/tipos';
+import { CriarProcessoRequest, AtualizarProcessoRequest, TipoProcesso } from '@/types/tipos';
 
 vi.mock('@/axios-setup');
 
@@ -11,7 +11,7 @@ describe('processoService', () => {
     });
 
     it('criarProcesso deve fazer requisição POST', async () => {
-        const request: CriarProcessoRequest = { descricao: 'Teste', tipo: 'MAPEAMENTO', dataLimiteEtapa1: '2024-01-01' };
+        const request: CriarProcessoRequest = { descricao: 'Teste', tipo: TipoProcesso.MAPEAMENTO, dataLimiteEtapa1: '2024-01-01', unidades: [] };
         const responseData = { codigo: 1, ...request };
         vi.mocked(apiClient.post).mockResolvedValue({ data: responseData });
 
@@ -33,7 +33,7 @@ describe('processoService', () => {
 
     it('iniciarProcesso deve fazer requisição POST', async () => {
         const codProcesso = 1;
-        const tipo = 'MAPEAMENTO';
+        const tipo = TipoProcesso.MAPEAMENTO;
         const codigosUnidades = [1, 2];
 
         await processoService.iniciarProcesso(codProcesso, tipo, codigosUnidades);
@@ -63,7 +63,7 @@ describe('processoService', () => {
 
     it('atualizarProcesso deve fazer requisição POST', async () => {
         const codProcesso = 1;
-        const request: AtualizarProcessoRequest = { descricao: 'Atualizado' };
+        const request: AtualizarProcessoRequest = { codigo: 1, descricao: 'Atualizado', tipo: TipoProcesso.MAPEAMENTO, dataLimiteEtapa1: '2024-01-01', unidades: [] };
         const responseData = { codigo: 1, ...request };
         vi.mocked(apiClient.post).mockResolvedValue({ data: responseData });
 
