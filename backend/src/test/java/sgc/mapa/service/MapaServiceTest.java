@@ -230,10 +230,13 @@ class MapaServiceTest {
 
             // Second call for validation
             when(competenciaRepo.findByMapaCodigo(mapaId)).thenReturn(List.of(novaComp));
-            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(new MapaCompletoDto());
+            MapaCompletoDto expectedDto = new MapaCompletoDto();
+            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(expectedDto);
 
-            service.salvarMapaCompleto(mapaId, req, "user");
+            var resultado = service.salvarMapaCompleto(mapaId, req, "user");
 
+            assertThat(resultado).isNotNull();
+            assertThat(resultado).isEqualTo(expectedDto);
             verify(mapaRepo).save(mapa);
             verify(competenciaRepo).saveAll(anyList());
             verify(atividadeRepo).saveAll(anyList());

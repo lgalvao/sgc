@@ -98,6 +98,9 @@ class AtividadeControllerTest {
                             .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
                     .andExpect(status().isCreated())
                     .andExpect(header().exists("Location"));
+            
+            // Verify validarPermissaoEdicaoMapa was called with mapa codigo 1L (not subprocess codigo)
+            Mockito.verify(subprocessoService).validarPermissaoEdicaoMapa(eq(1L), any());
         }
 
         @Test
@@ -120,6 +123,9 @@ class AtividadeControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
                     .andExpect(status().isOk());
+            
+            // Verify service was called
+            Mockito.verify(atividadeService).atualizar(eq(1L), any(AtividadeDto.class));
         }
 
         @Test

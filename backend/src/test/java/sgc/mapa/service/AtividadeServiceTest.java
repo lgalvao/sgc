@@ -307,14 +307,16 @@ class AtividadeServiceTest {
             ConhecimentoDto dto = new ConhecimentoDto();
             Atividade atividade = new Atividade();
             atividade.setMapa(new Mapa());
+            Conhecimento conhecimento = new Conhecimento();
 
             when(atividadeRepo.findById(ativId)).thenReturn(Optional.of(atividade));
             when(conhecimentoMapper.toEntity(dto)).thenReturn(new Conhecimento());
-            when(conhecimentoRepo.save(any())).thenReturn(new Conhecimento());
+            when(conhecimentoRepo.save(any())).thenReturn(conhecimento);
             when(conhecimentoMapper.toDto(any())).thenReturn(dto);
 
-            service.criarConhecimento(ativId, dto);
+            var resultado = service.criarConhecimento(ativId, dto);
 
+            assertThat(resultado).isNotNull();
             verify(conhecimentoRepo).save(any());
         }
 
