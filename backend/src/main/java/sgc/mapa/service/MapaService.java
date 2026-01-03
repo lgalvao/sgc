@@ -117,8 +117,8 @@ public class MapaService {
         mapaRepo.save(mapa);
 
         // 1. Fetch current state
-        List<Competencia> competenciasAtuais = competenciaRepo.findByMapaCodigo(codMapa);
-        List<Atividade> atividadesAtuais = atividadeRepo.findByMapaCodigo(codMapa);
+        List<Competencia> competenciasAtuais = new ArrayList<>(competenciaRepo.findByMapaCodigo(codMapa));
+        List<Atividade> atividadesAtuais = new ArrayList<>(atividadeRepo.findByMapaCodigo(codMapa));
         Set<Long> atividadesDoMapaIds = atividadesAtuais.stream()
                 .map(Atividade::getCodigo)
                 .collect(Collectors.toSet());

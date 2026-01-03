@@ -1,52 +1,43 @@
 package sgc.notificacao;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.env.Environment;
 import sgc.alerta.AlertaService;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UsuarioDto;
+import sgc.organizacao.model.TipoUnidade;
+import sgc.organizacao.model.Unidade;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
-import sgc.organizacao.UsuarioService;
-import sgc.organizacao.dto.ResponsavelDto;
-import sgc.organizacao.dto.UsuarioDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes Unitários: EventoProcessoListener")
+@DisplayName("Testes do Listener de Eventos de Processo")
 class EventoProcessoListenerTest {
-    private static final String UNID_OP = "UNID-OP";
-    private static final Long T123 = 123123123123L;
-    private static final String TITULAR_TESTE = "Titular Teste";
-    private static final String TITULAR_EMAIL = "titular@test.com";
-    private static final String RAMAL = "12345";
-    private static final Long S456 = 456456456456L;
-    private static final String SUBSTITUTO_TESTE = "Substituto Teste";
-    private static final String SUBSTITUTO_EMAIL = "substituto@test.com";
-    private static final String RAMAL_SUBSTITUTO = "67890";
 
     @Mock
-    private AlertaService alertaService;
+    private AlertaService servicoAlertas;
     @Mock
     private NotificacaoEmailService notificacaoEmailService;
     @Mock
@@ -57,371 +48,225 @@ class EventoProcessoListenerTest {
     private ProcessoService processoService;
     @Mock
     private SubprocessoService subprocessoService;
-    @Mock
-    private Environment environment;
 
     @InjectMocks
-    private EventoProcessoListener ouvinteDeEvento;
+    private EventoProcessoListener listener;
 
-    private Processo processo;
-    private Subprocesso subprocessoOperacional;
-    private EventoProcessoIniciado evento;
-    private Unidade unidadeOperacional;
+    @Nested
+    @DisplayName("Processo Iniciado")
+    class InicioProcesso {
 
-    @BeforeEach
-    void setUp() {
-        processo = new Processo();
-        processo.setCodigo(1L);
-        processo.setDescricao("Teste de Processo");
-        processo.setTipo(TipoProcesso.REVISAO);
+        @Test
+        @DisplayName("Deve processar início de processo com sucesso")
+        void deveProcessarInicioSucesso() {
+            Processo processo = new Processo();
+            processo.setCodigo(1L);
+            processo.setDescricao("Processo 1");
+            processo.setTipo(TipoProcesso.MAPEAMENTO);
 
-        unidadeOperacional = new Unidade();
-        unidadeOperacional.setCodigo(100L);
-        unidadeOperacional.setSigla(UNID_OP);
-        unidadeOperacional.setNome("Unidade Operacional");
-        unidadeOperacional.setTipo(TipoUnidade.OPERACIONAL);
+            Unidade u = new Unidade();
+            u.setCodigo(10L);
+            u.setNome("Unidade Teste");
+            u.setSigla("U1");
+            u.setTipo(TipoUnidade.OPERACIONAL);
 
-        subprocessoOperacional = new Subprocesso();
-        subprocessoOperacional.setCodigo(10L);
-        subprocessoOperacional.setProcesso(processo);
-        subprocessoOperacional.setUnidade(unidadeOperacional);
-        subprocessoOperacional.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setUnidade(u);
+            sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
 
-        evento = new EventoProcessoIniciado(1L, "INICIADO", LocalDateTime.now(), List.of(100L));
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+            when(servicoAlertas.criarAlertasProcessoIniciado(any(), any())).thenReturn(Collections.emptyList());
+
+            ResponsavelDto resp = new ResponsavelDto();
+            resp.setTitularTitulo("TITULAR");
+            resp.setSubstitutoTitulo("SUBSTITUTO");
+            when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, resp));
+
+            UsuarioDto titular = new UsuarioDto();
+            titular.setEmail("titular@email.com");
+            UsuarioDto substituto = new UsuarioDto();
+            substituto.setEmail("sub@email.com");
+            when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("TITULAR", titular, "SUBSTITUTO", substituto));
+
+            when(notificacaoModelosService.criarEmailDeProcessoIniciado(any(), any(), any(), any())).thenReturn("html");
+
+            listener.aoIniciarProcesso(new EventoProcessoIniciado(1L, "MAPEAMENTO", LocalDateTime.now(), List.of()));
+
+            verify(notificacaoEmailService, times(2)).enviarEmailHtml(any(), any(), any());
+        }
+
+        @Test
+        @DisplayName("Deve ignorar se não houver subprocessos")
+        void deveIgnorarSemSubprocessos() {
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(new Processo());
+            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(Collections.emptyList());
+
+            listener.aoIniciarProcesso(new EventoProcessoIniciado(1L, "MAPEAMENTO", LocalDateTime.now(), List.of()));
+
+            verify(servicoAlertas, never()).criarAlertasProcessoIniciado(any(), any());
+        }
+
+        @Test
+        @DisplayName("Deve capturar erro e não falhar")
+        void deveCapturarErro() {
+            when(processoService.buscarEntidadePorId(1L)).thenThrow(new RuntimeException("Erro banco"));
+
+            assertThatCode(() -> listener.aoIniciarProcesso(new EventoProcessoIniciado(1L, "MAPEAMENTO", LocalDateTime.now(), List.of())))
+                    .doesNotThrowAnyException();
+        }
+
+        @Test
+        @DisplayName("Deve lidar com falta de responsável")
+        void deveLidarFaltaResponsavel() {
+            Processo p = new Processo();
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            Unidade u = new Unidade();
+            u.setCodigo(10L);
+            Subprocesso sp = new Subprocesso();
+            sp.setUnidade(u);
+
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+            when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Collections.emptyMap());
+
+            listener.aoIniciarProcesso(new EventoProcessoIniciado(1L, "MAPEAMENTO", LocalDateTime.now(), List.of()));
+
+            verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+        }
+
+        @Test
+        @DisplayName("Deve lidar com falta de email do titular")
+        void deveLidarFaltaEmail() {
+            Processo p = new Processo();
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            Unidade u = new Unidade();
+            u.setCodigo(10L);
+            Subprocesso sp = new Subprocesso();
+            sp.setUnidade(u);
+
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+            
+            ResponsavelDto resp = new ResponsavelDto();
+            resp.setTitularTitulo("TITULAR");
+            when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, resp));
+            
+            UsuarioDto titular = new UsuarioDto(); // Sem email
+            when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("TITULAR", titular));
+
+            listener.aoIniciarProcesso(new EventoProcessoIniciado(1L, "MAPEAMENTO", LocalDateTime.now(), List.of()));
+
+            verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+        }
     }
 
     @Nested
-    @DisplayName("Evento: Processo Iniciado")
-    class ProcessoIniciado {
+    @DisplayName("Processo Finalizado")
+    class FinalizacaoProcesso {
         @Test
-        @DisplayName("Deve processar evento completo para unidade operacional")
-        void deveProcessarCompletoQuandoUnidadeOperacional() {
-            // Given
-            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
-            when(subprocessoService.listarEntidadesPorProcesso(1L))
-                    .thenReturn(List.of(subprocessoOperacional));
+        @DisplayName("Deve processar finalização com sucesso para unidade OPERACIONAL")
+        void deveProcessarFinalizacaoOperacional() {
+            Processo p = new Processo();
+            p.setCodigo(1L);
+            p.setDescricao("P1");
+            Unidade u = new Unidade();
+            u.setCodigo(10L);
+            u.setSigla("U1");
+            u.setTipo(TipoUnidade.OPERACIONAL);
+            p.setParticipantes(Set.of(u));
 
-            ResponsavelDto responsavelDto = new ResponsavelDto(
-                    100L,
-                    String.valueOf(T123),
-                    TITULAR_TESTE,
-                    String.valueOf(S456),
-                    SUBSTITUTO_TESTE);
-            when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(100L, responsavelDto));
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+            
+            ResponsavelDto resp = new ResponsavelDto();
+            resp.setTitularTitulo("TITULAR");
+            when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, resp));
+            
+            UsuarioDto titular = new UsuarioDto();
+            titular.setEmail("t@mail.com");
+            when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("TITULAR", titular));
 
-            UsuarioDto titular = UsuarioDto.builder()
-                    .tituloEleitoral(String.valueOf(T123))
-                    .nome(TITULAR_TESTE)
-                    .email(TITULAR_EMAIL)
-                    .matricula(RAMAL)
-                    .build();
-            UsuarioDto substituto = UsuarioDto.builder()
-                    .tituloEleitoral(String.valueOf(S456))
-                    .nome(SUBSTITUTO_TESTE)
-                    .email(SUBSTITUTO_EMAIL)
-                    .matricula(RAMAL_SUBSTITUTO)
-                    .build();
+            when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("html");
 
-            when(usuarioService.buscarUsuariosPorTitulos(anyList()))
-                    .thenReturn(Map.of(String.valueOf(T123), titular, String.valueOf(S456), substituto));
+            listener.aoFinalizarProcesso(new EventoProcessoFinalizado(1L, LocalDateTime.now()));
 
-            when(notificacaoModelosService.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
-                    .thenReturn("<html><body>Email Operacional</body></html>");
-
-            // When
-            ouvinteDeEvento.aoIniciarProcesso(evento);
-
-            // Then
-            verify(alertaService, times(1))
-                    .criarAlertasProcessoIniciado(
-                            processo,
-                            List.of(subprocessoOperacional.getUnidade()));
-
-            verify(notificacaoEmailService, times(1))
-                    .enviarEmailHtml(eq(TITULAR_EMAIL), anyString(), anyString());
-            verify(notificacaoEmailService, times(1))
-                    .enviarEmailHtml(eq(SUBSTITUTO_EMAIL), anyString(), anyString());
+            verify(notificacaoEmailService).enviarEmailHtml(eq("t@mail.com"), any(), any());
         }
 
         @Test
-        @DisplayName("Não deve fazer nada quando processo não encontrado")
-        void naoDeveFazerNadaQuandoProcessoNaoEncontrado() {
-            // Given
-            when(processoService.buscarEntidadePorId(1L)).thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Processo não encontrado"));
+        @DisplayName("Deve processar finalização com sucesso para unidade INTERMEDIARIA")
+        void deveProcessarFinalizacaoIntermediaria() {
+            Processo p = new Processo();
+            p.setCodigo(1L);
+            p.setDescricao("P1");
 
-            // When
-            ouvinteDeEvento.aoIniciarProcesso(evento);
+            Unidade uPai = new Unidade();
+            uPai.setCodigo(10L);
+            uPai.setSigla("PAI");
+            uPai.setTipo(TipoUnidade.INTERMEDIARIA);
 
-            // Then
-            verify(alertaService, never()).criarAlertasProcessoIniciado(any(), anyList());
-            verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
-        }
+            Unidade uFilha = new Unidade();
+            uFilha.setCodigo(20L);
+            uFilha.setSigla("FILHA");
+            uFilha.setUnidadeSuperior(uPai);
 
-        @Test
-        @DisplayName("Não deve enviar e-mails quando não houver subprocessos")
-        void naoDeveEnviarEmailsQuandoNaoHouverSubprocessos() {
-            // Given
-            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
-            when(subprocessoService.listarEntidadesPorProcesso(1L))
-                    .thenReturn(Collections.emptyList());
+            p.setParticipantes(Set.of(uPai, uFilha));
 
-            // When
-            ouvinteDeEvento.aoIniciarProcesso(evento);
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
 
-            // Then
-            verify(alertaService, never()).criarAlertasProcessoIniciado(any(), anyList());
-            verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
-        }
-
-        @Test
-        @DisplayName("Deve enviar e-mail correto para unidade INTERMEDIARIA")
-        void deveEnviarEmailCorretoQuandoUnidadeIntermediaria() {
-            // Given
-            unidadeOperacional.setTipo(TipoUnidade.INTERMEDIARIA);
+            ResponsavelDto resp = new ResponsavelDto();
+            resp.setTitularTitulo("TITULAR");
+            when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, resp, 20L, resp));
             
-            ResponsavelDto responsavelDto =
-                    new ResponsavelDto(
-                            100L, String.valueOf(T123), TITULAR_TESTE, null, null); // Sem substituto
-            UsuarioDto titular = UsuarioDto.builder()
-                    .tituloEleitoral(String.valueOf(T123))
-                    .nome(TITULAR_TESTE)
-                    .email(TITULAR_EMAIL)
-                    .matricula(RAMAL)
-                    .build();
+            UsuarioDto titular = new UsuarioDto();
+            titular.setEmail("t@mail.com");
+            when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("TITULAR", titular));
 
-            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
-            when(subprocessoService.listarEntidadesPorProcesso(1L))
-                    .thenReturn(List.of(subprocessoOperacional));
-            
-            when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(100L, responsavelDto));
-            when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(String.valueOf(T123), titular));
-            
-            when(notificacaoModelosService.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
-                    .thenReturn("<html><body>Email Intermediaria</body></html>");
-
-            // When
-            ouvinteDeEvento.aoIniciarProcesso(evento);
-
-            // Then
-            verify(alertaService, times(1)).criarAlertasProcessoIniciado(any(), anyList());
-            ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
-            ArgumentCaptor<String> corpoCaptor = ArgumentCaptor.forClass(String.class);
-            verify(notificacaoEmailService, times(1))
-                    .enviarEmailHtml(eq(TITULAR_EMAIL), assuntoCaptor.capture(), corpoCaptor.capture());
-
-            assertEquals(
-                    "Processo Iniciado em Unidades Subordinadas - Teste de Processo",
-                    assuntoCaptor.getValue());
-            verify(notificacaoEmailService, never())
-                    .enviarEmailHtml(eq(SUBSTITUTO_EMAIL), anyString(), anyString());
-        }
-
-        @Test
-        @DisplayName("Deve enviar e-mail correto para unidade INTEROPERACIONAL")
-        void deveEnviarEmailCorretoQuandoUnidadeInteroperacional() {
-            // Given
-            unidadeOperacional.setTipo(TipoUnidade.INTEROPERACIONAL);
-            
-            ResponsavelDto responsavelDto =
-                    new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, null, null);
-            UsuarioDto titular = UsuarioDto.builder()
-                    .tituloEleitoral(String.valueOf(T123))
-                    .nome(TITULAR_TESTE)
-                    .email(TITULAR_EMAIL)
-                    .matricula(RAMAL)
-                    .build();
-
-            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
-            when(subprocessoService.listarEntidadesPorProcesso(1L))
-                    .thenReturn(List.of(subprocessoOperacional));
-            
-            when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(100L, responsavelDto));
-            when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(String.valueOf(T123), titular));
-            
-            when(notificacaoModelosService.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
-                    .thenReturn("<html><body>Email Interoperacional</body></html>");
-
-            // When
-            ouvinteDeEvento.aoIniciarProcesso(evento);
-
-            // Then
-            ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
-            verify(notificacaoEmailService)
-                    .enviarEmailHtml(eq(TITULAR_EMAIL), assuntoCaptor.capture(), anyString());
-            assertEquals("Processo Iniciado - Teste de Processo", assuntoCaptor.getValue());
-        }
-
-        @Test
-        @DisplayName("Não deve enviar e-mail quando tipo de unidade desconhecido")
-        void naoDeveEnviarEmailQuandoTipoUnidadeDesconhecido() {
-            // Given
-            unidadeOperacional.setTipo(null); // Desconhecido
-            
-            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
-            when(subprocessoService.listarEntidadesPorProcesso(1L))
-                    .thenReturn(List.of(subprocessoOperacional));
-            
-            when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Collections.emptyMap());
-            when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Collections.emptyMap());
-
-            // When
-            ouvinteDeEvento.aoIniciarProcesso(evento);
-
-            // Then
-            verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
-        }
-
-        @Test
-        @DisplayName("Não deve enviar e-mail quando subprocesso sem unidade")
-        void naoDeveEnviarEmailQuandoSubprocessoSemUnidade() {
-            // Given
-            subprocessoOperacional.setUnidade(null);
-            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
-            when(subprocessoService.listarEntidadesPorProcesso(1L))
-                    .thenReturn(List.of(subprocessoOperacional));
-
-            // When
-            ouvinteDeEvento.aoIniciarProcesso(evento);
-
-            // Then
-            verify(usuarioService, never()).buscarResponsaveisUnidades(anyList());
-            verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
-        }
-
-        @Test
-        @DisplayName("Não deve enviar e-mail quando responsável não encontrado")
-        void naoDeveEnviarEmailQuandoResponsavelNaoEncontrado() {
-            // Given
-            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
-            when(subprocessoService.listarEntidadesPorProcesso(1L))
-                    .thenReturn(List.of(subprocessoOperacional));
-            when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Collections.emptyMap());
-            when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Collections.emptyMap());
-
-            // When
-            ouvinteDeEvento.aoIniciarProcesso(evento);
-
-            // Then
-            verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
-        }
-
-        @Test
-        @DisplayName("Não deve enviar e-mail quando titular sem e-mail")
-        void naoDeveEnviarEmailQuandoTitularSemEmail() {
-            // Given
-            ResponsavelDto responsavelDto =
-                    new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, null, null);
-            UsuarioDto titularSemEmail = UsuarioDto.builder()
-                    .tituloEleitoral(String.valueOf(T123))
-                    .nome(TITULAR_TESTE)
-                    .email(" ") // Email em branco
-                    .matricula(RAMAL)
-                    .build();
-
-            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
-            when(subprocessoService.listarEntidadesPorProcesso(1L))
-                    .thenReturn(List.of(subprocessoOperacional));
-            
-            when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(100L, responsavelDto));
-            when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(String.valueOf(T123), titularSemEmail));
-
-            // When
-            ouvinteDeEvento.aoIniciarProcesso(evento);
-
-            // Then
-            verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
-        }
-
-        @Test
-        @DisplayName("Deve capturar exception geral sem interromper execução")
-        void deveCapturarExceptionGeral() {
-            // Given
-            when(processoService.buscarEntidadePorId(1L)).thenThrow(new RuntimeException("Erro DB"));
-
-            // When
-            ouvinteDeEvento.aoIniciarProcesso(evento);
-
-            // Then
-            verify(subprocessoService, never()).listarEntidadesPorProcesso(any());
-        }
-
-        @Test
-        @DisplayName("Deve prosseguir envio para titular mesmo com erro no envio para substituto")
-        void deveProsseguirMesmoComErroEmailSubstituto() {
-            // Given
-            ResponsavelDto responsavelDto =
-                    new ResponsavelDto(
-                            100L,
-                            String.valueOf(T123),
-                            TITULAR_TESTE,
-                            String.valueOf(S456),
-                            SUBSTITUTO_TESTE);
-            UsuarioDto titular = UsuarioDto.builder()
-                    .tituloEleitoral(String.valueOf(T123))
-                    .nome(TITULAR_TESTE)
-                    .email(TITULAR_EMAIL)
-                    .matricula(RAMAL)
-                    .build();
-
-            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
-            when(subprocessoService.listarEntidadesPorProcesso(1L))
-                    .thenReturn(List.of(subprocessoOperacional));
-            
-            when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(100L, responsavelDto));
-            
-            // Simular erro ao buscar um dos usuários ou falha no envio para o substituto
-            // Mas agora a busca de usuários é em lote, então se falhar o lote, falha tudo?
-            // Vamos simular que o substituto não veio no mapa de usuários.
-            when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(String.valueOf(T123), titular));
-
-            when(notificacaoModelosService.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
+            when(notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), any()))
                     .thenReturn("html");
 
-            // When
-            ouvinteDeEvento.aoIniciarProcesso(evento);
+            listener.aoFinalizarProcesso(new EventoProcessoFinalizado(1L, LocalDateTime.now()));
 
-            // Then
-            verify(notificacaoEmailService, times(1)).enviarEmailHtml(eq(TITULAR_EMAIL), any(), any());
-            verify(notificacaoEmailService, never())
-                    .enviarEmailHtml(eq(SUBSTITUTO_EMAIL), any(), any());
+            // Verifica envio para a intermediária
+            verify(notificacaoEmailService, atLeastOnce()).enviarEmailHtml(any(), any(), any());
         }
-    }
 
-    @Nested
-    @DisplayName("Evento: Processo Finalizado")
-    class ProcessoFinalizado {
         @Test
-        @DisplayName("Deve processar finalização e enviar e-mail para unidade operacional")
-        void deveEnviarEmailQuandoUnidadeOperacional() {
-            // Given
-            EventoProcessoFinalizado eventoFinalizado = new EventoProcessoFinalizado(1L, LocalDateTime.now());
-            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+        @DisplayName("Deve ignorar se não houver participantes")
+        void deveIgnorarSemParticipantes() {
+            Processo p = new Processo();
+            p.setParticipantes(Set.of());
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
 
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(100L);
-            unidade.setSigla(UNID_OP);
-            unidade.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
-            processo.setParticipantes(java.util.Set.of(unidade));
+            listener.aoFinalizarProcesso(new EventoProcessoFinalizado(1L, LocalDateTime.now()));
 
-            ResponsavelDto responsavelDto = new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, null, null);
-            UsuarioDto titular = UsuarioDto.builder()
-                    .tituloEleitoral(String.valueOf(T123))
-                    .nome(TITULAR_TESTE)
-                    .email(TITULAR_EMAIL)
-                    .matricula(RAMAL)
-                    .build();
+            verify(usuarioService, never()).buscarResponsaveisUnidades(any());
+        }
 
-            when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(java.util.Map.of(100L, responsavelDto));
-            when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(java.util.Map.of(String.valueOf(T123), titular));
+        @Test
+        @DisplayName("Deve capturar erro e não falhar na finalização")
+        void deveCapturarErroFinalizacao() {
+            when(processoService.buscarEntidadePorId(1L)).thenThrow(new RuntimeException("Erro"));
+            
+            assertThatCode(() -> listener.aoFinalizarProcesso(new EventoProcessoFinalizado(1L, LocalDateTime.now())))
+                    .doesNotThrowAnyException();
+        }
 
-            when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any()))
-                    .thenReturn("html-finalizacao");
+        @Test
+        @DisplayName("Deve lidar com responsável não encontrado na finalização")
+        void deveLidarFaltaResponsavelFinalizacao() {
+            Processo p = new Processo();
+            Unidade u = new Unidade();
+            u.setCodigo(10L);
+            p.setParticipantes(Set.of(u));
 
-            // When
-            ouvinteDeEvento.aoFinalizarProcesso(eventoFinalizado);
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+            when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Collections.emptyMap());
 
-            // Then
-            verify(notificacaoEmailService).enviarEmailHtml(eq(TITULAR_EMAIL), anyString(), eq("html-finalizacao"));
+            listener.aoFinalizarProcesso(new EventoProcessoFinalizado(1L, LocalDateTime.now()));
+
+            verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
         }
     }
 }

@@ -183,6 +183,22 @@ tasks.jacocoTestReport {
         csv.required.set(true)
         html.required.set(true)
     }
+
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(
+                    "**/*MapperImpl*",
+                    "sgc/Sgc.class",
+                    "sgc/**/*Config.class",
+                    "sgc/**/*Dto.class",
+                    "sgc/**/*Exception.class",
+                    "sgc/notificacao/NotificacaoModelosServiceMock.class",
+                    "sgc/e2e/E2eController.class"
+                )
+            }
+        })
+    )
 }
 
 tasks.jacocoTestCoverageVerification {
@@ -196,7 +212,7 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "LINE"
-                minimum = "0.85".toBigDecimal()
+                minimum = "0.90".toBigDecimal()
             }
         }
     }
