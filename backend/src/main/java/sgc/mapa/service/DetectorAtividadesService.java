@@ -9,11 +9,15 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 
 import java.util.*;
+
+// Refactored in Phase 2
 import java.util.stream.Collectors;
 
 /**
  * Serviço especializado na detecção de alterações em atividades entre duas versões de mapa.
  * Responsável por identificar inserções, remoções e modificações em atividades e seus conhecimentos.
+ *
+ * <p>Utiliza mapas em memória para otimizar a comparação e evitar excesso de consultas ao banco de dados.
  */
 @Service
 @RequiredArgsConstructor

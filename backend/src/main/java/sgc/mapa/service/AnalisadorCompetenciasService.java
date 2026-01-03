@@ -9,10 +9,15 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 
 import java.util.*;
+
+// Refactored in Phase 2
 import java.util.stream.Collectors;
 
 /**
  * Serviço especializado na análise de impactos em competências causados por alterações em atividades.
+ *
+ * <p>Responsável por identificar quais competências foram afetadas pela inserção, remoção ou
+ * alteração de atividades durante o processo de revisão de cadastro.
  */
 @Service
 @RequiredArgsConstructor

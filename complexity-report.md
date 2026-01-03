@@ -439,6 +439,7 @@ Dashboard sugerido:
 - ✅ **Refatorar ImpactoMapaService**:
   - Implementada decomposição em `DetectorAtividadesService` e `AnalisadorCompetenciasService`.
   - Service principal reduzido para facade de orquestração.
+  - Testes unitários focados implementados para os novos serviços.
 - ✅ **Extrair lógica de AtividadeController**:
   - Implementado `AtividadeFacade` para encapsular orquestração.
   - Controller agora delega lógica de negócio e construção de resposta.
@@ -654,4 +655,23 @@ configure<PitestPluginExtension> {
 
 ---
 
-**Relatório elaborado através de análise automatizada de MBT + inspeção de código.**
+### 7.7 Acompanhamento Contínuo (Fase 1.5 - Janeiro 2026)
+
+**Objetivo**: Atingir a meta de 65% de Mutation Score e consolidar refatorações.
+
+#### Atividades Recentes
+- **Testes Unitários para Serviços Extraídos**:
+  - Criados `DetectorAtividadesServiceTest` e `AnalisadorCompetenciasServiceTest` para cobrir a lógica extraída de `ImpactoMapaService`.
+  - Cobertura de cenários de inserção, remoção e alteração de atividades e impactos em competências.
+  - Testes específicos para validação de listas vazias e relacionamentos.
+- **Refatoração de Testes**:
+  - `ImpactoMapaServiceTest` ajustado para testar o facade, zombando (mocking) os novos serviços especializados.
+
+#### Status Atual
+- `ImpactoMapaService` agora é um facade leve, delegando lógica complexa.
+- `DetectorAtividadesService` e `AnalisadorCompetenciasService` possuem testes unitários dedicados com foco em lógica de negócio pura.
+- A complexidade ciclomática foi reduzida e a testabilidade aumentada.
+
+#### Próximos Passos Imediatos
+1. Verificar cobertura de `AtividadeFacade` e `AtividadeController`.
+2. Expandir testes para cobrir caminhos de código legado em `AtividadeService`.
