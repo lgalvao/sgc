@@ -64,6 +64,9 @@ class ImpactoMapaServiceTest {
     @Mock
     private AnalisadorCompetenciasService analisadorCompetencias;
 
+    @Mock
+    private MapaAcessoService mapaAcessoService;
+
     private Usuario chefe;
     private Usuario gestor;
     private Usuario admin;
@@ -121,98 +124,37 @@ class ImpactoMapaServiceTest {
     @Nested
     @DisplayName("Testes de verificação de acesso")
     class AcessoTestes {
+        // Access tests are now covered by MapaAcessoServiceTest
+        // Here we just verify that the service is called
 
         @Test
-        @DisplayName("CHEFE pode acessar quando situação for REVISAO_CADASTRO_EM_ANDAMENTO")
-        void chefePodeAcessar() {
-            mockSecurityContext(chefe);
-            subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
+        @DisplayName("Deve chamar MapaAcessoService para verificar acesso")
+        void deveChamarServicoAcesso() {
+            // This test is kept to ensure integration/delegation, even though detailed logic is tested elsewhere
+            // But since we are mocking everything, we assume the delegation works if verify passes.
+            // However, ImpactoMapaService calls it before anything else relevant to this test scope.
 
+            // mockSecurityContext(chefe); // Removed unnecessary stubbing
+            // subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+
+            // Scenario 1: Access Granted (delegation happens)
+            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
             assertDoesNotThrow(() -> impactoMapaService.verificarImpactos(1L, chefe));
+            org.mockito.Mockito.verify(mapaAcessoService).verificarAcessoImpacto(chefe, subprocesso);
         }
 
         @Test
-        @DisplayName(
-                "CHEFE não pode acessar quando situação for diferente de"
-                        + " REVISAO_CADASTRO_EM_ANDAMENTO")
-        void chefeNaoPodeAcessar() {
-            mockSecurityContext(chefe);
-            subprocesso.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
+        @DisplayName("Deve propagar erro se acesso negado")
+        void devePropagarErroAcesso() {
+            // mockSecurityContext(chefe); // Removed unnecessary stubbing
+            // subprocesso.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
             when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            org.mockito.Mockito.doThrow(new ErroAccessoNegado("Acesso negado"))
+                    .when(mapaAcessoService).verificarAcessoImpacto(chefe, subprocesso);
 
             assertThrows(
                     ErroAccessoNegado.class, () -> impactoMapaService.verificarImpactos(1L, chefe));
-        }
-
-        @Test
-        @DisplayName("GESTOR pode acessar quando situação for REVISAO_CADASTRO_DISPONIBILIZADA")
-        void gestorPodeAcessar() {
-            mockSecurityContext(gestor);
-            subprocesso.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
-
-            assertDoesNotThrow(() -> impactoMapaService.verificarImpactos(1L, gestor));
-        }
-
-        @Test
-        @DisplayName(
-                "GESTOR não pode acessar quando situação for diferente de"
-                        + " REVISAO_CADASTRO_DISPONIBILIZADA")
-        void gestorNaoPodeAcessar() {
-            mockSecurityContext(gestor);
-            subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
-
-            assertThrows(
-                    ErroAccessoNegado.class,
-                    () -> impactoMapaService.verificarImpactos(1L, gestor));
-        }
-
-        @Test
-        @DisplayName("ADMIN pode acessar quando situação for REVISAO_CADASTRO_DISPONIBILIZADA")
-        void adminPodeAcessarDisponibilizada() {
-            mockSecurityContext(admin);
-            subprocesso.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
-
-            assertDoesNotThrow(() -> impactoMapaService.verificarImpactos(1L, admin));
-        }
-
-        @Test
-        @DisplayName("ADMIN pode acessar quando situação for REVISAO_CADASTRO_HOMOLOGADA")
-        void adminPodeAcessarHomologada() {
-            mockSecurityContext(admin);
-            subprocesso.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
-
-            assertDoesNotThrow(() -> impactoMapaService.verificarImpactos(1L, admin));
-        }
-
-        @Test
-        @DisplayName("ADMIN pode acessar quando situação for REVISAO_MAPA_AJUSTADO")
-        void adminPodeAcessarAjustado() {
-            mockSecurityContext(admin);
-            subprocesso.setSituacao(REVISAO_MAPA_AJUSTADO);
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
-
-            assertDoesNotThrow(() -> impactoMapaService.verificarImpactos(1L, admin));
-        }
-
-        @Test
-        @DisplayName("ADMIN não pode acessar quando situação for diferente das permitidas")
-        void adminNaoPodeAcessar() {
-            mockSecurityContext(admin);
-            subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
-
-            assertThrows(
-                    ErroAccessoNegado.class, () -> impactoMapaService.verificarImpactos(1L, admin));
         }
     }
 
@@ -223,8 +165,8 @@ class ImpactoMapaServiceTest {
         @Test
         @DisplayName("Deve retornar sem impacto se não houver mapa vigente")
         void semImpactoSeNaoHouverMapaVigente() {
-            mockSecurityContext(chefe);
-            subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+            // mockSecurityContext(chefe); // Removed unnecessary stubbing
+            // subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
             when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
 
@@ -243,8 +185,8 @@ class ImpactoMapaServiceTest {
         @Test
         @DisplayName("Deve detectar impactos quando há diferenças entre mapas")
         void comImpacto() {
-            mockSecurityContext(chefe);
-            subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+            // mockSecurityContext(chefe); // Removed unnecessary stubbing
+            // subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
             sgc.mapa.model.Mapa mapaVigente = new sgc.mapa.model.Mapa();
             mapaVigente.setCodigo(1L);
             sgc.mapa.model.Mapa mapaSubprocesso = new sgc.mapa.model.Mapa();

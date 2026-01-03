@@ -57,6 +57,7 @@ public class ImpactoMapaService {
     // Services refatorados
     private final DetectorAtividadesService detectorAtividades;
     private final AnalisadorCompetenciasService analisadorCompetencias;
+    private final MapaAcessoService mapaAcessoService;
 
     /**
      * Realiza a verificação de impactos no mapa de competências, comparando o mapa em revisão de um
@@ -83,7 +84,7 @@ public class ImpactoMapaService {
 
         Subprocesso subprocesso = subprocessoService.buscarSubprocesso(codSubprocesso);
 
-        verificarAcesso(usuario, subprocesso);
+        mapaAcessoService.verificarAcessoImpacto(usuario, subprocesso);
 
         Optional<Mapa> mapaVigenteOpt = mapaRepo.findMapaVigenteByUnidade(subprocesso.getUnidade().getCodigo());
 
@@ -132,43 +133,6 @@ public class ImpactoMapaService {
                 impactos.getTotalAtividadesAlteradas());
 
         return impactos;
-    }
-
-    // ========================================================================================
-    // Métodos de verificação de acesso
-    // ========================================================================================
-
-    private void verificarAcesso(Usuario usuario, Subprocesso subprocesso) {
-        final SituacaoSubprocesso situacao = subprocesso.getSituacao();
-
-        if (hasRole(usuario, "CHEFE")) {
-            validarSituacao(situacao, List.of(REVISAO_CADASTRO_EM_ANDAMENTO, NAO_INICIADO), MSG_ERRO_CHEFE);
-        } else if (hasRole(usuario, "GESTOR")) {
-            validarSituacao(situacao, List.of(REVISAO_CADASTRO_DISPONIBILIZADA), MSG_ERRO_GESTOR);
-        } else if (hasRole(usuario, "ADMIN")) {
-            validarSituacao(
-                    situacao,
-                    List.of(
-                            REVISAO_CADASTRO_DISPONIBILIZADA,
-                            REVISAO_CADASTRO_HOMOLOGADA,
-                            REVISAO_MAPA_AJUSTADO),
-                    MSG_ERRO_ADMIN);
-        }
-    }
-
-    private void validarSituacao(
-            SituacaoSubprocesso atual, List<SituacaoSubprocesso> esperadas, String mensagemErro) {
-        if (!esperadas.contains(atual)) throw new ErroAccessoNegado(mensagemErro);
-    }
-
-    private boolean hasRole(Usuario usuario, String role) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getPrincipal() != null && auth.getPrincipal().equals(usuario)) {
-            return auth.getAuthorities().stream()
-                    .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_%s".formatted(role)));
-        }
-        return usuario.getAuthorities().stream()
-                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_%s".formatted(role)));
     }
 
     /**
