@@ -62,7 +62,7 @@ class SubprocessoDetalheServiceTest {
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         Atividade ativ = new Atividade();
         ativ.setDescricao("Test");
-        when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of(ativ));
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(ativ));
 
         List<AtividadeVisualizacaoDto> result = service.listarAtividadesSubprocesso(1L);
         assertThat(result).hasSize(1);

@@ -51,12 +51,19 @@ public class SubprocessoDetalheService {
         if (subprocesso.getMapa() == null) {
             return List.of();
         }
-        List<Atividade> todasAtividades = atividadeService.buscarPorMapaCodigo(subprocesso.getMapa().getCodigo());
+        // ⚡ Bolt: Usando 'buscarPorMapaCodigoComConhecimentos' para evitar N+1 queries
+        // ao carregar conhecimentos para cada atividade
+        List<Atividade> todasAtividades = atividadeService.buscarPorMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
         return todasAtividades.stream().map(this::mapAtividadeToDto).toList();
     }
 
     private AtividadeVisualizacaoDto mapAtividadeToDto(Atividade atividade) {
-        List<Conhecimento> conhecimentos = atividadeService.listarConhecimentosPorAtividade(atividade.getCodigo());
+        // ⚡ Bolt: Usando a lista de conhecimentos já carregada na entidade
+        List<Conhecimento> conhecimentos = atividade.getConhecimentos();
+        if (conhecimentos == null) {
+            conhecimentos = emptyList();
+        }
+
         List<ConhecimentoVisualizacaoDto> conhecimentosDto = conhecimentos.stream()
                 .map(c -> ConhecimentoVisualizacaoDto.builder()
                         .codigo(c.getCodigo())
