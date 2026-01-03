@@ -3,6 +3,7 @@ package sgc.mapa.service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -77,7 +78,14 @@ class CopiaMapaServiceTest {
         verify(mapaRepo).save(any(Mapa.class));
         verify(atividadeRepo).save(any(Atividade.class));
         verify(conhecimentoRepo).saveAll(anyList());
-        verify(competenciaRepo).save(any(Competencia.class));
+
+        ArgumentCaptor<Competencia> captor = ArgumentCaptor.forClass(Competencia.class);
+        verify(competenciaRepo).save(captor.capture());
+
+        Competencia competenciaSalva = captor.getValue();
+        assertThat(competenciaSalva.getAtividades()).hasSize(1);
+        Atividade atividadeAssociada = competenciaSalva.getAtividades().iterator().next();
+        assertThat(atividadeAssociada.getCodigo()).isEqualTo(20L);
     }
 
     @Test
