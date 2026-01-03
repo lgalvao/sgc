@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -47,9 +48,7 @@ class MapaAcessoServiceTest {
                 .map(role -> (GrantedAuthority) () -> "ROLE_" + role)
                 .toList();
 
-        // Mock raw type issue workaround
-        Collection rawAuthorities = authorities;
-        when(authentication.getAuthorities()).thenReturn(rawAuthorities);
+        Mockito.doReturn(authorities).when(authentication).getAuthorities();
     }
 
     @Test
