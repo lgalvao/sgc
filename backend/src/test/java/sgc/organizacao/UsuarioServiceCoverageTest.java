@@ -191,6 +191,7 @@ class UsuarioServiceCoverageTest {
     @DisplayName("entrar: erro se unidade não encontrada")
     void entrar_ErroUnidadeNaoEncontrada() {
         // Simular autenticação recente
+        @SuppressWarnings("unchecked")
         Map<String, java.time.LocalDateTime> auths = (Map<String, java.time.LocalDateTime>) ReflectionTestUtils.getField(service, "autenticacoesRecentes");
         auths.put("user", java.time.LocalDateTime.now());
 
@@ -206,6 +207,7 @@ class UsuarioServiceCoverageTest {
     @DisplayName("entrar: erro se sem permissão")
     void entrar_ErroSemPermissao() {
         // Simular autenticação recente
+        @SuppressWarnings("unchecked")
         Map<String, java.time.LocalDateTime> auths = (Map<String, java.time.LocalDateTime>) ReflectionTestUtils.getField(service, "autenticacoesRecentes");
         auths.put("user", java.time.LocalDateTime.now());
 

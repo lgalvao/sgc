@@ -16,6 +16,10 @@ java {
     }
 }
 
+tasks.withType<JavaCompile> {
+    options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation"))
+}
+
 extra["mapstruct.version"] = "1.6.3"
 extra["lombok.version"] = "1.18.42"
 extra["jjwt.version"] = "0.13.0"

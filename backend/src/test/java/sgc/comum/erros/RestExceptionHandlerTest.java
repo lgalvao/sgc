@@ -58,7 +58,7 @@ class RestExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"campo\": \"valor\"}"))
                 .andDo(print())
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().is(422))
                 .andExpect(jsonPath("$.message").value("Erro validação negócio"));
     }
 
@@ -135,9 +135,10 @@ class RestExceptionHandlerTest {
     @Test
     @DisplayName("Deve tratar ConstraintViolationException (400)")
     void deveTratarConstraintViolationException() throws Exception {
-        ConstraintViolation<?> violation = Mockito.mock(ConstraintViolation.class);
+        @SuppressWarnings("unchecked")
+        ConstraintViolation<Object> violation = Mockito.mock(ConstraintViolation.class);
         Mockito.when(violation.getMessage()).thenReturn("Violação de constraint");
-        Mockito.when(violation.getRootBeanClass()).thenAnswer(i -> Object.class);
+        Mockito.doReturn(Object.class).when(violation).getRootBeanClass();
         Mockito.when(violation.getPropertyPath()).thenAnswer(i -> Mockito.mock(jakarta.validation.Path.class));
 
         Mockito.doThrow(new ConstraintViolationException("Erro constraint", Set.of(violation)))
