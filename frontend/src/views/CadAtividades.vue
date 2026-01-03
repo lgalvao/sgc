@@ -91,6 +91,7 @@
             v-model="novaAtividade"
             aria-label="Nova atividade"
             data-testid="inp-nova-atividade"
+            :disabled="loadingAdicionar"
             placeholder="Nova atividade"
             type="text"
         />
@@ -98,14 +99,21 @@
       <BCol cols="auto">
         <BButton
             aria-label="Adicionar atividade"
-            :disabled="!codSubprocesso || !permissoes?.podeEditarMapa"
+            :disabled="!codSubprocesso || !permissoes?.podeEditarMapa || loadingAdicionar"
             data-testid="btn-adicionar-atividade"
             size="sm"
             title="Adicionar atividade"
             type="submit"
             variant="outline-primary"
         >
+          <span
+              v-if="loadingAdicionar"
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+          />
           <i
+              v-else
               aria-hidden="true"
               class="bi bi-plus-lg"
           />
@@ -272,6 +280,7 @@ const historicoAnalises = computed(() => {
 });
 
 const novaAtividade = ref("");
+const loadingAdicionar = ref(false);
 
 // Modais
 const mostrarModalImpacto = ref(false);
@@ -289,15 +298,20 @@ const podeVerImpacto = computed(() => !!permissoes.value?.podeVisualizarImpacto)
 // CRUD Atividades (mantido local por enquanto)
 async function adicionarAtividade() {
   if (novaAtividade.value?.trim() && codMapa.value && codSubprocesso.value) {
-    const request: CriarAtividadeRequest = {
-      descricao: novaAtividade.value.trim(),
-    };
-    await atividadesStore.adicionarAtividade(
-        codSubprocesso.value,
-        codMapa.value,
-        request,
-    );
-    novaAtividade.value = "";
+    loadingAdicionar.value = true;
+    try {
+      const request: CriarAtividadeRequest = {
+        descricao: novaAtividade.value.trim(),
+      };
+      await atividadesStore.adicionarAtividade(
+          codSubprocesso.value,
+          codMapa.value,
+          request,
+      );
+      novaAtividade.value = "";
+    } finally {
+      loadingAdicionar.value = false;
+    }
   }
 }
 
