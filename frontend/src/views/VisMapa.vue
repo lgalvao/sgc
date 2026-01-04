@@ -85,9 +85,12 @@
       </div>
 
       <div class="mb-4 mt-3">
-        <div v-if="!mapa || mapa.competencias.length === 0">
-          Nenhuma competência cadastrada.
-        </div>
+        <EmptyState
+            v-if="!mapa || mapa.competencias.length === 0"
+            icon="bi-journal-x"
+            title="Nenhuma competência cadastrada"
+            description="Este mapa ainda não possui competências registradas."
+        />
         <BCard
             v-for="comp in mapa?.competencias"
             :key="comp.codigo"
@@ -327,6 +330,7 @@
 
 <script lang="ts" setup>
 import {BButton, BCard, BCardBody, BContainer, BFormTextarea, BModal,} from "bootstrap-vue-next";
+import EmptyState from "@/components/EmptyState.vue";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";

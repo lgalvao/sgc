@@ -122,17 +122,13 @@
     </BForm>
 
     <!-- Empty State -->
-    <div
+    <EmptyState
         v-if="atividades.length === 0"
-        class="text-center py-5 border rounded bg-light mb-4 text-muted"
+        icon="bi-list-check"
+        title="Nenhuma atividade cadastrada"
+        :description="`Comece adicionando uma atividade no campo acima${isChefe ? ' ou importe de outro processo' : ''}.`"
         data-testid="cad-atividades-empty-state"
     >
-      <i class="bi bi-list-check fs-1 d-block mb-3 text-secondary"/>
-      <p class="h5 fw-normal mb-2">Nenhuma atividade cadastrada</p>
-      <p class="small mb-3">
-        Comece adicionando uma atividade no campo acima{{ isChefe ? ' ou importe de outro processo' : '' }}.
-      </p>
-
       <BButton
           v-if="isChefe"
           variant="outline-primary"
@@ -142,7 +138,7 @@
       >
         <i class="bi bi-upload me-2"/> Importar atividades
       </BButton>
-    </div>
+    </EmptyState>
 
     <div
         v-for="(atividade, idx) in atividades"
@@ -210,6 +206,7 @@ import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
 import ConfirmacaoDisponibilizacaoModal from "@/components/ConfirmacaoDisponibilizacaoModal.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
+import EmptyState from "@/components/EmptyState.vue";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAnalisesStore} from "@/stores/analises";
 import {useAtividadesStore} from "@/stores/atividades";
