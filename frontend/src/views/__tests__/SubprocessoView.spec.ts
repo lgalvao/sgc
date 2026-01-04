@@ -6,13 +6,13 @@ import {useSubprocessosStore} from '@/stores/subprocessos';
 import {useMapasStore} from '@/stores/mapas';
 import {useFeedbackStore} from '@/stores/feedback';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
-import {setupComponentTest} from '@/test-utils/componentTestHelpers';
+import * as processoService from '@/services/processoService';
 
 // Mock child components
 const SubprocessoHeaderStub = {
   template: '<div data-testid="subprocesso-header"></div>',
   props: ['podeAlterarDataLimite', 'processoDescricao', 'situacao', 'unidadeAtual'],
-  emits: ['alterar-data-limite']
+  emits: ['alterar-data-limite', 'reabrir-cadastro', 'reabrir-revisao', 'enviar-lembrete']
 };
 const SubprocessoCardsStub = {
   template: '<div data-testid="subprocesso-cards"></div>',
@@ -28,9 +28,14 @@ const TabelaMovimentacoesStub = {
   props: ['movimentacoes']
 };
 
-describe('SubprocessoView.vue', () => {
-  const context = setupComponentTest();
+// Mock Services
+vi.mock('@/services/processoService', () => ({
+  reabrirCadastro: vi.fn(),
+  reabrirRevisaoCadastro: vi.fn(),
+  enviarLembrete: vi.fn(),
+}));
 
+describe('SubprocessoView.vue', () => {
   const mockSubprocesso = {
     codigo: 10,
     situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
@@ -73,7 +78,10 @@ describe('SubprocessoView.vue', () => {
       podeAceitarCadastro: false,
       podeVisualizarImpacto: false,
       podeVerPagina: true,
-      podeRealizarAutoavaliacao: false
+      podeRealizarAutoavaliacao: false,
+      podeReabrirCadastro: true,
+      podeReabrirRevisao: true,
+      podeEnviarLembrete: true
     },
     movimentacoes: [] as any[]
   };
@@ -84,6 +92,9 @@ describe('SubprocessoView.vue', () => {
       SubprocessoCards: SubprocessoCardsStub,
       SubprocessoModal: SubprocessoModalStub,
       TabelaMovimentacoes: TabelaMovimentacoesStub,
+      BModal: { template: '<div><slot /><slot name="footer" /></div>', props: ['modelValue', 'title'], emits: ['update:modelValue', 'ok'] },
+      BFormTextarea: { template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />', props: ['modelValue'], emits: ['update:modelValue'] },
+      BButton: { template: '<button :disabled="disabled"><slot /></button>', props: ['disabled'] }
   };
 
   beforeEach(() => {
@@ -91,10 +102,9 @@ describe('SubprocessoView.vue', () => {
   });
 
   // Helper to mount component with specific setup
-  const mountComponent = (overrideMockSubprocesso?: typeof mockSubprocesso) => {
-    const subprocessoToUse = overrideMockSubprocesso || mockSubprocesso;
+  const mountComponent = (overrideMockSubprocesso?: Partial<typeof mockSubprocesso>) => {
+    const subprocessoToUse = overrideMockSubprocesso ? { ...mockSubprocesso, ...overrideMockSubprocesso } : mockSubprocesso;
     
-    // Criar pinia ANTES do mount para configurar mocks
     const pinia = createTestingPinia({
       createSpy: vi.fn,
       initialState: {
@@ -112,19 +122,16 @@ describe('SubprocessoView.vue', () => {
     const mapaStore = useMapasStore(pinia);
     const feedbackStore = useFeedbackStore(pinia);
 
-    // Mock implementations ANTES do mount para que onMounted encontre os mocks
+    // Mock implementations
     (store.buscarSubprocessoPorProcessoEUnidade as any).mockImplementation(async () => 10);
-    
     (store.buscarSubprocessoDetalhe as any).mockImplementation(async () => {
-        store.subprocessoDetalhe = subprocessoToUse;
+        store.subprocessoDetalhe = subprocessoToUse as any;
         return subprocessoToUse;
     });
-
     (mapaStore.buscarMapaCompleto as any).mockResolvedValue({});
-
     (store.alterarDataLimiteSubprocesso as any).mockResolvedValue({});
 
-    context.wrapper = mount(SubprocessoView, {
+    const wrapper = mount(SubprocessoView, {
       global: {
         plugins: [pinia],
         stubs: {
@@ -139,7 +146,7 @@ describe('SubprocessoView.vue', () => {
       }
     });
 
-    return { store, mapaStore, feedbackStore };
+    return { wrapper, store, mapaStore, feedbackStore };
   };
 
   it('fetches data on mount', async () => {
@@ -152,61 +159,170 @@ describe('SubprocessoView.vue', () => {
   });
 
   it('renders components when data is available', async () => {
-    mountComponent();
+    const { wrapper } = mountComponent();
     await flushPromises();
-    await context.wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
 
-    expect(context.wrapper.findComponent(SubprocessoHeaderStub).exists()).toBe(true);
-    expect(context.wrapper.findComponent(SubprocessoCardsStub).exists()).toBe(true);
-    expect(context.wrapper.findComponent(TabelaMovimentacoesStub).exists()).toBe(true);
+    expect(wrapper.findComponent(SubprocessoHeaderStub).exists()).toBe(true);
+    expect(wrapper.findComponent(SubprocessoCardsStub).exists()).toBe(true);
+    expect(wrapper.findComponent(TabelaMovimentacoesStub).exists()).toBe(true);
   });
 
   it('opens date limit modal when allowed', async () => {
-    mountComponent();
+    const { wrapper } = mountComponent();
     await flushPromises();
-    await context.wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
 
-    const header = context.wrapper.findComponent(SubprocessoHeaderStub);
+    const header = wrapper.findComponent(SubprocessoHeaderStub);
     await header.vm.$emit('alterar-data-limite');
 
-    expect(context.wrapper.vm.mostrarModalAlterarDataLimite).toBe(true);
+    expect(wrapper.vm.mostrarModalAlterarDataLimite).toBe(true);
   });
 
   it('shows error when opening date limit modal is not allowed', async () => {
-    // Subprocesso com permissão de alterar data limite = false
     const subprocessoSemPermissao = {
-      ...mockSubprocesso,
       permissoes: { ...mockSubprocesso.permissoes, podeAlterarDataLimite: false }
     };
     
-    const { feedbackStore } = mountComponent(subprocessoSemPermissao as typeof mockSubprocesso);
+    const { wrapper, feedbackStore } = mountComponent(subprocessoSemPermissao);
     await flushPromises();
-    await context.wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
 
-    const header = context.wrapper.findComponent(SubprocessoHeaderStub);
+    const header = wrapper.findComponent(SubprocessoHeaderStub);
     await header.vm.$emit('alterar-data-limite');
 
-    expect(context.wrapper.vm.mostrarModalAlterarDataLimite).toBe(false);
+    expect(wrapper.vm.mostrarModalAlterarDataLimite).toBe(false);
     expect(feedbackStore.show).toHaveBeenCalledWith(expect.any(String), expect.stringContaining('não tem permissão'), 'danger');
   });
 
   it('handles date limit update confirmation', async () => {
-    const { store, feedbackStore } = mountComponent();
+    const { wrapper, store, feedbackStore } = mountComponent();
     await flushPromises();
-    await context.wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
 
     // Open modal
-    context.wrapper.vm.mostrarModalAlterarDataLimite = true;
-    await context.wrapper.vm.$nextTick();
+    wrapper.vm.mostrarModalAlterarDataLimite = true;
+    await wrapper.vm.$nextTick();
 
     // Confirm
-    const modal = context.wrapper.findComponent(SubprocessoModalStub);
+    const modal = wrapper.findComponent(SubprocessoModalStub);
     await modal.vm.$emit('confirmar-alteracao', '2024-01-01');
 
     await flushPromises();
 
     expect(store.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(1, { novaData: '2024-01-01' });
-    expect(context.wrapper.vm.mostrarModalAlterarDataLimite).toBe(false);
+    expect(wrapper.vm.mostrarModalAlterarDataLimite).toBe(false);
     expect(feedbackStore.show).toHaveBeenCalledWith(expect.any(String), expect.stringContaining('sucesso'), 'success');
+  });
+
+  it('trata erro ao alterar data limite', async () => {
+    const { wrapper, store, feedbackStore } = mountComponent();
+    await flushPromises();
+    (store.alterarDataLimiteSubprocesso as any).mockRejectedValue(new Error('Falha'));
+
+    wrapper.vm.mostrarModalAlterarDataLimite = true;
+    const modal = wrapper.findComponent(SubprocessoModalStub);
+    await modal.vm.$emit('confirmar-alteracao', '2024-01-01');
+    await flushPromises();
+
+    expect(feedbackStore.show).toHaveBeenCalledWith(expect.any(String), expect.stringContaining('Não foi possível alterar'), 'danger');
+  });
+
+  it('reabre cadastro com sucesso', async () => {
+    const { wrapper, feedbackStore, store } = mountComponent();
+    await flushPromises();
+
+    // Trigger Reabertura
+    const header = wrapper.findComponent(SubprocessoHeaderStub);
+    await header.vm.$emit('reabrir-cadastro');
+    expect(wrapper.vm.tipoReabertura).toBe('cadastro');
+    expect(wrapper.vm.mostrarModalReabrir).toBe(true);
+
+    // Preencher justificativa
+    const textarea = wrapper.find('textarea');
+    await textarea.setValue('Erro no preenchimento');
+
+    // Confirmar
+    const btn = wrapper.find('[data-testid="btn-confirmar-reabrir"]');
+    await btn.trigger('click');
+    await flushPromises();
+
+    expect(processoService.reabrirCadastro).toHaveBeenCalledWith(10, 'Erro no preenchimento');
+    expect(feedbackStore.show).toHaveBeenCalledWith('Cadastro reaberto', expect.any(String), 'success');
+    expect(store.buscarSubprocessoDetalhe).toHaveBeenCalledTimes(2); // Initial + Reload
+  });
+
+  it('reabre revisão com sucesso', async () => {
+    const { wrapper, feedbackStore } = mountComponent();
+    await flushPromises();
+
+    const header = wrapper.findComponent(SubprocessoHeaderStub);
+    await header.vm.$emit('reabrir-revisao');
+    expect(wrapper.vm.tipoReabertura).toBe('revisao');
+
+    const textarea = wrapper.find('textarea');
+    await textarea.setValue('Revisão incompleta');
+
+    const btn = wrapper.find('[data-testid="btn-confirmar-reabrir"]');
+    await btn.trigger('click');
+    await flushPromises();
+
+    expect(processoService.reabrirRevisaoCadastro).toHaveBeenCalledWith(10, 'Revisão incompleta');
+    expect(feedbackStore.show).toHaveBeenCalledWith('Revisão reaberta', expect.any(String), 'success');
+  });
+
+  it('impede reabertura se justificativa vazia (botão desabilitado)', async () => {
+    const { wrapper } = mountComponent();
+    await flushPromises();
+
+    const header = wrapper.findComponent(SubprocessoHeaderStub);
+    await header.vm.$emit('reabrir-cadastro');
+
+    // O botão deve estar desabilitado se a justificativa for vazia
+    const btn = wrapper.find('[data-testid="btn-confirmar-reabrir"]');
+    expect(btn.attributes('disabled')).toBeDefined();
+    expect(processoService.reabrirCadastro).not.toHaveBeenCalled();
+  });
+
+  it('trata erro na API ao reabrir', async () => {
+    const { wrapper, feedbackStore } = mountComponent();
+    await flushPromises();
+    vi.mocked(processoService.reabrirCadastro).mockRejectedValue(new Error('API Error'));
+
+    const header = wrapper.findComponent(SubprocessoHeaderStub);
+    await header.vm.$emit('reabrir-cadastro');
+
+    const textarea = wrapper.find('textarea');
+    await textarea.setValue('Justificativa');
+
+    const btn = wrapper.find('[data-testid="btn-confirmar-reabrir"]');
+    await btn.trigger('click');
+    await flushPromises();
+
+    expect(feedbackStore.show).toHaveBeenCalledWith('Erro', expect.stringContaining('Não foi possível reabrir'), 'danger');
+  });
+
+  it('envia lembrete com sucesso', async () => {
+    const { wrapper, feedbackStore } = mountComponent();
+    await flushPromises();
+
+    const header = wrapper.findComponent(SubprocessoHeaderStub);
+    await header.vm.$emit('enviar-lembrete');
+    await flushPromises();
+
+    expect(processoService.enviarLembrete).toHaveBeenCalledWith(1, 1);
+    expect(feedbackStore.show).toHaveBeenCalledWith('Lembrete enviado', expect.any(String), 'success');
+  });
+
+  it('trata erro ao enviar lembrete', async () => {
+    const { wrapper, feedbackStore } = mountComponent();
+    await flushPromises();
+    vi.mocked(processoService.enviarLembrete).mockRejectedValue(new Error('Erro'));
+
+    const header = wrapper.findComponent(SubprocessoHeaderStub);
+    await header.vm.$emit('enviar-lembrete');
+    await flushPromises();
+
+    expect(feedbackStore.show).toHaveBeenCalledWith('Erro', expect.stringContaining('Não foi possível enviar'), 'danger');
   });
 });
