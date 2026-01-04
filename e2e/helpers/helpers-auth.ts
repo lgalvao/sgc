@@ -17,6 +17,7 @@ export const USUARIOS = {
     CHEFE_ASSESSORIA_11: {titulo: '555555', senha: 'senha'}, // David Bowie (Assessoria 11)
     CHEFE_ASSESSORIA_12: {titulo: '151515', senha: 'senha'}, // Axl Rose (Assessoria 12)
     CHEFE_SECAO_121: {titulo: '171717', senha: 'senha'}, // Lemmy Kilmister (Seção 121)
+    CHEFE_SECAO_111: {titulo: '333333', senha: 'senha'}, // Chefe da Seção 111
     INVALIDO: {titulo: '999999999', senha: 'senhaerrada'}
 } as const;
 

@@ -2,6 +2,7 @@ import {expect, test} from './fixtures/base';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
+import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
 import {navegarParaMapa} from './helpers/helpers-mapas';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import * as path from 'path';
@@ -453,7 +454,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-logout').click();
             await login(page, USUARIOS.CHEFE_SECAO_121.titulo, USUARIOS.CHEFE_SECAO_121.senha);
 
-            await page.getByText(descricao).click();
+            await acessarSubprocessoChefeDireto(page, descricao, 'SECAO_121');
             await navegarParaAtividades(page);
 
             // Adicionar atividades
@@ -645,34 +646,37 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             const descricao = `Processo Bloco ${Date.now()}`;
+            // Criar com múltiplas unidades para que GESTOR veja tela de "Unidades participantes"
+            // COORD_11 tem SECAO_111, SECAO_112, SECAO_113 e é gerido por GESTOR_COORD
             await criarProcesso(page, {
                 descricao,
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
-                unidade: 'SECAO_221',
-                expandir: ['SECRETARIA_2', 'COORD_22'],
+                unidade: ['SECAO_111', 'SECAO_112'],  // Múltiplas unidades subordinadas ao GESTOR_COORD
+                expandir: ['SECRETARIA_1', 'COORD_11'],
                 iniciar: true
             });
 
-            // Capturar ID para cleanup
-            const processoId = Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
-            if (processoId > 0) cleanup.registrar(processoId);
-
-            // Login como Chefe para disponibilizar cadastro
+            // Login como Chefe da SECAO_111 para disponibilizar cadastro
             await page.getByTestId('btn-logout').click();
-            await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+            await login(page, USUARIOS.CHEFE_SECAO_111.titulo, USUARIOS.CHEFE_SECAO_111.senha);
 
             await page.getByText(descricao).click();
+            
+            // Capturar ID para cleanup (após navegar para o subprocesso)
+            const processoId = Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
+            if (processoId > 0) cleanup.registrar(processoId);
             await navegarParaAtividades(page);
             await adicionarAtividade(page, 'Atividade Bloco 1');
             await adicionarConhecimento(page, 'Atividade Bloco 1', 'Conhecimento 1');
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+            await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
             await page.waitForTimeout(500);
 
-            // Login como Gestor para ver botão de aceitar em bloco
+            // Login como Gestor da COORD_11 para ver botão de aceitar em bloco
             await page.getByTestId('btn-logout').click();
-            await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+            await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
 
             await page.getByText(descricao).click();
             await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();

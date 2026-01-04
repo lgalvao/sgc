@@ -1,1 +1,14 @@
 [BACKEND] WARN  sgc.seguranca.GerenciadorJwt.verificarSegurancaChave:34 - ⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão. Isso é aceitável APENAS para ambientes de desenvolvimento/teste (test, e2e, local).
+[FRONTEND]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m231[22m[2m[0m ms[22m
+[FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:29 - EXECUCAO LENTA: org.springframework.data.repository.CrudRepository.existsById levou 52 ms
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:29 - EXECUCAO LENTA: sgc.organizacao.UsuarioService.autenticar levou 53 ms
+[BACKEND] INFO  s.p.service.ProcessoService.criar:182 - Processo 1 criado.
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:29 - EXECUCAO LENTA: sgc.notificacao.NotificacaoModelosService.criarEmailDeProcessoIniciado levou 114 ms
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:263 - E-mail enviado para unidade SECAO_121
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:29 - EXECUCAO LENTA: sgc.processo.service.ProcessoService.iniciarProcessoMapeamento levou 138 ms
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_12 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para SECAO_121 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:181 - Subprocesso 1 atualizado e mapa disponibilizado.
