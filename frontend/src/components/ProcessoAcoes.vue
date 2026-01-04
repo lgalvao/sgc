@@ -41,7 +41,7 @@ import type {Perfil, SituacaoProcesso} from "@/types/tipos";
 
 defineProps<{
   mostrarBotoesBloco: boolean;
-  perfil: Perfil | string;
+  perfil: Perfil | string | null;
   situacaoProcesso: SituacaoProcesso | string;
 }>();
 

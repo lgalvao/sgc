@@ -4,16 +4,14 @@
       data-testid="cad-mapa__card-competencia"
       no-body
   >
-    <BCardBody class="position-relative">
-      <div
-          class="card-title fs-5 d-flex align-items-center competencia-edicao-row competencia-titulo-card"
-      >
+    <BCardHeader class="d-flex justify-content-between align-items-center">
+      <div class="card-title fs-5 mb-0">
         <strong
             class="competencia-descricao"
             data-testid="cad-mapa__txt-competencia-descricao"
         > {{ competencia.descricao }}</strong>
       </div>
-      <div class="botoes-acao-competencia position-absolute">
+      <div class="d-flex gap-1">
         <BButton
             v-b-tooltip.hover
             class="botao-acao"
@@ -28,7 +26,7 @@
         </BButton>
         <BButton
             v-b-tooltip.hover
-            class="botao-acao ms-1"
+            class="botao-acao"
             data-testid="btn-excluir-competencia"
             size="sm"
             title="Excluir"
@@ -39,7 +37,9 @@
           <i class="bi bi-trash" aria-hidden="true"/>
         </BButton>
       </div>
-      <div class="d-flex flex-wrap gap-2 mt-2">
+    </BCardHeader>
+    <BCardBody class="position-relative">
+      <div class="d-flex flex-wrap gap-2">
         <BCard
             v-for="atvCodigo in competencia.atividadesAssociadas"
             :key="atvCodigo"
@@ -78,7 +78,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BCardHeader} from "bootstrap-vue-next";
 import type {Atividade, Competencia} from "@/types/tipos";
 
 const props = defineProps<{
@@ -124,19 +124,10 @@ function getConhecimentosTooltip(atividadeCodigo: number): string {
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
 }
 
-.botoes-acao-competencia {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-  top: 0.5rem;
-  right: 0.5rem;
-  z-index: 10;
-}
-
-/* Show buttons when card is hovered */
-.competencia-card:hover .botoes-acao-competencia {
-  opacity: 1;
-  pointer-events: auto;
+.competencia-descricao {
+  word-break: break-word;
+  max-width: 100%;
+  display: inline-block;
 }
 
 .botao-acao {
@@ -149,48 +140,12 @@ function getConhecimentosTooltip(atividadeCodigo: number): string {
   font-size: 1.1rem;
   border-width: 2px;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
-  margin-left: 0;
-  margin-right: 0;
-  position: relative;
-  z-index: 2;
 }
 
 .botao-acao:focus,
 .botao-acao:hover {
   background: var(--bs-primary-bg-subtle);
   box-shadow: 0 0 0 2px var(--bs-primary);
-}
-
-.competencia-descricao {
-  word-break: break-word;
-  max-width: 100%;
-  display: inline-block;
-}
-
-.competencia-hover-row:hover .competencia-descricao {
-  font-weight: bold;
-}
-
-.competencia-edicao-row {
-  width: 100%;
-  justify-content: flex-start;
-}
-
-.competencia-titulo-card {
-  background: var(--bs-light);
-  border-bottom: 1px solid var(--bs-border-color);
-  padding: 0.5rem 0.75rem;
-  margin-left: -0.75rem;
-  margin-right: -0.75rem;
-  margin-top: -0.5rem;
-  border-top-left-radius: 0.375rem;
-  border-top-right-radius: 0.375rem;
-  /* Ajuste para preencher a largura total do card */
-  width: calc(100% + 1.5rem); /* 100% + 2 * 0.75rem (padding horizontal) */
-}
-
-.competencia-titulo-card .competencia-descricao {
-  font-size: 1.1rem;
 }
 
 .atividade-associada-card-item {
