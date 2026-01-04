@@ -2,15 +2,71 @@ import { setActivePinia, createPinia } from 'pinia';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useSubprocessosStore } from '../subprocessos';
 import { useProcessosStore } from '../processos';
-// import { useNotificacoesStore } from '../notificacoes'; // Module does not exist
+import { usePerfilStore } from '../perfil';
+import { useUnidadesStore } from '../unidades';
+import { useMapasStore } from '../mapas';
+import { useAtividadesStore } from '../atividades';
+import { useFeedbackStore } from '../feedback';
+import {
+    buscarContextoEdicao,
+    buscarSubprocessoDetalhe,
+    buscarSubprocessoPorProcessoEUnidade
+} from '@/services/subprocessoService';
+import {
+    disponibilizarCadastro,
+    disponibilizarRevisaoCadastro,
+    devolverCadastro,
+    aceitarCadastro,
+    homologarCadastro,
+    devolverRevisaoCadastro,
+    aceitarRevisaoCadastro,
+    homologarRevisaoCadastro
+} from '@/services/cadastroService';
 
-// Mock dependencies
-vi.mock('../processos');
-// Mock feedback store instead of notificacoes if that is what was intended
+// Mock Dependencies
+vi.mock('@/services/subprocessoService', () => ({
+    buscarContextoEdicao: vi.fn(),
+    buscarSubprocessoDetalhe: vi.fn(),
+    buscarSubprocessoPorProcessoEUnidade: vi.fn(),
+}));
+
+vi.mock('@/services/cadastroService', () => ({
+    disponibilizarCadastro: vi.fn(),
+    disponibilizarRevisaoCadastro: vi.fn(),
+    devolverCadastro: vi.fn(),
+    aceitarCadastro: vi.fn(),
+    homologarCadastro: vi.fn(),
+    devolverRevisaoCadastro: vi.fn(),
+    aceitarRevisaoCadastro: vi.fn(),
+    homologarRevisaoCadastro: vi.fn(),
+}));
+
+vi.mock('@/mappers/mapas', () => ({
+    mapMapaCompletoDtoToModel: vi.fn((data) => ({ ...data, mapped: true })),
+}));
+
+vi.mock('@/mappers/atividades', () => ({
+    mapAtividadeVisualizacaoToModel: vi.fn((data) => ({ ...data, mapped: true })),
+}));
+
+// Mock Stores
+vi.mock('../processos', () => ({
+    useProcessosStore: vi.fn(),
+}));
+vi.mock('../perfil', () => ({
+    usePerfilStore: vi.fn(),
+}));
+vi.mock('../unidades', () => ({
+    useUnidadesStore: vi.fn(),
+}));
+vi.mock('../mapas', () => ({
+    useMapasStore: vi.fn(),
+}));
+vi.mock('../atividades', () => ({
+    useAtividadesStore: vi.fn(),
+}));
 vi.mock('../feedback', () => ({
-    useFeedbackStore: vi.fn(() => ({
-        show: vi.fn()
-    }))
+    useFeedbackStore: vi.fn(),
 }));
 
 // Mock API Client
@@ -23,33 +79,190 @@ vi.mock('@/axios-setup', () => ({
 
 describe('Subprocessos Store', () => {
     let store: ReturnType<typeof useSubprocessosStore>;
-    let processosStore: any;
+
+    // Mocks dos stores retornados
+    const mockProcessosStore = {
+        buscarProcessoDetalhe: vi.fn(),
+        processoDetalhe: { codigo: 999 },
+    };
+    const mockPerfilStore = {
+        perfilSelecionado: null,
+        unidadeSelecionada: null,
+        perfisUnidades: [],
+    };
+    const mockUnidadesStore = {
+        unidade: null,
+    };
+    const mockMapasStore = {
+        mapaCompleto: null,
+    };
+    const mockAtividadesStore = {
+        setAtividadesParaSubprocesso: vi.fn(),
+    };
+    const mockFeedbackStore = {
+        show: vi.fn(),
+    };
 
     beforeEach(() => {
         setActivePinia(createPinia());
-        store = useSubprocessosStore();
 
-        // Setup mocks
-        processosStore = {
-            fetchProcessoDetalhe: vi.fn(),
-            buscarProcessoDetalhe: vi.fn(), // Add the method actually used
-            processoSelecionado: { codigo: 1 },
-            processoDetalhe: { codigo: 1 } // Add the property actually used
-        };
-        (useProcessosStore as any).mockReturnValue(processosStore);
+        // Reset mocks
+        vi.clearAllMocks();
+
+        // Configura retorno dos useStore mocks
+        (useProcessosStore as any).mockReturnValue(mockProcessosStore);
+        (usePerfilStore as any).mockReturnValue(mockPerfilStore);
+        (useUnidadesStore as any).mockReturnValue(mockUnidadesStore);
+        (useMapasStore as any).mockReturnValue(mockMapasStore);
+        (useAtividadesStore as any).mockReturnValue(mockAtividadesStore);
+        (useFeedbackStore as any).mockReturnValue(mockFeedbackStore);
+
+        store = useSubprocessosStore();
     });
 
-    it('alterarDataLimiteSubprocesso deve delegar para processosStore', async () => {
-        const id = 123;
-        const dados = { novaData: '2024-12-31', motivo: 'Teste' };
+    describe('buscarSubprocessoDetalhe', () => {
+        it('deve falhar se não houver perfil selecionado', async () => {
+            mockPerfilStore.perfilSelecionado = null;
 
-        // Mock apiClient.post inside the action
-        const { apiClient } = await import('@/axios-setup');
+            await store.buscarSubprocessoDetalhe(1);
 
-        await store.alterarDataLimiteSubprocesso(id, dados);
+            expect(store.lastError).toBeTruthy();
+            expect(store.lastError?.message).toBe("Informações de perfil ou unidade não disponíveis.");
+            expect(buscarSubprocessoDetalhe).not.toHaveBeenCalled();
+        });
 
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${id}/data-limite`, {
-             novaDataLimite: dados.novaData
+        it('deve buscar com sucesso para ADMIN (global)', async () => {
+            mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
+            (buscarSubprocessoDetalhe as any).mockResolvedValue({ codigo: 1, situacao: 'CRIADO' });
+
+            await store.buscarSubprocessoDetalhe(1);
+
+            expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(1, 'ADMIN', null);
+            expect(store.subprocessoDetalhe).toEqual({ codigo: 1, situacao: 'CRIADO' });
+            expect(store.lastError).toBeNull();
+        });
+
+        it('deve buscar com sucesso para SERVIDOR com unidade selecionada', async () => {
+            mockPerfilStore.perfilSelecionado = 'SERVIDOR' as any;
+            mockPerfilStore.unidadeSelecionada = 10;
+            mockPerfilStore.perfisUnidades = [{ perfil: 'SERVIDOR', unidade: { codigo: 10 } }] as any;
+
+            (buscarSubprocessoDetalhe as any).mockResolvedValue({ codigo: 1, situacao: 'CRIADO' });
+
+            await store.buscarSubprocessoDetalhe(1);
+
+            expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(1, 'SERVIDOR', 10);
+        });
+
+        it('deve lidar com erro do serviço', async () => {
+            mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
+            (buscarSubprocessoDetalhe as any).mockRejectedValue(new Error('Erro backend'));
+
+            await store.buscarSubprocessoDetalhe(1);
+
+            expect(store.subprocessoDetalhe).toBeNull();
+            expect(store.lastError).toBeTruthy();
+        });
+    });
+
+    describe('buscarSubprocessoPorProcessoEUnidade', () => {
+        it('deve retornar codigo em caso de sucesso', async () => {
+            (buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue({ codigo: 123 });
+
+            const result = await store.buscarSubprocessoPorProcessoEUnidade(1, 'SESEL');
+
+            expect(result).toBe(123);
+            expect(store.lastError).toBeNull();
+        });
+
+        it('deve retornar null em caso de erro', async () => {
+            (buscarSubprocessoPorProcessoEUnidade as any).mockRejectedValue(new Error('Não encontrado'));
+
+            const result = await store.buscarSubprocessoPorProcessoEUnidade(1, 'SESEL');
+
+            expect(result).toBeNull();
+            expect(store.lastError).toBeTruthy();
+        });
+    });
+
+    describe('buscarContextoEdicao', () => {
+        it('deve popular stores relacionados com dados retornados', async () => {
+            mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
+            const mockData = {
+                subprocesso: { codigo: 1 },
+                unidade: { codigo: 10, nome: 'Teste' },
+                mapa: { id: 5 },
+                atividadesDisponiveis: [{ id: 100 }]
+            };
+            (buscarContextoEdicao as any).mockResolvedValue(mockData);
+
+            await store.buscarContextoEdicao(1);
+
+            expect(store.subprocessoDetalhe).toEqual(mockData.subprocesso);
+            expect(mockUnidadesStore.unidade).toEqual(mockData.unidade);
+            // Verifica mapper
+            expect(mockMapasStore.mapaCompleto).toEqual({ id: 5, mapped: true });
+            expect(mockAtividadesStore.setAtividadesParaSubprocesso).toHaveBeenCalledWith(
+                1,
+                [{ id: 100, mapped: true }]
+            );
+        });
+    });
+
+    describe('Ações de Workflow', () => {
+        it('disponibilizarCadastro deve executar com sucesso e feedback', async () => {
+            (disponibilizarCadastro as any).mockResolvedValue({});
+
+            const result = await store.disponibilizarCadastro(1);
+
+            expect(result).toBe(true);
+            expect(disponibilizarCadastro).toHaveBeenCalledWith(1);
+            expect(mockFeedbackStore.show).toHaveBeenCalledWith(
+                "Cadastro de atividades disponibilizado", expect.anything(), 'success'
+            );
+            expect(mockProcessosStore.buscarProcessoDetalhe).toHaveBeenCalledWith(999);
+        });
+
+        it('disponibilizarCadastro deve lidar com erro', async () => {
+            (disponibilizarCadastro as any).mockRejectedValue(new Error('Falha'));
+
+            const result = await store.disponibilizarCadastro(1);
+
+            expect(result).toBe(false);
+            expect(store.lastError).toBeTruthy();
+            expect(mockFeedbackStore.show).not.toHaveBeenCalled(); // No error feedback via store, sets lastError
+        });
+
+        it('homologarCadastro deve recarregar detalhes após sucesso', async () => {
+            mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
+            (homologarCadastro as any).mockResolvedValue({});
+            (buscarSubprocessoDetalhe as any).mockResolvedValue({ codigo: 1, situacao: 'HOMOLOGADO' });
+
+            await store.homologarCadastro(1, { aprovado: true } as any);
+
+            expect(homologarCadastro).toHaveBeenCalledWith(1, { aprovado: true });
+            expect(buscarSubprocessoDetalhe).toHaveBeenCalled();
+        });
+    });
+
+    describe('alterarDataLimiteSubprocesso', () => {
+        it('deve delegar para apiClient e recarregar detalhes', async () => {
+            // Setup mock para buscarSubprocessoDetalhe ser chamado internamente
+            // Como é uma chamada interna para a mesma store, precisamos garantir que ela funcione ou seja mockada
+            // Neste caso, vamos deixar rodar, mas precisamos garantir que mockPerfilStore esteja ok para não falhar
+            mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
+            (buscarSubprocessoDetalhe as any).mockResolvedValue({});
+
+            const { apiClient } = await import('@/axios-setup');
+            const dados = { novaData: '2024-12-31' };
+
+            await store.alterarDataLimiteSubprocesso(123, dados);
+
+            expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/123/data-limite', {
+                 novaDataLimite: dados.novaData
+            });
+            // Verifica se recarregou
+            expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(123, 'ADMIN', null);
         });
     });
 });
