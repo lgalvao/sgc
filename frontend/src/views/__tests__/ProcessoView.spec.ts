@@ -284,7 +284,10 @@ describe("ProcessoView.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        perfilStore.$patch({ perfilSelecionado: Perfil.GESTOR });
+        perfilStore.$patch({
+            perfilSelecionado: Perfil.GESTOR,
+            perfis: [Perfil.GESTOR]
+        });
         processosStore.$patch({ processoDetalhe: mockProcesso });
 
         await nextTick();
