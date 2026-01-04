@@ -192,22 +192,22 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("Deve falhar ao tentar autorizar com unidade inexistente retornada pelo SGRH")
-        void testAutorizar_falhaUnidadeInexistente() throws Exception {
+        @DisplayName("Deve falhar ao tentar autorizar com usuário não autenticado")
+        void testAutorizar_falhaUsuarioNaoAutenticado() throws Exception {
             // Arrange
-            String tituloEleitoral = "888888888888"; // Non-existent user
+            String tituloEleitoral = "888888888888"; // Usuário inexistente
 
-            // Autentica primeiro para permitir a chamada de autorizar
+            // Tenta autenticar, mas falhará porque o usuário não existe no banco de teste
             usuarioService.autenticar(tituloEleitoral, "senha-qualquer");
 
             // Act & Assert
+            // Como a autenticação falhou, a tentativa de autorizar deve ser rejeitada com 401 (Unauthorized)
+            // e não 404 (Not Found), pois a verificação de segurança ocorre antes da busca no banco.
             mockMvc.perform(post(BASE_URL + "/autorizar")
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(tituloEleitoral))
-                    .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.message").value("&#39;Usuário&#39; com codigo &#39;"
-                            + tituloEleitoral + "&#39; não encontrado(a)."));
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test

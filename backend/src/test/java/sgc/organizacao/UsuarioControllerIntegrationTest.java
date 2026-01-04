@@ -54,8 +54,9 @@ class UsuarioControllerIntegrationTest {
     @Test
     @DisplayName("Deve autenticar")
     void autenticar_deveRetornarTrue() throws Exception {
+        // Usa um usuário existente no data.sql (Admin Teste)
         AutenticacaoReq request =
-                AutenticacaoReq.builder().tituloEleitoral("123456789101").senha("senha").build();
+                AutenticacaoReq.builder().tituloEleitoral("111111111111").senha("senha").build();
 
         mockMvc.perform(
                         post(API_URL + "/autenticar")

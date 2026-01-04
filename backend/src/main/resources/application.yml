@@ -14,8 +14,9 @@ spring:
         default_schema: sgc
         jdbc.fetch_size: 50
     show-sql: false
-    defer-datasource-initialization: true
+    defer-datasource-initialization: false
   sql.init.mode: always
+  sql.init.schema-locations: classpath:db/schema.sql
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}
