@@ -162,12 +162,12 @@ class RestExceptionHandlerTest {
 
     @Test
     @DisplayName("Deve tratar MethodArgumentNotValidException (400)")
-    void deveTratarMethodArgumentNotValidException() {
+    void deveTratarMethodArgumentNotValidException() throws Exception {
         BindingResult bindingResult = Mockito.mock(BindingResult.class);
         FieldError error = new FieldError("obj", "field", "defaultMessage");
         Mockito.when(bindingResult.getFieldErrors()).thenReturn(List.of(error));
         org.springframework.core.MethodParameter methodParameter = Mockito.mock(org.springframework.core.MethodParameter.class);
-        Mockito.when(methodParameter.getExecutable()).thenReturn(new Object() { public String toGenericString() { return ""; } }.getClass().getEnclosingMethod());
+        Mockito.when(methodParameter.getExecutable()).thenReturn(Object.class.getMethod("toString"));
         MethodArgumentNotValidException ex = new MethodArgumentNotValidException(methodParameter, bindingResult);
 
         ResponseEntity<Object> response = restExceptionHandler.handleMethodArgumentNotValid(ex, new HttpHeaders(), HttpStatus.BAD_REQUEST, null);

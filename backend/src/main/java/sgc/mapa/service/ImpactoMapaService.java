@@ -32,17 +32,6 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class ImpactoMapaService {
-    private static final String MSG_ERRO_CHEFE = """
-            O chefe da unidade só pode verificar os impactos com o subprocesso na situação\
-             'Revisão do cadastro em andamento'.""";
-    private static final String MSG_ERRO_GESTOR = """
-            O gestor só pode verificar os impactos com o subprocesso na situação 'Revisão do\
-             cadastro disponibilizada'.""";
-    private static final String MSG_ERRO_ADMIN = """
-            O administrador só pode verificar os impactos com o subprocesso na situação 'Revisão\
-             do cadastro disponibilizada', 'Revisão do cadastro homologada' ou 'Mapa\
-             Ajustado'.""";
-
     private final SubprocessoService subprocessoService;
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
