@@ -10,24 +10,23 @@ import {SituacaoSubprocesso, TipoProcesso,} from "@/types/tipos";
 import {createTestingPinia} from "@pinia/testing";
 
 // Mocks
-const { pushMock, mockRoute } = vi.hoisted(() => {
-    return {
-        pushMock: vi.fn(),
-        mockRoute: { query: {} as Record<string, string> }
-    };
-});
+const mocks = vi.hoisted(() => ({
+    push: vi.fn(),
+    mockRoute: { query: {} as Record<string, string> }
+}));
 
 vi.mock("vue-router", () => ({
     useRouter: () => ({
-        push: pushMock,
+        push: mocks.push,
+        back: vi.fn(),
     }),
-    useRoute: () => mockRoute,
+    useRoute: () => mocks.mockRoute,
     createRouter: vi.fn(() => ({
         beforeEach: vi.fn(),
         afterEach: vi.fn(),
-        push: pushMock,
+        push: mocks.push,
         resolve: vi.fn(),
-        currentRoute: { value: mockRoute }
+        currentRoute: { value: mocks.mockRoute }
     })),
     createWebHistory: vi.fn(),
     createMemoryHistory: vi.fn(),
@@ -112,12 +111,22 @@ function mountCadAtividades(options: any = {}) {
                 HistoricoAnaliseModal: HistoricoAnaliseModalStub,
                 AtividadeItem: AtividadeItemStub,
                 ImportarAtividadesModal: true,
+                ImpactoMapaModal: true,
                 ModalConfirmacao: {
                     name: "ModalConfirmacao", // Ensure name matches
                     template: '<div v-if="modelValue"><button @click="$emit(\'confirmar\')">Confirmar</button></div>',
                     props: ['modelValue'],
                     emits: ['confirmar', 'update:modelValue']
-                }
+                },
+                BContainer: { template: '<div><slot /></div>' },
+                BButton: { template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>', props: ['disabled'] },
+                // FIX: Use plain form with submit event to play nice with @submit.prevent in parent
+                BForm: { template: '<form @submit="$emit(\'submit\', $event)"><slot /></form>' },
+                BFormInput: { template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />', props: ['modelValue'], emits: ['update:modelValue'] },
+                BCol: { template: '<div><slot /></div>' },
+                BDropdown: { template: '<div><slot /></div>' },
+                BDropdownItem: { template: '<div><slot /></div>' },
+                BAlert: { template: '<div><slot /></div>' },
             },
         },
         props: {
@@ -141,7 +150,7 @@ describe("CadAtividades.vue", () => {
 
     const createWrapper = (isRevisao = false) => {
         // Mock route
-        mockRoute.query = {};
+        mocks.mockRoute.query = {};
 
         // Mock Services BEFORE mounting
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({ codigo: 123 } as any);
@@ -203,22 +212,14 @@ describe("CadAtividades.vue", () => {
 
     it("deve adicionar nova atividade", async () => {
         // Mock service for this action
-        // service method is criarAtividade
         vi.mocked(atividadeService.criarAtividade).mockResolvedValue({ subprocesso: {} } as any);
 
         const { wrapper } = createWrapper();
         await flushPromises();
 
-        // We need to set codSubprocesso in store implicitly by the fetch above.
-        // Component does: if (novaAtividade && codMapa && codSubprocesso)
-        // Check if codMapa is set.
-        // It comes from mapasStore.mapaCompleto.codigo
-        // In createWrapper we initialized initialState for maps but not set it in service mock?
-        // Service `buscarContextoEdicao` returns map: {codigo: 456}. Store sets it. So it should be fine.
-
         const input = wrapper.find('input[placeholder="Nova atividade"]');
         await input.setValue("Nova Atividade");
-        await wrapper.find('[data-testid="form-nova-atividade"]').trigger("submit");
+        await wrapper.find('form').trigger("submit");
         await flushPromises();
 
         expect(atividadeService.criarAtividade).toHaveBeenCalledWith(
@@ -238,10 +239,7 @@ describe("CadAtividades.vue", () => {
         await item.vm.$emit('remover-atividade');
         await flushPromises();
 
-        // Find by component definition from stubs
         const modal = wrapper.findComponent({ name: 'ModalConfirmacao' });
-        expect(modal.exists()).toBe(true);
-
         await modal.vm.$emit('confirmar');
         await flushPromises();
 
@@ -282,7 +280,7 @@ describe("CadAtividades.vue", () => {
         await flushPromises();
 
         expect(cadastroService.disponibilizarCadastro).toHaveBeenCalledWith(123);
-        expect(pushMock).toHaveBeenCalledWith("/painel");
+        expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
     it("deve permitir edição inline de atividade", async () => {
