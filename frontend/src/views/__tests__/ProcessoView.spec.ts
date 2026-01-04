@@ -10,20 +10,26 @@ import * as subprocessoService from "@/services/subprocessoService";
 import { useRouter } from "vue-router";
 import { nextTick } from "vue";
 
+// Define mocks first
+const mocks = vi.hoisted(() => ({
+    push: vi.fn(),
+}));
+
 // Mock router
 vi.mock("vue-router", () => ({
     useRoute: () => ({
         params: {
             codProcesso: "1",
         },
+        query: { codProcesso: "1" }
     }),
     useRouter: () => ({
-        push: vi.fn(),
+        push: mocks.push,
     }),
     createRouter: vi.fn(() => ({
         beforeEach: vi.fn(),
         afterEach: vi.fn(),
-        push: vi.fn(),
+        push: mocks.push,
     })),
     createWebHistory: vi.fn(),
     createMemoryHistory: vi.fn(),
@@ -143,7 +149,9 @@ describe("ProcessoView.vue", () => {
         (ModalAcaoBlocoStub.methods.fechar as any).mockClear();
         (ModalAcaoBlocoStub.methods.setErro as any).mockClear();
         (ModalAcaoBlocoStub.methods.setProcessando as any).mockClear();
-        router = useRouter();
+        // Reset router mock push spy
+        mocks.push.mockClear();
+        router = { push: mocks.push };
     });
 
     it("deve carregar e exibir os detalhes do processo ao montar", async () => {
@@ -292,7 +300,7 @@ describe("ProcessoView.vue", () => {
 
         await treeTable.vm.$emit("row-click", rowItem);
 
-        expect(router.push).toHaveBeenCalledWith({
+        expect(mocks.push).toHaveBeenCalledWith({
             name: "Subprocesso",
             params: {
                 codProcesso: "1",
@@ -338,7 +346,7 @@ describe("ProcessoView.vue", () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();
         feedbackStore = useFeedbackStore();
-        router = useRouter();
+        //router = useRouter(); // Removed because we use mocked router
 
         processosStore.$patch({ processoDetalhe: mockProcesso });
 
@@ -353,7 +361,7 @@ describe("ProcessoView.vue", () => {
 
         expect(processosStore.finalizarProcesso).toHaveBeenCalledWith(1);
         expect(feedbackStore.show).toHaveBeenCalledWith(expect.any(String), expect.any(String), "success");
-        expect(router.push).toHaveBeenCalledWith("/painel");
+        expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
     it("deve tratar erro na finalização do processo", async () => {
