@@ -12,7 +12,6 @@ import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.model.Mapa;
 import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Unidade;

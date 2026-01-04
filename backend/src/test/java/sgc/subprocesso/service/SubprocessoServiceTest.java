@@ -10,41 +10,24 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Conhecimento;
 import sgc.mapa.service.AtividadeService;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroValidacao;
-import sgc.fixture.MapaFixture;
-import sgc.fixture.SubprocessoFixture;
-import sgc.mapa.model.Competencia;
 import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaService;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.processo.model.Processo;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.model.Unidade;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
 import sgc.subprocesso.service.decomposed.*;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

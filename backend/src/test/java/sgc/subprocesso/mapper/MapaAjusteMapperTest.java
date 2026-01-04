@@ -14,7 +14,6 @@ import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 

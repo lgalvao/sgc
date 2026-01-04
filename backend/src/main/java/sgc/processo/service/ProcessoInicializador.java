@@ -136,9 +136,7 @@ public class ProcessoInicializador {
 
         switch (tipo) {
             case MAPEAMENTO -> {
-                for (Unidade unidade : unidadesParaProcessar) {
-                    subprocessoFactory.criarParaMapeamento(processo, unidade);
-                }
+                subprocessoFactory.criarParaMapeamento(processo, unidadesParaProcessar);
             }
             case REVISAO -> {
                 // Batch fetch units to avoid N+1 queries

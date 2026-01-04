@@ -1,7 +1,6 @@
 package sgc.organizacao;
 
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -136,6 +135,28 @@ public class UsuarioService {
         usuario.setAtribuicoes(new java.util.HashSet<>(atribuicoes));
     }
 
+    private void carregarAtribuicoesEmLote(List<Usuario> usuarios) {
+        if (usuarios.isEmpty()) return;
+        
+        List<String> titulos = usuarios.stream()
+            .map(Usuario::getTituloEleitoral)
+            .toList();
+        
+        List<UsuarioPerfil> todasAtribuicoes = usuarioPerfilRepo.findByUsuarioTituloIn(titulos);
+        
+        Map<String, Set<UsuarioPerfil>> atribuicoesPorUsuario = todasAtribuicoes.stream()
+            .collect(Collectors.groupingBy(
+                UsuarioPerfil::getUsuarioTitulo,
+                Collectors.toSet()
+            ));
+        
+        for (Usuario usuario : usuarios) {
+            Set<UsuarioPerfil> atribuicoes = atribuicoesPorUsuario
+                .getOrDefault(usuario.getTituloEleitoral(), new java.util.HashSet<>());
+            usuario.setAtribuicoes(atribuicoes);
+        }
+    }
+
     public Optional<UsuarioDto> buscarUsuarioPorEmail(String email) {
         return usuarioRepo.findByEmail(email).map(this::toUsuarioDto);
     }
@@ -185,13 +206,19 @@ public class UsuarioService {
     public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         List<Usuario> todosChefes = usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos);
 
-        // Precisamos recarregar as atribuições de cada chefe para evitar LazyInitializationException
-        // Isso não é o ideal em termos de performance (N+1), mas resolve o problema do TODO e LazyInit
-        // Uma solução melhor exigiria um query customizada mais complexa
-        List<Usuario> chefesCompletos = todosChefes.stream()
-            .map(u -> usuarioRepo.findByIdWithAtribuicoes(u.getTituloEleitoral()).orElse(u))
-            .peek(this::carregarAtribuicoes)
+        if (todosChefes.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        // Carrega todos os usuários com atribuições em uma única query (elimina N+1)
+        List<String> titulos = todosChefes.stream()
+            .map(Usuario::getTituloEleitoral)
             .toList();
+        
+        List<Usuario> chefesCompletos = usuarioRepo.findByIdInWithAtribuicoes(titulos);
+        
+        // Carrega perfis em lote
+        carregarAtribuicoesEmLote(chefesCompletos);
 
         Map<Long, List<Usuario>> chefesPorUnidade = chefesCompletos.stream()
                 .flatMap(u -> u.getTodasAtribuicoes().stream()
@@ -311,8 +338,16 @@ public class UsuarioService {
         boolean autenticado = false;
         if (acessoAdClient == null) {
             if (ambienteTestes) {
-                log.debug("Ambiente de testes: Simulando autenticação com sucesso.");
-                autenticado = true;
+                // Em ambiente de testes, verifica se o usuário existe no banco
+                // antes de simular autenticação com sucesso
+                boolean usuarioExiste = usuarioRepo.existsById(tituloEleitoral);
+                if (usuarioExiste) {
+                    log.debug("Ambiente de testes: Simulando autenticação com sucesso para usuário existente.");
+                    autenticado = true;
+                } else {
+                    log.debug("Ambiente de testes: Usuário {} não existe no banco, autenticação negada.", tituloEleitoral);
+                    autenticado = false;
+                }
             } else {
                 log.error("ERRO CRÍTICO DE SEGURANÇA: Tentativa de autenticação sem provedor configurado em ambiente produtivo. Usuário: {}", tituloEleitoral);
                 autenticado = false;

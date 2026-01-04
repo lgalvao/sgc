@@ -1,4 +1,4 @@
-package sgc.processo;
+package sgc.processo.service;
 
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.DisplayName;
@@ -32,7 +32,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;

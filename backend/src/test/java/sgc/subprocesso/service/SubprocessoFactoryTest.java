@@ -18,6 +18,7 @@ import sgc.organizacao.model.UnidadeMapa;
 import sgc.organizacao.model.UnidadeMapaRepo;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -48,14 +49,14 @@ class SubprocessoFactoryTest {
         unidade.setTipo(TipoUnidade.OPERACIONAL);
         unidade.setSigla("U1");
 
-        when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(i -> i.getArgument(0));
-        when(mapaRepo.save(any(Mapa.class))).thenAnswer(i -> i.getArgument(0));
+        when(subprocessoRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
+        when(mapaRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
 
-        factory.criarParaMapeamento(processo, unidade);
+        factory.criarParaMapeamento(processo, List.of(unidade));
 
-        verify(subprocessoRepo, times(1)).save(any(Subprocesso.class));
-        verify(mapaRepo).save(any(Mapa.class));
-        verify(movimentacaoRepo).save(any(Movimentacao.class));
+        verify(subprocessoRepo, times(1)).saveAll(anyList());
+        verify(mapaRepo).saveAll(anyList());
+        verify(movimentacaoRepo).saveAll(anyList());
     }
 
     @Test
@@ -65,7 +66,7 @@ class SubprocessoFactoryTest {
         Unidade unidade = new Unidade();
         unidade.setTipo(TipoUnidade.INTERMEDIARIA);
 
-        factory.criarParaMapeamento(processo, unidade);
+        factory.criarParaMapeamento(processo, List.of(unidade));
 
         verifyNoInteractions(subprocessoRepo);
     }

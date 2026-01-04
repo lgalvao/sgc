@@ -1,6 +1,7 @@
 package sgc.organizacao;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -233,6 +234,11 @@ public class UnidadeService {
         return unidadeRepo.findAllById(codigos);
     }
 
+    /**
+     * Busca todas as unidades com hierarquia.
+     * Resultado é cacheado pois a estrutura organizacional muda raramente.
+     */
+    @Cacheable(value = "arvoreUnidades", unless = "#result == null || #result.isEmpty()")
     public List<Unidade> buscarTodasEntidadesComHierarquia() {
         return unidadeRepo.findAllWithHierarquia();
     }

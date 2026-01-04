@@ -3,10 +3,6 @@ package sgc.subprocesso.service.decomposed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.service.AtividadeService;
-import sgc.mapa.model.Conhecimento;
-import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.model.Competencia;
 import sgc.mapa.service.MapaService;
 import sgc.mapa.model.Mapa;
 import sgc.subprocesso.dto.*;
@@ -14,10 +10,7 @@ import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.model.SituacaoSubprocesso;
 import java.util.List;
-import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor

@@ -9,8 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.dto.ImpactoMapaDto;
@@ -30,9 +28,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes para ImpactoMapaService")
@@ -108,17 +104,6 @@ class ImpactoMapaServiceTest {
                                 .perfil(p)
                                 .build());
         u.setAtribuicoes(attrs);
-    }
-
-    private void mockSecurityContext(Usuario usuario) {
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(usuario);
-        // Delegate getAuthorities to the real usuario object which calculates them from assignments
-        org.mockito.Mockito.doAnswer(invocation -> usuario.getAuthorities()).when(authentication).getAuthorities();
-
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
     }
 
     @Nested

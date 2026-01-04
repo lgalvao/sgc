@@ -11,18 +11,14 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.seguranca.AcessoAdClient;
 import sgc.seguranca.GerenciadorJwt;
 import sgc.seguranca.dto.EntrarReq;
-import sgc.seguranca.dto.PerfilUnidade;
-
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
@@ -157,12 +153,23 @@ class UsuarioServiceCoverageTest {
     }
 
     @Test
-    @DisplayName("autenticar: sucesso se sem AD e é teste")
+    @DisplayName("autenticar: sucesso se sem AD, é teste, e usuário existe")
     void autenticar_SucessoSemAdTeste() {
         ReflectionTestUtils.setField(service, "acessoAdClient", null);
         ReflectionTestUtils.setField(service, "ambienteTestes", true);
+        when(usuarioRepo.existsById("user")).thenReturn(true);
 
         assertThat(service.autenticar("user", "pass")).isTrue();
+    }
+
+    @Test
+    @DisplayName("autenticar: falha se sem AD, é teste, mas usuário não existe")
+    void autenticar_FalhaSemAdTesteUsuarioInexistente() {
+        ReflectionTestUtils.setField(service, "acessoAdClient", null);
+        ReflectionTestUtils.setField(service, "ambienteTestes", true);
+        when(usuarioRepo.existsById("user")).thenReturn(false);
+
+        assertThat(service.autenticar("user", "pass")).isFalse();
     }
 
     @Test

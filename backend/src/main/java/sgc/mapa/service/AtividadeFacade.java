@@ -14,8 +14,6 @@ import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 
-import java.util.List;
-
 // Refactored in Phase 2
 
 /**

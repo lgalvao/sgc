@@ -16,6 +16,8 @@ import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
 
+import java.util.List;
+
 import static sgc.subprocesso.model.SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
 
@@ -34,37 +36,53 @@ public class SubprocessoFactory {
     private final CopiaMapaService servicoDeCopiaDeMapa;
 
     /**
-     * Cria subprocesso para processo de mapeamento.
+     * Cria subprocessos para processo de mapeamento em lote.
      * Aplicável apenas a unidades OPERACIONAL ou INTEROPERACIONAL.
      */
-    public void criarParaMapeamento(Processo processo, Unidade unidade) {
-        if (TipoUnidade.OPERACIONAL != unidade.getTipo() && TipoUnidade.INTEROPERACIONAL != unidade.getTipo()) {
-            return; // Ignora unidades não elegíveis
+    public void criarParaMapeamento(Processo processo, java.util.Collection<Unidade> unidades) {
+        List<Unidade> unidadesElegiveis = unidades.stream()
+                .filter(u -> TipoUnidade.OPERACIONAL == u.getTipo() || TipoUnidade.INTEROPERACIONAL == u.getTipo())
+                .toList();
+        
+        if (unidadesElegiveis.isEmpty()) {
+            return;
+        }
+
+        // 1. Criar todos os subprocessos SEM mapa
+        List<Subprocesso> subprocessos = unidadesElegiveis.stream()
+                .map(unidade -> Subprocesso.builder()
+                        .processo(processo)
+                        .unidade(unidade)
+                        .mapa(null)
+                        .situacao(NAO_INICIADO)
+                        .dataLimiteEtapa1(processo.getDataLimite())
+                        .build())
+                .toList();
+        List<Subprocesso> subprocessosSalvos = subprocessoRepo.saveAll(subprocessos);
+        
+        // 2. Criar todos os mapas COM referência aos subprocessos
+        List<Mapa> mapas = subprocessosSalvos.stream()
+                .map(sp -> {
+                    Mapa mapa = new Mapa();
+                    mapa.setSubprocesso(sp);
+                    return mapa;
+                })
+                .toList();
+        List<Mapa> mapasSalvos = mapaRepo.saveAll(mapas);
+        
+        // 3. Atualizar subprocessos com os mapas (em memória)
+        for (int i = 0; i < subprocessosSalvos.size(); i++) {
+            subprocessosSalvos.get(i).setMapa(mapasSalvos.get(i));
         }
         
-        // 1. Criar subprocesso SEM mapa primeiro
-        Subprocesso subprocesso = Subprocesso.builder()
-                .processo(processo)
-                .unidade(unidade)
-                .mapa(null)
-                .situacao(NAO_INICIADO)
-                .dataLimiteEtapa1(processo.getDataLimite())
-                .build();
-        Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
+        // 4. Criar todas as movimentações em lote
+        List<Movimentacao> movimentacoes = new java.util.ArrayList<>();
+        for (Subprocesso sp : subprocessosSalvos) {
+            movimentacoes.add(new Movimentacao(sp, null, sp.getUnidade(), "Processo iniciado", null));
+        }
+        movimentacaoRepo.saveAll(movimentacoes);
         
-        // 2. Criar mapa COM referência ao subprocesso
-        Mapa mapa = new Mapa();
-        mapa.setSubprocesso(subprocessoSalvo);
-        Mapa mapaSalvo = mapaRepo.save(mapa);
-        
-        // 3. Atualizar subprocesso com o mapa (apenas em memória, save é redundante se for mappedBy)
-        subprocessoSalvo.setMapa(mapaSalvo);
-        
-        // 4. Criar movimentação
-        movimentacaoRepo.save(
-                new Movimentacao(subprocessoSalvo, null, unidade, "Processo iniciado", null));
-        
-        log.debug("Subprocesso for mapping created for unit {}", unidade.getSigla());
+        log.debug("Subprocessos para mapeamento criados em lote: {} unidades", unidadesElegiveis.size());
     }
 
     /**

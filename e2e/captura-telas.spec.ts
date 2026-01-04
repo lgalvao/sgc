@@ -749,6 +749,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 iniciar: true
             });
 
+            // Navegar para a página de detalhes do processo (estamos em /painel após criar)
+            await page.getByText(descricao).click();
+            await expect(page).toHaveURL(/\/processo\/\d+/);
+
             // Registrar para cleanup
             const processoId = Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
             if (processoId > 0) cleanup.registrar(processoId);
@@ -776,13 +780,11 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 await page.getByRole('button', {name: /Cancelar/i}).click();
             }
 
-            // Modal de enviar lembrete (CDU-34)
+            // CDU-34: Botão de enviar lembrete (ação direta, sem modal)
             const btnEnviarLembrete = page.getByRole('button', {name: /Enviar.*lembrete/i});
             if (await btnEnviarLembrete.isVisible().catch(() => false)) {
-                await btnEnviarLembrete.click();
-                await page.waitForTimeout(300);
-                await capturarTela(page, '10-gestao-subprocessos', '04-modal-enviar-lembrete');
-                await page.getByRole('button', {name: /Cancelar/i}).click();
+                // Apenas capturar o botão visível, não clicar pois executa ação direta
+                await capturarTela(page, '10-gestao-subprocessos', '04-botao-enviar-lembrete');
             }
         });
     });

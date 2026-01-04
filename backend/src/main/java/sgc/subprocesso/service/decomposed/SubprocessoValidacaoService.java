@@ -12,7 +12,6 @@ import sgc.mapa.model.Mapa;
 import sgc.subprocesso.dto.ErroValidacaoDto;
 import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroValidacao;
@@ -29,7 +28,6 @@ import static java.util.Collections.emptyList;
 @Slf4j
 @Transactional(readOnly = true)
 public class SubprocessoValidacaoService {
-    private final SubprocessoRepo repositorioSubprocesso;
     private final AtividadeService atividadeService;
     private final CompetenciaService competenciaService;
     private final UsuarioService usuarioService;

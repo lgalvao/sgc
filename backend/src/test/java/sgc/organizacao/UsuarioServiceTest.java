@@ -9,7 +9,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.seguranca.dto.PerfilUnidade;
 import sgc.comum.erros.ErroAutenticacao;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.Perfil;
@@ -300,14 +299,13 @@ class UsuarioServiceTest {
         }
 
         @Test
-        @DisplayName("Deve lançar exceção ao autorizar usuário não encontrado")
-        void deveLancarExcecaoAoAutorizarUsuarioNaoEncontrado() {
-            // Arrange
-            usuarioService.autenticar("TITULO_INEXISTENTE_XYZ", "senha");
+        @DisplayName("Deve retornar false ao autenticar usuário não encontrado")
+        void deveRetornarFalseAoAutenticarUsuarioInexistente() {
+            // Act - usuário inexistente não passa na autenticação em ambiente de testes
+            boolean resultado = usuarioService.autenticar("TITULO_INEXISTENTE_XYZ", "senha");
 
-            // Act & Assert
-            assertThrows(ErroEntidadeNaoEncontrada.class,
-                    () -> usuarioService.autorizar("TITULO_INEXISTENTE_XYZ"));
+            // Assert
+            assertFalse(resultado);
         }
 
         @Test

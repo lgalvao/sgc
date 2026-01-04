@@ -183,8 +183,9 @@ function formatarDadosParaArvore(dados: UnidadeParticipante[]): TreeTableItem[] 
 
 function abrirDetalhesUnidade(item: any) {
   if (item && item.clickable) {
-    const perfilUsuario = perfilStore.perfilSelecionado;
-    if (perfilUsuario === "ADMIN" || perfilUsuario === "GESTOR") {
+    // Usar isAdmin/isGestor que verificam a lista de perfis, não perfilSelecionado
+    // pois perfilSelecionado pode ser null mesmo quando o usuário tem o perfil
+    if (perfilStore.isAdmin || perfilStore.isGestor) {
       router.push({
         name: "Subprocesso",
         params: {
@@ -192,17 +193,21 @@ function abrirDetalhesUnidade(item: any) {
           siglaUnidade: String(item.unidadeAtual),
         },
       });
-    } else if (
-        (perfilUsuario === "CHEFE" || perfilUsuario === "SERVIDOR") &&
-        perfilStore.unidadeSelecionada === item.codigo
-    ) {
-      router.push({
-        name: "Subprocesso",
-        params: {
-          codProcesso: String(codProcesso.value),
-          siglaUnidade: String(item.unidadeAtual),
-        },
-      });
+    } else {
+      // Para CHEFE/SERVIDOR, só navega para sua própria unidade
+      const perfilUsuario = perfilStore.perfilSelecionado;
+      if (
+          (perfilUsuario === "CHEFE" || perfilUsuario === "SERVIDOR") &&
+          perfilStore.unidadeSelecionada === item.codigo
+      ) {
+        router.push({
+          name: "Subprocesso",
+          params: {
+            codProcesso: String(codProcesso.value),
+            siglaUnidade: String(item.unidadeAtual),
+          },
+        });
+      }
     }
   }
 }
