@@ -1,22 +1,24 @@
 <template>
-  <BTable
-      :fields="fields"
-      :items="alertas"
-      :tbody-tr-attr="rowAttr"
-      :tbody-tr-class="rowClass"
-      data-testid="tbl-alertas"
-      hover
-      responsive
-      show-empty
-      :striped="alertas.length > 0"
-      @sort-changed="handleSortChange"
-  >
-    <template #empty>
-      <div class="text-center text-muted">
-        Nenhum alerta encontrado.
-      </div>
-    </template>
-  </BTable>
+  <div class="table-responsive">
+    <BTable
+        :fields="fields"
+        :items="alertas"
+        :tbody-tr-attr="rowAttr"
+        :tbody-tr-class="rowClass"
+        data-testid="tbl-alertas"
+        hover
+        responsive
+        show-empty
+        :striped="alertas.length > 0"
+        @sort-changed="handleSortChange"
+    >
+      <template #empty>
+        <div class="text-center text-muted">
+          Nenhum alerta encontrado.
+        </div>
+      </template>
+    </BTable>
+  </div>
 </template>
 
 <script lang="ts" setup>

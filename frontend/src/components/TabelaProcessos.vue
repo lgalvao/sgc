@@ -90,7 +90,7 @@ const rowAttr = (item: ProcessoResumo | null, type: string) => {
 </script>
 
 <template>
-  <div>
+  <div class="table-responsive">
     <BTable
         :fields="fields"
         :items="processos"

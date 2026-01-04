@@ -9,17 +9,17 @@ export interface AdministradorDto {
 }
 
 export async function listarAdministradores(): Promise<AdministradorDto[]> {
-    const response = await apiClient.get<AdministradorDto[]>("/administradores");
+    const response = await apiClient.get<AdministradorDto[]>("/usuarios/administradores");
     return response.data;
 }
 
 export async function adicionarAdministrador(usuarioTitulo: string): Promise<AdministradorDto> {
-    const response = await apiClient.post<AdministradorDto>("/administradores", {
+    const response = await apiClient.post<AdministradorDto>("/usuarios/administradores", {
         usuarioTitulo
     });
     return response.data;
 }
 
 export async function removerAdministrador(usuarioTitulo: string): Promise<void> {
-    await apiClient.post(`/administradores/${usuarioTitulo}/remover`);
+    await apiClient.post(`/usuarios/administradores/${usuarioTitulo}/remover`);
 }
