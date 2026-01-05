@@ -87,8 +87,6 @@ public class MapaService {
 
     @Transactional(readOnly = true)
     public MapaCompletoDto obterMapaCompleto(Long codMapa, Long codSubprocesso) {
-        log.debug("Obtendo mapa completo: codigo={}, codSubprocesso={}", codMapa, codSubprocesso);
-
         Mapa mapa =
                 mapaRepo.findById(codMapa)
                         .orElseThrow(
@@ -140,7 +138,6 @@ public class MapaService {
             }
             competenciaRepo.deleteAll(paraRemover);
             competenciasAtuais.removeAll(paraRemover);
-            log.debug("Removidas {} competências.", paraRemover.size());
         }
 
         // 3. Process Upserts (Insert/Update Competencies)
@@ -153,7 +150,6 @@ public class MapaService {
             Competencia competencia;
             if (compDto.getCodigo() == null) {
                 competencia = new Competencia(compDto.getDescricao(), mapa);
-                log.debug("Criando nova competência: {}", compDto.getDescricao());
             } else {
                 competencia = mapaCompetenciasExistentes.get(compDto.getCodigo());
                 if (competencia == null) {

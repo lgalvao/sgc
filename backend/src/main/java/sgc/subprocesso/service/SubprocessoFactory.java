@@ -81,8 +81,6 @@ public class SubprocessoFactory {
             movimentacoes.add(new Movimentacao(sp, null, sp.getUnidade(), "Processo iniciado", null));
         }
         movimentacaoRepo.saveAll(movimentacoes);
-        
-        log.debug("Subprocessos para mapeamento criados em lote: {} unidades", unidadesElegiveis.size());
     }
 
     /**
@@ -90,15 +88,12 @@ public class SubprocessoFactory {
      * Copia o mapa vigente da unidade.
      */
     public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa) {
-        log.debug("Criando subprocesso de revisão para unidade: {}", unidade.getCodigo());
-        
         if (unidadeMapa == null) {
             log.error("ERRO CRITICO: Unidade {} nao possui mapa vigente.", unidade.getCodigo());
             throw new ErroProcesso("Unidade %s não possui mapa vigente.".formatted(unidade.getSigla()));
         }
 
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
-        log.debug("Mapa vigente da unidade {}: codigo={}", unidade.getSigla(), codMapaVigente);
         
         // 1. Criar subprocesso SEM mapa primeiro
         Subprocesso subprocesso = Subprocesso.builder()
@@ -109,10 +104,8 @@ public class SubprocessoFactory {
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build();
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
-        log.debug("Subprocesso criado");
         
         // 2. Copiar mapa COM referência ao subprocesso
-        log.debug("Iniciando copia do mapa vigente {} para unidade {}", codMapaVigente, unidade.getSigla());
         Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
         
         if (mapaCopiado == null) {
@@ -120,16 +113,11 @@ public class SubprocessoFactory {
             throw new ErroProcesso("Falha ao copiar mapa para unidade " + unidade.getSigla());
         }
         
-        log.debug("Mapa copiado: codigo={}", mapaCopiado.getCodigo());
         mapaCopiado.setSubprocesso(subprocessoSalvo);
         Mapa mapaSalvo = mapaRepo.save(mapaCopiado);
-        log.debug("Mapa salvo com associacao ao subprocesso");
         
         // 3. Atualizar subprocesso local com o mapa
         subprocessoSalvo.setMapa(mapaSalvo);
-        
-        log.debug("Subprocesso associado ao mapa (local): mapaId={} unidade={}",
-                mapaSalvo != null ? mapaSalvo.getCodigo() : "null", unidade.getSigla());
 
         // 4. Criar movimentação
         movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo de revisão iniciado", null));

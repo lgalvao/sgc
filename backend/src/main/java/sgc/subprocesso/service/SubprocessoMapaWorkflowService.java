@@ -47,8 +47,6 @@ public class SubprocessoMapaWorkflowService {
     private final SubprocessoService subprocessoService;
 
     public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request, String tituloUsuario) {
-        log.debug("Salvando mapa do subprocesso: codSubprocesso={}, usuario={}", codSubprocesso, tituloUsuario);
-
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         Long codMapa = subprocesso.getMapa().getCodigo();
         boolean eraVazio = competenciaService.buscarPorMapa(codMapa).isEmpty();
@@ -139,8 +137,6 @@ public class SubprocessoMapaWorkflowService {
 
     @Transactional
     public void disponibilizarMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
-        log.debug("Disponibilizando mapa do subprocesso: codSubprocesso={}", codSubprocesso);
-
         Subprocesso sp = getSubprocessoParaEdicao(codSubprocesso);
         validarMapaParaDisponibilizacao(sp);
         
@@ -177,8 +173,6 @@ public class SubprocessoMapaWorkflowService {
                 sp.getUnidade(),
                 usuario,
                 request.getObservacoes());
-
-        log.info("Subprocesso {} atualizado e mapa disponibilizado.", codSubprocesso);
     }
 
     private void validarMapaParaDisponibilizacao(Subprocesso subprocesso) {

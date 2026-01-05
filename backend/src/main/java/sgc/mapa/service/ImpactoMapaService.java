@@ -63,8 +63,6 @@ public class ImpactoMapaService {
      */
     @Transactional(readOnly = true)
     public ImpactoMapaDto verificarImpactos(Long codSubprocesso, Usuario usuario) {
-        log.debug("Verificando impactos no mapa: subprocesso={}", codSubprocesso);
-
         Subprocesso subprocesso = subprocessoService.buscarSubprocesso(codSubprocesso);
 
         mapaAcessoService.verificarAcessoImpacto(usuario, subprocesso);
@@ -122,7 +120,6 @@ public class ImpactoMapaService {
      * Obtém todas as atividades associadas a um mapa, com seus conhecimentos.
      */
     private List<Atividade> obterAtividadesDoMapa(Mapa mapa) {
-        log.debug("Buscando atividades e conhecimentos para o mapa {}", mapa.getCodigo());
         return atividadeService.buscarPorMapaCodigoComConhecimentos(mapa.getCodigo());
     }
 }

@@ -39,7 +39,6 @@ public class SubprocessoEmailService {
         TipoTransicao tipo = evento.getTipo();
         
         if (!tipo.enviaEmail()) {
-            log.debug("Transição {} não envia e-mail", tipo);
             return;
         }
 
@@ -138,7 +137,6 @@ public class SubprocessoEmailService {
         while (superior != null) {
             try {
                 notificacaoEmailService.enviarEmail(superior.getSigla(), assunto, corpo);
-                log.debug("E-mail enviado para unidade superior: {}", superior.getSigla());
             } catch (Exception e) {
                 log.warn("Falha ao enviar e-mail para {}: {}", superior.getSigla(), e.getMessage());
             }

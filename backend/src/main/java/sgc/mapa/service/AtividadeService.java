@@ -128,7 +128,6 @@ public class AtividadeService {
      * @throws ErroEntidadeNaoEncontrada se a atividade não for encontrada.
      */
     public void atualizar(Long codigo, AtividadeDto atividadeDto) {
-        log.debug("Atualizando atividade com código: {}", codigo);
         try {
             atividadeRepo
                     .findById(codigo)
@@ -141,9 +140,6 @@ public class AtividadeService {
     }
 
     private AtividadeDto atualizarAtividadeExistente(Long codigo, AtividadeDto atividadeDto, Atividade existente) {
-        log.debug("Atividade encontrada: {}, mapa: {}", existente.getCodigo(),
-                existente.getMapa() != null ? existente.getMapa().getCodigo() : "null");
-
         if (existente.getMapa() != null) {
             atualizarSituacaoSubprocessoSeNecessario(existente.getMapa().getCodigo());
         }

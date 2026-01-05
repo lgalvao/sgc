@@ -84,7 +84,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             @Nullable WebRequest request) {
 
         log.info("Erro de validação de argumento");
-        log.debug(">> Detalhes do erro: {}", ex != null ? ex.getMessage() : null);
 
         String message = "A requisição contém dados de entrada inválidos.";
         var subErrors = ex != null

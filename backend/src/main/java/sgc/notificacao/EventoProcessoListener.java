@@ -60,7 +60,6 @@ public class EventoProcessoListener {
     @Transactional
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public void aoIniciarProcesso(EventoProcessoIniciado evento) {
-        log.debug("Processando evento de processo iniciado: codProcesso={}, tipo={}", evento.getCodProcesso(), evento.getTipo());
         try {
             processarInicioProcesso(evento);
         } catch (RuntimeException e) {
@@ -77,7 +76,6 @@ public class EventoProcessoListener {
     @EventListener
     @Transactional
     public void aoFinalizarProcesso(EventoProcessoFinalizado evento) {
-        log.debug("Processando evento de processo finalizado: {}", evento.getCodProcesso());
         try {
             processarFinalizacaoProcesso(evento);
         } catch (RuntimeException e) {
@@ -96,17 +94,11 @@ public class EventoProcessoListener {
             return;
         }
 
-        log.debug(
-                "Encontrados {} subprocessos para o processo {}",
-                subprocessos.size(),
-                evento.getCodProcesso());
-
         // 1. Criar alertas diferenciados por tipo de unidade
         List<Unidade> unidadesParticipantes = subprocessos.stream()
                 .map(Subprocesso::getUnidade)
                 .toList();
-        List<Alerta> alertas = servicoAlertas.criarAlertasProcessoIniciado(processo, unidadesParticipantes);
-        log.debug("Criados {} alertas para o processo {}", alertas.size(), processo.getCodigo());
+        servicoAlertas.criarAlertasProcessoIniciado(processo, unidadesParticipantes);
 
         // 2. Pré-carregar responsáveis e usuários para evitar N+1
         List<Long> todosCodigosUnidades = subprocessos.stream()
@@ -131,7 +123,6 @@ public class EventoProcessoListener {
                 log.error("Erro ao enviar e-mail para o subprocesso {}: {}", subprocesso.getCodigo(), e.getClass().getSimpleName(), e);
             }
         }
-        log.debug("Processamento de evento concluído para o processo {}", processo.getCodigo());
     }
 
     private void processarFinalizacaoProcesso(EventoProcessoFinalizado evento) {

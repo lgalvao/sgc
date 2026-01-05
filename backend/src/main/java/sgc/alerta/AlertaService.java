@@ -47,8 +47,6 @@ public class AlertaService {
             Unidade unidadeDestino,
             String descricao) {
 
-        log.debug("Criando alerta tipo={} para unidade {}.", tipoAlerta, unidadeDestino.getCodigo());
-
         Alerta alerta = new Alerta()
                 .setProcesso(processo)
                 .setDataHora(LocalDateTime.now())
@@ -75,9 +73,6 @@ public class AlertaService {
             String descricao,
             Unidade unidadeOrigem,
             Unidade unidadeDestino) {
-
-        log.debug("Criando alerta de transição: descricao='{}', destino={}",
-                descricao, unidadeDestino != null ? unidadeDestino.getSigla() : "null");
 
         if (unidadeDestino == null) {
             log.warn("Unidade destino é nula, alerta não será criado");
@@ -136,7 +131,6 @@ public class AlertaService {
             alertasCriados.add(criarAlerta(processo, PROCESSO_INICIADO_INTERMEDIARIA, u, "Início do processo em unidade(s) subordinada(s)"));
         }
 
-        log.debug("Criados {} alertas para o processo {}", alertasCriados.size(), processo.getCodigo());
         return alertasCriados;
     }
 

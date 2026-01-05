@@ -21,11 +21,9 @@ public class NotificacaoEmailServiceMock extends NotificacaoEmailService {
 
     @Override
     public void enviarEmail(String para, String assunto, String corpo) {
-        log.debug("[MOCK] E-mail NÃO enviado - Para: {}, Assunto: {}", para, assunto);
     }
 
     @Override
     public void enviarEmailHtml(String para, String assunto, String corpoHtml) {
-        log.debug("[MOCK] E-mail HTML NÃO enviado - Para: {}, Assunto: {}", para, assunto);
     }
 }
