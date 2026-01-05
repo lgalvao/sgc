@@ -19,8 +19,6 @@ public class AcessoAdClient {
         try {
             AutenticarRequest request = new AutenticarRequest(titulo, senha);
             
-            log.debug("Autenticando usuário {} na API do AD", titulo);
-            
             acessoAdRestClient.post()
                     .uri("/auth/autenticar")
                     .body(request)

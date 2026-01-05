@@ -65,9 +65,6 @@ public class GerenciadorJwt {
                 .signWith(getSigningKey())
                 .compact();
 
-        log.debug("JWT gerado para usuário {} com perfil {} na unidade {}", 
-            tituloEleitoral, perfil, unidadeCodigo);
-        
         return token;
     }
 
@@ -89,14 +86,10 @@ public class GerenciadorJwt {
             }
 
             Perfil perfil = Perfil.valueOf(perfilStr);
-            
-            log.debug("JWT válido para usuário {} com perfil {} na unidade {}", 
-                tituloEleitoral, perfil, unidadeCodigo);
 
             return Optional.of(new JwtClaims(tituloEleitoral, perfil, unidadeCodigo));
             
         } catch (Exception e) {
-            log.debug("JWT inválido ou expirado: {}", e.getMessage());
             return Optional.empty();
         }
     }

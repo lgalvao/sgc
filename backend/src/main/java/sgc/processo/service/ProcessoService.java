@@ -82,24 +82,18 @@ public class ProcessoService {
                         .orElse(null);
 
         if (codUnidadeUsuario == null) {
-            log.debug("checarAcesso: codUnidadeUsuario é null para usuário {}", username);
             return false;
         }
 
         List<Long> codigosUnidadesHierarquia = buscarCodigosDescendentes(codUnidadeUsuario);
-        log.debug("checarAcesso: usuário {} (unidade {}) tem acesso a {} unidades na hierarquia: {}",
-                username, codUnidadeUsuario, codigosUnidadesHierarquia.size(), codigosUnidadesHierarquia);
 
         if (codigosUnidadesHierarquia.isEmpty()) {
             log.warn("checarAcesso: busca hierárquica retornou lista vazia para unidade {}", codUnidadeUsuario);
             return false;
         }
 
-        boolean temAcesso = subprocessoService.verificarAcessoUnidadeAoProcesso(
+        return subprocessoService.verificarAcessoUnidadeAoProcesso(
                 codProcesso, codigosUnidadesHierarquia);
-        log.debug("checarAcesso: usuário {} {} acesso ao processo {}",
-                username, temAcesso ? "TEM" : "NÃO TEM", codProcesso);
-        return temAcesso;
     }
 
     private List<Long> buscarCodigosDescendentes(Long codUnidade) {
@@ -317,8 +311,6 @@ public class ProcessoService {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void finalizar(Long codigo) {
-        log.debug("Iniciando finalização do processo: código={}", codigo);
-
         Processo processo = processoRepo.findById(codigo).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         validarFinalizacaoProcesso(processo);
@@ -382,8 +374,6 @@ public class ProcessoService {
     }
 
     private void validarTodosSubprocessosHomologados(Processo processo) {
-        log.debug("Validando homologação de subprocessos do processo {}", processo.getCodigo());
-
         List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(processo.getCodigo());
         List<String> pendentes = subprocessos.stream().filter(sp -> sp.getSituacao() != MAPEAMENTO_MAPA_HOMOLOGADO
                                                 && sp.getSituacao() != REVISAO_MAPA_HOMOLOGADO)
@@ -415,10 +405,6 @@ public class ProcessoService {
                     .orElseThrow(() -> new ErroProcesso("Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
 
             unidadeService.definirMapaVigente(unidade.getCodigo(), mapaDoSubprocesso);
-
-            log.debug("Mapa vigente para unidade {} definido como mapa {}",
-                    unidade.getCodigo(),
-                    mapaDoSubprocesso.getCodigo());
         }
         log.info("Mapa(s) de {} subprocesso(s) definidos como vigentes.", subprocessos.size());
     }

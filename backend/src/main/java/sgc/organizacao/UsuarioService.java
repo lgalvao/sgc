@@ -333,8 +333,6 @@ public class UsuarioService {
     }
 
     public boolean autenticar(String tituloEleitoral, String senha) {
-        log.debug("Autenticando usuário no AD: {}", tituloEleitoral);
-
         boolean autenticado = false;
         if (acessoAdClient == null) {
             if (ambienteTestes) {
@@ -342,10 +340,8 @@ public class UsuarioService {
                 // antes de simular autenticação com sucesso
                 boolean usuarioExiste = usuarioRepo.existsById(tituloEleitoral);
                 if (usuarioExiste) {
-                    log.debug("Ambiente de testes: Simulando autenticação com sucesso para usuário existente.");
                     autenticado = true;
                 } else {
-                    log.debug("Ambiente de testes: Usuário {} não existe no banco, autenticação negada.", tituloEleitoral);
                     autenticado = false;
                 }
             } else {
@@ -383,7 +379,6 @@ public class UsuarioService {
      * Usado internamente pelo método entrar() para evitar chamada transacional via 'this'.
      */
     private List<PerfilUnidade> buscarAutorizacoesInterno(String tituloEleitoral) {
-        log.debug("Buscando autorizações (perfis e unidades) para o usuário: {}", tituloEleitoral);
         Usuario usuario = usuarioRepo
                 .findByIdWithAtribuicoes(tituloEleitoral)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloEleitoral));
@@ -397,10 +392,6 @@ public class UsuarioService {
     }
 
     public void entrar(String tituloEleitoral, @NonNull PerfilUnidade pu) {
-        log.debug("Usuário {} entrou. Perfil: {}, Unidade: {}",
-                tituloEleitoral,
-                pu.getPerfil(),
-                pu.getSiglaUnidade());
     }
 
     @Transactional(readOnly = true)
@@ -443,7 +434,6 @@ public class UsuarioService {
                 codUnidade
         );
 
-        log.debug("Usuário {} entrou com sucesso. JWT gerado.", request.getTituloEleitoral());
         return token;
     }
 
@@ -451,8 +441,6 @@ public class UsuarioService {
 
     @Transactional(readOnly = true)
     public List<AdministradorDto> listarAdministradores() {
-        log.debug("Listando todos os administradores");
-
         return administradorRepo.findAll().stream()
                 .map(admin -> {
                     Usuario usuario = usuarioRepo.findById(admin.getUsuarioTitulo()).orElse(null);

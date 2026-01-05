@@ -43,9 +43,7 @@ public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
                 Usuario usuario = usuarioService.carregarUsuarioParaAutenticacao(claims.tituloEleitoral());
                 
                 if (usuario != null) {
-                    log.debug("Carregando authorities para usuário {}", claims.tituloEleitoral());
                     var authorities = usuario.getAuthorities();
-                    log.debug("Authorities carregadas: {}", authorities);
                     
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                             usuario,
@@ -54,8 +52,6 @@ public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
                     );
                     
                     SecurityContextHolder.getContext().setAuthentication(auth);
-                    log.debug("Usuário {} autenticado via JWT com authorities: {}", 
-                        claims.tituloEleitoral(), authorities);
                 } else {
                     log.warn("Usuário {} do JWT não encontrado no SGRH", claims.tituloEleitoral());
                 }

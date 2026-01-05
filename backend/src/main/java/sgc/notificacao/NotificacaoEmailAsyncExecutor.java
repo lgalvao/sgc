@@ -55,11 +55,6 @@ public class NotificacaoEmailAsyncExecutor {
         Exception excecaoFinal = null;
         for (int tentativa = 1; tentativa <= MAX_TENTATIVAS; tentativa++) {
             try {
-                log.debug(
-                        "Tentativa {} de {} para enviar e-mail para: {}",
-                        tentativa,
-                        MAX_TENTATIVAS,
-                        emailDto.getDestinatario());
                 enviarEmailSmtp(emailDto);
                 log.info("E-mail enviado para: {}", emailDto.getDestinatario());
                 return CompletableFuture.completedFuture(true);
@@ -105,9 +100,5 @@ public class NotificacaoEmailAsyncExecutor {
         helper.setText(emailDto.getCorpo(), emailDto.isHtml());
 
         enviadorDeEmail.send(mensagem);
-        log.debug(
-                "E-mail enviado via SMTP para: {} - Assunto: {}",
-                emailDto.getDestinatario(),
-                assuntoCompleto);
     }
 }

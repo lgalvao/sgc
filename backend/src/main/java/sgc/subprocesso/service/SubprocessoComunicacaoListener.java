@@ -43,9 +43,6 @@ public class SubprocessoComunicacaoListener {
         Subprocesso sp = evento.getSubprocesso();
         TipoTransicao tipo = evento.getTipo();
 
-        log.debug("Processando comunicação para transição: tipo={}, subprocesso={}",
-                tipo, sp.getCodigo());
-
         // 1. Criar alerta (se aplicável)
         if (tipo.geraAlerta()) {
             criarAlerta(sp, evento);
@@ -60,8 +57,6 @@ public class SubprocessoComunicacaoListener {
     private void criarAlerta(Subprocesso sp, EventoTransicaoSubprocesso evento) {
         TipoTransicao tipo = evento.getTipo();
         String descricao = tipo.formatarAlerta(sp.getUnidade().getSigla());
-
-        log.debug("Criando alerta: tipo={}, descricao='{}'", tipo, descricao);
 
         alertaService.criarAlertaTransicao(
                 sp.getProcesso(),

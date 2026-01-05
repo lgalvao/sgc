@@ -69,11 +69,6 @@ public class SubprocessoTransicaoService {
             Usuario usuario,
             String observacoes) {
 
-        log.debug("Registrando transição: tipo={}, subprocesso={}, origem={}, destino={}",
-                tipo, subprocesso.getCodigo(),
-                origem != null ? origem.getSigla() : "null",
-                destino != null ? destino.getSigla() : "null");
-
         // 1. Salvar movimentação (atômico com a transação do chamador)
         Movimentacao movimentacao = new Movimentacao(
                 subprocesso,
@@ -95,7 +90,6 @@ public class SubprocessoTransicaoService {
                 .build();
 
         eventPublisher.publishEvent(evento);
-        log.debug("Evento de transição publicado: {}", tipo);
     }
 
     /**
