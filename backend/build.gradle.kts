@@ -57,10 +57,10 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 
     // Relatórios
-    implementation("com.github.librepdf:openpdf:1.3.30")
+    implementation("com.github.librepdf:openpdf:3.0.0")
 
     // Segurança
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260102.1")
     implementation("io.jsonwebtoken:jjwt-api:${property("jjwt.version")}")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:${property("jjwt.version")}")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
@@ -70,18 +70,18 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("net.jqwik:jqwik:1.9.2")
+    testImplementation("net.jqwik:jqwik:1.9.3")
 
     // Documentação da API
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0")
-    testImplementation("io.swagger.parser.v3:swagger-parser:2.1.36")
-    implementation("org.mozilla:rhino:1.8.1")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
+    testImplementation("io.swagger.parser.v3:swagger-parser:2.1.37")
+    implementation("org.mozilla:rhino:1.9.0")
     testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.0")
 
     // Dependências básicas com versões mais recentes que as definidas pelo Spring (reduz CVEs)
     implementation("org.apache.commons:commons-lang3:3.20.0")
-    implementation("ch.qos.logback:logback-classic:1.5.21")
-    implementation("ch.qos.logback:logback-core:1.5.21")
+    implementation("ch.qos.logback:logback-classic:1.5.23")
+    implementation("ch.qos.logback:logback-core:1.5.23")
 }
 
 
@@ -126,11 +126,6 @@ tasks.withType<Test> {
         showCauses = true
         showStandardStreams = false
     }
-
-    // Exibir resumo ao final dos testes
-    var passedCount = 0
-    var failedCount = 0
-    var skippedCount = 0
 
     addTestListener(object : TestListener {
         override fun beforeSuite(suite: TestDescriptor) {}
@@ -210,7 +205,7 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "BRANCH"
-                minimum = "0.70".toBigDecimal()
+                minimum = "0.75".toBigDecimal()
             }
         }
         rule {
@@ -245,11 +240,8 @@ configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
     ))
 
     // Threads para paralelismo (ajustar conforme a máquina)
-    threads.set(4)
+    threads.set(8)
 
     // Formatos de saída
     outputFormats.set(setOf("XML", "HTML"))
-
-    // Fail-fast: para no primeiro mutante sobrevivente (útil para CI, opcional localmente)
-    // mutationThreshold.set(80) // Meta de 80% de mutantes mortos
 }
