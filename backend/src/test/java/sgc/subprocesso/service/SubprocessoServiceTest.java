@@ -1,5 +1,6 @@
 package sgc.subprocesso.service;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaService;
@@ -78,6 +80,11 @@ class SubprocessoServiceTest {
         SecurityContextHolder.setContext(securityContext);
     }
 
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
+
     @Nested
     @DisplayName("Cenários de Leitura")
     class LeituraTests {
@@ -131,6 +138,35 @@ class SubprocessoServiceTest {
             when(validacaoService.obterAtividadesSemConhecimento(1L)).thenReturn(Collections.emptyList());
             List<Atividade> result = service.obterAtividadesSemConhecimento(1L);
             assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve buscar subprocesso por ID")
+        void deveBuscarSubprocessoPorId() {
+            when(crudService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
+            assertThat(service.buscarSubprocesso(1L)).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Deve buscar subprocesso com mapa")
+        void deveBuscarSubprocessoComMapa() {
+            when(crudService.buscarSubprocessoComMapa(1L)).thenReturn(new Subprocesso());
+            assertThat(service.buscarSubprocessoComMapa(1L)).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Deve obter atividades sem conhecimento por Mapa")
+        void deveObterAtividadesSemConhecimentoPorMapa() {
+            Mapa mapa = new Mapa();
+            when(validacaoService.obterAtividadesSemConhecimento(mapa)).thenReturn(Collections.emptyList());
+            assertThat(service.obterAtividadesSemConhecimento(mapa)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve listar subprocessos homologados")
+        void deveListarSubprocessosHomologados() {
+            when(workflowService.listarSubprocessosHomologados()).thenReturn(Collections.emptyList());
+            assertThat(service.listarSubprocessosHomologados()).isEmpty();
         }
     }
 
@@ -187,6 +223,13 @@ class SubprocessoServiceTest {
             ValidacaoCadastroDto result = service.validarCadastro(1L);
             assertThat(result.getValido()).isTrue();
         }
+
+        @Test
+        @DisplayName("Deve validar associações do mapa")
+        void deveValidarAssociacoesMapa() {
+            service.validarAssociacoesMapa(100L);
+            verify(validacaoService).validarAssociacoesMapa(100L);
+        }
     }
 
     @Nested
@@ -197,6 +240,28 @@ class SubprocessoServiceTest {
         void deveAtualizarParaEmAndamentoMapeamento() {
             service.atualizarSituacaoParaEmAndamento(100L);
             verify(workflowService).atualizarSituacaoParaEmAndamento(100L);
+        }
+
+        @Test
+        @DisplayName("Deve alterar data limite")
+        void deveAlterarDataLimite() {
+            java.time.LocalDate novaData = java.time.LocalDate.now();
+            service.alterarDataLimite(1L, novaData);
+            verify(workflowService).alterarDataLimite(1L, novaData);
+        }
+
+        @Test
+        @DisplayName("Deve reabrir cadastro")
+        void deveReabrirCadastro() {
+            service.reabrirCadastro(1L, "Justificativa");
+            verify(workflowService).reabrirCadastro(1L, "Justificativa");
+        }
+
+        @Test
+        @DisplayName("Deve reabrir revisão cadastro")
+        void deveReabrirRevisaoCadastro() {
+            service.reabrirRevisaoCadastro(1L, "Justificativa");
+            verify(workflowService).reabrirRevisaoCadastro(1L, "Justificativa");
         }
     }
 
@@ -230,6 +295,29 @@ class SubprocessoServiceTest {
 
             SubprocessoPermissoesDto result = service.obterPermissoes(1L);
             assertThat(result).isNotNull();
+        }
+
+        @Test
+        @DisplayName("obterPermissoes lança exceção quando não autenticado")
+        void obterPermissoesSemAutenticacao() {
+            SecurityContextHolder.clearContext();
+            org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () ->
+                service.obterPermissoes(1L)
+            );
+        }
+
+        @Test
+        @DisplayName("obterPermissoes lança exceção quando autenticação não tem nome")
+        void obterPermissoesComAutenticacaoSemNome() {
+            Authentication authentication = mock(Authentication.class);
+            when(authentication.getName()).thenReturn(null);
+            SecurityContext securityContext = mock(SecurityContext.class);
+            when(securityContext.getAuthentication()).thenReturn(authentication);
+            SecurityContextHolder.setContext(securityContext);
+
+            org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () ->
+                service.obterPermissoes(1L)
+            );
         }
     }
 

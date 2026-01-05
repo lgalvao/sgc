@@ -142,4 +142,64 @@ class UnidadeControllerTest {
         // Act & Assert
         mockMvc.perform(get("/api/unidades/1")).andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("Deve retornar 404 ao buscar árvore de unidade inexistente")
+    @WithMockUser
+    void deveRetornar404AoBuscarArvoreDeUnidadeInexistente() throws Exception {
+        // Arrange
+        when(unidadeService.buscarArvore(99L)).thenReturn(null);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/unidades/99/arvore"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Deve retornar árvore de unidade quando existente")
+    @WithMockUser
+    void deveRetornarArvoreDeUnidadeExistente() throws Exception {
+        // Arrange
+        when(unidadeService.buscarArvore(1L)).thenReturn(UnidadeDto.builder().build());
+
+        // Act & Assert
+        mockMvc.perform(get("/api/unidades/1/arvore"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Deve retornar siglas subordinadas")
+    @WithMockUser
+    void deveRetornarSiglasSubordinadas() throws Exception {
+        // Arrange
+        when(unidadeService.buscarSiglasSubordinadas("SIGLA")).thenReturn(List.of("SIGLA", "FILHA"));
+
+        // Act & Assert
+        mockMvc.perform(get("/api/unidades/sigla/SIGLA/subordinadas"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Deve retornar sigla superior")
+    @WithMockUser
+    void deveRetornarSiglaSuperior() throws Exception {
+        // Arrange
+        when(unidadeService.buscarSiglaSuperior("FILHA")).thenReturn("SIGLA");
+
+        // Act & Assert
+        mockMvc.perform(get("/api/unidades/sigla/FILHA/superior"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Deve retornar 204 ao buscar sigla superior de raiz")
+    @WithMockUser
+    void deveRetornar204AoBuscarSiglaSuperiorDeRaiz() throws Exception {
+        // Arrange
+        when(unidadeService.buscarSiglaSuperior("RAIZ")).thenReturn(null);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/unidades/sigla/RAIZ/superior"))
+                .andExpect(status().isNoContent());
+    }
 }
