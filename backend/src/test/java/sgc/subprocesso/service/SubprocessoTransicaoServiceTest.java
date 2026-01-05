@@ -18,7 +18,6 @@ import sgc.organizacao.model.Usuario;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes Unitários para SubprocessoTransicaoService")
@@ -38,14 +37,8 @@ class SubprocessoTransicaoServiceTest {
     void deveRegistrarComObservacoes() {
         // Arrange
         Subprocesso subprocesso = mock(Subprocesso.class);
-        when(subprocesso.getCodigo()).thenReturn(1L);
-
         Unidade origem = mock(Unidade.class);
-        when(origem.getSigla()).thenReturn("ORIGEM");
-
         Unidade destino = mock(Unidade.class);
-        when(destino.getSigla()).thenReturn("DESTINO");
-
         Usuario usuario = new Usuario();
 
         // Act
@@ -68,7 +61,6 @@ class SubprocessoTransicaoServiceTest {
     void deveRegistrarSemObservacoes() {
         // Arrange
         Subprocesso subprocesso = mock(Subprocesso.class);
-
         Unidade origem = mock(Unidade.class);
         Unidade destino = mock(Unidade.class);
         Usuario usuario = new Usuario();
@@ -92,8 +84,6 @@ class SubprocessoTransicaoServiceTest {
     void deveLidarComUnidadesNulas() {
         // Arrange
         Subprocesso subprocesso = mock(Subprocesso.class);
-        when(subprocesso.getCodigo()).thenReturn(1L);
-
         Usuario usuario = new Usuario();
 
         // Act
