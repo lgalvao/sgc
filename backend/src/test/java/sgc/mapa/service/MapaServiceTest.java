@@ -271,6 +271,37 @@ class MapaServiceTest {
         }
 
         @Test
+        @DisplayName("Deve manter competências presentes no request")
+        void deveManterCompetenciasPresentes() {
+            Long mapaId = 1L;
+            SalvarMapaRequest req = new SalvarMapaRequest();
+            CompetenciaMapaDto compDto = new CompetenciaMapaDto();
+            compDto.setCodigo(100L);
+            compDto.setDescricao("Comp Mantida");
+            req.setCompetencias(List.of(compDto));
+
+            Mapa mapa = new Mapa();
+            Competencia compExistente = new Competencia();
+            compExistente.setCodigo(100L);
+            compExistente.setDescricao("Desc Antiga");
+
+            when(mapaRepo.findById(mapaId)).thenReturn(Optional.of(mapa));
+            when(competenciaRepo.findByMapaCodigo(mapaId))
+                    .thenReturn(new ArrayList<>(List.of(compExistente)));
+
+            when(atividadeRepo.findByMapaCodigo(mapaId)).thenReturn(List.of());
+            when(competenciaRepo.saveAll(anyList())).thenReturn(List.of(compExistente));
+            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(new MapaCompletoDto());
+
+            service.salvarMapaCompleto(mapaId, req, "user");
+
+            // Verifica que NÃO removeu nada
+            verify(competenciaRepo, never()).deleteAll(anyList());
+            // Verifica que a descrição foi atualizada
+            assertThat(compExistente.getDescricao()).isEqualTo("Comp Mantida");
+        }
+
+        @Test
         @DisplayName("Deve falhar se atividade não pertence ao mapa")
         void deveFalharSeAtividadeInvalida() {
             Long mapaId = 1L;

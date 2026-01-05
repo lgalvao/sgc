@@ -426,6 +426,7 @@ class AtividadeServiceTest {
 
             assertThat(resultado).isNotNull();
             verify(conhecimentoRepo).save(any());
+            verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
         }
 
         @Test
@@ -462,6 +463,7 @@ class AtividadeServiceTest {
             service.atualizarConhecimento(ativId, conhId, dto);
 
             verify(conhecimentoRepo).save(conhecimento);
+            verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
         }
 
         @Test
