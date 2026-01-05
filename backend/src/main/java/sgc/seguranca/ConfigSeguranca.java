@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -33,13 +34,14 @@ public class ConfigSeguranca {
      *   <li>Desabilita CSRF, HTTP Basic e formulário de login, adequando-se a uma API RESTful.
      *   <li>Retorna status 401 Unauthorized para tentativas de acesso não autenticadas a endpoints
      *       protegidos.
+     *   <li>Configura headers de segurança (HSTS, CSP, etc).
      * </ul>
      *
      * @param http o construtor {@link HttpSecurity} para configurar a segurança.
      * @return o {@link SecurityFilterChain} configurado.
      */
     @Bean("defaultSecurityFilterChain")
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource) throws Exception {
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/api/usuarios/autenticar",
                                 "/api/usuarios/autorizar",
@@ -57,6 +59,14 @@ public class ConfigSeguranca {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .headers(headers -> headers
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .includeSubDomains(true)
+                                .maxAgeInSeconds(31536000))
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives("default-src 'none'; frame-ancestors 'none'; sandbox"))
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
+                        .xssProtection(HeadersConfigurer.XXssConfig::disable))
                 .addFilterBefore(filtroAutenticacaoSimulado, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
