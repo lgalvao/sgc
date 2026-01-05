@@ -38,14 +38,8 @@ class SubprocessoTransicaoServiceTest {
     void deveRegistrarComObservacoes() {
         // Arrange
         Subprocesso subprocesso = mock(Subprocesso.class);
-        when(subprocesso.getCodigo()).thenReturn(1L);
-
         Unidade origem = mock(Unidade.class);
-        when(origem.getSigla()).thenReturn("ORIGEM");
-
         Unidade destino = mock(Unidade.class);
-        when(destino.getSigla()).thenReturn("DESTINO");
-
         Usuario usuario = new Usuario();
 
         // Act
@@ -92,8 +86,6 @@ class SubprocessoTransicaoServiceTest {
     void deveLidarComUnidadesNulas() {
         // Arrange
         Subprocesso subprocesso = mock(Subprocesso.class);
-        when(subprocesso.getCodigo()).thenReturn(1L);
-
         Usuario usuario = new Usuario();
 
         // Act
