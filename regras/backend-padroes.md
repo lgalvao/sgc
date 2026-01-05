@@ -490,38 +490,103 @@ Isso melhora organização e coesão quando há muitas operações.
 
 ### 5.3. Tratamento de Erros
 
+**IMPORTANTE**: Consulte o [Guia Completo de Exceções](/regras/guia-excecoes.md) para orientações detalhadas sobre escolha de exceções.
+
 **Hierarquia de Exceções:**
 
 ```mermaid
 graph TD
     RE[RuntimeException]
-    ENB[ErroNegocioBase]
-    EN[ErroNegocio]
-    EE[ErroEntidadeNaoEncontrada]
-    EV[ErroValidacao]
-    ESI[ErroSituacaoInvalida]
-    EAN[ErroAccessoNegado]
-    ERS[ErroRequisicaoSemCorpo]
+    
+    subgraph "Erros Internos (500)"
+        EI[ErroInterno - abstrata]
+        EC[ErroConfiguracao]
+        EIV[ErroInvarianteViolada]
+        EEI[ErroEstadoImpossivel]
+    end
+    
+    subgraph "Erros de Negócio (4xx)"
+        ENB[ErroNegocioBase - abstrata]
+        EN[ErroNegocio - interface]
+        EE[ErroEntidadeNaoEncontrada - 404]
+        EV[ErroValidacao - 422]
+        ESI[ErroSituacaoInvalida - abstrata, 422]
+        EPSI[ErroProcessoEmSituacaoInvalida - 422]
+        EMSI[ErroMapaEmSituacaoInvalida - 422]
+        EAN[ErroAccessoNegado - 403]
+        ERS[ErroRequisicaoSemCorpo - 400]
+    end
+    
+    RE --> EI
+    EI --> EC
+    EI --> EIV
+    EI --> EEI
     
     RE --> ENB
-    ENB --> EN
+    ENB -.implementa.-> EN
     ENB --> EE
     ENB --> EV
     ENB --> ESI
     ENB --> EAN
     ENB --> ERS
+    ESI --> EPSI
+    ESI --> EMSI
 ```
 
-**Exceções Customizadas (sgc.comum.erros):**
+**Exceções Customizadas:**
 
-| Exceção                     | HTTP Status     | Uso                      |
-|-----------------------------|-----------------|--------------------------|
-| `ErroEntidadeNaoEncontrada` | 404 Not Found   | Recurso não existe       |
-| `ErroValidacao`             | 400 Bad Request | Dados inválidos          |
-| `ErroSituacaoInvalida`      | 409 Conflict    | Estado inconsistente     |
-| `ErroAccessoNegado`         | 403 Forbidden   | Sem permissão            |
-| `ErroRequisicaoSemCorpo`    | 400 Bad Request | Body ausente             |
-| `ErroNegocio`               | 400 Bad Request | Regra de negócio violada |
+| Categoria | Exceção | HTTP Status | Quando Usar |
+|-----------|---------|-------------|-------------|
+| **Erros Internos** | | | |
+| | `ErroConfiguracao` | 500 | Configuração ausente/inválida |
+| | `ErroInvarianteViolada` | 500 | Violação de integridade de dados |
+| | `ErroEstadoImpossivel` | 500 | Estado que UI impede (programação defensiva) |
+| **Erros de Negócio** | | | |
+| | `ErroEntidadeNaoEncontrada` | 404 | Recurso não existe |
+| | `ErroValidacao` | 422 | Dados de entrada inválidos |
+| | `ErroProcessoEmSituacaoInvalida` | 422 | Operação em estado incorreto |
+| | `ErroAccessoNegado` | 403 | Sem permissão |
+| | `ErroRequisicaoSemCorpo` | 400 | Body ausente |
+
+**Distinção: Erro Interno vs Erro de Negócio**
+
+**Erros Internos** (HTTP 500):
+- Indicam bugs, configuração incorreta ou dados corrompidos
+- NUNCA deveriam ocorrer se sistema funciona corretamente
+- Logados como ERROR com stack trace
+- Mensagem genérica ao usuário (não expor detalhes)
+
+```java
+// ✓ CORRETO - Erro interno
+if (secret.length() < 32) {
+    throw new ErroConfiguracao("JWT secret muito curto");
+}
+
+// ✓ CORRETO - Invariante violada
+if (unidadeSuperior == null && unidade.isOperacional()) {
+    throw new ErroInvarianteViolada("Unidade operacional sem superior");
+}
+```
+
+**Erros de Negócio** (HTTP 4xx):
+- Esperados durante uso normal
+- Podem ocorrer legitimamente (múltiplos usuários, condições de corrida)
+- Logados como WARN
+- Mensagem clara ao usuário
+
+```java
+// ✓ CORRETO - Erro de negócio
+if (processo.getSituacao() != CRIADO) {
+    throw new ErroProcessoEmSituacaoInvalida(
+        "Processo só pode ser iniciado em estado CRIADO"
+    );
+}
+
+// ✓ CORRETO - Validação
+if (atividades.isEmpty()) {
+    throw new ErroValidacao("Deve ter pelo menos uma atividade");
+}
+```
 
 **RestExceptionHandler:**
 
@@ -532,18 +597,31 @@ O `RestExceptionHandler` (anotado com `@ControllerAdvice`) intercepta exceções
 ```json
 {
   "status": 404,
-  "mensagem": "Processo não encontrado com o código: 123",
-  "timestamp": "2025-12-14T16:30:00",
-  "erros": []
+  "message": "Processo não encontrado com o código: 123",
+  "code": "ENTIDADE_NAO_ENCONTRADA",
+  "traceId": "abc123-def456",
+  "timestamp": "2025-12-14T16:30:00"
 }
 ```
 
 **Exemplo de Uso:**
 
 ```java
+// Busca que pode retornar 404
 public Processo buscarPorCodigo(Long codigo) {
     return processoRepo.findById(codigo)
         .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+}
+
+// Validação de negócio
+public void iniciar(Long codigo) {
+    Processo p = buscarPorCodigo(codigo);
+    if (p.getSituacao() != CRIADO) {
+        throw new ErroProcessoEmSituacaoInvalida(
+            "Apenas processos em estado CRIADO podem ser iniciados"
+        );
+    }
+    // ... resto da lógica
 }
 ```
 
