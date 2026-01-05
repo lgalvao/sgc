@@ -502,7 +502,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                     .with(user(admin))
                                     .contentType("application/json")
                                     .content("{\"observacoes\": \"Homologado fora de hora\"}"))
-                    .andExpect(status().isConflict());
+                    .andExpect(status().isUnprocessableEntity());
         }
     }
 }

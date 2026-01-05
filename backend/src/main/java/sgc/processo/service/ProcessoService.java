@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.mapa.model.Mapa;
 import sgc.processo.dto.*;
 import sgc.processo.dto.mappers.ProcessoMapper;
@@ -154,7 +155,7 @@ public class ProcessoService {
 
             if (unidade.getTipo() == INTERMEDIARIA) {
                 log.error("ERRO INTERNO: Tentativa de criar processo com unidade INTERMEDIARIA: {}", unidade.getSigla());
-                throw new IllegalStateException("Erro interno: unidade não elegível foi enviada ao backend");
+                throw new ErroEstadoImpossivel("Erro interno: unidade não elegível foi enviada ao backend");
             }
             participantes.add(unidade);
         }

@@ -10,7 +10,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.TipoProcesso;
@@ -56,7 +58,7 @@ public class E2eController {
 
         File seedFile = new File("../e2e/setup/seed.sql");
         if (!seedFile.exists()) seedFile = new File("e2e/setup/seed.sql");
-        if (!seedFile.exists()) throw new IllegalStateException("Arquivo seed.sql não encontrado");
+        if (!seedFile.exists()) throw new ErroConfiguracao("Arquivo seed.sql não encontrado");
 
         try (Connection conn = dataSource.getConnection()) {
             ScriptUtils.executeSqlScript(conn, new FileSystemResource(seedFile));
@@ -160,7 +162,7 @@ public class E2eController {
     private ProcessoDto criarProcessoFixture(ProcessoFixtureRequest request, TipoProcesso tipo) {
         // Validar entrada
         if (request.unidadeSigla() == null || request.unidadeSigla().isBlank()) {
-            throw new IllegalArgumentException("Unidade é obrigatória");
+            throw new ErroValidacao("Unidade é obrigatória");
         }
 
         // Buscar unidade pela sigla

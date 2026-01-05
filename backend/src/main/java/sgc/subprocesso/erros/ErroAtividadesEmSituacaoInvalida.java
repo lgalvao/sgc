@@ -1,7 +1,6 @@
 package sgc.subprocesso.erros;
 
-import org.springframework.http.HttpStatus;
-import sgc.comum.erros.ErroNegocioBase;
+import sgc.comum.erros.ErroSituacaoInvalida;
 
 /**
  * Lançada quando atividades devem ser importadas para um subprocesso em situação inválida.
@@ -9,8 +8,8 @@ import sgc.comum.erros.ErroNegocioBase;
  * <p>Exemplo: tentar importar atividades para um subprocesso que não está em
  * 'CADASTRO_EM_ANDAMENTO'.
  */
-public class ErroAtividadesEmSituacaoInvalida extends ErroNegocioBase {
+public class ErroAtividadesEmSituacaoInvalida extends ErroSituacaoInvalida {
     public ErroAtividadesEmSituacaoInvalida(String message) {
-        super(message, "ATIVIDADES_SITUACAO_INVALIDA", HttpStatus.UNPROCESSABLE_CONTENT);
+        super(message, "ATIVIDADES_SITUACAO_INVALIDA");
     }
 }

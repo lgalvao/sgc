@@ -9,9 +9,11 @@ import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroInvarianteViolada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
+import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
@@ -116,7 +118,7 @@ public class SubprocessoCadastroWorkflowService {
 
         Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
         if (unidadeAnalise == null) {
-            throw new IllegalStateException(
+            throw new ErroInvarianteViolada(
                     "Unidade superior não encontrada para o subprocesso " + codSubprocesso);
         }
 
@@ -144,7 +146,7 @@ public class SubprocessoCadastroWorkflowService {
         Unidade unidadeOrigem = sp.getUnidade();
         Unidade unidadeDestino = unidadeOrigem.getUnidadeSuperior();
         if (unidadeDestino == null) {
-            throw new IllegalStateException(
+            throw new ErroInvarianteViolada(
                     "Não foi possível identificar a unidade superior para enviar a análise.");
         }
 
@@ -168,7 +170,7 @@ public class SubprocessoCadastroWorkflowService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         if (sp.getSituacao() != MAPEAMENTO_CADASTRO_DISPONIBILIZADO) {
-            throw new IllegalStateException(
+            throw new ErroProcessoEmSituacaoInvalida(
                     "Ação de homologar só pode ser executada em cadastros disponibilizados.");
         }
 
@@ -191,14 +193,14 @@ public class SubprocessoCadastroWorkflowService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         if (sp.getSituacao() != REVISAO_CADASTRO_DISPONIBILIZADA) {
-            throw new IllegalStateException(
+            throw new ErroProcessoEmSituacaoInvalida(
                     "Ação de devolução só pode ser executada em revisões de cadastro"
                             + " disponibilizadas.");
         }
 
         Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
         if (unidadeAnalise == null) {
-            throw new IllegalStateException(
+            throw new ErroInvarianteViolada(
                     "Unidade superior não encontrada para o subprocesso " + codSubprocesso);
         }
 
@@ -224,14 +226,14 @@ public class SubprocessoCadastroWorkflowService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         if (sp.getSituacao() != REVISAO_CADASTRO_DISPONIBILIZADA) {
-            throw new IllegalStateException(
+            throw new ErroProcessoEmSituacaoInvalida(
                     "Ação de aceite só pode ser executada em revisões de cadastro"
                             + " disponibilizadas.");
         }
 
         Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
         if (unidadeAnalise == null) {
-            throw new IllegalStateException(
+            throw new ErroInvarianteViolada(
                     "Unidade superior não encontrada para o subprocesso " + codSubprocesso);
         }
 
@@ -260,7 +262,7 @@ public class SubprocessoCadastroWorkflowService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         if (sp.getSituacao() != REVISAO_CADASTRO_DISPONIBILIZADA) {
-            throw new IllegalStateException(
+            throw new ErroProcessoEmSituacaoInvalida(
                     "Ação de homologar só pode ser executada em revisões de cadastro aguardando"
                             + " homologação.");
         }

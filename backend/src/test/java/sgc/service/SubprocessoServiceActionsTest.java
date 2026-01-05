@@ -17,6 +17,7 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.notificacao.NotificacaoEmailService;
+import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
@@ -209,7 +210,7 @@ public class SubprocessoServiceActionsTest {
                     criarSubprocesso(
                             processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             assertThrows(
-                    IllegalStateException.class,
+                    ErroProcessoEmSituacaoInvalida.class,
                     () ->
                             subprocessoWorkflowService.aceitarRevisaoCadastro(
                                     sp.getCodigo(), OBSERVACOES, usuario));
@@ -277,7 +278,7 @@ public class SubprocessoServiceActionsTest {
                     criarSubprocesso(
                             processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             assertThrows(
-                    IllegalStateException.class,
+                    ErroProcessoEmSituacaoInvalida.class,
                     () ->
                             subprocessoWorkflowService.homologarRevisaoCadastro(
                                     subprocesso.getCodigo(), OBSERVACOES, usuario));

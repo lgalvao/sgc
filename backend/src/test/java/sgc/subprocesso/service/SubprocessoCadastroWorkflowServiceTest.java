@@ -9,10 +9,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseService;
 import sgc.mapa.model.Atividade;
 import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroInvarianteViolada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
+import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -244,7 +246,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         assertThatThrownBy(() -> service.aceitarCadastro(id, "obs", user))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(ErroInvarianteViolada.class);
     }
 
     // --- Homologar Cadastro ---
@@ -283,7 +285,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         assertThatThrownBy(() -> service.homologarCadastro(id, "obs", new Usuario()))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 
     // --- Devolver Revisão Cadastro ---
@@ -420,7 +422,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         assertThatThrownBy(() -> service.homologarRevisaoCadastro(id, "obs", new Usuario()))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 
     // --- Validação de Lista Vazia de Atividades (CDU-09/10) ---
