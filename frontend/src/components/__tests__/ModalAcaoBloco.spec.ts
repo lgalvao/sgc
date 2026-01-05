@@ -1,96 +1,120 @@
-import { mount } from '@vue/test-utils'
-import { describe, it, expect, vi } from 'vitest'
-import { createTestingPinia } from '@pinia/testing'
-import ModalAcaoBloco from '@/components/ModalAcaoBloco.vue'
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { mount } from "@vue/test-utils";
+import ModalAcaoBloco from "../ModalAcaoBloco.vue";
 
-// Mock Bootstrap Modal globally for this test file
-// Use a factory function that returns the class to avoid hoisting issues
-vi.mock('bootstrap', () => {
-  return {
-    Modal: class {
-      static instances: any[] = [];
-      element: any;
-      show = vi.fn();
-      hide = vi.fn();
-      dispose = vi.fn();
+// Mock Bootstrap Modal with hoisted variables
+const { mockShow, mockHide } = vi.hoisted(() => ({
+    mockShow: vi.fn(),
+    mockHide: vi.fn(),
+}));
 
-      constructor(element: any) {
-        this.element = element;
-      }
-    }
-  }
-})
+vi.mock("bootstrap", () => {
+    return {
+        Modal: class {
+            show = mockShow;
+            hide = mockHide;
+            dispose = vi.fn();
+        }
+    };
+});
 
-describe('ModalAcaoBloco.vue', () => {
-  const defaultProps = {
-    id: 'test-modal',
-    titulo: 'Teste',
-    texto: 'Texto teste',
-    rotuloBotao: 'Confirmar',
-    unidades: [
-      { codigo: 1, sigla: 'U1', nome: 'Unidade 1', situacao: 'Situação 1', selecionada: true },
-      { codigo: 2, sigla: 'U2', nome: 'Unidade 2', situacao: 'Situação 2', selecionada: true }
-    ],
-    unidadesPreSelecionadas: [1, 2]
-  }
+describe("ModalAcaoBloco.vue", () => {
+    const mockUnidades = [
+        { codigo: 1, sigla: "U1", nome: "Unidade 1", situacao: "Pendente" },
+        { codigo: 2, sigla: "U2", nome: "Unidade 2", situacao: "Pendente" },
+    ];
 
-  it('renders correctly', () => {
-    const wrapper = mount(ModalAcaoBloco, {
-      props: defaultProps,
-      global: {
-        plugins: [createTestingPinia({ createSpy: vi.fn })]
-      }
-    })
-    expect(wrapper.find('.modal-title').text()).toBe('Teste')
-    // Note: The new component template wraps text in <p class="mb-3">
-    expect(wrapper.find('.modal-body p').text()).toBe('Texto teste')
-    expect(wrapper.findAll('tbody tr')).toHaveLength(2)
-  })
+    const defaultProps = {
+        id: "modal-test",
+        titulo: "Titulo Teste",
+        texto: "Texto Teste",
+        rotuloBotao: "Confirmar",
+        unidades: mockUnidades,
+        unidadesPreSelecionadas: [],
+    };
 
-  it('emits confirmar event with selected ids', async () => {
-    const wrapper = mount(ModalAcaoBloco, {
-      props: defaultProps,
-      global: {
-        plugins: [createTestingPinia({ createSpy: vi.fn })]
-      }
-    })
+    const createWrapper = (props = {}) => {
+        return mount(ModalAcaoBloco, {
+            props: { ...defaultProps, ...props },
+        });
+    };
 
-    await wrapper.find('button.btn-primary').trigger('click')
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
 
-    expect(wrapper.emitted('confirmar')).toBeTruthy()
-    expect(wrapper.emitted('confirmar')![0][0]).toEqual({
-      ids: [1, 2],
-      dataLimite: undefined
-    })
-  })
+    it("deve inicializar e abrir o modal", async () => {
+        const wrapper = createWrapper();
+        // Wait for onMounted
+        await wrapper.vm.$nextTick();
 
-  it('validates required date limit when configured', async () => {
-    const propsWithDate = { ...defaultProps, mostrarDataLimite: true }
-    const wrapper = mount(ModalAcaoBloco, {
-      props: propsWithDate,
-      global: {
-        plugins: [createTestingPinia({ createSpy: vi.fn })]
-      }
-    })
+        (wrapper.vm as any).abrir();
+        expect(mockShow).toHaveBeenCalled();
+    });
 
-    // Try to confirm without date
-    await wrapper.find('button.btn-primary').trigger('click')
+    it("deve selecionar/deselecionar todas as unidades", async () => {
+        const wrapper = createWrapper();
+        const checkboxTodos = wrapper.find('thead input[type="checkbox"]');
 
-    // In the new component logic, confirm() sets erro.value but doesn't emit 'confirmar' if validation fails
-    expect(wrapper.emitted('confirmar')).toBeFalsy()
+        await checkboxTodos.setValue(true);
+        // Checking DOM:
+        const checkboxes = wrapper.findAll('tbody input[type="checkbox"]');
+        expect((checkboxes[0].element as HTMLInputElement).checked).toBe(true);
+        expect((checkboxes[1].element as HTMLInputElement).checked).toBe(true);
 
-    // Check if error message is displayed
-    expect(wrapper.text()).toContain('A data limite é obrigatória')
+        await checkboxTodos.setValue(false);
+        expect((checkboxes[0].element as HTMLInputElement).checked).toBe(false);
+    });
 
-    // Set date and confirm
-    const dateInput = wrapper.find('input[type="date"]')
-    await dateInput.setValue('2024-12-31')
-    await wrapper.find('button.btn-primary').trigger('click')
+    it("deve inicializar com unidades pré-selecionadas", () => {
+        const wrapper = createWrapper({ unidadesPreSelecionadas: [1] });
+        const checkboxes = wrapper.findAll('tbody input[type="checkbox"]');
+        expect((checkboxes[0].element as HTMLInputElement).checked).toBe(true); // U1
+        expect((checkboxes[1].element as HTMLInputElement).checked).toBe(false); // U2
+    });
 
-    expect(wrapper.emitted('confirmar')).toBeTruthy()
-    expect(wrapper.emitted('confirmar')![0][0]).toEqual({
-      ids: [1, 2],
-      dataLimite: '2024-12-31'
-    })
-  })
-})
+    it("deve emitir 'confirmar' com os IDs selecionados", async () => {
+        const wrapper = createWrapper({ unidadesPreSelecionadas: [2] });
+
+        await wrapper.find('.btn-primary').trigger('click');
+
+        expect(wrapper.emitted('confirmar')).toBeTruthy();
+        expect(wrapper.emitted('confirmar')![0][0]).toEqual({
+            ids: [2],
+            dataLimite: undefined
+        });
+    });
+
+    it("deve validar data limite se obrigatória", async () => {
+        const wrapper = createWrapper({
+            unidadesPreSelecionadas: [1],
+            mostrarDataLimite: true
+        });
+
+        // Try confirming without date
+        await wrapper.find('.btn-primary').trigger('click');
+        expect(wrapper.emitted('confirmar')).toBeFalsy();
+        expect(wrapper.text()).toContain("A data limite é obrigatória");
+
+        // Set date
+        await wrapper.find('#dataLimiteBloco').setValue('2024-12-31');
+        await wrapper.find('.btn-primary').trigger('click');
+
+        expect(wrapper.emitted('confirmar')).toBeTruthy();
+        expect(wrapper.emitted('confirmar')![0][0]).toEqual({
+            ids: [1],
+            dataLimite: '2024-12-31'
+        });
+    });
+
+    it("deve fechar o modal e limpar estado", () => {
+        const wrapper = createWrapper();
+        // Simulate open state with error and processing
+        (wrapper.vm as any).setProcessando(true);
+        (wrapper.vm as any).setErro("Erro");
+
+        (wrapper.vm as any).fechar();
+
+        expect(mockHide).toHaveBeenCalled();
+    });
+});

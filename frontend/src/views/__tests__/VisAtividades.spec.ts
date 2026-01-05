@@ -65,6 +65,10 @@ vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoDetalhe: vi.fn(),
 }));
 
+vi.mock("@/services/mapaService", () => ({
+    verificarImpactosMapa: vi.fn().mockResolvedValue({ temImpactos: false, impactos: [] }),
+}));
+
 vi.mock("@/stores/atividades", () => ({
     useAtividadesStore: vi.fn(() => ({
         buscarAtividadesParaSubprocesso: vi.fn(),
@@ -217,5 +221,17 @@ describe("VisAtividades.vue", () => {
             { observacoes: "Devolvendo" }
         );
         expect(pushMock).toHaveBeenCalledWith("/painel");
+    });
+
+    it("deve abrir modal de impacto ao clicar no botão", async () => {
+        const wrapper = mount(VisAtividades, mountOptions());
+        // Force button visibility
+        // computed 'podeVerImpacto' needs perfil=ADMIN/GESTOR and situacao=DISPONIBILIZADA (which is set in mountOptions)
+
+        const btn = wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]');
+        await btn.trigger("click");
+
+        await flushPromises();
+        expect((wrapper.vm as any).mostrarModalImpacto).toBe(true);
     });
 });
