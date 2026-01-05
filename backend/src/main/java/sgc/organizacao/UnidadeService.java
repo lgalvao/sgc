@@ -233,7 +233,9 @@ public class UnidadeService {
     /**
      * Busca IDs de todas as unidades subordinadas (recursivamente) em memória,
      * utilizando a lista cacheada de unidades para evitar N+1 queries.
+     * Resultado é cacheado para evitar reconstrução do mapa O(N) em chamadas repetidas.
      */
+    @Cacheable(value = "unidadeDescendentes", key = "#codigoUnidade")
     public List<Long> buscarIdsDescendentes(Long codigoUnidade) {
         List<Unidade> todas = buscarTodasEntidadesComHierarquia();
 

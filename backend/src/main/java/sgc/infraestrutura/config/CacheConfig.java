@@ -18,6 +18,6 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("arvoreUnidades");
+        return new ConcurrentMapCacheManager("arvoreUnidades", "unidadeDescendentes");
     }
 }
