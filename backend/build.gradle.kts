@@ -133,17 +133,12 @@ tasks.withType<Test> {
             // Exibir resumo apenas para a suite raiz (nível do projeto)
             if (suite.parent == null) {
                 val output = """
-                    |
-                    |═══════════════════════════════════════════════════════════════
-                    |  RESUMO DOS TESTES
-                    |═══════════════════════════════════════════════════════════════
-                    |  Resultado: ${result.resultType}
+                    |  Results: ${result.resultType}
                     |  Total:     ${result.testCount} testes
-                    |  ✓ Passou:  ${result.successfulTestCount}
-                    |  ✗ Falhou:  ${result.failedTestCount}
-                    |  ○ Ignorados: ${result.skippedTestCount}
-                    |  Tempo:     ${(result.endTime - result.startTime) / 1000.0}s
-                    |═══════════════════════════════════════════════════════════════
+                    |  ✓ Passed:  ${result.successfulTestCount}
+                    |  ✗ Failed:  ${result.failedTestCount}
+                    |  ○ Ignored: ${result.skippedTestCount}
+                    |  Time:     ${(result.endTime - result.startTime) / 1000.0}s
                 """.trimMargin()
                 println(output)
             }
