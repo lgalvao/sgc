@@ -120,7 +120,7 @@ tasks.withType<Test> {
     finalizedBy(tasks.jacocoTestReport) // Relatório é gerado após os testes
 
     testLogging {
-        events(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
+        events(TestLogEvent.SKIPPED, TestLogEvent.FAILED)
         exceptionFormat = TestExceptionFormat.FULL
         showStackTraces = true
         showCauses = true
