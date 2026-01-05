@@ -41,6 +41,8 @@ import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.service.SubprocessoService;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.UnidadeService;
+import sgc.alerta.AlertaService;
+import sgc.alerta.model.TipoAlerta;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -79,6 +81,8 @@ class ProcessoServiceTest {
     private UsuarioService usuarioService;
     @Mock
     private sgc.processo.service.ProcessoInicializador processoInicializador;
+    @Mock
+    private AlertaService alertaService;
 
     @InjectMocks
     private ProcessoService processoService;
@@ -160,6 +164,23 @@ class ProcessoServiceTest {
                     .hasMessageContaining("Unidade")
                     .hasNoCause();
         }
+
+        @Test
+        @DisplayName("Deve validar mapa para processo REVISAO")
+        void deveValidarMapaParaRevisao() {
+            CriarProcessoReq req = new CriarProcessoReq(
+                "Teste", TipoProcesso.REVISAO, LocalDateTime.now(), List.of(1L));
+
+            Unidade u = UnidadeFixture.unidadeComId(1L);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
+            when(unidadeService.buscarEntidadesPorIds(List.of(1L))).thenReturn(List.of(u));
+            when(unidadeService.verificarExistenciaMapaVigente(1L)).thenReturn(false);
+            when(unidadeService.buscarSiglasPorIds(List.of(1L))).thenReturn(List.of("U1"));
+
+            assertThatThrownBy(() -> processoService.criar(req))
+                .isInstanceOf(ErroProcesso.class)
+                .hasMessageContaining("U1");
+        }
     }
 
     @Nested
@@ -193,6 +214,33 @@ class ProcessoServiceTest {
             // Assert
             assertThat(processo.getDescricao()).isEqualTo("Nova Desc");
             verify(processoRepo).saveAndFlush(processo);
+        }
+
+        @Test
+        @DisplayName("Deve validar mapa para REVISAO na atualização")
+        void deveValidarMapaParaRevisaoNaAtualizacao() {
+             Long id = 100L;
+            Processo processo = ProcessoFixture.processoPadrao();
+            processo.setCodigo(id);
+
+            AtualizarProcessoReq req =
+                    AtualizarProcessoReq.builder()
+                            .codigo(id)
+                            .descricao("Nova Desc")
+                            .tipo(TipoProcesso.REVISAO)
+                            .dataLimiteEtapa1(LocalDateTime.now())
+                            .unidades(List.of(1L))
+                            .build();
+
+            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            Unidade u = UnidadeFixture.unidadeComId(1L);
+            when(unidadeService.buscarEntidadesPorIds(List.of(1L))).thenReturn(List.of(u));
+            when(unidadeService.verificarExistenciaMapaVigente(1L)).thenReturn(false);
+            when(unidadeService.buscarSiglasPorIds(List.of(1L))).thenReturn(List.of("U1"));
+
+            assertThatThrownBy(() -> processoService.atualizar(id, req))
+                .isInstanceOf(ErroProcesso.class)
+                .hasMessageContaining("U1");
         }
 
         @Test
@@ -416,6 +464,13 @@ class ProcessoServiceTest {
             // Assert
             assertThat(res).isEmpty();
         }
+
+        @Test
+        @DisplayName("Listar por participantes ignorando criado")
+        void listarPorParticipantesIgnorandoCriado() {
+            processoService.listarPorParticipantesIgnorandoCriado(List.of(1L), null);
+            verify(processoRepo).findDistinctByParticipantes_CodigoInAndSituacaoNot(anyList(), eq(SituacaoProcesso.CRIADO), any());
+        }
     }
 
     @Nested
@@ -616,6 +671,51 @@ class ProcessoServiceTest {
         }
 
         @Test
+        @DisplayName("Deve negar acesso quando codUnidadeUsuario é null no perfil")
+        void deveNegarAcessoQuandoUnidadeNull() {
+             Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getName()).thenReturn("gestor");
+
+            Collection<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
+            doReturn(authorities).when(auth).getAuthorities();
+
+            PerfilDto perfil = PerfilDto.builder()
+                    .usuarioTitulo("gestor")
+                    .perfil("GESTOR")
+                    .unidadeCodigo(null) // Null
+                    .build();
+            when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
+
+            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+        }
+
+        @Test
+        @DisplayName("Deve negar acesso se hierarquia vazia")
+        void deveNegarAcessoSeHierarquiaVazia() {
+            // Configurar auth
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getName()).thenReturn("gestor");
+            doReturn(List.of(new SimpleGrantedAuthority("ROLE_GESTOR"))).when(auth).getAuthorities();
+
+            // Configurar perfil
+            PerfilDto perfil = PerfilDto.builder().unidadeCodigo(10L).build();
+            when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
+
+            // Configurar hierarquia retornando lista vazia (mock do service)
+            // Como o metodo de buscar hierarquia é privado e usa unidadeService.buscarTodasEntidadesComHierarquia(),
+            // precisamos mockar o retorno de unidadeService para que a busca resulte em vazio?
+            // O metodo 'buscarCodigosDescendentes' sempre retorna pelo menos a propria unidade se ela existir na lista?
+            // Não, ele pega todasUnidades. Se a unidade 10L não estiver na lista retornada por buscarTodasEntidadesComHierarquia(),
+            // ele pode nao achar.
+            when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of()); // Nenhuma unidade no sistema
+
+            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+        }
+
+        @Test
         @DisplayName("Deve permitir acesso quando gestor é da unidade participante")
         void devePermitirAcessoQuandoGestorDeUnidadeParticipante() {
             // Arrange
@@ -634,10 +734,51 @@ class ProcessoServiceTest {
                     .build();
             when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
 
+            // Necessário para o metodo privado buscarCodigosDescendentes
+            Unidade u = new Unidade();
+            u.setCodigo(10L);
+            when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(u));
+
             when(subprocessoService.verificarAcessoUnidadeAoProcesso(anyLong(), anyList())).thenReturn(true);
 
             // Act & Assert
             assertThat(processoService.checarAcesso(auth, 1L)).isTrue();
+        }
+    }
+
+    @Nested
+    @DisplayName("Lembretes")
+    class Lembretes {
+        @Test
+        @DisplayName("Deve enviar lembrete com sucesso")
+        void deveEnviarLembrete() {
+            Processo p = ProcessoFixture.processoEmAndamento();
+            p.setCodigo(1L);
+            Unidade u = UnidadeFixture.unidadeComId(10L);
+            p.setParticipantes(java.util.Set.of(u));
+
+            when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+            when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
+
+            processoService.enviarLembrete(1L, 10L);
+            verify(alertaService).criarAlerta(eq(p), eq(TipoAlerta.PRAZO_EXPIRANDO), eq(u), anyString());
+        }
+
+        @Test
+        @DisplayName("Deve falhar ao enviar lembrete se unidade nao participa")
+        void deveFalharEnviarLembreteUnidadeNaoParticipa() {
+            Processo p = ProcessoFixture.processoEmAndamento();
+            p.setCodigo(1L);
+            Unidade u = UnidadeFixture.unidadeComId(10L);
+            Unidade outra = UnidadeFixture.unidadeComId(20L);
+            p.setParticipantes(java.util.Set.of(outra));
+
+            when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+            when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
+
+            assertThatThrownBy(() -> processoService.enviarLembrete(1L, 10L))
+                .isInstanceOf(ErroProcesso.class)
+                .hasMessageContaining("não participa");
         }
     }
 }
