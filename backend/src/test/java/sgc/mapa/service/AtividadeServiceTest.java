@@ -257,6 +257,71 @@ class AtividadeServiceTest {
             assertThatThrownBy(() -> service.criar(dto, titulo))
                     .isInstanceOf(ErroAccessoNegado.class);
         }
+
+        @Test
+        @DisplayName("Deve lançar erro ao criar atividade sem mapa")
+        void deveLancarErroAoCriarSemMapa() {
+            AtividadeDto dto = new AtividadeDto();
+            dto.setMapaCodigo(null);
+            String titulo = "123";
+
+            assertThatThrownBy(() -> service.criar(dto, titulo))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Mapa");
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro ao criar atividade em mapa inexistente")
+        void deveLancarErroAoCriarEmMapaInexistente() {
+            AtividadeDto dto = new AtividadeDto();
+            dto.setMapaCodigo(1L);
+            String titulo = "123";
+
+            when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> service.criar(dto, titulo))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Mapa");
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro ao criar atividade se mapa não tem subprocesso")
+        void deveLancarErroAoCriarSemSubprocesso() {
+            AtividadeDto dto = new AtividadeDto();
+            dto.setMapaCodigo(1L);
+            String titulo = "123";
+
+            Mapa mapa = new Mapa();
+            mapa.setSubprocesso(null);
+
+            when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
+
+            assertThatThrownBy(() -> service.criar(dto, titulo))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Subprocesso");
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro ao criar atividade se subprocesso não tem unidade")
+        void deveLancarErroAoCriarSemUnidade() {
+            AtividadeDto dto = new AtividadeDto();
+            dto.setMapaCodigo(1L);
+            String titulo = "123";
+
+            Mapa mapa = new Mapa();
+            Subprocesso subprocesso = new Subprocesso();
+            subprocesso.setUnidade(null);
+            mapa.setSubprocesso(subprocesso);
+
+            Usuario usuario = new Usuario();
+
+            when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
+            when(usuarioService.buscarEntidadePorId(titulo)).thenReturn(usuario);
+
+            assertThatThrownBy(() -> service.criar(dto, titulo))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Unidade");
+        }
     }
 
     @Nested
@@ -301,6 +366,20 @@ class AtividadeServiceTest {
         }
 
         @Test
+        @DisplayName("Deve lançar exceção ao atualizar se ocorrer erro inesperado")
+        void deveRelancarExcecaoAoAtualizar() {
+            Long id = 1L;
+            AtividadeDto dto = new AtividadeDto();
+
+            // Simula erro ao buscar ou processar
+            when(atividadeRepo.findById(id)).thenThrow(new RuntimeException("Erro banco"));
+
+            assertThatThrownBy(() -> service.atualizar(id, dto))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("Erro banco");
+        }
+
+        @Test
         @DisplayName("Deve excluir atividade")
         void deveExcluirAtividade() {
             Long id = 1L;
@@ -313,6 +392,16 @@ class AtividadeServiceTest {
 
             verify(atividadeRepo).delete(atividade);
             verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro ao excluir atividade inexistente")
+        void deveLancarErroAoExcluirAtividadeInexistente() {
+            Long id = 1L;
+            when(atividadeRepo.findById(id)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> service.excluir(id))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
 
@@ -337,6 +426,17 @@ class AtividadeServiceTest {
 
             assertThat(resultado).isNotNull();
             verify(conhecimentoRepo).save(any());
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro ao criar conhecimento para atividade inexistente")
+        void deveLancarErroAoCriarConhecimentoAtividadeInexistente() {
+            Long ativId = 1L;
+            ConhecimentoDto dto = new ConhecimentoDto();
+            when(atividadeRepo.findById(ativId)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> service.criarConhecimento(ativId, dto))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
@@ -377,6 +477,63 @@ class AtividadeServiceTest {
             when(conhecimentoRepo.findById(conhId)).thenReturn(Optional.of(conhecimento));
 
             assertThatThrownBy(() -> service.atualizarConhecimento(ativId, conhId, new ConhecimentoDto()))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro ao atualizar conhecimento inexistente")
+        void deveLancarErroAoAtualizarConhecimentoInexistente() {
+            Long ativId = 1L;
+            Long conhId = 2L;
+            when(conhecimentoRepo.findById(conhId)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> service.atualizarConhecimento(ativId, conhId, new ConhecimentoDto()))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
+
+        @Test
+        @DisplayName("Deve excluir conhecimento com sucesso")
+        void deveExcluirConhecimento() {
+            Long ativId = 1L;
+            Long conhId = 2L;
+            Conhecimento conhecimento = new Conhecimento();
+            Atividade atividade = new Atividade();
+            atividade.setCodigo(ativId);
+            atividade.setMapa(new Mapa());
+            conhecimento.setAtividade(atividade);
+
+            when(conhecimentoRepo.findById(conhId)).thenReturn(Optional.of(conhecimento));
+
+            service.excluirConhecimento(ativId, conhId);
+
+            verify(conhecimentoRepo).delete(conhecimento);
+            verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro ao excluir conhecimento se não pertencer à atividade")
+        void deveLancarErroAoExcluirConhecimentoOutraAtividade() {
+            Long ativId = 1L;
+            Long conhId = 2L;
+            Conhecimento conhecimento = new Conhecimento();
+            Atividade outra = new Atividade();
+            outra.setCodigo(99L);
+            conhecimento.setAtividade(outra);
+
+            when(conhecimentoRepo.findById(conhId)).thenReturn(Optional.of(conhecimento));
+
+            assertThatThrownBy(() -> service.excluirConhecimento(ativId, conhId))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro ao excluir conhecimento inexistente")
+        void deveLancarErroAoExcluirConhecimentoInexistente() {
+            Long ativId = 1L;
+            Long conhId = 2L;
+            when(conhecimentoRepo.findById(conhId)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> service.excluirConhecimento(ativId, conhId))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
@@ -458,6 +615,23 @@ class AtividadeServiceTest {
 
             verify(atividadeRepo).save(any(Atividade.class));
             verify(conhecimentoRepo, never()).save(any(Conhecimento.class));
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro ao importar se mapa destino não existir")
+        void deveLancarErroAoImportarSeMapaDestinoInexistente() {
+            Long origem = 1L;
+            Long destino = 2L;
+
+            Atividade ativOrigem = new Atividade();
+            ativOrigem.setDescricao("A1");
+
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(origem)).thenReturn(List.of(ativOrigem));
+            when(atividadeRepo.findByMapaCodigo(destino)).thenReturn(List.of());
+            when(mapaRepo.findById(destino)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> service.importarAtividadesDeOutroMapa(origem, destino))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
 }
