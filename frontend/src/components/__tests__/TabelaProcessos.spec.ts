@@ -134,6 +134,42 @@ describe("TabelaProcessos.vue", () => {
         ]);
     });
 
+    it("deve emitir o evento selecionarProcesso ao pressionar Enter em uma linha", async () => {
+        context.wrapper = mount(TabelaProcessos, {
+            ...getCommonMountOptions({}, {
+                BTable: {
+                    props: ['items', 'tbodyTrAttr'],
+                    template: `
+                        <table>
+                            <tbody>
+                                <tr v-for="item in items"
+                                    :key="item.codigo"
+                                    v-bind="tbodyTrAttr ? tbodyTrAttr(item, 'row') : {}">
+                                    <td>{{ item.descricao }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    `
+                }
+            }),
+            props: {
+                processos: mockProcessos,
+                criterioOrdenacao: "descricao",
+                direcaoOrdenacaoAsc: true,
+            },
+        });
+
+        await context.wrapper.vm.$nextTick();
+
+        const rows = context.wrapper.findAll("tbody tr");
+        await rows[0].trigger("keydown", { key: "Enter" });
+
+        expect(context.wrapper.emitted("selecionarProcesso")).toBeTruthy();
+        expect(context.wrapper.emitted("selecionarProcesso")![0]).toEqual([
+            mockProcessos[0],
+        ]);
+    });
+
     it("deve exibir a coluna Finalizado em quando showDataFinalizacao é true", async () => {
         context.wrapper = mount(TabelaProcessos, {
             ...getCommonMountOptions(),

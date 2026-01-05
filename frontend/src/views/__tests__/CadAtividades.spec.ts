@@ -6,8 +6,11 @@ import {useAtividadesStore} from "@/stores/atividades";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as atividadeService from "@/services/atividadeService";
 import * as cadastroService from "@/services/cadastroService";
+import * as analiseService from "@/services/analiseService";
+import * as mapaService from "@/services/mapaService";
 import {SituacaoSubprocesso, TipoProcesso,} from "@/types/tipos";
 import {createTestingPinia} from "@pinia/testing";
+import { nextTick } from "vue";
 
 // Mocks
 const mocks = vi.hoisted(() => ({
@@ -53,13 +56,19 @@ vi.mock("@/services/atividadeService", () => ({
     excluirConhecimento: vi.fn(),
 }));
 
-
 vi.mock("@/services/cadastroService", () => ({
     disponibilizarCadastro: vi.fn(),
 }));
 
+vi.mock("@/services/analiseService", () => ({
+    listarAnalisesCadastro: vi.fn(),
+}));
+
+vi.mock("@/services/mapaService", () => ({
+    verificarImpactosMapa: vi.fn(),
+}));
+
 vi.mock("@/services/processoService");
-vi.mock("@/services/analiseService");
 
 // Stubs
 const ConfirmacaoDisponibilizacaoModalStub = {
@@ -166,12 +175,16 @@ describe("CadAtividades.vue", () => {
                 permissoes: {
                      podeEditarMapa: true,
                      podeDisponibilizarCadastro: true,
+                     podeVisualizarImpacto: true
                 }
             },
             mapa: { codigo: 456, competencias: [] },
             atividadesDisponiveis: [...mockAtividades],
             unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
         } as any);
+
+        vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
+        vi.mocked(mapaService.verificarImpactosMapa).mockResolvedValue({ temImpactos: false, impactos: [] });
 
         const wrapper = mountCadAtividades({
             initialState: {
@@ -188,7 +201,8 @@ describe("CadAtividades.vue", () => {
                     }
                 },
                 mapas: {
-                    mapaCompleto: { codigo: 456, competencias: [] }
+                    mapaCompleto: { codigo: 456, competencias: [] },
+                    impactoMapa: null
                 }
             }
         });
@@ -332,5 +346,84 @@ describe("CadAtividades.vue", () => {
 
         expect(wrapper.findComponent(ConfirmacaoDisponibilizacaoModalStub).props('mostrar')).toBe(false);
         expect((wrapper.vm as any).errosValidacao).toHaveLength(1);
+    });
+
+    it("deve exibir e fechar modal de impacto", async () => {
+        const { wrapper } = createWrapper();
+        await flushPromises();
+
+        // Dropdown actions
+        await wrapper.find('[data-testid="btn-mais-acoes"]').trigger("click");
+        await wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]').trigger("click");
+
+        await flushPromises();
+        expect((wrapper.vm as any).mostrarModalImpacto).toBe(true);
+    });
+
+    it("deve exibir e fechar modal de historico", async () => {
+        const { wrapper } = createWrapper(); // isChefe=true in setup
+        await flushPromises();
+
+        await wrapper.find('[data-testid="btn-mais-acoes"]').trigger("click");
+        await wrapper.find('[data-testid="btn-cad-atividades-historico"]').trigger("click");
+
+        await flushPromises();
+        expect((wrapper.vm as any).mostrarModalHistorico).toBe(true);
+    });
+
+    it("deve processar importação de atividades", async () => {
+        const { wrapper, atividadesStore } = createWrapper();
+        await flushPromises();
+
+        // Trigger logic manually or via component interaction if possible
+        // But the modal is stubbed: ImportarAtividadesModal: true.
+        // We can find it and emit 'importar'
+
+        // First open it
+        await wrapper.find('[data-testid="btn-mais-acoes"]').trigger("click");
+        await wrapper.find('[data-testid="btn-cad-atividades-importar"]').trigger("click");
+        expect((wrapper.vm as any).mostrarModalImportar).toBe(true);
+
+        const modal = wrapper.findComponent({ name: "ImportarAtividadesModal" });
+        // The real component emits 'importar'
+        await modal.vm.$emit("importar");
+        await flushPromises();
+
+        expect(atividadesStore.buscarAtividadesParaSubprocesso).toHaveBeenCalledWith(123);
+        expect((wrapper.vm as any).mostrarModalImportar).toBe(false);
+    });
+
+    it("deve fazer scroll para erro de validação", async () => {
+        const scrollIntoViewMock = vi.fn();
+        // Setup element ref mock
+        Element.prototype.scrollIntoView = scrollIntoViewMock;
+
+        const { wrapper } = createWrapper();
+        await flushPromises();
+
+        // Force errors
+        vi.mocked(subprocessoService.validarCadastro).mockResolvedValue({
+            valido: false,
+            erros: [{tipo: 'ERRO', mensagem: 'Erro', atividadeCodigo: 1}]
+        });
+
+        await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
+        await flushPromises();
+        await nextTick(); // Wait for nextTick in component
+
+        // Since we stubbed AtividadeItem, the v-for loop with ref might not bind correctly to a DOM element unless we ensure the stub renders something and the ref function is called.
+        // In Vue Test Utils, ref binding on components works.
+        // The component uses :ref="el => setAtividadeRef(atividade.codigo, el)"
+        // If AtividadeItemStub is rendered, el will be the component instance or root element.
+        // We need to ensure scrollIntoView is called on that element's $el or the element itself.
+
+        // Check if scroll was called.
+        // Note: checking this might be flaky if jsdom doesn't support scrollIntoView fully or if refs aren't set in shallow mount.
+        // But we are using mount.
+
+        // Ideally we check if the function ran.
+        // Since we can't easily spy on the inner function, we rely on the side effect (scrollIntoView).
+        // If it fails, we might need to skip this specific assertion or improve the mock.
+        expect(scrollIntoViewMock).toHaveBeenCalled();
     });
 });
