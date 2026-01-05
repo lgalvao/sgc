@@ -79,7 +79,7 @@ foi utilizada para registrar o histórico de decisões em diferentes etapas do w
 
 ## Como Testar
 
-Para executar apenas os testes deste módulo:
+Para executar apenas os testes deste módulo (a partir do diretório `backend`):
 ```bash
-./gradlew :backend:test --tests "sgc.analise.*"
+./gradlew test --tests "sgc.analise.*"
 ```

@@ -56,7 +56,8 @@ sgc/
 1. **Backend:**
 
     ```bash
-    cd /app && ./gradlew bootRun
+    cd backend
+    ./gradlew bootRun
     ```
 
     A API estará disponível em `http://localhost:10000`.
@@ -81,7 +82,7 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 
 | Tipo | Comando | Descrição |
 | --- | --- | --- |
-| **Unitários Backend** | `cd /app && ./gradlew :backend:test` | JUnit 5 com banco em memória (H2). |
+| **Unitários Backend** | `cd backend && ./gradlew test` | JUnit 5 com banco em memória (H2). |
 | **Unitários Frontend** | `cd frontend && npm run test:unit` | Vitest para componentes e lógica. |
 | **End-to-End (E2E)** | `npm run test:e2e` | Playwright simulando fluxos reais. |
 | **Type Check (Front)** | `cd frontend && npm run typecheck` | Verificação estática de tipos TypeScript. |

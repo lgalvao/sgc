@@ -1,25 +1,25 @@
-# Mappers (Mapeadores de Dados)
+# Diretório de Mappers
 
-
-Este diretório contém funções puras responsáveis por transformar dados entre o formato da API (DTOs do Backend) e o
-formato utilizado internamente pelo Frontend (Interfaces TypeScript e Stores).
+Este diretório contém funções responsáveis por transformar dados entre diferentes formatos, geralmente entre a API (Backend) e a View (Frontend).
 
 ## Por que usar Mappers?
 
-1. **Desacoplamento:** Isola o frontend de mudanças na estrutura da API. Se o backend mudar o nome de um campo, basta
-   ajustar o mapper, sem precisar caçar todas as referências nos componentes.
-2. **Formatação:** Permite formatar dados (como datas e moedas) logo na entrada, garantindo que os componentes recebam
-   dados prontos para exibição.
-3. **Tipagem:** Garante que os objetos manipulados no frontend estejam estritamente tipados de acordo com as interfaces
-   do TypeScript.
+- **Desacoplamento:** Evita que a estrutura do banco de dados/API "vaze" diretamente para os componentes visuais. Se o backend mudar o nome de um campo, você altera apenas o mapper, não 50 componentes.
+- **Formatação:** Prepara dados para exibição (ex: formatar datas, converter códigos de status em labels legíveis, calcular campos derivados).
 
-## Arquivos Disponíveis
+## Exemplo
 
-- **`alertas.ts`**: Mapeia DTOs de alertas para o modelo de alerta da UI.
-- **`atividades.ts`**: Transforma dados de atividades e conhecimentos.
-- **`mapas.ts`**: Lida com a estrutura complexa dos mapas de competências.
-- **`processos.ts`**: Mapeia listas e detalhes de processos.
-- **`servidores.ts`**: Mapeia dados de servidores (usuários).
-- **`sgrh.ts`**: Mapeia dados vindos da integração com o SGRH (unidades, perfis).
-- **`unidades.ts`**: Transforma dados da estrutura organizacional.
+```typescript
+// ProcessoMapper.ts
+import type { ProcessoDto, ProcessoVisualizacao } from '@/types';
+import { formatarDataBrasileira } from '@/utils/formatters';
 
+export function paraVisualizacao(dto: ProcessoDto): ProcessoVisualizacao {
+  return {
+    id: dto.codigo,
+    tituloFormatado: dto.titulo.toUpperCase(),
+    inicio: formatarDataBrasileira(dto.dataInicio),
+    statusLabel: obterLabelSituacao(dto.situacao)
+  };
+}
+```

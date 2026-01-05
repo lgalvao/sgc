@@ -87,14 +87,14 @@ stateDiagram-v2
 
     [*] --> PENDENTE_CADASTRO: Processo iniciado
 
-    state "Fluxo de Cadastro" {
+    state FluxoCadastro {
         PENDENTE_CADASTRO --> CADASTRO_DISPONIBILIZADO: disponibilizarCadastro()
         CADASTRO_DISPONIBILIZADO --> PENDENTE_AJUSTES_CADASTRO: devolverCadastro()
         PENDENTE_AJUSTES_CADASTRO --> CADASTRO_DISPONIBILIZADO: disponibilizarCadastro()
         CADASTRO_DISPONIBILIZADO --> REVISAO_CADASTRO_HOMOLOGADA: aceitarCadastro()
     }
 
-    state "Fluxo de Ajuste/Revisão" {
+    state FluxoAjuste {
          REVISAO_CADASTRO_HOMOLOGADA --> MAPA_AJUSTADO: submeterMapaAjustado()
          MAPA_AJUSTADO --> PENDENTE_AJUSTES_MAPA: devolverMapa()
          PENDENTE_AJUSTES_MAPA --> MAPA_AJUSTADO: submeterMapaAjustado()
@@ -111,8 +111,8 @@ Para cada transição de estado, uma nova entidade `Movimentacao` é persistida,
 
 ## Como Testar
 
-Para executar apenas os testes deste módulo:
+Para executar apenas os testes deste módulo (a partir do diretório `backend`):
 
 ```bash
-cd /app && ./gradlew :backend:test --tests "sgc.subprocesso.*"
+./gradlew test --tests "sgc.subprocesso.*"
 ```

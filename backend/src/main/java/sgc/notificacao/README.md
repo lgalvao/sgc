@@ -18,7 +18,7 @@ pelo `ApplicationEventPublisher` do Spring e, em resposta, delega as tarefas par
 ```mermaid
 graph TD
     subgraph "Módulo de Negócio (ex: processo)"
-        ProcessoService -- 1. Publica evento -->
+        ProcessoService
     end
 
     subgraph "Infraestrutura Spring"
@@ -39,6 +39,7 @@ graph TD
         MailServer
     end
 
+    ProcessoService -- 1. Publica evento --> EventBus
     EventBus -- 2. Notifica --> Listener
     Listener -- 3. Invoca --> AlertaService
     Listener -- 4. Usa --> TemplateService
@@ -87,7 +88,7 @@ graph TD
 
 ## Como Testar
 
-Para executar apenas os testes deste módulo:
+Para executar apenas os testes deste módulo (a partir do diretório `backend`):
 ```bash
-./gradlew :backend:test --tests "sgc.notificacao.*"
+./gradlew test --tests "sgc.notificacao.*"
 ```

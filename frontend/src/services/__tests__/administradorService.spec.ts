@@ -9,7 +9,7 @@ describe('AdministradorService', () => {
         vi.clearAllMocks();
     });
 
-    it('listarAdministradores deve fazer uma requisição GET para /administradores', async () => {
+    it('listarAdministradores deve fazer uma requisição GET para /usuarios/administradores', async () => {
         const mockData = [
             { tituloEleitoral: '123456789012', nome: 'Admin 1', matricula: '111', unidadeCodigo: 1, unidadeSigla: 'UN1' }
         ];
@@ -17,27 +17,27 @@ describe('AdministradorService', () => {
 
         const result = await AdministradorService.listarAdministradores();
 
-        expect(apiClient.get).toHaveBeenCalledWith('/administradores');
+        expect(apiClient.get).toHaveBeenCalledWith('/usuarios/administradores');
         expect(result).toEqual(mockData);
     });
 
-    it('adicionarAdministrador deve fazer uma requisição POST para /administradores', async () => {
+    it('adicionarAdministrador deve fazer uma requisição POST para /usuarios/administradores', async () => {
         const usuarioTitulo = '123456789012';
         const mockResponse = { tituloEleitoral: '123456789012', nome: 'Admin 1', matricula: '111', unidadeCodigo: 1, unidadeSigla: 'UN1' };
         vi.mocked(apiClient.post).mockResolvedValue({ data: mockResponse });
 
         const result = await AdministradorService.adicionarAdministrador(usuarioTitulo);
 
-        expect(apiClient.post).toHaveBeenCalledWith('/administradores', { usuarioTitulo });
+        expect(apiClient.post).toHaveBeenCalledWith('/usuarios/administradores', { usuarioTitulo });
         expect(result).toEqual(mockResponse);
     });
 
-    it('removerAdministrador deve fazer uma requisição POST para /administradores/{titulo}/remover', async () => {
+    it('removerAdministrador deve fazer uma requisição POST para /usuarios/administradores/{titulo}/remover', async () => {
         const usuarioTitulo = '123456789012';
         vi.mocked(apiClient.post).mockResolvedValue({});
 
         await AdministradorService.removerAdministrador(usuarioTitulo);
 
-        expect(apiClient.post).toHaveBeenCalledWith(`/administradores/${usuarioTitulo}/remover`);
+        expect(apiClient.post).toHaveBeenCalledWith(`/usuarios/administradores/${usuarioTitulo}/remover`);
     });
 });

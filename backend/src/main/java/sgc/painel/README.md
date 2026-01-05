@@ -51,7 +51,7 @@ graph TD
 
 ## Como Testar
 
-Para executar apenas os testes deste módulo:
+Para executar apenas os testes deste módulo (a partir do diretório `backend`):
 ```bash
-./gradlew :backend:test --tests "sgc.painel.*"
+./gradlew test --tests "sgc.painel.*"
 ```

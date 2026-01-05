@@ -69,7 +69,7 @@ graph TD
 
 ## Como Testar
 
-Para executar apenas os testes deste módulo:
+Para executar apenas os testes deste módulo (a partir do diretório `backend`):
 ```bash
-cd /app && ./gradlew :backend:test --tests "sgc.processo.*"
+./gradlew test --tests "sgc.processo.*"
 ```

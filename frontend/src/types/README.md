@@ -1,18 +1,33 @@
-# Types (Definições TypeScript)
+# Diretório de Tipos (TypeScript)
 
-
-Este diretório armazena as definições de tipos, interfaces e enums do TypeScript. Ele serve como o contrato de dados
-entre o frontend e o backend.
+Este diretório centraliza as definições de tipos, interfaces e enums compartilhados por toda a aplicação frontend.
 
 ## Organização
 
-- **`tipos.ts`**: Contém as interfaces principais que espelham as entidades do domínio (ex: `Processo`, `Unidade`,
-  `Usuario`).
+- **`index.ts`**: (Opcional) Pode exportar todos os tipos para facilitar imports, mas prefira imports explícitos de arquivos específicos se o volume crescer.
+- **`DomainTypes.ts`**: Interfaces que espelham as entidades do backend (Processo, Unidade, Competencia).
+- **`ComponentProps.ts`**: Interfaces para props complexas de componentes reutilizáveis.
+- **`ApiTypes.ts`**: DTOs de requisição e resposta da API (se diferirem muito das entidades de domínio).
 
-## Boas Práticas
+## Convenção de Nomenclatura
 
-- **Sincronia com Backend:** As interfaces aqui definidas devem refletir fielmente os DTOs retornados pela API Java. Se
-  o backend mudar um campo, a interface aqui deve ser atualizada.
-- **Uso Global:** Evite definir interfaces dentro de componentes (`.vue`). Sempre que um tipo for usado em mais de um
-  lugar, ele deve ser movido para este diretório.
+- **Interfaces:** PascalCase (ex: `Processo`, `Usuario`). Evite prefixo `I` (ex: `IProcesso` - não use).
+- **Enums:** PascalCase para o nome e chaves.
+- **Types:** PascalCase.
 
+## Exemplo
+
+```typescript
+// DomainTypes.ts
+export interface Processo {
+  codigo: number; // Note que usamos 'codigo' e não 'id'
+  titulo: string;
+  dataInicio: string; // ISO Date String
+  situacao: SituacaoProcesso;
+}
+
+export enum SituacaoProcesso {
+  EM_ANDAMENTO = 'EM_ANDAMENTO',
+  FINALIZADO = 'FINALIZADO'
+}
+```

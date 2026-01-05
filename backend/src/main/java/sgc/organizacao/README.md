@@ -45,6 +45,7 @@ O módulo trabalha em conjunto com o pacote `seguranca` para:
 
 ## Como Testar
 
+Para executar apenas os testes deste módulo (a partir do diretório `backend`):
 ```bash
-./gradlew :backend:test --tests "sgc.organizacao.*"
+./gradlew test --tests "sgc.organizacao.*"
 ```

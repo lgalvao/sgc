@@ -1,23 +1,21 @@
-# Test Utils (Utilitários de Teste)
+# Diretório de Test Utils
 
+Este diretório contém utilitários específicos para facilitar a escrita de testes unitários (Vitest) e de componentes.
 
-Este diretório contém ferramentas, mocks e helpers para facilitar a escrita de testes unitários e de integração com *
-*Vitest**.
+## Conteúdo Típico
 
-## Arquivos e Diretórios
+- **`renderUtils.ts`**: Wrappers customizados para o `mount` do Vue Test Utils que já injetam plugins comuns (Pinia, Router, BootstrapVueNext) para evitar repetição em cada teste.
+- **`mockFactories.ts`**: Funções geradoras de dados fake (fixtures) para testes. Ex: `criarProcessoMock()`.
 
-### `helpers.ts`
+## Exemplo de Factory
 
-- Funções auxiliares genéricas para testes, como:
-    - `flushPromises()`: Aguarda a resolução de todas as promises pendentes (útil para testar código assíncrono no Vue).
-    - `initPinia()`: Configura uma instância de teste do Pinia.
-
-### `uiHelpers.ts`
-
-- Helpers focados em interação com a UI/DOM nos testes, como simuladores de eventos ou buscadores de elementos
-  específicos.
-
-### `mocks/`
-
-- Contém dados falsos (fixtures) e implementações mockadas de serviços ou objetos complexos para isolar os testes.
-
+```typescript
+export function criarProcessoMock(overrides?: Partial<Processo>): Processo {
+  return {
+    codigo: 1,
+    titulo: 'Processo Teste',
+    situacao: 'EM_ANDAMENTO',
+    ...overrides
+  };
+}
+```

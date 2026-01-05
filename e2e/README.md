@@ -8,7 +8,7 @@ Garantir que os fluxos críticos de negócio (Casos de Uso) funcionem corretamen
 
 ## 🏗️ Estrutura do Projeto
 
-Seguimos uma arquitetura em 3 camadas para manter os testes legíveis e manuteníveis:
+Seguimos uma arquitetura organizada para manter os testes legíveis e manuteníveis:
 
 ### 1. Specs (`*.spec.ts`)
 Arquivos de teste declarativos. Descrevem **O QUE** está sendo testado, não **COMO**.
@@ -18,15 +18,19 @@ Arquivos de teste declarativos. Descrevem **O QUE** está sendo testado, não **
 
 ### 2. Helpers (`/helpers`)
 Encapsulam a complexidade de automação e interações com a página.
-*   **`LoginHelper`**: Realiza login, seleção de perfil e logout.
-*   **`ProcessoHelper`**: Navegação e ações em processos.
-*   **`MapaHelper`**: Manipulação de tabelas e formulários de competências.
-*   **Abstração:** Métodos semânticos como `criarProcesso(...)` em vez de `click('#btn-criar')`.
+*   **`helpers-auth.ts`**: Login e gestão de sessão.
+*   **`helpers-processos.ts`**: Navegação e ações em processos.
+*   **`helpers-mapas.ts`**: Manipulação de tabelas e formulários de competências.
+*   **Abstração:** Métodos semânticos como `criarCompetencia(...)` em vez de manipulação direta de seletores nos testes.
 
-### 3. Dados (`/dados`)
-Centralizam constantes e seletores.
-*   **`constantes-teste.ts`**: Seletores `data-testid`, mensagens de erro esperadas, URLs.
-*   Evita "magic strings" espalhadas pelos testes.
+### 3. Fixtures (`/fixtures`)
+Define dados de teste e extensões do objeto `test` do Playwright.
+*   **`base.ts`**: Extensão base do Playwright com configurações globais e listeners de log.
+*   **`fixtures-processos.ts`**: Massa de dados para testes de processos.
+
+### 4. Setup e Hooks (`/setup`, `/hooks`)
+*   **`/setup`**: Scripts de inicialização global, como `seed.sql` e configuração inicial do ambiente.
+*   **`/hooks`**: Lógica executada antes ou depois dos testes, como `hooks-limpeza.ts` para garantir um estado limpo.
 
 ## 🚀 Como Executar
 
@@ -37,7 +41,7 @@ Centralizam constantes e seletores.
 ### Comandos
 
 ```bash
-# Instalar dependências (na raiz do projeto ou dentro de e2e se for separado)
+# Instalar dependências
 npm install
 
 # Rodar todos os testes (Headless)

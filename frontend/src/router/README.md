@@ -1,40 +1,29 @@
-# Router (Roteamento)
+# Diretório de Roteamento
 
+Este diretório contém a configuração do Vue Router.
 
-Este diretório contém a configuração do **Vue Router**, responsável pela navegação entre as páginas da aplicação.
+## Estrutura
 
-## Estrutura Modular
+- **`index.ts`**: Ponto de entrada que cria a instância do router e define os guards globais (autenticação).
+- **`*.routes.ts`**: Definições de rotas modulares. Cada domínio funcional deve ter seu próprio arquivo de rotas para evitar um `index.ts` gigante.
 
-Para evitar um arquivo de rotas gigante e incontrolável, as definições de rota foram divididas em módulos por domínio
-funcional.
+## Modularização
 
-### Arquivos
+Exemplo de importação no `index.ts`:
 
-- **`index.ts`**: Ponto de entrada principal.
-  - Cria a instância do roteador (`createRouter`).
-  - Define o histórico de navegação (`createWebHistory`).
-  - Importa e combina as rotas dos submódulos.
-  - **Guards Globais:** Implementa o `beforeEach` para verificação de autenticação (redireciona para `/login` se não
-      autenticado).
+```typescript
+import processoRoutes from './processo.routes';
+import adminRoutes from './admin.routes';
 
-- **`main.routes.ts`**: Rotas gerais da aplicação, como:
-  - `/`: Redirecionamento raiz.
-  - `/login`: Página de login.
-  - `/painel`: Dashboard principal.
-  - `/404`: Página de erro não encontrado.
+const routes = [
+  ...processoRoutes,
+  ...adminRoutes,
+  { path: '/login', component: Login }
+];
+```
 
-- **`processo.routes.ts`**: Rotas relacionadas à gestão de processos e subprocessos.
-  - `/processos`: Listagem.
-  - `/processos/novo`: Criação.
-  - `/subprocessos/:id`: Detalhes e execução do workflow.
+## Navigation Guards
 
-- **`unidade.routes.ts`**: Rotas para visualização e gestão de unidades organizacionais.
-
-## Convenções
-
-- **Lazy Loading:** As views devem ser importadas dinamicamente (ex:
-  `component: () => import('../views/MinhaView.vue')`) para otimizar o carregamento inicial da aplicação (Code
-  Splitting).
-- **Meta Fields:** O campo `meta` é usado para definir propriedades da rota, como `requiresAuth` (se exige login) e
-  `breadcrumb` (para navegação).
-
+O `index.ts` implementa o `beforeEach` para verificar:
+1. Se a rota requer autenticação (`meta: { requiresAuth: true }`).
+2. Se o usuário tem o perfil necessário (`meta: { roles: ['ADMIN'] }`).

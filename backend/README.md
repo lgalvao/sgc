@@ -29,9 +29,10 @@ O código está organizado em `src/main/java/sgc/` com os seguintes módulos pri
 
 ## 🚀 Como Executar
 
-A partir da raiz do projeto (`/app`), execute:
+A partir da raiz do projeto, execute:
 
 ```bash
+cd backend
 ./gradlew bootRun -Dspring.profiles.active=e2e
 ```
 
@@ -53,7 +54,8 @@ O sistema utiliza perfis para configurar o comportamento do ambiente:
 Para rodar todos os testes de backend:
 
 ```bash
-./gradlew :backend:test
+cd backend
+./gradlew test
 ```
 
 ### Estrutura de Testes

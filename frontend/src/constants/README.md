@@ -1,24 +1,26 @@
-# Constantes
+# Diretório de Constantes
 
+Este diretório armazena valores constantes reutilizáveis para evitar "magic numbers" e strings soltas pelo código.
 
-Este diretório centraliza valores constantes utilizados em toda a aplicação frontend. O objetivo é evitar "números
-mágicos" e strings repetidas, facilitando a manutenção e a consistência.
+## Boas Práticas
 
-## Arquivos Principais
+- Agrupe constantes logicamente em arquivos ou objetos.
+- Use `UPPER_SNAKE_CASE` para constantes primitivas.
+- Use `PascalCase` para Objetos congelados que funcionam como Enums.
 
-### `situacoes.ts`
+## Exemplos
 
-- Define os enums e constantes para as situações das entidades de negócio, como:
-    - `SituacaoProcesso` (ex: EM_ANDAMENTO, FINALIZADO)
-    - `SituacaoSubprocesso` (ex: PENDENTE_CADASTRO, MAPA_HOMOLOGADO)
-    - `SituacaoMapa`
+**`AppConstants.ts`**
+```typescript
+export const APP_NAME = 'SGC - Sistema de Gestão de Competências';
+export const API_TIMEOUT = 30000;
+```
 
-### `textos.ts`
-
-- Centraliza textos exibidos na interface, mensagens de erro padrão e rótulos. Útil para padronização e futura
-  internacionalização.
-
-### `index.ts`
-
-- Ponto de entrada que exporta as constantes para facilitar a importação em outros arquivos.
-
+**`BusinessConstants.ts`**
+```typescript
+export const PERFIS_ACESSO = {
+  ADMIN: 'ADMIN',
+  GESTOR: 'GESTOR',
+  SERVIDOR: 'SERVIDOR'
+} as const;
+```

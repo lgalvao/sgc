@@ -95,7 +95,7 @@ public Recurso buscar(Long codigo) {
 
 ## Como Testar
 
-Para executar apenas os testes deste módulo:
+Para executar apenas os testes deste módulo (a partir do diretório `backend`):
 ```bash
-./gradlew :backend:test --tests "sgc.comum.*"
+./gradlew test --tests "sgc.comum.*"
 ```
