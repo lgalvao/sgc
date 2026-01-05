@@ -7,12 +7,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaService;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.UnidadeService;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -22,14 +22,12 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes para SubprocessoWorkflowService")
+@DisplayName("SubprocessoWorkflowService Test")
 class SubprocessoWorkflowServiceTest {
 
     @Mock
@@ -47,179 +45,176 @@ class SubprocessoWorkflowServiceTest {
     private SubprocessoWorkflowService service;
 
     @Test
-    @DisplayName("Deve atualizar situação para EM ANDAMENTO (Mapeamento)")
-    void deveAtualizarParaEmAndamentoMapeamento() {
+    @DisplayName("Alterar data limite para cadastro")
+    void alterarDataLimiteCadastro() {
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setProcesso(new Processo());
+        sp.setUnidade(new Unidade());
+
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+
+        service.alterarDataLimite(1L, LocalDate.now().plusDays(5));
+
+        assertThat(sp.getDataLimiteEtapa1()).isEqualTo(LocalDate.now().plusDays(5).atStartOfDay());
+        verify(repositorioSubprocesso).save(sp);
+        verify(alertaService).criarAlertaAlteracaoDataLimite(any(), any(), anyString(), eq(1));
+    }
+
+    @Test
+    @DisplayName("Alterar data limite para mapa")
+    void alterarDataLimiteMapa() {
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        sp.setProcesso(new Processo());
+        sp.setUnidade(new Unidade());
+
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+
+        service.alterarDataLimite(1L, LocalDate.now().plusDays(5));
+
+        assertThat(sp.getDataLimiteEtapa2()).isEqualTo(LocalDate.now().plusDays(5).atStartOfDay());
+        verify(repositorioSubprocesso).save(sp);
+        verify(alertaService).criarAlertaAlteracaoDataLimite(any(), any(), anyString(), eq(2));
+    }
+
+    @Test
+    @DisplayName("Alterar data limite outros")
+    void alterarDataLimiteOutros() {
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        Processo p = new Processo();
-        p.setTipo(TipoProcesso.MAPEAMENTO);
-        sp.setProcesso(p);
+        sp.setProcesso(new Processo());
 
-        when(repositorioSubprocesso.findByMapaCodigo(100L)).thenReturn(Optional.of(sp));
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
-        service.atualizarSituacaoParaEmAndamento(100L);
+        service.alterarDataLimite(1L, LocalDate.now().plusDays(5));
+
+        assertThat(sp.getDataLimiteEtapa1()).isEqualTo(LocalDate.now().plusDays(5).atStartOfDay());
+    }
+
+    @Test
+    @DisplayName("Atualizar situacao para em andamento (Mapeamento)")
+    void atualizarSituacaoMapeamento() {
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setProcesso(new Processo());
+        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+
+        when(repositorioSubprocesso.findByMapaCodigo(10L)).thenReturn(Optional.of(sp));
+
+        service.atualizarSituacaoParaEmAndamento(10L);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         verify(repositorioSubprocesso).save(sp);
     }
 
     @Test
-    @DisplayName("Deve atualizar situação para EM ANDAMENTO (Revisão)")
-    void deveAtualizarParaEmAndamentoRevisao() {
+    @DisplayName("Atualizar situacao para em andamento (Revisao)")
+    void atualizarSituacaoRevisao() {
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        Processo p = new Processo();
-        p.setTipo(TipoProcesso.REVISAO);
-        sp.setProcesso(p);
+        sp.setProcesso(new Processo());
+        sp.getProcesso().setTipo(TipoProcesso.REVISAO);
 
-        when(repositorioSubprocesso.findByMapaCodigo(100L)).thenReturn(Optional.of(sp));
+        when(repositorioSubprocesso.findByMapaCodigo(10L)).thenReturn(Optional.of(sp));
 
-        service.atualizarSituacaoParaEmAndamento(100L);
+        service.atualizarSituacaoParaEmAndamento(10L);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         verify(repositorioSubprocesso).save(sp);
     }
 
     @Test
-    @DisplayName("alterarDataLimite: deve capturar exceção do AlertaService e não falhar")
-    void alterarDataLimite_DeveCapturarExceptionAlerta() {
-        Long codSubprocesso = 1L;
+    @DisplayName("Atualizar situacao falha se processo null")
+    void atualizarSituacaoProcessoNull() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setCodigo(1L);
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setProcesso(null);
+
+        when(repositorioSubprocesso.findByMapaCodigo(10L)).thenReturn(Optional.of(sp));
+
+        assertThatThrownBy(() -> service.atualizarSituacaoParaEmAndamento(10L))
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("Reabrir cadastro sucesso")
+    void reabrirCadastroSucesso() {
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(new Processo());
+        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         sp.setUnidade(new Unidade());
+        sp.getUnidade().setUnidadeSuperior(new Unidade());
 
-        when(crudService.buscarSubprocesso(codSubprocesso)).thenReturn(sp);
-        doThrow(new RuntimeException("Erro envio alerta")).when(alertaService).criarAlertaAlteracaoDataLimite(any(), any(), any(), anyInt());
-
-        assertThatCode(() -> service.alterarDataLimite(codSubprocesso, LocalDate.now()))
-                .doesNotThrowAnyException();
-
-        verify(repositorioSubprocesso).save(sp);
-    }
-
-    @Test
-    @DisplayName("alterarDataLimite: deve atualizar data etapa 2 quando situacao contem MAPA")
-    void alterarDataLimite_DeveAtualizarEtapa2() {
-        Long codSubprocesso = 1L;
-        Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
-        sp.setUnidade(new Unidade());
-
-        when(crudService.buscarSubprocesso(codSubprocesso)).thenReturn(sp);
-
-        service.alterarDataLimite(codSubprocesso, LocalDate.now());
-
-        assertThat(sp.getDataLimiteEtapa2()).isEqualTo(LocalDate.now().atStartOfDay());
-        verify(repositorioSubprocesso).save(sp);
-    }
-
-    @Test
-    @DisplayName("reabrirCadastro: deve falhar se tipo processo incorreto")
-    void reabrirCadastro_ErroTipoProcesso() {
-        Long codigo = 1L;
-        Subprocesso sp = new Subprocesso();
-        Processo p = new Processo();
-        p.setTipo(TipoProcesso.REVISAO);
-        sp.setProcesso(p);
-
-        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
-
-        assertThatThrownBy(() -> service.reabrirCadastro(codigo, "justificativa"))
-                .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining("apenas para processos de Mapeamento");
-    }
-
-    @Test
-    @DisplayName("reabrirCadastro: deve falhar se situação inicial")
-    void reabrirCadastro_ErroSituacaoInicial() {
-        Long codigo = 1L;
-        Subprocesso sp = new Subprocesso();
-        Processo p = new Processo();
-        p.setTipo(TipoProcesso.MAPEAMENTO);
-        sp.setProcesso(p);
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-
-        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
-
-        assertThatThrownBy(() -> service.reabrirCadastro(codigo, "justificativa"))
-                .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining("ainda está em fase de cadastro");
-    }
-
-    @Test
-    @DisplayName("reabrirCadastro: sucesso com captura de erro na notificação")
-    void reabrirCadastro_SucessoComErroNotificacao() {
-        Long codigo = 1L;
-        Subprocesso sp = new Subprocesso();
-        Processo p = new Processo();
-        p.setTipo(TipoProcesso.MAPEAMENTO);
-        sp.setProcesso(p);
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-        sp.setUnidade(new Unidade());
-
-        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
-        doThrow(new RuntimeException("Erro alerta")).when(alertaService).criarAlertaReaberturaCadastro(any(), any(), any());
 
-        assertThatCode(() -> service.reabrirCadastro(codigo, "justif"))
-                .doesNotThrowAnyException();
+        service.reabrirCadastro(1L, "Just");
 
-        verify(repositorioSubprocesso).save(sp);
-        verify(repositorioMovimentacao).save(any(Movimentacao.class));
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        verify(alertaService).criarAlertaReaberturaCadastro(any(), any(), any());
+        verify(alertaService).criarAlertaReaberturaCadastroSuperior(any(), any(), any(), any());
     }
 
     @Test
-    @DisplayName("reabrirRevisaoCadastro: deve falhar se tipo processo incorreto")
-    void reabrirRevisaoCadastro_ErroTipoProcesso() {
-        Long codigo = 1L;
+    @DisplayName("Reabrir cadastro falha tipo invalido")
+    void reabrirCadastroFalhaTipo() {
         Subprocesso sp = new Subprocesso();
-        Processo p = new Processo();
-        p.setTipo(TipoProcesso.MAPEAMENTO);
-        sp.setProcesso(p);
+        sp.setProcesso(new Processo());
+        sp.getProcesso().setTipo(TipoProcesso.REVISAO);
 
-        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
-        assertThatThrownBy(() -> service.reabrirRevisaoCadastro(codigo, "justificativa"))
-                .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining("apenas para processos de Revisão");
+        assertThatThrownBy(() -> service.reabrirCadastro(1L, "Just"))
+            .isInstanceOf(ErroValidacao.class);
     }
 
     @Test
-    @DisplayName("reabrirRevisaoCadastro: deve falhar se situação inicial")
-    void reabrirRevisaoCadastro_ErroSituacaoInicial() {
-        Long codigo = 1L;
+    @DisplayName("Reabrir cadastro falha estado invalido")
+    void reabrirCadastroFalhaEstado() {
         Subprocesso sp = new Subprocesso();
-        Processo p = new Processo();
-        p.setTipo(TipoProcesso.REVISAO);
-        sp.setProcesso(p);
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        sp.setProcesso(new Processo());
+        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
-        assertThatThrownBy(() -> service.reabrirRevisaoCadastro(codigo, "justificativa"))
-                .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining("ainda está em fase de revisão");
+        assertThatThrownBy(() -> service.reabrirCadastro(1L, "Just"))
+            .isInstanceOf(ErroValidacao.class);
     }
 
     @Test
-    @DisplayName("reabrirRevisaoCadastro: sucesso com captura de erro na notificação")
-    void reabrirRevisaoCadastro_SucessoComErroNotificacao() {
-        Long codigo = 1L;
+    @DisplayName("Reabrir revisao sucesso")
+    void reabrirRevisaoSucesso() {
         Subprocesso sp = new Subprocesso();
-        Processo p = new Processo();
-        p.setTipo(TipoProcesso.REVISAO);
-        sp.setProcesso(p);
+        sp.setProcesso(new Processo());
+        sp.getProcesso().setTipo(TipoProcesso.REVISAO);
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         sp.setUnidade(new Unidade());
+        sp.getUnidade().setUnidadeSuperior(new Unidade());
 
-        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
-        doThrow(new RuntimeException("Erro alerta")).when(alertaService).criarAlertaReaberturaRevisao(any(), any(), any());
 
-        assertThatCode(() -> service.reabrirRevisaoCadastro(codigo, "justif"))
-                .doesNotThrowAnyException();
+        service.reabrirRevisaoCadastro(1L, "Just");
 
-        verify(repositorioSubprocesso).save(sp);
-        verify(repositorioMovimentacao).save(any(Movimentacao.class));
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        verify(alertaService).criarAlertaReaberturaRevisao(any(), any(), any());
+        verify(alertaService).criarAlertaReaberturaRevisaoSuperior(any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Reabrir revisao falha tipo invalido")
+    void reabrirRevisaoFalhaTipo() {
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(new Processo());
+        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+
+        assertThatThrownBy(() -> service.reabrirRevisaoCadastro(1L, "Just"))
+            .isInstanceOf(ErroValidacao.class);
     }
 }

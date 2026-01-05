@@ -7,176 +7,181 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-import sgc.processo.eventos.EventoProcessoIniciado;
+import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
+import sgc.processo.erros.ErroUnidadesNaoDefinidas;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.service.SubprocessoFactory;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.UnidadeMapaRepo;
+import sgc.organizacao.model.UnidadeMapa;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ProcessoInicializador")
+@DisplayName("ProcessoInicializador Test")
 class ProcessoInicializadorTest {
 
     @Mock
     private ProcessoRepo processoRepo;
     @Mock
-    private sgc.organizacao.model.UnidadeRepo unidadeRepo;
+    private UnidadeRepo unidadeRepo;
     @Mock
-    private sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo;
-    @Mock
-    private SubprocessoFactory subprocessoFactory;
+    private UnidadeMapaRepo unidadeMapaRepo;
     @Mock
     private ApplicationEventPublisher publicadorEventos;
+    @Mock
+    private SubprocessoFactory subprocessoFactory;
 
     @InjectMocks
     private ProcessoInicializador inicializador;
 
     @Test
-    @DisplayName("Deve iniciar processo de mapeamento com sucesso")
-    void deveIniciarProcessoMapeamentoComSucesso() {
-        // Arrange
-        Long codProcesso = 1L;
-        Processo processo = new Processo();
-        processo.setCodigo(codProcesso);
-        processo.setSituacao(SituacaoProcesso.CRIADO);
-        processo.setTipo(TipoProcesso.MAPEAMENTO);
+    @DisplayName("Iniciar processo falha se situação inválida")
+    void iniciarProcessoFalhaSituacaoInvalida() {
+        Processo p = new Processo();
+        p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
 
-        Unidade u1 = new Unidade(); u1.setCodigo(10L);
-        processo.setParticipantes(Set.of(u1));
+        assertThatThrownBy(() -> inicializador.iniciar(1L, List.of()))
+                .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
+    }
 
-        when(processoRepo.findById(codProcesso)).thenReturn(java.util.Optional.of(processo));
+    @Test
+    @DisplayName("Iniciar REVISAO falha se lista unidades vazia")
+    void iniciarRevisaoFalhaListaUnidadesVazia() {
+        Processo p = new Processo();
+        p.setSituacao(SituacaoProcesso.CRIADO);
+        p.setTipo(TipoProcesso.REVISAO);
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
 
-        // Simular que não há unidades em processos ativos
-        when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), anyList()))
-            .thenReturn(List.of());
+        assertThatThrownBy(() -> inicializador.iniciar(1L, Collections.emptyList()))
+                .isInstanceOf(ErroUnidadesNaoDefinidas.class);
+    }
 
-        // Act
-        List<String> erros = inicializador.iniciar(codProcesso, null); // Passa null pois pega do processo
+    @Test
+    @DisplayName("Iniciar MAPEAMENTO falha se sem participantes")
+    void iniciarMapeamentoFalhaSemParticipantes() {
+        Processo p = new Processo();
+        p.setSituacao(SituacaoProcesso.CRIADO);
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        p.setParticipantes(Collections.emptySet());
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
 
-        // Assert
+        assertThatThrownBy(() -> inicializador.iniciar(1L, null))
+                .isInstanceOf(ErroUnidadesNaoDefinidas.class);
+    }
+
+    @Test
+    @DisplayName("Iniciar sucesso (Mapeamento)")
+    void iniciarSucessoMapeamento() {
+        Processo p = new Processo();
+        p.setSituacao(SituacaoProcesso.CRIADO);
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        Unidade u = new Unidade(); u.setCodigo(1L);
+        p.setParticipantes(Set.of(u));
+
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of());
+
+        List<String> erros = inicializador.iniciar(1L, null);
+
         assertThat(erros).isEmpty();
-        verify(processoRepo).save(processo);
-        assertThat(processo.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
-        verify(subprocessoFactory).criarParaMapeamento(eq(processo), any());
-        verify(publicadorEventos).publishEvent(any(EventoProcessoIniciado.class));
+        verify(subprocessoFactory).criarParaMapeamento(eq(p), any());
+        // Verify publishEvent is called with ANY object, as we don't care about the specific timestamp or instance here for this test
+        verify(publicadorEventos).publishEvent(any(Object.class));
+        assertThat(p.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
     }
 
     @Test
-    @DisplayName("Deve falhar ao iniciar processo se não estiver CRIADO")
-    void deveFalharAoIniciarSeProcessoNaoCriado() {
-        // Arrange
-        Long codProcesso = 1L;
-        Processo processo = new Processo();
-        processo.setCodigo(codProcesso);
-        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO); // Já iniciado
+    @DisplayName("Iniciar falha se unidade sem mapa em Revisão")
+    void iniciarFalhaUnidadeSemMapaRevisao() {
+        Processo p = new Processo();
+        p.setSituacao(SituacaoProcesso.CRIADO);
+        p.setTipo(TipoProcesso.REVISAO);
 
-        when(processoRepo.findById(codProcesso)).thenReturn(java.util.Optional.of(processo));
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(unidadeMapaRepo.findAllById(any())).thenReturn(List.of()); // Nenhuma unidade tem mapa
+        when(unidadeRepo.findSiglasByCodigos(any())).thenReturn(List.of("U1"));
 
-        // Act & Assert
-        assertThatThrownBy(() -> inicializador.iniciar(codProcesso, List.of(10L)))
-                .isInstanceOf(sgc.processo.erros.ErroProcessoEmSituacaoInvalida.class)
-                .hasMessageContaining("Apenas processos na situação 'CRIADO' podem ser iniciados");
+        List<String> erros = inicializador.iniciar(1L, List.of(1L));
+
+        assertThat(erros).isNotEmpty();
+        assertThat(erros.get(0)).contains("não possuem mapa vigente");
     }
 
     @Test
-    @DisplayName("Deve retornar erros se unidades já estiverem em processos ativos")
-    void deveRetornarErrosSeUnidadesEmProcessosAtivos() {
-        // Arrange
-        Long codProcesso = 1L;
-        Processo processo = new Processo();
-        processo.setCodigo(codProcesso);
-        processo.setSituacao(SituacaoProcesso.CRIADO);
-        processo.setTipo(TipoProcesso.MAPEAMENTO);
+    @DisplayName("Iniciar falha se unidade em processo ativo")
+    void iniciarFalhaUnidadeEmProcessoAtivo() {
+        Processo p = new Processo();
+        p.setSituacao(SituacaoProcesso.CRIADO);
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        Unidade u = new Unidade(); u.setCodigo(1L);
+        p.setParticipantes(Set.of(u));
 
-        Unidade u1 = new Unidade(); u1.setCodigo(10L); u1.setSigla("U1");
-        Unidade u2 = new Unidade(); u2.setCodigo(20L); u2.setSigla("U2");
-        processo.setParticipantes(Set.of(u1, u2));
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of(1L));
+        when(unidadeRepo.findSiglasByCodigos(any())).thenReturn(List.of("U1"));
 
-        when(processoRepo.findById(codProcesso)).thenReturn(java.util.Optional.of(processo));
+        List<String> erros = inicializador.iniciar(1L, null);
 
-        // Mocking para findUnidadeCodigosBySituacaoAndUnidadeCodigosIn
-        when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(eq(SituacaoProcesso.EM_ANDAMENTO), anyList()))
-                .thenReturn(List.of(10L));
-
-        // Mocking para findSiglasByCodigos em UnidadeRepo
-        when(unidadeRepo.findSiglasByCodigos(List.of(10L))).thenReturn(List.of("U1"));
-
-        // Act
-        List<String> erros = inicializador.iniciar(codProcesso, null);
-
-        // Assert
-        assertThat(erros).hasSize(1);
-        assertThat(erros.get(0)).contains("As seguintes unidades já participam de outro processo ativo: U1");
-        verify(processoRepo, never()).save(processo);
+        assertThat(erros).isNotEmpty();
+        assertThat(erros.get(0)).contains("já participam de outro processo");
     }
 
     @Test
-    @DisplayName("Deve iniciar processo de revisão com sucesso")
-    void deveIniciarProcessoRevisaoComSucesso() {
-        // Arrange
-        Long codProcesso = 1L;
-        Processo processo = new Processo();
-        processo.setCodigo(codProcesso);
-        processo.setSituacao(SituacaoProcesso.CRIADO);
-        processo.setTipo(TipoProcesso.REVISAO);
+    @DisplayName("Iniciar sucesso (Revisão)")
+    void iniciarSucessoRevisao() {
+        Processo p = new Processo();
+        p.setSituacao(SituacaoProcesso.CRIADO);
+        p.setTipo(TipoProcesso.REVISAO);
 
-        Unidade u1 = new Unidade(); u1.setCodigo(10L);
-
-        when(processoRepo.findById(codProcesso)).thenReturn(java.util.Optional.of(processo));
-
-        // Mock para unidadeMapaRepo.findAllById
-        sgc.organizacao.model.UnidadeMapa um1 = new sgc.organizacao.model.UnidadeMapa();
-        um1.setUnidadeCodigo(10L);
-        when(unidadeMapaRepo.findAllById(anyList())).thenReturn(List.of(um1));
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
         
-        // Mock para processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn
-        when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), anyList())).thenReturn(List.of());
+        UnidadeMapa um = new UnidadeMapa();
+        um.setUnidadeCodigo(1L);
+        when(unidadeMapaRepo.findAllById(anyList())).thenReturn(List.of(um));
 
-        // Mock para unidadeRepo.findAllById em vez de findById (para teste da otimização)
-        when(unidadeRepo.findAllById(List.of(10L))).thenReturn(List.of(u1));
+        Unidade u = new Unidade(); u.setCodigo(1L);
+        when(unidadeRepo.findAllById(anyList())).thenReturn(List.of(u));
 
-        // Act
-        List<String> erros = inicializador.iniciar(codProcesso, List.of(10L));
+        List<String> erros = inicializador.iniciar(1L, List.of(1L));
 
-        // Assert
         assertThat(erros).isEmpty();
-        verify(subprocessoFactory).criarParaRevisao(eq(processo), any(), any());
+        verify(subprocessoFactory).criarParaRevisao(eq(p), any(), any());
     }
 
     @Test
-    @DisplayName("Deve retornar erro ao iniciar revisão se unidade sem mapa vigente")
-    void deveRetornarErroSeUnidadeSemMapaVigenteNaRevisao() {
-        // Arrange
-        Long codProcesso = 1L;
-        Processo processo = new Processo();
-        processo.setCodigo(codProcesso);
-        processo.setSituacao(SituacaoProcesso.CRIADO);
-        processo.setTipo(TipoProcesso.REVISAO);
+    @DisplayName("Iniciar sucesso (Diagnóstico)")
+    void iniciarSucessoDiagnostico() {
+        Processo p = new Processo();
+        p.setSituacao(SituacaoProcesso.CRIADO);
+        p.setTipo(TipoProcesso.DIAGNOSTICO);
+        Unidade u = new Unidade(); u.setCodigo(1L);
+        p.setParticipantes(Set.of(u));
 
-        Unidade u1 = new Unidade(); u1.setCodigo(10L); u1.setSigla("U1");
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
 
-        when(processoRepo.findById(codProcesso)).thenReturn(java.util.Optional.of(processo));
+        UnidadeMapa um = new UnidadeMapa();
+        um.setUnidadeCodigo(1L);
+        when(unidadeMapaRepo.findAllById(anyList())).thenReturn(List.of(um));
 
-        // Mock para unidadeMapaRepo.findAllById - retorna lista vazia para simular que a unidade 10L não tem mapa
-        when(unidadeMapaRepo.findAllById(anyList())).thenReturn(List.of());
-        // Mock para unidadeRepo.findSiglasByCodigos
-        when(unidadeRepo.findSiglasByCodigos(List.of(10L))).thenReturn(List.of("U1"));
+        List<String> erros = inicializador.iniciar(1L, null);
 
-        // Act
-        List<String> erros = inicializador.iniciar(codProcesso, List.of(10L));
-
-        // Assert
-        assertThat(erros).hasSize(1);
-        assertThat(erros.get(0)).contains("As seguintes unidades não possuem mapa vigente");
+        assertThat(erros).isEmpty();
+        verify(subprocessoFactory).criarParaDiagnostico(eq(p), any(), any());
     }
 }

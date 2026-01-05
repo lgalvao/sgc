@@ -121,4 +121,22 @@ class SubprocessoValidacaoServiceTest {
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("competências que não foram associadas");
     }
+
+    @Test
+    @DisplayName("Validar existencia atividades falha sem conhecimentos")
+    void validarExistenciaAtividadesFalhaSemConhecimentos() {
+        Subprocesso sp = new Subprocesso();
+        sp.setMapa(new Mapa());
+        sp.getMapa().setCodigo(10L);
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+
+        Atividade a = mock(Atividade.class);
+        when(a.getConhecimentos()).thenReturn(Collections.emptyList());
+
+        // Ensure the service returns the mocked activity
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(a));
+
+        assertThatThrownBy(() -> service.validarExistenciaAtividades(1L))
+                .isInstanceOf(ErroValidacao.class);
+    }
 }

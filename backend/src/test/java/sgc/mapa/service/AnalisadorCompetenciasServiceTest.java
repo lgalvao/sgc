@@ -9,98 +9,128 @@ import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.TipoImpactoAtividade;
+import sgc.mapa.model.TipoImpactoCompetencia;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes para AnalisadorCompetenciasService")
+@DisplayName("AnalisadorCompetenciasService Test")
 class AnalisadorCompetenciasServiceTest {
 
     @InjectMocks
     private AnalisadorCompetenciasService analisador;
 
     @Test
-    @DisplayName("Deve construir mapa de atividade para competências corretamente")
-    void deveConstruirMapaAtividadeCompetencias() {
-        // Arrange
-        Atividade a1 = new Atividade();
-        a1.setCodigo(1L);
+    @DisplayName("Identificar impactos em atividade removida")
+    void identificarImpactoRemovida() {
+        Atividade a1 = new Atividade(); a1.setCodigo(1L); a1.setDescricao("Ativ 1");
+        Competencia c1 = new Competencia(); c1.setCodigo(10L); c1.setDescricao("Comp 1");
+        c1.setAtividades(java.util.Set.of(a1));
 
-        Competencia c1 = new Competencia();
-        c1.setCodigo(10L);
-        c1.setDescricao("Competencia 1");
+        AtividadeImpactadaDto rem = new AtividadeImpactadaDto();
+        rem.setCodigo(1L); rem.setDescricao("Ativ 1");
 
-        // Configurando a relação bidirecional (ou unidirecional conforme a lógica de serviço espera)
-        // O serviço itera sobre as competências e verifica c.getAtividades()
-        Set<Atividade> atividades = new HashSet<>();
-        atividades.add(a1);
-        c1.setAtividades(atividades);
+        List<CompetenciaImpactadaDto> res = analisador.identificarCompetenciasImpactadas(
+                List.of(c1),
+                List.of(rem),
+                Collections.emptyList(),
+                Collections.emptyList()
+        );
 
-        List<Competencia> competencias = List.of(c1);
-
-        // Act
-        Map<Long, List<Competencia>> resultado = analisador.construirMapaAtividadeCompetencias(competencias);
-
-        // Assert
-        assertThat(resultado).containsKey(1L);
-        assertThat(resultado.get(1L)).hasSize(1);
-        assertThat(resultado.get(1L).getFirst().getDescricao()).isEqualTo("Competencia 1");
+        assertThat(res).hasSize(1);
+        assertThat(res.get(0).getTipoImpacto()).isEqualTo(TipoImpactoCompetencia.ATIVIDADE_REMOVIDA);
     }
 
     @Test
-    @DisplayName("Deve identificar competências impactadas por remoção de atividade")
-    void deveIdentificarImpactadasPorRemocao() {
-        // Arrange
-        AtividadeImpactadaDto removida = AtividadeImpactadaDto.builder()
-                .codigo(1L)
-                .tipoImpacto(TipoImpactoAtividade.REMOVIDA)
-                .build();
+    @DisplayName("Identificar impactos em atividade alterada")
+    void identificarImpactoAlterada() {
+        Atividade a1 = new Atividade(); a1.setCodigo(1L); a1.setDescricao("Ativ Nova");
+        Competencia c1 = new Competencia(); c1.setCodigo(10L); c1.setDescricao("Comp 1");
+        c1.setAtividades(java.util.Set.of(a1));
 
-        Competencia c1 = new Competencia();
-        c1.setCodigo(10L);
-        c1.setDescricao("Comp 1");
+        AtividadeImpactadaDto alt = new AtividadeImpactadaDto();
+        alt.setDescricao("Ativ Nova");
+        alt.setDescricaoAnterior("Ativ Velha");
 
-        // Simular que esta competência estava ligada à atividade removida
-        Atividade a1 = new Atividade();
-        a1.setCodigo(1L);
+        // A lista de atividades vigentes deve conter a atividade com a descrição nova para fazer o match
+        List<Atividade> vigentes = List.of(a1);
 
-        Set<Atividade> atividades = new HashSet<>();
-        atividades.add(a1);
-        c1.setAtividades(atividades);
+        List<CompetenciaImpactadaDto> res = analisador.identificarCompetenciasImpactadas(
+                List.of(c1),
+                Collections.emptyList(),
+                List.of(alt),
+                vigentes
+        );
 
-        List<Competencia> todasCompetencias = List.of(c1);
-        List<AtividadeImpactadaDto> removidas = List.of(removida);
-        List<AtividadeImpactadaDto> alteradas = List.of();
-        List<Atividade> atividadesVigentes = List.of(a1);
-
-        // Act
-        List<CompetenciaImpactadaDto> resultado = analisador.identificarCompetenciasImpactadas(
-                todasCompetencias, removidas, alteradas, atividadesVigentes);
-
-        // Assert
-        assertThat(resultado).hasSize(1);
-        assertThat(resultado.getFirst().getDescricao()).isEqualTo("Comp 1");
-        // DTO não tem getImpacto, verificamos tipoImpacto
-        assertThat(resultado.getFirst().getTipoImpacto()).isEqualTo(sgc.mapa.model.TipoImpactoCompetencia.ATIVIDADE_REMOVIDA);
-
-        // Edge case
-        assertFalse(resultado.isEmpty());
+        assertThat(res).hasSize(1);
+        assertThat(res.get(0).getTipoImpacto()).isEqualTo(TipoImpactoCompetencia.ATIVIDADE_ALTERADA);
     }
 
     @Test
-    @DisplayName("Deve retornar vazio se não houver impactos")
-    void deveRetornarVazioSeSemImpactos() {
-         List<CompetenciaImpactadaDto> resultado = analisador.identificarCompetenciasImpactadas(
-                List.of(), List.of(), List.of(), List.of());
+    @DisplayName("Identificar impacto misto (removida e alterada)")
+    void identificarImpactoMisto() {
+        Atividade a1 = new Atividade(); a1.setCodigo(1L); a1.setDescricao("Ativ Removida");
+        Atividade a2 = new Atividade(); a2.setCodigo(2L); a2.setDescricao("Ativ Nova");
 
-         assertTrue(resultado.isEmpty());
+        Competencia c1 = new Competencia(); c1.setCodigo(10L); c1.setDescricao("Comp 1");
+        // A competencia tem ambas atividades
+        c1.setAtividades(java.util.Set.of(a1, a2));
+
+        AtividadeImpactadaDto rem = new AtividadeImpactadaDto();
+        rem.setCodigo(1L); rem.setDescricao("Ativ Removida");
+
+        AtividadeImpactadaDto alt = new AtividadeImpactadaDto();
+        alt.setDescricao("Ativ Nova"); alt.setDescricaoAnterior("Ativ Velha");
+
+        List<Atividade> vigentes = List.of(a2);
+
+        List<CompetenciaImpactadaDto> res = analisador.identificarCompetenciasImpactadas(
+                List.of(c1),
+                List.of(rem),
+                List.of(alt),
+                vigentes
+        );
+
+        assertThat(res).hasSize(1);
+        assertThat(res.get(0).getTipoImpacto()).isEqualTo(TipoImpactoCompetencia.IMPACTO_GENERICO);
+    }
+
+    @Test
+    @DisplayName("Ignorar removida sem codigo")
+    void ignorarRemovidaSemCodigo() {
+        AtividadeImpactadaDto rem = new AtividadeImpactadaDto();
+        rem.setCodigo(null);
+
+        List<CompetenciaImpactadaDto> res = analisador.identificarCompetenciasImpactadas(
+                List.of(), List.of(rem), List.of(), List.of()
+        );
+        assertThat(res).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Ignorar alterada sem descricao")
+    void ignorarAlteradaSemDescricao() {
+         AtividadeImpactadaDto alt = new AtividadeImpactadaDto();
+         alt.setDescricao(null);
+         List<CompetenciaImpactadaDto> res = analisador.identificarCompetenciasImpactadas(
+                List.of(), List.of(), List.of(alt), List.of()
+        );
+        assertThat(res).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Ignorar alterada não encontrada em vigentes")
+    void ignorarAlteradaNaoVigente() {
+        AtividadeImpactadaDto alt = new AtividadeImpactadaDto();
+        alt.setDescricao("X");
+        List<CompetenciaImpactadaDto> res = analisador.identificarCompetenciasImpactadas(
+                List.of(), List.of(), List.of(alt), List.of()
+        );
+        assertThat(res).isEmpty();
     }
 }

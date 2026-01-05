@@ -7,6 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.dto.AlertaMapper;
 import sgc.alerta.model.*;
@@ -169,6 +172,58 @@ class AlertaServiceTest {
             // Then
             verify(alertaRepo).save(any());
         }
+
+        @Test
+        @DisplayName("Deve criar alerta de transição e retornar null se destino nulo")
+        void deveRetornarNullSeDestinoNuloEmCriarAlertaTransicao() {
+            Processo p = new Processo();
+            Unidade uOrigem = new Unidade();
+            Alerta resultado = service.criarAlertaTransicao(p, "desc", uOrigem, null);
+            assertThat(resultado).isNull();
+        }
+
+        @Test
+        @DisplayName("Deve criar alerta de transição com sucesso")
+        void deveCriarAlertaTransicaoComSucesso() {
+            Processo p = new Processo();
+            Unidade uOrigem = new Unidade();
+            Unidade uDestino = new Unidade();
+            uDestino.setSigla("DEST");
+            when(alertaRepo.save(any())).thenReturn(new Alerta());
+
+            Alerta resultado = service.criarAlertaTransicao(p, "desc", uOrigem, uDestino);
+            assertThat(resultado).isNotNull();
+            verify(alertaRepo).save(any());
+        }
+
+        @Test
+        @DisplayName("Deve criar alerta de alteração de data limite")
+        void deveCriarAlertaAlteracaoDataLimite() {
+            Processo p = new Processo();
+            Unidade uDestino = new Unidade();
+            when(alertaRepo.save(any())).thenReturn(new Alerta());
+
+            service.criarAlertaAlteracaoDataLimite(p, uDestino, "20/10/2023", 1);
+            verify(alertaRepo).save(any());
+        }
+
+        @Test
+        @DisplayName("Deve criar alertas de reabertura")
+        void deveCriarAlertasDeReabertura() {
+            Processo p = new Processo();
+            Unidade u = new Unidade();
+            u.setSigla("U1");
+            Unidade sup = new Unidade();
+
+            when(alertaRepo.save(any())).thenReturn(new Alerta());
+
+            service.criarAlertaReaberturaCadastro(p, u, "just");
+            service.criarAlertaReaberturaCadastroSuperior(p, sup, u, "just");
+            service.criarAlertaReaberturaRevisao(p, u, "just");
+            service.criarAlertaReaberturaRevisaoSuperior(p, sup, u, "just");
+
+            verify(alertaRepo, times(4)).save(any());
+        }
     }
 
     @Nested
@@ -264,6 +319,52 @@ class AlertaServiceTest {
             // Then
             assertThat(resultado).hasSize(1);
             verify(alertaUsuarioRepo, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("Deve retornar vazio se usuario nao tem unidade de lotacao")
+        void deveRetornarVazioSeSemLotacao() {
+            Usuario u = new Usuario();
+            u.setUnidadeLotacao(null);
+            when(usuarioService.buscarEntidadePorId("123")).thenReturn(u);
+            assertThat(service.listarAlertasPorUsuario("123")).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("Listagens Paginadas e Outros")
+    class OutrosMetodos {
+        @Test
+        @DisplayName("Listar por usuario paginado")
+        void listarPorUsuarioPaginado() {
+            Pageable p = Pageable.unpaged();
+            when(alertaRepo.findByUsuarioDestino_TituloEleitoral("123", p)).thenReturn(Page.empty());
+            assertThat(service.listarPorUsuario("123", p)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Listar por unidades paginado")
+        void listarPorUnidadesPaginado() {
+            Pageable p = Pageable.unpaged();
+            when(alertaRepo.findByUnidadeDestino_CodigoIn(List.of(1L), p)).thenReturn(Page.empty());
+            assertThat(service.listarPorUnidades(List.of(1L), p)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Listar todos paginado")
+        void listarTodosPaginado() {
+            Pageable p = Pageable.unpaged();
+            when(alertaRepo.findAll(p)).thenReturn(Page.empty());
+            assertThat(service.listarTodos(p)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Obter data hora leitura")
+        void obterDataHoraLeitura() {
+            AlertaUsuario au = new AlertaUsuario();
+            au.setDataHoraLeitura(LocalDateTime.now());
+            when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.of(au));
+            assertThat(service.obterDataHoraLeitura(1L, "user")).isPresent();
         }
     }
 }

@@ -19,6 +19,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapaRepo;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.mapa.service.MapaService;
+import sgc.comum.erros.ErroValidacao;
 
 import java.util.Collections;
 import java.util.List;
@@ -288,6 +289,18 @@ class UnidadeServiceTest {
         }
 
         @Test
+        @DisplayName("Deve falhar ao criar atribuição se datas inválidas")
+        void deveFalharCriarAtribuicaoDatasInvalidas() {
+            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
+            when(usuarioService.buscarEntidadePorId("123")).thenReturn(new Usuario());
+
+            CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
+                    "123", java.time.LocalDate.now().plusDays(1), java.time.LocalDate.now(), "Justificativa");
+
+            assertThrows(ErroValidacao.class, () -> service.criarAtribuicaoTemporaria(1L, req));
+        }
+
+        @Test
         @DisplayName("Deve buscar usuários por unidade")
         void deveBuscarUsuariosPorUnidade() {
             // Arrange
@@ -309,6 +322,66 @@ class UnidadeServiceTest {
 
             // Assert
             assertThat(result).hasSize(1);
+        }
+    }
+
+    @Nested
+    @DisplayName("Outros Metodos de Cobertura")
+    class OutrosMetodos {
+        @Test
+        @DisplayName("Buscar IDs descendentes recursivamente")
+        void buscarIdsDescendentes() {
+            Unidade pai = new Unidade(); pai.setCodigo(1L);
+            Unidade filho = new Unidade(); filho.setCodigo(2L); filho.setUnidadeSuperior(pai);
+            Unidade neto = new Unidade(); neto.setCodigo(3L); neto.setUnidadeSuperior(filho);
+
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(pai, filho, neto));
+
+            List<Long> result = service.buscarIdsDescendentes(1L);
+            assertThat(result).containsExactlyInAnyOrder(2L, 3L);
+        }
+
+        @Test
+        @DisplayName("Listar subordinadas")
+        void listarSubordinadas() {
+            service.listarSubordinadas(1L);
+            verify(unidadeRepo).findByUnidadeSuperiorCodigo(1L);
+        }
+
+        @Test
+        @DisplayName("Buscar entidades por IDs")
+        void buscarEntidadesPorIds() {
+            service.buscarEntidadesPorIds(List.of(1L));
+            verify(unidadeRepo).findAllById(any());
+        }
+
+        @Test
+        @DisplayName("Buscar todas entidades com hierarquia (cache)")
+        void buscarTodasEntidadesComHierarquia() {
+            service.buscarTodasEntidadesComHierarquia();
+            verify(unidadeRepo).findAllWithHierarquia();
+        }
+
+        @Test
+        @DisplayName("Buscar siglas por IDs")
+        void buscarSiglasPorIds() {
+            service.buscarSiglasPorIds(List.of(1L));
+            verify(unidadeRepo).findSiglasByCodigos(any());
+        }
+
+        @Test
+        @DisplayName("Verificar existencia mapa vigente")
+        void verificarExistenciaMapaVigente() {
+            service.verificarExistenciaMapaVigente(1L);
+            verify(unidadeMapaRepo).existsById(1L);
+        }
+
+        @Test
+        @DisplayName("Definir mapa vigente (criação)")
+        void definirMapaVigenteCriacao() {
+            when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.empty());
+            service.definirMapaVigente(1L, new sgc.mapa.model.Mapa());
+            verify(unidadeMapaRepo).save(any());
         }
     }
 }
