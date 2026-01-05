@@ -47,14 +47,13 @@ vi.mock("@/services/cadastroService", () => ({
 }));
 
 // Fix: Mock obterDetalhesProcesso to return minimal valid data matching the test scenario
-// This prevents onMounted from overwriting the store with empty data
 vi.mock("@/services/processoService", () => ({
     buscarProcessoDetalhe: vi.fn(),
     obterDetalhesProcesso: vi.fn().mockResolvedValue({
         codigo: 1,
         tipo: 'REVISAO',
         unidades: [{
-            sigla: "U1", // Match the prop 'sigla' passed to component
+            sigla: "U1",
             codSubprocesso: 10,
             situacaoSubprocesso: "REVISAO_CADASTRO_DISPONIBILIZADA"
         }]
@@ -226,8 +225,6 @@ describe("VisAtividades.vue", () => {
     it("deve abrir modal de impacto ao clicar no botão", async () => {
         const wrapper = mount(VisAtividades, mountOptions());
         // Force button visibility
-        // computed 'podeVerImpacto' needs perfil=ADMIN/GESTOR and situacao=DISPONIBILIZADA (which is set in mountOptions)
-
         const btn = wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]');
         await btn.trigger("click");
 

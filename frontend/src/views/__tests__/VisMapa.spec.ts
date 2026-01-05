@@ -425,4 +425,25 @@ describe("VisMapa.vue", () => {
 
         expect(wrapper.text()).toContain("Sugestões registradas");
     });
+
+    it("does not show content if unit not found", async () => {
+        const { wrapper } = mountComponent({
+            unidades: {
+                unidades: [], // empty list
+                unidade: null
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.text()).toContain("Unidade não encontrada");
+    });
+
+    it("shows empty state if no map", async () => {
+        const { wrapper } = mountComponent({
+            mapas: {
+                mapaVisualizacao: { competencias: [] } // empty
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.text()).toContain("Nenhuma competência cadastrada");
+    });
 });
