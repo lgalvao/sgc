@@ -66,6 +66,7 @@ class AtividadeFacadeTest {
 
         AtividadeOperacaoResponse response = facade.criarAtividade(request, "user");
 
+        verify(subprocessoService).validarPermissaoEdicaoMapa(1L, "user");
         assertThat(response.getAtividade().getCodigo()).isEqualTo(100L);
         assertThat(response.getSubprocesso()).isNotNull();
         assertThat(response.getSubprocesso().getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);

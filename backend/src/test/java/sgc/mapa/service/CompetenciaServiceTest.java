@@ -73,6 +73,7 @@ class CompetenciaServiceTest {
         ativNova.setCompetencias(new HashSet<>());
 
         when(competenciaRepo.findById(compId)).thenReturn(Optional.of(comp));
+        when(atividadeRepo.listarPorCompetencia(comp)).thenReturn(List.of(ativAntiga));
         when(atividadeRepo.findAllById(novosIds)).thenReturn(List.of(ativNova));
         when(competenciaRepo.save(any())).thenAnswer(i -> i.getArgument(0));
 
