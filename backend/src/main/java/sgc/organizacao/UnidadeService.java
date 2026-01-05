@@ -230,6 +230,37 @@ public class UnidadeService {
         return unidadeRepo.findByUnidadeSuperiorCodigo(codigoPai);
     }
 
+    /**
+     * Busca IDs de todas as unidades subordinadas (recursivamente) em memória,
+     * utilizando a lista cacheada de unidades para evitar N+1 queries.
+     */
+    public List<Long> buscarIdsDescendentes(Long codigoUnidade) {
+        List<Unidade> todas = buscarTodasEntidadesComHierarquia();
+
+        // Mapa para lookup rápido: Pai -> Lista de Filhos
+        Map<Long, List<Long>> mapPaiFilhos = new HashMap<>();
+        for (Unidade u : todas) {
+            if (u.getUnidadeSuperior() != null) {
+                mapPaiFilhos.computeIfAbsent(u.getUnidadeSuperior().getCodigo(), k -> new ArrayList<>())
+                        .add(u.getCodigo());
+            }
+        }
+
+        List<Long> descendentes = new ArrayList<>();
+        coletarDescendentes(codigoUnidade, mapPaiFilhos, descendentes);
+        return descendentes;
+    }
+
+    private void coletarDescendentes(Long atual, Map<Long, List<Long>> map, List<Long> resultado) {
+        List<Long> filhos = map.get(atual);
+        if (filhos != null) {
+            for (Long filho : filhos) {
+                resultado.add(filho);
+                coletarDescendentes(filho, map, resultado);
+            }
+        }
+    }
+
     public List<Unidade> buscarEntidadesPorIds(List<Long> codigos) {
         return unidadeRepo.findAllById(codigos);
     }

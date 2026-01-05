@@ -48,10 +48,8 @@ class PainelServiceCoverageTest {
     @DisplayName("listarProcessos: Perfil GESTOR deve buscar subordinadas")
     void listarProcessos_GestorBuscaSubordinadas() {
         Long codigoUnidade = 1L;
-        Unidade sub = new Unidade();
-        sub.setCodigo(2L);
-        when(unidadeService.listarSubordinadas(codigoUnidade)).thenReturn(List.of(sub));
-        when(unidadeService.listarSubordinadas(2L)).thenReturn(Collections.emptyList());
+        // Mock new optimized method
+        when(unidadeService.buscarIdsDescendentes(codigoUnidade)).thenReturn(List.of(2L));
 
         Processo p = new Processo();
         p.setCodigo(100L);
@@ -64,7 +62,7 @@ class PainelServiceCoverageTest {
         Page<ProcessoResumoDto> result = service.listarProcessos(Perfil.GESTOR, codigoUnidade, pageable);
 
         assertThat(result.getContent()).isNotEmpty();
-        verify(unidadeService).listarSubordinadas(codigoUnidade);
+        verify(unidadeService).buscarIdsDescendentes(codigoUnidade);
         verify(processoService).listarPorParticipantesIgnorandoCriado(
                 argThat(list -> list.contains(1L) && list.contains(2L)), any());
     }
@@ -111,7 +109,7 @@ class PainelServiceCoverageTest {
     @DisplayName("listarAlertas: busca por unidade e subordinadas se titulo nulo")
     void listarAlertas_PorUnidade() {
         Long codigoUnidade = 1L;
-        when(unidadeService.listarSubordinadas(codigoUnidade)).thenReturn(Collections.emptyList());
+        when(unidadeService.buscarIdsDescendentes(codigoUnidade)).thenReturn(Collections.emptyList());
 
         Alerta alerta = new Alerta();
         alerta.setCodigo(1L);
@@ -151,8 +149,9 @@ class PainelServiceCoverageTest {
         Unidade filho = new Unidade(); filho.setCodigo(2L); filho.setSigla("FILHO");
         filho.setUnidadeSuperior(pai);
 
-        when(unidadeService.listarSubordinadas(1L)).thenReturn(List.of(filho));
-        when(unidadeService.listarSubordinadas(2L)).thenReturn(Collections.emptyList());
+        // Mock buscarIdsDescendentes for todasSubordinadasParticipam
+        when(unidadeService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
+        when(unidadeService.buscarIdsDescendentes(2L)).thenReturn(Collections.emptyList());
 
         // Mock buscarEntidadePorId para o loop
         when(unidadeService.buscarEntidadePorId(1L)).thenReturn(pai);
@@ -198,5 +197,30 @@ class PainelServiceCoverageTest {
         Page<ProcessoResumoDto> result = service.listarProcessos(Perfil.ADMIN, null, pageable);
 
         assertThat(result.getContent().get(0).getUnidadesParticipantes()).isEqualTo("FILHO");
+    }
+
+    @Test
+    @DisplayName("Deve usar busca otimizada (in-memory) ao buscar unidades subordinadas")
+    void deveUsarBuscaOtimizadaDeSubordinadas() {
+        // Cenário: Hierarquia com profundidade 3
+        Long raizId = 1L;
+
+        // Mock para evitar NPE
+        when(processoService.listarPorParticipantesIgnorandoCriado(any(), any()))
+                .thenReturn(org.springframework.data.domain.Page.empty());
+
+        // Mock da resposta otimizada (simulando que o serviço retornou os IDs corretamente)
+        when(unidadeService.buscarIdsDescendentes(raizId))
+                .thenReturn(List.of(2L, 3L, 4L, 5L));
+
+        // Ação: Listar processos como GESTOR
+        service.listarProcessos(Perfil.GESTOR, raizId, org.springframework.data.domain.PageRequest.of(0, 10));
+
+        // Verificação:
+        // DEVE chamar buscarIdsDescendentes UMA vez
+        verify(unidadeService, times(1)).buscarIdsDescendentes(raizId);
+
+        // E NÃO DEVE chamar o método antigo (listarSubordinadas) NENHUMA vez
+        verify(unidadeService, never()).listarSubordinadas(any());
     }
 }

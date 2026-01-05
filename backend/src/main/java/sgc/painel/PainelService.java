@@ -69,7 +69,7 @@ public class PainelService {
             
             // GESTOR vê processos da unidade e subordinadas
             if (perfil == Perfil.GESTOR) {
-                unidadeIds.addAll(obterIdsUnidadesSubordinadas(codigoUnidade));
+                unidadeIds.addAll(unidadeService.buscarIdsDescendentes(codigoUnidade));
             }
             
             // Todos os perfis veem processos da própria unidade
@@ -118,7 +118,7 @@ public class PainelService {
         if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
             alertasPage = alertaService.listarPorUsuario(usuarioTitulo, sortedPageable);
         } else if (codigoUnidade != null) {
-            List<Long> unidadeIds = obterIdsUnidadesSubordinadas(codigoUnidade);
+            List<Long> unidadeIds = new ArrayList<>(unidadeService.buscarIdsDescendentes(codigoUnidade));
             unidadeIds.add(codigoUnidade);
             alertasPage = alertaService.listarPorUnidades(unidadeIds, sortedPageable);
         } else {
@@ -135,16 +135,6 @@ public class PainelService {
                     }
                     return paraAlertaDto(alerta, dataHoraLeitura);
                 });
-    }
-
-    private List<Long> obterIdsUnidadesSubordinadas(Long codUnidade) {
-        List<Unidade> subordinadas = unidadeService.listarSubordinadas(codUnidade);
-        List<Long> ids = new ArrayList<>();
-        for (Unidade u : subordinadas) {
-            ids.add(u.getCodigo());
-            ids.addAll(obterIdsUnidadesSubordinadas(u.getCodigo()));
-        }
-        return ids;
     }
 
     private ProcessoResumoDto paraProcessoResumoDto(Processo processo, Perfil perfil, Long codigoUnidade) {
@@ -220,7 +210,7 @@ public class PainelService {
     }
 
     private boolean todasSubordinadasParticipam(Long codigo, Set<Long> participantesIds) {
-        for (Long subordinadaId : obterIdsUnidadesSubordinadas(codigo)) {
+        for (Long subordinadaId : unidadeService.buscarIdsDescendentes(codigo)) {
             if (!participantesIds.contains(subordinadaId)) return false;
         }
         return true;
