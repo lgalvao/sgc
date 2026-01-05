@@ -3,6 +3,8 @@ package sgc.seguranca;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import sgc.comum.erros.ErroConfiguracao;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Teste de Verificação de Segurança do JWT")
@@ -24,7 +26,7 @@ class GerenciadorJwtSecurityTest {
                 .run(context -> {
                     assertThat(context).hasFailed();
                     assertThat(context.getStartupFailure())
-                            .hasRootCauseInstanceOf(IllegalStateException.class);
+                            .hasRootCauseInstanceOf(ErroConfiguracao.class);
                     assertThat(context.getStartupFailure().getCause())
                             .hasMessageContaining("FALHA DE SEGURANÇA");
                 });

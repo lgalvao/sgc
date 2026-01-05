@@ -97,17 +97,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
 
-    @ExceptionHandler(ErroValidacao.class)
-    protected ResponseEntity<Object> handleErroValidacao(ErroValidacao ex) {
-        log.warn("Erro de validação de negócio: {}", ex.getMessage());
-        ErroApi erroApi = new ErroApi(HttpStatus.UNPROCESSABLE_CONTENT, sanitizar(ex.getMessage()));
-        if (ex.getDetails() != null && !ex.getDetails().isEmpty()) {
-            log.warn("Detalhes da validação: {}", ex.getDetails());
-            erroApi.setDetails(ex.getDetails());
-        }
-        return buildResponseEntity(erroApi);
-    }
-
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<Object> handleConstraintViolationException(
             ConstraintViolationException ex) {
@@ -138,6 +127,23 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleErroAutenticacao(ErroAutenticacao ex) {
         log.warn("Erro de autenticação: {}", ex.getMessage());
         return buildResponseEntity(new ErroApi(HttpStatus.UNAUTHORIZED, sanitizar(ex.getMessage()), "NAO_AUTORIZADO", UUID.randomUUID().toString()));
+    }
+
+    /**
+     * Trata erros internos do sistema que indicam bugs ou problemas de configuração.
+     * Estes erros nunca deveriam ocorrer em produção se o sistema está funcionando corretamente.
+     */
+    @ExceptionHandler(ErroInterno.class)
+    protected ResponseEntity<Object> handleErroInterno(ErroInterno ex) {
+        String traceId = UUID.randomUUID().toString();
+        log.error("[{}] ERRO INTERNO - Isso indica um bug que precisa ser corrigido: {}", 
+                  traceId, ex.getMessage(), ex);
+        
+        // Não expor detalhes internos ao usuário
+        String mensagemUsuario = "Erro interno do sistema. Por favor, contate o suporte informando o código: " + traceId;
+        return buildResponseEntity(
+            new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, mensagemUsuario, "ERRO_INTERNO", traceId)
+        );
     }
 
     @ExceptionHandler(IllegalStateException.class)

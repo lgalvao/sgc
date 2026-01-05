@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Component;
+import sgc.comum.erros.ErroConfiguracao;
 import sgc.organizacao.model.Perfil;
 
 import javax.crypto.SecretKey;
@@ -35,7 +36,7 @@ public class GerenciadorJwt {
                         "Isso é aceitável APENAS para ambientes de desenvolvimento/teste (test, e2e, local).");
             } else {
                 log.error("🚨 ERRO CRÍTICO DE SEGURANÇA: Tentativa de iniciar em ambiente produtivo com o segredo JWT padrão.");
-                throw new IllegalStateException(
+                throw new ErroConfiguracao(
                         "FALHA DE SEGURANÇA: A propriedade 'aplicacao.jwt.secret' não foi alterada do padrão inseguro. " +
                         "Configure a variável de ambiente JWT_SECRET com um valor seguro.");
             }
@@ -46,7 +47,7 @@ public class GerenciadorJwt {
         // Garante que a chave tenha tamanho adequado (mínimo 256 bits para HS256)
         String secret = jwtProperties.getSecret();
         if (secret.length() < 32) {
-            throw new IllegalStateException("JWT secret deve ter no mínimo 32 caracteres");
+            throw new ErroConfiguracao("JWT secret deve ter no mínimo 32 caracteres");
         }
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
