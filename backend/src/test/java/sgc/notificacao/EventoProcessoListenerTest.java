@@ -160,6 +160,50 @@ class EventoProcessoListenerTest {
 
             verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
         }
+
+        @Test
+        @DisplayName("Deve ignorar envio se tipo de unidade desconhecido")
+        void deveIgnorarTipoDesconhecido() {
+            Processo processo = new Processo();
+            processo.setTipo(TipoProcesso.MAPEAMENTO);
+
+            Unidade u = new Unidade();
+            u.setCodigo(10L);
+            u.setTipo(TipoUnidade.RAIZ); // Não tratado no switch/if
+
+            Subprocesso sp = new Subprocesso();
+            sp.setUnidade(u);
+
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+
+            ResponsavelDto resp = new ResponsavelDto();
+            resp.setTitularTitulo("TITULAR");
+            when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, resp));
+
+            UsuarioDto titular = new UsuarioDto();
+            titular.setEmail("t@mail.com");
+            when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("TITULAR", titular));
+
+            listener.aoIniciarProcesso(new EventoProcessoIniciado(1L, "MAPEAMENTO", LocalDateTime.now(), List.of()));
+
+            verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+        }
+
+        @Test
+        @DisplayName("Deve ignorar se subprocesso sem unidade")
+        void deveIgnorarSemUnidade() {
+            Processo p = new Processo();
+            Subprocesso sp = new Subprocesso();
+            sp.setUnidade(null);
+
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+
+            listener.aoIniciarProcesso(new EventoProcessoIniciado(1L, "MAPEAMENTO", LocalDateTime.now(), List.of()));
+
+            verify(usuarioService, never()).buscarResponsaveisUnidades(any());
+        }
     }
 
     @Nested
@@ -233,6 +277,31 @@ class EventoProcessoListenerTest {
         }
 
         @Test
+        @DisplayName("Deve ignorar envio para intermediária se não houver subordinadas")
+        void deveIgnorarIntermediariaSemSubordinadas() {
+            Processo p = new Processo();
+            Unidade uPai = new Unidade();
+            uPai.setCodigo(10L);
+            uPai.setTipo(TipoUnidade.INTERMEDIARIA);
+            p.setParticipantes(Set.of(uPai)); // Só ela participa
+
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+
+            ResponsavelDto resp = new ResponsavelDto();
+            resp.setTitularTitulo("TITULAR");
+            when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, resp));
+
+            UsuarioDto titular = new UsuarioDto();
+            titular.setEmail("t@mail.com");
+            when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("TITULAR", titular));
+
+            listener.aoFinalizarProcesso(new EventoProcessoFinalizado(1L, LocalDateTime.now()));
+
+            // Não deve enviar pois a lista de siglas subordinadas será vazia
+            verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+        }
+
+        @Test
         @DisplayName("Deve ignorar se não houver participantes")
         void deveIgnorarSemParticipantes() {
             Processo p = new Processo();
@@ -263,6 +332,28 @@ class EventoProcessoListenerTest {
 
             when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
             when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Collections.emptyMap());
+
+            listener.aoFinalizarProcesso(new EventoProcessoFinalizado(1L, LocalDateTime.now()));
+
+            verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+        }
+
+        @Test
+        @DisplayName("Deve lidar com titular sem email na finalização")
+        void deveLidarTitularSemEmailFinalizacao() {
+            Processo p = new Processo();
+            Unidade u = new Unidade();
+            u.setCodigo(10L);
+            p.setParticipantes(Set.of(u));
+
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+
+            ResponsavelDto resp = new ResponsavelDto();
+            resp.setTitularTitulo("TITULAR");
+            when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, resp));
+
+            UsuarioDto titular = new UsuarioDto(); // Sem email
+            when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("TITULAR", titular));
 
             listener.aoFinalizarProcesso(new EventoProcessoFinalizado(1L, LocalDateTime.now()));
 
