@@ -3,11 +3,9 @@ import {flushPromises, mount} from "@vue/test-utils";
 import CadAtividades from "@/views/CadAtividades.vue";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useAtividadesStore} from "@/stores/atividades";
+import {useMapasStore} from "@/stores/mapas";
+import {useAnalisesStore} from "@/stores/analises";
 import * as subprocessoService from "@/services/subprocessoService";
-import * as atividadeService from "@/services/atividadeService";
-import * as cadastroService from "@/services/cadastroService";
-import * as analiseService from "@/services/analiseService";
-import * as mapaService from "@/services/mapaService";
 import {SituacaoSubprocesso, TipoProcesso,} from "@/types/tipos";
 import {createTestingPinia} from "@pinia/testing";
 import { nextTick } from "vue";
@@ -39,33 +37,6 @@ vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarContextoEdicao: vi.fn(),
     validarCadastro: vi.fn(),
-    listarAtividades: vi.fn(),
-}));
-
-vi.mock("@/services/atividadeService", () => ({
-    adicionarAtividade: vi.fn(),
-    removerAtividade: vi.fn(),
-    adicionarConhecimento: vi.fn(),
-    removerConhecimento: vi.fn(),
-    atualizarAtividade: vi.fn(),
-    atualizarConhecimento: vi.fn(),
-    buscarAtividadesParaSubprocesso: vi.fn(),
-    criarAtividade: vi.fn(),
-    criarConhecimento: vi.fn(),
-    excluirAtividade: vi.fn(),
-    excluirConhecimento: vi.fn(),
-}));
-
-vi.mock("@/services/cadastroService", () => ({
-    disponibilizarCadastro: vi.fn(),
-}));
-
-vi.mock("@/services/analiseService", () => ({
-    listarAnalisesCadastro: vi.fn(),
-}));
-
-vi.mock("@/services/mapaService", () => ({
-    verificarImpactosMapa: vi.fn(),
 }));
 
 vi.mock("@/services/processoService");
@@ -104,50 +75,11 @@ const AtividadeItemStub = {
     emits: ["remover-atividade", "editar-atividade", "atualizar-atividade", "adicionar-conhecimento", "remover-conhecimento", "editar-conhecimento", "atualizar-conhecimento", "update:atividade", "update:conhecimento"]
 };
 
-// Custom helper to override common options but ensure pinia stubActions is FALSE
-function mountCadAtividades(options: any = {}) {
-    return mount(CadAtividades, {
-        global: {
-            plugins: [
-                createTestingPinia({
-                    createSpy: vi.fn,
-                    initialState: options.initialState || {},
-                    stubActions: false // Real actions, using mocked services
-                }),
-            ],
-            stubs: {
-                ConfirmacaoDisponibilizacaoModal: ConfirmacaoDisponibilizacaoModalStub,
-                HistoricoAnaliseModal: HistoricoAnaliseModalStub,
-                AtividadeItem: AtividadeItemStub,
-                ImportarAtividadesModal: true,
-                ImpactoMapaModal: true,
-                ModalConfirmacao: {
-                    name: "ModalConfirmacao", // Ensure name matches
-                    template: '<div v-if="modelValue"><button @click="$emit(\'confirmar\')">Confirmar</button></div>',
-                    props: ['modelValue'],
-                    emits: ['confirmar', 'update:modelValue']
-                },
-                BContainer: { template: '<div><slot /></div>' },
-                BButton: { template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>', props: ['disabled'] },
-                // FIX: Use plain form with submit event to play nice with @submit.prevent in parent
-                BForm: { template: '<form @submit="$emit(\'submit\', $event)"><slot /></form>' },
-                BFormInput: { template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />', props: ['modelValue'], emits: ['update:modelValue'] },
-                BCol: { template: '<div><slot /></div>' },
-                BDropdown: { template: '<div><slot /></div>' },
-                BDropdownItem: { template: '<div><slot /></div>' },
-                BAlert: { template: '<div><slot /></div>' },
-            },
-        },
-        props: {
-            codProcesso: 1,
-            sigla: "TESTE",
-        },
-    });
-}
-
 describe("CadAtividades.vue", () => {
     let subprocessosStore: any;
     let atividadesStore: any;
+    let analisesStore: any;
+    let mapasStore: any;
 
     const mockAtividades = [
         {
@@ -161,32 +93,12 @@ describe("CadAtividades.vue", () => {
         // Mock route
         mocks.mockRoute.query = {};
 
-        // Mock Services BEFORE mounting
+        // Mock Services (kept for safety, though stubActions: true bypasses them mostly)
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({ codigo: 123 } as any);
-        vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
 
-        // Contexto lookup
-        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
-            subprocesso: {
-                codigo: 123,
-                situacao: isRevisao
-                            ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-                            : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                permissoes: {
-                     podeEditarMapa: true,
-                     podeDisponibilizarCadastro: true,
-                     podeVisualizarImpacto: true
-                }
-            },
-            mapa: { codigo: 456, competencias: [] },
-            atividadesDisponiveis: [...mockAtividades],
-            unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
-        } as any);
-
-        vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
-        vi.mocked(mapaService.verificarImpactosMapa).mockResolvedValue({ temImpactos: false, impactos: [] });
-
-        const wrapper = mountCadAtividades({
+        // Setup Pinia with Stubs
+        const pinia = createTestingPinia({
+            createSpy: vi.fn,
             initialState: {
                 perfil: {
                     perfilSelecionado: "CHEFE",
@@ -203,12 +115,88 @@ describe("CadAtividades.vue", () => {
                 mapas: {
                     mapaCompleto: { codigo: 456, competencias: [] },
                     impactoMapa: null
+                },
+                subprocessos: {
+                    subprocessoDetalhe: {
+                        codigo: 123,
+                        situacao: isRevisao
+                            ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+                            : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                         permissoes: {
+                             podeEditarMapa: true,
+                             podeDisponibilizarCadastro: true,
+                             podeVisualizarImpacto: true
+                        },
+                        tipoProcesso: isRevisao ? TipoProcesso.REVISAO : TipoProcesso.MAPEAMENTO
+                    }
+                },
+                atividades: {
+                    atividadesPorSubprocesso: new Map([[123, mockAtividades]])
+                },
+                unidades: {
+                    unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
                 }
-            }
+            },
+            stubActions: true
         });
 
-        subprocessosStore = useSubprocessosStore();
-        atividadesStore = useAtividadesStore();
+        // PRE-CONFIGURE STORE SPIES
+        subprocessosStore = useSubprocessosStore(pinia);
+        subprocessosStore.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(123);
+        subprocessosStore.buscarContextoEdicao.mockResolvedValue(undefined);
+        subprocessosStore.disponibilizarCadastro.mockResolvedValue(true);
+        subprocessosStore.disponibilizarRevisaoCadastro.mockResolvedValue(true);
+
+        atividadesStore = useAtividadesStore(pinia);
+        // Actions
+        atividadesStore.adicionarAtividade.mockResolvedValue({});
+        atividadesStore.removerAtividade.mockResolvedValue({});
+        atividadesStore.removerConhecimento.mockResolvedValue({});
+        atividadesStore.atualizarAtividade.mockResolvedValue({});
+        atividadesStore.atualizarConhecimento.mockResolvedValue({});
+        atividadesStore.buscarAtividadesParaSubprocesso.mockResolvedValue({});
+
+        mapasStore = useMapasStore(pinia);
+        mapasStore.buscarImpactoMapa.mockResolvedValue({});
+
+        analisesStore = useAnalisesStore(pinia);
+        analisesStore.buscarAnalisesCadastro.mockResolvedValue([]);
+
+        const wrapper = mount(CadAtividades, {
+            global: {
+                plugins: [pinia],
+                stubs: {
+                    ConfirmacaoDisponibilizacaoModal: ConfirmacaoDisponibilizacaoModalStub,
+                    HistoricoAnaliseModal: HistoricoAnaliseModalStub,
+                    AtividadeItem: AtividadeItemStub,
+                    ImportarAtividadesModal: {
+                         name: 'ImportarAtividadesModal',
+                         template: '<div v-if="mostrar"></div>',
+                         props: ['mostrar'],
+                         emits: ['importar', 'fechar']
+                    },
+                    ImpactoMapaModal: true,
+                    ModalConfirmacao: {
+                        name: "ModalConfirmacao",
+                        template: '<div v-if="modelValue"><button @click="$emit(\'confirmar\')">Confirmar</button></div>',
+                        props: ['modelValue'],
+                        emits: ['confirmar', 'update:modelValue']
+                    },
+                    BContainer: { template: '<div><slot /></div>' },
+                    BButton: { template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>', props: ['disabled'] },
+                    BForm: { template: '<form @submit="$emit(\'submit\', $event)"><slot /></form>' },
+                    BFormInput: { template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />', props: ['modelValue'], emits: ['update:modelValue'] },
+                    BCol: { template: '<div><slot /></div>' },
+                    BDropdown: { template: '<div><slot /></div>' },
+                    BDropdownItem: { template: '<div><slot /></div>' },
+                    BAlert: { template: '<div><slot /></div>' },
+                },
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE",
+            },
+        });
 
         return { wrapper, subprocessosStore, atividadesStore };
     };
@@ -225,10 +213,7 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve adicionar nova atividade", async () => {
-        // Mock service for this action
-        vi.mocked(atividadeService.criarAtividade).mockResolvedValue({ subprocesso: {} } as any);
-
-        const { wrapper } = createWrapper();
+        const { wrapper, atividadesStore } = createWrapper();
         await flushPromises();
 
         const input = wrapper.find('input[placeholder="Nova atividade"]');
@@ -236,17 +221,15 @@ describe("CadAtividades.vue", () => {
         await wrapper.find('form').trigger("submit");
         await flushPromises();
 
-        expect(atividadeService.criarAtividade).toHaveBeenCalledWith(
-            {descricao: "Nova Atividade"},
-            456
+        expect(atividadesStore.adicionarAtividade).toHaveBeenCalledWith(
+            123,
+            456,
+            {descricao: "Nova Atividade"}
         );
     });
 
     it("deve remover atividade após confirmação", async () => {
-        // Service method is excluirAtividade
-        vi.mocked(atividadeService.excluirAtividade).mockResolvedValue({ subprocesso: {} } as any);
-
-        const { wrapper } = createWrapper();
+        const { wrapper, atividadesStore } = createWrapper();
         await flushPromises();
 
         const item = wrapper.findComponent(AtividadeItemStub);
@@ -257,13 +240,11 @@ describe("CadAtividades.vue", () => {
         await modal.vm.$emit('confirmar');
         await flushPromises();
 
-        expect(atividadeService.excluirAtividade).toHaveBeenCalledWith(1);
+        expect(atividadesStore.removerAtividade).toHaveBeenCalledWith(123, 1);
     });
 
     it("deve remover um conhecimento", async () => {
-        vi.mocked(atividadeService.excluirConhecimento).mockResolvedValue({ subprocesso: {} } as any);
-
-        const { wrapper } = createWrapper();
+        const { wrapper, atividadesStore } = createWrapper();
         await flushPromises();
 
         const item = wrapper.findComponent(AtividadeItemStub);
@@ -274,14 +255,13 @@ describe("CadAtividades.vue", () => {
         await modal.vm.$emit('confirmar');
         await flushPromises();
 
-        expect(atividadeService.excluirConhecimento).toHaveBeenCalledWith(1, 101);
+        expect(atividadesStore.removerConhecimento).toHaveBeenCalledWith(123, 1, 101);
     });
 
     it("deve disponibilizar o cadastro", async () => {
         vi.mocked(subprocessoService.validarCadastro).mockResolvedValue({ valido: true, erros: [] });
-        vi.mocked(cadastroService.disponibilizarCadastro).mockResolvedValue();
 
-        const { wrapper } = createWrapper();
+        const { wrapper, subprocessosStore } = createWrapper();
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
@@ -293,37 +273,35 @@ describe("CadAtividades.vue", () => {
         await modal.vm.$emit('confirmar');
         await flushPromises();
 
-        expect(cadastroService.disponibilizarCadastro).toHaveBeenCalledWith(123);
+        expect(subprocessosStore.disponibilizarCadastro).toHaveBeenCalledWith(123);
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
     it("deve permitir edição inline de atividade", async () => {
-        vi.mocked(atividadeService.atualizarAtividade).mockResolvedValue({ subprocesso: {} } as any);
-
-        const { wrapper } = createWrapper();
+        const { wrapper, atividadesStore } = createWrapper();
         await flushPromises();
 
         const item = wrapper.findComponent(AtividadeItemStub);
         await item.vm.$emit('atualizar-atividade', "Atividade Editada");
         await flushPromises();
 
-        expect(atividadeService.atualizarAtividade).toHaveBeenCalledWith(
+        expect(atividadesStore.atualizarAtividade).toHaveBeenCalledWith(
+            123,
             1,
             expect.objectContaining({descricao: "Atividade Editada"}),
         );
     });
 
     it("deve permitir edição inline de conhecimento", async () => {
-        vi.mocked(atividadeService.atualizarConhecimento).mockResolvedValue({ subprocesso: {} } as any);
-
-        const { wrapper } = createWrapper();
+        const { wrapper, atividadesStore } = createWrapper();
         await flushPromises();
 
         const item = wrapper.findComponent(AtividadeItemStub);
         await item.vm.$emit('atualizar-conhecimento', 101, "Conhecimento Editado");
         await flushPromises();
 
-        expect(atividadeService.atualizarConhecimento).toHaveBeenCalledWith(
+        expect(atividadesStore.atualizarConhecimento).toHaveBeenCalledWith(
+            123,
             1,
             101,
             expect.objectContaining({descricao: "Conhecimento Editado"}),
@@ -375,11 +353,7 @@ describe("CadAtividades.vue", () => {
         const { wrapper, atividadesStore } = createWrapper();
         await flushPromises();
 
-        // Trigger logic manually or via component interaction if possible
-        // But the modal is stubbed: ImportarAtividadesModal: true.
-        // We can find it and emit 'importar'
-
-        // First open it
+        // Open modal
         await wrapper.find('[data-testid="btn-mais-acoes"]').trigger("click");
         await wrapper.find('[data-testid="btn-cad-atividades-importar"]').trigger("click");
         expect((wrapper.vm as any).mostrarModalImportar).toBe(true);
@@ -395,7 +369,6 @@ describe("CadAtividades.vue", () => {
 
     it("deve fazer scroll para erro de validação", async () => {
         const scrollIntoViewMock = vi.fn();
-        // Setup element ref mock
         Element.prototype.scrollIntoView = scrollIntoViewMock;
 
         const { wrapper } = createWrapper();
@@ -409,21 +382,8 @@ describe("CadAtividades.vue", () => {
 
         await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
         await flushPromises();
-        await nextTick(); // Wait for nextTick in component
+        await nextTick();
 
-        // Since we stubbed AtividadeItem, the v-for loop with ref might not bind correctly to a DOM element unless we ensure the stub renders something and the ref function is called.
-        // In Vue Test Utils, ref binding on components works.
-        // The component uses :ref="el => setAtividadeRef(atividade.codigo, el)"
-        // If AtividadeItemStub is rendered, el will be the component instance or root element.
-        // We need to ensure scrollIntoView is called on that element's $el or the element itself.
-
-        // Check if scroll was called.
-        // Note: checking this might be flaky if jsdom doesn't support scrollIntoView fully or if refs aren't set in shallow mount.
-        // But we are using mount.
-
-        // Ideally we check if the function ran.
-        // Since we can't easily spy on the inner function, we rely on the side effect (scrollIntoView).
-        // If it fails, we might need to skip this specific assertion or improve the mock.
         expect(scrollIntoViewMock).toHaveBeenCalled();
     });
 });

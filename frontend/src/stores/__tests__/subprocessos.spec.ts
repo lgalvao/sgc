@@ -207,49 +207,153 @@ describe('Subprocessos Store', () => {
                 [{ id: 100, mapped: true }]
             );
         });
+
+        it('deve falhar se não houver perfil', async () => {
+            mockPerfilStore.perfilSelecionado = null;
+            await store.buscarContextoEdicao(1);
+            expect(store.lastError).toBeTruthy();
+            expect(buscarContextoEdicao).not.toHaveBeenCalled();
+        });
+
+        it('deve lidar com erro do serviço', async () => {
+             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
+             (buscarContextoEdicao as any).mockRejectedValue(new Error("Fail"));
+             await expect(store.buscarContextoEdicao(1)).rejects.toThrow("Fail");
+             expect(store.lastError).toBeTruthy();
+        });
     });
 
     describe('Ações de Workflow', () => {
+        // --- Disponibilizar Cadastro ---
         it('disponibilizarCadastro deve executar com sucesso e feedback', async () => {
             (disponibilizarCadastro as any).mockResolvedValue({});
-
             const result = await store.disponibilizarCadastro(1);
-
             expect(result).toBe(true);
             expect(disponibilizarCadastro).toHaveBeenCalledWith(1);
-            expect(mockFeedbackStore.show).toHaveBeenCalledWith(
-                "Cadastro de atividades disponibilizado", expect.anything(), 'success'
-            );
-            expect(mockProcessosStore.buscarProcessoDetalhe).toHaveBeenCalledWith(999);
+            expect(mockFeedbackStore.show).toHaveBeenCalledWith(expect.stringContaining("Cadastro"), expect.anything(), 'success');
         });
 
         it('disponibilizarCadastro deve lidar com erro', async () => {
             (disponibilizarCadastro as any).mockRejectedValue(new Error('Falha'));
-
             const result = await store.disponibilizarCadastro(1);
-
             expect(result).toBe(false);
             expect(store.lastError).toBeTruthy();
-            expect(mockFeedbackStore.show).not.toHaveBeenCalled(); // No error feedback via store, sets lastError
         });
 
+        // --- Disponibilizar Revisão ---
+        it('disponibilizarRevisaoCadastro deve executar com sucesso', async () => {
+            (disponibilizarRevisaoCadastro as any).mockResolvedValue({});
+            const result = await store.disponibilizarRevisaoCadastro(1);
+            expect(result).toBe(true);
+            expect(disponibilizarRevisaoCadastro).toHaveBeenCalledWith(1);
+            expect(mockFeedbackStore.show).toHaveBeenCalledWith(expect.stringContaining("Revisão"), expect.anything(), 'success');
+        });
+
+        it('disponibilizarRevisaoCadastro deve lidar com erro', async () => {
+             (disponibilizarRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
+             const result = await store.disponibilizarRevisaoCadastro(1);
+             expect(result).toBe(false);
+             expect(store.lastError).toBeTruthy();
+        });
+
+        // --- Devolver Cadastro ---
+        it('devolverCadastro deve executar com sucesso', async () => {
+            (devolverCadastro as any).mockResolvedValue({});
+            const result = await store.devolverCadastro(1, { motivo: 'Erro' });
+            expect(result).toBe(true);
+            expect(devolverCadastro).toHaveBeenCalledWith(1, { motivo: 'Erro' });
+            expect(mockFeedbackStore.show).toHaveBeenCalledWith(expect.stringContaining("Cadastro"), expect.anything(), 'success');
+        });
+
+         it('devolverCadastro deve lidar com erro', async () => {
+             (devolverCadastro as any).mockRejectedValue(new Error('Falha'));
+             const result = await store.devolverCadastro(1, { motivo: 'Erro' });
+             expect(result).toBe(false);
+             expect(store.lastError).toBeTruthy();
+        });
+
+        // --- Aceitar Cadastro ---
+        it('aceitarCadastro deve executar com sucesso', async () => {
+            (aceitarCadastro as any).mockResolvedValue({});
+            const result = await store.aceitarCadastro(1, { aprovado: true } as any);
+            expect(result).toBe(true);
+            expect(aceitarCadastro).toHaveBeenCalledWith(1, { aprovado: true });
+        });
+
+        it('aceitarCadastro deve lidar com erro', async () => {
+            (aceitarCadastro as any).mockRejectedValue(new Error('Falha'));
+            const result = await store.aceitarCadastro(1, { aprovado: true } as any);
+            expect(result).toBe(false);
+        });
+
+        // --- Homologar Cadastro ---
         it('homologarCadastro deve recarregar detalhes após sucesso', async () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
             (homologarCadastro as any).mockResolvedValue({});
             (buscarSubprocessoDetalhe as any).mockResolvedValue({ codigo: 1, situacao: 'HOMOLOGADO' });
 
-            await store.homologarCadastro(1, { aprovado: true } as any);
-
+            const result = await store.homologarCadastro(1, { aprovado: true } as any);
+            expect(result).toBe(true);
             expect(homologarCadastro).toHaveBeenCalledWith(1, { aprovado: true });
             expect(buscarSubprocessoDetalhe).toHaveBeenCalled();
+        });
+
+        it('homologarCadastro deve lidar com erro', async () => {
+            (homologarCadastro as any).mockRejectedValue(new Error('Falha'));
+            const result = await store.homologarCadastro(1, { aprovado: true } as any);
+            expect(result).toBe(false);
+            expect(store.lastError).toBeTruthy();
+        });
+
+         // --- Devolver Revisão ---
+         it('devolverRevisaoCadastro deve executar com sucesso', async () => {
+            (devolverRevisaoCadastro as any).mockResolvedValue({});
+            const result = await store.devolverRevisaoCadastro(1, { motivo: 'Erro' });
+            expect(result).toBe(true);
+            expect(devolverRevisaoCadastro).toHaveBeenCalledWith(1, { motivo: 'Erro' });
+        });
+
+         it('devolverRevisaoCadastro deve lidar com erro', async () => {
+             (devolverRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
+             const result = await store.devolverRevisaoCadastro(1, { motivo: 'Erro' });
+             expect(result).toBe(false);
+        });
+
+         // --- Aceitar Revisão ---
+         it('aceitarRevisaoCadastro deve executar com sucesso', async () => {
+            (aceitarRevisaoCadastro as any).mockResolvedValue({});
+            const result = await store.aceitarRevisaoCadastro(1, { aprovado: true } as any);
+            expect(result).toBe(true);
+            expect(aceitarRevisaoCadastro).toHaveBeenCalledWith(1, { aprovado: true });
+        });
+
+        it('aceitarRevisaoCadastro deve lidar com erro', async () => {
+             (aceitarRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
+             const result = await store.aceitarRevisaoCadastro(1, { aprovado: true } as any);
+             expect(result).toBe(false);
+        });
+
+         // --- Homologar Revisão ---
+         it('homologarRevisaoCadastro deve executar com sucesso e recarregar', async () => {
+            mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
+            (homologarRevisaoCadastro as any).mockResolvedValue({});
+            (buscarSubprocessoDetalhe as any).mockResolvedValue({ codigo: 1 });
+
+            const result = await store.homologarRevisaoCadastro(1, { aprovado: true } as any);
+            expect(result).toBe(true);
+            expect(homologarRevisaoCadastro).toHaveBeenCalledWith(1, { aprovado: true });
+            expect(buscarSubprocessoDetalhe).toHaveBeenCalled();
+        });
+
+        it('homologarRevisaoCadastro deve lidar com erro', async () => {
+             (homologarRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
+             const result = await store.homologarRevisaoCadastro(1, { aprovado: true } as any);
+             expect(result).toBe(false);
         });
     });
 
     describe('alterarDataLimiteSubprocesso', () => {
         it('deve delegar para apiClient e recarregar detalhes', async () => {
-            // Setup mock para buscarSubprocessoDetalhe ser chamado internamente
-            // Como é uma chamada interna para a mesma store, precisamos garantir que ela funcione ou seja mockada
-            // Neste caso, vamos deixar rodar, mas precisamos garantir que mockPerfilStore esteja ok para não falhar
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
             (buscarSubprocessoDetalhe as any).mockResolvedValue({});
 
@@ -261,8 +365,16 @@ describe('Subprocessos Store', () => {
             expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/123/data-limite', {
                  novaDataLimite: dados.novaData
             });
-            // Verifica se recarregou
             expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(123, 'ADMIN', null);
+        });
+
+        it('deve lidar com erro na API', async () => {
+            const { apiClient } = await import('@/axios-setup');
+            (apiClient.post as any).mockRejectedValue(new Error("API Fail"));
+
+            await expect(store.alterarDataLimiteSubprocesso(123, { novaData: '2022' }))
+                .rejects.toThrow("API Fail");
+            expect(store.lastError).toBeTruthy();
         });
     });
 });

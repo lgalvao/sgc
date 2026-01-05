@@ -60,7 +60,7 @@ describe('CadProcesso.vue', () => {
                 },
                 {
                     BContainer: { template: '<div><slot /></div>' },
-                    BAlert: { template: '<div><slot /></div>', props: ['modelValue', 'variant'] },
+                    BAlert: { template: '<div class="alert"><slot /></div>', props: ['modelValue', 'variant'] },
                     BForm: { template: '<form @submit.prevent><slot /></form>' },
                     BFormGroup: { template: '<div><slot /></div>', props: ['label'] },
                     BFormInput: {
@@ -77,7 +77,9 @@ describe('CadProcesso.vue', () => {
                         template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>',
                         props: ['modelValue']
                     },
-                    ArvoreUnidades: ArvoreUnidadesStub
+                    BSpinner: { template: '<span>Loading...</span>' },
+                    ArvoreUnidades: ArvoreUnidadesStub,
+                    BFormInvalidFeedback: { template: '<div><slot /></div>' }
                 }
             )
         });
@@ -138,31 +140,19 @@ describe('CadProcesso.vue', () => {
     });
 
     it('loads process data for editing', async () => {
-        // Mock route query param BEFORE creating wrapper
         mockRoute.query = { codProcesso: '123' };
-
         const { processosStore } = createWrapper();
-
-        // Verify the action was called
         expect(processosStore.buscarProcessoDetalhe).toHaveBeenCalledWith(123);
     });
 
     it('redirects if process is not editable', async () => {
         mockRoute.query = { codProcesso: '123' };
-
-        // Mock the store to return a non-CRIADO process
-        // We need to pass initial state because onMounted runs immediately
         const { processosStore } = createWrapper({
             processos: {
                 processoDetalhe: { codigo: 123, situacao: 'EM_ANDAMENTO', unidades: [] },
                 lastError: null
             }
         });
-
-        // The component calls await buscarProcessoDetalhe(123)
-        // Since it's a spy from createTestingPinia, it resolves immediately.
-        // The component then checks state.
-
         await flushPromises();
         expect(processosStore.buscarProcessoDetalhe).toHaveBeenCalledWith(123);
         expect(mockPush).toHaveBeenCalledWith('/processo/123');
@@ -177,7 +167,6 @@ describe('CadProcesso.vue', () => {
         const dataInput = wrapper.find('[data-testid="inp-processo-data-limite"]');
         await dataInput.setValue('2023-12-31');
 
-        // Simulate unit selection
         wrapper.vm.unidadesSelecionadas = [1, 2];
         await nextTick();
 
@@ -199,7 +188,6 @@ describe('CadProcesso.vue', () => {
         const { wrapper, processosStore } = createWrapper();
 
         processosStore.criarProcesso.mockRejectedValue(new Error('Erro API'));
-        // We also need to set lastError because the component likely reads it
         processosStore.lastError = { message: 'Erro validacao', subErrors: [] };
 
         wrapper.vm.descricao = 'Teste';
@@ -218,7 +206,6 @@ describe('CadProcesso.vue', () => {
     it('updates an existing process', async () => {
         const { wrapper, processosStore } = createWrapper();
 
-        // Setup component as editing
         wrapper.vm.processoEditando = { codigo: 123 };
         wrapper.vm.descricao = 'Editado';
         wrapper.vm.tipo = 'MAPEAMENTO';
@@ -242,20 +229,17 @@ describe('CadProcesso.vue', () => {
     it('initiates a process (confirmation flow)', async () => {
         const { wrapper, processosStore } = createWrapper();
 
-        // Setup data
         wrapper.vm.descricao = 'Iniciar Teste';
         wrapper.vm.tipo = 'MAPEAMENTO';
         wrapper.vm.dataLimite = '2023-12-31';
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        // Open modal
         await wrapper.find('[data-testid="btn-processo-iniciar"]').trigger('click');
         expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
 
         processosStore.criarProcesso.mockResolvedValue({ codigo: 999 });
 
-        // Confirm
         await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
 
         expect(processosStore.criarProcesso).toHaveBeenCalled();
@@ -274,7 +258,6 @@ describe('CadProcesso.vue', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        // Open modal and confirm
         await wrapper.find('[data-testid="btn-processo-iniciar"]').trigger('click');
         expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
         await nextTick();
@@ -287,14 +270,11 @@ describe('CadProcesso.vue', () => {
 
     it('removes a process', async () => {
         const { wrapper } = createWrapper();
-
-        // Mock the service explicitly since it's imported as *
         vi.spyOn(processoService, 'excluirProcesso').mockResolvedValue(undefined);
 
         wrapper.vm.processoEditando = { codigo: 123 };
         wrapper.vm.mostrarModalRemocao = true;
 
-        // Trigger remove logic (simulating button click in modal footer)
         await wrapper.vm.confirmarRemocao();
 
         expect(processoService.excluirProcesso).toHaveBeenCalledWith(123);
@@ -348,7 +328,6 @@ describe('CadProcesso.vue', () => {
 
     it('handles error when removing a process', async () => {
          const { wrapper } = createWrapper();
-
          vi.spyOn(processoService, 'excluirProcesso').mockRejectedValue(new Error('Erro Remocao'));
 
          wrapper.vm.processoEditando = { codigo: 123 };
@@ -370,23 +349,17 @@ describe('CadProcesso.vue', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        // Open modal
         await wrapper.find('[data-testid="btn-processo-iniciar"]').trigger('click');
         expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
 
-        // Close modal via cancel button
         await wrapper.find('[data-testid="btn-iniciar-processo-cancelar"]').trigger('click');
         expect(wrapper.vm.mostrarModalConfirmacao).toBe(false);
     });
 
     it('maps field-specific validation errors from subErrors', async () => {
         const { wrapper, processosStore } = createWrapper();
-
-        // Ensure lastError is null initially
         processosStore.lastError = null;
 
-        // Mock implementation to set lastError before throwing
-        // This ensures the component sees the error state when catching the exception
         processosStore.criarProcesso.mockImplementation(async () => {
              processosStore.lastError = {
                 message: 'Erro de validação',
@@ -410,13 +383,10 @@ describe('CadProcesso.vue', () => {
         await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
         await flushPromises();
 
-        // Verifica se os erros de campo foram mapeados
         expect(wrapper.vm.fieldErrors.descricao).toBe('Descrição é obrigatória');
         expect(wrapper.vm.fieldErrors.tipo).toBe('Tipo inválido');
         expect(wrapper.vm.fieldErrors.dataLimite).toBe('Data inválida');
         expect(wrapper.vm.fieldErrors.unidades).toBe('Selecione ao menos uma unidade');
-
-        // Verifica se o erro genérico aparece no alerta
         expect(wrapper.vm.alertState.show).toBe(true);
         expect(wrapper.vm.alertState.errors).toContain('Erro genérico');
     });
@@ -442,7 +412,6 @@ describe('CadProcesso.vue', () => {
 
     it('does nothing when confirmarRemocao is called without processoEditando', async () => {
         const { wrapper } = createWrapper();
-
         vi.spyOn(processoService, 'excluirProcesso');
 
         wrapper.vm.processoEditando = null;
@@ -459,14 +428,12 @@ describe('CadProcesso.vue', () => {
     it('clears field errors when fields are updated', async () => {
         const { wrapper } = createWrapper();
 
-        // Set initial errors
         wrapper.vm.fieldErrors.descricao = 'Erro';
         wrapper.vm.fieldErrors.tipo = 'Erro';
         wrapper.vm.fieldErrors.dataLimite = 'Erro';
         wrapper.vm.fieldErrors.unidades = 'Erro';
         await nextTick();
 
-        // Update fields (triggers watchers)
         wrapper.vm.descricao = 'Nova descricao';
         await nextTick();
         expect(wrapper.vm.fieldErrors.descricao).toBe('');
@@ -482,5 +449,47 @@ describe('CadProcesso.vue', () => {
         wrapper.vm.unidadesSelecionadas = [2];
         await nextTick();
         expect(wrapper.vm.fieldErrors.unidades).toBe('');
+    });
+
+    // --- New tests to improve coverage ---
+
+    it('shows loading spinner when units are loading', async () => {
+        const { wrapper } = createWrapper({
+            unidades: {
+                isLoading: true,
+                unidades: []
+            }
+        });
+        expect(wrapper.text()).toContain('Carregando unidades...');
+    });
+
+    it('shows alert with multiple errors', async () => {
+        const { wrapper } = createWrapper();
+        // Trigger alert manually or via error handling
+        (wrapper.vm as any).mostrarAlerta('danger', 'Titulo', 'Corpo', ['Erro 1', 'Erro 2']);
+        await nextTick();
+
+        const alert = wrapper.find('.alert');
+        expect(alert.text()).toContain('Erro 1');
+        expect(alert.text()).toContain('Erro 2');
+    });
+
+    it('shows saving spinner on button', async () => {
+        const { wrapper, processosStore } = createWrapper();
+        // Mock slow promise
+        processosStore.criarProcesso.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
+
+        wrapper.vm.descricao = 'Teste';
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.unidadesSelecionadas = [1];
+        await nextTick();
+
+        const btn = wrapper.find('[data-testid="btn-processo-salvar"]');
+        await btn.trigger('click');
+
+        expect(btn.text()).toContain('Salvando...'); // Button content might be replaced by "Salvando..."
+        // In the template: {{ isLoading ? 'Salvando...' : 'Salvar' }}
+        // And BSpinner is shown.
     });
 });

@@ -7,7 +7,6 @@ import { useFeedbackStore } from "@/stores/feedback";
 import { usePerfilStore } from "@/stores/perfil";
 import { Perfil, SituacaoSubprocesso } from "@/types/tipos";
 import * as subprocessoService from "@/services/subprocessoService";
-import { useRouter } from "vue-router";
 import { nextTick } from "vue";
 
 // Define mocks first
@@ -124,6 +123,22 @@ describe("ProcessoView.vue", () => {
                 situacaoSubprocesso: SituacaoSubprocesso.NAO_INICIADO,
                 codSubprocesso: 1002,
                 filhos: [],
+            },
+             {
+                codUnidade: 103,
+                sigla: "UNI3",
+                nome: "Unidade 3",
+                situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
+                codSubprocesso: 1003,
+                filhos: [],
+            },
+             {
+                codUnidade: 104,
+                sigla: "UNI4",
+                nome: "Unidade 4",
+                situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+                codSubprocesso: 1004,
+                filhos: [],
             }
         ]
     };
@@ -179,11 +194,6 @@ describe("ProcessoView.vue", () => {
         expect(alert.text()).toContain("Erro ao carregar");
         expect(alert.text()).toContain("Detalhes do erro");
 
-        // Dismiss alert
-        // The BAlert stub we defined emits 'dismissed'.
-        // So we emit it on the component instance (vm).
-        // Since BAlertStub is a stub object, wrapper.findComponent(BAlertStub) might not work if it doesn't match the mounted instance perfectly by reference.
-        // We find by name.
         const alertCmp = wrapper.findComponent({ name: "BAlert" });
         await alertCmp.vm.$emit("dismissed");
         expect(processosStore.clearError).toHaveBeenCalled();
@@ -207,6 +217,14 @@ describe("ProcessoView.vue", () => {
         const btnAceitar = botoesDiv.find("button.btn-success");
         expect(btnAceitar.exists()).toBe(true);
         expect(btnAceitar.text()).toContain("Aceitar em Bloco");
+
+        // Homologar
+        const btnHomologar = botoesDiv.find("button.btn-warning");
+        expect(btnHomologar.exists()).toBe(true);
+
+        // Disponibilizar
+        const btnDisponibilizar = botoesDiv.find("button.btn-info");
+        expect(btnDisponibilizar.exists()).toBe(true);
     });
 
     it("deve abrir modal de ação em bloco ao clicar no botão", async () => {
@@ -225,10 +243,11 @@ describe("ProcessoView.vue", () => {
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         expect(modal.exists()).toBe(true);
-
         expect(ModalAcaoBlocoStub.methods.abrir).toHaveBeenCalled();
         expect(modal.props("titulo")).toBe("Aceitar em Bloco");
     });
+
+    // --- Testes para Aceitar em Bloco ---
 
     it("deve executar ação em bloco com sucesso (Aceitar Cadastro)", async () => {
         wrapper = createWrapper();
@@ -245,7 +264,7 @@ describe("ProcessoView.vue", () => {
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await wrapper.find("button.btn-success").trigger("click"); // Abrir modal 'aceitar'
 
-        // Simular confirmação do modal
+        // Simular confirmação do modal com ID 101 (Mapeamento Cadastro Disponibilizado)
         const dadosConfirmacao = { ids: [101] };
         await modal.vm.$emit("confirmar", dadosConfirmacao);
 
@@ -253,6 +272,89 @@ describe("ProcessoView.vue", () => {
         expect(processosStore.buscarContextoCompleto).toHaveBeenCalledWith(1);
         expect(feedbackStore.show).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("realizada"), "success");
         expect(ModalAcaoBlocoStub.methods.fechar).toHaveBeenCalled();
+    });
+
+    it("deve executar ação em bloco com sucesso (Aceitar Validação)", async () => {
+        wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        processosStore = useProcessosStore();
+        feedbackStore = useFeedbackStore();
+
+        perfilStore.$patch({ perfis: [Perfil.GESTOR, Perfil.ADMIN] });
+        processosStore.$patch({ processoDetalhe: mockProcesso });
+
+        await nextTick();
+        await flushPromises();
+
+        const modal = wrapper.findComponent(ModalAcaoBlocoStub);
+        await wrapper.find("button.btn-success").trigger("click"); // Abrir modal 'aceitar'
+
+        // Simular confirmação com ID 103 (Mapa Validado)
+        const dadosConfirmacao = { ids: [103] };
+        await modal.vm.$emit("confirmar", dadosConfirmacao);
+
+        expect(subprocessoService.aceitarValidacaoEmBloco).toHaveBeenCalledWith(1003, { unidadeCodigos: [103], dataLimite: undefined });
+    });
+
+    // --- Testes para Homologar em Bloco ---
+
+    it("deve executar ação em bloco com sucesso (Homologar Cadastro)", async () => {
+        wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        processosStore = useProcessosStore();
+        perfilStore.$patch({ perfis: [Perfil.ADMIN] });
+        processosStore.$patch({ processoDetalhe: mockProcesso });
+
+        await nextTick();
+        await flushPromises();
+
+        const modal = wrapper.findComponent(ModalAcaoBlocoStub);
+        await wrapper.find("button.btn-warning").trigger("click"); // Abrir modal 'homologar'
+
+        // ID 101 -> Cadastro Disponibilizado
+        await modal.vm.$emit("confirmar", { ids: [101] });
+
+        expect(subprocessoService.homologarCadastroEmBloco).toHaveBeenCalledWith(1001, { unidadeCodigos: [101], dataLimite: undefined });
+    });
+
+    it("deve executar ação em bloco com sucesso (Homologar Validação)", async () => {
+        wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        processosStore = useProcessosStore();
+        perfilStore.$patch({ perfis: [Perfil.ADMIN] });
+        processosStore.$patch({ processoDetalhe: mockProcesso });
+
+        await nextTick();
+        await flushPromises();
+
+        const modal = wrapper.findComponent(ModalAcaoBlocoStub);
+        await wrapper.find("button.btn-warning").trigger("click"); // Abrir modal 'homologar'
+
+        // ID 103 -> Mapa Validado
+        await modal.vm.$emit("confirmar", { ids: [103] });
+
+        expect(subprocessoService.homologarValidacaoEmBloco).toHaveBeenCalledWith(1003, { unidadeCodigos: [103], dataLimite: undefined });
+    });
+
+    // --- Teste para Disponibilizar em Bloco ---
+
+    it("deve executar ação em bloco com sucesso (Disponibilizar)", async () => {
+        wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        processosStore = useProcessosStore();
+        perfilStore.$patch({ perfis: [Perfil.ADMIN] });
+        processosStore.$patch({ processoDetalhe: mockProcesso });
+
+        await nextTick();
+        await flushPromises();
+
+        const modal = wrapper.findComponent(ModalAcaoBlocoStub);
+        await wrapper.find("button.btn-info").trigger("click"); // Abrir modal 'disponibilizar'
+
+        // ID 104 -> Mapa Criado
+        await modal.vm.$emit("confirmar", { ids: [104], dataLimite: '2024-12-31' });
+
+        expect(subprocessoService.disponibilizarMapaEmBloco).toHaveBeenCalledWith(1004, { unidadeCodigos: [104], dataLimite: '2024-12-31' });
     });
 
      it("deve lidar com erro na execução da ação em bloco", async () => {
@@ -277,6 +379,27 @@ describe("ProcessoView.vue", () => {
         expect(subprocessoService.aceitarCadastroEmBloco).toHaveBeenCalled();
         expect(ModalAcaoBlocoStub.methods.setErro).toHaveBeenCalledWith(errorMsg);
         expect(ModalAcaoBlocoStub.methods.setProcessando).toHaveBeenCalledWith(false);
+    });
+
+    it("deve mostrar erro se unidade não for encontrada para ação em bloco", async () => {
+        wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        processosStore = useProcessosStore();
+        feedbackStore = useFeedbackStore();
+
+        perfilStore.$patch({ perfis: [Perfil.GESTOR] });
+        processosStore.$patch({ processoDetalhe: mockProcesso });
+
+        await nextTick();
+        await flushPromises();
+
+        const modal = wrapper.findComponent(ModalAcaoBlocoStub);
+        await wrapper.find("button.btn-success").trigger("click");
+
+        // ID inexistente
+        await modal.vm.$emit("confirmar", { ids: [9999] });
+
+        expect(feedbackStore.show).toHaveBeenCalledWith('Erro', expect.stringContaining("Não foi possível identificar"), 'danger');
     });
 
     it("deve redirecionar para detalhes da unidade ao clicar na tabela (Gestor)", async () => {
@@ -330,6 +453,8 @@ describe("ProcessoView.vue", () => {
         expect(router.push).not.toHaveBeenCalled();
     });
 
+    // --- Finalização ---
+
     it("deve abrir modal de finalização de processo", async () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();
@@ -349,7 +474,6 @@ describe("ProcessoView.vue", () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();
         feedbackStore = useFeedbackStore();
-        //router = useRouter(); // Removed because we use mocked router
 
         processosStore.$patch({ processoDetalhe: mockProcesso });
 

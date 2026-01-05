@@ -344,7 +344,10 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
     const unidadeExemplo = participantesHierarquia.value.find(u => u.codUnidade === dados.ids[0])
         || unidadesElegiveis.value.find(u => u.codigo === dados.ids[0]);
 
-    if (!unidadeExemplo) return;
+    if (!unidadeExemplo) {
+        feedbackStore.show('Erro', 'Não foi possível identificar o contexto do subprocesso.', 'danger');
+        return;
+    }
 
     // Precisamos de um ID de subprocesso válido para usar como base na API
     // Se unidadeExemplo veio de participantesHierarquia, ela tem codSubprocesso.

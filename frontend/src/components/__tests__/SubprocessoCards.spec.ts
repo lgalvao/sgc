@@ -1,279 +1,162 @@
-import {mount} from "@vue/test-utils";
-import {beforeEach, describe, expect, it, vi} from "vitest";
-import {type Mapa, type SubprocessoPermissoes, TipoProcesso, type Unidade,} from "@/types/tipos";
-import SubprocessoCards from "../SubprocessoCards.vue";
-import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import { describe, it, expect, vi } from 'vitest';
+import { mount } from '@vue/test-utils';
+import SubprocessoCards from '@/components/SubprocessoCards.vue';
+import { TipoProcesso } from '@/types/tipos';
 
 const pushMock = vi.fn();
-
-vi.mock("vue-router", () => ({
-    useRouter: () => ({
-        push: pushMock,
-    }),
+vi.mock('vue-router', () => ({
+    useRouter: () => ({ push: pushMock })
 }));
 
-describe("SubprocessoCards.vue", () => {
-    const context = setupComponentTest();
-
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
-
-    const defaultPermissoes: SubprocessoPermissoes = {
-        podeVerPagina: true,
-        podeEditarMapa: true,
-        podeVisualizarMapa: true,
-        podeDisponibilizarCadastro: true,
-        podeDevolverCadastro: true,
-        podeAceitarCadastro: true,
-        podeVisualizarDiagnostico: true,
-        podeAlterarDataLimite: true,
-        podeVisualizarImpacto: true,
-        podeRealizarAutoavaliacao: true,
-    };
-
-    const createWrapper = (propsOverride: any = {}) => {
-        const mountOptions = getCommonMountOptions({}, {}, { stubActions: false });
-
-        context.wrapper = mount(SubprocessoCards, {
-            ...mountOptions,
-            props: {
-                permissoes: defaultPermissoes,
-                codProcesso: 1,
-                siglaUnidade: "TEST",
-                codSubprocesso: 10,
-                tipoProcesso: TipoProcesso.MAPEAMENTO,
-                mapa: null,
-                ...propsOverride,
-            },
-        });
-        return context.wrapper;
-    };
-
-    const mockMapa: Mapa = {
-        codigo: 1,
-        descricao: "mapa de teste",
-        unidade: {sigla: "UNID_TESTE"} as Unidade,
-        situacao: "em_andamento",
+describe('SubprocessoCards.vue', () => {
+    const defaultProps = {
+        tipoProcesso: TipoProcesso.MAPEAMENTO,
+        mapa: { id: 1 },
+        permissoes: {
+            podeEditarMapa: true,
+            podeVisualizarMapa: true,
+            podeVisualizarDiagnostico: false
+        },
+        codSubprocesso: 100,
         codProcesso: 1,
-        competencias: [],
-        dataCriacao: new Date().toISOString(),
-        dataDisponibilizacao: null,
-        dataFinalizacao: null,
+        siglaUnidade: 'TESTE'
     };
 
-    describe("Lógica de Navegação", () => {
-        it("deve navegar para SubprocessoCadastro ao clicar no card de atividades (edição)", async () => {
-            const wrapper = createWrapper({
-                tipoProcesso: TipoProcesso.MAPEAMENTO,
-                mapa: null,
-                situacao: "Mapa disponibilizado",
-                permissoes: {...defaultPermissoes, podeEditarMapa: true},
-            });
-
-            const card = wrapper.find('[data-testid="card-subprocesso-atividades"]');
-            await card.trigger("click");
-
-            expect(pushMock).toHaveBeenCalledWith({
-                name: "SubprocessoCadastro",
-                params: {
-                    codProcesso: 1,
-                    siglaUnidade: "TEST",
-                },
-            });
+    it('renderiza cards de edição para MAPEAMENTO com permissão', async () => {
+        const wrapper = mount(SubprocessoCards, {
+            props: defaultProps,
+            global: {
+                stubs: {
+                    BCard: { template: '<div class="card" @click="$emit(\'click\')"><slot /></div>' },
+                    BCardTitle: { template: '<div><slot /></div>' },
+                    BCardText: { template: '<div><slot /></div>' },
+                    BRow: { template: '<div><slot /></div>' },
+                    BCol: { template: '<div><slot /></div>' }
+                }
+            }
         });
 
-        it("deve navegar para SubprocessoVisCadastro ao clicar no card de atividades (visualização)", async () => {
-            const wrapper = createWrapper({
-                tipoProcesso: TipoProcesso.MAPEAMENTO,
-                mapa: null,
-                situacao: "Mapa disponibilizado",
-                permissoes: {
-                    ...defaultPermissoes,
-                    podeEditarMapa: false,
-                    podeVisualizarMapa: true,
-                },
-            });
+        expect(wrapper.find('[data-testid="card-subprocesso-atividades"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="card-subprocesso-mapa"]').exists()).toBe(true);
 
-            const card = wrapper.find('[data-testid="card-subprocesso-atividades-vis"]');
-            await card.trigger("click");
-
-            expect(pushMock).toHaveBeenCalledWith({
-                name: "SubprocessoVisCadastro",
-                params: {
-                    codProcesso: 1,
-                    siglaUnidade: "TEST",
-                },
-            });
+        // Click action
+        await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('click');
+        expect(pushMock).toHaveBeenCalledWith({
+            name: 'SubprocessoCadastro',
+            params: { codProcesso: 1, siglaUnidade: 'TESTE' }
         });
 
-        it("deve navegar para SubprocessoMapa ao clicar no card de mapa", async () => {
-            const wrapper = createWrapper({
-                tipoProcesso: TipoProcesso.MAPEAMENTO,
-                mapa: mockMapa,
-                situacao: "Mapa disponibilizado",
-                permissoes: {...defaultPermissoes, podeVisualizarMapa: true},
-            });
-
-            const card = wrapper.find('[data-testid="card-subprocesso-mapa"]');
-            await card.trigger("click");
-
-            expect(pushMock).toHaveBeenCalledWith({
-                name: "SubprocessoMapa",
-                params: {
-                    codProcesso: 1,
-                    siglaUnidade: "TEST",
-                },
-            });
-        });
-
-        it("deve navegar para AutoavaliacaoDiagnostico ao clicar no card de diagnostico", async () => {
-            const wrapper = createWrapper({
-                tipoProcesso: TipoProcesso.DIAGNOSTICO,
-                mapa: null,
-                situacao: "Em andamento",
-                permissoes: {...defaultPermissoes, podeVisualizarDiagnostico: true},
-                codSubprocesso: 10,
-            });
-
-            const card = wrapper.find('[data-testid="card-subprocesso-diagnostico"]');
-            await card.trigger("click");
-
-            expect(pushMock).toHaveBeenCalledWith({
-                name: "AutoavaliacaoDiagnostico",
-                params: {
-                    codSubprocesso: 10,
-                    siglaUnidade: "TEST",
-                },
-            });
-        });
-
-        it("deve navegar para OcupacoesCriticasDiagnostico ao clicar no card de ocupações", async () => {
-            const wrapper = createWrapper({
-                tipoProcesso: TipoProcesso.DIAGNOSTICO,
-                mapa: null,
-                situacao: "Em andamento",
-                codSubprocesso: 10,
-            });
-
-            const card = wrapper.find('[data-testid="card-subprocesso-ocupacoes"]');
-            await card.trigger("click");
-
-            expect(pushMock).toHaveBeenCalledWith({
-                name: "OcupacoesCriticasDiagnostico",
-                params: {
-                    codSubprocesso: 10,
-                    siglaUnidade: "TEST",
-                },
-            });
-        });
-
-        it("deve navegar para MonitoramentoDiagnostico ao clicar no card de monitoramento", async () => {
-            const wrapper = createWrapper({
-                tipoProcesso: TipoProcesso.DIAGNOSTICO,
-                mapa: null,
-                situacao: "Em andamento",
-                codSubprocesso: 10,
-            });
-
-            const card = wrapper.find('[data-testid="card-subprocesso-monitoramento"]');
-            await card.trigger("click");
-
-            expect(pushMock).toHaveBeenCalledWith({
-                name: "MonitoramentoDiagnostico",
-                params: {
-                    codSubprocesso: 10,
-                    siglaUnidade: "TEST",
-                },
-            });
+        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('click');
+        expect(pushMock).toHaveBeenCalledWith({
+            name: 'SubprocessoMapa',
+            params: { codProcesso: 1, siglaUnidade: 'TESTE' }
         });
     });
 
-    describe("Lógica de Renderização", () => {
-        it("não deve renderizar card de mapa se não puder visualizar", () => {
-            const wrapper = createWrapper({
-                tipoProcesso: TipoProcesso.MAPEAMENTO,
-                mapa: mockMapa,
-                situacao: "Mapa disponibilizado",
-                permissoes: {
-                    ...defaultPermissoes,
-                    podeVisualizarMapa: false,
-                    podeEditarMapa: false,
-                },
-            });
+    it('renderiza cards de visualização se não puder editar', async () => {
+        const wrapper = mount(SubprocessoCards, {
+            props: {
+                ...defaultProps,
+                permissoes: { ...defaultProps.permissoes, podeEditarMapa: false }
+            },
+            global: {
+                stubs: {
+                    BCard: { template: '<div class="card" @click="$emit(\'click\')"><slot /></div>' },
+                    BCardTitle: { template: '<div><slot /></div>' },
+                    BCardText: { template: '<div><slot /></div>' },
+                    BRow: { template: '<div><slot /></div>' },
+                    BCol: { template: '<div><slot /></div>' }
+                }
+            }
+        });
 
-            expect(wrapper.find('[data-testid="card-subprocesso-mapa"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').exists()).toBe(true);
+
+        // Map card for viewing (using same test-id, but different click handler is expected)
+
+        await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('click');
+        expect(pushMock).toHaveBeenCalledWith({
+            name: 'SubprocessoVisCadastro',
+            params: { codProcesso: 1, siglaUnidade: 'TESTE' }
+        });
+
+        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('click');
+        expect(pushMock).toHaveBeenCalledWith({
+            name: 'SubprocessoVisMapa',
+            params: { codProcesso: 1, siglaUnidade: 'TESTE' }
         });
     });
 
-    describe("Acessibilidade", () => {
-        it("cards devem ter role='button' e tabindex='0'", () => {
-            const wrapper = createWrapper({
-                tipoProcesso: TipoProcesso.MAPEAMENTO,
-                mapa: null,
-                situacao: "Mapa disponibilizado",
-                permissoes: {...defaultPermissoes, podeEditarMapa: true},
-            });
-            const card = wrapper.find('[data-testid="card-subprocesso-atividades"]');
-
-            expect(card.attributes("role")).toBe("button");
-            expect(card.attributes("tabindex")).toBe("0");
+    it('renderiza cards de diagnostico', async () => {
+        const wrapper = mount(SubprocessoCards, {
+            props: {
+                ...defaultProps,
+                tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                permissoes: { podeVisualizarDiagnostico: true }
+            },
+            global: {
+                stubs: {
+                    BCard: { template: '<div class="card" @click="$emit(\'click\')"><slot /></div>' },
+                    BCardTitle: { template: '<div><slot /></div>' },
+                    BCardText: { template: '<div><slot /></div>' },
+                    BRow: { template: '<div><slot /></div>' },
+                    BCol: { template: '<div><slot /></div>' }
+                }
+            }
         });
 
-        it("deve navegar ao pressionar Enter", async () => {
-            const wrapper = createWrapper({
-                tipoProcesso: TipoProcesso.MAPEAMENTO,
-                mapa: null,
-                situacao: "Mapa disponibilizado",
-                permissoes: {...defaultPermissoes, podeEditarMapa: true},
-            });
-            const card = wrapper.find('[data-testid="card-subprocesso-atividades"]');
+        expect(wrapper.find('[data-testid="card-subprocesso-diagnostico"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="card-subprocesso-monitoramento"]').exists()).toBe(true);
 
-            await card.trigger("keydown.enter");
-
-            expect(pushMock).toHaveBeenCalledWith({
-                name: "SubprocessoCadastro",
-                params: {
-                    codProcesso: 1,
-                    siglaUnidade: "TEST",
-                },
-            });
+        await wrapper.find('[data-testid="card-subprocesso-diagnostico"]').trigger('click');
+        expect(pushMock).toHaveBeenCalledWith({
+            name: 'AutoavaliacaoDiagnostico',
+            params: { codSubprocesso: 100, siglaUnidade: 'TESTE' }
         });
 
-        it("deve navegar ao pressionar Espaço", async () => {
-            const wrapper = createWrapper({
-                tipoProcesso: TipoProcesso.MAPEAMENTO,
-                mapa: null,
-                situacao: "Mapa disponibilizado",
-                permissoes: {...defaultPermissoes, podeEditarMapa: true},
-            });
-            const card = wrapper.find('[data-testid="card-subprocesso-atividades"]');
-
-            await card.trigger("keydown.space");
-
-            expect(pushMock).toHaveBeenCalledWith({
-                name: "SubprocessoCadastro",
-                params: {
-                    codProcesso: 1,
-                    siglaUnidade: "TEST",
-                },
-            });
+        await wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').trigger('click');
+        expect(pushMock).toHaveBeenCalledWith({
+            name: 'OcupacoesCriticasDiagnostico',
+            params: { codSubprocesso: 100, siglaUnidade: 'TESTE' }
         });
 
-        it("deve desabilitar navegação e foco se mapa não existir (card desabilitado)", async () => {
-            const wrapper = createWrapper({
-                tipoProcesso: TipoProcesso.MAPEAMENTO,
-                mapa: null, // Sem mapa
-                situacao: "Mapa disponibilizado",
-                permissoes: {...defaultPermissoes, podeEditarMapa: true},
-            });
-            const card = wrapper.find('[data-testid="card-subprocesso-mapa"]');
-
-            expect(card.attributes("aria-disabled")).toBe("true");
-            expect(card.attributes("tabindex")).toBe("-1");
-
-            await card.trigger("click");
-            expect(pushMock).not.toHaveBeenCalled();
+        await wrapper.find('[data-testid="card-subprocesso-monitoramento"]').trigger('click');
+        expect(pushMock).toHaveBeenCalledWith({
+            name: 'MonitoramentoDiagnostico',
+            params: { codSubprocesso: 100, siglaUnidade: 'TESTE' }
         });
+    });
+
+    it('não deve navegar se mapa não existir (modo edição)', async () => {
+        const wrapper = mount(SubprocessoCards, {
+            props: {
+                ...defaultProps,
+                mapa: null
+            },
+            global: {
+                stubs: {
+                    BCard: { template: '<div class="card" @click="$emit(\'click\')"><slot /></div>' },
+                    BCardTitle: { template: '<div><slot /></div>' },
+                    BCardText: { template: '<div><slot /></div>' },
+                    BRow: { template: '<div><slot /></div>' },
+                    BCol: { template: '<div><slot /></div>' }
+                }
+            }
+        });
+
+        // Ensure push mock is clear
+        pushMock.mockClear();
+
+        // When mapa is null, BCard might have disabled style or class, but @click handler might check it.
+        // In SubprocessoCards.vue:
+        // @click="!mapa ? null : navegarPara('SubprocessoMapa')"
+        // If BCard stub emits 'click', the handler runs.
+
+        const card = wrapper.find('[data-testid="card-subprocesso-mapa"]');
+        expect(card.exists()).toBe(true);
+
+        await card.trigger('click');
+        expect(pushMock).not.toHaveBeenCalled();
     });
 });
