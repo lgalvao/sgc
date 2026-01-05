@@ -1,3 +1,3 @@
-## 2024-01-20 - [Loading States for Micro-Interactions]
-**Learning:** Even small interactions like "Adding an item" need loading states. Without it, users may double-click, leading to duplicate requests or frustration if the network is slow. The absence of feedback breaks the sense of responsiveness.
-**Action:** Always add a loading spinner or disable state to local action buttons (like "Add", "Remove", "Update") that trigger async API calls, not just for main page submissions.
+## 2024-05-23 - [Destructive Action Safety]
+**Learning:** Default focusing the confirm button in destructive modals is an accident waiting to happen. Users often spam "Enter" or click too fast.
+**Action:** Always auto-focus the "Cancel" button for actions with irreversible consequences (like deletion). Use visual cues like warning icons inside the modal to further signal danger.

@@ -4,12 +4,21 @@
       :title="titulo"
       centered
       @hide="fechar"
+      @shown="onShown"
   >
     <slot>
-      <p>{{ mensagem }}</p>
+      <div class="d-flex align-items-start">
+        <i
+            v-if="variant === 'danger'"
+            class="bi bi-exclamation-triangle-fill text-danger fs-3 me-3"
+            aria-hidden="true"
+        />
+        <p class="mb-0 pt-1">{{ mensagem }}</p>
+      </div>
     </slot>
     <template #footer>
       <BButton
+          ref="btnCancelar"
           :data-testid="testIdCancelar || 'btn-modal-confirmacao-cancelar'"
           variant="secondary"
           @click="fechar"
@@ -29,7 +38,7 @@
 
 <script lang="ts" setup>
 import {BButton, BModal} from "bootstrap-vue-next";
-import {computed} from "vue";
+import {computed, ref} from "vue";
 
 const props = defineProps<{
   modelValue: boolean;
@@ -45,6 +54,8 @@ const emit = defineEmits<{
   (e: 'confirmar'): void;
 }>();
 
+const btnCancelar = ref<InstanceType<typeof BButton> | null>(null);
+
 const modelValueComputed = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val),
@@ -57,5 +68,12 @@ function fechar() {
 function confirmar() {
   emit('confirmar');
   modelValueComputed.value = false;
+}
+
+function onShown() {
+  // UX Improvement: Auto-focus Cancel button for destructive actions
+  if (props.variant === 'danger' && btnCancelar.value?.$el) {
+    btnCancelar.value.$el.focus();
+  }
 }
 </script>

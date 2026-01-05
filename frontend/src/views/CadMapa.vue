@@ -87,21 +87,14 @@
         @fechar="fecharModalDisponibilizar"
     />
 
-    <!-- Modal de Exclusão de Competência (Simples demais para componente separado por enquanto, ou usar ModalAcaoBloco?) -->
-    <BModal
+    <ModalConfirmacao
         v-model="mostrarModalExcluirCompetencia"
-        :fade="false"
-        cancel-title="Cancelar"
-        centered
-        data-testid="mdl-excluir-competencia"
-        ok-title="Confirmar"
-        ok-variant="danger"
         title="Exclusão de competência"
-        @hidden="fecharModalExcluirCompetencia"
-        @ok="confirmarExclusaoCompetencia"
-    >
-      <p>Confirma a exclusão da competência "{{ competenciaParaExcluir?.descricao }}"?</p>
-    </BModal>
+        :mensagem="`Confirma a exclusão da competência '${competenciaParaExcluir?.descricao}'?`"
+        variant="danger"
+        test-id-confirmar="btn-confirmar-exclusao-competencia"
+        @confirmar="confirmarExclusaoCompetencia"
+    />
 
     <ImpactoMapaModal
         v-if="codSubprocesso"
