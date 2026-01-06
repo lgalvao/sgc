@@ -3,6 +3,7 @@ package sgc.integracao.mocks;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import sgc.notificacao.NotificacaoEmailAsyncExecutor;
@@ -22,6 +23,7 @@ public class TestConfig {
     }
 
     @Bean
+    @Primary
     @Profile({"test", "e2e", "secure-test"})
     public NotificacaoEmailAsyncExecutor notificacaoEmailAsyncExecutor() {
         return Mockito.mock(NotificacaoEmailAsyncExecutor.class);
