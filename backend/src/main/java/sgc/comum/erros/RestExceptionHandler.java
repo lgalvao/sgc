@@ -42,7 +42,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      * O status HTTP e código de erro são definidos na própria exceção.
      */
     @ExceptionHandler(ErroNegocioBase.class)
-    protected ResponseEntity<Object> handleErroNegocio(ErroNegocioBase ex) {
+    protected ResponseEntity<?> handleErroNegocio(ErroNegocioBase ex) {
         String traceId = UUID.randomUUID().toString();
 
         if (ex.getStatus().is4xxClientError()) {
@@ -97,7 +97,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    protected ResponseEntity<Object> handleConstraintViolationException(
+    protected ResponseEntity<?> handleConstraintViolationException(
             ConstraintViolationException ex) {
         String traceId = UUID.randomUUID().toString();
         log.error("[{}] Erro de constraint de banco de dados: {}", traceId, ex.getMessage(), ex);
@@ -116,14 +116,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    protected ResponseEntity<Object> handleAccessDenied(AccessDeniedException ex) {
+    protected ResponseEntity<?> handleAccessDenied(AccessDeniedException ex) {
         log.warn("Acesso negado via Spring Security: {}", ex.getMessage());
         ErroApi erroApi = new ErroApi(HttpStatus.FORBIDDEN, "Acesso negado.");
         return buildResponseEntity(erroApi);
     }
 
     @ExceptionHandler(ErroAutenticacao.class)
-    protected ResponseEntity<Object> handleErroAutenticacao(ErroAutenticacao ex) {
+    protected ResponseEntity<?> handleErroAutenticacao(ErroAutenticacao ex) {
         log.warn("Erro de autenticação: {}", ex.getMessage());
         return buildResponseEntity(new ErroApi(HttpStatus.UNAUTHORIZED, sanitizar(ex.getMessage()), "NAO_AUTORIZADO", UUID.randomUUID().toString()));
     }
@@ -133,7 +133,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      * Estes erros nunca deveriam ocorrer em produção se o sistema está funcionando corretamente.
      */
     @ExceptionHandler(ErroInterno.class)
-    protected ResponseEntity<Object> handleErroInterno(ErroInterno ex) {
+    protected ResponseEntity<?> handleErroInterno(ErroInterno ex) {
         String traceId = UUID.randomUUID().toString();
         log.error("[{}] ERRO INTERNO - Isso indica um bug que precisa ser corrigido: {}", 
                   traceId, ex.getMessage(), ex);
@@ -146,7 +146,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    protected ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
+    protected ResponseEntity<?> handleIllegalStateException(IllegalStateException ex) {
         String traceId = UUID.randomUUID().toString();
         log.warn("[{}] Estado ilegal da aplicação: {}", traceId, ex.getMessage());
         String message = "A operação não pode ser executada no estado atual do recurso.";
@@ -154,7 +154,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    protected ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
+    protected ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException ex) {
         String traceId = UUID.randomUUID().toString();
         log.error("[{}] Argumento ilegal fornecido: {}", traceId, ex.getMessage(), ex);
         String message = "A requisição contém um argumento inválido ou malformado.";
@@ -162,7 +162,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<Object> handleGenericException(Exception ex) {
+    protected ResponseEntity<?> handleGenericException(Exception ex) {
         String traceId = UUID.randomUUID().toString();
         log.error("[{}] Erro inesperado na aplicação", traceId, ex);
         return buildResponseEntity(

@@ -17,7 +17,6 @@ class CoberturaExtraTest {
     void deveInstanciarErros() {
         assertThat(new ErroEstadoImpossivel("msg")).isNotNull();
         assertThat(new ErroConfiguracao("msg")).isNotNull();
-        assertThat(new ErroRequisicaoSemCorpo("msg")).isNotNull();
         assertThat(new ErroMapaNaoAssociado("msg")).isNotNull();
         assertThat(new sgc.painel.erros.ErroParametroPainelInvalido("msg")).isNotNull();
         

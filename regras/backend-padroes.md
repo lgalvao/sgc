@@ -514,7 +514,6 @@ graph TD
         EPSI[ErroProcessoEmSituacaoInvalida - 422]
         EMSI[ErroMapaEmSituacaoInvalida - 422]
         EAN[ErroAccessoNegado - 403]
-        ERS[ErroRequisicaoSemCorpo - 400]
     end
     
     RE --> EI
@@ -546,7 +545,6 @@ graph TD
 | | `ErroValidacao` | 422 | Dados de entrada inválidos |
 | | `ErroProcessoEmSituacaoInvalida` | 422 | Operação em estado incorreto |
 | | `ErroAccessoNegado` | 403 | Sem permissão |
-| | `ErroRequisicaoSemCorpo` | 400 | Body ausente |
 
 **Distinção: Erro Interno vs Erro de Negócio**
 

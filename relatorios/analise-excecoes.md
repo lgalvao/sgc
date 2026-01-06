@@ -29,7 +29,6 @@ RuntimeException
             ├── ErroEntidadeNaoEncontrada (404)
             ├── ErroAccessoNegado (403)
             ├── ErroAutenticacao (401)
-            ├── ErroRequisicaoSemCorpo (400)
             ├── ErroValidacao (422) *
             ├── ErroProcesso (409)
             ├── ErroProcessoEmSituacaoInvalida (422)

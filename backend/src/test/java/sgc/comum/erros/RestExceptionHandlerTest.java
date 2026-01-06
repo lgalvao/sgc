@@ -183,7 +183,7 @@ class RestExceptionHandlerTest {
     void deveTratarErroNegocioBase() {
         // ErroNegocioBase is abstract or base, let's use a subclass or anonymous
         ErroNegocioBase ex = new ErroNegocioBase("Erro Base", "CODE", HttpStatus.BAD_REQUEST) {};
-        ResponseEntity<Object> response = restExceptionHandler.handleErroNegocio(ex);
+        ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Erro Base", ((ErroApi) response.getBody()).getMessage());
     }
@@ -192,7 +192,7 @@ class RestExceptionHandlerTest {
     @DisplayName("Deve tratar ErroNegocioBase genérico (500)")
     void deveTratarErroNegocioBase500() {
         ErroNegocioBase ex = new ErroNegocioBase("Erro Server", "CODE", HttpStatus.INTERNAL_SERVER_ERROR) {};
-        ResponseEntity<Object> response = restExceptionHandler.handleErroNegocio(ex);
+        ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 
@@ -200,7 +200,7 @@ class RestExceptionHandlerTest {
     @DisplayName("Deve tratar ErroInterno (500)")
     void deveTratarErroInterno() {
         ErroEstadoImpossivel ex = new ErroEstadoImpossivel("Bug crítico");
-        ResponseEntity<Object> response = restExceptionHandler.handleErroInterno(ex);
+        ResponseEntity<?> response = restExceptionHandler.handleErroInterno(ex);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertThat(((ErroApi) response.getBody()).getMessage()).contains("Erro interno do sistema");
     }

@@ -13,7 +13,6 @@ import java.util.Map;
  * <p>Pode incluir detalhes adicionais sobre campos específicos que falharam na validação.
  */
 public class ErroValidacao extends ErroNegocioBase {
-    
     public ErroValidacao(String message) {
         super(message, "VALIDACAO", HttpStatus.UNPROCESSABLE_CONTENT);
     }

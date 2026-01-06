@@ -26,8 +26,4 @@ public class ErroEstadoImpossivel extends ErroInterno {
     public ErroEstadoImpossivel(String message) {
         super(message);
     }
-
-    public ErroEstadoImpossivel(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

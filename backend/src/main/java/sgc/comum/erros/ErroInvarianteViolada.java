@@ -19,12 +19,7 @@ package sgc.comum.erros;
  * lógica de negócio que permitiu o sistema chegar em estado inconsistente.
  */
 public class ErroInvarianteViolada extends ErroInterno {
-    
     public ErroInvarianteViolada(String message) {
         super(message);
-    }
-
-    public ErroInvarianteViolada(String message, Throwable cause) {
-        super(message, cause);
     }
 }
