@@ -9,7 +9,7 @@ import sgc.organizacao.dto.UnidadeDto;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class PerfilUnidade {
+public class PerfilUnidadeDto {
     private Perfil perfil;
     private UnidadeDto unidade;
 

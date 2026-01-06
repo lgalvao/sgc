@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import sgc.comum.json.SanitizarHtml;
+import sgc.seguranca.SanitizarHtml;
 
 /**
  * Request para apresentar sugestões ao mapa de competências (CDU-19 item 8). Usado pelo CHEFE da

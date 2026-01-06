@@ -11,6 +11,7 @@ import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Component;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.organizacao.model.Perfil;
+import sgc.seguranca.config.JwtProperties;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;

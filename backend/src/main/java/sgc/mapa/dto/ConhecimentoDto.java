@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import sgc.comum.json.SanitizarHtml;
+import sgc.seguranca.SanitizarHtml;
 
 /**
  * DTO para Conhecimento usado nas APIs (entrada/saída). Contém apenas campos primários e referência

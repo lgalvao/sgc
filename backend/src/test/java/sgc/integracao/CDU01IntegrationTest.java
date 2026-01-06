@@ -16,7 +16,7 @@ import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.organizacao.UsuarioService;
-import sgc.seguranca.dto.AutenticacaoReq;
+import sgc.seguranca.autenticacao.AutenticarReq;
 import sgc.seguranca.dto.EntrarReq;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
@@ -122,8 +122,8 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
         void testLoginCompleto_sucessoUsuarioUnicoPerfil() throws Exception {
             String tituloEleitoral = usuarioAdmin.getTituloEleitoral();
             String senha = "password";
-            AutenticacaoReq authRequest =
-                    AutenticacaoReq.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
+            AutenticarReq authRequest =
+                    AutenticarReq.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
 
             mockMvc.perform(post(BASE_URL + "/autenticar")
                                     .with(csrf())
@@ -159,8 +159,8 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
         void testLoginCompleto_sucessoUsuarioMultiplosPerfis() throws Exception {
             String tituloEleitoral = usuarioGestor.getTituloEleitoral();
             String senha = "password";
-            AutenticacaoReq authRequest =
-                    AutenticacaoReq.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
+            AutenticarReq authRequest =
+                    AutenticarReq.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
 
             mockMvc.perform(post(BASE_URL + "/autenticar")
                                     .with(csrf())
@@ -218,7 +218,7 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
             long codigoUnidadeInexistente = 999999L;
 
             // Pre-authenticate (Required by security fix)
-            AutenticacaoReq authRequest = AutenticacaoReq.builder()
+            AutenticarReq authRequest = AutenticarReq.builder()
                     .tituloEleitoral(tituloEleitoral)
                     .senha("any")
                     .build();

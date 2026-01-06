@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import sgc.comum.json.SanitizarHtml;
+import sgc.seguranca.SanitizarHtml;
 
 import java.time.LocalDateTime;
 

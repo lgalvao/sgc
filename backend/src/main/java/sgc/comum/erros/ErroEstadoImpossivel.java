@@ -23,7 +23,6 @@ package sgc.comum.erros;
  * externamente (ex: via SQL direto no banco).
  */
 public class ErroEstadoImpossivel extends ErroInterno {
-    
     public ErroEstadoImpossivel(String message) {
         super(message);
     }

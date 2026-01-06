@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sgc.seguranca.LimitadorTentativasLogin;
+import sgc.seguranca.autenticacao.AutenticarReq;
 import sgc.seguranca.dto.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.Perfil;
@@ -49,7 +50,7 @@ public class UsuarioController {
      * false} caso contrário.
      */
     @PostMapping("/autenticar")
-    public ResponseEntity<Boolean> autenticar(@Valid @RequestBody AutenticacaoReq request, HttpServletRequest httpRequest) {
+    public ResponseEntity<Boolean> autenticar(@Valid @RequestBody AutenticarReq request, HttpServletRequest httpRequest) {
         String ip = httpRequest.getHeader("X-Forwarded-For");
         if (ip == null || ip.isEmpty()) {
             ip = httpRequest.getRemoteAddr();
@@ -67,11 +68,11 @@ public class UsuarioController {
      * Autoriza um usuário, retornando a lista de perfis e unidades a que ele tem acesso.
      *
      * @param tituloEleitoral O título de eleitor do usuário (chave).
-     * @return Um {@link ResponseEntity} contendo a lista de {@link PerfilUnidade}.
+     * @return Um {@link ResponseEntity} contendo a lista de {@link PerfilUnidadeDto}.
      */
     @PostMapping("/autorizar")
-    public ResponseEntity<List<PerfilUnidade>> autorizar(@RequestBody String tituloEleitoral) {
-        List<PerfilUnidade> perfis = usuarioService.autorizar(tituloEleitoral);
+    public ResponseEntity<List<PerfilUnidadeDto>> autorizar(@RequestBody String tituloEleitoral) {
+        List<PerfilUnidadeDto> perfis = usuarioService.autorizar(tituloEleitoral);
         return ResponseEntity.ok(perfis);
     }
     
@@ -82,11 +83,11 @@ public class UsuarioController {
      * @return Um {@link ResponseEntity} com o token de sessão.
      */
     @PostMapping("/entrar")
-    public ResponseEntity<LoginResp> entrar(@Valid @RequestBody EntrarReq request) {
+    public ResponseEntity<EntrarResp> entrar(@Valid @RequestBody EntrarReq request) {
         String token = usuarioService.entrar(request);
         Usuario usuario = usuarioService.buscarUsuarioPorLogin(request.getTituloEleitoral());
         
-        LoginResp response = LoginResp.builder()
+        EntrarResp response = EntrarResp.builder()
                 .tituloEleitoral(request.getTituloEleitoral())
                 .nome(usuario.getNome())
                 .perfil(Perfil.valueOf(request.getPerfil()))

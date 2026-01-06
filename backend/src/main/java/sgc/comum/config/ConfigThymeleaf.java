@@ -11,7 +11,7 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
  * Configuração explícita do Thymeleaf para garantir o carregamento correto dos templates de e-mail.
  */
 @Configuration
-public class ThymeleafConfig {
+public class ConfigThymeleaf {
 
     @Bean
     public SpringTemplateEngine springTemplateEngine() {

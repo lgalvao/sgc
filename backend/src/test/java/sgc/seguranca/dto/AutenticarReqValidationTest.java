@@ -9,13 +9,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import sgc.seguranca.autenticacao.AutenticarReq;
 
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Testes de Validação: AutenticacaoReq")
-class AutenticacaoReqValidationTest {
+@DisplayName("Testes de Validação: AutenticarReq")
+class AutenticarReqValidationTest {
 
     private Validator validator;
 
@@ -29,13 +30,13 @@ class AutenticacaoReqValidationTest {
     @DisplayName("Deve aceitar inputs normais")
     void deveAceitarInputsNormais() {
         // Arrange
-        AutenticacaoReq req = AutenticacaoReq.builder()
+        AutenticarReq req = AutenticarReq.builder()
                 .tituloEleitoral("123456789012")
                 .senha("senha123")
                 .build();
 
         // Act
-        Set<ConstraintViolation<AutenticacaoReq>> violations = validator.validate(req);
+        Set<ConstraintViolation<AutenticarReq>> violations = validator.validate(req);
 
         // Assert
         assertThat(violations).isEmpty();
@@ -53,13 +54,13 @@ class AutenticacaoReqValidationTest {
         String tituloLongo = "a".repeat(tamanhoTitulo);
         String senhaLonga = "b".repeat(tamanhoSenha);
 
-        AutenticacaoReq req = AutenticacaoReq.builder()
+        AutenticarReq req = AutenticarReq.builder()
                 .tituloEleitoral(tituloLongo)
                 .senha(senhaLonga)
                 .build();
 
         // Act
-        Set<ConstraintViolation<AutenticacaoReq>> violations = validator.validate(req);
+        Set<ConstraintViolation<AutenticarReq>> violations = validator.validate(req);
 
         // Assert
         assertThat(violations).isNotEmpty();

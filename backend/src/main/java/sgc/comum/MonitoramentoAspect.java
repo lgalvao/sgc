@@ -1,4 +1,4 @@
-package sgc.infraestrutura.monitoramento;
+package sgc.comum;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

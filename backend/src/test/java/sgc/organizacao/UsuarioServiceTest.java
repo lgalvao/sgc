@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.seguranca.dto.PerfilUnidade;
+import sgc.seguranca.dto.PerfilUnidadeDto;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.*;
@@ -288,7 +288,7 @@ class UsuarioServiceTest {
             usuarioService.autenticar(TITULO_CHEFE_UNIT2, "senha");
 
             // Act
-            List<PerfilUnidade> resultado = usuarioService.autorizar(TITULO_CHEFE_UNIT2);
+            List<PerfilUnidadeDto> resultado = usuarioService.autorizar(TITULO_CHEFE_UNIT2);
 
             // Assert
             assertNotNull(resultado);
@@ -313,11 +313,11 @@ class UsuarioServiceTest {
         void deveEntrarComSucesso() {
             // Arrange
             usuarioService.autenticar(TITULO_CHEFE_UNIT2, "senha");
-            List<PerfilUnidade> perfis = usuarioService.autorizar(TITULO_CHEFE_UNIT2);
-            PerfilUnidade perfilUnidade = perfis.getFirst();
+            List<PerfilUnidadeDto> perfis = usuarioService.autorizar(TITULO_CHEFE_UNIT2);
+            PerfilUnidadeDto perfilUnidadeDto = perfis.getFirst();
 
             // Act & Assert
-            assertDoesNotThrow(() -> usuarioService.entrar(TITULO_CHEFE_UNIT2, perfilUnidade));
+            assertDoesNotThrow(() -> usuarioService.entrar(TITULO_CHEFE_UNIT2, perfilUnidadeDto));
         }
     }
 }

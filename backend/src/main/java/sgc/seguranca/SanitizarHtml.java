@@ -1,4 +1,4 @@
-package sgc.comum.json;
+package sgc.seguranca;
 
 import tools.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;

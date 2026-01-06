@@ -13,7 +13,7 @@ import sgc.organizacao.model.Perfil;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResp {
+public class EntrarResp {
     private String tituloEleitoral;
     private String nome;
     private Perfil perfil;

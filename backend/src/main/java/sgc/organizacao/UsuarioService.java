@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.seguranca.autenticacao.AcessoAdClient;
 import sgc.seguranca.GerenciadorJwt;
 import sgc.seguranca.dto.EntrarReq;
-import sgc.seguranca.dto.PerfilUnidade;
+import sgc.seguranca.dto.PerfilUnidadeDto;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -364,7 +364,7 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public List<PerfilUnidade> autorizar(String tituloEleitoral) {
+    public List<PerfilUnidadeDto> autorizar(String tituloEleitoral) {
         // Previne Information Disclosure verificando se usuário se autenticou recentemente
         if (!autenticacoesRecentes.containsKey(tituloEleitoral)) {
             log.warn("Tentativa de autorização sem autenticação prévia para usuário {}", tituloEleitoral);
@@ -378,20 +378,20 @@ public class UsuarioService {
      * Método interno para buscar autorizações sem verificação de autenticação prévia.
      * Usado internamente pelo método entrar() para evitar chamada transacional via 'this'.
      */
-    private List<PerfilUnidade> buscarAutorizacoesInterno(String tituloEleitoral) {
+    private List<PerfilUnidadeDto> buscarAutorizacoesInterno(String tituloEleitoral) {
         Usuario usuario = usuarioRepo
                 .findByIdWithAtribuicoes(tituloEleitoral)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloEleitoral));
 
         carregarAtribuicoes(usuario);
 
-        return usuario.getTodasAtribuicoes().stream().map(atribuicao -> new PerfilUnidade(
+        return usuario.getTodasAtribuicoes().stream().map(atribuicao -> new PerfilUnidadeDto(
                         atribuicao.getPerfil(),
                         toUnidadeDto(atribuicao.getUnidade())))
                 .toList();
     }
 
-    public void entrar(String tituloEleitoral, @NonNull PerfilUnidade pu) {
+    public void entrar(String tituloEleitoral, @NonNull PerfilUnidadeDto pu) {
     }
 
     @Transactional(readOnly = true)
@@ -412,7 +412,7 @@ public class UsuarioService {
             throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
         }
 
-        List<PerfilUnidade> autorizacoes = buscarAutorizacoesInterno(request.getTituloEleitoral());
+        List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoesInterno(request.getTituloEleitoral());
         
         // Remove a autenticação do cache após usá-la (garante que só pode entrar uma vez por autenticação)
         autenticacoesRecentes.remove(request.getTituloEleitoral());

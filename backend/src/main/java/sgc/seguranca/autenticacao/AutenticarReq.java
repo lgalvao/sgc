@@ -1,4 +1,4 @@
-package sgc.seguranca.dto;
+package sgc.seguranca.autenticacao;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,6 +1,5 @@
-package sgc.comum.json;
+package sgc.seguranca;
 
-import sgc.seguranca.SanitizacaoUtil;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.deser.std.StdDeserializer;

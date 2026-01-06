@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import sgc.comum.TestUtil;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.seguranca.dto.AutenticacaoReq;
+import sgc.seguranca.autenticacao.AutenticarReq;
 import sgc.seguranca.dto.EntrarReq;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
@@ -55,8 +55,8 @@ class UsuarioControllerIntegrationTest {
     @DisplayName("Deve autenticar")
     void autenticar_deveRetornarTrue() throws Exception {
         // Usa um usuário existente no data.sql (Admin Teste)
-        AutenticacaoReq request =
-                AutenticacaoReq.builder().tituloEleitoral("111111111111").senha("senha").build();
+        AutenticarReq request =
+                AutenticarReq.builder().tituloEleitoral("111111111111").senha("senha").build();
 
         mockMvc.perform(
                         post(API_URL + "/autenticar")

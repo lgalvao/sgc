@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import sgc.comum.erros.ErroConfiguracao;
+import sgc.seguranca.config.JwtProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

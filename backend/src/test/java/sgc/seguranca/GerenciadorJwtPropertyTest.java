@@ -4,6 +4,7 @@ import net.jqwik.api.*;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import sgc.organizacao.model.Perfil;
+import sgc.seguranca.config.JwtProperties;
 
 import java.util.Optional;
 
