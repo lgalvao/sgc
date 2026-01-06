@@ -301,6 +301,32 @@ class UnidadeServiceTest {
         }
 
         @Test
+        @DisplayName("Deve falhar ao criar atribuição se unidade não encontrada")
+        void deveFalharCriarAtribuicaoSeUnidadeNaoEncontrada() {
+            when(unidadeRepo.findById(99L)).thenReturn(Optional.empty());
+
+            CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
+                    "123", java.time.LocalDate.now(), java.time.LocalDate.now().plusDays(1), "Justificativa");
+
+            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class,
+                    () -> service.criarAtribuicaoTemporaria(99L, req));
+        }
+
+        @Test
+        @DisplayName("Deve criar atribuição com data atual se dataInicio for nula")
+        void deveCriarAtribuicaoComDataAtualSeInicioNulo() {
+            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
+            when(usuarioService.buscarEntidadePorId("123")).thenReturn(new Usuario());
+
+            CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
+                    "123", null, java.time.LocalDate.now().plusDays(1), "Justificativa");
+
+            service.criarAtribuicaoTemporaria(1L, req);
+
+            verify(atribuicaoTemporariaRepo).save(argThat(at -> at.getDataInicio() != null));
+        }
+
+        @Test
         @DisplayName("Deve buscar usuários por unidade")
         void deveBuscarUsuariosPorUnidade() {
             // Arrange
