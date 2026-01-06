@@ -332,4 +332,137 @@ class SubprocessoDetalheServiceTest {
 
         assertThat(service.obterMapaParaAjuste(1L)).isNotNull();
     }
+
+    // ==================== Testes adicionais para cobertura de branches ====================
+
+    @Test
+    @DisplayName("Obter cadastro com mapa code null")
+    void obterCadastroMapaCodeNull() {
+        Subprocesso sp = new Subprocesso();
+        sp.setMapa(new Mapa());
+        sp.getMapa().setCodigo(null); // código null
+        sp.setUnidade(new Unidade());
+        sp.getUnidade().setSigla("U1");
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+
+        SubprocessoCadastroDto dto = service.obterCadastro(1L);
+        assertThat(dto.getAtividades()).isEmpty();
+        assertThat(dto.getUnidadeSigla()).isEqualTo("U1");
+    }
+
+    @Test
+    @DisplayName("Obter cadastro com atividades null")
+    void obterCadastroAtividadesNull() {
+        Subprocesso sp = new Subprocesso();
+        sp.setMapa(new Mapa());
+        sp.getMapa().setCodigo(10L);
+        sp.setUnidade(new Unidade());
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(null);
+
+        SubprocessoCadastroDto dto = service.obterCadastro(1L);
+        assertThat(dto.getAtividades()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Obter cadastro com atividades sem conhecimentos (null)")
+    void obterCadastroConhecimentosNull() {
+        Subprocesso sp = new Subprocesso();
+        sp.setMapa(new Mapa());
+        sp.getMapa().setCodigo(10L);
+        sp.setUnidade(new Unidade());
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+
+        Atividade a = new Atividade();
+        a.setCodigo(1L);
+        a.setDescricao("Test");
+        a.setConhecimentos(null); // null explícito
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(a));
+
+        SubprocessoCadastroDto dto = service.obterCadastro(1L);
+        assertThat(dto.getAtividades()).hasSize(1);
+        assertThat(dto.getAtividades().get(0).getConhecimentos()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Obter cadastro com unidade null")
+    void obterCadastroUnidadeNull() {
+        Subprocesso sp = new Subprocesso();
+        sp.setMapa(new Mapa());
+        sp.getMapa().setCodigo(10L);
+        sp.setUnidade(null); // unidade null
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of());
+
+        SubprocessoCadastroDto dto = service.obterCadastro(1L);
+        assertThat(dto.getUnidadeSigla()).isNull();
+    }
+
+    @Test
+    @DisplayName("Obter detalhes com unidade sem tituloTitular")
+    void obterDetalhesUnidadeSemTitular() {
+        Usuario admin = new Usuario();
+        UsuarioPerfil up = new UsuarioPerfil();
+        up.setPerfil(Perfil.ADMIN);
+        admin.setAtribuicoes(Set.of(up));
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        sp.setUnidade(new Unidade());
+        sp.getUnidade().setSigla("U1");
+        sp.getUnidade().setTituloTitular(null); // titular null
+
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+        when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
+                .thenReturn(SubprocessoDetalheDto.builder().build());
+
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, null, admin);
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Obter detalhes com unidade null")
+    void obterDetalhesUnidadeNull() {
+        Usuario admin = new Usuario();
+        UsuarioPerfil up = new UsuarioPerfil();
+        up.setPerfil(Perfil.ADMIN);
+        admin.setAtribuicoes(Set.of(up));
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        sp.setUnidade(null); // unidade null
+
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+
+        // Deve lançar erro por unidade null na verificação de permissão
+        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.CHEFE, 10L, admin))
+                .isInstanceOf(ErroAccessoNegado.class);
+    }
+
+    @Test
+    @DisplayName("Obter detalhes com CHEFE mesma unidade")
+    void obterDetalhesChefeMesmaUnidade() {
+        Usuario chefe = new Usuario();
+        Unidade u1 = new Unidade();
+        u1.setCodigo(10L);
+        u1.setSigla("U1");
+        u1.setTituloTitular("titular");
+
+        UsuarioPerfil up = new UsuarioPerfil();
+        up.setPerfil(Perfil.CHEFE);
+        up.setUnidade(u1);
+        chefe.setAtribuicoes(Set.of(up));
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        sp.setUnidade(u1);
+
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+        when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
+                .thenReturn(SubprocessoDetalheDto.builder().build());
+        when(usuarioService.buscarUsuarioPorLogin("titular")).thenReturn(new Usuario());
+
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.CHEFE, 10L, chefe);
+        assertThat(result).isNotNull();
+    }
 }

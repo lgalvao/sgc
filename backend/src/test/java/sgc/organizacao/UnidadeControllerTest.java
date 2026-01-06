@@ -57,8 +57,7 @@ class UnidadeControllerTest {
                         post("/api/unidades/1/atribuicoes-temporarias")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                        """
+                                .content("""
                                                 {
                                                     "tituloEleitoralUsuario":"123",
                                                     "dataTermino":"2025-12-31",
@@ -91,8 +90,7 @@ class UnidadeControllerTest {
                 .thenReturn(Collections.emptyList());
 
         // Act & Assert
-        mockMvc.perform(
-                        get("/api/unidades/arvore-com-elegibilidade")
+        mockMvc.perform(get("/api/unidades/arvore-com-elegibilidade")
                                 .param("tipoProcesso", "MAPEAMENTO"))
                 .andExpect(status().isOk());
     }

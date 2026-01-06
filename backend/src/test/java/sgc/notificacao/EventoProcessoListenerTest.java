@@ -11,6 +11,7 @@ import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
+import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
@@ -21,6 +22,7 @@ import sgc.subprocesso.service.SubprocessoService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -202,5 +204,75 @@ class EventoProcessoListenerTest {
         listener.aoIniciarProcesso(evento);
 
         verify(notificacaoEmailService).enviarEmailHtml(eq("inter@t.com"), contains("Processo Iniciado"), any());
+    }
+    
+    @Test
+    void deveEnviarParaIntermediariaComSubordinadas() {
+        // Teste de finalização para intermediária (cobre 189-194)
+        Processo processo = new Processo();
+        processo.setCodigo(2L);
+        processo.setDescricao("P2");
+        when(processoService.buscarEntidadePorId(2L)).thenReturn(processo);
+        
+        Unidade intermediaria = new Unidade();
+        intermediaria.setCodigo(30L);
+        intermediaria.setSigla("INTER");
+        intermediaria.setTipo(TipoUnidade.INTERMEDIARIA);
+        
+        Unidade subordinada = new Unidade();
+        subordinada.setCodigo(40L);
+        subordinada.setSigla("SUB");
+        subordinada.setUnidadeSuperior(intermediaria);
+        
+        // Ambas participam so que notificamos a intermediaria sobre a finalização (e ela ve as subordinadas)
+        processo.setParticipantes(Set.of(intermediaria, subordinada));
+        
+        // Mock responsaveis
+        ResponsavelDto respInter = ResponsavelDto.builder().unidadeCodigo(30L).titularTitulo("444").build();
+        ResponsavelDto respSub = ResponsavelDto.builder().unidadeCodigo(40L).titularTitulo("555").build();
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(30L, respInter, 40L, respSub));
+        
+        UsuarioDto userInter = UsuarioDto.builder().tituloEleitoral("444").email("inter@mail.com").build();
+        UsuarioDto userSub = UsuarioDto.builder().tituloEleitoral("555").email("sub@mail.com").build();
+        
+        when(usuarioService.buscarUsuariosPorTitulos(argThat(list -> list.containsAll(List.of("444", "555")))))
+            .thenReturn(Map.of("444", userInter, "555", userSub));
+        
+        // Executa
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(2L).build();
+        listener.aoFinalizarProcesso(evento);
+        
+        // Verifica envio para intermediária com assunto específico
+        verify(notificacaoEmailService).enviarEmailHtml(eq("inter@mail.com"), contains("unidades subordinadas"), any());
+    }
+
+    @Test
+    void naoDeveEnviarParaIntermediariaSemSubordinadas() {
+        // Teste de finalização para intermediária SEM subordinadas no processo (cobre 184)
+        Processo processo = new Processo();
+        processo.setCodigo(3L);
+        processo.setDescricao("P3");
+        when(processoService.buscarEntidadePorId(3L)).thenReturn(processo);
+        
+        Unidade intermediaria = new Unidade();
+        intermediaria.setCodigo(50L);
+        intermediaria.setSigla("INTER_SOLO");
+        intermediaria.setTipo(TipoUnidade.INTERMEDIARIA);
+        
+        // Apenas a intermediaria participa (ou subordinadas não estao no .getParticipantes())
+        processo.setParticipantes(Set.of(intermediaria));
+        
+        ResponsavelDto respInter = ResponsavelDto.builder().unidadeCodigo(50L).titularTitulo("666").build();
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(50L, respInter));
+        
+        UsuarioDto userInter = UsuarioDto.builder().tituloEleitoral("666").email("solo@mail.com").build();
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("666", userInter));
+        
+        // Executa
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(3L).build();
+        listener.aoFinalizarProcesso(evento);
+        
+        // NAO deve enviar email para a intermediaria pois não tem subordinadas no contexto
+        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("solo@mail.com"), anyString(), any());
     }
 }

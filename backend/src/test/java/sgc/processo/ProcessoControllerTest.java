@@ -636,4 +636,70 @@ public class ProcessoControllerTest {
                     .andExpect(jsonPath("$[0].codigo").value(10L));
         }
     }
+
+    @Nested
+    @DisplayName("Cobertura de Branches Adicionais")
+    class CoberturaBranches {
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve retornar 200 OK ao iniciar diagnóstico com sucesso")
+        void deveRetornarOkAoIniciarDiagnosticoQuandoValido() throws Exception {
+            // Arrange
+            var req = new IniciarProcessoReq(TipoProcesso.DIAGNOSTICO, List.of(1L));
+            var processo = ProcessoDto.builder().codigo(1L).descricao("Processo Diagnóstico").build();
+
+            when(processoService.obterPorId(1L)).thenReturn(Optional.of(processo));
+            when(processoService.iniciarProcessoDiagnostico(eq(1L), anyList())).thenReturn(List.of());
+
+            // Act & Assert
+            mockMvc.perform(
+                            post("/api/processos/1/iniciar")
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(req)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.codigo").value(1L))
+                    .andExpect(jsonPath("$.descricao").value("Processo Diagnóstico"));
+
+            verify(processoService).iniciarProcessoDiagnostico(eq(1L), eq(List.of(1L)));
+        }
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve retornar 400 Bad Request quando iniciar processo retorna erros")
+        void deveRetornarBadRequestQuandoIniciarRetornaErros() throws Exception {
+            // Arrange
+            var req = new IniciarProcessoReq(TipoProcesso.MAPEAMENTO, List.of(1L));
+
+            when(processoService.iniciarProcessoMapeamento(eq(1L), anyList()))
+                    .thenReturn(List.of("Erro 1", "Erro 2"));
+
+            // Act & Assert
+            mockMvc.perform(
+                            post("/api/processos/1/iniciar")
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(req)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.erros").isArray())
+                    .andExpect(jsonPath("$.erros[0]").value("Erro 1"))
+                    .andExpect(jsonPath("$.erros[1]").value("Erro 2"));
+        }
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve retornar contexto completo com sucesso")
+        void deveRetornarContextoCompletoComSucesso() throws Exception {
+            // Arrange
+            ProcessoDetalheDto detalhe = ProcessoDetalheDto.builder().codigo(1L).build();
+            when(processoService.obterContextoCompleto(1L))
+                    .thenReturn(ProcessoContextoDto.builder().processo(detalhe).build());
+
+            // Act & Assert
+            mockMvc.perform(get("/api/processos/1/contexto-completo"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.processo.codigo").value(1L));
+        }
+    }
 }

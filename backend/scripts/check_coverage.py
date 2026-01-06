@@ -9,8 +9,91 @@ def calculate_percentage(covered, missed):
         return 0.0
     return (covered / total) * 100
 
-def format_row(name, covered, missed, total, percentage):
-    return f"| {name:<40} | {covered:>7} | {missed:>7} | {total:>7} | {percentage:>6.2f}% |"
+def get_counters(element):
+    return {c.get('type'): {'covered': int(c.get('covered')), 'missed': int(c.get('missed'))} for c in element.findall('counter')}
+
+def process_package(package, filter_package):
+    pname = package.get('name').replace('/', '.')
+    if filter_package and filter_package not in pname:
+        return None, []
+    
+    metrics = get_counters(package)
+    low_cov_classes = []
+
+    if 'INSTRUCTION' in metrics:
+        inst = metrics['INSTRUCTION']
+        line = metrics.get('LINE', {'covered': 0, 'missed': 0})
+        
+        p_inst = calculate_percentage(inst['covered'], inst['missed'])
+        p_line = calculate_percentage(line['covered'], line['missed'])
+        total_inst = inst['covered'] + inst['missed']
+        
+        print(f"| {pname:<45} | {p_inst:>8.2f}% | {p_line:>8.2f}% | {inst['covered']:>10} | {total_inst:>10} |")
+
+    for cls in package.findall('class'):
+        c_metrics = get_counters(cls)
+        if 'LINE' in c_metrics:
+            l = c_metrics['LINE']
+            perc = calculate_percentage(l['covered'], l['missed'])
+            
+            cname = cls.get('name').replace('/', '.')
+
+            if perc < 100.0: # Collect all non-100 for potential sorting/filtering
+                 low_cov_classes.append({
+                    'name': cname,
+                    'covered': l['covered'],
+                    'missed': l['missed'],
+                    'total': l['covered'] + l['missed'],
+                    'percentage': perc,
+                    'metrics': c_metrics # Store full metrics for later branch processing
+                })
+    return metrics, low_cov_classes
+
+def print_class_details(low_coverage_classes, min_coverage):
+    # Filter by user specified min_coverage
+    filtered_classes = [c for c in low_coverage_classes if c['percentage'] < min_coverage]
+    
+    if not filtered_classes:
+        return
+
+    # Sort by missed branches descending (or missed lines if no branches)
+    # Enrich with branch data
+    for c in filtered_classes:
+        c['missed_branches'] = 0
+        c['total_branches'] = 0
+        c['branch_percentage'] = 100.0
+        
+        if 'BRANCH' in c['metrics']:
+             b_metrics = c['metrics']['BRANCH']
+             c['missed_branches'] = b_metrics['missed']
+             c['total_branches'] = b_metrics['covered'] + b_metrics['missed']
+             c['branch_percentage'] = calculate_percentage(b_metrics['covered'], b_metrics['missed'])
+
+    filtered_classes.sort(key=lambda x: x.get('missed_branches', 0), reverse=True)
+    
+    print(f"| {'Classe':<60} | {'Linhas %':^10} | {'Missed L':^10} | {'Branches %':^10} | {'Missed B':^10} |")
+    print("-" * 115)
+
+    for c in filtered_classes[:20]: # Show top 20
+        branch_cov_str = f"{c.get('branch_percentage', 100.0):>8.2f}%" if c.get('total_branches', 0) > 0 else "N/A"
+        print(f"| {c['name']:<60} | {c['percentage']:>8.2f}% | {c['missed']:>10} | {branch_cov_str:>10} | {c.get('missed_branches', 0):>10} |")
+    print("-" * 115 + "\n")
+
+def print_global_summary(global_counters):
+    if 'INSTRUCTION' in global_counters:
+        inst = global_counters['INSTRUCTION']
+        line = global_counters.get('LINE', {'covered': 0, 'missed': 0})
+        p_inst = calculate_percentage(inst['covered'], inst['missed'])
+        p_line = calculate_percentage(line['covered'], line['missed'])
+        total_inst = inst['covered'] + inst['missed']
+        print(f"| {'TOTAL DO PROJETO':<45} | {p_inst:>8.2f}% | {p_line:>8.2f}% | {inst['covered']:>10} | {total_inst:>10} |")
+    
+    print("="*105 + "\n")
+
+    if 'BRANCH' in global_counters:
+        b = global_counters['BRANCH']
+        perc_b = calculate_percentage(b['covered'], b['missed'])
+        print(f"Cobertura de Branches (Global): {perc_b:.2f}% ({b['covered']}/{b['covered']+b['missed']})")
 
 def print_report(xml_path, filter_package=None, min_coverage=95.0):
     if not os.path.exists(xml_path):
@@ -24,96 +107,20 @@ def print_report(xml_path, filter_package=None, min_coverage=95.0):
     print("\n" + "="*105)
     print(f"{'RELATÓRIO DE COBERTURA JACOCO':^105}")
     print("="*105)
-    header = f"| {'Componente':<45} | {'Instr. %':^10} | {'Linhas %':^10} | {'Coberto':<10} | {'Total':<10} |"
-    print(header)
+    print(f"| {'Componente':<45} | {'Instr. %':^10} | {'Linhas %':^10} | {'Coberto':<10} | {'Total':<10} |")
     print("|" + "-"*47 + "|" + "-"*12 + "|" + "-"*12 + "|" + "-"*12 + "|" + "-"*12 + "|")
 
-    # Global counters
-    global_counters = {c.get('type'): {'covered': int(c.get('covered')), 'missed': int(c.get('missed'))} for c in root.findall('counter')}
+    global_counters = get_counters(root)
+    all_low_cov_classes = []
 
-    low_coverage_classes = []
-
-    # Package-level details
     for package in root.findall('package'):
-        pname = package.get('name').replace('/', '.')
-        if filter_package and filter_package not in pname:
-            continue
-        
-        metrics = {c.get('type'): {'covered': int(c.get('covered')), 'missed': int(c.get('missed'))} for c in package.findall('counter')}
-        
-        if 'INSTRUCTION' in metrics:
-            inst = metrics['INSTRUCTION']
-            line = metrics.get('LINE', {'covered': 0, 'missed': 0})
-            
-            p_inst = calculate_percentage(inst['covered'], inst['missed'])
-            p_line = calculate_percentage(line['covered'], line['missed'])
-            total_inst = inst['covered'] + inst['missed']
-            
-            print(f"| {pname:<45} | {p_inst:>8.2f}% | {p_line:>8.2f}% | {inst['covered']:>10} | {total_inst:>10} |")
-
-        # Check classes
-        for cls in package.findall('class'):
-            cname = cls.get('name').replace('/', '.')
-            c_metrics = {c.get('type'): {'covered': int(c.get('covered')), 'missed': int(c.get('missed'))} for c in cls.findall('counter')}
-            
-            if 'LINE' in c_metrics:
-                l = c_metrics['LINE']
-                perc = calculate_percentage(l['covered'], l['missed'])
-                if perc < min_coverage:
-                    low_coverage_classes.append({
-                        'name': cname,
-                        'covered': l['covered'],
-                        'missed': l['missed'],
-                        'total': l['covered'] + l['missed'],
-                        'percentage': perc
-                    })
+        _, classes = process_package(package, filter_package)
+        all_low_cov_classes.extend(classes)
 
     print("|" + "-"*47 + "|" + "-"*12 + "|" + "-"*12 + "|" + "-"*12 + "|" + "-"*12 + "|")
     
-    if 'INSTRUCTION' in global_counters:
-        inst = global_counters['INSTRUCTION']
-        line = global_counters.get('LINE', {'covered': 0, 'missed': 0})
-        p_inst = calculate_percentage(inst['covered'], inst['missed'])
-        p_line = calculate_percentage(line['covered'], line['missed'])
-        total_inst = inst['covered'] + inst['missed']
-        print(f"| {'TOTAL DO PROJETO':<45} | {p_inst:>8.2f}% | {p_line:>8.2f}% | {inst['covered']:>10} | {total_inst:>10} |")
-    
-    print("="*105 + "\n")
-
-    if low_coverage_classes:
-        # Sort by missed branches descending
-        # First gather branch data if available
-        for c in low_coverage_classes:
-             c['missed_branches'] = 0
-             c['total_branches'] = 0
-             c['branch_percentage'] = 100.0
-
-        if 'BRANCH' in global_counters:
-            for package in root.findall('package'):
-                for cls in package.findall('class'):
-                    cname = cls.get('name').replace('/', '.')
-                    found = next((x for x in low_coverage_classes if x['name'] == cname), None)
-                    if found:
-                        b_metrics = cls.find("counter[@type='BRANCH']")
-                        if b_metrics is not None:
-                             found['missed_branches'] = int(b_metrics.get('missed'))
-                             found['total_branches'] = int(b_metrics.get('covered')) + int(b_metrics.get('missed'))
-                             found['branch_percentage'] = calculate_percentage(int(b_metrics.get('covered')), int(b_metrics.get('missed')))
-
-        low_coverage_classes.sort(key=lambda x: x.get('missed_branches', 0), reverse=True)
-        
-        print(f"| {'Classe':<60} | {'Linhas %':^10} | {'Missed L':^10} | {'Branches %':^10} | {'Missed B':^10} |")
-        print("-" * 115)
-
-        for c in low_coverage_classes[:20]: # Show top 20
-            branch_cov_str = f"{c.get('branch_percentage', 100.0):>8.2f}%" if c.get('total_branches', 0) > 0 else "N/A"
-            print(f"| {c['name']:<60} | {c['percentage']:>8.2f}% | {c['missed']:>10} | {branch_cov_str:>10} | {c.get('missed_branches', 0):>10} |")
-        print("-" * 115 + "\n")
-
-    if 'BRANCH' in global_counters:
-        b = global_counters['BRANCH']
-        perc_b = calculate_percentage(b['covered'], b['missed'])
-        print(f"Cobertura de Branches (Global): {perc_b:.2f}% ({b['covered']}/{b['covered']+b['missed']})")
+    print_global_summary(global_counters)
+    print_class_details(all_low_cov_classes, min_coverage)
 
 if __name__ == "__main__":
     report_path = "build/reports/jacoco/test/jacocoTestReport.xml"

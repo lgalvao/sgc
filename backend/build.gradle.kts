@@ -135,7 +135,7 @@ tasks.withType<Test> {
             if (suite.parent == null) {
                 val output = """
                     |  Results: ${result.resultType}
-                    |  Total:     ${result.testCount} testes
+                    |  Total:     ${result.testCount} tests run
                     |  ✓ Passed:  ${result.successfulTestCount}
                     |  ✗ Failed:  ${result.failedTestCount}
                     |  ○ Ignored: ${result.skippedTestCount}
