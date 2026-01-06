@@ -11,7 +11,6 @@ import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.subprocesso.dto.AtividadeAjusteDto;

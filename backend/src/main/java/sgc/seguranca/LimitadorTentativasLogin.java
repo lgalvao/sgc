@@ -33,16 +33,20 @@ public class LimitadorTentativasLogin {
 
     private final Map<String, Deque<LocalDateTime>> tentativasPorIp = new ConcurrentHashMap<>();
 
+    private final java.time.Clock clock;
+
     @Autowired
-    public LimitadorTentativasLogin(Environment environment) {
+    public LimitadorTentativasLogin(Environment environment, java.time.Clock clock) {
         this.environment = environment;
+        this.clock = clock;
         this.maxCacheEntries = DEFAULT_MAX_CACHE_ENTRIES;
     }
 
     // Construtor para testes permitindo configurar o limite
-    LimitadorTentativasLogin(Environment environment, int maxCacheEntries) {
+    LimitadorTentativasLogin(Environment environment, int maxCacheEntries, java.time.Clock clock) {
         this.environment = environment;
         this.maxCacheEntries = maxCacheEntries;
+        this.clock = clock;
     }
 
     public void verificar(String ip) {
@@ -69,7 +73,7 @@ public class LimitadorTentativasLogin {
         if (tentativas.size() >= MAX_TENTATIVAS) {
             throw new ErroMuitasTentativas("Muitas tentativas de login. Tente novamente em alguns minutos.");
         }
-        tentativas.add(LocalDateTime.now());
+        tentativas.add(LocalDateTime.now(clock));
     }
 
     private boolean isPerfilTesteAtivo() {
@@ -81,7 +85,7 @@ public class LimitadorTentativasLogin {
         Deque<LocalDateTime> tentativas = tentativasPorIp.get(ip);
         if (tentativas == null) return;
 
-        LocalDateTime limite = LocalDateTime.now().minusMinutes(JANELA_MINUTOS);
+        LocalDateTime limite = LocalDateTime.now(clock).minusMinutes(JANELA_MINUTOS);
 
         // Loop seguro contra condição de corrida onde peekFirst() pode retornar null
         LocalDateTime tentativaAntiga;
@@ -99,7 +103,7 @@ public class LimitadorTentativasLogin {
      */
     @Scheduled(fixedRate = 600000)
     public void limparCachePeriodico() {
-        LocalDateTime limite = LocalDateTime.now().minusMinutes(JANELA_MINUTOS);
+        LocalDateTime limite = LocalDateTime.now(clock).minusMinutes(JANELA_MINUTOS);
 
         tentativasPorIp.entrySet().removeIf(entry -> {
             Deque<LocalDateTime> tentativas = entry.getValue();

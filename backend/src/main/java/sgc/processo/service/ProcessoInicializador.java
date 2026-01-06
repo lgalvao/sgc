@@ -135,9 +135,8 @@ public class ProcessoInicializador {
                 .collect(Collectors.toMap(sgc.organizacao.model.UnidadeMapa::getUnidadeCodigo, m -> m));
 
         switch (tipo) {
-            case MAPEAMENTO -> {
+            case MAPEAMENTO -> 
                 subprocessoFactory.criarParaMapeamento(processo, unidadesParaProcessar);
-            }
             case REVISAO -> {
                 // Batch fetch units to avoid N+1 queries
                 List<Unidade> unidades = unidadeRepo.findAllById(codigosUnidades);
@@ -163,9 +162,7 @@ public class ProcessoInicializador {
     }
 
     private Optional<String> getMensagemErroUnidadesEmProcessosAtivos(List<Long> codsUnidades) {
-        if (codsUnidades == null || codsUnidades.isEmpty()) {
-            return Optional.empty();
-        }
+        // Validation done upstream ensures list is not empty
         List<Long> unidadesBloqueadas = processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(
                 SituacaoProcesso.EM_ANDAMENTO, codsUnidades);
 
@@ -178,10 +175,7 @@ public class ProcessoInicializador {
     }
 
     private Optional<String> getMensagemErroUnidadesSemMapa(List<Long> codigosUnidades) {
-        if (codigosUnidades == null || codigosUnidades.isEmpty()) {
-            return Optional.empty();
-        }
-
+        // Validation done upstream ensures list is not empty
         List<Long> codigosComMapa = unidadeMapaRepo.findAllById(codigosUnidades).stream()
                 .map(sgc.organizacao.model.UnidadeMapa::getUnidadeCodigo)
                 .toList();

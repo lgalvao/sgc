@@ -15,12 +15,17 @@ class LimitadorTentativasLoginTest {
 
     private LimitadorTentativasLogin limitador;
     private Environment environment;
+    private java.time.Clock clock;
 
     @BeforeEach
     void setUp() {
         environment = mock(Environment.class);
+        clock = mock(java.time.Clock.class);
+        when(clock.getZone()).thenReturn(java.time.ZoneId.systemDefault());
+        when(clock.instant()).thenReturn(java.time.Instant.now());
+        
         when(environment.getActiveProfiles()).thenReturn(new String[]{});
-        limitador = new LimitadorTentativasLogin(environment);
+        limitador = new LimitadorTentativasLogin(environment, clock);
     }
 
     @Test
@@ -32,7 +37,7 @@ class LimitadorTentativasLoginTest {
             assertDoesNotThrow(() -> limitador.verificar(ip))
         );
     }
-
+    
     @Test
     void deveBloquearAposLimiteExcedido() {
         String ip = "192.168.1.2";
@@ -90,7 +95,7 @@ class LimitadorTentativasLoginTest {
     void deveLimparCacheAoAtingirLimiteMaximoEntradas() {
         // Configura um limitador com cache pequeno (100 entradas) para teste rápido
         int limiteTeste = 100;
-        LimitadorTentativasLogin limitadorTeste = new LimitadorTentativasLogin(environment, limiteTeste);
+        LimitadorTentativasLogin limitadorTeste = new LimitadorTentativasLogin(environment, limiteTeste, clock);
 
         // Adiciona entradas únicas até o limite
         for (int i = 0; i < limiteTeste; i++) {
@@ -100,10 +105,35 @@ class LimitadorTentativasLoginTest {
         // Verifica se atingiu o limite
         assertEquals(limiteTeste, limitadorTeste.getCacheSize());
 
+        // Avança o tempo para além da janela (2 minutos)
+        when(clock.instant()).thenReturn(java.time.Instant.now().plusSeconds(120));
+
         // Adiciona mais uma entrada, deve acionar a limpeza
+        // Como o tempo passou, ele deve limpar as antigas e NÃO precisar limpar tudo (clear)
         limitadorTeste.verificar("10.0.0." + limiteTeste);
 
-        // O tamanho deve ter resetado (agora tem 1, o último adicionado)
+        // O tamanho deve ser 1 (apenas a nova, as velhas expiraram)
+        assertEquals(1, limitadorTeste.getCacheSize());
+    }
+
+    @Test
+    void deveLimparTudoSeCacheCheioEEntradasRecentes() {
+        // Cache minúsculo
+        int limiteTeste = 5;
+        LimitadorTentativasLogin limitadorTeste = new LimitadorTentativasLogin(environment, limiteTeste, clock);
+        
+        // Enche o cache
+        for(int i=0; i<limiteTeste; i++) {
+            limitadorTeste.verificar("Ip" + i);
+        }
+        assertEquals(limiteTeste, limitadorTeste.getCacheSize());
+        
+        // Tenta adicionar mais um, SEM avançar o tempo
+        // limparCachePeriodico roda, mas nao remove nada.
+        // Entao deve cair no fallback de limpar tudo.
+        limitadorTeste.verificar("IpNovo");
+        
+        // Deve ter limpado tudo e adicionado o novo. Size = 1.
         assertEquals(1, limitadorTeste.getCacheSize());
     }
 }

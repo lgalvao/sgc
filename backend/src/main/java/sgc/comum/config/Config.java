@@ -16,4 +16,9 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 @Configuration
 @EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
 public class Config {
+
+    @org.springframework.context.annotation.Bean
+    public java.time.Clock clock() {
+        return java.time.Clock.systemDefaultZone();
+    }
 }

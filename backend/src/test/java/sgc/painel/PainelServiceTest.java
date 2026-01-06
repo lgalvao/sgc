@@ -23,12 +23,11 @@ import sgc.organizacao.UnidadeService;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,7 +47,8 @@ class PainelServiceTest {
     @Test
     @DisplayName("listarProcessos deve lançar erro se perfil for nulo")
     void listarProcessos_PerfilNulo() {
-        assertThatThrownBy(() -> painelService.listarProcessos(null, 1L, Pageable.unpaged()))
+        Pageable pageable = Pageable.unpaged();
+        assertThatThrownBy(() -> painelService.listarProcessos(null, 1L, pageable))
                 .isInstanceOf(ErroParametroPainelInvalido.class);
     }
 
@@ -75,7 +75,7 @@ class PainelServiceTest {
         painelService.listarProcessos(Perfil.GESTOR, 1L, PageRequest.of(0, 10));
 
         // Verifica se chamou buscando por 1L, 2L e 3L
-        // (A verificação exata dos IDs na lista exigiria Captor, mas o mock responder já valida o fluxo principal)
+        verify(processoService).listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class));
     }
 
     @Test
@@ -107,12 +107,6 @@ class PainelServiceTest {
         Processo p = criarProcessoMock(1L);
         when(processoService.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(p)));
-        // UnidadeService.buscarPorCodigo retorna UnidadeDto, mas PainelService usa buscarPorCodigo(Long) que retorna UNIDADEDTO
-        // ESPERA... PainelService linha 229: var unidade = unidadeService.buscarPorCodigo(codigoUnidade);
-        // E depois usa unidade.getSigla().
-        // UnidadeService.buscarPorCodigo retorna UnidadeDto.
-        // O mock deve retornar UnidadeDto.
-        
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(sgc.organizacao.dto.UnidadeDto.builder()
                 .codigo(1L)
                 .sigla("U1")
@@ -132,5 +126,54 @@ class PainelServiceTest {
         p.setDataCriacao(java.time.LocalDateTime.now()); // Fixed: LocalDateTime
         p.setParticipantes(Collections.emptySet());
         return p;
+    }
+    @Test
+    @DisplayName("listarAlertas por título de usuário deve buscar alertas específicos")
+    void listarAlertas_PorUsuario() {
+        sgc.alerta.model.Alerta alerta = new sgc.alerta.model.Alerta();
+        alerta.setCodigo(100L);
+        alerta.setDescricao("Alerta teste");
+        alerta.setDataHora(java.time.LocalDateTime.now());
+        
+        when(alertaService.listarPorUsuario(any(String.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(alerta)));
+        when(alertaService.obterDataHoraLeitura(any(), any())).thenReturn(java.util.Optional.empty());
+
+        Page<sgc.alerta.dto.AlertaDto> result = painelService.listarAlertas("123456", null, PageRequest.of(0, 10));
+
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getDescricao()).isEqualTo("Alerta teste");
+        verify(alertaService).listarPorUsuario(any(String.class), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("listarAlertas por unidade deve buscar alertas da hierarquia")
+    void listarAlertas_PorUnidade() {
+        when(unidadeService.buscarIdsDescendentes(10L)).thenReturn(List.of(11L));
+        
+        sgc.alerta.model.Alerta alerta = new sgc.alerta.model.Alerta();
+        alerta.setCodigo(200L);
+        when(alertaService.listarPorUnidades(anyList(), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(alerta)));
+
+        Page<sgc.alerta.dto.AlertaDto> result = painelService.listarAlertas(null, 10L, PageRequest.of(0, 10));
+
+        assertThat(result.getContent()).hasSize(1);
+        verify(unidadeService).buscarIdsDescendentes(10L);
+        verify(alertaService).listarPorUnidades(anyList(), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("listarAlertas sem filtros deve buscar todos")
+    void listarAlertas_Todos() {
+        sgc.alerta.model.Alerta alerta = new sgc.alerta.model.Alerta();
+        alerta.setCodigo(300L);
+        when(alertaService.listarTodos(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(alerta)));
+
+        Page<sgc.alerta.dto.AlertaDto> result = painelService.listarAlertas(null, null, PageRequest.of(0, 10));
+
+        assertThat(result.getContent()).hasSize(1);
+        verify(alertaService).listarTodos(any(Pageable.class));
     }
 }

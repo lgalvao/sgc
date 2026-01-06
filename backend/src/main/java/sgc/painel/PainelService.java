@@ -102,7 +102,7 @@ public class PainelService {
     public Page<AlertaDto> listarAlertas(String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
         // Aplica ordenação padrão por dataHora decrescente para alertas também
         Pageable sortedPageable = pageable;
-        if (pageable.getSort().isUnsorted()) {
+        if (pageable.isPaged() && pageable.getSort().isUnsorted()) {
             sortedPageable = PageRequest.of(
                     pageable.getPageNumber(),
                     pageable.getPageSize(),
