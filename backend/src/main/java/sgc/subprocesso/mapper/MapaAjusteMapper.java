@@ -13,7 +13,9 @@ import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
@@ -25,6 +27,11 @@ public interface MapaAjusteMapper {
     MapaAjusteDto toDto(Subprocesso sp, Analise analise, List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos);
 
     default List<CompetenciaAjusteDto> mapCompetencias(List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos) {
+        // ⚡ Bolt: Agrupando conhecimentos por atividade para evitar filtragem repetida (O(N) vs O(N^2))
+        Map<Long, List<Conhecimento>> conhecimentosPorAtividade = conhecimentos.stream()
+                .filter(c -> c.getAtividade() != null)
+                .collect(Collectors.groupingBy(Conhecimento::getCodigoAtividade));
+
         List<CompetenciaAjusteDto> competenciaDtos = new ArrayList<>();
 
         for (Competencia comp : competencias) {
@@ -32,9 +39,7 @@ public interface MapaAjusteMapper {
 
             for (Atividade ativ : atividades) {
                 List<Conhecimento> conhecimentosDaAtividade =
-                        conhecimentos.stream()
-                                .filter(c -> c.getAtividade().getCodigo().equals(ativ.getCodigo()))
-                                .toList();
+                        conhecimentosPorAtividade.getOrDefault(ativ.getCodigo(), Collections.emptyList());
 
                 boolean isLinked = comp.getAtividades().contains(ativ);
                 List<ConhecimentoAjusteDto> conhecimentoDtos =
