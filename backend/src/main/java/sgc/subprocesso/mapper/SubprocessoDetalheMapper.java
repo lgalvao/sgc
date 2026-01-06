@@ -13,7 +13,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = MovimentacaoMapper.class)
 public interface SubprocessoDetalheMapper {
-
     @Mapping(target = "unidade", source = "sp.unidade")
     @Mapping(target = "titular", expression = "java(mapTitular(sp, titular, responsavel))")
     @Mapping(target = "responsavel", expression = "java(mapResponsavel(sp, responsavel))")
