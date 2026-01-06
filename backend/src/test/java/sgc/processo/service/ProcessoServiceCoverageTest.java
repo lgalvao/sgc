@@ -46,6 +46,9 @@ class ProcessoServiceCoverageTest {
     @Mock private ProcessoMapper processoMapper;
     @Mock private UsuarioService usuarioService;
     @Mock private AlertaService alertaService;
+    @Mock private sgc.processo.service.ProcessoDetalheBuilder processoDetalheBuilder;
+    @Mock private sgc.subprocesso.mapper.SubprocessoMapper subprocessoMapper;
+    @Mock private sgc.processo.service.ProcessoInicializador processoInicializador;
 
     @Test
     @DisplayName("atualizar: deve lançar erro se processo não estiver CRIADO")
@@ -227,5 +230,122 @@ class ProcessoServiceCoverageTest {
         when(usuarioService.buscarPerfisUsuario("user")).thenReturn(List.of(new PerfilDto()));
 
         assertThat(service.listarSubprocessosElegiveis(1L)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("checarAcesso: retorna false se buscarCodigosDescendentes retorna vazio")
+    void checarAcesso_HierarquiaVazia() {
+        Authentication auth = mock(Authentication.class);
+        when(auth.isAuthenticated()).thenReturn(true);
+        when(auth.getName()).thenReturn("user");
+        doReturn(List.of(new SimpleGrantedAuthority("ROLE_GESTOR"))).when(auth).getAuthorities();
+
+        PerfilDto perfil = new PerfilDto();
+        perfil.setUnidadeCodigo(10L);
+        when(usuarioService.buscarPerfisUsuario("user")).thenReturn(List.of(perfil));
+        when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of());
+
+        assertThat(service.checarAcesso(auth, 1L)).isFalse();
+    }
+
+    @Test
+    @DisplayName("obterContextoCompleto: sucesso")
+    void obterContextoCompleto_Sucesso() {
+        Long codProcesso = 1L;
+        Processo processo = new Processo();
+        processo.setCodigo(codProcesso);
+
+        // Setup security context
+        SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication auth = mock(Authentication.class);
+        when(auth.getName()).thenReturn("admin");
+        doReturn(List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))).when(auth).getAuthorities();
+        when(securityContext.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(securityContext);
+
+        sgc.processo.dto.ProcessoDetalheDto detalhe = new sgc.processo.dto.ProcessoDetalheDto();
+        when(processoRepo.findById(codProcesso)).thenReturn(Optional.of(processo));
+        when(processoDetalheBuilder.build(processo)).thenReturn(detalhe);
+        when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of());
+
+        sgc.processo.dto.ProcessoContextoDto resultado = service.obterContextoCompleto(codProcesso);
+
+        assertThat(resultado).isNotNull();
+        assertThat(resultado.getProcesso()).isEqualTo(detalhe);
+        
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    @DisplayName("iniciarProcessoDiagnostico: sucesso")
+    void iniciarProcessoDiagnostico_Sucesso() {
+        Long codigo = 1L;
+        List<Long> unidades = List.of(10L, 20L);
+        List<String> avisos = List.of("aviso1");
+
+        when(processoInicializador.iniciar(codigo, unidades)).thenReturn(avisos);
+
+        List<String> resultado = service.iniciarProcessoDiagnostico(codigo, unidades);
+
+        assertThat(resultado).isEqualTo(avisos);
+        verify(processoInicializador).iniciar(codigo, unidades);
+    }
+
+    @Test
+    @DisplayName("criar: erro se unidade INTERMEDIARIA")
+    void criar_ErroUnidadeIntermediaria() {
+        sgc.processo.dto.CriarProcessoReq req = new sgc.processo.dto.CriarProcessoReq();
+        req.setDescricao("Teste");
+        req.setUnidades(List.of(10L));
+        req.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setTipo(sgc.organizacao.model.TipoUnidade.INTERMEDIARIA);
+        unidade.setSigla("INT");
+
+        when(unidadeService.buscarEntidadePorId(10L)).thenReturn(unidade);
+
+        assertThatThrownBy(() -> service.criar(req))
+                .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class)
+                .hasMessageContaining("Erro interno: unidade não elegível");
+    }
+
+    @Test
+    @DisplayName("atualizar: erro se tipo REVISAO e unidade sem mapa")
+    void atualizar_ErroRevisaoSemMapa() {
+        Long codigo = 1L;
+        Processo processo = new Processo();
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+
+        AtualizarProcessoReq req = new AtualizarProcessoReq();
+        req.setDescricao("Teste");
+        req.setTipo(sgc.processo.model.TipoProcesso.REVISAO);
+        req.setUnidades(List.of(10L));
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("UND");
+
+        when(processoRepo.findById(codigo)).thenReturn(Optional.of(processo));
+        when(unidadeService.buscarEntidadesPorIds(List.of(10L))).thenReturn(List.of(unidade));
+        when(unidadeService.verificarExistenciaMapaVigente(10L)).thenReturn(false);
+        when(unidadeService.buscarSiglasPorIds(List.of(10L))).thenReturn(List.of("UND"));
+
+        assertThatThrownBy(() -> service.atualizar(codigo, req))
+                .isInstanceOf(ErroProcesso.class)
+                .hasMessageContaining("não possuem mapa vigente");
+    }
+
+    @Test
+    @DisplayName("criar: sucesso com getMensagemErroUnidadesSemMapa vazio")
+    void criar_GetMensagemErroVazio() {
+        sgc.processo.dto.CriarProcessoReq req = new sgc.processo.dto.CriarProcessoReq();
+        req.setDescricao("Teste");
+        req.setUnidades(List.of());
+        req.setTipo(sgc.processo.model.TipoProcesso.REVISAO);
+
+        assertThatThrownBy(() -> service.criar(req))
+                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
     }
 }
