@@ -257,6 +257,11 @@ describe("CadMapa.vue", () => {
             name: "ImpactoMapaModal",
             props: ['mostrar'],
             template: `<div v-if="mostrar">Impacto</div>`
+        },
+        ModalConfirmacao: {
+            props: ['modelValue', 'titulo', 'mensagem'],
+            template: '<div v-if="modelValue" data-testid="mdl-excluir-competencia"><slot /></div>',
+            emits: ['update:modelValue', 'confirmar']
         }
     };
 
@@ -462,7 +467,7 @@ describe("CadMapa.vue", () => {
         expect(deleteModal.exists()).toBe(true);
         expect(deleteModal.props("modelValue")).toBe(true);
 
-        await deleteModal.vm.$emit("ok");
+        await deleteModal.vm.$emit("confirmar");
         await flushPromises();
 
         expect(subprocessoService.removerCompetencia).toHaveBeenCalledWith(123, 10);
@@ -585,7 +590,7 @@ describe("CadMapa.vue", () => {
         vi.mocked(subprocessoService.removerCompetencia).mockRejectedValueOnce(axiosError);
 
         const deleteModal = wrapper.findComponent('[data-testid="mdl-excluir-competencia"]') as any;
-        await deleteModal.vm.$emit("ok");
+        await deleteModal.vm.$emit("confirmar");
         await flushPromises();
 
         expect((wrapper.vm as any).fieldErrors.generic).toBe("Erro API");

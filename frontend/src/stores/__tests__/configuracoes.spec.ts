@@ -20,6 +20,7 @@ describe('Configuracoes Store', () => {
 
         // Reset mocks and re-import apiClient
         vi.clearAllMocks();
+        vi.spyOn(console, 'error').mockImplementation(() => {});
         const axiosSetup = await import('@/axios-setup');
         apiClient = axiosSetup.apiClient;
     });

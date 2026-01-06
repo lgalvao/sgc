@@ -89,7 +89,8 @@
 
     <ModalConfirmacao
         v-model="mostrarModalExcluirCompetencia"
-        title="Exclusão de competência"
+        data-testid="mdl-excluir-competencia"
+        titulo="Exclusão de competência"
         :mensagem="`Confirma a exclusão da competência '${competenciaParaExcluir?.descricao}'?`"
         variant="danger"
         test-id-confirmar="btn-confirmar-exclusao-competencia"
@@ -120,6 +121,7 @@ import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
 import type {Atividade, Competencia} from "@/types/tipos";
 import CompetenciaCard from "@/components/CompetenciaCard.vue";
+import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 
 // Lazy loading de componentes pesados ou modais
 const ImpactoMapaModal = defineAsyncComponent(() => import("@/components/ImpactoMapaModal.vue"));

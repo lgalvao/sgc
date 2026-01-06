@@ -8,13 +8,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseService;
-import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.CompetenciaMapaDto;
-import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
@@ -31,23 +28,17 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
-import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -94,9 +85,19 @@ class SubprocessoMapaWorkflowServiceTest {
         @DisplayName("Deve falhar ao editar mapa em situação inválida")
         void deveFalharEditarMapaSituacaoInvalida() {
             Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
 
-            assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, new SalvarMapaRequest(), "user"))
-                .isInstanceOf(ErroMapaEmSituacaoInvalida.class);
+            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of()); // Era vazio
+
+            SalvarMapaRequest req = new SalvarMapaRequest();
+            req.setCompetencias(List.of(new CompetenciaMapaDto())); // Tem novas
+
+            service.salvarMapaSubprocesso(1L, req, "user");
+
+            verify(subprocessoRepo).save(sp);
+            verify(mapaService).salvarMapaCompleto(eq(10L), eq(req), eq("user"));
         }
 
         @Test

@@ -10,8 +10,6 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
-import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.model.Subprocesso;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 
@@ -19,7 +17,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

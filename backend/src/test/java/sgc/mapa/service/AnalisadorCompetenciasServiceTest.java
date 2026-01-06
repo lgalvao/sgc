@@ -11,11 +11,8 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.TipoImpactoCompetencia;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
