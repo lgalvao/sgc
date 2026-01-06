@@ -81,17 +81,33 @@ def print_report(xml_path, filter_package=None, min_coverage=95.0):
     print("="*105 + "\n")
 
     if low_coverage_classes:
-        print(f"CLASSES COM COBERTURA DE LINHAS ABAIXO DE {min_coverage}% (Ordenadas por linhas perdidas):")
-        print("-" * 105)
-        print(f"| {'Classe':<65} | {'Cob. %':^10} | {'Perdidas':^10} | {'Total':^10} |")
-        print("-" * 105)
+        # Sort by missed branches descending
+        # First gather branch data if available
+        for c in low_coverage_classes:
+             c['missed_branches'] = 0
+             c['total_branches'] = 0
+             c['branch_percentage'] = 100.0
+
+        if 'BRANCH' in global_counters:
+            for package in root.findall('package'):
+                for cls in package.findall('class'):
+                    cname = cls.get('name').replace('/', '.')
+                    found = next((x for x in low_coverage_classes if x['name'] == cname), None)
+                    if found:
+                        b_metrics = cls.find("counter[@type='BRANCH']")
+                        if b_metrics is not None:
+                             found['missed_branches'] = int(b_metrics.get('missed'))
+                             found['total_branches'] = int(b_metrics.get('covered')) + int(b_metrics.get('missed'))
+                             found['branch_percentage'] = calculate_percentage(int(b_metrics.get('covered')), int(b_metrics.get('missed')))
+
+        low_coverage_classes.sort(key=lambda x: x.get('missed_branches', 0), reverse=True)
         
-        # Sort by missed lines descending
-        low_coverage_classes.sort(key=lambda x: x['missed'], reverse=True)
-        
+        print(f"| {'Classe':<65} | {'Cob. Lin %':^10} | {'Perdidas Lines':^14} | {'Branches Miss':^13} |")
+        print("-" * 115)
+
         for c in low_coverage_classes[:20]: # Show top 20
-            print(f"| {c['name']:<65} | {c['percentage']:>8.2f}% | {c['missed']:>10} | {c['total']:>10} |")
-        print("-" * 105 + "\n")
+            print(f"| {c['name']:<65} | {c['percentage']:>8.2f}% | {c['missed']:>14} | {c.get('missed_branches', 0):>13} |")
+        print("-" * 115 + "\n")
 
     if 'BRANCH' in global_counters:
         b = global_counters['BRANCH']
