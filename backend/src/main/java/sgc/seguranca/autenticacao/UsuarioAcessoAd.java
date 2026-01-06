@@ -1,4 +1,4 @@
-package sgc.seguranca;
+package sgc.seguranca.autenticacao;
 
 import lombok.Data;
 

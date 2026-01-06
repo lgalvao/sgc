@@ -32,8 +32,7 @@ public class GerenciadorJwt {
     public void verificarSegurancaChave() {
         if (DEFAULT_SECRET.equals(jwtProperties.getSecret())) {
             if (environment.acceptsProfiles(Profiles.of("test", "e2e", "local"))) {
-                log.warn("⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão. " +
-                        "Isso é aceitável APENAS para ambientes de desenvolvimento/teste (test, e2e, local).");
+                log.warn("⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão.");
             } else {
                 log.error("🚨 ERRO CRÍTICO DE SEGURANÇA: Tentativa de iniciar em ambiente produtivo com o segredo JWT padrão.");
                 throw new ErroConfiguracao(
@@ -86,9 +85,8 @@ public class GerenciadorJwt {
             }
 
             Perfil perfil = Perfil.valueOf(perfilStr);
-
             return Optional.of(new JwtClaims(tituloEleitoral, perfil, unidadeCodigo));
-            
+
         } catch (Exception e) {
             return Optional.empty();
         }

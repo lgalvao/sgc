@@ -13,7 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import sgc.seguranca.FiltroAutenticacaoSimulado;
+import sgc.seguranca.FiltroAutenticacaoMock;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Profile("e2e")
 public class E2eSecurityConfig {
-    private final FiltroAutenticacaoSimulado filtroAutenticacaoSimulado;
+    private final FiltroAutenticacaoMock filtroAutenticacaoMock;
 
     /**
      * Configura a cadeia de filtros de segurança para testes E2E.
@@ -67,7 +67,7 @@ public class E2eSecurityConfig {
                     config.setAllowCredentials(true);
                     return config;
                 }))
-                .addFilterBefore(filtroAutenticacaoSimulado, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(filtroAutenticacaoMock, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

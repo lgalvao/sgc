@@ -19,7 +19,7 @@ public class NotificacaoModelosServiceMock extends NotificacaoModelosService {
     }
 
     @Override
-    public String criarEmailDeProcessoIniciado(
+    public String criarEmailProcessoIniciado(
             String nomeUnidade,
             String nomeProcesso,
             String tipoProcesso,

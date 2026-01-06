@@ -13,7 +13,7 @@ import java.util.List;
 @Configuration
 @ConfigurationProperties(prefix = "aplicacao.cors")
 @Data
-public class CorsConfig {
+public class ConfigCors {
 
     private List<String> allowedOrigins = List.of("http://localhost:5173");
     private List<String> allowedMethods = List.of("GET", "POST", "PUT", "DELETE", "OPTIONS");

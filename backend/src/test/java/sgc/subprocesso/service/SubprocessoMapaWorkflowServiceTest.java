@@ -28,6 +28,7 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
+import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -78,26 +79,19 @@ class SubprocessoMapaWorkflowServiceTest {
             service.salvarMapaSubprocesso(1L, req, "user");
 
             verify(subprocessoRepo).save(sp);
-            verify(mapaService).salvarMapaCompleto(eq(10L), eq(req), eq("user"));
+            verify(mapaService).salvarMapaCompleto(10L, req, "user");
         }
 
         @Test
         @DisplayName("Deve falhar ao editar mapa em situação inválida")
         void deveFalharEditarMapaSituacaoInvalida() {
-            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            Mapa mapa = mock(Mapa.class);
-            when(mapa.getCodigo()).thenReturn(10L);
-            when(sp.getMapa()).thenReturn(mapa);
-
-            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of()); // Era vazio
+            mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
             SalvarMapaRequest req = new SalvarMapaRequest();
-            req.setCompetencias(List.of(new CompetenciaMapaDto())); // Tem novas
+            req.setCompetencias(List.of(new CompetenciaMapaDto()));
 
-            service.salvarMapaSubprocesso(1L, req, "user");
-
-            verify(subprocessoRepo).save(sp);
-            verify(mapaService).salvarMapaCompleto(eq(10L), eq(req), eq("user"));
+            assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, req, "user"))
+                .isInstanceOf(ErroMapaEmSituacaoInvalida.class);
         }
 
         @Test
@@ -116,7 +110,7 @@ class SubprocessoMapaWorkflowServiceTest {
             service.adicionarCompetencia(1L, req, "user");
 
             verify(subprocessoRepo).save(sp);
-            verify(competenciaService).adicionarCompetencia(eq(mapa), eq("Nova Comp"), eq(List.of(1L)));
+            verify(competenciaService).adicionarCompetencia(mapa, "Nova Comp", List.of(1L));
         }
 
         @Test
@@ -200,8 +194,9 @@ class SubprocessoMapaWorkflowServiceTest {
             when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(c));
 
             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
+            Usuario usuario = new Usuario();
 
-            assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, new Usuario()))
+            assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, usuario))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("pelo menos uma atividade");
         }
@@ -223,8 +218,9 @@ class SubprocessoMapaWorkflowServiceTest {
             when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of(a1, a2));
 
             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
+            Usuario usuario = new Usuario();
 
-            assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, new Usuario()))
+            assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, usuario))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("Orfã");
         }

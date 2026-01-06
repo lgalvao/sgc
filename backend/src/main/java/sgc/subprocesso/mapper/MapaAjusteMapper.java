@@ -4,8 +4,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import sgc.analise.model.Analise;
 import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Competencia;
+import sgc.mapa.model.Conhecimento;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.dto.ConhecimentoAjusteDto;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface MapaAjusteMapper {
-
+    // TODO avisos do IDE de propriedades inexistentes no mapeamento
     @Mapping(target = "codMapa", source = "sp.mapa.codigo")
     @Mapping(target = "unidadeNome", source = "sp.unidade.nome")
     @Mapping(target = "competencias", expression = "java(mapCompetencias(competencias, atividades, conhecimentos))")
@@ -30,21 +30,21 @@ public interface MapaAjusteMapper {
 
         for (Competencia comp : competencias) {
             List<AtividadeAjusteDto> atividadeDtos = new ArrayList<>();
+
             for (Atividade ativ : atividades) {
                 List<Conhecimento> conhecimentosDaAtividade =
                         conhecimentos.stream()
                                 .filter(c -> c.getAtividade().getCodigo().equals(ativ.getCodigo()))
                                 .toList();
+
                 boolean isLinked = comp.getAtividades().contains(ativ);
                 List<ConhecimentoAjusteDto> conhecimentoDtos =
                         conhecimentosDaAtividade.stream()
-                                .map(
-                                        con ->
-                                                ConhecimentoAjusteDto.builder()
-                                                        .conhecimentoCodigo(con.getCodigo())
-                                                        .nome(con.getDescricao())
-                                                        .incluido(isLinked)
-                                                        .build())
+                                .map(con -> ConhecimentoAjusteDto.builder()
+                                        .conhecimentoCodigo(con.getCodigo())
+                                        .nome(con.getDescricao())
+                                        .incluido(isLinked)
+                                        .build())
                                 .collect(Collectors.toList());
 
                 atividadeDtos.add(

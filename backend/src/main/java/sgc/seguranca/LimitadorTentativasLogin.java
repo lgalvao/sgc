@@ -18,16 +18,15 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 @Component
 @Slf4j
 public class LimitadorTentativasLogin {
-
     private final Environment environment;
 
     // Máximo de tentativas permitidas por IP
     private static final int MAX_TENTATIVAS = 5;
+
     // Janela de tempo em minutos
     private static final int JANELA_MINUTOS = 1;
 
     // Limite padrão de entradas no cache
-    // Ajustado para 1000 considerando a base de usuários (algumas centenas)
     private static final int DEFAULT_MAX_CACHE_ENTRIES = 1000;
 
     private final int maxCacheEntries;
@@ -50,7 +49,7 @@ public class LimitadorTentativasLogin {
         if (ip == null || isPerfilTesteAtivo()) return;
 
         // Proteção contra DoS: Se o mapa estiver muito cheio, limpa tudo.
-        // É uma medida de emergência para evitar OutOfMemoryError.
+        // Medida de emergência para evitar OutOfMemoryError.
         if (tentativasPorIp.size() >= maxCacheEntries) {
              // Tenta limpar entradas antigas primeiro
              limparCachePeriodico();
@@ -58,7 +57,7 @@ public class LimitadorTentativasLogin {
              // Se ainda estiver cheio (ataque ativo ou tráfego muito alto), reseta o cache.
              // Fail-open para rate limiting é preferível a travar o servidor.
              if (tentativasPorIp.size() >= maxCacheEntries) {
-                 log.warn("🛡️ Sentinel: Cache de limitador de login atingiu {} entradas. " +
+                 log.warn("Cache de limitador de login atingiu {} entradas. " +
                          "Limpando cache para prevenir exaustão de memória.", tentativasPorIp.size());
                  tentativasPorIp.clear();
              }
@@ -67,11 +66,9 @@ public class LimitadorTentativasLogin {
         limparTentativasAntigas(ip);
 
         Deque<LocalDateTime> tentativas = tentativasPorIp.computeIfAbsent(ip, k -> new ConcurrentLinkedDeque<>());
-
         if (tentativas.size() >= MAX_TENTATIVAS) {
             throw new ErroMuitasTentativas("Muitas tentativas de login. Tente novamente em alguns minutos.");
         }
-
         tentativas.add(LocalDateTime.now());
     }
 
@@ -86,12 +83,11 @@ public class LimitadorTentativasLogin {
 
         LocalDateTime limite = LocalDateTime.now().minusMinutes(JANELA_MINUTOS);
 
-        // SENTINEL: Loop seguro contra condição de corrida onde peekFirst() pode retornar null
+        // Loop seguro contra condição de corrida onde peekFirst() pode retornar null
         LocalDateTime tentativaAntiga;
         while ((tentativaAntiga = tentativas.peekFirst()) != null && tentativaAntiga.isBefore(limite)) {
             tentativas.pollFirst();
         }
-
         if (tentativas.isEmpty()) {
             tentativasPorIp.remove(ip);
         }
@@ -117,7 +113,7 @@ public class LimitadorTentativasLogin {
         });
     }
 
-    // Método para teste
+    // Para testes
     int getCacheSize() {
         return tentativasPorIp.size();
     }

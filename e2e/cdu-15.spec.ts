@@ -177,7 +177,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         await excluirCompetenciaCancelando(page, compDesc);
 
-        await expect(page.getByText(compDesc)).toBeVisible();
+        await expect(page.getByText(compDesc).first()).toBeVisible();
     });
 
     test('CT-04: Excluir Competência com Confirmação', async ({page}) => {

@@ -22,7 +22,7 @@ import java.io.IOException;
 @Profile({"!test", "secure-test"})
 @RequiredArgsConstructor
 @Slf4j
-public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
+public class FiltroAutenticacaoMock extends OncePerRequestFilter {
     private final GerenciadorJwt gerenciadorJwt;
     @Lazy
     private final UsuarioService usuarioService;

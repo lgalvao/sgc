@@ -2,7 +2,7 @@ import {expect, test} from './fixtures/base';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
-import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
+import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
 import {navegarParaMapa} from './helpers/helpers-mapas';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import * as path from 'path';
@@ -428,6 +428,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
     test.describe('05 - Mapa de Competências', () => {
         test('Captura fluxo de mapa de competências', async ({page}) => {
+            test.setTimeout(180_000); // Teste complexo com múltiplos logins e uploads
+            
+            page.on('console', msg => {
+                if (msg.type() === 'error' || msg.type() === 'warning' || msg.text().includes('NAVEGACAO')) {
+                    console.log(`[Browser Console] ${msg.type()}: ${msg.text()}`);
+                }
+            });
+
             const descricao = `Proc Mapa ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_121';
 
@@ -475,14 +483,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-logout').click();
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-            // Navegar para o subprocesso
-            await page.getByText(descricao).click();
-
-            // Se não for redirecionado automaticamente, clicar na unidade
-            if (!page.url().includes('SECAO_121')) {
-                // Clicar na unidade (como admin vê tabela)
-                await page.getByRole('row', {name: 'SECAO_121'}).click();
-            }
+            // Navegar para o subprocesso (admin vê tabela de unidades)
+            await acessarSubprocessoAdmin(page, descricao, UNIDADE_ALVO);
 
             // Entrar no cadastro de atividades (visualização)
             await page.getByTestId('card-subprocesso-atividades-vis').click();
@@ -903,6 +905,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // ========================================================================
     test.describe('14 - Relatórios', () => {
         test('Captura página e modais de relatórios', async ({page}) => {
+            test.setTimeout(60_000);
             await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 

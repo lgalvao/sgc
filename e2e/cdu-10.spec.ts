@@ -355,7 +355,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         // Chefe vai direto para o subprocesso
-        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
 
         // Verificar situação voltou para 'em andamento'
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro em andamento/i);
@@ -407,7 +407,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
         await disponibilizarCadastro(page);
@@ -443,7 +443,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
         // Disponibilizar novamente - ISSO DEVE LIMPAR O HISTÓRICO DAS ANÁLISES ANTERIORES
@@ -477,7 +477,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
         
         const modal = await abrirHistoricoAnalise(page);
@@ -497,7 +497,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         // Chefe vai direto
-        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
 
         await navegarParaAtividades(page);
 

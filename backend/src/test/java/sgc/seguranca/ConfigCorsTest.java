@@ -9,12 +9,12 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CorsConfigTest {
+class ConfigCorsTest {
 
     @Test
     @DisplayName("Should configure CORS source with allowed origins")
     void shouldConfigureCorsSource() {
-        CorsConfig config = new CorsConfig();
+        ConfigCors config = new ConfigCors();
         config.setAllowedOrigins(List.of("http://example.com"));
         config.setAllowedMethods(List.of("GET", "POST"));
         config.setAllowedHeaders(List.of("*"));
@@ -31,7 +31,7 @@ class CorsConfigTest {
         // return this.corsConfigurations.get(path);
 
         // A simpler test is to use reflection or check behavior.
-        // But to keep it simple and safe, let's just inspect the CorsConfig object itself
+        // But to keep it simple and safe, let's just inspect the ConfigCors object itself
         // and ensure the bean creation logic maps it correctly.
 
         // Let's create a MockHttpServletRequest to satisfy the source.

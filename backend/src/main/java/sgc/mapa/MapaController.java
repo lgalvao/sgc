@@ -57,7 +57,7 @@ public class MapaController {
      * MapaDto} criado no corpo da resposta.
      */
     @PostMapping
-    @Operation(summary = "Cria um novo mapa")
+    @Operation(summary = "Cria um mapa")
     public ResponseEntity<MapaDto> criar(@Valid @RequestBody MapaDto mapaDto) {
         var entidade = mapaMapper.toEntity(mapaDto);
         var salvo = mapaService.criar(entidade);

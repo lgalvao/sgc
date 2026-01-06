@@ -41,7 +41,7 @@ public class NotificacaoModelosService {
      * @param dataLimite   A data limite para a conclusão da primeira etapa.
      * @return O conteúdo HTML do email renderizado pelo Thymeleaf.
      */
-    public String criarEmailDeProcessoIniciado(
+    public String criarEmailProcessoIniciado(
             String nomeUnidade,
             String nomeProcesso,
             String tipoProcesso,

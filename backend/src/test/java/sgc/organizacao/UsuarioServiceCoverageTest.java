@@ -12,7 +12,7 @@ import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.model.*;
-import sgc.seguranca.AcessoAdClient;
+import sgc.seguranca.autenticacao.AcessoAdClient;
 import sgc.seguranca.GerenciadorJwt;
 import sgc.seguranca.dto.EntrarReq;
 import java.util.*;

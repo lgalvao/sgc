@@ -321,7 +321,7 @@ class EventoProcessoListenerCoverageTest {
         when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
         when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, responsavel));
         when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("user1", titular, "user2", substituto));
-        when(notificacaoModelosService.criarEmailDeProcessoIniciado(anyString(), anyString(), anyString(), any()))
+        when(notificacaoModelosService.criarEmailProcessoIniciado(anyString(), anyString(), anyString(), any()))
                 .thenThrow(new RuntimeException("Erro de teste"));
 
         assertThatCode(() -> listener.aoIniciarProcesso(evento))
@@ -382,7 +382,7 @@ class EventoProcessoListenerCoverageTest {
         when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
         when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, responsavel));
         when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("user1", titular));
-        when(notificacaoModelosService.criarEmailDeProcessoIniciado(anyString(), anyString(), anyString(), any()))
+        when(notificacaoModelosService.criarEmailProcessoIniciado(anyString(), anyString(), anyString(), any()))
                 .thenReturn("<html>Email</html>");
 
         assertThatCode(() -> listener.aoIniciarProcesso(evento))
@@ -426,7 +426,7 @@ class EventoProcessoListenerCoverageTest {
         when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
         when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, responsavel));
         when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("user1", titular, "user2", substituto));
-        when(notificacaoModelosService.criarEmailDeProcessoIniciado(anyString(), anyString(), anyString(), any()))
+        when(notificacaoModelosService.criarEmailProcessoIniciado(anyString(), anyString(), anyString(), any()))
                 .thenReturn("<html>Email</html>");
         doThrow(new RuntimeException("Erro no envio")).when(notificacaoEmailService).enviarEmailHtml(eq("substituto@test.com"), anyString(), anyString());
 
@@ -465,7 +465,7 @@ class EventoProcessoListenerCoverageTest {
         when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
         when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, responsavel));
         when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("user1", titular));
-        when(notificacaoModelosService.criarEmailDeProcessoIniciado(anyString(), anyString(), anyString(), any()))
+        when(notificacaoModelosService.criarEmailProcessoIniciado(anyString(), anyString(), anyString(), any()))
                 .thenReturn("<html>Email</html>");
 
         assertThatCode(() -> listener.aoIniciarProcesso(evento))

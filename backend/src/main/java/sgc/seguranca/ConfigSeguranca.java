@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 @Profile("(!test & !e2e) | secure-test")
 public class ConfigSeguranca {
-    private final FiltroAutenticacaoSimulado filtroAutenticacaoSimulado;
+    private final FiltroAutenticacaoMock filtroAutenticacaoMock;
 
     /**
      * Configura a cadeia de filtros de segurança para a aplicação.
@@ -67,7 +67,7 @@ public class ConfigSeguranca {
                                 .policyDirectives("default-src 'none'; frame-ancestors 'none'; sandbox"))
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
                         .xssProtection(HeadersConfigurer.XXssConfig::disable))
-                .addFilterBefore(filtroAutenticacaoSimulado, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(filtroAutenticacaoMock, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

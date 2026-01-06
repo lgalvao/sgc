@@ -8,13 +8,12 @@ import org.owasp.html.PolicyFactory;
  * Garante que a política de segurança seja aplicada consistentemente em todo o sistema.
  */
 public final class SanitizacaoUtil {
-
     // Política padrão: remove todas as tags HTML (strip all tags).
     // Usamos toFactory() sem configurar nada no builder, o que resulta em uma política que rejeita todas as tags.
     private static final PolicyFactory POLITICA_PADRAO = new HtmlPolicyBuilder().toFactory();
 
     private SanitizacaoUtil() {
-        // Construtor privado para impedir instancialização
+        // Construtor privado para impedir instanciação
     }
 
     /**
@@ -25,9 +24,6 @@ public final class SanitizacaoUtil {
      * @return O texto sem tags HTML, ou nulo se a entrada for nula.
      */
     public static String sanitizar(String entrada) {
-        if (entrada == null) {
-            return null;
-        }
-        return POLITICA_PADRAO.sanitize(entrada);
+        return entrada == null ? null : POLITICA_PADRAO.sanitize(entrada);
     }
 }

@@ -14,34 +14,24 @@ import java.util.Optional;
  */
 @Repository
 public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
-    @Query(
-            "select s from Subprocesso s join fetch s.unidade u left join fetch s.mapa m where"
-                    + " s.processo.codigo = :codProcesso")
+    @Query("""
+            select s from Subprocesso s
+              join fetch s.unidade u
+              left join fetch s.mapa m
+            where s.processo.codigo = :codProcesso""")
     List<Subprocesso> findByProcessoCodigoWithUnidade(@Param("codProcesso") Long codProcesso);
 
     @Override
     @Query("SELECT s FROM Subprocesso s JOIN FETCH s.processo JOIN FETCH s.unidade LEFT JOIN FETCH s.mapa")
+    // TODO o nome do metodo deveria mudar para deixar claro que nao é um findall comum
     List<Subprocesso> findAll();
 
     List<Subprocesso> findByProcessoCodigo(Long processoCodigo);
 
-    boolean existsByProcessoCodigoAndUnidadeCodigo(Long processoCodigo, Long unidadeCodigo);
-
-    Optional<Subprocesso> findByProcessoCodigoAndUnidadeCodigo(
-            Long processoCodigo, Long unidadeCodigo);
-
     Optional<Subprocesso> findByMapaCodigo(Long mapaCodigo);
 
-    List<Subprocesso> findByUnidadeCodigo(Long unidadeCodigo);
+    Optional<Subprocesso> findByProcessoCodigoAndUnidadeCodigo(Long processoCodigo, Long unidadeCodigo);
 
-    /**
-     * Verifica se existe subprocesso para um processo e qualquer uma das unidades fornecidas.
-     * Útil para verificação hierárquica de permissões.
-     *
-     * @param processoCodigo código do processo
-     * @param unidadesCodigos lista de códigos de unidades
-     * @return true se existir pelo menos um subprocesso
-     */
     boolean existsByProcessoCodigoAndUnidadeCodigoIn(Long processoCodigo, List<Long> unidadesCodigos);
 
     List<Subprocesso> findBySituacao(SituacaoSubprocesso situacao);

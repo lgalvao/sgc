@@ -90,7 +90,7 @@ class EventoProcessoListenerTest {
             substituto.setEmail("sub@email.com");
             when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("TITULAR", titular, "SUBSTITUTO", substituto));
 
-            when(notificacaoModelosService.criarEmailDeProcessoIniciado(any(), any(), any(), any())).thenReturn("html");
+            when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("html");
 
             listener.aoIniciarProcesso(new EventoProcessoIniciado(1L, "MAPEAMENTO", LocalDateTime.now(), List.of()));
 

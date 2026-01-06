@@ -56,7 +56,7 @@ class NotificacaoModelosServiceTest {
             LocalDateTime dataLimite = LocalDateTime.now();
 
             // When
-            notificacaoModelosService.criarEmailDeProcessoIniciado(
+            notificacaoModelosService.criarEmailProcessoIniciado(
                     nomeUnidade, nomeProcesso, tipoProcesso, dataLimite);
 
             // Then

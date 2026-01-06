@@ -19,7 +19,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Subprocesso extends EntidadeBase {
-    
     @ManyToOne
     @JoinColumn(name = "processo_codigo", nullable = false)
     private Processo processo;
