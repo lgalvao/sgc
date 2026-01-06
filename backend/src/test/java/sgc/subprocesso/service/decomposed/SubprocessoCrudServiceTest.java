@@ -203,7 +203,7 @@ class SubprocessoCrudServiceTest {
     @Test
     @DisplayName("Deve listar todos os subprocessos")
     void deveListarTodos() {
-        when(repositorioSubprocesso.findAll()).thenReturn(List.of(new Subprocesso()));
+        when(repositorioSubprocesso.findAllComFetch()).thenReturn(List.of(new Subprocesso()));
         when(subprocessoMapper.toDTO(any())).thenReturn(SubprocessoDto.builder().build());
 
         assertThat(service.listar()).hasSize(1);

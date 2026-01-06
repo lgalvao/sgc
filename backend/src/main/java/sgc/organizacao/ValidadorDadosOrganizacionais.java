@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroConfiguracao;
@@ -32,13 +33,16 @@ import static sgc.organizacao.model.TipoUnidade.*;
  *
  * <p>Invariantes validadas:
  * <ul>
- *   <li>Toda unidade ativa (OPERACIONAL, INTEROPERACIONAL, INTERMEDIARIA) tem titular</li>
+ *   <li>Toda unidade ativa tem titular</li>
  *   <li>Todo titular tem título eleitoral</li>
  *   <li>Todo titular tem email cadastrado</li>
  *   <li>Toda unidade INTERMEDIARIA tem pelo menos uma subordinada</li>
  * </ul>
+ *
+ * <p>Pode ser desabilitado com a propriedade {@code sgc.validacao.startup=false}.
  */
 @Component
+@ConditionalOnProperty(name = "sgc.validacao.startup", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
 @Slf4j
 public class ValidadorDadosOrganizacionais implements ApplicationRunner {
@@ -63,8 +67,9 @@ public class ValidadorDadosOrganizacionais implements ApplicationRunner {
 
         if (!violacoes.isEmpty()) {
             violacoes.forEach(v -> log.error("INVARIANTE VIOLADA: {}", v));
-            throw new ErroConfiguracao("Dados organizacionais inválidos. %d violações encontradas. Verifique os logs."
-                    .formatted(violacoes.size()));
+            String termo = violacoes.size() == 1 ? "violação encontrada" : "violações encontradas";
+            throw new ErroConfiguracao("Dados organizacionais inválidos. %d %s. Verifique os logs."
+                    .formatted(violacoes.size(), termo));
         }
 
         log.info("Dados organizacionais validados com sucesso. {} unidades verificadas.", unidadesAtivas.size());

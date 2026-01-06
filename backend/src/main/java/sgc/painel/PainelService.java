@@ -54,12 +54,9 @@ public class PainelService {
             throw new ErroParametroPainelInvalido("O parâmetro 'perfil' é obrigatório");
         }
 
-        // Garante ordenação padrão por data de criação decrescente se nenhuma for fornecida
-        // Isso resolve o problema onde processos recém-criados ("Rev 10") ficavam escondidos
-        // dependendo da ordem aleatória do banco ou paginação.
         Pageable sortedPageable = garantirOrdenacaoPadrao(pageable);
-
         Page<Processo> processos;
+
         if (perfil == Perfil.ADMIN) {
             processos = processoService.listarTodos(sortedPageable);
         } else {
@@ -86,8 +83,7 @@ public class PainelService {
             return PageRequest.of(
                     pageable.getPageNumber(),
                     pageable.getPageSize(),
-                    Sort.by(Sort.Direction.DESC, "dataCriacao")
-                            .and(Sort.by(Sort.Direction.DESC, "codigo")));
+                    Sort.by(Sort.Direction.DESC, "dataCriacao").and(Sort.by(Sort.Direction.DESC, "codigo")));
         }
         return pageable;
     }
@@ -138,10 +134,14 @@ public class PainelService {
     }
 
     private ProcessoResumoDto paraProcessoResumoDto(Processo processo, Perfil perfil, Long codigoUnidade) {
-        Unidade participante = processo.getParticipantes() != null && !processo.getParticipantes().isEmpty()
-                ? processo.getParticipantes().iterator().next()
+        Set<Unidade> participantes = processo.getParticipantes();
+
+        Unidade participante = participantes != null && !participantes.isEmpty()
+                ? participantes.iterator().next()
                 : null;
+
         String linkDestino = calcularLinkDestinoProcesso(processo, perfil, codigoUnidade);
+
         String unidadesParticipantes = formatarUnidadesParticipantes(processo.getParticipantes());
 
         return ProcessoResumoDto.builder()

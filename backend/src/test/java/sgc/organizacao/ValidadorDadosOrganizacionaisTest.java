@@ -1,6 +1,5 @@
 package sgc.organizacao;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -223,7 +222,7 @@ class ValidadorDadosOrganizacionaisTest {
             // Act & Assert
             assertThatThrownBy(() -> validador.run(new DefaultApplicationArguments()))
                     .isInstanceOf(ErroConfiguracao.class)
-                    .hasMessageContaining("2 violação");
+                    .hasMessageContaining("2 violações");
         }
     }
 }
