@@ -77,8 +77,10 @@ const rowAttr = (item: ProcessoResumo | null, type: string) => {
   if (item && type === 'row') {
     return {
       tabindex: '0',
+      style: { cursor: 'pointer' },
       onKeydown: (e: KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
+          // Prevent scrolling for Space
           e.preventDefault();
           handleSelecionarProcesso(item);
         }
@@ -92,6 +94,7 @@ const rowAttr = (item: ProcessoResumo | null, type: string) => {
 <template>
   <div class="table-responsive">
     <BTable
+        aria-label="Lista de processos cadastrados"
         :fields="fields"
         :items="processos"
         :sort-by="[{key: criterioOrdenacao, order: direcaoOrdenacaoAsc ? 'asc' : 'desc'}]"
