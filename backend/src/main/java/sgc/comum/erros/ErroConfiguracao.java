@@ -21,8 +21,4 @@ public class ErroConfiguracao extends ErroInterno {
     public ErroConfiguracao(String message) {
         super(message);
     }
-
-    public ErroConfiguracao(String message, Throwable cause) {
-        super(message, cause);
-    }
 }
