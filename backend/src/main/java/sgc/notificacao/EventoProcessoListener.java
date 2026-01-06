@@ -10,6 +10,7 @@ import sgc.organizacao.UsuarioService;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.TipoUnidade;
+import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
@@ -208,25 +209,12 @@ public class EventoProcessoListener {
 
             UsuarioDto titular = usuarios.get(responsavel.getTitularTitulo());
 
-            String assunto;
-            String corpoHtml;
-            TipoUnidade tipoUnidade = unidade.getTipo();
-            TipoProcesso tipoProcesso = processo.getTipo();
-
-            switch (tipoUnidade) {
-                case OPERACIONAL, INTEROPERACIONAL -> {
-                    assunto = "Processo Iniciado - %s".formatted(processo.getDescricao());
-                    corpoHtml = notificacaoModelosService.criarEmailProcessoIniciado(nomeUnidade, processo.getDescricao(), tipoProcesso.name(), subprocesso.getDataLimiteEtapa1());
-                }
-                case INTERMEDIARIA -> {
-                    assunto = "Processo Iniciado em Unidades Subordinadas - %s".formatted(processo.getDescricao());
-                    corpoHtml = notificacaoModelosService.criarEmailProcessoIniciado(nomeUnidade, processo.getDescricao(), tipoProcesso.name(), subprocesso.getDataLimiteEtapa1());
-                }
-                default -> {
-                    log.warn("Tipo de unidade desconhecido: {} (unidade={})", tipoUnidade, codigoUnidade);
-                    return;
-                }
-            }
+            String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
+            String assunto = switch (unidade.getTipo()) {
+                case OPERACIONAL, INTEROPERACIONAL -> "Processo Iniciado - %s".formatted(processo.getDescricao());
+                case INTERMEDIARIA -> "Processo Iniciado em Unidades Subordinadas - %s".formatted(processo.getDescricao());
+                default -> throw new ErroEstadoImpossivel("Tipo de unidade desconhecido ao definir assunto: " + unidade.getTipo());
+            };
 
             notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
             log.info("E-mail enviado para unidade {}", unidade.getSigla());
@@ -237,6 +225,24 @@ public class EventoProcessoListener {
         } catch (Exception e) {
             log.error("Erro ao enviar e-mail para a unidade {}: {}", codigoUnidade, e.getClass().getSimpleName(), e);
         }
+    }
+
+    String criarCorpoEmailPorTipo(TipoUnidade tipoUnidade, Processo processo, Subprocesso subprocesso) {
+        return switch (tipoUnidade) {
+            case OPERACIONAL, INTEROPERACIONAL -> notificacaoModelosService.criarEmailProcessoIniciado(
+                    subprocesso.getUnidade().getNome(),
+                    processo.getDescricao(),
+                    processo.getTipo().name(),
+                    subprocesso.getDataLimiteEtapa1()
+            );
+            case INTERMEDIARIA -> notificacaoModelosService.criarEmailProcessoIniciado(
+                    subprocesso.getUnidade().getNome(),
+                    processo.getDescricao(),
+                    processo.getTipo().name(),
+                    subprocesso.getDataLimiteEtapa1()
+            );
+            default -> throw new ErroEstadoImpossivel("Tipo de unidade não suportado para geração de e-mail: " + tipoUnidade);
+        };
     }
 
     private void enviarEmailParaSubstituto(String tituloSubstituto, Map<String, UsuarioDto> usuarios, String assunto, String corpoHtml, String nomeUnidade) {

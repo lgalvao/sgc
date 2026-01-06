@@ -123,7 +123,7 @@ class SubprocessoDetalheServiceTest {
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         Atividade ativ = new Atividade();
         ativ.setDescricao("Test");
-        ativ.setConhecimentos(null); // Null explicitamente
+        ativ.setConhecimentos(null);
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(ativ));
 
         List<AtividadeVisualizacaoDto> result = service.listarAtividadesSubprocesso(1L);
@@ -333,14 +333,12 @@ class SubprocessoDetalheServiceTest {
         assertThat(service.obterMapaParaAjuste(1L)).isNotNull();
     }
 
-    // ==================== Testes adicionais para cobertura de branches ====================
-
     @Test
     @DisplayName("Obter cadastro com mapa code null")
     void obterCadastroMapaCodeNull() {
         Subprocesso sp = new Subprocesso();
         sp.setMapa(new Mapa());
-        sp.getMapa().setCodigo(null); // código null
+        sp.getMapa().setCodigo(null);
         sp.setUnidade(new Unidade());
         sp.getUnidade().setSigla("U1");
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
@@ -376,7 +374,7 @@ class SubprocessoDetalheServiceTest {
         Atividade a = new Atividade();
         a.setCodigo(1L);
         a.setDescricao("Test");
-        a.setConhecimentos(null); // null explícito
+        a.setConhecimentos(null);
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(a));
 
         SubprocessoCadastroDto dto = service.obterCadastro(1L);
@@ -390,7 +388,7 @@ class SubprocessoDetalheServiceTest {
         Subprocesso sp = new Subprocesso();
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
-        sp.setUnidade(null); // unidade null
+        sp.setUnidade(null);
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of());
 
@@ -410,7 +408,7 @@ class SubprocessoDetalheServiceTest {
         sp.setCodigo(1L);
         sp.setUnidade(new Unidade());
         sp.getUnidade().setSigla("U1");
-        sp.getUnidade().setTituloTitular(null); // titular null
+        sp.getUnidade().setTituloTitular(null);
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
@@ -430,11 +428,10 @@ class SubprocessoDetalheServiceTest {
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
-        sp.setUnidade(null); // unidade null
+        sp.setUnidade(null);
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
-        // Deve lançar erro por unidade null na verificação de permissão
         assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.CHEFE, 10L, admin))
                 .isInstanceOf(ErroAccessoNegado.class);
     }
