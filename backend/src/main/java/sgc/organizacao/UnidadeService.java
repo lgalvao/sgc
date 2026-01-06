@@ -126,7 +126,8 @@ public class UnidadeService {
         // O requisito CDU-28 diz apenas "ADMIN seleciona servidor" da lista de servidores da unidade.
 
         // Validação de datas
-        if (request.dataTermino().isBefore(request.dataInicio())) {
+        java.time.LocalDate inicio = request.dataInicio() != null ? request.dataInicio() : java.time.LocalDate.now();
+        if (request.dataTermino().isBefore(inicio)) {
             throw new sgc.comum.erros.ErroValidacao("A data de término deve ser posterior à data de início.");
         }
 
