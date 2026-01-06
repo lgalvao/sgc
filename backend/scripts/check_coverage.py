@@ -102,11 +102,12 @@ def print_report(xml_path, filter_package=None, min_coverage=95.0):
 
         low_coverage_classes.sort(key=lambda x: x.get('missed_branches', 0), reverse=True)
         
-        print(f"| {'Classe':<65} | {'Cob. Lin %':^10} | {'Perdidas Lines':^14} | {'Branches Miss':^13} |")
+        print(f"| {'Classe':<60} | {'Linhas %':^10} | {'Missed L':^10} | {'Branches %':^10} | {'Missed B':^10} |")
         print("-" * 115)
 
         for c in low_coverage_classes[:20]: # Show top 20
-            print(f"| {c['name']:<65} | {c['percentage']:>8.2f}% | {c['missed']:>14} | {c.get('missed_branches', 0):>13} |")
+            branch_cov_str = f"{c.get('branch_percentage', 100.0):>8.2f}%" if c.get('total_branches', 0) > 0 else "N/A"
+            print(f"| {c['name']:<60} | {c['percentage']:>8.2f}% | {c['missed']:>10} | {branch_cov_str:>10} | {c.get('missed_branches', 0):>10} |")
         print("-" * 115 + "\n")
 
     if 'BRANCH' in global_counters:

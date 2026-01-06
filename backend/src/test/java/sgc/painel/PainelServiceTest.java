@@ -23,6 +23,7 @@ import sgc.organizacao.UnidadeService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -175,5 +176,58 @@ class PainelServiceTest {
 
         assertThat(result.getContent()).hasSize(1);
         verify(alertaService).listarTodos(any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("listarProcessos deve tratar exceção ao formatar unidades participantes")
+    void listarProcessos_FormatarUnidadesException() {
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
+        // Sem sigla ou mockando erro service
+        
+        Processo p = criarProcessoMock(1L);
+        p.setParticipantes(Set.of(u));
+        
+        when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
+        // Simula erro ao buscar entidade para validar visibilidade
+        when(unidadeService.buscarEntidadePorId(1L)).thenThrow(new RuntimeException("DB Error"));
+
+        Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
+
+        // Deve retornar lista mas com participantes vazio ou parcial, sem quebrar
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getUnidadesParticipantes()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("listarProcessos deve retornar link null se unidade nao encontrada no calculo de link CHEFE")
+    void listarProcessos_LinkChefeErro() {
+        Processo p = criarProcessoMock(1L);
+        when(processoService.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(p)));
+        
+        when(unidadeService.buscarPorCodigo(2L)).thenThrow(new RuntimeException("Unidade não achada"));
+
+        Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, 2L, PageRequest.of(0, 10));
+
+        assertThat(result.getContent().get(0).getLinkDestino()).isNull();
+    }
+    
+    @Test
+    @DisplayName("listarAlertas deve tratar unidades nulas no DTO")
+    void listarAlertas_UnidadesNulas() {
+        sgc.alerta.model.Alerta alerta = new sgc.alerta.model.Alerta();
+        alerta.setCodigo(400L);
+        alerta.setDescricao("Alerta sem unidade");
+        alerta.setDataHora(java.time.LocalDateTime.now());
+        // Unidades null
+        
+        when(alertaService.listarTodos(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(alerta)));
+
+        Page<sgc.alerta.dto.AlertaDto> result = painelService.listarAlertas(null, null, PageRequest.of(0, 10));
+
+        assertThat(result.getContent().get(0).getUnidadeOrigem()).isNull();
+        assertThat(result.getContent().get(0).getUnidadeDestino()).isNull();
     }
 }
