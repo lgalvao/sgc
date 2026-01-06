@@ -100,7 +100,7 @@ public class SubprocessoCrudService {
 
     @Transactional(readOnly = true)
     public List<SubprocessoDto> listar() {
-        return repositorioSubprocesso.findAll().stream().map(subprocessoMapper::toDTO).toList();
+        return repositorioSubprocesso.findAllComFetch().stream().map(subprocessoMapper::toDTO).toList();
     }
 
     @Transactional(readOnly = true)

@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface MapaAjusteMapper {
-    // TODO avisos do IDE de propriedades inexistentes no mapeamento
     @Mapping(target = "codMapa", source = "sp.mapa.codigo")
     @Mapping(target = "unidadeNome", source = "sp.unidade.nome")
     @Mapping(target = "competencias", expression = "java(mapCompetencias(competencias, atividades, conhecimentos))")

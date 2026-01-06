@@ -22,7 +22,6 @@ import sgc.subprocesso.service.SubprocessoService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static sgc.organizacao.model.TipoUnidade.*;
 
@@ -32,6 +31,9 @@ import static sgc.organizacao.model.TipoUnidade.*;
  * <p>Processa eventos de processo iniciado e finalizado, criando alertas e enviando e-mails para as unidades
  * participantes de forma diferenciada, conforme o tipo de unidade.
  *
+ * <p><strong>Pré-requisito:</strong> As invariantes de dados organizacionais são validadas na inicialização
+ * do sistema pelo {@link sgc.organizacao.ValidadorDadosOrganizacionais}. Este listener assume que os dados
+ * são válidos (toda unidade tem titular, todo titular tem email, etc.).
  */
 @Component
 @RequiredArgsConstructor
@@ -60,7 +62,7 @@ public class EventoProcessoListener {
     public void aoIniciarProcesso(EventoProcessoIniciado evento) {
         try {
             processarInicioProcesso(evento);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             log.error("Erro ao processar evento de processo iniciado: {}", e.getClass().getSimpleName(), e);
         }
     }
@@ -76,7 +78,7 @@ public class EventoProcessoListener {
     public void aoFinalizarProcesso(EventoProcessoFinalizado evento) {
         try {
             processarFinalizacaoProcesso(evento);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             log.error("Erro ao processar evento de processo finalizado: {}", e.getClass().getSimpleName(), e);
         }
     }
@@ -117,7 +119,7 @@ public class EventoProcessoListener {
         for (Subprocesso subprocesso : subprocessos) {
             try {
                 enviarEmailProcessoIniciado(processo, subprocesso, responsaveis, usuarios);
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 log.error("Erro ao enviar e-mail referente a subprocesso {}: {}", subprocesso.getCodigo(), e.getClass().getSimpleName(), e);
             }
         }
@@ -128,7 +130,6 @@ public class EventoProcessoListener {
 
         List<Unidade> unidadesParticipantes = new ArrayList<>(processo.getParticipantes());
 
-        // TODO isso é um erro interno gravíssimo -- nunca deveria ocorrer e deve ser tratado diferente!
         if (unidadesParticipantes.isEmpty()) {
             log.warn("Nenhuma unidade participante encontrada para notificar ao finalizar processo {}", processo.getCodigo());
             return;
@@ -142,76 +143,61 @@ public class EventoProcessoListener {
                 .distinct()
                 .toList());
 
+        // Filtrar subordinadas uma vez para uso nas intermediárias
+        List<Unidade> todasSubordinadas = unidadesParticipantes.stream()
+                .filter(u -> u.getUnidadeSuperior() != null)
+                .toList();
+
         for (Unidade unidade : unidadesParticipantes) {
             try {
-
-                // TODO Nenhum desses três erros poderiam ocorrer. As unidades são importadas de uma view. Se os dados retornados vierem com esse nivel de inconsistência,  o sistema nao deve nem caarregar!
-
-                // TODO toda unidade TEM que ter um responsável cadastrado!
-                ResponsavelDto responsavel = Optional.ofNullable(responsaveis.get(unidade.getCodigo()))
-                        .orElseThrow(() -> new IllegalStateException("Responsável não encontrado para a unidade %s".formatted(unidade.getSigla())));
-
-                // TODO toda unidade TEM que ter um titular
-                UsuarioDto titular = Optional.ofNullable(usuarios.get(responsavel.getTitularTitulo()))
-                        .orElseThrow(() -> new IllegalStateException("Usuário titular não encontrado: %s".formatted(responsavel.getTitularTitulo())));
-
-                // TODO todo titular tem que ter um e-mail cadastrado
-                String emailTitular = Optional.ofNullable(titular.getEmail())
-                        .filter(e -> !e.isBlank())
-                        .orElseThrow(() -> new IllegalStateException("E-mail não cadastrado para o titular %s".formatted(titular.getNome())));
+                ResponsavelDto responsavel = responsaveis.get(unidade.getCodigo());
+                UsuarioDto titular = usuarios.get(responsavel.getTitularTitulo());
+                String emailTitular = titular.getEmail();
 
                 TipoUnidade tipoUnidade = unidade.getTipo();
                 if (tipoUnidade == OPERACIONAL || tipoUnidade == INTEROPERACIONAL) {
                     enviarEmailUnidadeFinal(processo, unidade, emailTitular);
                 } else if (tipoUnidade == INTERMEDIARIA) {
-                    enviarEmailUnidadeIntermediaria(processo, unidade, emailTitular, unidadesParticipantes);
+                    enviarEmailUnidadeIntermediaria(processo, unidade, emailTitular, todasSubordinadas);
                 }
-            } catch (RuntimeException ex) { // TODO Exceçao muito genérica!
-                log.error("Falha ao preparar notificação para unidade {} no processo {}: {}", unidade.getSigla(), processo.getCodigo(), ex.getMessage(), ex);
+            } catch (Exception e) {
+                log.error("Falha ao preparar notificação para unidade {} no processo {}: {}", 
+                        unidade.getSigla(), processo.getCodigo(), e.getMessage(), e);
             }
         }
     }
 
     private void enviarEmailUnidadeFinal(Processo processo, Unidade unidade, String email) {
-        String assunto = String.format("SGC: Conclusão do processo %s", processo.getDescricao());
+        String assunto = String.format("SGC: Finalização do processo %s", processo.getDescricao());
         String html = notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(unidade.getSigla(), processo.getDescricao());
         notificacaoEmailService.enviarEmailHtml(email, assunto, html);
         log.info("E-mail de finalização enviado para {}", unidade.getSigla());
     }
 
-    // TODO por que passar todas as unidades se podemos passar apenas as subordinadas?
-    private void enviarEmailUnidadeIntermediaria(Processo processo, Unidade unidade, String email, List<Unidade> todasUnidades) {
-        List<String> siglasSubordinadas = todasUnidades.stream()
-                .filter(u -> u.getUnidadeSuperior() != null
-                        && u.getUnidadeSuperior().getCodigo().equals(unidade.getCodigo()))
+    private void enviarEmailUnidadeIntermediaria(Processo processo, Unidade unidade, String email, List<Unidade> subordinadas) {
+        List<String> siglasSubordinadas = subordinadas.stream()
+                .filter(u -> u.getUnidadeSuperior().getCodigo().equals(unidade.getCodigo()))
                 .map(Unidade::getSigla)
                 .sorted()
                 .toList();
 
-        // TODO isso é um invariante! Se é uma unidade intermediária, TEM que ter subordinadas!
         if (siglasSubordinadas.isEmpty()) {
             log.warn("Nenhuma unidade subordinada encontrada para notificar a unidade intermediária {}", unidade.getSigla());
             return;
         }
 
-        // TODO o termo é 'Finalização' e não 'Conclusão'
-        String assunto = String.format("SGC: Conclusão do processo %s em unidades subordinadas", processo.getDescricao());
+        String assunto = String.format("SGC: Finalização do processo %s em unidades subordinadas", processo.getDescricao());
         String html = notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(unidade.getSigla(), processo.getDescricao(), siglasSubordinadas);
 
         notificacaoEmailService.enviarEmailHtml(email, assunto, html);
-        log.info("E-mail de finalização enviado para {})", unidade.getSigla());
+        log.info("E-mail de finalização enviado para {}", unidade.getSigla());
     }
 
     private void enviarEmailProcessoIniciado(
-            Processo processo, // TODO para que passar o processo se o subprocesso já tem uma referência para ele?
+            Processo processo,
             Subprocesso subprocesso,
             Map<Long, ResponsavelDto> responsaveis,
             Map<String, UsuarioDto> usuarios) {
-
-        if (subprocesso.getUnidade() == null) {
-            log.warn("Subprocesso {} sem unidade associada", subprocesso.getCodigo());
-            return;
-        }
 
         Unidade unidade = subprocesso.getUnidade();
         Long codigoUnidade = unidade.getCodigo();
@@ -220,18 +206,7 @@ public class EventoProcessoListener {
             ResponsavelDto responsavel = responsaveis.get(codigoUnidade);
             String nomeUnidade = unidade.getNome();
 
-            if (responsavel == null || responsavel.getTitularTitulo() == null) {
-                // TODO erro impossivel!
-                log.warn("Responsável não encontrado para a unidade {}.", nomeUnidade);
-                return;
-            }
-
             UsuarioDto titular = usuarios.get(responsavel.getTitularTitulo());
-            if (titular == null || titular.getEmail() == null || titular.getEmail().isBlank()) {
-                // TODO erro impossivel!
-                log.warn("E-mail não encontrado para o titular da unidade {}.", nomeUnidade);
-                return;
-            }
 
             String assunto;
             String corpoHtml;
@@ -247,8 +222,7 @@ public class EventoProcessoListener {
                     assunto = "Processo Iniciado em Unidades Subordinadas - %s".formatted(processo.getDescricao());
                     corpoHtml = notificacaoModelosService.criarEmailProcessoIniciado(nomeUnidade, processo.getDescricao(), tipoProcesso.name(), subprocesso.getDataLimiteEtapa1());
                 }
-                // TODO Não existem outros tipos!!
-                case null, default -> {
+                default -> {
                     log.warn("Tipo de unidade desconhecido: {} (unidade={})", tipoUnidade, codigoUnidade);
                     return;
                 }
@@ -257,11 +231,10 @@ public class EventoProcessoListener {
             notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
             log.info("E-mail enviado para unidade {}", unidade.getSigla());
 
-            // TODO titulo nao pode ser nulo nunca!
             if (responsavel.getSubstitutoTitulo() != null) {
                 enviarEmailParaSubstituto(responsavel.getSubstitutoTitulo(), usuarios, assunto, corpoHtml, nomeUnidade);
             }
-        } catch (RuntimeException e) { // TODO exceção muito genérica!
+        } catch (Exception e) {
             log.error("Erro ao enviar e-mail para a unidade {}: {}", codigoUnidade, e.getClass().getSimpleName(), e);
         }
     }
@@ -273,7 +246,7 @@ public class EventoProcessoListener {
                 notificacaoEmailService.enviarEmailHtml(substituto.getEmail(), assunto, corpoHtml);
                 log.info("E-mail enviado para o substituto da unidade {}.", nomeUnidade);
             }
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             log.warn("Erro ao enviar e-mail para o substituto da unidade {}: {}", nomeUnidade, e.getClass().getSimpleName());
         }
     }

@@ -21,10 +21,8 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
             where s.processo.codigo = :codProcesso""")
     List<Subprocesso> findByProcessoCodigoWithUnidade(@Param("codProcesso") Long codProcesso);
 
-    @Override
     @Query("SELECT s FROM Subprocesso s JOIN FETCH s.processo JOIN FETCH s.unidade LEFT JOIN FETCH s.mapa")
-    // TODO o nome do metodo deveria mudar para deixar claro que nao é um findall comum
-    List<Subprocesso> findAll();
+    List<Subprocesso> findAllComFetch();
 
     List<Subprocesso> findByProcessoCodigo(Long processoCodigo);
 

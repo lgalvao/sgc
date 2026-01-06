@@ -1,4 +1,4 @@
-package sgc.comum;
+package sgc.comum.util;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
