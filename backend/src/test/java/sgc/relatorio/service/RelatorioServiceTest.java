@@ -151,6 +151,66 @@ class RelatorioServiceTest {
     }
 
     @Test
+    @DisplayName("Deve ignorar subprocesso sem mapa no relatório de mapas")
+    void deveIgnorarSubprocessoSemMapa() {
+        Processo p = new Processo();
+        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1");
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(u);
+        sp.setMapa(null); // Mapa nulo
+
+        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioMapas(1L, null, out);
+        assertThat(out.toString()).isNotEmpty(); // Gera o PDF, mas sem dados do mapa
+    }
+
+    @Test
+    @DisplayName("Deve processar competência sem atividades")
+    void deveProcessarCompetenciaSemAtividades() {
+        Processo p = new Processo();
+        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1");
+        Subprocesso sp = new Subprocesso(); sp.setUnidade(u); sp.setMapa(new Mapa()); sp.getMapa().setCodigo(10L);
+
+        Competencia c = new Competencia();
+        c.setDescricao("Comp 1");
+        c.setAtividades(null); // Atividades nulas
+
+        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(c));
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioMapas(1L, null, out);
+        assertThat(out.toString()).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve processar atividade sem conhecimentos")
+    void deveProcessarAtividadeSemConhecimentos() {
+        Processo p = new Processo();
+        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1");
+        Subprocesso sp = new Subprocesso(); sp.setUnidade(u); sp.setMapa(new Mapa()); sp.getMapa().setCodigo(10L);
+
+        Competencia c = new Competencia();
+        c.setDescricao("Comp 1");
+        Atividade a = new Atividade();
+        a.setDescricao("Ativ 1");
+        a.setConhecimentos(null); // Conhecimentos nulos
+        c.setAtividades(java.util.Set.of(a));
+
+        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(c));
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioMapas(1L, null, out);
+        assertThat(out.toString()).isNotEmpty();
+    }
+
+    @Test
     @DisplayName("Deve cobrir catch ao buscar responsável")
     void deveCobrirCatchBuscarResponsavel() {
         Processo p = new Processo();

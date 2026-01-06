@@ -20,7 +20,27 @@ class AlertaMapperTest {
     @Test
     @DisplayName("formatDataHora deve retornar string vazia se nulo")
     void formatDataHoraNull() {
-        assertThat(mapper.formatDataHora(null)).isEqualTo("");
+        assertThat(mapper.formatDataHora(null)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("extractProcessoName deve retornar nome do processo quando padrão casar")
+    void extractProcessoName() {
+        String descricao = "Alteração no processo 'Processo Teste' realizada com sucesso.";
+        assertThat(mapper.extractProcessoName(descricao)).isEqualTo("Processo Teste");
+    }
+
+    @Test
+    @DisplayName("extractProcessoName deve retornar string vazia se descrição for nula")
+    void extractProcessoNameNull() {
+        assertThat(mapper.extractProcessoName(null)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("extractProcessoName deve retornar string vazia se padrão não casar")
+    void extractProcessoNameSemMatch() {
+        String descricao = "Descrição sem nome de processo entre aspas simples.";
+        assertThat(mapper.extractProcessoName(descricao)).isEmpty();
     }
 
     static class AlertaMapperImpl extends AlertaMapper {
