@@ -158,6 +158,85 @@ class SubprocessoMapaWorkflowServiceTest {
                 .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class)
                 .hasMessageContaining("mapa associado");
         }
+
+        @Test
+        @DisplayName("Deve salvar mapa sem alterar situação se mapa não era vazio")
+        void deveSalvarMapaSemAlterarSituacaoSeNaoVazio() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+
+            // Mapa já tinha competências (não era vazio)
+            Competencia c = new Competencia();
+            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(c));
+
+            SalvarMapaRequest req = new SalvarMapaRequest();
+            req.setCompetencias(List.of(new CompetenciaMapaDto()));
+
+            service.salvarMapaSubprocesso(1L, req, "user");
+
+            // Não deve salvar porque não mudou situação
+            verify(subprocessoRepo, never()).save(sp);
+            verify(mapaService).salvarMapaCompleto(10L, req, "user");
+        }
+
+        @Test
+        @DisplayName("Deve salvar mapa sem alterar situação se requisição sem novas competências")
+        void deveSalvarMapaSemAlterarSituacaoSeSemNovasCompetencias() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+
+            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of()); // Era vazio
+
+            SalvarMapaRequest req = new SalvarMapaRequest();
+            req.setCompetencias(List.of()); // Sem novas competências
+
+            service.salvarMapaSubprocesso(1L, req, "user");
+
+            // Não deve salvar porque não tem novas competências
+            verify(subprocessoRepo, never()).save(sp);
+        }
+
+        @Test
+        @DisplayName("Deve adicionar competência sem alterar status se já tinha mapa")
+        void deveAdicionarCompetenciaSemAlterarStatusSeJaTinhaMapa() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+            // Mapa não era vazio
+            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(new Competencia()));
+
+            CompetenciaReq req = new CompetenciaReq();
+            req.setDescricao("Nova Comp");
+            req.setAtividadesIds(List.of(1L));
+
+            service.adicionarCompetencia(1L, req, "user");
+
+            // Não deve salvar porque o mapa já não era vazio
+            verify(subprocessoRepo, never()).save(sp);
+        }
+
+        @Test
+        @DisplayName("Deve remover competência sem alterar status se ainda tem competências")
+        void deveRemoverCompetenciaSemAlterarStatusSeAindaTemCompetencias() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+
+            // Simular que ainda tem competências após remover
+            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(new Competencia()));
+
+            service.removerCompetencia(1L, 5L, "user");
+
+            verify(competenciaService).removerCompetencia(5L);
+            // Não deve salvar porque ainda tem competências
+            verify(subprocessoRepo, never()).save(sp);
+        }
     }
 
     @Nested
@@ -254,6 +333,95 @@ class SubprocessoMapaWorkflowServiceTest {
             assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, new Usuario()))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("obrigatória");
+        }
+
+        @Test
+        @DisplayName("Deve disponibilizar mapa sem definir sugestões quando observações null")
+        void deveDisponibilizarMapaSemObservacoes() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+
+            Competencia c = new Competencia();
+            c.setAtividades(new HashSet<>(List.of(new Atividade())));
+            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(c));
+            when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of());
+
+            when(unidadeService.buscarPorSigla("SEDOC")).thenReturn(UnidadeDto.builder().codigo(99L).build());
+            when(unidadeService.buscarEntidadePorId(99L)).thenReturn(new Unidade());
+
+            DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
+            req.setDataLimite(LocalDate.now());
+            req.setObservacoes(null); // Observações null
+
+            service.disponibilizarMapa(1L, req, new Usuario());
+
+            // Verifica que sugestões não foi setado (por ser null)
+            verify(mapa).setSugestoes(null);
+            verify(mapa, never()).setSugestoes(argThat(s -> s != null && !s.isBlank())); 
+        }
+
+        @Test
+        @DisplayName("Deve disponibilizar mapa sem definir sugestões quando observações blank")
+        void deveDisponibilizarMapaComObservacoesBlank() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+
+            Competencia c = new Competencia();
+            c.setAtividades(new HashSet<>(List.of(new Atividade())));
+            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(c));
+            when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of());
+
+            when(unidadeService.buscarPorSigla("SEDOC")).thenReturn(UnidadeDto.builder().codigo(99L).build());
+            when(unidadeService.buscarEntidadePorId(99L)).thenReturn(new Unidade());
+
+            DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
+            req.setDataLimite(LocalDate.now());
+            req.setObservacoes("   "); // Observações blank
+
+            service.disponibilizarMapa(1L, req, new Usuario());
+
+            // Verifica que sugestões não foi setado (por ser blank)
+            verify(mapa).setSugestoes(null);
+        }
+
+        @Test
+        @DisplayName("Deve editar mapa em situação REVISAO_CADASTRO_HOMOLOGADA")
+        void deveEditarMapaEmRevisaoCadastroHomologada() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+            sp.getProcesso().setTipo(TipoProcesso.REVISAO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of());
+
+            SalvarMapaRequest req = new SalvarMapaRequest();
+            req.setCompetencias(List.of());
+
+            service.salvarMapaSubprocesso(1L, req, "user");
+
+            verify(mapaService).salvarMapaCompleto(10L, req, "user");
+        }
+
+        @Test
+        @DisplayName("Deve editar mapa em situação REVISAO_MAPA_AJUSTADO")
+        void deveEditarMapaEmRevisaoMapaAjustado() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+            sp.getProcesso().setTipo(TipoProcesso.REVISAO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of());
+
+            SalvarMapaRequest req = new SalvarMapaRequest();
+            req.setCompetencias(List.of());
+
+            service.salvarMapaSubprocesso(1L, req, "user");
+
+            verify(mapaService).salvarMapaCompleto(10L, req, "user");
         }
     }
 

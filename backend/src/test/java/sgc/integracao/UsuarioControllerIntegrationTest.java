@@ -1,4 +1,4 @@
-package sgc.organizacao;
+package sgc.integracao;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +17,7 @@ import sgc.comum.TestUtil;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.seguranca.autenticacao.AutenticarReq;
 import sgc.seguranca.dto.EntrarReq;
+import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;

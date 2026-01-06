@@ -43,14 +43,4 @@ public abstract class ErroInterno extends RuntimeException {
     protected ErroInterno(String message) {
         super(message);
     }
-
-    /**
-     * Construtor com mensagem e causa raiz.
-     *
-     * @param message descrição técnica do erro
-     * @param cause exceção que causou este erro
-     */
-    protected ErroInterno(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

@@ -248,7 +248,8 @@ class ControllersServicesCoverageTest {
     void deveListarAlertasComOrdenacaoPadrao() {
         when(alertaService.listarTodos(any())).thenReturn(Page.empty());
         // PageRequest.of(0, 10) sem sort explicitado deve cair no if e ganhar sort padrão
-        painelService.listarAlertas(null, null, PageRequest.of(0, 10));
+        var result = painelService.listarAlertas(null, null, PageRequest.of(0, 10));
+        assertThat(result).isNotNull();
     }
 
     @Test
@@ -256,6 +257,7 @@ class ControllersServicesCoverageTest {
     void deveRespeitarOrdenacaoEmListarAlertas() {
         Pageable p = PageRequest.of(0, 10, Sort.by("codigo"));
         when(alertaService.listarTodos(p)).thenReturn(Page.empty());
-        painelService.listarAlertas(null, null, p);
+        var result = painelService.listarAlertas(null, null, p);
+        assertThat(result).isNotNull();
     }
 }

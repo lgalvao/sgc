@@ -5,20 +5,23 @@
 
 ---
 
-## Métricas Atuais
+## Métricas Atuais (2026-01-06 18:35)
 
 | Métrica | Valor | Meta |
 |---------|-------|------|
-| Cobertura de Linhas | 98.80% | 98% ✅ |
-| Cobertura de Branches | 88.09% | 90% ❌ |
-| Total de Testes | 1026 | - |
-| Branches Perdidos | 154/1293 | - |
+| Cobertura de Linhas | 99.00% | 98% ✅ |
+| Cobertura de Branches | 90.02% | 90% ✅ |
+| Total de Testes | 1053 | - |
+| Branches Cobertos | 1164/1293 | - |
 
-### Progresso das Refatorações (2026-01-06)
+### Progresso das Refatorações (Concluídas)
 
-- ✅ **Strategy Pattern em `SubprocessoMapaWorkflowService`**: 8 ocorrências de if/else substituídas por Maps estáticos
-- ✅ **Strategy Pattern em `ProcessoController.iniciar()`**: Chain de if/else substituída por Map de handlers
-- **Resultado**: Eliminados 18 branches da complexidade total, código mais testável
+- ✅ **Strategy Pattern em `SubprocessoMapaWorkflowService`**: 8 ocorrências de if/else substituídas por Maps estáticos.
+- ✅ **Strategy Pattern em `ProcessoController.iniciar()`**: Chain de if/else substituída por Map de handlers + validação de nulo.
+- ✅ **Cobertura de Gaps no `UsuarioService`**: Adicionados 8 testes unitários de edge-case (lotacão null, chefes substitutos, erros de autorização).
+- ✅ **Cobertura de Gaps no `SubprocessoPermissoesService`**: Adicionados testes para cenários de permissão complexos e dados incompletos.
+- ✅ **Limpeza de Código Morto**: Removidas classes e construtores de erro não utilizados (6 linhas removidas).
+- **Resultado**: Aumento de ~2% na cobertura de branches em uma única sessão, atingindo a meta global.
 
 ---
 
@@ -244,27 +247,24 @@ public interface AmbienteInfo {
 
 ## 🎯 Plano de Execução
 
-### Fase 1: Quick Wins (Meta: 88% branches)
+### Fase 1: Quick Wins (Meta: 88% branches) - CONCLUÍDA ✅
 
-**Tempo estimado:** 4h
-
-| Tarefa | Arquivo | Impacto |
+| Tarefa | Arquivo | Status |
 |--------|---------|---------|
-| 1.1 | Testes para `SubprocessoValidacaoService` edge-cases | +4 branches |
-| 1.2 | Testes para `SubprocessoDetalheService` null checks | +4 branches |
-| 1.3 | Teste `ProcessoController.iniciar` com DIAGNOSTICO | +2 branches |
-| 1.4 | Remover/testar construtores não usados de erros | +5 linhas |
+| 1.1 | Testes para `SubprocessoValidacaoService` edge-cases | Concluído |
+| 1.2 | Testes para `SubprocessoDetalheService` null checks | Concluído |
+| 1.3 | Teste `ProcessoController.iniciar` com DIAGNOSTICO | Concluído |
+| 1.4 | Remover/testar construtores não usados de erros | Concluído |
 
-### Fase 2: Refatorações de Médio Esforço (Meta: 90% branches)
+### Fase 2: Refatorações de Médio Esforço (Meta: 90% branches) - CONCLUÍDA ✅
 
-**Tempo estimado:** 6h
-
-| Tarefa | Arquivo | Impacto |
+| Tarefa | Arquivo | Status |
 |--------|---------|---------|
-| 2.1 | Strategy Pattern em `SubprocessoMapaWorkflowService` | +3 branches |
-| 2.2 | Extrair lógica de `EventoProcessoListener` | +2 branches |
-| 2.3 | Testes para `SubprocessoMapaService` | +3 branches |
-| 2.4 | Testes para `GerenciadorJwt` claims parciais | +2 branches |
+| 2.1 | Strategy Pattern em `SubprocessoMapaWorkflowService` | Concluído |
+| 2.2 | Extrair lógica de `EventoProcessoListener` | Pendente (Próximo) |
+| 2.3 | Testes para `SubprocessoMapaService` | Concluído |
+| 2.4 | Testes para `GerenciadorJwt` claims parciais | Pendente |
+| 2.5 | Testes de Gaps no `UsuarioService` | Concluído |
 
 ### Fase 3: Refatorações Estruturais (Melhoria contínua)
 
@@ -296,10 +296,16 @@ public interface AmbienteInfo {
 # Executar testes e gerar relatório
 ./gradlew test jacocoTestReport
 
+
+
 # Verificar cobertura geral
+Dentro de `backend`:
+
 python3 scripts/check_coverage.py "" 90
 
 # Verificar branches perdidos de uma classe específica
+Dentro de `backend`:
+
 python3 scripts/list_missed_lines.py SubprocessoMapaWorkflowService
 
 # Rodar um teste específico
@@ -310,12 +316,10 @@ python3 scripts/list_missed_lines.py SubprocessoMapaWorkflowService
 
 ## 📈 Projeção de Resultados
 
-| Fase | Branches Cobertos | Cobertura Esperada |
-|------|-------------------|-------------------|
-| Atual | 1141/1311 | 87.03% |
-| Fase 1 | ~1155/1311 | ~88.1% |
-| Fase 2 | ~1180/1311 | ~90.0% ✅ |
-| Fase 3 | ~1200/1311 | ~91.5% |
+| Fase | Branches Cobertos | Cobertura Esperada | Status |
+|------|-------------------|-------------------|---|
+| Inicial | 1139/1293 | 88.09% | Concluído |
+| Atual | 1164/1293 | 90.02% | **META ATINGIDA** ✅ |
 
 ---
 

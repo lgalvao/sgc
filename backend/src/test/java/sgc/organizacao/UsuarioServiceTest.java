@@ -112,6 +112,13 @@ class UsuarioServiceTest {
             assertTrue(result.containsKey(TITULO_CHEFE_UNIT2));
             assertTrue(result.containsKey(TITULO_ADMIN));
         }
+
+        @Test
+        @DisplayName("Deve carregar atribuições em lote com lista vazia")
+        void deveCarregarAtribuicoesEmLoteVazio() {
+            // Apenas para cobrir o branch da linha 139
+            assertDoesNotThrow(() -> usuarioService.buscarResponsaveisUnidades(List.of()));
+        }
     }
 
     @Nested
@@ -235,6 +242,22 @@ class UsuarioServiceTest {
             assertEquals(TITULO_CHEFE_UNIT2, result.get(2L).getTitularTitulo());
             assertEquals("333333333333", result.get(9L).getTitularTitulo());
         }
+
+        @Test
+        @DisplayName("Deve buscar responsáveis de unidades sem chefes")
+        void deveBuscarResponsaveisUnidadesSemChefes() {
+            // No data.sql, unidade 100 não tem chefe (apenas admin tem perfil lá)
+            // Mas admin não é CHEFE, então buscarResponsaveis deve ignorar
+            Map<Long, ResponsavelDto> result = usuarioService.buscarResponsaveisUnidades(List.of(100L));
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        @DisplayName("Deve buscar responsável de unidade sem nenhum usuário")
+        void deveBuscarResponsavelUnidadeInexistente() {
+            Optional<ResponsavelDto> res = usuarioService.buscarResponsavelUnidade(9999L);
+            assertTrue(res.isEmpty());
+        }
     }
 
     @Nested
@@ -270,6 +293,18 @@ class UsuarioServiceTest {
 
             // Assert
             assertTrue(adminUnits.contains(100L));
+        }
+
+        @Test
+        @DisplayName("Deve retornar falso ou vazio para usuário inexistente ou sem os perfis")
+        void deveVerificarPerfisUsuarioInexistente() {
+            assertFalse(usuarioService.usuarioTemPerfil("INEXISTENTE", "ADMIN", 100L));
+            assertTrue(usuarioService.buscarUnidadesOndeEhResponsavel("INEXISTENTE").isEmpty());
+            assertTrue(usuarioService.buscarUnidadesPorPerfil("INEXISTENTE", "ADMIN").isEmpty());
+            
+            // Usuário existe mas não tem esse perfil nessa unidade
+            assertFalse(usuarioService.usuarioTemPerfil(TITULO_ADMIN, "CHEFE", 100L));
+            assertFalse(usuarioService.usuarioTemPerfil(TITULO_ADMIN, "ADMIN", 2L));
         }
     }
 
@@ -340,6 +375,31 @@ class UsuarioServiceTest {
         void deveFalharEntrarSessaoExpirada() {
              // Usa um título que com certeza não foi autenticado recentemente
              EntrarReq req = new EntrarReq("TITULO_NUNCA_VISTO", "ADMIN", 100L);
+             assertThrows(ErroAutenticacao.class, () -> usuarioService.entrar(req));
+        }
+
+        @Test
+        @DisplayName("Deve falhar 'entrar' com perfil ou unidade não autorizado")
+        void deveFalharEntrarNaoAutorizado() {
+            usuarioService.autenticar(TITULO_CHEFE_UNIT2, "senha");
+            // Tentando entrar como ADMIN na unidade 2 (ele só é CHEFE lá)
+            EntrarReq req = new EntrarReq(TITULO_CHEFE_UNIT2, "ADMIN", 2L);
+            assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () -> usuarioService.entrar(req));
+            
+            usuarioService.autenticar(TITULO_CHEFE_UNIT2, "senha");
+            // Tentando entrar como CHEFE na unidade 100 (não tem perfil lá)
+            EntrarReq req2 = new EntrarReq(TITULO_CHEFE_UNIT2, "CHEFE", 100L);
+            assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () -> usuarioService.entrar(req2));
+        }
+
+        @Test
+        @DisplayName("Deve autorizar e remover do cache de autenticações recentes")
+        void deveRemoverDoCacheAposSucesso() {
+             usuarioService.autenticar(TITULO_CHEFE_UNIT2, "senha");
+             EntrarReq req = new EntrarReq(TITULO_CHEFE_UNIT2, "CHEFE", 2L);
+             usuarioService.entrar(req);
+             
+             // Segunda tentativa com o mesmo login deve falhar por falta de autenticação recente
              assertThrows(ErroAutenticacao.class, () -> usuarioService.entrar(req));
         }
     }

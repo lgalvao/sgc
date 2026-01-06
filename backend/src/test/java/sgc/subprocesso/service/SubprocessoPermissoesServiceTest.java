@@ -131,6 +131,52 @@ class SubprocessoPermissoesServiceTest {
 
             assertDoesNotThrow(() -> service.validar(sub, 1L, "AJUSTAR_MAPA"));
         }
+
+        @Test
+        @DisplayName("Deve ignorar ação desconhecida sem lançar exceção")
+        void deveIgnorarAcaoDesconhecida() {
+            Subprocesso sub = mock(Subprocesso.class);
+            Unidade unidade = mock(Unidade.class);
+            when(unidade.getCodigo()).thenReturn(1L);
+            when(sub.getUnidade()).thenReturn(unidade);
+            when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.NAO_INICIADO);
+
+            // Ação desconhecida não deve lançar exceção (cai no else implícito)
+            assertDoesNotThrow(() -> service.validar(sub, 1L, "ACAO_DESCONHECIDA"));
+        }
+
+        @Test
+        @DisplayName("Deve validar ajuste de mapa quando mapa é null")
+        void deveValidarAjusteMapaQuandoMapaNull() {
+            Subprocesso sub = mock(Subprocesso.class);
+            Unidade unidade = mock(Unidade.class);
+            when(unidade.getCodigo()).thenReturn(1L);
+            when(sub.getUnidade()).thenReturn(unidade);
+            when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+            when(sub.getMapa()).thenReturn(null);
+
+            // Mapa null não deve entrar na verificação de atividades vazias
+            assertDoesNotThrow(() -> service.validar(sub, 1L, "AJUSTAR_MAPA"));
+        }
+
+        @Test
+        @DisplayName("Deve validar ajuste de mapa em REVISAO_CADASTRO_HOMOLOGADA mesmo com atividades vazias")
+        void deveValidarAjusteMapaEmCadastroHomologadaComAtividadesVazias() {
+            Subprocesso sub = mock(Subprocesso.class);
+            Unidade unidade = mock(Unidade.class);
+            when(unidade.getCodigo()).thenReturn(1L);
+            when(sub.getUnidade()).thenReturn(unidade);
+            when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sub.getMapa()).thenReturn(mapa);
+
+            when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(Collections.emptyList());
+
+            // Em REVISAO_CADASTRO_HOMOLOGADA, mesmo com atividades vazias, deve ser permitido
+            assertDoesNotThrow(() -> service.validar(sub, 1L, "AJUSTAR_MAPA"));
+        }
     }
 
     @Nested
@@ -281,6 +327,80 @@ class SubprocessoPermissoesServiceTest {
             SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, usuario);
 
             assertThat(permissoes.isPodeVisualizarImpacto()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Deve tratar subprocesso com unidade null")
+        void deveTratarSubprocessoComUnidadeNull() {
+            Usuario admin = criarUsuario(Perfil.ADMIN, null);
+            Subprocesso sub = mock(Subprocesso.class);
+            when(sub.getUnidade()).thenReturn(null);
+            when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+
+            Processo processo = mock(Processo.class);
+            when(processo.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
+            when(sub.getProcesso()).thenReturn(processo);
+
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, admin);
+
+            // Admin ainda tem acesso mesmo com unidade null
+            assertThat(permissoes.isPodeEditarMapa()).isTrue();
+        }
+
+        @Test
+        @DisplayName("Gestor com atribuição sem unidade não deve ter acesso")
+        void gestorComAtribuicaoSemUnidadeNaoDeveTerAcesso() {
+            Usuario usuario = mock(Usuario.class);
+            Set<UsuarioPerfil> atribuicoes = new HashSet<>();
+            // Atribuição de gestor sem unidade definida
+            atribuicoes.add(UsuarioPerfil.builder().perfil(Perfil.GESTOR).unidade(null).build());
+            when(usuario.getTodasAtribuicoes()).thenReturn(atribuicoes);
+
+            Subprocesso sub = criarSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO, TipoProcesso.MAPEAMENTO);
+
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, usuario);
+
+            assertThat(permissoes.isPodeEditarMapa()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Servidor com atribuição com unidade sem código não deve ter acesso")
+        void servidorComUnidadeSemCodigoNaoDeveTerAcesso() {
+            Usuario usuario = mock(Usuario.class);
+            Set<UsuarioPerfil> atribuicoes = new HashSet<>();
+            Unidade unidadeSemCodigo = new Unidade();
+            unidadeSemCodigo.setCodigo(null);
+            atribuicoes.add(UsuarioPerfil.builder().perfil(Perfil.SERVIDOR).unidade(unidadeSemCodigo).build());
+            when(usuario.getTodasAtribuicoes()).thenReturn(atribuicoes);
+
+            Subprocesso sub = criarSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO, TipoProcesso.MAPEAMENTO);
+
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, usuario);
+
+            assertThat(permissoes.isPodeEditarMapa()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Chefe da mesma unidade deve ter acesso")
+        void chefeMesmaUnidadeDeveTerAcesso() {
+            Usuario chefe = criarUsuario(Perfil.CHEFE, 1L);
+            Subprocesso sub = criarSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO, TipoProcesso.MAPEAMENTO);
+
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, chefe);
+
+            assertThat(permissoes.isPodeEditarMapa()).isTrue();
+        }
+
+        @Test
+        @DisplayName("Deve permitir autoavaliação em situação DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO")
+        void devePermitirAutoavaliacaoEmSituacaoCorreta() {
+            Usuario admin = criarUsuario(Perfil.ADMIN, null);
+            Subprocesso sub = criarSubprocesso(1L, SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO);
+
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, admin);
+
+            assertThat(permissoes.isPodeRealizarAutoavaliacao()).isTrue();
+            assertThat(permissoes.isPodeEditarMapa()).isTrue();
         }
     }
 }
