@@ -1,5 +1,7 @@
 package sgc.relatorio.service;
 
+import org.openpdf.text.Document;
+import org.openpdf.text.DocumentException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +29,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("RelatorioService Test")
@@ -42,12 +45,19 @@ class RelatorioServiceTest {
     @Mock
     private CompetenciaService competenciaService;
 
+    @Mock
+    private PdfFactory pdfFactory;
+
+    @Mock
+    private Document document;
+
     @InjectMocks
     private RelatorioService relatorioService;
 
     @Test
     @DisplayName("Deve gerar relatório de andamento")
     void deveGerarRelatorioAndamento() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         p.setDescricao("Proc Teste");
 
@@ -66,12 +76,13 @@ class RelatorioServiceTest {
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);
-        assertThat(out.toString()).isNotEmpty();
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve gerar relatório de andamento sem responsável definido")
     void deveGerarRelatorioAndamentoSemResponsavel() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         p.setDescricao("Proc Teste");
 
@@ -90,12 +101,13 @@ class RelatorioServiceTest {
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);
-        assertThat(out.toString()).isNotEmpty();
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve gerar relatório de mapas completo")
     void deveGerarRelatorioMapasCompleto() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         p.setDescricao("Proc Teste");
 
@@ -125,12 +137,13 @@ class RelatorioServiceTest {
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(1L, null, out);
-        assertThat(out.toString()).isNotEmpty();
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve filtrar por unidade no relatório de mapas")
     void deveFiltrarPorUnidadeNoRelatorioMapas() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         p.setDescricao("Proc Teste");
 
@@ -147,12 +160,13 @@ class RelatorioServiceTest {
         OutputStream out = new ByteArrayOutputStream();
         // Filtra pela unidade 1
         relatorioService.gerarRelatorioMapas(1L, 1L, out);
-        assertThat(out.toString()).isNotEmpty();
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve ignorar subprocesso sem mapa no relatório de mapas")
     void deveIgnorarSubprocessoSemMapa() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1");
         Subprocesso sp = new Subprocesso();
@@ -164,12 +178,13 @@ class RelatorioServiceTest {
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(1L, null, out);
-        assertThat(out.toString()).isNotEmpty(); // Gera o PDF, mas sem dados do mapa
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve processar competência sem atividades")
     void deveProcessarCompetenciaSemAtividades() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1");
         Subprocesso sp = new Subprocesso(); sp.setUnidade(u); sp.setMapa(new Mapa()); sp.getMapa().setCodigo(10L);
@@ -184,12 +199,13 @@ class RelatorioServiceTest {
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(1L, null, out);
-        assertThat(out.toString()).isNotEmpty();
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve processar atividade sem conhecimentos")
     void deveProcessarAtividadeSemConhecimentos() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1");
         Subprocesso sp = new Subprocesso(); sp.setUnidade(u); sp.setMapa(new Mapa()); sp.getMapa().setCodigo(10L);
@@ -207,12 +223,13 @@ class RelatorioServiceTest {
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(1L, null, out);
-        assertThat(out.toString()).isNotEmpty();
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve cobrir catch ao buscar responsável")
     void deveCobrirCatchBuscarResponsavel() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         Subprocesso sp = new Subprocesso();
         Unidade u = new Unidade(); u.setCodigo(1L); sp.setUnidade(u);
@@ -223,20 +240,32 @@ class RelatorioServiceTest {
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);
-        assertThat(out.toString()).isNotEmpty();
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve cobrir erro ao gerar PDF")
-    void deveCobrirErroGerarPdf() {
+    void deveCobrirErroGerarPdf() throws DocumentException {
         when(processoService.buscarEntidadePorId(1L)).thenReturn(new Processo());
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+        when(pdfFactory.createDocument()).thenReturn(document);
+        doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
 
-        // Para forçar DocumentException em PdfWriter.getInstance, podemos passar null no stream
-        // ou um stream que lança erro.
         assertThatThrownBy(() -> relatorioService.gerarRelatorioAndamento(1L, null))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("Erro ao gerar PDF");
+    }
+
+    @Test
+    @DisplayName("Deve cobrir erro ao gerar PDF de mapas")
+    void deveCobrirErroGerarPdfMapas() throws DocumentException {
+        when(processoService.buscarEntidadePorId(1L)).thenReturn(new Processo());
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+        when(pdfFactory.createDocument()).thenReturn(document);
+        doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
+
+        assertThatThrownBy(() -> relatorioService.gerarRelatorioMapas(1L, null, null))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Erro ao gerar PDF");
     }
 }
-
-

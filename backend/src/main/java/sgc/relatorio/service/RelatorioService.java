@@ -28,14 +28,15 @@ public class RelatorioService {
     private final SubprocessoService subprocessoService;
     private final UsuarioService usuarioService;
     private final CompetenciaService competenciaService;
+    private final PdfFactory pdfFactory;
 
     @Transactional(readOnly = true)
     public void gerarRelatorioAndamento(Long codProcesso, OutputStream outputStream) {
         Processo processo = processoService.buscarEntidadePorId(codProcesso);
         List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
 
-        try (Document document = new Document()) {
-            PdfWriter.getInstance(document, outputStream);
+        try (Document document = pdfFactory.createDocument()) {
+            pdfFactory.createWriter(document, outputStream);
             document.open();
 
             document.add(new Paragraph("Relatório de Andamento - " + processo.getDescricao()));
@@ -74,8 +75,8 @@ public class RelatorioService {
                     .toList();
         }
 
-        try (Document document = new Document()) {
-            PdfWriter.getInstance(document, outputStream);
+        try (Document document = pdfFactory.createDocument()) {
+            pdfFactory.createWriter(document, outputStream);
             document.open();
 
             document.add(new Paragraph("Relatório de Mapas - " + processo.getDescricao()));

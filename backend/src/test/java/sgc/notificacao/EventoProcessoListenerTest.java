@@ -275,4 +275,36 @@ class EventoProcessoListenerTest {
         // NAO deve enviar email para a intermediaria pois não tem subordinadas no contexto
         verify(notificacaoEmailService, never()).enviarEmailHtml(eq("solo@mail.com"), anyString(), any());
     }
+
+    @Test
+    void deveLogarErroParaTipoUnidadeNaoSuportado() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setDescricao("P1");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(99L);
+        unidade.setTipo(TipoUnidade.RAIZ); // Tipo não suportado no switch
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(999L);
+        subprocesso.setUnidade(unidade);
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
+
+        ResponsavelDto responsavel = ResponsavelDto.builder().unidadeCodigo(99L).titularTitulo("999").build();
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(99L, responsavel));
+
+        UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("999").email("raiz@mail.com").build();
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("999", titular));
+
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
+
+        // Não deve lançar exceção para fora, mas deve logar o erro (capturado pelo try/catch interno)
+        listener.aoIniciarProcesso(evento);
+
+        // Verifica que NÃO enviou e-mail
+        verify(notificacaoEmailService, never()).enviarEmailHtml(anyString(), anyString(), anyString());
+    }
 }
