@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -148,4 +149,34 @@ class RelatorioServiceTest {
         relatorioService.gerarRelatorioMapas(1L, 1L, out);
         assertThat(out.toString()).isNotEmpty();
     }
+
+    @Test
+    @DisplayName("Deve cobrir catch ao buscar responsável")
+    void deveCobrirCatchBuscarResponsavel() {
+        Processo p = new Processo();
+        Subprocesso sp = new Subprocesso();
+        Unidade u = new Unidade(); u.setCodigo(1L); sp.setUnidade(u);
+
+        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(usuarioService.buscarResponsavelUnidade(1L)).thenThrow(new RuntimeException("Falha simulada"));
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioAndamento(1L, out);
+        assertThat(out.toString()).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve cobrir erro ao gerar PDF")
+    void deveCobrirErroGerarPdf() {
+        when(processoService.buscarEntidadePorId(1L)).thenReturn(new Processo());
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+
+        // Para forçar DocumentException em PdfWriter.getInstance, podemos passar null no stream
+        // ou um stream que lança erro.
+        assertThatThrownBy(() -> relatorioService.gerarRelatorioAndamento(1L, null))
+            .isInstanceOf(RuntimeException.class);
+    }
 }
+
+

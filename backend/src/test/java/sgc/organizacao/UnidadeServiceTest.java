@@ -26,10 +26,6 @@ import java.util.Collections;
 import sgc.mapa.service.MapaService;
 import sgc.comum.erros.ErroValidacao;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
@@ -481,11 +477,55 @@ class UnidadeServiceTest {
             when(unidadeRepo.findBySigla("INVALIDO")).thenReturn(Optional.empty());
             assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglaSuperior("INVALIDO"));
         }
+
+        @Test
+        @DisplayName("Deve buscar na hierarquia recursivamente (não encontrado)")
+        void deveBuscarNaHierarquiaRecursivamenteNaoEncontrado() {
+            UnidadeDto filho = UnidadeDto.builder().codigo(2L).subunidades(new ArrayList<>()).build();
+            UnidadeDto pai = UnidadeDto.builder().codigo(1L).subunidades(List.of(filho)).build();
+            
+            Unidade u1 = new Unidade(); u1.setCodigo(1L);
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
+            when(usuarioMapper.toUnidadeDto(u1)).thenReturn(pai);
+            
+            assertThat(service.buscarArvore(999L)).isNull();
+        }
+
+        @Test
+        @DisplayName("Deve buscar na hierarquia por sigla recursivamente (não encontrado)")
+        void deveBuscarNaHierarquiaPorSiglaRecursivamenteNaoEncontrado() {
+            UnidadeDto filho = UnidadeDto.builder().codigo(2L).sigla("FILHO").subunidades(new ArrayList<>()).build();
+            UnidadeDto pai = UnidadeDto.builder().codigo(1L).sigla("PAI").subunidades(List.of(filho)).build();
+            
+            Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setSigla("PAI");
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
+            when(usuarioMapper.toUnidadeDto(u1)).thenReturn(pai);
+            
+            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglasSubordinadas("INVALIDA"));
+        }
+    }
+
+    @Test
+    @DisplayName("Deve testar elegibilidade com unidades que possuem pai")
+    void deveTestarElegibilidadeComPai() {
+        Unidade pai = new Unidade(); pai.setCodigo(1L);
+        Unidade filho = new Unidade(); filho.setCodigo(2L); filho.setUnidadeSuperior(pai);
+        
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(pai, filho));
+        when(processoConsultaService.buscarIdsUnidadesEmProcessosAtivos(null)).thenReturn(Collections.emptySet());
+        
+        when(usuarioMapper.toUnidadeDto(eq(pai), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
+        when(usuarioMapper.toUnidadeDto(eq(filho), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(2L).build());
+        
+        service.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, null);
+        
+        verify(usuarioMapper).toUnidadeDto(eq(filho), anyBoolean());
     }
 
     @Test
     @DisplayName("Deve construir unidades com hierarquia (cobertura caminhos recursivos)")
     void deveTestarHierarquiaRecursiva() {
+
         // Arrange
         Unidade pai = new Unidade();
         pai.setCodigo(1L);
