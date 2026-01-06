@@ -1,8 +1,10 @@
 package sgc.seguranca;
 
-import tools.jackson.core.JsonParser;
-import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+
+import java.io.IOException;
 
 /**
  * Custom JSON deserializer that sanitizes HTML content in String fields. Prevents XSS attacks by
@@ -15,7 +17,7 @@ public class HtmlSanitizingDeserializer extends StdDeserializer<String> {
     }
 
     @Override
-    public String deserialize(JsonParser parser, DeserializationContext ctxt) {
+    public String deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException {
         String value = parser.getValueAsString();
         if (value == null || value.isBlank()) {
             return value;
