@@ -181,6 +181,20 @@ class ProcessoServiceTest {
                 .isInstanceOf(ErroProcesso.class)
                 .hasMessageContaining("U1");
         }
+
+        @Test
+        @DisplayName("Deve falhar se unidade participamente for INTERMEDIARIA")
+        void deveFalharSeUnidadeIntermediaria() {
+            CriarProcessoReq req = new CriarProcessoReq(
+                "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
+
+            Unidade u = UnidadeFixture.unidadeComId(1L);
+            u.setTipo(sgc.organizacao.model.TipoUnidade.INTERMEDIARIA);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
+
+            assertThatThrownBy(() -> processoService.criar(req))
+                .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
+        }
     }
 
     @Nested
@@ -241,6 +255,29 @@ class ProcessoServiceTest {
             assertThatThrownBy(() -> processoService.atualizar(id, req))
                 .isInstanceOf(ErroProcesso.class)
                 .hasMessageContaining("U1");
+        }
+
+        @Test
+        @DisplayName("Deve validar mapa para DIAGNOSTICO na atualização com lista vazia")
+        void deveValidarMapaParaDiagnosticoVazio() {
+            Long id = 100L;
+            Processo processo = ProcessoFixture.processoPadrao();
+            processo.setCodigo(id);
+
+            AtualizarProcessoReq req =
+                    AtualizarProcessoReq.builder()
+                            .codigo(id)
+                            .descricao("Nova Desc")
+                            .tipo(TipoProcesso.DIAGNOSTICO)
+                            .unidades(List.of()) // Vazio para bater no if (null/vazio)
+                            .build();
+
+            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
+            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
+
+            processoService.atualizar(id, req);
+            verify(processoRepo).saveAndFlush(any());
         }
 
         @Test
@@ -620,6 +657,28 @@ class ProcessoServiceTest {
                     .isInstanceOf(ErroProcesso.class)
                     .hasMessageContaining("sem unidade associada");
         }
+
+        @Test
+        @DisplayName("Deve falhar ao finalizar se subprocesso não tem mapa")
+        void deveFalharAoFinalizarSeSubprocessoSemMapa() {
+            // Arrange
+            Long id = 100L;
+            Processo processo = ProcessoFixture.processoEmAndamento();
+            processo.setCodigo(id);
+
+            Unidade u = UnidadeFixture.unidadeComId(1L);
+            Subprocesso sp = SubprocessoFixture.subprocessoPadrao(processo, u);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+            sp.setMapa(null); // Sem mapa
+
+            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(subprocessoService.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
+
+            // Act & Assert
+            assertThatThrownBy(() -> processoService.finalizar(id))
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessageContaining("sem mapa associado");
+        }
     }
 
     @Nested
@@ -634,6 +693,7 @@ class ProcessoServiceTest {
 
             // Act & Assert
             assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+            assertThat(processoService.checarAcesso(null, 1L)).isFalse();
         }
 
         @Test
@@ -716,7 +776,7 @@ class ProcessoServiceTest {
         }
 
         @Test
-        @DisplayName("Deve permitir acesso quando gestor é da unidade participante")
+        @DisplayName("Deve permitir acesso quando gestor é da unidade participante (com hierarquia)")
         void devePermitirAcessoQuandoGestorDeUnidadeParticipante() {
             // Arrange
             Authentication auth = mock(Authentication.class);
@@ -735,11 +795,15 @@ class ProcessoServiceTest {
             when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
 
             // Necessário para o metodo privado buscarCodigosDescendentes
-            Unidade u = new Unidade();
-            u.setCodigo(10L);
-            when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(u));
+            Unidade pai = new Unidade();
+            pai.setCodigo(10L);
+            Unidade filho = new Unidade();
+            filho.setCodigo(20L);
+            filho.setUnidadeSuperior(pai);
+            
+            when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(pai, filho));
 
-            when(subprocessoService.verificarAcessoUnidadeAoProcesso(anyLong(), anyList())).thenReturn(true);
+            when(subprocessoService.verificarAcessoUnidadeAoProcesso(eq(1L), argThat(list -> list.contains(10L) && list.contains(20L)))).thenReturn(true);
 
             // Act & Assert
             assertThat(processoService.checarAcesso(auth, 1L)).isTrue();

@@ -10,7 +10,7 @@ Este documento resume as diretrizes essenciais para o desenvolvimento no projeto
   * **Backend:** Classes `PascalCase`, métodos `camelCase`. Sufixos: `Controller`, `Service`, `Repo`, `Dto`, `Mapper`. Exceções iniciam com `Erro` (ex: `ErroNegocio`).
   * **Frontend:** Componentes `PascalCase` (`ProcessoCard.vue`), arquivos TS `camelCase`. Stores seguem `use{Nome}Store`.
 
-## 2. Backend (Java / Spring Boot)
+## 2. Backend (Java / Spring Boot 4)
 
 * **Arquitetura:** Módulos de domínio com uma **Service Facade** (ex: `MapaService`) que orquestra serviços especializados. Controllers interagem *apenas* com a Facade.
 * **Comunicação entre Módulos:** Use **Spring Events** para desacoplamento (ex: `eventPublisher.publishEvent(new EventoProcessoIniciado(codigo))`).

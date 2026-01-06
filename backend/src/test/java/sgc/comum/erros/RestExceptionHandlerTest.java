@@ -1,5 +1,7 @@
 package sgc.comum.erros;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.DisplayName;
@@ -192,5 +194,24 @@ class RestExceptionHandlerTest {
         ErroNegocioBase ex = new ErroNegocioBase("Erro Server", "CODE", HttpStatus.INTERNAL_SERVER_ERROR) {};
         ResponseEntity<Object> response = restExceptionHandler.handleErroNegocio(ex);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Deve tratar ErroInterno (500)")
+    void deveTratarErroInterno() {
+        ErroEstadoImpossivel ex = new ErroEstadoImpossivel("Bug crítico");
+        ResponseEntity<Object> response = restExceptionHandler.handleErroInterno(ex);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertThat(((ErroApi) response.getBody()).getMessage()).contains("Erro interno do sistema");
+    }
+
+    @Test
+    @DisplayName("Deve tratar casos nulos nos handlers da Spring")
+    void deveTratarCasosNulos() {
+        ResponseEntity<Object> r1 = restExceptionHandler.handleHttpMessageNotReadable(null, new HttpHeaders(), HttpStatus.BAD_REQUEST, null);
+        assertEquals(HttpStatus.BAD_REQUEST, r1.getStatusCode());
+
+        ResponseEntity<Object> r2 = restExceptionHandler.handleMethodArgumentNotValid(null, new HttpHeaders(), HttpStatus.BAD_REQUEST, null);
+        assertEquals(HttpStatus.BAD_REQUEST, r2.getStatusCode());
     }
 }

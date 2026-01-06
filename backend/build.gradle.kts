@@ -190,7 +190,7 @@ tasks.jacocoTestReport {
                     "sgc/**/*Exception.class",
                     "sgc/notificacao/NotificacaoModelosServiceMock.class",
                     "sgc/e2e/E2eController.class",
-                    "sgc/seguranca/AcessoAdClient.class"
+                    "sgc/seguranca/autenticacao/AcessoAdClient.class"
                 )
             }
         })

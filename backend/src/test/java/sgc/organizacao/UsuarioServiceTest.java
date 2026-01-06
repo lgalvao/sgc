@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.seguranca.dto.PerfilUnidadeDto;
+import sgc.seguranca.dto.EntrarReq;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.*;
@@ -167,12 +168,18 @@ class UsuarioServiceTest {
             // Roots in data.sql: 1 (TRE)
             assertTrue(result.stream().anyMatch(u -> u.getCodigo().equals(1L)));
 
-            // Ensure roots have no parent
             for (UnidadeDto unidade : result) {
                 if (unidade.getCodigo().equals(1L)) {
                     assertNull(unidade.getCodigoPai());
                 }
             }
+        }
+
+        @Test
+        @DisplayName("Deve retornar vazio ao buscar unidade inexistente por código ou sigla")
+        void deveRetornarVazioAoBuscarUnidadeInexistente() {
+            assertTrue(usuarioService.buscarUnidadePorCodigo(9999L).isEmpty());
+            assertTrue(usuarioService.buscarUnidadePorSigla("SIGLA_NAO_EXISTE").isEmpty());
         }
     }
 
@@ -318,6 +325,59 @@ class UsuarioServiceTest {
 
             // Act & Assert
             assertDoesNotThrow(() -> usuarioService.entrar(TITULO_CHEFE_UNIT2, perfilUnidadeDto));
+        }
+
+        @Test
+        @DisplayName("Deve falhar 'entrar' com sessão expirada")
+        void deveFalharEntrarSessaoExpirada() {
+             // Usa um título que com certeza não foi autenticado recentemente
+             EntrarReq req = new EntrarReq("TITULO_NUNCA_VISTO", "ADMIN", 100L);
+             assertThrows(ErroAutenticacao.class, () -> usuarioService.entrar(req));
+        }
+    }
+
+    @Nested
+    @DisplayName("Gestão de Administradores")
+    class GestaoAdministradores {
+        @Test
+        @DisplayName("Deve listar, adicionar e remover administradores")
+        void deveGerenciarAdministradores() {
+            // TITULO_CHEFE_UNIT2 (777) não é admin no data.sql original
+            String tituloNovoAdmin = TITULO_CHEFE_UNIT2;
+            
+            // Adicionar
+            usuarioService.adicionarAdministrador(tituloNovoAdmin);
+            assertTrue(usuarioService.isAdministrador(tituloNovoAdmin));
+            
+            // Listar
+            List<AdministradorDto> admins = usuarioService.listarAdministradores();
+            assertTrue(admins.stream().anyMatch(a -> a.getTituloEleitoral().equals(tituloNovoAdmin)));
+            
+            // Falhar ao adicionar duplicado
+            assertThrows(sgc.comum.erros.ErroValidacao.class, 
+                () -> usuarioService.adicionarAdministrador(tituloNovoAdmin));
+            
+            // Remover
+            usuarioService.removerAdministrador(tituloNovoAdmin, TITULO_ADMIN);
+            assertFalse(usuarioService.isAdministrador(tituloNovoAdmin));
+        }
+
+        @Test
+        @DisplayName("Deve falhar ao remover a si mesmo")
+        void deveFalharRemoverSiMesmo() {
+            assertThrows(sgc.comum.erros.ErroValidacao.class,
+                () -> usuarioService.removerAdministrador(TITULO_ADMIN, TITULO_ADMIN));
+        }
+
+        @Test
+        @DisplayName("Deve falhar ao remover único admin")
+        void deveFalharRemoverUnicoAdmin() {
+            // Remove os admins extras do data.sql para sobrar apenas 1
+            usuarioService.removerAdministrador("6", "OUTRO");
+            usuarioService.removerAdministrador("999999999999", "OUTRO");
+            
+            assertThrows(sgc.comum.erros.ErroValidacao.class,
+                () -> usuarioService.removerAdministrador(TITULO_ADMIN, "OUTRO"));
         }
     }
 }

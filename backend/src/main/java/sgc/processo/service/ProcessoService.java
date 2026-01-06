@@ -87,11 +87,6 @@ public class ProcessoService {
 
         List<Long> codigosUnidadesHierarquia = buscarCodigosDescendentes(codUnidadeUsuario);
 
-        if (codigosUnidadesHierarquia.isEmpty()) {
-            log.warn("checarAcesso: busca hierárquica retornou lista vazia para unidade {}", codUnidadeUsuario);
-            return false;
-        }
-
         return subprocessoService.verificarAcessoUnidadeAoProcesso(
                 codProcesso, codigosUnidadesHierarquia);
     }

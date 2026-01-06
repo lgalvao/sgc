@@ -217,4 +217,61 @@ class SubprocessoWorkflowServiceTest {
         assertThatThrownBy(() -> service.reabrirRevisaoCadastro(1L, "Just"))
             .isInstanceOf(ErroValidacao.class);
     }
+
+    @Test
+    @DisplayName("Reabrir revisao falha se ja esta em andamento")
+    void reabrirRevisaoFalhaAndamento() {
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(new Processo());
+        sp.getProcesso().setTipo(TipoProcesso.REVISAO);
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+
+        assertThatThrownBy(() -> service.reabrirRevisaoCadastro(1L, "Just"))
+            .isInstanceOf(ErroValidacao.class)
+            .hasMessageContaining("em fase de revisão");
+    }
+
+    @Test
+    @DisplayName("Buscar subprocessos homologados")
+    void buscarSubprocessosHomologados() {
+        service.listarSubprocessosHomologados();
+        verify(repositorioSubprocesso).findBySituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+    }
+
+    @Test
+    @DisplayName("Deve logar erro mas não falhar se erro ao enviar notificação na alteração de data")
+    void erroNotificacaoAlteracaoData() {
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setProcesso(new Processo());
+        sp.setUnidade(new Unidade());
+
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+        doThrow(new RuntimeException("Simulated error")).when(alertaService).criarAlertaAlteracaoDataLimite(any(), any(), any(), anyInt());
+
+        // Não deve lançar exceção
+        service.alterarDataLimite(1L, LocalDate.now());
+        
+        verify(repositorioSubprocesso).save(sp);
+    }
+
+    @Test
+    @DisplayName("Deve logar erro mas não falhar se erro ao enviar notificação na reabertura")
+    void erroNotificacaoReabertura() {
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(new Processo());
+        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        sp.setUnidade(new Unidade());
+
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+        doThrow(new RuntimeException("Simulated error")).when(alertaService).criarAlertaReaberturaCadastro(any(), any(), any());
+
+        // Não deve lançar exceção
+        service.reabrirCadastro(1L, "Just");
+        
+        verify(repositorioSubprocesso).save(sp);
+    }
 }

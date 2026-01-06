@@ -166,6 +166,51 @@ class UnidadeServiceTest {
             // Act & Assert
             assertThat(service.buscarSiglaSuperior("RAIZ")).isNull();
         }
+
+        @Test
+        @DisplayName("Deve buscar árvore de unidade específica")
+        void deveBuscarArvoreEspecifica() {
+            // Arrange
+            Unidade u1 = new Unidade();
+            u1.setCodigo(1L);
+            u1.setSigla("U1");
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
+            when(usuarioMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
+
+            // Act
+            UnidadeDto result = service.buscarArvore(1L);
+
+            // Assert
+            assertThat(result.getCodigo()).isEqualTo(1L);
+        }
+
+        @Test
+        @DisplayName("Deve buscar siglas subordinadas recursivamente")
+        void deveBuscarSiglasSubordinadasRecursivamente() {
+            // Arrange
+            UnidadeDto netoDto = UnidadeDto.builder().codigo(3L).sigla("NETO").build();
+            UnidadeDto filhoDto = UnidadeDto.builder().codigo(2L).sigla("FILHO").subunidades(List.of(netoDto)).build();
+            UnidadeDto paiDto = UnidadeDto.builder().codigo(1L).sigla("PAI").subunidades(List.of(filhoDto)).build();
+
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(Collections.emptyList()); // Not used because we mock more levels
+            // We need to mock the full hierarchy return from buscarTodasUnidades
+            // which calls buscarArvoreHierarquica -> montarHierarquia
+            
+            Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setSigla("PAI");
+            Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setSigla("FILHO"); u2.setUnidadeSuperior(u1);
+            Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setSigla("NETO"); u3.setUnidadeSuperior(u2);
+            
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1, u2, u3));
+            when(usuarioMapper.toUnidadeDto(u1)).thenReturn(paiDto);
+            when(usuarioMapper.toUnidadeDto(u2)).thenReturn(filhoDto);
+            when(usuarioMapper.toUnidadeDto(u3)).thenReturn(netoDto);
+
+            // Act
+            List<String> result = service.buscarSiglasSubordinadas("PAI");
+
+            // Assert
+            assertThat(result).containsExactlyInAnyOrder("PAI", "FILHO", "NETO");
+        }
     }
 
     @Nested
@@ -406,6 +451,14 @@ class UnidadeServiceTest {
         @DisplayName("Definir mapa vigente (criação)")
         void definirMapaVigenteCriacao() {
             when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.empty());
+            service.definirMapaVigente(1L, new sgc.mapa.model.Mapa());
+            verify(unidadeMapaRepo).save(any());
+        }
+
+        @Test
+        @DisplayName("Definir mapa vigente (atualização)")
+        void definirMapaVigenteAtualizacao() {
+            when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(new sgc.organizacao.model.UnidadeMapa()));
             service.definirMapaVigente(1L, new sgc.mapa.model.Mapa());
             verify(unidadeMapaRepo).save(any());
         }
