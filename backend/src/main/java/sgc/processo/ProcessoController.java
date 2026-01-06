@@ -15,6 +15,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
+import sgc.processo.model.TipoProcesso;
 
 /**
  * Controller REST para Processos. Implementa endpoints CRUD e ações de iniciar/finalizar processo
@@ -29,6 +31,15 @@ import java.util.Map;
                 "Endpoints para gerenciamento de processos de mapeamento, revisão e diagnóstico")
 public class ProcessoController {
     private final ProcessoService processoService;
+
+    // Strategy Pattern: Map de handlers para inicialização de processo por tipo
+    private Map<TipoProcesso, BiFunction<Long, List<Long>, List<String>>> getProcessadoresInicio() {
+        return Map.of(
+                TipoProcesso.MAPEAMENTO, processoService::iniciarProcessoMapeamento,
+                TipoProcesso.REVISAO, processoService::iniciarProcessoRevisao,
+                TipoProcesso.DIAGNOSTICO, processoService::iniciarProcessoDiagnostico
+        );
+    }
 
     /**
      * Cria um novo processo.
@@ -155,16 +166,14 @@ public class ProcessoController {
     public ResponseEntity<?> iniciar(
             @PathVariable Long codigo, @RequestBody IniciarProcessoReq req) {
 
-        List<String> erros;
-        if (req.tipo() == sgc.processo.model.TipoProcesso.REVISAO) {
-            erros = processoService.iniciarProcessoRevisao(codigo, req.unidades());
-        } else if (req.tipo() == sgc.processo.model.TipoProcesso.MAPEAMENTO) {
-            erros = processoService.iniciarProcessoMapeamento(codigo, req.unidades());
-        } else if (req.tipo() == sgc.processo.model.TipoProcesso.DIAGNOSTICO) {
-            erros = processoService.iniciarProcessoDiagnostico(codigo, req.unidades());
-        } else {
+        if (req.tipo() == null) {
             return ResponseEntity.badRequest().build();
         }
+        var processador = getProcessadoresInicio().get(req.tipo());
+        if (processador == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<String> erros = processador.apply(codigo, req.unidades());
 
         if (!erros.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("erros", erros));

@@ -9,10 +9,16 @@
 
 | Métrica | Valor | Meta |
 |---------|-------|------|
-| Cobertura de Linhas | 98.75% | 98% ✅ |
-| Cobertura de Branches | 87.03% | 90% ❌ |
-| Total de Testes | 1007 | - |
-| Branches Perdidos | 170/1311 | - |
+| Cobertura de Linhas | 98.80% | 98% ✅ |
+| Cobertura de Branches | 88.09% | 90% ❌ |
+| Total de Testes | 1026 | - |
+| Branches Perdidos | 154/1293 | - |
+
+### Progresso das Refatorações (2026-01-06)
+
+- ✅ **Strategy Pattern em `SubprocessoMapaWorkflowService`**: 8 ocorrências de if/else substituídas por Maps estáticos
+- ✅ **Strategy Pattern em `ProcessoController.iniciar()`**: Chain de if/else substituída por Map de handlers
+- **Resultado**: Eliminados 18 branches da complexidade total, código mais testável
 
 ---
 

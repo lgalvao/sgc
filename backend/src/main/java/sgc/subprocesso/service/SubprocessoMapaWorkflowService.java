@@ -29,6 +29,8 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.UnidadeService;
 
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
@@ -37,6 +39,28 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @RequiredArgsConstructor
 @Slf4j
 public class SubprocessoMapaWorkflowService {
+
+    // Strategy Pattern: Maps para eliminar if/else por TipoProcesso
+    private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_DISPONIBILIZADO = new EnumMap<>(Map.of(
+            TipoProcesso.MAPEAMENTO, MAPEAMENTO_MAPA_DISPONIBILIZADO,
+            TipoProcesso.REVISAO, REVISAO_MAPA_DISPONIBILIZADO
+    ));
+
+    private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_COM_SUGESTOES = new EnumMap<>(Map.of(
+            TipoProcesso.MAPEAMENTO, MAPEAMENTO_MAPA_COM_SUGESTOES,
+            TipoProcesso.REVISAO, REVISAO_MAPA_COM_SUGESTOES
+    ));
+
+    private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_VALIDADO = new EnumMap<>(Map.of(
+            TipoProcesso.MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO,
+            TipoProcesso.REVISAO, REVISAO_MAPA_VALIDADO
+    ));
+
+    private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_HOMOLOGADO = new EnumMap<>(Map.of(
+            TipoProcesso.MAPEAMENTO, MAPEAMENTO_MAPA_HOMOLOGADO,
+            TipoProcesso.REVISAO, REVISAO_MAPA_HOMOLOGADO
+    ));
+
     private final SubprocessoRepo subprocessoRepo;
     private final CompetenciaService competenciaService;
     private final AtividadeService atividadeService;
@@ -154,11 +178,7 @@ public class SubprocessoMapaWorkflowService {
             sp.getMapa().setSugestoes(request.getObservacoes());
         }
 
-        if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
-            sp.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO);
-        } else {
-            sp.setSituacao(REVISAO_MAPA_DISPONIBILIZADO);
-        }
+        sp.setSituacao(SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo()));
         
         sp.setDataLimiteEtapa2(request.getDataLimite().atStartOfDay());
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
@@ -217,11 +237,7 @@ public class SubprocessoMapaWorkflowService {
             sp.getMapa().setSugestoes(sugestoes);
         }
 
-        if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
-            sp.setSituacao(MAPEAMENTO_MAPA_COM_SUGESTOES);
-        } else {
-            sp.setSituacao(REVISAO_MAPA_COM_SUGESTOES);
-        }
+        sp.setSituacao(SITUACAO_MAPA_COM_SUGESTOES.get(sp.getProcesso().getTipo()));
 
         sp.setDataFimEtapa2(java.time.LocalDateTime.now());
         subprocessoRepo.save(sp);
@@ -241,11 +257,7 @@ public class SubprocessoMapaWorkflowService {
     public void validarMapa(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
-            sp.setSituacao(MAPEAMENTO_MAPA_VALIDADO);
-        } else {
-            sp.setSituacao(REVISAO_MAPA_VALIDADO);
-        }
+        sp.setSituacao(SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo()));
 
         sp.setDataFimEtapa2(java.time.LocalDateTime.now());
         subprocessoRepo.save(sp);
@@ -264,9 +276,7 @@ public class SubprocessoMapaWorkflowService {
     public void devolverValidacao(Long codSubprocesso, String justificativa, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        SituacaoSubprocesso novaSituacao = sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO
-                ? MAPEAMENTO_MAPA_DISPONIBILIZADO
-                : REVISAO_MAPA_DISPONIBILIZADO;
+        SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo());
 
         sp.setDataFimEtapa2(null);
 
@@ -310,17 +320,11 @@ public class SubprocessoMapaWorkflowService {
                         .motivo(null)
                         .build());
 
-            if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
-                sp.setSituacao(MAPEAMENTO_MAPA_HOMOLOGADO);
-            } else {
-                sp.setSituacao(REVISAO_MAPA_HOMOLOGADO);
-            }
+            sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
             subprocessoRepo.save(sp);
             // Sem transição registrada no código original para este caso.
         } else {
-            SituacaoSubprocesso novaSituacao = sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO
-                    ? MAPEAMENTO_MAPA_VALIDADO
-                    : REVISAO_MAPA_VALIDADO;
+            SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo());
 
             workflowExecutor.registrarAnaliseETransicao(
                     sp,
@@ -342,11 +346,7 @@ public class SubprocessoMapaWorkflowService {
     public void homologarValidacao(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
-            sp.setSituacao(MAPEAMENTO_MAPA_HOMOLOGADO);
-        } else {
-            sp.setSituacao(REVISAO_MAPA_HOMOLOGADO);
-        }
+        sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
         subprocessoRepo.save(sp);
 
         Unidade sedoc = unidadeService.buscarEntidadePorId(unidadeService.buscarPorSigla("SEDOC").getCodigo());
@@ -366,11 +366,7 @@ public class SubprocessoMapaWorkflowService {
 
         subprocessoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
 
-        if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
-            sp.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO);
-        } else {
-            sp.setSituacao(REVISAO_MAPA_DISPONIBILIZADO);
-        }
+        sp.setSituacao(SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo()));
 
         sp.setDataLimiteEtapa2(request.getDataLimiteEtapa2());
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
