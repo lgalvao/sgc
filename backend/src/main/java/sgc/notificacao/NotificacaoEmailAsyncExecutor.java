@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import sgc.comum.util.Sleeper;
 import sgc.notificacao.dto.EmailDto;
 
 import java.io.UnsupportedEncodingException;
@@ -29,6 +30,7 @@ public class NotificacaoEmailAsyncExecutor {
     private static final long ESPERA_ENTRE_TENTATIVAS_MS = 1000;
 
     private final JavaMailSender enviadorDeEmail;
+    private final Sleeper sleeper;
 
     @Value("${aplicacao.email.remetente}")
     private String remetente;
@@ -68,7 +70,7 @@ public class NotificacaoEmailAsyncExecutor {
                         e.getMessage());
                 if (tentativa < MAX_TENTATIVAS) {
                     try {
-                        Thread.sleep(ESPERA_ENTRE_TENTATIVAS_MS * tentativa);
+                        sleeper.sleep(ESPERA_ENTRE_TENTATIVAS_MS * tentativa);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
                         log.error(

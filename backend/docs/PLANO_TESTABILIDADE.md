@@ -9,98 +9,55 @@
 
 | Métrica | Valor | Meta |
 |---------|-------|------|
-| Cobertura de Linhas | 97.62% | 98% ❌ |
-| Cobertura de Branches | 87.96% | 90% ❌ |
-| Total de Testes | 1026 | - |
-| Branches Perdidos | ~150/1296 | - |
-
-### Progresso das Refatorações (2026-01-06)
-
-- ✅ **Strategy Pattern em `SubprocessoMapaWorkflowService`**: 8 ocorrências de if/else substituídas por Maps estáticos
-- ✅ **Strategy Pattern em `ProcessoController.iniciar()`**: Chain de if/else substituída por Map de handlers
-- ✅ **Extração de Lógica em `EventoProcessoListener`**: Lógica de switch extraída para `criarCorpoEmailPorTipo`, eliminando branches redundantes e uso de exceções brutas.
-- ✅ **Testes para `SubprocessoValidacaoService`**: 23 novos testes cobrindo edge-cases e null checks.
-- ✅ **Testes para `SubprocessoDetalheService`**: 22 novos testes cobrindo visualização, permissões e tratamento de nulos.
-- **Resultado**: Melhoria na robustez e manutenibilidade, embora a cobertura percentual total tenha flutuado devido à adição de código de teste e mudanças na base.
+| Cobertura de Linhas | ~99% | 100% ❌ |
+| Cobertura de Branches | ~88% | 90% ❌ |
+| Total de Testes | 1026+ | - |
+| Linhas Perdidas | ~44 (Identificadas) | - |
 
 ---
 
-## 📊 Análise de Gaps por Prioridade
+## 📊 Linhas Perdidas Identificadas (Prioridade Imediata)
 
-### Prioridade Alta (Maior impacto em branches)
-
-#### 1. SubprocessoMapaWorkflowService (~13 branches perdidos)
-**Status**: Parcialmente abordado via Strategy Pattern. Ainda há branches de negócio complexos.
-
-#### 2. ProcessoController
-**Status**: Iniciado. Necessita de testes para o branch `DIAGNOSTICO`.
-
-#### 3. GerenciadorJwt
-**Status**: Pendente. Branches de claims nulos e validação de ambiente.
-
-### Próximos Passos (Fase 1.5 - Consolidação)
-
-**Tempo estimado:** 2h
-
-| Tarefa | Arquivo | Impacto |
-|--------|---------|---------|
-| 1.3 | Teste `ProcessoController.iniciar` com DIAGNOSTICO | +2 branches |
-| 1.4 | Remover/testar construtores não usados de erros | +5 linhas |
-| 2.3 | Testes para `SubprocessoMapaService` | +3 branches |
-
----
-
-## 🎯 Plano de Execução Atualizado
-
-### Fase 2: Refatorações de Médio Esforço (Meta: 90% branches)
-
-**Tempo estimado:** 6h
-
-| Tarefa | Arquivo | Impacto | Status |
-|--------|---------|---------|--------|
-| 2.1 | Strategy Pattern em `SubprocessoMapaWorkflowService` | +3 branches | ✅ |
-| 2.2 | Extrair lógica de `EventoProcessoListener` | +2 branches | ✅ |
-| 2.3 | Testes para `SubprocessoMapaService` | +3 branches | Pendente |
-| 2.4 | Testes para `GerenciadorJwt` claims parciais | +2 branches | Pendente |
-
-### Fase 3: Refatorações Estruturais (Melhoria contínua)
-
-**Tempo estimado:** 8h
-
-| Tarefa | Descrição |
-|--------|-----------|
-| 3.1 | Strategy Pattern em `ProcessoController.iniciar()` |
-| 3.2 | Interface `AmbienteInfo` para abstração de ambiente |
-| 3.3 | Separação de guards via AOP (se necessário) |
-| 3.4 | Factory Methods para responses complexos |
+| Arquivo | Linhas | Contexto |
+|---------|--------|----------|
+| `sgc.organizacao.UsuarioService` | 353, 357 | Possíveis falhas em buscas ou validações de segurança |
+| `sgc.painel.PainelService` | 88, 235 | Filtros de dashboard ou tratamento de erro |
+| `sgc.notificacao.NotificacaoEmailAsyncExecutor` | 72, 73, 74, 78 | Logs de erro e retentativas em caso de exceção |
+| `sgc.relatorio.service.RelatorioService` | 61, 62, 109, 110 | Tratamento de erro ao gerar PDF (catch blocks) |
+| `sgc.notificacao.EventoProcessoListener` | 123, 124 | Exceções ao enviar e-mails em loop |
+| `sgc.subprocesso.service.SubprocessoMapaService` | 167 | Validação específica ou branch raro |
+| `sgc.subprocesso.SubprocessoCadastroController` | 326 | Tratamento de erro ou validação |
+| `sgc.subprocesso.SubprocessoCrudController` | 35, 36, 50 | Endpoints menores não testados |
+| `sgc.subprocesso.service.SubprocessoFactory` | 133, 134 | Tratamento de erro na criação de subprocessos |
+| `sgc.subprocesso.service.SubprocessoCadastroWorkflowService` | 203 | Condição de borda em workflow |
+| `sgc.organizacao.ValidadorDadosOrganizacionais` | 118 | Validação de dados inválidos |
+| `sgc.seguranca.GerenciadorJwt` | 84, 85 | Validação de ambiente de produção |
+| `sgc.alerta.AlertaController` | 25, 26 | Construtor ou método utilitário |
+| `sgc.comum.erros.ErroInterno` | 54, 55 | Construtor secundário |
+| `sgc.seguranca.FiltroAutenticacaoMock` | 56 | Log de erro ou condição de filtro |
+| `sgc.alerta.AlertaService` | 187 | Validação de alerta não encontrado |
+| `sgc.mapa.service.AtividadeFacade` | 39 | Método não coberto |
+| `sgc.mapa.service.AnalisadorCompetenciasService` | 145 | Branch complexo de análise |
+| `sgc.processo.ProcessoController` | 174 | Endpoint de busca ou validação |
 
 ---
 
-## 📋 Checklist de Implementação
+## 🎯 Plano de Execução
 
-### Para cada refatoração
+1. **UsuarioService & PainelService**: Criar testes unitários focados nas linhas específicas (provavelmente `catch` blocks ou validações de `null`).
+2. **Notificacao & Relatorio**: Garantir cobertura dos blocos `catch` através de mocks que lançam exceções.
+3. **Controladores**: Adicionar testes `@WebMvcTest` ou unitários para os endpoints faltantes.
+4. **Classes Utilitárias e Erros**: Criar testes simples para construtores ou métodos estáticos não utilizados.
+5. **Limpeza**: Se algum código for inalcançável ou inútil, remover.
 
-- [x] Executar testes existentes antes da mudança
-- [x] Implementar a refatoração
-- [x] Adicionar novos testes cobrindo os branches
-- [x] Verificar que nenhum teste existente quebrou
-- [ ] Rodar `python3 scripts/check_coverage.py "" 90` para validar (Script indisponível, verificação manual via relatório Gradle)
-- [x] Atualizar BACKLOG_TESTABILIDADE.md com métricas atualizadas
+---
 
-### Comandos úteis
+### Comandos para Verificação
 
 ```bash
 # Executar testes e gerar relatório
-cd /app && ./gradlew :backend:test :backend:jacocoTestReport
+cd /app && ./gradlew :backend:test :backend:jacocoTestReport > test_output.log 2>&1
 
-# Verificar cobertura geral (Manual)
-cat backend/build/reports/jacoco/test/jacocoTestReport.csv | awk -F, '{instructions += $4 + $5; covered_instructions += $5; branches += $6 + $7; covered_branches += $7} END {print "Total Instructions: " instructions; print "Covered Instructions: " covered_instructions; print "Instruction Coverage: " covered_instructions/instructions*100 "%"; print "Total Branches: " branches; print "Covered Branches: " covered_branches; print "Branch Coverage: " covered_branches/branches*100 "%"}'
+# Verificar linhas perdidas detalhadas
+cd /app/backend && python3 scripts/list_missed_lines.py
 ```
-
----
-
-## Referências
-
-- [BACKLOG_TESTABILIDADE.md](./BACKLOG_TESTABILIDADE.md) - Backlog original
-- [AGENTS.md](/AGENTS.md) - Diretrizes de desenvolvimento
-- [backend-padroes.md](/regras/backend-padroes.md) - Padrões de código backend

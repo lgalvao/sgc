@@ -132,4 +132,67 @@ class SubprocessoCrudControllerTest {
         mockMvc.perform(post("/api/subprocessos/1/excluir").with(csrf()))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    @DisplayName("obterPermissoes deve retornar OK")
+    @WithMockUser
+    void obterPermissoes() throws Exception {
+        mockMvc.perform(get("/api/subprocessos/1/permissoes"))
+                .andExpect(status().isOk());
+        verify(subprocessoService).obterPermissoes(1L);
+    }
+
+    @Test
+    @DisplayName("validarCadastro deve retornar OK")
+    @WithMockUser
+    void validarCadastro() throws Exception {
+        mockMvc.perform(get("/api/subprocessos/1/validar-cadastro"))
+                .andExpect(status().isOk());
+        verify(subprocessoService).validarCadastro(1L);
+    }
+
+    @Test
+    @DisplayName("obterStatus deve retornar OK")
+    @WithMockUser
+    void obterStatus() throws Exception {
+        mockMvc.perform(get("/api/subprocessos/1/status"))
+                .andExpect(status().isOk());
+        verify(subprocessoService).obterStatus(1L);
+    }
+
+    @Test
+    @DisplayName("alterarDataLimite deve retornar OK")
+    @WithMockUser(roles = "ADMIN")
+    void alterarDataLimite() throws Exception {
+        mockMvc.perform(post("/api/subprocessos/1/data-limite")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"novaDataLimite\": \"2030-01-01\"}"))
+                .andExpect(status().isOk());
+        verify(subprocessoService).alterarDataLimite(eq(1L), any());
+    }
+
+    @Test
+    @DisplayName("reabrirCadastro deve retornar OK")
+    @WithMockUser(roles = "ADMIN")
+    void reabrirCadastro() throws Exception {
+        mockMvc.perform(post("/api/subprocessos/1/reabrir-cadastro")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"justificativa\": \"Erro\"}"))
+                .andExpect(status().isOk());
+        verify(subprocessoService).reabrirCadastro(eq(1L), eq("Erro"));
+    }
+
+    @Test
+    @DisplayName("reabrirRevisaoCadastro deve retornar OK")
+    @WithMockUser(roles = "ADMIN")
+    void reabrirRevisaoCadastro() throws Exception {
+        mockMvc.perform(post("/api/subprocessos/1/reabrir-revisao-cadastro")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"justificativa\": \"Erro\"}"))
+                .andExpect(status().isOk());
+        verify(subprocessoService).reabrirRevisaoCadastro(eq(1L), eq("Erro"));
+    }
 }
