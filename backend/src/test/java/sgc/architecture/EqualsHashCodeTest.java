@@ -1,0 +1,59 @@
+package sgc.architecture;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.jupiter.api.Test;
+import sgc.organizacao.model.AtribuicaoTemporaria;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilId;
+
+class EqualsHashCodeTest {
+
+    @Test
+    void testUsuario() {
+        Unidade u1 = new Unidade("Unidade 1", "U1");
+        Unidade u2 = new Unidade("Unidade 2", "U2");
+
+        AtribuicaoTemporaria at1 = new AtribuicaoTemporaria();
+        at1.setJustificativa("Justificativa 1");
+        AtribuicaoTemporaria at2 = new AtribuicaoTemporaria();
+        at2.setJustificativa("Justificativa 2");
+
+        UsuarioPerfil up1 = new UsuarioPerfil();
+        up1.setUsuarioTitulo("111");
+        UsuarioPerfil up2 = new UsuarioPerfil();
+        up2.setUsuarioTitulo("222");
+
+        EqualsVerifier.forClass(Usuario.class)
+                .usingGetClass()
+                .suppress(Warning.SURROGATE_KEY)
+                .withPrefabValues(Unidade.class, u1, u2)
+                .withPrefabValues(AtribuicaoTemporaria.class, at1, at2)
+                .withPrefabValues(UsuarioPerfil.class, up1, up2)
+                .verify();
+    }
+
+    @Test
+    void testUsuarioPerfil() {
+        Unidade u1 = new Unidade("Unidade 1", "U1");
+        Unidade u2 = new Unidade("Unidade 2", "U2");
+        Usuario user1 = Usuario.builder().tituloEleitoral("111").build();
+        Usuario user2 = Usuario.builder().tituloEleitoral("222").build();
+
+        EqualsVerifier.forClass(UsuarioPerfil.class)
+                .usingGetClass()
+                .suppress(Warning.SURROGATE_KEY)
+                .withPrefabValues(Unidade.class, u1, u2)
+                .withPrefabValues(Usuario.class, user1, user2)
+                .verify();
+    }
+
+    @Test
+    void testUsuarioPerfilId() {
+        EqualsVerifier.forClass(UsuarioPerfilId.class)
+                .suppress(Warning.STRICT_INHERITANCE, Warning.NONFINAL_FIELDS)
+                .verify();
+    }
+}
