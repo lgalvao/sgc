@@ -1,4 +1,4 @@
-package sgc.seguranca.autenticacao;
+package sgc.seguranca.erros.autenticacao;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

@@ -12,7 +12,7 @@ import lombok.Value;
  */
 @Value
 @Builder
-public class AutenticacaoReq {
+public class AutenticarReq {
     @NotNull(message = "O título é obrigatório.")
     @Size(max = 12, message = "O título deve ter no máximo 12 caracteres.")
     String tituloEleitoral;
@@ -22,7 +22,7 @@ public class AutenticacaoReq {
     String senha;
 
     @JsonCreator
-    public AutenticacaoReq(
+    public AutenticarReq(
             @JsonProperty("tituloEleitoral") String tituloEleitoral,
             @JsonProperty("senha") String senha) {
 
