@@ -49,8 +49,10 @@ class SubprocessoMapaServiceTest {
     @DisplayName("salvarAjustesMapa deve lançar exceção se subprocesso não encontrado")
     void salvarAjustesMapa_NaoEncontrado() {
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.empty());
+        List<CompetenciaAjusteDto> emptyList = Collections.emptyList();
+        
         assertThatThrownBy(() ->
-                subprocessoMapaService.salvarAjustesMapa(1L, Collections.emptyList(), "123"))
+                subprocessoMapaService.salvarAjustesMapa(1L, emptyList, "123"))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
@@ -60,9 +62,10 @@ class SubprocessoMapaServiceTest {
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        List<CompetenciaAjusteDto> emptyList = Collections.emptyList();
 
         assertThatThrownBy(() ->
-                subprocessoMapaService.salvarAjustesMapa(1L, Collections.emptyList(), "123"))
+                subprocessoMapaService.salvarAjustesMapa(1L, emptyList, "123"))
                 .isInstanceOf(ErroMapaEmSituacaoInvalida.class);
     }
 
