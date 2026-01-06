@@ -160,4 +160,53 @@ class NotificacaoEmailServiceTest {
         assertThat(notificacaoSalva.getConteudo().length()).isLessThanOrEqualTo(LIMITE_CONTEUDO_NOTIFICACAO);
         assertThat(notificacaoSalva.getConteudo()).endsWith("...");
     }
+
+    @Test
+    @DisplayName("Deve logar erro quando envio falha")
+    void deveLogarErroQuandoEnvioFalha() throws Exception {
+        when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
+        CompletableFuture<Boolean> futureFalho = CompletableFuture.completedFuture(false);
+        when(emailExecutor.enviarEmailAssincrono(any(EmailDto.class))).thenReturn(futureFalho);
+
+        String para = "recipient@test.com";
+        String assunto = "Test";
+        String corpo = "Test body";
+
+        notificacaoServico.enviarEmail(para, assunto, corpo);
+
+        verify(emailExecutor).enviarEmailAssincrono(any(EmailDto.class));
+    }
+
+    @Test
+    @DisplayName("Deve logar erro quando exception ocorre no CompletableFuture")
+    void deveLogarErroQuandoExceptionOcorre() throws Exception {
+        when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
+        CompletableFuture<Boolean> futureComErro = new CompletableFuture<>();
+        futureComErro.completeExceptionally(new RuntimeException("Erro de teste"));
+        when(emailExecutor.enviarEmailAssincrono(any(EmailDto.class))).thenReturn(futureComErro);
+
+        String para = "recipient@test.com";
+        String assunto = "Test";
+        String corpo = "Test body";
+
+        notificacaoServico.enviarEmail(para, assunto, corpo);
+
+        verify(emailExecutor).enviarEmailAssincrono(any(EmailDto.class));
+    }
+
+    @Test
+    @DisplayName("Deve capturar RuntimeException durante processamento")
+    void deveCapturaRuntimeException() throws Exception {
+        when(repositorioNotificacao.save(any(Notificacao.class))).thenThrow(new RuntimeException("Erro de teste"));
+
+        String para = "recipient@test.com";
+        String assunto = "Test";
+        String corpo = "Test body";
+
+        // Não deve lançar exceção, apenas logar
+        notificacaoServico.enviarEmail(para, assunto, corpo);
+
+        verify(repositorioNotificacao).save(any(Notificacao.class));
+        verify(emailExecutor, never()).enviarEmailAssincrono(any(EmailDto.class));
+    }
 }
