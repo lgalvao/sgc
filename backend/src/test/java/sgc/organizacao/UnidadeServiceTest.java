@@ -18,6 +18,11 @@ import sgc.organizacao.model.AtribuicaoTemporariaRepo;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapaRepo;
 import sgc.organizacao.model.UnidadeRepo;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Collections;
 import sgc.mapa.service.MapaService;
 import sgc.comum.erros.ErroValidacao;
 
@@ -462,5 +467,47 @@ class UnidadeServiceTest {
             service.definirMapaVigente(1L, new sgc.mapa.model.Mapa());
             verify(unidadeMapaRepo).save(any());
         }
+
+        @Test
+        @DisplayName("Deve falhar ao buscar entidade por ID inexistente")
+        void deveFalharAoBuscarEntidadePorIdInexistente() {
+            when(unidadeRepo.findById(999L)).thenReturn(Optional.empty());
+            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(999L));
+        }
+
+        @Test
+        @DisplayName("Deve falhar ao buscar sigla superior de unidade inexistente")
+        void deveFalharAoBuscarSiglaSuperiorInexistente() {
+            when(unidadeRepo.findBySigla("INVALIDO")).thenReturn(Optional.empty());
+            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglaSuperior("INVALIDO"));
+        }
+    }
+
+    @Test
+    @DisplayName("Deve construir unidades com hierarquia (cobertura caminhos recursivos)")
+    void deveTestarHierarquiaRecursiva() {
+        // Arrange
+        Unidade pai = new Unidade();
+        pai.setCodigo(1L);
+        pai.setSigla("PAI");
+        
+        Unidade filho = new Unidade();
+        filho.setCodigo(2L);
+        filho.setSigla("FILHO");
+        filho.setUnidadeSuperior(pai);
+        
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(pai, filho));
+        when(usuarioMapper.toUnidadeDto(pai)).thenReturn(UnidadeDto.builder().codigo(1L).sigla("PAI").subunidades(new ArrayList<>()).build());
+        when(usuarioMapper.toUnidadeDto(filho)).thenReturn(UnidadeDto.builder().codigo(2L).sigla("FILHO").subunidades(new ArrayList<>()).build());
+        
+        // Act
+        List<UnidadeDto> res = service.buscarTodasUnidades();
+        
+        // Assert
+        assertThat(res).hasSize(1); // Somente o pai na raiz
+        UnidadeDto paiDto = res.get(0);
+        assertThat(paiDto.getSigla()).isEqualTo("PAI");
+        assertThat(paiDto.getSubunidades()).hasSize(1);
+        assertThat(paiDto.getSubunidades().get(0).getSigla()).isEqualTo("FILHO");
     }
 }

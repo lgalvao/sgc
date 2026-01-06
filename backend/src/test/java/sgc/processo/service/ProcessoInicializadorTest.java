@@ -184,4 +184,21 @@ class ProcessoInicializadorTest {
         assertThat(erros).isEmpty();
         verify(subprocessoFactory).criarParaDiagnostico(eq(p), any(), any());
     }
+
+    @Test
+    @DisplayName("Iniciar falha se unidade participante não for encontrada")
+    void iniciarFalhaUnidadeNaoEncontrada() {
+        Processo p = new Processo();
+        p.setSituacao(SituacaoProcesso.CRIADO);
+        p.setTipo(TipoProcesso.REVISAO);
+
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        UnidadeMapa um = new UnidadeMapa();
+        um.setUnidadeCodigo(99L);
+        when(unidadeMapaRepo.findAllById(any())).thenReturn(List.of(um));
+        when(unidadeRepo.findAllById(any())).thenReturn(List.of()); // Retorna vazio
+
+        assertThatThrownBy(() -> inicializador.iniciar(1L, List.of(99L)))
+                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
+    }
 }

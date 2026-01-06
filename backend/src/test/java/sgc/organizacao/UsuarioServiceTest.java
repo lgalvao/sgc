@@ -176,6 +176,14 @@ class UsuarioServiceTest {
         }
 
         @Test
+        @DisplayName("Deve buscar usuários por unidade de lotação")
+        void deveBuscarPorUnidadeLotacao() {
+            // Unidade 2 tem usuários no data.sql
+            List<UsuarioDto> res = usuarioService.buscarUsuariosPorUnidade(2L);
+            assertFalse(res.isEmpty());
+        }
+
+        @Test
         @DisplayName("Deve retornar vazio ao buscar unidade inexistente por código ou sigla")
         void deveRetornarVazioAoBuscarUnidadeInexistente() {
             assertTrue(usuarioService.buscarUnidadePorCodigo(9999L).isEmpty());

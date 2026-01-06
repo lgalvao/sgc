@@ -81,6 +81,29 @@ class SubprocessoDetalheServiceTest {
     }
 
     @Test
+    @DisplayName("Deve listar atividades com conhecimentos")
+    void deveListarAtividadesComConhecimentos() {
+        Subprocesso sp = new Subprocesso();
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
+        sp.setMapa(mapa);
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+
+        Atividade ativ = new Atividade();
+        ativ.setDescricao("Test");
+        Conhecimento c = new Conhecimento();
+        c.setCodigo(1L);
+        c.setDescricao("K1");
+        ativ.setConhecimentos(List.of(c));
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(ativ));
+
+        List<AtividadeVisualizacaoDto> result = service.listarAtividadesSubprocesso(1L);
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getConhecimentos()).hasSize(1);
+        assertThat(result.get(0).getConhecimentos().get(0).getDescricao()).isEqualTo("K1");
+    }
+
+    @Test
     @DisplayName("Deve retornar vazio ao listar atividades se mapa null")
     void deveRetornarVazioSeMapaNull() {
         Subprocesso sp = new Subprocesso();

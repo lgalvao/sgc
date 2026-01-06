@@ -114,10 +114,8 @@ public class SubprocessoDetalheService {
                     Unidade unidadeUsuario = a.getUnidade();
                     if (perfil == Perfil.GESTOR) {
                         return isMesmaUnidadeOuSubordinada(unidadeAlvo, unidadeUsuario);
-                    } else if (perfil == Perfil.CHEFE || perfil == Perfil.SERVIDOR) {
-                        return unidadeAlvo.getCodigo().equals(unidadeUsuario.getCodigo());
                     }
-                    return false;
+                    return unidadeAlvo.getCodigo().equals(unidadeUsuario.getCodigo());
                 });
         if (!hasPermission) throw new ErroAccessoNegado("Usuário sem permissão para visualizar este subprocesso.");
     }

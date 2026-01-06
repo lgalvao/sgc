@@ -160,4 +160,49 @@ class ProcessoDetalheBuilderTest {
         assertThat(dto.getUnidades().get(0).getSigla()).isEqualTo("A");
         assertThat(dto.getUnidades().get(1).getSigla()).isEqualTo("B");
     }
+
+    @Test
+    @DisplayName("Deve construir DTO com hierarquia de participantes")
+    void deveConstruirDtoComHierarquiaParticipantes() {
+        // Arrange
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+
+        Unidade pai = new Unidade();
+        pai.setCodigo(1L);
+        pai.setSigla("PAI");
+
+        Unidade filho = new Unidade();
+        filho.setCodigo(2L);
+        filho.setSigla("FILHO");
+        filho.setUnidadeSuperior(pai);
+
+        processo.setParticipantes(Set.of(pai, filho));
+
+        Subprocesso spPai = new Subprocesso();
+        spPai.setUnidade(pai);
+        spPai.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
+        spPai.setMapa(new sgc.mapa.model.Mapa());
+        spPai.getMapa().setCodigo(100L);
+
+        Subprocesso spFilho = new Subprocesso();
+        spFilho.setUnidade(filho);
+        spFilho.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
+
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(spPai, spFilho));
+
+        SecurityContextHolder.setContext(mock(SecurityContext.class));
+
+        // Act
+        ProcessoDetalheDto dto = builder.build(processo);
+
+        // Assert
+        assertThat(dto.getUnidades()).hasSize(1); // Somente o pai na raiz
+        ProcessoDetalheDto.UnidadeParticipanteDto paiDto = dto.getUnidades().get(0);
+        assertThat(paiDto.getMapaCodigo()).isEqualTo(100L);
+        assertThat(paiDto.getFilhos()).hasSize(1);
+        assertThat(paiDto.getFilhos().get(0).getSigla()).isEqualTo("FILHO");
+    }
 }
