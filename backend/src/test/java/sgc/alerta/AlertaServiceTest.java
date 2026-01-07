@@ -11,7 +11,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.dto.AlertaMapper;
-import sgc.alerta.model.*;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.AlertaRepo;
+import sgc.alerta.model.AlertaUsuario;
+import sgc.alerta.model.AlertaUsuarioRepo;
+import sgc.organizacao.UnidadeService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
@@ -28,18 +32,31 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes Unitários: AlertaService")
 class AlertaServiceTest {
-
     @Mock
     private AlertaRepo alertaRepo;
+
     @Mock
     private AlertaUsuarioRepo alertaUsuarioRepo;
+
     @Mock
     private UsuarioService usuarioService;
+
     @Mock
     private AlertaMapper alertaMapper;
 
+    @Mock
+    private UnidadeService unidadeService;
+
     @InjectMocks
     private AlertaService service;
+
+    private Unidade criarSedocMock() {
+        Unidade sedoc = new Unidade();
+        sedoc.setCodigo(15L);
+        sedoc.setSigla("SEDOC");
+        when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(sedoc);
+        return sedoc;
+    }
 
     @Nested
     @DisplayName("Método: criarAlerta")
@@ -48,6 +65,7 @@ class AlertaServiceTest {
         @DisplayName("Deve criar alerta com sucesso")
         void deveCriarAlertaComSucesso() {
             // Given
+            criarSedocMock();
             Processo p = new Processo();
             Unidade u = new Unidade();
             u.setCodigo(1L);
@@ -55,8 +73,7 @@ class AlertaServiceTest {
             when(alertaRepo.save(any())).thenReturn(new Alerta().setCodigo(100L));
 
             // When
-            Alerta resultado = service.criarAlerta(
-                    p, TipoAlerta.CADASTRO_DISPONIBILIZADO, u, "desc");
+            Alerta resultado = service.criarAlertaSedoc(p, u, "desc");
 
             // Then
             assertThat(resultado).isNotNull();
@@ -71,6 +88,7 @@ class AlertaServiceTest {
         @DisplayName("Deve criar alerta operacional com texto fixo")
         void deveCriarAlertaOperacional() {
             // Given
+            criarSedocMock();
             Processo p = new Processo();
             p.setDescricao("Proc");
             Unidade u = new Unidade();
@@ -90,6 +108,7 @@ class AlertaServiceTest {
         @DisplayName("Deve criar alerta para unidade participante e seus ancestrais")
         void deveCriarAlertaParaAncestrais() {
             // Given
+            criarSedocMock();
             Processo p = new Processo();
             
             Unidade root = Unidade.builder().nome("Root").tipo(TipoUnidade.INTEROPERACIONAL).build();
@@ -110,7 +129,7 @@ class AlertaServiceTest {
                     && a.getUnidadeDestino().getCodigo().equals(2L)));
             
             // 1 alerta intermediário para o pai (root)
-            verify(alertaRepo).save(argThat(a -> "Início do processo em unidade(s) subordinada(s)".equals(a.getDescricao()) 
+            verify(alertaRepo).save(argThat(a -> "Início do processo em unidades subordinadas".equals(a.getDescricao()) 
                     && a.getUnidadeDestino().getCodigo().equals(1L)));
         }
 
@@ -118,6 +137,7 @@ class AlertaServiceTest {
         @DisplayName("Deve criar 2 alertas para interoperacional participante")
         void deveCriarDoisAlertasInteroperacional() {
             // Given
+            criarSedocMock();
             Processo p = new Processo();
             Unidade u = Unidade.builder().tipo(TipoUnidade.INTEROPERACIONAL).build();
             u.setCodigo(1L);
@@ -159,6 +179,7 @@ class AlertaServiceTest {
         @DisplayName("Deve criar alerta de cadastro devolvido com sucesso")
         void deveCriarAlertaCadastroDevolvido() {
             // Given
+            criarSedocMock();
             Processo p = new Processo();
             p.setDescricao("P");
             Unidade uDestino = new Unidade();
@@ -198,6 +219,7 @@ class AlertaServiceTest {
         @Test
         @DisplayName("Deve criar alerta de alteração de data limite")
         void deveCriarAlertaAlteracaoDataLimite() {
+            criarSedocMock();
             Processo p = new Processo();
             Unidade uDestino = new Unidade();
             when(alertaRepo.save(any())).thenReturn(new Alerta());
@@ -209,6 +231,7 @@ class AlertaServiceTest {
         @Test
         @DisplayName("Deve criar alertas de reabertura")
         void deveCriarAlertasDeReabertura() {
+            criarSedocMock();
             Processo p = new Processo();
             Unidade u = new Unidade();
             u.setSigla("U1");
@@ -216,35 +239,12 @@ class AlertaServiceTest {
 
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
-            service.criarAlertaReaberturaCadastro(p, u, "just");
-            service.criarAlertaReaberturaCadastroSuperior(p, sup, u, "just");
-            service.criarAlertaReaberturaRevisao(p, u, "just");
-            service.criarAlertaReaberturaRevisaoSuperior(p, sup, u, "just");
+            service.criarAlertaReaberturaCadastro(p, u);
+            service.criarAlertaReaberturaCadastroSuperior(p, sup, u);
+            service.criarAlertaReaberturaRevisao(p, u);
+            service.criarAlertaReaberturaRevisaoSuperior(p, sup, u);
 
             verify(alertaRepo, times(4)).save(any());
-        }
-    }
-
-    @Nested
-    @DisplayName("Método: marcarComoLido")
-    class MarcarComoLido {
-        @Test
-        @DisplayName("Deve marcar como lido com sucesso")
-        void deveMarcarComoLido() {
-            // Given
-            String user = "123";
-            Long alertaId = 10L;
-            AlertaUsuario au = new AlertaUsuario();
-            au.setDataHoraLeitura(null);
-
-            when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.of(au));
-
-            // When
-            service.marcarComoLido(user, alertaId);
-
-            // Then
-            assertThat(au.getDataHoraLeitura()).isNotNull();
-            verify(alertaUsuarioRepo).save(au);
         }
     }
 
@@ -252,8 +252,8 @@ class AlertaServiceTest {
     @DisplayName("Método: listarAlertasPorUsuario")
     class ListarAlertasPorUsuario {
         @Test
-        @DisplayName("Deve listar e criar AlertaUsuario (lazy creation)")
-        void deveListarECriarAlertaUsuario() {
+        @DisplayName("Deve listar alertas com sucesso")
+        void deveListarAlertas() {
             // Given
             String usuarioTitulo = "123";
             Long codUnidade = 1L;
@@ -268,27 +268,23 @@ class AlertaServiceTest {
             Alerta alerta = new Alerta();
             alerta.setCodigo(100L);
 
-            AlertaUsuario alertaUsuarioCriado = new AlertaUsuario();
-            alertaUsuarioCriado.setAlerta(alerta);
-            alertaUsuarioCriado.setDataHoraLeitura(null);
-
-            when(usuarioService.buscarEntidadePorId(usuarioTitulo)).thenReturn(usuario);
+            when(usuarioService.buscarPorId(usuarioTitulo)).thenReturn(usuario);
             when(alertaRepo.findByUnidadeDestino_Codigo(codUnidade)).thenReturn(List.of(alerta));
-            when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.empty()); // Não existe ainda
-            when(alertaUsuarioRepo.save(any())).thenReturn(alertaUsuarioCriado);
-            when(alertaMapper.toDto(alerta)).thenReturn(AlertaDto.builder().codigo(100L).build());
+            when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.empty());
+            when(alertaMapper.toDto(eq(alerta), any())).thenReturn(AlertaDto.builder().codigo(100L).build());
 
             // When
             List<AlertaDto> resultado = service.listarAlertasPorUsuario(usuarioTitulo);
 
             // Then
             assertThat(resultado).hasSize(1);
-            verify(alertaUsuarioRepo).save(any());
+            // Não deve salvar pois listar agora é somente leitura
+            verify(alertaUsuarioRepo, never()).save(any());
         }
 
         @Test
-        @DisplayName("Deve listar sem criar novo se já existente")
-        void deveListarSemCriarNovo() {
+        @DisplayName("Deve listar com dataHoraLeitura se AlertaUsuario existente")
+        void deveListarComDataHoraLeitura() {
             // Given
             String usuarioTitulo = "123";
             Long codUnidade = 1L;
@@ -307,10 +303,10 @@ class AlertaServiceTest {
             alertaUsuarioExistente.setAlerta(alerta);
             alertaUsuarioExistente.setDataHoraLeitura(LocalDateTime.now());
 
-            when(usuarioService.buscarEntidadePorId(usuarioTitulo)).thenReturn(usuario);
+            when(usuarioService.buscarPorId(usuarioTitulo)).thenReturn(usuario);
             when(alertaRepo.findByUnidadeDestino_Codigo(codUnidade)).thenReturn(List.of(alerta));
             when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.of(alertaUsuarioExistente));
-            when(alertaMapper.toDto(alerta)).thenReturn(AlertaDto.builder().codigo(100L).build());
+            when(alertaMapper.toDto(eq(alerta), any())).thenReturn(AlertaDto.builder().codigo(100L).build());
 
             // When
             List<AlertaDto> resultado = service.listarAlertasPorUsuario(usuarioTitulo);
@@ -325,7 +321,7 @@ class AlertaServiceTest {
         void deveRetornarVazioSeSemLotacao() {
             Usuario u = new Usuario();
             u.setUnidadeLotacao(null);
-            when(usuarioService.buscarEntidadePorId("123")).thenReturn(u);
+            when(usuarioService.buscarPorId("123")).thenReturn(u);
             assertThat(service.listarAlertasPorUsuario("123")).isEmpty();
         }
     }
@@ -334,27 +330,11 @@ class AlertaServiceTest {
     @DisplayName("Listagens Paginadas e Outros")
     class OutrosMetodos {
         @Test
-        @DisplayName("Listar por usuario paginado")
-        void listarPorUsuarioPaginado() {
+        @DisplayName("Listar por unidade paginado")
+        void listarPorUnidadePaginado() {
             Pageable p = Pageable.unpaged();
-            when(alertaRepo.findByUsuarioDestino_TituloEleitoral("123", p)).thenReturn(Page.empty());
-            assertThat(service.listarPorUsuario("123", p)).isEmpty();
-        }
-
-        @Test
-        @DisplayName("Listar por unidades paginado")
-        void listarPorUnidadesPaginado() {
-            Pageable p = Pageable.unpaged();
-            when(alertaRepo.findByUnidadeDestino_CodigoIn(List.of(1L), p)).thenReturn(Page.empty());
-            assertThat(service.listarPorUnidades(List.of(1L), p)).isEmpty();
-        }
-
-        @Test
-        @DisplayName("Listar todos paginado")
-        void listarTodosPaginado() {
-            Pageable p = Pageable.unpaged();
-            when(alertaRepo.findAll(p)).thenReturn(Page.empty());
-            assertThat(service.listarTodos(p)).isEmpty();
+            when(alertaRepo.findByUnidadeDestino_Codigo(1L, p)).thenReturn(Page.empty());
+            assertThat(service.listarPorUnidade(1L, p)).isEmpty();
         }
 
         @Test

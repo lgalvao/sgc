@@ -222,7 +222,7 @@ class AtividadeServiceTest {
             usuario.setTituloEleitoral(titulo);
 
             when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
-            when(usuarioService.buscarEntidadePorId(titulo)).thenReturn(usuario);
+            when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
             when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade());
             when(atividadeRepo.save(any())).thenReturn(new Atividade());
             when(atividadeMapper.toDto(any())).thenReturn(dto);
@@ -252,7 +252,7 @@ class AtividadeServiceTest {
             usuario.setTituloEleitoral(titulo);
 
             when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
-            when(usuarioService.buscarEntidadePorId(titulo)).thenReturn(usuario);
+            when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
 
             assertThatThrownBy(() -> service.criar(dto, titulo))
                     .isInstanceOf(ErroAccessoNegado.class);
@@ -316,7 +316,7 @@ class AtividadeServiceTest {
             Usuario usuario = new Usuario();
 
             when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
-            when(usuarioService.buscarEntidadePorId(titulo)).thenReturn(usuario);
+            when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
 
             assertThatThrownBy(() -> service.criar(dto, titulo))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)

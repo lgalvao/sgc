@@ -38,23 +38,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AnaliseControllerTest {
     private static final String OBSERVACAO_1 = "Observação 1";
     private static final String OBSERVACAO_2 = "Observação 2";
-    private static final String API_SUBPROCESSOS_1_ANALISES_CADASTRO =
-            "/api/subprocessos/1/analises-cadastro";
-    private static final String DEVE_RETORNAR_404_NOT_FOUND =
-            "Deve retornar 404 Not Found quando subprocesso não encontrado";
+    private static final String API_SUBPROCESSOS_1_ANALISES_CADASTRO = "/api/subprocessos/1/analises-cadastro";
+    private static final String DEVE_RETORNAR_404_NOT_FOUND = "Deve retornar 404 Not Found quando subprocesso não encontrado";
     private static final String SUBPROCESSO_NAO_ENCONTRADO = "Subprocesso não encontrado";
-    private static final String API_SUBPROCESSOS_99_ANALISES_CADASTRO =
-            "/api/subprocessos/99/analises-cadastro";
+    private static final String API_SUBPROCESSOS_99_ANALISES_CADASTRO = "/api/subprocessos/99/analises-cadastro";
     private static final String ERRO_INESPERADO = "Erro inesperado";
     private static final String MESSAGE_JSON_PATH = "$.message";
     private static final String OCORREU_UM_ERRO_INESPERADO = "Erro inesperado";
     private static final String NOVA_ANALISE_DE_CADASTRO = "Nova análise de cadastro";
     private static final String ANALISE_DE_CADASTRO = "Análise de cadastro";
     private static final String ANALISE_INVALIDA = "Análise inválida";
-    private static final String API_SUBPROCESSOS_1_ANALISES_VALIDACAO =
-            "/api/subprocessos/1/analises-validacao";
-    private static final String API_SUBPROCESSOS_99_ANALISES_VALIDACAO =
-            "/api/subprocessos/99/analises-validacao";
+    private static final String API_SUBPROCESSOS_1_ANALISES_VALIDACAO = "/api/subprocessos/1/analises-validacao";
+    private static final String API_SUBPROCESSOS_99_ANALISES_VALIDACAO = "/api/subprocessos/99/analises-validacao";
     private static final String NOVA_ANALISE_DE_VALIDACAO = "Nova análise de validação";
     private static final String ANALISE_DE_VALIDACAO = "Análise de validação";
 

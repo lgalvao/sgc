@@ -1,9 +1,6 @@
 package sgc.analise.model;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,10 +15,6 @@ public interface AnaliseRepo extends JpaRepository<Analise, Long> {
      *
      * @param codSubprocesso O código do subprocesso.
      */
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("DELETE FROM Analise a WHERE a.subprocesso.codigo = :codSubprocesso")
-    void deleteBySubprocessoCodigo(@Param("codSubprocesso") Long codSubprocesso);
-
     /**
      * Busca todas as análises de um subprocesso, ordenadas pela data e hora em ordem decrescente.
      *

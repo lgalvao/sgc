@@ -115,7 +115,7 @@ public class UnidadeService {
                                                         + codUnidade
                                                         + " não encontrada"));
 
-        Usuario usuario = usuarioService.buscarEntidadePorId(request.tituloEleitoralUsuario());
+        Usuario usuario = usuarioService.buscarPorId(request.tituloEleitoralUsuario());
 
         // Valida se o usuário pertence à unidade (simplificado, poderia ser mais rigoroso)
         // Se a unidade não for a mesma e nem superior/subordinada, talvez devesse bloquear?

@@ -11,11 +11,18 @@ vi.mock('vue-router', () => ({
 describe('SubprocessoCards.vue', () => {
     const defaultProps = {
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: { id: 1 },
+        mapa: { codigo: 1 } as any,
         permissoes: {
             podeEditarMapa: true,
             podeVisualizarMapa: true,
-            podeVisualizarDiagnostico: false
+            podeVisualizarDiagnostico: false,
+            podeVerPagina: true,
+            podeDisponibilizarCadastro: false,
+            podeDevolverCadastro: false,
+            podeAceitarCadastro: false,
+            podeVisualizarImpacto: false,
+            podeAlterarDataLimite: false,
+            podeRealizarAutoavaliacao: false
         },
         codSubprocesso: 100,
         codProcesso: 1,
@@ -92,7 +99,7 @@ describe('SubprocessoCards.vue', () => {
             props: {
                 ...defaultProps,
                 tipoProcesso: TipoProcesso.DIAGNOSTICO,
-                permissoes: { podeVisualizarDiagnostico: true }
+                permissoes: { ...defaultProps.permissoes, podeVisualizarDiagnostico: true }
             },
             global: {
                 stubs: {

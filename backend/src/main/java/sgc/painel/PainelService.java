@@ -110,15 +110,13 @@ public class PainelService {
         }
 
         Page<Alerta> alertasPage;
-    
-        if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
-            alertasPage = alertaService.listarPorUsuario(usuarioTitulo, sortedPageable);
-        } else if (codigoUnidade != null) {
-            List<Long> unidadeIds = new ArrayList<>(unidadeService.buscarIdsDescendentes(codigoUnidade));
-            unidadeIds.add(codigoUnidade);
-            alertasPage = alertaService.listarPorUnidades(unidadeIds, sortedPageable);
+
+        if (codigoUnidade != null) {
+            // Alertas são filtrados pela unidade do usuário (sem subordinadas)
+            alertasPage = alertaService.listarPorUnidade(codigoUnidade, sortedPageable);
         } else {
-            alertasPage = alertaService.listarTodos(sortedPageable);
+            // Sem unidade, retorna vazio
+            return Page.empty(sortedPageable);
         }
 
         return alertasPage.map(

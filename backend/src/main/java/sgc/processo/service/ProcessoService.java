@@ -337,7 +337,7 @@ public class ProcessoService {
         String descricao = "Lembrete: Prazo do processo %s encerra em %s"
                 .formatted(processo.getDescricao(), dataLimite);
 
-        alertaService.criarAlerta(processo, sgc.alerta.model.TipoAlerta.PRAZO_EXPIRANDO, unidade, descricao);
+        alertaService.criarAlertaSedoc(processo, unidade, descricao);
     }
 
     // ========== MÉTODOS PRIVADOS DE VALIDAÇÃO (usados apenas em criar/atualizar) ==========

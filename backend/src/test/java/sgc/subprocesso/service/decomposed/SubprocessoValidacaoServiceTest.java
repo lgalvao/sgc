@@ -52,12 +52,12 @@ class SubprocessoValidacaoServiceTest {
         usuario.setTituloEleitoral("123");
 
         when(crudService.obterEntidadePorCodigoMapa(1L)).thenReturn(sp);
-        when(usuarioService.buscarUsuarioPorLogin("123")).thenReturn(usuario);
+        when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
 
         service.validarPermissaoEdicaoMapa(1L, "123");
 
         verify(crudService).obterEntidadePorCodigoMapa(1L);
-        verify(usuarioService).buscarUsuarioPorLogin("123");
+        verify(usuarioService).buscarPorLogin("123");
     }
 
     @Test
@@ -82,7 +82,7 @@ class SubprocessoValidacaoServiceTest {
         usuario.setTituloEleitoral("123");
 
         when(crudService.obterEntidadePorCodigoMapa(1L)).thenReturn(sp);
-        when(usuarioService.buscarUsuarioPorLogin("123")).thenReturn(usuario);
+        when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
 
         assertThatThrownBy(() -> service.validarPermissaoEdicaoMapa(1L, "123"))
                 .isInstanceOf(ErroAccessoNegado.class);
@@ -99,7 +99,7 @@ class SubprocessoValidacaoServiceTest {
         usuario.setTituloEleitoral("123");
 
         when(crudService.obterEntidadePorCodigoMapa(1L)).thenReturn(sp);
-        when(usuarioService.buscarUsuarioPorLogin("123")).thenReturn(usuario);
+        when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
 
         assertThatThrownBy(() -> service.validarPermissaoEdicaoMapa(1L, "123"))
                 .isInstanceOf(ErroAccessoNegado.class);

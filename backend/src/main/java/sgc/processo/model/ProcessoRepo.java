@@ -22,8 +22,6 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
 
     List<Processo> findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso situacao);
 
-    Page<Processo> findDistinctByParticipantes_CodigoIn(List<Long> codigos, Pageable pageable);
-
     Page<Processo> findDistinctByParticipantes_CodigoInAndSituacaoNot(
             List<Long> codigos, SituacaoProcesso situacao, Pageable pageable);
 

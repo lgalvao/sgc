@@ -7,9 +7,10 @@ import sgc.alerta.model.Alerta;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+/**
+ * Mapper para conversão entre Alerta (entidade) e AlertaDto.
+ */
 @Mapper(componentModel = "spring")
 public abstract class AlertaMapper {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
@@ -24,17 +25,28 @@ public abstract class AlertaMapper {
     @Mapping(target = "dataHoraLeitura", ignore = true)
     public abstract AlertaDto toDto(Alerta alerta);
 
+    /**
+     * Converte Alerta para DTO incluindo a data/hora de leitura do usuário.
+     */
+    public AlertaDto toDto(Alerta alerta, LocalDateTime dataHoraLeitura) {
+        AlertaDto dto = toDto(alerta);
+        return AlertaDto.builder()
+                .codigo(dto.getCodigo())
+                .codProcesso(dto.getCodProcesso())
+                .unidadeOrigem(dto.getUnidadeOrigem())
+                .unidadeDestino(dto.getUnidadeDestino())
+                .descricao(dto.getDescricao())
+                .dataHora(dto.getDataHora())
+                .dataHoraLeitura(dataHoraLeitura)
+                .mensagem(dto.getMensagem())
+                .dataHoraFormatada(dto.getDataHoraFormatada())
+                .processo(dto.getProcesso())
+                .origem(dto.getOrigem())
+                .build();
+    }
+
     @Named("formatDataHora")
     protected String formatDataHora(LocalDateTime dataHora) {
         return dataHora == null ? "" : dataHora.format(FORMATTER);
-    }
-
-    @Named("extractProcessoName")
-    protected String extractProcessoName(String descricao) {
-        if (descricao == null) return "";
-
-        Pattern pattern = Pattern.compile(".*processo '(.*?)'.*");
-        Matcher matcher = pattern.matcher(descricao);
-        return matcher.find() ? matcher.group(1) : "";
     }
 }

@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @Import(TestSecurityConfig.class)
 @DisplayName("CDU-01: Realizar Login")
-public class CDU01IntegrationTest extends BaseIntegrationTest {
+class CDU01IntegrationTest extends BaseIntegrationTest {
     private static final String BASE_URL = "/api/usuarios";
 
     @Autowired
@@ -63,7 +63,9 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
         // Reset sequences to avoid conflicts
         try {
             jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 10000");
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) { 
+            // Nada a fazer
+        }
 
         // Setup Unidade Admin
         unidadeAdmin = UnidadeFixture.unidadePadrao();
@@ -134,7 +136,7 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
                                     .content(tituloEleitoral))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$[0].perfil").value("ADMIN"))
-                    .andExpect(jsonPath("$[0].siglaUnidade").value(unidadeAdmin.getSigla()));
+                    .andExpect(jsonPath("$[0].unidade.sigla").value(unidadeAdmin.getSigla()));
 
             // Act & Assert: Etapa 3 - Entrar
             EntrarReq entrarReq = EntrarReq.builder()

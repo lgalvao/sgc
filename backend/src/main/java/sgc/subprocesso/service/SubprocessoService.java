@@ -192,6 +192,6 @@ public class SubprocessoService {
             throw new ErroAccessoNegado("Usuário não autenticado.");
         }
         String username = authentication.getName();
-        return usuarioService.buscarUsuarioPorLogin(username);
+        return usuarioService.buscarPorLogin(username);
     }
 }

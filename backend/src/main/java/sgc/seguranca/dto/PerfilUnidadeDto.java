@@ -12,8 +12,4 @@ import sgc.organizacao.model.Perfil;
 public class PerfilUnidadeDto {
     private Perfil perfil;
     private UnidadeDto unidade;
-
-    public String getSiglaUnidade() {
-        return unidade.getSigla();
-    }
 }

@@ -70,7 +70,7 @@ public class SubprocessoCadastroController {
             @PathVariable("codigo") Long codSubprocesso,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         List<Atividade> faltando =
                 subprocessoService.obterAtividadesSemConhecimento(codSubprocesso);
         if (faltando != null && !faltando.isEmpty()) {
@@ -111,7 +111,7 @@ public class SubprocessoCadastroController {
     public ResponseEntity<RespostaDto> disponibilizarRevisao(
             @PathVariable Long codigo, @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(codigo);
         if (faltando != null && !faltando.isEmpty()) {
             var lista = faltando.stream()
@@ -157,7 +157,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.devolverCadastro(codigo, sanitizedObservacoes, usuario);
@@ -179,7 +179,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.aceitarCadastro(codigo, sanitizedObservacoes, usuario);
@@ -201,7 +201,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.homologarCadastro(codigo, sanitizedObservacoes, usuario);
@@ -222,7 +222,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.devolverRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
@@ -242,7 +242,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.aceitarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
@@ -264,7 +264,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.homologarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
@@ -300,7 +300,7 @@ public class SubprocessoCadastroController {
                                        @RequestBody @Valid ProcessarEmBlocoRequest request,
                                        @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         subprocessoWorkflowService.aceitarCadastroEmBloco(request.getUnidadeCodigos(), codigo, usuario);
     }
 
@@ -315,7 +315,7 @@ public class SubprocessoCadastroController {
                                          @RequestBody @Valid ProcessarEmBlocoRequest request,
                                          @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         subprocessoWorkflowService.homologarCadastroEmBloco(request.getUnidadeCodigos(), codigo, usuario);
     }
 

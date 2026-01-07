@@ -118,8 +118,7 @@ tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    finalizedBy(tasks.jacocoTestReport) // Relatório é gerado após os testes
-
+    
     testLogging {
         events(TestLogEvent.SKIPPED, TestLogEvent.FAILED)
         exceptionFormat = TestExceptionFormat.FULL
@@ -171,14 +170,41 @@ tasks.withType<Test> {
     }
 }
 
+tasks.named<Test>("test") {
+    // Padrão: Executa TUDO (sem filtros)
+    description = "Executa TODOS os testes (Unitários e Integração)."
+}
+
+tasks.register<Test>("unitTest") {
+    description = "Executa APENAS testes unitários (exclui tag 'integration')."
+    group = "verification"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform {
+        excludeTags("integration")
+    }
+}
+
+tasks.register<Test>("integrationTest") {
+    description = "Executa APENAS testes de integração (tag 'integration')."
+    group = "verification"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform {
+        includeTags("integration")
+    }
+}
+
 tasks.jacocoTestReport {
-    dependsOn(tasks.test)
+    // Relatório consome dados de qualquer tarefa de teste que rodou
+    executionData.setFrom(fileTree(layout.buildDirectory.get().asFile).include("/jacoco/*.exec"))
+    
     reports {
         xml.required.set(true)
         csv.required.set(true)
         html.required.set(true)
     }
-
+    
     classDirectories.setFrom(
         files(classDirectories.files.map {
             fileTree(it) {
@@ -196,6 +222,7 @@ tasks.jacocoTestReport {
         })
     )
 }
+
 
 tasks.jacocoTestCoverageVerification {
     violationRules {

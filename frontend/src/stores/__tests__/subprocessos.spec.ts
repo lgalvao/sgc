@@ -259,15 +259,15 @@ describe('Subprocessos Store', () => {
         // --- Devolver Cadastro ---
         it('devolverCadastro deve executar com sucesso', async () => {
             (devolverCadastro as any).mockResolvedValue({});
-            const result = await store.devolverCadastro(1, { motivo: 'Erro' });
+            const result = await store.devolverCadastro(1, { observacoes: 'Erro' });
             expect(result).toBe(true);
-            expect(devolverCadastro).toHaveBeenCalledWith(1, { motivo: 'Erro' });
+            expect(devolverCadastro).toHaveBeenCalledWith(1, { observacoes: 'Erro' });
             expect(mockFeedbackStore.show).toHaveBeenCalledWith(expect.stringContaining("Cadastro"), expect.anything(), 'success');
         });
 
          it('devolverCadastro deve lidar com erro', async () => {
              (devolverCadastro as any).mockRejectedValue(new Error('Falha'));
-             const result = await store.devolverCadastro(1, { motivo: 'Erro' });
+             const result = await store.devolverCadastro(1, { observacoes: 'Erro' });
              expect(result).toBe(false);
              expect(store.lastError).toBeTruthy();
         });
@@ -308,14 +308,14 @@ describe('Subprocessos Store', () => {
          // --- Devolver Revisão ---
          it('devolverRevisaoCadastro deve executar com sucesso', async () => {
             (devolverRevisaoCadastro as any).mockResolvedValue({});
-            const result = await store.devolverRevisaoCadastro(1, { motivo: 'Erro' });
+            const result = await store.devolverRevisaoCadastro(1, { observacoes: 'Erro' });
             expect(result).toBe(true);
-            expect(devolverRevisaoCadastro).toHaveBeenCalledWith(1, { motivo: 'Erro' });
+            expect(devolverRevisaoCadastro).toHaveBeenCalledWith(1, { observacoes: 'Erro' });
         });
 
          it('devolverRevisaoCadastro deve lidar com erro', async () => {
              (devolverRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
-             const result = await store.devolverRevisaoCadastro(1, { motivo: 'Erro' });
+             const result = await store.devolverRevisaoCadastro(1, { observacoes: 'Erro' });
              expect(result).toBe(false);
         });
 

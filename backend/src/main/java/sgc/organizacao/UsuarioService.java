@@ -1,7 +1,6 @@
 package sgc.organizacao;
 
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -18,6 +17,7 @@ import sgc.seguranca.autenticacao.AcessoAdClient;
 import sgc.seguranca.dto.EntrarReq;
 import sgc.seguranca.dto.PerfilUnidadeDto;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,13 +50,13 @@ public class UsuarioService {
         return usuario;
     }
 
-    @Autowired
     public UsuarioService(UsuarioRepo usuarioRepo,
-                       UsuarioPerfilRepo usuarioPerfilRepo,
-                       AdministradorRepo administradorRepo,
-                       GerenciadorJwt gerenciadorJwt,
-                       @Autowired(required = false) AcessoAdClient acessoAdClient,
-                       @Lazy UnidadeService unidadeService) {
+                          UsuarioPerfilRepo usuarioPerfilRepo,
+                          AdministradorRepo administradorRepo,
+                          GerenciadorJwt gerenciadorJwt,
+                          @Autowired(required = false) AcessoAdClient acessoAdClient,
+                          @Lazy UnidadeService unidadeService) {
+
         this.usuarioRepo = usuarioRepo;
         this.usuarioPerfilRepo = usuarioPerfilRepo;
         this.administradorRepo = administradorRepo;
@@ -76,14 +76,14 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public Usuario buscarEntidadePorId(String titulo) {
+    public Usuario buscarPorId(String titulo) {
         return usuarioRepo
                 .findById(titulo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", titulo));
     }
 
     @Transactional(readOnly = true)
-    public Usuario buscarUsuarioPorLogin(String login) {
+    public Usuario buscarPorLogin(String login) {
         Usuario usuario = usuarioRepo
                 .findByIdWithAtribuicoes(login)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", login));
@@ -93,7 +93,7 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public Usuario buscarResponsavelVigente(String sigla) {
+    public Usuario buscarResponsavelAtual(String sigla) {
         UnidadeDto unidadeDto = unidadeService.buscarPorSigla(sigla);
 
         // Primeiro busca o chefe (pode ser lazy)
@@ -104,7 +104,7 @@ public class UsuarioService {
         // Recarrega com join fetch para garantir as atribuições
         Usuario usuarioCompleto = usuarioRepo.findByIdWithAtribuicoes(usuarioSimples.getTituloEleitoral())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", usuarioSimples.getTituloEleitoral()));
-        
+
         carregarAtribuicoes(usuarioCompleto);
         return usuarioCompleto;
     }
@@ -128,22 +128,22 @@ public class UsuarioService {
 
     private void carregarAtribuicoesEmLote(List<Usuario> usuarios) {
         if (usuarios.isEmpty()) return;
-        
+
         List<String> titulos = usuarios.stream()
-            .map(Usuario::getTituloEleitoral)
-            .toList();
-        
+                .map(Usuario::getTituloEleitoral)
+                .toList();
+
         List<UsuarioPerfil> todasAtribuicoes = usuarioPerfilRepo.findByUsuarioTituloIn(titulos);
-        
+
         Map<String, Set<UsuarioPerfil>> atribuicoesPorUsuario = todasAtribuicoes.stream()
-            .collect(Collectors.groupingBy(
-                UsuarioPerfil::getUsuarioTitulo,
-                Collectors.toSet()
-            ));
-        
+                .collect(Collectors.groupingBy(
+                        UsuarioPerfil::getUsuarioTitulo,
+                        Collectors.toSet()
+                ));
+
         for (Usuario usuario : usuarios) {
             Set<UsuarioPerfil> atribuicoes = atribuicoesPorUsuario
-                .getOrDefault(usuario.getTituloEleitoral(), new java.util.HashSet<>());
+                    .getOrDefault(usuario.getTituloEleitoral(), new java.util.HashSet<>());
             usuario.setAtribuicoes(atribuicoes);
         }
     }
@@ -203,11 +203,11 @@ public class UsuarioService {
 
         // Carrega todos os usuários com atribuições em uma única query (elimina N+1)
         List<String> titulos = todosChefes.stream()
-            .map(Usuario::getTituloEleitoral)
-            .toList();
-        
+                .map(Usuario::getTituloEleitoral)
+                .toList();
+
         List<Usuario> chefesCompletos = usuarioRepo.findByIdInWithAtribuicoes(titulos);
-        
+
         // Carrega perfis em lote
         carregarAtribuicoesEmLote(chefesCompletos);
 
@@ -327,14 +327,8 @@ public class UsuarioService {
         boolean autenticado = false;
         if (acessoAdClient == null) {
             if (ambienteTestes) {
-                // Em ambiente de testes, verifica se o usuário existe no banco
-                // antes de simular autenticação com sucesso
-                boolean usuarioExiste = usuarioRepo.existsById(tituloEleitoral);
-                if (usuarioExiste) {
-                    autenticado = true;
-                } else {
-                    autenticado = false;
-                }
+                // Em ambiente de testes, verifica se o usuário existe no banco antes de simular autenticação com sucesso
+                autenticado = usuarioRepo.existsById(tituloEleitoral);
             } else {
                 log.error("ERRO CRÍTICO DE SEGURANÇA: Tentativa de autenticação sem provedor configurado em ambiente produtivo. Usuário: {}", tituloEleitoral);
                 autenticado = false;
@@ -382,13 +376,10 @@ public class UsuarioService {
                 .toList();
     }
 
-    public void entrar(String tituloEleitoral, @NonNull PerfilUnidadeDto pu) {
-    }
-
     @Transactional(readOnly = true)
-    public String entrar(@NonNull EntrarReq request) {
-        // SENTINEL: Verifica se houve autenticação recente (previne bypass chamando /entrar direto)
-        java.time.LocalDateTime ultimoAcesso = autenticacoesRecentes.get(request.getTituloEleitoral());
+    public String entrar(EntrarReq request) {
+        // Verifica se houve autenticação recente (previne bypass chamando /entrar direto)
+        LocalDateTime ultimoAcesso = autenticacoesRecentes.get(request.getTituloEleitoral());
 
         if (ultimoAcesso == null || ultimoAcesso.isBefore(java.time.LocalDateTime.now().minusMinutes(5))) {
             log.warn("Tentativa de acesso não autorizada (sem login prévio) para usuário {}", request.getTituloEleitoral());
@@ -396,7 +387,6 @@ public class UsuarioService {
         }
 
         Long codUnidade = request.getUnidadeCodigo();
-
         try {
             unidadeService.buscarEntidadePorId(codUnidade);
         } catch (ErroEntidadeNaoEncontrada e) {
@@ -404,28 +394,26 @@ public class UsuarioService {
         }
 
         List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoesInterno(request.getTituloEleitoral());
-        
+
         // Remove a autenticação do cache após usá-la (garante que só pode entrar uma vez por autenticação)
         autenticacoesRecentes.remove(request.getTituloEleitoral());
         boolean autorizado = autorizacoes
                 .stream()
                 .anyMatch(pu -> {
                     Perfil perfil = pu.getPerfil();
-                    return perfil.name().equals(request.getPerfil())
-                            && pu.getUnidade().getCodigo().equals(codUnidade);
+                    Long codigoUnidade = pu.getUnidade().getCodigo();
+                    return perfil.name().equals(request.getPerfil()) && codigoUnidade.equals(codUnidade);
                 });
 
         if (!autorizado) {
             throw new ErroAccessoNegado("Usuário não tem permissão para acessar com perfil e unidade informados.");
         }
 
-        String token = gerenciadorJwt.gerarToken(
+        return gerenciadorJwt.gerarToken(
                 request.getTituloEleitoral(),
                 Perfil.valueOf(request.getPerfil()),
                 codUnidade
         );
-
-        return token;
     }
 
     // ===================== ADMINISTRADORES =====================
@@ -441,7 +429,7 @@ public class UsuarioService {
                     }
                     return toAdministradorDto(usuario);
                 })
-                .filter(dto -> dto != null)
+                .filter(Objects::nonNull)
                 .toList();
     }
 
@@ -449,14 +437,14 @@ public class UsuarioService {
     public AdministradorDto adicionarAdministrador(String usuarioTitulo) {
         Usuario usuario = usuarioRepo.findById(usuarioTitulo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", usuarioTitulo));
-        
+
         if (administradorRepo.existsById(usuarioTitulo)) {
             throw new ErroValidacao("Usuário já é administrador");
         }
-        
+
         Administrador administrador = new Administrador(usuarioTitulo);
         administradorRepo.save(administrador);
-        
+
         log.info("Administrador {} adicionado", usuarioTitulo);
         return toAdministradorDto(usuario);
     }
@@ -464,20 +452,20 @@ public class UsuarioService {
     @Transactional
     public void removerAdministrador(String usuarioTitulo, String usuarioAtualTitulo) {
         log.info("Removendo administrador: {}", usuarioTitulo);
-        
+
         if (!administradorRepo.existsById(usuarioTitulo)) {
             throw new ErroValidacao("Usuário não é administrador");
         }
-        
+
         if (usuarioTitulo.equals(usuarioAtualTitulo)) {
             throw new ErroValidacao("Não é permitido remover a si mesmo como administrador");
         }
-        
+
         long totalAdministradores = administradorRepo.count();
         if (totalAdministradores <= 1) {
             throw new ErroValidacao("Não é permitido remover o único administrador do sistema");
         }
-        
+
         administradorRepo.deleteById(usuarioTitulo);
         log.info("Administrador {} removido com sucesso", usuarioTitulo);
     }

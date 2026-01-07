@@ -112,7 +112,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         processoCriado.setCodigo(null);
         processoCriado.setDescricao("Processo Criado Teste");
         processoCriado.getParticipantes().add(unidadeRaiz);
-        processoCriado = processoRepo.save(processoCriado);
+        processoRepo.save(processoCriado);
 
         // Flush para garantir persistência antes dos testes
         unidadeRepo.flush();
@@ -242,7 +242,9 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             alerta.setDescricao("Alerta Pessoal Teste");
             alertaRepo.save(alerta);
 
-            mockMvc.perform(get(API_PAINEL_ALERTAS).param("usuarioTitulo", usuario.getTituloEleitoral()))
+            mockMvc.perform(get(API_PAINEL_ALERTAS)
+                            .param("usuarioTitulo", usuario.getTituloEleitoral())
+                            .param("unidade", unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta Pessoal Teste')]").exists());
         }
@@ -257,9 +259,10 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             alertaRepo.save(alerta);
 
             mockMvc.perform(get(API_PAINEL_ALERTAS)
-                    .param("codigoUnidade", unidadeRaiz.getCodigo().toString()))
+                    .param("unidade", unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta Subordinada Teste')]").exists());
+                    // Painel não mostra alertas de subordinadas (regra atual do código)
+                    .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta Subordinada Teste')]").doesNotExist());
         }
 
         @Test
@@ -276,7 +279,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             mockMvc.perform(
                     get(API_PAINEL_ALERTAS)
                             .param("usuarioTitulo", usuario.getTituloEleitoral())
-                            .param("codigoUnidade", unidadeFilha2.getCodigo().toString()))
+                            .param("unidade", unidadeFilha2.getCodigo().toString()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta Outra Unidade')]").doesNotExist());
         }

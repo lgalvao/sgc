@@ -4,11 +4,10 @@ import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import sgc.comum.util.FormatadorData;
-import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.Processo;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -27,26 +26,16 @@ public interface ProcessoMapper {
     @Mapping(target = "participantes", ignore = true)
     Processo toEntity(ProcessoDto processoDTO);
 
-    /**
-     * Popula campos formatados após o mapeamento básico.
-     */
     @AfterMapping
-    default void populaCamposFormatados(Processo processo, @MappingTarget ProcessoDto dto) {
-        dto.setDataCriacaoFormatada(FormatadorData.formatarData(processo.getDataCriacao()));
-        dto.setDataFinalizacaoFormatada(
-                FormatadorData.formatarData(processo.getDataFinalizacao()));
-        dto.setDataLimiteFormatada(FormatadorData.formatarData(processo.getDataLimite()));
-        dto.setSituacaoLabel(processo.getSituacao().getLabel());
-        dto.setTipoLabel(processo.getTipo().getLabel());
-
-        if (processo.getParticipantes() != null && !processo.getParticipantes().isEmpty()) {
-            String participantes = processo.getParticipantes().stream()
-                    .map(Unidade::getSigla)
+    default void mapUnidadesParticipantes(Processo processo, @MappingTarget ProcessoDto dto) {
+        if (processo.getParticipantes() != null) {
+            String siglas = processo.getParticipantes().stream()
+                    .map(sgc.organizacao.model.Unidade::getSigla)
+                    .filter(Objects::nonNull)
                     .sorted()
                     .collect(Collectors.joining(", "));
-            dto.setUnidadesParticipantes(participantes);
-        } else {
-            dto.setUnidadesParticipantes(null);
+            dto.setUnidadesParticipantes(siglas);
         }
     }
 }
+

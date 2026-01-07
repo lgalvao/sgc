@@ -318,7 +318,7 @@ class UnidadeServiceTest {
         void deveCriarAtribuicaoTemporariaComSucesso() {
             // Arrange
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
-            when(usuarioService.buscarEntidadePorId("123")).thenReturn(new Usuario());
+            when(usuarioService.buscarPorId("123")).thenReturn(new Usuario());
 
             CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
                     "123", java.time.LocalDate.now(), java.time.LocalDate.now().plusDays(1), "Justificativa");
@@ -334,7 +334,7 @@ class UnidadeServiceTest {
         @DisplayName("Deve falhar ao criar atribuição se datas inválidas")
         void deveFalharCriarAtribuicaoDatasInvalidas() {
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
-            when(usuarioService.buscarEntidadePorId("123")).thenReturn(new Usuario());
+            when(usuarioService.buscarPorId("123")).thenReturn(new Usuario());
 
             CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
                     "123", java.time.LocalDate.now().plusDays(1), java.time.LocalDate.now(), "Justificativa");
@@ -358,7 +358,7 @@ class UnidadeServiceTest {
         @DisplayName("Deve criar atribuição com data atual se dataInicio for nula")
         void deveCriarAtribuicaoComDataAtualSeInicioNulo() {
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
-            when(usuarioService.buscarEntidadePorId("123")).thenReturn(new Usuario());
+            when(usuarioService.buscarPorId("123")).thenReturn(new Usuario());
 
             CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
                     "123", null, java.time.LocalDate.now().plusDays(1), "Justificativa");

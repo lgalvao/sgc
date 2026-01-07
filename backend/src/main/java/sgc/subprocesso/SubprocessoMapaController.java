@@ -80,7 +80,7 @@ public class SubprocessoMapaController {
             throw new sgc.comum.erros.ErroAccessoNegado("Usuário não autenticado");
         }
 
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         return impactoMapaService.verificarImpactos(codigo, usuario);
     }
 

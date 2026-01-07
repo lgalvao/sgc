@@ -165,11 +165,11 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                         "SA-TEST",
                                         Perfil.CHEFE.name())));
 
-        when(usuarioService.buscarUsuarioPorLogin(admin.getTituloEleitoral()))
+        when(usuarioService.buscarPorLogin(admin.getTituloEleitoral()))
                 .thenReturn(admin);
-        when(usuarioService.buscarUsuarioPorLogin(gestor.getTituloEleitoral()))
+        when(usuarioService.buscarPorLogin(gestor.getTituloEleitoral()))
                 .thenReturn(gestor);
-        when(usuarioService.buscarUsuarioPorLogin(chefe.getTituloEleitoral()))
+        when(usuarioService.buscarPorLogin(chefe.getTituloEleitoral()))
                 .thenReturn(chefe);
 
         UsuarioFixture.adicionarPerfil(admin, unidadeAdmin, Perfil.ADMIN);

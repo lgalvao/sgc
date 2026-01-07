@@ -8,13 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Testes Unitários: EntidadeBase")
 class EntidadeBaseTest {
-
-    // Implementação concreta para testar a classe abstrata
     private static class EntidadeTeste extends EntidadeBase {
-        public EntidadeTeste() {
-            super();
-        }
-
         public EntidadeTeste(Long codigo) {
             super(codigo);
         }

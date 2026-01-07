@@ -3,7 +3,6 @@ package sgc.subprocesso.mapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.model.Mapa;
@@ -27,8 +26,15 @@ class SubprocessoMapperTest {
     @Mock private UnidadeRepo unidadeRepo;
     @Mock private MapaRepo mapaRepo;
 
-    @InjectMocks
-    private SubprocessoMapperImpl mapper;
+    private SubprocessoMapper mapper;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setup() {
+        mapper = org.mapstruct.factory.Mappers.getMapper(SubprocessoMapper.class);
+        mapper.processoRepo = processoRepo;
+        mapper.unidadeRepo = unidadeRepo;
+        mapper.mapaRepo = mapaRepo;
+    }
 
     @Test
     @DisplayName("Deve mapear Processo por ID com sucesso")

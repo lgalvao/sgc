@@ -15,7 +15,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.alerta.AlertaService;
-import sgc.alerta.model.TipoAlerta;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.fixture.MapaFixture;
 import sgc.fixture.ProcessoFixture;
@@ -993,7 +992,7 @@ class ProcessoServiceTest {
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
 
             processoService.enviarLembrete(1L, 10L);
-            verify(alertaService).criarAlerta(eq(p), eq(TipoAlerta.PRAZO_EXPIRANDO), eq(u), anyString());
+            verify(alertaService).criarAlertaSedoc(eq(p), eq(u), anyString());
         }
 
         @Test

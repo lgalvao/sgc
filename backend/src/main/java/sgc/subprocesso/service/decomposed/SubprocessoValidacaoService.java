@@ -42,7 +42,7 @@ public class SubprocessoValidacaoService {
             throw new ErroEntidadeNaoEncontrada("Unidade não associada ao Subprocesso %d".formatted(subprocesso.getCodigo()));
         }
 
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         String titularTitulo = subprocesso.getUnidade().getTituloTitular();
 
         if (titularTitulo == null || !titularTitulo.equals(String.valueOf(usuario.getTituloEleitoral()))) {

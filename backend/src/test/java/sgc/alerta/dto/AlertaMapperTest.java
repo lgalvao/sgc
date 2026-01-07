@@ -2,6 +2,7 @@ package sgc.alerta.dto;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import sgc.alerta.model.Alerta;
 
 import java.time.LocalDateTime;
 
@@ -10,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Testes Unitários: AlertaMapper")
 class AlertaMapperTest {
 
-    private final AlertaMapper mapper = new AlertaMapperImpl();
+    private final AlertaMapper mapper = new AlertaMapperStub();
 
     @Test
     @DisplayName("formatDataHora deve retornar string formatada")
@@ -26,29 +27,24 @@ class AlertaMapperTest {
     }
 
     @Test
-    @DisplayName("extractProcessoName deve retornar nome do processo quando padrão casar")
-    void extractProcessoName() {
-        String descricao = "Alteração no processo 'Processo Teste' realizada com sucesso.";
-        assertThat(mapper.extractProcessoName(descricao)).isEqualTo("Processo Teste");
+    @DisplayName("toDto com dataHoraLeitura deve incluir o campo")
+    void toDtoComDataHoraLeitura() {
+        Alerta alerta = new Alerta();
+        alerta.setCodigo(1L);
+        LocalDateTime dataLeitura = LocalDateTime.of(2023, 10, 25, 15, 0, 0);
+        
+        AlertaDto dto = mapper.toDto(alerta, dataLeitura);
+        
+        assertThat(dto.getDataHoraLeitura()).isEqualTo(dataLeitura);
     }
 
-    @Test
-    @DisplayName("extractProcessoName deve retornar string vazia se descrição for nula")
-    void extractProcessoNameNull() {
-        assertThat(mapper.extractProcessoName(null)).isEmpty();
-    }
-
-    @Test
-    @DisplayName("extractProcessoName deve retornar string vazia se padrão não casar")
-    void extractProcessoNameSemMatch() {
-        String descricao = "Descrição sem nome de processo entre aspas simples.";
-        assertThat(mapper.extractProcessoName(descricao)).isEmpty();
-    }
-
-    static class AlertaMapperImpl extends AlertaMapper {
+    static class AlertaMapperStub extends AlertaMapper {
         @Override
-        public AlertaDto toDto(sgc.alerta.model.Alerta alerta) {
-            return null; // Note: MapStruct generates the real implementation
+        public AlertaDto toDto(Alerta alerta) {
+            if (alerta == null) return null;
+            return AlertaDto.builder()
+                    .codigo(alerta.getCodigo())
+                    .build();
         }
     }
 }

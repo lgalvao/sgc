@@ -149,7 +149,7 @@ class UsuarioControllerTest {
         usuario.setNome("Admin User");
         
         when(usuarioService.entrar(any(EntrarReq.class))).thenReturn("token-jwt");
-        when(usuarioService.buscarUsuarioPorLogin("123")).thenReturn(usuario);
+        when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
 
         mockMvc.perform(post("/api/usuarios/entrar")
                 .with(csrf())

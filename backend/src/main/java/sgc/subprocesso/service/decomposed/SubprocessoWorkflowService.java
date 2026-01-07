@@ -126,16 +126,16 @@ public class SubprocessoWorkflowService {
     private void enviarAlertasReabertura(Subprocesso sp, String justificativa, boolean isRevisao) {
         try {
             if (isRevisao) {
-                 alertaService.criarAlertaReaberturaRevisao(sp.getProcesso(), sp.getUnidade(), justificativa);
+                 alertaService.criarAlertaReaberturaRevisao(sp.getProcesso(), sp.getUnidade());
             } else {
-                 alertaService.criarAlertaReaberturaCadastro(sp.getProcesso(), sp.getUnidade(), justificativa);
+                 alertaService.criarAlertaReaberturaCadastro(sp.getProcesso(), sp.getUnidade());
             }
             Unidade superior = sp.getUnidade().getUnidadeSuperior();
             while (superior != null) {
                 if (isRevisao) {
-                    alertaService.criarAlertaReaberturaRevisaoSuperior(sp.getProcesso(), superior, sp.getUnidade(), justificativa);
+                    alertaService.criarAlertaReaberturaRevisaoSuperior(sp.getProcesso(), superior, sp.getUnidade());
                 } else {
-                    alertaService.criarAlertaReaberturaCadastroSuperior(sp.getProcesso(), superior, sp.getUnidade(), justificativa);
+                    alertaService.criarAlertaReaberturaCadastroSuperior(sp.getProcesso(), superior, sp.getUnidade());
                 }
                 superior = superior.getUnidadeSuperior();
             }

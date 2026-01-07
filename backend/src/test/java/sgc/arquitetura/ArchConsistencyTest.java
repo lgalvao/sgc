@@ -2,6 +2,7 @@ package sgc.arquitetura;
 
 import com.tngtech.archunit.core.domain.Dependency;
 import com.tngtech.archunit.core.domain.JavaClass;
+import com.tngtech.archunit.core.domain.JavaPackage;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
@@ -9,6 +10,7 @@ import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
+import org.jspecify.annotations.NullMarked;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
@@ -96,4 +98,26 @@ public class ArchConsistencyTest {
                             return parts[1];
                         }
                     });
+
+    @ArchTest
+    static final ArchRule controllers_e_services_devem_estar_em_pacotes_null_marked =
+            classes()
+                    .that().haveSimpleNameEndingWith("Controller")
+                    .or().haveSimpleNameEndingWith("Service")
+                    .should(new ArchCondition<JavaClass>("residir em pacote anotado com @NullMarked") {
+                        @Override
+                        public void check(JavaClass item, ConditionEvents events) {
+                            JavaPackage javaPackage = item.getPackage();
+                            boolean pacoteNullMarked = javaPackage.isAnnotatedWith(NullMarked.class);
+                            
+                            if (!pacoteNullMarked) {
+                                String mensagem = String.format(
+                                        "%s não está em um pacote @NullMarked (pacote: %s)",
+                                        item.getSimpleName(), javaPackage.getName());
+                                events.add(SimpleConditionEvent.violated(item, mensagem));
+                            }
+                        }
+                    })
+                    .because("Controllers e Services devem estar em pacotes @NullMarked para garantir null-safety");
 }
+

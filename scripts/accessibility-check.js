@@ -127,7 +127,7 @@ async function run() {
         } catch (err) {
             console.error('Lighthouse execution failed:', err);
         } finally {
-            await chrome.kill();
+            chrome.kill();
             cleanup();
             process.exit(0);
         }

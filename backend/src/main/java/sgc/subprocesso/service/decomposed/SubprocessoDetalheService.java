@@ -86,11 +86,11 @@ public class SubprocessoDetalheService {
         Subprocesso sp = crudService.buscarSubprocesso(codigo);
         verificarPermissaoVisualizacao(sp, perfil, usuarioAutenticado);
 
-        Usuario responsavel = usuarioService.buscarResponsavelVigente(sp.getUnidade().getSigla());
+        Usuario responsavel = usuarioService.buscarResponsavelAtual(sp.getUnidade().getSigla());
         Usuario titular = null;
         if (sp.getUnidade() != null && sp.getUnidade().getTituloTitular() != null) {
             try {
-                titular = usuarioService.buscarUsuarioPorLogin(sp.getUnidade().getTituloTitular());
+                titular = usuarioService.buscarPorLogin(sp.getUnidade().getTituloTitular());
             } catch (Exception e) {
                 log.warn("Erro ao buscar titular: {}", e.getMessage());
             }

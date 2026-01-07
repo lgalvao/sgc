@@ -109,36 +109,28 @@ class PainelServiceCoverageTest {
     }
 
     @Test
-    @DisplayName("listarAlertas: busca por unidade e subordinadas se titulo nulo")
+    @DisplayName("listarAlertas: busca por unidade se codigoUnidade informado")
     void listarAlertas_PorUnidade() {
         Long codigoUnidade = 1L;
-        when(unidadeService.buscarIdsDescendentes(codigoUnidade)).thenReturn(Collections.emptyList());
 
         Alerta alerta = new Alerta();
         alerta.setCodigo(1L);
         alerta.setDataHora(LocalDateTime.now());
 
-        when(alertaService.listarPorUnidades(anyList(), any())).thenReturn(new PageImpl<>(List.of(alerta)));
+        when(alertaService.listarPorUnidade(eq(codigoUnidade), any())).thenReturn(new PageImpl<>(List.of(alerta)));
 
         Page<AlertaDto> result = service.listarAlertas(null, codigoUnidade, pageable);
 
         assertThat(result.getContent()).isNotEmpty();
-        verify(alertaService).listarPorUnidades(anyList(), any());
+        verify(alertaService).listarPorUnidade(eq(codigoUnidade), any());
     }
 
     @Test
-    @DisplayName("listarAlertas: busca todos se titulo e unidade nulos")
-    void listarAlertas_Todos() {
-        Alerta alerta = new Alerta();
-        alerta.setCodigo(1L);
-        alerta.setDataHora(LocalDateTime.now());
-
-        when(alertaService.listarTodos(any())).thenReturn(new PageImpl<>(List.of(alerta)));
-
+    @DisplayName("listarAlertas: retorna vazio se titulo e unidade nulos")
+    void listarAlertas_SemFiltrosRetornaVazio() {
         Page<AlertaDto> result = service.listarAlertas(null, null, pageable);
 
-        assertThat(result.getContent()).isNotEmpty();
-        verify(alertaService).listarTodos(any());
+        assertThat(result).isEmpty();
     }
 
     @Test

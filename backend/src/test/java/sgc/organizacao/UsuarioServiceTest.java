@@ -2,6 +2,7 @@ package sgc.organizacao;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +20,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Tag("integration")
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
@@ -58,7 +60,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar entidade usuário por login garantindo inicialização")
         void deveBuscarEntidadeUsuarioPorLogin() {
             // Act
-            var usuario = usuarioService.buscarUsuarioPorLogin(TITULO_ADMIN);
+            var usuario = usuarioService.buscarPorLogin(TITULO_ADMIN);
 
             // Assert
             assertNotNull(usuario);
@@ -320,18 +322,6 @@ class UsuarioServiceTest {
 
             // Assert
             assertFalse(resultado);
-        }
-
-        @Test
-        @DisplayName("Deve entrar no sistema com perfil selecionado")
-        void deveEntrarComSucesso() {
-            // Arrange
-            usuarioService.autenticar(TITULO_CHEFE_UNIT2, "senha");
-            List<PerfilUnidadeDto> perfis = usuarioService.autorizar(TITULO_CHEFE_UNIT2);
-            PerfilUnidadeDto perfilUnidadeDto = perfis.getFirst();
-
-            // Act & Assert
-            assertDoesNotThrow(() -> usuarioService.entrar(TITULO_CHEFE_UNIT2, perfilUnidadeDto));
         }
 
         @Test

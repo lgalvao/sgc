@@ -278,7 +278,7 @@ class SubprocessoServiceTest {
         void obterDetalhesSucesso() {
             mockSecurityContext("admin");
             Usuario admin = new Usuario();
-            when(usuarioService.buscarUsuarioPorLogin("admin")).thenReturn(admin);
+            when(usuarioService.buscarPorLogin("admin")).thenReturn(admin);
 
             when(detalheService.obterDetalhes(1L, Perfil.ADMIN, null, admin))
                     .thenReturn(SubprocessoDetalheDto.builder().build());
@@ -292,7 +292,7 @@ class SubprocessoServiceTest {
         void obterPermissoes() {
             mockSecurityContext("user");
             Usuario user = new Usuario();
-            when(usuarioService.buscarUsuarioPorLogin("user")).thenReturn(user);
+            when(usuarioService.buscarPorLogin("user")).thenReturn(user);
 
             when(detalheService.obterPermissoes(1L, user))
                     .thenReturn(SubprocessoPermissoesDto.builder().build());

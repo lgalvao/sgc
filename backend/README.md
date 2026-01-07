@@ -51,12 +51,23 @@ O sistema utiliza perfis para configurar o comportamento do ambiente:
 
 ### Execução
 
-Para rodar todos os testes de backend:
+O projeto suporta a execução granular de testes através de tarefas Gradle específicas:
 
-```bash
-cd backend
-./gradlew test
-```
+*   **Todos os Testes** (Padrão):
+    ```bash
+    ./gradlew test
+    ```
+    Executa tanto testes unitários quanto de integração.
+
+*   **Apenas Unitários** (Rápido, exclui tag `integration`):
+    ```bash
+    ./gradlew unitTest
+    ```
+
+*   **Apenas Integração** (Filtra tag `integration`):
+    ```bash
+    ./gradlew integrationTest
+    ```
 
 ### Estrutura de Testes
 

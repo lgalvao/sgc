@@ -93,46 +93,46 @@ class UsuarioServiceCoverageTest {
 
     @Test
     @DisplayName("buscarEntidadePorId: lança erro se nao encontrado")
-    void buscarEntidadePorId_Erro() {
+    void buscarPorId_Erro() {
         when(usuarioRepo.findById("user")).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> service.buscarEntidadePorId("user"))
+        assertThatThrownBy(() -> service.buscarPorId("user"))
             .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
     @DisplayName("buscarUsuarioPorLogin: lança erro se nao encontrado")
-    void buscarUsuarioPorLogin_Erro() {
+    void buscarPorLogin_Erro() {
         when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> service.buscarUsuarioPorLogin("user"))
+        assertThatThrownBy(() -> service.buscarPorLogin("user"))
             .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
     @DisplayName("buscarUsuarioPorLogin: sucesso")
-    void buscarUsuarioPorLogin_Sucesso() {
+    void buscarPorLogin_Sucesso() {
         Usuario u = new Usuario();
         u.setTituloEleitoral("user");
         when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.of(u));
         when(usuarioPerfilRepo.findByUsuarioTitulo("user")).thenReturn(Collections.emptyList());
 
-        Usuario res = service.buscarUsuarioPorLogin("user");
+        Usuario res = service.buscarPorLogin("user");
         assertThat(res).isNotNull();
     }
 
     @Test
     @DisplayName("buscarResponsavelVigente: erro se chefe nao encontrado na busca simples")
-    void buscarResponsavelVigente_ErroChefeSimples() {
+    void buscarResponsavelAtual_ErroChefeSimples() {
         sgc.organizacao.dto.UnidadeDto dto = sgc.organizacao.dto.UnidadeDto.builder().codigo(1L).build();
         when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(dto);
         when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.buscarResponsavelVigente("SIGLA"))
+        assertThatThrownBy(() -> service.buscarResponsavelAtual("SIGLA"))
             .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
     @DisplayName("buscarResponsavelVigente: erro se chefe nao encontrado na busca completa")
-    void buscarResponsavelVigente_ErroChefeCompleto() {
+    void buscarResponsavelAtual_ErroChefeCompleto() {
         sgc.organizacao.dto.UnidadeDto dto = sgc.organizacao.dto.UnidadeDto.builder().codigo(1L).build();
         when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(dto);
 
@@ -142,7 +142,7 @@ class UsuarioServiceCoverageTest {
 
         when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.buscarResponsavelVigente("SIGLA"))
+        assertThatThrownBy(() -> service.buscarResponsavelAtual("SIGLA"))
             .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
@@ -524,13 +524,6 @@ class UsuarioServiceCoverageTest {
     void carregarAtribuicoesEmLote_Vazia() {
         ReflectionTestUtils.invokeMethod(service, "carregarAtribuicoesEmLote", Collections.emptyList());
         verify(usuarioPerfilRepo, never()).findByUsuarioTituloIn(any());
-    }
-
-    @Test
-    @DisplayName("entrar(string, dto): metodo vazio existe")
-    void entrar_VoidMethod() {
-        // Apenas para cobertura do método vazio
-        service.entrar("user", new sgc.seguranca.dto.PerfilUnidadeDto(Perfil.CHEFE, sgc.organizacao.dto.UnidadeDto.builder().build()));
     }
 
     @Test

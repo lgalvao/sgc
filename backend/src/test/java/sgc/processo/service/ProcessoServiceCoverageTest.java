@@ -191,7 +191,7 @@ class ProcessoServiceCoverageTest {
         when(unidadeService.buscarEntidadePorId(2L)).thenReturn(u);
 
         service.enviarLembrete(1L, 2L);
-        verify(alertaService).criarAlerta(eq(p), any(), eq(u), anyString());
+        verify(alertaService).criarAlertaSedoc(eq(p), eq(u), anyString());
     }
 
     // --- FINALIZAR ---

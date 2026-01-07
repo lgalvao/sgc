@@ -148,7 +148,7 @@ class SubprocessoDetalheServiceTest {
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
-        when(usuarioService.buscarUsuarioPorLogin("titular")).thenReturn(new Usuario());
+        when(usuarioService.buscarPorLogin("titular")).thenReturn(new Usuario());
 
         SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, null, admin);
         assertThat(result).isNotNull();
@@ -171,7 +171,7 @@ class SubprocessoDetalheServiceTest {
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
-        when(usuarioService.buscarUsuarioPorLogin("titular")).thenThrow(new RuntimeException("Erro"));
+        when(usuarioService.buscarPorLogin("titular")).thenThrow(new RuntimeException("Erro"));
 
         SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, null, admin);
         assertThat(result).isNotNull();
@@ -457,7 +457,7 @@ class SubprocessoDetalheServiceTest {
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
-        when(usuarioService.buscarUsuarioPorLogin("titular")).thenReturn(new Usuario());
+        when(usuarioService.buscarPorLogin("titular")).thenReturn(new Usuario());
 
         SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.CHEFE, 10L, chefe);
         assertThat(result).isNotNull();

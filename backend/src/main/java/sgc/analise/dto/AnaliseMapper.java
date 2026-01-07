@@ -34,9 +34,17 @@ public abstract class AnaliseMapper {
     @Mapping(target = "analistaUsuarioTitulo", source = "usuarioTitulo")
     public abstract AnaliseValidacaoHistoricoDto toAnaliseValidacaoHistoricoDto(Analise analise);
 
-    protected String getUnidadeSigla(Long codigo) {
-        if (codigo == null) return null;
-        return unidadeRepo.findById(codigo)
+    /**
+     * Busca a sigla da unidade pelo código.
+     *
+     * @param unidadeCodigo O código da unidade.
+     * @return A sigla da unidade ou null se não encontrada.
+     */
+    protected String getUnidadeSigla(Long unidadeCodigo) {
+        if (unidadeCodigo == null) {
+            return null;
+        }
+        return unidadeRepo.findById(unidadeCodigo)
                 .map(sgc.organizacao.model.Unidade::getSigla)
                 .orElse(null);
     }

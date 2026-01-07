@@ -93,7 +93,7 @@ public class AtividadeService {
                     "Subprocesso não encontrado para o mapa com código %d".formatted(atividadeDto.getMapaCodigo()));
         }
 
-        var usuario = usuarioService.buscarEntidadePorId(tituloUsuario);
+        var usuario = usuarioService.buscarPorId(tituloUsuario);
 
         // Validação defensiva: garante que apenas o titular da unidade pode criar atividades.
         if (subprocesso.getUnidade() == null) {

@@ -2,6 +2,7 @@ package sgc.e2e;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -19,6 +20,7 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Tag("integration")
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")

@@ -88,7 +88,7 @@ public class UsuarioController {
     @PostMapping("/entrar")
     public ResponseEntity<EntrarResp> entrar(@Valid @RequestBody EntrarReq request) {
         String token = usuarioService.entrar(request);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(request.getTituloEleitoral());
+        Usuario usuario = usuarioService.buscarPorLogin(request.getTituloEleitoral());
         
         EntrarResp response = EntrarResp.builder()
                 .tituloEleitoral(request.getTituloEleitoral())

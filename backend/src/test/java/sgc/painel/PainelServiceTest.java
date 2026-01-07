@@ -130,53 +130,30 @@ class PainelServiceTest {
         return p;
     }
     @Test
-    @DisplayName("listarAlertas por título de usuário deve buscar alertas específicos")
-    void listarAlertas_PorUsuario() {
+    @DisplayName("listarAlertas por unidade deve buscar alertas da unidade")
+    void listarAlertas_PorUnidade() {
         sgc.alerta.model.Alerta alerta = new sgc.alerta.model.Alerta();
         alerta.setCodigo(100L);
         alerta.setDescricao("Alerta teste");
         alerta.setDataHora(java.time.LocalDateTime.now());
         
-        when(alertaService.listarPorUsuario(any(String.class), any(Pageable.class)))
+        when(alertaService.listarPorUnidade(any(Long.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(alerta)));
         when(alertaService.obterDataHoraLeitura(any(), any())).thenReturn(java.util.Optional.empty());
 
-        Page<sgc.alerta.dto.AlertaDto> result = painelService.listarAlertas("123456", null, PageRequest.of(0, 10));
+        Page<sgc.alerta.dto.AlertaDto> result = painelService.listarAlertas("123456", 1L, PageRequest.of(0, 10));
 
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getDescricao()).isEqualTo("Alerta teste");
-        verify(alertaService).listarPorUsuario(any(String.class), any(Pageable.class));
+        verify(alertaService).listarPorUnidade(any(Long.class), any(Pageable.class));
     }
 
     @Test
-    @DisplayName("listarAlertas por unidade deve buscar alertas da hierarquia")
-    void listarAlertas_PorUnidade() {
-        when(unidadeService.buscarIdsDescendentes(10L)).thenReturn(List.of(11L));
-        
-        sgc.alerta.model.Alerta alerta = new sgc.alerta.model.Alerta();
-        alerta.setCodigo(200L);
-        when(alertaService.listarPorUnidades(anyList(), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of(alerta)));
-
-        Page<sgc.alerta.dto.AlertaDto> result = painelService.listarAlertas(null, 10L, PageRequest.of(0, 10));
-
-        assertThat(result.getContent()).hasSize(1);
-        verify(unidadeService).buscarIdsDescendentes(10L);
-        verify(alertaService).listarPorUnidades(anyList(), any(Pageable.class));
-    }
-
-    @Test
-    @DisplayName("listarAlertas sem filtros deve buscar todos")
-    void listarAlertas_Todos() {
-        sgc.alerta.model.Alerta alerta = new sgc.alerta.model.Alerta();
-        alerta.setCodigo(300L);
-        when(alertaService.listarTodos(any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of(alerta)));
-
+    @DisplayName("listarAlertas sem unidade deve retornar vazio")
+    void listarAlertas_SemUnidadeRetornaVazio() {
         Page<sgc.alerta.dto.AlertaDto> result = painelService.listarAlertas(null, null, PageRequest.of(0, 10));
 
-        assertThat(result.getContent()).hasSize(1);
-        verify(alertaService).listarTodos(any(Pageable.class));
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -223,10 +200,10 @@ class PainelServiceTest {
         alerta.setDataHora(java.time.LocalDateTime.now());
         // Unidades null
         
-        when(alertaService.listarTodos(any(Pageable.class)))
+        when(alertaService.listarPorUnidade(any(Long.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(alerta)));
 
-        Page<sgc.alerta.dto.AlertaDto> result = painelService.listarAlertas(null, null, PageRequest.of(0, 10));
+        Page<sgc.alerta.dto.AlertaDto> result = painelService.listarAlertas(null, 1L, PageRequest.of(0, 10));
 
         assertThat(result.getContent().get(0).getUnidadeOrigem()).isNull();
         assertThat(result.getContent().get(0).getUnidadeDestino()).isNull();

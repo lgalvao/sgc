@@ -31,8 +31,6 @@ public class CopiaMapaService {
 
         Map<Long, Atividade> mapaDeAtividades = new HashMap<>();
 
-        // Optimization: Use findByMapaCodigoWithConhecimentos to fetch activities and their knowledges
-        // in a single query (LEFT JOIN FETCH), avoiding the N+1 problem inside the loop.
         List<Atividade> atividadesFonte = atividadeRepo.findByMapaCodigoWithConhecimentos(fonte.getCodigo());
         if (atividadesFonte == null) {
             atividadesFonte = Collections.emptyList();
@@ -81,7 +79,6 @@ public class CopiaMapaService {
                 competenciaRepo.save(novaCompetencia);
             }
         }
-
         return mapaSalvo;
     }
 }
