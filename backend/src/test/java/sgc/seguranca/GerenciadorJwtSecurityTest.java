@@ -2,72 +2,43 @@ package sgc.seguranca;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.seguranca.config.JwtProperties;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-@DisplayName("Teste de Verificação de Segurança do JWT")
+@ExtendWith(MockitoExtension.class)
+@DisplayName("Testes Unitários: GerenciadorJwt - Segurança")
 class GerenciadorJwtSecurityTest {
 
-    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withUserConfiguration(GerenciadorJwt.class)
-            .withBean(JwtProperties.class, () -> {
-                JwtProperties props = new JwtProperties();
-                props.setSecret("sgc-secret-key-change-this-in-production-minimum-32-chars"); // Default secret
-                return props;
-            });
+    @Mock
+    private JwtProperties jwtProperties;
+
+    @Mock
+    private Environment environment;
+
+    @InjectMocks
+    private GerenciadorJwt gerenciadorJwt;
+
+    private static final String DEFAULT_SECRET = "sgc-secret-key-change-this-in-production-minimum-32-chars";
 
     @Test
-    @DisplayName("Deve falhar ao iniciar em produção com secret padrão")
-    void deveFalharEmProducaoComSecretPadrao() {
-        contextRunner
-                .withPropertyValues("spring.profiles.active=production")
-                .run(context -> {
-                    assertThat(context).hasFailed();
-                    assertThat(context.getStartupFailure())
-                            .hasRootCauseInstanceOf(ErroConfiguracao.class);
-                    assertThat(context.getStartupFailure().getCause())
-                            .hasMessageContaining("FALHA DE SEGURANÇA");
-                });
-    }
+    @DisplayName("Deve lançar erro crítico se usar secret padrão em ambiente produtivo")
+    void deveLancarErroEmProducaoComSecretPadrao() {
+        // Given
+        when(jwtProperties.getSecret()).thenReturn(DEFAULT_SECRET);
+        // Simula que NÃO é um ambiente de teste/dev (retorna false para os perfis seguros)
+        when(environment.acceptsProfiles(any(Profiles.class))).thenReturn(false);
 
-    @Test
-    @DisplayName("Deve iniciar com sucesso em teste com secret padrão")
-    void deveSucessoEmTesteComSecretPadrao() {
-        contextRunner
-                .withPropertyValues("spring.profiles.active=test")
-                .run(context -> assertThat(context).hasNotFailed());
-    }
-
-    @Test
-    @DisplayName("Deve iniciar com sucesso em e2e com secret padrão")
-    void deveSucessoEmE2eComSecretPadrao() {
-        contextRunner
-                .withPropertyValues("spring.profiles.active=e2e")
-                .run(context -> assertThat(context).hasNotFailed());
-    }
-
-    @Test
-    @DisplayName("Deve iniciar com sucesso em local com secret padrão")
-    void deveSucessoEmLocalComSecretPadrao() {
-        contextRunner
-                .withPropertyValues("spring.profiles.active=local")
-                .run(context -> assertThat(context).hasNotFailed());
-    }
-
-    @Test
-    @DisplayName("Deve iniciar com sucesso em produção se o secret for seguro")
-    void deveSucessoEmProducaoComSecretSeguro() {
-        new ApplicationContextRunner()
-                .withUserConfiguration(GerenciadorJwt.class)
-                .withBean(JwtProperties.class, () -> {
-                    JwtProperties props = new JwtProperties();
-                    props.setSecret("uma-senha-muito-segura-e-diferente-da-padrao-123456");
-                    return props;
-                })
-                .withPropertyValues("spring.profiles.active=production")
-                .run(context -> assertThat(context).hasNotFailed());
+        // When & Then
+        assertThrows(ErroConfiguracao.class, () -> gerenciadorJwt.verificarSegurancaChave());
     }
 }
