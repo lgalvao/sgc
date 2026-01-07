@@ -223,10 +223,9 @@ class MapaServiceTest {
 
             Competencia novaComp = new Competencia();
             novaComp.setCodigo(50L);
+            novaComp.setAtividades(new HashSet<>()); // Initialize set for validation check
             when(competenciaRepo.saveAll(anyList())).thenReturn(List.of(novaComp));
 
-            // Second call for validation
-            when(competenciaRepo.findByMapaCodigo(mapaId)).thenReturn(List.of(novaComp));
             MapaCompletoDto expectedDto = new MapaCompletoDto();
             when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(expectedDto);
 
@@ -237,6 +236,8 @@ class MapaServiceTest {
             verify(mapaRepo).save(mapa);
             verify(competenciaRepo).saveAll(anyList());
             verify(atividadeRepo).saveAll(anyList());
+            // Verify findByMapaCodigo is called only once (initial fetch)
+            verify(competenciaRepo, times(1)).findByMapaCodigo(mapaId);
         }
 
         @Test
@@ -256,16 +257,15 @@ class MapaServiceTest {
 
             when(mapaRepo.findById(mapaId)).thenReturn(Optional.of(mapa));
             // First call returns existing to be removed
-            // Second call (validation) returns empty
             when(competenciaRepo.findByMapaCodigo(mapaId))
-                .thenReturn(new ArrayList<>(List.of(compExistente)))
-                .thenReturn(List.of());
+                .thenReturn(new ArrayList<>(List.of(compExistente)));
 
             when(atividadeRepo.findByMapaCodigo(mapaId)).thenReturn(List.of(ativ));
 
             service.salvarMapaCompleto(mapaId, req, "user");
 
             verify(competenciaRepo).deleteAll(anyList());
+            verify(competenciaRepo, times(1)).findByMapaCodigo(mapaId);
         }
 
         @Test
