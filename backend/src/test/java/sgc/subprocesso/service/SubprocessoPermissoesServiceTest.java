@@ -230,11 +230,12 @@ class SubprocessoPermissoesServiceTest {
         @Test
         @DisplayName("Deve lidar com Subprocesso com unidade nula")
         void deveLidarComSubprocessoUnidadeNula() {
-            Usuario admin = criarUsuario(Perfil.ADMIN, null);
+            Usuario gestor = criarUsuario(Perfil.GESTOR, 1L);
             Subprocesso sub = criarSubprocesso(null, SituacaoSubprocesso.NAO_INICIADO, TipoProcesso.MAPEAMENTO);
 
-            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, admin);
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, gestor);
 
+            // Should be false because spUnidadeCodigo is null
             assertThat(permissoes.isPodeEditarMapa()).isFalse();
         }
 
