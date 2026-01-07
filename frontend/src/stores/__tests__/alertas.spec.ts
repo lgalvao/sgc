@@ -2,6 +2,7 @@ import {beforeEach, describe, expect, it, type Mocked, vi} from "vitest";
 import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 import type {Alerta} from "@/types/tipos";
 import {useAlertasStore} from "../alertas";
+import {normalizeError} from "@/utils/apiError";
 
 // Mock dos serviços
 vi.mock("@/services/painelService");
@@ -56,32 +57,52 @@ describe("useAlertasStore", () => {
         expect(context.store.alertasPage).toEqual({});
     });
 
+    it("deve limpar o erro com clearError", () => {
+        context.store.lastError = normalizeError(new Error("Erro de teste"));
+        context.store.clearError();
+        expect(context.store.lastError).toBeNull();
+    });
+
     describe("actions", () => {
-        it("buscarAlertas deve chamar painelService e atualizar o estado", async () => {
-            const mockPage = {
-                content: [mockAlerta],
-                totalPages: 1,
-                totalElements: 1,
-                number: 0,
-                size: 10,
-                first: true,
-                last: true,
-                empty: false,
-            };
-            painelService.listarAlertas.mockResolvedValue(mockPage);
+        describe("buscarAlertas", () => {
+            it("deve chamar painelService e atualizar o estado", async () => {
+                const mockPage = {
+                    content: [mockAlerta],
+                    totalPages: 1,
+                    totalElements: 1,
+                    number: 0,
+                    size: 10,
+                    first: true,
+                    last: true,
+                    empty: false,
+                };
+                painelService.listarAlertas.mockResolvedValue(mockPage);
 
-            await context.store.buscarAlertas(123, 456, 0, 10);
+                await context.store.buscarAlertas(123, 456, 0, 10);
 
-            expect(painelService.listarAlertas).toHaveBeenCalledWith(
-                123,
-                456,
-                0,
-                10,
-                undefined,
-                undefined,
-            );
-            expect(context.store.alertas).toEqual(mockPage.content);
-            expect(context.store.alertasPage).toEqual(mockPage);
+                expect(painelService.listarAlertas).toHaveBeenCalledWith(
+                    123,
+                    456,
+                    0,
+                    10,
+                    undefined,
+                    undefined,
+                );
+                expect(context.store.alertas).toEqual(mockPage.content);
+                expect(context.store.alertasPage).toEqual(mockPage);
+                expect(context.store.lastError).toBeNull();
+            });
+
+            it("deve lidar com erros no serviço", async () => {
+                const error = new Error("Erro na busca");
+                painelService.listarAlertas.mockRejectedValue(error);
+
+                await expect(
+                    context.store.buscarAlertas(123, 456, 0, 10)
+                ).rejects.toThrow("Erro na busca");
+
+                expect(context.store.lastError).toEqual(normalizeError(error));
+            });
         });
 
         describe("marcarAlertaComoLido", () => {
@@ -115,6 +136,18 @@ describe("useAlertasStore", () => {
                 expect(alertaService.marcarComoLido).toHaveBeenCalledWith(1);
                 // Revert check: dataHoraLeitura should be null again
                 expect(context.store.alertas[0].dataHoraLeitura).toBeNull();
+                expect(context.store.lastError).not.toBeNull();
+            });
+
+            it("deve lidar com alerta não encontrado na lista local", async () => {
+                context.store.alertas = []; // Lista vazia
+                alertaService.marcarComoLido.mockResolvedValue();
+
+                const result = await context.store.marcarAlertaComoLido(999);
+
+                expect(result).toBe(true);
+                expect(alertaService.marcarComoLido).toHaveBeenCalledWith(999);
+                // Como não estava na lista, nada muda localmente, mas chama o serviço
             });
         });
     });

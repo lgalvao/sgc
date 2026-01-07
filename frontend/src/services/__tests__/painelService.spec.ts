@@ -65,6 +65,14 @@ describe("painelService", () => {
             });
         });
 
+        it("deve lidar com ordenação", async () => {
+             mockApi.get.mockResolvedValueOnce({data: {content: []}});
+            await service.listarProcessos("GESTOR", undefined, 0, 10, "descricao", "desc");
+             expect(mockApi.get).toHaveBeenCalledWith("/painel/processos", {
+                params: {perfil: "GESTOR", unidade: undefined, page: 0, size: 10, sort: "descricao,desc"},
+            });
+        });
+
         testErrorHandling(() => service.listarProcessos("CHEFE"));
     });
 
@@ -95,6 +103,15 @@ describe("painelService", () => {
             expect(result.content[0]).toHaveProperty("mapped", true);
             expect(result.totalElements).toBe(1);
         });
+
+         it("deve lidar com ordenação", async () => {
+             mockApi.get.mockResolvedValueOnce({data: {content: []}});
+            await service.listarAlertas(123, 1, 0, 10, "data", "asc");
+             expect(mockApi.get).toHaveBeenCalledWith("/painel/alertas", {
+                params: {usuarioTitulo: 123, unidade: 1, page: 0, size: 10, sort: "data,asc"},
+            });
+        });
+
 
         testErrorHandling(() => service.listarAlertas(123));
     });
