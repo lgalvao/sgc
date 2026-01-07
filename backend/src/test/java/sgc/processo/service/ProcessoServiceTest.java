@@ -604,6 +604,13 @@ class ProcessoServiceTest {
         }
 
         @Test
+        @DisplayName("Deve lançar exceção para tipo de processo inválido")
+        void deveLancarExcecaoParaTipoInvalido() {
+            assertThatThrownBy(() -> processoService.listarUnidadesBloqueadasPorTipo("TIPO_INEXISTENTE"))
+                .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
         @DisplayName("Deve retornar vazio ao listar subprocessos se authentication for null")
         void deveRetornarVazioSeAuthenticationNull() {
             // Arrange
@@ -836,6 +843,25 @@ class ProcessoServiceTest {
                     .isInstanceOf(ErroProcesso.class)
                     .hasMessageContaining("sem mapa associado");
         }
+
+        @Test
+        @DisplayName("Deve formatar mensagem de erro corretamente para subprocesso sem unidade ao finalizar")
+        void deveFormatarMensagemErroParaSubprocessoSemUnidade() {
+            Long id = 100L;
+            Processo processo = ProcessoFixture.processoEmAndamento();
+            processo.setCodigo(id);
+
+            Subprocesso sp = SubprocessoFixture.subprocessoPadrao(processo, null);
+            sp.setCodigo(55L);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO); // Pendente
+
+            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(subprocessoService.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
+
+            assertThatThrownBy(() -> processoService.finalizar(id))
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessageContaining("Subprocesso 55 (Situação: MAPEAMENTO_CADASTRO_EM_ANDAMENTO)");
+        }
     }
 
     @Nested
@@ -931,12 +957,6 @@ class ProcessoServiceTest {
             PerfilDto perfil = PerfilDto.builder().unidadeCodigo(10L).build();
             when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
 
-            // Configurar hierarquia retornando lista vazia (mock do service)
-            // Como o metodo de buscar hierarquia é privado e usa unidadeService.buscarTodasEntidadesComHierarquia(),
-            // precisamos mockar o retorno de unidadeService para que a busca resulte em vazio?
-            // O metodo 'buscarCodigosDescendentes' sempre retorna pelo menos a propria unidade se ela existir na lista?
-            // Não, ele pega todasUnidades. Se a unidade 10L não estiver na lista retornada por buscarTodasEntidadesComHierarquia(),
-            // ele pode nao achar.
             when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of()); // Nenhuma unidade no sistema
 
             assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
@@ -975,6 +995,40 @@ class ProcessoServiceTest {
             // Act & Assert
             assertThat(processoService.checarAcesso(auth, 1L)).isTrue();
         }
+
+        @Test
+        @DisplayName("Deve permitir acesso em hierarquia complexa (Neto)")
+        void devePermitirAcessoEmHierarquiaComplexa() {
+            // Arrange
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getName()).thenReturn("chefe");
+            doReturn(List.of(new SimpleGrantedAuthority("ROLE_CHEFE"))).when(auth).getAuthorities();
+
+            PerfilDto perfil = PerfilDto.builder().unidadeCodigo(100L).build(); // Avô
+            when(usuarioService.buscarPerfisUsuario("chefe")).thenReturn(List.of(perfil));
+
+            // Hierarquia: 100 (Avô) -> 101 (Pai) -> 102 (Neto)
+            Unidade avo = UnidadeFixture.unidadeComId(100L);
+            Unidade pai = UnidadeFixture.unidadeComId(101L);
+            pai.setUnidadeSuperior(avo);
+            Unidade neto = UnidadeFixture.unidadeComId(102L);
+            neto.setUnidadeSuperior(pai);
+            Unidade solta = UnidadeFixture.unidadeComId(200L); // Unidade solta sem pai
+
+            when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(avo, pai, neto, solta));
+
+            // Mock da verificação final: espera-se que a lista inclua 100, 101 e 102
+            when(subprocessoService.verificarAcessoUnidadeAoProcesso(eq(1L), argThat(list ->
+                    list.contains(100L) && list.contains(101L) && list.contains(102L) && !list.contains(200L)
+            ))).thenReturn(true);
+
+            // Act
+            boolean acesso = processoService.checarAcesso(auth, 1L);
+
+            // Assert
+            assertThat(acesso).isTrue();
+        }
     }
 
     @Nested
@@ -1011,5 +1065,6 @@ class ProcessoServiceTest {
                 .isInstanceOf(ErroProcesso.class)
                 .hasMessageContaining("não participa");
         }
+
     }
 }
