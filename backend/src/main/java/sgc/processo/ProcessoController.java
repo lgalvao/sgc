@@ -164,11 +164,8 @@ public class ProcessoController {
     @PostMapping("/{codigo}/iniciar")
     @Operation(summary = "Inicia um processo (CDU-03)")
     public ResponseEntity<?> iniciar(
-            @PathVariable Long codigo, @RequestBody IniciarProcessoReq req) {
+            @PathVariable Long codigo, @Valid @RequestBody IniciarProcessoReq req) {
 
-        if (req.tipo() == null) {
-            return ResponseEntity.badRequest().build();
-        }
         var processador = getProcessadoresInicio().get(req.tipo());
         if (processador == null) {
             return ResponseEntity.badRequest().build();
