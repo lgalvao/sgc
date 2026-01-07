@@ -20,6 +20,7 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -411,5 +412,29 @@ class EventoProcessoListenerTest {
         // Verifica que o primeiro subprocesso foi processado com sucesso
         // O segundo causará NPE ao tentar acessar responsavel.getTitularTitulo() quando responsavel é null
         verify(notificacaoEmailService).enviarEmailHtml(eq("normal@email.com"), anyString(), anyString());
+    }
+
+    @Test
+    void deveTratarExcecaoAoFinalizarProcesso_ListaVazia() {
+        // Cobre o caso de lista vazia no inicio de processarFinalizacaoProcesso
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(99L).build();
+        Processo processo = new Processo();
+        processo.setCodigo(99L);
+        processo.setParticipantes(Collections.emptySet());
+
+        when(processoService.buscarEntidadePorId(99L)).thenReturn(processo);
+
+        listener.aoFinalizarProcesso(evento);
+        // Sem exceções
+    }
+
+    @Test
+    void deveTratarExcecaoGeralAoFinalizarProcesso() {
+        // Cobre o catch global em aoFinalizarProcesso
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(99L).build();
+        when(processoService.buscarEntidadePorId(99L)).thenThrow(new RuntimeException("Erro Geral"));
+
+        listener.aoFinalizarProcesso(evento);
+        // Sem exceções
     }
 }

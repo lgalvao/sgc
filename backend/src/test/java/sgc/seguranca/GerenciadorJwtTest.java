@@ -15,6 +15,8 @@ import sgc.seguranca.config.JwtProperties;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,7 +46,9 @@ class GerenciadorJwtTest {
     @DisplayName("Deve alertar (warn) se segredo padrão em ambiente de teste")
     void warnDefaultTest() {
         when(jwtProperties.getSecret()).thenReturn(DEFAULT_SECRET);
-        when(environment.acceptsProfiles(Profiles.of("test", "e2e", "local"))).thenReturn(true);
+        // Correctly match the Profiles.of argument using an ArgumentMatcher
+        when(environment.acceptsProfiles(any(Profiles.class))).thenReturn(true);
+
         assertThatCode(() -> gerenciador.verificarSegurancaChave())
             .doesNotThrowAnyException();
     }
@@ -53,7 +57,7 @@ class GerenciadorJwtTest {
     @DisplayName("Deve falhar se segredo padrão em produção")
     void failDefaultProd() {
         when(jwtProperties.getSecret()).thenReturn(DEFAULT_SECRET);
-        when(environment.acceptsProfiles(Profiles.of("test", "e2e", "local"))).thenReturn(false);
+        when(environment.acceptsProfiles(any(Profiles.class))).thenReturn(false);
         
         assertThatThrownBy(() -> gerenciador.verificarSegurancaChave())
                 .isInstanceOf(ErroConfiguracao.class)
