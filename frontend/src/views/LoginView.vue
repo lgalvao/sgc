@@ -39,6 +39,7 @@
                 />
                 Título eleitoral <span class="text-danger" aria-hidden="true">*</span>
               </label>
+              <!-- eslint-disable vuejs-accessibility/no-autofocus -->
               <BFormInput
                   id="titulo"
                   v-model="titulo"
@@ -49,7 +50,9 @@
                   type="text"
                   inputmode="numeric"
                   required
+                  autofocus
               />
+              <!-- eslint-enable vuejs-accessibility/no-autofocus -->
             </div>
             <div class="mb-3">
               <label
