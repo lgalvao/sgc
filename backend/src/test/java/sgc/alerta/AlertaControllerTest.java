@@ -9,15 +9,20 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.erros.ErroAlerta;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -84,5 +89,19 @@ class AlertaControllerTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    @DisplayName("listarAlertas_quandoSucesso_deveRetornarListaDeAlertas")
+    @WithMockUser
+    void listarAlertas_quandoSucesso_deveRetornarListaDeAlertas() throws Exception {
+        when(alertaService.listarAlertasPorUsuario(anyString()))
+                .thenReturn(List.of());
+
+        mockMvc.perform(get("/api/alertas")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(alertaService).listarAlertasPorUsuario(anyString());
     }
 }

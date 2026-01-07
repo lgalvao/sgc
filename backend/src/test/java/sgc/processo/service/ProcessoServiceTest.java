@@ -508,6 +508,46 @@ class ProcessoServiceTest {
             processoService.listarPorParticipantesIgnorandoCriado(List.of(1L), null);
             verify(processoRepo).findDistinctByParticipantes_CodigoInAndSituacaoNot(anyList(), eq(SituacaoProcesso.CRIADO), any());
         }
+
+        @Test
+        @DisplayName("Deve retornar vazio ao listar subprocessos se authentication for null")
+        void deveRetornarVazioSeAuthenticationNull() {
+            // Arrange
+            SecurityContext securityContext = mock(SecurityContext.class);
+            when(securityContext.getAuthentication()).thenReturn(null);
+            SecurityContextHolder.setContext(securityContext);
+
+            // Act
+            List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(100L);
+
+            // Assert
+            assertThat(res).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve retornar contexto completo do processo")
+        void deveRetornarContextoCompleto() {
+            // Arrange
+            Long id = 100L;
+            Processo processo = ProcessoFixture.processoPadrao();
+            ProcessoDetalheDto detalhes = new ProcessoDetalheDto();
+            
+            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoDetalheBuilder.build(processo)).thenReturn(detalhes);
+            
+            SecurityContext securityContext = mock(SecurityContext.class);
+            when(securityContext.getAuthentication()).thenReturn(null);
+            SecurityContextHolder.setContext(securityContext);
+
+            // Act
+            var res = processoService.obterContextoCompleto(id);
+
+            // Assert
+            assertThat(res).isNotNull();
+            assertThat(res.getProcesso()).isEqualTo(detalhes);
+            // listarSubprocessosElegiveis retorna lista vazia quando auth é null
+            assertThat(res.getElegiveis()).isEmpty();
+        }
     }
 
     @Nested

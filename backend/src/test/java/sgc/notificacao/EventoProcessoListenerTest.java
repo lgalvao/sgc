@@ -307,4 +307,109 @@ class EventoProcessoListenerTest {
         // Verifica que NÃO enviou e-mail
         verify(notificacaoEmailService, never()).enviarEmailHtml(anyString(), anyString(), anyString());
     }
+
+    @Test
+    void deveEnviarEmailParaUnidadeIntermediaria() {
+        // Testa envio de email específico para unidade INTERMEDIARIA ao iniciar processo
+        Processo processo = new Processo();
+        processo.setCodigo(5L);
+        processo.setDescricao("Processo com Intermediária");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        when(processoService.buscarEntidadePorId(5L)).thenReturn(processo);
+
+        Unidade intermediaria = new Unidade();
+        intermediaria.setCodigo(100L);
+        intermediaria.setSigla("INTER");
+        intermediaria.setNome("Unidade Intermediária");
+        intermediaria.setTipo(TipoUnidade.INTERMEDIARIA);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(200L);
+        subprocesso.setUnidade(intermediaria);
+        subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+
+        when(subprocessoService.listarEntidadesPorProcesso(5L)).thenReturn(List.of(subprocesso));
+
+        ResponsavelDto responsavel = ResponsavelDto.builder()
+                .unidadeCodigo(100L)
+                .titularTitulo("888")
+                .build();
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(100L, responsavel));
+
+        UsuarioDto titular = UsuarioDto.builder()
+                .tituloEleitoral("888")
+                .email("inter@email.com")
+                .build();
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("888", titular));
+
+        when(notificacaoModelosService.criarEmailProcessoIniciado(anyString(), anyString(), anyString(), any()))
+                .thenReturn("<html>Email content</html>");
+
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(5L).build();
+        listener.aoIniciarProcesso(evento);
+
+        // Verifica que enviou email com assunto específico para INTERMEDIARIA
+        verify(notificacaoEmailService).enviarEmailHtml(
+                eq("inter@email.com"),
+                contains("Unidades Subordinadas"),
+                anyString()
+        );
+    }
+
+    @Test
+    void deveTratarExcecaoNoLoopDeSubprocessos() {
+        // Testa o catch do loop externo (linhas 123-124) quando enviarEmailProcessoIniciado lança exceção
+        Processo processo = new Processo();
+        processo.setCodigo(6L);
+        processo.setDescricao("Processo Teste");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        when(processoService.buscarEntidadePorId(6L)).thenReturn(processo);
+
+        // Primeiro subprocesso normal
+        Subprocesso subprocessoBom = new Subprocesso();
+        subprocessoBom.setCodigo(300L);
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(50L);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        unidade.setNome("Unidade Normal");
+        unidade.setSigla("UN");
+        subprocessoBom.setUnidade(unidade);
+        subprocessoBom.setDataLimiteEtapa1(LocalDateTime.now());
+
+        // Segundo subprocesso que causará exceção devido a responsável null no map
+        Subprocesso subprocessoRuim = new Subprocesso();
+        subprocessoRuim.setCodigo(301L);
+        Unidade unidadeRuim = new Unidade();
+        unidadeRuim.setCodigo(99L); // Código que não terá responsável no map
+        unidadeRuim.setTipo(TipoUnidade.OPERACIONAL);
+        subprocessoRuim.setUnidade(unidadeRuim);
+
+        when(subprocessoService.listarEntidadesPorProcesso(6L))
+                .thenReturn(List.of(subprocessoBom, subprocessoRuim));
+
+        // Fornece responsável apenas para a unidade 50, não para 99
+        ResponsavelDto responsavel = ResponsavelDto.builder()
+                .unidadeCodigo(50L)
+                .titularTitulo("777")
+                .build();
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(50L, responsavel));
+
+        UsuarioDto titular = UsuarioDto.builder()
+                .tituloEleitoral("777")
+                .email("normal@email.com")
+                .build();
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("777", titular));
+
+        when(notificacaoModelosService.criarEmailProcessoIniciado(anyString(), anyString(), anyString(), any()))
+                .thenReturn("<html>Email</html>");
+
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(6L).build();
+        
+        // Não deve lançar exceção para fora - deve capturar e logar
+        listener.aoIniciarProcesso(evento);
+
+        // Verifica que o primeiro subprocesso foi processado com sucesso
+        // O segundo causará NPE ao tentar acessar responsavel.getTitularTitulo() quando responsavel é null
+        verify(notificacaoEmailService).enviarEmailHtml(eq("normal@email.com"), anyString(), anyString());
+    }
 }

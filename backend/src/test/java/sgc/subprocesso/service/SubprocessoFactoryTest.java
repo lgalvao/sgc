@@ -20,6 +20,7 @@ import sgc.organizacao.model.UnidadeMapaRepo;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -156,5 +157,17 @@ class SubprocessoFactoryTest {
         // Verifica situacao inicial
         verify(subprocessoRepo, atLeastOnce()).save(argThat(s -> s.getSituacao() == SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO));
         verify(movimentacaoRepo).save(any(Movimentacao.class));
+    }
+
+    @Test
+    @DisplayName("criarParaDiagnostico deve lançar exceção quando unidadeMapa é null")
+    void criarParaDiagnostico_UnidadeMapaNull() {
+        Processo processo = new Processo();
+        Unidade unidade = new Unidade();
+        unidade.setSigla("U1");
+
+        assertThatThrownBy(() -> factory.criarParaDiagnostico(processo, unidade, null))
+                .isInstanceOf(ErroProcesso.class)
+                .hasMessageContaining("não possui mapa vigente");
     }
 }
