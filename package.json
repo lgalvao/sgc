@@ -19,5 +19,8 @@
     "lighthouse": "^13.0.1",
     "typescript": "^5.9.3"
   },
-  "description": "Testes E2E"
+  "description": "Testes E2E",
+  "dependencies": {
+    "xml2js": "^0.6.2"
+  }
 }
