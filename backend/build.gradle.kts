@@ -11,9 +11,6 @@ plugins {
 }
 
 java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
 }
 
 tasks.withType<JavaCompile> {
@@ -124,7 +121,7 @@ tasks.withType<Test> {
         exceptionFormat = TestExceptionFormat.FULL
         showStackTraces = true
         showCauses = true
-        showStandardStreams = false
+        showStandardStreams = true
     }
 
     addTestListener(object : TestListener {
@@ -171,7 +168,6 @@ tasks.withType<Test> {
 }
 
 tasks.named<Test>("test") {
-    // Padrão: Executa TUDO (sem filtros)
     description = "Executa TODOS os testes (Unitários e Integração)."
 }
 

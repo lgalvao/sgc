@@ -47,6 +47,7 @@ public class WithMockCustomUserSecurityContextFactory
                 .ramal("321")
                 .unidadeLotacao(unidade)
                 .build();
+        principal.setAtribuicoes(new java.util.HashSet<>());
         final Unidade finalUnidade = unidade;
         Arrays.stream(customUser.perfis())
                 .forEach(

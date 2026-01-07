@@ -3,42 +3,49 @@ package sgc.alerta;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import sgc.comum.erros.RestExceptionHandler;
-
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.annotation.Import;
+import sgc.integracao.mocks.TestSecurityConfig;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AlertaController.class)
-@Import(RestExceptionHandler.class)
-@DisplayName("Testes Unitários: AlertaController")
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Transactional
+@Import(TestSecurityConfig.class)
+@DisplayName("AlertaController")
 class AlertaControllerTest {
-    @MockitoBean
-    private AlertaService alertaService;
 
     @Autowired
     private MockMvc mockMvc;
 
-    private static final String TITULO_TESTE = "123456789012";
+    @MockitoBean
+    private AlertaService alertaService;
+
+    private static final String TITULO_TESTE = "12345678901"; // 11 ou 12 dígitos
 
     @Test
     @DisplayName("marcarComoLidos_quandoSucesso_deveRetornarOk")
     void marcarComoLidos_quandoSucesso_deveRetornarOk() throws Exception {
         mockMvc.perform(post("/api/alertas/marcar-como-lidos")
-                        .with(csrf())
                         .with(user(TITULO_TESTE))
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("[1, 2, 3]"))
                 .andExpect(status().isOk());
@@ -50,8 +57,8 @@ class AlertaControllerTest {
     @DisplayName("marcarComoLidos_quandoListaVazia_deveRetornarOk")
     void marcarComoLidos_quandoListaVazia_deveRetornarOk() throws Exception {
         mockMvc.perform(post("/api/alertas/marcar-como-lidos")
-                        .with(csrf())
                         .with(user(TITULO_TESTE))
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("[]"))
                 .andExpect(status().isOk());

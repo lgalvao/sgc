@@ -61,7 +61,7 @@ describe('ModalConfirmacao.vue', () => {
         const bModalComp = wrapper.findComponent('.b-modal-stub')
 
         if (bModalComp.exists()) {
-            await (bModalComp.vm as any).$emit('shown')
+            await (bModalComp as any).vm.$emit('shown')
         } else {
             (wrapper.vm as any).onShown()
         }

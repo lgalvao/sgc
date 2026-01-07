@@ -39,8 +39,9 @@ backend/bin/
 /dados/
 
 # Reports de testes
-!backend/build/reports/tests/test/index.html
+!backend/build/reports/tests/test/
 !frontend/coverage/coverage-final.json
 
 # Jqwik
 .jqwik-database
+
