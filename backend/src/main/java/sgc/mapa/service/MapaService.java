@@ -186,12 +186,11 @@ public class MapaService {
         atividadeRepo.saveAll(atividadesAtuais);
 
         // ⚡ Bolt: Otimização
-        // Reutilizamos as listas já em memória (ou recém-fetchadas) para a validação,
-        // evitando 2 queries pesadas adicionais dentro do validador.
-        List<Competencia> competenciasFinais = competenciaRepo.findByMapaCodigo(codMapa);
-        validarIntegridadeMapa(codMapa, atividadesAtuais, competenciasFinais);
+        // Reutilizamos as listas já em memória para a validação,
+        // evitando queries redundantes ao banco.
+        validarIntegridadeMapa(codMapa, atividadesAtuais, competenciasSalvas);
 
-        return mapaCompletoMapper.toDto(mapa, null, competenciasFinais);
+        return mapaCompletoMapper.toDto(mapa, null, competenciasSalvas);
     }
 
     // ========================================================================================
