@@ -84,6 +84,44 @@ class SubprocessoMapaWorkflowServiceTest {
         }
 
         @Test
+        @DisplayName("Não deve alterar situação ao salvar se já tinha competências")
+        void naoDeveAlterarSituacaoSeJaTinhaCompetencias() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+
+            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(new Competencia())); // Já tinha
+
+            SalvarMapaRequest req = new SalvarMapaRequest();
+            req.setCompetencias(List.of(new CompetenciaMapaDto())); // Tem novas
+
+            service.salvarMapaSubprocesso(1L, req, "user");
+
+            verify(subprocessoRepo, never()).save(sp); // Não deve salvar mudança de status
+            verify(mapaService).salvarMapaCompleto(10L, req, "user");
+        }
+
+        @Test
+        @DisplayName("Não deve alterar situação ao salvar se não houver novas competências")
+        void naoDeveAlterarSituacaoSeSemNovasCompetencias() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+
+            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of()); // Era vazio
+
+            SalvarMapaRequest req = new SalvarMapaRequest();
+            req.setCompetencias(List.of()); // Não tem novas
+
+            service.salvarMapaSubprocesso(1L, req, "user");
+
+            verify(subprocessoRepo, never()).save(sp);
+            verify(mapaService).salvarMapaCompleto(10L, req, "user");
+        }
+
+        @Test
         @DisplayName("Deve falhar ao editar mapa em situação inválida")
         void deveFalharEditarMapaSituacaoInvalida() {
             mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
@@ -111,6 +149,25 @@ class SubprocessoMapaWorkflowServiceTest {
             service.adicionarCompetencia(1L, req, "user");
 
             verify(subprocessoRepo).save(sp);
+            verify(competenciaService).adicionarCompetencia(mapa, "Nova Comp", List.of(1L));
+        }
+
+        @Test
+        @DisplayName("Não deve mudar status ao adicionar competência se mapa não era vazio")
+        void naoDeveMudarStatusAdicionarSeNaoVazio() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(new Competencia())); // Não vazio
+
+            CompetenciaReq req = new CompetenciaReq();
+            req.setDescricao("Nova Comp");
+            req.setAtividadesIds(List.of(1L));
+
+            service.adicionarCompetencia(1L, req, "user");
+
+            verify(subprocessoRepo, never()).save(sp);
             verify(competenciaService).adicionarCompetencia(mapa, "Nova Comp", List.of(1L));
         }
 
@@ -146,6 +203,22 @@ class SubprocessoMapaWorkflowServiceTest {
 
             verify(competenciaService).removerCompetencia(5L);
             verify(subprocessoRepo).save(sp);
+        }
+
+        @Test
+        @DisplayName("Não deve mudar status ao remover se não ficou vazio")
+        void naoDeveMudarStatusRemoverSeNaoFicouVazio() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+
+            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(new Competencia())); // Não vazio
+
+            service.removerCompetencia(1L, 5L, "user");
+
+            verify(competenciaService).removerCompetencia(5L);
+            verify(subprocessoRepo, never()).save(sp);
         }
 
         @Test
