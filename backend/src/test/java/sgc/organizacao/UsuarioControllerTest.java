@@ -10,13 +10,16 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import sgc.organizacao.dto.*;
-import sgc.seguranca.dto.*;
+import sgc.comum.erros.RestExceptionHandler;
+import sgc.organizacao.dto.AdministradorDto;
+import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.LimitadorTentativasLogin;
 import sgc.seguranca.autenticacao.AutenticarReq;
-import sgc.comum.erros.RestExceptionHandler;
+import sgc.seguranca.dto.EntrarReq;
+import sgc.seguranca.dto.PerfilUnidadeDto;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
@@ -26,7 +29,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UsuarioController.class)

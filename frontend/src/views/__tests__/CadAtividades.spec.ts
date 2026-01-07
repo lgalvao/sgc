@@ -8,7 +8,7 @@ import {useAnalisesStore} from "@/stores/analises";
 import * as subprocessoService from "@/services/subprocessoService";
 import {SituacaoSubprocesso, TipoProcesso,} from "@/types/tipos";
 import {createTestingPinia} from "@pinia/testing";
-import { nextTick } from "vue";
+import {nextTick} from "vue";
 
 // Mocks
 const mocks = vi.hoisted(() => ({

@@ -1,25 +1,25 @@
-import { setActivePinia, createPinia } from 'pinia';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useSubprocessosStore } from '../subprocessos';
-import { useProcessosStore } from '../processos';
-import { usePerfilStore } from '../perfil';
-import { useUnidadesStore } from '../unidades';
-import { useMapasStore } from '../mapas';
-import { useAtividadesStore } from '../atividades';
-import { useFeedbackStore } from '../feedback';
+import {createPinia, setActivePinia} from 'pinia';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {useSubprocessosStore} from '../subprocessos';
+import {useProcessosStore} from '../processos';
+import {usePerfilStore} from '../perfil';
+import {useUnidadesStore} from '../unidades';
+import {useMapasStore} from '../mapas';
+import {useAtividadesStore} from '../atividades';
+import {useFeedbackStore} from '../feedback';
 import {
     buscarContextoEdicao,
     buscarSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade
 } from '@/services/subprocessoService';
 import {
+    aceitarCadastro,
+    aceitarRevisaoCadastro,
+    devolverCadastro,
+    devolverRevisaoCadastro,
     disponibilizarCadastro,
     disponibilizarRevisaoCadastro,
-    devolverCadastro,
-    aceitarCadastro,
     homologarCadastro,
-    devolverRevisaoCadastro,
-    aceitarRevisaoCadastro,
     homologarRevisaoCadastro
 } from '@/services/cadastroService';
 

@@ -3,9 +3,9 @@ package sgc.organizacao.mapper;
 import org.mapstruct.Mapper;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.AtribuicaoTemporaria;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.Usuario;
 
 @Mapper(componentModel = "spring")

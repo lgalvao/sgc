@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { mount, flushPromises } from "@vue/test-utils";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {flushPromises, mount} from "@vue/test-utils";
 import VisAtividades from "@/views/VisAtividades.vue";
-import { createTestingPinia } from "@pinia/testing";
-import { useSubprocessosStore } from "@/stores/subprocessos";
-import { Perfil, SituacaoSubprocesso, TipoProcesso } from "@/types/tipos";
-import { useRouter } from "vue-router";
+import {createTestingPinia} from "@pinia/testing";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
+import {useRouter} from "vue-router";
 
 // Hoist mocks to avoid ReferenceError
 const { mockApiClient } = vi.hoisted(() => {

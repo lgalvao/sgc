@@ -8,10 +8,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
 
 import java.util.Optional;
 

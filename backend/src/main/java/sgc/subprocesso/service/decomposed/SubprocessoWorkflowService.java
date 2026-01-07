@@ -4,17 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.processo.model.TipoProcesso;
+import sgc.alerta.AlertaService;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.UnidadeService;
 import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.alerta.AlertaService;
-import sgc.comum.erros.ErroValidacao;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.*;
+
 import java.util.List;
 import java.util.Map;
 

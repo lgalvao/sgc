@@ -11,19 +11,20 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import sgc.alerta.AlertaService;
+import sgc.organizacao.UnidadeService;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
 import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.UnidadeService;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;

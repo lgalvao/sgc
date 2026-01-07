@@ -7,12 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.seguranca.dto.PerfilUnidadeDto;
-import sgc.seguranca.dto.EntrarReq;
 import sgc.comum.erros.ErroAutenticacao;
-import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.Perfil;
+import sgc.seguranca.dto.EntrarReq;
+import sgc.seguranca.dto.PerfilUnidadeDto;
 
 import java.util.List;
 import java.util.Map;

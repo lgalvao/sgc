@@ -84,7 +84,7 @@ import SubprocessoModal from "@/components/SubprocessoModal.vue";
 import TabelaMovimentacoes from "@/components/TabelaMovimentacoes.vue";
 import {useMapasStore} from "@/stores/mapas";
 import {useFeedbackStore} from "@/stores/feedback";
-import {reabrirCadastro, reabrirRevisaoCadastro, enviarLembrete} from "@/services/processoService";
+import {enviarLembrete, reabrirCadastro, reabrirRevisaoCadastro} from "@/services/processoService";
 
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso,} from "@/types/tipos";

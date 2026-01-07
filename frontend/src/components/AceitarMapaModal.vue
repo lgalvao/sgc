@@ -53,8 +53,8 @@
 </template>
 
 <script lang="ts" setup>
-import { BButton, BFormTextarea, BModal } from "bootstrap-vue-next";
-import { computed, ref } from "vue";
+import {BButton, BFormTextarea, BModal} from "bootstrap-vue-next";
+import {computed, ref} from "vue";
 
 interface Props {
     mostrarModal: boolean;

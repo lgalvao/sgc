@@ -7,11 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.AtividadeRepo;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.model.*;
 
 import java.util.HashSet;
 import java.util.List;

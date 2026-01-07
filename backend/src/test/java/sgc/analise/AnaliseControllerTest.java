@@ -17,8 +17,8 @@ import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
-import sgc.subprocesso.service.SubprocessoService;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.SubprocessoService;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;

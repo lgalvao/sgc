@@ -11,10 +11,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.integracao.mocks.TestConfig;
-import sgc.seguranca.GerenciadorJwt;
 import sgc.organizacao.model.*;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
+import sgc.seguranca.GerenciadorJwt;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

@@ -16,13 +16,9 @@ import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.*;
 import sgc.seguranca.autenticacao.AutenticarReq;
 import sgc.seguranca.dto.EntrarReq;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.util.TestUtil;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;

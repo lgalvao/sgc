@@ -20,7 +20,10 @@ import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.*;
+import sgc.subprocesso.service.SubprocessoContextoService;
+import sgc.subprocesso.service.SubprocessoMapaService;
+import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.List;
 

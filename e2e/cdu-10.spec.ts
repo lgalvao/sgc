@@ -1,7 +1,12 @@
 import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades, disponibilizarCadastro} from './helpers/helpers-atividades';
+import {
+    adicionarAtividade,
+    adicionarConhecimento,
+    disponibilizarCadastro,
+    navegarParaAtividades
+} from './helpers/helpers-atividades';
 import {abrirHistoricoAnalise, acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
 import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';

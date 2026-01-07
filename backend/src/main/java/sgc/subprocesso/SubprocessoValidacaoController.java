@@ -14,8 +14,8 @@ import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.model.TipoAnalise;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
-import sgc.subprocesso.service.SubprocessoService;
 import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.List;
 

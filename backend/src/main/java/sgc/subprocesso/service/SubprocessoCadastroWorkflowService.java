@@ -13,14 +13,14 @@ import sgc.comum.erros.ErroInvarianteViolada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
-import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
-import sgc.subprocesso.eventos.TipoTransicao;
+import sgc.organizacao.UnidadeService;
+import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
+import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
+import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.UnidadeService;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 

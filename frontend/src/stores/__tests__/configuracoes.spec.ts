@@ -1,6 +1,6 @@
-import { setActivePinia, createPinia } from 'pinia';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useConfiguracoesStore } from '../configuracoes';
+import {createPinia, setActivePinia} from 'pinia';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {useConfiguracoesStore} from '../configuracoes';
 
 // Mock API Client
 vi.mock('@/axios-setup', () => ({

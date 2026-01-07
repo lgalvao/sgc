@@ -102,7 +102,7 @@ import {BAlert, BBadge, BContainer} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import ModalAcaoBloco, { type UnidadeSelecao } from "@/components/ModalAcaoBloco.vue";
+import ModalAcaoBloco, {type UnidadeSelecao} from "@/components/ModalAcaoBloco.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import ProcessoAcoes from "@/components/ProcessoAcoes.vue";
 import TreeTable from "@/components/TreeTableView.vue";

@@ -8,9 +8,9 @@ import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAnalise;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.organizacao.model.Unidade;
 import sgc.organizacao.UnidadeService;
+import sgc.organizacao.model.Unidade;
+import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDateTime;
 import java.util.List;

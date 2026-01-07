@@ -3,18 +3,21 @@ package sgc.subprocesso.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
-import sgc.subprocesso.dto.*;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.service.decomposed.*;
-import sgc.organizacao.UsuarioService;
-import org.springframework.security.core.context.SecurityContextHolder;
-import sgc.comum.erros.ErroAccessoNegado;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.decomposed.SubprocessoCrudService;
+import sgc.subprocesso.service.decomposed.SubprocessoDetalheService;
+import sgc.subprocesso.service.decomposed.SubprocessoValidacaoService;
+import sgc.subprocesso.service.decomposed.SubprocessoWorkflowService;
 
 import java.util.List;
 

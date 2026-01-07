@@ -10,7 +10,7 @@ import {
     homologarCadastro,
     homologarRevisaoCadastro,
 } from "@/services/cadastroService";
-import { apiClient } from "@/axios-setup";
+import {apiClient} from "@/axios-setup";
 import {
     buscarContextoEdicao as serviceBuscarContextoEdicao,
     buscarSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,

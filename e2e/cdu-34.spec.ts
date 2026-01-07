@@ -1,7 +1,7 @@
 import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
-import {verificarPaginaPainel, navegarParaSubprocesso} from './helpers/helpers-navegacao';
+import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 /**

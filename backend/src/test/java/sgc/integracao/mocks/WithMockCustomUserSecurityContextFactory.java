@@ -7,11 +7,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.*;
 
 import java.util.Arrays;
 

@@ -8,9 +8,9 @@ import sgc.alerta.AlertaService;
 import sgc.notificacao.EventoProcessoListener;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
+import sgc.organizacao.UsuarioService;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.service.ProcessoService;
-import sgc.organizacao.UsuarioService;
 import sgc.subprocesso.service.SubprocessoService;
 
 /**

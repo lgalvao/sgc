@@ -1,9 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { mount } from "@vue/test-utils";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {mount} from "@vue/test-utils";
 import HistoricoView from "@/views/HistoricoView.vue";
-import { createTestingPinia } from "@pinia/testing";
-import { useRouter } from "vue-router";
-import { apiClient } from "@/axios-setup";
+import {createTestingPinia} from "@pinia/testing";
+import {useRouter} from "vue-router";
+import {apiClient} from "@/axios-setup";
 
 // Mock router
 vi.mock("vue-router", () => ({

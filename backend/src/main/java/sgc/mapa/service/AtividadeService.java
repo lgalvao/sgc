@@ -2,23 +2,18 @@ package sgc.mapa.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.dto.AtividadeDto;
-import sgc.mapa.dto.ConhecimentoDto;
-import sgc.mapa.mapper.AtividadeMapper;
-import sgc.mapa.mapper.ConhecimentoMapper;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.AtividadeRepo;
-import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.ConhecimentoRepo;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.organizacao.UsuarioService;
-import org.springframework.context.ApplicationEventPublisher;
+import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.evento.EventoMapaAlterado;
+import sgc.mapa.mapper.AtividadeMapper;
+import sgc.mapa.mapper.ConhecimentoMapper;
+import sgc.mapa.model.*;
+import sgc.organizacao.UsuarioService;
 
 import java.util.List;
 

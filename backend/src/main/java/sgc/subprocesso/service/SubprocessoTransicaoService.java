@@ -4,13 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
 
 /**
  * Serviço responsável por registrar transições de subprocesso.

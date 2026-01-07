@@ -56,8 +56,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
-import { Modal } from 'bootstrap';
+import {computed, onMounted, ref, watch} from 'vue';
+import {Modal} from 'bootstrap';
 
 export interface UnidadeSelecao {
   codigo: number;

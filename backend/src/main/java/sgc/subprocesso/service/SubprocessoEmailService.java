@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import sgc.notificacao.NotificacaoEmailService;
+import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.organizacao.model.Unidade;
 
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;

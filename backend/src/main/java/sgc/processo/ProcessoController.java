@@ -5,18 +5,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.dto.*;
+import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
 import sgc.subprocesso.dto.SubprocessoDto;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-import sgc.processo.model.TipoProcesso;
 
 /**
  * Controller REST para Processos. Implementa endpoints CRUD e ações de iniciar/finalizar processo

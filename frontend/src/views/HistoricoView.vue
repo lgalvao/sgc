@@ -62,10 +62,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { BContainer, BRow, BCol, BCard, BButton } from 'bootstrap-vue-next';
-import { apiClient } from '@/axios-setup';
+import {onMounted, ref} from 'vue';
+import {useRouter} from 'vue-router';
+import {BButton, BCard, BCol, BContainer, BRow} from 'bootstrap-vue-next';
+import {apiClient} from '@/axios-setup';
 
 interface ProcessoResumo {
   codigo: number;

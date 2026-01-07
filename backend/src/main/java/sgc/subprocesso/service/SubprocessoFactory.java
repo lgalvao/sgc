@@ -6,15 +6,15 @@ import org.springframework.stereotype.Service;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.CopiaMapaService;
+import sgc.organizacao.model.TipoUnidade;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeMapa;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeMapa;
 
 import java.util.List;
 

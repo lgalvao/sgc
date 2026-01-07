@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
-import { mount } from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
+import {mount} from '@vue/test-utils';
 import SubprocessoCards from '@/components/SubprocessoCards.vue';
-import { TipoProcesso } from '@/types/tipos';
+import {TipoProcesso} from '@/types/tipos';
 
 const pushMock = vi.fn();
 vi.mock('vue-router', () => ({

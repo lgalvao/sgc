@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.model.TipoProcesso;
-import sgc.organizacao.model.Unidade;
 
 import java.time.LocalDateTime;
 import java.util.List;

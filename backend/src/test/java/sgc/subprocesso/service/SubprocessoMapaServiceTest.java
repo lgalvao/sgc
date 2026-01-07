@@ -18,14 +18,18 @@ import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
-import sgc.subprocesso.model.*;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes Unitários: SubprocessoMapaService")

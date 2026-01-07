@@ -11,10 +11,10 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.Conhecimento;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
@@ -23,8 +23,8 @@ import sgc.organizacao.model.UsuarioPerfil;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
-import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoPermissoesService;
 
 import java.util.List;
@@ -33,7 +33,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes para SubprocessoDetalheService")

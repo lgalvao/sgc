@@ -7,13 +7,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;

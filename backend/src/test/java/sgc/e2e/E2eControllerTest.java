@@ -11,8 +11,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.processo.service.ProcessoService;
 import sgc.organizacao.UsuarioService;
+import sgc.processo.service.ProcessoService;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;

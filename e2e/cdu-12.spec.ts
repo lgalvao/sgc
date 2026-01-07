@@ -1,5 +1,4 @@
 import {expect, test} from './fixtures/base';
-import {Page} from '@playwright/test';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {
@@ -10,8 +9,8 @@ import {
     fecharModalImpacto,
     navegarParaAtividades,
     removerAtividade,
-    verificarBotaoImpactoDropdown,
-    verificarBotaoImpactoDireto
+    verificarBotaoImpactoDireto,
+    verificarBotaoImpactoDropdown
 } from './helpers/helpers-atividades';
 import {fazerLogout, limparNotificacoes, navegarParaSubprocesso} from './helpers/helpers-navegacao';
 import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise';

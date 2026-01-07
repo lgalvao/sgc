@@ -12,6 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.mapa.model.Mapa;
+import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.dto.PerfilDto;
+import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.*;
 import sgc.processo.dto.mappers.ProcessoMapper;
 import sgc.processo.erros.ErroProcesso;
@@ -22,25 +26,21 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.organizacao.UsuarioService;
-import sgc.organizacao.dto.PerfilDto;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.UnidadeService;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static sgc.organizacao.model.TipoUnidade.INTERMEDIARIA;
 import static sgc.processo.model.SituacaoProcesso.CRIADO;
 import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
 import static sgc.processo.model.TipoProcesso.REVISAO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
-import static sgc.organizacao.model.TipoUnidade.INTERMEDIARIA;
 
 @Service
 @RequiredArgsConstructor

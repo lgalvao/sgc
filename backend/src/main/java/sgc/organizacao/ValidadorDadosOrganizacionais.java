@@ -8,12 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroConfiguracao;
-import sgc.organizacao.model.SituacaoUnidade;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
+import sgc.organizacao.model.*;
 
 import java.util.ArrayList;
 import java.util.List;

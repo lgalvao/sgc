@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import sgc.comum.model.EntidadeBase;
 import sgc.mapa.model.Mapa;
-import sgc.processo.model.Processo;
 import sgc.organizacao.model.Unidade;
+import sgc.processo.model.Processo;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;

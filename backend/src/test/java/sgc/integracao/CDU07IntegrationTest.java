@@ -19,15 +19,13 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockCustomUser;
+import sgc.organizacao.model.*;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.organizacao.model.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 

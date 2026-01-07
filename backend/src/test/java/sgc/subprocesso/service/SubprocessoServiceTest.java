@@ -16,19 +16,23 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaService;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.UsuarioService;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.service.decomposed.*;
+import sgc.subprocesso.service.decomposed.SubprocessoCrudService;
+import sgc.subprocesso.service.decomposed.SubprocessoDetalheService;
+import sgc.subprocesso.service.decomposed.SubprocessoValidacaoService;
+import sgc.subprocesso.service.decomposed.SubprocessoWorkflowService;
 
 import java.util.Collections;
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 

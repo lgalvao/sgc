@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import {describe, expect, it} from 'vitest';
 import fc from 'fast-check';
-import { validarEmail, validarSenha } from '../validators';
+import {validarEmail, validarSenha} from '../validators';
 
 describe('Propriedades de Validação (validators.ts)', () => {
 

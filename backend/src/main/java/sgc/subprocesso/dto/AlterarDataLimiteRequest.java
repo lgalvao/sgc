@@ -1,8 +1,9 @@
 package sgc.subprocesso.dto;
 
-import java.time.LocalDate;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import java.time.LocalDate;
 
 @Data
 public class AlterarDataLimiteRequest {

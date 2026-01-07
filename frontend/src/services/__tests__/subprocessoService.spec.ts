@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import * as subprocessoService from '../subprocessoService';
 import apiClient from '@/axios-setup';
 import * as mapasMapper from '@/mappers/mapas';

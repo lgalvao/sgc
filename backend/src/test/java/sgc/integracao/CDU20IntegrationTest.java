@@ -17,14 +17,14 @@ import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockChefe;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.DevolverValidacaoReq;
 import sgc.subprocesso.model.*;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 

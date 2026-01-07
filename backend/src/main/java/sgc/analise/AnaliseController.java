@@ -10,8 +10,8 @@ import sgc.analise.dto.CriarAnaliseApiRequest;
 import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
-import sgc.subprocesso.service.SubprocessoService;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.List;
 

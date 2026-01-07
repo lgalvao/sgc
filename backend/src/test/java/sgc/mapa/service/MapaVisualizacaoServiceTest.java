@@ -9,9 +9,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.model.*;
+import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.organizacao.model.Unidade;
 
 import java.util.List;
 import java.util.Set;

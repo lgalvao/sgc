@@ -16,6 +16,8 @@ import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.dto.EnviarLembreteReq;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
@@ -24,11 +26,10 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

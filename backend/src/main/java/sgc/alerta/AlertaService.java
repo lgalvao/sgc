@@ -10,11 +10,11 @@ import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.dto.AlertaMapper;
 import sgc.alerta.model.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.processo.model.Processo;
-import sgc.organizacao.model.Usuario;
+import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.Usuario;
+import sgc.processo.model.Processo;
 
 import java.time.LocalDateTime;
 import java.util.*;

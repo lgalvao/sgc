@@ -22,14 +22,9 @@ import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
+import sgc.organizacao.model.*;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.model.UsuarioRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -4,23 +4,25 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
-import sgc.mapa.service.AtividadeService;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.model.Mapa;
+import sgc.mapa.service.AtividadeService;
+import sgc.mapa.service.CompetenciaService;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.ErroValidacaoDto;
 import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroAccessoNegado;
-import sgc.comum.erros.ErroValidacao;
-import sgc.organizacao.UsuarioService;
-import sgc.organizacao.model.Usuario;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.stream.Collectors;
+
 import static java.util.Collections.emptyList;
 
 @Service

@@ -3,7 +3,7 @@ import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas';
-import {verificarPaginaPainel, navegarParaSubprocesso} from './helpers/helpers-navegacao';
+import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 /**

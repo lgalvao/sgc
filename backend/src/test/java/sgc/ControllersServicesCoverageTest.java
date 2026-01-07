@@ -6,46 +6,44 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.PageRequest;
-
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.service.MapaService;
+import sgc.organizacao.UnidadeService;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.painel.PainelService;
+import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.subprocesso.SubprocessoMapaController;
-import sgc.subprocesso.service.SubprocessoService;
-import sgc.subprocesso.service.SubprocessoContextoService;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroAccessoNegado;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
-import java.util.Optional;
-import java.util.List;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
+import sgc.subprocesso.service.SubprocessoContextoService;
+import sgc.subprocesso.service.SubprocessoService;
+
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-
-// Imports para novos testes
-import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
-import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.UnidadeService;
-import sgc.painel.PainelService;
-import sgc.painel.erros.ErroParametroPainelInvalido;
-import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.model.SituacaoSubprocesso;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Cobertura Extra de Controllers e Services")

@@ -1,10 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {
-    setupServiceTest,
-    testErrorHandling,
-    testGetEndpoint,
-    testPostEndpoint
-} from "@/test-utils/serviceTestHelpers";
+import {setupServiceTest, testErrorHandling, testGetEndpoint, testPostEndpoint} from "@/test-utils/serviceTestHelpers";
 import {diagnosticoService} from "../diagnosticoService";
 
 describe("diagnosticoService", () => {

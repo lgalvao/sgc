@@ -1,15 +1,17 @@
 package sgc.processo.service;
 
-import net.jqwik.api.*;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyLong;

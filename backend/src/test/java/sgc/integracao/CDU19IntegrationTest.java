@@ -20,13 +20,13 @@ import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.*;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 
 import java.util.List;
 

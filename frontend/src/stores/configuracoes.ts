@@ -1,6 +1,6 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
-import { apiClient } from "@/axios-setup";
+import {defineStore} from "pinia";
+import {ref} from "vue";
+import {apiClient} from "@/axios-setup";
 
 export interface Parametro {
     id?: number;

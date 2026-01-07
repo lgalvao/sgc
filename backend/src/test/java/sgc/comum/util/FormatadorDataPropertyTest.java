@@ -1,6 +1,8 @@
 package sgc.comum.util;
 
-import net.jqwik.api.*;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+
 import java.time.LocalDateTime;
 
 class FormatadorDataPropertyTest {

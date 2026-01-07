@@ -1,7 +1,7 @@
 package sgc.seguranca;
 
-import tools.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

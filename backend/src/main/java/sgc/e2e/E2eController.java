@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
-import sgc.organizacao.UsuarioService;
-import sgc.organizacao.dto.UnidadeDto;
 
 import javax.sql.DataSource;
 import java.io.File;

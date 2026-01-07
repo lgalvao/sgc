@@ -11,13 +11,17 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.organizacao.model.*;
-import sgc.seguranca.autenticacao.AcessoAdClient;
-import sgc.seguranca.GerenciadorJwt;
-import sgc.seguranca.dto.EntrarReq;
-import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.dto.ResponsavelDto;
-import java.util.*;
+import sgc.organizacao.dto.UsuarioDto;
+import sgc.organizacao.model.*;
+import sgc.seguranca.GerenciadorJwt;
+import sgc.seguranca.autenticacao.AcessoAdClient;
+import sgc.seguranca.dto.EntrarReq;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

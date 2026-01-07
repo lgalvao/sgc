@@ -6,12 +6,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.util.FormatadorData;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.model.Processo;
-import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.model.Unidade;
 
 import java.util.*;
 

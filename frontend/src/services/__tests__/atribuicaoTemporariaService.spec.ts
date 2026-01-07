@@ -1,10 +1,5 @@
 import {describe} from "vitest";
-import {
-    setupServiceTest,
-    testErrorHandling,
-    testGetEndpoint,
-    testPostEndpoint
-} from "@/test-utils/serviceTestHelpers";
+import {setupServiceTest, testErrorHandling, testGetEndpoint, testPostEndpoint} from "@/test-utils/serviceTestHelpers";
 import {buscarTodasAtribuicoes, criarAtribuicaoTemporaria} from "../atribuicaoTemporariaService";
 
 describe("atribuicaoTemporariaService", () => {

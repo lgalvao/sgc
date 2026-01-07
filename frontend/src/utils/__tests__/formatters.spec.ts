@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { formatarSituacaoProcesso, formatarTipoProcesso, limparCpf, formatarCpf } from '../formatters';
-import { SituacaoProcesso, TipoProcesso } from '@/types/tipos';
+import {describe, expect, it} from 'vitest';
+import {formatarCpf, formatarSituacaoProcesso, formatarTipoProcesso, limparCpf} from '../formatters';
+import {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 
 describe('formatters', () => {
     describe('formatarSituacaoProcesso', () => {

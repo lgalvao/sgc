@@ -9,12 +9,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.organizacao.model.Perfil;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
-import sgc.organizacao.model.Perfil;
 
 import java.time.LocalDateTime;
 import java.util.List;

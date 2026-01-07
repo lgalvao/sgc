@@ -108,7 +108,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BContainer, BModal,} from "bootstrap-vue-next";
+import {BAlert, BButton, BContainer,} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";

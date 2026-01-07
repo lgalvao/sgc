@@ -1,10 +1,6 @@
 package sgc.mapa.service;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -16,11 +12,11 @@ import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.ConhecimentoRepo;
 import sgc.mapa.model.MapaRepo;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
 
 import java.util.List;
 import java.util.Optional;

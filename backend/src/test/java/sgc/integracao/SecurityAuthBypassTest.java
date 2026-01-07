@@ -13,12 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.organizacao.model.*;
 import sgc.seguranca.dto.EntrarReq;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.util.TestUtil;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;

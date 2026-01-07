@@ -3,15 +3,15 @@ package sgc.seguranca;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import sgc.comum.erros.ErroNegocioBase;
-import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.Map;
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 

@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { validarEmail, validarSenha } from '../validators';
+import {describe, expect, it} from 'vitest';
+import {validarEmail, validarSenha} from '../validators';
 
 describe('validators', () => {
     describe('validarEmail', () => {

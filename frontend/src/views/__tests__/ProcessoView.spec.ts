@@ -1,13 +1,13 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { mount, flushPromises } from "@vue/test-utils";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {flushPromises, mount} from "@vue/test-utils";
 import ProcessoView from "@/views/ProcessoView.vue";
-import { createTestingPinia } from "@pinia/testing";
-import { useProcessosStore } from "@/stores/processos";
-import { useFeedbackStore } from "@/stores/feedback";
-import { usePerfilStore } from "@/stores/perfil";
-import { Perfil, SituacaoSubprocesso } from "@/types/tipos";
+import {createTestingPinia} from "@pinia/testing";
+import {useProcessosStore} from "@/stores/processos";
+import {useFeedbackStore} from "@/stores/feedback";
+import {usePerfilStore} from "@/stores/perfil";
+import {Perfil, SituacaoSubprocesso} from "@/types/tipos";
 import * as subprocessoService from "@/services/subprocessoService";
-import { nextTick } from "vue";
+import {nextTick} from "vue";
 
 // Define mocks first
 const mocks = vi.hoisted(() => ({

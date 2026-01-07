@@ -4,30 +4,32 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.service.AtividadeService;
-import sgc.mapa.model.Conhecimento;
-import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.model.Competencia;
-import sgc.subprocesso.dto.*;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.analise.AnaliseService;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
+import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.mapper.ConhecimentoMapper;
-import sgc.comum.erros.ErroAccessoNegado;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.Conhecimento;
+import sgc.mapa.service.AtividadeService;
+import sgc.mapa.service.CompetenciaService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoPermissoesService;
-import java.util.List;
+
 import java.util.ArrayList;
+import java.util.List;
+
 import static java.util.Collections.emptyList;
 
 @Service

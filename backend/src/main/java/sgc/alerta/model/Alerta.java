@@ -3,9 +3,9 @@ package sgc.alerta.model;
 import jakarta.persistence.*;
 import lombok.*;
 import sgc.comum.model.EntidadeBase;
-import sgc.processo.model.Processo;
-import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.processo.model.Processo;
 
 import java.time.LocalDateTime;
 

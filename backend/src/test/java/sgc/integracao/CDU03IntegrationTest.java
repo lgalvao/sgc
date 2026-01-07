@@ -14,11 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.model.TipoProcesso;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
 
 import java.nio.charset.StandardCharsets;

@@ -14,13 +14,13 @@ import sgc.analise.dto.AnaliseMapper;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.Usuario;
 import sgc.seguranca.SanitizacaoUtil;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.SubprocessoMapaService;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.organizacao.UsuarioService;
-import sgc.organizacao.model.Usuario;
 
 import java.util.List;
 import java.util.Map;

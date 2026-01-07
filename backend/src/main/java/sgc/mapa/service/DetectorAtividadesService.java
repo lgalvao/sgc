@@ -3,14 +3,12 @@ package sgc.mapa.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sgc.mapa.dto.AtividadeImpactadaDto;
-import sgc.mapa.model.TipoImpactoAtividade;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.TipoImpactoAtividade;
 
 import java.util.*;
-
-// Refactored in Phase 2
 import java.util.stream.Collectors;
 
 /**

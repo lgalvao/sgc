@@ -16,10 +16,10 @@ import sgc.mapa.evento.EventoMapaAlterado;
 import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.*;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.organizacao.model.Unidade;
 import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
+import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 import java.util.Optional;

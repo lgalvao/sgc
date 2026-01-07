@@ -8,12 +8,12 @@ import sgc.analise.AnaliseService;
 import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
 
 @Service
 @RequiredArgsConstructor
