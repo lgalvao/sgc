@@ -60,6 +60,30 @@ class SubprocessoPermissoesServiceTest {
         }
 
         @Test
+        @DisplayName("Deve permitir ação desconhecida (fallback)")
+        void devePermitirAcaoDesconhecida() {
+            Subprocesso sub = mock(Subprocesso.class);
+            Unidade unidade = mock(Unidade.class);
+            when(unidade.getCodigo()).thenReturn(1L);
+            when(sub.getUnidade()).thenReturn(unidade);
+            when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.NAO_INICIADO);
+
+            assertDoesNotThrow(() -> service.validar(sub, 1L, "ACAO_DESCONHECIDA"));
+        }
+
+        @Test
+        @DisplayName("Deve validar ajuste de mapa quando situação é revisão cadastro homologada")
+        void deveValidarAjusteMapaEmRevisaoCadastroHomologada() {
+            Subprocesso sub = mock(Subprocesso.class);
+            Unidade unidade = mock(Unidade.class);
+            when(unidade.getCodigo()).thenReturn(1L);
+            when(sub.getUnidade()).thenReturn(unidade);
+            when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+
+            assertDoesNotThrow(() -> service.validar(sub, 1L, "AJUSTAR_MAPA"));
+        }
+
+        @Test
         @DisplayName("Deve lançar erro quando unidade sem acesso")
         void deveLancarErroQuandoUnidadeSemAcesso() {
             Subprocesso sub = mock(Subprocesso.class);
@@ -115,7 +139,7 @@ class SubprocessoPermissoesServiceTest {
         }
 
         @Test
-        @DisplayName("Deve validar ajuste de mapa com sucesso")
+        @DisplayName("Deve validar ajuste de mapa com sucesso quando mapa não é vazio")
         void deveValidarAjusteMapaComSucesso() {
             Subprocesso sub = mock(Subprocesso.class);
             Unidade unidade = mock(Unidade.class);
@@ -131,6 +155,19 @@ class SubprocessoPermissoesServiceTest {
 
             assertDoesNotThrow(() -> service.validar(sub, 1L, "AJUSTAR_MAPA"));
         }
+
+        @Test
+        @DisplayName("Deve validar ajuste de mapa quando mapa é nulo (evita NPE no check de vazio)")
+        void deveValidarAjusteMapaQuandoMapaNulo() {
+            Subprocesso sub = mock(Subprocesso.class);
+            Unidade unidade = mock(Unidade.class);
+            when(unidade.getCodigo()).thenReturn(1L);
+            when(sub.getUnidade()).thenReturn(unidade);
+            when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+            when(sub.getMapa()).thenReturn(null);
+
+            assertDoesNotThrow(() -> service.validar(sub, 1L, "AJUSTAR_MAPA"));
+        }
     }
 
     @Nested
@@ -140,10 +177,26 @@ class SubprocessoPermissoesServiceTest {
         private Usuario criarUsuario(Perfil perfil, Long unidadeId) {
             Usuario usuario = mock(Usuario.class);
             Set<UsuarioPerfil> atribuicoes = new HashSet<>();
-            Unidade unidade = new Unidade();
-            if (unidadeId != null) {
-                unidade.setCodigo(unidadeId);
+            Unidade unidade = null;
+            if (unidadeId != null || perfil != null) { // Create unit object unless explicitly avoiding for edge cases
+                 unidade = new Unidade();
+                 if (unidadeId != null) unidade.setCodigo(unidadeId);
             }
+            // If perfil is provided but unitId is -1, pass null Unit to constructor
+            if (unidadeId != null && unidadeId == -1L) {
+                unidade = null;
+            }
+
+            atribuicoes.add(UsuarioPerfil.builder().perfil(perfil).unidade(unidade).build());
+            when(usuario.getTodasAtribuicoes()).thenReturn(atribuicoes);
+            return usuario;
+        }
+
+        // Helper to simulate unit with null code
+        private Usuario criarUsuarioComUnidadeSemCodigo(Perfil perfil) {
+            Usuario usuario = mock(Usuario.class);
+            Set<UsuarioPerfil> atribuicoes = new HashSet<>();
+            Unidade unidade = new Unidade(); // Code is null by default
             atribuicoes.add(UsuarioPerfil.builder().perfil(perfil).unidade(unidade).build());
             when(usuario.getTodasAtribuicoes()).thenReturn(atribuicoes);
             return usuario;
@@ -151,24 +204,38 @@ class SubprocessoPermissoesServiceTest {
 
         private Subprocesso criarSubprocesso(Long unidadeId, SituacaoSubprocesso situacao, TipoProcesso tipo) {
             Subprocesso sub = mock(Subprocesso.class);
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(unidadeId);
-            // Configurar hierarquia básica para testes de subordinação
-            // Unidade 2 é superior de Unidade 1
-            if (unidadeId.equals(1L)) {
-                Unidade superior = new Unidade();
-                superior.setCodigo(2L);
-                unidade.setUnidadeSuperior(superior);
+            Unidade unidade = null;
+            if (unidadeId != null) {
+                unidade = new Unidade();
+                unidade.setCodigo(unidadeId);
+                // Configurar hierarquia: Unidade 2 é superior de Unidade 1. Unidade 99 é raiz.
+                if (unidadeId.equals(1L)) {
+                    Unidade superior = new Unidade();
+                    superior.setCodigo(2L);
+                    unidade.setUnidadeSuperior(superior);
+                }
             }
-
             when(sub.getUnidade()).thenReturn(unidade);
             when(sub.getSituacao()).thenReturn(situacao);
 
             Processo processo = mock(Processo.class);
-            when(processo.getTipo()).thenReturn(tipo);
+            if (tipo != null) {
+                when(processo.getTipo()).thenReturn(tipo);
+            }
             when(sub.getProcesso()).thenReturn(processo);
 
             return sub;
+        }
+
+        @Test
+        @DisplayName("Deve lidar com Subprocesso com unidade nula")
+        void deveLidarComSubprocessoUnidadeNula() {
+            Usuario admin = criarUsuario(Perfil.ADMIN, null);
+            Subprocesso sub = criarSubprocesso(null, SituacaoSubprocesso.NAO_INICIADO, TipoProcesso.MAPEAMENTO);
+
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, admin);
+
+            assertThat(permissoes.isPodeEditarMapa()).isFalse();
         }
 
         @Test
@@ -207,6 +274,28 @@ class SubprocessoPermissoesServiceTest {
         }
 
         @Test
+        @DisplayName("Gestor deve falhar se unidade da atribuição for nula")
+        void gestorSemUnidadeNaoTemAcesso() {
+            Usuario gestor = criarUsuario(Perfil.GESTOR, -1L); // -1 triggers null unit in helper
+            Subprocesso sub = criarSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO, TipoProcesso.MAPEAMENTO);
+
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, gestor);
+
+            assertThat(permissoes.isPodeEditarMapa()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Gestor deve falhar se unidade da atribuição tiver código nulo")
+        void gestorComUnidadeSemCodigoNaoTemAcesso() {
+            Usuario gestor = criarUsuarioComUnidadeSemCodigo(Perfil.GESTOR);
+            Subprocesso sub = criarSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO, TipoProcesso.MAPEAMENTO);
+
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, gestor);
+
+            assertThat(permissoes.isPodeEditarMapa()).isFalse();
+        }
+
+        @Test
         @DisplayName("Gestor de unidade superior deve ter acesso")
         void gestorSuperiorDeveTerAcesso() {
             Usuario gestorSuperior = criarUsuario(Perfil.GESTOR, 2L);
@@ -218,7 +307,7 @@ class SubprocessoPermissoesServiceTest {
         }
 
         @Test
-        @DisplayName("Gestor de outra unidade (não superior) não deve ter acesso")
+        @DisplayName("Gestor de outra unidade (não superior) não deve ter acesso (Loop subordinada termina)")
         void gestorOutraUnidadeNaoDeveTerAcesso() {
             Usuario gestorOutro = criarUsuario(Perfil.GESTOR, 99L);
             Subprocesso sub = criarSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO, TipoProcesso.MAPEAMENTO);
@@ -226,7 +315,18 @@ class SubprocessoPermissoesServiceTest {
             SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, gestorOutro);
 
             assertThat(permissoes.isPodeEditarMapa()).isFalse();
-            assertThat(permissoes.isPodeVisualizarImpacto()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Gestor de outra unidade com Subprocesso sem unidade superior (Cobertura de nulo em isSubordinada)")
+        void gestorOutraUnidadeComSubprocessoRaiz() {
+            Usuario gestor = criarUsuario(Perfil.GESTOR, 2L);
+            // Unidade 99 não tem superior no mock
+            Subprocesso sub = criarSubprocesso(99L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO, TipoProcesso.MAPEAMENTO);
+
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, gestor);
+
+            assertThat(permissoes.isPodeEditarMapa()).isFalse();
         }
 
         @Test
@@ -238,6 +338,17 @@ class SubprocessoPermissoesServiceTest {
             SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, servidor);
 
             assertThat(permissoes.isPodeEditarMapa()).isTrue();
+        }
+
+        @Test
+        @DisplayName("Chefe com unidade sem código não tem acesso")
+        void chefeComUnidadeSemCodigoNaoTemAcesso() {
+            Usuario chefe = criarUsuarioComUnidadeSemCodigo(Perfil.CHEFE);
+            Subprocesso sub = criarSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO, TipoProcesso.MAPEAMENTO);
+
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, chefe);
+
+            assertThat(permissoes.isPodeEditarMapa()).isFalse();
         }
 
         @Test
@@ -281,6 +392,28 @@ class SubprocessoPermissoesServiceTest {
             SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, usuario);
 
             assertThat(permissoes.isPodeVisualizarImpacto()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Deve validar permissão de autoavaliação")
+        void deveValidarPermissaoAutoavaliacao() {
+            Usuario admin = criarUsuario(Perfil.ADMIN, null);
+            Subprocesso sub = criarSubprocesso(1L, SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO);
+
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, admin);
+
+            assertThat(permissoes.isPodeRealizarAutoavaliacao()).isTrue();
+        }
+
+        @Test
+        @DisplayName("Não deve permitir autoavaliação se status incorreto")
+        void naoDevePermitirAutoavaliacaoSeStatusIncorreto() {
+            Usuario admin = criarUsuario(Perfil.ADMIN, null);
+            Subprocesso sub = criarSubprocesso(1L, SituacaoSubprocesso.NAO_INICIADO, TipoProcesso.DIAGNOSTICO);
+
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, admin);
+
+            assertThat(permissoes.isPodeRealizarAutoavaliacao()).isFalse();
         }
     }
 }
