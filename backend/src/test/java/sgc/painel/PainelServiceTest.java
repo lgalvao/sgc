@@ -21,8 +21,10 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -119,27 +121,17 @@ class PainelServiceTest {
         assertThat(result.getContent().get(0).getLinkDestino()).isEqualTo("/processo/1/U1");
     }
 
-    private Processo criarProcessoMock(Long codigo) {
-        Processo p = new Processo();
-        p.setCodigo(codigo);
-        p.setDescricao("Processo " + codigo);
-        p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        p.setTipo(TipoProcesso.MAPEAMENTO);
-        p.setDataCriacao(java.time.LocalDateTime.now()); // Fixed: LocalDateTime
-        p.setParticipantes(Collections.emptySet());
-        return p;
-    }
     @Test
     @DisplayName("listarAlertas por unidade deve buscar alertas da unidade")
     void listarAlertas_PorUnidade() {
         sgc.alerta.model.Alerta alerta = new sgc.alerta.model.Alerta();
         alerta.setCodigo(100L);
         alerta.setDescricao("Alerta teste");
-        alerta.setDataHora(java.time.LocalDateTime.now());
+        alerta.setDataHora(LocalDateTime.now());
         
         when(alertaService.listarPorUnidade(any(Long.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(alerta)));
-        when(alertaService.obterDataHoraLeitura(any(), any())).thenReturn(java.util.Optional.empty());
+        when(alertaService.obterDataHoraLeitura(any(), any())).thenReturn(Optional.empty());
 
         Page<sgc.alerta.dto.AlertaDto> result = painelService.listarAlertas("123456", 1L, PageRequest.of(0, 10));
 
@@ -197,7 +189,7 @@ class PainelServiceTest {
         sgc.alerta.model.Alerta alerta = new sgc.alerta.model.Alerta();
         alerta.setCodigo(400L);
         alerta.setDescricao("Alerta sem unidade");
-        alerta.setDataHora(java.time.LocalDateTime.now());
+        alerta.setDataHora(LocalDateTime.now());
         // Unidades null
         
         when(alertaService.listarPorUnidade(any(Long.class), any(Pageable.class)))
@@ -207,5 +199,16 @@ class PainelServiceTest {
 
         assertThat(result.getContent().get(0).getUnidadeOrigem()).isNull();
         assertThat(result.getContent().get(0).getUnidadeDestino()).isNull();
+    }
+
+    private Processo criarProcessoMock(Long codigo) {
+        Processo p = new Processo();
+        p.setCodigo(codigo);
+        p.setDescricao("Processo " + codigo);
+        p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        p.setDataCriacao(LocalDateTime.now());
+        p.setParticipantes(Collections.emptySet());
+        return p;
     }
 }
