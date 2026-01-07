@@ -3,6 +3,7 @@ import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 import type {Processo} from "@/types/tipos";
 import {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
 import {useProcessosStore} from "../processos";
+import {normalizeError} from "@/utils/apiError";
 
 // Mocks
 vi.mock("@/services/painelService");
@@ -32,6 +33,7 @@ describe("useProcessosStore", () => {
 
     // Setup específico dos services que não cabe no setup genérico
     beforeEach(async () => {
+        vi.clearAllMocks();
         painelService = (await import("@/services/painelService")) as Mocked<
             typeof import("@/services/painelService")
         >;
@@ -43,6 +45,12 @@ describe("useProcessosStore", () => {
     it("deve inicializar com o estado padrão", () => {
         expect(context.store.processosPainel).toEqual([]);
         expect(context.store.processoDetalhe).toBeNull();
+    });
+
+    it("deve limpar o erro com clearError", () => {
+        context.store.lastError = normalizeError(new Error("Erro de teste"));
+        context.store.clearError();
+        expect(context.store.lastError).toBeNull();
     });
 
     describe("Actions", () => {
@@ -79,6 +87,29 @@ describe("useProcessosStore", () => {
                 await expect(
                     context.store.buscarProcessosPainel("perfil", 1, 0, 10),
                 ).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
+            });
+        });
+
+        describe("buscarContextoCompleto", () => {
+            it("deve atualizar processoDetalhe e subprocessosElegiveis", async () => {
+                const mockData = {
+                    processo: MOCK_PROCESSO_DETALHE,
+                    elegiveis: [{codigo: 1}]
+                };
+                processoService.buscarContextoCompleto.mockResolvedValue(mockData as any);
+
+                await context.store.buscarContextoCompleto(1);
+
+                expect(processoService.buscarContextoCompleto).toHaveBeenCalledWith(1);
+                expect(context.store.processoDetalhe).toEqual(MOCK_PROCESSO_DETALHE);
+                expect(context.store.subprocessosElegiveis).toEqual([{codigo: 1}]);
+            });
+
+            it("deve lidar com erros", async () => {
+                processoService.buscarContextoCompleto.mockRejectedValue(MOCK_ERROR);
+                await expect(context.store.buscarContextoCompleto(1)).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
@@ -95,6 +126,8 @@ describe("useProcessosStore", () => {
             it("não deve atualizar o estado em caso de falha", async () => {
                 processoService.obterDetalhesProcesso.mockRejectedValue(MOCK_ERROR);
                 await expect(context.store.buscarProcessoDetalhe(1)).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.processoDetalhe).toBeNull();
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
@@ -114,6 +147,7 @@ describe("useProcessosStore", () => {
             it("deve lançar um erro em caso de falha", async () => {
                 processoService.criarProcesso.mockRejectedValue(MOCK_ERROR);
                 await expect(context.store.criarProcesso(payload)).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
@@ -139,6 +173,7 @@ describe("useProcessosStore", () => {
                 await expect(context.store.atualizarProcesso(1, payload)).rejects.toThrow(
                     MOCK_ERROR,
                 );
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
@@ -152,6 +187,7 @@ describe("useProcessosStore", () => {
             it("deve lançar um erro em caso de falha", async () => {
                 processoService.excluirProcesso.mockRejectedValue(MOCK_ERROR);
                 await expect(context.store.removerProcesso(1)).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
@@ -166,7 +202,6 @@ describe("useProcessosStore", () => {
                     TipoProcesso.MAPEAMENTO,
                     [10],
                 );
-                // Nota: O código atual não recarrega detalhes após iniciar
             });
 
             it("deve lançar um erro em caso de falha", async () => {
@@ -174,6 +209,7 @@ describe("useProcessosStore", () => {
                 await expect(
                     context.store.iniciarProcesso(1, TipoProcesso.MAPEAMENTO, [10]),
                 ).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
@@ -191,6 +227,7 @@ describe("useProcessosStore", () => {
             it("deve lançar erro em caso de falha", async () => {
                 processoService.buscarProcessosFinalizados.mockRejectedValue(MOCK_ERROR);
                 await expect(context.store.buscarProcessosFinalizados()).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
@@ -210,6 +247,7 @@ describe("useProcessosStore", () => {
             it("deve lançar erro em caso de falha", async () => {
                 processoService.buscarSubprocessosElegiveis.mockRejectedValue(MOCK_ERROR);
                 await expect(context.store.buscarSubprocessosElegiveis(1)).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
@@ -227,6 +265,7 @@ describe("useProcessosStore", () => {
             it("deve lançar erro em caso de falha", async () => {
                 processoService.finalizarProcesso.mockRejectedValue(MOCK_ERROR);
                 await expect(context.store.finalizarProcesso(1)).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
@@ -253,11 +292,12 @@ describe("useProcessosStore", () => {
                 const payload = { codProcesso: 1 } as any;
                 processoService.processarAcaoEmBloco.mockRejectedValue(MOCK_ERROR);
                 await expect(context.store.processarCadastroBloco(payload)).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
         describe("alterarDataLimiteSubprocesso", () => {
-            it("deve chamar o processoService e recarregar os detalhes", async () => {
+            it("deve chamar o processoService e recarregar os detalhes se disponíveis", async () => {
                 context.store.processoDetalhe = MOCK_PROCESSO_DETALHE;
                 const payload = {novaData: "2026-01-01"};
                 processoService.alterarDataLimiteSubprocesso.mockResolvedValue(undefined);
@@ -271,10 +311,22 @@ describe("useProcessosStore", () => {
                 expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
 
+             it("não deve recarregar detalhes se processoDetalhe for nulo", async () => {
+                context.store.processoDetalhe = null;
+                const payload = {novaData: "2026-01-01"};
+                processoService.alterarDataLimiteSubprocesso.mockResolvedValue(undefined);
+
+                await context.store.alterarDataLimiteSubprocesso(1, payload);
+
+                expect(processoService.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(1, payload);
+                expect(processoService.obterDetalhesProcesso).not.toHaveBeenCalled();
+            });
+
             it("deve lançar erro em caso de falha", async () => {
                 const payload = {novaData: "2026-01-01"};
                 processoService.alterarDataLimiteSubprocesso.mockRejectedValue(MOCK_ERROR);
                 await expect(context.store.alterarDataLimiteSubprocesso(1, payload)).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
@@ -294,10 +346,22 @@ describe("useProcessosStore", () => {
                 expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
 
+            it("não deve recarregar detalhes se processoDetalhe for nulo", async () => {
+                context.store.processoDetalhe = null;
+                const payload = {sugestoes: "sugestoes"};
+                processoService.apresentarSugestoes.mockResolvedValue(undefined);
+
+                await context.store.apresentarSugestoes(1, payload);
+
+                expect(processoService.apresentarSugestoes).toHaveBeenCalledWith(1, payload);
+                expect(processoService.obterDetalhesProcesso).not.toHaveBeenCalled();
+            });
+
             it("deve lançar erro em caso de falha", async () => {
                 const payload = {sugestoes: "sugestoes"};
                 processoService.apresentarSugestoes.mockRejectedValue(MOCK_ERROR);
                 await expect(context.store.apresentarSugestoes(1, payload)).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
@@ -313,9 +377,20 @@ describe("useProcessosStore", () => {
                 expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
 
+             it("não deve recarregar detalhes se processoDetalhe for nulo", async () => {
+                context.store.processoDetalhe = null;
+                processoService.validarMapa.mockResolvedValue(undefined);
+
+                await context.store.validarMapa(1);
+
+                expect(processoService.validarMapa).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).not.toHaveBeenCalled();
+            });
+
             it("deve lançar erro em caso de falha", async () => {
                 processoService.validarMapa.mockRejectedValue(MOCK_ERROR);
                 await expect(context.store.validarMapa(1)).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
@@ -331,9 +406,20 @@ describe("useProcessosStore", () => {
                 expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
 
+             it("não deve recarregar detalhes se processoDetalhe for nulo", async () => {
+                context.store.processoDetalhe = null;
+                processoService.homologarValidacao.mockResolvedValue(undefined);
+
+                await context.store.homologarValidacao(1);
+
+                expect(processoService.homologarValidacao).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).not.toHaveBeenCalled();
+            });
+
             it("deve lançar erro em caso de falha", async () => {
                 processoService.homologarValidacao.mockRejectedValue(MOCK_ERROR);
                 await expect(context.store.homologarValidacao(1)).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
@@ -347,9 +433,20 @@ describe("useProcessosStore", () => {
                  expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
              });
 
+             it("não deve recarregar detalhes se processoDetalhe for nulo", async () => {
+                context.store.processoDetalhe = null;
+                processoService.aceitarValidacao.mockResolvedValue(undefined);
+
+                await context.store.aceitarValidacao(10, { observacoes: 'Obs' });
+
+                expect(processoService.aceitarValidacao).toHaveBeenCalledWith(10, { observacoes: 'Obs' });
+                expect(processoService.obterDetalhesProcesso).not.toHaveBeenCalled();
+            });
+
              it("deve lançar erro em caso de falha", async () => {
                 processoService.aceitarValidacao.mockRejectedValue(MOCK_ERROR);
                 await expect(context.store.aceitarValidacao(10)).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
@@ -368,6 +465,13 @@ describe("useProcessosStore", () => {
 
             it("deve retornar lista vazia se processo não corresponder", () => {
                 context.store.processoDetalhe = {...MOCK_PROCESSO_DETALHE, codigo: 2} as any;
+
+                const unidades = context.store.obterUnidadesDoProcesso(1);
+                expect(unidades).toEqual([]);
+            });
+
+            it("deve retornar lista vazia se processoDetalhe for nulo", () => {
+                context.store.processoDetalhe = null;
 
                 const unidades = context.store.obterUnidadesDoProcesso(1);
                 expect(unidades).toEqual([]);

@@ -5,10 +5,10 @@ Este documento apresenta o estado atual da cobertura de testes unitários do fro
 ## Estado Atual
 
 **Resumo Geral:**
-- **Statements:** 91.97%
-- **Branches:** 82.89%
-- **Functions:** 89.69%
-- **Lines:** 93.2%
+- **Statements:** 92.5% (Anterior: 91.97%)
+- **Branches:** 83.31% (Anterior: 82.89%)
+- **Functions:** 90.16% (Anterior: 89.69%)
+- **Lines:** 93.77% (Anterior: 93.2%)
 
 A cobertura geral é alta, mas existem lacunas específicas, principalmente em componentes Vue complexos, tratamento de erros em serviços e stores, e alguns utilitários.
 
@@ -31,9 +31,9 @@ A cobertura geral é alta, mas existem lacunas específicas, principalmente em c
 *   `index.ts` (Branches: 75%): Guards globais (`beforeEach`) e redirecionamentos.
 
 ### 4. Stores (`src/stores`)
-*   `alertas.ts` (Branches: 50%): Ações de busca ou marcação de lido com falhas de rede.
-*   `atribuicoes.ts` (Branches: 50%): Lógica de erro ou estados intermediários.
-*   `processos.ts` (Branches: 64.28%): Filtros complexos ou tratamento de erros em ações assíncronas.
+*   `alertas.ts`: **Cobertura atingida (100%)**.
+*   `atribuicoes.ts`: **Cobertura atingida (100%)**.
+*   `processos.ts`: **Cobertura atingida (100%)**.
 
 ### 5. Views (`src/views`)
 *   `CadAtividades.vue` (Branches: 68.21%): Formulário complexo com muitas validações e estados.
@@ -44,14 +44,16 @@ A cobertura geral é alta, mas existem lacunas específicas, principalmente em c
 
 O trabalho deve ser dividido em iterações focadas por tipo de arquivo.
 
-### Passo 1: Stores e Services (Base Lógica)
+### Passo 1: Stores e Services (Base Lógica) - **CONCLUÍDO**
 Garantir que a camada de dados esteja blindada facilita o teste dos componentes visuais.
 1.  **`src/stores/alertas.ts`, `atribuicoes.ts`, `processos.ts`**:
     *   Simular erros de API (`axios` mockado retornando erro).
     *   Testar todos os branches de `if/else` em getters e actions.
+    *   **Status:** Concluído. Stores agora têm 100% de cobertura.
 2.  **`src/services/*.ts`**:
     *   Verificar arquivos com cobertura < 100% (`mapaService.ts`, `painelService.ts`, `usuarioService.ts`).
     *   Cobrir tratamento de respostas vazias ou malformadas.
+    *   **Status:** Concluído. Services agora têm 100% de cobertura.
 
 ### Passo 2: Mappers e Utils (Funções Puras)
 São os testes mais fáceis e rápidos de corrigir.

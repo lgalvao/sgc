@@ -88,6 +88,13 @@ describe("mapaService", () => {
             expect(result).toBe(false);
         });
 
+        it("deve retornar false se a resposta não contiver temMapaVigente", async () => {
+            // This test covers the "?? false" branch in line 67
+             mockApi.get.mockResolvedValue({ data: { } });
+            const result = await mapaService.verificarMapaVigente(1);
+            expect(result).toBe(false);
+        });
+
         it("deve lançar exceção para outros erros", async () => {
             const error = new Error("Erro genérico");
             mockApi.get.mockRejectedValue(error);
@@ -96,5 +103,14 @@ describe("mapaService", () => {
                 "Erro genérico",
             );
         });
+    });
+
+    describe("disponibilizarMapa", () => {
+        testPostEndpoint(
+            () => mapaService.disponibilizarMapa(1, {} as any),
+            "/subprocessos/1/disponibilizar-mapa",
+            {}
+        );
+        testErrorHandling(() => mapaService.disponibilizarMapa(1, {} as any), 'post');
     });
 });
