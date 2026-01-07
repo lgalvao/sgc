@@ -121,7 +121,7 @@ tasks.withType<Test> {
         exceptionFormat = TestExceptionFormat.FULL
         showStackTraces = true
         showCauses = true
-        showStandardStreams = true
+        showStandardStreams = false
     }
 
     addTestListener(object : TestListener {
@@ -219,7 +219,6 @@ tasks.jacocoTestReport {
     )
 }
 
-
 tasks.jacocoTestCoverageVerification {
     violationRules {
         rule {
@@ -231,7 +230,7 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "LINE"
-                minimum = "0.90".toBigDecimal()
+                minimum = "0.95".toBigDecimal()
             }
         }
     }
@@ -242,26 +241,16 @@ tasks.named("check") {
 }
 
 configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
-    // Integração com JUnit 5
     junit5PluginVersion.set("1.2.1")
-
-    // Evitar rodar em todo o projeto inicialmente (muito custoso)
-    // Definiremos classes alvo via linha de comando ou perfis, mas aqui fica o padrão seguro
     targetClasses.set(setOf("sgc.mapa.*"))
-
-    // Excluir classes que não devem ser mutadas (Configurações, DTOs, Exceções, etc.)
     excludedClasses.set(setOf(
         "sgc.Sgc",
         "sgc.**.*Config",
         "sgc.**.*Dto",
         "sgc.**.*Exception",
-        "sgc.**.*Repo", // Repositórios são interfaces/Spring Data, mutação aqui é pouco útil
-        "sgc.**.*MapperImpl" // Classes geradas pelo MapStruct
+        "sgc.**.*Repo",
+        "sgc.**.*MapperImpl"
     ))
-
-    // Threads para paralelismo (ajustar conforme a máquina)
     threads.set(8)
-
-    // Formatos de saída
     outputFormats.set(setOf("XML", "HTML"))
 }

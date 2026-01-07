@@ -52,6 +52,7 @@ public class AlertaController {
         if (principal instanceof String string) return string;
         if (principal instanceof Usuario usuario) return usuario.getTituloEleitoral();
         if (principal instanceof UserDetails userDetails) return userDetails.getUsername();
-        return principal != null ? principal.toString() : null;
+
+        return principal.toString();
     }
 }
