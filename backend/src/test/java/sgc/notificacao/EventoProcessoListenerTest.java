@@ -307,4 +307,52 @@ class EventoProcessoListenerTest {
         // Verifica que NÃO enviou e-mail
         verify(notificacaoEmailService, never()).enviarEmailHtml(anyString(), anyString(), anyString());
     }
+
+    @Test
+    void deveEnviarEmailParaUnidadeIntermediaria() {
+        // Testa envio de email específico para unidade INTERMEDIARIA ao iniciar processo
+        Processo processo = new Processo();
+        processo.setCodigo(5L);
+        processo.setDescricao("Processo com Intermediária");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        when(processoService.buscarEntidadePorId(5L)).thenReturn(processo);
+
+        Unidade intermediaria = new Unidade();
+        intermediaria.setCodigo(100L);
+        intermediaria.setSigla("INTER");
+        intermediaria.setNome("Unidade Intermediária");
+        intermediaria.setTipo(TipoUnidade.INTERMEDIARIA);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(200L);
+        subprocesso.setUnidade(intermediaria);
+        subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+
+        when(subprocessoService.listarEntidadesPorProcesso(5L)).thenReturn(List.of(subprocesso));
+
+        ResponsavelDto responsavel = ResponsavelDto.builder()
+                .unidadeCodigo(100L)
+                .titularTitulo("888")
+                .build();
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(100L, responsavel));
+
+        UsuarioDto titular = UsuarioDto.builder()
+                .tituloEleitoral("888")
+                .email("inter@email.com")
+                .build();
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("888", titular));
+
+        when(notificacaoModelosService.criarEmailProcessoIniciado(anyString(), anyString(), anyString(), any()))
+                .thenReturn("<html>Email content</html>");
+
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(5L).build();
+        listener.aoIniciarProcesso(evento);
+
+        // Verifica que enviou email com assunto específico para INTERMEDIARIA
+        verify(notificacaoEmailService).enviarEmailHtml(
+                eq("inter@email.com"),
+                contains("Unidades Subordinadas"),
+                anyString()
+        );
+    }
 }
