@@ -129,6 +129,27 @@ class SubprocessoCadastroWorkflowServiceTest {
                 .isInstanceOf(ErroValidacao.class);
     }
 
+    @Test
+    @DisplayName("disponibilizarCadastro falha mapa nulo")
+    void disponibilizarCadastroMapaNulo() {
+        Long id = 1L;
+        Usuario user = new Usuario();
+        user.setTituloEleitoral("123");
+        Unidade u = new Unidade();
+        u.setTituloTitular("123");
+
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(u);
+        sp.setMapa(null); // Mapa nulo
+
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(subprocessoService.obterAtividadesSemConhecimento(id))
+                .thenReturn(Collections.emptyList());
+
+        assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
+                .isInstanceOf(sgc.subprocesso.erros.ErroMapaNaoAssociado.class);
+    }
+
     // --- Disponibilizar Revisão ---
 
     @Test
@@ -249,6 +270,25 @@ class SubprocessoCadastroWorkflowServiceTest {
                 .isInstanceOf(ErroInvarianteViolada.class);
     }
 
+    // --- Devolver Revisão Cadastro ---
+
+    @Test
+    @DisplayName("devolverRevisaoCadastro falha sem unidade superior")
+    void devolverRevisaoCadastroSemSuperior() {
+        Long id = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        Unidade u = new Unidade();
+        u.setUnidadeSuperior(null);
+        sp.setUnidade(u);
+        Usuario user = new Usuario();
+
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+
+        assertThatThrownBy(() -> service.devolverRevisaoCadastro(id, "obs", user))
+                .isInstanceOf(ErroInvarianteViolada.class);
+    }
+
     // --- Homologar Cadastro ---
 
     @Test
@@ -365,6 +405,23 @@ class SubprocessoCadastroWorkflowServiceTest {
                 eq("obs"),
                 eq(null)
         );
+    }
+
+    @Test
+    @DisplayName("aceitarRevisaoCadastro falha sem unidade superior")
+    void aceitarRevisaoCadastroSemSuperior() {
+        Long id = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        Unidade u = new Unidade();
+        u.setUnidadeSuperior(null);
+        sp.setUnidade(u);
+        Usuario user = new Usuario();
+
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+
+        assertThatThrownBy(() -> service.aceitarRevisaoCadastro(id, "obs", user))
+                .isInstanceOf(ErroInvarianteViolada.class);
     }
 
     // --- Homologar Revisão Cadastro ---

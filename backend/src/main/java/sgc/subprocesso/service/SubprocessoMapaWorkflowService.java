@@ -308,6 +308,9 @@ public class SubprocessoMapaWorkflowService {
         if (proximaUnidade == null) {
             // Caso especial: Fim da cadeia de validação (Homologação Implícita?)
 
+            String siglaUnidade = sp.getUnidade().getUnidadeSuperior() != null ?
+                    sp.getUnidade().getUnidadeSuperior().getSigla() : sp.getUnidade().getSigla();
+
             analiseService.criarAnalise(
                 sp,
                 CriarAnaliseRequest.builder()
@@ -315,7 +318,7 @@ public class SubprocessoMapaWorkflowService {
                         .observacoes("Aceite da validação")
                         .tipo(TipoAnalise.VALIDACAO)
                         .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
-                        .siglaUnidade(sp.getUnidade().getUnidadeSuperior().getSigla())
+                        .siglaUnidade(siglaUnidade)
                         .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
                         .motivo(null)
                         .build());
