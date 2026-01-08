@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -51,6 +52,8 @@ class SubprocessoCadastroWorkflowServiceTest {
     private ImpactoMapaService impactoMapaService;
     @Mock
     private SubprocessoWorkflowExecutor workflowExecutor;
+    @Mock
+    private sgc.seguranca.acesso.AccessControlService accessControlService;
 
     @InjectMocks
     private SubprocessoCadastroWorkflowService service;
@@ -104,6 +107,8 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(u);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        doThrow(new ErroAccessoNegado("Acesso negado para teste"))
+                .when(accessControlService).verificarPermissao(any(), any(), any());
 
         assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
                 .isInstanceOf(ErroAccessoNegado.class);
@@ -321,10 +326,13 @@ class SubprocessoCadastroWorkflowServiceTest {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        Usuario user = new Usuario();
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        doThrow(new ErroProcessoEmSituacaoInvalida("Situação inválida"))
+                .when(accessControlService).verificarPermissao(any(), any(), any());
 
-        assertThatThrownBy(() -> service.homologarCadastro(id, "obs", new Usuario()))
+        assertThatThrownBy(() -> service.homologarCadastro(id, "obs", user))
                 .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 
@@ -475,10 +483,13 @@ class SubprocessoCadastroWorkflowServiceTest {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        Usuario user = new Usuario();
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        doThrow(new ErroProcessoEmSituacaoInvalida("Estado inválido"))
+                .when(accessControlService).verificarPermissao(any(), any(), any());
 
-        assertThatThrownBy(() -> service.homologarRevisaoCadastro(id, "obs", new Usuario()))
+        assertThatThrownBy(() -> service.homologarRevisaoCadastro(id, "obs", user))
                 .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 
