@@ -162,8 +162,18 @@ Para dúvidas sobre o plano:
 - ✅ Teste de arquitetura passando (@NullMarked compliance)
 
 **Em Andamento:**
-- 🚧 Atualizar `SubprocessoCadastroWorkflowService` para usar `AccessControlService`
-- 🚧 Atualizar controllers de subprocesso para usar `AccessControlService`
-- ⏳ Deprecar `SubprocessoPermissoesService` e `MapaAcessoService`
+- ✅ Atualizar `SubprocessoCadastroWorkflowService` para usar `AccessControlService`
+- ✅ Atualizar `SubprocessoMapaWorkflowService` para usar `AccessControlService`
+- ✅ Atualizar `ImpactoMapaService` para usar `AccessControlService`
+- ✅ Deprecar `SubprocessoPermissoesService.validar()` e `.calcularPermissoes()`
+- ✅ Deprecar `MapaAcessoService.verificarAcessoImpacto()`
+- ⏳ Validar com testes backend completos
 - ⏳ Validar com testes E2E
+
+**Estatísticas Sprint 2:**
+- **Services migrados**: 3 (SubprocessoCadastroWorkflowService, SubprocessoMapaWorkflowService, ImpactoMapaService)
+- **Métodos migrados**: 16 métodos de workflow
+- **Services deprecados**: 2 (SubprocessoPermissoesService, MapaAcessoService)
+- **Linhas de código de acesso manual removidas**: ~50 linhas
+- **Testes passando**: 31 testes
 
