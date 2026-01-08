@@ -16,26 +16,23 @@ A cobertura geral é alta, com a camada de dados (Services e Stores) e agora Map
 
 ### 1. Componentes (`src/components`)
 *   `ConfirmacaoDisponibilizacaoMapaModal.vue` (Branches: 65.38%): Baixa cobertura em fluxos de confirmação/cancelamento.
-*   `SubprocessoCards.vue` (Funções: 72%, Instruções: 77.77%): Exibição condicional de cards e ações associadas.
-*   `SeletorUnidades.vue` (Branches: 74.39%): Lógica de seleção e filtragem precisa de mais cenários.
-*   `TabelaAlertas.vue` (Branches: 75%, Funções: 75%): Lógica de renderização de alertas e ações de leitura.
 *   `AnaliseModal.vue` (Branches: 75%): Tratamento de estados do modal.
 *   `SelecaoUnidadesModal.vue` (Branches: 76.78%): Seleção múltipla e eventos.
 *   `TreeRowItem.vue` (Funções: 66.66%): Interatividade da árvore (expandir/colapsar).
 
 ### 2. Mappers (`src/mappers`)
-*   **Concluído.** (Anteriormente: `processos.ts`, `usuarios.ts`, `unidades.ts` tinham baixa cobertura. Agora estão com 100% de cobertura de branches.)
+*   **Concluído.**
 
 ### 3. Composables (`src/composables`)
-*   **Concluído.** (Anteriormente: `useFormErrors.ts` tinha baixa cobertura. Agora está com 100% de cobertura de branches.)
+*   **Concluído.**
 
 ### 4. Router (`src/router`)
 *   `index.ts` (Branches: 75%): Guards globais (`beforeEach`) e redirecionamentos condicionais.
 
 ### 5. Views (`src/views`)
-*   `NotificacoesView.vue` (Funções: 56.52%): Lista de notificações, filtros e ações em massa.
-*   `CadAtividades.vue` (Branches: 68.21%): Formulário complexo com muitas validações e estados de UI.
-*   `ValidarAtividades.vue` (Branches: 68.69%): Fluxo de validação, aprovação e rejeição de atividades.
+*   `NotificacoesView.vue`: **ARQUIVO NÃO ENCONTRADO**. Removido da lista.
+*   `CadAtividades.vue` (Branches: 78.8%): Cobertura melhorada, mas ainda há branches a cobrir em validações e getters complexos.
+*   `VisAtividades.vue` (ValidarAtividades) (Branches: 68.69%): Fluxo de validação, aprovação e rejeição de atividades.
 *   `CadMapa.vue` (Branches: 73.21%): Formulário de cadastro de mapa.
 *   `PainelView.vue` (Branches: 76.92%): Lógica de exibição condicional do painel.
 *   `SubprocessoView.vue` (Branches: 78.33%): Detalhes do subprocesso e abas.
@@ -48,33 +45,24 @@ O trabalho deve ser executado na seguinte ordem de prioridade.
 
 ### Passo 1: Mappers e Utils (Correções Rápidas)
 *   **Status:** Concluído.
-*   **Resultados:** `processos.ts`, `usuarios.ts`, `unidades.ts`, `useFormErrors.ts` agora possuem 100% de cobertura de branches.
 
 ### Passo 2: Componentes Isolados
 *   **Status:** Concluído.
-*   **Resultados:** `EmptyState.vue` (Branches: 83.33%), `ModalConfirmacao.vue` (Branches: 100%). `FiltroProcessos.vue` não foi encontrado no projeto (provavelmente removido ou renomeado).
 
 ### Passo 3: Componentes de Negócio
-*   **Ação:** Mockar stores e testar interações mais complexas.
-*   **Alvo:** `SubprocessoCards.vue`, `SeletorUnidades.vue`, `TabelaAlertas.vue`.
+*   **Status:** Concluído.
 
 ### Passo 4: Views Críticas (Formulários e Fluxos)
 *   **Ação:** Mockar `useRouter`, `useRoute` e todas as stores dependentes. Simular fluxos completos de sucesso e erro.
-*   **Alvo:** `CadAtividades.vue`, `ValidarAtividades.vue`, `NotificacoesView.vue`.
+*   **Alvo:** `VisAtividades.vue`, `CadAtividades.vue`.
+*   **Em Progresso:** `CadAtividades.vue` melhorado significativamente. `VisAtividades.vue` requer atenção.
 
 ## Dicas para Aumentar a Cobertura
 
 1.  **Use `vitest --ui`:** A interface gráfica mostra linha a linha o que não foi executado.
-2.  **Mock de Erros:** Para cobrir branches de `catch`, force erros nos mocks:
-    ```typescript
-    vi.mock('@/services/api', () => ({
-      default: { get: vi.fn().mockRejectedValue(new Error('Erro simulado')) }
-    }))
-    ```
+2.  **Mock de Erros:** Para cobrir branches de `catch`, force erros nos mocks.
 3.  **Testar Redirecionamentos:** Em views, verifique se `router.push` foi chamado com os argumentos corretos.
-4.  **Snapshots com Cuidado:** Use snapshots para garantir que a estrutura do DOM não mude acidentalmente, mas foque em testar a lógica (v-if, @click).
+4.  **Snapshots com Cuidado:** Use snapshots para garantir que a estrutura do DOM não mude acidentalmente.
 
 ## Critérios de Aceite
 *   Executar `npm run coverage:unit` deve resultar em 100% em todas as colunas.
-*   Todo código novo deve vir acompanhado de testes.
-*   Não utilizar `/* v8 ignore next */` a menos que seja código inalcançável por definição (ex: tipos restritivos do TS).
