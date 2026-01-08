@@ -26,7 +26,7 @@ Consolidar e padronizar o controle de acesso do SGC, eliminando inconsistências
 
 | Sprint | Duração | Foco | Status |
 |--------|---------|------|--------|
-| Sprint 1 | 3-5 dias | Infraestrutura base | ⏳ Pendente |
+| Sprint 1 | 3-5 dias | Infraestrutura base | ✅ Concluído |
 | Sprint 2 | 5-7 dias | Migração subprocessos | ⏳ Pendente |
 | Sprint 3 | 4-6 dias | Processos e atividades | ⏳ Pendente |
 | Sprint 4 | 3-4 dias | Auditoria e testes | ⏳ Pendente |
@@ -112,4 +112,29 @@ Para dúvidas sobre o plano:
 
 **Criado em**: 2026-01-08  
 **Versão**: 1.0  
-**Status**: ✅ Plano Completo - Aguardando Aprovação para Execução
+**Status**: 🚧 Em Execução - Sprint 1 Concluído
+
+## Histórico de Execução
+
+### Sprint 1: Infraestrutura Base (Concluído em 2026-01-08)
+
+**Componentes Criados:**
+- ✅ `Acao` enum com 47 ações do sistema
+- ✅ `HierarchyService` para gerenciar hierarquia de unidades
+- ✅ `AccessAuditService` para logging de decisões de acesso
+- ✅ `AccessPolicy<T>` interface para políticas de acesso
+- ✅ `AccessControlService` (skeleton) como hub central
+
+**Testes Criados:**
+- ✅ `HierarchyServiceTest` - 13 testes, 100% aprovado
+- ✅ `AccessAuditServiceTest` - 5 testes, 100% aprovado
+- ✅ `AccessControlServiceTest` - 4 testes, 100% aprovado
+- ✅ Total: 22 testes passando
+
+**Localização dos arquivos:**
+- Código: `/backend/src/main/java/sgc/seguranca/acesso/`
+- Testes: `/backend/src/test/java/sgc/seguranca/acesso/`
+
+**Próximos Passos:**
+- Sprint 2: Implementar `SubprocessoAccessPolicy` e migrar verificações de subprocessos
+
