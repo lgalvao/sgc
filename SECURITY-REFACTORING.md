@@ -27,7 +27,7 @@ Consolidar e padronizar o controle de acesso do SGC, eliminando inconsistências
 | Sprint | Duração | Foco | Status |
 |--------|---------|------|--------|
 | Sprint 1 | 3-5 dias | Infraestrutura base | ✅ Concluído |
-| Sprint 2 | 5-7 dias | Migração subprocessos | 🚧 Em Andamento |
+| Sprint 2 | 5-7 dias | Migração subprocessos | 🚀 99% Concluído |
 | Sprint 3 | 4-6 dias | Processos e atividades | ⏳ Pendente |
 | Sprint 4 | 3-4 dias | Auditoria e testes | ⏳ Pendente |
 | Sprint 5 | 2-3 dias | Refinamento | ⏳ Pendente |
@@ -112,7 +112,7 @@ Para dúvidas sobre o plano:
 
 **Criado em**: 2026-01-08  
 **Versão**: 1.0  
-**Status**: 🚧 Em Execução - Sprint 1 Concluído
+**Status**: 🚧 Em Execução - Sprint 2 99% Concluído (1141/1148 testes passando)
 
 ## Histórico de Execução
 
@@ -138,7 +138,7 @@ Para dúvidas sobre o plano:
 **Próximos Passos:**
 - Sprint 2: Implementar `SubprocessoAccessPolicy` e migrar verificações de subprocessos
 
-### Sprint 2: Migração de Verificações de Subprocesso (95% Concluído - 2026-01-08)
+### Sprint 2: Migração de Verificações de Subprocesso (99% Concluído - 2026-01-08)
 
 **Componentes Criados:**
 - ✅ `SubprocessoAccessPolicy` com 26 ações mapeadas
@@ -195,14 +195,16 @@ Para dúvidas sobre o plano:
 - ✅ Mensagens de erro mais descritivas e em português
 
 **Testes Backend:**
-- ✅ 1067/1148 testes passando (93%)
-- ⚠️ 81 testes precisam atualização para nova arquitetura (expectativas de exceções mudaram)
+- ✅ 1141/1148 testes passando (99.4%) - Excelente progresso!
+- ✅ Unit tests atualizados com mocks de AccessControlService
+- ✅ Integration tests atualizados com usuarios/perfis corretos (admin, gestor)
+- ⚠️ 7 testes precisam ajustes finais (hierarquia/perfil em cenários específicos)
 - ✅ Todos os testes de acesso específicos passando
 - ✅ Código compila com apenas avisos esperados de deprecação
 
 **Próximos Passos:**
-- ⏳ Atualizar testes que esperam exceções de negócio para aceitar ErroAccessoNegado
-- ⏳ Completar mocks de Usuario/Unidade em testes afetados
+- ⏳ Ajustar últimos 7 testes de integração (verificação de hierarquia)
 - ⏳ Validar com testes E2E
 - ⏳ Validação de performance
+- ⏳ Documentar mudanças no AGENTS.md
 
