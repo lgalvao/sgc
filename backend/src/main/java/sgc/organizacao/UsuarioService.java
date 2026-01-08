@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAccessoNegado;
@@ -41,6 +42,27 @@ public class UsuarioService {
     private boolean ambienteTestes;
 
     private final Map<String, java.time.LocalDateTime> autenticacoesRecentes = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /**
+     * Remove autenticações pendentes expiradas a cada minuto.
+     * O tempo limite é de 5 minutos.
+     */
+    @Scheduled(fixedRate = 60000)
+    public void limparAutenticacoesExpiradas() {
+        LocalDateTime limite = LocalDateTime.now().minusMinutes(5);
+        autenticacoesRecentes.entrySet().removeIf(entry -> entry.getValue().isBefore(limite));
+    }
+
+    // Método para testes
+    int getAutenticacoesRecentesSize() {
+        return autenticacoesRecentes.size();
+    }
+
+    // Método para testes: expira todas as autenticações
+    void expireAllAuthenticationsForTest() {
+        LocalDateTime passado = LocalDateTime.now().minusMinutes(10);
+        autenticacoesRecentes.replaceAll((k, v) -> passado);
+    }
 
     @Transactional(readOnly = true)
     public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
