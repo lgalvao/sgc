@@ -85,16 +85,21 @@ public class ImpactoMapaService {
         Map<Long, List<Competencia>> atividadeIdToCompetencias =
                 detectorImpactoCompetencia.construirMapaAtividadeCompetencias(competenciasMapa);
 
+        // Otimização: Construir mapas auxiliares uma única vez para evitar
+        // re-construção dentro de cada método do detector
+        Map<String, Atividade> mapaVigentes = detectorMudancasAtividade.atividadesPorDescricao(atividadesVigentes);
+        Map<String, Atividade> mapaAtuais = detectorMudancasAtividade.atividadesPorDescricao(atividadesAtuais);
+
         List<AtividadeImpactadaDto> inseridas = detectorMudancasAtividade.detectarInseridas(
-                atividadesAtuais, atividadesVigentes
+                atividadesAtuais, mapaVigentes.keySet()
         );
 
         List<AtividadeImpactadaDto> removidas = detectorMudancasAtividade.detectarRemovidas(
-                atividadesAtuais, atividadesVigentes, atividadeIdToCompetencias
+                mapaAtuais, atividadesVigentes, atividadeIdToCompetencias
         );
 
         List<AtividadeImpactadaDto> alteradas = detectorMudancasAtividade.detectarAlteradas(
-                atividadesAtuais, atividadesVigentes, atividadeIdToCompetencias
+                atividadesAtuais, mapaVigentes, atividadeIdToCompetencias
         );
 
         List<CompetenciaImpactadaDto> competenciasImpactadas = detectorImpactoCompetencia.competenciasImpactadas(

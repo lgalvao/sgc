@@ -22,12 +22,19 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class DetectorMudancasAtividadeService {
+
     /**
      * Detecta atividades que foram inseridas no mapa atual em comparação com o vigente.
      */
     public List<AtividadeImpactadaDto> detectarInseridas(List<Atividade> atuais, List<Atividade> vigentes) {
         Set<String> descVigentes = vigentes.stream().map(Atividade::getDescricao).collect(Collectors.toSet());
+        return detectarInseridas(atuais, descVigentes);
+    }
 
+    /**
+     * Versão otimizada de detectarInseridas que aceita o conjunto de descrições vigentes pré-calculado.
+     */
+    public List<AtividadeImpactadaDto> detectarInseridas(List<Atividade> atuais, Set<String> descVigentes) {
         List<AtividadeImpactadaDto> inseridas = new ArrayList<>();
         for (Atividade atual : atuais) {
             if (!descVigentes.contains(atual.getDescricao())) {
@@ -53,8 +60,19 @@ public class DetectorMudancasAtividadeService {
             List<Atividade> vigentes,
             Map<Long, List<Competencia>> competenciasVinculadas) {
 
-        List<AtividadeImpactadaDto> removidas = new ArrayList<>();
         Map<String, Atividade> atuaisMap = atividadesPorDescricao(atuais);
+        return detectarRemovidas(atuaisMap, vigentes, competenciasVinculadas);
+    }
+
+    /**
+     * Versão otimizada de detectarRemovidas que aceita o mapa de atividades atuais pré-calculado.
+     */
+    public List<AtividadeImpactadaDto> detectarRemovidas(
+            Map<String, Atividade> atuaisMap,
+            List<Atividade> vigentes,
+            Map<Long, List<Competencia>> competenciasVinculadas) {
+
+        List<AtividadeImpactadaDto> removidas = new ArrayList<>();
 
         for (Atividade vigente : vigentes) {
             if (!atuaisMap.containsKey(vigente.getDescricao())) {
@@ -81,8 +99,19 @@ public class DetectorMudancasAtividadeService {
             List<Atividade> vigentes,
             Map<Long, List<Competencia>> atividadeIdToCompetencias) {
 
-        List<AtividadeImpactadaDto> alteradas = new ArrayList<>();
         Map<String, Atividade> vigentesMap = atividadesPorDescricao(vigentes);
+        return detectarAlteradas(atuais, vigentesMap, atividadeIdToCompetencias);
+    }
+
+    /**
+     * Versão otimizada de detectarAlteradas que aceita o mapa de atividades vigentes pré-calculado.
+     */
+    public List<AtividadeImpactadaDto> detectarAlteradas(
+            List<Atividade> atuais,
+            Map<String, Atividade> vigentesMap,
+            Map<Long, List<Competencia>> atividadeIdToCompetencias) {
+
+        List<AtividadeImpactadaDto> alteradas = new ArrayList<>();
 
         for (Atividade atual : atuais) {
             if (vigentesMap.containsKey(atual.getDescricao())) {
@@ -107,15 +136,35 @@ public class DetectorMudancasAtividadeService {
         return alteradas;
     }
 
-    private Map<String, Atividade> atividadesPorDescricao(List<Atividade> atividades) {
-        return atividades.stream().collect(Collectors.toMap(Atividade::getDescricao, atividade -> atividade));
+    /**
+     * Constrói um mapa de Atividades indexado pela descrição.
+     * Útil para buscar atividades por nome (O(1)).
+     * <p>
+     * Se houver duplicatas de descrição, a primeira atividade encontrada será mantida.
+     */
+    public Map<String, Atividade> atividadesPorDescricao(List<Atividade> atividades) {
+        return atividades.stream().collect(Collectors.toMap(
+                Atividade::getDescricao,
+                atividade -> atividade,
+                (existente, substituto) -> existente // Mantém a primeira ocorrência em caso de duplicata
+        ));
     }
 
     private boolean conhecimentosDiferentes(List<Conhecimento> lista1, List<Conhecimento> lista2) {
         if (lista1.size() != lista2.size()) return true;
 
-        Set<String> descricoes1 = lista1.stream().map(Conhecimento::getDescricao).collect(Collectors.toSet());
-        Set<String> descricoes2 = lista2.stream().map(Conhecimento::getDescricao).collect(Collectors.toSet());
+        // Otimização: Evitar overhead de Stream/Set para listas vazias ou muito pequenas
+        if (lista1.isEmpty()) return !lista2.isEmpty();
+
+        Set<String> descricoes1 = new HashSet<>(lista1.size());
+        for (Conhecimento c : lista1) {
+            descricoes1.add(c.getDescricao());
+        }
+
+        Set<String> descricoes2 = new HashSet<>(lista2.size());
+        for (Conhecimento c : lista2) {
+            descricoes2.add(c.getDescricao());
+        }
 
         return !descricoes1.equals(descricoes2);
     }
