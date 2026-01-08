@@ -34,7 +34,7 @@ describe('SubprocessoCards.vue', () => {
             props: defaultProps,
             global: {
                 stubs: {
-                    BCard: { template: '<div class="card" @click="$emit(\'click\')"><slot /></div>' },
+                    BCard: { template: '<div class="card" @click="$emit(\'click\')" @keydown.enter.prevent="$emit(\'keydown.enter.prevent\')" @keydown.space.prevent="$emit(\'keydown.space.prevent\')"><slot /></div>' },
                     BCardTitle: { template: '<div><slot /></div>' },
                     BCardText: { template: '<div><slot /></div>' },
                     BRow: { template: '<div><slot /></div>' },
@@ -53,9 +53,19 @@ describe('SubprocessoCards.vue', () => {
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
         });
 
-        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('click');
+        // Keydown Enter action
+        pushMock.mockClear();
+        await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('keydown.enter');
         expect(pushMock).toHaveBeenCalledWith({
-            name: 'SubprocessoMapa',
+            name: 'SubprocessoCadastro',
+            params: { codProcesso: 1, siglaUnidade: 'TESTE' }
+        });
+
+        // Keydown Space action
+        pushMock.mockClear();
+        await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('keydown.space');
+        expect(pushMock).toHaveBeenCalledWith({
+            name: 'SubprocessoCadastro',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
         });
     });
@@ -68,7 +78,7 @@ describe('SubprocessoCards.vue', () => {
             },
             global: {
                 stubs: {
-                    BCard: { template: '<div class="card" @click="$emit(\'click\')"><slot /></div>' },
+                    BCard: { template: '<div class="card" @click="$emit(\'click\')" @keydown.enter.prevent="$emit(\'keydown.enter.prevent\')" @keydown.space.prevent="$emit(\'keydown.space.prevent\')"><slot /></div>' },
                     BCardTitle: { template: '<div><slot /></div>' },
                     BCardText: { template: '<div><slot /></div>' },
                     BRow: { template: '<div><slot /></div>' },
@@ -79,22 +89,30 @@ describe('SubprocessoCards.vue', () => {
 
         expect(wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').exists()).toBe(true);
 
-        // Map card for viewing (using same test-id, but different click handler is expected)
-
         await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoVisCadastro',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
         });
 
+         // Mapa vis click
+        pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('click');
+        expect(pushMock).toHaveBeenCalledWith({
+            name: 'SubprocessoVisMapa',
+            params: { codProcesso: 1, siglaUnidade: 'TESTE' }
+        });
+
+        // Mapa vis keydown
+        pushMock.mockClear();
+        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown.enter');
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoVisMapa',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
         });
     });
 
-    it('renderiza cards de diagnostico', async () => {
+    it('renderiza cards de diagnostico e navega corretamente', async () => {
         const wrapper = mount(SubprocessoCards, {
             props: {
                 ...defaultProps,
@@ -103,7 +121,7 @@ describe('SubprocessoCards.vue', () => {
             },
             global: {
                 stubs: {
-                    BCard: { template: '<div class="card" @click="$emit(\'click\')"><slot /></div>' },
+                    BCard: { template: '<div class="card" @click="$emit(\'click\')" @keydown.enter.prevent="$emit(\'keydown.enter.prevent\')" @keydown.space.prevent="$emit(\'keydown.space.prevent\')"><slot /></div>' },
                     BCardTitle: { template: '<div><slot /></div>' },
                     BCardText: { template: '<div><slot /></div>' },
                     BRow: { template: '<div><slot /></div>' },
@@ -112,30 +130,31 @@ describe('SubprocessoCards.vue', () => {
             }
         });
 
-        expect(wrapper.find('[data-testid="card-subprocesso-diagnostico"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="card-subprocesso-monitoramento"]').exists()).toBe(true);
-
+        // Click
         await wrapper.find('[data-testid="card-subprocesso-diagnostico"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
             name: 'AutoavaliacaoDiagnostico',
             params: { codSubprocesso: 100, siglaUnidade: 'TESTE' }
         });
 
-        await wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').trigger('click');
+        // Keydown Enter
+        pushMock.mockClear();
+        await wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').trigger('keydown.enter');
         expect(pushMock).toHaveBeenCalledWith({
             name: 'OcupacoesCriticasDiagnostico',
             params: { codSubprocesso: 100, siglaUnidade: 'TESTE' }
         });
 
-        await wrapper.find('[data-testid="card-subprocesso-monitoramento"]').trigger('click');
+        // Keydown Space
+        pushMock.mockClear();
+        await wrapper.find('[data-testid="card-subprocesso-monitoramento"]').trigger('keydown.space');
         expect(pushMock).toHaveBeenCalledWith({
             name: 'MonitoramentoDiagnostico',
             params: { codSubprocesso: 100, siglaUnidade: 'TESTE' }
         });
     });
 
-    it('não deve navegar se mapa não existir (modo edição)', async () => {
+    it('trata estado desabilitado (sem mapa) corretamente', async () => {
         const wrapper = mount(SubprocessoCards, {
             props: {
                 ...defaultProps,
@@ -143,7 +162,9 @@ describe('SubprocessoCards.vue', () => {
             },
             global: {
                 stubs: {
-                    BCard: { template: '<div class="card" @click="$emit(\'click\')"><slot /></div>' },
+                    BCard: {
+                        template: '<div class="card" @click="$emit(\'click\')" @keydown.enter.prevent="$emit(\'keydown.enter.prevent\')" @keydown.space.prevent="$emit(\'keydown.space.prevent\')"><slot /></div>'
+                    },
                     BCardTitle: { template: '<div><slot /></div>' },
                     BCardText: { template: '<div><slot /></div>' },
                     BRow: { template: '<div><slot /></div>' },
@@ -152,18 +173,51 @@ describe('SubprocessoCards.vue', () => {
             }
         });
 
-        // Ensure push mock is clear
-        pushMock.mockClear();
-
-        // When mapa is null, BCard might have disabled style or class, but @click handler might check it.
-        // In SubprocessoCards.vue:
-        // @click="!mapa ? null : navegarPara('SubprocessoMapa')"
-        // If BCard stub emits 'click', the handler runs.
-
         const card = wrapper.find('[data-testid="card-subprocesso-mapa"]');
         expect(card.exists()).toBe(true);
+        expect(card.classes()).toContain('disabled-card');
+        expect(card.attributes('aria-disabled')).toBe('true');
+        expect(card.attributes('tabindex')).toBe('-1');
 
+        pushMock.mockClear();
         await card.trigger('click');
+        expect(pushMock).not.toHaveBeenCalled();
+
+        await card.trigger('keydown.enter');
+        expect(pushMock).not.toHaveBeenCalled();
+
+        await card.trigger('keydown.space');
+        expect(pushMock).not.toHaveBeenCalled();
+    });
+
+    it('trata estado desabilitado (sem mapa) em modo visualização', async () => {
+        const wrapper = mount(SubprocessoCards, {
+            props: {
+                ...defaultProps,
+                permissoes: { ...defaultProps.permissoes, podeEditarMapa: false },
+                mapa: null
+            },
+            global: {
+                stubs: {
+                    BCard: {
+                        template: '<div class="card" @click="$emit(\'click\')" @keydown.enter.prevent="$emit(\'keydown.enter.prevent\')"><slot /></div>'
+                    },
+                    BCardTitle: { template: '<div><slot /></div>' },
+                    BCardText: { template: '<div><slot /></div>' },
+                    BRow: { template: '<div><slot /></div>' },
+                    BCol: { template: '<div><slot /></div>' }
+                }
+            }
+        });
+
+        const card = wrapper.find('[data-testid="card-subprocesso-mapa"]');
+        expect(card.classes()).toContain('disabled-card');
+
+        pushMock.mockClear();
+        await card.trigger('click');
+        expect(pushMock).not.toHaveBeenCalled();
+
+        await card.trigger('keydown.enter');
         expect(pushMock).not.toHaveBeenCalled();
     });
 });
