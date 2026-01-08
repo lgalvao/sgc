@@ -124,6 +124,8 @@ tasks.withType<Test> {
         showStandardStreams = false
     }
 
+    val slowTests = mutableListOf<Pair<String, Long>>()
+
     addTestListener(object : TestListener {
         override fun beforeSuite(suite: TestDescriptor) {}
         override fun afterSuite(suite: TestDescriptor, result: TestResult) {
@@ -138,10 +140,24 @@ tasks.withType<Test> {
                     |  Time:     ${(result.endTime - result.startTime) / 1000.0}s
                 """.trimMargin()
                 println(output)
+
+                if (slowTests.isNotEmpty()) {
+                    println("\nTop 10 Testes mais lentos (> 500ms):")
+                    slowTests.sortedByDescending { it.second }
+                        .take(10)
+                        .forEach { (name, time) ->
+                            println("  - ${time}ms: $name")
+                        }
+                }
             }
         }
         override fun beforeTest(testDescriptor: TestDescriptor) {}
-        override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
+        override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {
+            val duration = result.endTime - result.startTime
+            if (duration > 500) {
+                slowTests.add("${testDescriptor.className} > ${testDescriptor.name}" to duration)
+            }
+        }
     })
 
     jvmArgs = listOf(
