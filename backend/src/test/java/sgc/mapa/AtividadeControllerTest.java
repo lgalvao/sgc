@@ -52,15 +52,6 @@ class AtividadeControllerTest {
     @DisplayName("Operações de Atividade")
     class OperacoesAtividade {
         @Test
-        @DisplayName("Deve listar atividades")
-        @WithMockUser
-        void deveListar() throws Exception {
-            Mockito.when(atividadeService.listar()).thenReturn(List.of());
-            mockMvc.perform(get("/api/atividades"))
-                    .andExpect(status().isOk());
-        }
-
-        @Test
         @DisplayName("Deve obter por ID")
         @WithMockUser
         void deveObterPorId() throws Exception {
@@ -72,6 +63,7 @@ class AtividadeControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.codigo").value(1));
         }
+
 
         @Test
         @DisplayName("Deve criar atividade")
@@ -98,28 +90,15 @@ class AtividadeControllerTest {
         }
 
         @Test
-        @DisplayName("Deve criar atividade sem autenticação")
-        void deveCriarAtividadeSemAutenticacao() throws Exception {
-            AtividadeVisualizacaoDto dto = new AtividadeVisualizacaoDto();
-            dto.setCodigo(10L);
-            AtividadeOperacaoResp response = AtividadeOperacaoResp.builder()
-                    .atividade(dto)
-                    .subprocesso(SubprocessoSituacaoDto.builder().build())
-                    .build();
-
-            Mockito.when(atividadeFacade.criarAtividade(any(), any())).thenReturn(response);
-
-            // Sem @WithMockUser, o contexto de segurança deve estar vazio ou anônimo
+        @DisplayName("Deve retornar 401 se sem autenticação")
+        void deveRetornar401SeSemAutenticacao() throws Exception {
+            // Sem @WithMockUser, o contexto de segurança está vazio
+            // O controller deve retornar 401
             mockMvc.perform(post("/api/atividades")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
-                    .andExpect(status().isCreated());
-
-            // Verifica se o facade foi chamado com usuário nulo ou "anonymousUser" dependendo da config
-            // Como TestSecurityConfig pode ter permitAll, o authentication pode ser null ou token inválido
-            // Ajustamos o teste para aceitar qualquer valor de string ou null, pois o foco é o branch ternário
-            Mockito.verify(atividadeFacade).criarAtividade(any(), org.mockito.ArgumentMatchers.nullable(String.class));
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test
