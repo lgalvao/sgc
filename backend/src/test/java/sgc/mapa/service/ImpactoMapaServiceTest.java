@@ -19,11 +19,16 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -187,10 +192,11 @@ class ImpactoMapaServiceTest {
                     .tipoImpacto(sgc.mapa.model.TipoImpactoAtividade.REMOVIDA)
                     .build();
 
-            when(detectorAtividades.detectarRemovidas(any(), any(), any())).thenReturn(List.of(removida));
-            when(detectorAtividades.detectarInseridas(any(), any())).thenReturn(List.of());
-            when(detectorAtividades.detectarAlteradas(any(), any(), any())).thenReturn(List.of());
-            when(analisadorCompetencias.competenciasImpactadas(any(), any(), any(), any())).thenReturn(List.of());
+            // Use specific matchers to disambiguate overloaded methods
+            when(detectorAtividades.detectarRemovidas(anyMap(), anyList(), anyMap())).thenReturn(List.of(removida));
+            when(detectorAtividades.detectarInseridas(anyList(), anySet())).thenReturn(List.of());
+            when(detectorAtividades.detectarAlteradas(anyList(), anyMap(), anyMap())).thenReturn(List.of());
+            when(analisadorCompetencias.competenciasImpactadas(anyList(), anyList(), anyList(), anyList())).thenReturn(List.of());
 
 
             ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
