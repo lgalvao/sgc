@@ -30,6 +30,7 @@ import sgc.subprocesso.service.decomposed.SubprocessoDetalheService;
 import sgc.subprocesso.service.decomposed.SubprocessoValidacaoService;
 import sgc.subprocesso.service.decomposed.SubprocessoWorkflowService;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
@@ -249,7 +250,7 @@ class SubprocessoServiceTest {
         @Test
         @DisplayName("Deve alterar data limite")
         void deveAlterarDataLimite() {
-            java.time.LocalDate novaData = java.time.LocalDate.now();
+            LocalDate novaData = java.time.LocalDate.now();
             service.alterarDataLimite(1L, novaData);
             verify(workflowService).alterarDataLimite(1L, novaData);
         }
