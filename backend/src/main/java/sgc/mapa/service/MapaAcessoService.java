@@ -17,7 +17,12 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 /**
  * Serviço responsável por validar permissões de acesso e regras de negócio relacionadas
  * à situação do subprocesso para operações no mapa de competências.
+ * 
+ * @deprecated Usar {@link sgc.seguranca.acesso.AccessControlService} com a ação 
+ *             {@link sgc.seguranca.acesso.Acao#VERIFICAR_IMPACTOS} para verificação de acesso.
+ *             Este serviço será removido no Sprint 3 da refatoração de segurança.
  */
+@Deprecated(since = "2026-01-08", forRemoval = true)
 @Service
 @Slf4j
 public class MapaAcessoService {
@@ -41,7 +46,10 @@ public class MapaAcessoService {
      * @param usuario     O usuário autenticado.
      * @param subprocesso O subprocesso alvo da operação.
      * @throws ErroAccessoNegado se o usuário não tiver permissão.
+     * @deprecated Usar {@link sgc.seguranca.acesso.AccessControlService#verificarPermissao} 
+     *             com {@link sgc.seguranca.acesso.Acao#VERIFICAR_IMPACTOS}
      */
+    @Deprecated(since = "2026-01-08", forRemoval = true)
     public void verificarAcessoImpacto(Usuario usuario, Subprocesso subprocesso) {
         final SituacaoSubprocesso situacao = subprocesso.getSituacao();
 

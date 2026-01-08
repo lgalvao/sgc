@@ -11,12 +11,15 @@ import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Usuario;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS;
 
 /**
  * Serviço responsável por detectar impactos no mapa de competências causados por alterações no
@@ -36,7 +39,7 @@ public class ImpactoMapaService {
     // Serviços de detecção de mudanças e impactos
     private final DetectorMudancasAtividadeService detectorMudancasAtividade;
     private final DetectorImpactoCompetenciaService detectorImpactoCompetencia;
-    private final MapaAcessoService mapaAcessoService;
+    private final AccessControlService accessControlService;
 
     /**
      * Realiza a verificação de impactos no mapa de competências, comparando o mapa em revisão de um
@@ -59,7 +62,9 @@ public class ImpactoMapaService {
     @Transactional(readOnly = true)
     public ImpactoMapaDto verificarImpactos(Long codSubprocesso, Usuario usuario) {
         Subprocesso subprocesso = subprocessoService.buscarSubprocesso(codSubprocesso);
-        mapaAcessoService.verificarAcessoImpacto(usuario, subprocesso);
+        
+        // Verificação centralizada de acesso
+        accessControlService.verificarPermissao(usuario, VERIFICAR_IMPACTOS, subprocesso);
 
         Optional<Mapa> mapaVigenteOpt = mapaRepo.findMapaVigenteByUnidade(subprocesso.getUnidade().getCodigo());
         if (mapaVigenteOpt.isEmpty()) {

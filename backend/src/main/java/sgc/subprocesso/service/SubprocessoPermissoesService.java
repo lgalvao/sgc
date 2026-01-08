@@ -17,6 +17,15 @@ import java.util.Objects;
 import static sgc.processo.model.TipoProcesso.REVISAO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
+/**
+ * Serviço de validação e cálculo de permissões para operações em subprocessos.
+ * 
+ * @deprecated Usar {@link sgc.seguranca.acesso.AccessControlService} para verificações de acesso.
+ *             As políticas de acesso agora estão centralizadas em 
+ *             {@link sgc.seguranca.acesso.SubprocessoAccessPolicy}.
+ *             Este serviço será removido no Sprint 3 da refatoração de segurança.
+ */
+@Deprecated(since = "2026-01-08", forRemoval = true)
 @Service
 @RequiredArgsConstructor
 public class SubprocessoPermissoesService {
@@ -25,6 +34,12 @@ public class SubprocessoPermissoesService {
 
     private final AtividadeService atividadeService;
 
+    /**
+     * Valida se o usuário pode executar uma ação em um subprocesso.
+     * 
+     * @deprecated Usar {@link sgc.seguranca.acesso.AccessControlService#verificarPermissao}
+     */
+    @Deprecated(since = "2026-01-08", forRemoval = true)
     public void validar(Subprocesso subprocesso, Long unidadeCodigo, String acao) {
         if (!subprocesso.getUnidade().getCodigo().equals(unidadeCodigo)) {
             throw new ErroAccessoNegado(String.format(
@@ -66,6 +81,13 @@ public class SubprocessoPermissoesService {
         }
     }
 
+    /**
+     * Calcula as permissões do usuário para um subprocesso.
+     * 
+     * @deprecated Usar {@link sgc.seguranca.acesso.AccessControlService#podeExecutar} 
+     *             para cada ação específica
+     */
+    @Deprecated(since = "2026-01-08", forRemoval = true)
     public SubprocessoPermissoesDto calcularPermissoes(Subprocesso sp, Usuario usuario) {
         boolean isAdmin = usuario.getTodasAtribuicoes().stream()
                 .anyMatch(a -> a.getPerfil() == Perfil.ADMIN);
