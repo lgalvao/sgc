@@ -26,8 +26,8 @@ Consolidar e padronizar o controle de acesso do SGC, eliminando inconsistências
 
 | Sprint | Duração | Foco | Status |
 |--------|---------|------|--------|
-| Sprint 1 | 3-5 dias | Infraestrutura base | ⏳ Pendente |
-| Sprint 2 | 5-7 dias | Migração subprocessos | ⏳ Pendente |
+| Sprint 1 | 3-5 dias | Infraestrutura base | ✅ Concluído |
+| Sprint 2 | 5-7 dias | Migração subprocessos | 🚧 Em Andamento |
 | Sprint 3 | 4-6 dias | Processos e atividades | ⏳ Pendente |
 | Sprint 4 | 3-4 dias | Auditoria e testes | ⏳ Pendente |
 | Sprint 5 | 2-3 dias | Refinamento | ⏳ Pendente |
@@ -112,4 +112,55 @@ Para dúvidas sobre o plano:
 
 **Criado em**: 2026-01-08  
 **Versão**: 1.0  
-**Status**: ✅ Plano Completo - Aguardando Aprovação para Execução
+**Status**: 🚧 Em Execução - Sprint 1 Concluído
+
+## Histórico de Execução
+
+### Sprint 1: Infraestrutura Base (Concluído em 2026-01-08)
+
+**Componentes Criados:**
+- ✅ `Acao` enum com 47 ações do sistema
+- ✅ `HierarchyService` para gerenciar hierarquia de unidades
+- ✅ `AccessAuditService` para logging de decisões de acesso
+- ✅ `AccessPolicy<T>` interface para políticas de acesso
+- ✅ `AccessControlService` (skeleton) como hub central
+
+**Testes Criados:**
+- ✅ `HierarchyServiceTest` - 13 testes, 100% aprovado
+- ✅ `AccessAuditServiceTest` - 5 testes, 100% aprovado
+- ✅ `AccessControlServiceTest` - 4 testes, 100% aprovado
+- ✅ Total: 22 testes passando
+
+**Localização dos arquivos:**
+- Código: `/backend/src/main/java/sgc/seguranca/acesso/`
+- Testes: `/backend/src/test/java/sgc/seguranca/acesso/`
+
+**Próximos Passos:**
+- Sprint 2: Implementar `SubprocessoAccessPolicy` e migrar verificações de subprocessos
+
+### Sprint 2: Migração de Verificações de Subprocesso (Em Andamento - Iniciado em 2026-01-08)
+
+**Componentes Criados:**
+- ✅ `SubprocessoAccessPolicy` com 26 ações mapeadas
+  - CRUD básico (6 ações)
+  - Workflow de cadastro (5 ações)
+  - Workflow de revisão de cadastro (5 ações)
+  - Operações de mapa (10 ações)
+  - Diagnóstico (2 ações)
+- ✅ 5 requisitos de hierarquia implementados:
+  - `NENHUM`: Sem verificação de hierarquia
+  - `MESMA_UNIDADE`: Usuário na mesma unidade
+  - `MESMA_OU_SUBORDINADA`: Usuário na mesma unidade ou superior
+  - `SUPERIOR_IMEDIATA`: Usuário na unidade superior imediata
+  - `TITULAR_UNIDADE`: Usuário é o titular da unidade
+
+**Testes Criados:**
+- ✅ `SubprocessoAccessPolicyTest` - 21 testes adicionais
+- ✅ Cobertura de cenários CRUD, Cadastro, Revisão, Mapa e Diagnóstico
+- ✅ Total acumulado: 43 testes passando
+
+**Próximos Passos:**
+- Atualizar controllers de subprocesso para usar `AccessControlService`
+- Deprecar `SubprocessoPermissoesService` e `MapaAcessoService`
+- Validar com testes E2E
+
