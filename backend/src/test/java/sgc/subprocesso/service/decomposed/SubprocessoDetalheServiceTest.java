@@ -15,6 +15,7 @@ import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
+import sgc.mapa.service.ConhecimentoService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
@@ -59,6 +60,8 @@ class SubprocessoDetalheServiceTest {
     private CompetenciaService competenciaService;
     @Mock
     private MapaAjusteMapper mapaAjusteMapper;
+    @Mock
+    private ConhecimentoService conhecimentoService;
 
     @InjectMocks
     private SubprocessoDetalheService service;

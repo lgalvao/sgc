@@ -9,14 +9,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.mapper.MapaCompletoMapper;
 import sgc.mapa.model.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +35,8 @@ class MapaServiceTest {
     private AtividadeRepo atividadeRepo;
     @Mock
     private MapaCompletoMapper mapaCompletoMapper;
+    @Mock
+    private MapaSalvamentoService mapaSalvamentoService;
 
     @InjectMocks
     private MapaService service;
@@ -196,123 +195,46 @@ class MapaServiceTest {
     }
 
     @Nested
-    @DisplayName("Salvar Mapa Completo")
+    @DisplayName("Salvar Mapa Completo - Delegação")
     class SalvarCompleto {
         @Test
-        @DisplayName("Deve salvar mapa completo com sucesso")
-        void deveSalvarMapaCompleto() {
+        @DisplayName("Deve delegar salvar mapa completo ao MapaSalvamentoService")
+        void deveDelegarSalvarMapaCompleto() {
             Long mapaId = 1L;
             SalvarMapaRequest req = new SalvarMapaRequest();
             req.setObservacoes("Obs");
-            CompetenciaMapaDto compDto = new CompetenciaMapaDto();
-            compDto.setDescricao("Nova Comp");
-            compDto.setAtividadesCodigos(List.of(10L));
-            req.setCompetencias(List.of(compDto));
-
-            Mapa mapa = new Mapa();
-            mapa.setCodigo(mapaId);
-
-            Atividade ativ = new Atividade();
-            ativ.setCodigo(10L);
-            ativ.setMapa(mapa);
-            ativ.setCompetencias(new HashSet<>());
-
-            when(mapaRepo.findById(mapaId)).thenReturn(Optional.of(mapa));
-            when(competenciaRepo.findByMapaCodigo(mapaId)).thenReturn(new ArrayList<>());
-            when(atividadeRepo.findByMapaCodigo(mapaId)).thenReturn(List.of(ativ));
-
-            Competencia novaComp = new Competencia();
-            novaComp.setCodigo(50L);
-            novaComp.setAtividades(new HashSet<>()); // Initialize set for validation check
-            when(competenciaRepo.saveAll(anyList())).thenReturn(List.of(novaComp));
-
             MapaCompletoDto expectedDto = new MapaCompletoDto();
-            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(expectedDto);
+
+            when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req, "user")).thenReturn(expectedDto);
 
             var resultado = service.salvarMapaCompleto(mapaId, req, "user");
 
             assertThat(resultado).isNotNull();
             assertThat(resultado).isSameAs(expectedDto);
-            verify(mapaRepo).save(mapa);
-            verify(competenciaRepo).saveAll(anyList());
-            verify(atividadeRepo).saveAll(anyList());
-            // Verify findByMapaCodigo is called only once (initial fetch)
-            verify(competenciaRepo, times(1)).findByMapaCodigo(mapaId);
+            verify(mapaSalvamentoService).salvarMapaCompleto(mapaId, req, "user");
         }
 
         @Test
-        @DisplayName("Deve remover competências ausentes")
-        void deveRemoverCompetencias() {
+        @DisplayName("Deve propagar erro do MapaSalvamentoService")
+        void devePropagarErroDoMapaSalvamentoService() {
             Long mapaId = 1L;
             SalvarMapaRequest req = new SalvarMapaRequest();
-            req.setCompetencias(List.of()); // Empty list implies remove all
 
-            Mapa mapa = new Mapa();
-            Competencia compExistente = new Competencia();
-            compExistente.setCodigo(100L);
+            when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req, "user"))
+                .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", mapaId));
 
-            Atividade ativ = new Atividade();
-            ativ.setCodigo(10L);
-            ativ.setCompetencias(new HashSet<>(List.of(compExistente)));
-
-            when(mapaRepo.findById(mapaId)).thenReturn(Optional.of(mapa));
-            // First call returns existing to be removed
-            when(competenciaRepo.findByMapaCodigo(mapaId))
-                .thenReturn(new ArrayList<>(List.of(compExistente)));
-
-            when(atividadeRepo.findByMapaCodigo(mapaId)).thenReturn(List.of(ativ));
-
-            service.salvarMapaCompleto(mapaId, req, "user");
-
-            verify(competenciaRepo).deleteAll(anyList());
-            verify(competenciaRepo, times(1)).findByMapaCodigo(mapaId);
+            assertThatThrownBy(() -> service.salvarMapaCompleto(mapaId, req, "user"))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
-        @DisplayName("Deve manter competências presentes no request")
-        void deveManterCompetenciasPresentes() {
+        @DisplayName("Deve propagar ErroValidacao do MapaSalvamentoService")
+        void devePropagarErroValidacao() {
             Long mapaId = 1L;
             SalvarMapaRequest req = new SalvarMapaRequest();
-            CompetenciaMapaDto compDto = new CompetenciaMapaDto();
-            compDto.setCodigo(100L);
-            compDto.setDescricao("Comp Mantida");
-            req.setCompetencias(List.of(compDto));
 
-            Mapa mapa = new Mapa();
-            Competencia compExistente = new Competencia();
-            compExistente.setCodigo(100L);
-            compExistente.setDescricao("Desc Antiga");
-
-            when(mapaRepo.findById(mapaId)).thenReturn(Optional.of(mapa));
-            when(competenciaRepo.findByMapaCodigo(mapaId))
-                    .thenReturn(new ArrayList<>(List.of(compExistente)));
-
-            when(atividadeRepo.findByMapaCodigo(mapaId)).thenReturn(List.of());
-            when(competenciaRepo.saveAll(anyList())).thenReturn(List.of(compExistente));
-            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(new MapaCompletoDto());
-
-            service.salvarMapaCompleto(mapaId, req, "user");
-
-            // Verifica que NÃO removeu nada
-            verify(competenciaRepo, never()).deleteAll(anyList());
-            // Verifica que a descrição foi atualizada
-            assertThat(compExistente.getDescricao()).isEqualTo("Comp Mantida");
-        }
-
-        @Test
-        @DisplayName("Deve falhar se atividade não pertence ao mapa")
-        void deveFalharSeAtividadeInvalida() {
-            Long mapaId = 1L;
-            SalvarMapaRequest req = new SalvarMapaRequest();
-            CompetenciaMapaDto compDto = new CompetenciaMapaDto();
-            compDto.setAtividadesCodigos(List.of(99L)); // ID inválido
-            req.setCompetencias(List.of(compDto));
-
-            when(mapaRepo.findById(mapaId)).thenReturn(Optional.of(new Mapa()));
-            when(competenciaRepo.findByMapaCodigo(mapaId)).thenReturn(new ArrayList<>());
-            when(atividadeRepo.findByMapaCodigo(mapaId)).thenReturn(List.of()); // Nenhuma atividade no mapa
-
-            when(competenciaRepo.saveAll(anyList())).thenReturn(List.of(new Competencia()));
+            when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req, "user"))
+                .thenThrow(new ErroValidacao("Atividade 99 não pertence ao mapa"));
 
             assertThatThrownBy(() -> service.salvarMapaCompleto(mapaId, req, "user"))
                     .isInstanceOf(ErroValidacao.class)
