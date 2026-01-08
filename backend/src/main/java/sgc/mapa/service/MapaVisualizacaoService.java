@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.dto.visualizacao.CompetenciaDto;
 import sgc.mapa.dto.visualizacao.ConhecimentoDto;
@@ -32,7 +31,9 @@ public class MapaVisualizacaoService {
         Subprocesso subprocesso = subprocessoService.buscarSubprocesso(codSubprocesso);
         Mapa mapa = subprocesso.getMapa();
         if (mapa == null) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado: ", codSubprocesso);
+            throw new sgc.comum.erros.ErroEstadoImpossivel(
+                    "Subprocesso %d existe mas não possui Mapa associado - violação de invariante"
+                    .formatted(codSubprocesso));
         }
 
         Unidade unidade = subprocesso.getUnidade();

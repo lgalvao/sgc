@@ -132,12 +132,10 @@ export async function fecharHistoricoAnalise(page: Page) {
 // ============================================================================
 
 /**
- * Devolve cadastro de mapeamento para ajustes (CDU-13)
+ * Função genérica para devolução de cadastro/revisão
  */
-export async function devolverCadastroMapeamento(page: Page, observacao: string = '') {
+async function realizarDevolucao(page: Page, observacao: string = '', mensagemSucesso: string | RegExp) {
     await page.getByTestId('btn-acao-devolver').click();
-
-    // Verificar modal de devolução
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page.getByText(/Confirma a devolução.*para ajustes/i)).toBeVisible();
 
@@ -146,27 +144,22 @@ export async function devolverCadastroMapeamento(page: Page, observacao: string 
     }
 
     await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
-    await expect(page.getByRole('heading', {name: /Cadastro devolvido/i})).toBeVisible();
+    await expect(page.getByRole('heading', {name: mensagemSucesso})).toBeVisible();
     await verificarPaginaPainel(page);
+}
+
+/**
+ * Devolve cadastro de mapeamento para ajustes (CDU-13)
+ */
+export async function devolverCadastroMapeamento(page: Page, observacao: string = '') {
+    await realizarDevolucao(page, observacao, /Cadastro devolvido/i);
 }
 
 /**
  * Devolve revisão para ajustes (CDU-14)
  */
 export async function devolverRevisao(page: Page, observacao: string = '') {
-    await page.getByTestId('btn-acao-devolver').click();
-
-    // Verificar modal de devolução
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByText(/Confirma a devolução.*para ajustes/i)).toBeVisible();
-
-    if (observacao) {
-        await page.getByTestId('inp-devolucao-cadastro-obs').fill(observacao);
-    }
-
-    await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
-    await expect(page.getByRole('heading', {name: /Revisão devolvida/i})).toBeVisible();
-    await verificarPaginaPainel(page);
+    await realizarDevolucao(page, observacao, /Revisão devolvida/i);
 }
 
 /**
@@ -189,12 +182,10 @@ export async function cancelarDevolucao(page: Page) {
 // ============================================================================
 
 /**
- * Aceita cadastro de mapeamento (GESTOR - CDU-13)
+ * Função genérica para aceite de cadastro/revisão (GESTOR)
  */
-export async function aceitarCadastroMapeamento(page: Page, observacao: string = '') {
+async function realizarAceite(page: Page, observacao: string = '', mensagemSucesso: string | RegExp) {
     await page.getByTestId('btn-acao-analisar-principal').click();
-
-    // Verificar modal de aceite
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page.getByText(/Confirma o aceite/i)).toBeVisible();
 
@@ -203,27 +194,22 @@ export async function aceitarCadastroMapeamento(page: Page, observacao: string =
     }
 
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByRole('heading', {name: /Cadastro aceito/i})).toBeVisible();
+    await expect(page.getByRole('heading', {name: mensagemSucesso})).toBeVisible();
     await verificarPaginaPainel(page);
+}
+
+/**
+ * Aceita cadastro de mapeamento (GESTOR - CDU-13)
+ */
+export async function aceitarCadastroMapeamento(page: Page, observacao: string = '') {
+    await realizarAceite(page, observacao, /Cadastro aceito/i);
 }
 
 /**
  * Aceita revisão (GESTOR - CDU-14)
  */
 export async function aceitarRevisao(page: Page, observacao: string = '') {
-    await page.getByTestId('btn-acao-analisar-principal').click();
-
-    // Verificar modal de aceite
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByText(/Confirma o aceite/i)).toBeVisible();
-
-    if (observacao) {
-        await page.getByTestId('inp-aceite-cadastro-obs').fill(observacao);
-    }
-
-    await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByRole('heading', {name: /Revisão aceita/i})).toBeVisible();
-    await verificarPaginaPainel(page);
+    await realizarAceite(page, observacao, /Revisão aceita/i);
 }
 
 // ============================================================================

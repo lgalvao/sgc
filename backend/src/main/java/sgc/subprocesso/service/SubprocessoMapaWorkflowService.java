@@ -154,7 +154,9 @@ public class SubprocessoMapaWorkflowService {
         }
 
         if (subprocesso.getMapa() == null) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado");
+            throw new sgc.comum.erros.ErroEstadoImpossivel(
+                    "Subprocesso %d existe mas não possui Mapa associado - violação de invariante"
+                    .formatted(subprocesso.getCodigo()));
         }
         return subprocesso;
     }
@@ -388,7 +390,10 @@ public class SubprocessoMapaWorkflowService {
         unidadeCodigos.forEach(unidadeCodigo -> {
             Subprocesso base = buscarSubprocesso(codSubprocessoBase);
             Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para unidade " + unidadeCodigo));
+                    .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeDeveriaExistir(
+                            "Subprocesso",
+                            "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo),
+                            "Workflow em bloco - subprocesso deveria ter sido criado no início do processo"));
 
             disponibilizarMapa(target.getCodigo(), request, usuario);
         });
@@ -399,7 +404,10 @@ public class SubprocessoMapaWorkflowService {
         unidadeCodigos.forEach(unidadeCodigo -> {
             Subprocesso base = buscarSubprocesso(codSubprocessoBase);
             Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para unidade " + unidadeCodigo));
+                    .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeDeveriaExistir(
+                            "Subprocesso",
+                            "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo),
+                            "Workflow em bloco - subprocesso deveria ter sido criado no início do processo"));
 
             aceitarValidacao(target.getCodigo(), usuario);
         });
@@ -410,7 +418,10 @@ public class SubprocessoMapaWorkflowService {
         unidadeCodigos.forEach(unidadeCodigo -> {
             Subprocesso base = buscarSubprocesso(codSubprocessoBase);
             Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para unidade " + unidadeCodigo));
+                    .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeDeveriaExistir(
+                            "Subprocesso",
+                            "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo),
+                            "Workflow em bloco - subprocesso deveria ter sido criado no início do processo"));
 
             homologarValidacao(target.getCodigo(), usuario);
         });

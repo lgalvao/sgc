@@ -306,7 +306,10 @@ public class SubprocessoCadastroWorkflowService {
 
             Subprocesso base = buscarSubprocesso(codSubprocessoBase);
             Subprocesso target = repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para unidade " + unidadeCodigo));
+                    .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeDeveriaExistir(
+                            "Subprocesso",
+                            "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo),
+                            "Workflow em bloco - subprocesso deveria ter sido criado no início do processo"));
 
             aceitarCadastro(target.getCodigo(), "De acordo com o cadastro de atividades da unidade (Em Bloco)", usuario);
         });
@@ -317,7 +320,10 @@ public class SubprocessoCadastroWorkflowService {
         unidadeCodigos.forEach(unidadeCodigo -> {
             Subprocesso base = buscarSubprocesso(codSubprocessoBase);
             Subprocesso target = repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para unidade " + unidadeCodigo));
+                    .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeDeveriaExistir(
+                            "Subprocesso",
+                            "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo),
+                            "Workflow em bloco - subprocesso deveria ter sido criado no início do processo"));
 
             homologarCadastro(target.getCodigo(), "Homologação em bloco", usuario);
         });

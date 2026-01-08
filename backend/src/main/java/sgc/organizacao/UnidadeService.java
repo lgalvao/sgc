@@ -16,6 +16,7 @@ import sgc.processo.service.ProcessoConsultaService;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -55,48 +56,18 @@ public class UnidadeService {
 
     private List<UnidadeDto> montarHierarquiaComElegibilidade(
             List<Unidade> unidades, boolean requerMapaVigente, Long codProcessoIgnorar) {
-        Map<Long, UnidadeDto> mapaUnidades = new HashMap<>();
-        Map<Long, List<UnidadeDto>> mapaFilhas = new HashMap<>();
-        List<UnidadeDto> raizes = new ArrayList<>();
-
         Set<Long> unidadesEmProcessoAtivo = getUnidadesEmProcessosAtivos(codProcessoIgnorar);
 
-        // Otimização: Busca em lote os IDs das unidades que possuem mapa para evitar N+1
         Set<Long> unidadesComMapa = requerMapaVigente
                 ? new HashSet<>(unidadeMapaRepo.findAllUnidadeCodigos())
                 : Collections.emptySet();
 
-        for (Unidade u : unidades) {
-            // Elegibilidade simples (não recursiva):
-            // 3. NÃO está em outro processo ativo
-            boolean isElegivel =
-                    u.getTipo() != sgc.organizacao.model.TipoUnidade.INTERMEDIARIA
-                            && (!requerMapaVigente || unidadesComMapa.contains(u.getCodigo()))
-                            && !unidadesEmProcessoAtivo.contains(u.getCodigo());
+        Function<Unidade, Boolean> elegibilidadeChecker = u -> 
+                u.getTipo() != sgc.organizacao.model.TipoUnidade.INTERMEDIARIA
+                && (!requerMapaVigente || unidadesComMapa.contains(u.getCodigo()))
+                && !unidadesEmProcessoAtivo.contains(u.getCodigo());
 
-            UnidadeDto dto = usuarioMapper.toUnidadeDto(u, isElegivel);
-
-            mapaUnidades.put(u.getCodigo(), dto);
-            mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
-        }
-
-        for (Unidade u : unidades) {
-            UnidadeDto dto = mapaUnidades.get(u.getCodigo());
-
-            if (u.getUnidadeSuperior() == null) {
-                raizes.add(dto);
-            } else {
-                Long codigoPai = u.getUnidadeSuperior().getCodigo();
-                mapaFilhas.computeIfAbsent(codigoPai, k -> new ArrayList<>()).add(dto);
-            }
-        }
-
-        List<UnidadeDto> resultado = new ArrayList<>();
-        for (UnidadeDto raiz : raizes) {
-            resultado.add(montarComSubunidades(raiz, mapaFilhas));
-        }
-
-        return resultado;
+        return montarHierarquia(unidades, elegibilidadeChecker);
     }
 
     private Set<Long> getUnidadesEmProcessosAtivos(Long codProcessoIgnorar) {
@@ -117,11 +88,6 @@ public class UnidadeService {
 
         Usuario usuario = usuarioService.buscarPorId(request.tituloEleitoralUsuario());
 
-        // Valida se o usuário pertence à unidade (simplificado, poderia ser mais rigoroso)
-        // Se a unidade não for a mesma e nem superior/subordinada, talvez devesse bloquear?
-        // O requisito CDU-28 diz apenas "ADMIN seleciona servidor" da lista de servidores da unidade.
-
-        // Validação de datas
         java.time.LocalDate inicio = request.dataInicio() != null ? request.dataInicio() : java.time.LocalDate.now();
         if (request.dataTermino().isBefore(inicio)) {
             throw new sgc.comum.erros.ErroValidacao("A data de término deve ser posterior à data de início.");
@@ -147,12 +113,18 @@ public class UnidadeService {
     }
 
     private List<UnidadeDto> montarHierarquia(List<Unidade> unidades) {
+        return montarHierarquia(unidades, null);
+    }
+
+    private List<UnidadeDto> montarHierarquia(List<Unidade> unidades,
+            @org.jspecify.annotations.Nullable Function<Unidade, Boolean> elegibilidadeChecker) {
         Map<Long, UnidadeDto> mapaUnidades = new HashMap<>();
         Map<Long, List<UnidadeDto>> mapaFilhas = new HashMap<>();
         List<UnidadeDto> raizes = new ArrayList<>();
 
         for (Unidade u : unidades) {
-            UnidadeDto dto = usuarioMapper.toUnidadeDto(u);
+            boolean isElegivel = elegibilidadeChecker != null ? elegibilidadeChecker.apply(u) : true;
+            UnidadeDto dto = usuarioMapper.toUnidadeDto(u, isElegivel);
 
             mapaUnidades.put(u.getCodigo(), dto);
             mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
@@ -223,20 +195,18 @@ public class UnidadeService {
                                                 + " não encontrada"));
     }
 
+    public boolean existePorId(Long codigo) {
+        return unidadeRepo.existsById(codigo);
+    }
+
     public List<Unidade> listarSubordinadas(Long codigoPai) {
         return unidadeRepo.findByUnidadeSuperiorCodigo(codigoPai);
     }
 
-    /**
-     * Busca IDs de todas as unidades subordinadas (recursivamente) em memória,
-     * utilizando a lista cacheada de unidades para evitar N+1 queries.
-     * Resultado é cacheado para evitar reconstrução do mapa O(N) em chamadas repetidas.
-     */
     @Cacheable(value = "unidadeDescendentes", key = "#codigoUnidade")
     public List<Long> buscarIdsDescendentes(Long codigoUnidade) {
         List<Unidade> todas = buscarTodasEntidadesComHierarquia();
 
-        // Mapa para lookup rápido: Pai -> Lista de Filhos
         Map<Long, List<Long>> mapPaiFilhos = new HashMap<>();
         for (Unidade u : todas) {
             if (u.getUnidadeSuperior() != null) {
@@ -264,10 +234,6 @@ public class UnidadeService {
         return unidadeRepo.findAllById(codigos);
     }
 
-    /**
-     * Busca todas as unidades com hierarquia.
-     * Resultado é cacheado pois a estrutura organizacional muda raramente.
-     */
     @Cacheable(value = "arvoreUnidades", unless = "#result == null || #result.isEmpty()")
     public List<Unidade> buscarTodasEntidadesComHierarquia() {
         return unidadeRepo.findAllWithHierarquia();

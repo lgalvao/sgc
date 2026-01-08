@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class MapaSalvamentoService {
-
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
     private final AtividadeRepo atividadeRepo;
@@ -66,10 +65,6 @@ public class MapaSalvamentoService {
         return mapaCompletoMapper.toDto(mapa, null, competenciasSalvas);
     }
 
-    // ===================================================================================
-    // Métodos de preparação
-    // ===================================================================================
-
     private void atualizarObservacoes(Mapa mapa, String observacoes) {
         var sanitizedObservacoes = SanitizacaoUtil.sanitizar(observacoes);
         mapa.setObservacoesDisponibilizacao(sanitizedObservacoes);
@@ -98,11 +93,7 @@ public class MapaSalvamentoService {
         );
     }
 
-    // ===================================================================================
-    // Métodos de processamento de competências
-    // ===================================================================================
-
-    private void removerCompetenciasObsoletas(ContextoSalvamento contexto) {
+     private void removerCompetenciasObsoletas(ContextoSalvamento contexto) {
         List<Competencia> paraRemover = contexto.competenciasAtuais.stream()
                 .filter(c -> !contexto.codigosNovos.contains(c.getCodigo()))
                 .toList();
@@ -141,7 +132,9 @@ public class MapaSalvamentoService {
 
         Competencia competencia = mapaCompetenciasExistentes.get(compDto.getCodigo());
         if (competencia == null) {
-            throw new ErroEntidadeNaoEncontrada("Competência não encontrada: " + compDto.getCodigo());
+            throw new sgc.comum.erros.ErroEntidadeDeveriaExistir(
+                    "Competência", compDto.getCodigo(),
+                    "MapaSalvamentoService.atualizarCompetenciaExistente - competência deveria estar no mapa");
         }
         competencia.setDescricao(compDto.getDescricao());
         return competencia;
@@ -225,10 +218,6 @@ public class MapaSalvamentoService {
             }
         }
     }
-
-    // ===================================================================================
-    // Classe interna de contexto
-    // ===================================================================================
 
     /**
      * Classe auxiliar para manter o contexto durante o salvamento.

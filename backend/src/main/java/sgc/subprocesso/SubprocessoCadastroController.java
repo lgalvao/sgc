@@ -73,7 +73,7 @@ public class SubprocessoCadastroController {
         Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         List<Atividade> faltando =
                 subprocessoService.obterAtividadesSemConhecimento(codSubprocesso);
-        if (faltando != null && !faltando.isEmpty()) {
+        if (!faltando.isEmpty()) {
             var lista =
                     faltando.stream()
                             .map(
@@ -113,7 +113,7 @@ public class SubprocessoCadastroController {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(codigo);
-        if (faltando != null && !faltando.isEmpty()) {
+        if (!faltando.isEmpty()) {
             var lista = faltando.stream()
                     .map(a -> Map.of("codigo", a.getCodigo(), "descricao", a.getDescricao()))
                     .toList();
@@ -320,9 +320,6 @@ public class SubprocessoCadastroController {
     }
 
     private String extractTituloUsuario(Object principal) {
-        if (principal instanceof String string) return string;
-        if (principal instanceof sgc.organizacao.model.Usuario usuario)
-            return usuario.getTituloEleitoral();
-        return principal != null ? principal.toString() : null;
+        return usuarioService.extractTituloUsuario(principal);
     }
 }

@@ -50,10 +50,12 @@ public class AlertaController {
     }
 
     private String extractTituloUsuario(Object principal) {
-        if (principal instanceof String string) return string;
-        if (principal instanceof Usuario usuario) return usuario.getTituloEleitoral();
-        if (principal instanceof UserDetails userDetails) return userDetails.getUsername();
+        return switch (principal) {
+            case String string -> string;
+            case Usuario usuario -> usuario.getTituloEleitoral();
+            case UserDetails userDetails -> userDetails.getUsername();
+            case null, default -> principal.toString();
+        };
 
-        return principal.toString();
     }
 }

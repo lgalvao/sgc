@@ -154,7 +154,7 @@ class SubprocessoWorkflowServiceTest {
         service.reabrirCadastro(1L, "Just");
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        verify(alertaService).criarAlertaReaberturaCadastro(any(), any());
+        verify(alertaService).criarAlertaReaberturaCadastro(any(), any(), any());
         verify(alertaService).criarAlertaReaberturaCadastroSuperior(any(), any(), any());
     }
 
@@ -201,7 +201,7 @@ class SubprocessoWorkflowServiceTest {
         service.reabrirRevisaoCadastro(1L, "Just");
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-        verify(alertaService).criarAlertaReaberturaRevisao(any(), any());
+        verify(alertaService).criarAlertaReaberturaRevisao(any(), any(), any());
         verify(alertaService).criarAlertaReaberturaRevisaoSuperior(any(), any(), any());
     }
 
@@ -267,7 +267,7 @@ class SubprocessoWorkflowServiceTest {
         sp.setUnidade(new Unidade());
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        doThrow(new RuntimeException("Simulated error")).when(alertaService).criarAlertaReaberturaCadastro(any(), any());
+        doThrow(new RuntimeException("Simulated error")).when(alertaService).criarAlertaReaberturaCadastro(any(), any(), any());
 
         // Não deve lançar exceção
         service.reabrirCadastro(1L, "Just");

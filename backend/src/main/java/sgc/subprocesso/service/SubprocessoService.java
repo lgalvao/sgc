@@ -101,9 +101,9 @@ public class SubprocessoService {
     }
 
     @Transactional(readOnly = true)
-    public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil, Long codUnidadeUsuario) {
+    public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil) {
         Usuario usuario = obterUsuarioAutenticado();
-        return detalheService.obterDetalhes(codigo, perfil, codUnidadeUsuario, usuario);
+        return detalheService.obterDetalhes(codigo, perfil, usuario);
     }
 
     @Transactional(readOnly = true)

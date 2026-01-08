@@ -11,6 +11,8 @@ import java.util.List;
 public interface UsuarioPerfilRepo extends JpaRepository<UsuarioPerfil, UsuarioPerfilId> {
     List<UsuarioPerfil> findByUsuarioTitulo(String usuarioTitulo);
 
-    @Query("SELECT up FROM UsuarioPerfil up WHERE up.usuarioTitulo IN :titulos")
+    @Query("""
+            SELECT up FROM UsuarioPerfil up WHERE up.usuarioTitulo IN :titulos
+            """)
     List<UsuarioPerfil> findByUsuarioTituloIn(@Param("titulos") List<String> titulos);
 }

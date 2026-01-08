@@ -56,7 +56,7 @@ public class GerenciadorJwt {
         Instant now = Instant.now();
         Instant expiration = now.plus(jwtProperties.getExpiracaoMinutos(), ChronoUnit.MINUTES);
 
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .subject(tituloEleitoral)
                 .claim("perfil", perfil.name())
                 .claim("unidade", unidadeCodigo)
@@ -64,8 +64,6 @@ public class GerenciadorJwt {
                 .expiration(Date.from(expiration))
                 .signWith(getSigningKey())
                 .compact();
-
-        return token;
     }
 
     public Optional<JwtClaims> validarToken(String token) {

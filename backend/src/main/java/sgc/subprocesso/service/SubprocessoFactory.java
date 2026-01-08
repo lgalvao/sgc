@@ -106,7 +106,7 @@ public class SubprocessoFactory {
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
         
         // 2. Copiar mapa COM referência ao subprocesso
-        Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
+        Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente);
         
         if (mapaCopiado == null) {
             log.error("ERRO CRITICO: Copia do mapa retornou null para unidade {}", unidade.getSigla());
@@ -147,7 +147,7 @@ public class SubprocessoFactory {
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
         
         // 2. Copiar mapa COM referência ao subprocesso
-        Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
+        Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente);
         mapaCopiado.setSubprocesso(subprocessoSalvo);
         Mapa mapaSalvo = mapaRepo.save(mapaCopiado);
         

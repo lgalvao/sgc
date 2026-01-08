@@ -231,8 +231,8 @@ public class AlertaService {
     }
 
     @Transactional
-    public void criarAlertaReaberturaCadastro(Processo processo, Unidade unidade) {
-        String descricao = "Cadastro de atividades reaberto pela SEDOC";
+    public void criarAlertaReaberturaCadastro(Processo processo, Unidade unidade, String justificativa) {
+        String descricao = "Cadastro de atividades reaberto pela SEDOC. Justificativa: %s".formatted(justificativa);
         criarAlertaSedoc(processo, unidade, descricao);
     }
 
@@ -243,8 +243,8 @@ public class AlertaService {
     }
 
     @Transactional
-    public void criarAlertaReaberturaRevisao(Processo processo, Unidade unidade) {
-        String descricao = "Revisão de cadastro da unidade %s reaberta pela SEDOC".formatted(unidade.getSigla());
+    public void criarAlertaReaberturaRevisao(Processo processo, Unidade unidade, String justificativa) {
+        String descricao = "Revisão de cadastro da unidade %s reaberta pela SEDOC. Justificativa: %s".formatted(unidade.getSigla(), justificativa);
         criarAlertaSedoc(processo, unidade, descricao);
     }
 

@@ -236,8 +236,8 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(testUtil.toJson(entrarReq)))
-                    .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.message").value("&#39;Unidade&#39; com codigo &#39;" + codigoUnidadeInexistente + "&#39; não encontrado(a)."));
+                    .andExpect(status().is(422))
+                    .andExpect(jsonPath("$.message").value("Unidade informada não existe: " + codigoUnidadeInexistente));
         }
     }
 }

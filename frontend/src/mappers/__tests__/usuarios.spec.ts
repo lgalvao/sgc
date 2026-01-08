@@ -4,7 +4,6 @@ import type {Usuario} from "@/types/tipos";
 
 describe("mappers/usuarios", () => {
     it("mapVWUsuarioToUsuario handles null/undefined input", () => {
-        // @ts-expect-error - testing null input
         const user = mapVWUsuarioToUsuario(null);
         expect(user.codigo).toBe(0);
         expect(user.nome).toBe("");
@@ -50,7 +49,6 @@ describe("mappers/usuarios", () => {
     });
 
     it("mapVWUsuariosArray handles undefined input", () => {
-        // @ts-expect-error - testing undefined input
         const users = mapVWUsuariosArray(undefined);
         expect(users).toEqual([]);
     });

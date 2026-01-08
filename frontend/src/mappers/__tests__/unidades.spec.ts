@@ -5,7 +5,6 @@ import type {Unidade, UnidadeSnapshot} from "@/types/tipos";
 describe("mappers/unidades", () => {
     describe("mapUnidadeSnapshot", () => {
         it("handles null/undefined input", () => {
-            // @ts-expect-error - testing null input
             const snap = mapUnidadeSnapshot({});
             expect(snap.codigo).toBe(0);
             expect(snap.nome).toBe("");
@@ -35,7 +34,6 @@ describe("mappers/unidades", () => {
 
     describe("mapUnidade", () => {
         it("handles null/undefined input object", () => {
-             // @ts-expect-error - testing partial/empty input
             const u = mapUnidade({});
             expect(u.codigo).toBe(0);
             expect(u.sigla).toBe("");
@@ -111,7 +109,6 @@ describe("mappers/unidades", () => {
 
     describe("mapUnidadesArray", () => {
         it("handles undefined input", () => {
-             // @ts-expect-error - testing undefined input
             const arr = mapUnidadesArray(undefined);
             expect(arr).toEqual([]);
         });

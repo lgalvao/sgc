@@ -18,7 +18,9 @@ public interface MapaRepo extends JpaRepository<Mapa, Long> {
      * @param unidadeCodigo Código da unidade
      * @return Optional contendo o mapa vigente se existir
      */
-    @Query("SELECT um.mapaVigente FROM UnidadeMapa um WHERE um.unidadeCodigo = :unidadeCodigo")
+    @Query("""
+            SELECT um.mapaVigente FROM UnidadeMapa um WHERE um.unidadeCodigo = :unidadeCodigo
+            """)
     Optional<Mapa> findMapaVigenteByUnidade(@Param("unidadeCodigo") Long unidadeCodigo);
 
     /**
@@ -27,6 +29,8 @@ public interface MapaRepo extends JpaRepository<Mapa, Long> {
      * @param subprocessoCodigo Código do subprocesso
      * @return Optional contendo o mapa se existir
      */
-    @Query("SELECT m FROM Mapa m WHERE m.subprocesso.codigo = :subprocessoCodigo")
+    @Query("""
+            SELECT m FROM Mapa m WHERE m.subprocesso.codigo = :subprocessoCodigo
+            """)
     Optional<Mapa> findBySubprocessoCodigo(@Param("subprocessoCodigo") Long subprocessoCodigo);
 }

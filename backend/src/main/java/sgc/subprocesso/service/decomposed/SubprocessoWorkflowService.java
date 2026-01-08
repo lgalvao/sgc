@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaService;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.UnidadeService;
 import sgc.organizacao.model.Unidade;
@@ -55,11 +54,15 @@ public class SubprocessoWorkflowService {
 
     public void atualizarSituacaoParaEmAndamento(Long mapaCodigo) {
         var subprocesso = repositorioSubprocesso.findByMapaCodigo(mapaCodigo)
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o mapa com código %d".formatted(mapaCodigo)));
+            .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeDeveriaExistir(
+                    "Subprocesso", mapaCodigo,
+                    "SubprocessoWorkflowService - mapa deveria estar associado a um subprocesso"));
 
         if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
             if (subprocesso.getProcesso() == null) {
-                throw new ErroEntidadeNaoEncontrada("Processo não associado ao Subprocesso %d".formatted(subprocesso.getCodigo()));
+                throw new sgc.comum.erros.ErroEstadoImpossivel(
+                        "Subprocesso %d existe mas não possui Processo associado - violação de invariante"
+                        .formatted(subprocesso.getCodigo()));
             }
             var tipoProcesso = subprocesso.getProcesso().getTipo();
             if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
@@ -126,9 +129,9 @@ public class SubprocessoWorkflowService {
     private void enviarAlertasReabertura(Subprocesso sp, String justificativa, boolean isRevisao) {
         try {
             if (isRevisao) {
-                 alertaService.criarAlertaReaberturaRevisao(sp.getProcesso(), sp.getUnidade());
+                 alertaService.criarAlertaReaberturaRevisao(sp.getProcesso(), sp.getUnidade(), justificativa);
             } else {
-                 alertaService.criarAlertaReaberturaCadastro(sp.getProcesso(), sp.getUnidade());
+                 alertaService.criarAlertaReaberturaCadastro(sp.getProcesso(), sp.getUnidade(), justificativa);
             }
             Unidade superior = sp.getUnidade().getUnidadeSuperior();
             while (superior != null) {

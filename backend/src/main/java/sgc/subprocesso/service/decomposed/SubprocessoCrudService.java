@@ -31,7 +31,9 @@ public class SubprocessoCrudService {
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
         Subprocesso subprocesso = buscarSubprocesso(codigo);
         if (subprocesso.getMapa() == null) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado");
+            throw new sgc.comum.erros.ErroEstadoImpossivel(
+                    "Subprocesso %d existe mas não possui Mapa associado - violação de invariante"
+                    .formatted(subprocesso.getCodigo()));
         }
         return subprocesso;
     }

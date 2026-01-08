@@ -42,7 +42,7 @@ public class ConfigSeguranca {
      * @return o {@link SecurityFilterChain} configurado.
      */
     @Bean("defaultSecurityFilterChain")
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource) {
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/api/usuarios/autenticar",
                                 "/api/usuarios/autorizar",

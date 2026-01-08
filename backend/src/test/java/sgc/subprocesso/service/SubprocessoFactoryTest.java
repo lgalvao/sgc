@@ -90,7 +90,7 @@ class SubprocessoFactoryTest {
 
         Mapa mapaCopiado = new Mapa();
         mapaCopiado.setCodigo(200L);
-        when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L, 1L)).thenReturn(mapaCopiado);
+        when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L)).thenReturn(mapaCopiado);
         when(mapaRepo.save(any(Mapa.class))).thenAnswer(i -> i.getArgument(0));
 
         factory.criarParaRevisao(processo, unidade, unidadeMapa);
@@ -126,7 +126,7 @@ class SubprocessoFactoryTest {
 
         when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(i -> i.getArgument(0));
 
-        when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L, 1L)).thenReturn(null);
+        when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L)).thenReturn(null);
 
         assertThrows(ErroProcesso.class, () -> factory.criarParaRevisao(processo, unidade, unidadeMapa));
     }
@@ -149,7 +149,7 @@ class SubprocessoFactoryTest {
 
         Mapa mapaCopiado = new Mapa();
         mapaCopiado.setCodigo(200L);
-        when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L, 1L)).thenReturn(mapaCopiado);
+        when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L)).thenReturn(mapaCopiado);
         when(mapaRepo.save(any(Mapa.class))).thenAnswer(i -> i.getArgument(0));
 
         factory.criarParaDiagnostico(processo, unidade, unidadeMapa);

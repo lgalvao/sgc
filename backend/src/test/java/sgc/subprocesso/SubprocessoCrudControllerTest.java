@@ -53,7 +53,7 @@ class SubprocessoCrudControllerTest {
     @DisplayName("obterPorCodigo deve retornar detalhe")
     @WithMockUser
     void obterPorCodigo() throws Exception {
-        when(subprocessoService.obterDetalhes(eq(1L), any(), any()))
+        when(subprocessoService.obterDetalhes(eq(1L), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
 
         mockMvc.perform(get("/api/subprocessos/1")).andExpect(status().isOk());

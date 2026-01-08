@@ -153,7 +153,7 @@ class SubprocessoDetalheServiceTest {
                 .thenReturn(SubprocessoDetalheDto.builder().build());
         when(usuarioService.buscarPorLogin("titular")).thenReturn(new Usuario());
 
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, null, admin);
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, admin);
         assertThat(result).isNotNull();
     }
 
@@ -176,14 +176,15 @@ class SubprocessoDetalheServiceTest {
                 .thenReturn(SubprocessoDetalheDto.builder().build());
         when(usuarioService.buscarPorLogin("titular")).thenThrow(new RuntimeException("Erro"));
 
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, null, admin);
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, admin);
         assertThat(result).isNotNull();
     }
 
     @Test
     @DisplayName("obterDetalhes falha se perfil null")
     void obterDetalhesFalhaPerfilNull() {
-        assertThatThrownBy(() -> service.obterDetalhes(1L, null, null, new Usuario()))
+        Usuario usuario = new Usuario();
+        assertThatThrownBy(() -> service.obterDetalhes(1L, null, usuario))
             .isInstanceOf(ErroAccessoNegado.class);
     }
 
@@ -207,7 +208,7 @@ class SubprocessoDetalheServiceTest {
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
-        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.CHEFE, 10L, user))
+        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.CHEFE, user))
                 .isInstanceOf(ErroAccessoNegado.class);
     }
 
@@ -234,7 +235,7 @@ class SubprocessoDetalheServiceTest {
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
 
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.GESTOR, null, gestor);
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.GESTOR, gestor);
         assertThat(result).isNotNull();
     }
 
@@ -258,7 +259,7 @@ class SubprocessoDetalheServiceTest {
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
-        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.GESTOR, null, gestor))
+        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.GESTOR, gestor))
                 .isInstanceOf(ErroAccessoNegado.class);
     }
 
@@ -282,7 +283,7 @@ class SubprocessoDetalheServiceTest {
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
 
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.SERVIDOR, null, servidor);
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.SERVIDOR, servidor);
         assertThat(result).isNotNull();
     }
 
@@ -417,7 +418,7 @@ class SubprocessoDetalheServiceTest {
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
 
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, null, admin);
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, admin);
         assertThat(result).isNotNull();
     }
 
@@ -435,7 +436,7 @@ class SubprocessoDetalheServiceTest {
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
-        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.CHEFE, 10L, admin))
+        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.CHEFE, admin))
                 .isInstanceOf(ErroAccessoNegado.class);
     }
 
@@ -462,7 +463,7 @@ class SubprocessoDetalheServiceTest {
                 .thenReturn(SubprocessoDetalheDto.builder().build());
         when(usuarioService.buscarPorLogin("titular")).thenReturn(new Usuario());
 
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.CHEFE, 10L, chefe);
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.CHEFE, chefe);
         assertThat(result).isNotNull();
     }
 }

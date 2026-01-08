@@ -45,7 +45,6 @@ describe('useFormErrors', () => {
       kind: 'validation' as const,
       message: 'Global error'
     };
-    // @ts-expect-error - testing missing subErrors which might happen at runtime despite types
     setFromNormalizedError(normalizedError);
     expect(errors.value.field1).toBe('');
   });
@@ -57,7 +56,6 @@ describe('useFormErrors', () => {
       message: 'Global error',
       subErrors: [{ message: 'Error 1' }] // Missing field
     };
-    // @ts-expect-error - testing invalid subError shape
     setFromNormalizedError(normalizedError);
     expect(errors.value.field1).toBe('');
   });
@@ -81,7 +79,6 @@ describe('useFormErrors', () => {
       message: 'Global error',
       subErrors: [{ field: 'field1' }] // Missing message
     };
-    // @ts-expect-error - testing missing message
     setFromNormalizedError(normalizedError);
     expect(errors.value.field1).toBe('Campo inválido');
   });

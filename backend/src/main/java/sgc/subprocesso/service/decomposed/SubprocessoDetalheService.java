@@ -81,7 +81,7 @@ public class SubprocessoDetalheService {
                 .build();
     }
 
-    public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil, Long codUnidadeUsuario, Usuario usuarioAutenticado) {
+    public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil, Usuario usuarioAutenticado) {
         if (perfil == null) {
             throw new ErroAccessoNegado("Perfil inválido para acesso aos detalhes do subprocesso.");
         }

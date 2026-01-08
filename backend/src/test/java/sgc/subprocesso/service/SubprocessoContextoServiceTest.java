@@ -37,9 +37,11 @@ class SubprocessoContextoServiceTest {
     @InjectMocks
     private SubprocessoContextoService service;
 
+    private static final String SIGLA_TESTE = "TESTE";
+
     @Test
     @DisplayName("obterContextoEdicao deve retornar contexto completo quando tudo ok")
-    void obterContextoEdicao_Sucesso() {
+    void obterContextoEdicaoSucesso() {
         Long codSubprocesso = 1L;
         Long codUnidade = 10L;
         Perfil perfil = Perfil.CHEFE;
@@ -47,14 +49,14 @@ class SubprocessoContextoServiceTest {
 
         // Mock 1: Detalhes (agora via SubprocessoService)
         SubprocessoDetalheDto detalheDto = SubprocessoDetalheDto.builder()
-                .unidade(SubprocessoDetalheDto.UnidadeDto.builder().codigo(codUnidade).sigla("TESTE").build())
+                .unidade(SubprocessoDetalheDto.UnidadeDto.builder().codigo(codUnidade).sigla(SIGLA_TESTE).build())
                 .build();
-        when(subprocessoService.obterDetalhes(codSubprocesso, perfil, codUnidadeUsuario))
+        when(subprocessoService.obterDetalhes(codSubprocesso, perfil))
                 .thenReturn(detalheDto);
 
         // Mock 2: Unidade
-        UnidadeDto unidadeDto = UnidadeDto.builder().codigo(codUnidade).sigla("TESTE").build();
-        when(usuarioService.buscarUnidadePorSigla("TESTE")).thenReturn(Optional.of(unidadeDto));
+        UnidadeDto unidadeDto = UnidadeDto.builder().codigo(codUnidade).sigla(SIGLA_TESTE).build();
+        when(usuarioService.buscarUnidadePorSigla(SIGLA_TESTE)).thenReturn(Optional.of(unidadeDto));
 
         // Mock 3: Mapa (agora via SubprocessoService)
         Subprocesso subprocesso = new Subprocesso();
@@ -81,18 +83,18 @@ class SubprocessoContextoServiceTest {
 
     @Test
     @DisplayName("obterContextoEdicao deve lançar erro se unidade não encontrada")
-    void obterContextoEdicao_ErroUnidade() {
+    void obterContextoEdicaoErroUnidade() {
         Long codSubprocesso = 1L;
         Perfil perfil = Perfil.CHEFE;
         Long codUnidadeUsuario = 10L;
 
         SubprocessoDetalheDto detalheDto = SubprocessoDetalheDto.builder()
-                .unidade(SubprocessoDetalheDto.UnidadeDto.builder().sigla("TESTE").build())
+                .unidade(SubprocessoDetalheDto.UnidadeDto.builder().sigla(SIGLA_TESTE).build())
                 .build();
-        when(subprocessoService.obterDetalhes(codSubprocesso, perfil, codUnidadeUsuario))
+        when(subprocessoService.obterDetalhes(codSubprocesso, perfil))
                 .thenReturn(detalheDto);
 
-        when(usuarioService.buscarUnidadePorSigla("TESTE")).thenReturn(Optional.empty());
+        when(usuarioService.buscarUnidadePorSigla(SIGLA_TESTE)).thenReturn(Optional.empty());
 
         assertThrows(ErroEntidadeNaoEncontrada.class, () ->
             service.obterContextoEdicao(codSubprocesso, perfil, codUnidadeUsuario)
@@ -101,19 +103,19 @@ class SubprocessoContextoServiceTest {
 
     @Test
     @DisplayName("obterContextoEdicao deve retornar mapa nulo se subprocesso não tem mapa")
-    void obterContextoEdicao_SemMapa() {
+    void obterContextoEdicaoSemMapa() {
         Long codSubprocesso = 1L;
         Long codUnidade = 10L;
         Perfil perfil = Perfil.CHEFE;
         Long codUnidadeUsuario = 10L;
 
         SubprocessoDetalheDto detalheDto = SubprocessoDetalheDto.builder()
-                .unidade(SubprocessoDetalheDto.UnidadeDto.builder().codigo(codUnidade).sigla("TESTE").build())
+                .unidade(SubprocessoDetalheDto.UnidadeDto.builder().codigo(codUnidade).sigla(SIGLA_TESTE).build())
                 .build();
-        when(subprocessoService.obterDetalhes(codSubprocesso, perfil, codUnidadeUsuario))
+        when(subprocessoService.obterDetalhes(codSubprocesso, perfil))
                 .thenReturn(detalheDto);
 
-        when(usuarioService.buscarUnidadePorSigla("TESTE")).thenReturn(Optional.of(UnidadeDto.builder().build()));
+        when(usuarioService.buscarUnidadePorSigla(SIGLA_TESTE)).thenReturn(Optional.of(UnidadeDto.builder().build()));
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setMapa(null);

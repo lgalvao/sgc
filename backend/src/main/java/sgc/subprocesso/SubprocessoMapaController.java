@@ -277,12 +277,6 @@ public class SubprocessoMapaController {
     }
 
     private String extractTituloUsuario(Object principal) {
-        if (principal instanceof String) return (String) principal;
-
-        if (principal instanceof sgc.organizacao.model.Usuario) {
-            return ((sgc.organizacao.model.Usuario) principal).getTituloEleitoral();
-        }
-
-        return principal != null ? principal.toString() : null;
+        return usuarioService.extractTituloUsuario(principal);
     }
 }

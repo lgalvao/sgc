@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+const fs = require('node:fs');
+const path = require('node:path');
+const { execSync } = require('node:child_process');
 const xml2js = require('xml2js');
 
 // Configuração
@@ -17,8 +17,8 @@ async function main() {
     try {
         execSync(GRADLE_CMD, { cwd: GRADLE_DIR, stdio: 'inherit' });
     } catch (error) {
-        console.error('\nA execução do Gradle falhou (possivelmente devido a testes falhando).');
-        console.error('Tentando ler o relatório mesmo assim...\n');
+        console.warn('\nA execução do Gradle falhou (possivelmente devido a testes falhando).', error.message);
+        console.warn('Tentando ler o relatório mesmo assim...\n');
     }
 
     if (!fs.existsSync(REPORT_PATH)) {
@@ -67,10 +67,10 @@ function processCoverageData(report) {
             const missedBranchesLinesList = [];
 
             lines.forEach(line => {
-                const nr = parseInt(line.$.nr, 10);
-                const ci = parseInt(line.$.ci, 10); // Covered instructions
-                const mb = parseInt(line.$.mb, 10); // Missed branches
-                const cb = parseInt(line.$.cb, 10); // Covered branches
+                const nr = Number.parseInt(line.$.nr, 10);
+                const ci = Number.parseInt(line.$.ci, 10); // Covered instructions
+                const mb = Number.parseInt(line.$.mb, 10); // Missed branches
+                const cb = Number.parseInt(line.$.cb, 10); // Covered branches
 
                 // Contagem de Linhas
                 linesTotal++;
@@ -102,8 +102,8 @@ function processCoverageData(report) {
 
             const complexityCounter = counters.find(c => c.$.type === 'COMPLEXITY');
             if (complexityCounter) {
-                complexityMissed = parseInt(complexityCounter.$.missed, 10);
-                complexityCovered = parseInt(complexityCounter.$.covered, 10);
+                complexityMissed = Number.parseInt(complexityCounter.$.missed, 10);
+                complexityCovered = Number.parseInt(complexityCounter.$.covered, 10);
                 complexityTotal = complexityMissed + complexityCovered;
             } else {
                 // Fallback se não encontrar o contador de complexidade explícito
@@ -115,7 +115,6 @@ function processCoverageData(report) {
                 const lineCoveragePct = (linesCoveredCount / linesTotal) * 100;
                 const branchCoveragePct = branchesTotal > 0 ? (branchesCoveredCount / branchesTotal) * 100 : 100;
                 // Cxn = Complexidade
-                const complexityPct = complexityTotal > 0 ? (complexityCovered / complexityTotal) * 100 : 100;
 
                 tableData.push({
                     Arquivo: fullClassName,
@@ -137,8 +136,8 @@ function processCoverageData(report) {
 
     // Ordenar por menor cobertura de linhas
     tableData.sort((a, b) => {
-        const pctA = parseFloat(a['% Linhas']);
-        const pctB = parseFloat(b['% Linhas']);
+        const pctA = Number.parseFloat(a['% Linhas']);
+        const pctB = Number.parseFloat(b['% Linhas']);
         return pctA - pctB;
     });
 
@@ -160,4 +159,9 @@ function formatLineList(lines) {
     return lines.join(', ');
 }
 
-main();
+try {
+    await main();
+} catch (err) {
+    console.error('Falha catastrófica na execução da análise:', err);
+    process.exit(1);
+}

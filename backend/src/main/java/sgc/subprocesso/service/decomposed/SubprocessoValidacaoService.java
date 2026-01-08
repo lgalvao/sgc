@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAccessoNegado;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
@@ -39,7 +38,9 @@ public class SubprocessoValidacaoService {
         Subprocesso subprocesso = crudService.obterEntidadePorCodigoMapa(mapaCodigo);
 
         if (subprocesso.getUnidade() == null) {
-            throw new ErroEntidadeNaoEncontrada("Unidade não associada ao Subprocesso %d".formatted(subprocesso.getCodigo()));
+            throw new sgc.comum.erros.ErroEstadoImpossivel(
+                    "Subprocesso %d existe mas não possui Unidade associada - violação de invariante"
+                    .formatted(subprocesso.getCodigo()));
         }
 
         Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);

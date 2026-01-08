@@ -227,10 +227,10 @@ public class PainelService {
                 var unidade = unidadeService.buscarPorCodigo(codigoUnidade);
                 return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
             } catch (Exception e) {
-                return null;
+                return "/processo/" + processo.getCodigo();
             }
         }
-        return null;
+        return "/processo/" + processo.getCodigo();
     }
 
     private AlertaDto paraAlertaDto(Alerta alerta, LocalDateTime dataHoraLeitura) {

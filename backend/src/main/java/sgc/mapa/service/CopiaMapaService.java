@@ -24,16 +24,8 @@ public class CopiaMapaService {
     private final ConhecimentoRepo conhecimentoRepo;
     private final CompetenciaRepo competenciaRepo;
 
-    /**
-     * Cria uma cópia profunda de um mapa existente.
-     *
-     * @param codMapaOrigem     O código do mapa a ser copiado.
-     * @param codUnidadeDestino O código da unidade de destino (não utilizado atualmente, reservado para futuro).
-     * @return O novo mapa criado com toda a estrutura duplicada.
-     * @throws ErroEntidadeNaoEncontrada se o mapa de origem não for encontrado.
-     */
     @Transactional
-    public Mapa copiarMapaParaUnidade(Long codMapaOrigem, Long codUnidadeDestino) {
+    public Mapa copiarMapaParaUnidade(Long codMapaOrigem) {
         Mapa fonte = repositorioMapa
                 .findById(codMapaOrigem)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codMapaOrigem));

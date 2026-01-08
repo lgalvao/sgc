@@ -228,13 +228,7 @@ public class EventoProcessoListener {
 
     String criarCorpoEmailPorTipo(TipoUnidade tipoUnidade, Processo processo, Subprocesso subprocesso) {
         return switch (tipoUnidade) {
-            case OPERACIONAL, INTEROPERACIONAL -> notificacaoModelosService.criarEmailProcessoIniciado(
-                    subprocesso.getUnidade().getNome(),
-                    processo.getDescricao(),
-                    processo.getTipo().name(),
-                    subprocesso.getDataLimiteEtapa1()
-            );
-            case INTERMEDIARIA -> notificacaoModelosService.criarEmailProcessoIniciado(
+            case OPERACIONAL, INTEROPERACIONAL, INTERMEDIARIA -> notificacaoModelosService.criarEmailProcessoIniciado(
                     subprocesso.getUnidade().getNome(),
                     processo.getDescricao(),
                     processo.getTipo().name(),

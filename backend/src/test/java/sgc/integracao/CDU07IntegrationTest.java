@@ -252,7 +252,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
         void falhaSubprocessoInexistente() {
             assertThrows(
                     ErroEntidadeNaoEncontrada.class,
-                    () -> subprocessoService.obterDetalhes(99999L, Perfil.ADMIN, null));
+                    () -> subprocessoService.obterDetalhes(99999L, Perfil.ADMIN));
         }
     }
 }

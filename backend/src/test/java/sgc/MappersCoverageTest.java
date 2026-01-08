@@ -46,7 +46,7 @@ class MappersCoverageTest {
         // Test exception
         org.mockito.Mockito.when(repo.findById(1L)).thenReturn(java.util.Optional.empty());
         org.assertj.core.api.Assertions.assertThatThrownBy(() -> conhecimentoMapper.map(1L))
-                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(sgc.comum.erros.ErroEntidadeDeveriaExistir.class);
 
         // Test success
         org.mockito.Mockito.when(repo.findById(2L)).thenReturn(java.util.Optional.of(new sgc.mapa.model.Atividade()));

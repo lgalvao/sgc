@@ -239,9 +239,9 @@ class AlertaServiceTest {
 
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
-            service.criarAlertaReaberturaCadastro(p, u);
+            service.criarAlertaReaberturaCadastro(p, u, "Justificativa Teste");
             service.criarAlertaReaberturaCadastroSuperior(p, sup, u);
-            service.criarAlertaReaberturaRevisao(p, u);
+            service.criarAlertaReaberturaRevisao(p, u, "Justificativa Teste");
             service.criarAlertaReaberturaRevisaoSuperior(p, sup, u);
 
             verify(alertaRepo, times(4)).save(any());

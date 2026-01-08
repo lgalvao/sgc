@@ -387,10 +387,8 @@ public class UsuarioService {
         }
 
         Long codUnidade = request.getUnidadeCodigo();
-        try {
-            unidadeService.buscarEntidadePorId(codUnidade);
-        } catch (ErroEntidadeNaoEncontrada e) {
-            throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
+        if (!unidadeService.existePorId(codUnidade)) {
+            throw new ErroValidacao("Unidade informada não existe: " + codUnidade);
         }
 
         List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoesInterno(request.getTituloEleitoral());
@@ -485,5 +483,12 @@ public class UsuarioService {
                 .unidadeCodigo(unidadeLotacao != null ? unidadeLotacao.getCodigo() : null)
                 .unidadeSigla(unidadeLotacao != null ? unidadeLotacao.getSigla() : null)
                 .build();
+    }
+
+    public String extractTituloUsuario(Object principal) {
+        if (principal instanceof String string) return string;
+        if (principal instanceof Usuario usuario)
+            return usuario.getTituloEleitoral();
+        return principal != null ? principal.toString() : null;
     }
 }

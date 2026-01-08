@@ -21,7 +21,7 @@ const handleResponseError = (error: any) => {
             'Sua sessão expirou ou você não está autenticado. Faça login novamente.',
             'danger'
         );
-        router.push('/login');
+        router.push('/login').catch(e => console.error("Erro ao redirecionar:", e));
         return Promise.reject(error);
     }
 

@@ -251,10 +251,10 @@ class SubprocessoServiceTest {
             Usuario admin = new Usuario();
             when(usuarioService.buscarPorLogin("admin")).thenReturn(admin);
 
-            when(detalheService.obterDetalhes(1L, Perfil.ADMIN, null, admin))
+            when(detalheService.obterDetalhes(1L, Perfil.ADMIN, admin))
                     .thenReturn(SubprocessoDetalheDto.builder().build());
 
-            SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, null);
+            SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN);
             assertThat(result).isNotNull();
         }
 

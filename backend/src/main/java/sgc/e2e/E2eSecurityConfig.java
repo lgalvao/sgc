@@ -39,10 +39,9 @@ public class E2eSecurityConfig {
      *
      * @param http o construtor {@link HttpSecurity} para configurar a segurança.
      * @return o {@link SecurityFilterChain} configurado.
-     * @throws Exception se ocorrer um erro durante a configuração.
      */
     @Bean
-    public SecurityFilterChain e2eSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain e2eSecurityFilterChain(HttpSecurity http) {
         http.authorizeHttpRequests(auth ->
                         auth.requestMatchers(
                                         "/api/usuarios/autenticar",
