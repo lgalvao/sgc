@@ -61,14 +61,24 @@ class ControllersServicesCoverageTest {
     private SubprocessoRepo repositorioSubprocesso;
     @Mock
     private sgc.alerta.AlertaService alertaService;
-    @Mock
-    private sgc.mapa.model.AtividadeRepo atividadeRepo;
+    // Removido atividadeRepo não utilizado
     @Mock
     private sgc.mapa.mapper.MapaCompletoMapper mapaCompletoMapper;
     @Mock
     private MapaSalvamentoService mapaSalvamentoService;
     @Mock
     private sgc.mapa.service.ImpactoMapaService impactoMapaService;
+    
+    // Mocks adicionais para preencher construtores e evitar null
+    @Mock private sgc.mapa.service.MapaVisualizacaoService mapaVisualizacaoService;
+    @Mock private sgc.subprocesso.service.SubprocessoMapaService subprocessoMapaService;
+    @Mock private sgc.subprocesso.service.SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
+    @Mock private sgc.organizacao.UsuarioService usuarioService;
+    @Mock private sgc.subprocesso.service.SubprocessoTransicaoService transicaoService;
+    @Mock private sgc.organizacao.UnidadeService unidadeService;
+    @Mock private sgc.analise.AnaliseService analiseService;
+    @Mock private sgc.subprocesso.service.SubprocessoWorkflowExecutor workflowExecutor;
+    @Mock private sgc.processo.service.ProcessoService processoService;
 
     private SubprocessoMapaController subprocessoMapaController;
     private MapaService mapaService;
@@ -80,29 +90,30 @@ class ControllersServicesCoverageTest {
         // Instanciação manual para evitar overhead do @InjectMocks e lidar com muitas dependências
         
         // SubprocessoMapaController
-        // Dependências: subprocessoMapaService, mapaService, mapaVisualizacaoService, impactoMapaService,
-        // subprocessoMapaWorkflowService, usuarioService, subprocessoService, subprocessoContextoService
         subprocessoMapaController = new SubprocessoMapaController(
-                null, null, null, null, null, null, 
-                subprocessoService, subprocessoContextoService
+                subprocessoMapaService,
+                mapaService, 
+                mapaVisualizacaoService, 
+                impactoMapaService,
+                subprocessoMapaWorkflowService, 
+                usuarioService, 
+                subprocessoService, 
+                subprocessoContextoService
         );
 
         // MapaService
-        // Dependências: mapaRepo, competenciaRepo, mapaCompletoMapper, mapaSalvamentoService
         mapaService = new MapaService(
                 mapaRepo, competenciaRepo, mapaCompletoMapper, mapaSalvamentoService
         );
 
         // SubprocessoCadastroWorkflowService
-        // Dependências: repositorioSubprocesso, transicaoService, unidadeService, analiseService, subprocessoService, impactoMapaService
         cadastroService = new SubprocessoCadastroWorkflowService(
-                repositorioSubprocesso, null, null, null, subprocessoService, impactoMapaService
+                repositorioSubprocesso, transicaoService, unidadeService, analiseService, subprocessoService, impactoMapaService, workflowExecutor
         );
 
         // PainelService
-        // Dependências: processoService, alertaService, unidadeService
         painelService = new PainelService(
-                null, alertaService, null
+                processoService, alertaService, unidadeService
         );
     }
 
