@@ -1,9 +1,9 @@
 package sgc;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -67,17 +67,44 @@ class ControllersServicesCoverageTest {
     private sgc.mapa.mapper.MapaCompletoMapper mapaCompletoMapper;
     @Mock
     private MapaSalvamentoService mapaSalvamentoService;
+    @Mock
+    private sgc.mapa.service.ImpactoMapaService impactoMapaService;
 
-    @InjectMocks
     private SubprocessoMapaController subprocessoMapaController;
-    @InjectMocks
     private MapaService mapaService;
-
-    @InjectMocks
     private SubprocessoCadastroWorkflowService cadastroService;
-
-    @InjectMocks
     private PainelService painelService;
+
+    @BeforeEach
+    void setUp() {
+        // Instanciação manual para evitar overhead do @InjectMocks e lidar com muitas dependências
+        
+        // SubprocessoMapaController
+        // Dependências: subprocessoMapaService, mapaService, mapaVisualizacaoService, impactoMapaService,
+        // subprocessoMapaWorkflowService, usuarioService, subprocessoService, subprocessoContextoService
+        subprocessoMapaController = new SubprocessoMapaController(
+                null, null, null, null, null, null, 
+                subprocessoService, subprocessoContextoService
+        );
+
+        // MapaService
+        // Dependências: mapaRepo, competenciaRepo, mapaCompletoMapper, mapaSalvamentoService
+        mapaService = new MapaService(
+                mapaRepo, competenciaRepo, mapaCompletoMapper, mapaSalvamentoService
+        );
+
+        // SubprocessoCadastroWorkflowService
+        // Dependências: repositorioSubprocesso, transicaoService, unidadeService, analiseService, subprocessoService, impactoMapaService
+        cadastroService = new SubprocessoCadastroWorkflowService(
+                repositorioSubprocesso, null, null, null, subprocessoService, impactoMapaService
+        );
+
+        // PainelService
+        // Dependências: processoService, alertaService, unidadeService
+        painelService = new PainelService(
+                null, alertaService, null
+        );
+    }
 
     @Test
     @DisplayName("Deve listar atividades")

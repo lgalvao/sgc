@@ -2,6 +2,9 @@ package sgc.subprocesso.dto;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.model.Analise;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
@@ -13,34 +16,41 @@ import sgc.subprocesso.model.Subprocesso;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class MapaAjusteDtoTest {
+
+    @Mock
+    private Subprocesso subprocesso;
+    @Mock
+    private Analise analise;
+    @Mock
+    private Mapa mapa;
+    @Mock
+    private Unidade unidade;
+    @Mock
+    private Competencia comp;
+    @Mock
+    private Atividade ativ;
+    @Mock
+    private Conhecimento con;
 
     @Test
     @DisplayName("Deve criar MapaAjusteDto corretamente via método estático 'of'")
     void deveCriarViaOf() {
-        Subprocesso subprocesso = mock(Subprocesso.class);
-        Analise analise = mock(Analise.class);
-        Mapa mapa = mock(Mapa.class);
-        Unidade unidade = mock(Unidade.class);
-
         when(subprocesso.getMapa()).thenReturn(mapa);
         when(mapa.getCodigo()).thenReturn(100L);
         when(subprocesso.getUnidade()).thenReturn(unidade);
         when(unidade.getNome()).thenReturn("Unidade Teste");
         when(analise.getObservacoes()).thenReturn("Justificativa");
 
-        Competencia comp = mock(Competencia.class);
         when(comp.getCodigo()).thenReturn(1L);
         when(comp.getDescricao()).thenReturn("Comp 1");
 
-        Atividade ativ = mock(Atividade.class);
         when(ativ.getCodigo()).thenReturn(2L);
         when(ativ.getDescricao()).thenReturn("Ativ 1");
 
-        Conhecimento con = mock(Conhecimento.class);
         when(con.getCodigo()).thenReturn(3L);
         when(con.getDescricao()).thenReturn("Con 1");
         when(con.getAtividade()).thenReturn(ativ);
@@ -81,8 +91,6 @@ class MapaAjusteDtoTest {
     @Test
     @DisplayName("Deve lidar com listas vazias e nulos")
     void deveLidarComVazios() {
-        Subprocesso subprocesso = mock(Subprocesso.class);
-        Mapa mapa = mock(Mapa.class);
         when(subprocesso.getMapa()).thenReturn(mapa);
         when(mapa.getCodigo()).thenReturn(100L);
         when(subprocesso.getUnidade()).thenReturn(null);

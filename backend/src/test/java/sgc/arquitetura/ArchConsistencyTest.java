@@ -15,7 +15,7 @@ import org.jspecify.annotations.NullMarked;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
-@AnalyzeClasses(packages = "sgc", importOptions = ImportOption.DoNotIncludeTests.class)
+@AnalyzeClasses(packages = "sgc", importOptions = {ImportOption.DoNotIncludeTests.class, ImportOption.DoNotIncludeJars.class})
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class ArchConsistencyTest {
 
@@ -93,9 +93,11 @@ public class ArchConsistencyTest {
 
                         private String extractModule(String packageName) {
                             if (!packageName.startsWith("sgc.")) return null;
-                            String[] parts = packageName.split("\\.");
-                            if (parts.length < 2) return null;
-                            return parts[1];
+                            int firstDot = packageName.indexOf('.');
+                            if (firstDot == -1) return null;
+                            int secondDot = packageName.indexOf('.', firstDot + 1);
+                            if (secondDot == -1) return packageName.substring(firstDot + 1);
+                            return packageName.substring(firstDot + 1, secondDot);
                         }
                     });
 
