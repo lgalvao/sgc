@@ -138,15 +138,15 @@ Para dúvidas sobre o plano:
 **Próximos Passos:**
 - Sprint 2: Implementar `SubprocessoAccessPolicy` e migrar verificações de subprocessos
 
-### Sprint 2: Migração de Verificações de Subprocesso (Em Andamento - Continuado em 2026-01-08)
+### Sprint 2: Migração de Verificações de Subprocesso (95% Concluído - 2026-01-08)
 
 **Componentes Criados:**
 - ✅ `SubprocessoAccessPolicy` com 26 ações mapeadas
-  - CRUD básico (8 ações)
-  - Workflow de cadastro (5 ações)
-  - Workflow de revisão de cadastro (5 ações)
-  - Operações de mapa (10 ações)
-  - Diagnóstico (2 ações)
+  - CRUD básico (8 ações): LISTAR, VISUALIZAR, CRIAR, EDITAR, EXCLUIR, ALTERAR_DATA_LIMITE, REABRIR_CADASTRO, REABRIR_REVISAO
+  - Workflow de cadastro (5 ações): EDITAR_CADASTRO, DISPONIBILIZAR_CADASTRO, DEVOLVER_CADASTRO, ACEITAR_CADASTRO, HOMOLOGAR_CADASTRO
+  - Workflow de revisão de cadastro (5 ações): EDITAR_REVISAO, DISPONIBILIZAR_REVISAO, DEVOLVER_REVISAO, ACEITAR_REVISAO, HOMOLOGAR_REVISAO
+  - Operações de mapa (10 ações): VISUALIZAR_MAPA, EDITAR_MAPA, DISPONIBILIZAR_MAPA, VERIFICAR_IMPACTOS, APRESENTAR_SUGESTOES, VALIDAR_MAPA, DEVOLVER_MAPA, ACEITAR_MAPA, HOMOLOGAR_MAPA, AJUSTAR_MAPA
+  - Diagnóstico (2 ações): VISUALIZAR_DIAGNOSTICO, REALIZAR_AUTOAVALIACAO
 - ✅ 5 requisitos de hierarquia implementados:
   - `NENHUM`: Sem verificação de hierarquia
   - `MESMA_UNIDADE`: Usuário na mesma unidade
@@ -156,24 +156,53 @@ Para dúvidas sobre o plano:
 - ✅ `package-info.java` com `@NullMarked` para conformidade arquitetural
 
 **Testes Criados:**
-- ✅ `SubprocessoAccessPolicyTest` - 21 testes adicionais
+- ✅ `SubprocessoAccessPolicyTest` - 21 testes cobrindo todos os cenários
 - ✅ Cobertura de cenários CRUD, Cadastro, Revisão, Mapa e Diagnóstico
-- ✅ Total acumulado: 43 testes passando
+- ✅ Total acumulado: 31 testes de acesso passando (100%)
 - ✅ Teste de arquitetura passando (@NullMarked compliance)
 
-**Em Andamento:**
-- ✅ Atualizar `SubprocessoCadastroWorkflowService` para usar `AccessControlService`
-- ✅ Atualizar `SubprocessoMapaWorkflowService` para usar `AccessControlService`
-- ✅ Atualizar `ImpactoMapaService` para usar `AccessControlService`
-- ✅ Deprecar `SubprocessoPermissoesService.validar()` e `.calcularPermissoes()`
-- ✅ Deprecar `MapaAcessoService.verificarAcessoImpacto()`
-- ⏳ Validar com testes backend completos
-- ⏳ Validar com testes E2E
+**Services Migrados (3 services, 16 métodos):**
+- ✅ `SubprocessoCadastroWorkflowService` - 8 métodos usando AccessControlService:
+  - disponibilizarCadastro() → DISPONIBILIZAR_CADASTRO
+  - disponibilizarRevisao() → DISPONIBILIZAR_REVISAO_CADASTRO
+  - devolverCadastro() → DEVOLVER_CADASTRO
+  - aceitarCadastro() → ACEITAR_CADASTRO
+  - homologarCadastro() → HOMOLOGAR_CADASTRO
+  - devolverRevisaoCadastro() → DEVOLVER_REVISAO_CADASTRO
+  - aceitarRevisaoCadastro() → ACEITAR_REVISAO_CADASTRO
+  - homologarRevisaoCadastro() → HOMOLOGAR_REVISAO_CADASTRO
+- ✅ `SubprocessoMapaWorkflowService` - 7 métodos usando AccessControlService:
+  - disponibilizarMapa() → DISPONIBILIZAR_MAPA
+  - apresentarSugestoes() → APRESENTAR_SUGESTOES
+  - validarMapa() → VALIDAR_MAPA
+  - devolverValidacao() → DEVOLVER_MAPA
+  - aceitarValidacao() → ACEITAR_MAPA
+  - homologarValidacao() → HOMOLOGAR_MAPA
+  - submeterMapaAjustado() → AJUSTAR_MAPA
+- ✅ `ImpactoMapaService` - 1 método usando AccessControlService:
+  - verificarImpactos() → VERIFICAR_IMPACTOS
 
-**Estatísticas Sprint 2:**
-- **Services migrados**: 3 (SubprocessoCadastroWorkflowService, SubprocessoMapaWorkflowService, ImpactoMapaService)
-- **Métodos migrados**: 16 métodos de workflow
-- **Services deprecados**: 2 (SubprocessoPermissoesService, MapaAcessoService)
-- **Linhas de código de acesso manual removidas**: ~50 linhas
-- **Testes passando**: 31 testes
+**Services Deprecados:**
+- ✅ `MapaAcessoService` - Marcado @Deprecated(since="2026-01-08", forRemoval=true)
+  - verificarAcessoImpacto() deprecado, usar AccessControlService.verificarPermissao()
+- ✅ `SubprocessoPermissoesService` - Marcado @Deprecated(since="2026-01-08", forRemoval=true)
+  - validar() e calcularPermissoes() deprecados, usar AccessControlService
+
+**Melhorias de Código:**
+- ✅ ~50 linhas de verificação manual de acesso removidas
+- ✅ Separação clara entre validação de negócio e controle de acesso
+- ✅ Verificações de null-safety adicionadas para evitar NullPointerException
+- ✅ Mensagens de erro mais descritivas e em português
+
+**Testes Backend:**
+- ✅ 1067/1148 testes passando (93%)
+- ⚠️ 81 testes precisam atualização para nova arquitetura (expectativas de exceções mudaram)
+- ✅ Todos os testes de acesso específicos passando
+- ✅ Código compila com apenas avisos esperados de deprecação
+
+**Próximos Passos:**
+- ⏳ Atualizar testes que esperam exceções de negócio para aceitar ErroAccessoNegado
+- ⏳ Completar mocks de Usuario/Unidade em testes afetados
+- ⏳ Validar com testes E2E
+- ⏳ Validação de performance
 
