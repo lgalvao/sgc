@@ -23,6 +23,7 @@ import sgc.organizacao.UnidadeService;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
@@ -37,6 +38,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static sgc.seguranca.acesso.Acao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service
@@ -77,6 +79,7 @@ public class SubprocessoMapaWorkflowService {
     private final AnaliseService analiseService;
     private final UnidadeService unidadeService;
     private final SubprocessoValidacaoService validacaoService;
+    private final AccessControlService accessControlService;
 
     @Autowired
     @Lazy
@@ -175,6 +178,10 @@ public class SubprocessoMapaWorkflowService {
     @Transactional
     public void disponibilizarMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
         Subprocesso sp = getSubprocessoParaEdicao(codSubprocesso);
+        
+        // Verificação centralizada de acesso
+        accessControlService.verificarPermissao(usuario, DISPONIBILIZAR_MAPA, sp);
+        
         validarMapaParaDisponibilizacao(sp);
         
         // Validação adicional de associações (do service antigo)
@@ -246,6 +253,9 @@ public class SubprocessoMapaWorkflowService {
     public void apresentarSugestoes(Long codSubprocesso, String sugestoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
+        // Verificação centralizada de acesso
+        accessControlService.verificarPermissao(usuario, APRESENTAR_SUGESTOES, sp);
+
         if (sp.getMapa() != null) {
             sp.getMapa().setSugestoes(sugestoes);
         }
@@ -270,6 +280,9 @@ public class SubprocessoMapaWorkflowService {
     public void validarMapa(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
+        // Verificação centralizada de acesso
+        accessControlService.verificarPermissao(usuario, VALIDAR_MAPA, sp);
+
         sp.setSituacao(SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo()));
 
         sp.setDataFimEtapa2(java.time.LocalDateTime.now());
@@ -288,6 +301,9 @@ public class SubprocessoMapaWorkflowService {
     @Transactional
     public void devolverValidacao(Long codSubprocesso, String justificativa, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
+
+        // Verificação centralizada de acesso
+        accessControlService.verificarPermissao(usuario, DEVOLVER_MAPA, sp);
 
         SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo());
 
@@ -311,6 +327,9 @@ public class SubprocessoMapaWorkflowService {
     @Transactional
     public void aceitarValidacao(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
+
+        // Verificação centralizada de acesso
+        accessControlService.verificarPermissao(usuario, ACEITAR_MAPA, sp);
 
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
         Unidade proximaUnidade =
@@ -362,6 +381,9 @@ public class SubprocessoMapaWorkflowService {
     public void homologarValidacao(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
+        // Verificação centralizada de acesso
+        accessControlService.verificarPermissao(usuario, HOMOLOGAR_MAPA, sp);
+
         sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
         subprocessoRepo.save(sp);
 
@@ -379,6 +401,9 @@ public class SubprocessoMapaWorkflowService {
     public void submeterMapaAjustado(
             Long codSubprocesso, SubmeterMapaAjustadoReq request, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
+
+        // Verificação centralizada de acesso
+        accessControlService.verificarPermissao(usuario, AJUSTAR_MAPA, sp);
 
         validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
 
