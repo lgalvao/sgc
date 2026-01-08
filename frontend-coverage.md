@@ -15,13 +15,10 @@ A cobertura geral é alta, com a camada de dados (Services e Stores) e agora Map
 ## Arquivos Prioritários (Cobertura < 80% em algum critério)
 
 ### 1. Componentes (`src/components`)
-*   `EmptyState.vue` (Branches: 50%): Componente visual simples, mas com renderização condicional não testada.
-*   `ModalConfirmacao.vue` (Funções: 60%, Instruções: 73.68%): Métodos de emissão de eventos ou slots não cobertos.
 *   `ConfirmacaoDisponibilizacaoMapaModal.vue` (Branches: 65.38%): Baixa cobertura em fluxos de confirmação/cancelamento.
 *   `SubprocessoCards.vue` (Funções: 72%, Instruções: 77.77%): Exibição condicional de cards e ações associadas.
 *   `SeletorUnidades.vue` (Branches: 74.39%): Lógica de seleção e filtragem precisa de mais cenários.
 *   `TabelaAlertas.vue` (Branches: 75%, Funções: 75%): Lógica de renderização de alertas e ações de leitura.
-*   `FiltroProcessos.vue` (Branches: 75%): Lógica de filtragem condicional.
 *   `AnaliseModal.vue` (Branches: 75%): Tratamento de estados do modal.
 *   `SelecaoUnidadesModal.vue` (Branches: 76.78%): Seleção múltipla e eventos.
 *   `TreeRowItem.vue` (Funções: 66.66%): Interatividade da árvore (expandir/colapsar).
@@ -54,8 +51,8 @@ O trabalho deve ser executado na seguinte ordem de prioridade.
 *   **Resultados:** `processos.ts`, `usuarios.ts`, `unidades.ts`, `useFormErrors.ts` agora possuem 100% de cobertura de branches.
 
 ### Passo 2: Componentes Isolados
-*   **Ação:** Testar renderização condicional (v-if/v-else) e emissão de eventos.
-*   **Alvo:** `EmptyState.vue`, `ModalConfirmacao.vue`, `FiltroProcessos.vue`.
+*   **Status:** Concluído.
+*   **Resultados:** `EmptyState.vue` (Branches: 83.33%), `ModalConfirmacao.vue` (Branches: 100%). `FiltroProcessos.vue` não foi encontrado no projeto (provavelmente removido ou renomeado).
 
 ### Passo 3: Componentes de Negócio
 *   **Ação:** Mockar stores e testar interações mais complexas.
