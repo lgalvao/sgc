@@ -17,11 +17,13 @@ import sgc.organizacao.UnidadeService;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
+import static sgc.seguranca.acesso.Acao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service
@@ -34,12 +36,17 @@ public class SubprocessoCadastroWorkflowService {
     private final AnaliseService analiseService;
     private final SubprocessoService subprocessoService;
     private final ImpactoMapaService impactoMapaService;
+    private final AccessControlService accessControlService;
 
     @Transactional
     public void disponibilizarCadastro(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        validarSubprocessoParaDisponibilizacao(sp, usuario, codSubprocesso);
+        // Verificação centralizada de acesso
+        accessControlService.verificarPermissao(usuario, DISPONIBILIZAR_CADASTRO, sp);
+        
+        // Validações de negócio (sem verificações de acesso)
+        validarRequisitosNegocioParaDisponibilizacao(codSubprocesso, sp);
         
         Unidade origem = sp.getUnidade();
         Unidade destino = origem != null ? origem.getUnidadeSuperior() : null;
@@ -62,7 +69,11 @@ public class SubprocessoCadastroWorkflowService {
     public void disponibilizarRevisao(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        validarSubprocessoParaDisponibilizacao(sp, usuario, codSubprocesso);
+        // Verificação centralizada de acesso
+        accessControlService.verificarPermissao(usuario, DISPONIBILIZAR_REVISAO_CADASTRO, sp);
+        
+        // Validações de negócio (sem verificações de acesso)
+        validarRequisitosNegocioParaDisponibilizacao(codSubprocesso, sp);
         
         Unidade origem = sp.getUnidade();
         Unidade destino = origem != null ? origem.getUnidadeSuperior() : null;
@@ -81,25 +92,11 @@ public class SubprocessoCadastroWorkflowService {
                 usuario);
     }
 
-    private void validarSubprocessoParaDisponibilizacao(
-            Subprocesso sp, Usuario usuario, Long codSubprocesso) {
-        if (usuario == null) {
-            throw new ErroAccessoNegado("Usuário não autenticado");
-        }
-        
-        Unidade unidadeSubprocesso = sp.getUnidade();
-        String tituloTitular = unidadeSubprocesso.getTituloTitular();
-
-        if (tituloTitular == null || !tituloTitular.equals(usuario.getTituloEleitoral())) {
-            String msg =
-                    "Usuário %s não é o titular da unidade (%s). Titular é %s"
-                            .formatted(
-                                    usuario.getTituloEleitoral(),
-                                    unidadeSubprocesso.getSigla(),
-                                    tituloTitular != null ? tituloTitular : "não definido");
-            throw new ErroAccessoNegado(msg);
-        }
-
+    /**
+     * Valida requisitos de negócio para disponibilização (SEM verificações de acesso).
+     * As verificações de acesso devem ser feitas via AccessControlService.
+     */
+    private void validarRequisitosNegocioParaDisponibilizacao(Long codSubprocesso, Subprocesso sp) {
         // Valida se há pelo menos uma atividade cadastrada
         subprocessoService.validarExistenciaAtividades(codSubprocesso);
 
@@ -119,6 +116,9 @@ public class SubprocessoCadastroWorkflowService {
     @Transactional
     public void devolverCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
+
+        // Verificação centralizada de acesso
+        accessControlService.verificarPermissao(usuario, DEVOLVER_CADASTRO, sp);
 
         Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
         if (unidadeAnalise == null) {
@@ -147,6 +147,9 @@ public class SubprocessoCadastroWorkflowService {
     public void aceitarCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
+        // Verificação centralizada de acesso
+        accessControlService.verificarPermissao(usuario, ACEITAR_CADASTRO, sp);
+
         Unidade unidadeOrigem = sp.getUnidade();
         Unidade unidadeDestino = unidadeOrigem.getUnidadeSuperior();
         if (unidadeDestino == null) {
@@ -173,10 +176,8 @@ public class SubprocessoCadastroWorkflowService {
     public void homologarCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        if (sp.getSituacao() != MAPEAMENTO_CADASTRO_DISPONIBILIZADO) {
-            throw new ErroProcessoEmSituacaoInvalida(
-                    "Ação de homologar só pode ser executada em cadastros disponibilizados.");
-        }
+        // Verificação centralizada de acesso (já verifica situação)
+        accessControlService.verificarPermissao(usuario, HOMOLOGAR_CADASTRO, sp);
 
         Unidade sedoc = unidadeService.buscarEntidadePorSigla("SEDOC");
 
@@ -196,11 +197,8 @@ public class SubprocessoCadastroWorkflowService {
     public void devolverRevisaoCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        if (sp.getSituacao() != REVISAO_CADASTRO_DISPONIBILIZADA) {
-            throw new ErroProcessoEmSituacaoInvalida(
-                    "Ação de devolução só pode ser executada em revisões de cadastro"
-                            + " disponibilizadas.");
-        }
+        // Verificação centralizada de acesso (já verifica situação)
+        accessControlService.verificarPermissao(usuario, DEVOLVER_REVISAO_CADASTRO, sp);
 
         Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
         if (unidadeAnalise == null) {
@@ -229,11 +227,8 @@ public class SubprocessoCadastroWorkflowService {
     public void aceitarRevisaoCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        if (sp.getSituacao() != REVISAO_CADASTRO_DISPONIBILIZADA) {
-            throw new ErroProcessoEmSituacaoInvalida(
-                    "Ação de aceite só pode ser executada em revisões de cadastro"
-                            + " disponibilizadas.");
-        }
+        // Verificação centralizada de acesso (já verifica situação)
+        accessControlService.verificarPermissao(usuario, ACEITAR_REVISAO_CADASTRO, sp);
 
         Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
         if (unidadeAnalise == null) {
@@ -265,11 +260,8 @@ public class SubprocessoCadastroWorkflowService {
     public void homologarRevisaoCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        if (sp.getSituacao() != REVISAO_CADASTRO_DISPONIBILIZADA) {
-            throw new ErroProcessoEmSituacaoInvalida(
-                    "Ação de homologar só pode ser executada em revisões de cadastro aguardando"
-                            + " homologação.");
-        }
+        // Verificação centralizada de acesso (já verifica situação)
+        accessControlService.verificarPermissao(usuario, HOMOLOGAR_REVISAO_CADASTRO, sp);
 
         var impactos = impactoMapaService.verificarImpactos(codSubprocesso, usuario);
 

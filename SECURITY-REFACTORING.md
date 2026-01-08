@@ -138,11 +138,11 @@ Para dúvidas sobre o plano:
 **Próximos Passos:**
 - Sprint 2: Implementar `SubprocessoAccessPolicy` e migrar verificações de subprocessos
 
-### Sprint 2: Migração de Verificações de Subprocesso (Em Andamento - Iniciado em 2026-01-08)
+### Sprint 2: Migração de Verificações de Subprocesso (Em Andamento - Continuado em 2026-01-08)
 
 **Componentes Criados:**
 - ✅ `SubprocessoAccessPolicy` com 26 ações mapeadas
-  - CRUD básico (6 ações)
+  - CRUD básico (8 ações)
   - Workflow de cadastro (5 ações)
   - Workflow de revisão de cadastro (5 ações)
   - Operações de mapa (10 ações)
@@ -153,14 +153,17 @@ Para dúvidas sobre o plano:
   - `MESMA_OU_SUBORDINADA`: Usuário na mesma unidade ou superior
   - `SUPERIOR_IMEDIATA`: Usuário na unidade superior imediata
   - `TITULAR_UNIDADE`: Usuário é o titular da unidade
+- ✅ `package-info.java` com `@NullMarked` para conformidade arquitetural
 
 **Testes Criados:**
 - ✅ `SubprocessoAccessPolicyTest` - 21 testes adicionais
 - ✅ Cobertura de cenários CRUD, Cadastro, Revisão, Mapa e Diagnóstico
 - ✅ Total acumulado: 43 testes passando
+- ✅ Teste de arquitetura passando (@NullMarked compliance)
 
-**Próximos Passos:**
-- Atualizar controllers de subprocesso para usar `AccessControlService`
-- Deprecar `SubprocessoPermissoesService` e `MapaAcessoService`
-- Validar com testes E2E
+**Em Andamento:**
+- 🚧 Atualizar `SubprocessoCadastroWorkflowService` para usar `AccessControlService`
+- 🚧 Atualizar controllers de subprocesso para usar `AccessControlService`
+- ⏳ Deprecar `SubprocessoPermissoesService` e `MapaAcessoService`
+- ⏳ Validar com testes E2E
 
