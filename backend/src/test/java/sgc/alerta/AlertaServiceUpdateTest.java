@@ -50,6 +50,11 @@ class AlertaServiceUpdateTest {
     @InjectMocks
     private AlertaService service;
 
+    @BeforeEach
+    void setUp() {
+        service = new AlertaService(alertaRepo, alertaUsuarioRepo, usuarioService, alertaMapper, unidadeService);
+    }
+
     @Test
     @DisplayName("marcarComoLidos: deve ignorar alerta inexistente")
     void marcarComoLidosIgnoraAlertaInexistente() {
