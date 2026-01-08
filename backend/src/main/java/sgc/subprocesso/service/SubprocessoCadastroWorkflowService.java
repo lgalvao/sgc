@@ -120,7 +120,13 @@ public class SubprocessoCadastroWorkflowService {
         // Verificação centralizada de acesso
         accessControlService.verificarPermissao(usuario, DEVOLVER_CADASTRO, sp);
 
-        Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
+        Unidade unidadeSubprocesso = sp.getUnidade();
+        if (unidadeSubprocesso == null) {
+            throw new ErroInvarianteViolada(
+                    "Unidade não encontrada para o subprocesso " + codSubprocesso);
+        }
+        
+        Unidade unidadeAnalise = unidadeSubprocesso.getUnidadeSuperior();
         if (unidadeAnalise == null) {
             throw new ErroInvarianteViolada(
                     "Unidade superior não encontrada para o subprocesso " + codSubprocesso);
@@ -200,7 +206,13 @@ public class SubprocessoCadastroWorkflowService {
         // Verificação centralizada de acesso (já verifica situação)
         accessControlService.verificarPermissao(usuario, DEVOLVER_REVISAO_CADASTRO, sp);
 
-        Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
+        Unidade unidadeSubprocesso = sp.getUnidade();
+        if (unidadeSubprocesso == null) {
+            throw new ErroInvarianteViolada(
+                    "Unidade não encontrada para o subprocesso " + codSubprocesso);
+        }
+        
+        Unidade unidadeAnalise = unidadeSubprocesso.getUnidadeSuperior();
         if (unidadeAnalise == null) {
             throw new ErroInvarianteViolada(
                     "Unidade superior não encontrada para o subprocesso " + codSubprocesso);
@@ -230,7 +242,13 @@ public class SubprocessoCadastroWorkflowService {
         // Verificação centralizada de acesso (já verifica situação)
         accessControlService.verificarPermissao(usuario, ACEITAR_REVISAO_CADASTRO, sp);
 
-        Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
+        Unidade unidadeSubprocesso = sp.getUnidade();
+        if (unidadeSubprocesso == null) {
+            throw new ErroInvarianteViolada(
+                    "Unidade não encontrada para o subprocesso " + codSubprocesso);
+        }
+        
+        Unidade unidadeAnalise = unidadeSubprocesso.getUnidadeSuperior();
         if (unidadeAnalise == null) {
             throw new ErroInvarianteViolada(
                     "Unidade superior não encontrada para o subprocesso " + codSubprocesso);
