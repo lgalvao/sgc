@@ -15,6 +15,7 @@ import sgc.mapa.model.MapaRepo;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 
@@ -62,7 +63,7 @@ class ImpactoMapaServiceTest {
     private DetectorImpactoCompetenciaService analisadorCompetencias;
 
     @Mock
-    private MapaAcessoService mapaAcessoService;
+    private AccessControlService accessControlService;
 
     private Usuario chefe;
     private Usuario gestor;
@@ -110,22 +111,23 @@ class ImpactoMapaServiceTest {
     @Nested
     @DisplayName("Testes de verificação de acesso")
     class AcessoTestes {
-        // Access tests are now covered by MapaAcessoServiceTest
+        // Access tests are now covered by AccessControlService and SubprocessoAccessPolicy
         // Here we just verify that the service is called
 
         @Test
-        @DisplayName("Deve chamar MapaAcessoService para verificar acesso")
+        @DisplayName("Deve chamar AccessControlService para verificar acesso")
         void deveChamarServicoAcesso() {
-            // This test is kept to ensure integration/delegation, even though detailed logic is tested elsewhere
-            // But since we are mocking everything, we assume the delegation works if verify passes.
-            // However, ImpactoMapaService calls it before anything else relevant to this test scope.
-
+            // Após refatoração de segurança, verificação de acesso é feita via AccessControlService
             when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
 
             // Scenario 1: Access Granted (delegation happens)
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
             assertDoesNotThrow(() -> impactoMapaService.verificarImpactos(1L, chefe));
-            org.mockito.Mockito.verify(mapaAcessoService).verificarAcessoImpacto(chefe, subprocesso);
+            org.mockito.Mockito.verify(accessControlService).verificarPermissao(
+                org.mockito.Mockito.eq(chefe), 
+                org.mockito.Mockito.eq(sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS), 
+                org.mockito.Mockito.eq(subprocesso)
+            );
         }
 
         @Test
@@ -133,7 +135,11 @@ class ImpactoMapaServiceTest {
         void devePropagarErroAcesso() {
             when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             org.mockito.Mockito.doThrow(new ErroAccessoNegado("Acesso negado"))
-                    .when(mapaAcessoService).verificarAcessoImpacto(chefe, subprocesso);
+                    .when(accessControlService).verificarPermissao(
+                        org.mockito.Mockito.any(Usuario.class),
+                        org.mockito.Mockito.any(sgc.seguranca.acesso.Acao.class),
+                        org.mockito.Mockito.any()
+                    );
 
             assertThrows(
                     ErroAccessoNegado.class, () -> impactoMapaService.verificarImpactos(1L, chefe));
