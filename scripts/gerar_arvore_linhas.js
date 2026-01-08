@@ -1,16 +1,10 @@
-const {execSync} = require('child_process');
-const fs = require('fs');
-const path = require('path');
+const {execSync} = require('node:child_process');
+const fs = require('node:fs');
+const path = require('node:path');
 
 function getFiles() {
-    try {
-        // Tenta usar git ls-files para listar arquivos rastreados
-        const output = execSync('git ls-files', {encoding: 'utf-8', maxBuffer: 1024 * 1024 * 10});
-        return output.trim().split(/\r?\n/).filter(line => line);
-    } catch (e) {
-        console.log("Git não encontrado ou erro ao executar. Tentando varredura manual...");
-        return walkDir('.');
-    }
+    const output = execSync('git ls-files', {encoding: 'utf-8', maxBuffer: 1024 * 1024 * 10});
+    return output.trim().split(/\r?\n/).filter(Boolean);
 }
 
 function walkDir(dir, fileList = []) {
@@ -19,38 +13,26 @@ function walkDir(dir, fileList = []) {
         if (file === '.git' || file === 'node_modules' || file === 'dist' || file === 'build' || file === '.gradle') continue;
 
         const filePath = path.join(dir, file);
-        try {
             const stat = fs.statSync(filePath);
             if (stat.isDirectory()) {
                 walkDir(filePath, fileList);
             } else {
-                // Normaliza o caminho para usar /
-                fileList.push(filePath.replace(/\\/g, '/'));
+                fileList.push(filePath.replaceAll('\\', '/'));
             }
-        } catch (e) {
-            // Ignora arquivos inacessíveis
-        }
     }
     return fileList;
 }
 
 function countLines(filePath) {
-    try {
-        const content = fs.readFileSync(filePath, 'utf-8');
-        // Conta linhas cheias + 1 se o arquivo não terminar com newline
-        return content.split(/\r?\n/).length;
-    } catch (e) {
-        // Retorna 0 para arquivos binários ou erros de leitura
-        return 0;
-    }
+    const content = fs.readFileSync(filePath, 'utf-8');
+    return content.split(/\r?\n/).length;
 }
 
 function buildTree(fileList) {
     const root = {name: '.', count: 0, children: {}, isDir: true};
 
     fileList.forEach(filePath => {
-        // Normaliza separadores
-        const normalizedPath = filePath.replace(/\\/g, '/');
+        const normalizedPath = filePath.replaceAll('\\', '/');
         const count = countLines(normalizedPath);
 
         const parts = normalizedPath.split('/');
@@ -91,16 +73,17 @@ function calculateTotals(node) {
     return sum;
 }
 
-function printTree(node, options, prefix = '', isLast = true, isRoot = true, currentDepth = 0) {
-    const {maxDepth, minLines} = options;
+function getTreeConnectors(isRoot, isLast) {
+    if (isRoot) {
+        return {connector: '', childPrefix: ''};
+    }
+    return {
+        connector: isLast ? '└── ' : '├── ',
+        childPrefix: isLast ? '    ' : '│   '
+    };
+}
 
-    if (minLines !== undefined && node.count < minLines) return;
-
-    // Formatação
-    const connector = isRoot ? '' : (isLast ? '└── ' : '├── ');
-    const childPrefix = isRoot ? '' : (isLast ? '    ' : '│   ');
-
-    // Cores (ANSI escape codes)
+function printNode(node, prefix, connector) {
     const reset = '\x1b[0m';
     const blue = '\x1b[34m'; // Diretórios
     const green = '\x1b[32m'; // Arquivos
@@ -109,37 +92,39 @@ function printTree(node, options, prefix = '', isLast = true, isRoot = true, cur
     const color = node.isDir ? blue : green;
     const icon = node.isDir ? '📁' : '📄';
     const nameLine = `${prefix}${connector}${icon} ${color}${node.name}${reset} ${yellow}[${node.count.toLocaleString()}]${reset}`;
+    console.log(nameLine);
+}
 
-    if (!isRoot || (isRoot && node.name !== '.')) {
-        console.log(nameLine);
+function printTree(node, options, prefix = '', isLast = true, isRoot = true, currentDepth = 0) {
+    const {maxDepth, minLines} = options;
+
+    if (minLines !== undefined && node.count < minLines) return;
+
+    const {connector, childPrefix} = getTreeConnectors(isRoot, isLast);
+
+    const isRootDot = isRoot && node.name === '.';
+    if (!isRootDot) {
+        printNode(node, prefix, connector);
     }
 
-    if (node.isDir) {
-        if (maxDepth !== undefined && currentDepth >= maxDepth) return;
+    if (!node.isDir) return;
+    if (maxDepth !== undefined && currentDepth >= maxDepth) return;
 
-        let childKeys = Object.keys(node.children);
+    let childKeys = Object.keys(node.children);
 
-        if (minLines !== undefined) {
-            childKeys = childKeys.filter(key => node.children[key].count >= minLines);
-        }
-
-        childKeys.sort((a, b) => {
-            const nodeA = node.children[a];
-            const nodeB = node.children[b];
-
-            // Ordena por contagem (maior para menor)
-            if (nodeB.count !== nodeA.count) {
-                return nodeB.count - nodeA.count;
-            }
-
-            // Em caso de empate na contagem, ordena alfabeticamente
-            return a.localeCompare(b);
-        });
-
-        childKeys.forEach((key, index) => {
-            printTree(node.children[key], options, prefix + childPrefix, index === childKeys.length - 1, false, currentDepth + 1);
-        });
+    if (minLines !== undefined) {
+        childKeys = childKeys.filter(key => node.children[key].count >= minLines);
     }
+
+    childKeys.sort((a, b) => {
+        const countDiff = node.children[b].count - node.children[a].count;
+        return countDiff === 0 ? a.localeCompare(b) : countDiff;
+    });
+
+    childKeys.forEach((key, index) => {
+        const isLastChild = index === childKeys.length - 1;
+        printTree(node.children[key], options, prefix + childPrefix, isLastChild, false, currentDepth + 1);
+    });
 }
 
 function parseArgs() {
@@ -161,12 +146,12 @@ Opções:
 
     const depthIndex = args.indexOf('--depth');
     if (depthIndex !== -1 && args[depthIndex + 1]) {
-        options.maxDepth = parseInt(args[depthIndex + 1], 10);
+        options.maxDepth = Number.parseInt(args[depthIndex + 1], 10);
     }
 
     const minLinesIndex = args.indexOf('--min-lines');
     if (minLinesIndex !== -1 && args[minLinesIndex + 1]) {
-        options.minLines = parseInt(args[minLinesIndex + 1], 10);
+        options.minLines = Number.parseInt(args[minLinesIndex + 1], 10);
     }
 
     if (args.includes('--exclude-tests')) {
@@ -188,7 +173,7 @@ const testPatterns = [
 
 function isTestFile(filePath) {
     // Normaliza para barras para correspondência de padrão
-    const normalizedPath = filePath.replace(/\\/g, '/');
+    const normalizedPath = filePath.replaceAll('\\', '/');
     return testPatterns.some(pattern => pattern.test(normalizedPath));
 }
 

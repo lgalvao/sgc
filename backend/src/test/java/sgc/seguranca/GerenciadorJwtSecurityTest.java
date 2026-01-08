@@ -16,7 +16,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes Unitários: GerenciadorJwt - Segurança")
+@DisplayName("GerenciadorJwt - Segurança")
 class GerenciadorJwtSecurityTest {
 
     @Mock

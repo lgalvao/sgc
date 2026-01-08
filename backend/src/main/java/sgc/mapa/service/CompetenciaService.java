@@ -16,78 +16,73 @@ public class CompetenciaService {
     private final CompetenciaRepo competenciaRepo;
     private final AtividadeRepo atividadeRepo;
 
-    public List<Competencia> buscarPorMapa(Long mapaId) {
-        return competenciaRepo.findByMapaCodigo(mapaId);
+    public Competencia buscarPorCodigo(Long codCompetencia) {
+        return competenciaRepo.findById(codCompetencia)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência", codCompetencia));
     }
 
-    public Competencia buscarPorId(Long id) {
-        return competenciaRepo.findById(id)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência", id));
+    public List<Competencia> buscarPorCodMapa(Long codMapa) {
+        return competenciaRepo.findByMapaCodigo(codMapa);
     }
 
     public void salvar(Competencia competencia) {
         competenciaRepo.save(competencia);
     }
 
-    public void adicionarCompetencia(Mapa mapa, String descricao, List<Long> atividadesIds) {
+    /**
+     * Creates and persists competencia with associated activities
+     */
+    public void criarCompetenciaComAtividades(Mapa mapa, String descricao, List<Long> codigosAtividades) {
         Competencia competencia = new Competencia(descricao, mapa);
-        prepararCompetenciasAtividades(atividadesIds, competencia);
+        prepararCompetenciasAtividades(codigosAtividades, competencia);
         competenciaRepo.save(competencia);
-        if (competencia.getAtividades() != null) {
-            atividadeRepo.saveAll(competencia.getAtividades());
-        }
+
+        atividadeRepo.saveAll(competencia.getAtividades());
     }
 
+    /**
+     * Updates competencia description and associated activities
+     */
     public void atualizarCompetencia(Long codCompetencia, String descricao, List<Long> atividadesIds) {
-        Competencia competencia = competenciaRepo
-                .findById(codCompetencia)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência não encontrada"));
+        Competencia competencia = competenciaRepo.findById(codCompetencia)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência", codCompetencia));
 
         competencia.setDescricao(descricao);
 
-        // ⚡ Bolt: Otimização N+1.
-        // Busca atividades com suas competências já carregadas para evitar queries no loop de remoção.
         List<Atividade> atividadesAntigas = atividadeRepo.listarPorCompetencia(competencia);
-        for (Atividade atividade : atividadesAntigas) {
-            atividade.getCompetencias().remove(competencia);
-        }
+        atividadesAntigas.forEach(atividade -> atividade.getCompetencias().remove(competencia));
         atividadeRepo.saveAll(atividadesAntigas);
 
         competencia.getAtividades().clear();
         prepararCompetenciasAtividades(atividadesIds, competencia);
         competenciaRepo.save(competencia);
 
-        if (competencia.getAtividades() != null) {
-            atividadeRepo.saveAll(competencia.getAtividades());
-        }
+        atividadeRepo.saveAll(competencia.getAtividades());
     }
 
+    /**
+     * Removes competence after dissociating from related activities
+     */
     public void removerCompetencia(Long codCompetencia) {
-        Competencia competencia = competenciaRepo
-                .findById(codCompetencia)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência não encontrada"));
+        Competencia competencia = competenciaRepo.findById(codCompetencia)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência", codCompetencia));
 
-        // ⚡ Bolt: Otimização N+1.
-        // Busca atividades com suas competências já carregadas.
         List<Atividade> atividadesAssociadas = atividadeRepo.listarPorCompetencia(competencia);
+        atividadesAssociadas.forEach(atividade -> atividade.getCompetencias().remove(competencia));
 
-        for (Atividade atividade : atividadesAssociadas) {
-            atividade.getCompetencias().remove(competencia);
-        }
-        // É importante salvar as atividades se a cascata não for automática, mas JPA gerencia a coleção.
-        // Explicitamente salvando para garantir sincronia.
         atividadeRepo.saveAll(atividadesAssociadas);
-
         competenciaRepo.delete(competencia);
     }
 
-    private void prepararCompetenciasAtividades(List<Long> codAtividades, Competencia competencia) {
-        if (codAtividades == null || codAtividades.isEmpty()) return;
+    /**
+     * Prepares activities by associating with given competence
+     */
+    private void prepararCompetenciasAtividades(List<Long> codigosAtividades, Competencia competencia) {
+        if (codigosAtividades.isEmpty()) return;
 
-        List<Atividade> atividades = atividadeRepo.findAllById(codAtividades);
+        List<Atividade> atividades = atividadeRepo.findAllById(codigosAtividades);
         competencia.setAtividades(new HashSet<>(atividades));
-        for (Atividade atividade : atividades) {
-            atividade.getCompetencias().add(competencia);
-        }
+
+        atividades.forEach(atividade -> atividade.getCompetencias().add(competencia));
     }
 }

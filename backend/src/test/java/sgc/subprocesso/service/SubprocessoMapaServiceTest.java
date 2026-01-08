@@ -14,6 +14,7 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
+import sgc.mapa.service.CopiaMapaService;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
@@ -31,12 +32,11 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes Unitários: SubprocessoMapaService")
+@DisplayName("SubprocessoMapaService")
 class SubprocessoMapaServiceTest {
 
     @Mock
@@ -49,6 +49,8 @@ class SubprocessoMapaServiceTest {
     private CompetenciaService competenciaService;
     @Mock
     private AtividadeMapper atividadeMapper;
+    @Mock
+    private CopiaMapaService copiaMapaService;
 
     @InjectMocks
     private SubprocessoMapaService subprocessoMapaService;
@@ -97,11 +99,11 @@ class SubprocessoMapaServiceTest {
 
         Competencia comp = new Competencia();
         comp.setCodigo(10L);
-        when(competenciaService.buscarPorId(10L)).thenReturn(comp);
+        when(competenciaService.buscarPorCodigo(10L)).thenReturn(comp);
 
         Atividade ativ = new Atividade();
         ativ.setCodigo(20L);
-        when(atividadeService.obterEntidadePorCodigo(20L)).thenReturn(ativ);
+        when(atividadeService.obterPorCodigo(20L)).thenReturn(ativ);
         when(atividadeMapper.toDto(ativ)).thenReturn(new AtividadeDto());
 
         subprocessoMapaService.salvarAjustesMapa(1L, List.of(compDto), "123");
@@ -186,6 +188,6 @@ class SubprocessoMapaServiceTest {
         // Verifica que status NÃO mudou (continua NAO_INICIADO)
         assertThat(dest.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
 
-        verify(atividadeService).importarAtividadesDeOutroMapa(11L, 22L);
+        verify(copiaMapaService).importarAtividadesDeOutroMapa(11L, 22L);
     }
 }

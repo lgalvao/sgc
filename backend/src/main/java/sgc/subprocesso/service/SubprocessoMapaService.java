@@ -10,6 +10,7 @@ import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
+import sgc.mapa.service.CopiaMapaService;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
@@ -35,6 +36,7 @@ public class SubprocessoMapaService {
     private final SubprocessoMovimentacaoRepo movimentacaoRepo;
     private final AtividadeService atividadeService;
     private final CompetenciaService competenciaService;
+    private final CopiaMapaService copiaMapaService;
     private final AtividadeMapper atividadeMapper;
 
     @Transactional
@@ -58,7 +60,7 @@ public class SubprocessoMapaService {
         log.info("Salvando ajustes para o mapa do subprocesso {}...", codSubprocesso);
 
         for (CompetenciaAjusteDto compDto : competencias) {
-            var competencia = competenciaService.buscarPorId(compDto.getCodCompetencia());
+            var competencia = competenciaService.buscarPorCodigo(compDto.getCodCompetencia());
 
             competencia.setDescricao(compDto.getNome());
 
@@ -67,7 +69,7 @@ public class SubprocessoMapaService {
                 // Usando AtividadeService.atualizar -> mas preciso da Entidade para associar à competência
                 // Se AtividadeService não expõe entidade, tenho que mudar o service
                 // Mas AtividadeService expõe `obterEntidadePorCodigo`.
-                var atividade = atividadeService.obterEntidadePorCodigo(ativDto.getCodAtividade());
+                var atividade = atividadeService.obterPorCodigo(ativDto.getCodAtividade());
 
                 // Atualizar descrição via service (para manter regras de negócio se houver)
                 // Ou apenas setar aqui já que é um "ajuste"?
@@ -78,7 +80,7 @@ public class SubprocessoMapaService {
                 atividadeService.atualizar(atividade.getCodigo(), dto);
 
                 // Recarrega entidade atualizada
-                atividades.add(atividadeService.obterEntidadePorCodigo(atividade.getCodigo()));
+                atividades.add(atividadeService.obterPorCodigo(atividade.getCodigo()));
             }
             competencia.setAtividades(atividades);
             competenciaService.salvar(competencia);
@@ -153,8 +155,8 @@ public class SubprocessoMapaService {
             // vou adicionar `importarAtividade` no `AtividadeService`.
         }
 
-        // REFAZENDO LOOP PARA CHAMAR NOVO METODO NO SERVICE
-        atividadeService.importarAtividadesDeOutroMapa(
+        // Delega ao serviço especializado de cópia de mapas
+        copiaMapaService.importarAtividadesDeOutroMapa(
                 spOrigem.getMapa().getCodigo(),
                 spDestino.getMapa().getCodigo()
         );

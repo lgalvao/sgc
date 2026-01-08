@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-@DisplayName("Testes Unitários: NotificacaoEmailAsyncExecutor")
+@DisplayName("NotificacaoEmailAsyncExecutor")
 class NotificacaoEmailAsyncExecutorTest {
 
     @InjectMocks

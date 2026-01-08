@@ -235,7 +235,7 @@ class SubprocessoValidacaoServiceTest {
     void validarAssociacoesMapaErroCompetencias() {
         Competencia c = new Competencia();
         c.setAtividades(Collections.emptySet());
-        when(competenciaService.buscarPorMapa(1L)).thenReturn(List.of(c));
+        when(competenciaService.buscarPorCodMapa(1L)).thenReturn(List.of(c));
 
         assertThatThrownBy(() -> service.validarAssociacoesMapa(1L))
                 .isInstanceOf(ErroValidacao.class)
@@ -247,7 +247,7 @@ class SubprocessoValidacaoServiceTest {
     void validarAssociacoesMapaErroAtividades() {
         Competencia c = new Competencia();
         c.setAtividades(Set.of(new Atividade()));
-        when(competenciaService.buscarPorMapa(1L)).thenReturn(List.of(c));
+        when(competenciaService.buscarPorCodMapa(1L)).thenReturn(List.of(c));
 
         Atividade a = new Atividade();
         a.setCompetencias(Collections.emptySet());
@@ -266,12 +266,12 @@ class SubprocessoValidacaoServiceTest {
         c.setAtividades(Set.of(a));
         a.setCompetencias(Set.of(c));
 
-        when(competenciaService.buscarPorMapa(1L)).thenReturn(List.of(c));
+        when(competenciaService.buscarPorCodMapa(1L)).thenReturn(List.of(c));
         when(atividadeService.buscarPorMapaCodigo(1L)).thenReturn(List.of(a));
 
         service.validarAssociacoesMapa(1L);
 
-        verify(competenciaService).buscarPorMapa(1L);
+        verify(competenciaService).buscarPorCodMapa(1L);
         verify(atividadeService).buscarPorMapaCodigo(1L);
     }
 

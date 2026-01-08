@@ -28,9 +28,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(SubprocessoCrudController.class)
 @Import(RestExceptionHandler.class)
 class SubprocessoCrudControllerTest {
-
     @MockitoBean
     private SubprocessoService subprocessoService;
+
     @MockitoBean
     private UnidadeService unidadeService;
 
@@ -85,11 +85,8 @@ class SubprocessoCrudControllerTest {
 
         when(subprocessoService.criar(any())).thenReturn(dto);
 
-        mockMvc.perform(
-                        post("/api/subprocessos")
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"codProcesso\": 1}"))
+        mockMvc.perform(post("/api/subprocessos").with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"codProcesso\": 1}"))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/subprocessos/1"));
     }
@@ -103,11 +100,8 @@ class SubprocessoCrudControllerTest {
 
         when(subprocessoService.atualizar(eq(1L), any())).thenReturn(dto);
 
-        mockMvc.perform(
-                        post("/api/subprocessos/1/atualizar")
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"codProcesso\": 1}"))
+        mockMvc.perform(post("/api/subprocessos/1/atualizar").with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"codProcesso\": 1}"))
                 .andExpect(status().isOk());
     }
 
@@ -146,8 +140,7 @@ class SubprocessoCrudControllerTest {
     @DisplayName("validarCadastro deve retornar OK")
     @WithMockUser
     void validarCadastro() throws Exception {
-        mockMvc.perform(get("/api/subprocessos/1/validar-cadastro"))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/subprocessos/1/validar-cadastro")).andExpect(status().isOk());
         verify(subprocessoService).validarCadastro(1L);
     }
 
@@ -155,9 +148,8 @@ class SubprocessoCrudControllerTest {
     @DisplayName("obterStatus deve retornar OK")
     @WithMockUser
     void obterStatus() throws Exception {
-        mockMvc.perform(get("/api/subprocessos/1/status"))
-                .andExpect(status().isOk());
-        verify(subprocessoService).obterStatus(1L);
+        mockMvc.perform(get("/api/subprocessos/1/status")).andExpect(status().isOk());
+        verify(subprocessoService).obterSituacao(1L);
     }
 
     @Test
@@ -181,7 +173,7 @@ class SubprocessoCrudControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"justificativa\": \"Erro\"}"))
                 .andExpect(status().isOk());
-        verify(subprocessoService).reabrirCadastro(eq(1L), eq("Erro"));
+        verify(subprocessoService).reabrirCadastro(1L, "Erro");
     }
 
     @Test
@@ -193,6 +185,6 @@ class SubprocessoCrudControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"justificativa\": \"Erro\"}"))
                 .andExpect(status().isOk());
-        verify(subprocessoService).reabrirRevisaoCadastro(eq(1L), eq("Erro"));
+        verify(subprocessoService).reabrirRevisaoCadastro(1L, "Erro");
     }
 }

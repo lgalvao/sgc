@@ -90,7 +90,7 @@ public class SubprocessoValidacaoService {
     }
 
     public void validarAssociacoesMapa(Long mapaId) {
-        List<Competencia> competencias = competenciaService.buscarPorMapa(mapaId);
+        List<Competencia> competencias = competenciaService.buscarPorCodMapa(mapaId);
         List<String> competenciasSemAssociacao = competencias.stream()
             .filter(c -> c.getAtividades().isEmpty())
             .map(Competencia::getDescricao)

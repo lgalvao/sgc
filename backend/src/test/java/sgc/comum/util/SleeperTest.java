@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("Testes Unitários: Sleeper")
+@DisplayName("Sleeper")
 class SleeperTest {
 
     @Test

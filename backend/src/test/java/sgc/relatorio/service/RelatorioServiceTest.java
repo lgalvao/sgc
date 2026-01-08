@@ -132,7 +132,7 @@ class RelatorioServiceTest {
 
         when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(c));
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(1L, null, out);
@@ -154,7 +154,7 @@ class RelatorioServiceTest {
 
         when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
-        when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of());
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
 
         OutputStream out = new ByteArrayOutputStream();
         // Filtra pela unidade 1
@@ -194,7 +194,7 @@ class RelatorioServiceTest {
 
         when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(c));
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(1L, null, out);
@@ -218,7 +218,7 @@ class RelatorioServiceTest {
 
         when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(c));
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(1L, null, out);

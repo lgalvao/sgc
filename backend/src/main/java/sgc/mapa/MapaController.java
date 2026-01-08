@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sgc.mapa.dto.MapaDto;
-import sgc.mapa.dto.MapaMapper;
+import sgc.mapa.mapper.MapaMapper;
 import sgc.mapa.service.MapaService;
 
 import java.net.URI;

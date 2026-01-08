@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Testes Unitários: AlertaMapper")
+@DisplayName("AlertaMapper")
 class AlertaMapperTest {
 
     private final AlertaMapper mapper = new AlertaMapperStub();

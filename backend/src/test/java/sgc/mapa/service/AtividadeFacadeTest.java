@@ -12,7 +12,7 @@ import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
-import sgc.subprocesso.dto.AtividadeOperacaoResponse;
+import sgc.subprocesso.dto.AtividadeOperacaoResp;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -33,6 +33,9 @@ class AtividadeFacadeTest {
 
     @Mock
     private AtividadeService atividadeService;
+
+    @Mock
+    private ConhecimentoService conhecimentoService;
 
     @Mock
     private SubprocessoService subprocessoService;
@@ -58,14 +61,14 @@ class AtividadeFacadeTest {
 
         // Facade gets status
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().situacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO).build();
-        when(subprocessoService.obterStatus(10L)).thenReturn(status);
+        when(subprocessoService.obterSituacao(10L)).thenReturn(status);
 
         // Facade searches for activity in list to return visualization
         AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
         vis.setCodigo(100L);
         when(subprocessoService.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
-        AtividadeOperacaoResponse response = facade.criarAtividade(request, "user");
+        AtividadeOperacaoResp response = facade.criarAtividade(request, "user");
 
         verify(subprocessoService).validarPermissaoEdicaoMapa(1L, "user");
         assertThat(response.getAtividade().getCodigo()).isEqualTo(100L);
@@ -86,16 +89,16 @@ class AtividadeFacadeTest {
         atividadeEntity.setMapa(mapa);
 
         // Facade gets entity to find map code -> then subprocesso code
-        when(atividadeService.obterEntidadePorCodigo(codigo)).thenReturn(atividadeEntity);
+        when(atividadeService.obterPorCodigo(codigo)).thenReturn(atividadeEntity);
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(10L);
         when(subprocessoService.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
-        when(subprocessoService.obterStatus(10L)).thenReturn(status);
+        when(subprocessoService.obterSituacao(10L)).thenReturn(status);
 
-        AtividadeOperacaoResponse response = facade.atualizarAtividade(codigo, request);
+        AtividadeOperacaoResp response = facade.atualizarAtividade(codigo, request);
 
         verify(atividadeService).atualizar(codigo, request);
         assertThat(response.getSubprocesso()).isNotNull();
@@ -112,16 +115,16 @@ class AtividadeFacadeTest {
         mapa.setCodigo(1L);
         atividadeEntity.setMapa(mapa);
 
-        when(atividadeService.obterEntidadePorCodigo(codigo)).thenReturn(atividadeEntity);
+        when(atividadeService.obterPorCodigo(codigo)).thenReturn(atividadeEntity);
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(10L);
         when(subprocessoService.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
-        when(subprocessoService.obterStatus(10L)).thenReturn(status);
+        when(subprocessoService.obterSituacao(10L)).thenReturn(status);
 
-        AtividadeOperacaoResponse response = facade.excluirAtividade(codigo);
+        AtividadeOperacaoResp response = facade.excluirAtividade(codigo);
 
         verify(atividadeService).excluir(codigo);
         assertThat(response.getAtividade()).isNull();
@@ -131,7 +134,7 @@ class AtividadeFacadeTest {
     @Test
     @DisplayName("Deve propagar erro se atividade não encontrada na exclusão")
     void devePropagarErroExclusao() {
-        when(atividadeService.obterEntidadePorCodigo(1L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 1L));
+        when(atividadeService.obterPorCodigo(1L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 1L));
 
         assertThatThrownBy(() -> facade.excluirAtividade(1L))
             .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -151,16 +154,16 @@ class AtividadeFacadeTest {
         mapa.setCodigo(1L);
         atividadeEntity.setMapa(mapa);
 
-        when(atividadeService.criarConhecimento(codigoAtividade, dto)).thenReturn(salvo);
+        when(conhecimentoService.criar(codigoAtividade, dto)).thenReturn(salvo);
 
         // Mocks for creating response
-        when(atividadeService.obterEntidadePorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
+        when(atividadeService.obterPorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(10L);
         when(subprocessoService.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
-        when(subprocessoService.obterStatus(10L)).thenReturn(status);
+        when(subprocessoService.obterSituacao(10L)).thenReturn(status);
 
         AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
         vis.setCodigo(codigoAtividade);
@@ -187,21 +190,21 @@ class AtividadeFacadeTest {
         atividadeEntity.setMapa(mapa);
 
         // Mocks for creating response
-        when(atividadeService.obterEntidadePorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
+        when(atividadeService.obterPorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(10L);
         when(subprocessoService.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
-        when(subprocessoService.obterStatus(10L)).thenReturn(status);
+        when(subprocessoService.obterSituacao(10L)).thenReturn(status);
 
         AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
         vis.setCodigo(codigoAtividade);
         when(subprocessoService.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
-        AtividadeOperacaoResponse response = facade.atualizarConhecimento(codigoAtividade, codigoConhecimento, dto);
+        AtividadeOperacaoResp response = facade.atualizarConhecimento(codigoAtividade, codigoConhecimento, dto);
 
-        verify(atividadeService).atualizarConhecimento(codigoAtividade, codigoConhecimento, dto);
+        verify(conhecimentoService).atualizar(codigoAtividade, codigoConhecimento, dto);
         assertThat(response.getAtividade()).isNotNull();
         assertThat(response.getAtividade().getCodigo()).isEqualTo(codigoAtividade);
     }
@@ -219,21 +222,21 @@ class AtividadeFacadeTest {
         atividadeEntity.setMapa(mapa);
 
         // Mocks for creating response
-        when(atividadeService.obterEntidadePorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
+        when(atividadeService.obterPorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(10L);
         when(subprocessoService.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
-        when(subprocessoService.obterStatus(10L)).thenReturn(status);
+        when(subprocessoService.obterSituacao(10L)).thenReturn(status);
 
         AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
         vis.setCodigo(codigoAtividade);
         when(subprocessoService.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
-        AtividadeOperacaoResponse response = facade.excluirConhecimento(codigoAtividade, codigoConhecimento);
+        AtividadeOperacaoResp response = facade.excluirConhecimento(codigoAtividade, codigoConhecimento);
 
-        verify(atividadeService).excluirConhecimento(codigoAtividade, codigoConhecimento);
+        verify(conhecimentoService).excluir(codigoAtividade, codigoConhecimento);
         assertThat(response.getAtividade()).isNotNull();
     }
 }

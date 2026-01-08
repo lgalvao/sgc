@@ -88,7 +88,7 @@ public class RelatorioService {
                 document.add(new Paragraph("Unidade: " + unidade.getSigla() + " - " + unidade.getNome()));
                 document.add(new Paragraph(" "));
 
-                List<Competencia> competencias = competenciaService.buscarPorMapa(sp.getMapa().getCodigo());
+                List<Competencia> competencias = competenciaService.buscarPorCodMapa(sp.getMapa().getCodigo());
 
                 for (Competencia c : competencias) {
                     document.add(new Paragraph("Competência: " + c.getDescricao()));

@@ -32,7 +32,7 @@ class CompetenciaServiceTest {
 
     @Test
     @DisplayName("Deve adicionar competência com atividades")
-    void deveAdicionarCompetencia() {
+    void deveCriarCompetenciaComAtividades() {
         Mapa mapa = new Mapa();
         String descricao = "Comp 1";
         List<Long> ativIds = List.of(1L);
@@ -46,7 +46,7 @@ class CompetenciaServiceTest {
             return c;
         });
 
-        service.adicionarCompetencia(mapa, descricao, ativIds);
+        service.criarCompetenciaComAtividades(mapa, descricao, ativIds);
 
         verify(competenciaRepo).save(any());
         verify(atividadeRepo).saveAll(any());
@@ -102,17 +102,17 @@ class CompetenciaServiceTest {
 
     @Test
     @DisplayName("Deve buscar por ID")
-    void deveBuscarPorId() {
+    void deveBuscarPorCodigo() {
         Long id = 1L;
         when(competenciaRepo.findById(id)).thenReturn(Optional.of(new Competencia()));
-        assertThat(service.buscarPorId(id)).isNotNull();
+        assertThat(service.buscarPorCodigo(id)).isNotNull();
     }
 
     @Test
     @DisplayName("Deve lançar erro ao buscar inexistente")
     void deveLancarErroAoBuscarInexistente() {
         when(competenciaRepo.findById(1L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> service.buscarPorId(1L))
+        assertThatThrownBy(() -> service.buscarPorCodigo(1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }

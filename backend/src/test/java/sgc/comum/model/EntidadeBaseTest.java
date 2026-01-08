@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("Testes Unitários: EntidadeBase")
+@DisplayName("EntidadeBase")
 class EntidadeBaseTest {
     private static class EntidadeTeste extends EntidadeBase {
         public EntidadeTeste(Long codigo) {

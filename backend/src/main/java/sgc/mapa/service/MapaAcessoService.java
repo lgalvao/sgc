@@ -21,13 +21,14 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Service
 @Slf4j
 public class MapaAcessoService {
-
     private static final String MSG_ERRO_CHEFE = """
             O chefe da unidade só pode verificar os impactos com o subprocesso na situação\
              'Revisão do cadastro em andamento'.""";
+
     private static final String MSG_ERRO_GESTOR = """
             O gestor só pode verificar os impactos com o subprocesso na situação 'Revisão do\
              cadastro disponibilizada'.""";
+
     private static final String MSG_ERRO_ADMIN = """
             O administrador só pode verificar os impactos com o subprocesso na situação 'Revisão\
              do cadastro disponibilizada', 'Revisão do cadastro homologada' ou 'Mapa\
@@ -51,16 +52,13 @@ public class MapaAcessoService {
         } else if (hasRole(usuario, "ADMIN")) {
             validarSituacao(
                     situacao,
-                    List.of(
-                            REVISAO_CADASTRO_DISPONIBILIZADA,
-                            REVISAO_CADASTRO_HOMOLOGADA,
-                            REVISAO_MAPA_AJUSTADO),
-                    MSG_ERRO_ADMIN);
+                    List.of(REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO),
+                    MSG_ERRO_ADMIN
+            );
         }
     }
 
-    private void validarSituacao(
-            SituacaoSubprocesso atual, List<SituacaoSubprocesso> esperadas, String mensagemErro) {
+    private void validarSituacao(SituacaoSubprocesso atual, List<SituacaoSubprocesso> esperadas, String mensagemErro) {
         if (!esperadas.contains(atual)) throw new ErroAccessoNegado(mensagemErro);
     }
 

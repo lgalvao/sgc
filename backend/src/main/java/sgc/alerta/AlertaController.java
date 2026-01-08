@@ -22,19 +22,19 @@ public class AlertaController {
 
     @GetMapping
     @Operation(summary = "Lista todos os alertas do usuário autenticado")
-    public ResponseEntity<List<AlertaDto>> listarAlertas(
-            @AuthenticationPrincipal Object principal) {
+    public ResponseEntity<List<AlertaDto>> listarAlertas(@AuthenticationPrincipal Object principal) {
         String usuarioTitulo = extractTituloUsuario(principal);
         List<AlertaDto> alertas = alertaService.listarAlertasPorUsuario(usuarioTitulo);
+
         return ResponseEntity.ok(alertas);
     }
 
     @GetMapping("/nao-lidos")
     @Operation(summary = "Lista alertas não lidos do usuário autenticado")
-    public ResponseEntity<List<AlertaDto>> listarNaoLidos(
-            @AuthenticationPrincipal Object principal) {
+    public ResponseEntity<List<AlertaDto>> listarNaoLidos(@AuthenticationPrincipal Object principal) {
         String usuarioTitulo = extractTituloUsuario(principal);
         List<AlertaDto> alertas = alertaService.listarAlertasNaoLidos(usuarioTitulo);
+
         return ResponseEntity.ok(alertas);
     }
 
@@ -43,6 +43,7 @@ public class AlertaController {
     public ResponseEntity<Map<String, String>> marcarComoLidos(
             @RequestBody List<Long> codigos,
             @AuthenticationPrincipal Object principal) {
+
         String usuarioTitulo = extractTituloUsuario(principal);
         alertaService.marcarComoLidos(usuarioTitulo, codigos);
         return ResponseEntity.ok(Map.of("message", "Alertas marcados como lidos."));

@@ -59,7 +59,7 @@ public class SubprocessoService {
     }
 
     @Transactional(readOnly = true)
-    public SubprocessoSituacaoDto obterStatus(Long codSubprocesso) {
+    public SubprocessoSituacaoDto obterSituacao(Long codSubprocesso) {
         return crudService.obterStatus(codSubprocesso);
     }
 

@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes Unitários: ParametroService")
+@DisplayName("ParametroService")
 class ParametroServiceTest {
 
     @InjectMocks

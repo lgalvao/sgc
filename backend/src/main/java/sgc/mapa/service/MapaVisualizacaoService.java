@@ -16,6 +16,7 @@ import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,61 +30,41 @@ public class MapaVisualizacaoService {
 
     public MapaVisualizacaoDto obterMapaParaVisualizacao(Long codSubprocesso) {
         Subprocesso subprocesso = subprocessoService.buscarSubprocesso(codSubprocesso);
-
         Mapa mapa = subprocesso.getMapa();
         if (mapa == null) {
-            throw new ErroEntidadeNaoEncontrada(
-                    "Subprocesso não possui mapa associado: ", codSubprocesso);
+            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado: ", codSubprocesso);
         }
 
         Unidade unidade = subprocesso.getUnidade();
-        var unidadeDto =
-                MapaVisualizacaoDto.UnidadeDto.builder()
-                        .codigo(unidade.getCodigo())
-                        .sigla(unidade.getSigla())
-                        .nome(unidade.getNome())
-                        .build();
+        var unidadeDto = MapaVisualizacaoDto.UnidadeDto.builder()
+                .codigo(unidade.getCodigo())
+                .sigla(unidade.getSigla())
+                .nome(unidade.getNome())
+                .build();
 
-        // 1. Fetch all activities with their knowledge efficiently
         List<Atividade> atividadesComConhecimentos =
                 atividadeRepo.findByMapaCodigoWithConhecimentos(mapa.getCodigo());
 
-        // 2. Map them to DTOs and index by ID for fast lookup
         Map<Long, AtividadeDto> atividadeDtoMap = atividadesComConhecimentos.stream()
-                .collect(Collectors.toMap(
-                        Atividade::getCodigo,
-                        this::mapAtividadeToDto
-                ));
+                .collect(Collectors.toMap(Atividade::getCodigo, this::mapAtividadeToDto));
 
-        List<Competencia> competencias =
-                competenciaRepo.findByMapaCodigo(mapa.getCodigo());
+        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(mapa.getCodigo());
 
-        List<CompetenciaDto> competenciasDto =
-                competencias.stream()
-                        .map(
-                                competencia -> {
-                                    // Competencia.atividades are loaded by findByMapaCodigo
-                                    // but they are "shallow" (lazy knowledge).
-                                    // Use the map to get the full DTO.
-                                    List<AtividadeDto> atividadesDto =
-                                            competencia.getAtividades().stream()
-                                                    .map(a -> atividadeDtoMap.get(a.getCodigo()))
-                                                    // Handle case where activity might not be in the map (shouldn't happen if consistent)
-                                                    .filter(java.util.Objects::nonNull)
-                                                    .toList();
+        List<CompetenciaDto> competenciasDto = competencias.stream()
+                .map(competencia -> {
+                    List<AtividadeDto> atividadesDto =
+                            competencia.getAtividades().stream()
+                                    .map(a -> atividadeDtoMap.get(a.getCodigo()))
+                                    .filter(Objects::nonNull)
+                                    .toList();
 
-                                    return CompetenciaDto.builder()
-                                            .codigo(competencia.getCodigo())
-                                            .descricao(competencia.getDescricao())
-                                            .atividades(atividadesDto)
-                                            .build();
-                                })
-                        .toList();
+                    return CompetenciaDto.builder()
+                            .codigo(competencia.getCodigo())
+                            .descricao(competencia.getDescricao())
+                            .atividades(atividadesDto)
+                            .build();
+                }).toList();
 
-        // ⚡ Bolt: Otimização para evitar consultas N+1.
-        // Em vez de chamar a.getCompetencias().isEmpty() (que dispara carregamento lazy para cada atividade),
-        // coletamos todos os IDs de atividades que JÁ ESTÃO associadas a uma competência (carregadas em 'competencias')
-        // e verificamos contra este conjunto.
         var atividadesComCompetenciaIds = competencias.stream()
                 .flatMap(c -> c.getAtividades().stream())
                 .map(Atividade::getCodigo)
@@ -105,18 +86,14 @@ public class MapaVisualizacaoService {
     }
 
     private AtividadeDto mapAtividadeToDto(Atividade atividade) {
-        // Here atividade.getConhecimentos() is already fetched if passed from findByMapaCodigoWithConhecimentos
         List<Conhecimento> conhecimentos = atividade.getConhecimentos();
 
-        List<ConhecimentoDto> conhecimentosDto =
-                conhecimentos.stream()
-                        .map(
-                                c ->
-                                        ConhecimentoDto.builder()
-                                                .codigo(c.getCodigo())
-                                                .descricao(c.getDescricao())
-                                                .build())
-                        .toList();
+        List<ConhecimentoDto> conhecimentosDto = conhecimentos.stream()
+                .map(c -> ConhecimentoDto.builder()
+                        .codigo(c.getCodigo())
+                        .descricao(c.getDescricao())
+                        .build())
+                .toList();
         return AtividadeDto.builder()
                 .codigo(atividade.getCodigo())
                 .descricao(atividade.getDescricao())

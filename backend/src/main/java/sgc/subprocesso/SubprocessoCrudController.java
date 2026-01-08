@@ -47,7 +47,7 @@ public class SubprocessoCrudController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtém apenas o status atual do subprocesso")
     public ResponseEntity<SubprocessoSituacaoDto> obterStatus(@PathVariable Long codigo) {
-        return ResponseEntity.ok(subprocessoService.obterStatus(codigo));
+        return ResponseEntity.ok(subprocessoService.obterSituacao(codigo));
     }
 
     /**

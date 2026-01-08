@@ -126,7 +126,7 @@ class SubprocessoServiceTest {
         @DisplayName("Deve retornar situação quando subprocesso existe")
         void deveRetornarSituacaoQuandoSubprocessoExiste() {
             when(crudService.obterStatus(1L)).thenReturn(SubprocessoSituacaoDto.builder().build());
-            assertThat(service.obterStatus(1L)).isNotNull();
+            assertThat(service.obterSituacao(1L)).isNotNull();
         }
 
         @Test

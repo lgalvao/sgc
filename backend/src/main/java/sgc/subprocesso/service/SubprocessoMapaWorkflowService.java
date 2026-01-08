@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseService;
-import sgc.analise.dto.CriarAnaliseRequest;
+import sgc.analise.dto.CriarAnaliseReq;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -73,7 +73,7 @@ public class SubprocessoMapaWorkflowService {
     public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request, String tituloUsuario) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         Long codMapa = subprocesso.getMapa().getCodigo();
-        boolean eraVazio = competenciaService.buscarPorMapa(codMapa).isEmpty();
+        boolean eraVazio = competenciaService.buscarPorCodMapa(codMapa).isEmpty();
         boolean temNovasCompetencias = !request.getCompetencias().isEmpty();
 
         MapaCompletoDto mapaDto = mapaService.salvarMapaCompleto(codMapa, request, tituloUsuario);
@@ -93,9 +93,9 @@ public class SubprocessoMapaWorkflowService {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
 
         Long codMapa = subprocesso.getMapa().getCodigo();
-        boolean eraVazio = competenciaService.buscarPorMapa(codMapa).isEmpty();
+        boolean eraVazio = competenciaService.buscarPorCodMapa(codMapa).isEmpty();
 
-        competenciaService.adicionarCompetencia(
+        competenciaService.criarCompetenciaComAtividades(
                 subprocesso.getMapa(), request.getDescricao(), request.getAtividadesIds()
         );
 
@@ -130,7 +130,7 @@ public class SubprocessoMapaWorkflowService {
         competenciaService.removerCompetencia(codCompetencia);
 
         // Se o mapa ficou vazio e estava em MAPA_CRIADO, voltar para CADASTRO_HOMOLOGADO
-        boolean ficouVazio = competenciaService.buscarPorMapa(codMapa).isEmpty();
+        boolean ficouVazio = competenciaService.buscarPorCodMapa(codMapa).isEmpty();
         if (ficouVazio && subprocesso.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO) {
             subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
             subprocessoRepo.save(subprocesso);
@@ -197,7 +197,7 @@ public class SubprocessoMapaWorkflowService {
 
     private void validarMapaParaDisponibilizacao(Subprocesso subprocesso) {
         Long codMapa = subprocesso.getMapa().getCodigo();
-        var competencias = competenciaService.buscarPorMapa(codMapa);
+        var competencias = competenciaService.buscarPorCodMapa(codMapa);
 
         if (competencias.stream().anyMatch(c -> c.getAtividades().isEmpty())) {
             throw new ErroValidacao("Todas as competências devem estar associadas a pelo menos uma atividade.");
@@ -313,7 +313,7 @@ public class SubprocessoMapaWorkflowService {
 
             analiseService.criarAnalise(
                 sp,
-                CriarAnaliseRequest.builder()
+                CriarAnaliseReq.builder()
                         .codSubprocesso(codSubprocesso)
                         .observacoes("Aceite da validação")
                         .tipo(TipoAnalise.VALIDACAO)

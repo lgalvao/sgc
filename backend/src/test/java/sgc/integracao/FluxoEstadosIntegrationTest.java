@@ -26,6 +26,7 @@ import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.*;
 import sgc.mapa.service.AtividadeService;
+import sgc.mapa.service.ConhecimentoService;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Usuario;
@@ -64,6 +65,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
     @Autowired private SubprocessoCadastroWorkflowService cadastroWorkflowService;
     @Autowired private SubprocessoMapaWorkflowService mapaWorkflowService;
     @Autowired private AtividadeService atividadeService;
+    @Autowired private ConhecimentoService conhecimentoService;
     @Autowired private SubprocessoRepo subprocessoRepo;
     @Autowired private UnidadeRepo unidadeRepo;
     @Autowired private UsuarioRepo usuarioRepo;
@@ -195,7 +197,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 ConhecimentoDto conReq = ConhecimentoDto.builder()
                         .descricao("Conhecimento Teste")
                         .build();
-                atividadeService.criarConhecimento(ativCriada.getCodigo(), conReq);
+                conhecimentoService.criar(ativCriada.getCodigo(), conReq);
 
                 em.flush();
                 em.clear();
@@ -302,7 +304,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             AtividadeDto ativ = atividadeService.criar(
                 AtividadeDto.builder().descricao("A").mapaCodigo(codMapa).build(),
                 chefeMapeamento.getTituloEleitoral());
-            atividadeService.criarConhecimento(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
+            conhecimentoService.criar(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
 
             em.flush();
             em.clear();
@@ -372,7 +374,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                     AtividadeDto.builder().descricao("Nova Ativ Revisao").mapaCodigo(codMapa).build(),
                     chefeRevisao.getTituloEleitoral()
                 );
-                atividadeService.criarConhecimento(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
+                conhecimentoService.criar(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
 
                 // Link activity to ALL competencies to satisfy validation
                 List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
@@ -462,7 +464,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 AtividadeDto.builder().descricao("Ativ").mapaCodigo(codMapa).build(),
                 chefeRevisao.getTituloEleitoral()
             );
-            atividadeService.criarConhecimento(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
+            conhecimentoService.criar(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
 
             em.flush();
             em.clear();

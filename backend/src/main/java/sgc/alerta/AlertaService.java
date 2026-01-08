@@ -156,8 +156,7 @@ public class AlertaService {
     }
 
     /**
-     * Marca múltiplos alertas como lidos para o usuário.
-     * Cria o AlertaUsuario se ainda não existir.
+     * Marca múltiplos alertas como lidos para o usuário. Cria o AlertaUsuario se ainda não existir.
      */
     @Transactional
     public void marcarComoLidos(String usuarioTitulo, List<Long> alertaCodigos) {
@@ -169,10 +168,9 @@ public class AlertaService {
             
             AlertaUsuario alertaUsuario = alertaUsuarioRepo.findById(chave)
                     .orElseGet(() -> {
-                        // Cria AlertaUsuario se não existir
                         Alerta alerta = alertaRepo.findById(codigo).orElse(null);
                         if (alerta == null) {
-                            return null; // Ignora alertas inexistentes
+                            return null; 
                         }
                         AlertaUsuario novo = new AlertaUsuario();
                         novo.setId(chave);
@@ -181,6 +179,7 @@ public class AlertaService {
                         return novo;
                     });
             
+            // Persists read timestamp if alert was unread
             if (alertaUsuario != null && alertaUsuario.getDataHoraLeitura() == null) {
                 alertaUsuario.setDataHoraLeitura(agora);
                 alertaUsuarioRepo.save(alertaUsuario);
@@ -201,6 +200,7 @@ public class AlertaService {
         }
         List<Alerta> alertasUnidade = alertaRepo.findByUnidadeDestino_Codigo(lotacao.getCodigo());
 
+        // Maps alerts to DTOs with read timestamps
         return alertasUnidade.stream().map(alerta -> {
             LocalDateTime dataHoraLeitura = obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo).orElse(null);
             return alertaMapper.toDto(alerta, dataHoraLeitura);

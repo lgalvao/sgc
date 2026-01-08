@@ -17,25 +17,64 @@ O modelo de dados é hierárquico:
 
 ## Serviços Principais
 
-### `MapaService`
-Gerencia o ciclo de vida da entidade `Mapa`. Responsável por criar, buscar e associar mapas a subprocessos.
+### Serviços de CRUD
 
-### `AtividadeService`
-Gerencia o cadastro e manutenção de atividades e seus conhecimentos associados.
+| Serviço | Responsabilidade |
+|---------|------------------|
+| `MapaService` | Operações básicas de CRUD para a entidade `Mapa`. |
+| `AtividadeService` | Gerencia o cadastro e manutenção de atividades. |
+| `ConhecimentoService` | Gerencia o cadastro e manutenção de conhecimentos. |
+| `CompetenciaService` | Centraliza a lógica de CRUD para competências. |
 
-### `CompetenciaService`
-Centraliza a lógica de CRUD para competências.
+### Serviços Especializados
 
-### `ImpactoMapaService`
-Realiza a análise de impacto quando há alterações no mapa (ex: remoção de uma competência utilizada em múltiplos subprocessos). Calcula e retorna o `ImpactoMapaDto`.
+| Serviço | Responsabilidade |
+|---------|------------------|
+| `AtividadeFacade` | Orquestra operações entre Atividade, Conhecimento e Subprocesso. Remove lógica de negócio do Controller. |
+| `MapaSalvamentoService` | Processa salvamentos complexos do mapa completo com competências e associações. |
+| `CopiaMapaService` | Realiza cópias profundas de mapas e importação de atividades entre mapas. |
+| `MapaVisualizacaoService` | Monta DTOs complexos para exibir a árvore de competências no frontend. |
+| `MapaAcessoService` | Valida permissões de acesso baseadas em perfil e situação do subprocesso. |
 
-### `CopiaMapaService`
-Serviço especializado responsável por realizar a "deep copy" (cópia profunda) de um mapa. Essencial para iniciar novos ciclos de revisão baseados em mapas anteriores, duplicando toda a estrutura de competências, atividades e conhecimentos.
+### Serviços de Análise de Impacto
 
-### `MapaVisualizacaoService`
-Otimizado para leitura, monta DTOs complexos (`MapaVisualizacaoDto`) para exibir a árvore completa de competências no frontend de forma performática.
+| Serviço | Responsabilidade |
+|---------|------------------|
+| `ImpactoMapaService` | Orquestra a verificação de impactos no mapa de competências (CDU-12). |
+| `DetectorMudancasAtividadeService` | Detecta atividades inseridas, removidas ou alteradas entre versões de mapa. |
+| `DetectorImpactoCompetenciaService` | Identifica quais competências foram afetadas por mudanças em atividades. |
+
+## Arquitetura
+
+```
+sgc/mapa/
+├── AtividadeController.java     # REST endpoints para Atividades
+├── MapaController.java          # REST endpoints para Mapas
+├── dto/                         # Data Transfer Objects
+│   ├── visualizacao/            # DTOs específicos para visualização
+│   └── ...
+├── evento/                      # Eventos de domínio
+├── mapper/                      # MapStruct mappers
+├── model/                       # Entidades JPA e Repositórios
+└── service/                     # Lógica de negócios
+    ├── AtividadeService.java
+    ├── AtividadeFacade.java
+    ├── CompetenciaService.java
+    ├── ConhecimentoService.java
+    ├── CopiaMapaService.java
+    ├── DetectorImpactoCompetenciaService.java
+    ├── DetectorMudancasAtividadeService.java
+    ├── ImpactoMapaService.java
+    ├── MapaAcessoService.java
+    ├── MapaSalvamentoService.java
+    ├── MapaService.java
+    └── MapaVisualizacaoService.java
+```
 
 ## Padrões Utilizados
 
-*   **DTOs de Visualização:** Separação clara entre entidades JPA e objetos retornados para a UI (pacote `dto.visualizacao`), evitando problemas de serialização cíclica e carregamento desnecessário de dados.
+*   **Facade Pattern:** `AtividadeFacade` simplifica a interface de uso e centraliza a coordenação entre múltiplos serviços.
+*   **Single Responsibility Principle:** Cada serviço tem uma responsabilidade bem definida.
+*   **DTOs de Visualização:** Separação clara entre entidades JPA e objetos retornados para a UI (pacote `dto.visualizacao`), evitando problemas de serialização cíclica.
 *   **Mapper:** Uso de MapStruct para conversão eficiente entre Entidades e DTOs.
+*   **Domain Events:** `EventoMapaAlterado` para comunicação desacoplada entre módulos.

@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseService;
-import sgc.analise.dto.CriarAnaliseRequest;
+import sgc.analise.dto.CriarAnaliseReq;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
 import sgc.organizacao.model.Unidade;
@@ -40,7 +40,7 @@ public class SubprocessoWorkflowExecutor {
         // 1. Criar Análise
         analiseService.criarAnalise(
                 sp,
-                CriarAnaliseRequest.builder()
+                CriarAnaliseReq.builder()
                         .codSubprocesso(sp.getCodigo())
                         .observacoes(observacoes)
                         .tipo(tipoAnalise)

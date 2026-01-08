@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes Unitários: AlertaService")
+@DisplayName("AlertaService")
 class AlertaServiceTest {
     @Mock
     private AlertaRepo alertaRepo;

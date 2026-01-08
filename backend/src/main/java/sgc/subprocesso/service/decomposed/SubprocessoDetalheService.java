@@ -15,6 +15,7 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
+import sgc.mapa.service.ConhecimentoService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
@@ -46,6 +47,7 @@ public class SubprocessoDetalheService {
     private final ConhecimentoMapper conhecimentoMapper;
     private final AnaliseService analiseService;
     private final CompetenciaService competenciaService;
+    private final ConhecimentoService conhecimentoService;
     private final MapaAjusteMapper mapaAjusteMapper;
 
     public List<AtividadeVisualizacaoDto> listarAtividadesSubprocesso(Long codSubprocesso) {
@@ -163,9 +165,9 @@ public class SubprocessoDetalheService {
         Subprocesso sp = crudService.buscarSubprocessoComMapa(codSubprocesso);
         Long codMapa = sp.getMapa().getCodigo();
         Analise analise = analiseService.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst().orElse(null);
-        List<Competencia> competencias = competenciaService.buscarPorMapa(codMapa);
+        List<Competencia> competencias = competenciaService.buscarPorCodMapa(codMapa);
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(codMapa);
-        List<Conhecimento> conhecimentos = atividadeService.listarConhecimentosPorMapa(codMapa);
+        List<Conhecimento> conhecimentos = conhecimentoService.listarPorMapa(codMapa);
         return mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos);
     }
 

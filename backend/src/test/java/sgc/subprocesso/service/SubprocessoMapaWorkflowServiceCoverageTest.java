@@ -89,7 +89,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         sp.setMapa(mapa);
 
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
-        when(competenciaService.buscarPorMapa(10L)).thenReturn(Collections.emptyList());
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(Collections.emptyList());
 
         SalvarMapaRequest req = new SalvarMapaRequest();
         req.setCompetencias(List.of(new sgc.mapa.dto.CompetenciaMapaDto())); // Tem competencia
@@ -113,7 +113,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         sp.setMapa(mapa);
 
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
-        when(competenciaService.buscarPorMapa(10L)).thenReturn(Collections.emptyList());
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(Collections.emptyList());
 
         CompetenciaReq req = new CompetenciaReq();
         req.setDescricao("Nova");
@@ -139,7 +139,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
 
         // Simula que ficou vazio apos remover
-        when(competenciaService.buscarPorMapa(10L)).thenReturn(Collections.emptyList());
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(Collections.emptyList());
 
         when(mapaService.obterMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());
 
@@ -161,7 +161,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
 
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
         // Validacoes de mapa passam
-        when(competenciaService.buscarPorMapa(10L)).thenReturn(Collections.emptyList());
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(Collections.emptyList());
         when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(Collections.emptyList());
 
         DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(); // data null
@@ -184,7 +184,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         sgc.mapa.model.Competencia comp = new sgc.mapa.model.Competencia();
         comp.setAtividades(Collections.emptySet()); // Sem atividade
 
-        when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(comp));
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(comp));
 
         assertThatThrownBy(() -> service.disponibilizarMapa(1L, new DisponibilizarMapaRequest(), new Usuario()))
             .isInstanceOf(ErroValidacao.class)
@@ -206,7 +206,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         sgc.mapa.model.Atividade a1 = new sgc.mapa.model.Atividade(); a1.setCodigo(100L);
         comp.setAtividades(java.util.Set.of(a1));
 
-        when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(comp));
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(comp));
 
         // Atividades do mapa: 1 e 2. A 2 nao esta associada
         sgc.mapa.model.Atividade a2 = new sgc.mapa.model.Atividade(); a2.setCodigo(200L); a2.setDescricao("A2");

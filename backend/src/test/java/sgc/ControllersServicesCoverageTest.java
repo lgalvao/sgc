@@ -20,6 +20,7 @@ import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
+import sgc.mapa.service.MapaSalvamentoService;
 import sgc.mapa.service.MapaService;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -64,6 +65,8 @@ class ControllersServicesCoverageTest {
     private sgc.mapa.model.AtividadeRepo atividadeRepo;
     @Mock
     private sgc.mapa.mapper.MapaCompletoMapper mapaCompletoMapper;
+    @Mock
+    private MapaSalvamentoService mapaSalvamentoService;
 
     @InjectMocks
     private SubprocessoMapaController subprocessoMapaController;
@@ -108,27 +111,27 @@ class ControllersServicesCoverageTest {
     }
 
     @Test
-    @DisplayName("Deve lançar erro ao salvar mapa completo inexistente")
-    void deveLancarErroSalvarMapaCompletoInexistente() {
-        when(mapaRepo.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("Deve delegar salvar mapa completo inexistente para MapaSalvamentoService")
+    void deveDelegarSalvarMapaCompletoInexistente() {
         SalvarMapaRequest req = new SalvarMapaRequest();
+        when(mapaSalvamentoService.salvarMapaCompleto(99L, req, "123"))
+            .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 99L));
         assertThatThrownBy(() -> mapaService.salvarMapaCompleto(99L, req, "123"))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
-    @DisplayName("Deve lançar erro ao salvar mapa completo com competência inexistente")
-    void deveLancarErroSalvarCompetenciaInexistente() {
-        Mapa mapa = new Mapa();
-        when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
-        when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(new ArrayList<>());
-
+    @DisplayName("Deve delegar salvar mapa completo com competência inexistente para MapaSalvamentoService")
+    void deveDelegarSalvarCompetenciaInexistente() {
         SalvarMapaRequest req = new SalvarMapaRequest();
         req.setObservacoes("Obs");
         CompetenciaMapaDto compDto = new CompetenciaMapaDto();
         compDto.setCodigo(99L);
         compDto.setDescricao("Desc");
         req.setCompetencias(List.of(compDto));
+
+        when(mapaSalvamentoService.salvarMapaCompleto(1L, req, "123"))
+            .thenThrow(new ErroEntidadeNaoEncontrada("Competência não encontrada: 99"));
 
         assertThatThrownBy(() -> mapaService.salvarMapaCompleto(1L, req, "123"))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)

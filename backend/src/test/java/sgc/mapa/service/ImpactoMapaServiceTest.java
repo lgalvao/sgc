@@ -51,10 +51,10 @@ class ImpactoMapaServiceTest {
     private AtividadeService atividadeService;
 
     @Mock
-    private DetectorAtividadesService detectorAtividades;
+    private DetectorMudancasAtividadeService detectorAtividades;
 
     @Mock
-    private AnalisadorCompetenciasService analisadorCompetencias;
+    private DetectorImpactoCompetenciaService analisadorCompetencias;
 
     @Mock
     private MapaAcessoService mapaAcessoService;
@@ -115,8 +115,6 @@ class ImpactoMapaServiceTest {
             // But since we are mocking everything, we assume the delegation works if verify passes.
             // However, ImpactoMapaService calls it before anything else relevant to this test scope.
 
-            // mockSecurityContext(chefe); // Removed unnecessary stubbing
-            // subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
             when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
 
             // Scenario 1: Access Granted (delegation happens)
@@ -128,8 +126,6 @@ class ImpactoMapaServiceTest {
         @Test
         @DisplayName("Deve propagar erro se acesso negado")
         void devePropagarErroAcesso() {
-            // mockSecurityContext(chefe); // Removed unnecessary stubbing
-            // subprocesso.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
             when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             org.mockito.Mockito.doThrow(new ErroAccessoNegado("Acesso negado"))
                     .when(mapaAcessoService).verificarAcessoImpacto(chefe, subprocesso);
@@ -146,8 +142,6 @@ class ImpactoMapaServiceTest {
         @Test
         @DisplayName("Deve retornar sem impacto se não houver mapa vigente")
         void semImpactoSeNaoHouverMapaVigente() {
-            // mockSecurityContext(chefe); // Removed unnecessary stubbing
-            // subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
             when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
 
@@ -166,8 +160,6 @@ class ImpactoMapaServiceTest {
         @Test
         @DisplayName("Deve detectar impactos quando há diferenças entre mapas")
         void comImpacto() {
-            // mockSecurityContext(chefe); // Removed unnecessary stubbing
-            // subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
             sgc.mapa.model.Mapa mapaVigente = new sgc.mapa.model.Mapa();
             mapaVigente.setCodigo(1L);
             sgc.mapa.model.Mapa mapaSubprocesso = new sgc.mapa.model.Mapa();
@@ -198,7 +190,7 @@ class ImpactoMapaServiceTest {
             when(detectorAtividades.detectarRemovidas(any(), any(), any())).thenReturn(List.of(removida));
             when(detectorAtividades.detectarInseridas(any(), any())).thenReturn(List.of());
             when(detectorAtividades.detectarAlteradas(any(), any(), any())).thenReturn(List.of());
-            when(analisadorCompetencias.identificarCompetenciasImpactadas(any(), any(), any(), any())).thenReturn(List.of());
+            when(analisadorCompetencias.competenciasImpactadas(any(), any(), any(), any())).thenReturn(List.of());
 
 
             ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);

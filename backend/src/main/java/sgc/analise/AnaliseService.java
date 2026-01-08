@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.analise.dto.CriarAnaliseRequest;
+import sgc.analise.dto.CriarAnaliseReq;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAnalise;
@@ -34,21 +34,20 @@ public class AnaliseService {
      */
     @Transactional(readOnly = true)
     public List<Analise> listarPorSubprocesso(Long codSubprocesso, TipoAnalise tipoAnalise) {
-        // Validação de existência do subprocesso movida para o Controller/Caller.
         return analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso).stream()
                 .filter(analise -> analise.getTipo() == tipoAnalise)
                 .toList();
     }
 
     /**
-     * Cria e persiste uma nova análise com base nos dados fornecidos.
+     * Cria e persiste uma análise com base nos dados fornecidos.
      *
      * @param subprocesso A entidade do subprocesso.
      * @param req O DTO contendo todas as informações necessárias para criar a análise.
      * @return A entidade {@link Analise} que foi criada e salva no banco de dados.
      */
     @Transactional
-    public Analise criarAnalise(Subprocesso subprocesso, CriarAnaliseRequest req) {
+    public Analise criarAnalise(Subprocesso subprocesso, CriarAnaliseReq req) {
         Unidade unidade = null;
         if (req.getSiglaUnidade() != null) {
             var unidadeDto = unidadeService.buscarPorSigla(req.getSiglaUnidade());
