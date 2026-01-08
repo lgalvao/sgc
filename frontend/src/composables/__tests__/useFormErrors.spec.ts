@@ -32,4 +32,57 @@ describe('useFormErrors', () => {
       errors.value.field1 = 'Error';
       expect(hasErrors()).toBe(true);
   });
+
+  it('handles null normalized error', () => {
+    const { errors, setFromNormalizedError } = useFormErrors(['field1']);
+    setFromNormalizedError(null);
+    expect(errors.value.field1).toBe('');
+  });
+
+  it('handles normalized error without subErrors', () => {
+    const { errors, setFromNormalizedError } = useFormErrors(['field1']);
+    const normalizedError = {
+      kind: 'validation' as const,
+      message: 'Global error'
+    };
+    // @ts-expect-error - testing missing subErrors which might happen at runtime despite types
+    setFromNormalizedError(normalizedError);
+    expect(errors.value.field1).toBe('');
+  });
+
+  it('ignores subErrors with missing fields', () => {
+    const { errors, setFromNormalizedError } = useFormErrors(['field1']);
+    const normalizedError = {
+      kind: 'validation' as const,
+      message: 'Global error',
+      subErrors: [{ message: 'Error 1' }] // Missing field
+    };
+    // @ts-expect-error - testing invalid subError shape
+    setFromNormalizedError(normalizedError);
+    expect(errors.value.field1).toBe('');
+  });
+
+  it('ignores subErrors for fields not in tracking list', () => {
+    const { errors, setFromNormalizedError } = useFormErrors(['field1']);
+    const normalizedError = {
+      kind: 'validation' as const,
+      message: 'Global error',
+      subErrors: [{ field: 'otherField', message: 'Error 1' }]
+    };
+    setFromNormalizedError(normalizedError);
+    expect(errors.value.field1).toBe('');
+    expect(errors.value).not.toHaveProperty('otherField');
+  });
+
+  it('uses default message if subError message is missing', () => {
+    const { errors, setFromNormalizedError } = useFormErrors(['field1']);
+    const normalizedError = {
+      kind: 'validation' as const,
+      message: 'Global error',
+      subErrors: [{ field: 'field1' }] // Missing message
+    };
+    // @ts-expect-error - testing missing message
+    setFromNormalizedError(normalizedError);
+    expect(errors.value.field1).toBe('Campo inválido');
+  });
 });

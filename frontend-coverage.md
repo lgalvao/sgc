@@ -5,12 +5,12 @@ Este documento apresenta o estado atual da cobertura de testes unitários do fro
 ## Estado Atual
 
 **Resumo Geral:**
-- **Instruções (Statements):** 92.5%
-- **Ramos (Branches):** 83.31%
+- **Instruções (Statements):** 92.53%
+- **Ramos (Branches):** 84.15%
 - **Funções (Functions):** 90.16%
 - **Linhas (Lines):** 93.77%
 
-A cobertura geral é alta, com a camada de dados (Services e Stores) praticamente completa. O esforço restante deve focar em componentes visuais (UI), tratamento de bordas em mappers e views complexas.
+A cobertura geral é alta, com a camada de dados (Services e Stores) e agora Mappers e Utils praticamente completa. O esforço restante deve focar em componentes visuais (UI) e views complexas.
 
 ## Arquivos Prioritários (Cobertura < 80% em algum critério)
 
@@ -27,12 +27,10 @@ A cobertura geral é alta, com a camada de dados (Services e Stores) praticament
 *   `TreeRowItem.vue` (Funções: 66.66%): Interatividade da árvore (expandir/colapsar).
 
 ### 2. Mappers (`src/mappers`)
-*   `processos.ts` (Branches: 66.66%): Conversão de DTOs com campos opcionais ou nulos.
-*   `usuarios.ts` (Branches: 78.26%): Mapeamento de perfis ou dados aninhados complexos.
-*   `unidades.ts` (Branches: 78.78%): Estruturas hierárquicas e tratamento de nulos.
+*   **Concluído.** (Anteriormente: `processos.ts`, `usuarios.ts`, `unidades.ts` tinham baixa cobertura. Agora estão com 100% de cobertura de branches.)
 
 ### 3. Composables (`src/composables`)
-*   `useFormErrors.ts` (Branches: 77.77%): Tratamento de erros de formulário e mensagens de validação.
+*   **Concluído.** (Anteriormente: `useFormErrors.ts` tinha baixa cobertura. Agora está com 100% de cobertura de branches.)
 
 ### 4. Router (`src/router`)
 *   `index.ts` (Branches: 75%): Guards globais (`beforeEach`) e redirecionamentos condicionais.
@@ -49,11 +47,11 @@ A cobertura geral é alta, com a camada de dados (Services e Stores) praticament
 
 ## Plano de Ação para 100% de Cobertura
 
-O trabalho deve ser executado na seguinte ordem de prioridade, focando no retorno rápido de cobertura (Mappers/Utils) antes de atacar componentes complexos.
+O trabalho deve ser executado na seguinte ordem de prioridade.
 
 ### Passo 1: Mappers e Utils (Correções Rápidas)
-*   **Ação:** Criar casos de teste com objetos de entrada variados (nulos, arrays vazios, dados parciais).
-*   **Alvo:** `processos.ts`, `usuarios.ts`, `unidades.ts`, `useFormErrors.ts`.
+*   **Status:** Concluído.
+*   **Resultados:** `processos.ts`, `usuarios.ts`, `unidades.ts`, `useFormErrors.ts` agora possuem 100% de cobertura de branches.
 
 ### Passo 2: Componentes Isolados
 *   **Ação:** Testar renderização condicional (v-if/v-else) e emissão de eventos.
