@@ -13,18 +13,11 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.AtividadeService;
-import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.service.MapaService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
-import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
-import sgc.subprocesso.mapper.SubprocessoMapper;
-import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.decomposed.SubprocessoCrudService;
 import sgc.subprocesso.service.decomposed.SubprocessoDetalheService;
 import sgc.subprocesso.service.decomposed.SubprocessoValidacaoService;
@@ -40,31 +33,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes Unitários para SubprocessoService")
 class SubprocessoServiceTest {
-
-    @Mock
-    private SubprocessoRepo repositorioSubprocesso;
-    @Mock
-    private AtividadeService atividadeService;
-    @Mock
-    private CompetenciaService competenciaService;
-    @Mock
-    private SubprocessoMapper subprocessoMapper;
-    @Mock
-    private MapaService mapaService;
-    @Mock
-    private MovimentacaoRepo repositorioMovimentacao;
     @Mock
     private UsuarioService usuarioService;
-    @Mock
-    private SubprocessoPermissoesService subprocessoPermissoesService;
-    @Mock
-    private SubprocessoDetalheMapper subprocessoDetalheMapper;
-    @Mock
-    private sgc.subprocesso.mapper.MapaAjusteMapper mapaAjusteMapper;
-    @Mock
-    private sgc.analise.AnaliseService analiseService;
-
-    // Decomposed services mocks
     @Mock
     private SubprocessoCrudService crudService;
     @Mock
@@ -120,7 +90,7 @@ class SubprocessoServiceTest {
             List<AtividadeVisualizacaoDto> result = service.listarAtividadesSubprocesso(1L);
 
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).getDescricao()).isEqualTo("Atividade Teste");
+            assertThat(result.getFirst().getDescricao()).isEqualTo("Atividade Teste");
         }
 
         @Test
@@ -307,7 +277,7 @@ class SubprocessoServiceTest {
         void obterPermissoesSemAutenticacao() {
             SecurityContextHolder.clearContext();
             org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () ->
-                service.obterPermissoes(1L)
+                    service.obterPermissoes(1L)
             );
         }
 
@@ -321,7 +291,7 @@ class SubprocessoServiceTest {
             SecurityContextHolder.setContext(securityContext);
 
             org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () ->
-                service.obterPermissoes(1L)
+                    service.obterPermissoes(1L)
             );
         }
     }
