@@ -72,6 +72,10 @@ public class SubprocessoMapaController {
     public ImpactoMapaDto verificarImpactos(
             @PathVariable Long codigo, @AuthenticationPrincipal Object principal) {
 
+        if (principal == null) {
+            throw new sgc.comum.erros.ErroAccessoNegado("Usuário não autenticado");
+        }
+
         String tituloUsuario = extractTituloUsuario(principal);
 
         Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);

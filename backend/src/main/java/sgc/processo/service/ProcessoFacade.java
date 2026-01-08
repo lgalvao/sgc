@@ -349,7 +349,7 @@ public class ProcessoFacade {
     // ========== MÉTODOS PRIVADOS DE VALIDAÇÃO (usados apenas em criar/atualizar) ==========
 
     private Optional<String> getMensagemErroUnidadesSemMapa(List<Long> codigosUnidades) {
-        if (codigosUnidades.isEmpty()) {
+        if (codigosUnidades == null || codigosUnidades.isEmpty()) {
             return Optional.empty();
         }
         List<Unidade> unidades = unidadeService.buscarEntidadesPorIds(codigosUnidades);

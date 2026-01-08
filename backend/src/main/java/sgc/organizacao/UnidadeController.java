@@ -135,6 +135,9 @@ public class UnidadeController {
     @GetMapping("/{codigo}/arvore")
     public ResponseEntity<UnidadeDto> buscarArvoreUnidade(@PathVariable Long codigo) {
         UnidadeDto unidade = unidadeService.buscarArvore(codigo);
+        if (unidade == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(unidade);
     }
 
@@ -159,6 +162,9 @@ public class UnidadeController {
     @GetMapping("/sigla/{sigla}/superior")
     public ResponseEntity<String> buscarSiglaSuperior(@PathVariable String sigla) {
         String siglaSuperior = unidadeService.buscarSiglaSuperior(sigla);
+        if (siglaSuperior == null) {
+            return ResponseEntity.noContent().build();
+        }
         return ResponseEntity.ok(siglaSuperior);
     }
 }

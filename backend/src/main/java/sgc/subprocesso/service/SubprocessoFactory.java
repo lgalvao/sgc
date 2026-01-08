@@ -107,6 +107,9 @@ public class SubprocessoFactory {
         
         // 2. Copiar mapa COM referência ao subprocesso
         Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente);
+        if (mapaCopiado == null) {
+            throw new ErroProcesso("Falha ao copiar mapa vigente para unidade %s".formatted(unidade.getSigla()));
+        }
         
         mapaCopiado.setSubprocesso(subprocessoSalvo);
         Mapa mapaSalvo = mapaRepo.save(mapaCopiado);

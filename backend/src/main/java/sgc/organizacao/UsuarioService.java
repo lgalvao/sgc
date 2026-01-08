@@ -390,9 +390,7 @@ public class UsuarioService {
         }
 
         Long codUnidade = request.getUnidadeCodigo();
-        if (!unidadeService.existePorId(codUnidade)) {
-            throw new ErroValidacao("Unidade informada não existe: " + codUnidade);
-        }
+        Unidade unidade = unidadeService.buscarEntidadePorId(codUnidade);
 
         List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoesInterno(request.getTituloEleitoral());
 

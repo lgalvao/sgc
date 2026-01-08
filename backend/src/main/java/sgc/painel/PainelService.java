@@ -60,6 +60,10 @@ public class PainelService {
         if (perfil == Perfil.ADMIN) {
             processos = processoFacade.listarTodos(sortedPageable);
         } else {
+            if (codigoUnidade == null) {
+                return Page.empty(sortedPageable);
+            }
+            
             List<Long> unidadeIds = new ArrayList<>();
             
             // GESTOR vê processos da unidade e subordinadas
@@ -225,7 +229,7 @@ public class PainelService {
                 var unidade = unidadeService.buscarPorCodigo(codigoUnidade);
                 return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
             } catch (Exception e) {
-                return "/processo/" + processo.getCodigo();
+                return null;
             }
         }
         return "/processo/" + processo.getCodigo();

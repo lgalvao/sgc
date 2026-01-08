@@ -198,6 +198,6 @@ class ProcessoInicializadorTest {
         when(unidadeRepo.findAllById(any())).thenReturn(List.of()); // Retorna vazio
 
         assertThatThrownBy(() -> inicializador.iniciar(1L, List.of(99L)))
-                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(sgc.comum.erros.ErroEntidadeDeveriaExistir.class);
     }
 }

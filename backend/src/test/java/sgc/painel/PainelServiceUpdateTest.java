@@ -64,7 +64,8 @@ class PainelServiceUpdateTest {
         @DisplayName("Deve retornar vazio se codigoUnidade nulo para não-ADMIN")
         void vazioSeUnidadeNula() {
             Page<ProcessoResumoDto> res = service.listarProcessos(Perfil.SERVIDOR, null, PageRequest.of(0, 10));
-            assertThat(res).isEmpty();
+            assertThat(res).isNotNull();
+            assertThat(res.getContent()).isEmpty();
         }
 
         @Test

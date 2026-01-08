@@ -480,7 +480,7 @@ class UnidadeServiceTest {
             
             Unidade u1 = new Unidade(); u1.setCodigo(1L);
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(usuarioMapper.toUnidadeDto(u1)).thenReturn(pai);
+            when(usuarioMapper.toUnidadeDto(u1, true)).thenReturn(pai);
             
             assertThat(service.buscarArvore(999L)).isNull();
         }
@@ -493,7 +493,7 @@ class UnidadeServiceTest {
             
             Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setSigla("PAI");
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(usuarioMapper.toUnidadeDto(u1)).thenReturn(pai);
+            when(usuarioMapper.toUnidadeDto(u1, true)).thenReturn(pai);
             
             assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglasSubordinadas("INVALIDA"));
         }
@@ -531,8 +531,8 @@ class UnidadeServiceTest {
         filho.setUnidadeSuperior(pai);
         
         when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(pai, filho));
-        when(usuarioMapper.toUnidadeDto(pai)).thenReturn(UnidadeDto.builder().codigo(1L).sigla("PAI").subunidades(new ArrayList<>()).build());
-        when(usuarioMapper.toUnidadeDto(filho)).thenReturn(UnidadeDto.builder().codigo(2L).sigla("FILHO").subunidades(new ArrayList<>()).build());
+        when(usuarioMapper.toUnidadeDto(pai, true)).thenReturn(UnidadeDto.builder().codigo(1L).sigla("PAI").subunidades(new ArrayList<>()).build());
+        when(usuarioMapper.toUnidadeDto(filho, true)).thenReturn(UnidadeDto.builder().codigo(2L).sigla("FILHO").subunidades(new ArrayList<>()).build());
         
         // Act
         List<UnidadeDto> res = service.buscarTodasUnidades();

@@ -60,9 +60,7 @@ public class SubprocessoWorkflowService {
 
         if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
             if (subprocesso.getProcesso() == null) {
-                throw new sgc.comum.erros.ErroEstadoImpossivel(
-                        "Subprocesso %d existe mas não possui Processo associado - violação de invariante"
-                        .formatted(subprocesso.getCodigo()));
+                throw new sgc.comum.erros.ErroEntidadeNaoEncontrada("Processo associado não encontrado para subprocesso %d".formatted(subprocesso.getCodigo()));
             }
             var tipoProcesso = subprocesso.getProcesso().getTipo();
             if (tipoProcesso == TipoProcesso.MAPEAMENTO) {

@@ -49,6 +49,10 @@ public class AtividadeService {
         Mapa mapa = mapaRepo.findById(atividadeDto.getMapaCodigo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_MAPA, atividadeDto.getMapaCodigo()));
 
+        if (mapa.getSubprocesso() == null) {
+            throw new ErroEntidadeNaoEncontrada("Subprocesso", null);
+        }
+
         notificarAlteracaoMapa(atividadeDto.getMapaCodigo());
 
         Atividade entidade = atividadeMapper.toEntity(atividadeDto);

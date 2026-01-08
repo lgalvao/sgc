@@ -86,7 +86,8 @@ class PainelServiceTest {
     @DisplayName("listarProcessos não ADMIN retorna vazio se unidade for nula")
     void listarProcessos_NaoAdminSemUnidade() {
         Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, null, PageRequest.of(0, 10));
-        assertThat(result).isEmpty();
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).isEmpty();
     }
 
     @Test

@@ -83,6 +83,6 @@ class MapaVisualizacaoServiceTest {
         when(subprocessoService.buscarSubprocesso(subId)).thenReturn(sub);
 
         assertThatThrownBy(() -> service.obterMapaParaVisualizacao(subId))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
     }
 }

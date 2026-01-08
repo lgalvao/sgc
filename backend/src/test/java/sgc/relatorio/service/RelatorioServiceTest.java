@@ -113,6 +113,7 @@ class RelatorioServiceTest {
         Unidade u = new Unidade();
         u.setSigla("U1");
         u.setNome("Unidade 1");
+        u.setCodigo(1L);
 
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(u);
@@ -135,7 +136,7 @@ class RelatorioServiceTest {
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioMapas(1L, null, out);
+        relatorioService.gerarRelatorioMapas(1L, 1L, out);
         verify(document, atLeastOnce()).add(any());
     }
 
@@ -167,7 +168,7 @@ class RelatorioServiceTest {
     void deveIgnorarSubprocessoSemMapa() {
         when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
-        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1");
+        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1"); u.setCodigo(1L);
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(u);
         sp.setMapa(null); // Mapa nulo
@@ -176,7 +177,7 @@ class RelatorioServiceTest {
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
 
         OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioMapas(1L, null, out);
+        relatorioService.gerarRelatorioMapas(1L, 1L, out);
         verify(document, atLeastOnce()).add(any());
     }
 
@@ -185,7 +186,7 @@ class RelatorioServiceTest {
     void deveProcessarCompetenciaSemAtividades() {
         when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
-        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1");
+        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1"); u.setCodigo(1L);
         Subprocesso sp = new Subprocesso(); sp.setUnidade(u); sp.setMapa(new Mapa()); sp.getMapa().setCodigo(10L);
 
         Competencia c = new Competencia();
@@ -197,7 +198,7 @@ class RelatorioServiceTest {
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioMapas(1L, null, out);
+        relatorioService.gerarRelatorioMapas(1L, 1L, out);
         verify(document, atLeastOnce()).add(any());
     }
 
@@ -206,7 +207,7 @@ class RelatorioServiceTest {
     void deveProcessarAtividadeSemConhecimentos() {
         when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
-        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1");
+        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1"); u.setCodigo(1L);
         Subprocesso sp = new Subprocesso(); sp.setUnidade(u); sp.setMapa(new Mapa()); sp.getMapa().setCodigo(10L);
 
         Competencia c = new Competencia();
@@ -221,7 +222,7 @@ class RelatorioServiceTest {
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioMapas(1L, null, out);
+        relatorioService.gerarRelatorioMapas(1L, 1L, out);
         verify(document, atLeastOnce()).add(any());
     }
 
