@@ -1,0 +1,950 @@
+# Plano de Refatoração de Segurança e Controle de Acesso - SGC
+
+**Data:** 2026-01-08  
+**Versão:** 1.0  
+**Status:** Proposta Inicial
+
+---
+
+## 1. SUMÁRIO EXECUTIVO
+
+### 1.1 Situação Atual
+
+O sistema SGC implementa controle de acesso através de uma **abordagem híbrida** que mistura:
+
+1. **Controle Declarativo**: Uso de anotações `@PreAuthorize` nos controllers (Spring Security)
+2. **Controle Programático**: Verificações imperativas em services usando `ErroAccessoNegado`
+3. **Controle por Estado**: Validações baseadas na situação do subprocesso (`SituacaoSubprocesso`)
+4. **Controle Hierárquico**: Verificações baseadas na hierarquia de unidades organizacionais
+
+Esta abordagem híbrida resultou em **inconsistências significativas** que comprometem:
+- **Manutenibilidade**: Lógica de segurança espalhada em múltiplas camadas
+- **Auditabilidade**: Difícil rastrear todas as verificações de acesso
+- **Testabilidade**: Necessidade de testar segurança em múltiplos níveis
+- **Clareza**: Difícil entender rapidamente quem pode fazer o quê
+
+### 1.2 Problemas Identificados
+
+#### Problema 1: Inconsistência entre Declarativo e Programático
+- **Localização**: Controllers vs Services
+- **Exemplo**: `SubprocessoCadastroController.disponibilizarCadastro()` tem `@PreAuthorize("hasRole('CHEFE')")` mas o service faz verificações adicionais
+- **Impacto**: Duplicação de lógica, risco de bypass
+
+#### Problema 2: Verificações de Acesso Dispersas
+- **Arquivos com lógica de acesso identificados**: 22 arquivos
+- **Padrões diferentes**:
+  - `MapaAcessoService.verificarAcessoImpacto()`: Verifica perfil + situação
+  - `SubprocessoPermissoesService.calcularPermissoes()`: Retorna DTO com flags booleanas
+  - `ProcessoFacade.checarAcesso()`: Verifica authentication + hierarquia
+  - `SubprocessoDetalheService.verificarPermissaoVisualizacao()`: Verifica perfil + unidade
+  - Controllers: Uso direto de `@PreAuthorize`
+
+#### Problema 3: Controle de Acesso Baseado em Estado Complexo
+- **SituacaoSubprocesso**: 15 estados diferentes
+- **Cada ação** tem regras específicas de situação permitida
+- **Exemplos**:
+  - "Disponibilizar cadastro" só em `CADASTRO_EM_ANDAMENTO`
+  - "Impactos no mapa" depende de perfil + múltiplas situações
+  - Sem centralização clara dessas regras
+
+#### Problema 4: Mistura de Responsabilidades
+- **Controllers**: Deveriam apenas validar permissões básicas de role
+- **Services**: Contém regras de negócio + regras de acesso
+- **Resultado**: Violação do Single Responsibility Principle
+
+#### Problema 5: Falta de Abstração para Hierarquia
+- **Verificações hierárquicas** espalhadas:
+  - `SubprocessoPermissoesService.isSubordinada()`
+  - `ProcessoFacade.buscarCodigosDescendentes()`
+  - `SubprocessoDetalheService.isMesmaUnidadeOuSubordinada()`
+- **Problema**: Lógica duplicada, sem serviço centralizado
+
+#### Problema 6: Ausência de Auditoria de Acesso
+- **Não há logging** de decisões de acesso negado
+- **Difícil rastrear**: Quem tentou acessar o quê e quando
+- **Compliance**: Impossível auditar acessos para conformidade
+
+---
+
+## 2. INVENTÁRIO COMPLETO DE CONTROLE DE ACESSO
+
+### 2.1 Perfis do Sistema
+
+```java
+public enum Perfil {
+    ADMIN,    // Administrador do sistema (SEDOC)
+    GESTOR,   // Gestor de unidade intermediária
+    CHEFE,    // Chefe de unidade operacional/interoperacional
+    SERVIDOR  // Servidor lotado em unidade
+}
+```
+
+### 2.2 Matriz de Permissões por Endpoint
+
+| Endpoint | Controller | Annotation Atual | Verificações Adicionais |
+|----------|-----------|------------------|-------------------------|
+| **USUÁRIOS** |
+| `GET /api/usuarios/administradores` | UsuarioController | `@PreAuthorize("hasRole('ADMIN')")` | Nenhuma |
+| `POST /api/usuarios/administradores` | UsuarioController | `@PreAuthorize("hasRole('ADMIN')")` | Nenhuma |
+| `POST /api/usuarios/administradores/{id}/remover` | UsuarioController | `@PreAuthorize("hasRole('ADMIN')")` | Não pode remover a si mesmo |
+| **PROCESSOS** |
+| `POST /api/processos` | ProcessoController | Nenhuma | ❌ Sem controle |
+| `GET /api/processos/{id}` | ProcessoController | Nenhuma | ❌ Sem controle |
+| `POST /api/processos/{id}/atualizar` | ProcessoController | Nenhuma | ❌ Sem controle |
+| `POST /api/processos/{id}/excluir` | ProcessoController | Nenhuma | ❌ Sem controle |
+| `POST /api/processos/{id}/iniciar` | ProcessoController | Nenhuma | ❌ Sem controle |
+| `POST /api/processos/{id}/finalizar` | ProcessoController | Nenhuma | ❌ Sem controle |
+| `POST /api/processos/{id}/enviar-lembrete` | ProcessoController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| **SUBPROCESSOS - CRUD** |
+| `GET /api/subprocessos` | SubprocessoCrudController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| `GET /api/subprocessos/{id}` | SubprocessoCrudController | `@PreAuthorize("isAuthenticated()")` | ✅ Verifica perfil + unidade no service |
+| `POST /api/subprocessos` | SubprocessoCrudController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| `POST /api/subprocessos/{id}/atualizar` | SubprocessoCrudController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| `POST /api/subprocessos/{id}/excluir` | SubprocessoCrudController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| `POST /api/subprocessos/{id}/alterar-data-limite` | SubprocessoCrudController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| `POST /api/subprocessos/{id}/reabrir-cadastro` | SubprocessoCrudController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| `POST /api/subprocessos/{id}/reabrir-revisao` | SubprocessoCrudController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| **SUBPROCESSOS - CADASTRO** |
+| `POST /api/subprocessos/{id}/cadastro/disponibilizar` | SubprocessoCadastroController | `@PreAuthorize("hasRole('CHEFE')")` | ⚠️ Verifica unidade + situação |
+| `POST /api/subprocessos/{id}/revisao/disponibilizar` | SubprocessoCadastroController | `@PreAuthorize("hasRole('CHEFE')")` | ⚠️ Verifica unidade + situação |
+| `POST /api/subprocessos/{id}/cadastro/devolver` | SubprocessoCadastroController | `@PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")` | ⚠️ Verifica hierarquia |
+| `POST /api/subprocessos/{id}/cadastro/aceitar` | SubprocessoCadastroController | `@PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")` | ⚠️ Verifica hierarquia |
+| `POST /api/subprocessos/{id}/cadastro/homologar` | SubprocessoCadastroController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| `POST /api/subprocessos/{id}/revisao-cadastro/devolver` | SubprocessoCadastroController | `@PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")` | ⚠️ Verifica hierarquia |
+| `POST /api/subprocessos/{id}/revisao-cadastro/aceitar` | SubprocessoCadastroController | `@PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")` | ⚠️ Verifica hierarquia |
+| `POST /api/subprocessos/{id}/revisao-cadastro/homologar` | SubprocessoCadastroController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| `POST /api/processos/{id}/cadastro/aceitar-em-bloco` | SubprocessoCadastroController | `@PreAuthorize("hasAnyRole('GESTOR', 'ADMIN')")` | ⚠️ Verifica hierarquia |
+| `POST /api/processos/{id}/cadastro/homologar-em-bloco` | SubprocessoCadastroController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| **SUBPROCESSOS - VALIDAÇÃO/MAPA** |
+| `POST /api/subprocessos/{id}/disponibilizar-mapa` | SubprocessoValidacaoController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| `POST /api/subprocessos/{id}/apresentar-sugestoes` | SubprocessoValidacaoController | `@PreAuthorize("hasRole('CHEFE')")` | ⚠️ Verifica unidade |
+| `POST /api/subprocessos/{id}/validar-mapa` | SubprocessoValidacaoController | `@PreAuthorize("hasRole('CHEFE')")` | ⚠️ Verifica unidade |
+| `POST /api/subprocessos/{id}/mapa/devolver` | SubprocessoValidacaoController | `@PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")` | ⚠️ Verifica hierarquia |
+| `POST /api/subprocessos/{id}/mapa/aceitar` | SubprocessoValidacaoController | `@PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")` | ⚠️ Verifica hierarquia |
+| `POST /api/subprocessos/{id}/mapa/homologar` | SubprocessoValidacaoController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| `POST /api/subprocessos/{id}/ajustar-mapa` | SubprocessoValidacaoController | `@PreAuthorize("hasRole('ADMIN')")` | ⚠️ Verifica situação |
+| `POST /api/processos/{id}/mapa/aceitar-em-bloco` | SubprocessoValidacaoController | `@PreAuthorize("hasRole('GESTOR')")` | ⚠️ Verifica hierarquia |
+| `POST /api/processos/{id}/mapa/homologar-em-bloco` | SubprocessoValidacaoController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| **ATIVIDADES/CONHECIMENTOS** |
+| `POST /api/atividades` | AtividadeController | Nenhuma | ⚠️ Verifica no service |
+| `POST /api/atividades/{id}/atualizar` | AtividadeController | Nenhuma | ⚠️ Verifica no service |
+| `POST /api/atividades/{id}/excluir` | AtividadeController | Nenhuma | ⚠️ Verifica no service |
+| `POST /api/atividades/{id}/conhecimentos` | AtividadeController | Nenhuma | ⚠️ Verifica no service |
+| **MAPAS** |
+| `GET /api/mapas` | MapaController | Nenhuma | ❌ Sem controle |
+| `GET /api/mapas/{id}` | MapaController | Nenhuma | ❌ Sem controle |
+| `POST /api/mapas` | MapaController | Nenhuma | ❌ Sem controle |
+| `POST /api/mapas/{id}/atualizar` | MapaController | Nenhuma | ❌ Sem controle |
+| `POST /api/mapas/{id}/excluir` | MapaController | Nenhuma | ❌ Sem controle |
+| **RELATÓRIOS** |
+| `GET /api/relatorios/andamento/{id}` | RelatorioController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| `GET /api/relatorios/mapas/{id}` | RelatorioController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| **CONFIGURAÇÕES** |
+| `GET /api/configuracoes` | ConfiguracaoController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| `POST /api/configuracoes` | ConfiguracaoController | `@PreAuthorize("hasRole('ADMIN')")` | ✅ Correto |
+| **PAINEL** |
+| `GET /api/painel/processos` | PainelController | Nenhuma | ⚠️ Filtra por perfil/unidade |
+| `GET /api/painel/alertas` | PainelController | Nenhuma | ⚠️ Filtra por usuário/unidade |
+
+**Legenda:**
+- ✅ **Correto**: Apenas controle declarativo adequado
+- ⚠️ **Híbrido**: Controle declarativo + programático adicional
+- ❌ **Sem controle**: Nenhuma verificação de permissão
+
+### 2.3 Services com Lógica de Acesso
+
+| Service | Métodos de Verificação | Padrão Utilizado |
+|---------|------------------------|------------------|
+| `MapaAcessoService` | `verificarAcessoImpacto(Usuario, Subprocesso)` | Programático: Verifica perfil + situação |
+| `SubprocessoPermissoesService` | `calcularPermissoes(Subprocesso, Usuario)` | Programático: Retorna DTO com flags |
+| `SubprocessoPermissoesService` | `validar(Subprocesso, Long, String)` | Programático: Lança exceção |
+| `ProcessoFacade` | `checarAcesso(Authentication, Long)` | Programático: Verifica hierarquia |
+| `SubprocessoDetalheService` | `verificarPermissaoVisualizacao(Subprocesso, Perfil, Usuario)` | Programático: Verifica perfil + unidade |
+| `SubprocessoCadastroWorkflowService` | Verificações inline em múltiplos métodos | Ad-hoc |
+| `AtividadeFacade` | `validarPermissaoEdicaoMapa()` (delegado) | Programático |
+| `ImpactoMapaService` | Delega para `MapaAcessoService` | Programático |
+
+### 2.4 Regras de Acesso por CDU
+
+| CDU | Descrição | Ator(es) | Regras de Acesso Especiais |
+|-----|-----------|----------|----------------------------|
+| CDU-03 | Manter processo | ADMIN | Criar/Editar/Excluir processos |
+| CDU-08 | Manter cadastro de atividades | CHEFE | Apenas da própria unidade + situação adequada |
+| CDU-09 | Apresentar sugestões ao mapa | CHEFE | Apenas da própria unidade + situação `MAPA_DISPONIBILIZADO` |
+| CDU-10 | Validar mapa | CHEFE | Apenas da própria unidade + situação `MAPA_DISPONIBILIZADO` |
+| CDU-12 | Verificar impactos no mapa | CHEFE/GESTOR/ADMIN | Perfil + situação específica (ver `MapaAcessoService`) |
+| CDU-13 | Analisar cadastro de atividades | GESTOR/ADMIN | Apenas de unidades subordinadas |
+| CDU-14 | Analisar revisão de cadastro | GESTOR/ADMIN | Apenas de unidades subordinadas |
+| CDU-15 | Analisar validação de mapa | GESTOR/ADMIN | Apenas de unidades subordinadas |
+| CDU-16 | Ajustar mapa de competências | ADMIN | Situação `CADASTRO_HOMOLOGADO` ou `REVISAO_CADASTRO_HOMOLOGADA` |
+| CDU-21 | Finalizar processo | ADMIN | Processo em andamento |
+| CDU-34 | Enviar lembrete | ADMIN | - |
+| CDU-35 | Relatório de andamento | ADMIN | - |
+| CDU-36 | Relatório de mapas | ADMIN | - |
+
+---
+
+## 3. ARQUITETURA PROPOSTA
+
+### 3.1 Princípios de Design
+
+1. **Separação de Responsabilidades**
+   - Controllers: Apenas autenticação básica via `@PreAuthorize`
+   - Services: Regras de negócio (SEM verificações de acesso)
+   - Camada de Segurança: Todas as verificações de acesso centralizadas
+
+2. **Fail-Safe Defaults**
+   - Por padrão, acesso negado
+   - Permissões explícitas devem ser concedidas
+
+3. **Auditabilidade**
+   - Todas as decisões de acesso devem ser logadas
+   - Incluir: usuário, ação, recurso, resultado, timestamp
+
+4. **Testabilidade**
+   - Lógica de acesso deve ser facilmente testável
+   - Testes unitários devem cobrir todos os cenários
+
+### 3.2 Camadas de Segurança
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     CAMADA 1: HTTP                          │
+│  ConfigSeguranca - Proteção de endpoints básica             │
+│  @PreAuthorize nos Controllers - Verificação de roles       │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                CAMADA 2: AUTORIZAÇÃO DE AÇÃO                │
+│  AccessControlService - Centraliza TODAS as verificações    │
+│  - Verifica role necessária                                 │
+│  - Verifica ownership (unidade do usuário)                  │
+│  - Verifica hierarquia (subordinação)                       │
+│  - Verifica estado do recurso (SituacaoSubprocesso)         │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│              CAMADA 3: REGRAS DE NEGÓCIO                    │
+│  Services - Executam lógica de negócio                      │
+│  SEM verificações de acesso (já feitas na Camada 2)         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 3.3 Componentes Novos
+
+#### 3.3.1 `AccessControlService`
+**Responsabilidade**: Centralizar TODAS as verificações de acesso
+
+```java
+@Service
+public class AccessControlService {
+    
+    /**
+     * Verifica se o usuário pode executar uma ação em um recurso.
+     * 
+     * @param usuario O usuário autenticado
+     * @param acao A ação a ser executada (enum)
+     * @param recurso O recurso alvo (Subprocesso, Processo, etc.)
+     * @throws ErroAccessoNegado se não tiver permissão
+     */
+    public void verificarPermissao(Usuario usuario, Acao acao, Object recurso) {
+        // Implementação centralizada
+    }
+    
+    /**
+     * Verifica se o usuário PODE (sem lançar exceção)
+     */
+    public boolean podeExecutar(Usuario usuario, Acao acao, Object recurso) {
+        // Retorna boolean
+    }
+}
+```
+
+#### 3.3.2 `Acao` (Enum)
+**Responsabilidade**: Enumerar todas as ações possíveis no sistema
+
+```java
+public enum Acao {
+    // Processo
+    CRIAR_PROCESSO,
+    EDITAR_PROCESSO,
+    EXCLUIR_PROCESSO,
+    INICIAR_PROCESSO,
+    FINALIZAR_PROCESSO,
+    ENVIAR_LEMBRETE_PROCESSO,
+    
+    // Subprocesso - Cadastro
+    VISUALIZAR_SUBPROCESSO,
+    EDITAR_CADASTRO,
+    DISPONIBILIZAR_CADASTRO,
+    DEVOLVER_CADASTRO,
+    ACEITAR_CADASTRO,
+    HOMOLOGAR_CADASTRO,
+    
+    // Subprocesso - Mapa
+    VISUALIZAR_MAPA,
+    VERIFICAR_IMPACTOS,
+    APRESENTAR_SUGESTOES,
+    VALIDAR_MAPA,
+    DEVOLVER_MAPA,
+    ACEITAR_MAPA,
+    HOMOLOGAR_MAPA,
+    AJUSTAR_MAPA,
+    
+    // Atividades
+    CRIAR_ATIVIDADE,
+    EDITAR_ATIVIDADE,
+    EXCLUIR_ATIVIDADE,
+    
+    // Admin
+    REABRIR_CADASTRO,
+    REABRIR_REVISAO,
+    ALTERAR_DATA_LIMITE,
+    GERAR_RELATORIO
+}
+```
+
+#### 3.3.3 `AccessPolicy` (Interface)
+**Responsabilidade**: Definir políticas de acesso específicas
+
+```java
+public interface AccessPolicy<T> {
+    boolean canExecute(Usuario usuario, Acao acao, T recurso);
+    String getMotivoNegacao();
+}
+
+// Implementações:
+// - ProcessoAccessPolicy
+// - SubprocessoAccessPolicy
+// - MapaAccessPolicy
+// - AtividadeAccessPolicy
+```
+
+#### 3.3.4 `HierarchyService`
+**Responsabilidade**: Gerenciar hierarquia de unidades (centralizado)
+
+```java
+@Service
+public class HierarchyService {
+    boolean isSubordinada(Unidade alvo, Unidade superior);
+    List<Unidade> buscarSubordinadas(Unidade raiz);
+    List<Long> buscarCodigosHierarquia(Long codUnidade);
+}
+```
+
+#### 3.3.5 `AccessAuditService`
+**Responsabilidade**: Auditar todas as decisões de acesso
+
+```java
+@Service
+public class AccessAuditService {
+    void logAccessGranted(Usuario usuario, Acao acao, Object recurso);
+    void logAccessDenied(Usuario usuario, Acao acao, Object recurso, String motivo);
+}
+```
+
+---
+
+## 4. PLANO DE EXECUÇÃO - SPRINTS
+
+### Sprint 1: Fundação e Infraestrutura (Estimativa: 3-5 dias)
+
+**Objetivo**: Criar os componentes centrais de segurança sem quebrar funcionalidade existente
+
+#### Tarefas:
+1. **Criar `Acao` enum** com todas as ações do sistema
+   - Mapear CDUs → Ações
+   - Documentar cada ação
+
+2. **Criar `HierarchyService`**
+   - Consolidar lógica de hierarquia dispersa
+   - Testes unitários abrangentes
+   - Migrar código existente para usar este serviço
+
+3. **Criar `AccessAuditService`**
+   - Implementar logging estruturado
+   - Definir formato de log (JSON para análise)
+   - Integrar com SLF4J
+
+4. **Criar estrutura de `AccessPolicy`**
+   - Interface base
+   - Implementação inicial vazia (sempre retorna true)
+   - Testes de infraestrutura
+
+5. **Criar `AccessControlService` (skeleton)**
+   - Estrutura básica
+   - Delega para policies
+   - Integra com audit
+
+**Entregáveis**:
+- [ ] Código das 5 novas classes/interfaces
+- [ ] Testes unitários (cobertura > 80%)
+- [ ] Documentação JavaDoc completa
+- [ ] PR com revisão de código
+
+**Validação**:
+- Todos os testes existentes continuam passando
+- Nenhuma funcionalidade quebrada
+
+---
+
+### Sprint 2: Migração de Verificações de Subprocesso (Estimativa: 5-7 dias)
+
+**Objetivo**: Migrar verificações de acesso de subprocessos para o novo modelo
+
+#### Tarefas:
+1. **Implementar `SubprocessoAccessPolicy`**
+   - Consolidar lógica de `SubprocessoPermissoesService`
+   - Consolidar lógica de `MapaAcessoService`
+   - Mapear SituacaoSubprocesso → Ações permitidas
+   - Matriz de permissões completa
+
+2. **Atualizar `SubprocessoCadastroController`**
+   - Remover verificações programáticas
+   - Adicionar chamadas a `AccessControlService` nos services
+   - Manter `@PreAuthorize` existentes
+
+3. **Atualizar `SubprocessoValidacaoController`**
+   - Mesmo processo acima
+
+4. **Atualizar `SubprocessoMapaController`**
+   - Mesmo processo acima
+
+5. **Atualizar `SubprocessoCrudController`**
+   - Mesmo processo acima
+
+6. **Deprecar métodos antigos**
+   - `SubprocessoPermissoesService.validar()` → usar `AccessControlService`
+   - `MapaAcessoService.verificarAcessoImpacto()` → usar `AccessControlService`
+
+**Entregáveis**:
+- [ ] `SubprocessoAccessPolicy` implementada e testada
+- [ ] 4 controllers atualizados
+- [ ] Services limpos de lógica de acesso
+- [ ] Testes de integração atualizados
+- [ ] PR com revisão de código
+
+**Validação**:
+- Testes E2E de subprocessos passam
+- Verificação manual: CHEFE consegue disponibilizar cadastro
+- Verificação manual: GESTOR consegue aceitar/devolver
+- Verificação manual: ADMIN consegue homologar
+
+---
+
+### Sprint 3: Migração de Processos e Atividades (Estimativa: 4-6 dias)
+
+**Objetivo**: Completar migração de processos, atividades e mapas
+
+#### Tarefas:
+1. **Implementar `ProcessoAccessPolicy`**
+   - Regras de criação/edição/exclusão
+   - Regras de iniciar/finalizar
+   - Regras de enviar lembrete
+
+2. **Implementar `AtividadeAccessPolicy`**
+   - Consolidar lógica de `AtividadeFacade.validarPermissaoEdicaoMapa()`
+   - Regras baseadas em subprocesso + perfil
+
+3. **Implementar `MapaAccessPolicy`**
+   - Regras para operações diretas em mapas
+   - Integrar com `SubprocessoAccessPolicy`
+
+4. **Atualizar Controllers**
+   - `ProcessoController`: Adicionar `@PreAuthorize` faltantes
+   - `AtividadeController`: Adicionar verificações via `AccessControlService`
+   - `MapaController`: Adicionar `@PreAuthorize` + verificações
+
+5. **Remover código legacy**
+   - Métodos de verificação duplicados
+   - Lógica ad-hoc em services
+
+**Entregáveis**:
+- [ ] 3 policies implementadas
+- [ ] 3 controllers atualizados
+- [ ] Código legacy removido
+- [ ] Testes atualizados
+- [ ] PR com revisão de código
+
+**Validação**:
+- Testes E2E de processos passam
+- Testes E2E de atividades passam
+- Criação de processo só por ADMIN
+- Edição de atividades só quando permitido
+
+---
+
+### Sprint 4: Auditoria e Documentação (Estimativa: 3-4 dias)
+
+**Objetivo**: Completar auditoria, documentação e validação final
+
+#### Tarefas:
+1. **Implementar auditoria completa**
+   - Integrar `AccessAuditService` em todos os pontos
+   - Configurar níveis de log apropriados
+   - Criar dashboard/query de auditoria
+
+2. **Criar testes de segurança dedicados**
+   - Classe `SecurityIntegrationTest` para cada módulo
+   - Testar TODOS os cenários de acesso negado
+   - Testar bypass de hierarquia (GESTOR não acessa unidade não subordinada)
+   - Testar bypass de situação (CHEFE não disponibiliza em situação errada)
+
+3. **Documentação**
+   - Atualizar `AGENTS.md` com padrões de segurança
+   - Criar `docs/security-architecture.md` com arquitetura detalhada
+   - Atualizar JavaDoc de todos os componentes
+   - Criar matriz de permissões em Markdown
+
+4. **Verificação de cobertura**
+   - Cobertura de testes de segurança > 95%
+   - Análise estática com SpotBugs/PMD para vulnerabilidades
+
+5. **Revisão final**
+   - Code review completo
+   - Teste de penetração básico
+   - Validação com stakeholders
+
+**Entregáveis**:
+- [ ] Auditoria funcionando
+- [ ] Suite de testes de segurança
+- [ ] Documentação completa
+- [ ] Relatório de cobertura
+- [ ] Aprovação de revisão
+
+**Validação**:
+- Cobertura de testes > 95%
+- Todos os testes E2E passam
+- Zero vulnerabilidades de segurança detectadas
+- Aprovação do time
+
+---
+
+### Sprint 5: Refinamento e Casos Especiais (Estimativa: 2-3 dias)
+
+**Objetivo**: Tratar casos especiais e melhorias finais
+
+#### Tarefas:
+1. **Casos especiais identificados**
+   - Atribuições temporárias (sobrepõem regras normais)
+   - Ações em bloco (aceitar/homologar múltiplos subprocessos)
+   - Diagnóstico (se implementado, verificar regras)
+
+2. **Otimizações de performance**
+   - Cache de hierarquias de unidades
+   - Cache de permissões de usuário
+   - Lazy loading de verificações
+
+3. **Melhorias de UX**
+   - Mensagens de erro mais descritivas
+   - Frontend: esconder botões não permitidos (baseado em permissões)
+   - Feedback visual claro de permissões
+
+4. **Monitoramento**
+   - Métricas de acessos negados (alerta se muitos)
+   - Dashboard de auditoria
+   - Alertas de segurança
+
+**Entregáveis**:
+- [ ] Casos especiais tratados
+- [ ] Otimizações implementadas
+- [ ] Melhorias de UX
+- [ ] Monitoramento configurado
+- [ ] PR final
+
+**Validação**:
+- Performance não degradada
+- UX melhorada
+- Monitoramento funcionando
+
+---
+
+## 5. DETALHAMENTO TÉCNICO
+
+### 5.1 Implementação de `SubprocessoAccessPolicy`
+
+```java
+@Component
+public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
+    
+    private final HierarchyService hierarchyService;
+    
+    // Mapeamento: Ação → (Perfis Permitidos, Situações Permitidas)
+    private static final Map<Acao, RegrasAcao> REGRAS = Map.ofEntries(
+        entry(VISUALIZAR_SUBPROCESSO, new RegrasAcao(
+            Set.of(ADMIN, GESTOR, CHEFE, SERVIDOR),
+            Set.of(/* todas as situações */),
+            RequisitoHierarquia.MESMA_OU_SUBORDINADA
+        )),
+        entry(EDITAR_CADASTRO, new RegrasAcao(
+            Set.of(ADMIN, GESTOR, CHEFE),
+            Set.of(NAO_INICIADO, CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO),
+            RequisitoHierarquia.MESMA_UNIDADE
+        )),
+        entry(DISPONIBILIZAR_CADASTRO, new RegrasAcao(
+            Set.of(CHEFE),
+            Set.of(CADASTRO_EM_ANDAMENTO),
+            RequisitoHierarquia.MESMA_UNIDADE
+        )),
+        entry(DEVOLVER_CADASTRO, new RegrasAcao(
+            Set.of(ADMIN, GESTOR),
+            Set.of(CADASTRO_DISPONIBILIZADO),
+            RequisitoHierarquia.SUPERIOR_IMEDIATA
+        )),
+        // ... todas as outras ações
+    );
+    
+    @Override
+    public boolean canExecute(Usuario usuario, Acao acao, Subprocesso subprocesso) {
+        RegrasAcao regras = REGRAS.get(acao);
+        if (regras == null) return false;
+        
+        // 1. Verifica perfil
+        if (!temPerfilPermitido(usuario, regras.perfisPermitidos)) {
+            return false;
+        }
+        
+        // 2. Verifica situação
+        if (!regras.situacoesPermitidas.contains(subprocesso.getSituacao())) {
+            return false;
+        }
+        
+        // 3. Verifica hierarquia
+        return verificaHierarquia(usuario, subprocesso.getUnidade(), regras.requisitoHierarquia);
+    }
+    
+    private boolean temPerfilPermitido(Usuario usuario, Set<Perfil> perfisPermitidos) {
+        return usuario.getTodasAtribuicoes().stream()
+            .anyMatch(a -> perfisPermitidos.contains(a.getPerfil()));
+    }
+    
+    private boolean verificaHierarquia(Usuario usuario, Unidade unidadeAlvo, RequisitoHierarquia requisito) {
+        return switch (requisito) {
+            case NENHUM -> true;
+            case MESMA_UNIDADE -> usuario.getTodasAtribuicoes().stream()
+                .anyMatch(a -> a.getUnidade().getCodigo().equals(unidadeAlvo.getCodigo()));
+            case MESMA_OU_SUBORDINADA -> usuario.getTodasAtribuicoes().stream()
+                .anyMatch(a -> a.getUnidade().getCodigo().equals(unidadeAlvo.getCodigo())
+                    || hierarchyService.isSubordinada(unidadeAlvo, a.getUnidade()));
+            case SUPERIOR_IMEDIATA -> usuario.getTodasAtribuicoes().stream()
+                .anyMatch(a -> unidadeAlvo.getUnidadeSuperior() != null
+                    && a.getUnidade().getCodigo().equals(unidadeAlvo.getUnidadeSuperior().getCodigo()));
+        };
+    }
+    
+    @Override
+    public String getMotivoNegacao() {
+        // Retorna mensagem clara do motivo
+    }
+    
+    // Classes auxiliares
+    private record RegrasAcao(
+        Set<Perfil> perfisPermitidos,
+        Set<SituacaoSubprocesso> situacoesPermitidas,
+        RequisitoHierarquia requisitoHierarquia
+    ) {}
+    
+    private enum RequisitoHierarquia {
+        NENHUM,
+        MESMA_UNIDADE,
+        MESMA_OU_SUBORDINADA,
+        SUPERIOR_IMEDIATA
+    }
+}
+```
+
+### 5.2 Uso em Services
+
+**Antes:**
+```java
+@Service
+public class SubprocessoCadastroWorkflowService {
+    
+    public void disponibilizarCadastro(Long codSubprocesso, Usuario usuario) {
+        Subprocesso sp = repo.findById(codSubprocesso).orElseThrow();
+        
+        // Verificação manual de permissões
+        if (!usuario.hasRole("CHEFE")) {
+            throw new ErroAccessoNegado("Apenas CHEFE pode disponibilizar");
+        }
+        if (sp.getSituacao() != CADASTRO_EM_ANDAMENTO) {
+            throw new ErroAccessoNegado("Situação inválida");
+        }
+        // ... lógica de negócio
+    }
+}
+```
+
+**Depois:**
+```java
+@Service
+public class SubprocessoCadastroWorkflowService {
+    
+    private final AccessControlService accessControl;
+    
+    public void disponibilizarCadastro(Long codSubprocesso, Usuario usuario) {
+        Subprocesso sp = repo.findById(codSubprocesso).orElseThrow();
+        
+        // Verificação centralizada
+        accessControl.verificarPermissao(usuario, DISPONIBILIZAR_CADASTRO, sp);
+        
+        // ... apenas lógica de negócio
+    }
+}
+```
+
+### 5.3 Auditoria
+
+```java
+@Service
+@Slf4j
+public class AccessAuditService {
+    
+    public void logAccessGranted(Usuario usuario, Acao acao, Object recurso) {
+        log.info("ACCESS_GRANTED: user={}, action={}, resource={}, timestamp={}",
+            usuario.getTituloEleitoral(),
+            acao,
+            getResourceId(recurso),
+            Instant.now()
+        );
+    }
+    
+    public void logAccessDenied(Usuario usuario, Acao acao, Object recurso, String motivo) {
+        log.warn("ACCESS_DENIED: user={}, action={}, resource={}, reason={}, timestamp={}",
+            usuario.getTituloEleitoral(),
+            acao,
+            getResourceId(recurso),
+            motivo,
+            Instant.now()
+        );
+        
+        // Opcional: Persiste em tabela de auditoria
+        // auditRepo.save(new AuditRecord(...));
+    }
+    
+    private String getResourceId(Object recurso) {
+        if (recurso instanceof Subprocesso sp) return "Subprocesso:" + sp.getCodigo();
+        if (recurso instanceof Processo p) return "Processo:" + p.getCodigo();
+        // ...
+        return recurso.getClass().getSimpleName();
+    }
+}
+```
+
+---
+
+## 6. IMPACTO E RISCOS
+
+### 6.1 Impacto
+
+| Área | Impacto | Severidade |
+|------|---------|------------|
+| **Código** | ~22 arquivos modificados | Média |
+| **Testes** | ~50 testes atualizados, ~30 novos | Alta |
+| **Performance** | Possível melhoria (cache) | Baixa |
+| **Usuários** | Sem mudanças visíveis (mesmo comportamento) | Nenhuma |
+| **Documentação** | Documentação nova e atualizada | Baixa |
+
+### 6.2 Riscos
+
+| Risco | Probabilidade | Impacto | Mitigação |
+|-------|---------------|---------|-----------|
+| **Quebrar funcionalidade existente** | Média | Alto | Testes E2E abrangentes, sprints incrementais |
+| **Permissões muito restritivas** | Baixa | Alto | Validação com stakeholders, testes manuais |
+| **Permissões muito permissivas** | Baixa | Crítico | Code review rigoroso, testes de segurança |
+| **Performance degradada** | Baixa | Médio | Benchmarking, cache estratégico |
+| **Incompletude da migração** | Média | Alto | Checklist detalhado, revisão final |
+
+### 6.3 Estratégias de Mitigação
+
+1. **Feature Flags**: Permitir rollback rápido se necessário
+2. **Testes em Ambiente de Homologação**: Validar antes de produção
+3. **Logs Detalhados**: Monitorar mudanças em produção
+4. **Rollback Plan**: Plano claro para reverter mudanças
+
+---
+
+## 7. CRITÉRIOS DE ACEITAÇÃO
+
+### 7.1 Funcional
+
+- [ ] TODAS as funcionalidades existentes continuam funcionando
+- [ ] Nenhum endpoint sem controle de acesso
+- [ ] Mensagens de erro claras e em português
+- [ ] Logs de auditoria para todas as decisões de acesso
+
+### 7.2 Não-Funcional
+
+- [ ] Cobertura de testes de segurança > 95%
+- [ ] Zero vulnerabilidades detectadas por análise estática
+- [ ] Performance não degradada (< 5% overhead)
+- [ ] Documentação completa e atualizada
+
+### 7.3 Arquitetura
+
+- [ ] Separação clara: Controllers → AccessControl → Services
+- [ ] Nenhuma verificação de acesso em services (exceto chamada a AccessControlService)
+- [ ] Políticas de acesso centralizadas e testáveis
+- [ ] Hierarquia de unidades gerenciada centralmente
+
+---
+
+## 8. MÉTRICAS DE SUCESSO
+
+| Métrica | Valor Atual | Meta |
+|---------|-------------|------|
+| Arquivos com lógica de acesso | 22 | 5 (centralizados) |
+| Endpoints sem `@PreAuthorize` ou verificação | ~15 | 0 |
+| Padrões de verificação diferentes | 4+ | 1 |
+| Cobertura de testes de segurança | ~40% | 95%+ |
+| Tempo médio para adicionar nova regra | ~2h | ~15min |
+| Linhas de código duplicado (acesso) | ~300 | ~0 |
+
+---
+
+## 9. PRÓXIMOS PASSOS
+
+1. **Revisão deste plano** com o time de desenvolvimento
+2. **Aprovação** do plano por stakeholders
+3. **Criação de issues/tasks** no sistema de gestão de projeto
+4. **Alocação de recursos** (desenvolvedores)
+5. **Início do Sprint 1**
+
+---
+
+## 10. REFERÊNCIAS
+
+### 10.1 Documentos Consultados
+- `/reqs/cdu-*.md` - Casos de uso (CDUs 01-36)
+- `/reqs/_intro-glossario.md` - Glossário
+- `AGENTS.md` - Padrões de desenvolvimento
+- `backend/README.md` - Arquitetura do backend
+
+### 10.2 Arquivos-Chave Analisados
+- `sgc/seguranca/config/ConfigSeguranca.java`
+- `sgc/subprocesso/service/SubprocessoPermissoesService.java`
+- `sgc/mapa/service/MapaAcessoService.java`
+- `sgc/processo/service/ProcessoFacade.java`
+- Todos os controllers em `sgc/**/*Controller.java`
+
+### 10.3 Tecnologias
+- Spring Security 6
+- Spring Boot 4
+- Java 21
+
+---
+
+## APÊNDICES
+
+### Apêndice A: Checklist de Migração por Endpoint
+
+Para cada endpoint, verificar:
+- [ ] `@PreAuthorize` presente e correto no controller
+- [ ] Verificação adicional via `AccessControlService` se necessário
+- [ ] Lógica de acesso removida do service
+- [ ] Teste de segurança criado/atualizado
+- [ ] Auditoria implementada
+- [ ] Documentação atualizada
+
+### Apêndice B: Template de AccessPolicy
+
+```java
+@Component
+public class XxxAccessPolicy implements AccessPolicy<Xxx> {
+    
+    private static final Map<Acao, RegrasAcao> REGRAS = Map.ofEntries(
+        // Definir regras aqui
+    );
+    
+    @Override
+    public boolean canExecute(Usuario usuario, Acao acao, Xxx recurso) {
+        // Implementar lógica
+    }
+    
+    @Override
+    public String getMotivoNegacao() {
+        // Mensagem clara
+    }
+}
+```
+
+### Apêndice C: Template de Teste de Segurança
+
+```java
+@SpringBootTest
+@Transactional
+class XxxSecurityTest {
+    
+    @Test
+    void devePermitirAcaoParaPerfilAutorizado() {
+        // Arrange
+        Usuario usuario = criarUsuario(PERFIL_AUTORIZADO);
+        Xxx recurso = criarRecurso();
+        
+        // Act & Assert
+        assertDoesNotThrow(() -> 
+            accessControl.verificarPermissao(usuario, ACAO, recurso)
+        );
+    }
+    
+    @Test
+    void deveNegarAcaoParaPerfilNaoAutorizado() {
+        // Arrange
+        Usuario usuario = criarUsuario(PERFIL_NAO_AUTORIZADO);
+        Xxx recurso = criarRecurso();
+        
+        // Act & Assert
+        assertThrows(ErroAccessoNegado.class, () -> 
+            accessControl.verificarPermissao(usuario, ACAO, recurso)
+        );
+    }
+    
+    @Test
+    void deveNegarAcaoParaSituacaoInvalida() {
+        // ...
+    }
+    
+    @Test
+    void deveNegarAcaoParaUnidadeNaoSubordinada() {
+        // ...
+    }
+}
+```
+
+---
+
+**FIM DO DOCUMENTO**
+
+---
+
+**Nota para Execução por AI Agent:**
+
+Este plano deve ser executado de forma **incremental e iterativa**. Cada sprint deve:
+
+1. Ser executado completamente antes de iniciar o próximo
+2. Ter todos os testes passando ao final
+3. Ser revisado e aprovado antes de continuar
+4. Manter compatibilidade com código existente
+
+**Prioridades:**
+- **Não quebrar funcionalidade existente** é CRÍTICO
+- **Testes abrangentes** são OBRIGATÓRIOS
+- **Documentação clara** é ESSENCIAL
+- **Code review** deve ser rigoroso
+
+**Comandos de validação entre sprints:**
+```bash
+# Rodar todos os testes
+./gradlew test
+
+# Rodar testes E2E
+npm run test:e2e
+
+# Análise estática
+./gradlew check
+
+# Verificar cobertura
+./gradlew jacocoTestReport
+```
+
+Boa sorte! 🚀
