@@ -2,6 +2,7 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import sgc.organizacao.model.Unidade;
@@ -67,7 +68,7 @@ public class SubprocessoTransicaoService {
             Unidade origem,
             Unidade destino,
             Usuario usuario,
-            String observacoes) {
+            @Nullable String observacoes) {
 
         // 1. Salvar movimentação (atômico com a transação do chamador)
         Movimentacao movimentacao = new Movimentacao(

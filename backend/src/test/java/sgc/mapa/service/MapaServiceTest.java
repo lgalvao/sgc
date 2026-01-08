@@ -49,9 +49,7 @@ class MapaServiceTest {
         void deveListarMapas() {
             when(mapaRepo.findAll()).thenReturn(List.of(new Mapa()));
             var resultado = service.listar();
-            assertThat(resultado).isNotNull();
-            assertThat(resultado).isNotEmpty();
-            assertThat(resultado).hasSize(1);
+            assertThat(resultado).isNotNull().isNotEmpty().hasSize(1);
         }
 
         @Test
@@ -59,8 +57,7 @@ class MapaServiceTest {
         void deveRetornarListaVaziaQuandoNaoHaMapas() {
             when(mapaRepo.findAll()).thenReturn(List.of());
             var resultado = service.listar();
-            assertThat(resultado).isNotNull();
-            assertThat(resultado).isEmpty();
+            assertThat(resultado).isNotNull().isEmpty();
         }
 
         @Test
@@ -112,7 +109,8 @@ class MapaServiceTest {
         @DisplayName("Deve lançar erro ao atualizar mapa inexistente")
         void deveLancarErroAoAtualizarInexistente() {
             when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
-            assertThatThrownBy(() -> service.atualizar(1L, new Mapa()))
+            Mapa mapa = new Mapa();
+            assertThatThrownBy(() -> service.atualizar(1L, mapa))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
@@ -141,8 +139,7 @@ class MapaServiceTest {
         void deveBuscarMapaVigente() {
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(new Mapa()));
             var resultado = service.buscarMapaVigentePorUnidade(1L);
-            assertThat(resultado).isPresent();
-            assertThat(resultado.get()).isNotNull();
+            assertThat(resultado).isPresent().get().isNotNull();
         }
 
         @Test
@@ -158,8 +155,7 @@ class MapaServiceTest {
         void deveBuscarPorSubprocesso() {
             when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(new Mapa()));
             var resultado = service.buscarPorSubprocessoCodigo(1L);
-            assertThat(resultado).isPresent();
-            assertThat(resultado.get()).isNotNull();
+            assertThat(resultado).isPresent().get().isNotNull();
         }
 
         @Test
@@ -209,8 +205,7 @@ class MapaServiceTest {
 
             var resultado = service.salvarMapaCompleto(mapaId, req, "user");
 
-            assertThat(resultado).isNotNull();
-            assertThat(resultado).isSameAs(expectedDto);
+            assertThat(resultado).isNotNull().isSameAs(expectedDto);
             verify(mapaSalvamentoService).salvarMapaCompleto(mapaId, req, "user");
         }
 
