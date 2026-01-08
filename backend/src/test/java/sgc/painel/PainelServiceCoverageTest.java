@@ -21,7 +21,7 @@ import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -39,7 +39,7 @@ class PainelServiceCoverageTest {
     private PainelService service;
 
     @Mock
-    private ProcessoService processoService;
+    private ProcessoFacade processoFacade;
     @Mock
     private AlertaService alertaService;
     @Mock
@@ -60,13 +60,13 @@ class PainelServiceCoverageTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         p.setParticipantes(Set.of());
 
-        when(processoService.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
+        when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = service.listarProcessos(Perfil.GESTOR, codigoUnidade, pageable);
 
         assertThat(result.getContent()).isNotEmpty();
         verify(unidadeService).buscarIdsDescendentes(codigoUnidade);
-        verify(processoService).listarPorParticipantesIgnorandoCriado(
+        verify(processoFacade).listarPorParticipantesIgnorandoCriado(
                 argThat(list -> list.contains(1L) && list.contains(2L)), any());
     }
 
@@ -83,7 +83,7 @@ class PainelServiceCoverageTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         p.setParticipantes(Set.of());
 
-        when(processoService.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
+        when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = service.listarProcessos(Perfil.CHEFE, codigoUnidade, pageable);
 
@@ -101,7 +101,7 @@ class PainelServiceCoverageTest {
         p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         p.setTipo(TipoProcesso.MAPEAMENTO);
 
-        when(processoService.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
+        when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = service.listarProcessos(Perfil.CHEFE, codigoUnidade, pageable);
 
@@ -158,7 +158,7 @@ class PainelServiceCoverageTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         p.setParticipantes(Set.of(pai, filho));
 
-        when(processoService.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
+        when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = service.listarProcessos(Perfil.ADMIN, null, pageable);
 
@@ -187,7 +187,7 @@ class PainelServiceCoverageTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         p.setParticipantes(Set.of(filho));
 
-        when(processoService.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
+        when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = service.listarProcessos(Perfil.ADMIN, null, pageable);
 
@@ -201,7 +201,7 @@ class PainelServiceCoverageTest {
         Long raizId = 1L;
 
         // Mock para evitar NPE
-        when(processoService.listarPorParticipantesIgnorandoCriado(any(), any()))
+        when(processoFacade.listarPorParticipantesIgnorandoCriado(any(), any()))
                 .thenReturn(org.springframework.data.domain.Page.empty());
 
         // Mock da resposta otimizada (simulando que o serviço retornou os IDs corretamente)

@@ -17,7 +17,7 @@ import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 
@@ -40,7 +40,7 @@ class EventoProcessoListenerCoverageTest {
     @Mock private NotificacaoEmailService notificacaoEmailService;
     @Mock private NotificacaoModelosService notificacaoModelosService;
     @Mock private UsuarioService usuarioService;
-    @Mock private ProcessoService processoService;
+    @Mock private ProcessoFacade processoFacade;
     @Mock private SubprocessoService subprocessoService;
 
     // --- AO INICIAR PROCESSO ---
@@ -48,7 +48,7 @@ class EventoProcessoListenerCoverageTest {
     @Test
     @DisplayName("aoIniciarProcesso: deve capturar exceção geral e logar")
     void aoIniciarProcesso_Excecao() {
-        when(processoService.buscarEntidadePorId(any())).thenThrow(new RuntimeException("Erro"));
+        when(processoFacade.buscarEntidadePorId(any())).thenThrow(new RuntimeException("Erro"));
         listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
         // Se não lançar exceção, passou
     }
@@ -57,7 +57,7 @@ class EventoProcessoListenerCoverageTest {
     @DisplayName("aoIniciarProcesso: early return se lista de subprocessos vazia")
     void aoIniciarProcesso_SemSubprocessos() {
         Processo p = new Processo();
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(Collections.emptyList());
 
         listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
@@ -77,7 +77,7 @@ class EventoProcessoListenerCoverageTest {
         Subprocesso sOp = new Subprocesso();
         sOp.setUnidade(uOp);
 
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sOp));
 
         ResponsavelDto resp = ResponsavelDto.builder()
@@ -112,7 +112,7 @@ class EventoProcessoListenerCoverageTest {
         Unidade u = new Unidade(); u.setTipo(TipoUnidade.OPERACIONAL); u.setCodigo(1L);
         Subprocesso s = new Subprocesso(); s.setUnidade(u);
 
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
 
         // Simular erro ao buscar responsáveis
@@ -127,7 +127,7 @@ class EventoProcessoListenerCoverageTest {
     @Test
     @DisplayName("aoFinalizarProcesso: deve capturar exceção geral")
     void aoFinalizarProcesso_Excecao() {
-        when(processoService.buscarEntidadePorId(any())).thenThrow(new RuntimeException("Erro"));
+        when(processoFacade.buscarEntidadePorId(any())).thenThrow(new RuntimeException("Erro"));
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(1L).build());
     }
 
@@ -135,7 +135,7 @@ class EventoProcessoListenerCoverageTest {
     @DisplayName("aoFinalizarProcesso: early return se sem participantes")
     void aoFinalizarProcesso_SemParticipantes() {
         Processo p = new Processo(); // participantes vazio
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(1L).build());
         verify(usuarioService, never()).buscarResponsaveisUnidades(any());
@@ -149,7 +149,7 @@ class EventoProcessoListenerCoverageTest {
         p.setParticipantes(Set.of(u));
         p.setDescricao("Desc");
 
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
 
         ResponsavelDto resp = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("t").build();
         when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(1L, resp));
@@ -171,7 +171,7 @@ class EventoProcessoListenerCoverageTest {
         Processo p = new Processo();
         p.setParticipantes(Set.of(pai, filho));
 
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
 
         ResponsavelDto respPai = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("t").build();
         // Filho não precisa de responsável para este teste, pois só a intermediária é notificada sobre subordinadas
@@ -194,7 +194,7 @@ class EventoProcessoListenerCoverageTest {
         Processo p = new Processo();
         p.setParticipantes(Set.of(pai)); // Só o pai participa
 
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
 
         ResponsavelDto respPai = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("t").build();
         when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(1L, respPai));
@@ -213,7 +213,7 @@ class EventoProcessoListenerCoverageTest {
         Unidade u = new Unidade(); u.setCodigo(1L);
         Processo p = new Processo(); p.setParticipantes(Set.of(u));
 
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(usuarioService.buscarResponsaveisUnidades(any())).thenThrow(new RuntimeException("DB"));
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(1L).build());
@@ -231,13 +231,9 @@ class EventoProcessoListenerCoverageTest {
         s.setUnidade(u);
 
         // Precisamos forçar a chamada. O método é package-private.
-        try {
-           listener.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, new Processo(), s);
-        } catch (ErroEstadoImpossivel e) {
-            // Sucesso
-            return;
-        }
-        // Se chegar aqui falhou
-        // throw new RuntimeException("Deveria ter lançado ErroEstadoImpossivel");
+        Processo processo = new Processo();
+        org.junit.jupiter.api.Assertions.assertThrows(
+                ErroEstadoImpossivel.class,
+                () -> listener.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, processo, s));
     }
 }

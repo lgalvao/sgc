@@ -20,7 +20,7 @@ import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.*;
 class PainelServiceUpdateTest {
 
     @Mock
-    private ProcessoService processoService;
+    private ProcessoFacade processoFacade;
 
     @Mock
     private AlertaService alertaService;
@@ -78,7 +78,7 @@ class PainelServiceUpdateTest {
             p.setParticipantes(Collections.emptySet());
 
             when(unidadeService.buscarIdsDescendentes(any())).thenReturn(Collections.emptyList());
-            when(processoService.listarPorParticipantesIgnorandoCriado(any(), any()))
+            when(processoFacade.listarPorParticipantesIgnorandoCriado(any(), any()))
                 .thenReturn(new PageImpl<>(List.of(p)));
 
             // Simula erro na busca da unidade para montar o link
@@ -103,7 +103,7 @@ class PainelServiceUpdateTest {
             p.setParticipantes(Set.of(part));
             p.setTipo(TipoProcesso.MAPEAMENTO);
 
-            when(processoService.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
+            when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
 
             // Simula erro ao tentar buscar a entidade completa dentro do loop de visibilidade
             when(unidadeService.buscarEntidadePorId(99L)).thenThrow(new RuntimeException("Erro"));

@@ -42,10 +42,16 @@ import static sgc.processo.model.TipoProcesso.REVISAO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
 
+/**
+ * Facade para orquestrar operações de Processo.
+ *
+ * <p>Implementa o padrão Facade para simplificar a interface de uso e centralizar
+ * a coordenação entre múltiplos serviços relacionados a processos.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ProcessoService {
+public class ProcessoFacade {
     private final ProcessoRepo processoRepo;
     private final UnidadeService unidadeService;
     private final SubprocessoService subprocessoService;
@@ -237,7 +243,7 @@ public class ProcessoService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
+    @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
     public ProcessoContextoDto obterContextoCompleto(Long codigo) {
         ProcessoDetalheDto detalhes = obterDetalhes(codigo);
         List<SubprocessoElegivelDto> elegiveis = listarSubprocessosElegiveis(codigo);
@@ -249,7 +255,7 @@ public class ProcessoService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codProcesso)")
+    @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codProcesso)")
     public ProcessoDetalheDto obterDetalhes(Long codProcesso) {
         Processo processo = processoRepo.findById(codProcesso)
                         .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));

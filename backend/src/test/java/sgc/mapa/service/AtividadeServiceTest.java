@@ -51,10 +51,9 @@ class AtividadeServiceTest {
         void deveListarTodas() {
              when(atividadeRepo.findAll()).thenReturn(List.of(new Atividade()));
              when(atividadeMapper.toDto(any())).thenReturn(new AtividadeDto());
-             var resultado = service.listar();
-             assertThat(resultado).isNotNull();
-             assertThat(resultado).isNotEmpty();
-             assertThat(resultado).hasSize(1);
+             assertThat(service.listar())
+                 .isNotNull()
+                 .hasSize(1);
         }
 
         @Test
@@ -93,38 +92,36 @@ class AtividadeServiceTest {
         @DisplayName("Deve buscar por mapa")
         void deveBuscarPorMapa() {
              when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(List.of(new Atividade()));
-             var resultado = service.buscarPorMapaCodigo(1L);
-             assertThat(resultado).isNotNull();
-             assertThat(resultado).isNotEmpty();
-             assertThat(resultado).hasSize(1);
+             assertThat(service.buscarPorMapaCodigo(1L))
+                 .isNotNull()
+                 .hasSize(1);
         }
 
         @Test
         @DisplayName("Deve retornar lista vazia quando mapa não possui atividades")
         void deveRetornarListaVaziaQuandoMapaSemAtividades() {
              when(atividadeRepo.findByMapaCodigo(999L)).thenReturn(List.of());
-             var resultado = service.buscarPorMapaCodigo(999L);
-             assertThat(resultado).isNotNull();
-             assertThat(resultado).isEmpty();
+             assertThat(service.buscarPorMapaCodigo(999L))
+                 .isNotNull()
+                 .isEmpty();
         }
 
         @Test
         @DisplayName("Deve buscar por mapa com conhecimentos")
         void deveBuscarPorMapaComConhecimentos() {
              when(atividadeRepo.findByMapaCodigoWithConhecimentos(1L)).thenReturn(List.of(new Atividade()));
-             var resultado = service.buscarPorMapaCodigoComConhecimentos(1L);
-             assertThat(resultado).isNotNull();
-             assertThat(resultado).isNotEmpty();
-             assertThat(resultado).hasSize(1);
+             assertThat(service.buscarPorMapaCodigoComConhecimentos(1L))
+                 .isNotNull()
+                 .hasSize(1);
         }
 
         @Test
         @DisplayName("Deve retornar lista vazia quando mapa não possui atividades com conhecimentos")
         void deveRetornarListaVaziaQuandoMapaSemAtividadesComConhecimentos() {
              when(atividadeRepo.findByMapaCodigoWithConhecimentos(999L)).thenReturn(List.of());
-             var resultado = service.buscarPorMapaCodigoComConhecimentos(999L);
-             assertThat(resultado).isNotNull();
-             assertThat(resultado).isEmpty();
+             assertThat(service.buscarPorMapaCodigoComConhecimentos(999L))
+                 .isNotNull()
+                 .isEmpty();
         }
     }
 
@@ -154,7 +151,7 @@ class AtividadeServiceTest {
             when(atividadeRepo.save(any())).thenReturn(new Atividade());
             when(atividadeMapper.toDto(any())).thenReturn(dto);
 
-            AtividadeDto res = service.criar(dto, titulo);
+            AtividadeDto res = service.criar(dto);
 
             assertThat(res).isNotNull();
             verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
@@ -165,9 +162,8 @@ class AtividadeServiceTest {
         void deveLancarErroAoCriarSemMapa() {
             AtividadeDto dto = new AtividadeDto();
             dto.setMapaCodigo(null);
-            String titulo = "123";
 
-            assertThatThrownBy(() -> service.criar(dto, titulo))
+            assertThatThrownBy(() -> service.criar(dto))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                     .hasMessageContaining("Mapa");
         }
@@ -177,11 +173,10 @@ class AtividadeServiceTest {
         void deveLancarErroAoCriarEmMapaInexistente() {
             AtividadeDto dto = new AtividadeDto();
             dto.setMapaCodigo(1L);
-            String titulo = "123";
 
             when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> service.criar(dto, titulo))
+            assertThatThrownBy(() -> service.criar(dto))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                     .hasMessageContaining("Mapa");
         }
@@ -191,14 +186,13 @@ class AtividadeServiceTest {
         void deveLancarErroAoCriarSemSubprocesso() {
             AtividadeDto dto = new AtividadeDto();
             dto.setMapaCodigo(1L);
-            String titulo = "123";
 
             Mapa mapa = new Mapa();
             mapa.setSubprocesso(null);
 
             when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
 
-            assertThatThrownBy(() -> service.criar(dto, titulo))
+            assertThatThrownBy(() -> service.criar(dto))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                     .hasMessageContaining("Subprocesso");
         }

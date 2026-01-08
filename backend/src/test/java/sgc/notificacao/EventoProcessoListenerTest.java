@@ -15,7 +15,7 @@ import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 
@@ -38,7 +38,7 @@ class EventoProcessoListenerTest {
     @Mock private NotificacaoEmailService notificacaoEmailService;
     @Mock private NotificacaoModelosService notificacaoModelosService;
     @Mock private UsuarioService usuarioService;
-    @Mock private ProcessoService processoService;
+    @Mock private ProcessoFacade processoFacade;
     @Mock private SubprocessoService subprocessoService;
 
     @Test
@@ -49,7 +49,7 @@ class EventoProcessoListenerTest {
         processo.setDescricao("Processo Teste");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
         // Mock Subprocesso
         Unidade unidade = new Unidade();
@@ -100,7 +100,7 @@ class EventoProcessoListenerTest {
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
@@ -146,7 +146,7 @@ class EventoProcessoListenerTest {
         processo.setCodigo(1L);
         processo.setDescricao("P1");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(100L);
@@ -183,7 +183,7 @@ class EventoProcessoListenerTest {
         processo.setCodigo(1L);
         processo.setDescricao("P1");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(20L);
@@ -213,7 +213,7 @@ class EventoProcessoListenerTest {
         Processo processo = new Processo();
         processo.setCodigo(2L);
         processo.setDescricao("P2");
-        when(processoService.buscarEntidadePorId(2L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(2L)).thenReturn(processo);
         
         Unidade intermediaria = new Unidade();
         intermediaria.setCodigo(30L);
@@ -253,7 +253,7 @@ class EventoProcessoListenerTest {
         Processo processo = new Processo();
         processo.setCodigo(3L);
         processo.setDescricao("P3");
-        when(processoService.buscarEntidadePorId(3L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(3L)).thenReturn(processo);
         
         Unidade intermediaria = new Unidade();
         intermediaria.setCodigo(50L);
@@ -283,7 +283,7 @@ class EventoProcessoListenerTest {
         processo.setCodigo(1L);
         processo.setDescricao("P1");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(99L);
@@ -316,7 +316,7 @@ class EventoProcessoListenerTest {
         processo.setCodigo(5L);
         processo.setDescricao("Processo com Intermediária");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        when(processoService.buscarEntidadePorId(5L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(5L)).thenReturn(processo);
 
         Unidade intermediaria = new Unidade();
         intermediaria.setCodigo(100L);
@@ -364,7 +364,7 @@ class EventoProcessoListenerTest {
         processo.setCodigo(6L);
         processo.setDescricao("Processo Teste");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        when(processoService.buscarEntidadePorId(6L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(6L)).thenReturn(processo);
 
         // Primeiro subprocesso normal
         Subprocesso subprocessoBom = new Subprocesso();
@@ -422,7 +422,7 @@ class EventoProcessoListenerTest {
         processo.setCodigo(99L);
         processo.setParticipantes(Collections.emptySet());
 
-        when(processoService.buscarEntidadePorId(99L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(99L)).thenReturn(processo);
 
         listener.aoFinalizarProcesso(evento);
         // Sem exceções
@@ -432,7 +432,7 @@ class EventoProcessoListenerTest {
     void deveTratarExcecaoGeralAoFinalizarProcesso() {
         // Cobre o catch global em aoFinalizarProcesso
         EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(99L).build();
-        when(processoService.buscarEntidadePorId(99L)).thenThrow(new RuntimeException("Erro Geral"));
+        when(processoFacade.buscarEntidadePorId(99L)).thenThrow(new RuntimeException("Erro Geral"));
 
         listener.aoFinalizarProcesso(evento);
         // Sem exceções

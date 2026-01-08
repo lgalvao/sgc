@@ -78,7 +78,7 @@ class ControllersServicesCoverageTest {
     @Mock private sgc.organizacao.UnidadeService unidadeService;
     @Mock private sgc.analise.AnaliseService analiseService;
     @Mock private sgc.subprocesso.service.SubprocessoWorkflowExecutor workflowExecutor;
-    @Mock private sgc.processo.service.ProcessoService processoService;
+    @Mock private sgc.processo.service.ProcessoFacade processoFacade;
 
     private SubprocessoMapaController subprocessoMapaController;
     private MapaService mapaService;
@@ -113,7 +113,7 @@ class ControllersServicesCoverageTest {
 
         // PainelService
         painelService = new PainelService(
-                processoService, alertaService, unidadeService
+                processoFacade, alertaService, unidadeService
         );
     }
 

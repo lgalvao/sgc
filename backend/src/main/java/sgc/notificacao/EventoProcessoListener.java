@@ -15,7 +15,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 
@@ -43,7 +43,7 @@ public class EventoProcessoListener {
     private final NotificacaoEmailService notificacaoEmailService;
     private final NotificacaoModelosService notificacaoModelosService;
     private final UsuarioService usuarioService;
-    private final ProcessoService processoService;
+    private final ProcessoFacade processoFacade;
     private final SubprocessoService subprocessoService;
 
     /**
@@ -84,7 +84,7 @@ public class EventoProcessoListener {
     }
 
     private void processarInicioProcesso(EventoProcessoIniciado evento) {
-        Processo processo = processoService.buscarEntidadePorId(evento.getCodProcesso());
+        Processo processo = processoFacade.buscarEntidadePorId(evento.getCodProcesso());
 
         List<Subprocesso> subprocessos =
                 subprocessoService.listarEntidadesPorProcesso(evento.getCodProcesso());
@@ -126,7 +126,7 @@ public class EventoProcessoListener {
     }
 
     private void processarFinalizacaoProcesso(EventoProcessoFinalizado evento) {
-        Processo processo = processoService.buscarEntidadePorId(evento.getCodProcesso());
+        Processo processo = processoFacade.buscarEntidadePorId(evento.getCodProcesso());
 
         List<Unidade> unidadesParticipantes = new ArrayList<>(processo.getParticipantes());
 

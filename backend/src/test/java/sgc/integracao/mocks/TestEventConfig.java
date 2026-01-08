@@ -10,7 +10,7 @@ import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
 import sgc.organizacao.UsuarioService;
 import sgc.processo.eventos.EventoProcessoIniciado;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.service.SubprocessoService;
 
 /**
@@ -29,7 +29,7 @@ public class TestEventConfig {
             NotificacaoEmailService notificacaoEmailService,
             NotificacaoModelosService notificacaoModelosService,
             UsuarioService usuarioService,
-            ProcessoService processoService,
+            ProcessoFacade processoFacade,
             SubprocessoService subprocessoService) {
 
         // Retorna uma subclasse anônima com as dependências reais injetadas
@@ -38,7 +38,7 @@ public class TestEventConfig {
                 notificacaoEmailService,
                 notificacaoModelosService,
                 usuarioService,
-                processoService,
+                processoFacade,
                 subprocessoService) {
 
             @Override

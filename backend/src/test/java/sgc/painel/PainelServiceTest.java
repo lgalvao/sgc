@@ -19,7 +19,7 @@ import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 class PainelServiceTest {
 
     @Mock
-    private ProcessoService processoService;
+    private ProcessoFacade processoFacade;
     @Mock
     private AlertaService alertaService;
     @Mock
@@ -60,7 +60,7 @@ class PainelServiceTest {
     @DisplayName("listarProcessos para ADMIN deve listar todos")
     void listarProcessos_Admin() {
         Processo p = criarProcessoMock(1L);
-        when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
+        when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
 
@@ -73,13 +73,13 @@ class PainelServiceTest {
         when(unidadeService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L, 3L));
         
         Processo p = criarProcessoMock(1L);
-        when(processoService.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
+        when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(p)));
 
         painelService.listarProcessos(Perfil.GESTOR, 1L, PageRequest.of(0, 10));
 
         // Verifica se chamou buscando por 1L, 2L e 3L
-        verify(processoService).listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class));
+        verify(processoFacade).listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class));
     }
 
     @Test
@@ -94,7 +94,7 @@ class PainelServiceTest {
     void listarProcessos_LinkAdminCriado() {
         Processo p = criarProcessoMock(1L);
         p.setSituacao(SituacaoProcesso.CRIADO);
-        when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
+        when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
 
@@ -109,7 +109,7 @@ class PainelServiceTest {
         u.setSigla("U1");
 
         Processo p = criarProcessoMock(1L);
-        when(processoService.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
+        when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(p)));
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(sgc.organizacao.dto.UnidadeDto.builder()
                 .codigo(1L)
@@ -158,7 +158,7 @@ class PainelServiceTest {
         Processo p = criarProcessoMock(1L);
         p.setParticipantes(Set.of(u));
         
-        when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
+        when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
         // Simula erro ao buscar entidade para validar visibilidade
         when(unidadeService.buscarEntidadePorId(1L)).thenThrow(new RuntimeException("DB Error"));
 
@@ -173,7 +173,7 @@ class PainelServiceTest {
     @DisplayName("listarProcessos deve retornar link null se unidade nao encontrada no calculo de link CHEFE")
     void listarProcessos_LinkChefeErro() {
         Processo p = criarProcessoMock(1L);
-        when(processoService.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
+        when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(p)));
         
         when(unidadeService.buscarPorCodigo(2L)).thenThrow(new RuntimeException("Unidade não achada"));

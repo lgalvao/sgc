@@ -18,7 +18,7 @@ import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @Slf4j
 public class PainelService {
-    private final ProcessoService processoService;
+    private final ProcessoFacade processoFacade;
     private final AlertaService alertaService;
     private final UnidadeService unidadeService;
 
@@ -58,7 +58,7 @@ public class PainelService {
         Page<Processo> processos;
 
         if (perfil == Perfil.ADMIN) {
-            processos = processoService.listarTodos(sortedPageable);
+            processos = processoFacade.listarTodos(sortedPageable);
         } else {
             if (codigoUnidade == null) return Page.empty(sortedPageable);
 
@@ -72,7 +72,7 @@ public class PainelService {
             // Todos os perfis veem processos da própria unidade
             unidadeIds.add(codigoUnidade);
 
-            processos = processoService.listarPorParticipantesIgnorandoCriado(
+            processos = processoFacade.listarPorParticipantesIgnorandoCriado(
                     unidadeIds, sortedPageable);
         }
         return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade));

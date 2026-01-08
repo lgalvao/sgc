@@ -18,7 +18,7 @@ import sgc.processo.dto.*;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
@@ -46,7 +46,7 @@ public class ProcessoControllerTest {
     private static final String PROCESSO_NAO_ENCONTRADO = "Processo não encontrado";
 
     @MockitoBean
-    private ProcessoService processoService;
+    private ProcessoFacade processoFacade;
 
     @Autowired
     private MockMvc mockMvc;
@@ -88,7 +88,7 @@ public class ProcessoControllerTest {
                             .tipo(TipoProcesso.MAPEAMENTO.name())
                             .build();
 
-            when(processoService.criar(any(CriarProcessoReq.class))).thenReturn(dto);
+            when(processoFacade.criar(any(CriarProcessoReq.class))).thenReturn(dto);
 
             // Act & Assert
             mockMvc.perform(
@@ -101,7 +101,7 @@ public class ProcessoControllerTest {
                     .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
                     .andExpect(jsonPath(DESCRICAO_JSON_PATH).value(NOVO_PROCESSO));
 
-            verify(processoService).criar(criarCaptor.capture());
+            verify(processoFacade).criar(criarCaptor.capture());
             CriarProcessoReq capturado = criarCaptor.getValue();
             assertEquals(NOVO_PROCESSO, capturado.getDescricao());
         }
@@ -200,7 +200,7 @@ public class ProcessoControllerTest {
                             .tipo(TipoProcesso.MAPEAMENTO.name())
                             .build();
 
-            when(processoService.obterPorId(1L)).thenReturn(Optional.of(dto));
+            when(processoFacade.obterPorId(1L)).thenReturn(Optional.of(dto));
 
             // Act & Assert
             mockMvc.perform(get(API_PROCESSOS_1))
@@ -208,7 +208,7 @@ public class ProcessoControllerTest {
                     .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
                     .andExpect(jsonPath(DESCRICAO_JSON_PATH).value("Processo Teste"));
 
-            verify(processoService).obterPorId(1L);
+            verify(processoFacade).obterPorId(1L);
         }
 
         @Test
@@ -216,12 +216,12 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar 404 Not Found quando processo não existe")
         void deveRetornarNotFoundQuandoProcessoNaoExiste() throws Exception {
             // Arrange
-            when(processoService.obterPorId(999L)).thenReturn(Optional.empty());
+            when(processoFacade.obterPorId(999L)).thenReturn(Optional.empty());
 
             // Act & Assert
             mockMvc.perform(get(API_PROCESSOS_999)).andExpect(status().isNotFound());
 
-            verify(processoService).obterPorId(999L);
+            verify(processoFacade).obterPorId(999L);
         }
 
         @Test
@@ -238,7 +238,7 @@ public class ProcessoControllerTest {
                             .dataCriacao(LocalDateTime.now())
                             .build();
 
-            when(processoService.obterDetalhes(eq(1L))).thenReturn(dto);
+            when(processoFacade.obterDetalhes(eq(1L))).thenReturn(dto);
 
             // Act & Assert
             mockMvc.perform(get("/api/processos/1/detalhes"))
@@ -246,7 +246,7 @@ public class ProcessoControllerTest {
                     .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
                     .andExpect(jsonPath("$.descricao").value("Processo Detalhado"));
 
-            verify(processoService).obterDetalhes(eq(1L));
+            verify(processoFacade).obterDetalhes(eq(1L));
         }
 
         @Test
@@ -255,7 +255,7 @@ public class ProcessoControllerTest {
         void deveRetornarNotFoundAoObterDetalhesQuandoProcessoNaoEncontrado() throws Exception {
             // Arrange
             doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
-                    .when(processoService)
+                    .when(processoFacade)
                     .obterDetalhes(eq(999L));
 
             // Act & Assert
@@ -267,7 +267,7 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar 403 Forbidden ao obter detalhes se acesso negado")
         void deveRetornarForbiddenAoObterDetalhesQuandoAcessoNegado() throws Exception {
             // Arrange
-            doThrow(new ErroAccessoNegado("Acesso negado")).when(processoService).obterDetalhes(eq(1L));
+            doThrow(new ErroAccessoNegado("Acesso negado")).when(processoFacade).obterDetalhes(eq(1L));
 
             // Act & Assert
             mockMvc.perform(get("/api/processos/1/detalhes")).andExpect(status().isForbidden());
@@ -298,7 +298,7 @@ public class ProcessoControllerTest {
                             .tipo(TipoProcesso.REVISAO.name())
                             .build();
 
-            when(processoService.atualizar(eq(1L), any(AtualizarProcessoReq.class))).thenReturn(dto);
+            when(processoFacade.atualizar(eq(1L), any(AtualizarProcessoReq.class))).thenReturn(dto);
 
             // Act & Assert
             mockMvc.perform(
@@ -310,7 +310,7 @@ public class ProcessoControllerTest {
                     .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
                     .andExpect(jsonPath(DESCRICAO_JSON_PATH).value(PROCESSO_ATUALIZADO));
 
-            verify(processoService).atualizar(eq(1L), atualizarCaptor.capture());
+            verify(processoFacade).atualizar(eq(1L), atualizarCaptor.capture());
             AtualizarProcessoReq capturado = atualizarCaptor.getValue();
             assertEquals(PROCESSO_ATUALIZADO, capturado.getDescricao());
         }
@@ -329,7 +329,7 @@ public class ProcessoControllerTest {
                             List.of(1L));
 
             doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
-                    .when(processoService)
+                    .when(processoFacade)
                     .atualizar(eq(999L), any(AtualizarProcessoReq.class));
 
             // Act & Assert
@@ -355,7 +355,7 @@ public class ProcessoControllerTest {
                             List.of(1L));
 
             doThrow(new IllegalStateException())
-                    .when(processoService)
+                    .when(processoFacade)
                     .atualizar(eq(1L), any(AtualizarProcessoReq.class));
 
             // Act & Assert
@@ -379,7 +379,7 @@ public class ProcessoControllerTest {
             mockMvc.perform(post(API_PROCESSOS + "/1/excluir").with(csrf()))
                     .andExpect(status().isNoContent());
 
-            verify(processoService).apagar(1L);
+            verify(processoFacade).apagar(1L);
         }
 
         @Test
@@ -388,7 +388,7 @@ public class ProcessoControllerTest {
         void deveRetornarNotFoundAoExcluirQuandoProcessoNaoEncontrado() throws Exception {
             // Arrange
             doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
-                    .when(processoService)
+                    .when(processoFacade)
                     .apagar(999L);
 
             // Act & Assert
@@ -401,7 +401,7 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar 409 Conflict ao excluir se estado inválido")
         void deveRetornarConflictAoExcluirQuandoEstadoInvalido() throws Exception {
             // Arrange
-            doThrow(new IllegalStateException()).when(processoService).apagar(eq(1L));
+            doThrow(new IllegalStateException()).when(processoFacade).apagar(eq(1L));
 
             // Act & Assert
             mockMvc.perform(post(API_PROCESSOS + "/1/excluir").with(csrf()))
@@ -420,8 +420,8 @@ public class ProcessoControllerTest {
             var req = new IniciarProcessoReq(TipoProcesso.MAPEAMENTO, List.of(1L));
             var processo = ProcessoDto.builder().codigo(1L).descricao("Processo Teste").build();
 
-            when(processoService.obterPorId(1L)).thenReturn(Optional.of(processo));
-            when(processoService.iniciarProcessoMapeamento(eq(1L), anyList())).thenReturn(List.of());
+            when(processoFacade.obterPorId(1L)).thenReturn(Optional.of(processo));
+            when(processoFacade.iniciarProcessoMapeamento(eq(1L), anyList())).thenReturn(List.of());
 
             // Act & Assert
             mockMvc.perform(
@@ -433,7 +433,7 @@ public class ProcessoControllerTest {
                     .andExpect(jsonPath("$.codigo").value(1L))
                     .andExpect(jsonPath("$.descricao").value("Processo Teste"));
 
-            verify(processoService).iniciarProcessoMapeamento(eq(1L), eq(List.of(1L)));
+            verify(processoFacade).iniciarProcessoMapeamento(eq(1L), eq(List.of(1L)));
         }
 
         @Test
@@ -444,8 +444,8 @@ public class ProcessoControllerTest {
             var req = new IniciarProcessoReq(TipoProcesso.REVISAO, List.of(1L));
             var processo = ProcessoDto.builder().codigo(1L).descricao("Processo Teste").build();
 
-            when(processoService.obterPorId(1L)).thenReturn(Optional.of(processo));
-            when(processoService.iniciarProcessoRevisao(eq(1L), anyList())).thenReturn(List.of());
+            when(processoFacade.obterPorId(1L)).thenReturn(Optional.of(processo));
+            when(processoFacade.iniciarProcessoRevisao(eq(1L), anyList())).thenReturn(List.of());
 
             // Act & Assert
             mockMvc.perform(
@@ -457,7 +457,7 @@ public class ProcessoControllerTest {
                     .andExpect(jsonPath("$.codigo").value(1L))
                     .andExpect(jsonPath("$.descricao").value("Processo Teste"));
 
-            verify(processoService).iniciarProcessoRevisao(eq(1L), eq(List.of(1L)));
+            verify(processoFacade).iniciarProcessoRevisao(eq(1L), eq(List.of(1L)));
         }
 
         @Test
@@ -481,12 +481,12 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar 200 OK ao finalizar processo com sucesso")
         void deveRetornarOkAoFinalizarQuandoValido() throws Exception {
             // Arrange
-            doNothing().when(processoService).finalizar(1L);
+            doNothing().when(processoFacade).finalizar(1L);
 
             // Act & Assert
             mockMvc.perform(post("/api/processos/1/finalizar").with(csrf())).andExpect(status().isOk());
 
-            verify(processoService).finalizar(1L);
+            verify(processoFacade).finalizar(1L);
         }
 
         @Test
@@ -495,7 +495,7 @@ public class ProcessoControllerTest {
         void deveRetornarNotFoundAoFinalizarQuandoProcessoNaoEncontrado() throws Exception {
             // Arrange
             doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
-                    .when(processoService)
+                    .when(processoFacade)
                     .finalizar(999L);
 
             // Act & Assert
@@ -509,7 +509,7 @@ public class ProcessoControllerTest {
         void deveRetornarConflictAoFinalizarQuandoEstadoInvalido() throws Exception {
             // Arrange
             doThrow(new IllegalStateException("Processo em estado inválido"))
-                    .when(processoService)
+                    .when(processoFacade)
                     .finalizar(1L);
 
             // Act & Assert
@@ -528,7 +528,7 @@ public class ProcessoControllerTest {
         void deveRetornarConflictAoFinalizarQuandoValidacaoFalha() throws Exception {
             // Arrange
             doThrow(new ErroProcesso("Subprocessos não homologados"))
-                    .when(processoService)
+                    .when(processoFacade)
                     .finalizar(1L);
 
             // Act & Assert
@@ -546,7 +546,7 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar lista de processos finalizados")
         void deveRetornarListaDeProcessosFinalizados() throws Exception {
             // Arrange
-            when(processoService.listarFinalizados())
+            when(processoFacade.listarFinalizados())
                     .thenReturn(List.of(ProcessoDto.builder().codigo(1L).build()));
 
             // Act & Assert
@@ -561,7 +561,7 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar lista de processos ativos")
         void deveRetornarListaDeProcessosAtivos() throws Exception {
             // Arrange
-            when(processoService.listarAtivos())
+            when(processoFacade.listarAtivos())
                     .thenReturn(List.of(ProcessoDto.builder().codigo(1L).build()));
 
             // Act & Assert
@@ -576,7 +576,7 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar map de status de unidades")
         void deveRetornarMapDeStatusUnidades() throws Exception {
             // Arrange
-            when(processoService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO"))
+            when(processoFacade.listarUnidadesBloqueadasPorTipo("MAPEAMENTO"))
                     .thenReturn(List.of(100L));
 
             // Act & Assert
@@ -591,7 +591,7 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar lista de unidades bloqueadas")
         void deveRetornarListaDeUnidadesBloqueadas() throws Exception {
             // Arrange
-            when(processoService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO"))
+            when(processoFacade.listarUnidadesBloqueadasPorTipo("MAPEAMENTO"))
                     .thenReturn(List.of(100L));
 
             // Act & Assert
@@ -606,7 +606,7 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar lista de subprocessos elegíveis")
         void deveRetornarListaDeSubprocessosElegiveis() throws Exception {
             // Arrange
-            when(processoService.listarSubprocessosElegiveis(1L))
+            when(processoFacade.listarSubprocessosElegiveis(1L))
                     .thenReturn(
                             List.of(
                                     sgc.processo.dto.SubprocessoElegivelDto.builder()
@@ -625,7 +625,7 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar lista de subprocessos")
         void deveRetornarListaDeSubprocessos() throws Exception {
             // Arrange
-            when(processoService.listarTodosSubprocessos(1L))
+            when(processoFacade.listarTodosSubprocessos(1L))
                     .thenReturn(
                             List.of(sgc.subprocesso.dto.SubprocessoDto.builder().codigo(10L).build()));
 
@@ -649,8 +649,8 @@ public class ProcessoControllerTest {
             var req = new IniciarProcessoReq(TipoProcesso.DIAGNOSTICO, List.of(1L));
             var processo = ProcessoDto.builder().codigo(1L).descricao("Processo Diagnóstico").build();
 
-            when(processoService.obterPorId(1L)).thenReturn(Optional.of(processo));
-            when(processoService.iniciarProcessoDiagnostico(eq(1L), anyList())).thenReturn(List.of());
+            when(processoFacade.obterPorId(1L)).thenReturn(Optional.of(processo));
+            when(processoFacade.iniciarProcessoDiagnostico(eq(1L), anyList())).thenReturn(List.of());
 
             // Act & Assert
             mockMvc.perform(
@@ -662,7 +662,7 @@ public class ProcessoControllerTest {
                     .andExpect(jsonPath("$.codigo").value(1L))
                     .andExpect(jsonPath("$.descricao").value("Processo Diagnóstico"));
 
-            verify(processoService).iniciarProcessoDiagnostico(eq(1L), eq(List.of(1L)));
+            verify(processoFacade).iniciarProcessoDiagnostico(eq(1L), eq(List.of(1L)));
         }
 
         @Test
@@ -672,7 +672,7 @@ public class ProcessoControllerTest {
             // Arrange
             var req = new IniciarProcessoReq(TipoProcesso.MAPEAMENTO, List.of(1L));
 
-            when(processoService.iniciarProcessoMapeamento(eq(1L), anyList()))
+            when(processoFacade.iniciarProcessoMapeamento(eq(1L), anyList()))
                     .thenReturn(List.of("Erro 1", "Erro 2"));
 
             // Act & Assert
@@ -693,7 +693,7 @@ public class ProcessoControllerTest {
         void deveRetornarContextoCompletoComSucesso() throws Exception {
             // Arrange
             ProcessoDetalheDto detalhe = ProcessoDetalheDto.builder().codigo(1L).build();
-            when(processoService.obterContextoCompleto(1L))
+            when(processoFacade.obterContextoCompleto(1L))
                     .thenReturn(ProcessoContextoDto.builder().processo(detalhe).build());
 
             // Act & Assert

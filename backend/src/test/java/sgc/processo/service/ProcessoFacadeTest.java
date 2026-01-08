@@ -55,8 +55,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ProcessoService")
-class ProcessoServiceTest {
+@DisplayName("ProcessoFacade")
+class ProcessoFacadeTest {
     @Mock
     private ProcessoRepo processoRepo;
     @Mock
@@ -85,7 +85,7 @@ class ProcessoServiceTest {
     private AlertaService alertaService;
 
     @InjectMocks
-    private ProcessoService processoService;
+    private ProcessoFacade processoFacade;
 
     @Nested
     @DisplayName("Criação de Processo")
@@ -110,7 +110,7 @@ class ProcessoServiceTest {
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
-            ProcessoDto resultado = processoService.criar(req);
+            ProcessoDto resultado = processoFacade.criar(req);
 
             // Assert
             assertThat(resultado).isNotNull();
@@ -130,7 +130,7 @@ class ProcessoServiceTest {
                     new CriarProcessoReq("", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
 
             // Act & Assert
-            assertThatThrownBy(() -> processoService.criar(req))
+            assertThatThrownBy(() -> processoFacade.criar(req))
                     .isInstanceOf(ConstraintViolationException.class)
                     .hasMessageContaining("descrição");
         }
@@ -143,7 +143,7 @@ class ProcessoServiceTest {
                     new CriarProcessoReq(null, TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
 
             // Act & Assert
-            assertThatThrownBy(() -> processoService.criar(req))
+            assertThatThrownBy(() -> processoFacade.criar(req))
                     .isInstanceOf(ConstraintViolationException.class)
                     .hasMessageContaining("descrição");
         }
@@ -157,7 +157,7 @@ class ProcessoServiceTest {
                             "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of());
 
             // Act & Assert
-            assertThatThrownBy(() -> processoService.criar(req))
+            assertThatThrownBy(() -> processoFacade.criar(req))
                     .isInstanceOf(ConstraintViolationException.class)
                     .hasMessageContaining("unidade");
         }
@@ -172,7 +172,7 @@ class ProcessoServiceTest {
             when(unidadeService.buscarEntidadePorId(99L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 99L));
 
             // Act & Assert
-            assertThatThrownBy(() -> processoService.criar(req))
+            assertThatThrownBy(() -> processoFacade.criar(req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                     .hasMessageContaining("Unidade")
                     .hasNoCause();
@@ -190,7 +190,7 @@ class ProcessoServiceTest {
             when(unidadeService.verificarExistenciaMapaVigente(1L)).thenReturn(false);
             when(unidadeService.buscarSiglasPorIds(List.of(1L))).thenReturn(List.of("U1"));
 
-            assertThatThrownBy(() -> processoService.criar(req))
+            assertThatThrownBy(() -> processoFacade.criar(req))
                 .isInstanceOf(ErroProcesso.class)
                 .hasMessageContaining("U1");
         }
@@ -217,7 +217,7 @@ class ProcessoServiceTest {
             u.setTipo(sgc.organizacao.model.TipoUnidade.INTERMEDIARIA);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
 
-            assertThatThrownBy(() -> processoService.criar(req))
+            assertThatThrownBy(() -> processoFacade.criar(req))
                 .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
         }
     }
@@ -248,7 +248,7 @@ class ProcessoServiceTest {
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
-            processoService.atualizar(id, req);
+            processoFacade.atualizar(id, req);
 
             // Assert
             assertThat(processo.getDescricao()).isEqualTo("Nova Desc");
@@ -277,7 +277,7 @@ class ProcessoServiceTest {
             when(unidadeService.verificarExistenciaMapaVigente(1L)).thenReturn(false);
             when(unidadeService.buscarSiglasPorIds(List.of(1L))).thenReturn(List.of("U1"));
 
-            assertThatThrownBy(() -> processoService.atualizar(id, req))
+            assertThatThrownBy(() -> processoFacade.atualizar(id, req))
                 .isInstanceOf(ErroProcesso.class)
                 .hasMessageContaining("U1");
         }
@@ -301,7 +301,7 @@ class ProcessoServiceTest {
             when(processoRepo.saveAndFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
-            processoService.atualizar(id, req);
+            processoFacade.atualizar(id, req);
             verify(processoRepo).saveAndFlush(any());
         }
 
@@ -322,7 +322,7 @@ class ProcessoServiceTest {
                             .build();
 
             // Act & Assert
-            assertThatThrownBy(() -> processoService.atualizar(id, req))
+            assertThatThrownBy(() -> processoFacade.atualizar(id, req))
                     .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
         }
 
@@ -346,7 +346,7 @@ class ProcessoServiceTest {
             when(unidadeService.buscarEntidadePorId(99L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 99L));
 
             // Act & Assert
-            assertThatThrownBy(() -> processoService.atualizar(id, req))
+            assertThatThrownBy(() -> processoFacade.atualizar(id, req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
@@ -356,7 +356,7 @@ class ProcessoServiceTest {
             AtualizarProcessoReq req = AtualizarProcessoReq.builder().build();
             when(processoRepo.findById(999L)).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> processoService.atualizar(999L, req))
+            assertThatThrownBy(() -> processoFacade.atualizar(999L, req))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
@@ -374,7 +374,7 @@ class ProcessoServiceTest {
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
             // Act
-            processoService.apagar(id);
+            processoFacade.apagar(id);
 
             // Assert
             verify(processoRepo).deleteById(id);
@@ -387,7 +387,7 @@ class ProcessoServiceTest {
             when(processoRepo.findById(99L)).thenReturn(Optional.empty());
 
             // Act & Assert
-            assertThatThrownBy(() -> processoService.apagar(99L))
+            assertThatThrownBy(() -> processoFacade.apagar(99L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
@@ -401,7 +401,7 @@ class ProcessoServiceTest {
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
             // Act & Assert
-            assertThatThrownBy(() -> processoService.apagar(id))
+            assertThatThrownBy(() -> processoFacade.apagar(id))
                     .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
         }
     }
@@ -419,7 +419,7 @@ class ProcessoServiceTest {
             when(processoDetalheBuilder.build(processo)).thenReturn(new ProcessoDetalheDto());
 
             // Act
-            var res = processoService.obterDetalhes(id);
+            var res = processoFacade.obterDetalhes(id);
 
             // Assert
             assertThat(res).isNotNull();
@@ -429,7 +429,7 @@ class ProcessoServiceTest {
         @DisplayName("Deve falhar ao obter detalhes de processo inexistente")
         void deveFalharAoObterDetalhesProcessoInexistente() {
             when(processoRepo.findById(999L)).thenReturn(Optional.empty());
-            assertThatThrownBy(() -> processoService.obterDetalhes(999L))
+            assertThatThrownBy(() -> processoFacade.obterDetalhes(999L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
@@ -440,7 +440,7 @@ class ProcessoServiceTest {
             Processo processo = ProcessoFixture.processoPadrao();
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
-            Processo res = processoService.buscarEntidadePorId(id);
+            Processo res = processoFacade.buscarEntidadePorId(id);
             assertThat(res).isEqualTo(processo);
         }
 
@@ -448,7 +448,7 @@ class ProcessoServiceTest {
         @DisplayName("Deve falhar buscar entidade inexistente")
         void deveFalharBuscarEntidadeInexistente() {
             when(processoRepo.findById(999L)).thenReturn(Optional.empty());
-            assertThatThrownBy(() -> processoService.buscarEntidadePorId(999L))
+            assertThatThrownBy(() -> processoFacade.buscarEntidadePorId(999L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
@@ -460,7 +460,7 @@ class ProcessoServiceTest {
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
             when(processoMapper.toDto(processo)).thenReturn(ProcessoDto.builder().build());
 
-            Optional<ProcessoDto> res = processoService.obterPorId(id);
+            Optional<ProcessoDto> res = processoFacade.obterPorId(id);
             assertThat(res).isPresent();
         }
 
@@ -473,8 +473,8 @@ class ProcessoServiceTest {
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act & Assert
-            assertThat(processoService.listarFinalizados()).hasSize(1);
-            assertThat(processoService.listarAtivos()).hasSize(1);
+            assertThat(processoFacade.listarFinalizados()).hasSize(1);
+            assertThat(processoFacade.listarAtivos()).hasSize(1);
         }
 
         @Test
@@ -483,7 +483,7 @@ class ProcessoServiceTest {
              org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.Pageable.unpaged();
              when(processoRepo.findAll(pageable)).thenReturn(org.springframework.data.domain.Page.empty());
 
-             var res = processoService.listarTodos(pageable);
+             var res = processoFacade.listarTodos(pageable);
              assertThat(res).isEmpty();
         }
 
@@ -496,7 +496,7 @@ class ProcessoServiceTest {
                     .thenReturn(List.of(1L));
 
             // Act
-            List<Long> bloqueadas = processoService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
+            List<Long> bloqueadas = processoFacade.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
 
             // Assert
             assertThat(bloqueadas).contains(1L);
@@ -508,7 +508,7 @@ class ProcessoServiceTest {
              when(subprocessoService.listarEntidadesPorProcesso(100L)).thenReturn(List.of(SubprocessoFixture.subprocessoPadrao(null, null)));
              when(subprocessoMapper.toDTO(any())).thenReturn(SubprocessoDto.builder().build());
 
-             var res = processoService.listarTodosSubprocessos(100L);
+             var res = processoFacade.listarTodosSubprocessos(100L);
              assertThat(res).hasSize(1);
         }
 
@@ -534,7 +534,7 @@ class ProcessoServiceTest {
             when(subprocessoService.listarEntidadesPorProcesso(100L)).thenReturn(List.of(sp));
 
             // Act
-            List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(100L);
+            List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
 
             // Assert
             assertThat(res).hasSize(1);
@@ -566,7 +566,7 @@ class ProcessoServiceTest {
             when(subprocessoService.listarEntidadesPorProcesso(100L)).thenReturn(List.of(sp));
 
             // Act
-            List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(100L);
+            List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
 
             // Assert
             assertThat(res).hasSize(1);
@@ -590,7 +590,7 @@ class ProcessoServiceTest {
             when(subprocessoService.listarEntidadesPorProcesso(100L)).thenReturn(List.of());
 
             // Act
-            List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(100L);
+            List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
 
             // Assert
             assertThat(res).isEmpty();
@@ -599,14 +599,14 @@ class ProcessoServiceTest {
         @Test
         @DisplayName("Listar por participantes ignorando criado")
         void listarPorParticipantesIgnorandoCriado() {
-            processoService.listarPorParticipantesIgnorandoCriado(List.of(1L), null);
+            processoFacade.listarPorParticipantesIgnorandoCriado(List.of(1L), null);
             verify(processoRepo).findDistinctByParticipantes_CodigoInAndSituacaoNot(anyList(), eq(SituacaoProcesso.CRIADO), any());
         }
 
         @Test
         @DisplayName("Deve lançar exceção para tipo de processo inválido")
         void deveLancarExcecaoParaTipoInvalido() {
-            assertThatThrownBy(() -> processoService.listarUnidadesBloqueadasPorTipo("TIPO_INEXISTENTE"))
+            assertThatThrownBy(() -> processoFacade.listarUnidadesBloqueadasPorTipo("TIPO_INEXISTENTE"))
                 .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -619,7 +619,7 @@ class ProcessoServiceTest {
             SecurityContextHolder.setContext(securityContext);
 
             // Act
-            List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(100L);
+            List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
 
             // Assert
             assertThat(res).isEmpty();
@@ -634,7 +634,7 @@ class ProcessoServiceTest {
             when(securityContext.getAuthentication()).thenReturn(auth);
             SecurityContextHolder.setContext(securityContext);
 
-            List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(100L);
+            List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
             assertThat(res).isEmpty();
         }
 
@@ -654,7 +654,7 @@ class ProcessoServiceTest {
             SecurityContextHolder.setContext(securityContext);
 
             // Act
-            var res = processoService.obterContextoCompleto(id);
+            var res = processoFacade.obterContextoCompleto(id);
 
             // Assert
             assertThat(res).isNotNull();
@@ -675,7 +675,7 @@ class ProcessoServiceTest {
             when(processoInicializador.iniciar(id, List.of(1L))).thenReturn(List.of());
 
             // Act
-            List<String> erros = processoService.iniciarProcessoMapeamento(id, List.of(1L));
+            List<String> erros = processoFacade.iniciarProcessoMapeamento(id, List.of(1L));
 
             // Assert
             assertThat(erros).isEmpty();
@@ -691,7 +691,7 @@ class ProcessoServiceTest {
             when(processoInicializador.iniciar(id, List.of(1L))).thenReturn(List.of(mensagemErro));
 
             // Act
-            List<String> erros = processoService.iniciarProcessoMapeamento(id, List.of(1L));
+            List<String> erros = processoFacade.iniciarProcessoMapeamento(id, List.of(1L));
 
             // Assert
             assertThat(erros).contains(mensagemErro);
@@ -705,7 +705,7 @@ class ProcessoServiceTest {
             when(processoInicializador.iniciar(id, List.of(1L))).thenReturn(List.of());
 
             // Act
-            List<String> erros = processoService.iniciarProcessoRevisao(id, List.of(1L));
+            List<String> erros = processoFacade.iniciarProcessoRevisao(id, List.of(1L));
 
             // Assert
             assertThat(erros).isEmpty();
@@ -721,7 +721,7 @@ class ProcessoServiceTest {
             when(processoInicializador.iniciar(id, List.of(1L))).thenReturn(List.of(mensagemErro));
 
             // Act
-            List<String> erros = processoService.iniciarProcessoRevisao(id, List.of(1L));
+            List<String> erros = processoFacade.iniciarProcessoRevisao(id, List.of(1L));
 
             // Assert
             assertThat(erros).contains(mensagemErro);
@@ -732,7 +732,7 @@ class ProcessoServiceTest {
         void deveIniciarDiagnosticoComSucesso() {
             Long id = 100L;
             when(processoInicializador.iniciar(id, List.of(1L))).thenReturn(List.of());
-            List<String> erros = processoService.iniciarProcessoDiagnostico(id, List.of(1L));
+            List<String> erros = processoFacade.iniciarProcessoDiagnostico(id, List.of(1L));
             assertThat(erros).isEmpty();
             verify(processoInicializador).iniciar(id, List.of(1L));
         }
@@ -755,7 +755,7 @@ class ProcessoServiceTest {
             when(subprocessoService.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
 
             // Act & Assert
-            assertThatThrownBy(() -> processoService.finalizar(id))
+            assertThatThrownBy(() -> processoFacade.finalizar(id))
                     .isInstanceOf(ErroProcesso.class)
                     .hasMessageContaining("pendentes de homologação");
         }
@@ -770,7 +770,7 @@ class ProcessoServiceTest {
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
             // Act & Assert
-            assertThatThrownBy(() -> processoService.finalizar(id))
+            assertThatThrownBy(() -> processoFacade.finalizar(id))
                     .isInstanceOf(ErroProcesso.class)
                     .hasMessageContaining("Apenas processos 'EM ANDAMENTO'");
         }
@@ -794,7 +794,7 @@ class ProcessoServiceTest {
             when(subprocessoService.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
 
             // Act
-            processoService.finalizar(id);
+            processoFacade.finalizar(id);
 
             // Assert
             assertThat(processo.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
@@ -817,7 +817,7 @@ class ProcessoServiceTest {
             when(subprocessoService.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
 
             // Act & Assert
-            assertThatThrownBy(() -> processoService.finalizar(id))
+            assertThatThrownBy(() -> processoFacade.finalizar(id))
                     .isInstanceOf(ErroProcesso.class)
                     .hasMessageContaining("sem unidade associada");
         }
@@ -839,7 +839,7 @@ class ProcessoServiceTest {
             when(subprocessoService.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
 
             // Act & Assert
-            assertThatThrownBy(() -> processoService.finalizar(id))
+            assertThatThrownBy(() -> processoFacade.finalizar(id))
                     .isInstanceOf(ErroProcesso.class)
                     .hasMessageContaining("sem mapa associado");
         }
@@ -858,7 +858,7 @@ class ProcessoServiceTest {
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
             when(subprocessoService.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
 
-            assertThatThrownBy(() -> processoService.finalizar(id))
+            assertThatThrownBy(() -> processoFacade.finalizar(id))
                     .isInstanceOf(ErroProcesso.class)
                     .hasMessageContaining("Subprocesso 55 (Situação: MAPEAMENTO_CADASTRO_EM_ANDAMENTO)");
         }
@@ -875,8 +875,8 @@ class ProcessoServiceTest {
             when(auth.isAuthenticated()).thenReturn(false);
 
             // Act & Assert
-            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
-            assertThat(processoService.checarAcesso(null, 1L)).isFalse();
+            assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
+            assertThat(processoFacade.checarAcesso(null, 1L)).isFalse();
         }
 
         @Test
@@ -886,7 +886,7 @@ class ProcessoServiceTest {
             when(auth.isAuthenticated()).thenReturn(true);
             when(auth.getName()).thenReturn(null);
 
-            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+            assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
         }
 
         @Test
@@ -902,7 +902,7 @@ class ProcessoServiceTest {
             doReturn(authorities).when(auth).getAuthorities();
 
             // Act & Assert
-            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+            assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
         }
 
         @Test
@@ -920,7 +920,7 @@ class ProcessoServiceTest {
             when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of());
 
             // Act & Assert
-            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+            assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
         }
 
         @Test
@@ -941,7 +941,7 @@ class ProcessoServiceTest {
                     .build();
             when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
 
-            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+            assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
         }
 
         @Test
@@ -959,7 +959,7 @@ class ProcessoServiceTest {
 
             when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of()); // Nenhuma unidade no sistema
 
-            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+            assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
         }
 
         @Test
@@ -993,7 +993,7 @@ class ProcessoServiceTest {
             when(subprocessoService.verificarAcessoUnidadeAoProcesso(eq(1L), argThat(list -> list.contains(10L) && list.contains(20L)))).thenReturn(true);
 
             // Act & Assert
-            assertThat(processoService.checarAcesso(auth, 1L)).isTrue();
+            assertThat(processoFacade.checarAcesso(auth, 1L)).isTrue();
         }
 
         @Test
@@ -1024,7 +1024,7 @@ class ProcessoServiceTest {
             ))).thenReturn(true);
 
             // Act
-            boolean acesso = processoService.checarAcesso(auth, 1L);
+            boolean acesso = processoFacade.checarAcesso(auth, 1L);
 
             // Assert
             assertThat(acesso).isTrue();
@@ -1045,7 +1045,7 @@ class ProcessoServiceTest {
             when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
 
-            processoService.enviarLembrete(1L, 10L);
+            processoFacade.enviarLembrete(1L, 10L);
             verify(alertaService).criarAlertaSedoc(eq(p), eq(u), anyString());
         }
 
@@ -1061,7 +1061,7 @@ class ProcessoServiceTest {
             when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
 
-            assertThatThrownBy(() -> processoService.enviarLembrete(1L, 10L))
+            assertThatThrownBy(() -> processoFacade.enviarLembrete(1L, 10L))
                 .isInstanceOf(ErroProcesso.class)
                 .hasMessageContaining("não participa");
         }

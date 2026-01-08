@@ -57,7 +57,7 @@ class AtividadeFacadeTest {
         subprocesso.setCodigo(10L);
         when(subprocessoService.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
-        when(atividadeService.criar(request, "user")).thenReturn(created);
+        when(atividadeService.criar(request)).thenReturn(created);
 
         // Facade gets status
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().situacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO).build();

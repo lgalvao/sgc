@@ -38,7 +38,7 @@ public class AtividadeFacade {
         Long mapaCodigo = atividadeDto.getMapaCodigo();
 
         subprocessoService.validarPermissaoEdicaoMapa(mapaCodigo, tituloUsuario);
-        AtividadeDto salvo = atividadeService.criar(atividadeDto, tituloUsuario);
+        AtividadeDto salvo = atividadeService.criar(atividadeDto);
 
         return criarRespostaOperacaoPorMapaCodigo(mapaCodigo, salvo.getCodigo(), true);
     }

@@ -18,7 +18,7 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -35,7 +35,7 @@ import java.util.List;
 public class E2eController {
     private final JdbcTemplate jdbcTemplate;
     private final DataSource dataSource;
-    private final ProcessoService processoService;
+    private final ProcessoFacade processoFacade;
     private final UsuarioService usuarioService;
 
     @PostMapping("/reset-database")
@@ -197,7 +197,7 @@ public class E2eController {
                         .build();
 
         // Criar processo
-        ProcessoDto processo = processoService.criar(criarReq);
+        ProcessoDto processo = processoFacade.criar(criarReq);
 
         // Iniciar se solicitado
         if (request.iniciar() != null && request.iniciar()) {
@@ -205,14 +205,14 @@ public class E2eController {
             Long processoCodigo = processo.getCodigo();
 
             if (tipo == TipoProcesso.MAPEAMENTO) {
-                processoService.iniciarProcessoMapeamento(processoCodigo, unidades);
+                processoFacade.iniciarProcessoMapeamento(processoCodigo, unidades);
             } else if (tipo == TipoProcesso.REVISAO) {
-                processoService.iniciarProcessoRevisao(processoCodigo, unidades);
+                processoFacade.iniciarProcessoRevisao(processoCodigo, unidades);
             }
 
             // Recarregar processo após iniciar
             processo =
-                    processoService
+                    processoFacade
                             .obterPorId(processoCodigo)
                             .orElseThrow(
                                     () ->

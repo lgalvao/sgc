@@ -14,7 +14,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.SubprocessoService;
@@ -46,7 +46,7 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
     private static final String API_SUBPROCESSOS_BUSCAR = "/api/subprocessos/buscar";
 
     @Autowired
-    private ProcessoService processoService;
+    private ProcessoFacade processoFacade;
     @Autowired
     private SubprocessoRepo subprocessoRepo;
     @Autowired
@@ -77,19 +77,19 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
                         .unidades(List.of(unidadeSENIC.getCodigo()))
                         .build();
 
-        var processoCriado = processoService.criar(criarReq);
+        var processoCriado = processoFacade.criar(criarReq);
         Long codProcesso = processoCriado.getCodigo();
 
         // ============================================================
         // PASSO 2: Admin inicia processo
         // ============================================================
         var errosIniciacao =
-                processoService.iniciarProcessoMapeamento(
+                processoFacade.iniciarProcessoMapeamento(
                         codProcesso, List.of(unidadeSENIC.getCodigo()));
         assertThat(errosIniciacao).isEmpty();
 
         // Buscar o subprocesso criado
-        var subprocessos = processoService.listarTodosSubprocessos(codProcesso);
+        var subprocessos = processoFacade.listarTodosSubprocessos(codProcesso);
         assertThat(subprocessos).hasSize(1);
         Long codSubprocesso = subprocessos.getFirst().getCodigo();
 
@@ -116,7 +116,7 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
         // ============================================================
         // PASSO 8: Finalizar processo (Admin)
         // ============================================================
-        processoService.finalizar(codProcesso);
+        processoFacade.finalizar(codProcesso);
 
         // ============================================================
         // PASSO 9: Buscar subprocesso via API (como o frontend faz)

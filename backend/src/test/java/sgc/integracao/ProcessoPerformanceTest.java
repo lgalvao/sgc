@@ -9,7 +9,7 @@ import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ProcessoPerformanceTest extends BaseIntegrationTest {
 
     @Autowired
-    private ProcessoService processoService;
+    private ProcessoFacade processoFacade;
 
     @Test
     @DisplayName("Deve listar processos ativos com participantes")
@@ -42,7 +42,7 @@ class ProcessoPerformanceTest extends BaseIntegrationTest {
         processoRepo.flush();
 
         // Act
-        List<ProcessoDto> result = processoService.listarAtivos();
+        List<ProcessoDto> result = processoFacade.listarAtivos();
 
         // Assert
         assertThat(result).extracting(ProcessoDto::getDescricao)

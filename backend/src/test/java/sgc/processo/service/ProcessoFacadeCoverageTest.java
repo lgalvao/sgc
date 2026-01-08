@@ -26,7 +26,6 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -38,10 +37,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ProcessoServiceCoverageTest {
+class ProcessoFacadeCoverageTest {
 
     @InjectMocks
-    private ProcessoService service;
+    private ProcessoFacade facade;
 
     @Mock private ProcessoRepo processoRepo;
     @Mock private UnidadeService unidadeService;
@@ -60,9 +59,9 @@ class ProcessoServiceCoverageTest {
     void checarAcesso_NaoAutenticado() {
         Authentication auth = mock(Authentication.class);
         when(auth.isAuthenticated()).thenReturn(false);
-        assertThat(service.checarAcesso(auth, 1L)).isFalse();
+        assertThat(facade.checarAcesso(auth, 1L)).isFalse();
 
-        assertThat(service.checarAcesso(null, 1L)).isFalse();
+        assertThat(facade.checarAcesso(null, 1L)).isFalse();
     }
 
     @Test
@@ -76,7 +75,7 @@ class ProcessoServiceCoverageTest {
         // Para mockar getAuthorities, precisamos de um objeto Authentication mais complexo ou usar doReturn
         // Aqui assumimos que o mock retorna lista vazia por padrao
 
-        assertThat(service.checarAcesso(auth, 1L)).isFalse();
+        assertThat(facade.checarAcesso(auth, 1L)).isFalse();
     }
 
     // --- CRIAR PROCESSO ---
@@ -96,7 +95,7 @@ class ProcessoServiceCoverageTest {
         when(unidadeService.verificarExistenciaMapaVigente(1L)).thenReturn(false);
         when(unidadeService.buscarSiglasPorIds(any())).thenReturn(List.of("SIGLA"));
 
-        assertThatThrownBy(() -> service.criar(req))
+        assertThatThrownBy(() -> facade.criar(req))
             .isInstanceOf(ErroProcesso.class)
             .hasMessageContaining("não possuem mapa vigente");
     }
@@ -118,7 +117,7 @@ class ProcessoServiceCoverageTest {
         when(processoRepo.saveAndFlush(any())).thenAnswer(inv -> inv.getArgument(0));
         when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
-        service.criar(req);
+        facade.criar(req);
 
         verify(processoRepo).saveAndFlush(any());
     }
@@ -132,7 +131,7 @@ class ProcessoServiceCoverageTest {
         p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
 
-        assertThatThrownBy(() -> service.atualizar(1L, new AtualizarProcessoReq()))
+        assertThatThrownBy(() -> facade.atualizar(1L, new AtualizarProcessoReq()))
                 .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 
@@ -150,7 +149,7 @@ class ProcessoServiceCoverageTest {
         // a logica interna de 'listarSubprocessosElegiveis' depende do SecurityContext.
         // Vamos testar 'obterDetalhes' isoladamente que é chamado por ele.
 
-        assertThat(service.obterDetalhes(1L)).isNotNull();
+        assertThat(facade.obterDetalhes(1L)).isNotNull();
     }
 
     // --- INICIAR PROCESSO ---
@@ -158,7 +157,7 @@ class ProcessoServiceCoverageTest {
     @Test
     @DisplayName("iniciarProcessoDiagnostico: delega para inicializador")
     void iniciarProcessoDiagnostico_Sucesso() {
-        service.iniciarProcessoDiagnostico(1L, List.of(2L));
+        facade.iniciarProcessoDiagnostico(1L, List.of(2L));
         verify(processoInicializador).iniciar(1L, List.of(2L));
     }
 
@@ -173,7 +172,7 @@ class ProcessoServiceCoverageTest {
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
         when(unidadeService.buscarEntidadePorId(2L)).thenReturn(new Unidade());
 
-        assertThatThrownBy(() -> service.enviarLembrete(1L, 2L))
+        assertThatThrownBy(() -> facade.enviarLembrete(1L, 2L))
             .isInstanceOf(ErroProcesso.class)
             .hasMessage("Unidade não participa deste processo.");
     }
@@ -190,7 +189,7 @@ class ProcessoServiceCoverageTest {
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
         when(unidadeService.buscarEntidadePorId(2L)).thenReturn(u);
 
-        service.enviarLembrete(1L, 2L);
+        facade.enviarLembrete(1L, 2L);
         verify(alertaService).criarAlertaSedoc(eq(p), eq(u), anyString());
     }
 
@@ -202,7 +201,7 @@ class ProcessoServiceCoverageTest {
         Processo p = new Processo(); p.setSituacao(SituacaoProcesso.CRIADO);
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
 
-        assertThatThrownBy(() -> service.finalizar(1L))
+        assertThatThrownBy(() -> facade.finalizar(1L))
             .isInstanceOf(ErroProcesso.class)
             .hasMessageContaining("Apenas processos 'EM ANDAMENTO' podem ser finalizados");
     }
@@ -218,7 +217,7 @@ class ProcessoServiceCoverageTest {
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
         when(subprocessoService.listarEntidadesPorProcesso(any())).thenReturn(List.of(sp));
         
-        assertThatThrownBy(() -> service.finalizar(1L))
+        assertThatThrownBy(() -> facade.finalizar(1L))
             .isInstanceOf(ErroProcesso.class)
             .hasMessageContaining("sem unidade associada");
     }
@@ -235,7 +234,7 @@ class ProcessoServiceCoverageTest {
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
         when(subprocessoService.listarEntidadesPorProcesso(any())).thenReturn(List.of(sp));
 
-        assertThatThrownBy(() -> service.finalizar(1L))
+        assertThatThrownBy(() -> facade.finalizar(1L))
             .isInstanceOf(ErroProcesso.class)
             .hasMessageContaining("sem mapa associado");
     }
@@ -258,7 +257,7 @@ class ProcessoServiceCoverageTest {
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
 
-        service.finalizar(1L);
+        facade.finalizar(1L);
 
         verify(unidadeService).definirMapaVigente(10L, m);
         verify(publicadorEventos).publishEvent(any(sgc.processo.eventos.EventoProcessoFinalizado.class));
@@ -271,14 +270,14 @@ class ProcessoServiceCoverageTest {
         // Mas o metodo eh privado. O melhor eh testar atraves de `criar` ou `atualizar` com REVISAO
 
         Optional<String> msg = org.springframework.test.util.ReflectionTestUtils.invokeMethod(
-            service,
+            facade,
             "getMensagemErroUnidadesSemMapa",
             Collections.<Long>emptyList()
         );
         assertThat(msg).isEmpty();
 
         Optional<String> msgNull = org.springframework.test.util.ReflectionTestUtils.invokeMethod(
-            service,
+            facade,
             "getMensagemErroUnidadesSemMapa",
             (List<Long>) null
         );
@@ -289,7 +288,7 @@ class ProcessoServiceCoverageTest {
     @Test
     @DisplayName("listarUnidadesBloqueadasPorTipo: chama repo")
     void listarUnidadesBloqueadasPorTipo() {
-        service.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
+        facade.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
         verify(processoRepo).findUnidadeCodigosBySituacaoAndTipo(any(), any());
     }
 
@@ -309,7 +308,7 @@ class ProcessoServiceCoverageTest {
 
         @SuppressWarnings("unchecked")
         List<Long> descendentes = (List<Long>) org.springframework.test.util.ReflectionTestUtils
-            .invokeMethod(service, "buscarCodigosDescendentes", 1L);
+            .invokeMethod(facade, "buscarCodigosDescendentes", 1L);
 
         assertThat(descendentes).containsExactlyInAnyOrder(1L, 2L, 3L);
     }
