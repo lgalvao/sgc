@@ -2,6 +2,9 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.context.annotation.Lazy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseService;
@@ -28,6 +31,7 @@ import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.decomposed.SubprocessoValidacaoService;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -61,6 +65,10 @@ public class SubprocessoMapaWorkflowService {
             TipoProcesso.REVISAO, REVISAO_MAPA_HOMOLOGADO
     ));
 
+    private static final String ENTIDADE_SUBPROCESSO = "Subprocesso";
+    private static final String DETALHE_SUBPROCESSO_FMT = "processo=%d, unidade=%d";
+    private static final String MSG_ERRO_WORKFLOW_BLOCO = "Workflow em bloco - subprocesso deveria ter sido criado no início do processo";
+
     private final SubprocessoRepo subprocessoRepo;
     private final CompetenciaService competenciaService;
     private final AtividadeService atividadeService;
@@ -68,15 +76,19 @@ public class SubprocessoMapaWorkflowService {
     private final SubprocessoTransicaoService transicaoService;
     private final AnaliseService analiseService;
     private final UnidadeService unidadeService;
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoValidacaoService validacaoService;
 
-    public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request, String tituloUsuario) {
+    @Autowired
+    @Lazy
+    private SubprocessoMapaWorkflowService self;
+
+    public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         Long codMapa = subprocesso.getMapa().getCodigo();
         boolean eraVazio = competenciaService.buscarPorCodMapa(codMapa).isEmpty();
         boolean temNovasCompetencias = !request.getCompetencias().isEmpty();
 
-        MapaCompletoDto mapaDto = mapaService.salvarMapaCompleto(codMapa, request, tituloUsuario);
+        MapaCompletoDto mapaDto = mapaService.salvarMapaCompleto(codMapa, request);
 
         if (eraVazio
                 && temNovasCompetencias
@@ -89,7 +101,7 @@ public class SubprocessoMapaWorkflowService {
         return mapaDto;
     }
 
-    public MapaCompletoDto adicionarCompetencia(Long codSubprocesso, CompetenciaReq request, String tituloUsuario) {
+    public MapaCompletoDto adicionarCompetencia(Long codSubprocesso, CompetenciaReq request) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
 
         Long codMapa = subprocesso.getMapa().getCodigo();
@@ -111,8 +123,7 @@ public class SubprocessoMapaWorkflowService {
     public MapaCompletoDto atualizarCompetencia(
             Long codSubprocesso,
             Long codCompetencia,
-            CompetenciaReq request,
-            String tituloUsuario) {
+            CompetenciaReq request) {
 
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         competenciaService.atualizarCompetencia(
@@ -122,7 +133,7 @@ public class SubprocessoMapaWorkflowService {
     }
 
     public MapaCompletoDto removerCompetencia(
-            Long codSubprocesso, Long codCompetencia, String tituloUsuario) {
+            Long codSubprocesso, Long codCompetencia) {
 
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
 
@@ -167,7 +178,7 @@ public class SubprocessoMapaWorkflowService {
         validarMapaParaDisponibilizacao(sp);
         
         // Validação adicional de associações (do service antigo)
-        subprocessoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
+        validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
 
         if (request.getDataLimite() == null) {
             throw new ErroValidacao("A data limite para validação é obrigatória.");
@@ -369,7 +380,7 @@ public class SubprocessoMapaWorkflowService {
             Long codSubprocesso, SubmeterMapaAjustadoReq request, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        subprocessoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
+        validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
 
         sp.setSituacao(SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo()));
 
@@ -391,11 +402,11 @@ public class SubprocessoMapaWorkflowService {
             Subprocesso base = buscarSubprocesso(codSubprocessoBase);
             Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
                     .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeDeveriaExistir(
-                            "Subprocesso",
-                            "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo),
-                            "Workflow em bloco - subprocesso deveria ter sido criado no início do processo"));
+                            ENTIDADE_SUBPROCESSO,
+                            DETALHE_SUBPROCESSO_FMT.formatted(base.getProcesso().getCodigo(), unidadeCodigo),
+                            MSG_ERRO_WORKFLOW_BLOCO));
 
-            disponibilizarMapa(target.getCodigo(), request, usuario);
+            self.disponibilizarMapa(target.getCodigo(), request, usuario);
         });
     }
 
@@ -405,11 +416,11 @@ public class SubprocessoMapaWorkflowService {
             Subprocesso base = buscarSubprocesso(codSubprocessoBase);
             Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
                     .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeDeveriaExistir(
-                            "Subprocesso",
-                            "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo),
-                            "Workflow em bloco - subprocesso deveria ter sido criado no início do processo"));
+                            ENTIDADE_SUBPROCESSO,
+                            DETALHE_SUBPROCESSO_FMT.formatted(base.getProcesso().getCodigo(), unidadeCodigo),
+                            MSG_ERRO_WORKFLOW_BLOCO));
 
-            aceitarValidacao(target.getCodigo(), usuario);
+            self.aceitarValidacao(target.getCodigo(), usuario);
         });
     }
 
@@ -419,11 +430,11 @@ public class SubprocessoMapaWorkflowService {
             Subprocesso base = buscarSubprocesso(codSubprocessoBase);
             Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
                     .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeDeveriaExistir(
-                            "Subprocesso",
-                            "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo),
-                            "Workflow em bloco - subprocesso deveria ter sido criado no início do processo"));
+                            ENTIDADE_SUBPROCESSO,
+                            DETALHE_SUBPROCESSO_FMT.formatted(base.getProcesso().getCodigo(), unidadeCodigo),
+                            MSG_ERRO_WORKFLOW_BLOCO));
 
-            homologarValidacao(target.getCodigo(), usuario);
+            self.homologarValidacao(target.getCodigo(), usuario);
         });
     }
 

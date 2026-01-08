@@ -66,7 +66,9 @@ public class AtividadeService {
     }
 
     private void atualizarAtividadeExistente(AtividadeDto atividadeDto, Atividade existente) {
-        notificarAlteracaoMapa(existente.getMapa().getCodigo());
+        if (existente.getMapa() != null) {
+            notificarAlteracaoMapa(existente.getMapa().getCodigo());
+        }
 
         var entidadeParaAtualizar = atividadeMapper.toEntity(atividadeDto);
         existente.setDescricao(entidadeParaAtualizar.getDescricao());

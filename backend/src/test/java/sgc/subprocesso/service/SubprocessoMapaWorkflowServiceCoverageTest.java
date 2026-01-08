@@ -7,7 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseService;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -50,7 +49,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     @Mock private SubprocessoTransicaoService transicaoService;
     @Mock private AnaliseService analiseService;
     @Mock private UnidadeService unidadeService;
-    @Mock private SubprocessoService subprocessoService;
+    @Mock private sgc.subprocesso.service.decomposed.SubprocessoValidacaoService validacaoService;
     @Mock private SubprocessoWorkflowExecutor workflowExecutor;
 
     // --- SALVAR MAPA ---
@@ -63,7 +62,8 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
 
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
 
-        assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, new SalvarMapaRequest(), "user"))
+        SalvarMapaRequest request = new SalvarMapaRequest();
+        assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, request))
             .isInstanceOf(ErroMapaEmSituacaoInvalida.class);
     }
 
@@ -76,8 +76,9 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
 
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
 
-        assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, new SalvarMapaRequest(), "user"))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        SalvarMapaRequest request = new SalvarMapaRequest();
+        assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, request))
+            .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
     }
 
     @Test
@@ -94,9 +95,9 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         SalvarMapaRequest req = new SalvarMapaRequest();
         req.setCompetencias(List.of(new sgc.mapa.dto.CompetenciaMapaDto())); // Tem competencia
 
-        when(mapaService.salvarMapaCompleto(any(), any(), any())).thenReturn(new MapaCompletoDto());
+        when(mapaService.salvarMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());
 
-        service.salvarMapaSubprocesso(1L, req, "user");
+        service.salvarMapaSubprocesso(1L, req);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         verify(subprocessoRepo).save(sp);
@@ -120,7 +121,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
 
         when(mapaService.obterMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());
 
-        service.adicionarCompetencia(1L, req, "user");
+        service.adicionarCompetencia(1L, req);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         verify(subprocessoRepo).save(sp);
@@ -143,7 +144,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
 
         when(mapaService.obterMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());
 
-        service.removerCompetencia(1L, 100L, "user");
+        service.removerCompetencia(1L, 100L);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         verify(subprocessoRepo).save(sp);
@@ -164,9 +165,10 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(Collections.emptyList());
         when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(Collections.emptyList());
 
-        DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(); // data null
+        DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
+        Usuario user = new Usuario();
 
-        assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, new Usuario()))
+        assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, user))
             .isInstanceOf(ErroValidacao.class)
             .hasMessageContaining("data limite");
     }
@@ -186,7 +188,9 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
 
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(comp));
 
-        assertThatThrownBy(() -> service.disponibilizarMapa(1L, new DisponibilizarMapaRequest(), new Usuario()))
+        DisponibilizarMapaRequest request = new DisponibilizarMapaRequest();
+        Usuario user = new Usuario();
+        assertThatThrownBy(() -> service.disponibilizarMapa(1L, request, user))
             .isInstanceOf(ErroValidacao.class)
             .hasMessageContaining("pelo menos uma atividade");
     }
@@ -212,7 +216,9 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         sgc.mapa.model.Atividade a2 = new sgc.mapa.model.Atividade(); a2.setCodigo(200L); a2.setDescricao("A2");
         when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of(a1, a2));
 
-        assertThatThrownBy(() -> service.disponibilizarMapa(1L, new DisponibilizarMapaRequest(), new Usuario()))
+        DisponibilizarMapaRequest request = new DisponibilizarMapaRequest();
+        Usuario user = new Usuario();
+        assertThatThrownBy(() -> service.disponibilizarMapa(1L, request, user))
             .isInstanceOf(ErroValidacao.class)
             .hasMessageContaining("Atividades pendentes: A2");
     }

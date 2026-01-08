@@ -45,7 +45,6 @@ class SubprocessoContextoServiceTest {
         Long codSubprocesso = 1L;
         Long codUnidade = 10L;
         Perfil perfil = Perfil.CHEFE;
-        Long codUnidadeUsuario = 10L;
 
         // Mock 1: Detalhes (agora via SubprocessoService)
         SubprocessoDetalheDto detalheDto = SubprocessoDetalheDto.builder()
@@ -72,7 +71,7 @@ class SubprocessoContextoServiceTest {
         when(subprocessoService.listarAtividadesSubprocesso(codSubprocesso))
                 .thenReturn(Collections.emptyList());
 
-        ContextoEdicaoDto resultado = service.obterContextoEdicao(codSubprocesso, perfil, codUnidadeUsuario);
+        ContextoEdicaoDto resultado = service.obterContextoEdicao(codSubprocesso, perfil);
 
         assertThat(resultado).isNotNull();
         assertThat(resultado.getUnidade()).isEqualTo(unidadeDto);
@@ -86,7 +85,6 @@ class SubprocessoContextoServiceTest {
     void obterContextoEdicaoErroUnidade() {
         Long codSubprocesso = 1L;
         Perfil perfil = Perfil.CHEFE;
-        Long codUnidadeUsuario = 10L;
 
         SubprocessoDetalheDto detalheDto = SubprocessoDetalheDto.builder()
                 .unidade(SubprocessoDetalheDto.UnidadeDto.builder().sigla(SIGLA_TESTE).build())
@@ -97,7 +95,7 @@ class SubprocessoContextoServiceTest {
         when(usuarioService.buscarUnidadePorSigla(SIGLA_TESTE)).thenReturn(Optional.empty());
 
         assertThrows(ErroEntidadeNaoEncontrada.class, () ->
-            service.obterContextoEdicao(codSubprocesso, perfil, codUnidadeUsuario)
+            service.obterContextoEdicao(codSubprocesso, perfil)
         );
     }
 
@@ -107,7 +105,6 @@ class SubprocessoContextoServiceTest {
         Long codSubprocesso = 1L;
         Long codUnidade = 10L;
         Perfil perfil = Perfil.CHEFE;
-        Long codUnidadeUsuario = 10L;
 
         SubprocessoDetalheDto detalheDto = SubprocessoDetalheDto.builder()
                 .unidade(SubprocessoDetalheDto.UnidadeDto.builder().codigo(codUnidade).sigla(SIGLA_TESTE).build())
@@ -124,7 +121,7 @@ class SubprocessoContextoServiceTest {
         when(subprocessoService.listarAtividadesSubprocesso(codSubprocesso))
                 .thenReturn(Collections.emptyList());
 
-        ContextoEdicaoDto resultado = service.obterContextoEdicao(codSubprocesso, perfil, codUnidadeUsuario);
+        ContextoEdicaoDto resultado = service.obterContextoEdicao(codSubprocesso, perfil);
 
         assertThat(resultado.getMapa()).isNull();
     }

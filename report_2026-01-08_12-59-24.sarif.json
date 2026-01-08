@@ -1,0 +1,2222 @@
+{
+  "$schema": "https://raw.githubusercontent.com/schemastore/schemastore/master/src/schemas/json/sarif-2.1.0-rtm.5.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "IntelliJ IDEA",
+          "version": "253.29346.138",
+          "informationUri": "https://www.jetbrains.com?utm_source=product&utm_medium=link&utm_campaign=IU&utm_content=2025.3",
+          "rules": [
+            {
+              "id": "LoggingSimilarMessage",
+              "name": "Non-distinguishable logging calls"
+            },
+            {
+              "id": "ExtractMethodRecommender",
+              "name": "Method can be extracted"
+            },
+            {
+              "id": "unused",
+              "name": "Unused declaration"
+            },
+            {
+              "id": "NullableProblems",
+              "name": "@NotNull/@Nullable problems"
+            },
+            {
+              "id": "ConstantValue",
+              "name": "Constant values"
+            },
+            {
+              "id": "DataFlowIssue",
+              "name": "Nullability and data flow problems"
+            },
+            {
+              "id": "UnusedAssignment",
+              "name": "Unused assignment"
+            }
+          ],
+          "language": "en-US",
+          "contents": [
+            "localizedData",
+            "nonLocalizedData"
+          ],
+          "isComprehensive": false
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "workingDirectory": {
+            "uri": "file:///C:/sgc/"
+          }
+        }
+      ],
+      "language": "en-US",
+      "results": [
+        {
+          "ruleId": "LoggingSimilarMessage",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Similar log messages"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java"
+                },
+                "region": {
+                  "startLine": 174,
+                  "startColumn": 9,
+                  "endLine": 174,
+                  "endColumn": 78,
+                  "charOffset": 7756,
+                  "charLength": 69,
+                  "snippet": {
+                    "text": "log.info(\"E-mail de finalização enviado para {}\", unidade.getSigla())"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "LoggingSimilarMessage",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Similar log messages"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java"
+                },
+                "region": {
+                  "startLine": 193,
+                  "startColumn": 9,
+                  "endLine": 193,
+                  "endColumn": 78,
+                  "charOffset": 8783,
+                  "charLength": 69,
+                  "snippet": {
+                    "text": "log.info(\"E-mail de finalização enviado para {}\", unidade.getSigla())"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ExtractMethodRecommender",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "It's possible to extract method returning 'podeVisualizarImpacto' from a long surrounding method"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoPermissoesService.java"
+                },
+                "region": {
+                  "startLine": 99,
+                  "startColumn": 9,
+                  "endLine": 99,
+                  "endColumn": 67,
+                  "charOffset": 4449,
+                  "charLength": 58,
+                  "snippet": {
+                    "text": "boolean isRevisao = sp.getProcesso().getTipo() == REVISAO;"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "unused",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Parameter 'codUnidadeUsuario' is not used"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoContextoService.java"
+                },
+                "region": {
+                  "startLine": 28,
+                  "startColumn": 91,
+                  "endLine": 28,
+                  "endColumn": 108,
+                  "charOffset": 993,
+                  "charLength": 17,
+                  "snippet": {
+                    "text": "codUnidadeUsuario"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "unused",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Parameter 'usuarioTituloEleitoral' is not used"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/mapa/service/MapaSalvamentoService.java"
+                },
+                "region": {
+                  "startLine": 51,
+                  "startColumn": 61,
+                  "endLine": 51,
+                  "endColumn": 83,
+                  "charOffset": 1933,
+                  "charLength": 22,
+                  "snippet": {
+                    "text": "usuarioTituloEleitoral"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "NullableProblems",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Returning a class with nullable type parameters when a class with non-null type parameters is expected"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/UsuarioService.java"
+                },
+                "region": {
+                  "startLine": 421,
+                  "startColumn": 16,
+                  "endLine": 431,
+                  "endColumn": 26,
+                  "charOffset": 17391,
+                  "charLength": 527,
+                  "snippet": {
+                    "text": "administradorRepo.findAll().stream()\n                .map(admin -> {\n                    Usuario usuario = usuarioRepo.findById(admin.getUsuarioTitulo()).orElse(null);\n                    if (usuario == null) {\n                        log.warn(\"Administrador {} não encontrado na base de usuários\", admin.getUsuarioTitulo());\n                        return null;\n                    }\n                    return toAdministradorDto(usuario);\n                })\n                .filter(Objects::nonNull)\n                .toList()"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "NullableProblems",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Not annotated method overrides method annotated with @NullMarked"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/model/Usuario.java"
+                },
+                "region": {
+                  "startLine": 104,
+                  "startColumn": 51,
+                  "endLine": 104,
+                  "endColumn": 65,
+                  "charOffset": 3130,
+                  "charLength": 14,
+                  "snippet": {
+                    "text": "getAuthorities"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "NullableProblems",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Not annotated method overrides method annotated with @NullMarked"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/model/Usuario.java"
+                },
+                "region": {
+                  "startLine": 117,
+                  "startColumn": 19,
+                  "endLine": 117,
+                  "endColumn": 30,
+                  "charOffset": 3464,
+                  "charLength": 11,
+                  "snippet": {
+                    "text": "getUsername"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "NullableProblems",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Assigning a collection of nullable elements into a collection of non-null elements"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/e2e/E2eController.java"
+                },
+                "region": {
+                  "startLine": 46,
+                  "startColumn": 26,
+                  "endLine": 46,
+                  "endColumn": 32,
+                  "charOffset": 1682,
+                  "charLength": 6,
+                  "snippet": {
+                    "text": "tables"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "NullableProblems",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Overriding method parameters are not annotated"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java"
+                },
+                "region": {
+                  "startLine": 62,
+                  "startColumn": 58,
+                  "endLine": 62,
+                  "endColumn": 64,
+                  "charOffset": 2573,
+                  "charLength": 6,
+                  "snippet": {
+                    "text": "evento"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "NullableProblems",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Assigning a collection of nullable elements into a collection of non-null elements"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/e2e/E2eController.java"
+                },
+                "region": {
+                  "startLine": 73,
+                  "startColumn": 20,
+                  "endLine": 73,
+                  "endColumn": 27,
+                  "charOffset": 2866,
+                  "charLength": 7,
+                  "snippet": {
+                    "text": "mapaIds"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "NullableProblems",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Not annotated method overrides method annotated with @NullMarked"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/mapa/model/AtividadeRepo.java"
+                },
+                "region": {
+                  "startLine": 16,
+                  "startColumn": 21,
+                  "endLine": 16,
+                  "endColumn": 28,
+                  "charOffset": 483,
+                  "charLength": 7,
+                  "snippet": {
+                    "text": "findAll"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'codigosUnidades == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/processo/service/ProcessoFacade.java"
+                },
+                "region": {
+                  "startLine": 352,
+                  "startColumn": 13,
+                  "endLine": 352,
+                  "endColumn": 36,
+                  "charOffset": 14170,
+                  "charLength": 23,
+                  "snippet": {
+                    "text": "codigosUnidades == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'request.descricao() != null' is always 'true'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/e2e/E2eController.java"
+                },
+                "region": {
+                  "startLine": 185,
+                  "startColumn": 13,
+                  "endLine": 185,
+                  "endColumn": 40,
+                  "charOffset": 7998,
+                  "charLength": 27,
+                  "snippet": {
+                    "text": "request.descricao() != null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'mapaCopiado == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoFactory.java"
+                },
+                "region": {
+                  "startLine": 111,
+                  "startColumn": 13,
+                  "endLine": 111,
+                  "endColumn": 32,
+                  "charOffset": 4441,
+                  "charLength": 19,
+                  "snippet": {
+                    "text": "mapaCopiado == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'authentication == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/processo/service/ProcessoFacade.java"
+                },
+                "region": {
+                  "startLine": 67,
+                  "startColumn": 13,
+                  "endLine": 67,
+                  "endColumn": 35,
+                  "charOffset": 2863,
+                  "charLength": 22,
+                  "snippet": {
+                    "text": "authentication == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'atividades == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoService.java"
+                },
+                "region": {
+                  "startLine": 80,
+                  "startColumn": 13,
+                  "endLine": 80,
+                  "endColumn": 31,
+                  "charOffset": 3235,
+                  "charLength": 18,
+                  "snippet": {
+                    "text": "atividades == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'tituloUsuario == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/SubprocessoMapaController.java"
+                },
+                "region": {
+                  "startLine": 79,
+                  "startColumn": 13,
+                  "endLine": 79,
+                  "endColumn": 34,
+                  "charOffset": 3551,
+                  "charLength": 21,
+                  "snippet": {
+                    "text": "tituloUsuario == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'unidade == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/UnidadeController.java"
+                },
+                "region": {
+                  "startLine": 138,
+                  "startColumn": 13,
+                  "endLine": 138,
+                  "endColumn": 28,
+                  "charOffset": 5088,
+                  "charLength": 15,
+                  "snippet": {
+                    "text": "unidade == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'atividades == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoService.java"
+                },
+                "region": {
+                  "startLine": 64,
+                  "startColumn": 13,
+                  "endLine": 64,
+                  "endColumn": 31,
+                  "charOffset": 2534,
+                  "charLength": 18,
+                  "snippet": {
+                    "text": "atividades == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'candidato != null' is always 'true'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/painel/PainelService.java"
+                },
+                "region": {
+                  "startLine": 186,
+                  "startColumn": 17,
+                  "endLine": 186,
+                  "endColumn": 34,
+                  "charOffset": 7785,
+                  "charLength": 17,
+                  "snippet": {
+                    "text": "candidato != null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'siglaSuperior == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/UnidadeController.java"
+                },
+                "region": {
+                  "startLine": 165,
+                  "startColumn": 13,
+                  "endLine": 165,
+                  "endColumn": 34,
+                  "charOffset": 6082,
+                  "charLength": 21,
+                  "snippet": {
+                    "text": "siglaSuperior == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'principal != null' is always 'true'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/UsuarioService.java"
+                },
+                "region": {
+                  "startLine": 492,
+                  "startColumn": 16,
+                  "endLine": 492,
+                  "endColumn": 33,
+                  "charOffset": 20305,
+                  "charLength": 17,
+                  "snippet": {
+                    "text": "principal != null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'codigoUnidade == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/painel/PainelService.java"
+                },
+                "region": {
+                  "startLine": 63,
+                  "startColumn": 17,
+                  "endLine": 63,
+                  "endColumn": 38,
+                  "charOffset": 2414,
+                  "charLength": 21,
+                  "snippet": {
+                    "text": "codigoUnidade == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'codUnidade != null' is always 'true'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/relatorio/service/RelatorioService.java"
+                },
+                "region": {
+                  "startLine": 71,
+                  "startColumn": 13,
+                  "endLine": 71,
+                  "endColumn": 31,
+                  "charOffset": 2943,
+                  "charLength": 18,
+                  "snippet": {
+                    "text": "codUnidade != null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'unidadeMapa == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoFactory.java"
+                },
+                "region": {
+                  "startLine": 132,
+                  "startColumn": 13,
+                  "endLine": 132,
+                  "endColumn": 32,
+                  "charOffset": 5397,
+                  "charLength": 19,
+                  "snippet": {
+                    "text": "unidadeMapa == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'raiz == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/UnidadeService.java"
+                },
+                "region": {
+                  "startLine": 268,
+                  "startColumn": 13,
+                  "endLine": 268,
+                  "endColumn": 25,
+                  "charOffset": 10667,
+                  "charLength": 12,
+                  "snippet": {
+                    "text": "raiz == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'codigoUnidade != null' is always 'true'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/painel/PainelService.java"
+                },
+                "region": {
+                  "startLine": 114,
+                  "startColumn": 13,
+                  "endLine": 114,
+                  "endColumn": 34,
+                  "charOffset": 4540,
+                  "charLength": 21,
+                  "snippet": {
+                    "text": "codigoUnidade != null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'found != null' is always 'true'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/UnidadeService.java"
+                },
+                "region": {
+                  "startLine": 298,
+                  "startColumn": 21,
+                  "endLine": 298,
+                  "endColumn": 34,
+                  "charOffset": 11826,
+                  "charLength": 13,
+                  "snippet": {
+                    "text": "found != null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'request.iniciar() != null' is always 'true'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/e2e/E2eController.java"
+                },
+                "region": {
+                  "startLine": 203,
+                  "startColumn": 13,
+                  "endLine": 203,
+                  "endColumn": 38,
+                  "charOffset": 8683,
+                  "charLength": 25,
+                  "snippet": {
+                    "text": "request.iniciar() != null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'superior == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoPermissoesService.java"
+                },
+                "region": {
+                  "startLine": 150,
+                  "startColumn": 29,
+                  "endLine": 150,
+                  "endColumn": 45,
+                  "charOffset": 6853,
+                  "charLength": 16,
+                  "snippet": {
+                    "text": "superior == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'atividadesOrigem == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaService.java"
+                },
+                "region": {
+                  "startLine": 122,
+                  "startColumn": 13,
+                  "endLine": 122,
+                  "endColumn": 37,
+                  "charOffset": 5332,
+                  "charLength": 24,
+                  "snippet": {
+                    "text": "atividadesOrigem == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'request.diasLimite() != null' is always 'true'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/e2e/E2eController.java"
+                },
+                "region": {
+                  "startLine": 180,
+                  "startColumn": 26,
+                  "endLine": 180,
+                  "endColumn": 54,
+                  "charOffset": 7773,
+                  "charLength": 28,
+                  "snippet": {
+                    "text": "request.diasLimite() != null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'perfil == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoDetalheService.java"
+                },
+                "region": {
+                  "startLine": 85,
+                  "startColumn": 13,
+                  "endLine": 85,
+                  "endColumn": 27,
+                  "charOffset": 3621,
+                  "charLength": 14,
+                  "snippet": {
+                    "text": "perfil == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'participantes == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/painel/PainelService.java"
+                },
+                "region": {
+                  "startLine": 160,
+                  "startColumn": 13,
+                  "endLine": 160,
+                  "endColumn": 34,
+                  "charOffset": 6641,
+                  "charLength": 21,
+                  "snippet": {
+                    "text": "participantes == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'usuario != null' is always 'true'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/seguranca/FiltroAutenticacaoMock.java"
+                },
+                "region": {
+                  "startLine": 45,
+                  "startColumn": 21,
+                  "endLine": 45,
+                  "endColumn": 36,
+                  "charOffset": 1709,
+                  "charLength": 15,
+                  "snippet": {
+                    "text": "usuario != null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'usuario == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java"
+                },
+                "region": {
+                  "startLine": 86,
+                  "startColumn": 13,
+                  "endLine": 86,
+                  "endColumn": 28,
+                  "charOffset": 3158,
+                  "charLength": 15,
+                  "snippet": {
+                    "text": "usuario == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'unidade == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/painel/PainelService.java"
+                },
+                "region": {
+                  "startLine": 192,
+                  "startColumn": 13,
+                  "endLine": 192,
+                  "endColumn": 28,
+                  "charOffset": 7971,
+                  "charLength": 15,
+                  "snippet": {
+                    "text": "unidade == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'usuarioTitulo != null' is always 'true'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/painel/PainelService.java"
+                },
+                "region": {
+                  "startLine": 125,
+                  "startColumn": 25,
+                  "endLine": 125,
+                  "endColumn": 46,
+                  "charOffset": 4993,
+                  "charLength": 21,
+                  "snippet": {
+                    "text": "usuarioTitulo != null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'alvo == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoPermissoesService.java"
+                },
+                "region": {
+                  "startLine": 150,
+                  "startColumn": 13,
+                  "endLine": 150,
+                  "endColumn": 25,
+                  "charOffset": 6837,
+                  "charLength": 12,
+                  "snippet": {
+                    "text": "alvo == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'perfil == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/painel/PainelService.java"
+                },
+                "region": {
+                  "startLine": 53,
+                  "startColumn": 13,
+                  "endLine": 53,
+                  "endColumn": 27,
+                  "charOffset": 2053,
+                  "charLength": 14,
+                  "snippet": {
+                    "text": "perfil == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'email != null' is always 'true'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/notificacao/NotificacaoEmailService.java"
+                },
+                "region": {
+                  "startLine": 117,
+                  "startColumn": 16,
+                  "endLine": 117,
+                  "endColumn": 29,
+                  "charOffset": 4447,
+                  "charLength": 13,
+                  "snippet": {
+                    "text": "email != null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'request.unidadeSigla() == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/e2e/E2eController.java"
+                },
+                "region": {
+                  "startLine": 164,
+                  "startColumn": 13,
+                  "endLine": 164,
+                  "endColumn": 43,
+                  "charOffset": 7028,
+                  "charLength": 30,
+                  "snippet": {
+                    "text": "request.unidadeSigla() == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'unidadeMapa == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoFactory.java"
+                },
+                "region": {
+                  "startLine": 91,
+                  "startColumn": 13,
+                  "endLine": 91,
+                  "endColumn": 32,
+                  "charOffset": 3547,
+                  "charLength": 19,
+                  "snippet": {
+                    "text": "unidadeMapa == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'codigoUnidade != null' is always 'true'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/painel/PainelService.java"
+                },
+                "region": {
+                  "startLine": 225,
+                  "startColumn": 13,
+                  "endLine": 225,
+                  "endColumn": 34,
+                  "charOffset": 9315,
+                  "charLength": 21,
+                  "snippet": {
+                    "text": "codigoUnidade != null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'atividades == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoService.java"
+                },
+                "region": {
+                  "startLine": 134,
+                  "startColumn": 13,
+                  "endLine": 134,
+                  "endColumn": 31,
+                  "charOffset": 5676,
+                  "charLength": 18,
+                  "snippet": {
+                    "text": "atividades == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'acessoAdClient == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/UsuarioService.java"
+                },
+                "region": {
+                  "startLine": 328,
+                  "startColumn": 13,
+                  "endLine": 328,
+                  "endColumn": 35,
+                  "charOffset": 13136,
+                  "charLength": 22,
+                  "snippet": {
+                    "text": "acessoAdClient == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'found != null' is always 'true'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/UnidadeService.java"
+                },
+                "region": {
+                  "startLine": 309,
+                  "startColumn": 21,
+                  "endLine": 309,
+                  "endColumn": 34,
+                  "charOffset": 12244,
+                  "charLength": 13,
+                  "snippet": {
+                    "text": "found != null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'atividades == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoDetalheService.java"
+                },
+                "region": {
+                  "startLine": 141,
+                  "startColumn": 17,
+                  "endLine": 141,
+                  "endColumn": 35,
+                  "charOffset": 6553,
+                  "charLength": 18,
+                  "snippet": {
+                    "text": "atividades == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'codsUnidadesParam == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/processo/service/ProcessoInicializador.java"
+                },
+                "region": {
+                  "startLine": 62,
+                  "startColumn": 17,
+                  "endLine": 62,
+                  "endColumn": 42,
+                  "charOffset": 2300,
+                  "charLength": 25,
+                  "snippet": {
+                    "text": "codsUnidadesParam == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "ConstantValue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Condition 'mapa == null' is always 'false'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoService.java"
+                },
+                "region": {
+                  "startLine": 60,
+                  "startColumn": 13,
+                  "endLine": 60,
+                  "endColumn": 25,
+                  "charOffset": 2327,
+                  "charLength": 12,
+                  "snippet": {
+                    "text": "mapa == null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "'null' is returned by the method declared as @NullMarked"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/UnidadeService.java"
+                },
+                "region": {
+                  "startLine": 290,
+                  "startColumn": 16,
+                  "endLine": 290,
+                  "endColumn": 20,
+                  "charOffset": 11490,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Passing 'null' argument to parameter annotated as @NotNull"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java"
+                },
+                "region": {
+                  "startLine": 142,
+                  "startColumn": 17,
+                  "endLine": 142,
+                  "endColumn": 21,
+                  "charOffset": 5500,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Switch label 'null' is unreachable"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/alerta/AlertaController.java"
+                },
+                "region": {
+                  "startLine": 57,
+                  "startColumn": 18,
+                  "endLine": 57,
+                  "endColumn": 22,
+                  "charOffset": 2330,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Passing 'null' argument to parameter annotated as @NotNull"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/notificacao/NotificacaoEmailServiceMock.java"
+                },
+                "region": {
+                  "startLine": 18,
+                  "startColumn": 15,
+                  "endLine": 18,
+                  "endColumn": 19,
+                  "charOffset": 582,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "'null' is returned by the method declared as @NullMarked"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/UnidadeService.java"
+                },
+                "region": {
+                  "startLine": 301,
+                  "startColumn": 16,
+                  "endLine": 301,
+                  "endColumn": 20,
+                  "charOffset": 11894,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Passing 'null' argument to parameter annotated as @NotNull"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/notificacao/NotificacaoModelosServiceMock.java"
+                },
+                "region": {
+                  "startLine": 17,
+                  "startColumn": 15,
+                  "endLine": 17,
+                  "endColumn": 19,
+                  "charOffset": 454,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Passing 'null' argument to parameter annotated as @NotNull"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java"
+                },
+                "region": {
+                  "startLine": 168,
+                  "startColumn": 17,
+                  "endLine": 168,
+                  "endColumn": 21,
+                  "charOffset": 6477,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Passing 'null' argument to parameter annotated as @NotNull"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java"
+                },
+                "region": {
+                  "startLine": 345,
+                  "startColumn": 21,
+                  "endLine": 345,
+                  "endColumn": 25,
+                  "charOffset": 14688,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Expression 'usuario' might evaluate to null but is returned by the method declared as @NullMarked"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/UsuarioService.java"
+                },
+                "region": {
+                  "startLine": 50,
+                  "startColumn": 16,
+                  "endLine": 50,
+                  "endColumn": 23,
+                  "charOffset": 1833,
+                  "charLength": 7,
+                  "snippet": {
+                    "text": "usuario"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "'null' is returned by the method declared as @NullMarked"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/painel/PainelService.java"
+                },
+                "region": {
+                  "startLine": 193,
+                  "startColumn": 20,
+                  "endLine": 193,
+                  "endColumn": 24,
+                  "charOffset": 8060,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Passing 'null' argument to parameter annotated as @NotNull"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java"
+                },
+                "region": {
+                  "startLine": 224,
+                  "startColumn": 17,
+                  "endLine": 224,
+                  "endColumn": 21,
+                  "charOffset": 8519,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Argument 'codMapa' might be null"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/mapa/service/MapaSalvamentoService.java"
+                },
+                "region": {
+                  "startLine": 152,
+                  "startColumn": 47,
+                  "endLine": 152,
+                  "endColumn": 54,
+                  "charOffset": 6371,
+                  "charLength": 7,
+                  "snippet": {
+                    "text": "codMapa"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Argument 'origem' might be null"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java"
+                },
+                "region": {
+                  "startLine": 56,
+                  "startColumn": 17,
+                  "endLine": 56,
+                  "endColumn": 23,
+                  "charOffset": 2156,
+                  "charLength": 6,
+                  "snippet": {
+                    "text": "origem"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Argument 'descricao' might be null"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoComunicacaoListener.java"
+                },
+                "region": {
+                  "startLine": 63,
+                  "startColumn": 17,
+                  "endLine": 63,
+                  "endColumn": 26,
+                  "charOffset": 2252,
+                  "charLength": 9,
+                  "snippet": {
+                    "text": "descricao"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Argument 'destino' might be null"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java"
+                },
+                "region": {
+                  "startLine": 80,
+                  "startColumn": 17,
+                  "endLine": 80,
+                  "endColumn": 24,
+                  "charOffset": 2979,
+                  "charLength": 7,
+                  "snippet": {
+                    "text": "destino"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Argument 'origem' might be null"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java"
+                },
+                "region": {
+                  "startLine": 79,
+                  "startColumn": 17,
+                  "endLine": 79,
+                  "endColumn": 23,
+                  "charOffset": 2955,
+                  "charLength": 6,
+                  "snippet": {
+                    "text": "origem"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Variable is already assigned to this value"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/UsuarioService.java"
+                },
+                "region": {
+                  "startLine": 341,
+                  "startColumn": 17,
+                  "endLine": 341,
+                  "endColumn": 28,
+                  "charOffset": 13898,
+                  "charLength": 11,
+                  "snippet": {
+                    "text": "autenticado"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "'null' is returned by the method declared as @NullMarked"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/UnidadeService.java"
+                },
+                "region": {
+                  "startLine": 312,
+                  "startColumn": 16,
+                  "endLine": 312,
+                  "endColumn": 20,
+                  "charOffset": 12312,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Argument 'unidade' might be null"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/painel/PainelService.java"
+                },
+                "region": {
+                  "startLine": 185,
+                  "startColumn": 54,
+                  "endLine": 185,
+                  "endColumn": 61,
+                  "charOffset": 7741,
+                  "charLength": 7,
+                  "snippet": {
+                    "text": "unidade"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Argument 'destino' might be null"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java"
+                },
+                "region": {
+                  "startLine": 57,
+                  "startColumn": 17,
+                  "endLine": 57,
+                  "endColumn": 24,
+                  "charOffset": 2180,
+                  "charLength": 7,
+                  "snippet": {
+                    "text": "destino"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Argument 'dataHoraLeitura' might be null"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/painel/PainelService.java"
+                },
+                "region": {
+                  "startLine": 130,
+                  "startColumn": 50,
+                  "endLine": 130,
+                  "endColumn": 65,
+                  "charOffset": 5325,
+                  "charLength": 15,
+                  "snippet": {
+                    "text": "dataHoraLeitura"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Variable is already assigned to this value"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoWorkflowService.java"
+                },
+                "region": {
+                  "startLine": 35,
+                  "startColumn": 14,
+                  "endLine": 35,
+                  "endColumn": 19,
+                  "charOffset": 1229,
+                  "charLength": 5,
+                  "snippet": {
+                    "text": "etapa"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Passing 'null' argument to parameter annotated as @NotNull"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/notificacao/NotificacaoEmailServiceMock.java"
+                },
+                "region": {
+                  "startLine": 18,
+                  "startColumn": 21,
+                  "endLine": 18,
+                  "endColumn": 25,
+                  "charOffset": 588,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Passing 'null' argument to parameter annotated as @NotNull"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java"
+                },
+                "region": {
+                  "startLine": 260,
+                  "startColumn": 17,
+                  "endLine": 260,
+                  "endColumn": 21,
+                  "charOffset": 9950,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "DataFlowIssue",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Argument 'unidadesParaProcessar' might be null"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/processo/service/ProcessoInicializador.java"
+                },
+                "region": {
+                  "startLine": 90,
+                  "startColumn": 60,
+                  "endLine": 90,
+                  "endColumn": 81,
+                  "charOffset": 3742,
+                  "charLength": 21,
+                  "snippet": {
+                    "text": "unidadesParaProcessar"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "UnusedAssignment",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Variable 'autenticado' initializer 'false' is redundant"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "..\\ile://C:/sgc/backend/src/main/java/sgc/organizacao/UsuarioService.java"
+                },
+                "region": {
+                  "startLine": 327,
+                  "startColumn": 31,
+                  "endLine": 327,
+                  "endColumn": 36,
+                  "charOffset": 13117,
+                  "charLength": 5,
+                  "snippet": {
+                    "text": "false"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "newlineSequences": [
+        "\r\n",
+        "\n"
+      ]
+    }
+  ]
+}

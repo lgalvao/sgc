@@ -61,7 +61,7 @@ class UnidadeServiceTest {
             Unidade u1 = new Unidade();
             u1.setCodigo(1L);
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(usuarioMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).build());
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
             // Act
             List<UnidadeDto> result = service.buscarTodasUnidades();
@@ -99,7 +99,7 @@ class UnidadeServiceTest {
             Unidade u1 = new Unidade();
             u1.setCodigo(1L);
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(usuarioMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).build());
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
             // Act & Assert
             assertThat(service.buscarArvore(1L)).isNotNull();
@@ -113,7 +113,7 @@ class UnidadeServiceTest {
             u1.setCodigo(1L);
             u1.setSigla("U1");
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(usuarioMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
 
             // Act
             List<String> result = service.buscarSiglasSubordinadas("U1");
@@ -130,7 +130,7 @@ class UnidadeServiceTest {
             u1.setCodigo(1L);
             u1.setSigla("U1");
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(usuarioMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
 
             // Act & Assert
             assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglasSubordinadas("U2"));
@@ -172,7 +172,7 @@ class UnidadeServiceTest {
             u1.setCodigo(1L);
             u1.setSigla("U1");
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(usuarioMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
 
             // Act
             UnidadeDto result = service.buscarArvore(1L);
@@ -198,9 +198,7 @@ class UnidadeServiceTest {
             Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setSigla("NETO"); u3.setUnidadeSuperior(u2);
             
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1, u2, u3));
-            when(usuarioMapper.toUnidadeDto(u1)).thenReturn(paiDto);
-            when(usuarioMapper.toUnidadeDto(u2)).thenReturn(filhoDto);
-            when(usuarioMapper.toUnidadeDto(u3)).thenReturn(netoDto);
+            when(usuarioMapper.toUnidadeDto(any(Unidade.class), anyBoolean())).thenReturn(paiDto, filhoDto, netoDto);
 
             // Act
             List<String> result = service.buscarSiglasSubordinadas("PAI");

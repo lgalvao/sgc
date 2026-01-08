@@ -103,12 +103,10 @@ public class MapaService {
      *
      * @param codMapa                O código do mapa.
      * @param request                A requisição com os dados a salvar.
-     * @param usuarioTituloEleitoral O título de eleitor do usuário.
      * @return O DTO do mapa completo atualizado.
-     * @see MapaSalvamentoService#salvarMapaCompleto(Long, SalvarMapaRequest, String)
      */
     public MapaCompletoDto salvarMapaCompleto(
-            Long codMapa, SalvarMapaRequest request, String usuarioTituloEleitoral) {
-        return mapaSalvamentoService.salvarMapaCompleto(codMapa, request, usuarioTituloEleitoral);
+            Long codMapa, SalvarMapaRequest request) {
+        return mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
     }
 }

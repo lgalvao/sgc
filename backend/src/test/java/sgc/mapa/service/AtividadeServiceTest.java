@@ -207,12 +207,13 @@ class AtividadeServiceTest {
             Long id = 1L;
             AtividadeDto dto = new AtividadeDto();
             Atividade atividade = new Atividade();
-            atividade.setMapa(new Mapa());
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(1L);
+            atividade.setMapa(mapa);
 
             when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
             when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade());
             when(atividadeRepo.save(any())).thenReturn(atividade);
-            when(atividadeMapper.toDto(any())).thenReturn(dto);
 
             service.atualizar(id, dto);
 
@@ -231,7 +232,6 @@ class AtividadeServiceTest {
             when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
             when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade());
             when(atividadeRepo.save(any())).thenReturn(atividade);
-            when(atividadeMapper.toDto(any())).thenReturn(dto);
 
             service.atualizar(id, dto);
 

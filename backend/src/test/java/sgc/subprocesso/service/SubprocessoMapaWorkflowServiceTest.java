@@ -55,7 +55,7 @@ class SubprocessoMapaWorkflowServiceTest {
     @Mock private SubprocessoTransicaoService transicaoService;
     @Mock private AnaliseService analiseService;
     @Mock private UnidadeService unidadeService;
-    @Mock private SubprocessoService subprocessoService;
+    @Mock private sgc.subprocesso.service.decomposed.SubprocessoValidacaoService validacaoService;
     @Mock private SubprocessoWorkflowExecutor workflowExecutor;
 
     @InjectMocks private SubprocessoMapaWorkflowService service;
@@ -77,10 +77,10 @@ class SubprocessoMapaWorkflowServiceTest {
             SalvarMapaRequest req = new SalvarMapaRequest();
             req.setCompetencias(List.of(new CompetenciaMapaDto())); // Tem novas
 
-            service.salvarMapaSubprocesso(1L, req, "user");
+            service.salvarMapaSubprocesso(1L, req);
 
             verify(subprocessoRepo).save(sp);
-            verify(mapaService).salvarMapaCompleto(10L, req, "user");
+            verify(mapaService).salvarMapaCompleto(10L, req);
         }
 
         @Test
@@ -96,7 +96,7 @@ class SubprocessoMapaWorkflowServiceTest {
             SalvarMapaRequest req = new SalvarMapaRequest();
             req.setCompetencias(List.of(new CompetenciaMapaDto()));
 
-            service.salvarMapaSubprocesso(1L, req, "user");
+            service.salvarMapaSubprocesso(1L, req);
 
             // Não deve salvar (não mudou status)
             verify(subprocessoRepo, never()).save(sp);
@@ -114,9 +114,9 @@ class SubprocessoMapaWorkflowServiceTest {
             SalvarMapaRequest req = new SalvarMapaRequest();
             req.setCompetencias(List.of());
 
-            service.salvarMapaSubprocesso(1L, req, "user");
+            service.salvarMapaSubprocesso(1L, req);
 
-            verify(mapaService).salvarMapaCompleto(10L, req, "user");
+            verify(mapaService).salvarMapaCompleto(10L, req);
         }
 
         @Test
@@ -127,7 +127,7 @@ class SubprocessoMapaWorkflowServiceTest {
             SalvarMapaRequest req = new SalvarMapaRequest();
             req.setCompetencias(List.of(new CompetenciaMapaDto()));
 
-            assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, req, "user"))
+            assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, req))
                 .isInstanceOf(ErroMapaEmSituacaoInvalida.class);
         }
 
@@ -144,7 +144,7 @@ class SubprocessoMapaWorkflowServiceTest {
             req.setDescricao("Nova Comp");
             req.setAtividadesIds(List.of(1L));
 
-            service.adicionarCompetencia(1L, req, "user");
+            service.adicionarCompetencia(1L, req);
 
             verify(subprocessoRepo).save(sp);
             verify(competenciaService).criarCompetenciaComAtividades(mapa, "Nova Comp", List.of(1L));
@@ -162,7 +162,7 @@ class SubprocessoMapaWorkflowServiceTest {
             CompetenciaReq req = new CompetenciaReq();
             req.setDescricao("Nova Comp");
 
-            service.adicionarCompetencia(1L, req, "user");
+            service.adicionarCompetencia(1L, req);
 
             verify(subprocessoRepo, never()).save(sp);
         }
@@ -181,7 +181,7 @@ class SubprocessoMapaWorkflowServiceTest {
             CompetenciaReq req = new CompetenciaReq();
             req.setDescricao("Nova Comp");
 
-            service.adicionarCompetencia(1L, req, "user");
+            service.adicionarCompetencia(1L, req);
 
             verify(subprocessoRepo, never()).save(sp);
         }
@@ -198,7 +198,7 @@ class SubprocessoMapaWorkflowServiceTest {
             req.setDescricao("Comp Atualizada");
             req.setAtividadesIds(List.of(2L));
 
-            service.atualizarCompetencia(1L, 5L, req, "user");
+            service.atualizarCompetencia(1L, 5L, req);
 
             verify(competenciaService).atualizarCompetencia(5L, "Comp Atualizada", List.of(2L));
         }
@@ -214,7 +214,7 @@ class SubprocessoMapaWorkflowServiceTest {
             // Simular que ficou vazio após remover
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
 
-            service.removerCompetencia(1L, 5L, "user");
+            service.removerCompetencia(1L, 5L);
 
             verify(competenciaService).removerCompetencia(5L);
             verify(subprocessoRepo).save(sp);
@@ -231,7 +231,7 @@ class SubprocessoMapaWorkflowServiceTest {
             // Ainda tem competências
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(new Competencia()));
 
-            service.removerCompetencia(1L, 5L, "user");
+            service.removerCompetencia(1L, 5L);
 
             verify(subprocessoRepo, never()).save(sp);
         }
@@ -247,7 +247,7 @@ class SubprocessoMapaWorkflowServiceTest {
             // Ficou vazio
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
 
-            service.removerCompetencia(1L, 5L, "user");
+            service.removerCompetencia(1L, 5L);
 
             verify(subprocessoRepo, never()).save(sp);
         }
@@ -263,9 +263,9 @@ class SubprocessoMapaWorkflowServiceTest {
             SalvarMapaRequest req = new SalvarMapaRequest();
             req.setCompetencias(List.of());
 
-            service.salvarMapaSubprocesso(1L, req, "user");
+            service.salvarMapaSubprocesso(1L, req);
 
-            verify(mapaService).salvarMapaCompleto(10L, req, "user");
+            verify(mapaService).salvarMapaCompleto(10L, req);
         }
 
         @Test
@@ -275,9 +275,9 @@ class SubprocessoMapaWorkflowServiceTest {
             when(sp.getMapa()).thenReturn(null);
             
             SalvarMapaRequest req = new SalvarMapaRequest();
-            assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, req, "user"))
-                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class)
-                .hasMessageContaining("mapa associado");
+            assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, req))
+                .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class)
+                .hasMessageContaining("Mapa");
         }
     }
 
@@ -396,7 +396,8 @@ class SubprocessoMapaWorkflowServiceTest {
             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
             req.setDataLimite(null);
 
-            assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, new Usuario()))
+            Usuario user = new Usuario();
+            assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, user))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("obrigatória");
         }
@@ -514,6 +515,14 @@ class SubprocessoMapaWorkflowServiceTest {
     @Nested
     @DisplayName("Operações em Bloco")
     class EmBloco {
+         @org.junit.jupiter.api.BeforeEach
+         void injectSelf() throws Exception {
+             // Inject self reference for @Lazy self-injection pattern
+             java.lang.reflect.Field selfField = SubprocessoMapaWorkflowService.class.getDeclaredField("self");
+             selfField.setAccessible(true);
+             selfField.set(service, service);
+         }
+         
          @Test
          void deveDisponibilizarEmBloco() {
              Subprocesso base = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
@@ -615,7 +624,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.submeterMapaAjustado(1L, req, new Usuario());
 
-            verify(subprocessoService).validarAssociacoesMapa(any());
+            verify(validacaoService).validarAssociacoesMapa(any());
             verify(subprocessoRepo).save(sp);
             verify(sp).setSituacao(SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO);
         }
@@ -637,7 +646,7 @@ class SubprocessoMapaWorkflowServiceTest {
     @DisplayName("Deve falhar ao buscar subprocesso inexistente")
     void deveFalharSubprocessoInexistente() {
         when(subprocessoRepo.findById(999L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> service.adicionarCompetencia(999L, new CompetenciaReq(), "user"))
+        assertThatThrownBy(() -> service.adicionarCompetencia(999L, new CompetenciaReq()))
             .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
     }
 

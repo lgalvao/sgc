@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.jspecify.annotations.Nullable;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
@@ -33,6 +34,8 @@ import java.util.List;
 @Profile("e2e")
 @RequiredArgsConstructor
 public class E2eController {
+    private static final String SQL_SUBPROCESSO_POR_PROCESSO = " sgc.subprocesso WHERE processo_codigo = ?)";
+
     private final JdbcTemplate jdbcTemplate;
     private final DataSource dataSource;
     private final ProcessoFacade processoFacade;
@@ -47,7 +50,7 @@ public class E2eController {
                     jdbcTemplate.queryForList(
                             "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA ="
                                     + " 'SGC'",
-                            String.class);
+                            String.class).stream().filter(java.util.Objects::nonNull).toList();
 
             for (String table : tables) {
                 jdbcTemplate.execute("TRUNCATE TABLE sgc." + table);
@@ -69,20 +72,21 @@ public class E2eController {
     @Transactional
     public void limparProcessoComDependentes(@PathVariable Long codigo) {
         String sqlMapas =
-                "SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo IN (SELECT codigo FROM sgc.subprocesso WHERE processo_codigo = ?)";
-        List<Long> mapaIds = jdbcTemplate.queryForList(sqlMapas, Long.class, codigo);
+                "SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo IN (SELECT codigo FROM" + SQL_SUBPROCESSO_POR_PROCESSO;
+        List<Long> mapaIds = jdbcTemplate.queryForList(sqlMapas, Long.class, codigo).stream()
+                .filter(java.util.Objects::nonNull).toList();
 
         jdbcTemplate.update(
                 "DELETE FROM sgc.analise WHERE subprocesso_codigo IN (SELECT codigo FROM"
-                        + " sgc.subprocesso WHERE processo_codigo = ?)",
+                        + SQL_SUBPROCESSO_POR_PROCESSO,
                 codigo);
         jdbcTemplate.update(
                 "DELETE FROM sgc.notificacao WHERE subprocesso_codigo IN (SELECT codigo FROM"
-                        + " sgc.subprocesso WHERE processo_codigo = ?)",
+                        + SQL_SUBPROCESSO_POR_PROCESSO,
                 codigo);
         jdbcTemplate.update(
                 "DELETE FROM sgc.movimentacao WHERE subprocesso_codigo IN (SELECT codigo FROM"
-                        + " sgc.subprocesso WHERE processo_codigo = ?)",
+                        + SQL_SUBPROCESSO_POR_PROCESSO,
                 codigo);
 
 
@@ -161,7 +165,7 @@ public class E2eController {
      */
     private ProcessoDto criarProcessoFixture(ProcessoFixtureRequest request, TipoProcesso tipo) {
         // Validar entrada
-        if (request.unidadeSigla() == null || request.unidadeSigla().isBlank()) {
+        if (request.unidadeSigla().isBlank()) {
             throw new ErroValidacao("Unidade é obrigatória");
         }
 
@@ -182,8 +186,9 @@ public class E2eController {
 
         // Criar requisição de processo
         String descricao;
-        if (request.descricao() != null && !request.descricao().isBlank()) {
-            descricao = request.descricao();
+        String descReq = request.descricao();
+        if (descReq != null && !descReq.isBlank()) {
+            descricao = descReq;
         } else {
             descricao = "Processo Fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
         }
@@ -200,7 +205,7 @@ public class E2eController {
         ProcessoDto processo = processoFacade.criar(criarReq);
 
         // Iniciar se solicitado
-        if (request.iniciar() != null && request.iniciar()) {
+        if (Boolean.TRUE.equals(request.iniciar())) {
             List<Long> unidades = List.of(unidade.getCodigo());
             Long processoCodigo = processo.getCodigo();
 
@@ -227,6 +232,6 @@ public class E2eController {
      * DTO para requisição de criação de processo fixture.
      */
     public record ProcessoFixtureRequest(
-            String descricao, String unidadeSigla, Boolean iniciar, Integer diasLimite) {
+            @Nullable String descricao, String unidadeSigla, @Nullable Boolean iniciar, @Nullable Integer diasLimite) {
     }
 }

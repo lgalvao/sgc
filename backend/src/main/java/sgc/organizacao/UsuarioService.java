@@ -19,13 +19,16 @@ import sgc.seguranca.dto.PerfilUnidadeDto;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.Collectors; // Removido posteriormente se não usado noutros sitios
+
+import org.jspecify.annotations.Nullable;
 
 import static java.util.stream.Collectors.toMap;
 
 @Service
 @Slf4j
 public class UsuarioService {
+    private static final String ENTIDADE_USUARIO = "Usuário";
     private final UsuarioRepo usuarioRepo;
     private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final AdministradorRepo administradorRepo;
@@ -40,7 +43,7 @@ public class UsuarioService {
     private final Map<String, java.time.LocalDateTime> autenticacoesRecentes = new java.util.concurrent.ConcurrentHashMap<>();
 
     @Transactional(readOnly = true)
-    public Usuario carregarUsuarioParaAutenticacao(String titulo) {
+    public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
         Usuario usuario = usuarioRepo.findByIdWithAtribuicoes(titulo).orElse(null);
         if (usuario != null) {
             carregarAtribuicoes(usuario);
@@ -79,14 +82,14 @@ public class UsuarioService {
     public Usuario buscarPorId(String titulo) {
         return usuarioRepo
                 .findById(titulo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", titulo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, titulo));
     }
 
     @Transactional(readOnly = true)
     public Usuario buscarPorLogin(String login) {
         Usuario usuario = usuarioRepo
                 .findByIdWithAtribuicoes(login)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", login));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, login));
 
         carregarAtribuicoes(usuario);
         return usuario;
@@ -103,7 +106,7 @@ public class UsuarioService {
 
         // Recarrega com join fetch para garantir as atribuições
         Usuario usuarioCompleto = usuarioRepo.findByIdWithAtribuicoes(usuarioSimples.getTituloEleitoral())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", usuarioSimples.getTituloEleitoral()));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, usuarioSimples.getTituloEleitoral()));
 
         carregarAtribuicoes(usuarioCompleto);
         return usuarioCompleto;
@@ -366,7 +369,7 @@ public class UsuarioService {
     private List<PerfilUnidadeDto> buscarAutorizacoesInterno(String tituloEleitoral) {
         Usuario usuario = usuarioRepo
                 .findByIdWithAtribuicoes(tituloEleitoral)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloEleitoral));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, tituloEleitoral));
 
         carregarAtribuicoes(usuario);
 
@@ -419,22 +422,16 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public List<AdministradorDto> listarAdministradores() {
         return administradorRepo.findAll().stream()
-                .map(admin -> {
-                    Usuario usuario = usuarioRepo.findById(admin.getUsuarioTitulo()).orElse(null);
-                    if (usuario == null) {
-                        log.warn("Administrador {} não encontrado na base de usuários", admin.getUsuarioTitulo());
-                        return null;
-                    }
-                    return toAdministradorDto(usuario);
-                })
-                .filter(Objects::nonNull)
+                .flatMap(admin -> usuarioRepo.findById(admin.getUsuarioTitulo())
+                        .map(this::toAdministradorDto)
+                        .stream())
                 .toList();
     }
 
     @Transactional
     public AdministradorDto adicionarAdministrador(String usuarioTitulo) {
         Usuario usuario = usuarioRepo.findById(usuarioTitulo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", usuarioTitulo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, usuarioTitulo));
 
         if (administradorRepo.existsById(usuarioTitulo)) {
             throw new ErroValidacao("Usuário já é administrador");
@@ -485,7 +482,7 @@ public class UsuarioService {
                 .build();
     }
 
-    public String extractTituloUsuario(Object principal) {
+    public @Nullable String extractTituloUsuario(@Nullable Object principal) {
         if (principal instanceof String string) return string;
         if (principal instanceof Usuario usuario)
             return usuario.getTituloEleitoral();

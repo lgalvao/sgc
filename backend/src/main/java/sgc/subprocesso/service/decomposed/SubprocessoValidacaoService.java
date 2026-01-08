@@ -20,8 +20,8 @@ import sgc.subprocesso.model.Subprocesso;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import org.jspecify.annotations.Nullable;
 import static java.util.Collections.emptyList;
 
 @Service
@@ -36,17 +36,17 @@ public class SubprocessoValidacaoService {
 
     public void validarPermissaoEdicaoMapa(Long mapaCodigo, String tituloUsuario) {
         Subprocesso subprocesso = crudService.obterEntidadePorCodigoMapa(mapaCodigo);
-
-        if (subprocesso.getUnidade() == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel(
-                    "Subprocesso %d existe mas não possui Unidade associada - violação de invariante"
-                    .formatted(subprocesso.getCodigo()));
+        if (subprocesso == null || subprocesso.getUnidade() == null) {
+            throw new sgc.comum.erros.ErroEntidadeNaoEncontrada("Unidade do subprocesso não encontrada.");
         }
 
         Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
-        String titularTitulo = subprocesso.getUnidade().getTituloTitular();
+        if (usuario == null) {
+            throw new ErroAccessoNegado("Usuário não encontrado ou não autorizado.");
+        }
 
-        if (titularTitulo == null || !titularTitulo.equals(String.valueOf(usuario.getTituloEleitoral()))) {
+        String titularTitulo = subprocesso.getUnidade().getTituloTitular();
+        if (titularTitulo == null || !titularTitulo.equals(usuario.getTituloEleitoral())) {
              throw new ErroAccessoNegado("Usuário não autorizado a editar este mapa.");
         }
     }
@@ -56,7 +56,7 @@ public class SubprocessoValidacaoService {
         return obterAtividadesSemConhecimento(sp.getMapa());
     }
 
-    public List<Atividade> obterAtividadesSemConhecimento(Mapa mapa) {
+    public List<Atividade> obterAtividadesSemConhecimento(@Nullable Mapa mapa) {
         if (mapa == null || mapa.getCodigo() == null) {
             return emptyList();
         }
@@ -66,12 +66,12 @@ public class SubprocessoValidacaoService {
         }
         return atividades.stream()
                 .filter(a -> a.getConhecimentos() == null || a.getConhecimentos().isEmpty())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public void validarExistenciaAtividades(Long codSubprocesso) {
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
-        Mapa mapa = subprocesso.getMapa();
+        Mapa mapa = subprocesso == null ? null : subprocesso.getMapa();
         if (mapa == null) {
             throw new ErroValidacao("Mapa não encontrado para o subprocesso.");
         }
@@ -92,8 +92,9 @@ public class SubprocessoValidacaoService {
 
     public void validarAssociacoesMapa(Long mapaId) {
         List<Competencia> competencias = competenciaService.buscarPorCodMapa(mapaId);
+        if (competencias == null) competencias = List.of();
         List<String> competenciasSemAssociacao = competencias.stream()
-            .filter(c -> c.getAtividades().isEmpty())
+            .filter(c -> c.getAtividades() == null || c.getAtividades().isEmpty())
             .map(Competencia::getDescricao)
             .toList();
 
@@ -104,8 +105,9 @@ public class SubprocessoValidacaoService {
         }
 
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(mapaId);
+        if (atividades == null) atividades = List.of();
         List<String> atividadesSemAssociacao = atividades.stream()
-            .filter(a -> a.getCompetencias().isEmpty())
+            .filter(a -> a.getCompetencias() == null || a.getCompetencias().isEmpty())
             .map(Atividade::getDescricao)
             .toList();
 

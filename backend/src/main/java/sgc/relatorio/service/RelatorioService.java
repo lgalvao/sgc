@@ -68,11 +68,9 @@ public class RelatorioService {
         Processo processo = processoFacade.buscarEntidadePorId(codProcesso);
         List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
 
-        if (codUnidade != null) {
-            subprocessos = subprocessos.stream()
-                    .filter(sp -> sp.getUnidade().getCodigo().equals(codUnidade))
-                    .toList();
-        }
+        subprocessos = subprocessos.stream()
+                .filter(sp -> sp.getUnidade().getCodigo().equals(codUnidade))
+                .toList();
 
         try (Document document = pdfFactory.createDocument()) {
             pdfFactory.createWriter(document, outputStream);

@@ -60,8 +60,6 @@ public class PainelService {
         if (perfil == Perfil.ADMIN) {
             processos = processoFacade.listarTodos(sortedPageable);
         } else {
-            if (codigoUnidade == null) return Page.empty(sortedPageable);
-
             List<Long> unidadeIds = new ArrayList<>();
             
             // GESTOR vê processos da unidade e subordinadas
@@ -183,7 +181,7 @@ public class PainelService {
                 // ignore
             }
             Long candidato = encontrarMaiorIdVisivel(unidade, participantesIds);
-            if (candidato != null) visiveis.add(candidato);
+            visiveis.add(candidato);
         }
         return visiveis;
     }

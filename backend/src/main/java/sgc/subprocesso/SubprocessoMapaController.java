@@ -46,7 +46,6 @@ public class SubprocessoMapaController {
      *
      * @param codigo         O código do subprocesso.
      * @param perfil         O perfil do usuário (opcional).
-     * @param unidadeUsuario O código da unidade do usuário (opcional).
      * @return O {@link ContextoEdicaoDto} com todos os dados necessários.
      */
     @GetMapping("/{codigo}/contexto-edicao")
@@ -54,9 +53,8 @@ public class SubprocessoMapaController {
     @Operation(summary = "Obtém o contexto completo para edição de mapa (BFF)")
     public ContextoEdicaoDto obterContextoEdicao(
             @PathVariable Long codigo,
-            @RequestParam(required = false) sgc.organizacao.model.Perfil perfil,
-            @RequestParam(required = false) Long unidadeUsuario) {
-        return subprocessoContextoService.obterContextoEdicao(codigo, perfil, unidadeUsuario);
+            @RequestParam(required = false) sgc.organizacao.model.Perfil perfil) {
+        return subprocessoContextoService.obterContextoEdicao(codigo, perfil);
     }
 
     /**
@@ -75,10 +73,6 @@ public class SubprocessoMapaController {
             @PathVariable Long codigo, @AuthenticationPrincipal Object principal) {
 
         String tituloUsuario = extractTituloUsuario(principal);
-
-        if (tituloUsuario == null) {
-            throw new sgc.comum.erros.ErroAccessoNegado("Usuário não autenticado");
-        }
 
         Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         return impactoMapaService.verificarImpactos(codigo, usuario);
@@ -144,7 +138,7 @@ public class SubprocessoMapaController {
             @RequestBody @Valid SalvarMapaRequest request,
             @AuthenticationPrincipal Object principal) {
         return subprocessoMapaWorkflowService.salvarMapaSubprocesso(
-                codigo, request, extractTituloUsuario(principal));
+                codigo, request);
     }
 
     /**
@@ -211,7 +205,7 @@ public class SubprocessoMapaController {
             @AuthenticationPrincipal Object principal) {
 
         MapaCompletoDto mapa = subprocessoMapaWorkflowService.salvarMapaSubprocesso(
-                codigo, request, extractTituloUsuario(principal));
+                codigo, request);
 
         return ResponseEntity.ok(mapa);
     }
@@ -242,7 +236,7 @@ public class SubprocessoMapaController {
             @AuthenticationPrincipal Object principal) {
         MapaCompletoDto mapa =
                 subprocessoMapaWorkflowService.adicionarCompetencia(
-                        codigo, request, extractTituloUsuario(principal));
+                        codigo, request);
         return ResponseEntity.ok(mapa);
     }
 
@@ -257,7 +251,7 @@ public class SubprocessoMapaController {
             @AuthenticationPrincipal Object principal) {
 
         MapaCompletoDto mapa = subprocessoMapaWorkflowService.atualizarCompetencia(
-                codigo, codCompetencia, request, extractTituloUsuario(principal));
+                codigo, codCompetencia, request);
 
         return ResponseEntity.ok(mapa);
     }
@@ -271,7 +265,7 @@ public class SubprocessoMapaController {
             @PathVariable Long codCompetencia,
             @AuthenticationPrincipal Object principal) {
         MapaCompletoDto mapa = subprocessoMapaWorkflowService.removerCompetencia(
-                codigo, codCompetencia, extractTituloUsuario(principal));
+                codigo, codCompetencia);
 
         return ResponseEntity.ok(mapa);
     }

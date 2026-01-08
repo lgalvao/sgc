@@ -201,12 +201,12 @@ class MapaServiceTest {
             req.setObservacoes("Obs");
             MapaCompletoDto expectedDto = new MapaCompletoDto();
 
-            when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req, "user")).thenReturn(expectedDto);
+            when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req)).thenReturn(expectedDto);
 
-            var resultado = service.salvarMapaCompleto(mapaId, req, "user");
+            var resultado = service.salvarMapaCompleto(mapaId, req);
 
             assertThat(resultado).isNotNull().isSameAs(expectedDto);
-            verify(mapaSalvamentoService).salvarMapaCompleto(mapaId, req, "user");
+            verify(mapaSalvamentoService).salvarMapaCompleto(mapaId, req);
         }
 
         @Test
@@ -215,10 +215,10 @@ class MapaServiceTest {
             Long mapaId = 1L;
             SalvarMapaRequest req = new SalvarMapaRequest();
 
-            when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req, "user"))
+            when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req))
                 .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", mapaId));
 
-            assertThatThrownBy(() -> service.salvarMapaCompleto(mapaId, req, "user"))
+            assertThatThrownBy(() -> service.salvarMapaCompleto(mapaId, req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
@@ -228,10 +228,10 @@ class MapaServiceTest {
             Long mapaId = 1L;
             SalvarMapaRequest req = new SalvarMapaRequest();
 
-            when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req, "user"))
+            when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req))
                 .thenThrow(new ErroValidacao("Atividade 99 não pertence ao mapa"));
 
-            assertThatThrownBy(() -> service.salvarMapaCompleto(mapaId, req, "user"))
+            assertThatThrownBy(() -> service.salvarMapaCompleto(mapaId, req))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining("não pertence ao mapa");
         }

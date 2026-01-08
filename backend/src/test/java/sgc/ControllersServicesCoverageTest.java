@@ -128,8 +128,8 @@ class ControllersServicesCoverageTest {
     @Test
     @DisplayName("Deve obter contexto de edição")
     void deveObterContextoEdicao() {
-        when(subprocessoContextoService.obterContextoEdicao(anyLong(), any(), any())).thenReturn(ContextoEdicaoDto.builder().build());
-        ContextoEdicaoDto dto = subprocessoMapaController.obterContextoEdicao(1L, null, null);
+        when(subprocessoContextoService.obterContextoEdicao(anyLong(), any())).thenReturn(ContextoEdicaoDto.builder().build());
+        ContextoEdicaoDto dto = subprocessoMapaController.obterContextoEdicao(1L, null);
         assertThat(dto).isNotNull();
     }
 
@@ -152,9 +152,9 @@ class ControllersServicesCoverageTest {
     @DisplayName("Deve delegar salvar mapa completo inexistente para MapaSalvamentoService")
     void deveDelegarSalvarMapaCompletoInexistente() {
         SalvarMapaRequest req = new SalvarMapaRequest();
-        when(mapaSalvamentoService.salvarMapaCompleto(99L, req, "123"))
+        when(mapaSalvamentoService.salvarMapaCompleto(99L, req))
             .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 99L));
-        assertThatThrownBy(() -> mapaService.salvarMapaCompleto(99L, req, "123"))
+        assertThatThrownBy(() -> mapaService.salvarMapaCompleto(99L, req))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
@@ -168,10 +168,10 @@ class ControllersServicesCoverageTest {
         compDto.setDescricao("Desc");
         req.setCompetencias(List.of(compDto));
 
-        when(mapaSalvamentoService.salvarMapaCompleto(1L, req, "123"))
+        when(mapaSalvamentoService.salvarMapaCompleto(1L, req))
             .thenThrow(new ErroEntidadeNaoEncontrada("Competência não encontrada: 99"));
 
-        assertThatThrownBy(() -> mapaService.salvarMapaCompleto(1L, req, "123"))
+        assertThatThrownBy(() -> mapaService.salvarMapaCompleto(1L, req))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessageContaining("Competência não encontrada");
     }

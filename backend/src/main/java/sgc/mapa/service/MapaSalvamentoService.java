@@ -42,13 +42,12 @@ public class MapaSalvamentoService {
      *
      * @param codMapa                 O código do mapa a ser salvo.
      * @param request                 A requisição contendo as competências e observações.
-     * @param usuarioTituloEleitoral  O título de eleitor do usuário (para auditoria futura).
      * @return O DTO do mapa completo atualizado.
      * @throws ErroEntidadeNaoEncontrada se o mapa não for encontrado.
      * @throws ErroValidacao             se houver atividades inválidas na requisição.
      */
     public MapaCompletoDto salvarMapaCompleto(
-            Long codMapa, SalvarMapaRequest request, String usuarioTituloEleitoral) {
+            Long codMapa, SalvarMapaRequest request) {
 
         Mapa mapa = mapaRepo.findById(codMapa)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa não encontrado: %d".formatted(codMapa)));
@@ -222,6 +221,7 @@ public class MapaSalvamentoService {
     /**
      * Classe auxiliar para manter o contexto durante o salvamento.
      */
+    @SuppressWarnings("ClassCanBeRecord")
     private static class ContextoSalvamento {
         final List<Competencia> competenciasAtuais;
         final List<Atividade> atividadesAtuais;

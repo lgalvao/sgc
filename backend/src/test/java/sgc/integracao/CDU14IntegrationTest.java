@@ -83,6 +83,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private UnidadeMapaRepo unidadeMapaRepo;
+    @Autowired
+    private sgc.organizacao.model.UsuarioPerfilRepo usuarioPerfilRepo;
     @MockitoBean
     private UsuarioService usuarioService;
 
@@ -175,6 +177,11 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         UsuarioFixture.adicionarPerfil(admin, unidadeAdmin, Perfil.ADMIN);
         UsuarioFixture.adicionarPerfil(gestor, unidadeGestor, Perfil.GESTOR);
         UsuarioFixture.adicionarPerfil(chefe, unidade, Perfil.CHEFE);
+        
+        // Persist UsuarioPerfil for proper authentication
+        admin.getAtribuicoes().forEach(usuarioPerfilRepo::save);
+        gestor.getAtribuicoes().forEach(usuarioPerfilRepo::save);
+        chefe.getAtribuicoes().forEach(usuarioPerfilRepo::save);
 
         Mapa mapaVigente = MapaFixture.mapaPadrao(null);
         mapaVigente.setCodigo(null);

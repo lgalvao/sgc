@@ -53,7 +53,7 @@ class SubprocessoMapperTest {
         when(processoRepo.findById(1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> mapper.mapProcesso(1L))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Processo não encontrado");
+                .hasMessageContaining("FK violada em SubprocessoMapper");
     }
 
     @Test
@@ -79,7 +79,7 @@ class SubprocessoMapperTest {
         when(unidadeRepo.findById(1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> mapper.mapUnidade(1L))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Unidade não encontrada");
+                .hasMessageContaining("FK violada em SubprocessoMapper");
     }
 
     @Test
@@ -105,7 +105,7 @@ class SubprocessoMapperTest {
         when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> mapper.mapMapa(1L))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Mapa não encontrado");
+                .hasMessageContaining("FK violada em SubprocessoMapper");
     }
 
     @Test

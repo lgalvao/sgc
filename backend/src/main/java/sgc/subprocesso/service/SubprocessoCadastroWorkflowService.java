@@ -83,6 +83,10 @@ public class SubprocessoCadastroWorkflowService {
 
     private void validarSubprocessoParaDisponibilizacao(
             Subprocesso sp, Usuario usuario, Long codSubprocesso) {
+        if (usuario == null) {
+            throw new ErroAccessoNegado("Usuário não autenticado");
+        }
+        
         Unidade unidadeSubprocesso = sp.getUnidade();
         String tituloTitular = unidadeSubprocesso.getTituloTitular();
 

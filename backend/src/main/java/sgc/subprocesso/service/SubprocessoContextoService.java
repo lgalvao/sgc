@@ -25,7 +25,7 @@ public class SubprocessoContextoService {
     private final SubprocessoService subprocessoService;
 
     @Transactional(readOnly = true)
-    public ContextoEdicaoDto obterContextoEdicao(Long codSubprocesso, Perfil perfil, Long codUnidadeUsuario) {
+    public ContextoEdicaoDto obterContextoEdicao(Long codSubprocesso, Perfil perfil) {
         // 1. Obter Detalhes do Subprocesso (já inclui validação de permissão)
         SubprocessoDetalheDto subprocessoDto = subprocessoService.obterDetalhes(codSubprocesso, perfil);
 

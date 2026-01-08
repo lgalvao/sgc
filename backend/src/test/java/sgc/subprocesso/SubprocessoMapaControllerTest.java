@@ -110,7 +110,7 @@ class SubprocessoMapaControllerTest {
         req.setObservacoes("obs");
         req.setCompetencias(List.of());
 
-        when(subprocessoMapaWorkflowService.salvarMapaSubprocesso(eq(1L), any(), any()))
+        when(subprocessoMapaWorkflowService.salvarMapaSubprocesso(eq(1L), any()))
                 .thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(
@@ -168,7 +168,7 @@ class SubprocessoMapaControllerTest {
         req.setObservacoes("obs");
         req.setCompetencias(List.of());
 
-        when(subprocessoMapaWorkflowService.salvarMapaSubprocesso(eq(1L), any(), any()))
+        when(subprocessoMapaWorkflowService.salvarMapaSubprocesso(eq(1L), any()))
                 .thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(
@@ -187,7 +187,7 @@ class SubprocessoMapaControllerTest {
         req.setDescricao("Comp");
         req.setAtividadesIds(List.of(1L, 2L)); // Corrigido: lista não pode ser vazia
 
-        when(subprocessoMapaWorkflowService.adicionarCompetencia(eq(1L), any(), any()))
+        when(subprocessoMapaWorkflowService.adicionarCompetencia(eq(1L), any()))
                 .thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(
@@ -255,7 +255,7 @@ class SubprocessoMapaControllerTest {
         req.setDescricao("Comp");
         req.setAtividadesIds(List.of(1L)); // Corrigido: lista não pode ser vazia
 
-        when(subprocessoMapaWorkflowService.atualizarCompetencia(eq(1L), eq(10L), any(), any()))
+        when(subprocessoMapaWorkflowService.atualizarCompetencia(eq(1L), eq(10L), any()))
                 .thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(
@@ -270,7 +270,7 @@ class SubprocessoMapaControllerTest {
     @DisplayName("removerCompetencia")
     @WithMockUser
     void removerCompetencia() throws Exception {
-        when(subprocessoMapaWorkflowService.removerCompetencia(eq(1L), eq(10L), any()))
+        when(subprocessoMapaWorkflowService.removerCompetencia(1L, 10L))
                 .thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(post("/api/subprocessos/1/competencias/10/remover").with(csrf()))

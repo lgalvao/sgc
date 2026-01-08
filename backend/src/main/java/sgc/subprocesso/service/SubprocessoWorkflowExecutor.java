@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.jspecify.annotations.Nullable;
 import sgc.analise.AnaliseService;
 import sgc.analise.dto.CriarAnaliseReq;
 import sgc.analise.model.TipoAcaoAnalise;
@@ -34,8 +35,8 @@ public class SubprocessoWorkflowExecutor {
             Unidade unidadeOrigemTransicao, // Origem da transição
             Unidade unidadeDestinoTransicao, // Destino da transição
             Usuario usuario,
-            String observacoes,
-            String motivoAnalise
+            @Nullable String observacoes,
+            @Nullable String motivoAnalise
     ) {
         // 1. Criar Análise
         analiseService.criarAnalise(
