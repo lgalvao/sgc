@@ -245,12 +245,12 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
         }
 
         // 3. Verifica hierarquia
-        // Caso especial: ADMIN não precisa verificar hierarquia para EDITAR_MAPA
+        // Caso especial: ADMIN é global e não precisa verificar hierarquia para ações administrativas
         boolean isAdmin = usuario.getTodasAtribuicoes().stream()
                 .anyMatch(a -> a.getPerfil() == ADMIN);
         
-        if (acao == EDITAR_MAPA && isAdmin) {
-            // ADMIN pode editar mapa sem restrição de hierarquia (conforme comportamento original)
+        // ADMIN pode executar ações administrativas e de edição de mapa sem restrição de hierarquia
+        if (isAdmin && isAcaoAdministrativaOuEdicaoMapa(acao)) {
             return true;
         }
         
@@ -375,6 +375,27 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
                 yield tituloTitular.equals(usuario.getTituloEleitoral());
             }
         };
+    }
+
+    /**
+     * Verifica se a ação é administrativa ou de edição de mapa.
+     * ADMIN possui privilégios globais e pode executar estas ações sem restrição de hierarquia.
+     */
+    private boolean isAcaoAdministrativaOuEdicaoMapa(Acao acao) {
+        return acao == EDITAR_MAPA
+                || acao == DEVOLVER_CADASTRO
+                || acao == ACEITAR_CADASTRO
+                || acao == HOMOLOGAR_CADASTRO
+                || acao == DEVOLVER_REVISAO_CADASTRO
+                || acao == ACEITAR_REVISAO_CADASTRO
+                || acao == HOMOLOGAR_REVISAO_CADASTRO
+                || acao == DISPONIBILIZAR_MAPA
+                || acao == VALIDAR_MAPA
+                || acao == HOMOLOGAR_MAPA
+                || acao == DEVOLVER_MAPA
+                || acao == ALTERAR_DATA_LIMITE
+                || acao == REABRIR_CADASTRO
+                || acao == REABRIR_REVISAO;
     }
 
     private String obterMotivoNegacaoHierarquia(

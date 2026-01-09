@@ -45,3 +45,8 @@ backend/bin/
 # Jqwik
 .jqwik-database
 
+# Playwright E2E test results
+test-results/
+playwright-report/
+.playwright/
+
