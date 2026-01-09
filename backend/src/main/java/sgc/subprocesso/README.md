@@ -31,7 +31,6 @@ graph TD
             DtoBuilder(SubprocessoDtoService)
             Mapa(SubprocessoMapaService)
             Notificacao(SubprocessoNotificacaoService)
-            Permissoes(SubprocessoPermissoesService)
         end
 
         Repos(Repositórios JPA)
@@ -42,7 +41,7 @@ graph TD
     ControleMapa -- Utiliza --> MapaWorkflow & Mapa & DtoBuilder & Consulta
     ControleValidacao -- Utiliza --> MapaWorkflow & DtoBuilder
 
-    CadastroWorkflow & MapaWorkflow & Consulta & DtoBuilder & Mapa & Notificacao & Permissoes -- Acessam --> Repos
+    CadastroWorkflow & MapaWorkflow & Consulta & DtoBuilder & Mapa & Notificacao -- Acessam --> Repos
 ```
 
 ## Componentes Principais
@@ -77,7 +76,6 @@ graph TD
 - **`SubprocessoCadastroWorkflowService`**: Gerencia a fase de cadastro de atividades e conhecimentos, incluindo disponibilização, devolução, aceite e homologação do cadastro.
 - **`SubprocessoMapaWorkflowService`**: Gerencia a fase de elaboração e validação do mapa de competências. Responsável pela disponibilização, validação, sugestões, aceite e homologação final do mapa.
 - **`SubprocessoConsultaService`**: Centraliza as consultas complexas (ex: buscar subprocesso com mapa carregado).
-- **`SubprocessoPermissoesService`**: Centraliza a lógica de segurança e verificação de permissões.
 
 ## Diagrama da Máquina de Estados (`SituacaoSubprocesso`)
 
