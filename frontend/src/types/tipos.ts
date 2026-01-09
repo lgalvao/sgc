@@ -274,6 +274,7 @@ export interface SubprocessoPermissoes {
     podeVerPagina: boolean;
     podeEditarMapa: boolean;
     podeVisualizarMapa: boolean;
+    podeDisponibilizarMapa: boolean;
     podeDisponibilizarCadastro: boolean;
     podeDevolverCadastro: boolean;
     podeAceitarCadastro: boolean;

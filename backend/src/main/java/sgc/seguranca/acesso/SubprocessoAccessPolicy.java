@@ -151,7 +151,9 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
             )),
             Map.entry(DISPONIBILIZAR_MAPA, new RegrasAcao(
                     EnumSet.of(ADMIN),
-                    EnumSet.of(MAPEAMENTO_CADASTRO_HOMOLOGADO, REVISAO_CADASTRO_HOMOLOGADA),
+                    EnumSet.of(MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO,
+                               MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA,
+                               REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES),
                     RequisitoHierarquia.NENHUM
             )),
             Map.entry(VERIFICAR_IMPACTOS, new RegrasAcao(
@@ -243,6 +245,15 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
         }
 
         // 3. Verifica hierarquia
+        // Caso especial: ADMIN não precisa verificar hierarquia para EDITAR_MAPA
+        boolean isAdmin = usuario.getTodasAtribuicoes().stream()
+                .anyMatch(a -> a.getPerfil() == ADMIN);
+        
+        if (acao == EDITAR_MAPA && isAdmin) {
+            // ADMIN pode editar mapa sem restrição de hierarquia (conforme comportamento original)
+            return true;
+        }
+        
         if (!verificaHierarquia(usuario, subprocesso, regras.requisitoHierarquia)) {
             ultimoMotivoNegacao = obterMotivoNegacaoHierarquia(
                     usuario, subprocesso, regras.requisitoHierarquia

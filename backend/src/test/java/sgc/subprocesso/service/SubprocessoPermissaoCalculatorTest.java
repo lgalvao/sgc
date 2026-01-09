@@ -34,6 +34,7 @@ class SubprocessoPermissaoCalculatorTest {
         when(accessControlService.podeExecutar(usuario, Acao.VISUALIZAR_SUBPROCESSO, subprocesso)).thenReturn(true);
         when(accessControlService.podeExecutar(usuario, Acao.EDITAR_MAPA, subprocesso)).thenReturn(true);
         when(accessControlService.podeExecutar(usuario, Acao.VISUALIZAR_MAPA, subprocesso)).thenReturn(true);
+        when(accessControlService.podeExecutar(usuario, Acao.DISPONIBILIZAR_MAPA, subprocesso)).thenReturn(false);
         when(accessControlService.podeExecutar(usuario, Acao.DISPONIBILIZAR_CADASTRO, subprocesso)).thenReturn(false);
         when(accessControlService.podeExecutar(usuario, Acao.DEVOLVER_CADASTRO, subprocesso)).thenReturn(false);
         when(accessControlService.podeExecutar(usuario, Acao.ACEITAR_CADASTRO, subprocesso)).thenReturn(false);
@@ -50,6 +51,7 @@ class SubprocessoPermissaoCalculatorTest {
         assertThat(resultado.isPodeVerPagina()).isTrue();
         assertThat(resultado.isPodeEditarMapa()).isTrue();
         assertThat(resultado.isPodeVisualizarMapa()).isTrue();
+        assertThat(resultado.isPodeDisponibilizarMapa()).isFalse();
         assertThat(resultado.isPodeDisponibilizarCadastro()).isFalse();
         assertThat(resultado.isPodeDevolverCadastro()).isFalse();
         assertThat(resultado.isPodeAceitarCadastro()).isFalse();
@@ -75,6 +77,7 @@ class SubprocessoPermissaoCalculatorTest {
         assertThat(resultado.isPodeVerPagina()).isFalse();
         assertThat(resultado.isPodeEditarMapa()).isFalse();
         assertThat(resultado.isPodeVisualizarMapa()).isFalse();
+        assertThat(resultado.isPodeDisponibilizarMapa()).isFalse();
         assertThat(resultado.isPodeDisponibilizarCadastro()).isFalse();
         assertThat(resultado.isPodeDevolverCadastro()).isFalse();
         assertThat(resultado.isPodeAceitarCadastro()).isFalse();

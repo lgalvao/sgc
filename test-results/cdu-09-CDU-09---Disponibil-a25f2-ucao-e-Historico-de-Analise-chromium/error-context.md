@@ -1,0 +1,105 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link " Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link " Minha unidade" [ref=e14] [cursor=pointer]:
+                  - /url: /unidade/1
+                  - generic [ref=e15]: 
+                  - text: Minha unidade
+              - listitem [ref=e16]:
+                - link " Relatórios" [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link " Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link " ADMIN - SEDOC" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: ADMIN - SEDOC
+              - listitem "Configurações do sistema" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: /configuracoes
+                  - generic [ref=e30]: 
+              - listitem "Sair" [ref=e31]:
+                - link [ref=e32] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e33]: 
+      - generic [ref=e36]:
+        - button "" [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]: 
+        - navigation "breadcrumb" [ref=e39]:
+          - list [ref=e40]:
+            - listitem [ref=e41]:
+              - link "Início" [ref=e42] [cursor=pointer]:
+                - /url: /painel
+                - generic "Início" [ref=e43]: 
+            - listitem [ref=e44]:
+              - text: ›
+              - link "Detalhes do processo" [ref=e45] [cursor=pointer]:
+                - /url: /processo/25
+            - listitem [ref=e46]:
+              - text: ›
+              - link "SECAO_221" [ref=e47] [cursor=pointer]:
+                - /url: /processo/25/SECAO_221
+            - listitem [ref=e48]:
+              - text: ›
+              - generic [ref=e49]: Atividades e conhecimentos
+      - main [ref=e50]:
+        - generic [ref=e51]:
+          - generic [ref=e53]: SECAO_221
+          - generic [ref=e55]:
+            - heading "Atividades e conhecimentos" [level=2] [ref=e56]
+            - generic [ref=e57]:
+              - button " Impacto no mapa" [ref=e58] [cursor=pointer]:
+                - generic [ref=e59]: 
+                - text: Impacto no mapa
+              - button "Histórico de análise" [ref=e60] [cursor=pointer]
+              - button "Devolver para ajustes" [ref=e61] [cursor=pointer]
+              - button "Homologar" [ref=e62] [cursor=pointer]
+          - generic [ref=e64]:
+            - strong [ref=e66]: Atividade Incompleta 1767988756942
+            - generic [ref=e69]: Conhecimento Corretivo
+          - generic [ref=e71]:
+            - strong [ref=e73]: Atividade Validada 1767988756942
+            - generic [ref=e76]: Conhecimento Valido
+      - contentinfo [ref=e77]:
+        - generic [ref=e78]:
+          - generic [ref=e79]: Versão 1.0.0
+          - generic [ref=e80]: © SESEL/COSIS/TRE-PE
+  - dialog "Devolução do cadastro" [ref=e81]:
+    - generic [ref=e82]:
+      - generic [ref=e83]:
+        - heading "Devolução do cadastro" [level=5] [ref=e84]
+        - button "Close" [ref=e85] [cursor=pointer]
+      - generic [ref=e86]:
+        - paragraph [ref=e87]: Confirma a devolução do cadastro para ajustes?
+        - generic [ref=e88]:
+          - generic [ref=e89]: Observação
+          - textbox "Observação" [ref=e90]: Faltou detalhar melhor os conhecimentos técnicos.
+      - generic [ref=e91]:
+        - button "Cancelar" [ref=e92] [cursor=pointer]
+        - button "Confirmar" [active] [ref=e93] [cursor=pointer]
+```
