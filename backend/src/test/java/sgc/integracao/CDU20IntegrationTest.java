@@ -17,6 +17,7 @@ import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockChefe;
+import sgc.integracao.mocks.WithMockGestor;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
@@ -67,32 +68,21 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Criar hierarquia de 3 níveis de unidades via Fixture
-        // Nível 1: Unidade superior superior (interoperacional)
-        unidadeSuperiorSuperior = UnidadeFixture.unidadePadrao();
-        unidadeSuperiorSuperior.setCodigo(null);
-        unidadeSuperiorSuperior.setNome("Secretaria CDU-20");
-        unidadeSuperiorSuperior.setSigla("SEC20");
-        unidadeSuperiorSuperior.setUnidadeSuperior(null);
-        unidadeSuperiorSuperior = unidadeRepo.save(unidadeSuperiorSuperior);
+        // Use existing 3-level hierarchy from data.sql:
+        // Unit 2 (STIC - INTEROPERACIONAL) - top level
+        // Unit 6 (COSIS - INTERMEDIARIA) - subordinate to 2
+        // Unit 9 (SEDIA - OPERACIONAL) - subordinate to 6
+        // User '666666666666' is GESTOR of unit 6
+        unidadeSuperiorSuperior = unidadeRepo.findById(2L)
+                .orElseThrow(() -> new RuntimeException("Unit 2 not found in data.sql"));
+        
+        unidadeSuperior = unidadeRepo.findById(6L)
+                .orElseThrow(() -> new RuntimeException("Unit 6 not found in data.sql"));
+        
+        unidade = unidadeRepo.findById(9L)
+                .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
 
-        // Nível 2: Unidade superior (intermediária)
-        unidadeSuperior = UnidadeFixture.unidadePadrao();
-        unidadeSuperior.setCodigo(null);
-        unidadeSuperior.setNome("Coordenadoria CDU-20");
-        unidadeSuperior.setSigla("COORD20");
-        unidadeSuperior.setUnidadeSuperior(unidadeSuperiorSuperior);
-        unidadeSuperior = unidadeRepo.save(unidadeSuperior);
-
-        // Nível 3: Unidade operacional
-        unidade = UnidadeFixture.unidadePadrao();
-        unidade.setCodigo(null);
-        unidade.setNome("Seção CDU-20");
-        unidade.setSigla("SECAO20");
-        unidade.setUnidadeSuperior(unidadeSuperior);
-        unidade = unidadeRepo.save(unidade);
-
-        // Criar Processo via Fixture
+        // Create test process and subprocess
         Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setDescricao("Processo de Teste");
@@ -100,7 +90,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
 
-        // Criar Subprocesso via Fixture
+        // Create subprocess in MAPEAMENTO_MAPA_VALIDADO state for unit 9
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
@@ -110,7 +100,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Devolução e aceite da validação do mapa com verificação do histórico")
-    @WithMockChefe()
+    @WithMockGestor("666666666666") // GESTOR of unit 6 (immediate parent of unit 9)
     void devolucaoEaceiteComVerificacaoHistorico() throws Exception {
         // Devolução do mapa
         DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");

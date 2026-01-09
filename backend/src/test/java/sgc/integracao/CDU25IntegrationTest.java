@@ -85,58 +85,24 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        Long idSuperior = 7000L;
-        Long idUnidade1 = 7001L;
-        Long idUnidade2 = 7002L;
+        // Use existing 3-level hierarchy from data.sql:
+        // Unit 2 (STIC - INTEROPERACIONAL) - top level
+        // Unit 6 (COSIS - INTERMEDIARIA) - subordinate to 2, user '666666666666' is GESTOR
+        // Unit 8 (SEDESENV - OPERACIONAL) - subordinate to 6
+        // Unit 9 (SEDIA - OPERACIONAL) - subordinate to 6
+        
+        // When GESTOR of unit 6 accepts validations from units 8/9:
+        // proximaUnidade = unidade8.getUnidadeSuperior().getUnidadeSuperior() = unit 2 (not null)
+        // So it will create análise/movimentação for next level (unit 2)
+        
+        unidadeSuperior = unidadeRepo.findById(6L)
+                .orElseThrow(() -> new RuntimeException("Unit 6 not found in data.sql"));
+        unidade1 = unidadeRepo.findById(8L)
+                .orElseThrow(() -> new RuntimeException("Unit 8 not found in data.sql"));
+        unidade2 = unidadeRepo.findById(9L)
+                .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
 
-        // É crucial que a unidade superior tenha unidade superior ou seja nula corretamente para o fluxo de "Aceite".
-        // O fluxo de Aceitar Validação em SubprocessoMapaWorkflowService diz:
-        // Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
-        // Unidade proximaUnidade = unidadeSuperior != null ? unidadeSuperior.getUnidadeSuperior() : null;
-        // Se proximaUnidade == null, ele HOMOLOGA.
-        // Se proximaUnidade != null, ele registra analise/movimentacao para proxima unidade.
-
-        // No teste, criamos idSuperior como 7000L e unidade_superior_codigo = NULL.
-        // Entao unidade1.superior = unidadeSuperior.
-        // unidadeSuperior.superior = NULL.
-        // Logo, proximaUnidade = NULL.
-        // Então o sistema executa o bloco "homologarImplícito" que cria análise de aceite mas NAO cria movimentação de transição?
-        // Vamos verificar o código em SubprocessoMapaWorkflowService.aceitarValidacao:
-
-        /*
-        if (proximaUnidade == null) {
-            // ...
-            analiseService.criarAnalise(...);
-            sp.setSituacao(...HOMOLOGADO);
-            subprocessoRepo.save(sp);
-            // Sem transição registrada no código original para este caso.
-        }
-        */
-
-        // Se não tem transição, não tem movimentação! Por isso o teste falha "Expecting actual not to be empty".
-
-        // Para testar o fluxo "padrão" de ACEITE onde ele sobe para a próxima instância, precisamos de mais um nível hierárquico.
-
-        Long idSuperSuperior = 6999L;
-        String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-        jdbcTemplate.update(sqlInsertUnidade, idSuperSuperior, "Diretoria", "DIRETORIA", "INTERMEDIARIA", "ATIVA", null, null);
-        jdbcTemplate.update(sqlInsertUnidade, idSuperior, "Coordenação Validação", "COORD-VALID", "INTERMEDIARIA", "ATIVA", idSuperSuperior, null);
-        jdbcTemplate.update(sqlInsertUnidade, idUnidade1, "Unidade Valid 1", "UNID-VALID-1", "OPERACIONAL", "ATIVA", idSuperior, null);
-        jdbcTemplate.update(sqlInsertUnidade, idUnidade2, "Unidade Valid 2", "UNID-VALID-2", "OPERACIONAL", "ATIVA", idSuperior, null);
-
-        unidadeSuperior = unidadeRepo.findById(idSuperior).orElseThrow();
-        unidade1 = unidadeRepo.findById(idUnidade1).orElseThrow();
-        unidade2 = unidadeRepo.findById(idUnidade2).orElseThrow();
-
-        // Gestor da Unidade Superior (quem aceita)
-        Usuario gestor = UsuarioFixture.usuarioPadrao();
-        gestor.setTituloEleitoral("707070707070");
-        gestor.setNome("Gestor Validação");
-        gestor.setUnidadeLotacao(unidadeSuperior);
-        usuarioRepo.save(gestor);
-
-        // Processo
+        // Create test process
         processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -144,7 +110,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         processo.setDescricao("Processo Validação CDU-25");
         processo = processoRepo.save(processo);
 
-        // Subprocessos
+        // Create subprocesses in MAPEAMENTO_MAPA_VALIDADO state
         subprocesso1 = SubprocessoFixture.subprocessoPadrao(processo, unidade1);
         subprocesso1.setCodigo(null);
         subprocesso1.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
@@ -161,12 +127,12 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         processo = processoRepo.findById(processo.getCodigo()).orElseThrow();
         subprocesso1 = subprocessoRepo.findById(subprocesso1.getCodigo()).orElseThrow();
         subprocesso2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
-        unidadeSuperior = unidadeRepo.findById(idSuperior).orElseThrow();
+        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
     }
 
     @Test
     @DisplayName("Deve aceitar validação de mapas em bloco")
-    @WithMockGestor("707070707070")
+    @WithMockGestor("666666666666") // GESTOR of unit 6 (parent of units 8 and 9)
     void aceitarValidacaoEmBloco_deveAceitarSucesso() throws Exception {
         // Given
         Long codigoContexto = subprocesso1.getCodigo();

@@ -86,29 +86,19 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Criar Unidades
-        Long idSuperior = 4000L;
-        Long idUnidade1 = 4001L;
-        Long idUnidade2 = 4002L;
+        // Use existing units from data.sql:
+        // Unit 6 (COSIS - INTERMEDIARIA) is the parent
+        // Unit 8 (SEDESENV - OPERACIONAL) subordinate to 6
+        // Unit 9 (SEDIA - OPERACIONAL) subordinate to 6
+        // User '666666666666' is GESTOR of unit 6
+        unidadeSuperior = unidadeRepo.findById(6L)
+                .orElseThrow(() -> new RuntimeException("Unit 6 not found in data.sql"));
+        unidade1 = unidadeRepo.findById(8L)
+                .orElseThrow(() -> new RuntimeException("Unit 8 not found in data.sql"));
+        unidade2 = unidadeRepo.findById(9L)
+                .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
 
-        String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-        jdbcTemplate.update(sqlInsertUnidade, idSuperior, "Coordenação de Bloco", "COORD-BLOCO", "INTERMEDIARIA", "ATIVA", null, null);
-        jdbcTemplate.update(sqlInsertUnidade, idUnidade1, "Unidade Bloco 1", "UNID-BLOCO-1", "OPERACIONAL", "ATIVA", idSuperior, null);
-        jdbcTemplate.update(sqlInsertUnidade, idUnidade2, "Unidade Bloco 2", "UNID-BLOCO-2", "OPERACIONAL", "ATIVA", idSuperior, null);
-
-        unidadeSuperior = unidadeRepo.findById(idSuperior).orElseThrow();
-        unidade1 = unidadeRepo.findById(idUnidade1).orElseThrow();
-        unidade2 = unidadeRepo.findById(idUnidade2).orElseThrow();
-
-        // Criar Usuário Gestor
-        Usuario gestorUser = UsuarioFixture.usuarioPadrao();
-        gestorUser.setTituloEleitoral("303030303030");
-        gestorUser.setNome("Gestor Bloco");
-        gestorUser.setUnidadeLotacao(unidadeSuperior);
-        usuarioRepo.save(gestorUser);
-
-        // Criar Processo
+        // Create test process
         processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -116,7 +106,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         processo.setDescricao("Processo Bloco CDU-22");
         processo = processoRepo.save(processo);
 
-        // Criar Subprocessos
+        // Create subprocesses for both units
         subprocesso1 = SubprocessoFixture.subprocessoPadrao(processo, unidade1);
         subprocesso1.setCodigo(null);
         subprocesso1.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
@@ -136,12 +126,12 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         processo = processoRepo.findById(processo.getCodigo()).orElseThrow();
         subprocesso1 = subprocessoRepo.findById(subprocesso1.getCodigo()).orElseThrow();
         subprocesso2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
-        unidadeSuperior = unidadeRepo.findById(idSuperior).orElseThrow();
+        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
     }
 
     @Test
     @DisplayName("Deve aceitar cadastro de múltiplas unidades em bloco")
-    @WithMockGestor("303030303030")
+    @WithMockGestor("666666666666") // GESTOR of unit 6 (parent of units 8 and 9)
     void aceitarCadastroEmBloco_deveAceitarTodasSelecionadas() throws Exception {
         // Given
         Long codigoContexto = subprocesso1.getCodigo();
