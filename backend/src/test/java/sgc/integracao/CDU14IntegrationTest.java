@@ -406,13 +406,16 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         void naoPodeHomologarEmEstadoInvalido() throws Exception {
             Long subprocessoId = criarEComecarProcessoDeRevisao();
             
+            // Após refatoração de segurança, a validação de estado é feita no AccessControlService
+            // Retorna 403 (Forbidden) em vez de 422 (Unprocessable Entity)
+            // Isso é mais correto do ponto de vista de segurança: verificar permissões antes de validações de negócio
             mockMvc.perform(
                             post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
                                     .with(csrf())
                                     .with(user(admin))
                                     .contentType("application/json")
                                     .content("{\"observacoes\": \"Homologado fora de hora\"}"))
-                    .andExpect(status().is(422));
+                    .andExpect(status().isForbidden());
         }
     }
 }

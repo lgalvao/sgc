@@ -207,6 +207,11 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
 
     @Override
     public boolean canExecute(Usuario usuario, Acao acao, Subprocesso subprocesso) {
+        // Caso especial: VERIFICAR_IMPACTOS tem regras diferentes por perfil
+        if (acao == VERIFICAR_IMPACTOS) {
+            return canExecuteVerificarImpactos(usuario, subprocesso);
+        }
+        
         RegrasAcao regras = REGRAS.get(acao);
         if (regras == null) {
             ultimoMotivoNegacao = "Ação não reconhecida: " + acao;
@@ -243,6 +248,81 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
         }
 
         return true;
+    }
+    
+    /**
+     * Regras específicas para VERIFICAR_IMPACTOS baseadas na implementação original do MapaAcessoService.
+     * Cada perfil tem situações diferentes permitidas:
+     * - CHEFE: NAO_INICIADO ou REVISAO_CADASTRO_EM_ANDAMENTO (e deve estar na mesma unidade)
+     * - GESTOR: REVISAO_CADASTRO_DISPONIBILIZADA (sem verificação de unidade)
+     * - ADMIN: REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO (sem verificação de unidade)
+     */
+    private boolean canExecuteVerificarImpactos(Usuario usuario, Subprocesso subprocesso) {
+        SituacaoSubprocesso situacao = subprocesso.getSituacao();
+        
+        // Verifica se o usuário tem algum dos perfis permitidos
+        Set<Perfil> perfisUsuario = usuario.getTodasAtribuicoes().stream()
+                .map(UsuarioPerfil::getPerfil)
+                .collect(java.util.stream.Collectors.toSet());
+        
+        if (perfisUsuario.contains(CHEFE)) {
+            // CHEFE pode verificar impactos em NAO_INICIADO ou REVISAO_CADASTRO_EM_ANDAMENTO
+            // E deve estar na mesma unidade
+            if (situacao == NAO_INICIADO || situacao == REVISAO_CADASTRO_EM_ANDAMENTO) {
+                if (verificaHierarquia(usuario, subprocesso, RequisitoHierarquia.MESMA_UNIDADE)) {
+                    return true;
+                } else {
+                    ultimoMotivoNegacao = obterMotivoNegacaoHierarquia(
+                            usuario, subprocesso, RequisitoHierarquia.MESMA_UNIDADE
+                    );
+                    return false;
+                }
+            }
+        }
+        
+        if (perfisUsuario.contains(GESTOR)) {
+            // GESTOR pode verificar impactos em REVISAO_CADASTRO_DISPONIBILIZADA
+            if (situacao == REVISAO_CADASTRO_DISPONIBILIZADA) {
+                return true;
+            }
+        }
+        
+        if (perfisUsuario.contains(ADMIN)) {
+            // ADMIN pode verificar impactos em REVISAO_CADASTRO_DISPONIBILIZADA, 
+            // REVISAO_CADASTRO_HOMOLOGADA ou REVISAO_MAPA_AJUSTADO
+            if (situacao == REVISAO_CADASTRO_DISPONIBILIZADA 
+                    || situacao == REVISAO_CADASTRO_HOMOLOGADA
+                    || situacao == REVISAO_MAPA_AJUSTADO) {
+                return true;
+            }
+        }
+        
+        // Se chegou aqui, não tem permissão
+        if (perfisUsuario.isEmpty() || (!perfisUsuario.contains(CHEFE) 
+                && !perfisUsuario.contains(GESTOR) && !perfisUsuario.contains(ADMIN))) {
+            ultimoMotivoNegacao = String.format(
+                    "Usuário '%s' não possui um dos perfis necessários: ADMIN, GESTOR, CHEFE",
+                    usuario.getTituloEleitoral()
+            );
+        } else {
+            // Tem o perfil mas a situação não é permitida
+            String situacoesPermitidas;
+            if (perfisUsuario.contains(ADMIN)) {
+                situacoesPermitidas = "REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO";
+            } else if (perfisUsuario.contains(GESTOR)) {
+                situacoesPermitidas = "REVISAO_CADASTRO_DISPONIBILIZADA";
+            } else {
+                situacoesPermitidas = "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO";
+            }
+            ultimoMotivoNegacao = String.format(
+                    "Ação 'VERIFICAR_IMPACTOS' não pode ser executada com o subprocesso na situação '%s'. " +
+                    "Situações permitidas para o perfil do usuário: %s",
+                    subprocesso.getSituacao().getDescricao(),
+                    situacoesPermitidas
+            );
+        }
+        
+        return false;
     }
 
     @Override
