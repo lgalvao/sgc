@@ -57,8 +57,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UnidadeRepo unidadeRepo;
     @Autowired
-    private UsuarioRepo usuarioRepo;
-    @Autowired
     private UsuarioService usuarioService;
     @Autowired
     private AlertaRepo alertaRepo;
@@ -76,11 +74,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
     private jakarta.persistence.EntityManager entityManager;
-    @Autowired
-    private UnidadeMapaRepo unidadeMapaRepo;
 
     private Unidade unidadeChefe;
-    private Unidade unidadeGestor;
     private Usuario chefe;
     private Usuario gestor;
     private Usuario admin;
@@ -95,7 +90,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         gestor = usuarioService.buscarPorLogin("666666666666");
         chefe = usuarioService.buscarPorLogin("333333333333");
         
-        unidadeGestor = unidadeRepo.findById(6L).orElseThrow();
         unidadeChefe = unidadeRepo.findById(9L).orElseThrow();
 
         // Unit 9 already has mapa 1002 in data.sql, so use it

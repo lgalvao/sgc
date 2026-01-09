@@ -26,6 +26,7 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;

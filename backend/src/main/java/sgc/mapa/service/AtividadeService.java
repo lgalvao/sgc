@@ -9,7 +9,10 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.evento.EventoMapaAlterado;
 import sgc.mapa.mapper.AtividadeMapper;
-import sgc.mapa.model.*;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.AtividadeRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 
 import java.util.List;
 

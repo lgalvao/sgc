@@ -1,6 +1,5 @@
 import {describe, expect, it} from "vitest";
 import {mapUnidade, mapUnidadesArray, mapUnidadeSnapshot} from "../unidades";
-import type {Unidade, UnidadeSnapshot} from "@/types/tipos";
 
 describe("mappers/unidades", () => {
     describe("mapUnidadeSnapshot", () => {

@@ -8,7 +8,10 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.mapper.MapaCompletoMapper;
-import sgc.mapa.model.*;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 
 import java.util.List;
 import java.util.Optional;

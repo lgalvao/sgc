@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
@@ -17,13 +16,10 @@ import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
-import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -62,9 +58,6 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
     private UnidadeRepo unidadeRepo;
 
     @Autowired
-    private UsuarioRepo usuarioRepo;
-
-    @Autowired
     private SubprocessoMovimentacaoRepo movimentacaoRepo;
 
     @Autowired
@@ -73,10 +66,6 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    private Unidade unidadeSuperior;
     private Unidade unidade1;
     private Unidade unidade2;
     private Processo processo;
@@ -95,8 +84,6 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         // proximaUnidade = unidade8.getUnidadeSuperior().getUnidadeSuperior() = unit 2 (not null)
         // So it will create análise/movimentação for next level (unit 2)
         
-        unidadeSuperior = unidadeRepo.findById(6L)
-                .orElseThrow(() -> new RuntimeException("Unit 6 not found in data.sql"));
         unidade1 = unidadeRepo.findById(8L)
                 .orElseThrow(() -> new RuntimeException("Unit 8 not found in data.sql"));
         unidade2 = unidadeRepo.findById(9L)
@@ -127,7 +114,6 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         processo = processoRepo.findById(processo.getCodigo()).orElseThrow();
         subprocesso1 = subprocessoRepo.findById(subprocesso1.getCodigo()).orElseThrow();
         subprocesso2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
-        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
     }
 
     @Test

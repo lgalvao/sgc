@@ -1,6 +1,7 @@
 package sgc.organizacao;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -20,9 +21,7 @@ import sgc.seguranca.dto.PerfilUnidadeDto;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors; // Removido posteriormente se não usado noutros sitios
-
-import org.jspecify.annotations.Nullable;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -432,8 +431,6 @@ public class UsuarioService {
         }
 
         Long codUnidade = request.getUnidadeCodigo();
-        Unidade unidade = unidadeService.buscarEntidadePorId(codUnidade);
-
         List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoesInterno(request.getTituloEleitoral());
 
         // Remove a autenticação do cache após usá-la (garante que só pode entrar uma vez por autenticação)
@@ -517,8 +514,8 @@ public class UsuarioService {
                 .tituloEleitoral(usuario.getTituloEleitoral())
                 .nome(usuario.getNome())
                 .matricula(usuario.getMatricula())
-                .unidadeCodigo(unidadeLotacao != null ? unidadeLotacao.getCodigo() : null)
-                .unidadeSigla(unidadeLotacao != null ? unidadeLotacao.getSigla() : null)
+                .unidadeCodigo(unidadeLotacao.getCodigo())
+                .unidadeSigla(unidadeLotacao.getSigla())
                 .build();
     }
 

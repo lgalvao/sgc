@@ -1,10 +1,6 @@
 package sgc.service;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,8 +19,6 @@ import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
-import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
@@ -42,7 +36,7 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("Testes de Ações do SubprocessoService")
-public class SubprocessoServiceActionsTest {
+class SubprocessoServiceActionsTest {
     private static final String OBSERVACOES = "Observações de teste";
 
     @Autowired
@@ -53,9 +47,6 @@ public class SubprocessoServiceActionsTest {
 
     @Autowired
     private UnidadeRepo unidadeRepo;
-
-    @Autowired
-    private UsuarioRepo usuarioRepo;
 
     @Autowired
     private UsuarioService usuarioService;
@@ -79,14 +70,12 @@ public class SubprocessoServiceActionsTest {
     private ImpactoMapaService impactoMapaService;
 
     private Unidade unidade;
-    private Usuario usuario;
     private Usuario admin;
     private Usuario gestor;
 
     @BeforeEach
     void setUp() {
         unidade = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
-        usuario = carregarUsuarioComPerfis("1"); // Ana Paula Souza - SERVIDOR
         admin = carregarUsuarioComPerfis("6"); // Ricardo Alves - ADMIN
         gestor = carregarUsuarioComPerfis("666666666666"); // Gestor COSIS - GESTOR
     }
@@ -185,8 +174,9 @@ public class SubprocessoServiceActionsTest {
             Subprocesso sp = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             // Após refatoração de segurança, verificações de situação são feitas pelo AccessControlService
             // que sempre lança ErroAccessoNegado (com mensagem descritiva sobre a situação incorreta)
+            Long spCodigo = sp.getCodigo();
             ErroAccessoNegado erro = assertThrows(ErroAccessoNegado.class, 
-                () -> subprocessoWorkflowService.aceitarRevisaoCadastro(sp.getCodigo(), OBSERVACOES, gestor));
+                () -> subprocessoWorkflowService.aceitarRevisaoCadastro(spCodigo, OBSERVACOES, gestor));
             assertTrue(erro.getMessage().contains("situação"), 
                 "Mensagem de erro deve mencionar a situação incorreta");
         }
@@ -233,8 +223,9 @@ public class SubprocessoServiceActionsTest {
             // Após refatoração de segurança, verificações de situação são feitas pelo AccessControlService
             // que sempre lança ErroAccessoNegado (com mensagem descritiva sobre a situação incorreta)
             // Usa admin pois HOMOLOGAR_REVISAO_CADASTRO requer perfil ADMIN
+            Long spCodigo = subprocesso.getCodigo();
             ErroAccessoNegado erro = assertThrows(ErroAccessoNegado.class, 
-                () -> subprocessoWorkflowService.homologarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, admin));
+                () -> subprocessoWorkflowService.homologarRevisaoCadastro(spCodigo, OBSERVACOES, admin));
             assertTrue(erro.getMessage().contains("situação"), 
                 "Mensagem de erro deve mencionar a situação incorreta");
         }

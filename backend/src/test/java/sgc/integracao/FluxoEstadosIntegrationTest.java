@@ -31,7 +31,6 @@ import sgc.mapa.service.ImpactoMapaService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
@@ -69,7 +68,6 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
     @Autowired private ConhecimentoService conhecimentoService;
     @Autowired private SubprocessoRepo subprocessoRepo;
     @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private UsuarioRepo usuarioRepo;
     @Autowired private UsuarioService usuarioService;
     @Autowired private JdbcTemplate jdbcTemplate;
     @Autowired private CompetenciaRepo competenciaRepo;

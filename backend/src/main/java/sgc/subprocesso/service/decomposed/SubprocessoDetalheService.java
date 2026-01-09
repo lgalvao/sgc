@@ -26,7 +26,7 @@ import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoPermissoesService;
+import sgc.subprocesso.service.SubprocessoPermissaoCalculator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ public class SubprocessoDetalheService {
     private final AtividadeService atividadeService;
     private final MovimentacaoRepo repositorioMovimentacao;
     private final UsuarioService usuarioService;
-    private final SubprocessoPermissoesService subprocessoPermissoesService;
+    private final SubprocessoPermissaoCalculator subprocessoPermissaoCalculator;
     private final SubprocessoDetalheMapper subprocessoDetalheMapper;
     private final ConhecimentoMapper conhecimentoMapper;
     private final AnaliseService analiseService;
@@ -99,7 +99,7 @@ public class SubprocessoDetalheService {
         }
 
         List<Movimentacao> movimentacoes = repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
-        SubprocessoPermissoesDto permissoes = subprocessoPermissoesService.calcularPermissoes(sp, usuarioAutenticado);
+        SubprocessoPermissoesDto permissoes = subprocessoPermissaoCalculator.calcular(sp, usuarioAutenticado);
 
         return subprocessoDetalheMapper.toDto(sp, responsavel, titular, movimentacoes, permissoes);
     }
@@ -173,6 +173,6 @@ public class SubprocessoDetalheService {
 
     public SubprocessoPermissoesDto obterPermissoes(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        return subprocessoPermissoesService.calcularPermissoes(sp, usuario);
+        return subprocessoPermissaoCalculator.calcular(sp, usuario);
     }
 }

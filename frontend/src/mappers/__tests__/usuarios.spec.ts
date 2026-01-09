@@ -1,6 +1,5 @@
 import {describe, expect, it} from "vitest";
 import {mapVWUsuariosArray, mapVWUsuarioToUsuario} from "../usuarios";
-import type {Usuario} from "@/types/tipos";
 
 describe("mappers/usuarios", () => {
     it("mapVWUsuarioToUsuario handles null/undefined input", () => {

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
@@ -17,13 +16,10 @@ import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
-import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -63,9 +59,6 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
     private UnidadeRepo unidadeRepo;
 
     @Autowired
-    private UsuarioRepo usuarioRepo;
-
-    @Autowired
     private SubprocessoMovimentacaoRepo movimentacaoRepo;
 
     @Autowired
@@ -73,9 +66,6 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private EntityManager entityManager;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     private Unidade unidadeSuperior;
     private Unidade unidade1;

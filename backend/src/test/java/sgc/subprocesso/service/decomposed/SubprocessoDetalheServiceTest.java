@@ -26,7 +26,7 @@ import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoPermissoesService;
+import sgc.subprocesso.service.SubprocessoPermissaoCalculator;
 
 import java.util.List;
 import java.util.Set;
@@ -49,7 +49,7 @@ class SubprocessoDetalheServiceTest {
     @Mock
     private MovimentacaoRepo repositorioMovimentacao;
     @Mock
-    private SubprocessoPermissoesService subprocessoPermissoesService;
+    private SubprocessoPermissaoCalculator subprocessoPermissaoCalculator;
     @Mock
     private SubprocessoDetalheMapper subprocessoDetalheMapper;
     @Mock
@@ -293,7 +293,7 @@ class SubprocessoDetalheServiceTest {
         Usuario user = new Usuario();
         Subprocesso sp = new Subprocesso();
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(subprocessoPermissoesService.calcularPermissoes(sp, user))
+        when(subprocessoPermissaoCalculator.calcular(sp, user))
                 .thenReturn(SubprocessoPermissoesDto.builder().build());
 
         SubprocessoPermissoesDto result = service.obterPermissoes(1L, user);

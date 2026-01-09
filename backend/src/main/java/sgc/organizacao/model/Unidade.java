@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Immutable;
 import org.jspecify.annotations.Nullable;
-
 import sgc.comum.model.EntidadeBase;
 import sgc.processo.model.Processo;
 

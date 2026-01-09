@@ -15,32 +15,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Serviço responsável pelo envio de e-mails de notificação para transições de subprocesso.
- *
- * <p>Utiliza os metadados do {@link TipoTransicao} para determinar qual template utilizar
- * e processa os templates Thymeleaf correspondentes.
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class SubprocessoEmailService {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    
+
     private final NotificacaoEmailService notificacaoEmailService;
     private final TemplateEngine templateEngine;
 
-    /**
-     * Envia e-mail de notificação para uma transição de subprocesso.
-     *
-     * @param evento O evento de transição contendo os dados necessários
-     */
     public void enviarEmailTransicao(EventoTransicaoSubprocesso evento) {
         TipoTransicao tipo = evento.getTipo();
-        
-        if (!tipo.enviaEmail()) {
-            return;
-        }
+        if (!tipo.enviaEmail()) return;
 
         Subprocesso sp = evento.getSubprocesso();
         Unidade unidadeOrigem = evento.getUnidadeOrigem();
@@ -51,13 +37,11 @@ public class SubprocessoEmailService {
             String assunto = criarAssunto(tipo, sp);
             String corpo = processarTemplate(tipo.getTemplateEmail(), variaveis);
 
-            // Envia para a unidade destino
             if (unidadeDestino != null) {
                 notificacaoEmailService.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
                 log.info("E-mail enviado para {} - Transição: {}", unidadeDestino.getSigla(), tipo);
             }
 
-            // Para alguns tipos, notifica também a hierarquia
             if (deveNotificarHierarquia(tipo) && unidadeOrigem != null) {
                 notificarHierarquia(unidadeOrigem, assunto, corpo);
             }
@@ -82,11 +66,11 @@ public class SubprocessoEmailService {
         if (sp.getDataLimiteEtapa1() != null) {
             variaveis.put("dataLimiteEtapa1", sp.getDataLimiteEtapa1().format(DATE_FORMATTER));
         }
+
         if (sp.getDataLimiteEtapa2() != null) {
             variaveis.put("dataLimiteEtapa2", sp.getDataLimiteEtapa2().format(DATE_FORMATTER));
         }
-        
-        // Adiciona observações/motivo se presente
+
         if (evento.getObservacoes() != null) {
             variaveis.put("observacoes", evento.getObservacoes());
             variaveis.put("motivo", evento.getObservacoes());

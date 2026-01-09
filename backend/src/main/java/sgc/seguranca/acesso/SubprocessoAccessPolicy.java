@@ -9,7 +9,10 @@ import sgc.organizacao.model.UsuarioPerfil;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static sgc.organizacao.model.Perfil.*;
 import static sgc.seguranca.acesso.Acao.*;

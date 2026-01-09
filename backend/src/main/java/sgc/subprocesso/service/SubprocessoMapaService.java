@@ -92,11 +92,9 @@ public class SubprocessoMapaService {
 
     @Transactional
     public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
-        final Subprocesso spDestino =
-                subprocessoRepo
-                        .findById(codSubprocessoDestino)
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso de destino não encontrado: %d"
-                                .formatted(codSubprocessoDestino)));
+        final Subprocesso spDestino = subprocessoRepo
+                .findById(codSubprocessoDestino)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso de destino não encontrado: %d".formatted(codSubprocessoDestino)));
 
         if (spDestino.getSituacao() != MAPEAMENTO_CADASTRO_EM_ANDAMENTO
                 && spDestino.getSituacao() != REVISAO_CADASTRO_EM_ANDAMENTO
@@ -107,11 +105,8 @@ public class SubprocessoMapaService {
                     com cadastro em elaboração ou não iniciado.""");
         }
 
-        Subprocesso spOrigem =
-                subprocessoRepo
-                        .findById(codSubprocessoOrigem)
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                                "Subprocesso de origem não encontrado: %d".formatted(codSubprocessoOrigem)));
+        Subprocesso spOrigem = subprocessoRepo.findById(codSubprocessoOrigem)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso de origem não encontrado: %d".formatted(codSubprocessoOrigem)));
 
         if (spOrigem.getMapa() == null || spDestino.getMapa() == null) {
             throw new ErroMapaNaoAssociado("Subprocesso de origem ou destino não possui mapa associado.");
@@ -133,29 +128,11 @@ public class SubprocessoMapaService {
                 continue;
             }
 
-            // Usando AtividadeService.criar
             AtividadeDto novaDto = new AtividadeDto();
             novaDto.setDescricao(atividadeOrigem.getDescricao());
             novaDto.setMapaCodigo(spDestino.getMapa().getCodigo());
-
-            // Precisamos de um usuário titular para criar atividade via service...
-            // O importador é um processo de sistema/usuário logado?
-            // `importarAtividades` não recebe usuarioTitulo.
-            // Mas `criar` exige validação de titularidade.
-            // Solução: Criar um método `duplicarAtividade(Atividade origem, Mapa destino)` no AtividadeService?
-            // Ou manter a lógica aqui, mas usando os métodos expostos pelo service que não exigem validação (se houver)
-            // Como AtividadeService.criar exige validação, e aqui é uma importação sistêmica,
-            // talvez devêssemos expor um método `importar` no AtividadeService.
-
-            // Por enquanto, vou usar o AtividadeRepo indiretamente via Service? Não, a ideia é não usar Repo de outro módulo.
-            // Então `AtividadeService` deve ter um método `duplicarAtividade`.
-
-            // Vou assumir que posso chamar um método novo no AtividadeService ou refatorar isso depois.
-            // Para simplificar agora, e dado que `importarAtividades` é um caso de uso específico,
-            // vou adicionar `importarAtividade` no `AtividadeService`.
         }
 
-        // Delega ao serviço especializado de cópia de mapas
         copiaMapaService.importarAtividadesDeOutroMapa(
                 spOrigem.getMapa().getCodigo(),
                 spDestino.getMapa().getCodigo()
@@ -174,10 +151,9 @@ public class SubprocessoMapaService {
         }
 
         final Unidade unidadeOrigem = spOrigem.getUnidade();
-        String descMovimentacao =
-                String.format("Importação de atividades do subprocesso #%d (Unidade: %s)",
-                        spOrigem.getCodigo(),
-                        unidadeOrigem != null ? unidadeOrigem.getSigla() : "N/A");
+        String descMovimentacao = String.format("Importação de atividades do subprocesso #%d (Unidade: %s)",
+                spOrigem.getCodigo(),
+                unidadeOrigem != null ? unidadeOrigem.getSigla() : "N/A");
 
         movimentacaoRepo.save(new Movimentacao(
                 spDestino,

@@ -8,20 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
-import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -58,9 +54,6 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
     private UnidadeRepo unidadeRepo;
 
     @Autowired
-    private UsuarioRepo usuarioRepo;
-
-    @Autowired
     private SubprocessoMovimentacaoRepo movimentacaoRepo;
 
     @Autowired
@@ -74,9 +67,6 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private EntityManager entityManager;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     private Unidade unidade1;
     private Unidade unidade2;
@@ -133,15 +123,15 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
 
         // Criar Atividade
         Atividade ativ = new Atividade(mapa, "Atividade Teste " + unidade.getSigla());
-        ativ = atividadeRepo.save(ativ);
+        atividadeRepo.save(ativ);
 
         // Criar Competência
         Competencia comp = new Competencia("Competência Teste " + unidade.getSigla(), mapa);
-        comp = competenciaRepo.save(comp);
+        competenciaRepo.save(comp);
 
         // Associar (ManyToMany)
         ativ.getCompetencias().add(comp);
-        ativ = atividadeRepo.save(ativ);
+        atividadeRepo.save(ativ);
 
         return sub;
     }

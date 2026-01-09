@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.model.Subprocesso;
 import sgc.processo.model.Processo;
+import sgc.subprocesso.model.Subprocesso;
 
 import java.time.Instant;
 
