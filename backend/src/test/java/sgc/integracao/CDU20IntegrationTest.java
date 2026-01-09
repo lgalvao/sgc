@@ -20,6 +20,8 @@ import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.UsuarioService;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -33,6 +35,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -56,6 +59,9 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
     private UnidadeRepo unidadeRepo;
 
     @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
     private AlertaRepo alertaRepo;
 
     @Autowired
@@ -65,6 +71,8 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
     private Unidade unidade;
     private Unidade unidadeSuperior;
     private Unidade unidadeSuperiorSuperior;
+    private Usuario usuarioGestor;
+    private Usuario usuarioChefe;
 
     @BeforeEach
     void setUp() {
@@ -73,6 +81,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         // Unit 6 (COSIS - INTERMEDIARIA) - subordinate to 2
         // Unit 9 (SEDIA - OPERACIONAL) - subordinate to 6
         // User '666666666666' is GESTOR of unit 6
+        // User '333333333333' is CHEFE of unit 9
         unidadeSuperiorSuperior = unidadeRepo.findById(2L)
                 .orElseThrow(() -> new RuntimeException("Unit 2 not found in data.sql"));
         
@@ -81,6 +90,10 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         
         unidade = unidadeRepo.findById(9L)
                 .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
+
+        // Load users from database with their profiles
+        usuarioGestor = usuarioService.buscarPorLogin("666666666666");
+        usuarioChefe = usuarioService.buscarPorLogin("333333333333");
 
         // Create test process and subprocess
         Processo processo = ProcessoFixture.processoPadrao();
@@ -100,11 +113,11 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Devolução e aceite da validação do mapa com verificação do histórico")
-    @WithMockGestor("666666666666") // GESTOR of unit 6 (immediate parent of unit 9)
     void devolucaoEaceiteComVerificacaoHistorico() throws Exception {
-        // Devolução do mapa
+        // Devolução do mapa (GESTOR of unit 6 devolves to subordinate unit 9)
         DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");
-        mockMvc.perform(                        post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
+        mockMvc.perform(post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
+                                .with(user(usuarioGestor))
                                 .with(csrf())
                                 .contentType("application/json")
                                 .content(objectMapper.writeValueAsString(devolverReq)))
@@ -113,6 +126,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         // Verificação do histórico após devolução
         String responseDevolucao =
                 mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
+                        .with(user(usuarioGestor))
                         .with(csrf()))
                         .andExpect(status().isOk())
                         .andReturn()
@@ -151,24 +165,22 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         assertThat(alertasDevolucao.getFirst().getUnidadeDestino().getSigla())
                 .isEqualTo(subprocesso.getUnidade().getSigla());
 
-        // Unidade inferior valida o mapa novamente
-        mockMvc.perform(
-                        post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
+        // Unidade inferior valida o mapa novamente (CHEFE of unit 9)
+        mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
+                                .with(user(usuarioChefe))
                                 .with(csrf()))
                 .andExpect(status().isOk());
 
-        // Chefe da unidade superior aceita a validação
-        mockMvc.perform(
-                        post("/api/subprocessos/{id}/aceitar-validacao", subprocesso.getCodigo())
+        // GESTOR da unidade superior aceita a validação
+        mockMvc.perform(post("/api/subprocessos/{id}/aceitar-validacao", subprocesso.getCodigo())
+                                .with(user(usuarioGestor))
                                 .with(csrf()))
                 .andExpect(status().isOk());
 
         // Verificação do histórico após aceite
         String responseAceite =
-                mockMvc.perform(
-                                get(
-                                        "/api/subprocessos/{id}/historico-validacao",
-                                        subprocesso.getCodigo())
+                mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
+                                        .with(user(usuarioGestor))
                                         .with(csrf()))
                         .andExpect(status().isOk())
                         .andReturn()
