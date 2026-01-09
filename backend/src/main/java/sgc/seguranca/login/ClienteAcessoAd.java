@@ -1,4 +1,4 @@
-package sgc.seguranca.autenticacao;
+package sgc.seguranca.login;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,44 +7,52 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import sgc.comum.erros.ErroAutenticacao;
 
+/**
+ * Cliente para integração com o serviço AcessoAD (autenticação via Active
+ * Directory).
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
 @Profile("!test & !e2e")
-public class AcessoAdClient {
+public class ClienteAcessoAd {
     private final RestClient acessoAdRestClient;
 
+    /**
+     * Autentica um usuário no serviço AcessoAD.
+     *
+     * @param titulo Título de eleitor do usuário
+     * @param senha  Senha do usuário
+     * @return true se a autenticação for bem-sucedida
+     * @throws ErroAutenticacao se a autenticação falhar
+     */
     @SuppressWarnings("SameReturnValue")
     public boolean autenticar(String titulo, String senha) {
         try {
             AutenticarRequest request = new AutenticarRequest(titulo, senha);
-            
+
             acessoAdRestClient.post()
                     .uri("/auth/autenticar")
                     .body(request)
                     .retrieve()
-                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), 
-                        (req, res) -> {
-                            // SENTINEL: Ler o corpo apenas para log interno, nunca propagar para o cliente
-                            String body = new String(res.getBody().readAllBytes());
-                            log.error("Erro HTTP {} na autenticação AD: {}", res.getStatusCode(), body);
-                            // Mensagem genérica para o usuário final para evitar vazamento de dados internos
-                            throw new ErroAutenticacao("Falha na autenticação externa.");
-                        })
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                            (req, res) -> {
+                                String body = new String(res.getBody().readAllBytes());
+                                log.error("Erro HTTP {} na autenticação AD: {}", res.getStatusCode(), body);
+                                throw new ErroAutenticacao("Falha na autenticação externa.");
+                            })
                     .body(String.class);
 
-            // SENTINEL: Log apenas do sucesso, sem expor o corpo da resposta que pode conter dados sensíveis
             log.info("Usuário {} autenticado com sucesso no AD.", titulo);
             return true;
         } catch (ErroAutenticacao e) {
             throw e;
         } catch (Exception e) {
-            // Log detalhado para admin/dev
             log.error("Erro ao autenticar usuário {} no AD: {}", titulo, e.getMessage(), e);
-            // Mensagem genérica para o usuário final
             throw new ErroAutenticacao("Ocorreu um erro inesperado durante a autenticação.");
         }
     }
 
-    private record AutenticarRequest(String titulo, String senha) {}
+    private record AutenticarRequest(String titulo, String senha) {
+    }
 }

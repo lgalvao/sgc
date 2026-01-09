@@ -16,7 +16,7 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.SanitizacaoUtil;
+import sgc.seguranca.sanitizacao.UtilSanitizacao;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.SubprocessoMapaService;
@@ -28,9 +28,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
-@Tag(
-        name = "Subprocessos",
-        description = "Endpoints para gerenciamento do workflow de subprocessos")
+@Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoCadastroController {
 
     private final SubprocessoService subprocessoService;
@@ -56,9 +54,11 @@ public class SubprocessoCadastroController {
     }
 
     /**
-     * Disponibiliza o cadastro de atividades de um subprocesso para a próxima etapa de análise.
+     * Disponibiliza o cadastro de atividades de um subprocesso para a próxima etapa
+     * de análise.
      *
-     * <p>Ação restrita a usuários com perfil 'CHEFE' (CDU-08).
+     * <p>
+     * Ação restrita a usuários com perfil 'CHEFE' (CDU-08).
      *
      * @param codSubprocesso O código do subprocesso.
      * @return Um {@link ResponseEntity} com uma mensagem de sucesso.
@@ -71,19 +71,16 @@ public class SubprocessoCadastroController {
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
-        List<Atividade> faltando =
-                subprocessoService.obterAtividadesSemConhecimento(codSubprocesso);
+        List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(codSubprocesso);
         if (!faltando.isEmpty()) {
-            var lista =
-                    faltando.stream()
-                            .map(
-                                    a ->
-                                            Map.of(
-                                                    "codigo",
-                                                    a.getCodigo(),
-                                                    "descricao",
-                                                    a.getDescricao()))
-                            .toList();
+            var lista = faltando.stream()
+                    .map(
+                            a -> Map.of(
+                                    "codigo",
+                                    a.getCodigo(),
+                                    "descricao",
+                                    a.getDescricao()))
+                    .toList();
             throw new ErroValidacao(
                     "Existem atividades sem conhecimentos associados.",
                     Map.of("atividadesSemConhecimento", lista));
@@ -94,11 +91,15 @@ public class SubprocessoCadastroController {
     }
 
     /**
-     * Disponibiliza a revisão do cadastro de atividades para a próxima etapa de análise.
+     * Disponibiliza a revisão do cadastro de atividades para a próxima etapa de
+     * análise.
      *
-     * <p>Ação restrita a usuários com perfil 'CHEFE' (CDU-12).
+     * <p>
+     * Ação restrita a usuários com perfil 'CHEFE' (CDU-12).
      *
-     * <p>Antes de disponibilizar, o método valida se todas as atividades do subprocesso possuem
+     * <p>
+     * Antes de disponibilizar, o método valida se todas as atividades do
+     * subprocesso possuem
      * pelo menos um conhecimento associado.
      *
      * @param codigo O código do subprocesso.
@@ -141,10 +142,12 @@ public class SubprocessoCadastroController {
     }
 
     /**
-     * Devolve o cadastro de um subprocesso para o responsável pela unidade para que sejam feitos
+     * Devolve o cadastro de um subprocesso para o responsável pela unidade para que
+     * sejam feitos
      * ajustes.
      *
-     * <p>Ação restrita a usuários com perfil 'ADMIN' ou 'GESTOR' (CDU-13).
+     * <p>
+     * Ação restrita a usuários com perfil 'ADMIN' ou 'GESTOR' (CDU-13).
      *
      * @param codigo  O código do subprocesso.
      * @param request O DTO contendo o motivo e as observações da devolução.
@@ -158,15 +161,17 @@ public class SubprocessoCadastroController {
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
-        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.devolverCadastro(codigo, sanitizedObservacoes, usuario);
     }
 
     /**
-     * Aceita o cadastro de um subprocesso, movendo-o para a próxima etapa do fluxo de trabalho.
+     * Aceita o cadastro de um subprocesso, movendo-o para a próxima etapa do fluxo
+     * de trabalho.
      *
-     * <p>Ação restrita a usuários com perfil 'ADMIN' ou 'GESTOR' (CDU-13).
+     * <p>
+     * Ação restrita a usuários com perfil 'ADMIN' ou 'GESTOR' (CDU-13).
      *
      * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da aceitação.
@@ -180,7 +185,7 @@ public class SubprocessoCadastroController {
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
-        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.aceitarCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -188,7 +193,8 @@ public class SubprocessoCadastroController {
     /**
      * Homologa o cadastro de um subprocesso.
      *
-     * <p>Ação restrita a usuários com perfil 'ADMIN' (CDU-13).
+     * <p>
+     * Ação restrita a usuários com perfil 'ADMIN' (CDU-13).
      *
      * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da homologação.
@@ -202,13 +208,14 @@ public class SubprocessoCadastroController {
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
-        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.homologarCadastro(codigo, sanitizedObservacoes, usuario);
     }
 
     /**
-     * Devolve a revisão de um cadastro de subprocesso para o responsável pela unidade para que
+     * Devolve a revisão de um cadastro de subprocesso para o responsável pela
+     * unidade para que
      * sejam feitos ajustes.
      *
      * @param codigo  O código do subprocesso.
@@ -223,7 +230,7 @@ public class SubprocessoCadastroController {
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
-        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.devolverRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -243,7 +250,7 @@ public class SubprocessoCadastroController {
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
-        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.aceitarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -251,7 +258,8 @@ public class SubprocessoCadastroController {
     /**
      * Homologa a revisão do cadastro de um subprocesso.
      *
-     * <p>Esta ação é restrita a usuários com o perfil 'ADMIN'.
+     * <p>
+     * Esta ação é restrita a usuários com o perfil 'ADMIN'.
      *
      * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da homologação.
@@ -265,7 +273,7 @@ public class SubprocessoCadastroController {
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
-        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.homologarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -273,7 +281,8 @@ public class SubprocessoCadastroController {
     /**
      * Importa atividades de um subprocesso de origem para o subprocesso de destino.
      *
-     * <p>Ação restrita a usuários com perfil 'CHEFE'.
+     * <p>
+     * Ação restrita a usuários com perfil 'CHEFE'.
      *
      * @param codigo  O código do subprocesso de destino.
      * @param request O DTO contendo o código do subprocesso de origem.
@@ -297,8 +306,8 @@ public class SubprocessoCadastroController {
     @PreAuthorize("hasAnyRole('GESTOR', 'ADMIN')")
     @Operation(summary = "Aceita cadastros em bloco")
     public void aceitarCadastroEmBloco(@PathVariable Long codigo,
-                                       @RequestBody @Valid ProcessarEmBlocoRequest request,
-                                       @AuthenticationPrincipal Object principal) {
+            @RequestBody @Valid ProcessarEmBlocoRequest request,
+            @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         subprocessoWorkflowService.aceitarCadastroEmBloco(request.getUnidadeCodigos(), codigo, usuario);
@@ -312,8 +321,8 @@ public class SubprocessoCadastroController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Homologa cadastros em bloco")
     public void homologarCadastroEmBloco(@PathVariable Long codigo,
-                                         @RequestBody @Valid ProcessarEmBlocoRequest request,
-                                         @AuthenticationPrincipal Object principal) {
+            @RequestBody @Valid ProcessarEmBlocoRequest request,
+            @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
         subprocessoWorkflowService.homologarCadastroEmBloco(request.getUnidadeCodigos(), codigo, usuario);

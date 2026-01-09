@@ -1,4 +1,4 @@
-package sgc.seguranca.dto;
+package sgc.seguranca.login.dto;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -9,8 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import sgc.seguranca.autenticacao.AutenticarReq;
-
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,9 +42,9 @@ class AutenticarReqValidationTest {
 
     @ParameterizedTest
     @CsvSource({
-        "1000, 5000",
-        "500, 1000",
-        "2000, 3000"
+            "1000, 5000",
+            "500, 1000",
+            "2000, 3000"
     })
     @DisplayName("Deve rejeitar inputs excessivamente longos")
     void deveRejeitarInputsExcessivamenteLongos(int tamanhoTitulo, int tamanhoSenha) {

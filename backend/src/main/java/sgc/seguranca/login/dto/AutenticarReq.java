@@ -1,4 +1,4 @@
-package sgc.seguranca.autenticacao;
+package sgc.seguranca.login.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -25,7 +25,6 @@ public class AutenticarReq {
     public AutenticarReq(
             @JsonProperty("tituloEleitoral") String tituloEleitoral,
             @JsonProperty("senha") String senha) {
-
         this.tituloEleitoral = tituloEleitoral;
         this.senha = senha;
     }

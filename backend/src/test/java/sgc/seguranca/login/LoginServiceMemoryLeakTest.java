@@ -1,4 +1,4 @@
-package sgc.organizacao;
+package sgc.seguranca.login;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -14,20 +14,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag("integration")
 @SpringBootTest
 @ActiveProfiles("test")
-@DisplayName("Verificação de Correção de Vulnerabilidade de Memória")
-class UsuarioServiceMemoryLeakTest {
+@DisplayName("Verificação de Correção de Vulnerabilidade de Memória - LoginService")
+class LoginServiceMemoryLeakTest {
 
     @Autowired
-    private UsuarioService usuarioService;
+    private LoginService loginService;
 
     @Autowired
     private UsuarioRepo usuarioRepo;
 
     @Test
-    @DisplayName("Deve limpar autenticações expiradas")
+    @DisplayName("Deve limpar autenticações expiradas no LoginService")
     void deveLimparAutenticacoesExpiradas() {
         // Arrange
-        int tamanhoInicial = usuarioService.getAutenticacoesRecentesSize();
+        int tamanhoInicial = loginService.getAutenticacoesRecentesSize();
 
         // Act - Simula 100 autenticações
         for (int i = 0; i < 100; i++) {
@@ -36,33 +36,34 @@ class UsuarioServiceMemoryLeakTest {
 
             if (!usuarioRepo.existsById(tituloFalso)) {
                 Usuario u = Usuario.builder()
-                    .tituloEleitoral(tituloFalso)
-                    .matricula("M" + i)
-                    .nome("Nome " + i)
-                    .email("e" + i + "@t.com")
-                    .ramal("1")
-                    .build();
+                        .tituloEleitoral(tituloFalso)
+                        .nome("Nome " + i)
+                        .email("e" + i + "@t.com")
+                        .ramal("1")
+                        .build();
                 usuarioRepo.save(u);
             }
 
-            usuarioService.autenticar(tituloFalso, "senha");
+            loginService.autenticar(tituloFalso, "senha");
         }
 
         // Assert - O mapa deve ter crescido
-        int tamanhoAposAutenticacao = usuarioService.getAutenticacoesRecentesSize();
+        int tamanhoAposAutenticacao = loginService.getAutenticacoesRecentesSize();
         assertTrue(tamanhoAposAutenticacao >= tamanhoInicial + 100,
-            "Mapa deveria ter crescido. Inicial: " + tamanhoInicial + ", Atual: " + tamanhoAposAutenticacao);
+                "Mapa deveria ter crescido. Inicial: " + tamanhoInicial + ", Atual: " + tamanhoAposAutenticacao);
 
         // Manipula os tempos para simular expiração usando método de teste
-        usuarioService.expireAllAuthenticationsForTest();
+        loginService.expireAllAuthenticationsForTest();
 
         // Executa a limpeza
-        usuarioService.limparAutenticacoesExpiradas();
+        loginService.limparAutenticacoesExpiradas();
 
-        // Assert - O mapa deve ter reduzido (pelo menos os 100 removidos, possivelmente mais se outros expiraram)
-        int tamanhoFinal = usuarioService.getAutenticacoesRecentesSize();
+        // Assert - O mapa deve ter reduzido (pelo menos os 100 removidos, possivelmente
+        // mais se outros expiraram)
+        int tamanhoFinal = loginService.getAutenticacoesRecentesSize();
         assertTrue(tamanhoFinal < tamanhoAposAutenticacao,
-            "A limpeza deveria ter removido itens expirados. Antes: " + tamanhoAposAutenticacao + ", Depois: " + tamanhoFinal);
+                "A limpeza deveria ter removido itens expirados. Antes: " + tamanhoAposAutenticacao + ", Depois: "
+                        + tamanhoFinal);
 
         // Limpeza de dados
         for (int i = 0; i < 100; i++) {

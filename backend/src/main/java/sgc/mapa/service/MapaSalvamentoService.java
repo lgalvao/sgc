@@ -11,7 +11,7 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.mapper.MapaCompletoMapper;
 import sgc.mapa.model.*;
-import sgc.seguranca.SanitizacaoUtil;
+import sgc.seguranca.sanitizacao.UtilSanitizacao;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,12 +19,13 @@ import java.util.stream.Collectors;
 /**
  * Serviço especializado para salvar o mapa completo de competências.
  *
- * <p>Responsável por processar requisições de salvamento que incluem:
+ * <p>
+ * Responsável por processar requisições de salvamento que incluem:
  * <ul>
- *   <li>Atualização das observações do mapa</li>
- *   <li>Criação, atualização e remoção de competências</li>
- *   <li>Atualização das associações entre atividades e competências</li>
- *   <li>Validação de integridade do mapa</li>
+ * <li>Atualização das observações do mapa</li>
+ * <li>Criação, atualização e remoção de competências</li>
+ * <li>Atualização das associações entre atividades e competências</li>
+ * <li>Validação de integridade do mapa</li>
  * </ul>
  */
 @Service
@@ -40,11 +41,12 @@ public class MapaSalvamentoService {
     /**
      * Salva o mapa completo com todas as competências e suas associações.
      *
-     * @param codMapa                 O código do mapa a ser salvo.
-     * @param request                 A requisição contendo as competências e observações.
+     * @param codMapa O código do mapa a ser salvo.
+     * @param request A requisição contendo as competências e observações.
      * @return O DTO do mapa completo atualizado.
      * @throws ErroEntidadeNaoEncontrada se o mapa não for encontrado.
-     * @throws ErroValidacao             se houver atividades inválidas na requisição.
+     * @throws ErroValidacao             se houver atividades inválidas na
+     *                                   requisição.
      */
     public MapaCompletoDto salvarMapaCompleto(
             Long codMapa, SalvarMapaRequest request) {
@@ -65,7 +67,7 @@ public class MapaSalvamentoService {
     }
 
     private void atualizarObservacoes(Mapa mapa, String observacoes) {
-        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(observacoes);
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(observacoes);
         mapa.setObservacoesDisponibilizacao(sanitizedObservacoes);
         mapaRepo.save(mapa);
     }
@@ -88,11 +90,10 @@ public class MapaSalvamentoService {
                 atividadesAtuais,
                 atividadesDoMapaIds,
                 codigosNovos,
-                request
-        );
+                request);
     }
 
-     private void removerCompetenciasObsoletas(ContextoSalvamento contexto) {
+    private void removerCompetenciasObsoletas(ContextoSalvamento contexto) {
         List<Competencia> paraRemover = contexto.competenciasAtuais.stream()
                 .filter(c -> !contexto.codigosNovos.contains(c.getCodigo()))
                 .toList();

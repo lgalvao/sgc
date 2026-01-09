@@ -7,20 +7,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import sgc.comum.erros.ErroAccessoNegado;
-import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
-import sgc.seguranca.GerenciadorJwt;
-import sgc.seguranca.autenticacao.AcessoAdClient;
-import sgc.seguranca.dto.EntrarReq;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,12 +28,14 @@ class UsuarioServiceCoverageTest {
     @InjectMocks
     private UsuarioService service;
 
-    @Mock private UsuarioRepo usuarioRepo;
-    @Mock private UsuarioPerfilRepo usuarioPerfilRepo;
-    @Mock private AdministradorRepo administradorRepo;
-    @Mock private GerenciadorJwt gerenciadorJwt;
-    @Mock private AcessoAdClient acessoAdClient;
-    @Mock private UnidadeService unidadeService;
+    @Mock
+    private UsuarioRepo usuarioRepo;
+    @Mock
+    private UsuarioPerfilRepo usuarioPerfilRepo;
+    @Mock
+    private AdministradorRepo administradorRepo;
+    @Mock
+    private UnidadeService unidadeService;
 
     // --- MÉTODOS DE BUSCA E MAPEAMENTO ---
 
@@ -96,7 +92,7 @@ class UsuarioServiceCoverageTest {
     void buscarPorId_Erro() {
         when(usuarioRepo.findById("user")).thenReturn(Optional.empty());
         assertThatThrownBy(() -> service.buscarPorId("user"))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -104,7 +100,7 @@ class UsuarioServiceCoverageTest {
     void buscarPorLogin_Erro() {
         when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
         assertThatThrownBy(() -> service.buscarPorLogin("user"))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -127,7 +123,7 @@ class UsuarioServiceCoverageTest {
         when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.buscarResponsavelAtual("SIGLA"))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -143,7 +139,7 @@ class UsuarioServiceCoverageTest {
         when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.buscarResponsavelAtual("SIGLA"))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -205,8 +201,12 @@ class UsuarioServiceCoverageTest {
     @Test
     @DisplayName("buscarResponsavelUnidade: retorna dto com titular e substituto")
     void buscarResponsavelUnidade_ComSubstituto() {
-        Usuario t = new Usuario(); t.setTituloEleitoral("t"); t.setNome("T");
-        Usuario s = new Usuario(); s.setTituloEleitoral("s"); s.setNome("S");
+        Usuario t = new Usuario();
+        t.setTituloEleitoral("t");
+        t.setNome("T");
+        Usuario s = new Usuario();
+        s.setTituloEleitoral("s");
+        s.setNome("S");
 
         when(usuarioRepo.findChefesByUnidadesCodigos(anyList())).thenReturn(List.of(t, s));
 
@@ -226,7 +226,8 @@ class UsuarioServiceCoverageTest {
     @Test
     @DisplayName("buscarUsuariosPorTitulos: retorna map")
     void buscarUsuariosPorTitulos() {
-        Usuario u = new Usuario(); u.setTituloEleitoral("u");
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("u");
         when(usuarioRepo.findAllById(anyList())).thenReturn(List.of(u));
 
         var map = service.buscarUsuariosPorTitulos(List.of("u"));
@@ -297,7 +298,8 @@ class UsuarioServiceCoverageTest {
     @Test
     @DisplayName("adicionarAdministrador: erro se já existe")
     void adicionarAdministrador_ErroJaExiste() {
-        Usuario u = new Usuario(); u.setTituloEleitoral("user");
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("user");
         when(usuarioRepo.findById("user")).thenReturn(Optional.of(u));
         when(administradorRepo.existsById("user")).thenReturn(true);
 
@@ -308,7 +310,8 @@ class UsuarioServiceCoverageTest {
     @Test
     @DisplayName("adicionarAdministrador: sucesso")
     void adicionarAdministrador_Sucesso() {
-        Usuario u = new Usuario(); u.setTituloEleitoral("user");
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("user");
         when(usuarioRepo.findById("user")).thenReturn(Optional.of(u));
         when(administradorRepo.existsById("user")).thenReturn(false);
 
@@ -358,165 +361,23 @@ class UsuarioServiceCoverageTest {
         assertThat(service.isAdministrador("user")).isTrue();
     }
 
-    // --- AUTENTICAÇÃO E AUTORIZAÇÃO ---
-
-    @Test
-    @DisplayName("autenticar: erro se sem AD e não é teste")
-    void autenticar_ErroSemAdProducao() {
-        ReflectionTestUtils.setField(service, "acessoAdClient", null);
-        ReflectionTestUtils.setField(service, "ambienteTestes", false);
-
-        assertThat(service.autenticar("user", "pass")).isFalse();
-    }
-
-    @Test
-    @DisplayName("autenticar: sucesso se sem AD, é teste, e usuário existe")
-    void autenticar_SucessoSemAdTeste() {
-        ReflectionTestUtils.setField(service, "acessoAdClient", null);
-        ReflectionTestUtils.setField(service, "ambienteTestes", true);
-        when(usuarioRepo.existsById("user")).thenReturn(true);
-
-        assertThat(service.autenticar("user", "pass")).isTrue();
-    }
-
-    @Test
-    @DisplayName("autenticar: falha se sem AD, é teste, mas usuário não existe")
-    void autenticar_FalhaSemAdTesteUsuarioInexistente() {
-        ReflectionTestUtils.setField(service, "acessoAdClient", null);
-        ReflectionTestUtils.setField(service, "ambienteTestes", true);
-        when(usuarioRepo.existsById("user")).thenReturn(false);
-
-        assertThat(service.autenticar("user", "pass")).isFalse();
-    }
-
-    @Test
-    @DisplayName("autenticar: falha no AD retorna false")
-    void autenticar_FalhaAD() {
-        when(acessoAdClient.autenticar("user", "pass")).thenThrow(new ErroAutenticacao("Falha"));
-        assertThat(service.autenticar("user", "pass")).isFalse();
-    }
-
-    @Test
-    @DisplayName("autenticar: sucesso no AD")
-    void autenticar_SucessoAD() {
-        when(acessoAdClient.autenticar("user", "pass")).thenReturn(true);
-        assertThat(service.autenticar("user", "pass")).isTrue();
-    }
-
-    @Test
-    @DisplayName("autorizar: erro se não autenticado recentemente")
-    void autorizar_ErroNaoAutenticado() {
-        assertThatThrownBy(() -> service.autorizar("user"))
-                .isInstanceOf(ErroAutenticacao.class);
-    }
-
-    @Test
-    @DisplayName("autorizar: sucesso")
-    void autorizar_Sucesso() {
-         @SuppressWarnings("unchecked")
-        Map<String, java.time.LocalDateTime> auths = (Map<String, java.time.LocalDateTime>) ReflectionTestUtils.getField(service, "autenticacoesRecentes");
-        auths.put("user", java.time.LocalDateTime.now());
-
-        Usuario u = new Usuario(); u.setTituloEleitoral("user");
-        when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTitulo("user")).thenReturn(Collections.emptyList());
-
-        assertThat(service.autorizar("user")).isNotNull();
-    }
-
-    @Test
-    @DisplayName("entrar: erro se sessão expirada ou inválida")
-    void entrar_ErroSessaoInvalida() {
-        EntrarReq req = EntrarReq.builder().tituloEleitoral("user").build();
-        assertThatThrownBy(() -> service.entrar(req))
-                .isInstanceOf(ErroAutenticacao.class);
-    }
-
-    @Test
-    @DisplayName("entrar: erro se unidade não encontrada (ou sem acesso)")
-    void entrar_ErroUnidadeNaoEncontrada() {
-        // Simular autenticação recente
-        @SuppressWarnings("unchecked")
-        Map<String, java.time.LocalDateTime> auths = (Map<String, java.time.LocalDateTime>) ReflectionTestUtils.getField(service, "autenticacoesRecentes");
-        auths.put("user", java.time.LocalDateTime.now());
-
-        EntrarReq req = EntrarReq.builder().tituloEleitoral("user").unidadeCodigo(1L).build();
-
-        Usuario u = new Usuario();
-        u.setTituloEleitoral("user");
-        when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTitulo("user")).thenReturn(Collections.emptyList());
-
-        assertThatThrownBy(() -> service.entrar(req))
-                .isInstanceOf(ErroAccessoNegado.class);
-    }
-
-    @Test
-    @DisplayName("entrar: erro se sem permissão")
-    void entrar_ErroSemPermissao() {
-        // Simular autenticação recente
-        @SuppressWarnings("unchecked")
-        Map<String, java.time.LocalDateTime> auths = (Map<String, java.time.LocalDateTime>) ReflectionTestUtils.getField(service, "autenticacoesRecentes");
-        auths.put("user", java.time.LocalDateTime.now());
-
-        EntrarReq req = EntrarReq.builder().tituloEleitoral("user").unidadeCodigo(1L).perfil("GESTOR").build();
-
-        Usuario u = new Usuario();
-        u.setTituloEleitoral("user");
-        when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTitulo("user")).thenReturn(Collections.emptyList());
-
-        assertThatThrownBy(() -> service.entrar(req))
-                .isInstanceOf(ErroAccessoNegado.class);
-    }
-
-    @Test
-    @DisplayName("entrar: sucesso")
-    void entrar_Sucesso() {
-         // Simular autenticação recente
-        @SuppressWarnings("unchecked")
-        Map<String, java.time.LocalDateTime> auths = (Map<String, java.time.LocalDateTime>) ReflectionTestUtils.getField(service, "autenticacoesRecentes");
-        auths.put("user", java.time.LocalDateTime.now());
-
-        EntrarReq req = EntrarReq.builder().tituloEleitoral("user").unidadeCodigo(1L).perfil("CHEFE").build();
-
-        // Mock da unidade para evitar NPE ao mapear DTO de autorização
-        Unidade unidade = new Unidade();
-        ReflectionTestUtils.setField(unidade, "codigo", 1L);
-        ReflectionTestUtils.setField(unidade, "nome", "U");
-        ReflectionTestUtils.setField(unidade, "sigla", "S");
-        ReflectionTestUtils.setField(unidade, "tipo", TipoUnidade.OPERACIONAL);
-
-        Usuario u = new Usuario();
-        u.setTituloEleitoral("user");
-        when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.of(u));
-
-        UsuarioPerfil up = new UsuarioPerfil();
-        ReflectionTestUtils.setField(up, "usuario", u);
-        ReflectionTestUtils.setField(up, "unidade", unidade);
-        ReflectionTestUtils.setField(up, "perfil", Perfil.CHEFE);
-        when(usuarioPerfilRepo.findByUsuarioTitulo("user")).thenReturn(List.of(up));
-
-        when(gerenciadorJwt.gerarToken(eq("user"), eq(Perfil.CHEFE), eq(1L))).thenReturn("token");
-
-        assertThat(service.entrar(req)).isEqualTo("token");
-    }
-
     @Test
     @DisplayName("carregarAtribuicoesEmLote: deve processar lista de usuarios")
     void carregarAtribuicoesEmLote_Sucesso() {
-         Usuario u1 = new Usuario(); u1.setTituloEleitoral("u1");
-         Usuario u2 = new Usuario(); u2.setTituloEleitoral("u2");
+        Usuario u1 = new Usuario();
+        u1.setTituloEleitoral("u1");
+        Usuario u2 = new Usuario();
+        u2.setTituloEleitoral("u2");
 
-         UsuarioPerfil up = new UsuarioPerfil();
-         ReflectionTestUtils.setField(up, "usuarioTitulo", "u1");
+        UsuarioPerfil up = new UsuarioPerfil();
+        ReflectionTestUtils.setField(up, "usuarioTitulo", "u1");
 
-         when(usuarioPerfilRepo.findByUsuarioTituloIn(anyList())).thenReturn(List.of(up));
+        when(usuarioPerfilRepo.findByUsuarioTituloIn(anyList())).thenReturn(List.of(up));
 
-         ReflectionTestUtils.invokeMethod(service, "carregarAtribuicoesEmLote", List.of(u1, u2));
+        ReflectionTestUtils.invokeMethod(service, "carregarAtribuicoesEmLote", List.of(u1, u2));
 
-         assertThat(u1.getTodasAtribuicoes()).isNotEmpty();
-         assertThat(u2.getTodasAtribuicoes()).isEmpty();
+        assertThat(u1.getTodasAtribuicoes()).isNotEmpty();
+        assertThat(u2.getTodasAtribuicoes()).isEmpty();
     }
 
     @Test

@@ -29,7 +29,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 class SubprocessoAccessPolicyTest {
 
     @Mock
-    private HierarchyService hierarchyService;
+    private sgc.organizacao.ServicoHierarquia servicoHierarquia;
 
     @InjectMocks
     private SubprocessoAccessPolicy policy;
@@ -46,17 +46,17 @@ class SubprocessoAccessPolicyTest {
     void setUp() {
         unidadeSuperior = criarUnidade(1L, "SEDOC", null, null);
         unidadePrincipal = criarUnidade(2L, "UNIDADE", unidadeSuperior, "123456789012");
-        
+
         usuarioAdmin = criarUsuario("111111111111", "Admin User");
         usuarioGestor = criarUsuario("222222222222", "Gestor User");
         usuarioChefe = criarUsuario("123456789012", "Chefe User");
         usuarioServidor = criarUsuario("444444444444", "Servidor User");
-        
+
         adicionarAtribuicao(usuarioAdmin, ADMIN, unidadePrincipal);
         adicionarAtribuicao(usuarioGestor, GESTOR, unidadeSuperior);
         adicionarAtribuicao(usuarioChefe, CHEFE, unidadePrincipal);
         adicionarAtribuicao(usuarioServidor, SERVIDOR, unidadePrincipal);
-        
+
         subprocesso = criarSubprocesso(10L, unidadePrincipal, MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
     }
 
@@ -97,8 +97,8 @@ class SubprocessoAccessPolicyTest {
         @Test
         @DisplayName("Deve permitir visualizar subprocesso se usuário da mesma unidade ou superior")
         void devePermitirVisualizarSeHierarquiaCorreta() {
-            when(hierarchyService.isSubordinada(any(), any())).thenReturn(true);
-            
+            when(servicoHierarquia.isSubordinada(any(), any())).thenReturn(true);
+
             assertThat(policy.canExecute(usuarioChefe, VISUALIZAR_SUBPROCESSO, subprocesso)).isTrue();
             assertThat(policy.canExecute(usuarioGestor, VISUALIZAR_SUBPROCESSO, subprocesso)).isTrue();
         }
@@ -112,9 +112,9 @@ class SubprocessoAccessPolicyTest {
         @DisplayName("Deve permitir CHEFE disponibilizar cadastro se for titular")
         void devePermitirChefeDisponibilizarSeForTitular() {
             subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            
+
             boolean resultado = policy.canExecute(usuarioChefe, DISPONIBILIZAR_CADASTRO, subprocesso);
-            
+
             assertThat(resultado).isTrue();
         }
 
@@ -124,9 +124,9 @@ class SubprocessoAccessPolicyTest {
             Unidade outraUnidade = criarUnidade(3L, "OUTRA", unidadeSuperior, "999999999999");
             subprocesso.setUnidade(outraUnidade);
             subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            
+
             boolean resultado = policy.canExecute(usuarioChefe, DISPONIBILIZAR_CADASTRO, subprocesso);
-            
+
             assertThat(resultado).isFalse();
             assertThat(policy.getMotivoNegacao()).contains("não é o titular");
         }
@@ -135,9 +135,9 @@ class SubprocessoAccessPolicyTest {
         @DisplayName("Deve negar disponibilizar cadastro em situação inválida")
         void deveNegarDisponibilizarCadastroEmSituacaoInvalida() {
             subprocesso.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
-            
+
             boolean resultado = policy.canExecute(usuarioChefe, DISPONIBILIZAR_CADASTRO, subprocesso);
-            
+
             assertThat(resultado).isFalse();
             assertThat(policy.getMotivoNegacao()).contains("não pode ser executada com o subprocesso na situação");
         }
@@ -145,11 +145,11 @@ class SubprocessoAccessPolicyTest {
         @Test
         @DisplayName("Deve permitir GESTOR devolver cadastro se for superior imediata")
         void devePermitirGestorDevolverCadastroSeForSuperiorImediata() {
-            when(hierarchyService.isSuperiorImediata(unidadePrincipal, unidadeSuperior)).thenReturn(true);
+            when(servicoHierarquia.isSuperiorImediata(unidadePrincipal, unidadeSuperior)).thenReturn(true);
             subprocesso.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-            
+
             boolean resultado = policy.canExecute(usuarioGestor, DEVOLVER_CADASTRO, subprocesso);
-            
+
             assertThat(resultado).isTrue();
         }
 
@@ -157,9 +157,9 @@ class SubprocessoAccessPolicyTest {
         @DisplayName("Deve permitir ADMIN homologar cadastro")
         void devePermitirAdminHomologarCadastro() {
             subprocesso.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-            
+
             boolean resultado = policy.canExecute(usuarioAdmin, HOMOLOGAR_CADASTRO, subprocesso);
-            
+
             assertThat(resultado).isTrue();
         }
 
@@ -167,9 +167,9 @@ class SubprocessoAccessPolicyTest {
         @DisplayName("Deve negar CHEFE homologar cadastro")
         void deveNegarChefeHomologarCadastro() {
             subprocesso.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-            
+
             boolean resultado = policy.canExecute(usuarioChefe, HOMOLOGAR_CADASTRO, subprocesso);
-            
+
             assertThat(resultado).isFalse();
         }
     }
@@ -182,20 +182,20 @@ class SubprocessoAccessPolicyTest {
         @DisplayName("Deve permitir CHEFE disponibilizar revisão se for titular")
         void devePermitirChefeDisponibilizarRevisaoSeForTitular() {
             subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
-            
+
             boolean resultado = policy.canExecute(usuarioChefe, DISPONIBILIZAR_REVISAO_CADASTRO, subprocesso);
-            
+
             assertThat(resultado).isTrue();
         }
 
         @Test
         @DisplayName("Deve permitir GESTOR aceitar revisão de cadastro")
         void devePermitirGestorAceitarRevisaoCadastro() {
-            when(hierarchyService.isSuperiorImediata(unidadePrincipal, unidadeSuperior)).thenReturn(true);
+            when(servicoHierarquia.isSuperiorImediata(unidadePrincipal, unidadeSuperior)).thenReturn(true);
             subprocesso.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
-            
+
             boolean resultado = policy.canExecute(usuarioGestor, ACEITAR_REVISAO_CADASTRO, subprocesso);
-            
+
             assertThat(resultado).isTrue();
         }
     }
@@ -208,9 +208,9 @@ class SubprocessoAccessPolicyTest {
         @DisplayName("Deve permitir ADMIN disponibilizar mapa")
         void devePermitirAdminDisponibilizarMapa() {
             subprocesso.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
-            
+
             boolean resultado = policy.canExecute(usuarioAdmin, DISPONIBILIZAR_MAPA, subprocesso);
-            
+
             assertThat(resultado).isTrue();
         }
 
@@ -218,9 +218,9 @@ class SubprocessoAccessPolicyTest {
         @DisplayName("Deve permitir CHEFE apresentar sugestões ao mapa")
         void devePermitirChefeApresentarSugestoes() {
             subprocesso.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO);
-            
+
             boolean resultado = policy.canExecute(usuarioChefe, APRESENTAR_SUGESTOES, subprocesso);
-            
+
             assertThat(resultado).isTrue();
         }
 
@@ -228,9 +228,9 @@ class SubprocessoAccessPolicyTest {
         @DisplayName("Deve negar SERVIDOR apresentar sugestões")
         void deveNegarServidorApresentarSugestoes() {
             subprocesso.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO);
-            
+
             boolean resultado = policy.canExecute(usuarioServidor, APRESENTAR_SUGESTOES, subprocesso);
-            
+
             assertThat(resultado).isFalse();
         }
 
@@ -238,9 +238,9 @@ class SubprocessoAccessPolicyTest {
         @DisplayName("Deve permitir CHEFE validar mapa")
         void devePermitirChefeValidarMapa() {
             subprocesso.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO);
-            
+
             boolean resultado = policy.canExecute(usuarioChefe, VALIDAR_MAPA, subprocesso);
-            
+
             assertThat(resultado).isTrue();
         }
 
@@ -248,9 +248,9 @@ class SubprocessoAccessPolicyTest {
         @DisplayName("Deve permitir ADMIN ajustar mapa")
         void devePermitirAdminAjustarMapa() {
             subprocesso.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
-            
+
             boolean resultado = policy.canExecute(usuarioAdmin, AJUSTAR_MAPA, subprocesso);
-            
+
             assertThat(resultado).isTrue();
         }
 
@@ -258,9 +258,9 @@ class SubprocessoAccessPolicyTest {
         @DisplayName("Deve negar CHEFE ajustar mapa")
         void deveNegarChefeAjustarMapa() {
             subprocesso.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
-            
+
             boolean resultado = policy.canExecute(usuarioChefe, AJUSTAR_MAPA, subprocesso);
-            
+
             assertThat(resultado).isFalse();
         }
     }
@@ -273,9 +273,9 @@ class SubprocessoAccessPolicyTest {
         @DisplayName("Deve permitir CHEFE realizar autoavaliação")
         void devePermitirChefeRealizarAutoavaliacao() {
             subprocesso.setSituacao(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
-            
+
             boolean resultado = policy.canExecute(usuarioChefe, REALIZAR_AUTOAVALIACAO, subprocesso);
-            
+
             assertThat(resultado).isTrue();
         }
 
@@ -283,9 +283,9 @@ class SubprocessoAccessPolicyTest {
         @DisplayName("Deve negar SERVIDOR realizar autoavaliação")
         void deveNegarServidorRealizarAutoavaliacao() {
             subprocesso.setSituacao(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
-            
+
             boolean resultado = policy.canExecute(usuarioServidor, REALIZAR_AUTOAVALIACAO, subprocesso);
-            
+
             assertThat(resultado).isFalse();
         }
     }

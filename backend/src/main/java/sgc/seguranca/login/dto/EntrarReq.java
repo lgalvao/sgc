@@ -1,4 +1,4 @@
-package sgc.seguranca.dto;
+package sgc.seguranca.login.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -7,6 +7,9 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Value;
 
+/**
+ * DTO para a requisição de entrada (login) do usuário.
+ */
 @Value
 @Builder
 public class EntrarReq {

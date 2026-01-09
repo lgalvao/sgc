@@ -1,7 +1,10 @@
-package sgc.seguranca.autenticacao;
+package sgc.seguranca.login.dto;
 
 import lombok.Data;
 
+/**
+ * DTO para representar um usuário retornado pelo serviço AcessoAD.
+ */
 @Data
 public class UsuarioAcessoAd {
     private String login;

@@ -1,18 +1,17 @@
-package sgc.seguranca;
+package sgc.seguranca.sanitizacao;
 
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 
 /**
  * Utilitário centralizado para sanitização de HTML.
- * Garante que a política de segurança seja aplicada consistentemente em todo o sistema.
+ * Garante que a política de segurança seja aplicada consistentemente em todo o
+ * sistema.
  */
-public final class SanitizacaoUtil {
-    // Política padrão: remove todas as tags HTML (strip all tags).
-    // Usamos toFactory() sem configurar nada no builder, o que resulta em uma política que rejeita todas as tags.
+public final class UtilSanitizacao {
     private static final PolicyFactory POLITICA_PADRAO = new HtmlPolicyBuilder().toFactory();
 
-    private SanitizacaoUtil() {
+    private UtilSanitizacao() {
         // Construtor privado para impedir instanciação
     }
 

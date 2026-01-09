@@ -1,4 +1,4 @@
-package sgc.seguranca;
+package sgc.seguranca.login;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,24 +15,21 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+/**
+ * Componente que limita tentativas de login por IP para prevenir ataques de
+ * força bruta.
+ */
 @Component
 @Slf4j
 public class LimitadorTentativasLogin {
     private final Environment environment;
 
-    // Máximo de tentativas permitidas por IP
     private static final int MAX_TENTATIVAS = 5;
-
-    // Janela de tempo em minutos
     private static final int JANELA_MINUTOS = 1;
-
-    // Limite padrão de entradas no cache
     private static final int DEFAULT_MAX_CACHE_ENTRIES = 1000;
 
     private final int maxCacheEntries;
-
     private final Map<String, Deque<LocalDateTime>> tentativasPorIp = new ConcurrentHashMap<>();
-
     private final java.time.Clock clock;
 
     @Autowired
@@ -42,7 +39,6 @@ public class LimitadorTentativasLogin {
         this.maxCacheEntries = DEFAULT_MAX_CACHE_ENTRIES;
     }
 
-    // Construtor para testes permitindo configurar o limite
     LimitadorTentativasLogin(Environment environment, int maxCacheEntries, java.time.Clock clock) {
         this.environment = environment;
         this.maxCacheEntries = maxCacheEntries;
@@ -50,21 +46,17 @@ public class LimitadorTentativasLogin {
     }
 
     public void verificar(String ip) {
-        if (ip == null || isPerfilTesteAtivo()) return;
+        if (ip == null || isPerfilTesteAtivo())
+            return;
 
-        // Proteção contra DoS: Se o mapa estiver muito cheio, limpa tudo.
-        // Medida de emergência para evitar OutOfMemoryError.
         if (tentativasPorIp.size() >= maxCacheEntries) {
-             // Tenta limpar entradas antigas primeiro
-             limparCachePeriodico();
+            limparCachePeriodico();
 
-             // Se ainda estiver cheio (ataque ativo ou tráfego muito alto), reseta o cache.
-             // Fail-open para rate limiting é preferível a travar o servidor.
-             if (tentativasPorIp.size() >= maxCacheEntries) {
-                 log.warn("Cache de limitador de login atingiu {} entradas. " +
-                         "Limpando cache para prevenir exaustão de memória.", tentativasPorIp.size());
-                 tentativasPorIp.clear();
-             }
+            if (tentativasPorIp.size() >= maxCacheEntries) {
+                log.warn("Cache de limitador de login atingiu {} entradas. " +
+                        "Limpando cache para prevenir exaustão de memória.", tentativasPorIp.size());
+                tentativasPorIp.clear();
+            }
         }
 
         limparTentativasAntigas(ip);
@@ -83,11 +75,11 @@ public class LimitadorTentativasLogin {
 
     private void limparTentativasAntigas(String ip) {
         Deque<LocalDateTime> tentativas = tentativasPorIp.get(ip);
-        if (tentativas == null) return;
+        if (tentativas == null)
+            return;
 
         LocalDateTime limite = LocalDateTime.now(clock).minusMinutes(JANELA_MINUTOS);
 
-        // Loop seguro contra condição de corrida onde peekFirst() pode retornar null
         LocalDateTime tentativaAntiga;
         while ((tentativaAntiga = tentativas.peekFirst()) != null && tentativaAntiga.isBefore(limite)) {
             tentativas.pollFirst();
@@ -97,27 +89,20 @@ public class LimitadorTentativasLogin {
         }
     }
 
-    /**
-     * Remove IPs que não têm tentativas recentes para liberar memória.
-     * Executa a cada 10 minutos.
-     */
     @Scheduled(fixedRate = 600000)
     public void limparCachePeriodico() {
         LocalDateTime limite = LocalDateTime.now(clock).minusMinutes(JANELA_MINUTOS);
 
         tentativasPorIp.entrySet().removeIf(entry -> {
             Deque<LocalDateTime> tentativas = entry.getValue();
-            // Remove tentativas antigas
             LocalDateTime tentativaAntiga;
             while ((tentativaAntiga = tentativas.peekFirst()) != null && tentativaAntiga.isBefore(limite)) {
                 tentativas.pollFirst();
             }
-            // Se ficou vazio, remove a entrada do mapa
             return tentativas.isEmpty();
         });
     }
 
-    // Para testes
     int getCacheSize() {
         return tentativasPorIp.size();
     }

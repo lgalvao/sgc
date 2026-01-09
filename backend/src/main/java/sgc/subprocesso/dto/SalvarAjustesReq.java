@@ -20,7 +20,7 @@ public class SalvarAjustesReq {
     /**
      * A lista de competências com os ajustes a serem salvos.
      */
-    @NotNull
+    @NotNull(message = "A lista de competências é obrigatória")
     @Valid
     private List<CompetenciaAjusteDto> competencias;
 }

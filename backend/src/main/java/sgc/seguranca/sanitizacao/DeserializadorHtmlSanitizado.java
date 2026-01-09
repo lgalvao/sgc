@@ -1,16 +1,16 @@
-package sgc.seguranca;
+package sgc.seguranca.sanitizacao;
 
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.deser.std.StdDeserializer;
 
 /**
- * Custom JSON deserializer that sanitizes HTML content in String fields. Prevents XSS attacks by
- * removing potentially malicious HTML/JavaScript.
+ * Deserializador JSON customizado que sanitiza conteúdo HTML em campos String.
+ * Previne ataques XSS removendo HTML/JavaScript potencialmente malicioso.
  */
-public class HtmlSanitizingDeserializer extends StdDeserializer<String> {
+public class DeserializadorHtmlSanitizado extends StdDeserializer<String> {
 
-    public HtmlSanitizingDeserializer() {
+    public DeserializadorHtmlSanitizado() {
         super(String.class);
     }
 
@@ -20,6 +20,6 @@ public class HtmlSanitizingDeserializer extends StdDeserializer<String> {
         if (value == null || value.isBlank()) {
             return value;
         }
-        return SanitizacaoUtil.sanitizar(value);
+        return UtilSanitizacao.sanitizar(value);
     }
 }

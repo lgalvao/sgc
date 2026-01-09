@@ -15,10 +15,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class ConhecimentoAjusteDto {
-    @NotNull
+    @NotNull(message = "O código do conhecimento é obrigatório")
     private final Long conhecimentoCodigo;
-    @NotBlank
+    @NotBlank(message = "O nome do conhecimento é obrigatório")
     private final String nome;
-    @NotNull
+    @NotNull(message = "O campo 'incluído' é obrigatório")
     private final boolean incluido;
 }

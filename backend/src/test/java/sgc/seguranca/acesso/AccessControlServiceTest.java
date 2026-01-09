@@ -24,7 +24,7 @@ class AccessControlServiceTest {
     private AccessAuditService auditService;
 
     @Mock
-    private HierarchyService hierarchyService;
+    private sgc.organizacao.ServicoHierarquia servicoHierarquia;
 
     @Mock
     private SubprocessoAccessPolicy subprocessoAccessPolicy;
@@ -47,11 +47,11 @@ class AccessControlServiceTest {
         Usuario usuario = criarUsuario("123456789012");
         Acao acao = Acao.VISUALIZAR_PROCESSO;
         Processo processo = criarProcesso(1L);
-        
+
         when(processoAccessPolicy.canExecute(usuario, acao, processo)).thenReturn(true);
-        
+
         boolean resultado = accessControlService.podeExecutar(usuario, acao, processo);
-        
+
         assertThat(resultado).isTrue();
     }
 
@@ -61,13 +61,11 @@ class AccessControlServiceTest {
         Usuario usuario = criarUsuario("123456789012");
         Acao acao = Acao.VISUALIZAR_PROCESSO;
         Processo processo = criarProcesso(1L);
-        
+
         when(processoAccessPolicy.canExecute(usuario, acao, processo)).thenReturn(true);
-        
-        assertDoesNotThrow(() -> 
-            accessControlService.verificarPermissao(usuario, acao, processo)
-        );
-        
+
+        assertDoesNotThrow(() -> accessControlService.verificarPermissao(usuario, acao, processo));
+
         verify(auditService).logAccessGranted(eq(usuario), eq(acao), eq(processo));
     }
 
@@ -77,11 +75,11 @@ class AccessControlServiceTest {
         Usuario usuario = criarUsuario("123456789012");
         Acao acao = Acao.EDITAR_PROCESSO;
         Processo processo = criarProcesso(1L);
-        
+
         when(processoAccessPolicy.canExecute(usuario, acao, processo)).thenReturn(true);
-        
+
         boolean resultado = accessControlService.podeExecutar(usuario, acao, processo);
-        
+
         assertThat(resultado).isTrue();
     }
 
@@ -90,9 +88,9 @@ class AccessControlServiceTest {
     void deveFuncionarComDiferentesTiposDeAcoes() {
         Usuario usuario = criarUsuario("123456789012");
         Processo processo = criarProcesso(1L);
-        
+
         when(processoAccessPolicy.canExecute(eq(usuario), any(), eq(processo))).thenReturn(true);
-        
+
         assertThat(accessControlService.podeExecutar(usuario, Acao.CRIAR_PROCESSO, processo)).isTrue();
         assertThat(accessControlService.podeExecutar(usuario, Acao.EDITAR_PROCESSO, processo)).isTrue();
         assertThat(accessControlService.podeExecutar(usuario, Acao.EXCLUIR_PROCESSO, processo)).isTrue();

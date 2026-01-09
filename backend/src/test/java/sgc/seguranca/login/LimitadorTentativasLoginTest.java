@@ -1,9 +1,9 @@
-package sgc.seguranca;
+package sgc.seguranca.login;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.env.Environment;
-import sgc.seguranca.LimitadorTentativasLogin.ErroMuitasTentativas;
+import sgc.seguranca.login.LimitadorTentativasLogin.ErroMuitasTentativas;
 
 import java.util.stream.IntStream;
 
@@ -23,8 +23,8 @@ class LimitadorTentativasLoginTest {
         clock = mock(java.time.Clock.class);
         when(clock.getZone()).thenReturn(java.time.ZoneId.systemDefault());
         when(clock.instant()).thenReturn(java.time.Instant.now());
-        
-        when(environment.getActiveProfiles()).thenReturn(new String[]{});
+
+        when(environment.getActiveProfiles()).thenReturn(new String[] {});
         limitador = new LimitadorTentativasLogin(environment, clock);
     }
 
@@ -33,11 +33,9 @@ class LimitadorTentativasLoginTest {
         String ip = "192.168.1.1";
 
         // 5 tentativas permitidas
-        IntStream.range(0, 5).forEach(i ->
-            assertDoesNotThrow(() -> limitador.verificar(ip))
-        );
+        IntStream.range(0, 5).forEach(i -> assertDoesNotThrow(() -> limitador.verificar(ip)));
     }
-    
+
     @Test
     void deveBloquearAposLimiteExcedido() {
         String ip = "192.168.1.2";
@@ -69,26 +67,22 @@ class LimitadorTentativasLoginTest {
 
     @Test
     void naoDeveBloquearSePerfilDeTesteEstiverAtivo() {
-        when(environment.getActiveProfiles()).thenReturn(new String[]{"test"});
+        when(environment.getActiveProfiles()).thenReturn(new String[] { "test" });
 
         String ip = "192.168.1.4";
 
         // Com perfil 'test', não deve bloquear nunca
-        IntStream.range(0, 10).forEach(i ->
-            assertDoesNotThrow(() -> limitador.verificar(ip))
-        );
+        IntStream.range(0, 10).forEach(i -> assertDoesNotThrow(() -> limitador.verificar(ip)));
     }
 
     @Test
     void naoDeveBloquearSePerfilE2eEstiverAtivo() {
-        when(environment.getActiveProfiles()).thenReturn(new String[]{"e2e"});
+        when(environment.getActiveProfiles()).thenReturn(new String[] { "e2e" });
 
         String ip = "192.168.1.5";
 
         // Com perfil 'e2e', não deve bloquear nunca
-        IntStream.range(0, 10).forEach(i ->
-            assertDoesNotThrow(() -> limitador.verificar(ip))
-        );
+        IntStream.range(0, 10).forEach(i -> assertDoesNotThrow(() -> limitador.verificar(ip)));
     }
 
     @Test
@@ -96,12 +90,12 @@ class LimitadorTentativasLoginTest {
         String ip = "192.168.1.10";
         // 1. Adiciona uma tentativa
         limitador.verificar(ip);
-        
+
         // 2. Avança o tempo para expirar a tentativa (11 minutos, janela é 10)
         when(clock.instant()).thenReturn(java.time.Instant.now().plusSeconds(660));
-        
-        // 3. Verifica novamente o mesmo IP. 
-        // Isso deve chamar limparTentativasAntigas(ip), remover a antiga, 
+
+        // 3. Verifica novamente o mesmo IP.
+        // Isso deve chamar limparTentativasAntigas(ip), remover a antiga,
         // esvaziar a lista desse IP, remover do mapa, e adicionar a nova.
         assertDoesNotThrow(() -> limitador.verificar(ip));
     }
@@ -124,7 +118,8 @@ class LimitadorTentativasLoginTest {
         when(clock.instant()).thenReturn(java.time.Instant.now().plusSeconds(120));
 
         // Adiciona mais uma entrada, deve acionar a limpeza
-        // Como o tempo passou, ele deve limpar as antigas e NÃO precisar limpar tudo (clear)
+        // Como o tempo passou, ele deve limpar as antigas e NÃO precisar limpar tudo
+        // (clear)
         limitadorTeste.verificar("10.0.0." + limiteTeste);
 
         // O tamanho deve ser 1 (apenas a nova, as velhas expiraram)
@@ -136,18 +131,18 @@ class LimitadorTentativasLoginTest {
         // Cache minúsculo
         int limiteTeste = 5;
         LimitadorTentativasLogin limitadorTeste = new LimitadorTentativasLogin(environment, limiteTeste, clock);
-        
+
         // Enche o cache
-        for(int i=0; i<limiteTeste; i++) {
+        for (int i = 0; i < limiteTeste; i++) {
             limitadorTeste.verificar("Ip" + i);
         }
         assertEquals(limiteTeste, limitadorTeste.getCacheSize());
-        
+
         // Tenta adicionar mais um, SEM avançar o tempo
         // limparCachePeriodico roda, mas nao remove nada.
         // Entao deve cair no fallback de limpar tudo.
         limitadorTeste.verificar("IpNovo");
-        
+
         // Deve ter limpado tudo e adicionado o novo. Size = 1.
         assertEquals(1, limitadorTeste.getCacheSize());
     }

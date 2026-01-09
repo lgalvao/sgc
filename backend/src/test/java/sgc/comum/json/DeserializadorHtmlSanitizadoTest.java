@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import sgc.seguranca.HtmlSanitizingDeserializer;
+import sgc.seguranca.sanitizacao.DeserializadorHtmlSanitizado;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 
@@ -14,16 +14,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@DisplayName("Testes para HtmlSanitizingDeserializer")
-class HtmlSanitizingDeserializerTest {
+@DisplayName("Testes para DeserializadorHtmlSanitizado")
+class DeserializadorHtmlSanitizadoTest {
 
-    private HtmlSanitizingDeserializer deserializer;
+    private DeserializadorHtmlSanitizado deserializador;
     private JsonParser parser;
     private DeserializationContext context;
 
     @BeforeEach
     void setUp() {
-        deserializer = new HtmlSanitizingDeserializer();
+        deserializador = new DeserializadorHtmlSanitizado();
         parser = mock(JsonParser.class);
         context = mock(DeserializationContext.class);
     }
@@ -36,7 +36,7 @@ class HtmlSanitizingDeserializerTest {
         when(parser.getValueAsString()).thenReturn(inputMalicioso);
 
         // Act
-        String resultado = deserializer.deserialize(parser, context);
+        String resultado = deserializador.deserialize(parser, context);
 
         // Assert
         assertThat(resultado).doesNotContain("<script>");
@@ -52,7 +52,7 @@ class HtmlSanitizingDeserializerTest {
         when(parser.getValueAsString()).thenReturn(inputMalicioso);
 
         // Act
-        String resultado = deserializer.deserialize(parser, context);
+        String resultado = deserializador.deserialize(parser, context);
 
         // Assert
         assertThat(resultado).doesNotContain("onerror");
@@ -67,7 +67,7 @@ class HtmlSanitizingDeserializerTest {
         when(parser.getValueAsString()).thenReturn(textoSimples);
 
         // Act
-        String resultado = deserializer.deserialize(parser, context);
+        String resultado = deserializador.deserialize(parser, context);
 
         // Assert
         assertThat(resultado).isEqualTo(textoSimples);
@@ -75,14 +75,14 @@ class HtmlSanitizingDeserializerTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings = {" ", "  ", "\t", "\n"})
+    @ValueSource(strings = { " ", "  ", "\t", "\n" })
     @DisplayName("Deve retornar valores nulos ou vazios sem alteração")
     void deveRetornarValoresNulosOuVaziosSemAlteracao(String input) throws Exception {
         // Arrange
         when(parser.getValueAsString()).thenReturn(input);
 
         // Act
-        String resultado = deserializer.deserialize(parser, context);
+        String resultado = deserializador.deserialize(parser, context);
 
         // Assert
         assertThat(resultado).isEqualTo(input);
@@ -96,7 +96,7 @@ class HtmlSanitizingDeserializerTest {
         when(parser.getValueAsString()).thenReturn(inputMalicioso);
 
         // Act
-        String resultado = deserializer.deserialize(parser, context);
+        String resultado = deserializador.deserialize(parser, context);
 
         // Assert
         // O sanitizador HTML remove tags, mas texto plano permanece
@@ -112,7 +112,7 @@ class HtmlSanitizingDeserializerTest {
         when(parser.getValueAsString()).thenReturn(inputMalicioso);
 
         // Act
-        String resultado = deserializer.deserialize(parser, context);
+        String resultado = deserializador.deserialize(parser, context);
 
         // Assert
         assertThat(resultado).doesNotContain("javascript:");
@@ -128,7 +128,7 @@ class HtmlSanitizingDeserializerTest {
         when(parser.getValueAsString()).thenReturn(inputMalicioso);
 
         // Act
-        String resultado = deserializer.deserialize(parser, context);
+        String resultado = deserializador.deserialize(parser, context);
 
         // Assert
         assertThat(resultado).doesNotContain("<iframe");

@@ -14,7 +14,7 @@ import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.organizacao.model.*;
-import sgc.seguranca.dto.EntrarReq;
+import sgc.seguranca.login.dto.EntrarReq;
 import sgc.util.TestUtil;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -39,9 +39,10 @@ public class SecurityAuthBypassTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-         try {
-             jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 20000");
-         } catch (Exception ignored) { }
+        try {
+            jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 20000");
+        } catch (Exception ignored) {
+        }
     }
 
     @Test
@@ -57,7 +58,8 @@ public class SecurityAuthBypassTest extends BaseIntegrationTest {
         usuario.setTituloEleitoral("123456789099");
         usuarioRepo.saveAndFlush(usuario);
 
-        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
+        jdbcTemplate.update(
+                "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
                 usuario.getTituloEleitoral(), "ADMIN", unidade.getCodigo());
 
         // 2. Try to "login" (entrar) directly, skipping /autenticar
@@ -69,9 +71,9 @@ public class SecurityAuthBypassTest extends BaseIntegrationTest {
 
         // 3. Assert that it fails with 401 Unauthorized (or similar)
         mockMvc.perform(post("/api/usuarios/entrar")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(testUtil.toJson(entrarReq)))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(testUtil.toJson(entrarReq)))
                 .andExpect(status().isUnauthorized());
     }
 }

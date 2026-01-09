@@ -625,25 +625,30 @@ public void iniciar(Long codigo) {
 
 ### 5.4. Validação de Entrada
 
+> [!IMPORTANT]
+> Consulte o [Guia Completo de Validação](/regras/guia-validacao.md) para orientações detalhadas.
+
 **Validação em Camadas:**
 
-1. **Controller:** Validação básica com Bean Validation
-2. **Service:** Validação de regras de negócio
-3. **Repository:** Constraints de banco de dados
+1. **Controller:** `@Valid` no `@RequestBody` dispara Bean Validation
+2. **DTO:** Anotações `@NotBlank`, `@NotNull`, `@Size` com mensagens em português
+3. **Service:** Apenas regras de negócio (estado, permissões)
+4. **Repository:** Constraints de banco de dados
 
-**Exemplo:**
+**Exemplo de DTO:**
 
 ```java
 public record CriarProcessoReq(
-    @NotBlank(message = "Descrição é obrigatória")
+    @NotBlank(message = "Preencha a descrição")
+    @Size(max = 255, message = "Descrição deve ter no máximo 255 caracteres")
     String descricao,
     
-    @NotNull(message = "Data limite é obrigatória")
-    @Future(message = "Data limite deve ser futura")
+    @NotNull(message = "A data limite é obrigatória")
+    @Future(message = "A data limite deve ser futura")
     LocalDateTime dataLimite,
     
-    @NotNull(message = "Tipo é obrigatório")
-    TipoProcesso tipo
+    @NotEmpty(message = "Pelo menos uma unidade deve ser selecionada")
+    List<Long> unidades
 ) {}
 ```
 

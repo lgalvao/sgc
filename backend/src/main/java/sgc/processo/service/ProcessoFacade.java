@@ -1,6 +1,5 @@
 package sgc.processo.service;
 
-import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -45,7 +44,8 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
 /**
  * Facade para orquestrar operações de Processo.
  *
- * <p>Implementa o padrão Facade para simplificar a interface de uso e centralizar
+ * <p>
+ * Implementa o padrão Facade para simplificar a interface de uso e centralizar
  * a coordenação entre múltiplos serviços relacionados a processos.
  */
 @Service
@@ -69,23 +69,20 @@ public class ProcessoFacade {
         }
 
         String username = authentication.getName();
-        boolean isGestorOuChefe =
-                authentication.getAuthorities().stream()
-                        .anyMatch(
-                                a ->
-                                        "ROLE_GESTOR".equals(a.getAuthority())
-                                                || "ROLE_CHEFE".equals(a.getAuthority()));
+        boolean isGestorOuChefe = authentication.getAuthorities().stream()
+                .anyMatch(
+                        a -> "ROLE_GESTOR".equals(a.getAuthority())
+                                || "ROLE_CHEFE".equals(a.getAuthority()));
 
         if (!isGestorOuChefe) {
             return false;
         }
 
         List<PerfilDto> perfis = usuarioService.buscarPerfisUsuario(username);
-        Long codUnidadeUsuario =
-                perfis.stream()
-                        .findFirst()
-                        .map(PerfilDto::getUnidadeCodigo)
-                        .orElse(null);
+        Long codUnidadeUsuario = perfis.stream()
+                .findFirst()
+                .map(PerfilDto::getUnidadeCodigo)
+                .orElse(null);
 
         if (codUnidadeUsuario == null) {
             return false;
@@ -135,21 +132,11 @@ public class ProcessoFacade {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public ProcessoDto criar(CriarProcessoReq req) {
-        if (req.getDescricao() == null || req.getDescricao().isBlank()) {
-            throw new ConstraintViolationException("A descrição do processo é obrigatória.", null);
-        }
-
-        if (req.getUnidades().isEmpty()) {
-            throw new ConstraintViolationException(
-                    "Pelo menos uma unidade participante deve ser selecionada.", null);
-        }
-
         Set<Unidade> participantes = new HashSet<>();
         for (Long codigoUnidade : req.getUnidades()) {
             Unidade unidade = unidadeService.buscarEntidadePorId(codigoUnidade);
 
             if (unidade.getTipo() == INTERMEDIARIA) {
-                log.error("ERRO INTERNO: Tentativa de criar processo com unidade INTERMEDIARIA: {}", unidade.getSigla());
                 throw new ErroEstadoImpossivel("Erro interno: unidade não elegível foi enviada ao backend");
             }
             participantes.add(unidade);
@@ -184,7 +171,7 @@ public class ProcessoFacade {
     @PreAuthorize("hasRole('ADMIN')")
     public ProcessoDto atualizar(Long codigo, AtualizarProcessoReq requisicao) {
         Processo processo = processoRepo.findById(codigo)
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser editados.");
@@ -217,7 +204,7 @@ public class ProcessoFacade {
     @PreAuthorize("hasRole('ADMIN')")
     public void apagar(Long codigo) {
         Processo processo = processoRepo.findById(codigo)
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser removidos.");
@@ -234,7 +221,8 @@ public class ProcessoFacade {
 
     /**
      * Busca a entidade Processo por ID.
-     * Método público para permitir uso por outros serviços (ex: EventoProcessoListener).
+     * Método público para permitir uso por outros serviços (ex:
+     * EventoProcessoListener).
      */
     @Transactional(readOnly = true)
     public Processo buscarEntidadePorId(Long codigo) {
@@ -258,7 +246,7 @@ public class ProcessoFacade {
     @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codProcesso)")
     public ProcessoDetalheDto obterDetalhes(Long codProcesso) {
         Processo processo = processoRepo.findById(codProcesso)
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
 
         return processoDetalheBuilder.build(processo);
     }
@@ -277,7 +265,8 @@ public class ProcessoFacade {
                 .toList();
     }
 
-    public org.springframework.data.domain.Page<Processo> listarTodos(org.springframework.data.domain.Pageable pageable) {
+    public org.springframework.data.domain.Page<Processo> listarTodos(
+            org.springframework.data.domain.Pageable pageable) {
         return processoRepo.findAll(pageable);
     }
 
@@ -287,7 +276,8 @@ public class ProcessoFacade {
                 unidadeIds, SituacaoProcesso.CRIADO, pageable);
     }
 
-    // ========== MÉTODOS DE INICIALIZAÇÃO (delegam para ProcessoInicializador) ==========
+    // ========== MÉTODOS DE INICIALIZAÇÃO (delegam para ProcessoInicializador)
+    // ==========
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
@@ -312,7 +302,8 @@ public class ProcessoFacade {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void finalizar(Long codigo) {
-        Processo processo = processoRepo.findById(codigo).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+        Processo processo = processoRepo.findById(codigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         validarFinalizacaoProcesso(processo);
         tornarMapasVigentes(processo);
@@ -346,7 +337,8 @@ public class ProcessoFacade {
         alertaService.criarAlertaSedoc(processo, unidade, descricao);
     }
 
-    // ========== MÉTODOS PRIVADOS DE VALIDAÇÃO (usados apenas em criar/atualizar) ==========
+    // ========== MÉTODOS PRIVADOS DE VALIDAÇÃO (usados apenas em criar/atualizar)
+    // ==========
 
     private Optional<String> getMensagemErroUnidadesSemMapa(List<Long> codigosUnidades) {
         if (codigosUnidades == null || codigosUnidades.isEmpty()) {
@@ -355,9 +347,9 @@ public class ProcessoFacade {
         List<Unidade> unidades = unidadeService.buscarEntidadesPorIds(codigosUnidades);
 
         List<Long> unidadesSemMapa = unidades.stream()
-                        .map(Unidade::getCodigo)
-                        .filter(codigo -> !unidadeService.verificarExistenciaMapaVigente(codigo))
-                        .toList();
+                .map(Unidade::getCodigo)
+                .filter(codigo -> !unidadeService.verificarExistenciaMapaVigente(codigo))
+                .toList();
 
         if (!unidadesSemMapa.isEmpty()) {
             List<String> siglasUnidadesSemMapa = unidadeService.buscarSiglasPorIds(unidadesSemMapa);
@@ -377,16 +369,18 @@ public class ProcessoFacade {
     private void validarTodosSubprocessosHomologados(Processo processo) {
         List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(processo.getCodigo());
         List<String> pendentes = subprocessos.stream().filter(sp -> sp.getSituacao() != MAPEAMENTO_MAPA_HOMOLOGADO
-                                                && sp.getSituacao() != REVISAO_MAPA_HOMOLOGADO)
-                        .map(sp -> {String identificador = sp.getUnidade() != null ? sp.getUnidade().getSigla() : String.format("Subprocesso %d", sp.getCodigo());
-                                    return String.format("%s (Situação: %s)", identificador, sp.getSituacao());
-                                })
-                        .toList();
+                && sp.getSituacao() != REVISAO_MAPA_HOMOLOGADO)
+                .map(sp -> {
+                    String identificador = sp.getUnidade() != null ? sp.getUnidade().getSigla()
+                            : String.format("Subprocesso %d", sp.getCodigo());
+                    return String.format("%s (Situação: %s)", identificador, sp.getSituacao());
+                })
+                .toList();
 
         if (!pendentes.isEmpty()) {
             String mensagem = String.format("Não é possível encerrar o processo. Unidades pendentes de"
-                                    + " homologação:%n- %s",
-                            String.join("%n- ", pendentes));
+                    + " homologação:%n- %s",
+                    String.join("%n- ", pendentes));
             log.warn("Validação de finalização falhou: {} subprocessos não homologados.", pendentes.size());
             throw new ErroProcesso(mensagem);
         }
@@ -395,15 +389,16 @@ public class ProcessoFacade {
 
     private void tornarMapasVigentes(Processo processo) {
         log.info("Mapa vigente definido para o processo {}", processo.getCodigo());
-        List<Subprocesso> subprocessos =
-                subprocessoService.listarEntidadesPorProcesso(processo.getCodigo());
+        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(processo.getCodigo());
 
         for (Subprocesso subprocesso : subprocessos) {
             Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())
-                    .orElseThrow(() -> new ErroProcesso("Subprocesso %d sem unidade associada.".formatted(subprocesso.getCodigo())));
+                    .orElseThrow(() -> new ErroProcesso(
+                            "Subprocesso %d sem unidade associada.".formatted(subprocesso.getCodigo())));
 
             Mapa mapaDoSubprocesso = Optional.ofNullable(subprocesso.getMapa())
-                    .orElseThrow(() -> new ErroProcesso("Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
+                    .orElseThrow(() -> new ErroProcesso(
+                            "Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
 
             unidadeService.definirMapaVigente(unidade.getCodigo(), mapaDoSubprocesso);
         }
@@ -427,10 +422,9 @@ public class ProcessoFacade {
         }
         String username = authentication.getName();
         boolean isAdmin = authentication.getAuthorities().stream()
-                        .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
 
-        List<Subprocesso> subprocessos =
-                subprocessoService.listarEntidadesPorProcesso(codProcesso);
+        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
         if (isAdmin) {
             return subprocessos.stream()
                     .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)
@@ -441,7 +435,8 @@ public class ProcessoFacade {
         List<PerfilDto> perfis = usuarioService.buscarPerfisUsuario(username);
         Long codUnidadeUsuario = perfis.stream().findFirst().map(PerfilDto::getUnidadeCodigo).orElse(null);
 
-        if (codUnidadeUsuario == null) return List.of();
+        if (codUnidadeUsuario == null)
+            return List.of();
 
         return subprocessos.stream()
                 .filter(sp -> sp.getUnidade() != null

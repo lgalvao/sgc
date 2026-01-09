@@ -1,6 +1,5 @@
 package sgc.processo.service;
 
-import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -94,9 +93,8 @@ class ProcessoFacadeTest {
         @DisplayName("Deve criar processo quando dados válidos")
         void deveCriarProcessoQuandoDadosValidos() {
             // Arrange
-            CriarProcessoReq req =
-                    new CriarProcessoReq(
-                            "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
+            CriarProcessoReq req = new CriarProcessoReq(
+                    "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
             Unidade unidade = UnidadeFixture.unidadeComId(1L);
 
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidade);
@@ -114,61 +112,23 @@ class ProcessoFacadeTest {
 
             // Assert
             assertThat(resultado).isNotNull();
-            verify(processoRepo).saveAndFlush(argThat(p -> 
-                p.getDescricao().equals("Teste") && 
-                p.getTipo() == TipoProcesso.MAPEAMENTO &&
-                p.getSituacao() == SituacaoProcesso.CRIADO
-            ));
+            verify(processoRepo).saveAndFlush(argThat(p -> p.getDescricao().equals("Teste") &&
+                    p.getTipo() == TipoProcesso.MAPEAMENTO &&
+                    p.getSituacao() == SituacaoProcesso.CRIADO));
             verify(publicadorEventos).publishEvent(any(EventoProcessoCriado.class));
         }
 
-        @Test
-        @DisplayName("Deve lançar exceção quando descrição vazia")
-        void deveLancarExcecaoQuandoDescricaoVazia() {
-            // Arrange
-            CriarProcessoReq req =
-                    new CriarProcessoReq("", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
-
-            // Act & Assert
-            assertThatThrownBy(() -> processoFacade.criar(req))
-                    .isInstanceOf(ConstraintViolationException.class)
-                    .hasMessageContaining("descrição");
-        }
-
-        @Test
-        @DisplayName("Deve lançar exceção quando descrição nula")
-        void deveLancarExcecaoQuandoDescricaoNula() {
-            // Arrange
-            CriarProcessoReq req =
-                    new CriarProcessoReq(null, TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
-
-            // Act & Assert
-            assertThatThrownBy(() -> processoFacade.criar(req))
-                    .isInstanceOf(ConstraintViolationException.class)
-                    .hasMessageContaining("descrição");
-        }
-
-        @Test
-        @DisplayName("Deve lançar exceção quando lista de unidades vazia")
-        void deveLancarExcecaoQuandoSemUnidades() {
-            // Arrange
-            CriarProcessoReq req =
-                    new CriarProcessoReq(
-                            "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of());
-
-            // Act & Assert
-            assertThatThrownBy(() -> processoFacade.criar(req))
-                    .isInstanceOf(ConstraintViolationException.class)
-                    .hasMessageContaining("unidade");
-        }
+        // NOTA: Testes de validação de descrição vazia/nula e unidades vazias
+        // foram removidos pois a validação agora é feita via Bean Validation (@Valid)
+        // no Controller, não mais no Service. Ver ProcessoControllerTest para esses
+        // cenários.
 
         @Test
         @DisplayName("Deve lançar exceção quando unidade não encontrada")
         void deveLancarExcecaoQuandoUnidadeNaoEncontrada() {
             // Arrange
-            CriarProcessoReq req =
-                    new CriarProcessoReq(
-                            "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(99L));
+            CriarProcessoReq req = new CriarProcessoReq(
+                    "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(99L));
             when(unidadeService.buscarEntidadePorId(99L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 99L));
 
             // Act & Assert
@@ -182,7 +142,7 @@ class ProcessoFacadeTest {
         @DisplayName("Deve validar mapa para processo REVISAO")
         void deveValidarMapaParaRevisao() {
             CriarProcessoReq req = new CriarProcessoReq(
-                "Teste", TipoProcesso.REVISAO, LocalDateTime.now(), List.of(1L));
+                    "Teste", TipoProcesso.REVISAO, LocalDateTime.now(), List.of(1L));
 
             Unidade u = UnidadeFixture.unidadeComId(1L);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
@@ -191,19 +151,25 @@ class ProcessoFacadeTest {
             when(unidadeService.buscarSiglasPorIds(List.of(1L))).thenReturn(List.of("U1"));
 
             assertThatThrownBy(() -> processoFacade.criar(req))
-                .isInstanceOf(ErroProcesso.class)
-                .hasMessageContaining("U1");
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessageContaining("U1");
         }
 
         @Test
         @DisplayName("Deve validar mapa para processo REVISAO com unidades null ou vazias")
         void deveValidarMapaParaRevisaoComUnidadesVazias() {
-            // Testing getMensagemErroUnidadesSemMapa edge cases indirectly but need to bypass empty check in criar first
-            // Actually criar checks for empty units first. So we can only test the branch if we have valid units but logic fails inside.
-            // But there is an IF check: if (tipoProcesso == REVISAO || tipoProcesso == DIAGNOSTICO)
-            // And inside getMensagemErroUnidadesSemMapa: if (codigosUnidades == null || codigosUnidades.isEmpty())
-            // Since criar validates emptiness before, that null/empty check inside getMensagemErroUnidadesSemMapa is defensive/unreachable from criar.
-            // However, we can test it if we call the private method via reflection OR if there is another path.
+            // Testing getMensagemErroUnidadesSemMapa edge cases indirectly but need to
+            // bypass empty check in criar first
+            // Actually criar checks for empty units first. So we can only test the branch
+            // if we have valid units but logic fails inside.
+            // But there is an IF check: if (tipoProcesso == REVISAO || tipoProcesso ==
+            // DIAGNOSTICO)
+            // And inside getMensagemErroUnidadesSemMapa: if (codigosUnidades == null ||
+            // codigosUnidades.isEmpty())
+            // Since criar validates emptiness before, that null/empty check inside
+            // getMensagemErroUnidadesSemMapa is defensive/unreachable from criar.
+            // However, we can test it if we call the private method via reflection OR if
+            // there is another path.
             // atualizar also calls it.
         }
 
@@ -211,14 +177,14 @@ class ProcessoFacadeTest {
         @DisplayName("Deve falhar se unidade participamente for INTERMEDIARIA")
         void deveFalharSeUnidadeIntermediaria() {
             CriarProcessoReq req = new CriarProcessoReq(
-                "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
+                    "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
 
             Unidade u = UnidadeFixture.unidadeComId(1L);
             u.setTipo(sgc.organizacao.model.TipoUnidade.INTERMEDIARIA);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
 
             assertThatThrownBy(() -> processoFacade.criar(req))
-                .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
+                    .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
         }
     }
 
@@ -233,14 +199,13 @@ class ProcessoFacadeTest {
             Processo processo = ProcessoFixture.processoPadrao();
             processo.setCodigo(id);
 
-            AtualizarProcessoReq req =
-                    AtualizarProcessoReq.builder()
-                            .codigo(id)
-                            .descricao("Nova Desc")
-                            .tipo(TipoProcesso.MAPEAMENTO)
-                            .dataLimiteEtapa1(LocalDateTime.now())
-                            .unidades(List.of(1L))
-                            .build();
+            AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+                    .codigo(id)
+                    .descricao("Nova Desc")
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .dataLimiteEtapa1(LocalDateTime.now())
+                    .unidades(List.of(1L))
+                    .build();
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadePadrao());
@@ -258,18 +223,17 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve validar mapa para REVISAO na atualização")
         void deveValidarMapaParaRevisaoNaAtualizacao() {
-             Long id = 100L;
+            Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
             processo.setCodigo(id);
 
-            AtualizarProcessoReq req =
-                    AtualizarProcessoReq.builder()
-                            .codigo(id)
-                            .descricao("Nova Desc")
-                            .tipo(TipoProcesso.REVISAO)
-                            .dataLimiteEtapa1(LocalDateTime.now())
-                            .unidades(List.of(1L))
-                            .build();
+            AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+                    .codigo(id)
+                    .descricao("Nova Desc")
+                    .tipo(TipoProcesso.REVISAO)
+                    .dataLimiteEtapa1(LocalDateTime.now())
+                    .unidades(List.of(1L))
+                    .build();
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
             Unidade u = UnidadeFixture.unidadeComId(1L);
@@ -278,8 +242,8 @@ class ProcessoFacadeTest {
             when(unidadeService.buscarSiglasPorIds(List.of(1L))).thenReturn(List.of("U1"));
 
             assertThatThrownBy(() -> processoFacade.atualizar(id, req))
-                .isInstanceOf(ErroProcesso.class)
-                .hasMessageContaining("U1");
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessageContaining("U1");
         }
 
         @Test
@@ -289,13 +253,12 @@ class ProcessoFacadeTest {
             Processo processo = ProcessoFixture.processoPadrao();
             processo.setCodigo(id);
 
-            AtualizarProcessoReq req =
-                    AtualizarProcessoReq.builder()
-                            .codigo(id)
-                            .descricao("Nova Desc")
-                            .tipo(TipoProcesso.DIAGNOSTICO)
-                            .unidades(List.of()) // Vazio para bater no if (null/vazio)
-                            .build();
+            AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+                    .codigo(id)
+                    .descricao("Nova Desc")
+                    .tipo(TipoProcesso.DIAGNOSTICO)
+                    .unidades(List.of()) // Vazio para bater no if (null/vazio)
+                    .build();
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
             when(processoRepo.saveAndFlush(any())).thenReturn(processo);
@@ -314,12 +277,11 @@ class ProcessoFacadeTest {
             processo.setCodigo(id);
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
-            AtualizarProcessoReq req =
-                    AtualizarProcessoReq.builder()
-                            .descricao("Desc")
-                            .tipo(TipoProcesso.MAPEAMENTO)
-                            .unidades(List.of())
-                            .build();
+            AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+                    .descricao("Desc")
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .unidades(List.of())
+                    .build();
 
             // Act & Assert
             assertThatThrownBy(() -> processoFacade.atualizar(id, req))
@@ -334,13 +296,12 @@ class ProcessoFacadeTest {
             Processo processo = ProcessoFixture.processoPadrao();
             processo.setCodigo(id);
 
-            AtualizarProcessoReq req =
-                    AtualizarProcessoReq.builder()
-                            .codigo(id)
-                            .descricao("Desc")
-                            .tipo(TipoProcesso.MAPEAMENTO)
-                            .unidades(List.of(99L))
-                            .build();
+            AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+                    .codigo(id)
+                    .descricao("Desc")
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .unidades(List.of(99L))
+                    .build();
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
             when(unidadeService.buscarEntidadePorId(99L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 99L));
@@ -357,7 +318,7 @@ class ProcessoFacadeTest {
             when(processoRepo.findById(999L)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> processoFacade.atualizar(999L, req))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
 
@@ -430,7 +391,7 @@ class ProcessoFacadeTest {
         void deveFalharAoObterDetalhesProcessoInexistente() {
             when(processoRepo.findById(999L)).thenReturn(Optional.empty());
             assertThatThrownBy(() -> processoFacade.obterDetalhes(999L))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
@@ -449,7 +410,7 @@ class ProcessoFacadeTest {
         void deveFalharBuscarEntidadeInexistente() {
             when(processoRepo.findById(999L)).thenReturn(Optional.empty());
             assertThatThrownBy(() -> processoFacade.buscarEntidadePorId(999L))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
@@ -468,8 +429,10 @@ class ProcessoFacadeTest {
         @DisplayName("Deve listar processos finalizados e ativos")
         void deveListarProcessosFinalizadosEAtivos() {
             // Arrange
-            when(processoRepo.findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso.FINALIZADO)).thenReturn(List.of(ProcessoFixture.processoPadrao()));
-            when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of(ProcessoFixture.processoPadrao()));
+            when(processoRepo.findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso.FINALIZADO))
+                    .thenReturn(List.of(ProcessoFixture.processoPadrao()));
+            when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO))
+                    .thenReturn(List.of(ProcessoFixture.processoPadrao()));
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act & Assert
@@ -480,11 +443,11 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve listar todos com paginação")
         void deveListarTodosPaginado() {
-             org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.Pageable.unpaged();
-             when(processoRepo.findAll(pageable)).thenReturn(org.springframework.data.domain.Page.empty());
+            org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.Pageable.unpaged();
+            when(processoRepo.findAll(pageable)).thenReturn(org.springframework.data.domain.Page.empty());
 
-             var res = processoFacade.listarTodos(pageable);
-             assertThat(res).isEmpty();
+            var res = processoFacade.listarTodos(pageable);
+            assertThat(res).isEmpty();
         }
 
         @Test
@@ -492,7 +455,7 @@ class ProcessoFacadeTest {
         void deveListarUnidadesBloqueadasPorTipo() {
             // Arrange
             when(processoRepo.findUnidadeCodigosBySituacaoAndTipo(
-                            SituacaoProcesso.EM_ANDAMENTO, TipoProcesso.MAPEAMENTO))
+                    SituacaoProcesso.EM_ANDAMENTO, TipoProcesso.MAPEAMENTO))
                     .thenReturn(List.of(1L));
 
             // Act
@@ -505,11 +468,12 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve listar todos subprocessos")
         void deveListarTodosSubprocessos() {
-             when(subprocessoService.listarEntidadesPorProcesso(100L)).thenReturn(List.of(SubprocessoFixture.subprocessoPadrao(null, null)));
-             when(subprocessoMapper.toDTO(any())).thenReturn(SubprocessoDto.builder().build());
+            when(subprocessoService.listarEntidadesPorProcesso(100L))
+                    .thenReturn(List.of(SubprocessoFixture.subprocessoPadrao(null, null)));
+            when(subprocessoMapper.toDTO(any())).thenReturn(SubprocessoDto.builder().build());
 
-             var res = processoFacade.listarTodosSubprocessos(100L);
-             assertThat(res).hasSize(1);
+            var res = processoFacade.listarTodosSubprocessos(100L);
+            assertThat(res).hasSize(1);
         }
 
         @Test
@@ -600,14 +564,15 @@ class ProcessoFacadeTest {
         @DisplayName("Listar por participantes ignorando criado")
         void listarPorParticipantesIgnorandoCriado() {
             processoFacade.listarPorParticipantesIgnorandoCriado(List.of(1L), null);
-            verify(processoRepo).findDistinctByParticipantes_CodigoInAndSituacaoNot(anyList(), eq(SituacaoProcesso.CRIADO), any());
+            verify(processoRepo).findDistinctByParticipantes_CodigoInAndSituacaoNot(anyList(),
+                    eq(SituacaoProcesso.CRIADO), any());
         }
 
         @Test
         @DisplayName("Deve lançar exceção para tipo de processo inválido")
         void deveLancarExcecaoParaTipoInvalido() {
             assertThatThrownBy(() -> processoFacade.listarUnidadesBloqueadasPorTipo("TIPO_INEXISTENTE"))
-                .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
@@ -645,10 +610,10 @@ class ProcessoFacadeTest {
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
             ProcessoDetalheDto detalhes = new ProcessoDetalheDto();
-            
+
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
             when(processoDetalheBuilder.build(processo)).thenReturn(detalhes);
-            
+
             SecurityContext securityContext = mock(SecurityContext.class);
             when(securityContext.getAuthentication()).thenReturn(null);
             SecurityContextHolder.setContext(securityContext);
@@ -882,7 +847,7 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve negar acesso quando name é null")
         void deveNegarAcessoQuandoNameNull() {
-             Authentication auth = mock(Authentication.class);
+            Authentication auth = mock(Authentication.class);
             when(auth.isAuthenticated()).thenReturn(true);
             when(auth.getName()).thenReturn(null);
 
@@ -926,7 +891,7 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve negar acesso quando codUnidadeUsuario é null no perfil")
         void deveNegarAcessoQuandoUnidadeNull() {
-             Authentication auth = mock(Authentication.class);
+            Authentication auth = mock(Authentication.class);
             when(auth.isAuthenticated()).thenReturn(true);
             when(auth.getName()).thenReturn("gestor");
 
@@ -957,7 +922,8 @@ class ProcessoFacadeTest {
             PerfilDto perfil = PerfilDto.builder().unidadeCodigo(10L).build();
             when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
 
-            when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of()); // Nenhuma unidade no sistema
+            when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of()); // Nenhuma unidade no
+                                                                                            // sistema
 
             assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
         }
@@ -987,10 +953,11 @@ class ProcessoFacadeTest {
             Unidade filho = new Unidade();
             filho.setCodigo(20L);
             filho.setUnidadeSuperior(pai);
-            
+
             when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(pai, filho));
 
-            when(subprocessoService.verificarAcessoUnidadeAoProcesso(eq(1L), argThat(list -> list.contains(10L) && list.contains(20L)))).thenReturn(true);
+            when(subprocessoService.verificarAcessoUnidadeAoProcesso(eq(1L),
+                    argThat(list -> list.contains(10L) && list.contains(20L)))).thenReturn(true);
 
             // Act & Assert
             assertThat(processoFacade.checarAcesso(auth, 1L)).isTrue();
@@ -1019,9 +986,9 @@ class ProcessoFacadeTest {
             when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(avo, pai, neto, solta));
 
             // Mock da verificação final: espera-se que a lista inclua 100, 101 e 102
-            when(subprocessoService.verificarAcessoUnidadeAoProcesso(eq(1L), argThat(list ->
-                    list.contains(100L) && list.contains(101L) && list.contains(102L) && !list.contains(200L)
-            ))).thenReturn(true);
+            when(subprocessoService.verificarAcessoUnidadeAoProcesso(eq(1L), argThat(
+                    list -> list.contains(100L) && list.contains(101L) && list.contains(102L) && !list.contains(200L))))
+                    .thenReturn(true);
 
             // Act
             boolean acesso = processoFacade.checarAcesso(auth, 1L);
@@ -1062,8 +1029,8 @@ class ProcessoFacadeTest {
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
 
             assertThatThrownBy(() -> processoFacade.enviarLembrete(1L, 10L))
-                .isInstanceOf(ErroProcesso.class)
-                .hasMessageContaining("não participa");
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessageContaining("não participa");
         }
 
     }

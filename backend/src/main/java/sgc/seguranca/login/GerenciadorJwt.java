@@ -1,4 +1,4 @@
-package sgc.seguranca;
+package sgc.seguranca.login;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -20,6 +20,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Optional;
 
+/**
+ * Gerenciador de tokens JWT para autenticação.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -35,16 +38,17 @@ public class GerenciadorJwt {
             if (environment.acceptsProfiles(Profiles.of("test", "e2e", "local"))) {
                 log.warn("⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão.");
             } else {
-                log.error("🚨 ERRO CRÍTICO DE SEGURANÇA: Tentativa de iniciar em ambiente produtivo com o segredo JWT padrão.");
+                log.error(
+                        "🚨 ERRO CRÍTICO DE SEGURANÇA: Tentativa de iniciar em ambiente produtivo com o segredo JWT padrão.");
                 throw new ErroConfiguracao(
-                        "FALHA DE SEGURANÇA: A propriedade 'aplicacao.jwt.secret' não foi alterada do padrão inseguro. " +
-                        "Configure a variável de ambiente JWT_SECRET com um valor seguro.");
+                        "FALHA DE SEGURANÇA: A propriedade 'aplicacao.jwt.secret' não foi alterada do padrão inseguro. "
+                                +
+                                "Configure a variável de ambiente JWT_SECRET com um valor seguro.");
             }
         }
     }
-    
+
     private SecretKey getSigningKey() {
-        // Garante que a chave tenha tamanho adequado (mínimo 256 bits para HS256)
         String secret = jwtProperties.getSecret();
         if (secret.length() < 32) {
             throw new ErroConfiguracao("JWT secret deve ter no mínimo 32 caracteres");
@@ -91,5 +95,6 @@ public class GerenciadorJwt {
         }
     }
 
-    public record JwtClaims(String tituloEleitoral, Perfil perfil, Long unidadeCodigo) {}
+    public record JwtClaims(String tituloEleitoral, Perfil perfil, Long unidadeCodigo) {
+    }
 }

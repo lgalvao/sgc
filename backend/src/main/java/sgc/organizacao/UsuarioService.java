@@ -2,24 +2,15 @@ package sgc.organizacao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAccessoNegado;
-import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
-import sgc.seguranca.GerenciadorJwt;
-import sgc.seguranca.autenticacao.AcessoAdClient;
-import sgc.seguranca.dto.EntrarReq;
-import sgc.seguranca.dto.PerfilUnidadeDto;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,60 +23,26 @@ public class UsuarioService {
     private final UsuarioRepo usuarioRepo;
     private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final AdministradorRepo administradorRepo;
-    private final GerenciadorJwt gerenciadorJwt;
-    private final AcessoAdClient acessoAdClient;
     @Lazy
     private final UnidadeService unidadeService;
-
-    @Value("${aplicacao.ambiente-testes:false}")
-    private boolean ambienteTestes;
-
-    private final Map<String, java.time.LocalDateTime> autenticacoesRecentes = new java.util.concurrent.ConcurrentHashMap<>();
-
-    /**
-     * Remove autenticações pendentes expiradas a cada minuto.
-     * O tempo limite é de 5 minutos.
-     */
-    @Scheduled(fixedRate = 60000)
-    public void limparAutenticacoesExpiradas() {
-        LocalDateTime limite = LocalDateTime.now().minusMinutes(5);
-        autenticacoesRecentes.entrySet().removeIf(entry -> entry.getValue().isBefore(limite));
-    }
-
-    // Método para testes
-    int getAutenticacoesRecentesSize() {
-        return autenticacoesRecentes.size();
-    }
-
-    // Método para testes: expira todas as autenticações
-    void expireAllAuthenticationsForTest() {
-        LocalDateTime passado = LocalDateTime.now().minusMinutes(10);
-        autenticacoesRecentes.replaceAll((k, v) -> passado);
-    }
 
     @Transactional(readOnly = true)
     public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
         Usuario usuario = usuarioRepo.findByIdWithAtribuicoes(titulo).orElse(null);
         if (usuario != null) {
             carregarAtribuicoes(usuario);
-            // Força a inicialização das authorities
             usuario.getAuthorities();
         }
         return usuario;
     }
 
     public UsuarioService(UsuarioRepo usuarioRepo,
-                          UsuarioPerfilRepo usuarioPerfilRepo,
-                          AdministradorRepo administradorRepo,
-                          GerenciadorJwt gerenciadorJwt,
-                          @Autowired(required = false) AcessoAdClient acessoAdClient,
-                          @Lazy UnidadeService unidadeService) {
-
+            UsuarioPerfilRepo usuarioPerfilRepo,
+            AdministradorRepo administradorRepo,
+            @Lazy UnidadeService unidadeService) {
         this.usuarioRepo = usuarioRepo;
         this.usuarioPerfilRepo = usuarioPerfilRepo;
         this.administradorRepo = administradorRepo;
-        this.gerenciadorJwt = gerenciadorJwt;
-        this.acessoAdClient = acessoAdClient;
         this.unidadeService = unidadeService;
     }
 
@@ -121,21 +78,22 @@ public class UsuarioService {
     }
 
     /**
-     * Obtém o usuário atualmente autenticado a partir do contexto de segurança do Spring.
+     * Obtém o usuário atualmente autenticado a partir do contexto de segurança do
+     * Spring.
      * 
      * @return O usuário autenticado
      * @throws ErroAccessoNegado se não houver usuário autenticado
      */
     @Transactional(readOnly = true)
     public Usuario obterUsuarioAutenticado() {
-        org.springframework.security.core.Authentication authentication = 
-                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        
-        if (authentication == null || !authentication.isAuthenticated() 
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()
                 || authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken) {
             throw new ErroAccessoNegado("Nenhum usuário autenticado no contexto");
         }
-        
+
         String tituloEleitoral = authentication.getName();
         return buscarPorLoginInterno(tituloEleitoral);
     }
@@ -151,7 +109,8 @@ public class UsuarioService {
 
         // Recarrega com join fetch para garantir as atribuições
         Usuario usuarioCompleto = usuarioRepo.findByIdWithAtribuicoes(usuarioSimples.getTituloEleitoral())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, usuarioSimples.getTituloEleitoral()));
+                .orElseThrow(
+                        () -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, usuarioSimples.getTituloEleitoral()));
 
         carregarAtribuicoes(usuarioCompleto);
         return usuarioCompleto;
@@ -175,7 +134,8 @@ public class UsuarioService {
     }
 
     private void carregarAtribuicoesEmLote(List<Usuario> usuarios) {
-        if (usuarios.isEmpty()) return;
+        if (usuarios.isEmpty())
+            return;
 
         List<String> titulos = usuarios.stream()
                 .map(Usuario::getTituloEleitoral)
@@ -186,8 +146,7 @@ public class UsuarioService {
         Map<String, Set<UsuarioPerfil>> atribuicoesPorUsuario = todasAtribuicoes.stream()
                 .collect(Collectors.groupingBy(
                         UsuarioPerfil::getUsuarioTitulo,
-                        Collectors.toSet()
-                ));
+                        Collectors.toSet()));
 
         for (Usuario usuario : usuarios) {
             Set<UsuarioPerfil> atribuicoes = atribuicoesPorUsuario
@@ -263,12 +222,11 @@ public class UsuarioService {
                 .flatMap(u -> u.getTodasAtribuicoes().stream()
                         .filter(a -> a.getPerfil() == Perfil.CHEFE
                                 && unidadesCodigos.contains(
-                                a.getUnidadeCodigo()))
+                                        a.getUnidadeCodigo()))
                         .map(a -> new AbstractMap.SimpleEntry<>(a.getUnidadeCodigo(), u)))
                 .collect(Collectors.groupingBy(
                         Map.Entry::getKey,
-                        Collectors.mapping(Map.Entry::getValue, Collectors.toList()))
-                );
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
 
         Map<Long, ResponsavelDto> resultado = new HashMap<>();
         for (Long codigo : unidadesCodigos) {
@@ -370,96 +328,6 @@ public class UsuarioService {
                 .build();
     }
 
-    public boolean autenticar(String tituloEleitoral, String senha) {
-        boolean autenticado = false;
-        if (acessoAdClient == null) {
-            if (ambienteTestes) {
-                // Em ambiente de testes, verifica se o usuário existe no banco antes de simular autenticação com sucesso
-                autenticado = usuarioRepo.existsById(tituloEleitoral);
-            } else {
-                log.error("ERRO CRÍTICO DE SEGURANÇA: Tentativa de autenticação sem provedor configurado em ambiente produtivo. Usuário: {}", tituloEleitoral);
-                autenticado = false;
-            }
-        } else {
-            try {
-                autenticado = acessoAdClient.autenticar(tituloEleitoral, senha);
-            } catch (ErroAutenticacao e) {
-                log.warn("Falha na autenticação do usuário {}: {}", tituloEleitoral, e.getMessage());
-                autenticado = false;
-            }
-        }
-
-        if (autenticado) {
-            autenticacoesRecentes.put(tituloEleitoral, java.time.LocalDateTime.now());
-        }
-        return autenticado;
-    }
-
-    @Transactional(readOnly = true)
-    public List<PerfilUnidadeDto> autorizar(String tituloEleitoral) {
-        // Previne Information Disclosure verificando se usuário se autenticou recentemente
-        if (!autenticacoesRecentes.containsKey(tituloEleitoral)) {
-            log.warn("Tentativa de autorização sem autenticação prévia para usuário {}", tituloEleitoral);
-            throw new ErroAutenticacao("É necessário autenticar-se antes de consultar autorizações.");
-        }
-
-        return buscarAutorizacoesInterno(tituloEleitoral);
-    }
-
-    /**
-     * Método interno para buscar autorizações sem verificação de autenticação prévia.
-     * Usado internamente pelo método entrar() para evitar chamada transacional via 'this'.
-     */
-    private List<PerfilUnidadeDto> buscarAutorizacoesInterno(String tituloEleitoral) {
-        Usuario usuario = usuarioRepo
-                .findByIdWithAtribuicoes(tituloEleitoral)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, tituloEleitoral));
-
-        carregarAtribuicoes(usuario);
-
-        return usuario.getTodasAtribuicoes().stream().map(atribuicao -> new PerfilUnidadeDto(
-                        atribuicao.getPerfil(),
-                        toUnidadeDto(atribuicao.getUnidade())))
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public String entrar(EntrarReq request) {
-        // Verifica se houve autenticação recente (previne bypass chamando /entrar direto)
-        LocalDateTime ultimoAcesso = autenticacoesRecentes.get(request.getTituloEleitoral());
-
-        if (ultimoAcesso == null || ultimoAcesso.isBefore(java.time.LocalDateTime.now().minusMinutes(5))) {
-            log.warn("Tentativa de acesso não autorizada (sem login prévio) para usuário {}", request.getTituloEleitoral());
-            throw new ErroAutenticacao("Sessão de login expirada ou inválida. Por favor, autentique-se novamente.");
-        }
-
-        Long codUnidade = request.getUnidadeCodigo();
-        // Garante que a unidade existe (lança ErroEntidadeNaoEncontrada se não existir)
-        unidadeService.buscarEntidadePorId(codUnidade);
-
-        List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoesInterno(request.getTituloEleitoral());
-
-        // Remove a autenticação do cache após usá-la (garante que só pode entrar uma vez por autenticação)
-        autenticacoesRecentes.remove(request.getTituloEleitoral());
-        boolean autorizado = autorizacoes
-                .stream()
-                .anyMatch(pu -> {
-                    Perfil perfil = pu.getPerfil();
-                    Long codigoUnidade = pu.getUnidade().getCodigo();
-                    return perfil.name().equals(request.getPerfil()) && codigoUnidade.equals(codUnidade);
-                });
-
-        if (!autorizado) {
-            throw new ErroAccessoNegado("Usuário não tem permissão para acessar com perfil e unidade informados.");
-        }
-
-        return gerenciadorJwt.gerarToken(
-                request.getTituloEleitoral(),
-                Perfil.valueOf(request.getPerfil()),
-                codUnidade
-        );
-    }
-
     // ===================== ADMINISTRADORES =====================
 
     @Transactional(readOnly = true)
@@ -514,8 +382,9 @@ public class UsuarioService {
     }
 
     private AdministradorDto toAdministradorDto(Usuario usuario) {
-        if (usuario == null) return null;
-        
+        if (usuario == null)
+            return null;
+
         Unidade unidadeLotacao = usuario.getUnidadeLotacao();
 
         return AdministradorDto.builder()
@@ -528,7 +397,8 @@ public class UsuarioService {
     }
 
     public @Nullable String extractTituloUsuario(@Nullable Object principal) {
-        if (principal instanceof String string) return string;
+        if (principal instanceof String string)
+            return string;
         if (principal instanceof Usuario usuario)
             return usuario.getTituloEleitoral();
         return principal != null ? principal.toString() : null;

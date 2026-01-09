@@ -1,4 +1,4 @@
-package sgc.seguranca.dto;
+package sgc.seguranca.login.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import sgc.organizacao.model.Perfil;
 
 /**
- * DTO para resposta de login.''
+ * DTO para resposta de login.
  */
 @Data
 @Builder

@@ -1,4 +1,4 @@
-package sgc.seguranca;
+package sgc.seguranca.login;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,11 +18,15 @@ import sgc.organizacao.model.Usuario;
 
 import java.io.IOException;
 
+/**
+ * Filtro de segurança que valida tokens JWT em cada requisição.
+ * Extrai o token do header Authorization e configura o contexto de segurança.
+ */
 @Component
-@Profile({"!test", "secure-test"})
+@Profile({ "!test", "secure-test" })
 @RequiredArgsConstructor
 @Slf4j
-public class FiltroAutenticacaoMock extends OncePerRequestFilter {
+public class FiltroJwt extends OncePerRequestFilter {
     private final GerenciadorJwt gerenciadorJwt;
     @Lazy
     private final UsuarioService usuarioService;
@@ -38,19 +42,18 @@ public class FiltroAutenticacaoMock extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwtToken = authHeader.substring(7);
-            
+
             gerenciadorJwt.validarToken(jwtToken).ifPresent(claims -> {
                 Usuario usuario = usuarioService.carregarUsuarioParaAutenticacao(claims.tituloEleitoral());
-                
+
                 if (usuario != null) {
                     var authorities = usuario.getAuthorities();
-                    
+
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                             usuario,
                             null,
-                            authorities
-                    );
-                    
+                            authorities);
+
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 } else {
                     log.warn("Usuário {} do JWT não encontrado no SGRH", claims.tituloEleitoral());
@@ -61,5 +64,3 @@ public class FiltroAutenticacaoMock extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
-
-

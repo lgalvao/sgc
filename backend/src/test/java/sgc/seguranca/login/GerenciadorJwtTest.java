@@ -1,4 +1,4 @@
-package sgc.seguranca;
+package sgc.seguranca.login;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ class GerenciadorJwtTest {
     void initSecureProd() {
         when(jwtProperties.getSecret()).thenReturn(SECURE_SECRET);
         assertThatCode(() -> gerenciador.verificarSegurancaChave())
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
 
     @Test
@@ -49,7 +49,7 @@ class GerenciadorJwtTest {
         when(environment.acceptsProfiles(any(Profiles.class))).thenReturn(true);
 
         assertThatCode(() -> gerenciador.verificarSegurancaChave())
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
 
     @Test
@@ -57,7 +57,7 @@ class GerenciadorJwtTest {
     void failDefaultProd() {
         when(jwtProperties.getSecret()).thenReturn(DEFAULT_SECRET);
         when(environment.acceptsProfiles(any(Profiles.class))).thenReturn(false);
-        
+
         assertThatThrownBy(() -> gerenciador.verificarSegurancaChave())
                 .isInstanceOf(ErroConfiguracao.class)
                 .hasMessageContaining("FALHA DE SEGURANÇA");
@@ -68,10 +68,10 @@ class GerenciadorJwtTest {
     void failShortSecret() {
         // Mock getSecret calls in verification and generation
         when(jwtProperties.getSecret()).thenReturn(DEFAULT_SECRET_SHORT);
-        
+
         // init check doesn't check length, only equality to default.
         // length check happens on signing key generation which happens on usage.
-        
+
         assertThatThrownBy(() -> gerenciador.gerarToken("123", Perfil.ADMIN, 1L))
                 .isInstanceOf(ErroConfiguracao.class)
                 .hasMessageContaining("mínimo 32 caracteres");
@@ -84,9 +84,9 @@ class GerenciadorJwtTest {
         when(jwtProperties.getExpiracaoMinutos()).thenReturn(60);
 
         String token = gerenciador.gerarToken("123", Perfil.ADMIN, 1L);
-        
+
         Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken(token);
-        
+
         assertThat(result).isPresent();
         assertThat(result.get().tituloEleitoral()).isEqualTo("123");
         assertThat(result.get().perfil()).isEqualTo(Perfil.ADMIN);
@@ -100,16 +100,17 @@ class GerenciadorJwtTest {
         Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken("invalid.token.here");
         assertThat(result).isEmpty();
     }
-    
+
     @Test
     @DisplayName("Deve retornar empty para token com claims faltando (simulado)")
     void validateMissingClaims() {
         when(jwtProperties.getSecret()).thenReturn(SECURE_SECRET);
-        
+
         // Gerar token "mal formado" (business logic wise) mas valido (crypto wise)
         String token = io.jsonwebtoken.Jwts.builder()
                 .subject(null) // missing subject
-                .signWith(io.jsonwebtoken.security.Keys.hmacShaKeyFor(SECURE_SECRET.getBytes(java.nio.charset.StandardCharsets.UTF_8)))
+                .signWith(io.jsonwebtoken.security.Keys
+                        .hmacShaKeyFor(SECURE_SECRET.getBytes(java.nio.charset.StandardCharsets.UTF_8)))
                 .compact();
 
         Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken(token);

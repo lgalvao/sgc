@@ -1,4 +1,4 @@
-package sgc.seguranca;
+package sgc.seguranca.login;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,8 @@ class GerenciadorJwtSecurityTest {
     void deveLancarErroEmProducaoComSecretPadrao() {
         // Given
         when(jwtProperties.getSecret()).thenReturn(DEFAULT_SECRET);
-        // Simula que NÃO é um ambiente de teste/dev (retorna false para os perfis seguros)
+        // Simula que NÃO é um ambiente de teste/dev (retorna false para os perfis
+        // seguros)
         when(environment.acceptsProfiles(any(Profiles.class))).thenReturn(false);
 
         // When & Then
