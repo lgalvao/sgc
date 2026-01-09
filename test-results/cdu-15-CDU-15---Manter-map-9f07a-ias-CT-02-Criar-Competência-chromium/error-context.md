@@ -66,19 +66,32 @@
                 - /url: /processo/30/SECAO_221
             - listitem [ref=e48]:
               - text: ›
-              - generic [ref=e49]: Visualizar mapa
+              - generic [ref=e49]: Mapa de competências
       - main [ref=e50]:
         - generic [ref=e51]:
-          - generic [ref=e53]: Mapa de competências técnicas
-          - generic [ref=e54]:
-            - generic [ref=e56]: SECAO_221 - Seção 221
-            - generic [ref=e58]:
-              - generic [ref=e59]: 
-              - paragraph [ref=e60]: Nenhuma competência cadastrada
-              - paragraph [ref=e61]: Este mapa ainda não possui competências registradas.
-      - contentinfo [ref=e62]:
-        - generic [ref=e63]:
-          - generic [ref=e64]: Versão 1.0.0
-          - generic [ref=e65]: © SESEL/COSIS/TRE-PE
-  - text:  
+          - generic [ref=e52]: SECAO_221 - Seção 221 Mapa Criado
+          - generic [ref=e54]: Mapa de competências técnicas
+          - generic [ref=e56]:
+            - button " Criar competência" [ref=e57] [cursor=pointer]:
+              - generic [ref=e58]: 
+              - text: Criar competência
+            - generic [ref=e59]:
+              - generic [ref=e60]:
+                - strong [ref=e62]: Competência 1 1767988258493
+                - generic [ref=e63]:
+                  - button "Editar competência Competência 1 1767988258493" [ref=e64] [cursor=pointer]:
+                    - generic [ref=e65]: 
+                  - button "Excluir competência Competência 1 1767988258493" [ref=e66] [cursor=pointer]:
+                    - generic [ref=e67]: 
+              - generic [ref=e71]:
+                - generic [ref=e72]:
+                  - text: Atividade 1 1767988258493
+                  - generic [ref=e73]: "1"
+                - button "Remover atividade Atividade 1 1767988258493" [ref=e74] [cursor=pointer]:
+                  - generic [ref=e75]: 
+      - contentinfo [ref=e76]:
+        - generic [ref=e77]:
+          - generic [ref=e78]: Versão 1.0.0
+          - generic [ref=e79]: © SESEL/COSIS/TRE-PE
+  - text:  
 ```

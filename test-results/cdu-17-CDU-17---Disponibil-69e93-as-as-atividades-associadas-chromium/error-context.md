@@ -66,19 +66,53 @@
                 - /url: /processo/32/SECAO_221
             - listitem [ref=e48]:
               - text: ›
-              - generic [ref=e49]: Visualizar mapa
+              - generic [ref=e49]: Mapa de competências
       - main [ref=e50]:
         - generic [ref=e51]:
-          - generic [ref=e53]: Mapa de competências técnicas
-          - generic [ref=e54]:
-            - generic [ref=e56]: SECAO_221 - Seção 221
-            - generic [ref=e58]:
-              - generic [ref=e59]: 
-              - paragraph [ref=e60]: Nenhuma competência cadastrada
-              - paragraph [ref=e61]: Este mapa ainda não possui competências registradas.
-      - contentinfo [ref=e62]:
-        - generic [ref=e63]:
-          - generic [ref=e64]: Versão 1.0.0
-          - generic [ref=e65]: © SESEL/COSIS/TRE-PE
-  - text:  
+          - generic [ref=e52]: SECAO_221 - Seção 221 Mapa Criado
+          - generic [ref=e54]: Mapa de competências técnicas
+          - generic [ref=e56]:
+            - button " Criar competência" [ref=e57] [cursor=pointer]:
+              - generic [ref=e58]: 
+              - text: Criar competência
+            - generic [ref=e59]:
+              - generic [ref=e60]:
+                - strong [ref=e62]: Competência 1 1767988292788
+                - generic [ref=e63]:
+                  - button "Editar competência Competência 1 1767988292788" [ref=e64] [cursor=pointer]:
+                    - generic [ref=e65]: 
+                  - button "Excluir competência Competência 1 1767988292788" [ref=e66] [cursor=pointer]:
+                    - generic [ref=e67]: 
+              - generic [ref=e69]:
+                - generic [ref=e71]:
+                  - generic [ref=e72]:
+                    - text: Atividade 1 1767988292788
+                    - generic [ref=e73]: "1"
+                  - button "Remover atividade Atividade 1 1767988292788" [ref=e74] [cursor=pointer]:
+                    - generic [ref=e75]: 
+                - generic [ref=e77]:
+                  - generic [ref=e78]:
+                    - text: Atividade 2 1767988292788
+                    - generic [ref=e79]: "1"
+                  - button "Remover atividade Atividade 2 1767988292788" [ref=e80] [cursor=pointer]:
+                    - generic [ref=e81]: 
+            - generic [ref=e82]:
+              - generic [ref=e83]:
+                - strong [ref=e85]: Competência 2 1767988292788
+                - generic [ref=e86]:
+                  - button "Editar competência Competência 2 1767988292788" [ref=e87] [cursor=pointer]:
+                    - generic [ref=e88]: 
+                  - button "Excluir competência Competência 2 1767988292788" [ref=e89] [cursor=pointer]:
+                    - generic [ref=e90]: 
+              - generic [ref=e94]:
+                - generic [ref=e95]:
+                  - text: Atividade 3 1767988292788
+                  - generic [ref=e96]: "1"
+                - button "Remover atividade Atividade 3 1767988292788" [ref=e97] [cursor=pointer]:
+                  - generic [ref=e98]: 
+      - contentinfo [ref=e99]:
+        - generic [ref=e100]:
+          - generic [ref=e101]: Versão 1.0.0
+          - generic [ref=e102]: © SESEL/COSIS/TRE-PE
+  - text:  
 ```

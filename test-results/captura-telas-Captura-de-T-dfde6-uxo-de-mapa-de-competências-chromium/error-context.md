@@ -66,19 +66,39 @@
                 - /url: /processo/7/SECAO_121
             - listitem [ref=e48]:
               - text: ›
-              - generic [ref=e49]: Visualizar mapa
+              - generic [ref=e49]: Mapa de competências
       - main [ref=e50]:
         - generic [ref=e51]:
-          - generic [ref=e53]: Mapa de competências técnicas
-          - generic [ref=e54]:
-            - generic [ref=e56]: SECAO_121 - Seção 121
-            - generic [ref=e58]:
-              - generic [ref=e59]: 
-              - paragraph [ref=e60]: Nenhuma competência cadastrada
-              - paragraph [ref=e61]: Este mapa ainda não possui competências registradas.
-      - contentinfo [ref=e62]:
-        - generic [ref=e63]:
-          - generic [ref=e64]: Versão 1.0.0
-          - generic [ref=e65]: © SESEL/COSIS/TRE-PE
-  - text:  
+          - generic [ref=e52]: SECAO_121 - Seção 121 Mapa Criado
+          - generic [ref=e54]: Mapa de competências técnicas
+          - generic [ref=e56]:
+            - button " Criar competência" [ref=e57] [cursor=pointer]:
+              - generic [ref=e58]: 
+              - text: Criar competência
+            - generic [ref=e59]:
+              - generic [ref=e60]:
+                - strong [ref=e62]: Desenvolvimento de Software
+                - generic [ref=e63]:
+                  - button "Editar competência Desenvolvimento de Software" [ref=e64] [cursor=pointer]:
+                    - generic [ref=e65]: 
+                  - button "Excluir competência Desenvolvimento de Software" [ref=e66] [cursor=pointer]:
+                    - generic [ref=e67]: 
+              - generic [ref=e69]:
+                - generic [ref=e71]:
+                  - generic [ref=e72]:
+                    - text: Desenvolvimento Web
+                    - generic [ref=e73]: "2"
+                  - button "Remover atividade Desenvolvimento Web" [ref=e74] [cursor=pointer]:
+                    - generic [ref=e75]: 
+                - generic [ref=e77]:
+                  - generic [ref=e78]:
+                    - text: Desenvolvimento Backend
+                    - generic [ref=e79]: "2"
+                  - button "Remover atividade Desenvolvimento Backend" [ref=e80] [cursor=pointer]:
+                    - generic [ref=e81]: 
+      - contentinfo [ref=e82]:
+        - generic [ref=e83]:
+          - generic [ref=e84]: Versão 1.0.0
+          - generic [ref=e85]: © SESEL/COSIS/TRE-PE
+  - text:  
 ```

@@ -151,7 +151,9 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
             )),
             Map.entry(DISPONIBILIZAR_MAPA, new RegrasAcao(
                     EnumSet.of(ADMIN),
-                    EnumSet.of(MAPEAMENTO_CADASTRO_HOMOLOGADO, REVISAO_CADASTRO_HOMOLOGADA),
+                    EnumSet.of(MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO,
+                               MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA,
+                               REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES),
                     RequisitoHierarquia.NENHUM
             )),
             Map.entry(VERIFICAR_IMPACTOS, new RegrasAcao(
