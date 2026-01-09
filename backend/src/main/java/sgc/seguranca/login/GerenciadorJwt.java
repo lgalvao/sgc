@@ -38,8 +38,12 @@ public class GerenciadorJwt {
             if (environment.acceptsProfiles(Profiles.of("test", "e2e", "local"))) {
                 log.warn("⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão.");
             } else {
+<<<<<<< HEAD:backend/src/main/java/sgc/seguranca/login/GerenciadorJwt.java
                 log.error(
                         "🚨 ERRO CRÍTICO DE SEGURANÇA: Tentativa de iniciar em ambiente produtivo com o segredo JWT padrão.");
+=======
+                log.error("🚨 ERRO CRÍTICO DE SEGURANÇA: Tentativa de iniciar em ambiente de produção com o segredo JWT padrão.");
+>>>>>>> 8a490a12feaf3067749851e661c288fb01e280ac:backend/src/main/java/sgc/seguranca/GerenciadorJwt.java
                 throw new ErroConfiguracao(
                         "FALHA DE SEGURANÇA: A propriedade 'aplicacao.jwt.secret' não foi alterada do padrão inseguro. "
                                 +
