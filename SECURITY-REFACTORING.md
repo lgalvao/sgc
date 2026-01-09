@@ -112,7 +112,7 @@ Para dúvidas sobre o plano:
 
 **Criado em**: 2026-01-08  
 **Versão**: 1.0  
-**Status**: 🚧 Em Execução - Sprint 2 98.3% Concluído (1129/1149 testes passando)
+**Status**: 🚧 Em Execução - Sprint 2 98.7% Concluído (1134/1149 testes passando)
 
 ## Histórico de Execução
 
@@ -195,24 +195,34 @@ Para dúvidas sobre o plano:
 - ✅ Mensagens de erro mais descritivas e em português
 
 **Testes Backend:**
-- ✅ 1129/1149 testes passando (98.3%) - Excelente progresso!
+- ✅ 1134/1149 testes passando (98.7%) - Excelente progresso!
 - ✅ Todos os testes unitários de acesso passando
 - ✅ SubprocessoServiceActionsTest - 9/9 passando
 - ✅ ImpactoMapaServiceTest - 4/4 passando
 - ✅ FluxoEstadosIntegrationTest - 4/4 passando
 - ✅ CDU-13 IntegrationTest - 4/4 passando
-- ⚠️ 20 testes de integração precisam refatoração (CDU-14, CDU-19, CDU-20, CDU-22, CDU-24, CDU-25)
-  - Problema: testes criam unidades dinamicamente mas @WithMock* executa antes
-  - Problema: Usuario.getTodasAtribuicoes() com LazyInitializationException **RESOLVIDO**
-  - Solução: Testes agora usam UsuarioService.buscarPorLogin() para carregar perfis
-  - Solução pendente: Refatorar testes para usar unidades/usuários do data.sql
+- ✅ CDU-19 IntegrationTest - 2/2 passando (refatorado)
+- ✅ CDU-22 IntegrationTest - 1/1 passando (refatorado)
+- ✅ CDU-24 IntegrationTest - 1/1 passando (refatorado)
+- ✅ CDU-25 IntegrationTest - 1/1 passando (refatorado)
+- ⚠️ 15 testes de integração ainda precisam correção:
+  - CDU-14: 8 testes (erro 500) - setup complexo, usuários criados dinamicamente
+  - CDU-20: 1 teste (erro 403) - problema de permissão a investigar
+  - Outros: 6 testes diversos
 - ✅ Código compila com apenas avisos esperados de deprecação
 
+**Refatorações de Testes (2026-01-09):**
+- ✅ CDU-19: Refatorado para usar unidades 6/9 e usuário '333333333333' (CHEFE)
+- ✅ CDU-20: Refatorado para usar hierarquia 2→6→9 e usuário '666666666666' (GESTOR)
+- ✅ CDU-22: Refatorado para usar unidades 6/8/9 e usuário '666666666666' (GESTOR)
+- ✅ CDU-24: Refatorado para usar unidades 8/9 e usuário '111111111111' (ADMIN)
+  - Corrigido estado do subprocesso para CADASTRO_HOMOLOGADO
+- ✅ CDU-25: Refatorado para usar hierarquia 2→6→8/9 e usuário '666666666666' (GESTOR)
+- ✅ WithMockChefeSecurityContextFactory melhorado para carregar perfis do BD
+
 **Próximos Passos:**
-- ⏳ Refatorar 20 testes de integração para usar setup correto de usuários
-  - CDU-14: 7 testes (erro 500) - usuários não carregados corretamente
-  - CDU-19, CDU-20, CDU-22, CDU-24, CDU-25: 13 testes (erro 403) - perfis não correspondem às unidades dinâmicas
-  - Solução: Usar unidades e usuários pré-existentes do data.sql
+- ⏳ Investigar CDU-20 erro 403 (devolver-validacao)
+- ⏳ Refatorar CDU-14 (8 testes) - setup complexo com mocks de UsuarioService
 - ⏳ Validar com testes E2E
 - ⏳ Documentar mudanças no AGENTS.md
 

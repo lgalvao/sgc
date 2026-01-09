@@ -23,19 +23,6 @@ public class WithMockChefeSecurityContextFactory
 
     @Override
     public SecurityContext createSecurityContext(WithMockChefe annotation) {
-        Unidade unidade = null;
-        if (unidadeRepo != null) {
-            try {
-                unidade = unidadeRepo.findById(10L).orElse(null);
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
-        }
-        if (unidade == null) {
-            unidade = new Unidade("Unidade Mock", "SESEL");
-            unidade.setCodigo(10L);
-        }
-
         Usuario usuario = null;
         if (usuarioRepo != null) {
             try {
@@ -50,7 +37,21 @@ public class WithMockChefeSecurityContextFactory
             }
         }
 
+        // Se o usuário não foi encontrado, criar um mock com unidade 10
         if (usuario == null) {
+            Unidade unidade = null;
+            if (unidadeRepo != null) {
+                try {
+                    unidade = unidadeRepo.findById(10L).orElse(null);
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+            if (unidade == null) {
+                unidade = new Unidade("Unidade Mock", "SESEL");
+                unidade.setCodigo(10L);
+            }
+
             usuario = Usuario.builder()
                     .tituloEleitoral(annotation.value())
                     .nome("Chefe Teste")
@@ -67,22 +68,25 @@ public class WithMockChefeSecurityContextFactory
                                     .perfil(Perfil.CHEFE)
                                     .build());
             usuario.setAtribuicoes(atribuicoes);
-
-        }
-
-        // Garante que a unidade está correta no usuário do contexto
-        usuario.setUnidadeLotacao(unidade);
-
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getAtribuicoes());
-        if (atribuicoes.stream().noneMatch(a -> a.getPerfil() == Perfil.CHEFE)) {
-            // Usuário existe mas não tem perfil CHEFE, adicionar com a unidade carregada
-            atribuicoes.add(
+        } else {
+            // Usuário existe - garantir que tem pelo menos um perfil CHEFE
+            Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getAtribuicoes());
+            if (atribuicoes.stream().noneMatch(a -> a.getPerfil() == Perfil.CHEFE)) {
+                // Se não tem perfil CHEFE, adicionar com sua unidade de lotação
+                Unidade unidadeLotacao = usuario.getUnidadeLotacao();
+                if (unidadeLotacao == null && unidadeRepo != null) {
+                    unidadeLotacao = unidadeRepo.findById(10L).orElse(null);
+                }
+                if (unidadeLotacao != null) {
+                    atribuicoes.add(
                             UsuarioPerfil.builder()
                                     .usuario(usuario)
-                                    .unidade(unidade)
+                                    .unidade(unidadeLotacao)
                                     .perfil(Perfil.CHEFE)
                                     .build());
-            usuario.setAtribuicoes(atribuicoes);
+                    usuario.setAtribuicoes(atribuicoes);
+                }
+            }
         }
 
         UsernamePasswordAuthenticationToken authentication =
