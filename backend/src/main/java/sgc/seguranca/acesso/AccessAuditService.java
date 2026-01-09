@@ -27,7 +27,7 @@ public class AccessAuditService {
      */
     public void logAccessGranted(Usuario usuario, Acao acao, Object recurso) {
         log.info("ACCESS_GRANTED: user={}, action={}, resource={}, timestamp={}",
-                usuario.getTituloEleitoral(),
+                usuario != null ? usuario.getTituloEleitoral() : "ANONYMOUS",
                 acao,
                 getResourceId(recurso),
                 Instant.now()
@@ -44,7 +44,7 @@ public class AccessAuditService {
      */
     public void logAccessDenied(Usuario usuario, Acao acao, Object recurso, String motivo) {
         log.warn("ACCESS_DENIED: user={}, action={}, resource={}, reason={}, timestamp={}",
-                usuario.getTituloEleitoral(),
+                usuario != null ? usuario.getTituloEleitoral() : "ANONYMOUS",
                 acao,
                 getResourceId(recurso),
                 motivo,

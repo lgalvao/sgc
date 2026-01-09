@@ -51,6 +51,11 @@ public class AccessControlService {
      * @return true se pode executar, false caso contrário
      */
     public <T> boolean podeExecutar(Usuario usuario, Acao acao, T recurso) {
+        if (usuario == null) {
+            log.warn("Tentativa de verificação de permissão com usuário nulo: acao={}, recurso={}", acao, recurso);
+            return false;
+        }
+        
         log.debug("Verificando permissão: usuario={}, acao={}, recurso={}", 
                 usuario.getTituloEleitoral(), acao, recurso);
         
@@ -74,6 +79,10 @@ public class AccessControlService {
      * @return Mensagem explicativa
      */
     private <T> String obterMotivoNegacao(Usuario usuario, Acao acao, T recurso) {
+        if (usuario == null) {
+            return "Usuário não autenticado não pode executar a ação: " + acao.getDescricao();
+        }
+        
         // Obtém o motivo da policy apropriada
         if (recurso instanceof Subprocesso) {
             return subprocessoAccessPolicy.getMotivoNegacao();
