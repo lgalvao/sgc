@@ -112,7 +112,7 @@ Para dúvidas sobre o plano:
 
 **Criado em**: 2026-01-08  
 **Versão**: 1.0  
-**Status**: 🚧 Em Execução - Sprint 2 98.7% Concluído (1134/1149 testes passando)
+**Status**: 🚧 Em Execução - Sprint 2 99.1% Concluído (1139/1149 testes passando)
 
 ## Histórico de Execução
 
@@ -195,7 +195,7 @@ Para dúvidas sobre o plano:
 - ✅ Mensagens de erro mais descritivas e em português
 
 **Testes Backend:**
-- ✅ 1134/1149 testes passando (98.7%) - Excelente progresso!
+- ✅ 1139/1149 testes passando (99.1%) - Excelente progresso!
 - ✅ Todos os testes unitários de acesso passando
 - ✅ SubprocessoServiceActionsTest - 9/9 passando
 - ✅ ImpactoMapaServiceTest - 4/4 passando
@@ -206,9 +206,11 @@ Para dúvidas sobre o plano:
 - ✅ CDU-22 IntegrationTest - 1/1 passando (refatorado)
 - ✅ CDU-24 IntegrationTest - 1/1 passando (refatorado)
 - ✅ CDU-25 IntegrationTest - 1/1 passando (refatorado)
-- ⚠️ 15 testes de integração ainda precisam correção:
-  - CDU-14: 8 testes (erro 403) - setup complexo com @MockitoBean de UsuarioService
-  - Outros: 7 testes diversos (não relacionados à refatoração de segurança)
+- ⚠️ CDU-14 IntegrationTest - 5/8 passando (refatorado - 2026-01-09)
+  - ✅ 5 testes passando: Devolução, Aceite, Consultas (2), Segurança - CHEFE
+  - ⚠️ 3 testes com issue conhecida: Homologação ADMIN (2), Estado inválido (1)
+  - Problema: ADMIN user retorna 403 ao chamar homologar-revisao-cadastro em nested class
+- ⚠️ 10 testes de integração ainda precisam correção (não relacionados à refatoração de segurança)
 - ✅ Código compila com apenas avisos esperados de deprecação
 
 **Refatorações de Testes (2026-01-09):**
@@ -220,15 +222,22 @@ Para dúvidas sobre o plano:
 - ✅ CDU-24: Refatorado para usar unidades 8/9 e usuário '111111111111' (ADMIN)
   - Corrigido estado do subprocesso para CADASTRO_HOMOLOGADO
 - ✅ CDU-25: Refatorado para usar hierarquia 2→6→8/9 e usuário '666666666666' (GESTOR)
+- ✅ CDU-14: Refatorado completamente (2026-01-09) - **5/8 testes passando**
+  - Removido @MockitoBean(UsuarioService) e toda configuração de mocking (128 linhas removidas)
+  - Migrado para usar usuários existentes do data.sql (43 linhas adicionadas)
+  - Usuários: 111111111111 (ADMIN unit 100), 666666666666 (GESTOR unit 6), 333333333333 (CHEFE unit 9)
+  - Corrigido titular da unit 9 para 333333333333 (requisito TITULAR_UNIDADE)
+  - ✅ Passando: Devolução, Aceite, Consultas (2), Segurança - CHEFE não pode homologar
+  - ⚠️ Issue conhecida: 3 testes com ADMIN falham ao chamar homologar-revisao-cadastro (403)
 - ✅ WithMockChefeSecurityContextFactory melhorado para carregar perfis do BD
 
 **Próximos Passos:**
-- ⏳ Refatorar CDU-14 (8 testes) - requer remoção do @MockitoBean(UsuarioService)
-  - **Problema**: Teste usa @MockitoBean para UsuarioService mas também cria usuários via JDBC
-  - **Solução**: Opção 1 - Remover mock e usar usuários reais do data.sql
-  - **Solução**: Opção 2 - Refatorar infraestrutura de testes para suportar criação dinâmica
+- ⏳ Investigar e corrigir issue com ADMIN em CDU-14 (3 testes pendentes)
+  - Problema: ADMIN user passa em @PreAuthorize mas falha em contexto de nested test class
+  - Workaround possível: Mover testes para classe não-nested ou usar approach diferente
 - ⏳ Validar com testes E2E
 - ⏳ Documentar mudanças no AGENTS.md
+- ✅ **Sprint 2 pode ser considerado 99.1% concluído** (1139/1149 testes passando)
 
 **Melhorias Implementadas (2026-01-09):**
 - ✅ Usuario.getTodasAtribuicoes() agora tolera LazyInitializationException
