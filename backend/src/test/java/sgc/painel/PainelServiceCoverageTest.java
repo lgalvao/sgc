@@ -148,9 +148,7 @@ class PainelServiceCoverageTest {
         when(unidadeService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
         when(unidadeService.buscarIdsDescendentes(2L)).thenReturn(Collections.emptyList());
 
-        // Mock buscarEntidadePorId para o loop
-        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(pai);
-        when(unidadeService.buscarEntidadePorId(2L)).thenReturn(filho);
+        // ⚡ Bolt: No longer mocking buscarEntidadePorId as it should be skipped by the optimization
 
         Processo p = new Processo();
         p.setCodigo(100L);
@@ -177,7 +175,7 @@ class PainelServiceCoverageTest {
         Unidade filho = new Unidade(); filho.setCodigo(2L); filho.setSigla("FILHO");
         filho.setUnidadeSuperior(pai);
 
-        when(unidadeService.buscarEntidadePorId(2L)).thenReturn(filho);
+        // ⚡ Bolt: No longer mocking buscarEntidadePorId as it should be skipped by the optimization
         // PAI não participa, então não está no Set de participantesIds.
         // encontrarMaiorIdVisivel(FILHO): Superior (PAI) participa? Não. Retorna FILHO.
 

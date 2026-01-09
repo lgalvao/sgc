@@ -166,7 +166,8 @@ public class PainelService {
 
         Set<Long> participantesIds = participantesPorCodigo.keySet();
 
-        Set<Long> unidadesVisiveis = selecionarIdsVisiveis(participantesIds);
+        // ⚡ Bolt: Passando o mapa de participantes para evitar DB lookup redundante em loop
+        Set<Long> unidadesVisiveis = selecionarIdsVisiveis(participantesIds, participantesPorCodigo);
         return unidadesVisiveis.stream()
                 .map(participantesPorCodigo::get)
                 .filter(unidade -> unidade != null && unidade.getSigla() != null)
@@ -175,14 +176,18 @@ public class PainelService {
                 .collect(Collectors.joining(", "));
     }
 
-    private Set<Long> selecionarIdsVisiveis(Set<Long> participantesIds) {
+    private Set<Long> selecionarIdsVisiveis(Set<Long> participantesIds, Map<Long, Unidade> participantesPorCodigo) {
         Set<Long> visiveis = new LinkedHashSet<>();
         for (Long unidadeId : participantesIds) {
-            Unidade unidade = null;
-            try {
-                unidade = unidadeService.buscarEntidadePorId(unidadeId);
-            } catch (Exception e) {
-                // ignore
+            // ⚡ Bolt Optimization: Use the object already present in memory instead of fetching again from service/DB
+            Unidade unidade = participantesPorCodigo.get(unidadeId);
+            // Fallback for safety, though it should always be in the map as the IDs come from the map keys
+            if (unidade == null) {
+                try {
+                    unidade = unidadeService.buscarEntidadePorId(unidadeId);
+                } catch (Exception e) {
+                   continue;
+                }
             }
             Long candidato = encontrarMaiorIdVisivel(unidade, participantesIds);
             visiveis.add(candidato);
