@@ -12,6 +12,9 @@ import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.Usuario;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.AtividadeOperacaoResp;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
@@ -21,6 +24,9 @@ import sgc.subprocesso.service.SubprocessoService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +46,14 @@ class AtividadeFacadeTest {
     @Mock
     private SubprocessoService subprocessoService;
 
-    // SubprocessoCadastroController is not used in the Facade code provided, so removed mock.
+    @Mock
+    private AccessControlService accessControlService;
+
+    @Mock
+    private UsuarioService usuarioService;
+
+    @Mock
+    private MapaService mapaService;
 
     @Test
     @DisplayName("Deve criar atividade e retornar status")
@@ -51,6 +64,18 @@ class AtividadeFacadeTest {
         AtividadeDto created = new AtividadeDto();
         created.setCodigo(100L);
         created.setMapaCodigo(1L);
+
+        // Mock usuario e mapa para verificação de acesso
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("user");
+        when(usuarioService.buscarPorLogin("user")).thenReturn(usuario);
+        
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(1L);
+        when(mapaService.obterPorCodigo(1L)).thenReturn(mapa);
+        
+        // Mock accessControlService to allow access
+        doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());
 
         // Facade then gets Subprocesso code by Map code
         Subprocesso subprocesso = new Subprocesso();
@@ -70,7 +95,7 @@ class AtividadeFacadeTest {
 
         AtividadeOperacaoResp response = facade.criarAtividade(request, "user");
 
-        verify(subprocessoService).validarPermissaoEdicaoMapa(1L, "user");
+        verify(accessControlService).verificarPermissao(eq(usuario), any(), any());
         assertThat(response.getAtividade().getCodigo()).isEqualTo(100L);
         assertThat(response.getSubprocesso()).isNotNull();
         assertThat(response.getSubprocesso().getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -87,6 +112,11 @@ class AtividadeFacadeTest {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
         atividadeEntity.setMapa(mapa);
+
+        // Mock usuario autenticado
+        Usuario usuario = new Usuario();
+        when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+        doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());
 
         // Facade gets entity to find map code -> then subprocesso code
         when(atividadeService.obterPorCodigo(codigo)).thenReturn(atividadeEntity);
@@ -114,6 +144,11 @@ class AtividadeFacadeTest {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
         atividadeEntity.setMapa(mapa);
+
+        // Mock usuario autenticado
+        Usuario usuario = new Usuario();
+        when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+        doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());
 
         when(atividadeService.obterPorCodigo(codigo)).thenReturn(atividadeEntity);
 
@@ -154,6 +189,11 @@ class AtividadeFacadeTest {
         mapa.setCodigo(1L);
         atividadeEntity.setMapa(mapa);
 
+        // Mock usuario autenticado
+        Usuario usuario = new Usuario();
+        when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+        doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());
+
         when(conhecimentoService.criar(codigoAtividade, dto)).thenReturn(salvo);
 
         // Mocks for creating response
@@ -189,6 +229,11 @@ class AtividadeFacadeTest {
         mapa.setCodigo(1L);
         atividadeEntity.setMapa(mapa);
 
+        // Mock usuario autenticado
+        Usuario usuario = new Usuario();
+        when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+        doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());
+
         // Mocks for creating response
         when(atividadeService.obterPorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
         Subprocesso subprocesso = new Subprocesso();
@@ -220,6 +265,11 @@ class AtividadeFacadeTest {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
         atividadeEntity.setMapa(mapa);
+
+        // Mock usuario autenticado
+        Usuario usuario = new Usuario();
+        when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+        doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());
 
         // Mocks for creating response
         when(atividadeService.obterPorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
