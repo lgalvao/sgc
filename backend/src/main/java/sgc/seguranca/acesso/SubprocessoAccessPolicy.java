@@ -243,6 +243,15 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
         }
 
         // 3. Verifica hierarquia
+        // Caso especial: ADMIN não precisa verificar hierarquia para EDITAR_MAPA
+        boolean isAdmin = usuario.getTodasAtribuicoes().stream()
+                .anyMatch(a -> a.getPerfil() == ADMIN);
+        
+        if (acao == EDITAR_MAPA && isAdmin) {
+            // ADMIN pode editar mapa sem restrição de hierarquia (conforme comportamento original)
+            return true;
+        }
+        
         if (!verificaHierarquia(usuario, subprocesso, regras.requisitoHierarquia)) {
             ultimoMotivoNegacao = obterMotivoNegacaoHierarquia(
                     usuario, subprocesso, regras.requisitoHierarquia

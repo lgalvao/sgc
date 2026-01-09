@@ -80,10 +80,10 @@
               - button "Devolver para ajustes" [ref=e61] [cursor=pointer]
               - button "Homologar" [ref=e62] [cursor=pointer]
           - generic [ref=e64]:
-            - strong [ref=e66]: Atividade Incompleta 1767986450083
+            - strong [ref=e66]: Atividade Incompleta 1767987331003
             - generic [ref=e69]: Conhecimento Corretivo
           - generic [ref=e71]:
-            - strong [ref=e73]: Atividade Validada 1767986450083
+            - strong [ref=e73]: Atividade Validada 1767987331003
             - generic [ref=e76]: Conhecimento Valido
       - contentinfo [ref=e77]:
         - generic [ref=e78]:
