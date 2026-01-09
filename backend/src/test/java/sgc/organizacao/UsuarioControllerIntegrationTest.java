@@ -77,14 +77,17 @@ class UsuarioControllerIntegrationTest {
         usuarioService.autenticar(Long.toString(tituloEleitoral), "senha-qualquer");
 
         // When/Then
+        // Nota: getTodasAtribuicoes() usa HashSet, então a ordem não é garantida
+        // O teste verifica que os perfis existem, mas não a ordem específica
         mockMvc.perform(
                         post(API_URL + "/autorizar")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(Long.toString(tituloEleitoral)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].perfil").value(Perfil.ADMIN.toString()))
-                .andExpect(jsonPath("$[0].unidade.sigla").value("ADMIN-UNIT"));
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[?(@.perfil=='ADMIN' && @.unidade.codigo==100)]").exists())
+                .andExpect(jsonPath("$[?(@.perfil=='CHEFE' && @.unidade.codigo==102)]").exists());
     }
 
     @Test
