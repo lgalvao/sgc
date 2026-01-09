@@ -7,19 +7,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import sgc.Sgc;
 import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.AnaliseRepo;
 import sgc.fixture.MapaFixture;
-import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.model.*;
 import sgc.organizacao.UsuarioService;
-import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.ProcessoDto;
 import sgc.subprocesso.model.MovimentacaoRepo;
@@ -36,7 +32,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -64,6 +59,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UsuarioRepo usuarioRepo;
     @Autowired
+    private UsuarioService usuarioService;
+    @Autowired
     private AlertaRepo alertaRepo;
     @Autowired
     private AnaliseRepo analiseRepo;
@@ -80,135 +77,53 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private jakarta.persistence.EntityManager entityManager;
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-    @Autowired
     private UnidadeMapaRepo unidadeMapaRepo;
-    @Autowired
-    private sgc.organizacao.model.UsuarioPerfilRepo usuarioPerfilRepo;
-    @MockitoBean
-    private UsuarioService usuarioService;
 
-    private Unidade unidade;
+    private Unidade unidadeChefe;
+    private Unidade unidadeGestor;
     private Usuario chefe;
     private Usuario gestor;
     private Usuario admin;
 
     @BeforeEach
     void setUp() {
-        // IDs controlados para evitar conflito
-        Long idAdminUnit = 4000L;
-        Long idGestorUnit = 4001L;
-        Long idChefeUnit = 4002L;
+        // Use existing users and units from data.sql
+        // Hierarchy: unit 100 (ADMIN) → unit 6 (GESTOR - COSIS) → unit 9 (CHEFE - SEDIA)
+        // Users: 111111111111 (ADMIN), 666666666666 (GESTOR), 333333333333 (CHEFE on unit 9)
+        
+        admin = usuarioService.buscarPorLogin("111111111111");
+        gestor = usuarioService.buscarPorLogin("666666666666");
+        chefe = usuarioService.buscarPorLogin("333333333333");
+        
+        unidadeGestor = unidadeRepo.findById(6L).orElseThrow();
+        unidadeChefe = unidadeRepo.findById(9L).orElseThrow();
 
-        String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        // Unit 9 already has mapa 1002 in data.sql, so use it
+        // Add test data to mapa 1002 if needed
+        Mapa mapaVigente = mapaRepo.findById(1002L).orElseGet(() -> {
+            Mapa novoMapa = MapaFixture.mapaPadrao(null);
+            novoMapa.setCodigo(1002L);
+            return mapaRepo.save(novoMapa);
+        });
 
-        // Verificar se SEDOC já existe
-        Unidade unidadeAdmin = unidadeRepo.findBySigla("SEDOC").orElse(null);
-        if (unidadeAdmin == null) {
-            jdbcTemplate.update(sqlInsertUnidade, idAdminUnit, "SEDOC", "SEDOC", "OPERACIONAL", "ATIVA", null, null);
-            unidadeAdmin = unidadeRepo.findById(idAdminUnit).orElseThrow();
+        // Ensure mapa has at least one atividade with conhecimento for validation
+        if (atividadeRepo.findByMapaCodigo(mapaVigente.getCodigo()).isEmpty()) {
+            Atividade atividade = new Atividade(mapaVigente, "Atividade CDU-14 Test");
+            atividade = atividadeRepo.save(atividade);
+            
+            Conhecimento conhecimento = new Conhecimento("Conhecimento CDU-14 Test", atividade);
+            conhecimento = conhecimentoRepo.save(conhecimento);
+            
+            atividade.getConhecimentos().add(conhecimento);
+            
+            // Add competência for impact testing
+            Competencia competencia = new Competencia("Competencia CDU-14 Test", mapaVigente);
+            competencia = competenciaRepo.save(competencia);
+            atividade.getCompetencias().add(competencia);
+            competencia.getAtividades().add(atividade);
+            
+            atividadeRepo.save(atividade);
         }
-
-        // Criar DA-TEST e SA-TEST
-        jdbcTemplate.update(sqlInsertUnidade, idGestorUnit, "DA Teste", "DA-TEST", "OPERACIONAL", "ATIVA", unidadeAdmin.getCodigo(), null);
-        jdbcTemplate.update(sqlInsertUnidade, idChefeUnit, "SA Teste", "SA-TEST", "OPERACIONAL", "ATIVA", idGestorUnit, null);
-
-        Unidade unidadeGestor = unidadeRepo.findById(idGestorUnit).orElseThrow();
-        unidade = unidadeRepo.findById(idChefeUnit).orElseThrow();
-
-        // Criar Usuários
-        admin = UsuarioFixture.usuarioPadrao();
-        admin.setTituloEleitoral("303030303030");
-        admin.setUnidadeLotacao(unidadeAdmin);
-        admin.setEmail("admin@test.com");
-        admin = usuarioRepo.save(admin);
-
-        gestor = UsuarioFixture.usuarioPadrao();
-        gestor.setTituloEleitoral("404040404040");
-        gestor.setUnidadeLotacao(unidadeGestor);
-        gestor.setEmail("gestor@test.com");
-        gestor = usuarioRepo.save(gestor);
-
-        chefe = UsuarioFixture.usuarioPadrao();
-        chefe.setTituloEleitoral("505050505050");
-        chefe.setUnidadeLotacao(unidade);
-        chefe.setEmail("chefe@test.com");
-        chefe = usuarioRepo.save(chefe);
-
-        // Update titular using JDBC
-        jdbcTemplate.update("UPDATE sgc.vw_unidade SET titulo_titular = ? WHERE codigo = ?",
-                chefe.getTituloEleitoral(), unidade.getCodigo());
-
-        entityManager.refresh(unidade);
-
-        // Configuração do Mock UsuarioService
-        when(usuarioService.buscarPerfisUsuario(admin.getTituloEleitoral()))
-                .thenReturn(
-                        List.of(
-                                new PerfilDto(
-                                        admin.getTituloEleitoral(),
-                                        unidadeAdmin.getCodigo(),
-                                        "SEDOC",
-                                        Perfil.ADMIN.name())));
-        when(usuarioService.buscarPerfisUsuario(gestor.getTituloEleitoral()))
-                .thenReturn(
-                        List.of(
-                                new PerfilDto(
-                                        gestor.getTituloEleitoral(),
-                                        unidadeGestor.getCodigo(),
-                                        "DA-TEST",
-                                        Perfil.GESTOR.name())));
-        when(usuarioService.buscarPerfisUsuario(chefe.getTituloEleitoral()))
-                .thenReturn(
-                        List.of(
-                                new PerfilDto(
-                                        chefe.getTituloEleitoral(),
-                                        unidade.getCodigo(),
-                                        "SA-TEST",
-                                        Perfil.CHEFE.name())));
-
-        when(usuarioService.buscarPorLogin(admin.getTituloEleitoral()))
-                .thenReturn(admin);
-        when(usuarioService.buscarPorLogin(gestor.getTituloEleitoral()))
-                .thenReturn(gestor);
-        when(usuarioService.buscarPorLogin(chefe.getTituloEleitoral()))
-                .thenReturn(chefe);
-
-        UsuarioFixture.adicionarPerfil(admin, unidadeAdmin, Perfil.ADMIN);
-        UsuarioFixture.adicionarPerfil(gestor, unidadeGestor, Perfil.GESTOR);
-        UsuarioFixture.adicionarPerfil(chefe, unidade, Perfil.CHEFE);
-        
-        // Persist UsuarioPerfil for proper authentication
-        admin.getAtribuicoes().forEach(usuarioPerfilRepo::save);
-        gestor.getAtribuicoes().forEach(usuarioPerfilRepo::save);
-        chefe.getAtribuicoes().forEach(usuarioPerfilRepo::save);
-
-        Mapa mapaVigente = MapaFixture.mapaPadrao(null);
-        mapaVigente.setCodigo(null);
-        mapaVigente = mapaRepo.save(mapaVigente);
-
-        Atividade atividade = new Atividade(mapaVigente, "Atividade Existente");
-        atividade = atividadeRepo.save(atividade);
-        
-        // Adicionar conhecimento à atividade para passar na validação
-        Conhecimento conhecimento = new Conhecimento("Conhecimento Teste", atividade);
-        conhecimento = conhecimentoRepo.save(conhecimento);
-        
-        // Adicionar o conhecimento à lista de conhecimentos da atividade para garantir a relação bidirecional
-        atividade.getConhecimentos().add(conhecimento);
-        atividadeRepo.save(atividade);
-
-        // Adicionar competência e vincular à atividade para teste de impacto
-        Competencia competencia = new Competencia("Competencia Teste", mapaVigente);
-        competencia = competenciaRepo.save(competencia);
-        atividade.getCompetencias().add(competencia);
-        competencia.getAtividades().add(atividade); // Manter bidirecionalidade para testes sem clear()
-        atividadeRepo.save(atividade);
-
-        UnidadeMapa unidadeMapa = new UnidadeMapa(unidade.getCodigo(), mapaVigente);
-        unidadeMapaRepo.save(unidadeMapa);
-
-        // Note: Not flushing here to avoid detaching entities that are mocked
     }
 
     private Long criarEComecarProcessoDeRevisao() throws Exception {
@@ -227,7 +142,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         Map<String, Object> criarReqMap =
                 Map.of(
                         "descricao",
-                        "Processo Revisão",
+                        "Processo Revisão CDU-14",
                         "tipo",
                         "REVISAO",
                         "dataLimiteEtapa1",
@@ -235,7 +150,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                 .plusDays(10)
                                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")),
                         "unidades",
-                        List.of(unidade.getCodigo()));
+                        List.of(unidadeChefe.getCodigo()));
         String reqJson = objectMapper.writeValueAsString(criarReqMap);
 
         String resJson =
@@ -253,7 +168,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         ProcessoDto processoDto = objectMapper.readValue(resJson, ProcessoDto.class);
 
         Map<String, Object> iniciarReqMap =
-                Map.of("tipo", "REVISAO", "unidades", List.of(unidade.getCodigo()));
+                Map.of("tipo", "REVISAO", "unidades", List.of(unidadeChefe.getCodigo()));
         String iniciarReqJson = objectMapper.writeValueAsString(iniciarReqMap);
 
         mockMvc.perform(
