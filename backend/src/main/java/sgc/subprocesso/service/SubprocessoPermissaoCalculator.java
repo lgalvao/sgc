@@ -26,14 +26,30 @@ public class SubprocessoPermissaoCalculator {
      * @return DTO com todas as permissões calculadas
      */
     public SubprocessoPermissoesDto calcular(Subprocesso subprocesso, Usuario usuario) {
+        // Determina as ações baseado no tipo de processo
+        boolean isRevisao = subprocesso.getProcesso() != null 
+                && subprocesso.getProcesso().getTipo() == sgc.processo.model.TipoProcesso.REVISAO;
+        
+        Acao acaoDisponibilizarCadastro = isRevisao 
+                ? Acao.DISPONIBILIZAR_REVISAO_CADASTRO 
+                : Acao.DISPONIBILIZAR_CADASTRO;
+        
+        Acao acaoDevolverCadastro = isRevisao 
+                ? Acao.DEVOLVER_REVISAO_CADASTRO 
+                : Acao.DEVOLVER_CADASTRO;
+        
+        Acao acaoAceitarCadastro = isRevisao 
+                ? Acao.ACEITAR_REVISAO_CADASTRO 
+                : Acao.ACEITAR_CADASTRO;
+        
         return SubprocessoPermissoesDto.builder()
                 .podeVerPagina(podeExecutar(usuario, Acao.VISUALIZAR_SUBPROCESSO, subprocesso))
                 .podeEditarMapa(podeExecutar(usuario, Acao.EDITAR_MAPA, subprocesso))
                 .podeVisualizarMapa(podeExecutar(usuario, Acao.VISUALIZAR_MAPA, subprocesso))
                 .podeDisponibilizarMapa(podeExecutar(usuario, Acao.DISPONIBILIZAR_MAPA, subprocesso))
-                .podeDisponibilizarCadastro(podeExecutar(usuario, Acao.DISPONIBILIZAR_CADASTRO, subprocesso))
-                .podeDevolverCadastro(podeExecutar(usuario, Acao.DEVOLVER_CADASTRO, subprocesso))
-                .podeAceitarCadastro(podeExecutar(usuario, Acao.ACEITAR_CADASTRO, subprocesso))
+                .podeDisponibilizarCadastro(podeExecutar(usuario, acaoDisponibilizarCadastro, subprocesso))
+                .podeDevolverCadastro(podeExecutar(usuario, acaoDevolverCadastro, subprocesso))
+                .podeAceitarCadastro(podeExecutar(usuario, acaoAceitarCadastro, subprocesso))
                 .podeVisualizarDiagnostico(podeExecutar(usuario, Acao.VISUALIZAR_DIAGNOSTICO, subprocesso))
                 .podeAlterarDataLimite(podeExecutar(usuario, Acao.ALTERAR_DATA_LIMITE, subprocesso))
                 .podeVisualizarImpacto(podeExecutar(usuario, Acao.VERIFICAR_IMPACTOS, subprocesso))
