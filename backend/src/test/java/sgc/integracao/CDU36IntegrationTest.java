@@ -118,6 +118,7 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Não deve permitir gerar relatório de mapas sem ser ADMIN")
+    @org.springframework.security.test.context.support.WithMockUser(roles = "GESTOR")
     void gerarRelatorioMapas_semPermissao_proibido() throws Exception {
         // When/Then
         mockMvc.perform(

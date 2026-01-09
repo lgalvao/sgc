@@ -108,6 +108,10 @@ public class UsuarioService {
 
     @Transactional(readOnly = true)
     public Usuario buscarPorLogin(String login) {
+        return buscarPorLoginInterno(login);
+    }
+
+    private Usuario buscarPorLoginInterno(String login) {
         Usuario usuario = usuarioRepo
                 .findByIdWithAtribuicoes(login)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, login));
@@ -133,7 +137,7 @@ public class UsuarioService {
         }
         
         String tituloEleitoral = authentication.getName();
-        return buscarPorLogin(tituloEleitoral);
+        return buscarPorLoginInterno(tituloEleitoral);
     }
 
     @Transactional(readOnly = true)
@@ -333,13 +337,12 @@ public class UsuarioService {
     }
 
     private UnidadeDto toUnidadeDto(Unidade unidade) {
+        Unidade superior = unidade.getUnidadeSuperior();
         return UnidadeDto.builder()
                 .codigo(unidade.getCodigo())
                 .nome(unidade.getNome())
                 .sigla(unidade.getSigla())
-                .codigoPai(unidade.getUnidadeSuperior() != null
-                        ? unidade.getUnidadeSuperior().getCodigo()
-                        : null)
+                .codigoPai(superior != null ? superior.getCodigo() : null)
                 .tipo(unidade.getTipo().name())
                 .isElegivel(unidade.getTipo() != TipoUnidade.INTERMEDIARIA)
                 .build();
@@ -431,6 +434,9 @@ public class UsuarioService {
         }
 
         Long codUnidade = request.getUnidadeCodigo();
+        // Garante que a unidade existe (lança ErroEntidadeNaoEncontrada se não existir)
+        unidadeService.buscarEntidadePorId(codUnidade);
+
         List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoesInterno(request.getTituloEleitoral());
 
         // Remove a autenticação do cache após usá-la (garante que só pode entrar uma vez por autenticação)

@@ -361,7 +361,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                             jsonPath("$.competenciasImpactadas[0].atividadesAfetadas", hasSize(1)))
                     .andExpect(
                             jsonPath(
-                                    "$.competenciasImpactadas[0].tipoImpacto",
+                                    "$.competenciasImpactadas[0].tiposImpacto[0]",
                                     is("ATIVIDADE_REMOVIDA")));
         }
     }

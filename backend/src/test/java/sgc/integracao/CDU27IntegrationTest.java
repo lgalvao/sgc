@@ -125,7 +125,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Não deve permitir alterar data limite se não for ADMIN")
-    // Sem autenticação específica, ou com usuário comum se precisar
+    @org.springframework.security.test.context.support.WithMockUser(roles = "GESTOR")
     void alterarDataLimite_semPermissao_proibido() throws Exception {
         // Given
         LocalDate novaData = LocalDate.now().plusDays(20);

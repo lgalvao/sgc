@@ -76,8 +76,7 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Deve listar apenas processos finalizados")
-    // Sem autenticação específica necessária se for público, mas se for protegido, adicionar @WithMockUser
-    // Verificar endpoint security
+    @org.springframework.security.test.context.support.WithMockUser
     void listarFinalizados_sucesso() throws Exception {
         mockMvc.perform(get("/api/processos/finalizados")
                         .with(csrf()))

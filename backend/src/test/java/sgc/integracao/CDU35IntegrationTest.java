@@ -93,6 +93,7 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Não deve permitir gerar relatório de andamento sem ser ADMIN")
+    @org.springframework.security.test.context.support.WithMockUser(roles = "GESTOR")
     void gerarRelatorioAndamento_semPermissao_proibido() throws Exception {
         // When/Then
         mockMvc.perform(

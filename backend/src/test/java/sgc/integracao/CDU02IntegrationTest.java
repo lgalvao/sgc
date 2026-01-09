@@ -175,6 +175,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("GESTOR da unidade raiz deve ver todos os processos da sua unidade e de todas as subordinadas")
+        @org.springframework.security.test.context.support.WithMockUser(username = "99001")
         void testListarProcessos_GestorRaiz_VeTodos() throws Exception {
             setupSecurityContext("99001", unidadeRaiz, "GESTOR");
 
@@ -192,6 +193,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("CHEFE da unidade Filha 2 não deve ver processos de outras unidades")
+        @org.springframework.security.test.context.support.WithMockUser(username = "99002")
         void testListarProcessos_ChefeUnidadeFilha2_NaoVeProcessosDeOutros() throws Exception {
             setupSecurityContext("99002", unidadeFilha2, "CHEFE");
 
@@ -207,6 +209,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("Nenhum perfil, exceto ADMIN, deve ver processos com status 'Criado' (Exceto da própria unidade)")
+        @org.springframework.security.test.context.support.WithMockUser(username = "99003")
         void testListarProcessos_NaoAdmin_NaoVeProcessosCriados() throws Exception {
             setupSecurityContext("99003", unidadeRaiz, "GESTOR");
 
@@ -234,6 +237,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     class VisibilidadeAlertasTestes {
         @Test
         @DisplayName("Usuário deve ver alertas direcionados a ele")
+        @org.springframework.security.test.context.support.WithMockUser(username = "99004")
         void testListarAlertas_UsuarioVeSeusAlertas() throws Exception {
             Usuario usuario = setupSecurityContext("99004", unidadeRaiz, "GESTOR");
 
@@ -251,7 +255,9 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("Usuário deve ver alertas direcionados à sua unidade e às suas subordinadas")
+        @org.springframework.security.test.context.support.WithMockUser(username = "99005")
         void testListarAlertas_UsuarioVeAlertasDaSuaUnidade() throws Exception {
+            setupSecurityContext("99005", unidadeRaiz, "GESTOR");
             // Alerta para Unidade Filha 1 (Subordinada à Raiz)
             Alerta alerta = AlertaFixture.alertaParaUnidade(processoFilha1, unidadeFilha1);
             alerta.setCodigo(null);
@@ -267,6 +273,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("Usuário não deve ver alertas de outros usuários ou unidades")
+        @org.springframework.security.test.context.support.WithMockUser(username = "99006")
         void testListarAlertas_UsuarioNaoVeAlertasDeOutros() throws Exception {
             Usuario usuario = setupSecurityContext("99006", unidadeFilha2, "CHEFE");
 

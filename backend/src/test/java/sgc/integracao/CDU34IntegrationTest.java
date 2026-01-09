@@ -122,6 +122,7 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Não deve permitir enviar lembrete sem ser ADMIN")
+    @org.springframework.security.test.context.support.WithMockUser(roles = "GESTOR")
     void enviarLembrete_semPermissao_proibido() throws Exception {
         // Given
         EnviarLembreteReq request = new EnviarLembreteReq();

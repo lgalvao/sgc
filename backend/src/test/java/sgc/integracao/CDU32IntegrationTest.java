@@ -133,6 +133,7 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Não deve permitir reabrir cadastro sem ser ADMIN")
+    @org.springframework.security.test.context.support.WithMockUser(roles = "GESTOR")
     void reabrirCadastro_semPermissao_proibido() throws Exception {
         // Given
         ReabrirProcessoReq request = new ReabrirProcessoReq("Tentativa sem permissão");
