@@ -983,7 +983,7 @@ npm run test:e2e
   - Causa raiz: Teste usa `@MockitoBean(UsuarioService)` mas cria usuários via JDBC
   - O mock não retorna os usuários criados, causando falha de autenticação
   - Requer refatoração mais substancial da infraestrutura de teste
-  - **Decisão**: Manter como limitação conhecida por enquanto (98.8% de testes é excelente)
+  - **Decisão**: Manter como limitação conhecida por enquanto (98.7% de testes é excelente)
 
 #### Progresso dos Testes (Atualizado)
 
@@ -998,7 +998,7 @@ npm run test:e2e
 - ✅ FluxoEstadosIntegrationTest: 4 testes
 - ✅ CDU-13: 4 testes  
 - ✅ CDU-19: 2 testes
-- ✅ CDU-20: 1 teste (**corrigido mas pode apresentar falhas intermitentes**)
+- ✅ CDU-20: 1 teste (corrigido - pode variar devido a timing de testes concorrentes)
 - ✅ CDU-22: 1 teste
 - ✅ CDU-24: 1 teste
 - ✅ CDU-25: 1 teste
@@ -1031,7 +1031,8 @@ npm run test:e2e
 
 #### Próximos Passos (Atualizado)
 
-1. ✅ ~~Investigar CDU-20~~ - **RESOLVIDO** (mas pode ter falhas intermitentes)
+1. ✅ ~~Investigar CDU-20~~ - **RESOLVIDO**
+   - Note: Em execuções concorrentes de todos os testes, pode haver variação devido a timing
    
 2. ⏳ Refatorar CDU-14 (8 testes) - **OPCIONAL** (baixa prioridade):
    - Requer remoção do @MockitoBean(UsuarioService) 

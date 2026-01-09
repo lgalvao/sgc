@@ -112,8 +112,8 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Devolução e aceite da validação do mapa com verificação do histórico")
-    void devolucaoEaceiteComVerificacaoHistorico() throws Exception {
+    @DisplayName("Devolução e aceitação da validação do mapa com verificação do histórico")
+    void devolucaoEAceitacaoComVerificacaoHistorico() throws Exception {
         // Devolução do mapa (GESTOR of unit 6 devolves to subordinate unit 9)
         DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");
         mockMvc.perform(post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
