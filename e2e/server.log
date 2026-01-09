@@ -1,6 +1,452 @@
 [BACKEND] WARN  sgc.seguranca.GerenciadorJwt.verificarSegurancaChave:36 - ⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão.
 [BACKEND] INFO  s.o.ValidadorDadosOrganizacionais.run:53 - Validando integridade dos dados organizacionais...
 [BACKEND] INFO  s.o.ValidadorDadosOrganizacionais.run:70 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
-[FRONTEND]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m310[22m[2m[0m ms[22m
+[FRONTEND]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m314[22m[2m[0m ms[22m
 [FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
 [FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 1 criado.
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 2 criado.
+[BACKEND] WARN  s.c.util.MonitoramentoAspect.monitorarExecucao:28 - EXECUCAO LENTA: sgc.notificacao.NotificacaoModelosService.criarEmailProcessoIniciado levou 168 ms
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_211
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_212
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 2 iniciado para 2 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 3 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_211
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 3 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 4 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 4 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 5 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_211
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 5 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=101010, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:43:31.775234575Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=101010, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:43:32.004793305Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=101010, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:43:32.083025899Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=101010, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:43:32.249827166Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=101010, action=Disponibilizar cadastro, resource=Subprocesso:5, timestamp=2026-01-09T20:43:33.152306159Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_21 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 6 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_212
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 6 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=181818, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:43:35.185481297Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=181818, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:43:35.682105663Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=181818, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:43:36.131553440Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=181818, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:43:36.284193692Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=181818, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:43:38.534244396Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=181818, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:43:40.283560182Z
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 7 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_121
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 7 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=171717, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:43:43.317306172Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=171717, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:43:43.467255487Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=171717, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:43:43.630786847Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=171717, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:43:43.799498112Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=171717, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:43:43.949608119Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=171717, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:43:44.114735455Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=171717, action=Disponibilizar cadastro, resource=Subprocesso:7, timestamp=2026-01-09T20:43:44.233809590Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_12 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:7, timestamp=2026-01-09T20:43:44.866479592Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Disponibilizar mapa, resource=Subprocesso:7, timestamp=2026-01-09T20:43:46.936839682Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECAO_121 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 8 criado.
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 9 criado.
+[BACKEND] INFO  s.s.service.SubprocessoFactory.criarParaRevisao:105 - Subprocesso para revisão criado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de revisao 9 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 10 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_111
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_112
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 10 iniciado para 2 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=333333, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:43:52.350344186Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=333333, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:43:52.498264158Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=333333, action=Disponibilizar cadastro, resource=Subprocesso:9, timestamp=2026-01-09T20:43:53.014655027Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_11 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 11 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_121
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 11 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 12 criado.
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 13 criado.
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 14 criado.
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 15 criado.
+[BACKEND] INFO  s.p.service.ProcessoFacade.atualizar:211 - Processo 15 atualizado.
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 16 criado.
+[BACKEND] INFO  s.p.service.ProcessoFacade.apagar:227 - Processo 16 removido.
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 17 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade ASSESSORIA_11
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 17 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 18 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade ASSESSORIA_21
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 18 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=777777, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:44:20.431545898Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=777777, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:44:20.579765119Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=777777, action=Disponibilizar cadastro, resource=Subprocesso:13, timestamp=2026-01-09T20:44:21.862589503Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECRETARIA_2 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:13, timestamp=2026-01-09T20:44:23.196517818Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Disponibilizar mapa, resource=Subprocesso:13, timestamp=2026-01-09T20:44:25.295983452Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para ASSESSORIA_21 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=777777, action=Validar mapa, resource=Subprocesso:13, timestamp=2026-01-09T20:44:26.270411482Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECRETARIA_2 - Transição: MAPA_VALIDADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar mapa, resource=Subprocesso:13, timestamp=2026-01-09T20:44:27.229103926Z
+[BACKEND] INFO  s.p.service.ProcessoFacade.validarTodosSubprocessosHomologados:393 - Homologados 1 subprocessos.
+[BACKEND] INFO  s.p.service.ProcessoFacade.tornarMapasVigentes:397 - Mapa vigente definido para o processo 18
+[BACKEND] INFO  s.p.service.ProcessoFacade.tornarMapasVigentes:410 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:174 - E-mail de finalização enviado para ASSESSORIA_21
+[BACKEND] INFO  s.p.service.ProcessoFacade.finalizar:327 - Processo 18 finalizado
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 19 criado.
+[BACKEND] INFO  s.s.service.SubprocessoFactory.criarParaRevisao:105 - Subprocesso para revisão criado para unidade ASSESSORIA_21
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade ASSESSORIA_21
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de revisao 19 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 20 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 20 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 21 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_111
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 21 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 22 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_121
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 22 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 23 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade ASSESSORIA_11
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 23 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=555555, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:44:34.597317199Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=555555, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:44:34.746034802Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=555555, action=Editar atividade, resource=Atividade, timestamp=2026-01-09T20:44:34.880867410Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=555555, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:44:35.115857104Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=555555, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:44:35.297732505Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=555555, action=Excluir atividade, resource=Atividade, timestamp=2026-01-09T20:44:35.580779151Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=555555, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:44:35.780203673Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=555555, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:44:35.930220985Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=555555, action=Disponibilizar cadastro, resource=Subprocesso:18, timestamp=2026-01-09T20:44:36.445546214Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECRETARIA_1 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 24 criado.
+[BACKEND] INFO  s.s.service.SubprocessoFactory.criarParaRevisao:105 - Subprocesso para revisão criado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de revisao 24 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=151515, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:44:38.247626771Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=151515, action=Verificar impactos no mapa, resource=Subprocesso:19, timestamp=2026-01-09T20:44:38.580112303Z
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 25 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 25 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:44:41.196010625Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:44:41.495979344Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:44:42.780060670Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:44:42.928946319Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:20, timestamp=2026-01-09T20:44:43.047576410Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] WARN  s.s.acesso.AccessAuditService.logAccessDenied:46 - ACCESS_DENIED: user=191919, action=Devolver cadastro, resource=Subprocesso:20, reason=Usuário '191919' não pertence à unidade superior imediata da unidade 'SECAO_221', timestamp=2026-01-09T20:44:44.514355892Z
+[BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:49 - Erro de negócio (ACESSO_NEGADO): Usuário '191919' não pertence à unidade superior imediata da unidade 'SECAO_221'
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 26 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 26 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:44:52.213339081Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:44:52.361687286Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:44:52.429157335Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:44:52.578173101Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:21, timestamp=2026-01-09T20:44:52.697749456Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:21, timestamp=2026-01-09T20:44:53.778015916Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Disponibilizar mapa, resource=Subprocesso:21, timestamp=2026-01-09T20:44:56.844191278Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Validar mapa, resource=Subprocesso:21, timestamp=2026-01-09T20:44:57.793216705Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar mapa, resource=Subprocesso:21, timestamp=2026-01-09T20:44:58.744023444Z
+[BACKEND] INFO  s.p.service.ProcessoFacade.validarTodosSubprocessosHomologados:393 - Homologados 1 subprocessos.
+[BACKEND] INFO  s.p.service.ProcessoFacade.tornarMapasVigentes:397 - Mapa vigente definido para o processo 26
+[BACKEND] INFO  s.p.service.ProcessoFacade.tornarMapasVigentes:410 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:174 - E-mail de finalização enviado para SECAO_221
+[BACKEND] INFO  s.p.service.ProcessoFacade.finalizar:327 - Processo 26 finalizado
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 27 criado.
+[BACKEND] INFO  s.s.service.SubprocessoFactory.criarParaRevisao:105 - Subprocesso para revisão criado para unidade SECAO_221
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de revisao 27 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:45:00.946696687Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:45:01.312296038Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:45:03.666152226Z
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 28 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 28 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:45:20.661879258Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:45:20.810213967Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:45:20.876520727Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:45:20.944160551Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:45:21.095715898Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:23, timestamp=2026-01-09T20:45:21.212888403Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:23, timestamp=2026-01-09T20:45:24.160385738Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Disponibilizar mapa, resource=Subprocesso:23, timestamp=2026-01-09T20:45:26.493025937Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Validar mapa, resource=Subprocesso:23, timestamp=2026-01-09T20:45:27.209108546Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar mapa, resource=Subprocesso:23, timestamp=2026-01-09T20:45:27.908526951Z
+[BACKEND] INFO  s.p.service.ProcessoFacade.validarTodosSubprocessosHomologados:393 - Homologados 1 subprocessos.
+[BACKEND] INFO  s.p.service.ProcessoFacade.tornarMapasVigentes:397 - Mapa vigente definido para o processo 28
+[BACKEND] INFO  s.p.service.ProcessoFacade.tornarMapasVigentes:410 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:174 - E-mail de finalização enviado para SECAO_221
+[BACKEND] INFO  s.p.service.ProcessoFacade.finalizar:327 - Processo 28 finalizado
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 29 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 29 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:45:31.295873313Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:45:31.444161272Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:45:31.510329489Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:45:31.659645995Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:45:31.727696640Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:45:32.094129308Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:24, timestamp=2026-01-09T20:45:33.594555781Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:24, timestamp=2026-01-09T20:45:34.325425075Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Disponibilizar mapa, resource=Subprocesso:24, timestamp=2026-01-09T20:45:37.708730728Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Validar mapa, resource=Subprocesso:24, timestamp=2026-01-09T20:45:38.275081621Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar mapa, resource=Subprocesso:24, timestamp=2026-01-09T20:45:39.059086527Z
+[BACKEND] INFO  s.p.service.ProcessoFacade.validarTodosSubprocessosHomologados:393 - Homologados 1 subprocessos.
+[BACKEND] INFO  s.p.service.ProcessoFacade.tornarMapasVigentes:397 - Mapa vigente definido para o processo 29
+[BACKEND] INFO  s.p.service.ProcessoFacade.tornarMapasVigentes:410 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:174 - E-mail de finalização enviado para SECAO_221
+[BACKEND] INFO  s.p.service.ProcessoFacade.finalizar:327 - Processo 29 finalizado
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 30 criado.
+[BACKEND] INFO  s.s.service.SubprocessoFactory.criarParaRevisao:105 - Subprocesso para revisão criado para unidade SECAO_221
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de revisao 30 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Verificar impactos no mapa, resource=Subprocesso:25, timestamp=2026-01-09T20:45:41.511583055Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:45:42.461931564Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:45:42.609653914Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Verificar impactos no mapa, resource=Subprocesso:25, timestamp=2026-01-09T20:45:42.711180624Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Editar atividade, resource=Atividade, timestamp=2026-01-09T20:45:44.461784265Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Verificar impactos no mapa, resource=Subprocesso:25, timestamp=2026-01-09T20:45:44.643766593Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Excluir atividade, resource=Atividade, timestamp=2026-01-09T20:45:46.362372842Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Verificar impactos no mapa, resource=Subprocesso:25, timestamp=2026-01-09T20:45:46.626942774Z
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 31 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 31 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:46:05.110898640Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:46:05.258961704Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:46:05.326085739Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:46:05.475539118Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:46:05.543691140Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:46:05.909618740Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:26, timestamp=2026-01-09T20:46:07.427710164Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=131313, action=Devolver cadastro, resource=Subprocesso:26, timestamp=2026-01-09T20:46:10.459252648Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECAO_221 - Transição: CADASTRO_DEVOLVIDO
+[BACKEND] INFO  s.s.s.SubprocessoWorkflowExecutor.registrarAnaliseETransicao:67 - Workflow executado: Subprocesso 26 -> MAPEAMENTO_CADASTRO_EM_ANDAMENTO, Transição CADASTRO_DEVOLVIDO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:26, timestamp=2026-01-09T20:46:12.443785875Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=131313, action=Aceitar cadastro, resource=Subprocesso:26, timestamp=2026-01-09T20:46:15.360844052Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_ACEITO
+[BACKEND] INFO  s.s.s.SubprocessoWorkflowExecutor.registrarAnaliseETransicao:67 - Workflow executado: Subprocesso 26 -> MAPEAMENTO_CADASTRO_DISPONIBILIZADO, Transição CADASTRO_ACEITO
+[BACKEND] WARN  s.s.acesso.AccessAuditService.logAccessDenied:46 - ACCESS_DENIED: user=191919, action=Devolver cadastro, resource=Subprocesso:26, reason=Usuário '191919' não pertence à unidade superior imediata da unidade 'SECAO_221', timestamp=2026-01-09T20:46:16.724907418Z
+[BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:49 - Erro de negócio (ACESSO_NEGADO): Usuário '191919' não pertence à unidade superior imediata da unidade 'SECAO_221'
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 32 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 32 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:46:24.442558343Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:46:24.591127893Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:27, timestamp=2026-01-09T20:46:24.710079577Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=131313, action=Aceitar cadastro, resource=Subprocesso:27, timestamp=2026-01-09T20:46:26.041721856Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_ACEITO
+[BACKEND] INFO  s.s.s.SubprocessoWorkflowExecutor.registrarAnaliseETransicao:67 - Workflow executado: Subprocesso 27 -> MAPEAMENTO_CADASTRO_DISPONIBILIZADO, Transição CADASTRO_ACEITO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:27, timestamp=2026-01-09T20:46:27.373916083Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Disponibilizar mapa, resource=Subprocesso:27, timestamp=2026-01-09T20:46:29.507959280Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Validar mapa, resource=Subprocesso:27, timestamp=2026-01-09T20:46:30.432776098Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar mapa, resource=Subprocesso:27, timestamp=2026-01-09T20:46:31.489280745Z
+[BACKEND] INFO  s.p.service.ProcessoFacade.validarTodosSubprocessosHomologados:393 - Homologados 1 subprocessos.
+[BACKEND] INFO  s.p.service.ProcessoFacade.tornarMapasVigentes:397 - Mapa vigente definido para o processo 32
+[BACKEND] INFO  s.p.service.ProcessoFacade.tornarMapasVigentes:410 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:174 - E-mail de finalização enviado para SECAO_221
+[BACKEND] INFO  s.p.service.ProcessoFacade.finalizar:327 - Processo 32 finalizado
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 33 criado.
+[BACKEND] INFO  s.s.service.SubprocessoFactory.criarParaRevisao:105 - Subprocesso para revisão criado para unidade SECAO_221
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de revisao 33 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:46:34.175079447Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:46:34.324269925Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:46:34.392659392Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:46:34.540068981Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:46:34.609786568Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:46:34.974644954Z
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 34 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 34 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:46:50.957995829Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:46:51.107042834Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:46:51.174608158Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:46:51.323200181Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:29, timestamp=2026-01-09T20:46:51.442790132Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=131313, action=Aceitar cadastro, resource=Subprocesso:29, timestamp=2026-01-09T20:46:52.439836994Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_ACEITO
+[BACKEND] INFO  s.s.s.SubprocessoWorkflowExecutor.registrarAnaliseETransicao:67 - Workflow executado: Subprocesso 29 -> MAPEAMENTO_CADASTRO_DISPONIBILIZADO, Transição CADASTRO_ACEITO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:29, timestamp=2026-01-09T20:46:53.490092136Z
+[BACKEND] INFO  s.s.s.SubprocessoMapaWorkflowService.removerCompetencia:151 - Situação do subprocesso 29 alterada para CADASTRO_HOMOLOGADO (mapa ficou vazio)
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Disponibilizar mapa, resource=Subprocesso:29, timestamp=2026-01-09T20:47:03.222220800Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 35 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 35 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:47:05.173960711Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:47:05.322834811Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:47:05.389717428Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:47:05.538890695Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:47:05.607179102Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:47:05.973191010Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:30, timestamp=2026-01-09T20:47:07.473407089Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:30, timestamp=2026-01-09T20:47:08.472649620Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Disponibilizar mapa, resource=Subprocesso:30, timestamp=2026-01-09T20:47:12.322238135Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Validar mapa, resource=Subprocesso:30, timestamp=2026-01-09T20:47:13.171214067Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar mapa, resource=Subprocesso:30, timestamp=2026-01-09T20:47:14.154837578Z
+[BACKEND] INFO  s.p.service.ProcessoFacade.validarTodosSubprocessosHomologados:393 - Homologados 1 subprocessos.
+[BACKEND] INFO  s.p.service.ProcessoFacade.tornarMapasVigentes:397 - Mapa vigente definido para o processo 35
+[BACKEND] INFO  s.p.service.ProcessoFacade.tornarMapasVigentes:410 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:174 - E-mail de finalização enviado para SECAO_221
+[BACKEND] INFO  s.p.service.ProcessoFacade.finalizar:327 - Processo 35 finalizado
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 36 criado.
+[BACKEND] INFO  s.s.service.SubprocessoFactory.criarParaRevisao:105 - Subprocesso para revisão criado para unidade SECAO_221
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de revisao 36 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:47:16.791185604Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:47:17.289517629Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Editar atividade, resource=Atividade, timestamp=2026-01-09T20:47:17.442709922Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Excluir atividade, resource=Atividade, timestamp=2026-01-09T20:47:17.659521732Z
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 37 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 37 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:47:33.722509956Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:47:33.871805671Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:47:33.938919486Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:47:34.088744512Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:47:34.155759905Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:47:34.522458942Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:32, timestamp=2026-01-09T20:47:36.040197911Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:32, timestamp=2026-01-09T20:47:37.038164975Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Disponibilizar mapa, resource=Subprocesso:32, timestamp=2026-01-09T20:47:44.121753655Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 38 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 38 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:47:47.955903044Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:47:48.104237032Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:47:48.171589830Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:47:48.320684154Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:33, timestamp=2026-01-09T20:47:48.439862523Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:33, timestamp=2026-01-09T20:47:49.454883752Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Disponibilizar mapa, resource=Subprocesso:33, timestamp=2026-01-09T20:47:52.353773812Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Validar mapa, resource=Subprocesso:33, timestamp=2026-01-09T20:47:55.419804919Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 39 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 39 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:47:57.538243001Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:47:57.687130262Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:47:57.754135137Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:47:57.903441857Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:34, timestamp=2026-01-09T20:47:58.022097671Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:34, timestamp=2026-01-09T20:47:59.019883758Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Disponibilizar mapa, resource=Subprocesso:34, timestamp=2026-01-09T20:48:01.903571709Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Validar mapa, resource=Subprocesso:34, timestamp=2026-01-09T20:48:03.102719941Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=131313, action=Aceitar mapa, resource=Subprocesso:34, timestamp=2026-01-09T20:48:06.089675155Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECRETARIA_2 - Transição: MAPA_VALIDACAO_ACEITA
+[BACKEND] INFO  s.s.s.SubprocessoWorkflowExecutor.registrarAnaliseETransicao:67 - Workflow executado: Subprocesso 34 -> MAPEAMENTO_MAPA_VALIDADO, Transição MAPA_VALIDACAO_ACEITA
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar mapa, resource=Subprocesso:34, timestamp=2026-01-09T20:48:07.685505887Z
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 40 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 40 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:48:09.805245004Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:48:09.953489814Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:48:10.020187139Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:48:10.169560747Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:35, timestamp=2026-01-09T20:48:10.288471997Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:35, timestamp=2026-01-09T20:48:11.285877659Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Disponibilizar mapa, resource=Subprocesso:35, timestamp=2026-01-09T20:48:14.186532838Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Validar mapa, resource=Subprocesso:35, timestamp=2026-01-09T20:48:15.451595477Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=131313, action=Aceitar mapa, resource=Subprocesso:35, timestamp=2026-01-09T20:48:16.719688467Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECRETARIA_2 - Transição: MAPA_VALIDACAO_ACEITA
+[BACKEND] INFO  s.s.s.SubprocessoWorkflowExecutor.registrarAnaliseETransicao:67 - Workflow executado: Subprocesso 35 -> MAPEAMENTO_MAPA_VALIDADO, Transição MAPA_VALIDACAO_ACEITA
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar mapa, resource=Subprocesso:35, timestamp=2026-01-09T20:48:18.001768578Z
+[BACKEND] INFO  s.p.service.ProcessoFacade.validarTodosSubprocessosHomologados:393 - Homologados 1 subprocessos.
+[BACKEND] INFO  s.p.service.ProcessoFacade.tornarMapasVigentes:397 - Mapa vigente definido para o processo 40
+[BACKEND] INFO  s.p.service.ProcessoFacade.tornarMapasVigentes:410 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:174 - E-mail de finalização enviado para SECAO_221
+[BACKEND] INFO  s.p.service.ProcessoFacade.finalizar:327 - Processo 40 finalizado
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 41 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 41 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:48:22.687388744Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:48:22.836030160Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:36, timestamp=2026-01-09T20:48:22.954467601Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 42 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 42 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:48:26.975497751Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:48:27.121623633Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:37, timestamp=2026-01-09T20:48:27.237392839Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 43 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 43 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:48:31.203269553Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:48:31.352815268Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:38, timestamp=2026-01-09T20:48:31.470796373Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:38, timestamp=2026-01-09T20:48:32.452243347Z
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 44 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 44 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:48:37.869941297Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:48:38.019320150Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:39, timestamp=2026-01-09T20:48:38.137507390Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:39, timestamp=2026-01-09T20:48:39.135186828Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Disponibilizar mapa, resource=Subprocesso:39, timestamp=2026-01-09T20:48:40.535150864Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Validar mapa, resource=Subprocesso:39, timestamp=2026-01-09T20:48:41.701221805Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 45 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 45 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:48:44.653420889Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:48:44.802246112Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:40, timestamp=2026-01-09T20:48:44.920989399Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:40, timestamp=2026-01-09T20:48:45.901672987Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Disponibilizar mapa, resource=Subprocesso:40, timestamp=2026-01-09T20:48:47.301344622Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Validar mapa, resource=Subprocesso:40, timestamp=2026-01-09T20:48:48.450644851Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 46 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 46 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 47 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 47 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:49:01.268570455Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:49:01.419513222Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:42, timestamp=2026-01-09T20:49:01.537240674Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 48 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 48 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-09T20:49:06.568570403Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-09T20:49:06.718336810Z
+[BACKEND] INFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:43, timestamp=2026-01-09T20:49:06.835896107Z
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:42 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.p.service.ProcessoFacade.criar:178 - Processo 49 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailProcessoIniciado:219 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:104 - Processo de mapeamento 49 iniciado para 1 unidade(s).

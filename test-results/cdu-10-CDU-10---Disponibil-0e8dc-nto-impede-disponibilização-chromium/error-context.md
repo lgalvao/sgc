@@ -1,0 +1,165 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link " Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link " Minha unidade" [ref=e14] [cursor=pointer]:
+                  - /url: /unidade/18
+                  - generic [ref=e15]: 
+                  - text: Minha unidade
+              - listitem [ref=e16]:
+                - link " Relatórios" [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link " Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link " CHEFE - SECAO_221" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: CHEFE - SECAO_221
+              - listitem "Sair" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e30]: 
+      - generic [ref=e33]:
+        - button "" [ref=e34] [cursor=pointer]:
+          - generic [ref=e35]: 
+        - navigation "breadcrumb" [ref=e36]:
+          - list [ref=e37]:
+            - listitem [ref=e38]:
+              - link "Início" [ref=e39] [cursor=pointer]:
+                - /url: /painel
+                - generic "Início" [ref=e40]: 
+            - listitem [ref=e41]:
+              - text: ›
+              - link "SECAO_221" [ref=e42] [cursor=pointer]:
+                - /url: /processo/27/SECAO_221
+            - listitem [ref=e43]:
+              - text: ›
+              - generic [ref=e44]: Atividades e conhecimentos
+      - main [ref=e45]:
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - button "Voltar" [ref=e48] [cursor=pointer]:
+              - generic [ref=e49]: 
+            - generic [ref=e50]:
+              - generic [ref=e51]: SECAO_221 - Seção 221
+              - generic [ref=e52]: Revisão de Cadastro em Andamento
+          - generic [ref=e53]:
+            - heading "Atividades e conhecimentos" [level=1] [ref=e54]
+            - generic [ref=e56]:
+              - button "Mais ações" [ref=e57] [cursor=pointer]
+              - text:   
+          - generic [ref=e58]:
+            - textbox "Nova atividade" [ref=e60]
+            - button "Adicionar atividade" [ref=e62] [cursor=pointer]:
+              - generic [ref=e63]: 
+          - generic [ref=e66]:
+            - strong [ref=e68]: Atividade Mapeamento 1 1767991490218
+            - generic:
+              - 'button "Editar atividade: Atividade Mapeamento 1 1767991490218"':
+                - generic: 
+              - 'button "Remover atividade: Atividade Mapeamento 1 1767991490218"':
+                - generic: 
+            - generic [ref=e69]:
+              - generic [ref=e70]:
+                - strong [ref=e71]: Conhecimentos *
+                - text: (adicione pelo menos um)
+              - generic [ref=e72]:
+                - generic [ref=e73]: Conhecimento 1
+                - generic:
+                  - 'button "Editar conhecimento: Conhecimento 1"':
+                    - generic: 
+                  - 'button "Remover conhecimento: Conhecimento 1"':
+                    - generic: 
+              - generic [ref=e74]:
+                - textbox "Novo conhecimento" [ref=e76]
+                - button "Adicionar conhecimento" [ref=e78] [cursor=pointer]:
+                  - generic [ref=e79]: 
+          - generic [ref=e82]:
+            - strong [ref=e84]: Atividade Mapeamento 2 1767991490218
+            - generic:
+              - 'button "Editar atividade: Atividade Mapeamento 2 1767991490218"':
+                - generic: 
+              - 'button "Remover atividade: Atividade Mapeamento 2 1767991490218"':
+                - generic: 
+            - generic [ref=e85]:
+              - generic [ref=e86]:
+                - strong [ref=e87]: Conhecimentos *
+                - text: (adicione pelo menos um)
+              - generic [ref=e88]:
+                - generic [ref=e89]: Conhecimento 2
+                - generic:
+                  - 'button "Editar conhecimento: Conhecimento 2"':
+                    - generic: 
+                  - 'button "Remover conhecimento: Conhecimento 2"':
+                    - generic: 
+              - generic [ref=e90]:
+                - textbox "Novo conhecimento" [ref=e92]
+                - button "Adicionar conhecimento" [ref=e94] [cursor=pointer]:
+                  - generic [ref=e95]: 
+          - generic [ref=e98]:
+            - strong [ref=e100]: Atividade Revisão Nova 1767991490218
+            - generic:
+              - 'button "Editar atividade: Atividade Revisão Nova 1767991490218"':
+                - generic: 
+              - 'button "Remover atividade: Atividade Revisão Nova 1767991490218"':
+                - generic: 
+            - generic [ref=e101]:
+              - generic [ref=e102]:
+                - strong [ref=e103]: Conhecimentos *
+                - text: (adicione pelo menos um)
+              - generic [ref=e104]:
+                - generic [ref=e105]: Conhecimento Revisão
+                - generic:
+                  - 'button "Editar conhecimento: Conhecimento Revisão"':
+                    - generic: 
+                  - 'button "Remover conhecimento: Conhecimento Revisão"':
+                    - generic: 
+              - generic [ref=e106]:
+                - textbox "Novo conhecimento" [ref=e108]
+                - button "Adicionar conhecimento" [ref=e110] [cursor=pointer]:
+                  - generic [ref=e111]: 
+          - generic [ref=e114]:
+            - strong [ref=e116]: Atividade Incompleta 1767991490218
+            - generic:
+              - 'button "Editar atividade: Atividade Incompleta 1767991490218"':
+                - generic: 
+              - 'button "Remover atividade: Atividade Incompleta 1767991490218"':
+                - generic: 
+            - generic [ref=e117]:
+              - generic [ref=e118]:
+                - strong [ref=e119]: Conhecimentos *
+                - text: (adicione pelo menos um)
+              - generic [ref=e120]:
+                - textbox "Novo conhecimento" [ref=e122]
+                - button "Adicionar conhecimento" [ref=e124] [cursor=pointer]:
+                  - generic [ref=e125]: 
+      - contentinfo [ref=e126]:
+        - generic [ref=e127]:
+          - generic [ref=e128]: Versão 1.0.0
+          - generic [ref=e129]: © SESEL/COSIS/TRE-PE
+  - text: 
+```
