@@ -30,6 +30,7 @@ public class SubprocessoPermissaoCalculator {
                 .podeVerPagina(podeExecutar(usuario, Acao.VISUALIZAR_SUBPROCESSO, subprocesso))
                 .podeEditarMapa(podeExecutar(usuario, Acao.EDITAR_MAPA, subprocesso))
                 .podeVisualizarMapa(podeExecutar(usuario, Acao.VISUALIZAR_MAPA, subprocesso))
+                .podeDisponibilizarMapa(podeExecutar(usuario, Acao.DISPONIBILIZAR_MAPA, subprocesso))
                 .podeDisponibilizarCadastro(podeExecutar(usuario, Acao.DISPONIBILIZAR_CADASTRO, subprocesso))
                 .podeDevolverCadastro(podeExecutar(usuario, Acao.DEVOLVER_CADASTRO, subprocesso))
                 .podeAceitarCadastro(podeExecutar(usuario, Acao.ACEITAR_CADASTRO, subprocesso))

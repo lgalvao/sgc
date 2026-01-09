@@ -11,6 +11,7 @@ public class SubprocessoPermissoesDto {
     private final boolean podeVerPagina;
     private final boolean podeEditarMapa;
     private final boolean podeVisualizarMapa;
+    private final boolean podeDisponibilizarMapa;
     private final boolean podeDisponibilizarCadastro;
     private final boolean podeDevolverCadastro;
     private final boolean podeAceitarCadastro;

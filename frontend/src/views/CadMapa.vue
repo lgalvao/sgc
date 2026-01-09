@@ -34,6 +34,7 @@
           <i class="bi bi-arrow-right-circle me-2"/>Impacto no mapa
         </BButton>
         <BButton
+            v-if="podeDisponibilizarMapa"
             :disabled="competencias.length === 0"
             data-testid="btn-cad-mapa-disponibilizar"
             variant="outline-success"
@@ -47,6 +48,7 @@
     <div v-if="unidade">
       <div class="mb-4 mt-3">
         <BButton
+            v-if="podeEditarMapa"
             class="mb-3"
             data-testid="btn-abrir-criar-competencia"
             variant="outline-primary"
@@ -60,6 +62,7 @@
             :key="comp.codigo"
             :atividades="atividades"
             :competencia="comp"
+            :pode-editar="podeEditarMapa"
             @editar="iniciarEdicaoCompetencia"
             @excluir="excluirCompetencia"
             @remover-atividade="removerAtividadeAssociada"
@@ -143,6 +146,20 @@ const siglaUnidade = computed(() => String(route.params.siglaUnidade));
 const podeVerImpacto = computed(() => {
   return (
       subprocessosStore.subprocessoDetalhe?.permissoes?.podeVisualizarImpacto ||
+      false
+  );
+});
+
+const podeEditarMapa = computed(() => {
+  return (
+      subprocessosStore.subprocessoDetalhe?.permissoes?.podeEditarMapa ||
+      false
+  );
+});
+
+const podeDisponibilizarMapa = computed(() => {
+  return (
+      subprocessosStore.subprocessoDetalhe?.permissoes?.podeDisponibilizarMapa ||
       false
   );
 });
