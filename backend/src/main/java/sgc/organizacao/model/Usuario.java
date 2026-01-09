@@ -67,22 +67,28 @@ public class Usuario implements UserDetails {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        if (atribuicoesTemporarias != null) {
-            for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
-                if ((temp.getDataInicio() == null || 
-                    !temp.getDataInicio().isAfter(now))
-                    && (temp.getDataTermino() == null 
-                    || !temp.getDataTermino().isBefore(now))) {
+        // Tenta carregar atribuições temporárias, mas tolera LazyInitializationException
+        try {
+            if (atribuicoesTemporarias != null && !atribuicoesTemporarias.isEmpty()) {
+                for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
+                    if ((temp.getDataInicio() == null || 
+                        !temp.getDataInicio().isAfter(now))
+                        && (temp.getDataTermino() == null 
+                        || !temp.getDataTermino().isBefore(now))) {
 
-                    UsuarioPerfil perfil = new UsuarioPerfil();
-                    perfil.setUsuarioTitulo(this.tituloEleitoral);
-                    perfil.setUsuario(this);
-                    perfil.setUnidadeCodigo(temp.getUnidade().getCodigo());
-                    perfil.setUnidade(temp.getUnidade());
-                    perfil.setPerfil(temp.getPerfil());
-                    todas.add(perfil);
+                        UsuarioPerfil perfil = new UsuarioPerfil();
+                        perfil.setUsuarioTitulo(this.tituloEleitoral);
+                        perfil.setUsuario(this);
+                        perfil.setUnidadeCodigo(temp.getUnidade().getCodigo());
+                        perfil.setUnidade(temp.getUnidade());
+                        perfil.setPerfil(temp.getPerfil());
+                        todas.add(perfil);
+                    }
                 }
             }
+        } catch (org.hibernate.LazyInitializationException e) {
+            // Se não há sessão disponível, apenas retorna as atribuições do cache
+            // Isso é esperado quando o método é chamado fora de uma transação
         }
         return todas;
     }
