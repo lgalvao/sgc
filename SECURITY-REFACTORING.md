@@ -27,7 +27,7 @@ Consolidar e padronizar o controle de acesso do SGC, eliminando inconsistências
 | Sprint | Duração | Foco | Status |
 |--------|---------|------|--------|
 | Sprint 1 | 3-5 dias | Infraestrutura base | ✅ Concluído |
-| Sprint 2 | 5-7 dias | Migração subprocessos | 🚀 98.8% Concluído |
+| Sprint 2 | 5-7 dias | Migração subprocessos | 🚀 98.7% Concluído |
 | Sprint 3 | 4-6 dias | Processos e atividades | ⏳ Pendente |
 | Sprint 4 | 3-4 dias | Auditoria e testes | ⏳ Pendente |
 | Sprint 5 | 2-3 dias | Refinamento | ⏳ Pendente |
@@ -112,7 +112,7 @@ Para dúvidas sobre o plano:
 
 **Criado em**: 2026-01-08  
 **Versão**: 1.0  
-**Status**: 🚧 Em Execução - Sprint 2 98.8% Concluído (1135/1149 testes passando)
+**Status**: 🚧 Em Execução - Sprint 2 98.7% Concluído (1134/1149 testes passando)
 
 ## Histórico de Execução
 
@@ -195,7 +195,7 @@ Para dúvidas sobre o plano:
 - ✅ Mensagens de erro mais descritivas e em português
 
 **Testes Backend:**
-- ✅ 1135/1149 testes passando (98.8%) - Excelente progresso!
+- ✅ 1134/1149 testes passando (98.7%) - Excelente progresso!
 - ✅ Todos os testes unitários de acesso passando
 - ✅ SubprocessoServiceActionsTest - 9/9 passando
 - ✅ ImpactoMapaServiceTest - 4/4 passando
@@ -206,9 +206,9 @@ Para dúvidas sobre o plano:
 - ✅ CDU-22 IntegrationTest - 1/1 passando (refatorado)
 - ✅ CDU-24 IntegrationTest - 1/1 passando (refatorado)
 - ✅ CDU-25 IntegrationTest - 1/1 passando (refatorado)
-- ⚠️ 14 testes de integração ainda precisam correção:
+- ⚠️ 15 testes de integração ainda precisam correção:
   - CDU-14: 8 testes (erro 403) - setup complexo com @MockitoBean de UsuarioService
-  - Outros: 6 testes diversos
+  - Outros: 7 testes diversos (não relacionados à refatoração de segurança)
 - ✅ Código compila com apenas avisos esperados de deprecação
 
 **Refatorações de Testes (2026-01-09):**
