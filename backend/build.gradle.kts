@@ -118,7 +118,7 @@ tasks.withType<Test> {
     
     testLogging {
         events(TestLogEvent.SKIPPED, TestLogEvent.FAILED)
-        exceptionFormat = TestExceptionFormat.FULL
+        exceptionFormat = TestExceptionFormat.SHORT
         showStackTraces = true
         showCauses = true
         showStandardStreams = false
@@ -142,7 +142,7 @@ tasks.withType<Test> {
                 println(output)
 
                 if (slowTests.isNotEmpty()) {
-                    println("\nTop 10 Testes mais lentos (> 200ms):")
+                    println("\nTestes mais lentos (> 1s):")
                     slowTests.sortedByDescending { it.second }
                         .take(10)
                         .forEach { (name, time) ->
@@ -154,7 +154,7 @@ tasks.withType<Test> {
         override fun beforeTest(testDescriptor: TestDescriptor) {}
         override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {
             val duration = result.endTime - result.startTime
-            if (duration > 200) {
+            if (duration > 1000) {
                 slowTests.add("${testDescriptor.className} > ${testDescriptor.name}" to duration)
             }
         }

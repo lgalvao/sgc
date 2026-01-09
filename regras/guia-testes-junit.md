@@ -116,7 +116,7 @@ class ProcessoServiceTest {
 
 ```java
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes Unitários para ProcessoService")
+@DisplayName("ProcessoService")
 class ProcessoServiceTest {
     
     @Mock

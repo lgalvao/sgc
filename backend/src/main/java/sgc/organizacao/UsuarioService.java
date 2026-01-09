@@ -508,14 +508,16 @@ public class UsuarioService {
     }
 
     private AdministradorDto toAdministradorDto(Usuario usuario) {
+        if (usuario == null) return null;
+        
         Unidade unidadeLotacao = usuario.getUnidadeLotacao();
 
         return AdministradorDto.builder()
                 .tituloEleitoral(usuario.getTituloEleitoral())
                 .nome(usuario.getNome())
                 .matricula(usuario.getMatricula())
-                .unidadeCodigo(unidadeLotacao.getCodigo())
-                .unidadeSigla(unidadeLotacao.getSigla())
+                .unidadeCodigo(unidadeLotacao != null ? unidadeLotacao.getCodigo() : null)
+                .unidadeSigla(unidadeLotacao != null ? unidadeLotacao.getSigla() : null)
                 .build();
     }
 

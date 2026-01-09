@@ -262,70 +262,67 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
      */
     private boolean canExecuteVerificarImpactos(Usuario usuario, Subprocesso subprocesso) {
         SituacaoSubprocesso situacao = subprocesso.getSituacao();
-        
-        // Verifica se o usuário tem algum dos perfis permitidos
         Set<Perfil> perfisUsuario = usuario.getTodasAtribuicoes().stream()
                 .map(UsuarioPerfil::getPerfil)
                 .collect(java.util.stream.Collectors.toSet());
         
-        if (perfisUsuario.contains(CHEFE)) {
-            // CHEFE pode verificar impactos em NAO_INICIADO ou REVISAO_CADASTRO_EM_ANDAMENTO
-            // E deve estar na mesma unidade
-            if (situacao == NAO_INICIADO || situacao == REVISAO_CADASTRO_EM_ANDAMENTO) {
-                if (verificaHierarquia(usuario, subprocesso, RequisitoHierarquia.MESMA_UNIDADE)) {
-                    return true;
-                } else {
-                    ultimoMotivoNegacao = obterMotivoNegacaoHierarquia(
-                            usuario, subprocesso, RequisitoHierarquia.MESMA_UNIDADE
-                    );
-                    return false;
-                }
-            }
+        if (isChefeVerificarImpactosPermitido(perfisUsuario, situacao, usuario, subprocesso)) {
+            return true;
         }
         
-        if (perfisUsuario.contains(GESTOR)) {
-            // GESTOR pode verificar impactos em REVISAO_CADASTRO_DISPONIBILIZADA
-            if (situacao == REVISAO_CADASTRO_DISPONIBILIZADA) {
-                return true;
-            }
+        if (perfisUsuario.contains(GESTOR) && situacao == REVISAO_CADASTRO_DISPONIBILIZADA) {
+            return true;
         }
         
-        if (perfisUsuario.contains(ADMIN)) {
-            // ADMIN pode verificar impactos em REVISAO_CADASTRO_DISPONIBILIZADA, 
-            // REVISAO_CADASTRO_HOMOLOGADA ou REVISAO_MAPA_AJUSTADO
-            if (situacao == REVISAO_CADASTRO_DISPONIBILIZADA 
-                    || situacao == REVISAO_CADASTRO_HOMOLOGADA
-                    || situacao == REVISAO_MAPA_AJUSTADO) {
-                return true;
-            }
+        if (perfisUsuario.contains(ADMIN) && 
+            (situacao == REVISAO_CADASTRO_DISPONIBILIZADA 
+                || situacao == REVISAO_CADASTRO_HOMOLOGADA
+                || situacao == REVISAO_MAPA_AJUSTADO)) {
+            return true;
         }
         
-        // Se chegou aqui, não tem permissão
-        if (perfisUsuario.isEmpty() || (!perfisUsuario.contains(CHEFE) 
-                && !perfisUsuario.contains(GESTOR) && !perfisUsuario.contains(ADMIN))) {
-            ultimoMotivoNegacao = String.format(
-                    "Usuário '%s' não possui um dos perfis necessários: ADMIN, GESTOR, CHEFE",
-                    usuario.getTituloEleitoral()
-            );
-        } else {
-            // Tem o perfil mas a situação não é permitida
-            String situacoesPermitidas;
-            if (perfisUsuario.contains(ADMIN)) {
-                situacoesPermitidas = "REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO";
-            } else if (perfisUsuario.contains(GESTOR)) {
-                situacoesPermitidas = "REVISAO_CADASTRO_DISPONIBILIZADA";
-            } else {
-                situacoesPermitidas = "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO";
-            }
-            ultimoMotivoNegacao = String.format(
-                    "Ação 'VERIFICAR_IMPACTOS' não pode ser executada com o subprocesso na situação '%s'. " +
-                    "Situações permitidas para o perfil do usuário: %s",
-                    subprocesso.getSituacao().getDescricao(),
-                    situacoesPermitidas
-            );
-        }
-        
+        definirMotivoNegacaoVerificarImpactos(perfisUsuario, subprocesso);
         return false;
+    }
+
+    private boolean isChefeVerificarImpactosPermitido(Set<Perfil> perfis, SituacaoSubprocesso situacao, 
+                                                   Usuario usuario, Subprocesso subprocesso) {
+        if (perfis.contains(CHEFE) && (situacao == NAO_INICIADO || situacao == REVISAO_CADASTRO_EM_ANDAMENTO)) {
+            if (verificaHierarquia(usuario, subprocesso, RequisitoHierarquia.MESMA_UNIDADE)) {
+                return true;
+            }
+            ultimoMotivoNegacao = obterMotivoNegacaoHierarquia(
+                    usuario, subprocesso, RequisitoHierarquia.MESMA_UNIDADE
+            );
+            return false;
+        }
+        return false;
+    }
+
+    private void definirMotivoNegacaoVerificarImpactos(Set<Perfil> perfis, Subprocesso subprocesso) {
+        if (!perfis.contains(CHEFE) && !perfis.contains(GESTOR) && !perfis.contains(ADMIN)) {
+            ultimoMotivoNegacao = "O usuário não possui um dos perfis necessários: ADMIN, GESTOR, CHEFE";
+            return;
+        }
+
+        String situacoesPermitidas = switch (perfis.stream().findFirst().orElse(null)) {
+            case ADMIN -> "REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO";
+            case GESTOR -> "REVISAO_CADASTRO_DISPONIBILIZADA";
+            default -> "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO";
+        };
+
+        if (perfis.contains(ADMIN)) {
+            situacoesPermitidas = "REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO";
+        } else if (perfis.contains(GESTOR)) {
+            situacoesPermitidas = "REVISAO_CADASTRO_DISPONIBILIZADA";
+        }
+
+        ultimoMotivoNegacao = String.format(
+                "Ação 'VERIFICAR_IMPACTOS' não pode ser executada com o subprocesso na situação '%s'. " +
+                "Situações permitidas para o perfil do usuário: %s",
+                subprocesso.getSituacao().getDescricao(),
+                situacoesPermitidas
+        );
     }
 
     @Override
@@ -364,8 +361,7 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
             
             case TITULAR_UNIDADE -> {
                 String tituloTitular = unidadeSubprocesso.getTituloTitular();
-                yield tituloTitular != null 
-                        && tituloTitular.equals(usuario.getTituloEleitoral());
+                yield tituloTitular.equals(usuario.getTituloEleitoral());
             }
         };
     }
@@ -394,8 +390,7 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
                         ? unidadeSubprocesso.getTituloTitular() : "não definido";
                 yield String.format(
                         "Usuário '%s' não é o titular da unidade '%s'. Titular: %s",
-                        usuario.getTituloEleitoral(), siglaUnidade, 
-                        tituloTitular != null ? tituloTitular : "não definido"
+                        usuario.getTituloEleitoral(), siglaUnidade, tituloTitular
                 );
             }
             case NENHUM -> "Erro inesperado na verificação de hierarquia";

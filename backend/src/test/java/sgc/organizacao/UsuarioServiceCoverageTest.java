@@ -433,7 +433,7 @@ class UsuarioServiceCoverageTest {
     }
 
     @Test
-    @DisplayName("entrar: erro se unidade não encontrada")
+    @DisplayName("entrar: erro se unidade não encontrada (ou sem acesso)")
     void entrar_ErroUnidadeNaoEncontrada() {
         // Simular autenticação recente
         @SuppressWarnings("unchecked")
@@ -442,10 +442,13 @@ class UsuarioServiceCoverageTest {
 
         EntrarReq req = EntrarReq.builder().tituloEleitoral("user").unidadeCodigo(1L).build();
 
-        when(unidadeService.buscarEntidadePorId(1L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 1L));
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("user");
+        when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.of(u));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("user")).thenReturn(Collections.emptyList());
 
         assertThatThrownBy(() -> service.entrar(req))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroAccessoNegado.class);
     }
 
     @Test
@@ -457,8 +460,6 @@ class UsuarioServiceCoverageTest {
         auths.put("user", java.time.LocalDateTime.now());
 
         EntrarReq req = EntrarReq.builder().tituloEleitoral("user").unidadeCodigo(1L).perfil("GESTOR").build();
-
-        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(new Unidade());
 
         Usuario u = new Usuario();
         u.setTituloEleitoral("user");
@@ -479,13 +480,12 @@ class UsuarioServiceCoverageTest {
 
         EntrarReq req = EntrarReq.builder().tituloEleitoral("user").unidadeCodigo(1L).perfil("CHEFE").build();
 
+        // Mock da unidade para evitar NPE ao mapear DTO de autorização
         Unidade unidade = new Unidade();
         ReflectionTestUtils.setField(unidade, "codigo", 1L);
         ReflectionTestUtils.setField(unidade, "nome", "U");
         ReflectionTestUtils.setField(unidade, "sigla", "S");
         ReflectionTestUtils.setField(unidade, "tipo", TipoUnidade.OPERACIONAL);
-
-        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidade);
 
         Usuario u = new Usuario();
         u.setTituloEleitoral("user");

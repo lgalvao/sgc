@@ -8,9 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioService;
@@ -31,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes Unitários para SubprocessoService")
+@DisplayName("SubprocessoService")
 class SubprocessoServiceTest {
     @Mock
     private UsuarioService usuarioService;
@@ -47,17 +44,10 @@ class SubprocessoServiceTest {
     @InjectMocks
     private SubprocessoService service;
 
-    private void mockSecurityContext(String username) {
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getName()).thenReturn(username);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-    }
+
 
     @AfterEach
     void tearDown() {
-        SecurityContextHolder.clearContext();
     }
 
     @Nested
@@ -240,9 +230,8 @@ class SubprocessoServiceTest {
         @Test
         @DisplayName("obterDetalhes sucesso")
         void obterDetalhesSucesso() {
-            mockSecurityContext("admin");
             Usuario admin = new Usuario();
-            when(usuarioService.buscarPorLogin("admin")).thenReturn(admin);
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(admin);
 
             when(detalheService.obterDetalhes(1L, Perfil.ADMIN, admin))
                     .thenReturn(SubprocessoDetalheDto.builder().build());
@@ -254,9 +243,8 @@ class SubprocessoServiceTest {
         @Test
         @DisplayName("obterPermissoes")
         void obterPermissoes() {
-            mockSecurityContext("user");
             Usuario user = new Usuario();
-            when(usuarioService.buscarPorLogin("user")).thenReturn(user);
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(user);
 
             when(detalheService.obterPermissoes(1L, user))
                     .thenReturn(SubprocessoPermissoesDto.builder().build());
@@ -268,7 +256,9 @@ class SubprocessoServiceTest {
         @Test
         @DisplayName("obterPermissoes lança exceção quando não autenticado")
         void obterPermissoesSemAutenticacao() {
-            SecurityContextHolder.clearContext();
+            when(usuarioService.obterUsuarioAutenticado())
+                    .thenThrow(new sgc.comum.erros.ErroAccessoNegado("Nenhum usuário autenticado"));
+
             org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () ->
                     service.obterPermissoes(1L)
             );
@@ -277,11 +267,8 @@ class SubprocessoServiceTest {
         @Test
         @DisplayName("obterPermissoes lança exceção quando autenticação não tem nome")
         void obterPermissoesComAutenticacaoSemNome() {
-            Authentication authentication = mock(Authentication.class);
-            when(authentication.getName()).thenReturn(null);
-            SecurityContext securityContext = mock(SecurityContext.class);
-            when(securityContext.getAuthentication()).thenReturn(authentication);
-            SecurityContextHolder.setContext(securityContext);
+            when(usuarioService.obterUsuarioAutenticado())
+                    .thenThrow(new sgc.comum.erros.ErroAccessoNegado("Usuário sem nome"));
 
             org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () ->
                     service.obterPermissoes(1L)
