@@ -28,6 +28,7 @@ import sgc.mapa.model.*;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.ConhecimentoService;
 import sgc.mapa.service.ImpactoMapaService;
+import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioRepo;
@@ -69,6 +70,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
     @Autowired private SubprocessoRepo subprocessoRepo;
     @Autowired private UnidadeRepo unidadeRepo;
     @Autowired private UsuarioRepo usuarioRepo;
+    @Autowired private UsuarioService usuarioService;
     @Autowired private JdbcTemplate jdbcTemplate;
     @Autowired private CompetenciaRepo competenciaRepo;
     @Autowired private AtividadeRepo atividadeRepo;
@@ -103,23 +105,23 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
         // Chefe SENIC (11): '12' (Taís Condida) - Already in data.sql
         // Ensure profile CHEFE for 11 exists.
         criarUsuarioETitulo("90001", "Chefe Mapeamento", 11L, "CHEFE", 11L);
-        chefeMapeamento = usuarioRepo.findById("90001").orElseThrow();
+        chefeMapeamento = usuarioService.buscarPorLogin("90001");
 
         // Gestor COSINF (7): Need to create one.
         criarUsuarioETitulo("90002", "Gestor Mapeamento", 7L, "GESTOR", 7L);
-        gestorMapeamento = usuarioRepo.findById("90002").orElseThrow();
+        gestorMapeamento = usuarioService.buscarPorLogin("90002");
 
         // Admin: '6' (Ricardo Alves) - STIC (2) - Already in data.sql
-        admin = usuarioRepo.findById("6").orElseThrow();
+        admin = usuarioService.buscarPorLogin("6");
 
         // --- Setup Revisao Users ---
         // Chefe SEDIA (9): '333333333333' - Already in data.sql
         // Ensure titular of SEDIA is correct
         jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET titulo_titular = ? WHERE codigo = ?", "333333333333", 9L);
-        chefeRevisao = usuarioRepo.findById("333333333333").orElseThrow();
+        chefeRevisao = usuarioService.buscarPorLogin("333333333333");
 
         // Gestor COSIS (6): '666666666666' - Already in data.sql
-        gestorRevisao = usuarioRepo.findById("666666666666").orElseThrow();
+        gestorRevisao = usuarioService.buscarPorLogin("666666666666");
     }
 
     private void criarUsuarioETitulo(String titulo, String nome, Long unidadeLotacao, String perfil, Long unidadePerfil) {

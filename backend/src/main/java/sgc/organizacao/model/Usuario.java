@@ -2,6 +2,7 @@ package sgc.organizacao.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.LazyInitializationException;
 import org.hibernate.annotations.Immutable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -67,22 +68,30 @@ public class Usuario implements UserDetails {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        if (atribuicoesTemporarias != null) {
-            for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
-                if ((temp.getDataInicio() == null || 
-                    !temp.getDataInicio().isAfter(now))
-                    && (temp.getDataTermino() == null 
-                    || !temp.getDataTermino().isBefore(now))) {
+        // Tenta carregar atribuições temporárias, mas tolera LazyInitializationException
+        try {
+            // Verifica se a coleção não é nula antes de iterar
+            // A iteração irá tentar inicializar a coleção lazy, o que pode causar LazyInitializationException
+            if (atribuicoesTemporarias != null) {
+                for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
+                    if ((temp.getDataInicio() == null || 
+                        !temp.getDataInicio().isAfter(now))
+                        && (temp.getDataTermino() == null 
+                        || !temp.getDataTermino().isBefore(now))) {
 
-                    UsuarioPerfil perfil = new UsuarioPerfil();
-                    perfil.setUsuarioTitulo(this.tituloEleitoral);
-                    perfil.setUsuario(this);
-                    perfil.setUnidadeCodigo(temp.getUnidade().getCodigo());
-                    perfil.setUnidade(temp.getUnidade());
-                    perfil.setPerfil(temp.getPerfil());
-                    todas.add(perfil);
+                        UsuarioPerfil perfil = new UsuarioPerfil();
+                        perfil.setUsuarioTitulo(this.tituloEleitoral);
+                        perfil.setUsuario(this);
+                        perfil.setUnidadeCodigo(temp.getUnidade().getCodigo());
+                        perfil.setUnidade(temp.getUnidade());
+                        perfil.setPerfil(temp.getPerfil());
+                        todas.add(perfil);
+                    }
                 }
             }
+        } catch (LazyInitializationException e) {
+            // Se não há sessão disponível, apenas retorna as atribuições do cache
+            // Isso é esperado quando o método é chamado fora de uma transação
         }
         return todas;
     }

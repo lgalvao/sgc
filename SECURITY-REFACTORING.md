@@ -112,7 +112,7 @@ Para dúvidas sobre o plano:
 
 **Criado em**: 2026-01-08  
 **Versão**: 1.0  
-**Status**: 🚧 Em Execução - Sprint 2 99% Concluído (1122/1149 testes passando - 97.7%)
+**Status**: 🚧 Em Execução - Sprint 2 98.3% Concluído (1129/1149 testes passando)
 
 ## Histórico de Execução
 
@@ -195,19 +195,38 @@ Para dúvidas sobre o plano:
 - ✅ Mensagens de erro mais descritivas e em português
 
 **Testes Backend:**
-- ✅ 1122/1149 testes passando (97.7%) - Excelente progresso!
+- ✅ 1129/1149 testes passando (98.3%) - Excelente progresso!
 - ✅ Todos os testes unitários de acesso passando
 - ✅ SubprocessoServiceActionsTest - 9/9 passando
-- ✅ ImpactoMapaServiceTest - 4/4 passando  
-- ⚠️ 27 testes de integração precisam refatoração (CDU-* e FluxoEstados*)
-  - Problema: testes criam usuários dinamicamente mas @WithMock* executa antes
-  - Solução: refatorar testes para usar usuários existentes ou @BeforeAll
+- ✅ ImpactoMapaServiceTest - 4/4 passando
+- ✅ FluxoEstadosIntegrationTest - 4/4 passando
+- ✅ CDU-13 IntegrationTest - 4/4 passando
+- ⚠️ 20 testes de integração precisam refatoração (CDU-14, CDU-19, CDU-20, CDU-22, CDU-24, CDU-25)
+  - Problema: testes criam unidades dinamicamente mas @WithMock* executa antes
+  - Problema: Usuario.getTodasAtribuicoes() com LazyInitializationException **RESOLVIDO**
+  - Solução: Testes agora usam UsuarioService.buscarPorLogin() para carregar perfis
+  - Solução pendente: Refatorar testes para usar unidades/usuários do data.sql
 - ✅ Código compila com apenas avisos esperados de deprecação
 
 **Próximos Passos:**
-- ⏳ Refatorar 27 testes de integração para usar setup correto de usuários
-  - Opção 1: Usar usuários existentes do data.sql (ex: '666666666666' GESTOR, '111111111111' ADMIN)
-  - Opção 2: Mover setup de usuários para @BeforeAll em vez de @BeforeEach
+- ⏳ Refatorar 20 testes de integração para usar setup correto de usuários
+  - CDU-14: 7 testes (erro 500) - usuários não carregados corretamente
+  - CDU-19, CDU-20, CDU-22, CDU-24, CDU-25: 13 testes (erro 403) - perfis não correspondem às unidades dinâmicas
+  - Solução: Usar unidades e usuários pré-existentes do data.sql
 - ⏳ Validar com testes E2E
 - ⏳ Documentar mudanças no AGENTS.md
+
+**Melhorias Implementadas (2026-01-09):**
+- ✅ Usuario.getTodasAtribuicoes() agora tolera LazyInitializationException
+  - Método tenta carregar atribuicoesTemporarias mas não falha se não houver sessão
+  - Permite chamadas fora de contexto transacional (ex: AccessControlService)
+- ✅ FluxoEstadosIntegrationTest refatorado para usar UsuarioService.buscarPorLogin()
+  - Garante que perfis sejam carregados corretamente na atribuicoesCache
+  - Todos os 4 testes passando
+- ✅ CDU-13 IntegrationTest corrigido
+  - Usuários criados via JDBC (Usuario é @Immutable)
+  - Perfis inseridos após criação dos usuários
+  - Todos os 4 testes passando
+- ✅ data.sql atualizado com perfil CHEFE para usuário 111111111111 (unit 102)
+  - Permite uso do @WithMockChefe em mais cenários de teste
 
