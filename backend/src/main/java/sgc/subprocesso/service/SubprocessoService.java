@@ -3,10 +3,8 @@ package sgc.subprocesso.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioService;
@@ -130,11 +128,6 @@ public class SubprocessoService {
     // --- Métodos do SubprocessoValidacaoService ---
 
     @Transactional(readOnly = true)
-    public void validarPermissaoEdicaoMapa(Long mapaCodigo, String tituloUsuario) {
-        validacaoService.validarPermissaoEdicaoMapa(mapaCodigo, tituloUsuario);
-    }
-
-    @Transactional(readOnly = true)
     public List<Atividade> obterAtividadesSemConhecimento(Long codSubprocesso) {
         return validacaoService.obterAtividadesSemConhecimento(codSubprocesso);
     }
@@ -187,11 +180,6 @@ public class SubprocessoService {
     // --- Helper Methods ---
 
     private Usuario obterUsuarioAutenticado() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication.getName() == null) {
-            throw new ErroAccessoNegado("Usuário não autenticado.");
-        }
-        String username = authentication.getName();
-        return usuarioService.buscarPorLogin(username);
+        return usuarioService.obterUsuarioAutenticado();
     }
 }

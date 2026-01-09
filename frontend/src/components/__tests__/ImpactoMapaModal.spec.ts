@@ -102,19 +102,19 @@ describe("ImpactoMapaModal.vue", () => {
                     codigo: 1,
                     descricao: "Competência A",
                     atividadesAfetadas: ["Ativ 1"],
-                    tipoImpacto: TipoImpactoCompetencia.ATIVIDADE_REMOVIDA,
+                    tiposImpacto: [TipoImpactoCompetencia.ATIVIDADE_REMOVIDA],
                 },
                 {
                     codigo: 2,
                     descricao: "Competência B",
                     atividadesAfetadas: ["Ativ 2"],
-                    tipoImpacto: TipoImpactoCompetencia.ATIVIDADE_ALTERADA,
+                    tiposImpacto: [TipoImpactoCompetencia.ATIVIDADE_ALTERADA],
                 },
                 {
                     codigo: 3,
                     descricao: "Competência C",
-                    atividadesAfetadas: ["Ativ 3"],
-                    tipoImpacto: TipoImpactoCompetencia.IMPACTO_GENERICO,
+                    atividadesAfetadas: ["Ativ 3", "Ativ 4"],
+                    tiposImpacto: [TipoImpactoCompetencia.ATIVIDADE_REMOVIDA, TipoImpactoCompetencia.ATIVIDADE_ALTERADA],
                 },
             ],
         };
@@ -130,7 +130,8 @@ describe("ImpactoMapaModal.vue", () => {
         expect(wrapper.text()).toContain("Atividade Alterada"); // Formatação do tipo
 
         expect(wrapper.text()).toContain("Competência C");
-        expect(wrapper.text()).toContain("Alteração no Mapa"); // Formatação do tipo
+        // Competência C tem múltiplos tipos
+        expect(wrapper.text()).toContain("Atividade Removida, Atividade Alterada");
     });
 
     it("deve emitir evento 'fechar' ao clicar no botão", async () => {

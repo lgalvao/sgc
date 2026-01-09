@@ -35,8 +35,8 @@ public class CompetenciaImpactadaDto {
     private List<String> atividadesAfetadas; // Descrições das atividades que causaram impacto
 
     /**
-     * O tipo de impacto sofrido pela competência (e.g., nova atividade associada).
+     * Os tipos de impacto sofridos pela competência.
+     * Uma competência pode ser afetada por múltiplos tipos de mudança (ex: atividade removida E alterada).
      */
-    private TipoImpactoCompetencia
-            tipoImpacto; // NOVA_ATIVIDADE, ATIVIDADE_REMOVIDA, ATIVIDADE_ALTERADA
+    private List<TipoImpactoCompetencia> tiposImpacto;
 }

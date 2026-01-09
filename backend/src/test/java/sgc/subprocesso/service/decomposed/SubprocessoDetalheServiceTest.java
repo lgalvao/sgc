@@ -116,8 +116,8 @@ class SubprocessoDetalheServiceTest {
     }
 
     @Test
-    @DisplayName("Deve listar atividades tratando conhecimentos nulos")
-    void deveListarAtividadesTratandoConhecimentosNulos() {
+    @DisplayName("Deve listar atividades tratando conhecimentos vazios")
+    void deveListarAtividadesTratandoConhecimentosVazios() {
         Subprocesso sp = new Subprocesso();
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
@@ -126,7 +126,7 @@ class SubprocessoDetalheServiceTest {
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         Atividade ativ = new Atividade();
         ativ.setDescricao("Test");
-        ativ.setConhecimentos(null);
+        ativ.setConhecimentos(List.of());
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(ativ));
 
         List<AtividadeVisualizacaoDto> result = service.listarAtividadesSubprocesso(1L);
@@ -353,22 +353,22 @@ class SubprocessoDetalheServiceTest {
     }
 
     @Test
-    @DisplayName("Obter cadastro com atividades null")
-    void obterCadastroAtividadesNull() {
+    @DisplayName("Obter cadastro com atividades vazias")
+    void obterCadastroAtividadesVazias() {
         Subprocesso sp = new Subprocesso();
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
         sp.setUnidade(new Unidade());
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(null);
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of());
 
         SubprocessoCadastroDto dto = service.obterCadastro(1L);
         assertThat(dto.getAtividades()).isEmpty();
     }
 
     @Test
-    @DisplayName("Obter cadastro com atividades sem conhecimentos (null)")
-    void obterCadastroConhecimentosNull() {
+    @DisplayName("Obter cadastro com atividades sem conhecimentos")
+    void obterCadastroConhecimentosVazios() {
         Subprocesso sp = new Subprocesso();
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
@@ -378,7 +378,7 @@ class SubprocessoDetalheServiceTest {
         Atividade a = new Atividade();
         a.setCodigo(1L);
         a.setDescricao("Test");
-        a.setConhecimentos(null);
+        a.setConhecimentos(List.of());
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(a));
 
         SubprocessoCadastroDto dto = service.obterCadastro(1L);

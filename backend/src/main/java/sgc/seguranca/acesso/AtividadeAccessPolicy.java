@@ -49,6 +49,7 @@ public class AtividadeAccessPolicy implements AccessPolicy<Atividade> {
     );
 
     @Override
+    @SuppressWarnings("squid:S2589") // Sonar FP: Atividade.mapa é @Nullable, pode ser null
     public boolean canExecute(Usuario usuario, Acao acao, Atividade atividade) {
         RegrasAcaoAtividade regras = REGRAS.get(acao);
         if (regras == null) {
@@ -74,12 +75,8 @@ public class AtividadeAccessPolicy implements AccessPolicy<Atividade> {
                 return false;
             }
 
+            // Subprocesso nunca é null (nullable=false na FK)
             Subprocesso subprocesso = mapa.getSubprocesso();
-            if (subprocesso == null) {
-                ultimoMotivoNegacao = "Mapa não possui subprocesso associado";
-                return false;
-            }
-
             Unidade unidade = subprocesso.getUnidade();
             if (unidade == null) {
                 ultimoMotivoNegacao = "Subprocesso não possui unidade associada";
@@ -87,12 +84,12 @@ public class AtividadeAccessPolicy implements AccessPolicy<Atividade> {
             }
 
             String tituloTitular = unidade.getTituloTitular();
-            if (tituloTitular == null || !tituloTitular.equals(usuario.getTituloEleitoral())) {
+            if (!usuario.getTituloEleitoral().equals(tituloTitular)) {
                 ultimoMotivoNegacao = String.format(
                         "Usuário '%s' não é o titular da unidade '%s'. Titular: %s",
                         usuario.getTituloEleitoral(),
                         unidade.getSigla(),
-                        tituloTitular != null ? tituloTitular : "não definido"
+                        java.util.Objects.toString(tituloTitular, "não definido")
                 );
                 return false;
             }

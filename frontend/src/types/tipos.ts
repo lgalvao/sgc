@@ -439,7 +439,6 @@ export enum TipoImpactoAtividade {
 export enum TipoImpactoCompetencia {
     ATIVIDADE_REMOVIDA = "ATIVIDADE_REMOVIDA",
     ATIVIDADE_ALTERADA = "ATIVIDADE_ALTERADA",
-    IMPACTO_GENERICO = "IMPACTO_GENERICO",
 }
 
 export interface AtividadeImpactada {
@@ -454,7 +453,7 @@ export interface CompetenciaImpactada {
     codigo: number;
     descricao: string;
     atividadesAfetadas: string[];
-    tipoImpacto: TipoImpactoCompetencia;
+    tiposImpacto: TipoImpactoCompetencia[];
 }
 
 export interface ImpactoMapa {

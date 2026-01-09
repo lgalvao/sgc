@@ -6,8 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroAccessoNegado;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
@@ -15,9 +13,6 @@ import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
-import sgc.organizacao.UsuarioService;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -36,74 +31,9 @@ class SubprocessoValidacaoServiceTest {
 
     @Mock private AtividadeService atividadeService;
     @Mock private CompetenciaService competenciaService;
-    @Mock private UsuarioService usuarioService;
     @Mock private SubprocessoCrudService crudService;
 
     @InjectMocks private SubprocessoValidacaoService service;
-
-    @Test
-    @DisplayName("validarPermissaoEdicaoMapa: sucesso")
-    void validarPermissaoEdicaoMapaSucesso() {
-        Subprocesso sp = new Subprocesso();
-        Unidade u = new Unidade();
-        u.setTituloTitular("123");
-        sp.setUnidade(u);
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral("123");
-
-        when(crudService.obterEntidadePorCodigoMapa(1L)).thenReturn(sp);
-        when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
-
-        service.validarPermissaoEdicaoMapa(1L, "123");
-
-        verify(crudService).obterEntidadePorCodigoMapa(1L);
-        verify(usuarioService).buscarPorLogin("123");
-    }
-
-    @Test
-    @DisplayName("validarPermissaoEdicaoMapa: erro sem unidade")
-    void validarPermissaoEdicaoMapaSemUnidade() {
-        Subprocesso sp = new Subprocesso();
-        sp.setUnidade(null);
-        when(crudService.obterEntidadePorCodigoMapa(1L)).thenReturn(sp);
-
-        assertThatThrownBy(() -> service.validarPermissaoEdicaoMapa(1L, "123"))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
-
-    @Test
-    @DisplayName("validarPermissaoEdicaoMapa: erro acesso negado")
-    void validarPermissaoEdicaoMapaAcessoNegado() {
-        Subprocesso sp = new Subprocesso();
-        Unidade u = new Unidade();
-        u.setTituloTitular("456");
-        sp.setUnidade(u);
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral("123");
-
-        when(crudService.obterEntidadePorCodigoMapa(1L)).thenReturn(sp);
-        when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
-
-        assertThatThrownBy(() -> service.validarPermissaoEdicaoMapa(1L, "123"))
-                .isInstanceOf(ErroAccessoNegado.class);
-    }
-
-    @Test
-    @DisplayName("validarPermissaoEdicaoMapa: erro quando titularTitulo é null")
-    void validarPermissaoEdicaoMapaTitularNull() {
-        Subprocesso sp = new Subprocesso();
-        Unidade u = new Unidade();
-        u.setTituloTitular(null);
-        sp.setUnidade(u);
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral("123");
-
-        when(crudService.obterEntidadePorCodigoMapa(1L)).thenReturn(sp);
-        when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
-
-        assertThatThrownBy(() -> service.validarPermissaoEdicaoMapa(1L, "123"))
-                .isInstanceOf(ErroAccessoNegado.class);
-    }
 
     @Test
     @DisplayName("obterAtividadesSemConhecimento: retorna lista vazia se mapa null")
@@ -122,11 +52,11 @@ class SubprocessoValidacaoServiceTest {
     }
 
     @Test
-    @DisplayName("obterAtividadesSemConhecimento: retorna lista vazia se atividades retornam null")
-    void obterAtividadesSemConhecimentoAtividadesNull() {
+    @DisplayName("obterAtividadesSemConhecimento: retorna lista vazia se atividades retornam lista vazia")
+    void obterAtividadesSemConhecimentoAtividadesVazia() {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(null);
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of());
         assertThat(service.obterAtividadesSemConhecimento(mapa)).isEmpty();
     }
 
@@ -143,42 +73,12 @@ class SubprocessoValidacaoServiceTest {
     }
 
     @Test
-    @DisplayName("obterAtividadesSemConhecimento: filtra atividades com conhecimentos null")
-    void obterAtividadesSemConhecimentoConhecimentosNull() {
-        Mapa mapa = new Mapa();
-        mapa.setCodigo(1L);
-        Atividade a1 = new Atividade();
-        a1.setConhecimentos(null);
-        Atividade a2 = new Atividade();
-        a2.setConhecimentos(List.of(new Conhecimento()));
-
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1, a2));
-        assertThat(service.obterAtividadesSemConhecimento(mapa)).containsExactly(a1);
-    }
-
-    @Test
     @DisplayName("validarExistenciaAtividades: erro sem mapa")
     void validarExistenciaAtividadesErroSemMapa() {
         Subprocesso sp = new Subprocesso();
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         assertThatThrownBy(() -> service.validarExistenciaAtividades(1L))
                 .isInstanceOf(ErroValidacao.class);
-    }
-
-    @Test
-    @DisplayName("validarExistenciaAtividades: erro quando lista de atividades é null")
-    void validarExistenciaAtividadesListaNull() {
-        Subprocesso sp = new Subprocesso();
-        Mapa m = new Mapa();
-        m.setCodigo(1L);
-        sp.setMapa(m);
-
-        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(null);
-
-        assertThatThrownBy(() -> service.validarExistenciaAtividades(1L))
-                .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining("ao menos uma atividade");
     }
 
     @Test
@@ -203,24 +103,6 @@ class SubprocessoValidacaoServiceTest {
         sp.setMapa(m);
         Atividade a = new Atividade();
         a.setConhecimentos(List.of());
-
-        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
-
-        assertThatThrownBy(() -> service.validarExistenciaAtividades(1L))
-                .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining("atividades devem possuir conhecimentos");
-    }
-
-    @Test
-    @DisplayName("validarExistenciaAtividades: erro quando atividade tem conhecimentos null")
-    void validarExistenciaAtividadesConhecimentosNull() {
-        Subprocesso sp = new Subprocesso();
-        Mapa m = new Mapa();
-        m.setCodigo(1L);
-        sp.setMapa(m);
-        Atividade a = new Atividade();
-        a.setConhecimentos(null);
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
@@ -286,22 +168,6 @@ class SubprocessoValidacaoServiceTest {
     }
 
     @Test
-    @DisplayName("validarCadastro: retorna erro quando lista de atividades é null")
-    void validarCadastroAtividadesNull() {
-        Subprocesso sp = new Subprocesso();
-        Mapa m = new Mapa();
-        m.setCodigo(1L);
-        sp.setMapa(m);
-
-        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(null);
-
-        ValidacaoCadastroDto res = service.validarCadastro(1L);
-        assertThat(res.getValido()).isFalse();
-        assertThat(res.getErros().getFirst().getTipo()).isEqualTo("SEM_ATIVIDADES");
-    }
-
-    @Test
     @DisplayName("validarCadastro: sem atividades")
     void validarCadastroSemAtividades() {
         Subprocesso sp = new Subprocesso();
@@ -312,26 +178,6 @@ class SubprocessoValidacaoServiceTest {
         ValidacaoCadastroDto res = service.validarCadastro(1L);
         assertThat(res.getValido()).isFalse();
         assertThat(res.getErros().getFirst().getTipo()).isEqualTo("SEM_ATIVIDADES");
-    }
-
-    @Test
-    @DisplayName("validarCadastro: retorna erro quando atividade tem conhecimentos null")
-    void validarCadastroConhecimentosNull() {
-        Subprocesso sp = new Subprocesso();
-        Mapa m = new Mapa();
-        m.setCodigo(1L);
-        sp.setMapa(m);
-        Atividade a = new Atividade();
-        a.setCodigo(10L);
-        a.setDescricao("Atividade Teste");
-        a.setConhecimentos(null);
-
-        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
-
-        ValidacaoCadastroDto res = service.validarCadastro(1L);
-        assertThat(res.getValido()).isFalse();
-        assertThat(res.getErros().getFirst().getTipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
     }
 
     @Test

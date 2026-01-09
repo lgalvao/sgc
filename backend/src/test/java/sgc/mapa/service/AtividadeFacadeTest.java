@@ -63,10 +63,10 @@ class AtividadeFacadeTest {
         created.setCodigo(100L);
         created.setMapaCodigo(1L);
 
-        // Mock usuario e mapa para verificação de acesso
+        // Mock usuario autenticado
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("user");
-        when(usuarioService.buscarPorLogin("user")).thenReturn(usuario);
+        when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
         
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
@@ -91,7 +91,7 @@ class AtividadeFacadeTest {
         vis.setCodigo(100L);
         when(subprocessoService.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
-        AtividadeOperacaoResp response = facade.criarAtividade(request, "user");
+        AtividadeOperacaoResp response = facade.criarAtividade(request);
 
         verify(accessControlService).verificarPermissao(eq(usuario), any(), any());
         assertThat(response.getAtividade().getCodigo()).isEqualTo(100L);

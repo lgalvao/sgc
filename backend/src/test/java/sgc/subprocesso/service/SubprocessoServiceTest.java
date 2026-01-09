@@ -176,13 +176,6 @@ class SubprocessoServiceTest {
     @DisplayName("Cenários de Validação")
     class ValidacaoTests {
         @Test
-        @DisplayName("Deve validar permissão de edição do mapa - Sucesso")
-        void deveValidarPermissaoEdicaoMapaSucesso() {
-            service.validarPermissaoEdicaoMapa(100L, "user");
-            verify(validacaoService).validarPermissaoEdicaoMapa(100L, "user");
-        }
-
-        @Test
         @DisplayName("Deve validar existência de atividades - Sucesso")
         void deveValidarExistenciaAtividadesSucesso() {
             service.validarExistenciaAtividades(1L);

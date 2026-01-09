@@ -41,7 +41,7 @@ class DetectorImpactoCompetenciaServiceTest {
         );
 
         assertThat(res).hasSize(1);
-        assertThat(res.get(0).getTipoImpacto()).isEqualTo(TipoImpactoCompetencia.ATIVIDADE_REMOVIDA);
+        assertThat(res.get(0).getTiposImpacto()).containsExactly(TipoImpactoCompetencia.ATIVIDADE_REMOVIDA);
     }
 
     @Test
@@ -66,7 +66,7 @@ class DetectorImpactoCompetenciaServiceTest {
         );
 
         assertThat(res).hasSize(1);
-        assertThat(res.get(0).getTipoImpacto()).isEqualTo(TipoImpactoCompetencia.ATIVIDADE_ALTERADA);
+        assertThat(res.get(0).getTiposImpacto()).containsExactly(TipoImpactoCompetencia.ATIVIDADE_ALTERADA);
     }
 
     @Test
@@ -95,7 +95,8 @@ class DetectorImpactoCompetenciaServiceTest {
         );
 
         assertThat(res).hasSize(1);
-        assertThat(res.get(0).getTipoImpacto()).isEqualTo(TipoImpactoCompetencia.IMPACTO_GENERICO);
+        assertThat(res.get(0).getTiposImpacto())
+            .containsExactlyInAnyOrder(TipoImpactoCompetencia.ATIVIDADE_REMOVIDA, TipoImpactoCompetencia.ATIVIDADE_ALTERADA);
     }
 
     @Test

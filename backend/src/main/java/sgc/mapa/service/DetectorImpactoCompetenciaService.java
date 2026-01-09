@@ -58,17 +58,18 @@ public class DetectorImpactoCompetenciaService {
             Map<Long, List<Competencia>> atividadeIdToCompetencias,
             Map<Long, CompetenciaImpactoAcumulador> mapaImpactos) {
 
-        for (AtividadeImpactadaDto atividadeDto : removidas) {
-            if (atividadeDto.getCodigo() == null) continue;
-
-            List<Competencia> competenciasAfetadas = atividadeIdToCompetencias.getOrDefault(
-                    atividadeDto.getCodigo(), List.of()
-            );
-
-            for (Competencia comp : competenciasAfetadas) {
-                adicionarImpacto(mapaImpactos, comp, "Atividade removida: %s".formatted(atividadeDto.getDescricao()));
-            }
-        }
+        removidas.stream()
+                .filter(dto -> dto.getCodigo() != null)
+                .forEach(dto -> {
+                    List<Competencia> competenciasAfetadas = atividadeIdToCompetencias.getOrDefault(
+                            dto.getCodigo(), List.of()
+                    );
+                    competenciasAfetadas.forEach(comp ->
+                            adicionarImpacto(mapaImpactos, comp,
+                                    "Atividade removida: %s".formatted(dto.getDescricao()),
+                                    TipoImpactoCompetencia.ATIVIDADE_REMOVIDA)
+                    );
+                });
     }
 
     private void processarAlteradas(
@@ -77,35 +78,34 @@ public class DetectorImpactoCompetenciaService {
             Map<Long, List<Competencia>> atividadeIdToCompetencias,
             Map<Long, CompetenciaImpactoAcumulador> mapaImpactos) {
 
-        for (AtividadeImpactadaDto atividadeDto : alteradas) {
-            String descricao = atividadeDto.getDescricao();
-            if (descricao == null) continue;
+        alteradas.stream()
+                .filter(dto -> dto.getDescricao() != null)
+                .filter(dto -> descricaoToVigenteId.containsKey(dto.getDescricao()))
+                .forEach(dto -> {
+                    Long idVigente = descricaoToVigenteId.get(dto.getDescricao());
+                    List<Competencia> competenciasAfetadas = atividadeIdToCompetencias.getOrDefault(idVigente, List.of());
 
-            Long idVigente = descricaoToVigenteId.get(descricao);
-            if (idVigente == null) continue;
-
-            List<Competencia> competenciasAfetadas = atividadeIdToCompetencias.getOrDefault(idVigente, List.of());
-
-            for (Competencia comp : competenciasAfetadas) {
-                String detalhe = "Atividade alterada: '%s' → '%s'".formatted(
-                        atividadeDto.getDescricaoAnterior(), atividadeDto.getDescricao()
-                );
-                adicionarImpacto(mapaImpactos, comp, detalhe);
-            }
-        }
+                    competenciasAfetadas.forEach(comp -> {
+                        String detalhe = "Atividade alterada: '%s' → '%s'".formatted(
+                                dto.getDescricaoAnterior(), dto.getDescricao()
+                        );
+                        adicionarImpacto(mapaImpactos, comp, detalhe, TipoImpactoCompetencia.ATIVIDADE_ALTERADA);
+                    });
+                });
     }
 
     private void adicionarImpacto(
             Map<Long, CompetenciaImpactoAcumulador> mapaImpactos,
             Competencia comp,
-            String detalhe) {
+            String detalhe,
+            TipoImpactoCompetencia tipoImpacto) {
 
         CompetenciaImpactoAcumulador acumulador = mapaImpactos.computeIfAbsent(
                 comp.getCodigo(),
                 x -> new CompetenciaImpactoAcumulador(comp.getCodigo(), comp.getDescricao())
         );
 
-        acumulador.adicionarImpacto(detalhe);
+        acumulador.adicionarImpacto(detalhe, tipoImpacto);
     }
 
     private CompetenciaImpactadaDto converterParaDto(CompetenciaImpactoAcumulador acc) {
@@ -113,7 +113,7 @@ public class DetectorImpactoCompetenciaService {
                 acc.codigo,
                 acc.descricao,
                 new ArrayList<>(acc.atividadesAfetadas),
-                TipoImpactoCompetencia.valueOf(determinarTipoImpacto(acc.atividadesAfetadas))
+                acc.obterTiposImpacto()
         );
     }
 
@@ -131,34 +131,26 @@ public class DetectorImpactoCompetenciaService {
         return mapa;
     }
 
-    private String determinarTipoImpacto(Set<String> atividadesAfetadas) {
-        boolean temRemovida = atividadesAfetadas.stream().anyMatch(desc -> desc.contains("removida"));
-        boolean temAlterada = atividadesAfetadas.stream().anyMatch(desc -> desc.contains("alterada"));
-
-        if (temRemovida && temAlterada) {
-            return "IMPACTO_GENERICO";
-        } else if (temRemovida) {
-            return "ATIVIDADE_REMOVIDA";
-        } else if (temAlterada) {
-            return "ATIVIDADE_ALTERADA";
-        }
-
-        return "IMPACTO_GENERICO";
-    }
-
     // Classe auxiliar interna para acumular impactos antes de converter para DTO
     private static class CompetenciaImpactoAcumulador {
         private final Long codigo;
         private final String descricao;
         private final Set<String> atividadesAfetadas = new LinkedHashSet<>();
+        private final Set<TipoImpactoCompetencia> tiposImpacto = new LinkedHashSet<>();
 
         public CompetenciaImpactoAcumulador(Long codigo, String descricao) {
             this.codigo = codigo;
             this.descricao = descricao;
         }
 
-        void adicionarImpacto(String descricaoImpacto) {
+        void adicionarImpacto(String descricaoImpacto, TipoImpactoCompetencia tipoImpacto) {
             atividadesAfetadas.add(descricaoImpacto);
+            tiposImpacto.add(tipoImpacto);
+        }
+
+        List<TipoImpactoCompetencia> obterTiposImpacto() {
+            return new ArrayList<>(tiposImpacto);
         }
     }
 }
+

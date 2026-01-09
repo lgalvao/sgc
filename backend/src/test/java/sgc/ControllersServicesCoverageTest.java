@@ -136,9 +136,13 @@ class ControllersServicesCoverageTest {
     }
 
     @Test
-    @DisplayName("Deve lançar erro de acesso negado quando usuário nulo em verificarImpactos")
+    @DisplayName("Deve lançar erro de acesso negado quando usuário não autenticado em verificarImpactos")
     void deveLancarErroAcessoNegado() {
-        assertThatThrownBy(() -> subprocessoMapaController.verificarImpactos(1L, null))
+        // Simula usuário não autenticado retornando null ou lançando exceção
+        when(usuarioService.obterUsuarioAutenticado())
+            .thenThrow(new ErroAccessoNegado("Usuário não autenticado"));
+        
+        assertThatThrownBy(() -> subprocessoMapaController.verificarImpactos(1L))
                 .isInstanceOf(ErroAccessoNegado.class);
     }
 

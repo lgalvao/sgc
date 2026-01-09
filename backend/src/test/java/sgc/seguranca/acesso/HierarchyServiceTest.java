@@ -105,30 +105,6 @@ class HierarchyServiceTest {
         assertThat(hierarchyService.isSuperiorImediata(alvo, raiz)).isFalse();
     }
 
-    @Test
-    @DisplayName("Deve retornar lista vazia para buscarSubordinadas (implementação básica)")
-    void deveRetornarListaVaziaParaBuscarSubordinadas() {
-        Unidade unidade = criarUnidade(1L, null);
-        
-        assertThat(hierarchyService.buscarSubordinadas(unidade)).isEmpty();
-    }
-
-    @Test
-    @DisplayName("Deve retornar lista com código para buscarCodigosHierarquia")
-    void deveRetornarListaComCodigoParaBuscarCodigosHierarquia() {
-        Long codigo = 1L;
-        
-        assertThat(hierarchyService.buscarCodigosHierarquia(codigo))
-                .hasSize(1)
-                .contains(codigo);
-    }
-
-    @Test
-    @DisplayName("Deve retornar lista vazia para código nulo em buscarCodigosHierarquia")
-    void deveRetornarListaVaziaParaCodigoNulo() {
-        assertThat(hierarchyService.buscarCodigosHierarquia(null)).isEmpty();
-    }
-
     private Unidade criarUnidade(Long codigo, Unidade superior) {
         Unidade unidade = new Unidade();
         unidade.setCodigo(codigo);

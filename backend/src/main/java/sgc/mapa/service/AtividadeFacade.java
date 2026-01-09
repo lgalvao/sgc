@@ -3,7 +3,6 @@ package sgc.mapa.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
@@ -41,16 +40,11 @@ public class AtividadeFacade {
     /**
      * Cria uma nova atividade e retorna a resposta formatada.
      */
-    public AtividadeOperacaoResp criarAtividade(AtividadeDto atividadeDto, String tituloUsuario) {
-        if (tituloUsuario.isBlank()) throw new ErroAccessoNegado("Usuário não autenticado.");
-
+    public AtividadeOperacaoResp criarAtividade(AtividadeDto atividadeDto) {
         Long mapaCodigo = atividadeDto.getMapaCodigo();
         
-        // Busca o usuário e o mapa para verificação de acesso
-        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
-        if (usuario == null) {
-            throw new ErroAccessoNegado("Usuário não encontrado: " + tituloUsuario);
-        }
+        // Busca usuário autenticado através do contexto Spring Security
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
         
         Mapa mapa = mapaService.obterPorCodigo(mapaCodigo);
         

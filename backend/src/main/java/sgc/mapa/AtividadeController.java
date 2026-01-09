@@ -5,9 +5,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.dto.ConhecimentoDto;
@@ -55,13 +52,7 @@ public class AtividadeController {
     @PostMapping
     @Operation(summary = "Cria uma atividade")
     public ResponseEntity<AtividadeOperacaoResp> criar(@Valid @RequestBody AtividadeDto atividadeDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
-        }
-
-        String tituloUsuario = authentication.getName();
-        AtividadeOperacaoResp resp = atividadeFacade.criarAtividade(atividadeDto, tituloUsuario);
+        AtividadeOperacaoResp resp = atividadeFacade.criarAtividade(atividadeDto);
 
         URI uri = URI.create("/api/atividades/%d".formatted(resp.getAtividade().getCodigo()));
         return ResponseEntity.created(uri).body(resp);

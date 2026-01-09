@@ -20,7 +20,6 @@ import sgc.subprocesso.model.Subprocesso;
 @Slf4j
 @RequiredArgsConstructor
 public class AccessControlService {
-
     private final AccessAuditService auditService;
     private final SubprocessoAccessPolicy subprocessoAccessPolicy;
     private final ProcessoAccessPolicy processoAccessPolicy;
@@ -30,12 +29,6 @@ public class AccessControlService {
     /**
      * Verifica se o usuário pode executar uma ação em um recurso.
      * Lança exceção se não tiver permissão.
-     * 
-     * @param usuario O usuário autenticado
-     * @param acao A ação a ser executada
-     * @param recurso O recurso alvo
-     * @param <T> Tipo do recurso
-     * @throws ErroAccessoNegado se não tiver permissão
      */
     public <T> void verificarPermissao(Usuario usuario, Acao acao, T recurso) {
         if (!podeExecutar(usuario, acao, recurso)) {
@@ -49,12 +42,6 @@ public class AccessControlService {
 
     /**
      * Verifica se o usuário PODE executar uma ação (sem lançar exceção).
-     * 
-     * @param usuario O usuário autenticado
-     * @param acao A ação a ser executada
-     * @param recurso O recurso alvo
-     * @param <T> Tipo do recurso
-     * @return true se pode executar, false caso contrário
      */
     public <T> boolean podeExecutar(@Nullable Usuario usuario, Acao acao, T recurso) {
         if (usuario == null) {
@@ -90,12 +77,6 @@ public class AccessControlService {
 
     /**
      * Obtém o motivo da negação de acesso.
-     * 
-     * @param usuario O usuário
-     * @param acao A ação
-     * @param recurso O recurso
-     * @param <T> Tipo do recurso
-     * @return Mensagem explicativa
      */
     private <T> String obterMotivoNegacao(@Nullable Usuario usuario, Acao acao, T recurso) {
         if (usuario == null) {

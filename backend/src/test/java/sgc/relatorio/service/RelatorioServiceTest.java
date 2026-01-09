@@ -191,7 +191,7 @@ class RelatorioServiceTest {
 
         Competencia c = new Competencia();
         c.setDescricao("Comp 1");
-        c.setAtividades(null); // Atividades nulas
+        c.setAtividades(java.util.Set.of()); // Atividades vazias
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
@@ -214,7 +214,7 @@ class RelatorioServiceTest {
         c.setDescricao("Comp 1");
         Atividade a = new Atividade();
         a.setDescricao("Ativ 1");
-        a.setConhecimentos(null); // Conhecimentos nulos
+        a.setConhecimentos(List.of()); // Conhecimentos vazios
         c.setAtividades(java.util.Set.of(a));
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);

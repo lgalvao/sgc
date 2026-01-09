@@ -31,8 +31,6 @@ import sgc.subprocesso.service.SubprocessoPermissaoCalculator;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Collections.emptyList;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -62,13 +60,7 @@ public class SubprocessoDetalheService {
     }
 
     private AtividadeVisualizacaoDto mapAtividadeToDto(Atividade atividade) {
-        // ⚡ Bolt: Usando a lista de conhecimentos já carregada na entidade
-        List<Conhecimento> conhecimentos = atividade.getConhecimentos();
-        if (conhecimentos == null) {
-            conhecimentos = emptyList();
-        }
-
-        List<ConhecimentoVisualizacaoDto> conhecimentosDto = conhecimentos.stream()
+        List<ConhecimentoVisualizacaoDto> conhecimentosDto = atividade.getConhecimentos().stream()
                 .map(c -> ConhecimentoVisualizacaoDto.builder()
                         .codigo(c.getCodigo())
                         .descricao(c.getDescricao())
@@ -138,10 +130,8 @@ public class SubprocessoDetalheService {
         List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos = new ArrayList<>();
         if (sp.getMapa() != null && sp.getMapa().getCodigo() != null) {
             List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
-            if (atividades == null) atividades = emptyList();
             for (Atividade a : atividades) {
-                List<ConhecimentoDto> ksDto = a.getConhecimentos() == null ? emptyList() :
-                    a.getConhecimentos().stream().map(conhecimentoMapper::toDto).toList();
+                List<ConhecimentoDto> ksDto = a.getConhecimentos().stream().map(conhecimentoMapper::toDto).toList();
                 atividadesComConhecimentos.add(SubprocessoCadastroDto.AtividadeCadastroDto.builder()
                         .codigo(a.getCodigo())
                         .descricao(a.getDescricao())

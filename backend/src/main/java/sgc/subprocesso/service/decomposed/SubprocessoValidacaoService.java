@@ -5,15 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
-import sgc.organizacao.UsuarioService;
-import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.ErroValidacaoDto;
 import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.model.Subprocesso;
@@ -31,25 +28,7 @@ import static java.util.Collections.emptyList;
 public class SubprocessoValidacaoService {
     private final AtividadeService atividadeService;
     private final CompetenciaService competenciaService;
-    private final UsuarioService usuarioService;
     private final SubprocessoCrudService crudService; // Reuse lookups
-
-    public void validarPermissaoEdicaoMapa(Long mapaCodigo, String tituloUsuario) {
-        Subprocesso subprocesso = crudService.obterEntidadePorCodigoMapa(mapaCodigo);
-        if (subprocesso == null || subprocesso.getUnidade() == null) {
-            throw new sgc.comum.erros.ErroEntidadeNaoEncontrada("Unidade do subprocesso não encontrada.");
-        }
-
-        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
-        if (usuario == null) {
-            throw new ErroAccessoNegado("Usuário não encontrado ou não autorizado.");
-        }
-
-        String titularTitulo = subprocesso.getUnidade().getTituloTitular();
-        if (titularTitulo == null || !titularTitulo.equals(usuario.getTituloEleitoral())) {
-             throw new ErroAccessoNegado("Usuário não autorizado a editar este mapa.");
-        }
-    }
 
     public List<Atividade> obterAtividadesSemConhecimento(Long codSubprocesso) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
@@ -61,28 +40,28 @@ public class SubprocessoValidacaoService {
             return emptyList();
         }
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(mapa.getCodigo());
-        if (atividades == null || atividades.isEmpty()) {
+        if (atividades.isEmpty()) {
             return emptyList();
         }
         return atividades.stream()
-                .filter(a -> a.getConhecimentos() == null || a.getConhecimentos().isEmpty())
+                .filter(a -> a.getConhecimentos().isEmpty())
                 .toList();
     }
 
     public void validarExistenciaAtividades(Long codSubprocesso) {
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
-        Mapa mapa = subprocesso == null ? null : subprocesso.getMapa();
+        Mapa mapa = subprocesso.getMapa();
         if (mapa == null) {
             throw new ErroValidacao("Mapa não encontrado para o subprocesso.");
         }
 
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(mapa.getCodigo());
-        if (atividades == null || atividades.isEmpty()) {
+        if (atividades.isEmpty()) {
             throw new ErroValidacao("O mapa de competências deve ter ao menos uma atividade cadastrada.");
         }
 
         List<Atividade> atividadesSemConhecimento = atividades.stream()
-            .filter(a -> a.getConhecimentos() == null || a.getConhecimentos().isEmpty())
+            .filter(a -> a.getConhecimentos().isEmpty())
             .toList();
 
         if (!atividadesSemConhecimento.isEmpty()) {
@@ -92,9 +71,8 @@ public class SubprocessoValidacaoService {
 
     public void validarAssociacoesMapa(Long mapaId) {
         List<Competencia> competencias = competenciaService.buscarPorCodMapa(mapaId);
-        if (competencias == null) competencias = List.of();
         List<String> competenciasSemAssociacao = competencias.stream()
-            .filter(c -> c.getAtividades() == null || c.getAtividades().isEmpty())
+            .filter(c -> c.getAtividades().isEmpty())
             .map(Competencia::getDescricao)
             .toList();
 
@@ -105,9 +83,8 @@ public class SubprocessoValidacaoService {
         }
 
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(mapaId);
-        if (atividades == null) atividades = List.of();
         List<String> atividadesSemAssociacao = atividades.stream()
-            .filter(a -> a.getCompetencias() == null || a.getCompetencias().isEmpty())
+            .filter(a -> a.getCompetencias().isEmpty())
             .map(Atividade::getDescricao)
             .toList();
 
@@ -133,14 +110,14 @@ public class SubprocessoValidacaoService {
         }
 
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
-        if (atividades == null || atividades.isEmpty()) {
+        if (atividades.isEmpty()) {
             erros.add(ErroValidacaoDto.builder()
                     .tipo("SEM_ATIVIDADES")
                     .mensagem("O mapa não possui atividades cadastradas.")
                     .build());
         } else {
             for (Atividade atividade : atividades) {
-                if (atividade.getConhecimentos() == null || atividade.getConhecimentos().isEmpty()) {
+                if (atividade.getConhecimentos().isEmpty()) {
                     erros.add(ErroValidacaoDto.builder()
                             .tipo("ATIVIDADE_SEM_CONHECIMENTO")
                             .atividadeCodigo(atividade.getCodigo())

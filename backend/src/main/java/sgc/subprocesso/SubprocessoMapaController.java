@@ -69,16 +69,8 @@ public class SubprocessoMapaController {
     @GetMapping("/{codigo}/impactos-mapa")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Verifica os impactos da revisão no mapa de competências")
-    public ImpactoMapaDto verificarImpactos(
-            @PathVariable Long codigo, @AuthenticationPrincipal Object principal) {
-
-        if (principal == null) {
-            throw new sgc.comum.erros.ErroAccessoNegado("Usuário não autenticado");
-        }
-
-        String tituloUsuario = extractTituloUsuario(principal);
-
-        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+    public ImpactoMapaDto verificarImpactos(@PathVariable Long codigo) {
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
         return impactoMapaService.verificarImpactos(codigo, usuario);
     }
 

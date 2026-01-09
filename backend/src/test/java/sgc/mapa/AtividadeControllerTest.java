@@ -74,7 +74,7 @@ class AtividadeControllerTest {
                     .subprocesso(SubprocessoSituacaoDto.builder().build())
                     .build();
 
-            Mockito.when(atividadeFacade.criarAtividade(any(), any())).thenReturn(response);
+            Mockito.when(atividadeFacade.criarAtividade(any())).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades")
                             .with(user("123"))
@@ -84,7 +84,7 @@ class AtividadeControllerTest {
                     .andExpect(status().isCreated())
                     .andExpect(header().exists("Location"));
 
-            Mockito.verify(atividadeFacade).criarAtividade(any(), any());
+            Mockito.verify(atividadeFacade).criarAtividade(any());
         }
 
         @Test
