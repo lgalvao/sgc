@@ -405,6 +405,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Não pode homologar em estado inválido")
         void naoPodeHomologarEmEstadoInvalido() throws Exception {
             Long subprocessoId = criarEComecarProcessoDeRevisao();
+            
             mockMvc.perform(
                             post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
                                     .with(csrf())
