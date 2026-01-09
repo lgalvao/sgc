@@ -49,6 +49,7 @@ public class ProcessoController {
      * ProcessoDto} criado no corpo da resposta.
      */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProcessoDto> criar(@Valid @RequestBody CriarProcessoReq requisicao) {
         ProcessoDto criado = processoFacade.criar(requisicao);
         URI uri = URI.create("/api/processos/%d".formatted(criado.getCodigo()));
@@ -78,6 +79,7 @@ public class ProcessoController {
      * @return Um {@link ResponseEntity} contendo o {@link ProcessoDto} ou status 404 Not Found.
      */
     @GetMapping("/{codigo}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     public ResponseEntity<ProcessoDto> obterPorId(@PathVariable Long codigo) {
         return processoFacade
                 .obterPorId(codigo)
@@ -93,6 +95,7 @@ public class ProcessoController {
      * @return Um {@link ResponseEntity} com status 200 OK e o {@link ProcessoDto} atualizado.
      */
     @PostMapping("/{codigo}/atualizar")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProcessoDto> atualizar(
             @PathVariable Long codigo, @Valid @RequestBody AtualizarProcessoReq requisicao) {
         ProcessoDto atualizado = processoFacade.atualizar(codigo, requisicao);
@@ -106,6 +109,7 @@ public class ProcessoController {
      * @return Um {@link ResponseEntity} com status 204 No Content.
      */
     @PostMapping("/{codigo}/excluir")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> excluir(@PathVariable Long codigo) {
         processoFacade.apagar(codigo);
         return ResponseEntity.noContent().build();
@@ -162,6 +166,7 @@ public class ProcessoController {
      * @return Um {@link ResponseEntity} com status 200 OK.
      */
     @PostMapping("/{codigo}/iniciar")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Inicia um processo (CDU-03)")
     public ResponseEntity<Object> iniciar(
             @PathVariable Long codigo, @Valid @RequestBody IniciarProcessoReq req) {
@@ -193,6 +198,7 @@ public class ProcessoController {
      * @return Um {@link ResponseEntity} com status 200 OK.
      */
     @PostMapping("/{codigo}/finalizar")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Finaliza um processo (CDU-21)")
     public ResponseEntity<Void> finalizar(@PathVariable Long codigo) {
         processoFacade.finalizar(codigo);

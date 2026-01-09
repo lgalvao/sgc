@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroAccessoNegado;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Usuario;
+import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Subprocesso;
 
 /**
@@ -20,6 +23,9 @@ public class AccessControlService {
     private final AccessAuditService auditService;
     private final HierarchyService hierarchyService;
     private final SubprocessoAccessPolicy subprocessoAccessPolicy;
+    private final ProcessoAccessPolicy processoAccessPolicy;
+    private final AtividadeAccessPolicy atividadeAccessPolicy;
+    private final MapaAccessPolicy mapaAccessPolicy;
 
     /**
      * Verifica se o usuário pode executar uma ação em um recurso.
@@ -64,9 +70,22 @@ public class AccessControlService {
             return subprocessoAccessPolicy.canExecute(usuario, acao, subprocesso);
         }
         
-        // Para outros tipos de recursos, retorna true temporariamente
-        // As políticas serão implementadas nos próximos sprints
-        return true;
+        if (recurso instanceof Processo processo) {
+            return processoAccessPolicy.canExecute(usuario, acao, processo);
+        }
+        
+        if (recurso instanceof Atividade atividade) {
+            return atividadeAccessPolicy.canExecute(usuario, acao, atividade);
+        }
+        
+        if (recurso instanceof Mapa mapa) {
+            return mapaAccessPolicy.canExecute(usuario, acao, mapa);
+        }
+        
+        // Tipo de recurso não reconhecido - nega acesso por segurança
+        log.warn("Tipo de recurso não reconhecido para verificação de acesso: {}", 
+                recurso != null ? recurso.getClass().getName() : "null");
+        return false;
     }
 
     /**
@@ -86,6 +105,18 @@ public class AccessControlService {
         // Obtém o motivo da policy apropriada
         if (recurso instanceof Subprocesso) {
             return subprocessoAccessPolicy.getMotivoNegacao();
+        }
+        
+        if (recurso instanceof Processo) {
+            return processoAccessPolicy.getMotivoNegacao();
+        }
+        
+        if (recurso instanceof Atividade) {
+            return atividadeAccessPolicy.getMotivoNegacao();
+        }
+        
+        if (recurso instanceof Mapa) {
+            return mapaAccessPolicy.getMotivoNegacao();
         }
         
         // Mensagem genérica para outros tipos

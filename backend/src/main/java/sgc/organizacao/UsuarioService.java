@@ -117,6 +117,26 @@ public class UsuarioService {
         return usuario;
     }
 
+    /**
+     * Obtém o usuário atualmente autenticado a partir do contexto de segurança do Spring.
+     * 
+     * @return O usuário autenticado
+     * @throws ErroAccessoNegado se não houver usuário autenticado
+     */
+    @Transactional(readOnly = true)
+    public Usuario obterUsuarioAutenticado() {
+        org.springframework.security.core.Authentication authentication = 
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication == null || !authentication.isAuthenticated() 
+                || authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken) {
+            throw new ErroAccessoNegado("Nenhum usuário autenticado no contexto");
+        }
+        
+        String tituloEleitoral = authentication.getName();
+        return buscarPorLogin(tituloEleitoral);
+    }
+
     @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String sigla) {
         UnidadeDto unidadeDto = unidadeService.buscarPorSigla(sigla);

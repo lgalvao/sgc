@@ -8,11 +8,17 @@ import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.Usuario;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.AtividadeOperacaoResp;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
+
+import static sgc.seguranca.acesso.Acao.*;
 
 /**
  * Facade para orquestrar operações de atividades e conhecimentos,
@@ -28,6 +34,9 @@ public class AtividadeFacade {
     private final AtividadeService atividadeService;
     private final ConhecimentoService conhecimentoService;
     private final SubprocessoService subprocessoService;
+    private final AccessControlService accessControlService;
+    private final UsuarioService usuarioService;
+    private final MapaService mapaService;
 
     /**
      * Cria uma nova atividade e retorna a resposta formatada.
@@ -36,8 +45,22 @@ public class AtividadeFacade {
         if (tituloUsuario.isBlank()) throw new ErroAccessoNegado("Usuário não autenticado.");
 
         Long mapaCodigo = atividadeDto.getMapaCodigo();
-
-        subprocessoService.validarPermissaoEdicaoMapa(mapaCodigo, tituloUsuario);
+        
+        // Busca o usuário e o mapa para verificação de acesso
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        if (usuario == null) {
+            throw new ErroAccessoNegado("Usuário não encontrado: " + tituloUsuario);
+        }
+        
+        Mapa mapa = mapaService.obterPorCodigo(mapaCodigo);
+        
+        // Cria atividade temporária para verificação de acesso
+        Atividade atividadeTemp = new Atividade();
+        atividadeTemp.setMapa(mapa);
+        
+        // Verifica permissão usando AccessControlService
+        accessControlService.verificarPermissao(usuario, CRIAR_ATIVIDADE, atividadeTemp);
+        
         AtividadeDto salvo = atividadeService.criar(atividadeDto);
 
         return criarRespostaOperacaoPorMapaCodigo(mapaCodigo, salvo.getCodigo(), true);
@@ -47,6 +70,14 @@ public class AtividadeFacade {
      * Atualiza uma atividade e retorna a resposta formatada.
      */
     public AtividadeOperacaoResp atualizarAtividade(Long codigo, AtividadeDto atividadeDto) {
+        Atividade atividade = atividadeService.obterPorCodigo(codigo);
+        
+        // Busca usuário autenticado através do contexto Spring Security
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        
+        // Verifica permissão
+        accessControlService.verificarPermissao(usuario, EDITAR_ATIVIDADE, atividade);
+        
         atividadeService.atualizar(codigo, atividadeDto);
 
         return criarRespostaOperacaoPorAtividade(codigo);
@@ -58,6 +89,13 @@ public class AtividadeFacade {
     public AtividadeOperacaoResp excluirAtividade(Long codigo) {
         Atividade atividade = atividadeService.obterPorCodigo(codigo);
         Long codMapa = atividade.getMapa().getCodigo();
+        
+        // Busca usuário autenticado
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        
+        // Verifica permissão
+        accessControlService.verificarPermissao(usuario, EXCLUIR_ATIVIDADE, atividade);
+        
         atividadeService.excluir(codigo);
 
         return criarRespostaOperacaoPorMapaCodigo(codMapa, codigo, false);
@@ -67,6 +105,14 @@ public class AtividadeFacade {
      * Cria um conhecimento e retorna a resposta formatada junto com o ID criado.
      */
     public ResultadoOperacaoConhecimento criarConhecimento(Long codAtividade, ConhecimentoDto conhecimentoDto) {
+        Atividade atividade = atividadeService.obterPorCodigo(codAtividade);
+        
+        // Busca usuário autenticado
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        
+        // Verifica permissão usando a ação ASSOCIAR_CONHECIMENTOS
+        accessControlService.verificarPermissao(usuario, ASSOCIAR_CONHECIMENTOS, atividade);
+        
         var salvo = conhecimentoService.criar(codAtividade, conhecimentoDto);
         var response = criarRespostaOperacaoPorAtividade(codAtividade);
 
@@ -77,6 +123,14 @@ public class AtividadeFacade {
      * Atualiza um conhecimento e retorna a resposta formatada.
      */
     public AtividadeOperacaoResp atualizarConhecimento(Long codAtividade, Long codConhecimento, ConhecimentoDto conhecimentoDto) {
+        Atividade atividade = atividadeService.obterPorCodigo(codAtividade);
+        
+        // Busca usuário autenticado
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        
+        // Verifica permissão
+        accessControlService.verificarPermissao(usuario, ASSOCIAR_CONHECIMENTOS, atividade);
+        
         conhecimentoService.atualizar(codAtividade, codConhecimento, conhecimentoDto);
         return criarRespostaOperacaoPorAtividade(codAtividade);
     }
@@ -85,6 +139,14 @@ public class AtividadeFacade {
      * Exclui um conhecimento e retorna a resposta formatada.
      */
     public AtividadeOperacaoResp excluirConhecimento(Long codAtividade, Long codConhecimento) {
+        Atividade atividade = atividadeService.obterPorCodigo(codAtividade);
+        
+        // Busca usuário autenticado
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        
+        // Verifica permissão
+        accessControlService.verificarPermissao(usuario, ASSOCIAR_CONHECIMENTOS, atividade);
+        
         conhecimentoService.excluir(codAtividade, codConhecimento);
         return criarRespostaOperacaoPorAtividade(codAtividade);
     }
