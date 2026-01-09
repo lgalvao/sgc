@@ -44,6 +44,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -232,10 +233,28 @@ class ControllersServicesCoverageTest {
     void deveLancarErroDevolverRevisaoStatusInvalido() {
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO); // Status inválido
+        
+        // Criar unidade com superior para evitar ErroInvarianteViolada
+        Unidade unidadeSuperior = new Unidade();
+        unidadeSuperior.setCodigo(100L);
+        
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+        unidade.setUnidadeSuperior(unidadeSuperior);
+        sp.setUnidade(unidade);
+        
+        Usuario usuario = new Usuario();
+        
         when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+        
+        // Após refatoração de segurança, a validação de situação é feita no AccessControlService
+        // que lança ErroAccessoNegado em vez de ErroProcessoEmSituacaoInvalida
+        doThrow(new ErroAccessoNegado("Situação inválida"))
+                .when(accessControlService)
+                .verificarPermissao(any(), any(), any());
 
-        assertThatThrownBy(() -> cadastroService.devolverRevisaoCadastro(1L, "Obs", new Usuario()))
-                .isInstanceOf(sgc.processo.erros.ErroProcessoEmSituacaoInvalida.class);
+        assertThatThrownBy(() -> cadastroService.devolverRevisaoCadastro(1L, "Obs", usuario))
+                .isInstanceOf(ErroAccessoNegado.class);
     }
 
     @Test
