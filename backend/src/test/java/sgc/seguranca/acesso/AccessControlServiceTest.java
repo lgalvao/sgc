@@ -107,7 +107,7 @@ class AccessControlServiceTest {
         usuario.setTituloEleitoral(tituloEleitoral);
         usuario.setNome("Usuário Teste");
         // Add perfil to avoid null pointer in access policies
-        usuario.setAtribuicoesPermanentes(new ArrayList<>());
+        usuario.setAtribuicoes(new java.util.HashSet<>());
         return usuario;
     }
 
