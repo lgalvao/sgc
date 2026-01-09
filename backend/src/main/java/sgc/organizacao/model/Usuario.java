@@ -2,6 +2,7 @@ package sgc.organizacao.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.LazyInitializationException;
 import org.hibernate.annotations.Immutable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -69,7 +70,9 @@ public class Usuario implements UserDetails {
         LocalDateTime now = LocalDateTime.now();
         // Tenta carregar atribuições temporárias, mas tolera LazyInitializationException
         try {
-            if (atribuicoesTemporarias != null && !atribuicoesTemporarias.isEmpty()) {
+            // Verifica se a coleção não é nula antes de iterar
+            // A iteração irá tentar inicializar a coleção lazy, o que pode causar LazyInitializationException
+            if (atribuicoesTemporarias != null) {
                 for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
                     if ((temp.getDataInicio() == null || 
                         !temp.getDataInicio().isAfter(now))
@@ -86,7 +89,7 @@ public class Usuario implements UserDetails {
                     }
                 }
             }
-        } catch (org.hibernate.LazyInitializationException e) {
+        } catch (LazyInitializationException e) {
             // Se não há sessão disponível, apenas retorna as atribuições do cache
             // Isso é esperado quando o método é chamado fora de uma transação
         }
