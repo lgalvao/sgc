@@ -1,0 +1,84 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link " Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link " Minha unidade" [ref=e14] [cursor=pointer]:
+                  - /url: /unidade/1
+                  - generic [ref=e15]: 
+                  - text: Minha unidade
+              - listitem [ref=e16]:
+                - link " Relatórios" [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link " Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link " ADMIN - SEDOC" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: ADMIN - SEDOC
+              - listitem "Configurações do sistema" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: /configuracoes
+                  - generic [ref=e30]: 
+              - listitem "Sair" [ref=e31]:
+                - link [ref=e32] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e33]: 
+      - generic [ref=e36]:
+        - button "" [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]: 
+        - navigation "breadcrumb" [ref=e39]:
+          - list [ref=e40]:
+            - listitem [ref=e41]:
+              - link "Início" [ref=e42] [cursor=pointer]:
+                - /url: /painel
+                - generic "Início" [ref=e43]: 
+            - listitem [ref=e44]:
+              - text: ›
+              - link "Detalhes do processo" [ref=e45] [cursor=pointer]:
+                - /url: /processo/35
+            - listitem [ref=e46]:
+              - text: ›
+              - link "SECAO_221" [ref=e47] [cursor=pointer]:
+                - /url: /processo/35/SECAO_221
+            - listitem [ref=e48]:
+              - text: ›
+              - generic [ref=e49]: Visualizar mapa
+      - main [ref=e50]:
+        - generic [ref=e51]:
+          - generic [ref=e53]: Mapa de competências técnicas
+          - generic [ref=e54]:
+            - generic [ref=e56]: SECAO_221 - Seção 221
+            - generic [ref=e58]:
+              - generic [ref=e59]: 
+              - paragraph [ref=e60]: Nenhuma competência cadastrada
+              - paragraph [ref=e61]: Este mapa ainda não possui competências registradas.
+      - contentinfo [ref=e62]:
+        - generic [ref=e63]:
+          - generic [ref=e64]: Versão 1.0.0
+          - generic [ref=e65]: © SESEL/COSIS/TRE-PE
+  - text:  
+```
