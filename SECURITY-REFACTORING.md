@@ -27,7 +27,7 @@ Consolidar e padronizar o controle de acesso do SGC, eliminando inconsistências
 | Sprint | Duração | Foco | Status |
 |--------|---------|------|--------|
 | Sprint 1 | 3-5 dias | Infraestrutura base | ✅ Concluído |
-| Sprint 2 | 5-7 dias | Migração subprocessos | 🚀 99% Concluído |
+| Sprint 2 | 5-7 dias | Migração subprocessos | 🚀 98.8% Concluído |
 | Sprint 3 | 4-6 dias | Processos e atividades | ⏳ Pendente |
 | Sprint 4 | 3-4 dias | Auditoria e testes | ⏳ Pendente |
 | Sprint 5 | 2-3 dias | Refinamento | ⏳ Pendente |
@@ -112,7 +112,7 @@ Para dúvidas sobre o plano:
 
 **Criado em**: 2026-01-08  
 **Versão**: 1.0  
-**Status**: 🚧 Em Execução - Sprint 2 98.7% Concluído (1134/1149 testes passando)
+**Status**: 🚧 Em Execução - Sprint 2 98.8% Concluído (1135/1149 testes passando)
 
 ## Histórico de Execução
 
@@ -195,25 +195,27 @@ Para dúvidas sobre o plano:
 - ✅ Mensagens de erro mais descritivas e em português
 
 **Testes Backend:**
-- ✅ 1134/1149 testes passando (98.7%) - Excelente progresso!
+- ✅ 1135/1149 testes passando (98.8%) - Excelente progresso!
 - ✅ Todos os testes unitários de acesso passando
 - ✅ SubprocessoServiceActionsTest - 9/9 passando
 - ✅ ImpactoMapaServiceTest - 4/4 passando
 - ✅ FluxoEstadosIntegrationTest - 4/4 passando
 - ✅ CDU-13 IntegrationTest - 4/4 passando
 - ✅ CDU-19 IntegrationTest - 2/2 passando (refatorado)
+- ✅ CDU-20 IntegrationTest - 1/1 passando (refatorado - 2026-01-09)
 - ✅ CDU-22 IntegrationTest - 1/1 passando (refatorado)
 - ✅ CDU-24 IntegrationTest - 1/1 passando (refatorado)
 - ✅ CDU-25 IntegrationTest - 1/1 passando (refatorado)
-- ⚠️ 15 testes de integração ainda precisam correção:
-  - CDU-14: 8 testes (erro 500) - setup complexo, usuários criados dinamicamente
-  - CDU-20: 1 teste (erro 403) - problema de permissão a investigar
+- ⚠️ 14 testes de integração ainda precisam correção:
+  - CDU-14: 8 testes (erro 403) - setup complexo com @MockitoBean de UsuarioService
   - Outros: 6 testes diversos
 - ✅ Código compila com apenas avisos esperados de deprecação
 
 **Refatorações de Testes (2026-01-09):**
 - ✅ CDU-19: Refatorado para usar unidades 6/9 e usuário '333333333333' (CHEFE)
-- ✅ CDU-20: Refatorado para usar hierarquia 2→6→9 e usuário '666666666666' (GESTOR)
+- ✅ CDU-20: Refatorado para usar hierarquia 2→6→9, UsuarioService.buscarPorLogin(), e .with(user(...))
+  - Corrigido fluxo de teste para alternar entre GESTOR (devolver/aceitar) e CHEFE (validar)
+  - Todos os testes passando
 - ✅ CDU-22: Refatorado para usar unidades 6/8/9 e usuário '666666666666' (GESTOR)
 - ✅ CDU-24: Refatorado para usar unidades 8/9 e usuário '111111111111' (ADMIN)
   - Corrigido estado do subprocesso para CADASTRO_HOMOLOGADO
@@ -221,8 +223,10 @@ Para dúvidas sobre o plano:
 - ✅ WithMockChefeSecurityContextFactory melhorado para carregar perfis do BD
 
 **Próximos Passos:**
-- ⏳ Investigar CDU-20 erro 403 (devolver-validacao)
-- ⏳ Refatorar CDU-14 (8 testes) - setup complexo com mocks de UsuarioService
+- ⏳ Refatorar CDU-14 (8 testes) - requer remoção do @MockitoBean(UsuarioService)
+  - **Problema**: Teste usa @MockitoBean para UsuarioService mas também cria usuários via JDBC
+  - **Solução**: Opção 1 - Remover mock e usar usuários reais do data.sql
+  - **Solução**: Opção 2 - Refatorar infraestrutura de testes para suportar criação dinâmica
 - ⏳ Validar com testes E2E
 - ⏳ Documentar mudanças no AGENTS.md
 
@@ -239,4 +243,8 @@ Para dúvidas sobre o plano:
   - Todos os 4 testes passando
 - ✅ data.sql atualizado com perfil CHEFE para usuário 111111111111 (unit 102)
   - Permite uso do @WithMockChefe em mais cenários de teste
+- ✅ AccessControlService e AccessAuditService com null-safety (2026-01-09 tarde)
+  - Previne NullPointerException quando usuário é null
+  - Retorna false e loga "ANONYMOUS" em vez de falhar
+  - CDU-14 testes agora retornam 403 em vez de 500
 
