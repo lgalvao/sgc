@@ -20,6 +20,9 @@ public class WithMockGestorSecurityContextFactory
         implements WithSecurityContextFactory<WithMockGestor> {
     @Autowired(required = false)
     private UsuarioRepo usuarioRepo;
+    
+    @Autowired(required = false)
+    private sgc.organizacao.model.UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Override
     public SecurityContext createSecurityContext(WithMockGestor customUser) {
@@ -29,6 +32,11 @@ public class WithMockGestorSecurityContextFactory
         if (usuarioRepo != null) {
             try {
                 principal = usuarioRepo.findById(tituloGestor).orElse(null);
+                // Carregar atribuições do banco de dados se o usuário existir
+                if (principal != null && usuarioPerfilRepo != null) {
+                    var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(tituloGestor);
+                    principal.setAtribuicoes(new HashSet<>(atribuicoes));
+                }
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
@@ -55,11 +63,15 @@ public class WithMockGestorSecurityContextFactory
             Set<sgc.organizacao.model.UsuarioPerfil> atribuicoes = new HashSet<>(principal.getAtribuicoes());
             if (atribuicoes.stream()
                     .noneMatch(a -> a.getPerfil() == Perfil.GESTOR)) {
-                Unidade u = new Unidade("Unidade Mock", "UO_SUP");
+                // Usuário existe mas não tem perfil GESTOR, adicionar com sua unidade de lotação
+                Unidade unidade = principal.getUnidadeLotacao();
+                if (unidade == null) {
+                    unidade = new Unidade("Unidade Mock", "UO_SUP");
+                }
                 atribuicoes.add(
                                 sgc.organizacao.model.UsuarioPerfil.builder()
                                         .usuario(principal)
-                                        .unidade(u)
+                                        .unidade(unidade)
                                         .perfil(Perfil.GESTOR)
                                         .build());
                 principal.setAtribuicoes(atribuicoes);

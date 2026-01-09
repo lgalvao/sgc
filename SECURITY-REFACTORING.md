@@ -112,7 +112,7 @@ Para dúvidas sobre o plano:
 
 **Criado em**: 2026-01-08  
 **Versão**: 1.0  
-**Status**: 🚧 Em Execução - Sprint 2 99% Concluído (1141/1148 testes passando)
+**Status**: 🚧 Em Execução - Sprint 2 99% Concluído (1122/1149 testes passando - 97.7%)
 
 ## Histórico de Execução
 
@@ -195,16 +195,19 @@ Para dúvidas sobre o plano:
 - ✅ Mensagens de erro mais descritivas e em português
 
 **Testes Backend:**
-- ✅ 1141/1148 testes passando (99.4%) - Excelente progresso!
-- ✅ Unit tests atualizados com mocks de AccessControlService
-- ✅ Integration tests atualizados com usuarios/perfis corretos (admin, gestor)
-- ⚠️ 7 testes precisam ajustes finais (hierarquia/perfil em cenários específicos)
-- ✅ Todos os testes de acesso específicos passando
+- ✅ 1122/1149 testes passando (97.7%) - Excelente progresso!
+- ✅ Todos os testes unitários de acesso passando
+- ✅ SubprocessoServiceActionsTest - 9/9 passando
+- ✅ ImpactoMapaServiceTest - 4/4 passando  
+- ⚠️ 27 testes de integração precisam refatoração (CDU-* e FluxoEstados*)
+  - Problema: testes criam usuários dinamicamente mas @WithMock* executa antes
+  - Solução: refatorar testes para usar usuários existentes ou @BeforeAll
 - ✅ Código compila com apenas avisos esperados de deprecação
 
 **Próximos Passos:**
-- ⏳ Ajustar últimos 7 testes de integração (verificação de hierarquia)
+- ⏳ Refatorar 27 testes de integração para usar setup correto de usuários
+  - Opção 1: Usar usuários existentes do data.sql (ex: '666666666666' GESTOR, '111111111111' ADMIN)
+  - Opção 2: Mover setup de usuários para @BeforeAll em vez de @BeforeEach
 - ⏳ Validar com testes E2E
-- ⏳ Validação de performance
 - ⏳ Documentar mudanças no AGENTS.md
 

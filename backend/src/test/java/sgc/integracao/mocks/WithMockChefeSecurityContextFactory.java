@@ -17,6 +17,9 @@ public class WithMockChefeSecurityContextFactory
 
     @Autowired(required = false)
     private UnidadeRepo unidadeRepo;
+    
+    @Autowired(required = false)
+    private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Override
     public SecurityContext createSecurityContext(WithMockChefe annotation) {
@@ -37,6 +40,11 @@ public class WithMockChefeSecurityContextFactory
         if (usuarioRepo != null) {
             try {
                 usuario = usuarioRepo.findById(annotation.value()).orElse(null);
+                // Carregar atribuições do banco de dados se o usuário existir
+                if (usuario != null && usuarioPerfilRepo != null) {
+                    var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(annotation.value());
+                    usuario.setAtribuicoes(new HashSet<>(atribuicoes));
+                }
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
@@ -67,6 +75,7 @@ public class WithMockChefeSecurityContextFactory
 
         Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getAtribuicoes());
         if (atribuicoes.stream().noneMatch(a -> a.getPerfil() == Perfil.CHEFE)) {
+            // Usuário existe mas não tem perfil CHEFE, adicionar com a unidade carregada
             atribuicoes.add(
                             UsuarioPerfil.builder()
                                     .usuario(usuario)

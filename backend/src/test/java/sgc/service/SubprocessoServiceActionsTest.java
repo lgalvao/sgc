@@ -12,12 +12,14 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
+import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.notificacao.NotificacaoEmailService;
+import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Usuario;
@@ -56,6 +58,9 @@ public class SubprocessoServiceActionsTest {
     private UsuarioRepo usuarioRepo;
 
     @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
     private AnaliseRepo analiseRepo;
 
     @Autowired
@@ -81,9 +86,17 @@ public class SubprocessoServiceActionsTest {
     @BeforeEach
     void setUp() {
         unidade = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
-        usuario = usuarioRepo.findById("1").orElseThrow(); // Ana Paula Souza - SERVIDOR
-        admin = usuarioRepo.findById("6").orElseThrow(); // Ricardo Alves - ADMIN
-        gestor = usuarioRepo.findById("666666666666").orElseThrow(); // Gestor COSIS - GESTOR
+        usuario = carregarUsuarioComPerfis("1"); // Ana Paula Souza - SERVIDOR
+        admin = carregarUsuarioComPerfis("6"); // Ricardo Alves - ADMIN
+        gestor = carregarUsuarioComPerfis("666666666666"); // Gestor COSIS - GESTOR
+    }
+
+    private Usuario carregarUsuarioComPerfis(String titulo) {
+        Usuario usuario = usuarioService.carregarUsuarioParaAutenticacao(titulo);
+        if (usuario == null) {
+            throw new RuntimeException("Usuário não encontrado: " + titulo);
+        }
+        return usuario;
     }
 
     private Processo criarProcesso(TipoProcesso tipo) {
@@ -170,7 +183,12 @@ public class SubprocessoServiceActionsTest {
         void deveLancarExcecaoSeSituacaoIncorreta() {
             Processo processo = criarProcesso(TipoProcesso.REVISAO);
             Subprocesso sp = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            assertThrows(ErroProcessoEmSituacaoInvalida.class, () -> subprocessoWorkflowService.aceitarRevisaoCadastro(sp.getCodigo(), OBSERVACOES, gestor));
+            // Após refatoração de segurança, verificações de situação são feitas pelo AccessControlService
+            // que sempre lança ErroAccessoNegado (com mensagem descritiva sobre a situação incorreta)
+            ErroAccessoNegado erro = assertThrows(ErroAccessoNegado.class, 
+                () -> subprocessoWorkflowService.aceitarRevisaoCadastro(sp.getCodigo(), OBSERVACOES, gestor));
+            assertTrue(erro.getMessage().contains("situação"), 
+                "Mensagem de erro deve mencionar a situação incorreta");
         }
     }
 
@@ -192,7 +210,8 @@ public class SubprocessoServiceActionsTest {
 
             when(impactoMapaService.verificarImpactos(anyLong(), any(Usuario.class))).thenReturn(ImpactoMapaDto.semImpacto());
 
-            subprocessoWorkflowService.homologarRevisaoCadastro(subprocessoAposAceite.getCodigo(), OBSERVACOES, gestor);
+            // Homologação requer perfil ADMIN
+            subprocessoWorkflowService.homologarRevisaoCadastro(subprocessoAposAceite.getCodigo(), OBSERVACOES, admin);
 
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo())
                             .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após homologação da revisão."));
@@ -202,7 +221,7 @@ public class SubprocessoServiceActionsTest {
 
         @Test
         void deveLancarExcecaoSeSubprocessoNaoEncontrado_homologar() {
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoWorkflowService.homologarRevisaoCadastro(999L, OBSERVACOES, gestor));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoWorkflowService.homologarRevisaoCadastro(999L, OBSERVACOES, admin));
         }
 
         @Test
@@ -211,7 +230,13 @@ public class SubprocessoServiceActionsTest {
             Processo processo = criarProcesso(TipoProcesso.REVISAO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-            assertThrows(ErroProcessoEmSituacaoInvalida.class, () -> subprocessoWorkflowService.homologarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, gestor));
+            // Após refatoração de segurança, verificações de situação são feitas pelo AccessControlService
+            // que sempre lança ErroAccessoNegado (com mensagem descritiva sobre a situação incorreta)
+            // Usa admin pois HOMOLOGAR_REVISAO_CADASTRO requer perfil ADMIN
+            ErroAccessoNegado erro = assertThrows(ErroAccessoNegado.class, 
+                () -> subprocessoWorkflowService.homologarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, admin));
+            assertTrue(erro.getMessage().contains("situação"), 
+                "Mensagem de erro deve mencionar a situação incorreta");
         }
     }
 
