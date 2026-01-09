@@ -20,6 +20,15 @@ Este documento resume as diretrizes essenciais para o desenvolvimento no projeto
   * `POST` com sufixo semanticamente claro para atualizações, ações de workflow e exclusão (ex: `/api/processos/{id}/iniciar`, `/api/processos/{id}/excluir`).
 * **DTOs:** NUNCA exponha entidades JPA. Use DTOs e Mappers (MapStruct).
 * **Persistence:** Tabelas em `UPPER_CASE`, colunas em `snake_case`. Enums como `STRING`.
+* **Controle de Acesso (Security):**
+  * **SEMPRE** use a arquitetura centralizada: `Controller → AccessControlService → Services`
+  * **Controllers:** Use `@PreAuthorize` para verificações básicas de role
+  * **Services:** NUNCA adicione verificações de acesso diretas. Use `AccessControlService.verificarPermissao(usuario, acao, recurso)`
+  * **Políticas:** Crie `AccessPolicy` específica para cada tipo de recurso (Processo, Subprocesso, Atividade, Mapa)
+  * **Ações:** Use enum `Acao` do pacote `sgc.seguranca.acesso`
+  * **Hierarquia:** Use `HierarchyService` para verificações de hierarquia de unidades
+  * **Auditoria:** Todas as decisões de acesso são automaticamente logadas por `AccessAuditService`
+  * **Documentação completa:** Ver `SECURITY-REFACTORING.md` e `security-refactoring-plan.md`
 
 ## 3. Frontend (Vue 3.5 / TypeScript)
 
