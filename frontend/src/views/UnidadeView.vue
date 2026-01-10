@@ -80,6 +80,7 @@
 import {BAlert, BButton, BCard, BCardBody, BContainer} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
+import {logger} from "@/utils";
 import {useAtribuicaoTemporariaStore} from "@/stores/atribuicoes";
 import {useMapasStore} from "@/stores/mapas";
 import {usePerfilStore} from "@/stores/perfil";
@@ -109,7 +110,7 @@ onMounted(async () => {
     try {
       titular.value = await buscarUsuarioPorTitulo(unidadesStore.unidade.tituloTitular);
     } catch (e) {
-      console.error("Erro ao buscar titular:", e);
+      logger.error("Erro ao buscar titular:", e);
     }
   }
 });

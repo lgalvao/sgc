@@ -3,7 +3,11 @@
  */
 
 import {CLASSES_BADGE_SITUACAO, LABELS_SITUACAO} from "@/constants/situacoes";
+import logger from "@/utils/logger";
 // import type {TipoNotificacao} from "@/stores/notificacoes"; // Removed
+
+// ===== LOGGER =====
+export {logger};
 
 // ===== CLASSES DE BADGE =====
 export function badgeClass(situacao: string): string {
