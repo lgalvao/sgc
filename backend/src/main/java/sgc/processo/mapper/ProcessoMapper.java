@@ -1,4 +1,4 @@
-package sgc.processo.dto.mappers;
+package sgc.processo.mapper;
 
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;

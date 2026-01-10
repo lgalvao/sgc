@@ -2,6 +2,7 @@ package sgc.alerta.dto;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import sgc.alerta.mapper.AlertaMapper;
 import sgc.alerta.model.Alerta;
 
 import java.time.LocalDateTime;
@@ -17,13 +18,15 @@ class AlertaMapperTest {
     @DisplayName("formatDataHora deve retornar string formatada")
     void formatDataHora() {
         LocalDateTime dt = LocalDateTime.of(2023, 10, 25, 14, 30, 15);
-        assertThat(mapper.formatDataHora(dt)).isEqualTo("25/10/2023 14:30:15");
+        AlertaMapperStub stub = (AlertaMapperStub) mapper;
+        assertThat(stub.publicFormatDataHora(dt)).isEqualTo("25/10/2023 14:30:15");
     }
 
     @Test
     @DisplayName("formatDataHora deve retornar string vazia se nulo")
     void formatDataHoraNull() {
-        assertThat(mapper.formatDataHora(null)).isEmpty();
+        AlertaMapperStub stub = (AlertaMapperStub) mapper;
+        assertThat(stub.publicFormatDataHora(null)).isEmpty();
     }
 
     @Test
@@ -45,6 +48,11 @@ class AlertaMapperTest {
             return AlertaDto.builder()
                     .codigo(alerta.getCodigo())
                     .build();
+        }
+        
+        // Expõe o método protegido para testes
+        public String publicFormatDataHora(LocalDateTime dataHora) {
+            return formatDataHora(dataHora);
         }
     }
 }

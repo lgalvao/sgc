@@ -1,8 +1,10 @@
-package sgc.analise.dto;
+package sgc.analise.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
+import sgc.analise.dto.AnaliseHistoricoDto;
+import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.model.Analise;
 import sgc.organizacao.model.UnidadeRepo;
 

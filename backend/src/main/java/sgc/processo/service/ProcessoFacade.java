@@ -16,7 +16,7 @@ import sgc.organizacao.UsuarioService;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.*;
-import sgc.processo.dto.mappers.ProcessoMapper;
+import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.eventos.EventoProcessoCriado;
