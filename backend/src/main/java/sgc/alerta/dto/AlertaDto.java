@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 @Value
 @Builder
 public class AlertaDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     Long codigo;
     Long codProcesso;
     String unidadeOrigem;

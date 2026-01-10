@@ -18,6 +18,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class AtividadeAjusteDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     @NotNull(message = "O código da atividade é obrigatório")
     private final Long codAtividade;
     @NotBlank(message = "O nome da atividade é obrigatório")

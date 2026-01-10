@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class SubprocessoDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private Long codigo;
 
     @NotNull(message = "O código do processo é obrigatório")

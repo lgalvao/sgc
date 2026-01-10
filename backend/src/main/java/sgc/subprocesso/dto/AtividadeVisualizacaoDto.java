@@ -15,6 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AtividadeVisualizacaoDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private Long codigo;
     private String descricao;
     private List<ConhecimentoVisualizacaoDto> conhecimentos;

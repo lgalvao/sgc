@@ -17,6 +17,8 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ErroSubApi {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private String object;
     private String field;
     private String message;

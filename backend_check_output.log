@@ -1,0 +1,1023 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:check
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses UP-TO-DATE
+> Task :backend:test UP-TO-DATE
+
+> Task :backend:jacocoTestCoverageVerification FAILED
+[ant:jacocoReport] Rule violated for bundle backend: branches covered ratio is 0.83, but expected minimum is 0.85
+
+> Task :backend:pmdMain
+Warning at /app/backend/config/pmd/pmd-ruleset.xml:48:9
+ 46|     <rule ref="category/java/errorprone.xml">
+ 47|         <!-- Exclude some false positives with Lombok -->
+ 48|         <exclude name="BeanMembersShouldSerialize"/>
+             ^^^^^^^^ Exclude pattern 'BeanMembersShouldSerialize' did not match any rule in ruleset 'category/java/errorprone.xml'
+
+ 49|         <exclude name="DataflowAnomalyAnalysis"/>
+ 50|         <exclude name="NullAssignment"/>
+Warning at /app/backend/config/pmd/pmd-ruleset.xml:49:9
+ 47|         <!-- Exclude some false positives with Lombok -->
+ 48|         <exclude name="BeanMembersShouldSerialize"/>
+ 49|         <exclude name="DataflowAnomalyAnalysis"/>
+             ^^^^^^^^ Exclude pattern 'DataflowAnomalyAnalysis' did not match any rule in ruleset 'category/java/errorprone.xml'
+
+ 50|         <exclude name="NullAssignment"/>
+ 51|     </rule>
+
+/app/backend/src/main/java/sgc/Sgc.java:11:	UseUtilityClass:	This utility class has a non-private constructor
+/app/backend/src/main/java/sgc/alerta/AlertaService.java:1:	CouplingBetweenObjects:	High amount of different objects as members denotes a high coupling
+
+> Task :backend:checkstyleMain
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/relatorio/service/RelatorioService.java:57: Line is longer than 120 characters (found 124). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/relatorio/service/RelatorioService.java:72: Line is longer than 120 characters (found 143). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/relatorio/controller/RelatorioController.java:10:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/relatorio/controller/RelatorioController.java:25: Line is longer than 120 characters (found 122). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/notificacao/model/Notificacao.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:26:48: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:123: Line is longer than 120 characters (found 140). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:134: Line is longer than 120 characters (found 126). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:172: Line is longer than 120 characters (found 132). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:177: Line is longer than 120 characters (found 128). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:185: Line is longer than 120 characters (found 125). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:189: Line is longer than 120 characters (found 124). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:190: Line is longer than 120 characters (found 162). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:214: Line is longer than 120 characters (found 123). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:215: Line is longer than 120 characters (found 131). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:237: Line is longer than 120 characters (found 126). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:241: Line is longer than 120 characters (found 157). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:249: Line is longer than 120 characters (found 125). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/analise/AnaliseController.java:9:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/analise/AnaliseController.java:93: Line is longer than 120 characters (found 125). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/analise/model/Analise.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/analise/model/Analise.java:4:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/analise/model/AnaliseRepo.java:11:5: 'METHOD_DEF' should be separated from previous line. [EmptyLineSeparator]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/alerta/AlertaController.java:9:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/alerta/AlertaService.java:24:17: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/alerta/AlertaService.java:247: Line is longer than 120 characters (found 147). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/alerta/model/Alerta.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/alerta/model/Alerta.java:4:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/alerta/model/AlertaUsuario.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/alerta/model/AlertaUsuario.java:4:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/config/ConfigSeguranca.java:75: Line is longer than 120 characters (found 135). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/login/LoginController.java:10:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/login/dto/PerfilUnidadeDto.java:3:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/login/GerenciadorJwt.java:42: Line is longer than 120 characters (found 125). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/login/LoginService.java:87: Line is longer than 120 characters (found 139). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java:18:43: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java:19:40: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java:20:56: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java:209: Line is longer than 120 characters (found 136). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java:299: Line is longer than 120 characters (found 133). [LineLength]
+
+/app/backend/src/main/java/sgc/alerta/AlertaService.java:95:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/alerta/AlertaService.java:167:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/alerta/AlertaService.java:175:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/alerta/model/Alerta.java:25:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/alerta/model/AlertaRepo.java:29:	MethodNamingConventions:	The instance method name 'findByUnidadeDestino_Codigo' doesn't match '[a-z][a-zA-Z0-9]*'
+/app/backend/src/main/java/sgc/alerta/model/AlertaRepo.java:38:	MethodNamingConventions:	The instance method name 'findByUnidadeDestino_Codigo' doesn't match '[a-z][a-zA-Z0-9]*'
+/app/backend/src/main/java/sgc/alerta/model/AlertaUsuario.java:22:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/alerta/model/AlertaUsuario.java:52:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/analise/AnaliseService.java:53:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/analise/AnaliseService.java:83:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/analise/mapper/AnaliseMapper.java:40:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/analise/model/Analise.java:24:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/comum/erros/ErroAccessoNegado.java:8:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/comum/erros/ErroAutenticacao.java:7:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/comum/erros/ErroConfiguracao.java:19:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/comum/erros/ErroEntidadeDeveriaExistir.java:14:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/comum/erros/ErroEntidadeNaoEncontrada.java:9:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/comum/erros/ErroEstadoImpossivel.java:25:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/comum/erros/ErroInterno.java:35:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/comum/erros/ErroInvarianteViolada.java:21:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/comum/erros/ErroNegocio.java:16:	ReturnEmptyCollectionRatherThanNull:	Return an empty collection rather than null.
+/app/backend/src/main/java/sgc/comum/erros/ErroNegocioBase.java:9:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/comum/erros/ErroSituacaoInvalida.java:25:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/comum/erros/ErroValidacao.java:15:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/comum/erros/RestExceptionHandler.java:91:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/comum/erros/RestExceptionHandler.java:108:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/comum/model/EntidadeBase.java:18:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/comum/util/FormatadorData.java:9:	ClassWithOnlyPrivateConstructorsShouldBeFinal:	This class has only private constructors and may be final
+/app/backend/src/main/java/sgc/comum/util/Sleeper.java:8:	DoNotUseThreads:	To be compliant to J2EE, a webapp should not use any thread.
+/app/backend/src/main/java/sgc/configuracao/model/Parametro.java:18:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/e2e/E2eController.java:63:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/e2e/E2eController.java:64:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/e2e/E2eController.java:149:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/e2e/E2eController.java:154:	UseExplicitTypes:	Use Explicit Types
+
+> Task :backend:checkstyleTest
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:32:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:74: Line is longer than 120 characters (found 136). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:150:53: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:150:72: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:151:53: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:151:72: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:153:64: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:153:89: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:153:119: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:154:64: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:154:89: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:154:119: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:171:52: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:171:69: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:171:86: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:189:52: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:189:69: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:189:86: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:190:61: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:190:85: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:190:114: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:210:52: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:210:69: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:210:86: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:211:61: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:211:85: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:211:114: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:235:51: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/relatorio/service/RelatorioServiceTest.java:235:69: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:31:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:112:70: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:112:87: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:113:59: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:147:51: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:147:87: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:168:55: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:168:95: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:168:116: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:169:59: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:169:90: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:169:115: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:186: Line is longer than 120 characters (found 150). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:192:55: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:192:95: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:207: Line is longer than 120 characters (found 121). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:213:51: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerCoverageTest.java:214:67: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/NotificacaoEmailServiceTest.java:21:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/NotificacaoEmailServiceTest.java:49: Line is longer than 120 characters (found 123). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/NotificacaoEmailServiceTest.java:87: Line is longer than 120 characters (found 123). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/NotificacaoEmailServiceTest.java:146: Line is longer than 120 characters (found 123). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerTest.java:28:43: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerTest.java:29:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/EventoProcessoListenerTest.java:99:8: Comment has incorrect indentation level 7, expected is 8, indentation should be the same level as line 100. [CommentsIndentation]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/notificacao/NotificacaoEmailAsyncExecutorTest.java:22:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/analise/AnaliseServiceTest.java:21:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/analise/AnaliseServiceTest.java:87: Line is longer than 120 characters (found 128). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/analise/AnaliseServiceTest.java:144: Line is longer than 120 characters (found 133). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/analise/AnaliseControllerTest.java:29:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/analise/AnaliseControllerTest.java:33:80: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/analise/AnaliseControllerTest.java:42: Line is longer than 120 characters (found 126). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/alerta/AlertaServiceUpdateTest.java:30:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/alerta/AlertaServiceUpdateTest.java:108:51: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/alerta/AlertaServiceUpdateTest.java:109:51: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/alerta/AlertaServiceTest.java:30:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:3:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:25:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:31:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:32:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:118: Line is longer than 120 characters (found 122). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:121: Line is longer than 120 characters (found 141). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:123: Line is longer than 120 characters (found 129). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:125: Line is longer than 120 characters (found 132). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:138: Line is longer than 120 characters (found 122). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:141: Line is longer than 120 characters (found 180). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:156: Line is longer than 120 characters (found 141). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:160: Line is longer than 120 characters (found 132). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:162: Line is longer than 120 characters (found 126). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:167: Line is longer than 120 characters (found 142). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:199: Line is longer than 120 characters (found 121). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:201: Line is longer than 120 characters (found 126). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:207: Line is longer than 120 characters (found 126). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:214: Line is longer than 120 characters (found 143). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:241: Line is longer than 120 characters (found 122). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU07IntegrationTest.java:22:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU07IntegrationTest.java:27:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU07IntegrationTest.java:102: Line is longer than 120 characters (found 122). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU07IntegrationTest.java:220: Line is longer than 120 characters (found 126). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU07IntegrationTest.java:225: Line is longer than 120 characters (found 121). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU33IntegrationTest.java:26:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU33IntegrationTest.java:119: Line is longer than 120 characters (found 128). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU08IntegrationTest.java:19:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU08IntegrationTest.java:20:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU05IntegrationTest.java:19:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU05IntegrationTest.java:87: Line is longer than 120 characters (found 145). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU05IntegrationTest.java:169: Line is longer than 120 characters (found 133). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU05IntegrationTest.java:212: Line is longer than 120 characters (found 121). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU18IntegrationTest.java:15:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU04IntegrationTest.java:24:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU04IntegrationTest.java:115: Line is longer than 120 characters (found 123). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU04IntegrationTest.java:147: Line is longer than 120 characters (found 123). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU21IntegrationTest.java:14:19: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU21IntegrationTest.java:40:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU28IntegrationTest.java:90: Line is longer than 120 characters (found 148). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU28IntegrationTest.java:94: Line is longer than 120 characters (found 138). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU32IntegrationTest.java:26:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU32IntegrationTest.java:119: Line is longer than 120 characters (found 128). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU26IntegrationTest.java:29:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU26IntegrationTest.java:82: Line is longer than 120 characters (found 171). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU26IntegrationTest.java:83: Line is longer than 120 characters (found 142). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU26IntegrationTest.java:84: Line is longer than 120 characters (found 139). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU26IntegrationTest.java:85: Line is longer than 120 characters (found 139). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU23IntegrationTest.java:29:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU23IntegrationTest.java:84: Line is longer than 120 characters (found 171). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU23IntegrationTest.java:86: Line is longer than 120 characters (found 140). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU23IntegrationTest.java:87: Line is longer than 120 characters (found 139). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU23IntegrationTest.java:88: Line is longer than 120 characters (found 139). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU01IntegrationTest.java:18:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU01IntegrationTest.java:84: Line is longer than 120 characters (found 134). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU01IntegrationTest.java:103: Line is longer than 120 characters (found 134). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU01IntegrationTest.java:106: Line is longer than 120 characters (found 134). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU09IntegrationTest.java:27:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU09IntegrationTest.java:28:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU09IntegrationTest.java:32:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU09IntegrationTest.java:158: Line is longer than 120 characters (found 130). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU09IntegrationTest.java:244: Line is longer than 120 characters (found 125). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU09IntegrationTest.java:247: Line is longer than 120 characters (found 124). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU30IntegrationTest.java:16:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU02IntegrationTest.java:25:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU02IntegrationTest.java:128:13: Comment has incorrect indentation level 12, expected is 13, indentation should be the same level as line 129. [CommentsIndentation]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU02IntegrationTest.java:132: Line is longer than 120 characters (found 130). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU12IntegrationTest.java:14:19: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU12IntegrationTest.java:15:28: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU12IntegrationTest.java:16:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU12IntegrationTest.java:116: Line is longer than 120 characters (found 123). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU12IntegrationTest.java:208: Line is longer than 120 characters (found 123). [LineLength]
+
+/app/backend/src/main/java/sgc/mapa/MapaController.java:51:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/mapa/MapaController.java:66:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/mapa/MapaController.java:67:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/mapa/MapaController.java:83:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/mapa/MapaController.java:84:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/mapa/mapper/MapaCompletoMapper.java:33:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/mapa/mapper/MapaCompletoMapper.java:33:	ReturnEmptyCollectionRatherThanNull:	Return an empty collection rather than null.
+/app/backend/src/main/java/sgc/mapa/model/Atividade.java:25:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/mapa/model/Competencia.java:19:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/mapa/model/Conhecimento.java:16:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/mapa/model/Mapa.java:19:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/mapa/service/AtividadeFacade.java:1:	CouplingBetweenObjects:	High amount of different objects as members denotes a high coupling
+/app/backend/src/main/java/sgc/mapa/service/AtividadeFacade.java:130:	UnusedLocalVariable:	Avoid unused local variables such as 'descricaoAnterior'.
+/app/backend/src/main/java/sgc/mapa/service/AtividadeFacade.java:214:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/mapa/service/AtividadeFacade.java:215:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/mapa/service/AtividadeService.java:85:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/mapa/service/CompetenciaService.java:81:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/mapa/service/ConhecimentoService.java:80:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/mapa/service/ConhecimentoService.java:82:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/mapa/service/ConhecimentoService.java:107:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/mapa/service/ConhecimentoService.java:110:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/mapa/service/ConhecimentoService.java:138:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/mapa/service/CopiaMapaService.java:77:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/mapa/service/CopiaMapaService.java:80:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/mapa/service/CopiaMapaService.java:103:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/mapa/service/CopiaMapaService.java:107:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/mapa/service/CopiaMapaService.java:119:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/mapa/service/CopiaMapaService.java:122:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/mapa/service/CopiaMapaService.java:126:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/mapa/service/DetectorImpactoCompetenciaService.java:38:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/mapa/service/DetectorImpactoCompetenciaService.java:128:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/mapa/service/DetectorImpactoCompetenciaService.java:131:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/mapa/service/DetectorMudancasAtividadeService.java:158:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/mapa/service/DetectorMudancasAtividadeService.java:161:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/mapa/service/MapaSalvamentoService.java:73:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/mapa/service/MapaSalvamentoService.java:166:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/mapa/service/MapaSalvamentoService.java:170:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/mapa/service/MapaVisualizacaoService.java:46:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/mapa/service/MapaVisualizacaoService.java:75:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:65:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+/app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:81:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+/app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:112:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:113:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:122:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+/app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:163:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+/app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:224:	ExceptionAsFlowControl:	Exception thrown at line 215 is caught in this block.
+/app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:224:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+/app/backend/src/main/java/sgc/notificacao/EventoProcessoListener.java:248:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+/app/backend/src/main/java/sgc/notificacao/NotificacaoEmailAsyncExecutor.java:75:	DoNotUseThreads:	To be compliant to J2EE, a webapp should not use any thread.
+/app/backend/src/main/java/sgc/notificacao/NotificacaoModelosService.java:51:	AvoidDuplicateLiterals:	The String literal "titulo" appears 8 times in this file; the first occurrence is on line 51
+/app/backend/src/main/java/sgc/notificacao/NotificacaoModelosService.java:52:	AvoidDuplicateLiterals:	The String literal "nomeUnidade" appears 5 times in this file; the first occurrence is on line 52
+/app/backend/src/main/java/sgc/notificacao/NotificacaoModelosService.java:53:	AvoidDuplicateLiterals:	The String literal "nomeProcesso" appears 8 times in this file; the first occurrence is on line 53
+/app/backend/src/main/java/sgc/notificacao/NotificacaoModelosService.java:92:	UseObjectForClearerAPI:	Rather than using a lot of String arguments, consider using a container object for those values.
+/app/backend/src/main/java/sgc/notificacao/NotificacaoModelosServiceMock.java:37:	UseObjectForClearerAPI:	Rather than using a lot of String arguments, consider using a container object for those values.
+/app/backend/src/main/java/sgc/notificacao/model/Notificacao.java:20:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/organizacao/ServicoHierarquia.java:52:	SimplifyBooleanReturns:	This if statement can be replaced by `return {condition} || {elseBranch};`
+/app/backend/src/main/java/sgc/organizacao/ServicoHierarquia.java:72:	SimplifyBooleanReturns:	This if statement can be replaced by `return !{condition} || {elseBranch};`
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:1:	CouplingBetweenObjects:	High amount of different objects as members denotes a high coupling
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:23:	GodClass:	Possible God Class (WMC=61, ATFD=39, TCC=14.194%)
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:25:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'sgc.organizacao.model': 'UnidadeMapaRepo' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:66:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'sgc.organizacao.model': 'TipoUnidade' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:87:	AvoidDuplicateLiterals:	The String literal " n\u00e3o encontrada" appears 4 times in this file; the first occurrence is on line 87
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:121:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:122:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:126:	SimplifiedTernary:	This conditional expression can be simplified with || or &&
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:130:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:140:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:210:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:213:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:252:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'sgc.organizacao.model': 'UnidadeMapa' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:253:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'sgc.organizacao.model': 'UnidadeMapa' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:295:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:298:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:306:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/organizacao/UnidadeService.java:309:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/organizacao/UsuarioService.java:1:	CouplingBetweenObjects:	High amount of different objects as members denotes a high coupling
+/app/backend/src/main/java/sgc/organizacao/UsuarioService.java:21:	GodClass:	Possible God Class (WMC=69, ATFD=64, TCC=26.387%)
+/app/backend/src/main/java/sgc/organizacao/UsuarioService.java:149:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/organizacao/UsuarioService.java:150:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'java.util': 'HashSet' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/organizacao/UsuarioService.java:155:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/organizacao/UsuarioService.java:170:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/organizacao/UsuarioService.java:170:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'java.util': 'HashSet' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/organizacao/UsuarioService.java:248:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/organizacao/UsuarioService.java:388:	AvoidLiteralsInIfCondition:	Avoid using literals in if statements
+/app/backend/src/main/java/sgc/organizacao/UsuarioService.java:403:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/organizacao/UsuarioService.java:418:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/organizacao/UsuarioService.java:420:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/organizacao/model/AtribuicaoTemporaria.java:22:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/organizacao/model/AtribuicaoTemporaria.java:47:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'sgc.organizacao.model': 'Perfil' is already in scope because it is declared in the same package
+/app/backend/src/main/java/sgc/organizacao/model/AtribuicaoTemporaria.java:49:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'sgc.organizacao.model': 'Perfil' is already in scope because it is declared in the same package
+/app/backend/src/main/java/sgc/organizacao/model/AtribuicaoTemporaria.java:50:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'sgc.organizacao.model': 'Perfil' is already in scope because it is declared in the same package
+/app/backend/src/main/java/sgc/organizacao/model/Unidade.java:22:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/organizacao/model/Usuario.java:24:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/organizacao/model/Usuario.java:82:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/organizacao/model/Usuario.java:92:	EmptyCatchBlock:	Avoid empty catch blocks
+/app/backend/src/main/java/sgc/organizacao/model/Usuario.java:101:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/organizacao/model/Usuario.java:102:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/organizacao/model/UsuarioPerfil.java:19:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/organizacao/model/UsuarioPerfil.java:43:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/organizacao/model/UsuarioPerfil.java:44:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/organizacao/model/UsuarioPerfilId.java:12:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/organizacao/model/VinculacaoUnidadeId.java:12:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/painel/PainelService.java:162:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/painel/PainelService.java:188:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+/app/backend/src/main/java/sgc/painel/PainelService.java:219:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/painel/PainelService.java:234:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/painel/PainelService.java:236:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+/app/backend/src/main/java/sgc/painel/erros/ErroParametroPainelInvalido.java:9:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/processo/ProcessoController.java:1:	CouplingBetweenObjects:	High amount of different objects as members denotes a high coupling
+/app/backend/src/main/java/sgc/processo/ProcessoController.java:52:	AvoidDuplicateLiterals:	The String literal "hasRole(\'ADMIN\')" appears 6 times in this file; the first occurrence is on line 52
+/app/backend/src/main/java/sgc/processo/ProcessoController.java:174:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/processo/erros/ErroProcesso.java:10:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/processo/erros/ErroProcessoEmSituacaoInvalida.java:10:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/processo/erros/ErroUnidadesNaoDefinidas.java:9:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/processo/eventos/EventoProcessoCriado.java:16:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/processo/model/Processo.java:23:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/processo/model/ProcessoRepo.java:27:	MethodNamingConventions:	The instance method name 'findDistinctByParticipantes_CodigoInAndSituacaoNot' doesn't match '[a-z][a-zA-Z0-9]*'
+/app/backend/src/main/java/sgc/processo/service/ProcessoDetalheBuilder.java:57:	SimplifyBooleanReturns:	This if statement can be replaced by `return !{condition} || {elseBranch};`
+/app/backend/src/main/java/sgc/processo/service/ProcessoDetalheBuilder.java:77:	NPathComplexity:	The method 'montarHierarquiaUnidades(ProcessoDetalheDto, Processo, List<Subprocesso>)' has an NPath complexity of 256, current threshold is 200
+/app/backend/src/main/java/sgc/processo/service/ProcessoDetalheBuilder.java:79:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/processo/service/ProcessoFacade.java:1:	CouplingBetweenObjects:	High amount of different objects as members denotes a high coupling
+/app/backend/src/main/java/sgc/processo/service/ProcessoFacade.java:1:	TooManyStaticImports:	Too many static imports may lead to messy code
+/app/backend/src/main/java/sgc/processo/service/ProcessoFacade.java:56:	GodClass:	Possible God Class (WMC=69, ATFD=97, TCC=29.846%)
+/app/backend/src/main/java/sgc/processo/service/ProcessoFacade.java:102:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/processo/service/ProcessoFacade.java:105:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/processo/service/ProcessoFacade.java:135:	AvoidDuplicateLiterals:	The String literal "hasRole(\'ADMIN\')" appears 8 times in this file; the first occurrence is on line 135
+/app/backend/src/main/java/sgc/processo/service/ProcessoFacade.java:174:	NPathComplexity:	The method 'atualizar(Long, AtualizarProcessoReq)' has an NPath complexity of 576, current threshold is 200
+/app/backend/src/main/java/sgc/processo/service/ProcessoFacade.java:176:	AvoidDuplicateLiterals:	The String literal "Processo" appears 5 times in this file; the first occurrence is on line 176
+/app/backend/src/main/java/sgc/processo/service/ProcessoFacade.java:229:	ConfusingTernary:	Avoid if (x != y) ..; else ..;
+/app/backend/src/main/java/sgc/processo/service/ProcessoFacade.java:325:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'SituacaoProcesso': 'CRIADO' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/processo/service/ProcessoFacade.java:445:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/processo/service/ProcessoFacade.java:449:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/processo/service/ProcessoFacade.java:488:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/processo/service/ProcessoInicializador.java:105:	UseLocaleWithCaseConversions:	When doing a String.toLowerCase()/toUpperCase() call, use a Locale
+/app/backend/src/main/java/sgc/relatorio/service/PdfFactory.java:16:	AvoidUncheckedExceptionsInSignatures:	A method or constructor should not explicitly declare unchecked exceptions in its 'throws' clause
+/app/backend/src/main/java/sgc/relatorio/service/RelatorioService.java:49:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/relatorio/service/RelatorioService.java:53:	EmptyCatchBlock:	Avoid empty catch blocks
+/app/backend/src/main/java/sgc/relatorio/service/RelatorioService.java:53:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+/app/backend/src/main/java/sgc/relatorio/service/RelatorioService.java:59:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/relatorio/service/RelatorioService.java:67:	CognitiveComplexity:	The method 'gerarRelatorioMapas(Long, Long, OutputStream)' has a cognitive complexity of 25, current threshold is 20
+/app/backend/src/main/java/sgc/relatorio/service/RelatorioService.java:83:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/relatorio/service/RelatorioService.java:86:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/relatorio/service/RelatorioService.java:87:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/relatorio/service/RelatorioService.java:92:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/relatorio/service/RelatorioService.java:96:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/relatorio/service/RelatorioService.java:99:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/relatorio/service/RelatorioService.java:105:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/seguranca/acesso/Acao.java:12:	ExcessivePublicCount:	This class has a bunch of public methods and attributes
+/app/backend/src/main/java/sgc/seguranca/acesso/AtividadeAccessPolicy.java:110:	LooseCoupling:	Avoid using implementation types like 'EnumSet'; use the interface instead
+/app/backend/src/main/java/sgc/seguranca/acesso/AtividadeAccessPolicy.java:115:	LooseCoupling:	Avoid using implementation types like 'EnumSet'; use the interface instead
+/app/backend/src/main/java/sgc/seguranca/acesso/AtividadeAccessPolicy.java:126:	LooseCoupling:	Avoid using implementation types like 'EnumSet'; use the interface instead
+/app/backend/src/main/java/sgc/seguranca/acesso/MapaAccessPolicy.java:66:	LooseCoupling:	Avoid using implementation types like 'EnumSet'; use the interface instead
+/app/backend/src/main/java/sgc/seguranca/acesso/MapaAccessPolicy.java:71:	LooseCoupling:	Avoid using implementation types like 'EnumSet'; use the interface instead
+/app/backend/src/main/java/sgc/seguranca/acesso/MapaAccessPolicy.java:82:	LooseCoupling:	Avoid using implementation types like 'EnumSet'; use the interface instead
+/app/backend/src/main/java/sgc/seguranca/acesso/ProcessoAccessPolicy.java:67:	LooseCoupling:	Avoid using implementation types like 'EnumSet'; use the interface instead
+/app/backend/src/main/java/sgc/seguranca/acesso/ProcessoAccessPolicy.java:72:	LooseCoupling:	Avoid using implementation types like 'EnumSet'; use the interface instead
+/app/backend/src/main/java/sgc/seguranca/acesso/ProcessoAccessPolicy.java:83:	LooseCoupling:	Avoid using implementation types like 'EnumSet'; use the interface instead
+/app/backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java:32:	GodClass:	Possible God Class (WMC=50, ATFD=43, TCC=10.909%)
+/app/backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java:317:	LooseCoupling:	Avoid using implementation types like 'EnumSet'; use the interface instead
+/app/backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java:408:	LooseCoupling:	Avoid using implementation types like 'EnumSet'; use the interface instead
+/app/backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java:415:	LooseCoupling:	Avoid using implementation types like 'EnumSet'; use the interface instead
+/app/backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java:416:	AvoidLiteralsInIfCondition:	Avoid using literals in if statements
+/app/backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java:440:	LooseCoupling:	Avoid using implementation types like 'EnumSet'; use the interface instead
+/app/backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java:441:	LooseCoupling:	Avoid using implementation types like 'EnumSet'; use the interface instead
+/app/backend/src/main/java/sgc/seguranca/config/ConfigSeguranca.java:72:	UseUnderscoresInNumericLiterals:	Number 31536000 should separate every third digit with an underscore
+/app/backend/src/main/java/sgc/seguranca/login/ClienteAcessoAd.java:48:	AvoidRethrowingException:	A catch statement that catches an exception only to rethrow it should be avoided.
+/app/backend/src/main/java/sgc/seguranca/login/ClienteAcessoAd.java:50:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+/app/backend/src/main/java/sgc/seguranca/login/ClienteAcessoAd.java:52:	PreserveStackTrace:	Thrown exception does not preserve the stack trace of exception 'e' on all code paths
+/app/backend/src/main/java/sgc/seguranca/login/FiltroJwt.java:50:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/seguranca/login/GerenciadorJwt.java:53:	AvoidLiteralsInIfCondition:	Avoid using literals in if statements
+/app/backend/src/main/java/sgc/seguranca/login/GerenciadorJwt.java:93:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+/app/backend/src/main/java/sgc/seguranca/login/LimitadorTentativasLogin.java:50:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/seguranca/login/LimitadorTentativasLogin.java:73:	LiteralsFirstInComparisons:	Position literals first in String comparisons
+/app/backend/src/main/java/sgc/seguranca/login/LimitadorTentativasLogin.java:73:	LiteralsFirstInComparisons:	Position literals first in String comparisons
+/app/backend/src/main/java/sgc/seguranca/login/LimitadorTentativasLogin.java:79:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/seguranca/login/LimitadorTentativasLogin.java:84:	AssignmentInOperand:	Avoid assignments in operands
+/app/backend/src/main/java/sgc/seguranca/login/LimitadorTentativasLogin.java:92:	UseUnderscoresInNumericLiterals:	Number 600000 should separate every third digit with an underscore
+/app/backend/src/main/java/sgc/seguranca/login/LimitadorTentativasLogin.java:99:	AssignmentInOperand:	Avoid assignments in operands
+/app/backend/src/main/java/sgc/seguranca/login/LimitadorTentativasLogin.java:110:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/seguranca/login/LoginService.java:67:	UseUnderscoresInNumericLiterals:	Number 60000 should separate every third digit with an underscore
+/app/backend/src/main/java/sgc/seguranca/login/LoginService.java:81:	UnusedAssignment:	The initializer for variable 'autenticado' is never used (overwritten on lines 84, 89, 93 and 96)
+/app/backend/src/main/java/sgc/seguranca/login/LoginService.java:178:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoCadastroController.java:71:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoCadastroController.java:113:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoCadastroController.java:151:	AvoidDuplicateLiterals:	The String literal "hasAnyRole(\'ADMIN\', \'GESTOR\')" appears 4 times in this file; the first occurrence is on line 151
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoCadastroController.java:159:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoCadastroController.java:183:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoCadastroController.java:206:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoCadastroController.java:228:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoCadastroController.java:248:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoCadastroController.java:271:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoCrudController.java:33:	AvoidDuplicateLiterals:	The String literal "isAuthenticated()" appears 5 times in this file; the first occurrence is on line 33
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoCrudController.java:60:	AvoidDuplicateLiterals:	The String literal "hasRole(\'ADMIN\')" appears 7 times in this file; the first occurrence is on line 60
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoCrudController.java:111:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoCrudController.java:129:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoMapaController.java:42:	AvoidDuplicateLiterals:	The String literal "isAuthenticated()" appears 6 times in this file; the first occurrence is on line 42
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoMapaController.java:120:	AvoidDuplicateLiterals:	The String literal "hasRole(\'ADMIN\')" appears 8 times in this file; the first occurrence is on line 120
+/app/backend/src/main/java/sgc/subprocesso/SubprocessoValidacaoController.java:43:	AvoidDuplicateLiterals:	The String literal "hasRole(\'ADMIN\')" appears 4 times in this file; the first occurrence is on line 43
+/app/backend/src/main/java/sgc/subprocesso/dto/MapaAjusteDto.java:43:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/subprocesso/erros/ErroAtividadesEmSituacaoInvalida.java:11:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/subprocesso/erros/ErroMapaEmSituacaoInvalida.java:11:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/subprocesso/erros/ErroMapaNaoAssociado.java:9:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/subprocesso/mapper/MapaAjusteMapper.java:38:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/subprocesso/mapper/SubprocessoDetalheMapper.java:37:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/subprocesso/mapper/SubprocessoMapper.java:44:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/subprocesso/mapper/SubprocessoMapper.java:51:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/subprocesso/mapper/SubprocessoMapper.java:58:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/subprocesso/model/Movimentacao.java:18:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/subprocesso/model/Subprocesso.java:21:	MissingSerialVersionUID:	Classes implementing Serializable should set a serialVersionUID
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java:176:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoComunicacaoListener.java:26:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoComunicacaoListener.java:27:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoEmailService.java:37:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoEmailService.java:57:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoEmailService.java:63:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoEmailService.java:132:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoFacade.java:1:	CouplingBetweenObjects:	High amount of different objects as members denotes a high coupling
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoFacade.java:36:	ExcessivePublicCount:	This class has a bunch of public methods and attributes
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoFactory.java:52:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaService.java:63:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaService.java:67:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaService.java:72:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaService.java:94:	CyclomaticComplexity:	The method 'importarAtividades(Long, Long)' has a cyclomatic complexity of 16.
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaService.java:94:	NPathComplexity:	The method 'importarAtividades(Long, Long)' has an NPath complexity of 864, current threshold is 200
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaService.java:131:	AvoidInstantiatingObjectsInLoops:	Avoid instantiating new objects inside loops
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaService.java:142:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:50:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:55:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:60:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:65:	UseConcurrentHashMap:	If you run in Java5 or newer and have concurrent access, you should use the ConcurrentHashMap implementation
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:99:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'SituacaoSubprocesso': 'MAPEAMENTO_CADASTRO_HOMOLOGADO' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:100:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'SituacaoSubprocesso': 'MAPEAMENTO_MAPA_CRIADO' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:118:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'SituacaoSubprocesso': 'MAPEAMENTO_CADASTRO_HOMOLOGADO' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:119:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'SituacaoSubprocesso': 'MAPEAMENTO_MAPA_CRIADO' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:148:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'SituacaoSubprocesso': 'MAPEAMENTO_MAPA_CRIADO' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:149:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'SituacaoSubprocesso': 'MAPEAMENTO_CADASTRO_HOMOLOGADO' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:161:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'SituacaoSubprocesso': 'MAPEAMENTO_CADASTRO_HOMOLOGADO' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:162:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'SituacaoSubprocesso': 'MAPEAMENTO_MAPA_CRIADO' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:163:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'SituacaoSubprocesso': 'REVISAO_CADASTRO_HOMOLOGADA' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:164:	UnnecessaryFullyQualifiedName:	Unnecessary qualifier 'SituacaoSubprocesso': 'REVISAO_MAPA_AJUSTADO' is already in scope because it is imported in this file
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:216:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:222:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:223:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:228:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java:1:	CouplingBetweenObjects:	High amount of different objects as members denotes a high coupling
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java:145:	ExcessiveParameterList:	Avoid long parameter lists.
+/app/backend/src/main/java/sgc/subprocesso/service/SubprocessoWorkflowExecutor.java:42:	ExcessiveParameterList:	Avoid long parameter lists.
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoCrudService.java:87:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoCrudService.java:89:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoCrudService.java:96:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoCrudService.java:115:	CognitiveComplexity:	The method 'atualizar(Long, SubprocessoDto)' has a cognitive complexity of 22, current threshold is 20
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoCrudService.java:163:	ConfusingTernary:	Avoid if (x != y) ..; else ..;
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoDetalheService.java:1:	CouplingBetweenObjects:	High amount of different objects as members denotes a high coupling
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoDetalheService.java:88:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoDetalheService.java:101:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoDetalheService.java:102:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoDetalheService.java:105:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoDetalheService.java:116:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoDetalheService.java:122:	ControlStatementBraces:	This statement should have braces
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoWorkflowService.java:50:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoWorkflowService.java:56:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoWorkflowService.java:65:	UseExplicitTypes:	Use Explicit Types
+/app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoWorkflowService.java:143:	AvoidCatchingGenericException:	Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+
+> Task :backend:pmdMain FAILED
+
+> Task :backend:checkstyleMain
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java:391: Line is longer than 120 characters (found 124). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/acesso/AtividadeAccessPolicy.java:15:43: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/acesso/AtividadeAccessPolicy.java:16:40: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/acesso/MapaAccessPolicy.java:12:43: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/acesso/MapaAccessPolicy.java:13:40: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/acesso/ProcessoAccessPolicy.java:12:43: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/acesso/ProcessoAccessPolicy.java:13:40: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/seguranca/acesso/AccessPolicy.java:12:5: 'METHOD_DEF' should be separated from previous line. [EmptyLineSeparator]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java:13:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java:25:40: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java:26:56: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java:103: Line is longer than 120 characters (found 261). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java:117: Line is longer than 120 characters (found 256). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java:148: Line is longer than 120 characters (found 263). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java:166: Line is longer than 120 characters (found 132). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java:168: Line is longer than 120 characters (found 259). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java:181: Line is longer than 120 characters (found 122). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java:198: Line is longer than 120 characters (found 139). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java:199: Line is longer than 120 characters (found 251). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java:201: Line is longer than 120 characters (found 121). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java:206: Line is longer than 120 characters (found 121). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowService.java:209: Line is longer than 120 characters (found 139). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:42:40: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:43:56: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:72: Line is longer than 120 characters (found 138). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:239:48: '.' should be on a new line. [SeparatorWrapDot]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:280: Line is longer than 120 characters (found 132). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:380: Line is longer than 120 characters (found 147). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:383: Line is longer than 120 characters (found 132). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:397: Line is longer than 120 characters (found 132). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaWorkflowService.java:411: Line is longer than 120 characters (found 132). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoFacade.java:12:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoFacade.java:281: Line is longer than 120 characters (found 137). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoFacade.java:315: Line is longer than 120 characters (found 128). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoService.java:68: Line is longer than 120 characters (found 134). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoDetalheService.java:23:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoDetalheService.java:58: Line is longer than 120 characters (found 130). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoDetalheService.java:93: Line is longer than 120 characters (found 126). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoDetalheService.java:157: Line is longer than 120 characters (found 135). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoCrudService.java:163: Line is longer than 120 characters (found 125). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoCrudService.java:201: Line is longer than 120 characters (found 163). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoWorkflowService.java:12:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/decomposed/SubprocessoWorkflowService.java:63: Line is longer than 120 characters (found 160). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoFactory.java:124: Line is longer than 120 characters (found 129). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoFactory.java:143: Line is longer than 120 characters (found 123). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoFactory.java:144: Line is longer than 120 characters (found 125). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaService.java:29:56: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaService.java:97: Line is longer than 120 characters (found 144). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/service/SubprocessoMapaService.java:109: Line is longer than 120 characters (found 142). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/dto/SubprocessoDto.java:4:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/dto/DisponibilizarMapaRequest.java:5:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/SubprocessoValidacaoController.java:11:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/SubprocessoValidacaoController.java:16:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/model/Movimentacao.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/model/Subprocesso.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/model/Subprocesso.java:4:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/SubprocessoMapaController.java:11:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/SubprocessoMapaController.java:19:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/mapper/MapaAjusteMapper.java:27: Line is longer than 120 characters (found 151). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/mapper/MapaAjusteMapper.java:29: Line is longer than 120 characters (found 150). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/mapper/SubprocessoDetalheMapper.java:23: Line is longer than 120 characters (found 127). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/mapper/SubprocessoDetalheMapper.java:29: Line is longer than 120 characters (found 157). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/SubprocessoCadastroController.java:11:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/SubprocessoCadastroController.java:20:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/SubprocessoCrudController.java:9:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/subprocesso/SubprocessoCrudController.java:12:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/configuracao/ConfiguracaoController.java:7:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/painel/PainelService.java:24:17: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/comum/model/EntidadeBase.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/comum/erros/ErroNegocio.java:14:5: 'METHOD_DEF' should be separated from previous line. [EmptyLineSeparator]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/comum/erros/ErroNegocio.java:15:5: 'METHOD_DEF' should be separated from previous line. [EmptyLineSeparator]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/comum/erros/ErroNegocio.java:16:41: '{' at column 41 should have line break after. [LeftCurly]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/e2e/E2eController.java:13:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/e2e/E2eController.java:75: Line is longer than 120 characters (found 125). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/processo/service/ProcessoInicializador.java:63: Line is longer than 120 characters (found 124). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/processo/service/ProcessoInicializador.java:137:9: switch without "default" clause. [MissingSwitchDefault]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/processo/service/ProcessoFacade.java:18:24: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+
+> Task :backend:checkstyleTest FAILED
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU12IntegrationTest.java:313: Line is longer than 120 characters (found 126). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU12IntegrationTest.java:326: Line is longer than 120 characters (found 131). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/ProcessoDetalhesIntegrationTest.java:66:13: Comment has incorrect indentation level 12, expected is 16, indentation should be the same level as line 67. [CommentsIndentation]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU20IntegrationTest.java:27:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU29IntegrationTest.java:84: Line is longer than 120 characters (found 131). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/ProcessoPerformanceTest.java:34: Line is longer than 120 characters (found 135). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/ProcessoPerformanceTest.java:38: Line is longer than 120 characters (found 132). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/SecurityAuthBypassTest.java:16:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/SecurityAuthBypassTest.java:44:37: Empty catch block. [EmptyCatchBlock]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU13IntegrationTest.java:35:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU13IntegrationTest.java:52: Line is longer than 120 characters (found 148). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU13IntegrationTest.java:92: Line is longer than 120 characters (found 171). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU13IntegrationTest.java:94: Line is longer than 120 characters (found 143). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU13IntegrationTest.java:95: Line is longer than 120 characters (found 152). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU13IntegrationTest.java:102: Line is longer than 120 characters (found 149). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU13IntegrationTest.java:107: Line is longer than 120 characters (found 135). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU24IntegrationTest.java:18:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU24IntegrationTest.java:26:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU06IntegrationTest.java:23:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU06IntegrationTest.java:76:37: Empty catch block. [EmptyCatchBlock]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU06IntegrationTest.java:76:37: WhitespaceAround: '{' is not followed by whitespace. Empty blocks may only be represented as {} when not part of a multi-block statement (4.1.3) [WhitespaceAround]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU06IntegrationTest.java:76:38: WhitespaceAround: '}' is not preceded with whitespace. [WhitespaceAround]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/AtividadeFluxoIntegrationTest.java:20:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU19IntegrationTest.java:28:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU19IntegrationTest.java:172: Line is longer than 120 characters (found 124). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU17IntegrationTest.java:26:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU17IntegrationTest.java:33:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU17IntegrationTest.java:89: Line is longer than 120 characters (found 173). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU17IntegrationTest.java:258: Line is longer than 120 characters (found 174). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU17IntegrationTest.java:276: Line is longer than 120 characters (found 136). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/ViewEntitiesIntegrationTest.java:10:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/ViewEntitiesIntegrationTest.java:43: Line is longer than 120 characters (found 159). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/ViewEntitiesIntegrationTest.java:44: Line is longer than 120 characters (found 142). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/ViewEntitiesIntegrationTest.java:65: Line is longer than 120 characters (found 143). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/ViewEntitiesIntegrationTest.java:82: Line is longer than 120 characters (found 121). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/ViewEntitiesIntegrationTest.java:88: Line is longer than 120 characters (found 161). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/ViewEntitiesIntegrationTest.java:108: Line is longer than 120 characters (found 143). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/ViewEntitiesIntegrationTest.java:111: Line is longer than 120 characters (found 130). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU14IntegrationTest.java:17:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU14IntegrationTest.java:19:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU10IntegrationTest.java:23:19: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU10IntegrationTest.java:29:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU10IntegrationTest.java:33:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU10IntegrationTest.java:157: Line is longer than 120 characters (found 130). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:26:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:54:56: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:96: Line is longer than 120 characters (found 153). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:124: Line is longer than 120 characters (found 122). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:143: Line is longer than 120 characters (found 121). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:422: Line is longer than 120 characters (found 122). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:435:14: Comment has incorrect indentation level 13, expected is 12, indentation should be the same level as line 436. [CommentsIndentation]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU11IntegrationTest.java:15:19: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU11IntegrationTest.java:19:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU11IntegrationTest.java:30:36: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU11IntegrationTest.java:142: Line is longer than 120 characters (found 138). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/mocks/WithMockCustomUserSecurityContextFactory.java:10:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/mocks/TestSecurityConfig.java:22: Line is longer than 120 characters (found 131). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/mocks/TestSecurityConfig.java:25: Line is longer than 120 characters (found 192). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/mocks/WithMockChefeSecurityContextFactory.java:8:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU16IntegrationTest.java:20:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU16IntegrationTest.java:162: Line is longer than 120 characters (found 138). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/integracao/CDU03IntegrationTest.java:66:37: Empty catch block. [EmptyCatchBlock]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/login/LoginServiceTest.java:37: Line is longer than 120 characters (found 121). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/login/LoginServiceTest.java:44: Line is longer than 120 characters (found 123). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/login/LoginControllerTest.java:26:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/login/LoginControllerTest.java:29:80: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/login/LimitadorTentativasLoginTest.java:10:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/login/GerenciadorJwtTest.java:17:46: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/acesso/MapaAccessPolicyTest.java:17:43: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/acesso/MapaAccessPolicyTest.java:18:40: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/acesso/AtividadeAccessPolicyTest.java:20:43: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/acesso/AtividadeAccessPolicyTest.java:21:40: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/acesso/ProcessoAccessPolicyTest.java:17:43: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/acesso/ProcessoAccessPolicyTest.java:18:40: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/acesso/SubprocessoAccessPolicyTest.java:23:43: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/acesso/SubprocessoAccessPolicyTest.java:24:40: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/acesso/SubprocessoAccessPolicyTest.java:25:56: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/acesso/SubprocessoAccessPolicyTest.java:274:14: Method name 'devePermitirChefeVerificarImpactosMesmaUnidadeSituaçãoPermitida' must match pattern '^[a-z][a-z0-9][a-zA-Z0-9_]*$'. [MethodName]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/seguranca/ConfigCorsTest.java:24: Line is longer than 120 characters (found 128). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:45:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:393: Line is longer than 120 characters (found 127). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:449:61: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:453:61: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:453:86: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:468:81: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:468:118: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:588: Line is longer than 120 characters (found 139). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:644: Line is longer than 120 characters (found 124). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:658: Line is longer than 120 characters (found 124). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:703: Line is longer than 120 characters (found 123). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:703:82: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:703:123: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:704:105: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:714: Line is longer than 120 characters (found 128). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:733:9: 'METHOD_DEF' should be separated from previous line. [EmptyLineSeparator]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceTest.java:788:72: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceCoverageTest.java:89:52: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceCoverageTest.java:113:52: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceCoverageTest.java:137:52: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceCoverageTest.java:160:52: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceCoverageTest.java:181:52: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceCoverageTest.java:203:52: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceCoverageTest.java:210:89: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceCoverageTest.java:216:89: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceCoverageTest.java:216:112: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceCoverageTest.java:234:72: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceCoverageTest.java:236:71: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceCoverageTest.java:251:72: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceCoverageTest.java:254:57: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceCoverageTest.java:255:61: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaWorkflowServiceCoverageTest.java:260:69: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoFactoryTest.java:18:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoFactoryTest.java:25:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoFactoryTest.java:158: Line is longer than 120 characters (found 145). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoEmailServiceTest.java:22:43: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoEmailServiceTest.java:23:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoEmailServiceTest.java:118:5: 'METHOD_DEF' should be separated from previous line. [EmptyLineSeparator]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoServiceTest.java:68:89: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoServiceTest.java:69:71: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoServiceTest.java:88:45: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoServiceTest.java:102:45: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoServiceTest.java:174:45: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoServiceTest.java:174:60: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoServiceTest.java:187:45: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoServiceTest.java:187:60: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoServiceTest.java:188:56: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoServiceTest.java:188:87: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoServiceTest.java:202:45: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoServiceTest.java:202:60: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoValidacaoServiceTest.java:203:87: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoDetalheServiceTest.java:24:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoWorkflowServiceTest.java:27:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoWorkflowServiceTest.java:252: Line is longer than 120 characters (found 139). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/decomposed/SubprocessoWorkflowServiceTest.java:270: Line is longer than 120 characters (found 128). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoServiceTest.java:16:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoServiceTest.java:28:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoServiceTest.java:286: Line is longer than 120 characters (found 126). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowServiceTest.java:34:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoCadastroWorkflowServiceTest.java:551:5: 'METHOD_DEF' should be separated from previous line. [EmptyLineSeparator]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/service/SubprocessoMapaServiceTest.java:149:97: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/dto/MapaAjusteDtoTest.java:16:17: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/SubprocessoCrudControllerTest.java:22:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/subprocesso/SubprocessoCrudControllerTest.java:26:80: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/configuracao/service/ParametroServiceTest.java:18:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/arquitetura/ArchConsistencyTest.java:162: Line is longer than 120 characters (found 123). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/arquitetura/ArchConsistencyTest.java:220: Line is longer than 120 characters (found 121). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceCoverageTest.java:33:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceCoverageTest.java:63: Line is longer than 120 characters (found 124). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceCoverageTest.java:86: Line is longer than 120 characters (found 124). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceCoverageTest.java:104: Line is longer than 120 characters (found 124). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceCoverageTest.java:143:55: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceCoverageTest.java:143:76: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceCoverageTest.java:144:59: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceCoverageTest.java:144:84: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceCoverageTest.java:174:55: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceCoverageTest.java:174:76: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceCoverageTest.java:175:59: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceCoverageTest.java:175:84: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceTest.java:165: Line is longer than 120 characters (found 126). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceTest.java:167: Line is longer than 120 characters (found 131). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceTest.java:170: Line is longer than 120 characters (found 127). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceTest.java:171: Line is longer than 120 characters (found 124). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/painel/PainelServiceTest.java:253: Line is longer than 120 characters (found 124). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/CoberturaExtraTest.java:32: Line is longer than 120 characters (found 122). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/architecture/EqualsHashCodeTest.java:6:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/comum/TestUtil.java:20: Line is longer than 120 characters (found 153). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/comum/erros/RestExceptionHandlerTest.java:104: Line is longer than 120 characters (found 121). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/comum/erros/RestExceptionHandlerTest.java:158: Line is longer than 120 characters (found 158). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/comum/erros/RestExceptionHandlerTest.java:159: Line is longer than 120 characters (found 145). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/comum/erros/RestExceptionHandlerTest.java:170: Line is longer than 120 characters (found 128). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/comum/erros/RestExceptionHandlerTest.java:174: Line is longer than 120 characters (found 145). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/comum/erros/RestExceptionHandlerTest.java:210: Line is longer than 120 characters (found 141). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/comum/erros/RestExceptionHandlerTest.java:213: Line is longer than 120 characters (found 141). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/e2e/E2eControllerTest.java:78: Line is longer than 120 characters (found 138). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/e2e/E2eControllerTest.java:144: Line is longer than 120 characters (found 122). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeTest.java:29:24: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeTest.java:54:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeTest.java:685: Line is longer than 120 characters (found 136). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeTest.java:926:93: Comment has incorrect indentation level 92, expected is 12, indentation should be the same level as line 928. [CommentsIndentation]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoDetalheBuilderTest.java:145:53: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoDetalheBuilderTest.java:145:71: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoDetalheBuilderTest.java:145:96: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoDetalheBuilderTest.java:146:53: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoDetalheBuilderTest.java:146:71: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoDetalheBuilderTest.java:146:96: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeCoverageTest.java:38:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeCoverageTest.java:149: Line is longer than 120 characters (found 189). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeCoverageTest.java:184:51: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeCoverageTest.java:202:76: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeCoverageTest.java:213:82: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeCoverageTest.java:227:5: Annotation 'DisplayName' have incorrect indentation level 4, expected level should be 5. [AnnotationLocationMostCases]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeCoverageTest.java:229:82: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeCoverageTest.java:250:52: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeCoverageTest.java:303:55: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeCoverageTest.java:304:59: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeCoverageTest.java:304:90: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeCoverageTest.java:305:57: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeCoverageTest.java:305:89: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoFacadeCoverageTest.java:306:59: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoInicializadorTest.java:29:43: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoInicializadorTest.java:93:51: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoInicializadorTest.java:103: Line is longer than 120 characters (found 134). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoInicializadorTest.java:131:51: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoInicializadorTest.java:157:51: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/service/ProcessoInicializadorTest.java:172:51: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/ProcessoControllerTest.java:17:24: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/ProcessoControllerTest.java:29:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/processo/ProcessoControllerTest.java:33:80: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/security/ActuatorSecurityTest.java:15:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/AtividadeControllerTest.java:30:80: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/ConhecimentoServiceTest.java:15:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/AtividadeFacadeTest.java:30:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/AtividadeFacadeTest.java:90: Line is longer than 120 characters (found 141). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/AtividadeFacadeTest.java:103: Line is longer than 120 characters (found 121). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/CopiaMapaServiceTest.java:11:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/CopiaMapaServiceTest.java:21:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:29:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorMudancasAtividadeServiceTest.java:125: Line is longer than 120 characters (found 153). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorMudancasAtividadeServiceTest.java:126: Line is longer than 120 characters (found 145). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/CompetenciaServiceTest.java:10:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/CompetenciaServiceTest.java:19:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/MapaVisualizacaoServiceTest.java:10:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/MapaFacadeTest.java:15:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/ImpactoMapaServiceTest.java:3:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/ImpactoMapaServiceTest.java:25:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/ImpactoMapaServiceTest.java:26:43: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/ImpactoMapaServiceTest.java:184: Line is longer than 120 characters (found 143). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/ImpactoMapaServiceTest.java:199: Line is longer than 120 characters (found 130). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:29:57: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:29:84: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:30:62: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:30:89: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:34:54: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:50:57: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:50:87: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:51:62: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:51:89: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:75:57: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:75:91: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:76:57: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:76:87: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:78:62: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:78:89: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:83:61: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:86:78: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/service/DetectorImpactoCompetenciaServiceTest.java:99: Line is longer than 120 characters (found 125). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/MapaControllerTest.java:23:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/mapa/MapaControllerTest.java:27:80: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:16:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:27:43: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:116: Line is longer than 120 characters (found 130). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:133: Line is longer than 120 characters (found 130). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:175: Line is longer than 120 characters (found 130). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:192: Line is longer than 120 characters (found 130). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:196:57: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:196:77: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:197:57: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:197:79: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:197:106: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:198:57: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:198:78: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:198:105: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:373: Line is longer than 120 characters (found 132). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:383: Line is longer than 120 characters (found 123). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:384: Line is longer than 120 characters (found 139). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:400:59: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:401:63: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:401:94: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:402:61: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:402:93: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:472: Line is longer than 120 characters (found 121). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:481:57: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:494:57: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:494:77: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:498: Line is longer than 120 characters (found 126). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:505:55: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:506:59: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:506:90: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:534: Line is longer than 120 characters (found 148). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceTest.java:535: Line is longer than 120 characters (found 152). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UsuarioServiceTest.java:11:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UsuarioServiceTest.java:16:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UsuarioControllerTest.java:20:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UsuarioControllerTest.java:22:80: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UsuarioServiceCoverageTest.java:14:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UsuarioServiceCoverageTest.java:23:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceHierarchyTest.java:30:61: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceHierarchyTest.java:49:57: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceHierarchyTest.java:50:61: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceHierarchyTest.java:50:94: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceHierarchyTest.java:51:59: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceHierarchyTest.java:51:93: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceHierarchyTest.java:52:61: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceHierarchyTest.java:52:94: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceHierarchyTest.java:77:53: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceHierarchyTest.java:78:53: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceHierarchyTest.java:78:80: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceHierarchyTest.java:80:54: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceHierarchyTest.java:81:54: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UnidadeServiceHierarchyTest.java:81:81: Only one statement per line allowed. [OneStatementPerLine]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/ValidadorDadosOrganizacionaisTest.java:12:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UsuarioServiceGapsTest.java:9:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UsuarioServiceGapsTest.java:17:17: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UsuarioServiceGapsTest.java:19:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UsuarioServiceGapsTest.java:20:34: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UsuarioServiceGapsTest.java:124: Line is longer than 120 characters (found 145). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UsuarioServiceGapsTest.java:135: Line is longer than 120 characters (found 142). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/organizacao/UsuarioServiceGapsTest.java:139:38: '{' at column 38 should have line break after. [LeftCurly]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/ControllersServicesCoverageTest.java:109: Line is longer than 120 characters (found 150). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/test/java/sgc/ControllersServicesCoverageTest.java:120: Line is longer than 120 characters (found 125). [LineLength]
+
+> Task :backend:checkstyleMain
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/processo/service/ProcessoFacade.java:37:17: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/processo/service/ProcessoDetalheBuilder.java:16:17: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/processo/dto/ProcessoResumoDto.java:3:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/processo/dto/ProcessoDetalheDto.java:3:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/processo/dto/ProcessoDto.java:3:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/processo/model/Processo.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/processo/ProcessoController.java:9:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/processo/ProcessoController.java:11:24: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/service/MapaVisualizacaoService.java:11:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/service/DetectorMudancasAtividadeService.java:11:17: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/service/DetectorMudancasAtividadeService.java:176: Line is longer than 120 characters (found 127). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/service/MapaSalvamentoService.java:13:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/service/MapaSalvamentoService.java:16:17: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/service/ImpactoMapaService.java:12:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/service/DetectorImpactoCompetenciaService.java:11:17: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/service/DetectorImpactoCompetenciaService.java:89: Line is longer than 120 characters (found 122). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/service/AtividadeFacade.java:30:40: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/service/AtividadeFacade.java:223: Line is longer than 120 characters (found 130). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/service/AtividadeFacade.java:257: Line is longer than 120 characters (found 135). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/service/AtividadeFacade.java:272: Line is longer than 120 characters (found 126). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/service/CopiaMapaService.java:7:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/service/CopiaMapaService.java:9:17: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/service/CompetenciaService.java:7:22: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/dto/ImpactoMapaDto.java:3:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/model/Atividade.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/model/Mapa.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/model/Competencia.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/model/Conhecimento.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/mapper/package-info.java:56: Line is longer than 120 characters (found 122). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/MapaController.java:9:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/AtividadeController.java:8:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/AtividadeController.java:70: Line is longer than 120 characters (found 134). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/AtividadeController.java:119: Line is longer than 120 characters (found 127). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/mapa/AtividadeController.java:139: Line is longer than 120 characters (found 127). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/ValidadorDadosOrganizacionais.java:11:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/ValidadorDadosOrganizacionais.java:19:48: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/model/Usuario.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/model/Usuario.java:4:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/model/VinculacaoUnidade.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/model/UsuarioPerfil.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/model/UsuarioPerfil.java:4:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/model/VinculacaoUnidadeId.java:3:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/model/UsuarioPerfilId.java:3:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/model/Unidade.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/model/Unidade.java:4:14: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/model/AtribuicaoTemporaria.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/model/UnidadeMapa.java:3:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/UsuarioService.java:11:27: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/UsuarioService.java:12:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/UsuarioService.java:14:17: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/UsuarioService.java:89: Line is longer than 120 characters (found 137). [LineLength]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/UnidadeController.java:6:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/UsuarioController.java:10:47: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/UnidadeService.java:13:29: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/UnidadeService.java:18:17: Using star imports (.*) is not allowed. Please import specific classes. [AvoidStarImport]
+[ant:checkstyle] [WARN] /app/backend/src/main/java/sgc/organizacao/UnidadeService.java:100: Line is longer than 120 characters (found 123). [LineLength]
+
+> Task :backend:checkstyleMain FAILED
+
+FAILURE: Build completed with 4 failures.
+
+1: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':backend:jacocoTestCoverageVerification'.
+> A failure occurred while executing org.gradle.internal.jacoco.JacocoCoverageAction
+   > Rule violated for bundle backend: branches covered ratio is 0.83, but expected minimum is 0.85
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to generate a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+2: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':backend:pmdMain'.
+> A failure occurred while executing org.gradle.api.plugins.quality.internal.PmdAction
+   > 299 PMD rule violations were found. See the report at: file:///app/backend/build/reports/pmd/main.html
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+==============================================================================
+
+3: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':backend:checkstyleTest'.
+> A failure occurred while executing org.gradle.api.plugins.quality.internal.CheckstyleAction
+   > Checkstyle rule violations were found. See the report at: file:///app/backend/build/reports/checkstyle/test.html
+     Checkstyle files with violations: 103
+     Checkstyle violations by severity: [warning:446]
+
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+==============================================================================
+
+4: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':backend:checkstyleMain'.
+> A failure occurred while executing org.gradle.api.plugins.quality.internal.CheckstyleAction
+   > Checkstyle rule violations were found. See the report at: file:///app/backend/build/reports/checkstyle/main.html
+     Checkstyle files with violations: 83
+     Checkstyle violations by severity: [warning:173]
+
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+==============================================================================
+
+BUILD FAILED in 20s
+9 actionable tasks: 4 executed, 5 up-to-date
+Configuration cache entry stored.

@@ -23,6 +23,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MapaDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private Long codigo;
     private LocalDateTime dataHoraDisponibilizado;
     private String observacoesDisponibilizacao;

@@ -16,6 +16,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UsuarioDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private String nome;
     private String tituloEleitoral;
     private String email;

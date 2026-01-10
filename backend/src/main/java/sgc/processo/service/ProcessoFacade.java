@@ -15,14 +15,19 @@ import sgc.organizacao.UnidadeService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.Unidade;
-import sgc.processo.dto.*;
-import sgc.processo.mapper.ProcessoMapper;
+import sgc.processo.dto.AtualizarProcessoReq;
+import sgc.processo.dto.CriarProcessoReq;
+import sgc.processo.dto.ProcessoContextoDto;
+import sgc.processo.dto.ProcessoDetalheDto;
+import sgc.processo.dto.ProcessoDto;
+import sgc.processo.dto.SubprocessoElegivelDto;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
-import sgc.processo.eventos.EventoProcessoCriado;
 import sgc.processo.eventos.EventoProcessoAtualizado;
+import sgc.processo.eventos.EventoProcessoCriado;
 import sgc.processo.eventos.EventoProcessoExcluido;
 import sgc.processo.eventos.EventoProcessoFinalizado;
+import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -34,7 +39,17 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static sgc.organizacao.model.TipoUnidade.INTERMEDIARIA;
 import static sgc.processo.model.SituacaoProcesso.CRIADO;
@@ -253,7 +268,7 @@ public class ProcessoFacade {
                 .usuario(usuarioService.obterUsuarioAutenticado())
                 .codigosUnidades(processo.getParticipantes().stream()
                         .map(Unidade::getCodigo)
-                        .collect(java.util.stream.Collectors.toSet()))
+                        .collect(Collectors.toSet()))
                 .dataHoraExclusao(LocalDateTime.now())
                 .build();
         publicadorEventos.publishEvent(evento);
@@ -484,8 +499,9 @@ public class ProcessoFacade {
         List<PerfilDto> perfis = usuarioService.buscarPerfisUsuario(username);
         Long codUnidadeUsuario = perfis.stream().findFirst().map(PerfilDto::getUnidadeCodigo).orElse(null);
 
-        if (codUnidadeUsuario == null)
+        if (codUnidadeUsuario == null) {
             return List.of();
+        }
 
         return subprocessos.stream()
                 .filter(sp -> sp.getUnidade() != null

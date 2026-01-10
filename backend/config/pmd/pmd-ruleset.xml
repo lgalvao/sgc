@@ -45,9 +45,9 @@
     <!-- Error Prone -->
     <rule ref="category/java/errorprone.xml">
         <!-- Exclude some false positives with Lombok -->
-        <exclude name="BeanMembersShouldSerialize"/>
-        <exclude name="DataflowAnomalyAnalysis"/>
-        <exclude name="NullAssignment"/>
+
+
+
     </rule>
 
     <!-- Multithreading -->
