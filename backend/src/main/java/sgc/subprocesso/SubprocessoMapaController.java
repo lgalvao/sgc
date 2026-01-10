@@ -20,10 +20,7 @@ import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoContextoService;
-import sgc.subprocesso.service.SubprocessoMapaService;
-import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
 
@@ -32,14 +29,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoMapaController {
-    private final SubprocessoMapaService subprocessoMapaService;
+    private final SubprocessoFacade subprocessoFacade;
     private final MapaService mapaService;
     private final MapaVisualizacaoService mapaVisualizacaoService;
     private final ImpactoMapaService impactoMapaService;
-    private final SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
     private final UsuarioService usuarioService;
-    private final SubprocessoService subprocessoService;
-    private final SubprocessoContextoService subprocessoContextoService;
 
     /**
      * Obtém o contexto completo para edição de mapa (BFF).
@@ -133,7 +127,7 @@ public class SubprocessoMapaController {
             @PathVariable Long codigo,
             @RequestBody @Valid SalvarMapaRequest request,
             @AuthenticationPrincipal Object principal) {
-        return subprocessoMapaWorkflowService.salvarMapaSubprocesso(
+        return subprocessoFacade.salvarMapaSubprocesso(
                 codigo, request);
     }
 
@@ -200,7 +194,7 @@ public class SubprocessoMapaController {
             @RequestBody @Valid SalvarMapaRequest request,
             @AuthenticationPrincipal Object principal) {
 
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.salvarMapaSubprocesso(
+        MapaCompletoDto mapa = subprocessoFacade.salvarMapaSubprocesso(
                 codigo, request);
 
         return ResponseEntity.ok(mapa);
@@ -219,7 +213,7 @@ public class SubprocessoMapaController {
         DisponibilizarMapaRequest serviceRequest = DisponibilizarMapaRequest.builder()
                 .dataLimite(request.getDataLimite())
                 .build();
-        subprocessoMapaWorkflowService.disponibilizarMapaEmBloco(request.getUnidadeCodigos(), codigo, serviceRequest, usuario);
+        subprocessoFacade.disponibilizarMapaEmBloco(request.getUnidadeCodigos(), codigo, serviceRequest, usuario);
     }
 
     @PostMapping("/{codigo}/competencias")
@@ -231,7 +225,7 @@ public class SubprocessoMapaController {
             @RequestBody @Valid CompetenciaReq request,
             @AuthenticationPrincipal Object principal) {
         MapaCompletoDto mapa =
-                subprocessoMapaWorkflowService.adicionarCompetencia(
+                subprocessoFacade.adicionarCompetencia(
                         codigo, request);
         return ResponseEntity.ok(mapa);
     }
@@ -246,7 +240,7 @@ public class SubprocessoMapaController {
             @RequestBody @Valid CompetenciaReq request,
             @AuthenticationPrincipal Object principal) {
 
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.atualizarCompetencia(
+        MapaCompletoDto mapa = subprocessoFacade.atualizarCompetencia(
                 codigo, codCompetencia, request);
 
         return ResponseEntity.ok(mapa);
@@ -260,7 +254,7 @@ public class SubprocessoMapaController {
             @PathVariable Long codigo,
             @PathVariable Long codCompetencia,
             @AuthenticationPrincipal Object principal) {
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.removerCompetencia(
+        MapaCompletoDto mapa = subprocessoFacade.removerCompetencia(
                 codigo, codCompetencia);
 
         return ResponseEntity.ok(mapa);

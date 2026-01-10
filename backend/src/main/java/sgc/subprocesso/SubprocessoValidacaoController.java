@@ -14,8 +14,7 @@ import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.model.TipoAnalise;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
-import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
 
@@ -25,8 +24,7 @@ import java.util.List;
 @Transactional
 @Tag(name = "Subprocessos", description = "Gerenciamento do workflow de subprocessos")
 public class SubprocessoValidacaoController {
-    private final SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoFacade subprocessoFacade;
     private final sgc.analise.AnaliseService analiseService;
     private final AnaliseMapper analiseMapper;
 
@@ -54,7 +52,7 @@ public class SubprocessoValidacaoController {
                 .observacoes(request.getObservacoes())
                 .build();
 
-        subprocessoMapaWorkflowService.disponibilizarMapa(codigo, serviceRequest, usuario);
+        subprocessoFacade.disponibilizarMapa(codigo, serviceRequest, usuario);
         return ResponseEntity.ok(new RespostaDto("Mapa de competências disponibilizado."));
     }
 
@@ -75,7 +73,7 @@ public class SubprocessoValidacaoController {
         @RequestBody @Valid ApresentarSugestoesReq request, 
         @AuthenticationPrincipal Usuario usuario) {
 
-        subprocessoMapaWorkflowService.apresentarSugestoes(codigo, request.getSugestoes(), usuario);
+        subprocessoFacade.apresentarSugestoes(codigo, request.getSugestoes(), usuario);
     }
 
     /**
@@ -90,7 +88,7 @@ public class SubprocessoValidacaoController {
     @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Valida o mapa de competências da unidade")
     public void validarMapa(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
-        subprocessoMapaWorkflowService.validarMapa(codigo, usuario);
+        subprocessoFacade.validarMapa(codigo, usuario);
     }
 
     /**
@@ -102,7 +100,7 @@ public class SubprocessoValidacaoController {
     @GetMapping("/{codigo}/sugestoes")
     @PreAuthorize("isAuthenticated()")
     public SugestoesDto obterSugestoes(@PathVariable Long codigo) {
-        return subprocessoService.obterSugestoes(codigo);
+        return subprocessoFacade.obterSugestoes(codigo);
     }
 
     /**
@@ -136,7 +134,7 @@ public class SubprocessoValidacaoController {
         @RequestBody @Valid DevolverValidacaoReq request, 
         @AuthenticationPrincipal Usuario usuario) {
 
-        subprocessoMapaWorkflowService.devolverValidacao(codigo, request.getJustificativa(), usuario);
+        subprocessoFacade.devolverValidacao(codigo, request.getJustificativa(), usuario);
     }
 
     /**
@@ -152,7 +150,7 @@ public class SubprocessoValidacaoController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @Operation(summary = "Aceita a validação do mapa")
     public void aceitarValidacao(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
-        subprocessoMapaWorkflowService.aceitarValidacao(codigo, usuario);
+        subprocessoFacade.aceitarValidacao(codigo, usuario);
     }
 
     /**
@@ -167,7 +165,7 @@ public class SubprocessoValidacaoController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Homologa a validação do mapa")
     public void homologarValidacao(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
-        subprocessoMapaWorkflowService.homologarValidacao(codigo, usuario);
+        subprocessoFacade.homologarValidacao(codigo, usuario);
     }
 
     /**
@@ -184,7 +182,7 @@ public class SubprocessoValidacaoController {
     @Operation(summary = "Submete o mapa ajustado para nova validação")
     public void submeterMapaAjustado(@PathVariable Long codigo, @RequestBody @Valid SubmeterMapaAjustadoReq request, 
         @AuthenticationPrincipal Usuario usuario) {
-        subprocessoMapaWorkflowService.submeterMapaAjustado(codigo, request, usuario);
+        subprocessoFacade.submeterMapaAjustado(codigo, request, usuario);
     }
 
     /**
@@ -197,7 +195,7 @@ public class SubprocessoValidacaoController {
     public void aceitarValidacaoEmBloco(@PathVariable Long codigo,
                                         @RequestBody @Valid ProcessarEmBlocoRequest request,
                                         @AuthenticationPrincipal Usuario usuario) {
-        subprocessoMapaWorkflowService.aceitarValidacaoEmBloco(request.getUnidadeCodigos(), codigo, usuario);
+        subprocessoFacade.aceitarValidacaoEmBloco(request.getUnidadeCodigos(), codigo, usuario);
     }
 
     /**
@@ -210,6 +208,6 @@ public class SubprocessoValidacaoController {
     public void homologarValidacaoEmBloco(@PathVariable Long codigo,
                                           @RequestBody @Valid ProcessarEmBlocoRequest request,
                                           @AuthenticationPrincipal Usuario usuario) {
-        subprocessoMapaWorkflowService.homologarValidacaoEmBloco(request.getUnidadeCodigos(), codigo, usuario);
+        subprocessoFacade.homologarValidacaoEmBloco(request.getUnidadeCodigos(), codigo, usuario);
     }
 }
