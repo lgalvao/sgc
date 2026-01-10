@@ -75,8 +75,12 @@ public class AtividadeAccessPolicy implements AccessPolicy<Atividade> {
                 return false;
             }
 
-            // Subprocesso nunca é null (nullable=false na FK)
+            // Subprocesso pode ser null em cenários de dados inconsistentes ou mocks incompletos
             Subprocesso subprocesso = mapa.getSubprocesso();
+            if (subprocesso == null) {
+                ultimoMotivoNegacao = "Mapa não possui subprocesso associado";
+                return false;
+            }
             Unidade unidade = subprocesso.getUnidade();
             if (unidade == null) {
                 ultimoMotivoNegacao = "Subprocesso não possui unidade associada";
