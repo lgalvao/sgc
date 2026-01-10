@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import sgc.organizacao.UnidadeService;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.subprocesso.dto.*;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.net.URI;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoCrudController {
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoFacade subprocessoFacade;
     private final UnidadeService unidadeService;
 
     /**
@@ -32,7 +32,7 @@ public class SubprocessoCrudController {
     @GetMapping("/{codigo}/permissoes")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<SubprocessoPermissoesDto> obterPermissoes(@PathVariable Long codigo) {
-        SubprocessoPermissoesDto permissoes = subprocessoService.obterPermissoes(codigo);
+        SubprocessoPermissoesDto permissoes = subprocessoFacade.obterPermissoes(codigo);
         return ResponseEntity.ok(permissoes);
     }
 
@@ -40,14 +40,14 @@ public class SubprocessoCrudController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Valida se o cadastro está pronto para disponibilização")
     public ResponseEntity<ValidacaoCadastroDto> validarCadastro(@PathVariable Long codigo) {
-        return ResponseEntity.ok(subprocessoService.validarCadastro(codigo));
+        return ResponseEntity.ok(subprocessoFacade.validarCadastro(codigo));
     }
 
     @GetMapping("/{codigo}/status")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtém apenas o status atual do subprocesso")
     public ResponseEntity<SubprocessoSituacaoDto> obterStatus(@PathVariable Long codigo) {
-        return ResponseEntity.ok(subprocessoService.obterSituacao(codigo));
+        return ResponseEntity.ok(subprocessoFacade.obterSituacao(codigo));
     }
 
     /**
@@ -59,7 +59,7 @@ public class SubprocessoCrudController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<SubprocessoDto> listar() {
-        return subprocessoService.listar();
+        return subprocessoFacade.listar();
     }
 
     /**
@@ -76,7 +76,7 @@ public class SubprocessoCrudController {
             @PathVariable Long codigo,
             @RequestParam(required = false) sgc.organizacao.model.Perfil perfil,
             @RequestParam(required = false) Long unidadeUsuario) {
-        return subprocessoService.obterDetalhes(codigo, perfil);
+        return subprocessoFacade.obterDetalhes(codigo, perfil);
     }
 
     /**
@@ -92,7 +92,7 @@ public class SubprocessoCrudController {
             @RequestParam Long codProcesso, @RequestParam String siglaUnidade) {
         UnidadeDto unidade = unidadeService.buscarPorSigla(siglaUnidade);
         SubprocessoDto dto =
-                subprocessoService.obterPorProcessoEUnidade(codProcesso, unidade.getCodigo());
+                subprocessoFacade.obterPorProcessoEUnidade(codProcesso, unidade.getCodigo());
         return ResponseEntity.ok(dto);
     }
 
@@ -108,7 +108,7 @@ public class SubprocessoCrudController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SubprocessoDto> criar(@Valid @RequestBody SubprocessoDto subprocessoDto) {
-        var salvo = subprocessoService.criar(subprocessoDto);
+        var salvo = subprocessoFacade.criar(subprocessoDto);
         URI uri = URI.create("/api/subprocessos/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(salvo);
     }
@@ -126,7 +126,7 @@ public class SubprocessoCrudController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SubprocessoDto> atualizar(
             @PathVariable Long codigo, @Valid @RequestBody SubprocessoDto subprocessoDto) {
-        var atualizado = subprocessoService.atualizar(codigo, subprocessoDto);
+        var atualizado = subprocessoFacade.atualizar(codigo, subprocessoDto);
         return ResponseEntity.ok(atualizado);
     }
 
@@ -141,7 +141,7 @@ public class SubprocessoCrudController {
     @PostMapping("/{codigo}/excluir")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> excluir(@PathVariable Long codigo) {
-        subprocessoService.excluir(codigo);
+        subprocessoFacade.excluir(codigo);
         return ResponseEntity.noContent().build();
     }
 
@@ -154,7 +154,7 @@ public class SubprocessoCrudController {
     public ResponseEntity<Void> alterarDataLimite(
             @PathVariable Long codigo,
             @RequestBody @Valid AlterarDataLimiteRequest request) {
-        subprocessoService.alterarDataLimite(codigo, request.getNovaDataLimite());
+        subprocessoFacade.alterarDataLimite(codigo, request.getNovaDataLimite());
         return ResponseEntity.ok().build();
     }
 
@@ -168,7 +168,7 @@ public class SubprocessoCrudController {
     public ResponseEntity<Void> reabrirCadastro(
             @PathVariable Long codigo,
             @RequestBody @Valid ReabrirProcessoReq request) {
-        subprocessoService.reabrirCadastro(codigo, request.getJustificativa());
+        subprocessoFacade.reabrirCadastro(codigo, request.getJustificativa());
         return ResponseEntity.ok().build();
     }
 
@@ -182,7 +182,7 @@ public class SubprocessoCrudController {
     public ResponseEntity<Void> reabrirRevisaoCadastro(
             @PathVariable Long codigo,
             @RequestBody @Valid ReabrirProcessoReq request) {
-        subprocessoService.reabrirRevisaoCadastro(codigo, request.getJustificativa());
+        subprocessoFacade.reabrirRevisaoCadastro(codigo, request.getJustificativa());
         return ResponseEntity.ok().build();
     }
 }
