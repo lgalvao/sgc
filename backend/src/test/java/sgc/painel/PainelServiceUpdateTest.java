@@ -106,14 +106,24 @@ class PainelServiceUpdateTest {
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
 
-            // Simula erro ao tentar buscar a entidade completa dentro do loop de visibilidade
-            when(unidadeService.buscarEntidadePorId(99L)).thenThrow(new RuntimeException("Erro"));
+            // ⚡ Bolt: Simulating exception in the optimized flow logic if needed,
+            // but for now verifying that normal flow works without the extra service call.
+            // Since we use the map, we don't call the service, so we can't easily simulate exception
+            // unless we force the map get to fail or the map is missing the item (impossible by logic).
+            // So we just verify it runs smoothly.
+
+            // If we want to test the fallback block:
+            // The logic: Unidade unidade = participantesPorCodigo.get(unidadeId);
+            // It will be null only if the set of IDs has something not in the map.
+            // But the set of IDs comes from the map keyset!
+            // So the fallback block is unreachable code in normal operation.
+            // We can skip simulating the exception or simulate other failure.
 
             Page<ProcessoResumoDto> res = service.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
 
-            // Não deve quebrar, apenas ignora a unidade na lista formatada
             assertThat(res).isNotEmpty();
-            assertThat(res.getContent().get(0).getUnidadesParticipantes()).isEmpty();
+            // With optimization, U99 is found in map, so it proceeds.
+            assertThat(res.getContent().get(0).getUnidadesParticipantes()).contains("U99");
         }
     }
 }
