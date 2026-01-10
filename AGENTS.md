@@ -61,11 +61,50 @@ Este documento resume as diretrizes essenciais para o desenvolvimento no projeto
 * **Frontend:** `npm run typecheck`, `npm run lint`, `npm run test:unit` (Vitest).
 * **E2E:** Playwright (consulte `/regras/e2e_regras.md`).
 
-## 5. Referências e Padrões Detalhados
+## 5. Padrões Arquiteturais (ADRs)
+
+O SGC segue padrões arquiteturais bem definidos, documentados em ADRs (Architectural Decision Records):
+
+* **[ADR-001: Facade Pattern](/docs/adr/ADR-001-facade-pattern.md)** - ✅ Implementado
+  * Controllers usam APENAS Facades, nunca Services especializados diretamente
+  * Facades orquestram operações complexas delegando para Services especializados
+  * Exemplo: `ProcessoFacade`, `SubprocessoFacade`, `MapaFacade`, `AtividadeFacade`
+  
+* **[ADR-002: Unified Events Pattern](/docs/adr/ADR-002-unified-events.md)** - ✅ Implementado
+  * Eventos de domínio para comunicação assíncrona entre módulos
+  * Padrão unificado: `EventoTransicaoSubprocesso` (design ⭐)
+  * Exemplo: `EventoProcessoCriado`, `EventoProcessoIniciado`, `EventoMapaAlterado`
+  
+* **[ADR-003: Security Architecture](/docs/adr/ADR-003-security-architecture.md)** - ✅ Implementado
+  * Arquitetura centralizada de controle de acesso em 3 camadas
+  * `AccessControlService` centraliza TODAS as verificações de permissão
+  * `AccessPolicy` especializada por tipo de recurso (Processo, Subprocesso, Atividade, Mapa)
+  * `HierarchyService` para verificações de hierarquia de unidades
+  * `AccessAuditService` para auditoria completa de decisões de acesso
+  * **CRÍTICO:** Services NUNCA fazem verificações de acesso diretas
+  
+* **[ADR-004: DTO Pattern](/docs/adr/ADR-004-dto-pattern.md)** - ✅ Implementado
+  * DTOs obrigatórios em TODAS as APIs REST
+  * Entidades JPA NUNCA são expostas diretamente
+  * Mappers implementados com MapStruct para conversão Entidade ↔ DTO
+  * DTOs de Request (entrada) vs. DTOs de Response (saída)
+  * Bean Validation para validação de entrada
+
+## 6. Referências e Padrões Detalhados
 
 Para detalhes técnicos e exemplos de código, consulte:
 
-* [Backend Patterns](/regras/backend-padroes.md)
-* [Frontend Patterns](/regras/frontend-padroes.md)
-* [Regras para execução de testes e2e e correção de bugs](/regras/e2e_regras.md)
-* `README.md` de cada módulo e diretório para responsabilidades específicas.
+* **Padrões de Código:**
+  * [Backend Patterns](/regras/backend-padroes.md)
+  * [Frontend Patterns](/regras/frontend-padroes.md)
+  * [Regras para execução de testes e2e e correção de bugs](/regras/e2e_regras.md)
+
+* **Arquitetura e Decisões:**
+  * [ARCHITECTURE.md](/docs/ARCHITECTURE.md) - Visão geral da arquitetura
+  * [ADRs](/docs/adr/) - Decisões arquiteturais documentadas
+  * [Refactoring Plan](/refactoring-plan.md) - Plano de melhorias arquiteturais
+  * [Security Refactoring Plan](/security-refactoring-plan.md) - Refatoração de segurança (completa)
+
+* **Módulo-Específico:**
+  * `README.md` de cada módulo e diretório para responsabilidades específicas
+  * `package-info.java` em cada pacote para documentação detalhada
