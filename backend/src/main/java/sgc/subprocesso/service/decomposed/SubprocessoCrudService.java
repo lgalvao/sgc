@@ -100,7 +100,10 @@ public class SubprocessoCrudService {
                 .subprocesso(salvo)
                 .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
                 .dataHoraCriacao(LocalDateTime.now())
-                .criadoPorProcesso(false)  // TODO: detectar se foi criado automaticamente
+                // TODO: Implementar detecção de criação automática
+                // Atualmente sempre false porque SubprocessoFactory usa saveAll() direto
+                // Solução: Migrar SubprocessoFactory para usar este método com parâmetro
+                .criadoPorProcesso(false)
                 .codProcesso(salvo.getProcesso() != null ? salvo.getProcesso().getCodigo() : null)
                 .codUnidade(salvo.getUnidade() != null ? salvo.getUnidade().getCodigo() : null)
                 .build();
