@@ -212,11 +212,11 @@ A análise da arquitetura atual revelou oportunidades de melhoria focadas em:
    - [ ] Documentar regras do ArchUnit
    - [ ] Exemplos de uso de Facades
 
-3. [ ] **Criar ADRs (Architectural Decision Records)**
-   - [ ] Por que Facade Pattern?
-   - [ ] Por que AccessControlService centralizado?
-   - [ ] Por que DTOs obrigatórios?
-   - [ ] Por que EventoTransicaoSubprocesso unificado?
+3. ⏳ **Criar ADRs (Architectural Decision Records)**
+   - ✅ ADR-001: Facade Pattern (Por que e como usar Facades)
+   - ✅ ADR-002: Unified Events Pattern (EventoTransicaoSubprocesso)
+   - [ ] ADR-003: Security Architecture (AccessControlService centralizado)
+   - [ ] ADR-004: DTO Pattern (Por que DTOs obrigatórios)
 
 4. [ ] **Diagramas de Arquitetura**
    - [ ] Diagrama de camadas (ASCII art melhorado)
@@ -226,7 +226,7 @@ A análise da arquitetura atual revelou oportunidades de melhoria focadas em:
 **Entregáveis**:
 - ⏳ package-info.java completos (5/~30 criados)
 - [ ] AGENTS.md atualizado com arquitetura
-- [ ] 4 ADRs criados
+- ✅ 2/4 ADRs criados (Facade Pattern, Unified Events)
 - [ ] 3 diagramas atualizados
 
 **Critérios de Aceitação**:
