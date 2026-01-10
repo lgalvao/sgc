@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(RestExceptionHandler.class)
 class SubprocessoCrudControllerTest {
     @MockitoBean
-    private SubprocessoService subprocessoService;
+    private sgc.subprocesso.service.SubprocessoFacade subprocessoFacade;
 
     @MockitoBean
     private UnidadeService unidadeService;
@@ -41,7 +41,7 @@ class SubprocessoCrudControllerTest {
     @DisplayName("listar deve retornar lista de subprocessos")
     @WithMockUser(roles = "ADMIN")
     void listar() throws Exception {
-        when(subprocessoService.listar()).thenReturn(List.of(new SubprocessoDto()));
+        when(subprocessoFacade.listar()).thenReturn(List.of(new SubprocessoDto()));
 
         mockMvc.perform(get("/api/subprocessos"))
                 .andExpect(status().isOk())
@@ -53,7 +53,7 @@ class SubprocessoCrudControllerTest {
     @DisplayName("obterPorCodigo deve retornar detalhe")
     @WithMockUser
     void obterPorCodigo() throws Exception {
-        when(subprocessoService.obterDetalhes(eq(1L), any()))
+        when(subprocessoFacade.obterDetalhes(eq(1L), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
 
         mockMvc.perform(get("/api/subprocessos/1")).andExpect(status().isOk());
@@ -66,7 +66,7 @@ class SubprocessoCrudControllerTest {
         UnidadeDto uDto = UnidadeDto.builder().codigo(10L).build();
 
         when(unidadeService.buscarPorSigla("U1")).thenReturn(uDto);
-        when(subprocessoService.obterPorProcessoEUnidade(1L, 10L))
+        when(subprocessoFacade.obterPorProcessoEUnidade(1L, 10L))
                 .thenReturn(new SubprocessoDto());
 
         mockMvc.perform(
@@ -83,7 +83,7 @@ class SubprocessoCrudControllerTest {
         SubprocessoDto dto = new SubprocessoDto();
         dto.setCodigo(1L);
 
-        when(subprocessoService.criar(any())).thenReturn(dto);
+        when(subprocessoFacade.criar(any())).thenReturn(dto);
 
         mockMvc.perform(post("/api/subprocessos").with(csrf()).contentType(MediaType.APPLICATION_JSON)
                 .content("{\"codProcesso\": 1}"))
@@ -98,7 +98,7 @@ class SubprocessoCrudControllerTest {
         SubprocessoDto dto = new SubprocessoDto();
         dto.setCodigo(1L);
 
-        when(subprocessoService.atualizar(eq(1L), any())).thenReturn(dto);
+        when(subprocessoFacade.atualizar(eq(1L), any())).thenReturn(dto);
 
         mockMvc.perform(post("/api/subprocessos/1/atualizar").with(csrf()).contentType(MediaType.APPLICATION_JSON)
                 .content("{\"codProcesso\": 1}"))
@@ -109,7 +109,7 @@ class SubprocessoCrudControllerTest {
     @DisplayName("excluir deve retornar NoContent")
     @WithMockUser(roles = "ADMIN")
     void excluir() throws Exception {
-        doNothing().when(subprocessoService).excluir(1L);
+        doNothing().when(subprocessoFacade).excluir(1L);
 
         mockMvc.perform(post("/api/subprocessos/1/excluir").with(csrf()))
                 .andExpect(status().isNoContent());
@@ -120,7 +120,7 @@ class SubprocessoCrudControllerTest {
     @WithMockUser(roles = "ADMIN")
     void excluirNotFound() throws Exception {
         doThrow(new ErroEntidadeNaoEncontrada("Subprocesso", 1L))
-                .when(subprocessoService)
+                .when(subprocessoFacade)
                 .excluir(1L);
 
         mockMvc.perform(post("/api/subprocessos/1/excluir").with(csrf()))
@@ -133,7 +133,7 @@ class SubprocessoCrudControllerTest {
     void obterPermissoes() throws Exception {
         mockMvc.perform(get("/api/subprocessos/1/permissoes"))
                 .andExpect(status().isOk());
-        verify(subprocessoService).obterPermissoes(1L);
+        verify(subprocessoFacade).obterPermissoes(1L);
     }
 
     @Test
@@ -141,7 +141,7 @@ class SubprocessoCrudControllerTest {
     @WithMockUser
     void validarCadastro() throws Exception {
         mockMvc.perform(get("/api/subprocessos/1/validar-cadastro")).andExpect(status().isOk());
-        verify(subprocessoService).validarCadastro(1L);
+        verify(subprocessoFacade).validarCadastro(1L);
     }
 
     @Test
@@ -149,7 +149,7 @@ class SubprocessoCrudControllerTest {
     @WithMockUser
     void obterStatus() throws Exception {
         mockMvc.perform(get("/api/subprocessos/1/status")).andExpect(status().isOk());
-        verify(subprocessoService).obterSituacao(1L);
+        verify(subprocessoFacade).obterSituacao(1L);
     }
 
     @Test
@@ -161,7 +161,7 @@ class SubprocessoCrudControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"novaDataLimite\": \"2030-01-01\"}"))
                 .andExpect(status().isOk());
-        verify(subprocessoService).alterarDataLimite(eq(1L), any());
+        verify(subprocessoFacade).alterarDataLimite(eq(1L), any());
     }
 
     @Test
@@ -173,7 +173,7 @@ class SubprocessoCrudControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"justificativa\": \"Erro\"}"))
                 .andExpect(status().isOk());
-        verify(subprocessoService).reabrirCadastro(1L, "Erro");
+        verify(subprocessoFacade).reabrirCadastro(1L, "Erro");
     }
 
     @Test
@@ -185,6 +185,6 @@ class SubprocessoCrudControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"justificativa\": \"Erro\"}"))
                 .andExpect(status().isOk());
-        verify(subprocessoService).reabrirRevisaoCadastro(1L, "Erro");
+        verify(subprocessoFacade).reabrirRevisaoCadastro(1L, "Erro");
     }
 }

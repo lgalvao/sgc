@@ -120,7 +120,7 @@ class ControllersServicesCoverageTest {
     @Test
     @DisplayName("Deve listar atividades")
     void deveListarAtividades() {
-        when(subprocessoService.listarAtividadesSubprocesso(1L)).thenReturn(new ArrayList<>());
+        when(subprocessoFacade.listarAtividadesSubprocesso(1L)).thenReturn(new ArrayList<>());
         ResponseEntity<List<AtividadeVisualizacaoDto>> response = subprocessoMapaController.listarAtividades(1L);
         assertThat(response.getBody()).isNotNull();
     }
@@ -128,7 +128,7 @@ class ControllersServicesCoverageTest {
     @Test
     @DisplayName("Deve obter contexto de edição")
     void deveObterContextoEdicao() {
-        when(subprocessoContextoService.obterContextoEdicao(anyLong(), any())).thenReturn(ContextoEdicaoDto.builder().build());
+        when(subprocessoFacade.obterContextoEdicao(anyLong(), any())).thenReturn(ContextoEdicaoDto.builder().build());
         ContextoEdicaoDto dto = subprocessoMapaController.obterContextoEdicao(1L, null);
         assertThat(dto).isNotNull();
     }
