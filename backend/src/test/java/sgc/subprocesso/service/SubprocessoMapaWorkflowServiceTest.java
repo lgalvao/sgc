@@ -290,16 +290,16 @@ class SubprocessoMapaWorkflowServiceTest {
 
             // Mapa já tinha competências (não era vazio)
             Competencia c = new Competencia();
-            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(c));
+            when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
 
             SalvarMapaRequest req = new SalvarMapaRequest();
             req.setCompetencias(List.of(new CompetenciaMapaDto()));
 
-            service.salvarMapaSubprocesso(1L, req, "user");
+            service.salvarMapaSubprocesso(1L, req);
 
             // Não deve salvar porque não mudou situação
             verify(subprocessoRepo, never()).save(sp);
-            verify(mapaService).salvarMapaCompleto(10L, req, "user");
+            verify(mapaService).salvarMapaCompleto(10L, req);
         }
 
         @Test
@@ -310,12 +310,12 @@ class SubprocessoMapaWorkflowServiceTest {
             when(mapa.getCodigo()).thenReturn(10L);
             when(sp.getMapa()).thenReturn(mapa);
 
-            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of()); // Era vazio
+            when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of()); // Era vazio
 
             SalvarMapaRequest req = new SalvarMapaRequest();
             req.setCompetencias(List.of()); // Sem novas competências
 
-            service.salvarMapaSubprocesso(1L, req, "user");
+            service.salvarMapaSubprocesso(1L, req);
 
             // Não deve salvar porque não tem novas competências
             verify(subprocessoRepo, never()).save(sp);
@@ -329,13 +329,13 @@ class SubprocessoMapaWorkflowServiceTest {
             when(mapa.getCodigo()).thenReturn(10L);
             when(sp.getMapa()).thenReturn(mapa);
             // Mapa não era vazio
-            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(new Competencia()));
+            when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(new Competencia()));
 
             CompetenciaReq req = new CompetenciaReq();
             req.setDescricao("Nova Comp");
             req.setAtividadesIds(List.of(1L));
 
-            service.adicionarCompetencia(1L, req, "user");
+            service.adicionarCompetencia(1L, req);
 
             // Não deve salvar porque o mapa já não era vazio
             verify(subprocessoRepo, never()).save(sp);
@@ -350,9 +350,9 @@ class SubprocessoMapaWorkflowServiceTest {
             when(sp.getMapa()).thenReturn(mapa);
 
             // Simular que ainda tem competências após remover
-            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(new Competencia()));
+            when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(new Competencia()));
 
-            service.removerCompetencia(1L, 5L, "user");
+            service.removerCompetencia(1L, 5L);
 
             verify(competenciaService).removerCompetencia(5L);
             // Não deve salvar porque ainda tem competências
@@ -491,7 +491,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             Competencia c = new Competencia();
             c.setAtividades(new HashSet<>(List.of(new Atividade())));
-            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(c));
+            when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
             when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of());
 
             when(unidadeService.buscarPorSigla("SEDOC")).thenReturn(UnidadeDto.builder().codigo(99L).build());
@@ -518,7 +518,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             Competencia c = new Competencia();
             c.setAtividades(new HashSet<>(List.of(new Atividade())));
-            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(c));
+            when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
             when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of());
 
             when(unidadeService.buscarPorSigla("SEDOC")).thenReturn(UnidadeDto.builder().codigo(99L).build());
@@ -542,14 +542,14 @@ class SubprocessoMapaWorkflowServiceTest {
             Mapa mapa = mock(Mapa.class);
             when(mapa.getCodigo()).thenReturn(10L);
             when(sp.getMapa()).thenReturn(mapa);
-            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of());
+            when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
 
             SalvarMapaRequest req = new SalvarMapaRequest();
             req.setCompetencias(List.of());
 
-            service.salvarMapaSubprocesso(1L, req, "user");
+            service.salvarMapaSubprocesso(1L, req);
 
-            verify(mapaService).salvarMapaCompleto(10L, req, "user");
+            verify(mapaService).salvarMapaCompleto(10L, req);
         }
 
         @Test
@@ -560,14 +560,14 @@ class SubprocessoMapaWorkflowServiceTest {
             Mapa mapa = mock(Mapa.class);
             when(mapa.getCodigo()).thenReturn(10L);
             when(sp.getMapa()).thenReturn(mapa);
-            when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of());
+            when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
 
             SalvarMapaRequest req = new SalvarMapaRequest();
             req.setCompetencias(List.of());
 
-            service.salvarMapaSubprocesso(1L, req, "user");
+            service.salvarMapaSubprocesso(1L, req);
 
-            verify(mapaService).salvarMapaCompleto(10L, req, "user");
+            verify(mapaService).salvarMapaCompleto(10L, req);
         }
     }
 

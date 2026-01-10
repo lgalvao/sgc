@@ -7,10 +7,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.organizacao.model.*;
-import sgc.seguranca.GerenciadorJwt;
-import sgc.seguranca.autenticacao.AcessoAdClient;
 import sgc.organizacao.dto.ResponsavelDto;
-import sgc.seguranca.dto.EntrarReq;
+
+import sgc.seguranca.login.ClienteAcessoAd;
+import sgc.seguranca.login.LoginService;
+import sgc.seguranca.login.dto.EntrarReq;
 
 import java.util.*;
 
@@ -24,9 +25,9 @@ class UsuarioServiceGapsTest {
     @Mock private UsuarioRepo usuarioRepo;
     @Mock private UsuarioPerfilRepo usuarioPerfilRepo;
     @Mock private AdministradorRepo administradorRepo;
-    @Mock private GerenciadorJwt gerenciadorJwt;
-    @Mock private AcessoAdClient acessoAdClient;
     @Mock private UnidadeService unidadeService;
+    @Mock private ClienteAcessoAd clienteAcessoAd;
+    @Mock private LoginService loginService;
 
     @InjectMocks
     private UsuarioService usuarioService;
@@ -113,8 +114,8 @@ class UsuarioServiceGapsTest {
     @DisplayName("Linhas 423-424: Deve falhar se unidade ou perfil não baterem na autorização")
     void deveFalharSeUnidadeNaoBaterNoEntrar() {
         // Simular autenticação prévia com sucesso
-        when(acessoAdClient.autenticar(anyString(), anyString())).thenReturn(true);
-        usuarioService.autenticar("123", "senha");
+        when(clienteAcessoAd.autenticar(anyString(), anyString())).thenReturn(true);
+        loginService.autenticar("123", "senha");
         
         Usuario u = new Usuario();
         u.setTituloEleitoral("123");
@@ -137,14 +138,14 @@ class UsuarioServiceGapsTest {
 
         // Tentando entrar como GESTOR na unidade 1 (ele é CHEFE)
         EntrarReq req = new EntrarReq("123", "GESTOR", 1L);
-        assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () -> usuarioService.entrar(req));
+        assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () -> loginService.entrar(req));
 
         // RE-AUTENTICA pois o entrar() remove do cache mesmo se falhar na autorização (segurança)
-        usuarioService.autenticar("123", "senha");
+        loginService.autenticar("123", "senha");
         
         // Tentando entrar como CHEFE na unidade 2 (ele é da 1)
         EntrarReq req2 = new EntrarReq("123", "CHEFE", 2L);
-        assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () -> usuarioService.entrar(req2));
+        assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () -> loginService.entrar(req2));
     }
 
     @Test

@@ -15,8 +15,6 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.service.AtividadeFacade;
-import sgc.mapa.service.AtividadeService;
-import sgc.mapa.service.ConhecimentoService;
 import sgc.subprocesso.dto.AtividadeOperacaoResp;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;

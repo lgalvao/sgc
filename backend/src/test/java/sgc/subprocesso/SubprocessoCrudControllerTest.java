@@ -15,7 +15,7 @@ import sgc.organizacao.UnidadeService;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.service.SubprocessoService;
+
 
 import java.util.List;
 

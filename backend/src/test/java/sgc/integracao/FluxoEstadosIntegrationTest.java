@@ -2,7 +2,6 @@ package sgc.integracao;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,7 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.comum.erros.ErroValidacao;
+
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.dto.AtividadeImpactadaDto;
@@ -274,11 +273,9 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 processoFacade.finalizar(codProcesso);
                 assertThat(processoFacade.obterPorId(codProcesso).orElseThrow().getSituacao())
                     .isEqualTo(sgc.processo.model.SituacaoProcesso.FINALIZADO);
-            } catch (ErroValidacao e) {
-                throw e;
             } catch (Exception e) {
                 throw e;
-            }
+            } 
         }
 
         @Test

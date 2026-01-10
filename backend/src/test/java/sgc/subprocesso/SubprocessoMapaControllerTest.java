@@ -24,8 +24,7 @@ import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesReq;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoMapaService;
-import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
+
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;

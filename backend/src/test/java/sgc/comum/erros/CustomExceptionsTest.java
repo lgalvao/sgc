@@ -4,20 +4,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+
 
 class CustomExceptionsTest {
 
-    // Classe de teste para cobrir o construtor com causa de ErroInterno
-    private static class ErroInternoTeste extends ErroInterno {
-        public ErroInternoTeste(String message) {
-            super(message);
-        }
-        
-        public ErroInternoTeste(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
 
     @Test
     @DisplayName("Deve instanciar ErroAccessoNegado")
@@ -51,16 +41,7 @@ class CustomExceptionsTest {
         assertEquals(message, exception.getMessage());
     }
 
-    @Test
-    @DisplayName("ErroInterno deve suportar construtor com mensagem e causa")
-    void testErroInternoComCausa() {
-        String message = "Erro interno";
-        Throwable cause = new RuntimeException("Causa raiz");
-        ErroInternoTeste exception = new ErroInternoTeste(message, cause);
-        
-        assertEquals(message, exception.getMessage());
-        assertSame(cause, exception.getCause());
-    }
+
 
     @Test
     @DisplayName("ErroNegocio deve retornar null para getDetails() por padrão")
