@@ -16,9 +16,7 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.ImpactoMapaService;
 import sgc.mapa.service.MapaFacade;
-import sgc.mapa.service.MapaVisualizacaoService;
 import sgc.organizacao.UsuarioService;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.MapaAjusteDto;
@@ -46,10 +44,6 @@ class SubprocessoMapaControllerTest {
     @MockitoBean
     private MapaFacade mapaFacade;
     @MockitoBean
-    private MapaVisualizacaoService mapaVisualizacaoService;
-    @MockitoBean
-    private ImpactoMapaService impactoMapaService;
-    @MockitoBean
     private UsuarioService usuarioService;
 
     @Autowired
@@ -65,7 +59,7 @@ class SubprocessoMapaControllerTest {
     @DisplayName("verificarImpactos")
     @WithMockUser
     void verificarImpactos() throws Exception {
-        when(impactoMapaService.verificarImpactos(eq(1L), any()))
+        when(mapaFacade.verificarImpactos(eq(1L), any()))
                 .thenReturn(ImpactoMapaDto.semImpacto());
 
         mockMvc.perform(get("/api/subprocessos/1/impactos-mapa")).andExpect(status().isOk());
@@ -89,7 +83,7 @@ class SubprocessoMapaControllerTest {
     @DisplayName("obterMapaVisualizacao")
     @WithMockUser
     void obterMapaVisualizacao() throws Exception {
-        when(mapaVisualizacaoService.obterMapaParaVisualizacao(1L))
+        when(mapaFacade.obterMapaParaVisualizacao(1L))
                 .thenReturn(new MapaVisualizacaoDto());
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-visualizacao")).andExpect(status().isOk());

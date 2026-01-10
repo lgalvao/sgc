@@ -130,4 +130,34 @@ public class ArchConsistencyTest {
                 }
             })
             .because("Controllers e Services devem estar em pacotes @NullMarked para garantir null-safety");
+
+    @ArchTest
+    static final ArchRule controllers_should_only_use_facades_not_specialized_services = noClasses()
+            .that()
+            .haveNameMatching(".*Controller")
+            .should()
+            .dependOnClassesThat()
+            .haveNameMatching(".*MapaVisualizacaoService")
+            .orShould()
+            .dependOnClassesThat()
+            .haveNameMatching(".*ImpactoMapaService")
+            .orShould()
+            .dependOnClassesThat()
+            .haveNameMatching(".*MapaSalvamentoService")
+            .orShould()
+            .dependOnClassesThat()
+            .haveNameMatching(".*AtividadeService")
+            .orShould()
+            .dependOnClassesThat()
+            .haveNameMatching(".*CompetenciaService")
+            .orShould()
+            .dependOnClassesThat()
+            .haveNameMatching(".*ConhecimentoService")
+            .orShould()
+            .dependOnClassesThat()
+            .haveNameMatching(".*CopiaMapaService")
+            .orShould()
+            .dependOnClassesThat()
+            .haveNameMatching(".*Detector.*Service")
+            .because("Controllers should use Facades (e.g., MapaFacade, AtividadeFacade) instead of specialized services");
 }

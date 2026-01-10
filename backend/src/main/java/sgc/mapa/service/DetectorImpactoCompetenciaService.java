@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
 
 /**
  * Serviço especializado na análise de impactos em competências causados por alterações em atividades.
+ * 
+ * <p><b>IMPORTANTE:</b> Este serviço deve ser acessado apenas dentro do pacote mapa.service.
+ * Operações de impacto devem ser realizadas via {@link ImpactoMapaService}.
  *
  * <p>Responsável por identificar quais competências foram afetadas pela inserção, remoção ou
  * alteração de atividades durante o processo de revisão de cadastro.

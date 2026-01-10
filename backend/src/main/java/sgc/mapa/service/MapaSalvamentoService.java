@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 
 /**
  * Serviço especializado para salvar o mapa completo de competências.
+ * 
+ * <p><b>IMPORTANTE:</b> Este serviço deve ser acessado APENAS via {@link MapaFacade}.
+ * Controllers não devem injetar este serviço diretamente.
  *
  * <p>
  * Responsável por processar requisições de salvamento que incluem:
