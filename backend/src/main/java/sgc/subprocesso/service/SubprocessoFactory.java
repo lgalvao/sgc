@@ -21,6 +21,16 @@ import java.util.List;
 import static sgc.subprocesso.model.SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
 
+/**
+ * Factory para criação de entidades Subprocesso.
+ *
+ * <p>Encapsula a lógica de construção de novos subprocessos com suas
+ * dependências e configurações iniciais.
+ *
+ * <p><b>Nota arquitetural:</b> Mantido público temporariamente devido a uso em
+ * {@link sgc.processo.service.ProcessoInicializador}. Considerar refatorar
+ * para expor via Facade no futuro.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j

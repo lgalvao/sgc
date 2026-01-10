@@ -14,6 +14,18 @@ import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.List;
 
+/**
+ * Serviço especializado para operações CRUD básicas de Subprocesso.
+ *
+ * <p>Responsável pelas operações de criação, leitura, atualização e exclusão
+ * de subprocessos. Parte da decomposição arquitetural do módulo subprocesso.
+ *
+ * <p><b>Visibilidade:</b> Package-private - uso interno ao módulo subprocesso.
+ * Acesso externo deve ser feito via {@link sgc.subprocesso.service.SubprocessoService}
+ * ou {@link sgc.subprocesso.service.SubprocessoFacade}.
+ *
+ * @since 2.0.0 - Tornado package-private na consolidação arquitetural Sprint 2
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional

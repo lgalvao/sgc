@@ -15,6 +15,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Serviço responsável pela comunicação relacionada a subprocessos via email.
+ *
+ * <p>Utiliza templates de email para notificar sobre eventos relacionados
+ * ao workflow de subprocessos.
+ *
+ * <p><b>Nota arquitetural:</b> Uso deveria ser via {@link SubprocessoFacade}.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j

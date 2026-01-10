@@ -280,8 +280,6 @@ public class SubprocessoMapaWorkflowService {
         transicaoService.registrar(sp, TipoTransicao.MAPA_VALIDADO, sp.getUnidade(), sp.getUnidade().getUnidadeSuperior(), usuario);
     }
 
-    private final SubprocessoWorkflowExecutor workflowExecutor;
-
     @Transactional
     public void devolverValidacao(Long codSubprocesso, String justificativa, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
@@ -290,7 +288,7 @@ public class SubprocessoMapaWorkflowService {
         SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo());
         sp.setDataFimEtapa2(null);
 
-        workflowExecutor.registrarAnaliseETransicao(
+        transicaoService.registrarAnaliseETransicao(
                 sp,
                 novaSituacao,
                 TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA,
@@ -332,7 +330,7 @@ public class SubprocessoMapaWorkflowService {
             subprocessoRepo.save(sp);
         } else {
             SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo());
-            workflowExecutor.registrarAnaliseETransicao(
+            transicaoService.registrarAnaliseETransicao(
                     sp,
                     novaSituacao,
                     TipoTransicao.MAPA_VALIDACAO_ACEITA,

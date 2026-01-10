@@ -56,7 +56,6 @@ class SubprocessoMapaWorkflowServiceTest {
     @Mock private AnaliseService analiseService;
     @Mock private UnidadeService unidadeService;
     @Mock private sgc.subprocesso.service.decomposed.SubprocessoValidacaoService validacaoService;
-    @Mock private SubprocessoWorkflowExecutor workflowExecutor;
     @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
 
     @InjectMocks private SubprocessoMapaWorkflowService service;
@@ -451,7 +450,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.devolverValidacao(1L, "Justificativa", new Usuario());
 
-            verify(workflowExecutor).registrarAnaliseETransicao(
+            verify(transicaoService).registrarAnaliseETransicao(
                 eq(sp),
                 eq(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO),
                 eq(TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA),
@@ -504,7 +503,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.aceitarValidacao(1L, new Usuario());
 
-            verify(workflowExecutor).registrarAnaliseETransicao(
+            verify(transicaoService).registrarAnaliseETransicao(
                 eq(sp),
                 eq(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO),
                 eq(TipoTransicao.MAPA_VALIDACAO_ACEITA),

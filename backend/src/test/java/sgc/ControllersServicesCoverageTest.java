@@ -79,7 +79,6 @@ class ControllersServicesCoverageTest {
     @Mock private sgc.subprocesso.service.SubprocessoTransicaoService transicaoService;
     @Mock private sgc.organizacao.UnidadeService unidadeService;
     @Mock private sgc.analise.AnaliseService analiseService;
-    @Mock private sgc.subprocesso.service.SubprocessoWorkflowExecutor workflowExecutor;
     @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
     @Mock private sgc.processo.service.ProcessoFacade processoFacade;
 
@@ -108,7 +107,7 @@ class ControllersServicesCoverageTest {
 
         // SubprocessoCadastroWorkflowService
         cadastroService = new SubprocessoCadastroWorkflowService(
-                repositorioSubprocesso, transicaoService, unidadeService, analiseService, subprocessoService, impactoMapaService, accessControlService, workflowExecutor
+                repositorioSubprocesso, transicaoService, unidadeService, analiseService, subprocessoService, impactoMapaService, accessControlService
         );
 
         // PainelService
