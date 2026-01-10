@@ -16,6 +16,15 @@ import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 
+/**
+ * Serviço responsável por obter o contexto de edição de um subprocesso.
+ *
+ * <p>Encapsula a lógica para construir o DTO de contexto com informações
+ * necessárias para edição (mapas, atividades, permissões).
+ *
+ * <p><b>Nota arquitetural:</b> Uso deveria ser via {@link SubprocessoFacade},
+ * mas mantido público temporariamente para compatibilidade com testes.
+ */
 @Service
 @RequiredArgsConstructor
 public class SubprocessoContextoService {
