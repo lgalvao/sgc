@@ -133,7 +133,8 @@ public class AtividadeFacade {
         if (!Objects.equals(atividade.getDescricao(), atividadeDto.getDescricao())) {
             camposAlterados.add("descricao");
         }
-        // TODO: Adicionar detecção de mudanças em competencias e conhecimentos se necessário
+        // Nota: Competências são afetadas apenas via conhecimentos (endpoints separados)
+        // Este método atualiza somente a descrição da atividade
         
         atividadeService.atualizar(codigo, atividadeDto);
 
@@ -151,7 +152,8 @@ public class AtividadeFacade {
                     .usuario(usuario)
                     .camposAlterados(camposAlterados)
                     .dataHoraAtualizacao(LocalDateTime.now())
-                    .afetouCompetencias(false)  // TODO: detectar mudanças em competências
+                    // Nota: false pois este método atualiza apenas descrição, não competências
+                    .afetouCompetencias(false)
                     .build();
             eventPublisher.publishEvent(evento);
         }
