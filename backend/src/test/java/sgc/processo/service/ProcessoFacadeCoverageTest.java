@@ -17,7 +17,7 @@ import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
-import sgc.processo.dto.mappers.ProcessoMapper;
+import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.model.Processo;

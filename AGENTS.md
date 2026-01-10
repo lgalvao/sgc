@@ -37,6 +37,23 @@ Este documento resume as diretrizes essenciais para o desenvolvimento no projeto
 * **Camadas:** `View -> Store -> Service -> API`. Views são inteligentes; Componentes são majoritariamente apresentacionais (Props/Emits).
 * **Erros:** Use `normalizeError` em services/stores. Componentes decidem como exibir (preferencialmente `BAlert` inline para erros de negócio).
 * **Roteamento:** Modularizado (cada módulo tem seu arquivo `.routes.ts`).
+* **Logging:**
+  * **NUNCA** use `console.log`, `console.warn`, ou `console.debug` em código de produção
+  * **USE** o logger estruturado: `import { logger } from '@/utils'`
+  * **Métodos disponíveis:**
+    * `logger.info(message, ...args)` - Informações gerais (apenas em desenvolvimento)
+    * `logger.warn(message, ...args)` - Avisos importantes
+    * `logger.error(message, ...args)` - Erros críticos
+    * `logger.debug(message, ...args)` - Debug detalhado (apenas em desenvolvimento)
+  * **ESLint:** Configurado para bloquear `console.*` (exceto `console.error` para casos extremos)
+  * **Exemplo:**
+    ```typescript
+    // ❌ ERRADO
+    console.log('Usuário logado:', usuario);
+    
+    // ✅ CORRETO
+    logger.info('Usuário logado:', usuario);
+    ```
 
 ## 4. Comandos e Testes
 

@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.dto.AlertaDto;
-import sgc.alerta.dto.AlertaMapper;
+import sgc.alerta.mapper.AlertaMapper;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.alerta.model.AlertaUsuario;

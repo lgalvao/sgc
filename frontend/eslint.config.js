@@ -23,6 +23,19 @@ export default [
                 ...globals.node,
             },
         },
+        rules: {
+            // Prevent console.* in production code (use logger instead)
+            // Allows console.error for critical errors that should always be visible
+            "no-console": ["error", { allow: ["error"] }],
+        },
+    },
+
+    // 2b. Allow console in test files
+    {
+        files: ["**/*.test.ts", "**/*.spec.ts", "**/__tests__/**"],
+        rules: {
+            "no-console": "off",
+        },
     },
 
     // 3. ESLint's recommended rules
