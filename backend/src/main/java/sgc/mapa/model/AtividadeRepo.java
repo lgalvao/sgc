@@ -44,4 +44,6 @@ public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
             WHERE :competencia MEMBER OF a.competencias
             """)
     List<Atividade> listarPorCompetencia(@Param("competencia") Competencia competencia);
+
+    long countByMapaCodigo(Long mapaCodigo);
 }

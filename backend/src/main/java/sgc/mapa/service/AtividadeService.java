@@ -48,6 +48,11 @@ public class AtividadeService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_ATIVIDADE, codAtividade));
     }
 
+    @Transactional(readOnly = true)
+    public int contarPorMapa(Long codMapa) {
+        return (int) atividadeRepo.countByMapaCodigo(codMapa);
+    }
+
     public AtividadeDto criar(AtividadeDto atividadeDto) {
         Mapa mapa = mapaRepo.findById(atividadeDto.getMapaCodigo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_MAPA, atividadeDto.getMapaCodigo()));
