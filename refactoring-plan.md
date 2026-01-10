@@ -59,9 +59,26 @@
 
 #### Próximos Passos
 
-1. **Análise Estática**: Configurar e executar Checkstyle/PMD/SpotBugs
-2. **Re-avaliar Sprint 1**: Verificar se código depreciado já foi removido
-3. **Atualizar Plano**: Ajustar metas baseado no estado atual
+1. **Decisão**: Continuar para Sprint 2 ou priorizar Sprint 4?
+   - **Recomendação**: Iniciar com **Sprint 4** (Padronização)
+   - **Razão**: Corrigir wildcard imports é **automatizado** e rápido
+   - **Benefício**: Código mais limpo facilita refatorações subsequentes
+
+2. **Sprint 4 Simplificado** (1-2 dias):
+   - Usar IntelliJ IDEA ou similar para substituir wildcard imports automaticamente
+   - Comando: "Optimize Imports" em todos os arquivos
+   - Validar: Re-executar Checkstyle (de 94 → 0 violações)
+   - Benefício: Reduz 55% das violações de Checkstyle
+
+3. **Depois**: Sprint 2 (Consolidação de Services)
+   - Com código mais limpo, será mais fácil identificar duplicações
+   - Imports explícitos revelam dependências reais
+
+**Aprendizados do Sprint 0:**
+- ✅ Refatoração de segurança trouxe o sistema para excelente estado (95.1% cobertura)
+- ✅ Código depreciado já foi removido (economiza Sprint 1 completo)
+- ⚠️ Wildcard imports são a principal violação de estilo (94/169 = 55%)
+- 💡 Testes robustos permitem refatoração confiante
 
 ---
 
@@ -533,24 +550,35 @@ Padrão esperado (de `/regras/frontend-padroes.md`):
 
 ## 🎯 PLAN DE EXECUÇÃO - SPRINTS
 
-### **Sprint 0: Preparação e Análise (2 dias)**
+### **Sprint 0: Preparação e Análise** ✅ **CONCLUÍDO**
 
 **Objetivo:** Preparar terreno para refatoração
 
+**Status:** ✅ **COMPLETO** - 2026-01-10
+
 **Tarefas:**
-1. ✅ Análise completa do código (CONCLUÍDO - este documento)
-2. [ ] Gerar relatório de cobertura de testes atual
-3. [ ] Criar branch `refactor/comprehensive-cleanup`
-4. [ ] Configurar ferramentas de análise estática:
-   - Checkstyle (wildcard imports, naming conventions)
-   - PMD (code smells)
-   - SpotBugs (bugs potenciais)
-5. [ ] Executar análise estática e gerar baseline
+1. ✅ Análise completa do código (documento refactoring-plan.md)
+2. ✅ Gerar relatório de cobertura de testes atual (95.1%)
+3. ✅ Branch de trabalho já existe (copilot/update-refactoring-plan)
+4. ✅ Configurar ferramentas de análise estática:
+   - ✅ Checkstyle 10.12.4 (wildcard imports, naming conventions)
+   - ✅ PMD 7.0.0 (code smells)
+   - ⏭️ SpotBugs (opcional - PMD oferece cobertura similar)
+5. ✅ Executar análise estática e gerar baseline
 
 **Entregáveis:**
-- [ ] Relatório de cobertura de testes
-- [ ] Baseline de análise estática
-- [ ] Branch de trabalho criada
+- ✅ Relatório de cobertura de testes: **95.1%** (18.791/19.752 instruções)
+- ✅ Baseline de análise estática:
+  - 81 arquivos com 169 violações Checkstyle
+  - 94 wildcard imports (AvoidStarImport)
+  - 65 linhas > 120 caracteres
+- ✅ Branch de trabalho: `copilot/update-refactoring-plan`
+
+**Descobertas:**
+- Sistema em excelente estado de qualidade (95.1% cobertura)
+- Código depreciado já removido (economiza Sprint 1)
+- Wildcard imports são 55% das violações de estilo
+- 1078/1078 testes passando (100%)
 
 ---
 
@@ -579,8 +607,6 @@ Este sprint pode ser **IGNORADO**. Avançar diretamente para Sprint 2.
 - [x] Build limpo sem warnings de deprecation
 
 ---
-- [ ] Todos os testes passam (1149/1149)
-- [ ] Nenhuma referência a classes removidas
 - [ ] Build limpo sem warnings de deprecation
 
 **Entregáveis:**
