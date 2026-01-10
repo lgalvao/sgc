@@ -21,28 +21,19 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
     List<Alerta> findByProcessoCodigo(Long codProcesso);
 
     /**
-     * Busca alertas destinados a um usuário específico, de forma paginada.
-     *
-     * @param tituloEleitoral O título de eleitor do usuário.
-     * @param pageable        Informações de paginação.
-     * @return Uma página de alertas.
-     */
-    Page<Alerta> findByUsuarioDestino_TituloEleitoral(String tituloEleitoral, Pageable pageable);
-
-    /**
-     * Busca alertas destinados a uma lista de unidades, de forma paginada.
-     *
-     * @param unidadeCodigos A lista de códigos de unidades.
-     * @param pageable       Informações de paginação.
-     * @return Uma página de alertas.
-     */
-    Page<Alerta> findByUnidadeDestino_CodigoIn(List<Long> unidadeCodigos, Pageable pageable);
-
-    /**
      * Busca alertas destinados a uma unidade específica.
      *
      * @param codUnidade O código da unidade.
      * @return Lista de alertas para a unidade.
      */
     List<Alerta> findByUnidadeDestino_Codigo(Long codUnidade);
+
+    /**
+     * Busca alertas destinados a uma unidade específica, de forma paginada.
+     *
+     * @param codUnidade O código da unidade.
+     * @param pageable   Informações de paginação.
+     * @return Uma página de alertas.
+     */
+    Page<Alerta> findByUnidadeDestino_Codigo(Long codUnidade, Pageable pageable);
 }

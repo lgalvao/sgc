@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.openpdf.text.Document;
+import org.openpdf.text.DocumentException;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
@@ -15,7 +17,7 @@ import sgc.organizacao.UsuarioService;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
@@ -25,16 +27,16 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("RelatorioService Test")
 class RelatorioServiceTest {
 
     @Mock
-    private ProcessoService processoService;
+    private ProcessoFacade processoFacade;
     @Mock
     private SubprocessoService subprocessoService;
     @Mock
@@ -42,12 +44,19 @@ class RelatorioServiceTest {
     @Mock
     private CompetenciaService competenciaService;
 
+    @Mock
+    private PdfFactory pdfFactory;
+
+    @Mock
+    private Document document;
+
     @InjectMocks
     private RelatorioService relatorioService;
 
     @Test
     @DisplayName("Deve gerar relatório de andamento")
     void deveGerarRelatorioAndamento() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         p.setDescricao("Proc Teste");
 
@@ -60,18 +69,19 @@ class RelatorioServiceTest {
         sp.setUnidade(u);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(usuarioService.buscarResponsavelUnidade(1L)).thenReturn(Optional.of(ResponsavelDto.builder().titularNome("Resp").build()));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);
-        assertThat(out.toString()).isNotEmpty();
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve gerar relatório de andamento sem responsável definido")
     void deveGerarRelatorioAndamentoSemResponsavel() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         p.setDescricao("Proc Teste");
 
@@ -84,24 +94,26 @@ class RelatorioServiceTest {
         sp.setUnidade(u);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(usuarioService.buscarResponsavelUnidade(1L)).thenReturn(Optional.empty());
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);
-        assertThat(out.toString()).isNotEmpty();
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve gerar relatório de mapas completo")
     void deveGerarRelatorioMapasCompleto() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         p.setDescricao("Proc Teste");
 
         Unidade u = new Unidade();
         u.setSigla("U1");
         u.setNome("Unidade 1");
+        u.setCodigo(1L);
 
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(u);
@@ -119,18 +131,19 @@ class RelatorioServiceTest {
         a.setConhecimentos(List.of(k));
         c.setAtividades(java.util.Set.of(a));
 
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(c));
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioMapas(1L, null, out);
-        assertThat(out.toString()).isNotEmpty();
+        relatorioService.gerarRelatorioMapas(1L, 1L, out);
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve filtrar por unidade no relatório de mapas")
     void deveFiltrarPorUnidadeNoRelatorioMapas() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         p.setDescricao("Proc Teste");
 
@@ -140,103 +153,119 @@ class RelatorioServiceTest {
         Subprocesso sp1 = new Subprocesso(); sp1.setUnidade(u1); sp1.setMapa(new Mapa()); sp1.getMapa().setCodigo(10L);
         Subprocesso sp2 = new Subprocesso(); sp2.setUnidade(u2); sp2.setMapa(new Mapa()); sp2.getMapa().setCodigo(20L);
 
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
-        when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of());
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
 
         OutputStream out = new ByteArrayOutputStream();
         // Filtra pela unidade 1
         relatorioService.gerarRelatorioMapas(1L, 1L, out);
-        assertThat(out.toString()).isNotEmpty();
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve ignorar subprocesso sem mapa no relatório de mapas")
     void deveIgnorarSubprocessoSemMapa() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
-        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1");
+        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1"); u.setCodigo(1L);
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(u);
         sp.setMapa(null); // Mapa nulo
 
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
 
         OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioMapas(1L, null, out);
-        assertThat(out.toString()).isNotEmpty(); // Gera o PDF, mas sem dados do mapa
+        relatorioService.gerarRelatorioMapas(1L, 1L, out);
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve processar competência sem atividades")
     void deveProcessarCompetenciaSemAtividades() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
-        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1");
+        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1"); u.setCodigo(1L);
         Subprocesso sp = new Subprocesso(); sp.setUnidade(u); sp.setMapa(new Mapa()); sp.getMapa().setCodigo(10L);
 
         Competencia c = new Competencia();
         c.setDescricao("Comp 1");
-        c.setAtividades(null); // Atividades nulas
+        c.setAtividades(java.util.Set.of()); // Atividades vazias
 
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(c));
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioMapas(1L, null, out);
-        assertThat(out.toString()).isNotEmpty();
+        relatorioService.gerarRelatorioMapas(1L, 1L, out);
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve processar atividade sem conhecimentos")
     void deveProcessarAtividadeSemConhecimentos() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
-        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1");
+        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1"); u.setCodigo(1L);
         Subprocesso sp = new Subprocesso(); sp.setUnidade(u); sp.setMapa(new Mapa()); sp.getMapa().setCodigo(10L);
 
         Competencia c = new Competencia();
         c.setDescricao("Comp 1");
         Atividade a = new Atividade();
         a.setDescricao("Ativ 1");
-        a.setConhecimentos(null); // Conhecimentos nulos
+        a.setConhecimentos(List.of()); // Conhecimentos vazios
         c.setAtividades(java.util.Set.of(a));
 
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(competenciaService.buscarPorMapa(10L)).thenReturn(List.of(c));
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioMapas(1L, null, out);
-        assertThat(out.toString()).isNotEmpty();
+        relatorioService.gerarRelatorioMapas(1L, 1L, out);
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve cobrir catch ao buscar responsável")
     void deveCobrirCatchBuscarResponsavel() {
+        when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         Subprocesso sp = new Subprocesso();
         Unidade u = new Unidade(); u.setCodigo(1L); sp.setUnidade(u);
 
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(usuarioService.buscarResponsavelUnidade(1L)).thenThrow(new RuntimeException("Falha simulada"));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);
-        assertThat(out.toString()).isNotEmpty();
+        verify(document, atLeastOnce()).add(any());
     }
 
     @Test
     @DisplayName("Deve cobrir erro ao gerar PDF")
-    void deveCobrirErroGerarPdf() {
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(new Processo());
+    void deveCobrirErroGerarPdf() throws DocumentException {
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(new Processo());
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+        when(pdfFactory.createDocument()).thenReturn(document);
+        doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
 
-        // Para forçar DocumentException em PdfWriter.getInstance, podemos passar null no stream
-        // ou um stream que lança erro.
         assertThatThrownBy(() -> relatorioService.gerarRelatorioAndamento(1L, null))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("Erro ao gerar PDF");
+    }
+
+    @Test
+    @DisplayName("Deve cobrir erro ao gerar PDF de mapas")
+    void deveCobrirErroGerarPdfMapas() throws DocumentException {
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(new Processo());
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+        when(pdfFactory.createDocument()).thenReturn(document);
+        doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
+
+        assertThatThrownBy(() -> relatorioService.gerarRelatorioMapas(1L, null, null))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Erro ao gerar PDF");
     }
 }
-
-

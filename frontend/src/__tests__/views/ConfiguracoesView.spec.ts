@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { createTestingPinia } from '@pinia/testing'
+import {describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {createTestingPinia} from '@pinia/testing'
 import ConfiguracoesView from '@/views/ConfiguracoesView.vue'
-import { useConfiguracoesStore } from '@/stores/configuracoes'
+import {useConfiguracoesStore} from '@/stores/configuracoes'
 
 // Mock dependencies
 const { mockApiClient } = vi.hoisted(() => {

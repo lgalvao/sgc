@@ -9,18 +9,17 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.*;
 import sgc.organizacao.model.Usuario;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS;
 
 /**
  * Serviço responsável por detectar impactos no mapa de competências causados por alterações no
@@ -37,18 +36,17 @@ public class ImpactoMapaService {
     private final CompetenciaRepo competenciaRepo;
     private final AtividadeService atividadeService;
 
-    // Services refatorados
-    private final DetectorAtividadesService detectorAtividades;
-    private final AnalisadorCompetenciasService analisadorCompetencias;
-    private final MapaAcessoService mapaAcessoService;
+    // Serviços de detecção de mudanças e impactos
+    private final DetectorMudancasAtividadeService detectorMudancasAtividade;
+    private final DetectorImpactoCompetenciaService detectorImpactoCompetencia;
+    private final AccessControlService accessControlService;
 
     /**
      * Realiza a verificação de impactos no mapa de competências, comparando o mapa em revisão de um
      * subprocesso com o mapa vigente da unidade.
      *
-     * <p>Este método implementa a lógica do CDU-12. Ele analisa as diferenças entre os dois mapas,
-     * identificando atividades inseridas, removidas ou alteradas, e as competências que são
-     * afetadas por essas mudanças.
+     * <p>Analisa as diferenças entre os dois mapas, identificando atividades inseridas,
+     * removidas ou alteradas, e as competências que são afetadas por essas mudanças.
      *
      * <p>O acesso a esta funcionalidade é restrito por perfil e pela situação atual do subprocesso
      * para garantir que a análise de impacto seja feita no momento correto do fluxo de trabalho.
@@ -64,56 +62,51 @@ public class ImpactoMapaService {
     @Transactional(readOnly = true)
     public ImpactoMapaDto verificarImpactos(Long codSubprocesso, Usuario usuario) {
         Subprocesso subprocesso = subprocessoService.buscarSubprocesso(codSubprocesso);
-
-        mapaAcessoService.verificarAcessoImpacto(usuario, subprocesso);
+        
+        // Verificação centralizada de acesso
+        accessControlService.verificarPermissao(usuario, VERIFICAR_IMPACTOS, subprocesso);
 
         Optional<Mapa> mapaVigenteOpt = mapaRepo.findMapaVigenteByUnidade(subprocesso.getUnidade().getCodigo());
-
         if (mapaVigenteOpt.isEmpty()) {
             log.info("Unidade sem mapa vigente, não há impactos a analisar");
             return ImpactoMapaDto.semImpacto();
         }
 
         Mapa mapaVigente = mapaVigenteOpt.get();
-        Mapa mapaSubprocesso = mapaRepo.findBySubprocessoCodigo(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                        "Mapa não encontrado para subprocesso", codSubprocesso)
-                );
+        Mapa mapaSubprocesso = mapaRepo.findBySubprocessoCodigo(codSubprocesso).orElseThrow(
+                () -> new ErroEntidadeNaoEncontrada("Mapa não encontrado para subprocesso", codSubprocesso)
+        );
 
         List<Atividade> atividadesAtuais = obterAtividadesDoMapa(mapaSubprocesso);
         List<Atividade> atividadesVigentes = obterAtividadesDoMapa(mapaVigente);
 
-        // ⚡ Otimização: Carregar todas as competências e construir o mapa em memória
-        List<Competencia> competenciasDoMapa = competenciaRepo.findByMapaCodigo(mapaVigente.getCodigo());
+        List<Competencia> competenciasMapa = competenciaRepo.findByMapaCodigo(mapaVigente.getCodigo());
 
-        // Delegar análise para services especializados
         Map<Long, List<Competencia>> atividadeIdToCompetencias =
-                analisadorCompetencias.construirMapaAtividadeCompetencias(competenciasDoMapa);
+                detectorImpactoCompetencia.construirMapaAtividadeCompetencias(competenciasMapa);
 
-        List<AtividadeImpactadaDto> inseridas =
-                detectorAtividades.detectarInseridas(atividadesAtuais, atividadesVigentes);
+        // Otimização: Construir mapas auxiliares uma única vez para evitar
+        // re-construção dentro de cada método do detector
+        Map<String, Atividade> mapaVigentes = detectorMudancasAtividade.atividadesPorDescricao(atividadesVigentes);
+        Map<String, Atividade> mapaAtuais = detectorMudancasAtividade.atividadesPorDescricao(atividadesAtuais);
 
-        List<AtividadeImpactadaDto> removidas =
-                detectorAtividades.detectarRemovidas(atividadesAtuais, atividadesVigentes, atividadeIdToCompetencias);
+        List<AtividadeImpactadaDto> inseridas = detectorMudancasAtividade.detectarInseridas(
+                atividadesAtuais, mapaVigentes.keySet()
+        );
 
-        List<AtividadeImpactadaDto> alteradas =
-                detectorAtividades.detectarAlteradas(atividadesAtuais, atividadesVigentes, atividadeIdToCompetencias);
+        List<AtividadeImpactadaDto> removidas = detectorMudancasAtividade.detectarRemovidas(
+                mapaAtuais, atividadesVigentes, atividadeIdToCompetencias
+        );
 
-        List<CompetenciaImpactadaDto> competenciasImpactadas =
-                analisadorCompetencias.identificarCompetenciasImpactadas(
-                        competenciasDoMapa, removidas, alteradas, atividadesVigentes);
+        List<AtividadeImpactadaDto> alteradas = detectorMudancasAtividade.detectarAlteradas(
+                atividadesAtuais, mapaVigentes, atividadeIdToCompetencias
+        );
 
-        ImpactoMapaDto impactos =
-                ImpactoMapaDto.comImpactos(inseridas, removidas, alteradas, competenciasImpactadas);
+        List<CompetenciaImpactadaDto> competenciasImpactadas = detectorImpactoCompetencia.competenciasImpactadas(
+                competenciasMapa, removidas, alteradas, atividadesVigentes
+        );
 
-        log.info(
-                "Análise de impactos concluída: tem={}, inseridas={} removidas={}, alteradas={}",
-                impactos.isTemImpactos(),
-                impactos.getTotalAtividadesInseridas(),
-                impactos.getTotalAtividadesRemovidas(),
-                impactos.getTotalAtividadesAlteradas());
-
-        return impactos;
+        return ImpactoMapaDto.comImpactos(inseridas, removidas, alteradas, competenciasImpactadas);
     }
 
     /**

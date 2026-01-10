@@ -1,8 +1,6 @@
 import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
-import {criarProcesso} from './helpers/helpers-processos';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
-import {verificarPaginaPainel} from './helpers/helpers-navegacao';
+import {resetDatabase} from './hooks/hooks-limpeza';
 
 /**
  * CDU-29 - Consultar histórico de processos

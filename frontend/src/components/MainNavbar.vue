@@ -127,7 +127,7 @@ defineExpose({
   color: rgba(255, 255, 255, 0.9) !important; /* Mais claro que os outros links para destaque */
 }
 
-@media (max-width: 991.98px) {
+@media (max-width: 992px) {
   .user-profile-item {
     margin-bottom: 0.5rem;
   }

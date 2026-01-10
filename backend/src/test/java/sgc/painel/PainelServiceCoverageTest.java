@@ -6,10 +6,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import sgc.alerta.AlertaService;
-import sgc.alerta.model.Alerta;
 import sgc.alerta.dto.AlertaDto;
+import sgc.alerta.model.Alerta;
 import sgc.organizacao.UnidadeService;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
@@ -18,7 +21,7 @@ import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -36,7 +39,7 @@ class PainelServiceCoverageTest {
     private PainelService service;
 
     @Mock
-    private ProcessoService processoService;
+    private ProcessoFacade processoFacade;
     @Mock
     private AlertaService alertaService;
     @Mock
@@ -57,13 +60,13 @@ class PainelServiceCoverageTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         p.setParticipantes(Set.of());
 
-        when(processoService.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
+        when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = service.listarProcessos(Perfil.GESTOR, codigoUnidade, pageable);
 
         assertThat(result.getContent()).isNotEmpty();
         verify(unidadeService).buscarIdsDescendentes(codigoUnidade);
-        verify(processoService).listarPorParticipantesIgnorandoCriado(
+        verify(processoFacade).listarPorParticipantesIgnorandoCriado(
                 argThat(list -> list.contains(1L) && list.contains(2L)), any());
     }
 
@@ -80,7 +83,7 @@ class PainelServiceCoverageTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         p.setParticipantes(Set.of());
 
-        when(processoService.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
+        when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = service.listarProcessos(Perfil.CHEFE, codigoUnidade, pageable);
 
@@ -98,7 +101,7 @@ class PainelServiceCoverageTest {
         p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         p.setTipo(TipoProcesso.MAPEAMENTO);
 
-        when(processoService.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
+        when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = service.listarProcessos(Perfil.CHEFE, codigoUnidade, pageable);
 
@@ -106,36 +109,28 @@ class PainelServiceCoverageTest {
     }
 
     @Test
-    @DisplayName("listarAlertas: busca por unidade e subordinadas se titulo nulo")
+    @DisplayName("listarAlertas: busca por unidade se codigoUnidade informado")
     void listarAlertas_PorUnidade() {
         Long codigoUnidade = 1L;
-        when(unidadeService.buscarIdsDescendentes(codigoUnidade)).thenReturn(Collections.emptyList());
 
         Alerta alerta = new Alerta();
         alerta.setCodigo(1L);
         alerta.setDataHora(LocalDateTime.now());
 
-        when(alertaService.listarPorUnidades(anyList(), any())).thenReturn(new PageImpl<>(List.of(alerta)));
+        when(alertaService.listarPorUnidade(eq(codigoUnidade), any())).thenReturn(new PageImpl<>(List.of(alerta)));
 
         Page<AlertaDto> result = service.listarAlertas(null, codigoUnidade, pageable);
 
         assertThat(result.getContent()).isNotEmpty();
-        verify(alertaService).listarPorUnidades(anyList(), any());
+        verify(alertaService).listarPorUnidade(eq(codigoUnidade), any());
     }
 
     @Test
-    @DisplayName("listarAlertas: busca todos se titulo e unidade nulos")
-    void listarAlertas_Todos() {
-        Alerta alerta = new Alerta();
-        alerta.setCodigo(1L);
-        alerta.setDataHora(LocalDateTime.now());
-
-        when(alertaService.listarTodos(any())).thenReturn(new PageImpl<>(List.of(alerta)));
-
+    @DisplayName("listarAlertas: retorna vazio se titulo e unidade nulos")
+    void listarAlertas_SemFiltrosRetornaVazio() {
         Page<AlertaDto> result = service.listarAlertas(null, null, pageable);
 
-        assertThat(result.getContent()).isNotEmpty();
-        verify(alertaService).listarTodos(any());
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -153,9 +148,7 @@ class PainelServiceCoverageTest {
         when(unidadeService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
         when(unidadeService.buscarIdsDescendentes(2L)).thenReturn(Collections.emptyList());
 
-        // Mock buscarEntidadePorId para o loop
-        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(pai);
-        when(unidadeService.buscarEntidadePorId(2L)).thenReturn(filho);
+        // ⚡ Bolt: No longer mocking buscarEntidadePorId as it should be skipped by the optimization
 
         Processo p = new Processo();
         p.setCodigo(100L);
@@ -163,7 +156,7 @@ class PainelServiceCoverageTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         p.setParticipantes(Set.of(pai, filho));
 
-        when(processoService.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
+        when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = service.listarProcessos(Perfil.ADMIN, null, pageable);
 
@@ -182,7 +175,7 @@ class PainelServiceCoverageTest {
         Unidade filho = new Unidade(); filho.setCodigo(2L); filho.setSigla("FILHO");
         filho.setUnidadeSuperior(pai);
 
-        when(unidadeService.buscarEntidadePorId(2L)).thenReturn(filho);
+        // ⚡ Bolt: No longer mocking buscarEntidadePorId as it should be skipped by the optimization
         // PAI não participa, então não está no Set de participantesIds.
         // encontrarMaiorIdVisivel(FILHO): Superior (PAI) participa? Não. Retorna FILHO.
 
@@ -192,7 +185,7 @@ class PainelServiceCoverageTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         p.setParticipantes(Set.of(filho));
 
-        when(processoService.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
+        when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = service.listarProcessos(Perfil.ADMIN, null, pageable);
 
@@ -206,7 +199,7 @@ class PainelServiceCoverageTest {
         Long raizId = 1L;
 
         // Mock para evitar NPE
-        when(processoService.listarPorParticipantesIgnorandoCriado(any(), any()))
+        when(processoFacade.listarPorParticipantesIgnorandoCriado(any(), any()))
                 .thenReturn(org.springframework.data.domain.Page.empty());
 
         // Mock da resposta otimizada (simulando que o serviço retornou os IDs corretamente)

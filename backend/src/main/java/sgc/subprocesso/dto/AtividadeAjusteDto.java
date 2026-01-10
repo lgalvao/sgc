@@ -18,11 +18,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class AtividadeAjusteDto {
-    @NotNull
+    @NotNull(message = "O código da atividade é obrigatório")
     private final Long codAtividade;
-    @NotBlank
+    @NotBlank(message = "O nome da atividade é obrigatório")
     private final String nome;
-    @NotNull
+    @NotNull(message = "A lista de conhecimentos é obrigatória")
     @Valid
     private final List<ConhecimentoAjusteDto> conhecimentos;
 }

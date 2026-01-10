@@ -16,6 +16,8 @@ import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -23,8 +25,6 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.AlterarDataLimiteRequest;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
@@ -125,7 +125,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Não deve permitir alterar data limite se não for ADMIN")
-    // Sem autenticação específica, ou com usuário comum se precisar
+    @org.springframework.security.test.context.support.WithMockUser(roles = "GESTOR")
     void alterarDataLimite_semPermissao_proibido() throws Exception {
         // Given
         LocalDate novaData = LocalDate.now().plusDays(20);

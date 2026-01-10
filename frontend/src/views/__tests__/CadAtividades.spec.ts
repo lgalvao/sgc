@@ -8,7 +8,7 @@ import {useAnalisesStore} from "@/stores/analises";
 import * as subprocessoService from "@/services/subprocessoService";
 import {SituacaoSubprocesso, TipoProcesso,} from "@/types/tipos";
 import {createTestingPinia} from "@pinia/testing";
-import { nextTick } from "vue";
+import {nextTick} from "vue";
 
 // Mocks
 const mocks = vi.hoisted(() => ({
@@ -154,6 +154,7 @@ describe("CadAtividades.vue", () => {
         atividadesStore.removerConhecimento.mockResolvedValue({});
         atividadesStore.atualizarAtividade.mockResolvedValue({});
         atividadesStore.atualizarConhecimento.mockResolvedValue({});
+        atividadesStore.adicionarConhecimento.mockResolvedValue({});
         atividadesStore.buscarAtividadesParaSubprocesso.mockResolvedValue({});
 
         mapasStore = useMapasStore(pinia);
@@ -228,6 +229,18 @@ describe("CadAtividades.vue", () => {
         );
     });
 
+    it("não deve adicionar atividade vazia", async () => {
+        const { wrapper, atividadesStore } = createWrapper();
+        await flushPromises();
+
+        const input = wrapper.find('input[placeholder="Nova atividade"]');
+        await input.setValue("   ");
+        await wrapper.find('form').trigger("submit");
+        await flushPromises();
+
+        expect(atividadesStore.adicionarAtividade).not.toHaveBeenCalled();
+    });
+
     it("deve remover atividade após confirmação", async () => {
         const { wrapper, atividadesStore } = createWrapper();
         await flushPromises();
@@ -258,6 +271,32 @@ describe("CadAtividades.vue", () => {
         expect(atividadesStore.removerConhecimento).toHaveBeenCalledWith(123, 1, 101);
     });
 
+    it("deve adicionar conhecimento", async () => {
+        const { wrapper, atividadesStore } = createWrapper();
+        await flushPromises();
+
+        const item = wrapper.findComponent(AtividadeItemStub);
+        await item.vm.$emit('adicionar-conhecimento', 'Novo Conhecimento');
+        await flushPromises();
+
+        expect(atividadesStore.adicionarConhecimento).toHaveBeenCalledWith(
+            123,
+            1,
+            expect.objectContaining({descricao: 'Novo Conhecimento'})
+        );
+    });
+
+    it("não deve adicionar conhecimento vazio", async () => {
+        const { wrapper, atividadesStore } = createWrapper();
+        await flushPromises();
+
+        const item = wrapper.findComponent(AtividadeItemStub);
+        await item.vm.$emit('adicionar-conhecimento', '   ');
+        await flushPromises();
+
+        expect(atividadesStore.adicionarConhecimento).not.toHaveBeenCalled();
+    });
+
     it("deve disponibilizar o cadastro", async () => {
         vi.mocked(subprocessoService.validarCadastro).mockResolvedValue({ valido: true, erros: [] });
 
@@ -277,6 +316,36 @@ describe("CadAtividades.vue", () => {
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
+    it("deve disponibilizar revisao de cadastro", async () => {
+        vi.mocked(subprocessoService.validarCadastro).mockResolvedValue({ valido: true, erros: [] });
+
+        const { wrapper, subprocessosStore } = createWrapper(true); // isRevisao=true
+        await flushPromises();
+
+        await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
+        await flushPromises();
+
+        const modal = wrapper.findComponent(ConfirmacaoDisponibilizacaoModalStub);
+        await modal.vm.$emit('confirmar');
+        await flushPromises();
+
+        expect(subprocessosStore.disponibilizarRevisaoCadastro).toHaveBeenCalledWith(123);
+    });
+
+    it("não deve permitir disponibilizar se status incorreto", async () => {
+        const { wrapper, subprocessosStore } = createWrapper();
+        await flushPromises();
+
+        // Change state
+        subprocessosStore.subprocessoDetalhe!.situacao = SituacaoSubprocesso.AGUARDANDO_ANALISE_CADASTRO;
+
+        await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
+        await flushPromises();
+
+        const modal = wrapper.findComponent(ConfirmacaoDisponibilizacaoModalStub);
+        expect(modal.props('mostrar')).toBe(false);
+    });
+
     it("deve permitir edição inline de atividade", async () => {
         const { wrapper, atividadesStore } = createWrapper();
         await flushPromises();
@@ -290,6 +359,17 @@ describe("CadAtividades.vue", () => {
             1,
             expect.objectContaining({descricao: "Atividade Editada"}),
         );
+    });
+
+    it("não deve salvar edição de atividade vazia", async () => {
+        const { wrapper, atividadesStore } = createWrapper();
+        await flushPromises();
+
+        const item = wrapper.findComponent(AtividadeItemStub);
+        await item.vm.$emit('atualizar-atividade', "   ");
+        await flushPromises();
+
+        expect(atividadesStore.atualizarAtividade).not.toHaveBeenCalled();
     });
 
     it("deve permitir edição inline de conhecimento", async () => {
@@ -306,6 +386,17 @@ describe("CadAtividades.vue", () => {
             101,
             expect.objectContaining({descricao: "Conhecimento Editado"}),
         );
+    });
+
+    it("não deve salvar edição de conhecimento vazio", async () => {
+        const { wrapper, atividadesStore } = createWrapper();
+        await flushPromises();
+
+        const item = wrapper.findComponent(AtividadeItemStub);
+        await item.vm.$emit('atualizar-conhecimento', 101, "   ");
+        await flushPromises();
+
+        expect(atividadesStore.atualizarConhecimento).not.toHaveBeenCalled();
     });
 
     it("deve mostrar erros de validação ao tentar disponibilizar se cadastro inválido", async () => {
@@ -326,6 +417,23 @@ describe("CadAtividades.vue", () => {
         expect((wrapper.vm as any).errosValidacao).toHaveLength(1);
     });
 
+    it("deve mostrar erro global se validação falhar sem código de atividade", async () => {
+        vi.mocked(subprocessoService.validarCadastro).mockResolvedValue({
+            valido: false,
+            erros: [
+                {tipo: 'ERRO_GERAL', mensagem: 'Erro geral no mapa'}
+            ]
+        });
+
+        const { wrapper } = createWrapper();
+        await flushPromises();
+
+        await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
+        await flushPromises();
+
+        expect((wrapper.vm as any).erroGlobal).toBe('Erro geral no mapa');
+    });
+
     it("deve exibir e fechar modal de impacto", async () => {
         const { wrapper } = createWrapper();
         await flushPromises();
@@ -336,6 +444,14 @@ describe("CadAtividades.vue", () => {
 
         await flushPromises();
         expect((wrapper.vm as any).mostrarModalImpacto).toBe(true);
+
+        const modal = wrapper.findComponent({name: 'ImpactoMapaModal'}); // Using name if component is stubbed with true or partial
+        // Since we stubbed with ImpactoMapaModal: true, it renders <impacto-mapa-modal-stub>
+        // We can find it by component definition or name if we knew it.
+        // Actually, let's just trigger the close event on the stub if possible or check variable
+
+        (wrapper.vm as any).fecharModalImpacto();
+        expect((wrapper.vm as any).mostrarModalImpacto).toBe(false);
     });
 
     it("deve exibir e fechar modal de historico", async () => {
@@ -380,10 +496,34 @@ describe("CadAtividades.vue", () => {
             erros: [{tipo: 'ERRO', mensagem: 'Erro', atividadeCodigo: 1}]
         });
 
+        // Mock setAtividadeRef to ensure the ref is populated
+        // The template calls setAtividadeRef automatically.
+        // We need to make sure the v-for rendered the activity and the ref function ran.
+        // This usually happens automatically in mount.
+
         await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
         await flushPromises();
         await nextTick();
 
         expect(scrollIntoViewMock).toHaveBeenCalled();
+    });
+
+    it("deve tratar erro ao remover atividade", async () => {
+        const { wrapper, atividadesStore } = createWrapper();
+        const feedbackStore = (wrapper.vm as any).feedbackStore; // Access store from VM or createTestingPinia
+
+        atividadesStore.removerAtividade.mockRejectedValue(new Error("Erro ao remover"));
+
+        await flushPromises();
+
+        const item = wrapper.findComponent(AtividadeItemStub);
+        await item.vm.$emit('remover-atividade');
+        await flushPromises();
+
+        const modal = wrapper.findComponent({ name: 'ModalConfirmacao' });
+        await modal.vm.$emit('confirmar');
+        await flushPromises();
+
+        expect(feedbackStore.show).toHaveBeenCalledWith("Erro na remoção", "Erro ao remover", "danger");
     });
 });

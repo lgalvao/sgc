@@ -3,86 +3,95 @@ package sgc.alerta;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import sgc.alerta.erros.ErroAlerta;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.RestExceptionHandler;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.integracao.mocks.TestSecurityConfig;
 
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doThrow;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AlertaController.class)
-@Import(RestExceptionHandler.class)
-@DisplayName("Testes Unitários: AlertaController")
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Transactional
+@Import(TestSecurityConfig.class)
+@DisplayName("AlertaController")
 class AlertaControllerTest {
-    @MockitoBean
-    private AlertaService alertaService;
 
     @Autowired
     private MockMvc mockMvc;
 
+    @MockitoBean
+    private AlertaService alertaService;
+
+    private static final String TITULO_TESTE = "12345678901"; // 11 ou 12 dígitos
+
     @Test
-    @DisplayName("marcarComoLido_quandoSucesso_deveRetornarOk")
-    @WithMockUser
-    void marcarComoLido_quandoSucesso_deveRetornarOk() throws Exception {
-        mockMvc.perform(post("/api/alertas/1/marcar-como-lido")
+    @DisplayName("marcarComoLidos_quandoSucesso_deveRetornarOk")
+    void marcarComoLidos_quandoSucesso_deveRetornarOk() throws Exception {
+        mockMvc.perform(post("/api/alertas/marcar-como-lidos")
+                        .with(user(TITULO_TESTE))
                         .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("[1, 2, 3]"))
+                .andExpect(status().isOk());
+
+        verify(alertaService).marcarComoLidos(eq(TITULO_TESTE), anyList());
+    }
+
+    @Test
+    @DisplayName("marcarComoLidos_quandoListaVazia_deveRetornarOk")
+    void marcarComoLidos_quandoListaVazia_deveRetornarOk() throws Exception {
+        mockMvc.perform(post("/api/alertas/marcar-como-lidos")
+                        .with(user(TITULO_TESTE))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("[]"))
+                .andExpect(status().isOk());
+
+        verify(alertaService).marcarComoLidos(eq(TITULO_TESTE), anyList());
+    }
+
+    @Test
+    @DisplayName("listarAlertas_quandoSucesso_deveRetornarListaDeAlertas")
+    void listarAlertas_quandoSucesso_deveRetornarListaDeAlertas() throws Exception {
+        when(alertaService.listarAlertasPorUsuario(TITULO_TESTE))
+                .thenReturn(List.of());
+
+        mockMvc.perform(get("/api/alertas")
+                        .with(user(TITULO_TESTE))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(alertaService).marcarComoLido(anyString(), anyLong());
+        verify(alertaService).listarAlertasPorUsuario(TITULO_TESTE);
     }
 
     @Test
-    @DisplayName("marcarComoLido_quandoAlertaNaoEncontrado_deveRetornarNotFound")
-    @WithMockUser
-    void marcarComoLido_quandoAlertaNaoEncontrado_deveRetornarNotFound() throws Exception {
-        doThrow(new ErroEntidadeNaoEncontrada("Não encontrado"))
-                .when(alertaService)
-                .marcarComoLido(anyString(), anyLong());
+    @DisplayName("listarNaoLidos_quandoSucesso_deveRetornarListaDeAlertas")
+    void listarNaoLidos_quandoSucesso_deveRetornarListaDeAlertas() throws Exception {
+        when(alertaService.listarAlertasNaoLidos(TITULO_TESTE))
+                .thenReturn(List.of());
 
-        mockMvc.perform(
-                        post("/api/alertas/1/marcar-como-lido")
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("marcarComoLido_quandoErroGenerico_deveRetornarInternalServerError")
-    @WithMockUser
-    void marcarComoLido_quandoErroGenerico_deveRetornarInternalServerError() throws Exception {
-        doThrow(new RuntimeException("Erro genérico"))
-                .when(alertaService)
-                .marcarComoLido(anyString(), anyLong());
-
-        mockMvc.perform(post("/api/alertas/1/marcar-como-lido")
-                        .with(csrf())
+        mockMvc.perform(get("/api/alertas/nao-lidos")
+                        .with(user(TITULO_TESTE))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError());
-    }
+                .andExpect(status().isOk());
 
-    @Test
-    @DisplayName("marcarComoLido_quandoFalhaAlteracaoStatus_deveRetornarConflict")
-    @WithMockUser
-    void marcarComoLido_quandoFalhaAlteracaoStatus_deveRetornarConflict() throws Exception {
-        doThrow(new ErroAlerta("Falha ao alterar status do alerta"))
-                .when(alertaService)
-                .marcarComoLido(anyString(), anyLong());
-
-        mockMvc.perform(post("/api/alertas/1/marcar-como-lido")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isConflict());
+        verify(alertaService).listarAlertasNaoLidos(TITULO_TESTE);
     }
 }

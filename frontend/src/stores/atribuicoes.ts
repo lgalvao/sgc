@@ -3,6 +3,7 @@ import {computed, ref} from "vue";
 import {buscarTodasAtribuicoes} from "@/services/atribuicaoTemporariaService";
 import type {AtribuicaoTemporaria} from "@/types/tipos";
 import {type NormalizedError, normalizeError} from "@/utils/apiError";
+import {logger} from "@/utils";
 
 export const useAtribuicaoTemporariaStore = defineStore(
     "atribuicaoTemporaria",
@@ -55,7 +56,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
                         justificativa: a.justificativa
                     })) as AtribuicaoTemporaria[];
                 } else {
-                    console.error("Expected array but got:", data);
+                    logger.error("Expected array but got:", data);
                     atribuicoes.value = [];
                 }
             } catch (err: any) {

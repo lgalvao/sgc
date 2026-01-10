@@ -172,18 +172,18 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, computed } from 'vue';
-import { BModal } from 'bootstrap-vue-next';
-import { useConfiguracoesStore, type Parametro } from '@/stores/configuracoes';
-import { useNotificacoesStore } from '@/stores/feedback';
-import { usePerfilStore } from '@/stores/perfil';
-import { 
-  listarAdministradores, 
-  adicionarAdministrador, 
-  removerAdministrador,
-  type AdministradorDto 
+import {computed, onMounted, reactive, ref} from 'vue';
+import {BModal} from 'bootstrap-vue-next';
+import {type Parametro, useConfiguracoesStore} from '@/stores/configuracoes';
+import {useNotificacoesStore} from '@/stores/feedback';
+import {usePerfilStore} from '@/stores/perfil';
+import {
+  adicionarAdministrador,
+  type AdministradorDto,
+  listarAdministradores,
+  removerAdministrador
 } from '@/services/administradorService';
-import { normalizeError } from '@/utils/apiError';
+import {normalizeError} from '@/utils/apiError';
 
 const store = useConfiguracoesStore();
 const notificacoes = useNotificacoesStore();

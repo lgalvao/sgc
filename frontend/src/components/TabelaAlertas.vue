@@ -13,8 +13,10 @@
         @sort-changed="handleSortChange"
     >
       <template #empty>
-        <div class="text-center text-muted">
-          Nenhum alerta encontrado.
+        <div class="text-center text-muted py-5" data-testid="empty-state-alertas">
+          <i class="bi bi-bell-slash display-4 d-block mb-3" aria-hidden="true"></i>
+          <p class="h5">Tudo limpo!</p>
+          <p class="small">Você não tem novos alertas no momento.</p>
         </div>
       </template>
     </BTable>

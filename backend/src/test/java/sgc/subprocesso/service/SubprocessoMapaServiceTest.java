@@ -11,24 +11,32 @@ import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
+import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
+import sgc.mapa.service.CopiaMapaService;
+import sgc.processo.model.Processo;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
-import sgc.subprocesso.model.*;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes Unitários: SubprocessoMapaService")
+@DisplayName("SubprocessoMapaService")
 class SubprocessoMapaServiceTest {
 
     @Mock
@@ -41,6 +49,8 @@ class SubprocessoMapaServiceTest {
     private CompetenciaService competenciaService;
     @Mock
     private AtividadeMapper atividadeMapper;
+    @Mock
+    private CopiaMapaService copiaMapaService;
 
     @InjectMocks
     private SubprocessoMapaService subprocessoMapaService;
@@ -89,11 +99,11 @@ class SubprocessoMapaServiceTest {
 
         Competencia comp = new Competencia();
         comp.setCodigo(10L);
-        when(competenciaService.buscarPorId(10L)).thenReturn(comp);
+        when(competenciaService.buscarPorCodigo(10L)).thenReturn(comp);
 
         Atividade ativ = new Atividade();
         ativ.setCodigo(20L);
-        when(atividadeService.obterEntidadePorCodigo(20L)).thenReturn(ativ);
+        when(atividadeService.obterPorCodigo(20L)).thenReturn(ativ);
         when(atividadeMapper.toDto(ativ)).thenReturn(new AtividadeDto());
 
         subprocessoMapaService.salvarAjustesMapa(1L, List.of(compDto), "123");
@@ -143,5 +153,41 @@ class SubprocessoMapaServiceTest {
 
         assertThatThrownBy(() -> subprocessoMapaService.importarAtividades(2L, 1L))
                 .isInstanceOf(ErroMapaNaoAssociado.class);
+    }
+
+    @Test
+    @DisplayName("importarAtividades deve ignorar alteração de status se tipo de processo for nulo")
+    void importarAtividades_TipoProcessoNulo() {
+        // Cobre o caso default/null no switch
+        Subprocesso dest = new Subprocesso();
+        dest.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        Mapa mapaDest = new Mapa();
+        mapaDest.setCodigo(22L);
+        dest.setMapa(mapaDest);
+
+        Processo proc = new Processo();
+        proc.setTipo(null); // Tipo nulo cai no default
+        dest.setProcesso(proc);
+
+        Subprocesso orig = new Subprocesso();
+        Mapa mapaOrig = new Mapa();
+        mapaOrig.setCodigo(11L);
+        orig.setMapa(mapaOrig);
+
+        when(subprocessoRepo.findById(2L)).thenReturn(Optional.of(dest));
+        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(orig));
+
+        // Simula lista de atividades origem para não sair no early return
+        Atividade ativ = new Atividade();
+        ativ.setDescricao("Ativ 1");
+        when(atividadeService.buscarPorMapaCodigo(11L)).thenReturn(List.of(ativ));
+        when(atividadeService.buscarPorMapaCodigo(22L)).thenReturn(Collections.emptyList());
+
+        subprocessoMapaService.importarAtividades(2L, 1L);
+
+        // Verifica que status NÃO mudou (continua NAO_INICIADO)
+        assertThat(dest.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
+
+        verify(copiaMapaService).importarAtividadesDeOutroMapa(11L, 22L);
     }
 }

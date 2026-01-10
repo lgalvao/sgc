@@ -7,15 +7,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import sgc.comum.erros.ErroAccessoNegado;
-import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
+import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
-import sgc.seguranca.autenticacao.AcessoAdClient;
-import sgc.seguranca.GerenciadorJwt;
-import sgc.seguranca.dto.EntrarReq;
-import java.util.*;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -28,12 +28,14 @@ class UsuarioServiceCoverageTest {
     @InjectMocks
     private UsuarioService service;
 
-    @Mock private UsuarioRepo usuarioRepo;
-    @Mock private UsuarioPerfilRepo usuarioPerfilRepo;
-    @Mock private AdministradorRepo administradorRepo;
-    @Mock private GerenciadorJwt gerenciadorJwt;
-    @Mock private AcessoAdClient acessoAdClient;
-    @Mock private UnidadeService unidadeService;
+    @Mock
+    private UsuarioRepo usuarioRepo;
+    @Mock
+    private UsuarioPerfilRepo usuarioPerfilRepo;
+    @Mock
+    private AdministradorRepo administradorRepo;
+    @Mock
+    private UnidadeService unidadeService;
 
     // --- MÉTODOS DE BUSCA E MAPEAMENTO ---
 
@@ -42,6 +44,194 @@ class UsuarioServiceCoverageTest {
     void carregarUsuarioParaAutenticacao_Nulo() {
         when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
         assertThat(service.carregarUsuarioParaAutenticacao("user")).isNull();
+    }
+
+    @Test
+    @DisplayName("carregarUsuarioParaAutenticacao: deve carregar atribuicoes se encontrado")
+    void carregarUsuarioParaAutenticacao_Sucesso() {
+        Usuario usuario = mock(Usuario.class);
+        when(usuario.getTituloEleitoral()).thenReturn("user");
+        when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.of(usuario));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("user")).thenReturn(Collections.emptyList());
+
+        Usuario result = service.carregarUsuarioParaAutenticacao("user");
+
+        assertThat(result).isNotNull();
+        verify(usuario).getAuthorities(); // Garante que authorities foram chamadas
+        verify(usuario).setAtribuicoes(any());
+    }
+
+    @Test
+    @DisplayName("buscarUsuarioPorTitulo: empty se nao encontrado")
+    void buscarUsuarioPorTitulo_Empty() {
+        when(usuarioRepo.findById("user")).thenReturn(Optional.empty());
+        assertThat(service.buscarUsuarioPorTitulo("user")).isEmpty();
+    }
+
+    @Test
+    @DisplayName("buscarUsuarioPorTitulo: retorna dto se encontrado")
+    void buscarUsuarioPorTitulo_Sucesso() {
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("user");
+        when(usuarioRepo.findById("user")).thenReturn(Optional.of(u));
+
+        Optional<UsuarioDto> res = service.buscarUsuarioPorTitulo("user");
+        assertThat(res).isPresent();
+        assertThat(res.get().getTituloEleitoral()).isEqualTo("user");
+    }
+
+    @Test
+    @DisplayName("buscarUsuariosPorUnidade: lista vazia")
+    void buscarUsuariosPorUnidade_Vazia() {
+        when(usuarioRepo.findByUnidadeLotacaoCodigo(1L)).thenReturn(Collections.emptyList());
+        assertThat(service.buscarUsuariosPorUnidade(1L)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("buscarEntidadePorId: lança erro se nao encontrado")
+    void buscarPorId_Erro() {
+        when(usuarioRepo.findById("user")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.buscarPorId("user"))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("buscarUsuarioPorLogin: lança erro se nao encontrado")
+    void buscarPorLogin_Erro() {
+        when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.buscarPorLogin("user"))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("buscarUsuarioPorLogin: sucesso")
+    void buscarPorLogin_Sucesso() {
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("user");
+        when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.of(u));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("user")).thenReturn(Collections.emptyList());
+
+        Usuario res = service.buscarPorLogin("user");
+        assertThat(res).isNotNull();
+    }
+
+    @Test
+    @DisplayName("buscarResponsavelVigente: erro se chefe nao encontrado na busca simples")
+    void buscarResponsavelAtual_ErroChefeSimples() {
+        sgc.organizacao.dto.UnidadeDto dto = sgc.organizacao.dto.UnidadeDto.builder().codigo(1L).build();
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(dto);
+        when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.buscarResponsavelAtual("SIGLA"))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("buscarResponsavelVigente: erro se chefe nao encontrado na busca completa")
+    void buscarResponsavelAtual_ErroChefeCompleto() {
+        sgc.organizacao.dto.UnidadeDto dto = sgc.organizacao.dto.UnidadeDto.builder().codigo(1L).build();
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(dto);
+
+        Usuario chefeSimples = new Usuario();
+        chefeSimples.setTituloEleitoral("user");
+        when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.of(chefeSimples));
+
+        when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.buscarResponsavelAtual("SIGLA"))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("buscarUsuarioPorEmail: empty se nao encontrado")
+    void buscarUsuarioPorEmail_Empty() {
+        when(usuarioRepo.findByEmail("email")).thenReturn(Optional.empty());
+        assertThat(service.buscarUsuarioPorEmail("email")).isEmpty();
+    }
+
+    @Test
+    @DisplayName("buscarUsuariosAtivos: lista vazia")
+    void buscarUsuariosAtivos_Vazia() {
+        when(usuarioRepo.findAll()).thenReturn(Collections.emptyList());
+        assertThat(service.buscarUsuariosAtivos()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("buscarUnidadePorCodigo: retorna unidade")
+    void buscarUnidadePorCodigo_Sucesso() {
+        sgc.organizacao.dto.UnidadeDto dto = sgc.organizacao.dto.UnidadeDto.builder().codigo(1L).build();
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(dto);
+        assertThat(service.buscarUnidadePorCodigo(1L)).isPresent();
+    }
+
+    @Test
+    @DisplayName("buscarUnidadePorSigla: retorna unidade")
+    void buscarUnidadePorSigla_Sucesso() {
+        sgc.organizacao.dto.UnidadeDto dto = sgc.organizacao.dto.UnidadeDto.builder().codigo(1L).build();
+        when(unidadeService.buscarPorSigla("S")).thenReturn(dto);
+        assertThat(service.buscarUnidadePorSigla("S")).isPresent();
+    }
+
+    @Test
+    @DisplayName("buscarUnidadesAtivas: chama service")
+    void buscarUnidadesAtivas() {
+        service.buscarUnidadesAtivas();
+        verify(unidadeService).buscarTodasUnidades();
+    }
+
+    @Test
+    @DisplayName("buscarSubunidades: mapeia lista")
+    void buscarSubunidades() {
+        Unidade u = new Unidade("Nome", "Sigla");
+        ReflectionTestUtils.setField(u, "codigo", 2L);
+        ReflectionTestUtils.setField(u, "tipo", TipoUnidade.OPERACIONAL);
+
+        when(unidadeService.listarSubordinadas(1L)).thenReturn(List.of(u));
+        var res = service.buscarSubunidades(1L);
+        assertThat(res).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("construirArvoreHierarquica: chama service")
+    void construirArvoreHierarquica() {
+        service.construirArvoreHierarquica();
+        verify(unidadeService).buscarArvoreHierarquica();
+    }
+
+    @Test
+    @DisplayName("buscarResponsavelUnidade: retorna dto com titular e substituto")
+    void buscarResponsavelUnidade_ComSubstituto() {
+        Usuario t = new Usuario();
+        t.setTituloEleitoral("t");
+        t.setNome("T");
+        Usuario s = new Usuario();
+        s.setTituloEleitoral("s");
+        s.setNome("S");
+
+        when(usuarioRepo.findChefesByUnidadesCodigos(anyList())).thenReturn(List.of(t, s));
+
+        Optional<ResponsavelDto> res = service.buscarResponsavelUnidade(1L);
+        assertThat(res).isPresent();
+        assertThat(res.get().getTitularTitulo()).isEqualTo("t");
+        assertThat(res.get().getSubstitutoTitulo()).isEqualTo("s");
+    }
+
+    @Test
+    @DisplayName("buscarResponsaveisUnidades: retorna map vazio se sem chefes")
+    void buscarResponsaveisUnidades_Vazio() {
+        when(usuarioRepo.findChefesByUnidadesCodigos(anyList())).thenReturn(Collections.emptyList());
+        assertThat(service.buscarResponsaveisUnidades(List.of(1L))).isEmpty();
+    }
+
+    @Test
+    @DisplayName("buscarUsuariosPorTitulos: retorna map")
+    void buscarUsuariosPorTitulos() {
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("u");
+        when(usuarioRepo.findAllById(anyList())).thenReturn(List.of(u));
+
+        var map = service.buscarUsuariosPorTitulos(List.of("u"));
+        assertThat(map).containsKey("u");
     }
 
     @Test
@@ -108,12 +298,25 @@ class UsuarioServiceCoverageTest {
     @Test
     @DisplayName("adicionarAdministrador: erro se já existe")
     void adicionarAdministrador_ErroJaExiste() {
-        Usuario u = new Usuario(); u.setTituloEleitoral("user");
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("user");
         when(usuarioRepo.findById("user")).thenReturn(Optional.of(u));
         when(administradorRepo.existsById("user")).thenReturn(true);
 
         assertThatThrownBy(() -> service.adicionarAdministrador("user"))
                 .isInstanceOf(ErroValidacao.class);
+    }
+
+    @Test
+    @DisplayName("adicionarAdministrador: sucesso")
+    void adicionarAdministrador_Sucesso() {
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("user");
+        when(usuarioRepo.findById("user")).thenReturn(Optional.of(u));
+        when(administradorRepo.existsById("user")).thenReturn(false);
+
+        service.adicionarAdministrador("user");
+        verify(administradorRepo).save(any());
     }
 
     @Test
@@ -141,93 +344,60 @@ class UsuarioServiceCoverageTest {
                 .isInstanceOf(ErroValidacao.class);
     }
 
-    // --- AUTENTICAÇÃO E AUTORIZAÇÃO ---
-
     @Test
-    @DisplayName("autenticar: erro se sem AD e não é teste")
-    void autenticar_ErroSemAdProducao() {
-        ReflectionTestUtils.setField(service, "acessoAdClient", null);
-        ReflectionTestUtils.setField(service, "ambienteTestes", false);
+    @DisplayName("removerAdministrador: sucesso")
+    void removerAdministrador_Sucesso() {
+        when(administradorRepo.existsById("user")).thenReturn(true);
+        when(administradorRepo.count()).thenReturn(2L);
 
-        assertThat(service.autenticar("user", "pass")).isFalse();
+        service.removerAdministrador("user", "other");
+        verify(administradorRepo).deleteById("user");
     }
 
     @Test
-    @DisplayName("autenticar: sucesso se sem AD, é teste, e usuário existe")
-    void autenticar_SucessoSemAdTeste() {
-        ReflectionTestUtils.setField(service, "acessoAdClient", null);
-        ReflectionTestUtils.setField(service, "ambienteTestes", true);
-        when(usuarioRepo.existsById("user")).thenReturn(true);
-
-        assertThat(service.autenticar("user", "pass")).isTrue();
+    @DisplayName("isAdministrador: retorna repo")
+    void isAdministrador() {
+        when(administradorRepo.existsById("user")).thenReturn(true);
+        assertThat(service.isAdministrador("user")).isTrue();
     }
 
     @Test
-    @DisplayName("autenticar: falha se sem AD, é teste, mas usuário não existe")
-    void autenticar_FalhaSemAdTesteUsuarioInexistente() {
-        ReflectionTestUtils.setField(service, "acessoAdClient", null);
-        ReflectionTestUtils.setField(service, "ambienteTestes", true);
-        when(usuarioRepo.existsById("user")).thenReturn(false);
+    @DisplayName("carregarAtribuicoesEmLote: deve processar lista de usuarios")
+    void carregarAtribuicoesEmLote_Sucesso() {
+        Usuario u1 = new Usuario();
+        u1.setTituloEleitoral("u1");
+        Usuario u2 = new Usuario();
+        u2.setTituloEleitoral("u2");
 
-        assertThat(service.autenticar("user", "pass")).isFalse();
+        UsuarioPerfil up = new UsuarioPerfil();
+        ReflectionTestUtils.setField(up, "usuarioTitulo", "u1");
+
+        when(usuarioPerfilRepo.findByUsuarioTituloIn(anyList())).thenReturn(List.of(up));
+
+        ReflectionTestUtils.invokeMethod(service, "carregarAtribuicoesEmLote", List.of(u1, u2));
+
+        assertThat(u1.getTodasAtribuicoes()).isNotEmpty();
+        assertThat(u2.getTodasAtribuicoes()).isEmpty();
     }
 
     @Test
-    @DisplayName("autenticar: falha no AD retorna false")
-    void autenticar_FalhaAD() {
-        when(acessoAdClient.autenticar("user", "pass")).thenThrow(new ErroAutenticacao("Falha"));
-        assertThat(service.autenticar("user", "pass")).isFalse();
+    @DisplayName("carregarAtribuicoesEmLote: deve ignorar lista vazia")
+    void carregarAtribuicoesEmLote_Vazia() {
+        ReflectionTestUtils.invokeMethod(service, "carregarAtribuicoesEmLote", Collections.emptyList());
+        verify(usuarioPerfilRepo, never()).findByUsuarioTituloIn(any());
     }
 
     @Test
-    @DisplayName("autorizar: erro se não autenticado recentemente")
-    void autorizar_ErroNaoAutenticado() {
-        assertThatThrownBy(() -> service.autorizar("user"))
-                .isInstanceOf(ErroAutenticacao.class);
-    }
-
-    @Test
-    @DisplayName("entrar: erro se sessão expirada ou inválida")
-    void entrar_ErroSessaoInvalida() {
-        EntrarReq req = EntrarReq.builder().tituloEleitoral("user").build();
-        assertThatThrownBy(() -> service.entrar(req))
-                .isInstanceOf(ErroAutenticacao.class);
-    }
-
-    @Test
-    @DisplayName("entrar: erro se unidade não encontrada")
-    void entrar_ErroUnidadeNaoEncontrada() {
-        // Simular autenticação recente
-        @SuppressWarnings("unchecked")
-        Map<String, java.time.LocalDateTime> auths = (Map<String, java.time.LocalDateTime>) ReflectionTestUtils.getField(service, "autenticacoesRecentes");
-        auths.put("user", java.time.LocalDateTime.now());
-
-        EntrarReq req = EntrarReq.builder().tituloEleitoral("user").unidadeCodigo(1L).build();
-
-        when(unidadeService.buscarEntidadePorId(1L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 1L));
-
-        assertThatThrownBy(() -> service.entrar(req))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
-
-    @Test
-    @DisplayName("entrar: erro se sem permissão")
-    void entrar_ErroSemPermissao() {
-        // Simular autenticação recente
-        @SuppressWarnings("unchecked")
-        Map<String, java.time.LocalDateTime> auths = (Map<String, java.time.LocalDateTime>) ReflectionTestUtils.getField(service, "autenticacoesRecentes");
-        auths.put("user", java.time.LocalDateTime.now());
-
-        EntrarReq req = EntrarReq.builder().tituloEleitoral("user").unidadeCodigo(1L).perfil("GESTOR").build();
-
-        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(new Unidade());
-
+    @DisplayName("toAdministradorDto: deve retornar null se unidade lotacao for null")
+    void toAdministradorDto_UnidadeNull() {
         Usuario u = new Usuario();
         u.setTituloEleitoral("user");
-        when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTitulo("user")).thenReturn(Collections.emptyList());
+        u.setUnidadeLotacao(null);
 
-        assertThatThrownBy(() -> service.entrar(req))
-                .isInstanceOf(ErroAccessoNegado.class);
+        // Usar reflection para acessar método privado
+        sgc.organizacao.dto.AdministradorDto dto = ReflectionTestUtils.invokeMethod(service, "toAdministradorDto", u);
+
+        assertThat(dto).isNotNull();
+        assertThat(dto.getUnidadeCodigo()).isNull();
     }
 }

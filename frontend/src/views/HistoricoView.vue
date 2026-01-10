@@ -62,10 +62,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { BContainer, BRow, BCol, BCard, BButton } from 'bootstrap-vue-next';
-import { apiClient } from '@/axios-setup';
+import {onMounted, ref} from 'vue';
+import {useRouter} from 'vue-router';
+import {BButton, BCard, BCol, BContainer, BRow} from 'bootstrap-vue-next';
+import {apiClient} from '@/axios-setup';
+import {logger} from '@/utils';
 
 interface ProcessoResumo {
   codigo: number;
@@ -85,7 +86,7 @@ async function carregarHistorico() {
     const response = await apiClient.get<ProcessoResumo[]>('/processos/finalizados');
     processos.value = response.data;
   } catch (e) {
-    console.error("Erro ao carregar histórico:", e);
+    logger.error("Erro ao carregar histórico:", e);
   } finally {
     loading.value = false;
   }

@@ -4,17 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.processo.model.TipoProcesso;
-import sgc.organizacao.UnidadeService;
-import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.alerta.AlertaService;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.organizacao.UnidadeService;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.*;
+
 import java.util.List;
 import java.util.Map;
 
@@ -58,11 +54,13 @@ public class SubprocessoWorkflowService {
 
     public void atualizarSituacaoParaEmAndamento(Long mapaCodigo) {
         var subprocesso = repositorioSubprocesso.findByMapaCodigo(mapaCodigo)
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o mapa com código %d".formatted(mapaCodigo)));
+            .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeDeveriaExistir(
+                    "Subprocesso", mapaCodigo,
+                    "SubprocessoWorkflowService - mapa deveria estar associado a um subprocesso"));
 
         if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
             if (subprocesso.getProcesso() == null) {
-                throw new ErroEntidadeNaoEncontrada("Processo não associado ao Subprocesso %d".formatted(subprocesso.getCodigo()));
+                throw new sgc.comum.erros.ErroEntidadeNaoEncontrada("Processo associado não encontrado para subprocesso %d".formatted(subprocesso.getCodigo()));
             }
             var tipoProcesso = subprocesso.getProcesso().getTipo();
             if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
@@ -136,9 +134,9 @@ public class SubprocessoWorkflowService {
             Unidade superior = sp.getUnidade().getUnidadeSuperior();
             while (superior != null) {
                 if (isRevisao) {
-                    alertaService.criarAlertaReaberturaRevisaoSuperior(sp.getProcesso(), superior, sp.getUnidade(), justificativa);
+                    alertaService.criarAlertaReaberturaRevisaoSuperior(sp.getProcesso(), superior, sp.getUnidade());
                 } else {
-                    alertaService.criarAlertaReaberturaCadastroSuperior(sp.getProcesso(), superior, sp.getUnidade(), justificativa);
+                    alertaService.criarAlertaReaberturaCadastroSuperior(sp.getProcesso(), superior, sp.getUnidade());
                 }
                 superior = superior.getUnidadeSuperior();
             }

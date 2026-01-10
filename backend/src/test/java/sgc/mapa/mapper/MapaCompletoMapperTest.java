@@ -2,8 +2,8 @@ package sgc.mapa.mapper;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import sgc.mapa.model.Atividade;
 import sgc.mapa.dto.MapaCompletoDto;
+import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 
@@ -13,7 +13,6 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MapaCompletoMapperTest {
-
     private final MapaCompletoMapper mapper = Mappers.getMapper(MapaCompletoMapper.class);
 
     @Test

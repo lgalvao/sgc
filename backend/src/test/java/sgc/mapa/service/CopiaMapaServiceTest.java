@@ -40,7 +40,6 @@ class CopiaMapaServiceTest {
     @DisplayName("Deve copiar mapa com sucesso")
     void deveCopiarMapaComSucesso() {
         Long origemId = 1L;
-        Long destinoId = 2L;
 
         Mapa mapaOrigem = new Mapa();
         mapaOrigem.setCodigo(origemId);
@@ -72,7 +71,7 @@ class CopiaMapaServiceTest {
         when(competenciaRepo.findByMapaCodigo(origemId)).thenReturn(List.of(competenciaOrigem));
         when(competenciaRepo.save(any(Competencia.class))).thenAnswer(i -> i.getArgument(0));
 
-        Mapa resultado = service.copiarMapaParaUnidade(origemId, destinoId);
+        Mapa resultado = service.copiarMapaParaUnidade(origemId);
 
         assertThat(resultado).isNotNull();
         verify(mapaRepo).save(any(Mapa.class));
@@ -92,7 +91,7 @@ class CopiaMapaServiceTest {
     @DisplayName("Deve lançar erro se mapa origem não existir")
     void deveLancarErroSeMapaOrigemNaoExistir() {
         when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> service.copiarMapaParaUnidade(1L, 2L))
+        assertThatThrownBy(() -> service.copiarMapaParaUnidade(1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
@@ -108,7 +107,7 @@ class CopiaMapaServiceTest {
         when(atividadeRepo.findByMapaCodigoWithConhecimentos(origemId)).thenReturn(null); // Return null
         when(competenciaRepo.findByMapaCodigo(origemId)).thenReturn(Collections.emptyList()); // Empty list
 
-        Mapa resultado = service.copiarMapaParaUnidade(origemId, 2L);
+        Mapa resultado = service.copiarMapaParaUnidade(origemId);
 
         assertThat(resultado).isNotNull();
         verify(atividadeRepo, never()).save(any(Atividade.class));

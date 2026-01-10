@@ -5,10 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import sgc.seguranca.SanitizarHtml;
+import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 /**
- * Request para apresentar sugestões ao mapa de competências (CDU-19 item 8). Usado pelo CHEFE da
+ * Request para apresentar sugestões ao mapa de competências (CDU-19 item 8).
+ * Usado pelo CHEFE da
  * unidade para fornecer feedback sobre o mapa disponibilizado.
  */
 @Data

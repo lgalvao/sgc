@@ -2,6 +2,7 @@ package sgc.security;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,14 +12,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.integracao.mocks.TestConfig;
-import sgc.seguranca.GerenciadorJwt;
 import sgc.organizacao.model.*;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
+import sgc.seguranca.login.GerenciadorJwt;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Tag("integration")
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(TestConfig.class)
@@ -52,7 +52,8 @@ class ActuatorSecurityTest {
     }
 
     private void criarUsuario(String titulo, Perfil perfil, Unidade unidade) {
-        if (usuarioRepo.existsById(titulo)) return;
+        if (usuarioRepo.existsById(titulo))
+            return;
 
         Usuario usuario = Usuario.builder()
                 .tituloEleitoral(titulo)
@@ -85,7 +86,7 @@ class ActuatorSecurityTest {
         String token = gerenciadorJwt.gerarToken("123456789", Perfil.ADMIN, 1L);
 
         mockMvc.perform(get("/actuator/health")
-                        .header("Authorization", "Bearer " + token))
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
     }
 
@@ -95,7 +96,7 @@ class ActuatorSecurityTest {
         String token = gerenciadorJwt.gerarToken("987654321", Perfil.SERVIDOR, 1L);
 
         mockMvc.perform(get("/actuator/health")
-                        .header("Authorization", "Bearer " + token))
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden());
     }
 }

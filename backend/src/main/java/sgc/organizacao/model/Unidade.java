@@ -3,8 +3,10 @@ package sgc.organizacao.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Immutable;
+import org.jspecify.annotations.Nullable;
 import sgc.comum.model.EntidadeBase;
 import sgc.processo.model.Processo;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +19,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@AttributeOverrides({@AttributeOverride(name = "codigo", column = @Column(name = "codigo"))})
 public class Unidade extends EntidadeBase {
     @Column(name = "nome")
     private String nome;
@@ -44,6 +45,7 @@ public class Unidade extends EntidadeBase {
 
     @ManyToOne
     @JoinColumn(name = "unidade_superior_codigo")
+    @Nullable
     private Unidade unidadeSuperior;
 
     @ManyToMany(mappedBy = "participantes")

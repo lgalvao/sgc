@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.erros.ErroUnidadesNaoDefinidas;
 import sgc.processo.eventos.EventoProcessoIniciado;
@@ -13,8 +15,6 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.service.SubprocessoFactory;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -146,7 +146,9 @@ public class ProcessoInicializador {
                 for (Long codUnidade : codigosUnidades) {
                     Unidade unidade = mapaUnidades.get(codUnidade);
                     if (unidade == null) {
-                         throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
+                         throw new sgc.comum.erros.ErroEntidadeDeveriaExistir(
+                                 "Unidade", codUnidade,
+                                 "ProcessoInicializador - unidade deveria existir ao iniciar processo");
                     }
                     sgc.organizacao.model.UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
                     subprocessoFactory.criarParaRevisao(processo, unidade, um);

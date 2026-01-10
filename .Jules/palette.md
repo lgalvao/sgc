@@ -1,3 +1,3 @@
-## 2024-05-23 - [Destructive Action Safety]
-**Learning:** Default focusing the confirm button in destructive modals is an accident waiting to happen. Users often spam "Enter" or click too fast.
-**Action:** Always auto-focus the "Cancel" button for actions with irreversible consequences (like deletion). Use visual cues like warning icons inside the modal to further signal danger.
+## 2025-01-08 - Empty States are Forgotten
+**Learning:** The application uses default BootstrapVue tables which result in plain text "No records found" messages. This is a pattern across multiple dashboard components.
+**Action:** Enhance empty states with large icons (Bootstrap Icons) and helpful context/call-to-action text to make the "zero data" state feel intentional and less broken.

@@ -13,7 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import sgc.seguranca.FiltroAutenticacaoMock;
+import sgc.seguranca.login.FiltroJwt;
 
 @Configuration
 @EnableWebSecurity
@@ -21,54 +21,61 @@ import sgc.seguranca.FiltroAutenticacaoMock;
 @RequiredArgsConstructor
 @Profile("(!test & !e2e) | secure-test")
 public class ConfigSeguranca {
-    private final FiltroAutenticacaoMock filtroAutenticacaoMock;
+        private final FiltroJwt filtroJwt;
 
-    /**
-     * Configura a cadeia de filtros de segurança para a aplicação.
-     *
-     * <p>Esta configuração define as seguintes regras:
-     *
-     * <ul>
-     *   <li>Permite acesso anônimo aos endpoints de autenticação.
-     *   <li>Exige autenticação para todos os outros endpoints sob '/api/'.
-     *   <li>Permite acesso a qualquer outra requisição (ex: frontend estático).
-     *   <li>Desabilita CSRF, HTTP Basic e formulário de login, adequando-se a uma API RESTful.
-     *   <li>Retorna status 401 Unauthorized para tentativas de acesso não autenticadas a endpoints
-     *       protegidos.
-     *   <li>Configura headers de segurança (HSTS, CSP, etc).
-     * </ul>
-     *
-     * @param http o construtor {@link HttpSecurity} para configurar a segurança.
-     * @return o {@link SecurityFilterChain} configurado.
-     */
-    @Bean("defaultSecurityFilterChain")
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource) throws Exception {
-        http.authorizeHttpRequests(auth -> auth.requestMatchers(
+        /**
+         * Configura a cadeia de filtros de segurança para a aplicação.
+         *
+         * <p>
+         * Esta configuração define as seguintes regras:
+         *
+         * <ul>
+         * <li>Permite acesso anônimo aos endpoints de autenticação.
+         * <li>Exige autenticação para todos os outros endpoints sob '/api/'.
+         * <li>Permite acesso a qualquer outra requisição (ex: frontend estático).
+         * <li>Desabilita CSRF, HTTP Basic e formulário de login, adequando-se a uma API
+         * RESTful.
+         * <li>Retorna status 401 Unauthorized para tentativas de acesso não
+         * autenticadas a endpoints
+         * protegidos.
+         * <li>Configura headers de segurança (HSTS, CSP, etc).
+         * </ul>
+         *
+         * @param http o construtor {@link HttpSecurity} para configurar a segurança.
+         * @return o {@link SecurityFilterChain} configurado.
+         */
+        @Bean("defaultSecurityFilterChain")
+        public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                        org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource) {
+                http.authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/api/usuarios/autenticar",
                                 "/api/usuarios/autorizar",
                                 "/api/usuarios/entrar")
-                        .permitAll()
-                        .requestMatchers("/actuator/**")
-                        .hasRole("ADMIN")
-                        .requestMatchers("/api/**")
-                        .authenticated()
-                        .anyRequest()
-                        .permitAll())
-                .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-                // Desabilita CSRF pois a API é stateless e usa JWTs via header, sem cookies de sessão
-                .csrf(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource))
-                .headers(headers -> headers
-                        .httpStrictTransportSecurity(hsts -> hsts
-                                .includeSubDomains(true)
-                                .maxAgeInSeconds(31536000))
-                        .contentSecurityPolicy(csp -> csp
-                                .policyDirectives("default-src 'none'; frame-ancestors 'none'; sandbox"))
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
-                        .xssProtection(HeadersConfigurer.XXssConfig::disable))
-                .addFilterBefore(filtroAutenticacaoMock, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
+                                .permitAll()
+                                .requestMatchers("/actuator/**")
+                                .hasRole("ADMIN")
+                                .requestMatchers("/api/**")
+                                .authenticated()
+                                .anyRequest()
+                                .permitAll())
+                                .exceptionHandling(e -> e.authenticationEntryPoint(
+                                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                                // Desabilita CSRF pois a API é stateless e usa JWTs via header, sem cookies de
+                                // sessão
+                                .csrf(AbstractHttpConfigurer::disable)
+                                .httpBasic(AbstractHttpConfigurer::disable)
+                                .formLogin(AbstractHttpConfigurer::disable)
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                                .headers(headers -> headers
+                                                .httpStrictTransportSecurity(hsts -> hsts
+                                                                .includeSubDomains(true)
+                                                                .maxAgeInSeconds(31536000))
+                                                .contentSecurityPolicy(csp -> csp
+                                                                .policyDirectives(
+                                                                                "default-src 'none'; frame-ancestors 'none'; sandbox"))
+                                                .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
+                                                .xssProtection(HeadersConfigurer.XXssConfig::disable))
+                                .addFilterBefore(filtroJwt, UsernamePasswordAuthenticationFilter.class);
+                return http.build();
+        }
 }

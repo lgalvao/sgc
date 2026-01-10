@@ -10,10 +10,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
-import sgc.processo.model.TipoProcesso;
+import sgc.organizacao.dto.CriarAtribuicaoTemporariaReq;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
-import sgc.organizacao.dto.CriarAtribuicaoTemporariaReq;
+import sgc.processo.model.TipoProcesso;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +37,7 @@ class UnidadeControllerTest {
     private UnidadeService unidadeService;
 
     @MockitoBean
-    private sgc.seguranca.GerenciadorJwt gerenciadorJwt;
+    private sgc.seguranca.login.GerenciadorJwt gerenciadorJwt;
 
     @MockitoBean
     private sgc.organizacao.model.UsuarioRepo usuarioRepo;
@@ -54,16 +54,16 @@ class UnidadeControllerTest {
     void deveRetornar201AoCriarAtribuicaoTemporaria() throws Exception {
         // Act & Assert
         mockMvc.perform(
-                        post("/api/unidades/1/atribuicoes-temporarias")
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("""
-                                                {
-                                                    "tituloEleitoralUsuario":"123",
-                                                    "dataTermino":"2025-12-31",
-                                                    "justificativa":"teste"
-                                                }
-                                                """))
+                post("/api/unidades/1/atribuicoes-temporarias")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "tituloEleitoralUsuario":"123",
+                                    "dataTermino":"2025-12-31",
+                                    "justificativa":"teste"
+                                }
+                                """))
                 .andExpect(status().isCreated());
 
         verify(unidadeService)
@@ -91,7 +91,7 @@ class UnidadeControllerTest {
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/arvore-com-elegibilidade")
-                                .param("tipoProcesso", "MAPEAMENTO"))
+                .param("tipoProcesso", "MAPEAMENTO"))
                 .andExpect(status().isOk());
     }
 

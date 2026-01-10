@@ -319,7 +319,7 @@ async function confirmarValidacao() {
     observacoes: observacaoValidacao.value,
   };
 
-  let sucesso = false;
+  let sucesso: boolean;
 
   if (isHomologacao.value) {
     const req: HomologarCadastroRequest = {
@@ -366,7 +366,7 @@ async function confirmarDevolucao() {
     observacoes: observacaoDevolucao.value,
   };
 
-  let sucesso = false;
+  let sucesso: boolean;
   if (isRevisao.value) {
     sucesso = await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, req);
   } else {

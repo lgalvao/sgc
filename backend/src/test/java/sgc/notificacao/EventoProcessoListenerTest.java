@@ -15,11 +15,12 @@ import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +38,7 @@ class EventoProcessoListenerTest {
     @Mock private NotificacaoEmailService notificacaoEmailService;
     @Mock private NotificacaoModelosService notificacaoModelosService;
     @Mock private UsuarioService usuarioService;
-    @Mock private ProcessoService processoService;
+    @Mock private ProcessoFacade processoFacade;
     @Mock private SubprocessoService subprocessoService;
 
     @Test
@@ -48,7 +49,7 @@ class EventoProcessoListenerTest {
         processo.setDescricao("Processo Teste");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
         // Mock Subprocesso
         Unidade unidade = new Unidade();
@@ -99,7 +100,7 @@ class EventoProcessoListenerTest {
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
@@ -145,7 +146,7 @@ class EventoProcessoListenerTest {
         processo.setCodigo(1L);
         processo.setDescricao("P1");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(100L);
@@ -182,7 +183,7 @@ class EventoProcessoListenerTest {
         processo.setCodigo(1L);
         processo.setDescricao("P1");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(20L);
@@ -212,7 +213,7 @@ class EventoProcessoListenerTest {
         Processo processo = new Processo();
         processo.setCodigo(2L);
         processo.setDescricao("P2");
-        when(processoService.buscarEntidadePorId(2L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(2L)).thenReturn(processo);
         
         Unidade intermediaria = new Unidade();
         intermediaria.setCodigo(30L);
@@ -252,7 +253,7 @@ class EventoProcessoListenerTest {
         Processo processo = new Processo();
         processo.setCodigo(3L);
         processo.setDescricao("P3");
-        when(processoService.buscarEntidadePorId(3L)).thenReturn(processo);
+        when(processoFacade.buscarEntidadePorId(3L)).thenReturn(processo);
         
         Unidade intermediaria = new Unidade();
         intermediaria.setCodigo(50L);
@@ -274,5 +275,166 @@ class EventoProcessoListenerTest {
         
         // NAO deve enviar email para a intermediaria pois não tem subordinadas no contexto
         verify(notificacaoEmailService, never()).enviarEmailHtml(eq("solo@mail.com"), anyString(), any());
+    }
+
+    @Test
+    void deveLogarErroParaTipoUnidadeNaoSuportado() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setDescricao("P1");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(99L);
+        unidade.setTipo(TipoUnidade.RAIZ); // Tipo não suportado no switch
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(999L);
+        subprocesso.setUnidade(unidade);
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
+
+        ResponsavelDto responsavel = ResponsavelDto.builder().unidadeCodigo(99L).titularTitulo("999").build();
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(99L, responsavel));
+
+        UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("999").email("raiz@mail.com").build();
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("999", titular));
+
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
+
+        // Não deve lançar exceção para fora, mas deve logar o erro (capturado pelo try/catch interno)
+        listener.aoIniciarProcesso(evento);
+
+        // Verifica que NÃO enviou e-mail
+        verify(notificacaoEmailService, never()).enviarEmailHtml(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void deveEnviarEmailParaUnidadeIntermediaria() {
+        // Testa envio de email específico para unidade INTERMEDIARIA ao iniciar processo
+        Processo processo = new Processo();
+        processo.setCodigo(5L);
+        processo.setDescricao("Processo com Intermediária");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        when(processoFacade.buscarEntidadePorId(5L)).thenReturn(processo);
+
+        Unidade intermediaria = new Unidade();
+        intermediaria.setCodigo(100L);
+        intermediaria.setSigla("INTER");
+        intermediaria.setNome("Unidade Intermediária");
+        intermediaria.setTipo(TipoUnidade.INTERMEDIARIA);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(200L);
+        subprocesso.setUnidade(intermediaria);
+        subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+
+        when(subprocessoService.listarEntidadesPorProcesso(5L)).thenReturn(List.of(subprocesso));
+
+        ResponsavelDto responsavel = ResponsavelDto.builder()
+                .unidadeCodigo(100L)
+                .titularTitulo("888")
+                .build();
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(100L, responsavel));
+
+        UsuarioDto titular = UsuarioDto.builder()
+                .tituloEleitoral("888")
+                .email("inter@email.com")
+                .build();
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("888", titular));
+
+        when(notificacaoModelosService.criarEmailProcessoIniciado(anyString(), anyString(), anyString(), any()))
+                .thenReturn("<html>Email content</html>");
+
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(5L).build();
+        listener.aoIniciarProcesso(evento);
+
+        // Verifica que enviou email com assunto específico para INTERMEDIARIA
+        verify(notificacaoEmailService).enviarEmailHtml(
+                eq("inter@email.com"),
+                contains("Unidades Subordinadas"),
+                anyString()
+        );
+    }
+
+    @Test
+    void deveTratarExcecaoNoLoopDeSubprocessos() {
+        // Testa o catch do loop externo (linhas 123-124) quando enviarEmailProcessoIniciado lança exceção
+        Processo processo = new Processo();
+        processo.setCodigo(6L);
+        processo.setDescricao("Processo Teste");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        when(processoFacade.buscarEntidadePorId(6L)).thenReturn(processo);
+
+        // Primeiro subprocesso normal
+        Subprocesso subprocessoBom = new Subprocesso();
+        subprocessoBom.setCodigo(300L);
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(50L);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        unidade.setNome("Unidade Normal");
+        unidade.setSigla("UN");
+        subprocessoBom.setUnidade(unidade);
+        subprocessoBom.setDataLimiteEtapa1(LocalDateTime.now());
+
+        // Segundo subprocesso que causará exceção devido a responsável null no map
+        Subprocesso subprocessoRuim = new Subprocesso();
+        subprocessoRuim.setCodigo(301L);
+        Unidade unidadeRuim = new Unidade();
+        unidadeRuim.setCodigo(99L); // Código que não terá responsável no map
+        unidadeRuim.setTipo(TipoUnidade.OPERACIONAL);
+        subprocessoRuim.setUnidade(unidadeRuim);
+
+        when(subprocessoService.listarEntidadesPorProcesso(6L))
+                .thenReturn(List.of(subprocessoBom, subprocessoRuim));
+
+        // Fornece responsável apenas para a unidade 50, não para 99
+        ResponsavelDto responsavel = ResponsavelDto.builder()
+                .unidadeCodigo(50L)
+                .titularTitulo("777")
+                .build();
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(50L, responsavel));
+
+        UsuarioDto titular = UsuarioDto.builder()
+                .tituloEleitoral("777")
+                .email("normal@email.com")
+                .build();
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("777", titular));
+
+        when(notificacaoModelosService.criarEmailProcessoIniciado(anyString(), anyString(), anyString(), any()))
+                .thenReturn("<html>Email</html>");
+
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(6L).build();
+        
+        // Não deve lançar exceção para fora - deve capturar e logar
+        listener.aoIniciarProcesso(evento);
+
+        // Verifica que o primeiro subprocesso foi processado com sucesso
+        // O segundo causará NPE ao tentar acessar responsavel.getTitularTitulo() quando responsavel é null
+        verify(notificacaoEmailService).enviarEmailHtml(eq("normal@email.com"), anyString(), anyString());
+    }
+
+    @Test
+    void deveTratarExcecaoAoFinalizarProcesso_ListaVazia() {
+        // Cobre o caso de lista vazia no inicio de processarFinalizacaoProcesso
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(99L).build();
+        Processo processo = new Processo();
+        processo.setCodigo(99L);
+        processo.setParticipantes(Collections.emptySet());
+
+        when(processoFacade.buscarEntidadePorId(99L)).thenReturn(processo);
+
+        listener.aoFinalizarProcesso(evento);
+        // Sem exceções
+    }
+
+    @Test
+    void deveTratarExcecaoGeralAoFinalizarProcesso() {
+        // Cobre o catch global em aoFinalizarProcesso
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(99L).build();
+        when(processoFacade.buscarEntidadePorId(99L)).thenThrow(new RuntimeException("Erro Geral"));
+
+        listener.aoFinalizarProcesso(evento);
+        // Sem exceções
     }
 }

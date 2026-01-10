@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroConfiguracao;
 import sgc.configuracao.model.Parametro;
 import sgc.configuracao.model.ParametroRepo;
 
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes Unitários: ParametroService")
+@DisplayName("ParametroService")
 class ParametroServiceTest {
 
     @InjectMocks
@@ -68,7 +68,7 @@ class ParametroServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> parametroService.buscarPorChave(chave))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .isInstanceOf(ErroConfiguracao.class)
                 .hasMessageContaining(chave);
     }
 
@@ -118,7 +118,7 @@ class ParametroServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> parametroService.atualizar(chave, "novo"))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroConfiguracao.class);
         verify(parametroRepo, never()).save(any());
     }
 }

@@ -8,26 +8,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
-import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.*;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
 import sgc.subprocesso.model.*;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
@@ -58,9 +54,6 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
     private UnidadeRepo unidadeRepo;
 
     @Autowired
-    private UsuarioRepo usuarioRepo;
-
-    @Autowired
     private SubprocessoMovimentacaoRepo movimentacaoRepo;
 
     @Autowired
@@ -75,9 +68,6 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
     private Unidade unidade1;
     private Unidade unidade2;
     private Processo processo;
@@ -86,24 +76,16 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        Long idSuperior = 6000L;
-        Long idUnidade1 = 6001L;
-        Long idUnidade2 = 6002L;
+        // Use existing units from data.sql:
+        // Unit 8 (SEDESENV - OPERACIONAL) subordinate to 6
+        // Unit 9 (SEDIA - OPERACIONAL) subordinate to 6
+        // User '111111111111' is ADMIN (can disponibilizar mapas em bloco)
+        unidade1 = unidadeRepo.findById(8L)
+                .orElseThrow(() -> new RuntimeException("Unit 8 not found in data.sql"));
+        unidade2 = unidadeRepo.findById(9L)
+                .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
 
-        String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sqlInsertUnidade, idSuperior, "Coordenação Mapa", "COORD-MAPA", "INTERMEDIARIA", "ATIVA", null, null);
-        jdbcTemplate.update(sqlInsertUnidade, idUnidade1, "Unidade Mapa 1", "UNID-MAPA-1", "OPERACIONAL", "ATIVA", idSuperior, null);
-        jdbcTemplate.update(sqlInsertUnidade, idUnidade2, "Unidade Mapa 2", "UNID-MAPA-2", "OPERACIONAL", "ATIVA", idSuperior, null);
-
-        unidade1 = unidadeRepo.findById(idUnidade1).orElseThrow();
-        unidade2 = unidadeRepo.findById(idUnidade2).orElseThrow();
-
-        // Usuário Admin
-        Usuario admin = UsuarioFixture.usuarioPadrao();
-        admin.setTituloEleitoral("888888888888");
-        usuarioRepo.save(admin);
-
-        // Processo
+        // Create test process
         processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -111,7 +93,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
         processo.setDescricao("Processo Mapa CDU-24");
         processo = processoRepo.save(processo);
 
-        // Subprocessos (Status: MAPEAMENTO_MAPA_CRIADO)
+        // Create subprocesses with complete maps (Status: MAPEAMENTO_MAPA_CRIADO)
         subprocesso1 = createSubprocessoComMapaCompleto(unidade1);
         subprocesso2 = createSubprocessoComMapaCompleto(unidade2);
 
@@ -124,10 +106,10 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
     }
 
     private Subprocesso createSubprocessoComMapaCompleto(Unidade unidade) {
-        // Criar Subprocesso
+        // Criar Subprocesso in correct state for disponibilizar mapa
         Subprocesso sub = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         sub.setCodigo(null);
-        sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+        sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO); // Changed from MAPEAMENTO_MAPA_CRIADO
         sub = subprocessoRepo.save(sub);
 
         // Criar Mapa
@@ -141,15 +123,15 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
 
         // Criar Atividade
         Atividade ativ = new Atividade(mapa, "Atividade Teste " + unidade.getSigla());
-        ativ = atividadeRepo.save(ativ);
+        atividadeRepo.save(ativ);
 
         // Criar Competência
         Competencia comp = new Competencia("Competência Teste " + unidade.getSigla(), mapa);
-        comp = competenciaRepo.save(comp);
+        competenciaRepo.save(comp);
 
         // Associar (ManyToMany)
         ativ.getCompetencias().add(comp);
-        ativ = atividadeRepo.save(ativ);
+        atividadeRepo.save(ativ);
 
         return sub;
     }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import sgc.seguranca.SanitizacaoUtil;
+import sgc.seguranca.sanitizacao.UtilSanitizacao;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,15 +22,18 @@ import java.util.stream.Collectors;
 /**
  * Handler centralizado para tratamento de exceções REST.
  *
- * <p>Todas as exceções de negócio devem estender {@link ErroNegocioBase} para serem
- * tratadas automaticamente pelo método {@link #handleErroNegocio(ErroNegocioBase)}.
+ * <p>
+ * Todas as exceções de negócio devem estender {@link ErroNegocioBase} para
+ * serem
+ * tratadas automaticamente pelo método
+ * {@link #handleErroNegocio(ErroNegocioBase)}.
  */
 @Slf4j
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private String sanitizar(String texto) {
-        return SanitizacaoUtil.sanitizar(texto);
+        return UtilSanitizacao.sanitizar(texto);
     }
 
     private ResponseEntity<Object> buildResponseEntity(ErroApi erroApi) {
@@ -52,11 +55,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         }
 
         ErroApi erroApi = new ErroApi(
-            ex.getStatus(),
-            sanitizar(ex.getMessage()),
-            ex.getCode(),
-            traceId
-        );
+                ex.getStatus(),
+                sanitizar(ex.getMessage()),
+                ex.getCode(),
+                traceId);
 
         if (ex.getDetails() != null && !ex.getDetails().isEmpty()) {
             erroApi.setDetails(ex.getDetails());
@@ -91,7 +93,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                         error -> new ErroSubApi(error.getObjectName(),
                                 error.getField(),
                                 sanitizar(error.getDefaultMessage())))
-                .toList() : null;
+                        .toList()
+                : null;
 
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
@@ -102,13 +105,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String traceId = UUID.randomUUID().toString();
         log.error("[{}] Erro de constraint de banco de dados: {}", traceId, ex.getMessage(), ex);
         String message = "A requisição contém dados inválidos.";
-        var subErrors =
-                ex.getConstraintViolations().stream().map(violation ->
-                                new ErroSubApi(
-                                        violation.getRootBeanClass().getSimpleName(),
-                                        violation.getPropertyPath().toString(),
-                                        sanitizar(violation.getMessage())))
-                        .collect(Collectors.toList());
+        var subErrors = ex.getConstraintViolations().stream().map(violation -> new ErroSubApi(
+                violation.getRootBeanClass().getSimpleName(),
+                violation.getPropertyPath().toString(),
+                sanitizar(violation.getMessage())))
+                .collect(Collectors.toList());
 
         ErroApi erroApi = new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors);
         erroApi.setTraceId(traceId);
@@ -125,24 +126,27 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ErroAutenticacao.class)
     protected ResponseEntity<?> handleErroAutenticacao(ErroAutenticacao ex) {
         log.warn("Erro de autenticação: {}", ex.getMessage());
-        return buildResponseEntity(new ErroApi(HttpStatus.UNAUTHORIZED, sanitizar(ex.getMessage()), "NAO_AUTORIZADO", UUID.randomUUID().toString()));
+        return buildResponseEntity(new ErroApi(HttpStatus.UNAUTHORIZED, sanitizar(ex.getMessage()), "NAO_AUTORIZADO",
+                UUID.randomUUID().toString()));
     }
 
     /**
-     * Trata erros internos do sistema que indicam bugs ou problemas de configuração.
-     * Estes erros nunca deveriam ocorrer em produção se o sistema está funcionando corretamente.
+     * Trata erros internos do sistema que indicam bugs ou problemas de
+     * configuração.
+     * Estes erros nunca deveriam ocorrer em produção se o sistema está funcionando
+     * corretamente.
      */
     @ExceptionHandler(ErroInterno.class)
     protected ResponseEntity<?> handleErroInterno(ErroInterno ex) {
         String traceId = UUID.randomUUID().toString();
-        log.error("[{}] ERRO INTERNO - Isso indica um bug que precisa ser corrigido: {}", 
-                  traceId, ex.getMessage(), ex);
-        
+        log.error("[{}] ERRO INTERNO - Isso indica um bug que precisa ser corrigido: {}",
+                traceId, ex.getMessage(), ex);
+
         // Não expor detalhes internos ao usuário
-        String mensagemUsuario = "Erro interno do sistema. Por favor, contate o suporte informando o código: " + traceId;
+        String mensagemUsuario = "Erro interno do sistema. Por favor, contate o suporte informando o código: "
+                + traceId;
         return buildResponseEntity(
-            new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, mensagemUsuario, "ERRO_INTERNO", traceId)
-        );
+                new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, mensagemUsuario, "ERRO_INTERNO", traceId));
     }
 
     @ExceptionHandler(IllegalStateException.class)

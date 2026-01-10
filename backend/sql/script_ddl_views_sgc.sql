@@ -51,9 +51,7 @@ HistoricoExtinto AS (
                 '^(.*?)->[^>]+->[^>]+$', -- Expressão para isolar o histórico
                 1, 1, 'i', 1
             )
-        ELSE
-            NULL
-    END AS Historico_String_Pura
+        END AS Historico_String_Pura
   FROM HistoricoCompleto h
 )
 SELECT
@@ -130,7 +128,7 @@ FROM (
            nvl(l.qtd_servidores, 0) as qtd_servidores_lotados, nvl(p.qtd_unidades_filhas, 0) as qtd_unidades_filhas
     from tb_unidade u
     left join (
-        select l1.cod_unid_tse, count(1) + nvl((select sum(case qtd_servidores when 1 then 1 else 0 end)
+        select l1.cod_unid_tse, count(1) + nvl((select sum(DECODE(qtd_servidores, 1, 1, 0))
                                                 from (
                                                     select l2.cod_unid_tse, u2.cod_unid_super, count(1) as qtd_servidores
                                                     from srh2.lotacao l2
@@ -196,7 +194,7 @@ select u.codigo as unidade_codigo,
             when s.mat_serv_com_subs is not null then 'SUBSTITUTO'
             else 'TITULAR' end as tipo,
        coalesce(a.data_inicio, s.dt_ini_subst, u.data_inicio_titularidade) as data_inicio,
-       coalesce(a.data_termino, s.dt_fim_subst, null) as data_fim
+       coalesce(a.data_termino, s.dt_fim_subst) as data_fim
 from (
     select codigo, matricula_titular, titulo_titular, data_inicio_titularidade
     from vw_unidade where situacao = 'ATIVA' and tipo in ('OPERACIONAL', 'INTEROPERACIONAL', 'INTERMEDIARIA')

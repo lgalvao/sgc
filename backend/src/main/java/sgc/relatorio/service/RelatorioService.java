@@ -4,19 +4,18 @@ import lombok.RequiredArgsConstructor;
 import org.openpdf.text.Document;
 import org.openpdf.text.DocumentException;
 import org.openpdf.text.Paragraph;
-import org.openpdf.text.pdf.PdfWriter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.service.CompetenciaService;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.UsuarioService;
 
 import java.io.OutputStream;
 import java.util.List;
@@ -24,18 +23,19 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RelatorioService {
-    private final ProcessoService processoService;
+    private final ProcessoFacade processoFacade;
     private final SubprocessoService subprocessoService;
     private final UsuarioService usuarioService;
     private final CompetenciaService competenciaService;
+    private final PdfFactory pdfFactory;
 
     @Transactional(readOnly = true)
     public void gerarRelatorioAndamento(Long codProcesso, OutputStream outputStream) {
-        Processo processo = processoService.buscarEntidadePorId(codProcesso);
+        Processo processo = processoFacade.buscarEntidadePorId(codProcesso);
         List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
 
-        try (Document document = new Document()) {
-            PdfWriter.getInstance(document, outputStream);
+        try (Document document = pdfFactory.createDocument()) {
+            pdfFactory.createWriter(document, outputStream);
             document.open();
 
             document.add(new Paragraph("Relatório de Andamento - " + processo.getDescricao()));
@@ -65,17 +65,15 @@ public class RelatorioService {
 
     @Transactional(readOnly = true)
     public void gerarRelatorioMapas(Long codProcesso, Long codUnidade, OutputStream outputStream) {
-        Processo processo = processoService.buscarEntidadePorId(codProcesso);
+        Processo processo = processoFacade.buscarEntidadePorId(codProcesso);
         List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
 
-        if (codUnidade != null) {
-            subprocessos = subprocessos.stream()
-                    .filter(sp -> sp.getUnidade().getCodigo().equals(codUnidade))
-                    .toList();
-        }
+        subprocessos = subprocessos.stream()
+                .filter(sp -> sp.getUnidade() != null && sp.getUnidade().getCodigo() != null && sp.getUnidade().getCodigo().equals(codUnidade))
+                .toList();
 
-        try (Document document = new Document()) {
-            PdfWriter.getInstance(document, outputStream);
+        try (Document document = pdfFactory.createDocument()) {
+            pdfFactory.createWriter(document, outputStream);
             document.open();
 
             document.add(new Paragraph("Relatório de Mapas - " + processo.getDescricao()));
@@ -88,7 +86,7 @@ public class RelatorioService {
                 document.add(new Paragraph("Unidade: " + unidade.getSigla() + " - " + unidade.getNome()));
                 document.add(new Paragraph(" "));
 
-                List<Competencia> competencias = competenciaService.buscarPorMapa(sp.getMapa().getCodigo());
+                List<Competencia> competencias = competenciaService.buscarPorCodMapa(sp.getMapa().getCodigo());
 
                 for (Competencia c : competencias) {
                     document.add(new Paragraph("Competência: " + c.getDescricao()));

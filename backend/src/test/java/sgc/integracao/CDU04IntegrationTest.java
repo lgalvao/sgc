@@ -21,17 +21,15 @@ import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.notificacao.NotificacaoEmailService;
+import sgc.organizacao.model.*;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.IniciarProcessoReq;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.organizacao.model.*;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;

@@ -13,18 +13,18 @@ import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
-import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.integracao.mocks.WithMockChefe;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.DevolverValidacaoReq;
 import sgc.subprocesso.model.*;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
@@ -32,6 +32,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -55,6 +56,9 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
     private UnidadeRepo unidadeRepo;
 
     @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
     private AlertaRepo alertaRepo;
 
     @Autowired
@@ -64,35 +68,31 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
     private Unidade unidade;
     private Unidade unidadeSuperior;
     private Unidade unidadeSuperiorSuperior;
+    private Usuario usuarioGestor;
+    private Usuario usuarioChefe;
 
     @BeforeEach
     void setUp() {
-        // Criar hierarquia de 3 níveis de unidades via Fixture
-        // Nível 1: Unidade superior superior (interoperacional)
-        unidadeSuperiorSuperior = UnidadeFixture.unidadePadrao();
-        unidadeSuperiorSuperior.setCodigo(null);
-        unidadeSuperiorSuperior.setNome("Secretaria CDU-20");
-        unidadeSuperiorSuperior.setSigla("SEC20");
-        unidadeSuperiorSuperior.setUnidadeSuperior(null);
-        unidadeSuperiorSuperior = unidadeRepo.save(unidadeSuperiorSuperior);
+        // Use existing 3-level hierarchy from data.sql:
+        // Unit 2 (STIC - INTEROPERACIONAL) - top level
+        // Unit 6 (COSIS - INTERMEDIARIA) - subordinate to 2
+        // Unit 9 (SEDIA - OPERACIONAL) - subordinate to 6
+        // User '666666666666' is GESTOR of unit 6
+        // User '333333333333' is CHEFE of unit 9
+        unidadeSuperiorSuperior = unidadeRepo.findById(2L)
+                .orElseThrow(() -> new RuntimeException("Unit 2 not found in data.sql"));
+        
+        unidadeSuperior = unidadeRepo.findById(6L)
+                .orElseThrow(() -> new RuntimeException("Unit 6 not found in data.sql"));
+        
+        unidade = unidadeRepo.findById(9L)
+                .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
 
-        // Nível 2: Unidade superior (intermediária)
-        unidadeSuperior = UnidadeFixture.unidadePadrao();
-        unidadeSuperior.setCodigo(null);
-        unidadeSuperior.setNome("Coordenadoria CDU-20");
-        unidadeSuperior.setSigla("COORD20");
-        unidadeSuperior.setUnidadeSuperior(unidadeSuperiorSuperior);
-        unidadeSuperior = unidadeRepo.save(unidadeSuperior);
+        // Load users from database with their profiles
+        usuarioGestor = usuarioService.buscarPorLogin("666666666666");
+        usuarioChefe = usuarioService.buscarPorLogin("333333333333");
 
-        // Nível 3: Unidade operacional
-        unidade = UnidadeFixture.unidadePadrao();
-        unidade.setCodigo(null);
-        unidade.setNome("Seção CDU-20");
-        unidade.setSigla("SECAO20");
-        unidade.setUnidadeSuperior(unidadeSuperior);
-        unidade = unidadeRepo.save(unidade);
-
-        // Criar Processo via Fixture
+        // Create test process and subprocess
         Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setDescricao("Processo de Teste");
@@ -100,7 +100,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
 
-        // Criar Subprocesso via Fixture
+        // Create subprocess in MAPEAMENTO_MAPA_VALIDADO state for unit 9
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
@@ -109,12 +109,12 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Devolução e aceite da validação do mapa com verificação do histórico")
-    @WithMockChefe()
-    void devolucaoEaceiteComVerificacaoHistorico() throws Exception {
-        // Devolução do mapa
+    @DisplayName("Devolução e aceitação da validação do mapa com verificação do histórico")
+    void devolucaoEAceitacaoComVerificacaoHistorico() throws Exception {
+        // Devolução do mapa (GESTOR of unit 6 devolves to subordinate unit 9)
         DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");
-        mockMvc.perform(                        post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
+        mockMvc.perform(post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
+                                .with(user(usuarioGestor))
                                 .with(csrf())
                                 .contentType("application/json")
                                 .content(objectMapper.writeValueAsString(devolverReq)))
@@ -123,6 +123,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         // Verificação do histórico após devolução
         String responseDevolucao =
                 mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
+                        .with(user(usuarioGestor))
                         .with(csrf()))
                         .andExpect(status().isOk())
                         .andReturn()
@@ -161,24 +162,22 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         assertThat(alertasDevolucao.getFirst().getUnidadeDestino().getSigla())
                 .isEqualTo(subprocesso.getUnidade().getSigla());
 
-        // Unidade inferior valida o mapa novamente
-        mockMvc.perform(
-                        post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
+        // Unidade inferior valida o mapa novamente (CHEFE of unit 9)
+        mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
+                                .with(user(usuarioChefe))
                                 .with(csrf()))
                 .andExpect(status().isOk());
 
-        // Chefe da unidade superior aceita a validação
-        mockMvc.perform(
-                        post("/api/subprocessos/{id}/aceitar-validacao", subprocesso.getCodigo())
+        // GESTOR da unidade superior aceita a validação
+        mockMvc.perform(post("/api/subprocessos/{id}/aceitar-validacao", subprocesso.getCodigo())
+                                .with(user(usuarioGestor))
                                 .with(csrf()))
                 .andExpect(status().isOk());
 
         // Verificação do histórico após aceite
         String responseAceite =
-                mockMvc.perform(
-                                get(
-                                        "/api/subprocessos/{id}/historico-validacao",
-                                        subprocesso.getCodigo())
+                mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
+                                        .with(user(usuarioGestor))
                                         .with(csrf()))
                         .andExpect(status().isOk())
                         .andReturn()

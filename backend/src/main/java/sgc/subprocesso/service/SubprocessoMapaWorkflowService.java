@@ -2,44 +2,50 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseService;
-import sgc.analise.dto.CriarAnaliseRequest;
+import sgc.analise.dto.CriarAnaliseReq;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.service.AtividadeService;
+import sgc.comum.erros.ErroEntidadeDeveriaExistir;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaService;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.eventos.TipoTransicao;
+import sgc.organizacao.UnidadeService;
+import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
+import sgc.processo.model.TipoProcesso;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
+import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.UnidadeService;
+import sgc.subprocesso.service.decomposed.SubprocessoValidacaoService;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static sgc.seguranca.acesso.Acao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class SubprocessoMapaWorkflowService {
-
     // Strategy Pattern: Maps para eliminar if/else por TipoProcesso
     private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_DISPONIBILIZADO = new EnumMap<>(Map.of(
             TipoProcesso.MAPEAMENTO, MAPEAMENTO_MAPA_DISPONIBILIZADO,
@@ -61,6 +67,10 @@ public class SubprocessoMapaWorkflowService {
             TipoProcesso.REVISAO, REVISAO_MAPA_HOMOLOGADO
     ));
 
+    private static final String ENTIDADE_SUBPROCESSO = "Subprocesso";
+    private static final String DETALHE_SUBPROCESSO_FMT = "processo=%d, unidade=%d";
+    private static final String MSG_ERRO_WORKFLOW_BLOCO = "Workflow em bloco - subprocesso deveria ter sido criado no início do processo";
+
     private final SubprocessoRepo subprocessoRepo;
     private final CompetenciaService competenciaService;
     private final AtividadeService atividadeService;
@@ -68,15 +78,20 @@ public class SubprocessoMapaWorkflowService {
     private final SubprocessoTransicaoService transicaoService;
     private final AnaliseService analiseService;
     private final UnidadeService unidadeService;
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoValidacaoService validacaoService;
+    private final AccessControlService accessControlService;
 
-    public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request, String tituloUsuario) {
+    @Autowired
+    @Lazy
+    private SubprocessoMapaWorkflowService self;
+
+    public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         Long codMapa = subprocesso.getMapa().getCodigo();
-        boolean eraVazio = competenciaService.buscarPorMapa(codMapa).isEmpty();
+        boolean eraVazio = competenciaService.buscarPorCodMapa(codMapa).isEmpty();
         boolean temNovasCompetencias = !request.getCompetencias().isEmpty();
 
-        MapaCompletoDto mapaDto = mapaService.salvarMapaCompleto(codMapa, request, tituloUsuario);
+        MapaCompletoDto mapaDto = mapaService.salvarMapaCompleto(codMapa, request);
 
         if (eraVazio
                 && temNovasCompetencias
@@ -89,13 +104,13 @@ public class SubprocessoMapaWorkflowService {
         return mapaDto;
     }
 
-    public MapaCompletoDto adicionarCompetencia(Long codSubprocesso, CompetenciaReq request, String tituloUsuario) {
+    public MapaCompletoDto adicionarCompetencia(Long codSubprocesso, CompetenciaReq request) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
 
         Long codMapa = subprocesso.getMapa().getCodigo();
-        boolean eraVazio = competenciaService.buscarPorMapa(codMapa).isEmpty();
+        boolean eraVazio = competenciaService.buscarPorCodMapa(codMapa).isEmpty();
 
-        competenciaService.adicionarCompetencia(
+        competenciaService.criarCompetenciaComAtividades(
                 subprocesso.getMapa(), request.getDescricao(), request.getAtividadesIds()
         );
 
@@ -111,8 +126,7 @@ public class SubprocessoMapaWorkflowService {
     public MapaCompletoDto atualizarCompetencia(
             Long codSubprocesso,
             Long codCompetencia,
-            CompetenciaReq request,
-            String tituloUsuario) {
+            CompetenciaReq request) {
 
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         competenciaService.atualizarCompetencia(
@@ -122,7 +136,7 @@ public class SubprocessoMapaWorkflowService {
     }
 
     public MapaCompletoDto removerCompetencia(
-            Long codSubprocesso, Long codCompetencia, String tituloUsuario) {
+            Long codSubprocesso, Long codCompetencia) {
 
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
 
@@ -130,7 +144,7 @@ public class SubprocessoMapaWorkflowService {
         competenciaService.removerCompetencia(codCompetencia);
 
         // Se o mapa ficou vazio e estava em MAPA_CRIADO, voltar para CADASTRO_HOMOLOGADO
-        boolean ficouVazio = competenciaService.buscarPorMapa(codMapa).isEmpty();
+        boolean ficouVazio = competenciaService.buscarPorCodMapa(codMapa).isEmpty();
         if (ficouVazio && subprocesso.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO) {
             subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
             subprocessoRepo.save(subprocesso);
@@ -154,7 +168,9 @@ public class SubprocessoMapaWorkflowService {
         }
 
         if (subprocesso.getMapa() == null) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado");
+            throw new sgc.comum.erros.ErroEstadoImpossivel(
+                    "Subprocesso %d existe mas não possui Mapa associado - violação de invariante"
+                    .formatted(subprocesso.getCodigo()));
         }
         return subprocesso;
     }
@@ -162,10 +178,10 @@ public class SubprocessoMapaWorkflowService {
     @Transactional
     public void disponibilizarMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
         Subprocesso sp = getSubprocessoParaEdicao(codSubprocesso);
+        accessControlService.verificarPermissao(usuario, DISPONIBILIZAR_MAPA, sp);
+
         validarMapaParaDisponibilizacao(sp);
-        
-        // Validação adicional de associações (do service antigo)
-        subprocessoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
+        validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
 
         if (request.getDataLimite() == null) {
             throw new ErroValidacao("A data limite para validação é obrigatória.");
@@ -197,16 +213,13 @@ public class SubprocessoMapaWorkflowService {
 
     private void validarMapaParaDisponibilizacao(Subprocesso subprocesso) {
         Long codMapa = subprocesso.getMapa().getCodigo();
-        var competencias = competenciaService.buscarPorMapa(codMapa);
+        var competencias = competenciaService.buscarPorCodMapa(codMapa);
 
         if (competencias.stream().anyMatch(c -> c.getAtividades().isEmpty())) {
             throw new ErroValidacao("Todas as competências devem estar associadas a pelo menos uma atividade.");
         }
 
-        // Recuperar atividades via mapa, já que não temos AtividadeRepo aqui e não há método findBySubprocessoCodigo no service
-        // (Assumindo que findBySubprocessoCodigo(codSubprocesso) é equivalente a findByMapaCodigo(sub.getMapa().getCodigo()))
         var atividadesDoSubprocesso = atividadeService.buscarPorMapaCodigo(codMapa);
-
         var atividadesAssociadas = competencias.stream()
                 .flatMap(c -> c.getAtividades().stream())
                 .map(Atividade::getCodigo)
@@ -232,6 +245,7 @@ public class SubprocessoMapaWorkflowService {
     @Transactional
     public void apresentarSugestoes(Long codSubprocesso, String sugestoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        accessControlService.verificarPermissao(usuario, APRESENTAR_SUGESTOES, sp);
 
         if (sp.getMapa() != null) {
             sp.getMapa().setSugestoes(sugestoes);
@@ -256,18 +270,14 @@ public class SubprocessoMapaWorkflowService {
     @Transactional
     public void validarMapa(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        accessControlService.verificarPermissao(usuario, VALIDAR_MAPA, sp);
 
         sp.setSituacao(SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo()));
 
         sp.setDataFimEtapa2(java.time.LocalDateTime.now());
         subprocessoRepo.save(sp);
 
-        transicaoService.registrar(
-                sp,
-                TipoTransicao.MAPA_VALIDADO,
-                sp.getUnidade(),
-                sp.getUnidade().getUnidadeSuperior(),
-                usuario);
+        transicaoService.registrar(sp, TipoTransicao.MAPA_VALIDADO, sp.getUnidade(), sp.getUnidade().getUnidadeSuperior(), usuario);
     }
 
     private final SubprocessoWorkflowExecutor workflowExecutor;
@@ -275,9 +285,9 @@ public class SubprocessoMapaWorkflowService {
     @Transactional
     public void devolverValidacao(Long codSubprocesso, String justificativa, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        accessControlService.verificarPermissao(usuario, DEVOLVER_MAPA, sp);
 
         SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo());
-
         sp.setDataFimEtapa2(null);
 
         workflowExecutor.registrarAnaliseETransicao(
@@ -298,34 +308,30 @@ public class SubprocessoMapaWorkflowService {
     @Transactional
     public void aceitarValidacao(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
-
+        accessControlService.verificarPermissao(usuario, ACEITAR_MAPA, sp);
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
-        Unidade proximaUnidade =
-                unidadeSuperior != null ? unidadeSuperior.getUnidadeSuperior() : null;
+        Unidade proximaUnidade = unidadeSuperior != null ? unidadeSuperior.getUnidadeSuperior() : null;
 
         // Se não tem próxima unidade (é o topo ou estrutura rasa), homologar direto
-
         if (proximaUnidade == null) {
             // Caso especial: Fim da cadeia de validação (Homologação Implícita?)
+            String siglaUnidade = sp.getUnidade().getUnidadeSuperior() != null ?
+                    sp.getUnidade().getUnidadeSuperior().getSigla() : sp.getUnidade().getSigla();
 
-            analiseService.criarAnalise(
-                sp,
-                CriarAnaliseRequest.builder()
+            analiseService.criarAnalise(sp, CriarAnaliseReq.builder()
                         .codSubprocesso(codSubprocesso)
                         .observacoes("Aceite da validação")
                         .tipo(TipoAnalise.VALIDACAO)
                         .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
-                        .siglaUnidade(sp.getUnidade().getUnidadeSuperior().getSigla())
+                        .siglaUnidade(siglaUnidade)
                         .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
                         .motivo(null)
                         .build());
 
             sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
             subprocessoRepo.save(sp);
-            // Sem transição registrada no código original para este caso.
         } else {
             SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo());
-
             workflowExecutor.registrarAnaliseETransicao(
                     sp,
                     novaSituacao,
@@ -345,29 +351,21 @@ public class SubprocessoMapaWorkflowService {
     @Transactional
     public void homologarValidacao(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        accessControlService.verificarPermissao(usuario, HOMOLOGAR_MAPA, sp);
 
         sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
         subprocessoRepo.save(sp);
 
         Unidade sedoc = unidadeService.buscarEntidadePorId(unidadeService.buscarPorSigla("SEDOC").getCodigo());
-
-        transicaoService.registrar(
-                sp,
-                TipoTransicao.MAPA_HOMOLOGADO,
-                sedoc,
-                sedoc,
-                usuario);
+        transicaoService.registrar(sp, TipoTransicao.MAPA_HOMOLOGADO, sedoc, sedoc, usuario);
     }
 
     @Transactional
-    public void submeterMapaAjustado(
-            Long codSubprocesso, SubmeterMapaAjustadoReq request, Usuario usuario) {
+    public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoReq request, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
-
-        subprocessoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
-
+        accessControlService.verificarPermissao(usuario, AJUSTAR_MAPA, sp);
+        validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
         sp.setSituacao(SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo()));
-
         sp.setDataLimiteEtapa2(request.getDataLimiteEtapa2());
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         subprocessoRepo.save(sp);
@@ -381,44 +379,49 @@ public class SubprocessoMapaWorkflowService {
     }
 
     @Transactional
-    public void disponibilizarMapaEmBloco(java.util.List<Long> unidadeCodigos, Long codSubprocessoBase, DisponibilizarMapaRequest request, Usuario usuario) {
+    public void disponibilizarMapaEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase, DisponibilizarMapaRequest request, Usuario usuario) {
         unidadeCodigos.forEach(unidadeCodigo -> {
             Subprocesso base = buscarSubprocesso(codSubprocessoBase);
             Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para unidade " + unidadeCodigo));
+                    .orElseThrow(() -> new ErroEntidadeDeveriaExistir(
+                            ENTIDADE_SUBPROCESSO,
+                            DETALHE_SUBPROCESSO_FMT.formatted(base.getProcesso().getCodigo(), unidadeCodigo),
+                            MSG_ERRO_WORKFLOW_BLOCO));
 
-            disponibilizarMapa(target.getCodigo(), request, usuario);
+            self.disponibilizarMapa(target.getCodigo(), request, usuario);
         });
     }
 
     @Transactional
-    public void aceitarValidacaoEmBloco(java.util.List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
+    public void aceitarValidacaoEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
         unidadeCodigos.forEach(unidadeCodigo -> {
             Subprocesso base = buscarSubprocesso(codSubprocessoBase);
             Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para unidade " + unidadeCodigo));
+                    .orElseThrow(() -> new ErroEntidadeDeveriaExistir(
+                            ENTIDADE_SUBPROCESSO,
+                            DETALHE_SUBPROCESSO_FMT.formatted(base.getProcesso().getCodigo(), unidadeCodigo),
+                            MSG_ERRO_WORKFLOW_BLOCO));
 
-            aceitarValidacao(target.getCodigo(), usuario);
+            self.aceitarValidacao(target.getCodigo(), usuario);
         });
     }
 
     @Transactional
-    public void homologarValidacaoEmBloco(java.util.List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
+    public void homologarValidacaoEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
         unidadeCodigos.forEach(unidadeCodigo -> {
             Subprocesso base = buscarSubprocesso(codSubprocessoBase);
             Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para unidade " + unidadeCodigo));
+                    .orElseThrow(() -> new ErroEntidadeDeveriaExistir(
+                            ENTIDADE_SUBPROCESSO,
+                            DETALHE_SUBPROCESSO_FMT.formatted(base.getProcesso().getCodigo(), unidadeCodigo),
+                            MSG_ERRO_WORKFLOW_BLOCO));
 
-            homologarValidacao(target.getCodigo(), usuario);
+            self.homologarValidacao(target.getCodigo(), usuario);
         });
     }
 
     private Subprocesso buscarSubprocesso(Long codSubprocesso) {
-        return subprocessoRepo
-                .findById(codSubprocesso)
-                .orElseThrow(
-                        () ->
-                                new ErroEntidadeNaoEncontrada(
-                                        "Subprocesso não encontrado: " + codSubprocesso));
+        return subprocessoRepo.findById(codSubprocesso)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + codSubprocesso));
     }
 }

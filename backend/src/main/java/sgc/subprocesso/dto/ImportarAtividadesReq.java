@@ -7,7 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO para a requisição de importação de atividades de outro subprocesso. CDU-08
+ * DTO para a requisição de importação de atividades de outro subprocesso.
+ * CDU-08
  */
 @Data
 @Builder
@@ -17,6 +18,6 @@ public class ImportarAtividadesReq {
     /**
      * O código do subprocesso do qual as atividades serão importadas.
      */
-    @NotNull
+    @NotNull(message = "O código do subprocesso de origem é obrigatório")
     private Long codSubprocessoOrigem;
 }

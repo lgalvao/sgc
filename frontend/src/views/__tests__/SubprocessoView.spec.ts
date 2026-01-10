@@ -161,7 +161,7 @@ describe('SubprocessoView.vue', () => {
   it('renders components when data is available', async () => {
     const { wrapper } = mountComponent();
     await flushPromises();
-    await wrapper.vm.$nextTick();
+    await (wrapper.vm as any).$nextTick();
 
     expect(wrapper.findComponent(SubprocessoHeaderStub).exists()).toBe(true);
     expect(wrapper.findComponent(SubprocessoCardsStub).exists()).toBe(true);
@@ -171,12 +171,12 @@ describe('SubprocessoView.vue', () => {
   it('opens date limit modal when allowed', async () => {
     const { wrapper } = mountComponent();
     await flushPromises();
-    await wrapper.vm.$nextTick();
+    await (wrapper.vm as any).$nextTick();
 
     const header = wrapper.findComponent(SubprocessoHeaderStub);
     await header.vm.$emit('alterar-data-limite');
 
-    expect(wrapper.vm.mostrarModalAlterarDataLimite).toBe(true);
+    expect((wrapper.vm as any).mostrarModalAlterarDataLimite).toBe(true);
   });
 
   it('shows error when opening date limit modal is not allowed', async () => {
@@ -186,23 +186,23 @@ describe('SubprocessoView.vue', () => {
     
     const { wrapper, feedbackStore } = mountComponent(subprocessoSemPermissao);
     await flushPromises();
-    await wrapper.vm.$nextTick();
+    await (wrapper.vm as any).$nextTick();
 
     const header = wrapper.findComponent(SubprocessoHeaderStub);
     await header.vm.$emit('alterar-data-limite');
 
-    expect(wrapper.vm.mostrarModalAlterarDataLimite).toBe(false);
+    expect((wrapper.vm as any).mostrarModalAlterarDataLimite).toBe(false);
     expect(feedbackStore.show).toHaveBeenCalledWith(expect.any(String), expect.stringContaining('não tem permissão'), 'danger');
   });
 
   it('handles date limit update confirmation', async () => {
     const { wrapper, store, feedbackStore } = mountComponent();
     await flushPromises();
-    await wrapper.vm.$nextTick();
+    await (wrapper.vm as any).$nextTick();
 
     // Open modal
-    wrapper.vm.mostrarModalAlterarDataLimite = true;
-    await wrapper.vm.$nextTick();
+    (wrapper.vm as any).mostrarModalAlterarDataLimite = true;
+    await (wrapper.vm as any).$nextTick();
 
     // Confirm
     const modal = wrapper.findComponent(SubprocessoModalStub);
@@ -211,7 +211,7 @@ describe('SubprocessoView.vue', () => {
     await flushPromises();
 
     expect(store.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(1, { novaData: '2024-01-01' });
-    expect(wrapper.vm.mostrarModalAlterarDataLimite).toBe(false);
+    expect((wrapper.vm as any).mostrarModalAlterarDataLimite).toBe(false);
     expect(feedbackStore.show).toHaveBeenCalledWith(expect.any(String), expect.stringContaining('sucesso'), 'success');
   });
 
@@ -220,7 +220,7 @@ describe('SubprocessoView.vue', () => {
     await flushPromises();
     (store.alterarDataLimiteSubprocesso as any).mockRejectedValue(new Error('Falha'));
 
-    wrapper.vm.mostrarModalAlterarDataLimite = true;
+    (wrapper.vm as any).mostrarModalAlterarDataLimite = true;
     const modal = wrapper.findComponent(SubprocessoModalStub);
     await modal.vm.$emit('confirmar-alteracao', '2024-01-01');
     await flushPromises();
@@ -235,8 +235,8 @@ describe('SubprocessoView.vue', () => {
     // Trigger Reabertura
     const header = wrapper.findComponent(SubprocessoHeaderStub);
     await header.vm.$emit('reabrir-cadastro');
-    expect(wrapper.vm.tipoReabertura).toBe('cadastro');
-    expect(wrapper.vm.mostrarModalReabrir).toBe(true);
+    expect((wrapper.vm as any).tipoReabertura).toBe('cadastro');
+    expect((wrapper.vm as any).mostrarModalReabrir).toBe(true);
 
     // Preencher justificativa
     const textarea = wrapper.find('textarea');
@@ -258,7 +258,7 @@ describe('SubprocessoView.vue', () => {
 
     const header = wrapper.findComponent(SubprocessoHeaderStub);
     await header.vm.$emit('reabrir-revisao');
-    expect(wrapper.vm.tipoReabertura).toBe('revisao');
+    expect((wrapper.vm as any).tipoReabertura).toBe('revisao');
 
     const textarea = wrapper.find('textarea');
     await textarea.setValue('Revisão incompleta');

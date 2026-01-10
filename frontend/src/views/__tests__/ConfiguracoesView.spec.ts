@@ -1,12 +1,12 @@
-import { mount } from '@vue/test-utils';
-import { createTestingPinia } from '@pinia/testing';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {createTestingPinia} from '@pinia/testing';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import ConfiguracoesView from '../ConfiguracoesView.vue';
-import { useConfiguracoesStore } from '@/stores/configuracoes';
-import { useNotificacoesStore } from '@/stores/feedback';
-import { usePerfilStore } from '@/stores/perfil';
+import {useConfiguracoesStore} from '@/stores/configuracoes';
+import {useNotificacoesStore} from '@/stores/feedback';
+import {usePerfilStore} from '@/stores/perfil';
 import * as administradorService from '@/services/administradorService';
-import { apiClient } from '@/axios-setup';
+import {apiClient} from '@/axios-setup';
 
 // Mock dependencies
 vi.mock('@/services/administradorService', () => ({

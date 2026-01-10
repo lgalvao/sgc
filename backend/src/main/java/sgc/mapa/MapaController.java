@@ -5,9 +5,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sgc.mapa.dto.MapaDto;
-import sgc.mapa.dto.MapaMapper;
+import sgc.mapa.mapper.MapaMapper;
 import sgc.mapa.service.MapaService;
 
 import java.net.URI;
@@ -31,6 +32,7 @@ public class MapaController {
      * @return Uma {@link List} de {@link MapaDto}.
      */
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Lista todos os mapas")
     public List<MapaDto> listar() {
         return mapaService.listar().stream().map(mapaMapper::toDto).toList();
@@ -43,6 +45,7 @@ public class MapaController {
      * @return Um {@link ResponseEntity} contendo o {@link MapaDto} correspondente.
      */
     @GetMapping("/{codigo}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Obtém um mapa pelo código")
     public ResponseEntity<MapaDto> obterPorId(@PathVariable Long codigo) {
         var mapa = mapaService.obterPorCodigo(codigo);
@@ -57,6 +60,7 @@ public class MapaController {
      * MapaDto} criado no corpo da resposta.
      */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Cria um mapa")
     public ResponseEntity<MapaDto> criar(@Valid @RequestBody MapaDto mapaDto) {
         var entidade = mapaMapper.toEntity(mapaDto);
@@ -73,6 +77,7 @@ public class MapaController {
      * @return Um {@link ResponseEntity} com status 200 OK e o {@link MapaDto} atualizado.
      */
     @PostMapping("/{codMapa}/atualizar")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualiza um mapa existente")
     public ResponseEntity<MapaDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody MapaDto mapaDto) {
         var entidade = mapaMapper.toEntity(mapaDto);
@@ -87,6 +92,7 @@ public class MapaController {
      * @return Um {@link ResponseEntity} com status 204 No Content.
      */
     @PostMapping("/{codMapa}/excluir")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Exclui um mapa")
     public ResponseEntity<Void> excluir(@PathVariable Long codMapa) {
         mapaService.excluir(codMapa);

@@ -7,21 +7,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseService;
-import sgc.mapa.model.Atividade;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroInvarianteViolada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.ImpactoMapaDto;
+import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
+import sgc.organizacao.UnidadeService;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.subprocesso.eventos.TipoTransicao;
-import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.UnidadeService;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,8 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoCadastroWorkflowServiceTest {
@@ -51,6 +50,8 @@ class SubprocessoCadastroWorkflowServiceTest {
     private ImpactoMapaService impactoMapaService;
     @Mock
     private SubprocessoWorkflowExecutor workflowExecutor;
+    @Mock
+    private sgc.seguranca.acesso.AccessControlService accessControlService;
 
     @InjectMocks
     private SubprocessoCadastroWorkflowService service;
@@ -104,6 +105,8 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(u);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        doThrow(new ErroAccessoNegado("Acesso negado para teste"))
+                .when(accessControlService).verificarPermissao(any(), any(), any());
 
         assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
                 .isInstanceOf(ErroAccessoNegado.class);
@@ -127,6 +130,27 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
                 .isInstanceOf(ErroValidacao.class);
+    }
+
+    @Test
+    @DisplayName("disponibilizarCadastro falha mapa nulo")
+    void disponibilizarCadastroMapaNulo() {
+        Long id = 1L;
+        Usuario user = new Usuario();
+        user.setTituloEleitoral("123");
+        Unidade u = new Unidade();
+        u.setTituloTitular("123");
+
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(u);
+        sp.setMapa(null); // Mapa nulo
+
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(subprocessoService.obterAtividadesSemConhecimento(id))
+                .thenReturn(Collections.emptyList());
+
+        assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
+                .isInstanceOf(sgc.subprocesso.erros.ErroMapaNaoAssociado.class);
     }
 
     // --- Disponibilizar Revisão ---
@@ -249,6 +273,25 @@ class SubprocessoCadastroWorkflowServiceTest {
                 .isInstanceOf(ErroInvarianteViolada.class);
     }
 
+    // --- Devolver Revisão Cadastro ---
+
+    @Test
+    @DisplayName("devolverRevisaoCadastro falha sem unidade superior")
+    void devolverRevisaoCadastroSemSuperior() {
+        Long id = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        Unidade u = new Unidade();
+        u.setUnidadeSuperior(null);
+        sp.setUnidade(u);
+        Usuario user = new Usuario();
+
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+
+        assertThatThrownBy(() -> service.devolverRevisaoCadastro(id, "obs", user))
+                .isInstanceOf(ErroInvarianteViolada.class);
+    }
+
     // --- Homologar Cadastro ---
 
     @Test
@@ -281,10 +324,13 @@ class SubprocessoCadastroWorkflowServiceTest {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        Usuario user = new Usuario();
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        doThrow(new ErroProcessoEmSituacaoInvalida("Situação inválida"))
+                .when(accessControlService).verificarPermissao(any(), any(), any());
 
-        assertThatThrownBy(() -> service.homologarCadastro(id, "obs", new Usuario()))
+        assertThatThrownBy(() -> service.homologarCadastro(id, "obs", user))
                 .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 
@@ -367,6 +413,23 @@ class SubprocessoCadastroWorkflowServiceTest {
         );
     }
 
+    @Test
+    @DisplayName("aceitarRevisaoCadastro falha sem unidade superior")
+    void aceitarRevisaoCadastroSemSuperior() {
+        Long id = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        Unidade u = new Unidade();
+        u.setUnidadeSuperior(null);
+        sp.setUnidade(u);
+        Usuario user = new Usuario();
+
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+
+        assertThatThrownBy(() -> service.aceitarRevisaoCadastro(id, "obs", user))
+                .isInstanceOf(ErroInvarianteViolada.class);
+    }
+
     // --- Homologar Revisão Cadastro ---
 
     @Test
@@ -418,10 +481,13 @@ class SubprocessoCadastroWorkflowServiceTest {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        Usuario user = new Usuario();
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        doThrow(new ErroProcessoEmSituacaoInvalida("Estado inválido"))
+                .when(accessControlService).verificarPermissao(any(), any(), any());
 
-        assertThatThrownBy(() -> service.homologarRevisaoCadastro(id, "obs", new Usuario()))
+        assertThatThrownBy(() -> service.homologarRevisaoCadastro(id, "obs", user))
                 .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 

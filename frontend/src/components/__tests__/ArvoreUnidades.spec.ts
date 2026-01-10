@@ -1,8 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { mount } from "@vue/test-utils";
+import {describe, expect, it} from "vitest";
+import {mount} from "@vue/test-utils";
 import ArvoreUnidades from "../ArvoreUnidades.vue";
-import UnidadeTreeNode from "../UnidadeTreeNode.vue";
-import type { Unidade } from "@/types/tipos";
+import type {Unidade} from "@/types/tipos";
 
 describe("ArvoreUnidades.vue", () => {
     // Mock data

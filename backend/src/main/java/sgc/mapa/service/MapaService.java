@@ -4,11 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.AtividadeRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.mapper.MapaCompletoMapper;
@@ -16,17 +12,16 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.seguranca.SanitizacaoUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
+/**
+ * Serviço para operações básicas de CRUD em Mapas.
+ *
+ * <p>A lógica complexa de salvamento do mapa completo foi movida para
+ * {@link MapaSalvamentoService}.
+ */
 @Service
 @Transactional
 @Slf4j
@@ -35,8 +30,12 @@ public class MapaService {
 
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
-    private final AtividadeRepo atividadeRepo;
     private final MapaCompletoMapper mapaCompletoMapper;
+    private final MapaSalvamentoService mapaSalvamentoService;
+
+    // ===================================================================================
+    // Operações de leitura
+    // ===================================================================================
 
     @Transactional(readOnly = true)
     public List<Mapa> listar() {
@@ -49,6 +48,29 @@ public class MapaService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codigo));
     }
 
+    @Transactional(readOnly = true)
+    public Optional<Mapa> buscarMapaVigentePorUnidade(Long codigoUnidade) {
+        return mapaRepo.findMapaVigenteByUnidade(codigoUnidade);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Mapa> buscarPorSubprocessoCodigo(Long codSubprocesso) {
+        return mapaRepo.findBySubprocessoCodigo(codSubprocesso);
+    }
+
+    @Transactional(readOnly = true)
+    public MapaCompletoDto obterMapaCompleto(Long codMapa, Long codSubprocesso) {
+        Mapa mapa = mapaRepo.findById(codMapa)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa não encontrado: %d".formatted(codMapa)));
+
+        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
+        return mapaCompletoMapper.toDto(mapa, codSubprocesso, competencias);
+    }
+
+    // ===================================================================================
+    // Operações de escrita básicas
+    // ===================================================================================
+
     public Mapa salvar(Mapa mapa) {
         return mapaRepo.save(mapa);
     }
@@ -59,14 +81,12 @@ public class MapaService {
 
     public Mapa atualizar(Long codigo, Mapa mapa) {
         return mapaRepo.findById(codigo)
-                .map(
-                        existente -> {
-                            existente.setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado());
-                            existente.setObservacoesDisponibilizacao(
-                                    mapa.getObservacoesDisponibilizacao());
-                            existente.setDataHoraHomologado(mapa.getDataHoraHomologado());
-                            return mapaRepo.save(existente);
-                        })
+                .map(existente -> {
+                    existente.setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado());
+                    existente.setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao());
+                    existente.setDataHoraHomologado(mapa.getDataHoraHomologado());
+                    return mapaRepo.save(existente);
+                })
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codigo));
     }
 
@@ -77,159 +97,19 @@ public class MapaService {
         mapaRepo.deleteById(codigo);
     }
 
-    public java.util.Optional<Mapa> buscarMapaVigentePorUnidade(Long codigoUnidade) {
-        return mapaRepo.findMapaVigenteByUnidade(codigoUnidade);
-    }
-
-    public java.util.Optional<Mapa> buscarPorSubprocessoCodigo(Long codSubprocesso) {
-        return mapaRepo.findBySubprocessoCodigo(codSubprocesso);
-    }
-
-    @Transactional(readOnly = true)
-    public MapaCompletoDto obterMapaCompleto(Long codMapa, Long codSubprocesso) {
-        Mapa mapa =
-                mapaRepo.findById(codMapa)
-                        .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Mapa não encontrado: %d".formatted(codMapa)));
-
-        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
-
-        return mapaCompletoMapper.toDto(mapa, codSubprocesso, competencias);
-    }
-
-    public MapaCompletoDto salvarMapaCompleto(
-            Long codMapa, SalvarMapaRequest request, String usuarioTituloEleitoral) {
-        log.info("Salvando mapa completo: codigo={}, usuario={}", codMapa, usuarioTituloEleitoral);
-
-        Mapa mapa =
-                mapaRepo.findById(codMapa)
-                        .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Mapa não encontrado: %d".formatted(codMapa)));
-
-        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
-        mapa.setObservacoesDisponibilizacao(sanitizedObservacoes);
-        mapaRepo.save(mapa);
-
-        // 1. Fetch current state
-        List<Competencia> competenciasAtuais = new ArrayList<>(competenciaRepo.findByMapaCodigo(codMapa));
-        List<Atividade> atividadesAtuais = new ArrayList<>(atividadeRepo.findByMapaCodigo(codMapa));
-        Set<Long> atividadesDoMapaIds = atividadesAtuais.stream()
-                .map(Atividade::getCodigo)
-                .collect(Collectors.toSet());
-
-        // 2. Identify and Process Deletions
-        Set<Long> idsNovos = request.getCompetencias().stream()
-                .map(CompetenciaMapaDto::getCodigo)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-
-        List<Competencia> paraRemover = competenciasAtuais.stream()
-                .filter(c -> !idsNovos.contains(c.getCodigo()))
-                .toList();
-
-        // Remove relationships from the owning side (Atividade)
-        if (!paraRemover.isEmpty()) {
-            for (Atividade atividade : atividadesAtuais) {
-                atividade.getCompetencias().removeAll(paraRemover);
-            }
-            competenciaRepo.deleteAll(paraRemover);
-            competenciasAtuais.removeAll(paraRemover);
-        }
-
-        // 3. Process Upserts (Insert/Update Competencies)
-        Map<Long, Competencia> mapaCompetenciasExistentes = competenciasAtuais.stream()
-                .collect(Collectors.toMap(Competencia::getCodigo, c -> c));
-
-        List<Competencia> competenciasParaSalvar = new ArrayList<>();
-
-        for (CompetenciaMapaDto compDto : request.getCompetencias()) {
-            Competencia competencia;
-            if (compDto.getCodigo() == null) {
-                competencia = new Competencia(compDto.getDescricao(), mapa);
-            } else {
-                competencia = mapaCompetenciasExistentes.get(compDto.getCodigo());
-                if (competencia == null) {
-                    throw new ErroEntidadeNaoEncontrada("Competência não encontrada: " + compDto.getCodigo());
-                }
-                competencia.setDescricao(compDto.getDescricao());
-            }
-            competenciasParaSalvar.add(competencia);
-        }
-
-        List<Competencia> competenciasSalvas = competenciaRepo.saveAll(competenciasParaSalvar);
-
-        // 4. Update Relationships (Atividade -> Competencia)
-        Map<Long, Set<Competencia>> mapAtividadeCompetencias = new HashMap<>();
-
-        // Initialize with empty sets for all activities to handle clearing
-        for (Long ativId : atividadesDoMapaIds) {
-            mapAtividadeCompetencias.put(ativId, new HashSet<>());
-        }
-
-        for (int i = 0; i < request.getCompetencias().size(); i++) {
-            CompetenciaMapaDto dto = request.getCompetencias().get(i);
-            Competencia competencia = competenciasSalvas.get(i);
-
-            if (dto.getAtividadesCodigos() != null) {
-                for (Long ativId : dto.getAtividadesCodigos()) {
-                    if (!atividadesDoMapaIds.contains(ativId)) {
-                        throw new ErroValidacao(
-                                "Atividade %d não pertence ao mapa %d".formatted(ativId, codMapa));
-                    }
-                    mapAtividadeCompetencias.get(ativId).add(competencia);
-                }
-            }
-        }
-
-        // Apply changes to Atividade entities
-        for (Atividade atividade : atividadesAtuais) {
-            Set<Competencia> novasCompetencias = mapAtividadeCompetencias.get(atividade.getCodigo());
-            atividade.setCompetencias(novasCompetencias);
-            for (Competencia competencia : novasCompetencias) {
-                competencia.getAtividades().add(atividade);
-            }
-        }
-
-        atividadeRepo.saveAll(atividadesAtuais);
-
-        // ⚡ Bolt: Otimização
-        // Reutilizamos as listas já em memória (ou recém-fetchadas) para a validação,
-        // evitando 2 queries pesadas adicionais dentro do validador.
-        List<Competencia> competenciasFinais = competenciaRepo.findByMapaCodigo(codMapa);
-        validarIntegridadeMapa(codMapa, atividadesAtuais, competenciasFinais);
-
-        return mapaCompletoMapper.toDto(mapa, null, competenciasFinais);
-    }
-
-    // ========================================================================================
-    // Métodos auxiliares
-    // ========================================================================================
+    // ===================================================================================
+    // Operação complexa delegada
+    // ===================================================================================
 
     /**
-     * Valida a integridade de um mapa, verificando se existem atividades ou competências órfãs.
-     * Recebe as listas de atividades e competências para evitar queries repetidas.
+     * Salva o mapa completo com competências e associações.
+     *
+     * @param codMapa                O código do mapa.
+     * @param request                A requisição com os dados a salvar.
+     * @return O DTO do mapa completo atualizado.
      */
-    private void validarIntegridadeMapa(Long codMapa, List<Atividade> atividades, List<Competencia> competencias) {
-        for (Atividade atividade : atividades) {
-            if (atividade.getCompetencias().isEmpty()) {
-                log.warn(
-                        "Atividade {} não vinculada a nenhuma competência no mapa {}",
-                        atividade.getCodigo(),
-                        codMapa);
-            }
-        }
-
-        for (Competencia competencia : competencias) {
-            if (competencia.getAtividades().isEmpty()) {
-                log.warn(
-                        "Competência {} sem atividades vinculadas no mapa {}",
-                        competencia.getCodigo(),
-                        codMapa);
-            }
-        }
+    public MapaCompletoDto salvarMapaCompleto(
+            Long codMapa, SalvarMapaRequest request) {
+        return mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
     }
 }

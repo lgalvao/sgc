@@ -2,25 +2,26 @@ package sgc.alerta;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.dto.AlertaDto;
-import sgc.alerta.dto.AlertaMapper;
-import sgc.alerta.model.*;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.processo.model.Processo;
-import sgc.organizacao.model.Usuario;
+import sgc.alerta.mapper.AlertaMapper;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.AlertaRepo;
+import sgc.alerta.model.AlertaUsuario;
+import sgc.alerta.model.AlertaUsuarioRepo;
+import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.Usuario;
+import sgc.processo.model.Processo;
 
 import java.time.LocalDateTime;
 import java.util.*;
-
-import static sgc.alerta.model.TipoAlerta.PROCESSO_INICIADO_INTERMEDIARIA;
-import static sgc.alerta.model.TipoAlerta.PROCESSO_INICIADO_OPERACIONAL;
 
 /**
  * Serviço para gerenciar alertas do sistema.
@@ -32,70 +33,61 @@ import static sgc.alerta.model.TipoAlerta.PROCESSO_INICIADO_OPERACIONAL;
 @RequiredArgsConstructor
 @Slf4j
 public class AlertaService {
-    private final AlertaRepo repositorioAlerta;
+    private final AlertaRepo alertaRepo;
     private final AlertaUsuarioRepo alertaUsuarioRepo;
     private final UsuarioService usuarioService;
     private final AlertaMapper alertaMapper;
+    private final UnidadeService unidadeService;
 
-    /**
-     * Cria um alerta básico para uma unidade destino.
-     */
-    @Transactional
-    public Alerta criarAlerta(
-            Processo processo,
-            TipoAlerta tipoAlerta,
-            Unidade unidadeDestino,
-            String descricao) {
+    private @Nullable Unidade sedoc;
 
-        Alerta alerta = new Alerta()
-                .setProcesso(processo)
-                .setDataHora(LocalDateTime.now())
-                .setUnidadeOrigem(null) // SEDOC não tem registro como unidade
-                .setUnidadeDestino(unidadeDestino)
-                .setDescricao(descricao);
-
-        return repositorioAlerta.save(alerta);
+    private Unidade getSedoc() {
+        if (sedoc == null) {
+            sedoc = unidadeService.buscarEntidadePorSigla("SEDOC");
+        }
+        return sedoc;
     }
 
     /**
-     * Cria um alerta genérico a partir de uma transição de subprocesso.
+     * Criar e persistir um alerta.
+     */
+    private Alerta criarAlerta(Processo processo, Unidade origem, Unidade destino, String descricao) {
+        return alertaRepo.save(new Alerta()
+                .setProcesso(processo)
+                .setDataHora(LocalDateTime.now())
+                .setUnidadeOrigem(origem)
+                .setUnidadeDestino(destino)
+                .setDescricao(descricao));
+    }
+
+    /**
+     * Cria e persistir alerta com origem SEDOC
+     */
+    @Transactional
+    public Alerta criarAlertaSedoc(Processo processo, Unidade destino, String descricao) {
+        return criarAlerta(processo, getSedoc(), destino, descricao);
+    }
+
+    /**
+     * Cria um alerta a partir de uma transição de subprocesso.
      * Usado pelo SubprocessoComunicacaoListener para processar eventos de transição.
      *
-     * @param processo Processo associado ao alerta
-     * @param descricao Descrição do alerta (já formatada)
-     * @param unidadeOrigem Unidade de origem da transição
-     * @param unidadeDestino Unidade de destino (receberá o alerta)
+     * @param processo  Processo associado ao alerta
+     * @param descricao Descrição do alerta (formatada)
+     * @param origem    Unidade de origem da transição
+     * @param destino   Unidade de destino (receberá o alerta)
      * @return O alerta criado
      */
     @Transactional
-    public Alerta criarAlertaTransicao(
-            Processo processo,
-            String descricao,
-            Unidade unidadeOrigem,
-            Unidade unidadeDestino) {
-
-        if (unidadeDestino == null) {
-            log.warn("Unidade destino é nula, alerta não será criado");
-            return null;
-        }
-
-        Alerta alerta = new Alerta()
-                .setProcesso(processo)
-                .setDataHora(LocalDateTime.now())
-                .setUnidadeOrigem(unidadeOrigem)
-                .setUnidadeDestino(unidadeDestino)
-                .setDescricao(descricao);
-
-        return repositorioAlerta.save(alerta);
+    public Alerta criarAlertaTransicao(Processo processo, String descricao, Unidade origem, Unidade destino) {
+        return criarAlerta(processo, origem, destino, descricao);
     }
 
     /**
      * Cria alertas para todas as unidades participantes quando um processo é iniciado.
-     * Conforme CDU-04/CDU-05:
      * - Operacional: "Início do processo"
      * - Intermediária: "Início do processo em unidade(s) subordinada(s)"
      * - Interoperacional: Recebe os dois alertas
-     * - Unidades ancestrais: Recebem o alerta de "unidade(s) subordinada(s)"
      */
     @Transactional
     public List<Alerta> criarAlertasProcessoIniciado(Processo processo, List<Unidade> unidadesParticipantes) {
@@ -106,29 +98,30 @@ public class AlertaService {
             // Unidades participantes sempre recebem o alerta operacional
             unidadesOperacionais.add(unidade);
 
-            // Se for Interoperacional, também recebe o de intermediária conforme requisito
+            // Se for Interoperacional, também recebe o de intermediária
             if (unidade.getTipo() == TipoUnidade.INTEROPERACIONAL) {
                 unidadesIntermediarias.put(unidade.getCodigo(), unidade);
             }
 
-            // Notificar todos os ancestrais
-            Unidade pai = unidade.getUnidadeSuperior();
-            while (pai != null) {
-                unidadesIntermediarias.put(pai.getCodigo(), pai);
-                pai = pai.getUnidadeSuperior();
+            // Serão notificadas todas as unidades superiores
+            Unidade unidadeSuperior = unidade.getUnidadeSuperior();
+            while (unidadeSuperior != null) {
+                unidadesIntermediarias.put(unidadeSuperior.getCodigo(), unidadeSuperior);
+                unidadeSuperior = unidadeSuperior.getUnidadeSuperior();
             }
         }
 
         List<Alerta> alertasCriados = new ArrayList<>();
 
         // Alertas operacionais
-        for (Unidade u : unidadesOperacionais) {
-            alertasCriados.add(criarAlerta(processo, PROCESSO_INICIADO_OPERACIONAL, u, "Início do processo"));
+        for (Unidade unidade : unidadesOperacionais) {
+            alertasCriados.add(criarAlertaSedoc(processo, unidade, "Início do processo"));
         }
 
-        // Alertas intermediários (consolidado por unidade)
-        for (Unidade u : unidadesIntermediarias.values()) {
-            alertasCriados.add(criarAlerta(processo, PROCESSO_INICIADO_INTERMEDIARIA, u, "Início do processo em unidade(s) subordinada(s)"));
+        // Alertas intermediários (consolidados)
+        for (Unidade unidade : unidadesIntermediarias.values()) {
+            Alerta alerta = criarAlertaSedoc(processo, unidade, "Início do processo em unidades subordinadas");
+            alertasCriados.add(alerta);
         }
 
         return alertasCriados;
@@ -138,13 +131,11 @@ public class AlertaService {
      * Cria alerta quando cadastro é disponibilizado para validação.
      */
     @Transactional
-    public void criarAlertaCadastroDisponibilizado(
-            Processo processo, Unidade unidadeOrigem, Unidade unidadeDestino) {
-
-        String descricao = "Cadastro disponibilizado pela unidade %s no processo '%s'. Realize a análise do cadastro."
+    public void criarAlertaCadastroDisponibilizado(Processo processo, Unidade unidadeOrigem, Unidade unidadeDestino) {
+        String desc = "Cadastro disponibilizado pela unidade %s no processo '%s'. Realize a análise do cadastro."
                 .formatted(unidadeOrigem.getSigla(), processo.getDescricao());
 
-        criarAlerta(processo, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeDestino, descricao);
+        criarAlerta(processo, unidadeOrigem, unidadeDestino, desc);
     }
 
     /**
@@ -152,107 +143,85 @@ public class AlertaService {
      */
     @Transactional
     public void criarAlertaCadastroDevolvido(Processo processo, Unidade unidadeDestino, String motivo) {
-
         String desc = "Cadastro devolvido no processo '%s'. Motivo: %s. Realize os ajustes necessários."
                 .formatted(processo.getDescricao(), motivo);
 
-        criarAlerta(processo, TipoAlerta.CADASTRO_DEVOLVIDO, unidadeDestino, desc);
+        criarAlerta(processo, getSedoc(), unidadeDestino, desc);
     }
 
     @Transactional
-    public void criarAlertaAlteracaoDataLimite(
-            Processo processo, Unidade unidadeDestino, String novaData, int etapa) {
-
-        String descricao = "Data limite da etapa %d alterada para %s"
-                .formatted(etapa, novaData);
-
-        Alerta alerta = new Alerta()
-                .setProcesso(processo)
-                .setDataHora(LocalDateTime.now())
-                .setUnidadeOrigem(null) // SEDOC
-                .setUnidadeDestino(unidadeDestino)
-                .setDescricao(descricao);
-
-        repositorioAlerta.save(alerta);
+    public void criarAlertaAlteracaoDataLimite(Processo processo, Unidade unidadeDestino, String novaData, int etapa) {
+        String desc = "Data limite da etapa %d alterada para %s".formatted(etapa, novaData);
+        criarAlerta(processo, getSedoc(), unidadeDestino, desc);
     }
 
     /**
-     * Marca um alerta como lido para o usuário especificado.
+     * Marca múltiplos alertas como lidos para o usuário. Cria o AlertaUsuario se ainda não existir.
      */
     @Transactional
-    public void marcarComoLido(String usuarioTitulo, Long alertaCodigo) {
-        AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaCodigo, usuarioTitulo);
-        AlertaUsuario alertaUsuario = alertaUsuarioRepo.findById(id)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                        "Não foi encontrado o alerta %d para o usuário %s".formatted(alertaCodigo, usuarioTitulo)));
-
-        if (alertaUsuario.getDataHoraLeitura() == null) {
-            alertaUsuario.setDataHoraLeitura(LocalDateTime.now());
-            alertaUsuarioRepo.save(alertaUsuario);
-            log.info("Alerta {} marcado como lido para o usuário {}", alertaCodigo, usuarioTitulo);
+    public void marcarComoLidos(String usuarioTitulo, List<Long> alertaCodigos) {
+        Usuario usuario = usuarioService.buscarPorId(usuarioTitulo);
+        LocalDateTime agora = LocalDateTime.now();
+        
+        for (Long codigo : alertaCodigos) {
+            AlertaUsuario.Chave chave = new AlertaUsuario.Chave(codigo, usuarioTitulo);
+            
+            AlertaUsuario alertaUsuario = alertaUsuarioRepo.findById(chave)
+                    .orElseGet(() -> {
+                        Alerta alerta = alertaRepo.findById(codigo).orElse(null);
+                        if (alerta == null) {
+                            return null; 
+                        }
+                        AlertaUsuario novo = new AlertaUsuario();
+                        novo.setId(chave);
+                        novo.setAlerta(alerta);
+                        novo.setUsuario(usuario);
+                        return novo;
+                    });
+            
+            // Persists read timestamp if alert was unread
+            if (alertaUsuario != null && alertaUsuario.getDataHoraLeitura() == null) {
+                alertaUsuario.setDataHoraLeitura(agora);
+                alertaUsuarioRepo.save(alertaUsuario);
+            }
         }
     }
 
     /**
      * Lista alertas para o usuário baseado na sua unidade de lotação.
-     * Implementa lazy creation: cria AlertaUsuario se não existir.
+     * Apenas leitura, sem efeitos colaterais.
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public List<AlertaDto> listarAlertasPorUsuario(String usuarioTitulo) {
-        // Buscar usuário para obter sua unidade de lotação
-        Usuario usuario = usuarioService.buscarEntidadePorId(usuarioTitulo);
-
-        if (usuario.getUnidadeLotacao() == null) {
-            log.warn("Usuário {} sem unidade de lotação", usuarioTitulo);
+        Usuario usuario = usuarioService.buscarPorId(usuarioTitulo);
+        Unidade lotacao = usuario.getUnidadeLotacao();
+        if (lotacao == null) {
             return List.of();
         }
+        List<Alerta> alertasUnidade = alertaRepo.findByUnidadeDestino_Codigo(lotacao.getCodigo());
 
-        Long codUnidade = usuario.getUnidadeLotacao().getCodigo();
-
-        // Buscar alertas da unidade do usuário
-        List<Alerta> alertasUnidade = repositorioAlerta.findByUnidadeDestino_Codigo(codUnidade);
-
-        // Para cada alerta, garantir que existe AlertaUsuario (lazy creation)
+        // Maps alerts to DTOs with read timestamps
         return alertasUnidade.stream().map(alerta -> {
-            AlertaUsuario.Chave chave = new AlertaUsuario.Chave(alerta.getCodigo(), usuarioTitulo);
-
-            AlertaUsuario alertaUsuario = alertaUsuarioRepo.findById(chave)
-                    .orElseGet(() -> {
-                        AlertaUsuario novoAlertaUsuario = new AlertaUsuario();
-                        novoAlertaUsuario.setId(chave);
-                        novoAlertaUsuario.setAlerta(alerta);
-                        novoAlertaUsuario.setUsuario(usuario);
-                        novoAlertaUsuario.setDataHoraLeitura(null);
-                        return alertaUsuarioRepo.save(novoAlertaUsuario);
-                    });
-
-            AlertaDto dto = alertaMapper.toDto(alerta);
-            return AlertaDto.builder()
-                    .codigo(dto.getCodigo())
-                    .codProcesso(dto.getCodProcesso())
-                    .unidadeOrigem(dto.getUnidadeOrigem())
-                    .unidadeDestino(dto.getUnidadeDestino())
-                    .descricao(dto.getDescricao())
-                    .dataHora(dto.getDataHora())
-                    .dataHoraLeitura(alertaUsuario.getDataHoraLeitura())
-                    .mensagem(dto.getMensagem())
-                    .dataHoraFormatada(dto.getDataHoraFormatada())
-                    .processo(dto.getProcesso())
-                    .origem(dto.getOrigem())
-                    .build();
+            LocalDateTime dataHoraLeitura = obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo).orElse(null);
+            return alertaMapper.toDto(alerta, dataHoraLeitura);
         }).toList();
     }
 
-    public Page<Alerta> listarPorUsuario(String usuarioTitulo, Pageable pageable) {
-        return repositorioAlerta.findByUsuarioDestino_TituloEleitoral(usuarioTitulo, pageable);
+    /**
+     * Lista apenas alertas não lidos para o usuário.
+     */
+    @Transactional(readOnly = true)
+    public List<AlertaDto> listarAlertasNaoLidos(String usuarioTitulo) {
+        return listarAlertasPorUsuario(usuarioTitulo).stream()
+                .filter(dto -> dto.getDataHoraLeitura() == null)
+                .toList();
     }
 
-    public Page<Alerta> listarPorUnidades(List<Long> unidadeIds, Pageable pageable) {
-        return repositorioAlerta.findByUnidadeDestino_CodigoIn(unidadeIds, pageable);
-    }
-
-    public Page<Alerta> listarTodos(Pageable pageable) {
-        return repositorioAlerta.findAll(pageable);
+    /**
+     * Lista alertas destinados a uma unidade específica.
+     */
+    public Page<Alerta> listarPorUnidade(Long codigoUnidade, Pageable pageable) {
+        return alertaRepo.findByUnidadeDestino_Codigo(codigoUnidade, pageable);
     }
 
     public Optional<LocalDateTime> obterDataHoraLeitura(Long codigoAlerta, String usuarioTitulo) {
@@ -263,45 +232,25 @@ public class AlertaService {
 
     @Transactional
     public void criarAlertaReaberturaCadastro(Processo processo, Unidade unidade, String justificativa) {
-        Alerta alerta = new Alerta()
-                .setProcesso(processo)
-                .setDataHora(LocalDateTime.now())
-                .setUnidadeOrigem(null) // SEDOC
-                .setUnidadeDestino(unidade)
-                .setDescricao("Cadastro de atividades reaberto pela SEDOC");
-        repositorioAlerta.save(alerta);
+        String descricao = "Cadastro de atividades reaberto pela SEDOC. Justificativa: %s".formatted(justificativa);
+        criarAlertaSedoc(processo, unidade, descricao);
     }
 
     @Transactional
-    public void criarAlertaReaberturaCadastroSuperior(Processo processo, Unidade superior, Unidade subordinada, String justificativa) {
-        Alerta alerta = new Alerta()
-                .setProcesso(processo)
-                .setDataHora(LocalDateTime.now())
-                .setUnidadeOrigem(null) // SEDOC
-                .setUnidadeDestino(superior)
-                .setDescricao("Cadastro da unidade %s reaberto pela SEDOC".formatted(subordinada.getSigla()));
-        repositorioAlerta.save(alerta);
+    public void criarAlertaReaberturaCadastroSuperior(Processo processo, Unidade superior, Unidade subordinada) {
+        String descricao = "Cadastro da unidade %s reaberto pela SEDOC".formatted(subordinada.getSigla());
+        criarAlertaSedoc(processo, superior, descricao);
     }
 
     @Transactional
     public void criarAlertaReaberturaRevisao(Processo processo, Unidade unidade, String justificativa) {
-        Alerta alerta = new Alerta()
-                .setProcesso(processo)
-                .setDataHora(LocalDateTime.now())
-                .setUnidadeOrigem(null) // SEDOC
-                .setUnidadeDestino(unidade)
-                .setDescricao("Revisão de cadastro reaberta pela SEDOC");
-        repositorioAlerta.save(alerta);
+        String descricao = "Revisão de cadastro da unidade %s reaberta pela SEDOC. Justificativa: %s".formatted(unidade.getSigla(), justificativa);
+        criarAlertaSedoc(processo, unidade, descricao);
     }
 
     @Transactional
-    public void criarAlertaReaberturaRevisaoSuperior(Processo processo, Unidade superior, Unidade subordinada, String justificativa) {
-        Alerta alerta = new Alerta()
-                .setProcesso(processo)
-                .setDataHora(LocalDateTime.now())
-                .setUnidadeOrigem(null) // SEDOC
-                .setUnidadeDestino(superior)
-                .setDescricao("Revisão de cadastro da unidade %s reaberta pela SEDOC".formatted(subordinada.getSigla()));
-        repositorioAlerta.save(alerta);
+    public void criarAlertaReaberturaRevisaoSuperior(Processo processo, Unidade superior, Unidade subordinada) {
+        String descricao = "Revisão de cadastro da unidade %s reaberta pela SEDOC".formatted(subordinada.getSigla());
+        criarAlertaSedoc(processo, superior, descricao);
     }
 }

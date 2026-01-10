@@ -226,6 +226,7 @@ import {useRoute, useRouter} from "vue-router";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
 import * as processoService from "@/services/processoService";
 import {useFormErrors} from '@/composables/useFormErrors';
+import {logger} from "@/utils";
 
 import {useProcessosStore} from "@/stores/processos";
 import {useUnidadesStore} from "@/stores/unidades";
@@ -336,7 +337,7 @@ onMounted(async () => {
       }
     } catch (error) {
       mostrarAlerta('danger', "Erro ao carregar processo", "Não foi possível carregar os detalhes do processo.");
-      console.error("Erro ao carregar processo:", error);
+      logger.error("Erro ao carregar processo:", error);
     }
   } else {
     await unidadesStore.buscarUnidadesParaProcesso(tipo.value);
@@ -376,9 +377,9 @@ function handleApiErrors(error: any, title: string, defaultMsg: string) {
     }
   } else {
     mostrarAlerta('danger', title, defaultMsg, []);
-    console.error(title + ":", error);
+    logger.error(title + ":", error);
   }
-  console.error(title + ":", error);
+  logger.error(title + ":", error);
 }
 
 async function salvarProcesso() {

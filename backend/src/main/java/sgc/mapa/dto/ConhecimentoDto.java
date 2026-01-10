@@ -6,10 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import sgc.seguranca.SanitizarHtml;
+import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 /**
- * DTO para Conhecimento usado nas APIs (entrada/saída). Contém apenas campos primários e referência
+ * DTO para Conhecimento usado nas APIs (entrada/saída). Contém apenas campos
+ * primários e referência
  * por codigo para evitar expor entidades JPA.
  */
 @Data

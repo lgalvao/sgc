@@ -1,6 +1,6 @@
-const { spawn } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+const { spawn } = require('node:child_process');
+const fs = require('node:fs');
+const path = require('node:path');
 const chromeLauncher = require('chrome-launcher');
 
 async function run() {
@@ -30,7 +30,13 @@ async function run() {
             console.log('Stopping lifecycle...');
             lifecycle.kill('SIGINT');
             setTimeout(() => {
-                 try { process.kill(lifecycle.pid, 0) && lifecycle.kill('SIGKILL'); } catch(e){}
+                 try {
+                     if (process.kill(lifecycle.pid, 0)) {
+                         lifecycle.kill('SIGKILL');
+                     }
+                 } catch (e) {
+                     console.log('Informação: Processo de limpeza já encerrado ou sem permissão:', e.message);
+                 }
             }, 2000);
         }
     };
@@ -48,7 +54,7 @@ async function run() {
     async function onReady() {
         console.log('Application ready. Starting accessibility check...');
 
-        let chromePath = undefined;
+        let chromePath;
         try {
             const { chromium } = require('@playwright/test');
             const candidatePath = chromium.executablePath();
@@ -60,7 +66,7 @@ async function run() {
             } else {
                 console.warn(`Playwright reported Chrome at ${candidatePath}, but it does not exist.`);
                 // Fallback search in cache directory
-                const cacheDir = path.dirname(path.dirname(path.dirname(candidatePath))); // go up from chrome-linux64/chrome
+
                 // Actually safer to look relative to home if we can, but let's try to search the cache dir we know exists
                 // typically ~/.cache/ms-playwright/
                 const homeDir = process.env.HOME || process.env.USERPROFILE;
@@ -127,11 +133,16 @@ async function run() {
         } catch (err) {
             console.error('Lighthouse execution failed:', err);
         } finally {
-            await chrome.kill();
+            chrome.kill();
             cleanup();
             process.exit(0);
         }
     }
 }
 
-run();
+try {
+    await run();
+} catch (err) {
+    console.error('Erro inesperado no accessibility-check:', err);
+    process.exit(1);
+}

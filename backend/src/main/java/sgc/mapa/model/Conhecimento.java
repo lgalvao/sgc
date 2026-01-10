@@ -7,9 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.model.EntidadeBase;
 
-/**
- * Representa um conhecimento específico necessário para realizar uma atividade.
- */
 @Entity
 @Table(name = "CONHECIMENTO", schema = "sgc")
 @Getter
@@ -20,6 +17,7 @@ public class Conhecimento extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "atividade_codigo")
     private Atividade atividade;
+
     @Column(name = "descricao")
     private String descricao;
 
@@ -29,21 +27,12 @@ public class Conhecimento extends EntidadeBase {
         this.atividade = atividade;
     }
 
-    /**
-     * @param descricao A descrição do conhecimento.
-     * @param atividade A atividade à qual o conhecimento está associado.
-     */
     public Conhecimento(String descricao, Atividade atividade) {
         super();
         this.descricao = descricao;
         this.atividade = atividade;
     }
 
-    /**
-     * Retorna o código da atividade associada.
-     *
-     * @return O código da atividade.
-     */
     public Long getCodigoAtividade() {
         return atividade.getCodigo();
     }

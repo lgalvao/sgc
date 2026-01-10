@@ -9,12 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.DefaultApplicationArguments;
 import sgc.comum.erros.ErroConfiguracao;
-import sgc.organizacao.model.SituacaoUnidade;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
+import sgc.organizacao.model.*;
 
 import java.util.List;
 

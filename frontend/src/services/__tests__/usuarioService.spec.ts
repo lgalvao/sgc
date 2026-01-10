@@ -1,10 +1,5 @@
 import {describe, expect, it, vi} from "vitest";
-import {
-    setupServiceTest,
-    testErrorHandling,
-    testGetEndpoint,
-    testPostEndpoint
-} from "@/test-utils/serviceTestHelpers";
+import {setupServiceTest, testErrorHandling, testGetEndpoint, testPostEndpoint} from "@/test-utils/serviceTestHelpers";
 import * as mappers from "@/mappers/sgrh";
 import * as service from "../usuarioService";
 
@@ -90,5 +85,16 @@ describe("usuarioService", () => {
         );
 
         testErrorHandling(() => service.buscarUsuariosPorUnidade(1), 'get');
+    });
+
+    describe("buscarUsuarioPorTitulo", () => {
+        const mockUsuario = { codigo: 1, name: "Test User", tituloEleitoral: "123" };
+        testGetEndpoint(
+            () => service.buscarUsuarioPorTitulo("123"),
+            "/usuarios/123",
+            mockUsuario
+        );
+
+        testErrorHandling(() => service.buscarUsuarioPorTitulo("123"), 'get');
     });
 });

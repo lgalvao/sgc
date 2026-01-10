@@ -13,6 +13,7 @@
       </div>
       <div class="d-flex gap-1">
         <BButton
+            v-if="podeEditar !== false"
             v-b-tooltip.hover
             class="botao-acao"
             data-testid="btn-editar-competencia"
@@ -25,6 +26,7 @@
           <i class="bi bi-pencil" aria-hidden="true"/>
         </BButton>
         <BButton
+            v-if="podeEditar !== false"
             v-b-tooltip.hover
             class="botao-acao"
             data-testid="btn-excluir-competencia"
@@ -59,6 +61,7 @@
                     </span>
                   </span>
             <BButton
+                v-if="podeEditar !== false"
                 v-b-tooltip.hover
                 class="botao-acao-inline"
                 data-testid="btn-remover-atividade-associada"
@@ -84,6 +87,7 @@ import type {Atividade, Competencia} from "@/types/tipos";
 const props = defineProps<{
   competencia: Competencia;
   atividades: Atividade[];
+  podeEditar?: boolean;
 }>();
 
 const emit = defineEmits<{

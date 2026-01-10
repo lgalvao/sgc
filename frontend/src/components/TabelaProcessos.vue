@@ -77,8 +77,10 @@ const rowAttr = (item: ProcessoResumo | null, type: string) => {
   if (item && type === 'row') {
     return {
       tabindex: '0',
+      style: { cursor: 'pointer' },
       onKeydown: (e: KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
+          // Prevent scrolling for Space
           e.preventDefault();
           handleSelecionarProcesso(item);
         }
@@ -92,6 +94,7 @@ const rowAttr = (item: ProcessoResumo | null, type: string) => {
 <template>
   <div class="table-responsive">
     <BTable
+        aria-label="Lista de processos cadastrados"
         :fields="fields"
         :items="processos"
         :sort-by="[{key: criterioOrdenacao, order: direcaoOrdenacaoAsc ? 'asc' : 'desc'}]"
@@ -106,8 +109,10 @@ const rowAttr = (item: ProcessoResumo | null, type: string) => {
         @sort-changed="handleSortChange"
     >
       <template #empty>
-        <div class="text-center text-muted">
-          Nenhum processo encontrado.
+        <div class="text-center text-muted py-5" data-testid="empty-state-processos">
+          <i class="bi bi-folder2-open display-4 d-block mb-3" aria-hidden="true"></i>
+          <p class="h5">Nenhum processo encontrado</p>
+          <p class="small">Os processos em que sua unidade participa aparecerão aqui.</p>
         </div>
       </template>
 

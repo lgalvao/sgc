@@ -10,9 +10,6 @@ import sgc.comum.model.EntidadeBase;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Representa uma competência, conjunto de atividades e conhecimentos.
- */
 @Entity
 @Table(name = "COMPETENCIA", schema = "sgc")
 @Getter
@@ -23,8 +20,10 @@ public class Competencia extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "mapa_codigo")
     private Mapa mapa;
+
     @Column(name = "descricao")
     private String descricao;
+
     @ManyToMany(mappedBy = "competencias")
     private Set<Atividade> atividades = new HashSet<>();
 
@@ -34,12 +33,6 @@ public class Competencia extends EntidadeBase {
         this.mapa = mapa;
     }
 
-    /**
-     * Construtor para criar uma nova competência.
-     *
-     * @param descricao A descrição da competência.
-     * @param mapa      O mapa ao qual a competência pertence.
-     */
     public Competencia(String descricao, Mapa mapa) {
         super();
         this.descricao = descricao;

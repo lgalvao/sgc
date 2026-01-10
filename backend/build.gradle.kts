@@ -5,15 +5,14 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 plugins {
     java
     jacoco
+    checkstyle
+    pmd
     id("org.springframework.boot") version "4.0.1"
     id("io.spring.dependency-management") version "1.1.7"
     id("info.solidsoft.pitest") version "1.19.0-rc.1"
 }
 
 java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
 }
 
 tasks.withType<JavaCompile> {
@@ -118,15 +117,16 @@ tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    finalizedBy(tasks.jacocoTestReport) // Relatório é gerado após os testes
-
+    
     testLogging {
         events(TestLogEvent.SKIPPED, TestLogEvent.FAILED)
-        exceptionFormat = TestExceptionFormat.FULL
+        exceptionFormat = TestExceptionFormat.SHORT
         showStackTraces = true
         showCauses = true
         showStandardStreams = false
     }
+
+    val slowTests = mutableListOf<Pair<String, Long>>()
 
     addTestListener(object : TestListener {
         override fun beforeSuite(suite: TestDescriptor) {}
@@ -142,10 +142,24 @@ tasks.withType<Test> {
                     |  Time:     ${(result.endTime - result.startTime) / 1000.0}s
                 """.trimMargin()
                 println(output)
+
+                if (slowTests.isNotEmpty()) {
+                    println("\nTestes mais lentos (> 1s):")
+                    slowTests.sortedByDescending { it.second }
+                        .take(10)
+                        .forEach { (name, time) ->
+                            println("  - ${time}ms: $name")
+                        }
+                }
             }
         }
         override fun beforeTest(testDescriptor: TestDescriptor) {}
-        override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
+        override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {
+            val duration = result.endTime - result.startTime
+            if (duration > 1000) {
+                slowTests.add("${testDescriptor.className} > ${testDescriptor.name}" to duration)
+            }
+        }
     })
 
     jvmArgs = listOf(
@@ -171,14 +185,40 @@ tasks.withType<Test> {
     }
 }
 
+tasks.named<Test>("test") {
+    description = "Executa TODOS os testes (Unitários e Integração)."
+}
+
+tasks.register<Test>("unitTest") {
+    description = "Executa APENAS testes unitários (exclui tag 'integration')."
+    group = "verification"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform {
+        excludeTags("integration")
+    }
+}
+
+tasks.register<Test>("integrationTest") {
+    description = "Executa APENAS testes de integração (tag 'integration')."
+    group = "verification"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform {
+        includeTags("integration")
+    }
+}
+
 tasks.jacocoTestReport {
-    dependsOn(tasks.test)
+    // Relatório consome dados de qualquer tarefa de teste que rodou
+    executionData.setFrom(fileTree(layout.buildDirectory.get().asFile).include("/jacoco/*.exec"))
+    
     reports {
         xml.required.set(true)
         csv.required.set(true)
-        html.required.set(true)
+        html.required.set(false)
     }
-
+    
     classDirectories.setFrom(
         files(classDirectories.files.map {
             fileTree(it) {
@@ -208,7 +248,7 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "LINE"
-                minimum = "0.90".toBigDecimal()
+                minimum = "0.95".toBigDecimal()
             }
         }
     }
@@ -219,26 +259,48 @@ tasks.named("check") {
 }
 
 configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
-    // Integração com JUnit 5
     junit5PluginVersion.set("1.2.1")
-
-    // Evitar rodar em todo o projeto inicialmente (muito custoso)
-    // Definiremos classes alvo via linha de comando ou perfis, mas aqui fica o padrão seguro
     targetClasses.set(setOf("sgc.mapa.*"))
-
-    // Excluir classes que não devem ser mutadas (Configurações, DTOs, Exceções, etc.)
     excludedClasses.set(setOf(
         "sgc.Sgc",
         "sgc.**.*Config",
         "sgc.**.*Dto",
         "sgc.**.*Exception",
-        "sgc.**.*Repo", // Repositórios são interfaces/Spring Data, mutação aqui é pouco útil
-        "sgc.**.*MapperImpl" // Classes geradas pelo MapStruct
+        "sgc.**.*Repo",
+        "sgc.**.*MapperImpl"
     ))
-
-    // Threads para paralelismo (ajustar conforme a máquina)
     threads.set(8)
-
-    // Formatos de saída
     outputFormats.set(setOf("XML", "HTML"))
 }
+
+// Configuração de Checkstyle
+checkstyle {
+    toolVersion = "10.12.4"
+    configFile = file("config/checkstyle/checkstyle.xml")
+    isIgnoreFailures = false
+    maxWarnings = 0
+}
+
+// Configuração de PMD
+pmd {
+    toolVersion = "7.0.0"
+    isConsoleOutput = true
+    isIgnoreFailures = false
+    ruleSets = listOf() // Usar configuração customizada
+    ruleSetFiles = files("config/pmd/pmd-ruleset.xml")
+}
+
+tasks.withType<Checkstyle> {
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
+tasks.withType<Pmd> {
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+

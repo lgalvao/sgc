@@ -155,7 +155,7 @@ class SubprocessoWorkflowServiceTest {
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         verify(alertaService).criarAlertaReaberturaCadastro(any(), any(), any());
-        verify(alertaService).criarAlertaReaberturaCadastroSuperior(any(), any(), any(), any());
+        verify(alertaService).criarAlertaReaberturaCadastroSuperior(any(), any(), any());
     }
 
     @Test
@@ -202,7 +202,7 @@ class SubprocessoWorkflowServiceTest {
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         verify(alertaService).criarAlertaReaberturaRevisao(any(), any(), any());
-        verify(alertaService).criarAlertaReaberturaRevisaoSuperior(any(), any(), any(), any());
+        verify(alertaService).criarAlertaReaberturaRevisaoSuperior(any(), any(), any());
     }
 
     @Test

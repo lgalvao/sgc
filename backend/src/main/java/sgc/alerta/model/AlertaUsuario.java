@@ -22,10 +22,12 @@ import java.time.LocalDateTime;
 public class AlertaUsuario implements Serializable {
     @EmbeddedId
     private Chave id;
+
     @MapsId("alertaCodigo")
     @ManyToOne
     @JoinColumn(name = "alerta_codigo", insertable = false, updatable = false)
     private Alerta alerta;
+
     @MapsId("usuarioTitulo")
     @ManyToOne
     @JoinColumn(
@@ -34,6 +36,7 @@ public class AlertaUsuario implements Serializable {
             insertable = false,
             updatable = false)
     private Usuario usuario;
+
     @Column(name = "data_hora_leitura")
     private LocalDateTime dataHoraLeitura;
 

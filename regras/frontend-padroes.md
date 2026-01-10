@@ -123,7 +123,7 @@ flowchart LR
 
 ## 7. Padrões de Implementação Detalhados
 
-### 7.1. Stores (Pinia) - Setup Store Pattern
+### 7.1. Stores (Pinia) Setup Store Pattern
 
 **Estrutura Padrão:**
 

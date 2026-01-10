@@ -2,51 +2,57 @@ package sgc.alerta.dto;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import sgc.alerta.mapper.AlertaMapper;
+import sgc.alerta.model.Alerta;
+
 import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Testes Unitários: AlertaMapper")
+@DisplayName("AlertaMapper")
 class AlertaMapperTest {
 
-    private final AlertaMapper mapper = new AlertaMapperImpl();
+    private final AlertaMapper mapper = new AlertaMapperStub();
 
     @Test
     @DisplayName("formatDataHora deve retornar string formatada")
     void formatDataHora() {
         LocalDateTime dt = LocalDateTime.of(2023, 10, 25, 14, 30, 15);
-        assertThat(mapper.formatDataHora(dt)).isEqualTo("25/10/2023 14:30:15");
+        AlertaMapperStub stub = (AlertaMapperStub) mapper;
+        assertThat(stub.publicFormatDataHora(dt)).isEqualTo("25/10/2023 14:30:15");
     }
 
     @Test
     @DisplayName("formatDataHora deve retornar string vazia se nulo")
     void formatDataHoraNull() {
-        assertThat(mapper.formatDataHora(null)).isEmpty();
+        AlertaMapperStub stub = (AlertaMapperStub) mapper;
+        assertThat(stub.publicFormatDataHora(null)).isEmpty();
     }
 
     @Test
-    @DisplayName("extractProcessoName deve retornar nome do processo quando padrão casar")
-    void extractProcessoName() {
-        String descricao = "Alteração no processo 'Processo Teste' realizada com sucesso.";
-        assertThat(mapper.extractProcessoName(descricao)).isEqualTo("Processo Teste");
+    @DisplayName("toDto com dataHoraLeitura deve incluir o campo")
+    void toDtoComDataHoraLeitura() {
+        Alerta alerta = new Alerta();
+        alerta.setCodigo(1L);
+        LocalDateTime dataLeitura = LocalDateTime.of(2023, 10, 25, 15, 0, 0);
+        
+        AlertaDto dto = mapper.toDto(alerta, dataLeitura);
+        
+        assertThat(dto.getDataHoraLeitura()).isEqualTo(dataLeitura);
     }
 
-    @Test
-    @DisplayName("extractProcessoName deve retornar string vazia se descrição for nula")
-    void extractProcessoNameNull() {
-        assertThat(mapper.extractProcessoName(null)).isEmpty();
-    }
-
-    @Test
-    @DisplayName("extractProcessoName deve retornar string vazia se padrão não casar")
-    void extractProcessoNameSemMatch() {
-        String descricao = "Descrição sem nome de processo entre aspas simples.";
-        assertThat(mapper.extractProcessoName(descricao)).isEmpty();
-    }
-
-    static class AlertaMapperImpl extends AlertaMapper {
+    static class AlertaMapperStub extends AlertaMapper {
         @Override
-        public AlertaDto toDto(sgc.alerta.model.Alerta alerta) {
-            return null; // Note: MapStruct generates the real implementation
+        public AlertaDto toDto(Alerta alerta) {
+            if (alerta == null) return null;
+            return AlertaDto.builder()
+                    .codigo(alerta.getCodigo())
+                    .build();
+        }
+        
+        // Expõe o método protegido para testes
+        public String publicFormatDataHora(LocalDateTime dataHora) {
+            return formatDataHora(dataHora);
         }
     }
 }

@@ -4,10 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.service.AtividadeService;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.service.CompetenciaService;
+import sgc.mapa.service.CopiaMapaService;
+import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
@@ -17,9 +21,6 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.mapa.dto.AtividadeDto;
-import sgc.mapa.mapper.AtividadeMapper;
 
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +36,7 @@ public class SubprocessoMapaService {
     private final SubprocessoMovimentacaoRepo movimentacaoRepo;
     private final AtividadeService atividadeService;
     private final CompetenciaService competenciaService;
+    private final CopiaMapaService copiaMapaService;
     private final AtividadeMapper atividadeMapper;
 
     @Transactional
@@ -58,7 +60,7 @@ public class SubprocessoMapaService {
         log.info("Salvando ajustes para o mapa do subprocesso {}...", codSubprocesso);
 
         for (CompetenciaAjusteDto compDto : competencias) {
-            var competencia = competenciaService.buscarPorId(compDto.getCodCompetencia());
+            var competencia = competenciaService.buscarPorCodigo(compDto.getCodCompetencia());
 
             competencia.setDescricao(compDto.getNome());
 
@@ -67,7 +69,7 @@ public class SubprocessoMapaService {
                 // Usando AtividadeService.atualizar -> mas preciso da Entidade para associar à competência
                 // Se AtividadeService não expõe entidade, tenho que mudar o service
                 // Mas AtividadeService expõe `obterEntidadePorCodigo`.
-                var atividade = atividadeService.obterEntidadePorCodigo(ativDto.getCodAtividade());
+                var atividade = atividadeService.obterPorCodigo(ativDto.getCodAtividade());
 
                 // Atualizar descrição via service (para manter regras de negócio se houver)
                 // Ou apenas setar aqui já que é um "ajuste"?
@@ -78,7 +80,7 @@ public class SubprocessoMapaService {
                 atividadeService.atualizar(atividade.getCodigo(), dto);
 
                 // Recarrega entidade atualizada
-                atividades.add(atividadeService.obterEntidadePorCodigo(atividade.getCodigo()));
+                atividades.add(atividadeService.obterPorCodigo(atividade.getCodigo()));
             }
             competencia.setAtividades(atividades);
             competenciaService.salvar(competencia);
@@ -90,11 +92,9 @@ public class SubprocessoMapaService {
 
     @Transactional
     public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
-        final Subprocesso spDestino =
-                subprocessoRepo
-                        .findById(codSubprocessoDestino)
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso de destino não encontrado: %d"
-                                .formatted(codSubprocessoDestino)));
+        final Subprocesso spDestino = subprocessoRepo
+                .findById(codSubprocessoDestino)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso de destino não encontrado: %d".formatted(codSubprocessoDestino)));
 
         if (spDestino.getSituacao() != MAPEAMENTO_CADASTRO_EM_ANDAMENTO
                 && spDestino.getSituacao() != REVISAO_CADASTRO_EM_ANDAMENTO
@@ -105,11 +105,8 @@ public class SubprocessoMapaService {
                     com cadastro em elaboração ou não iniciado.""");
         }
 
-        Subprocesso spOrigem =
-                subprocessoRepo
-                        .findById(codSubprocessoOrigem)
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                                "Subprocesso de origem não encontrado: %d".formatted(codSubprocessoOrigem)));
+        Subprocesso spOrigem = subprocessoRepo.findById(codSubprocessoOrigem)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso de origem não encontrado: %d".formatted(codSubprocessoOrigem)));
 
         if (spOrigem.getMapa() == null || spDestino.getMapa() == null) {
             throw new ErroMapaNaoAssociado("Subprocesso de origem ou destino não possui mapa associado.");
@@ -131,30 +128,12 @@ public class SubprocessoMapaService {
                 continue;
             }
 
-            // Usando AtividadeService.criar
             AtividadeDto novaDto = new AtividadeDto();
             novaDto.setDescricao(atividadeOrigem.getDescricao());
             novaDto.setMapaCodigo(spDestino.getMapa().getCodigo());
-
-            // Precisamos de um usuário titular para criar atividade via service...
-            // O importador é um processo de sistema/usuário logado?
-            // `importarAtividades` não recebe usuarioTitulo.
-            // Mas `criar` exige validação de titularidade.
-            // Solução: Criar um método `duplicarAtividade(Atividade origem, Mapa destino)` no AtividadeService?
-            // Ou manter a lógica aqui, mas usando os métodos expostos pelo service que não exigem validação (se houver)
-            // Como AtividadeService.criar exige validação, e aqui é uma importação sistêmica,
-            // talvez devêssemos expor um método `importar` no AtividadeService.
-
-            // Por enquanto, vou usar o AtividadeRepo indiretamente via Service? Não, a ideia é não usar Repo de outro módulo.
-            // Então `AtividadeService` deve ter um método `duplicarAtividade`.
-
-            // Vou assumir que posso chamar um método novo no AtividadeService ou refatorar isso depois.
-            // Para simplificar agora, e dado que `importarAtividades` é um caso de uso específico,
-            // vou adicionar `importarAtividade` no `AtividadeService`.
         }
 
-        // REFAZENDO LOOP PARA CHAMAR NOVO METODO NO SERVICE
-        atividadeService.importarAtividadesDeOutroMapa(
+        copiaMapaService.importarAtividadesDeOutroMapa(
                 spOrigem.getMapa().getCodigo(),
                 spDestino.getMapa().getCodigo()
         );
@@ -172,10 +151,9 @@ public class SubprocessoMapaService {
         }
 
         final Unidade unidadeOrigem = spOrigem.getUnidade();
-        String descMovimentacao =
-                String.format("Importação de atividades do subprocesso #%d (Unidade: %s)",
-                        spOrigem.getCodigo(),
-                        unidadeOrigem != null ? unidadeOrigem.getSigla() : "N/A");
+        String descMovimentacao = String.format("Importação de atividades do subprocesso #%d (Unidade: %s)",
+                spOrigem.getCodigo(),
+                unidadeOrigem != null ? unidadeOrigem.getSigla() : "N/A");
 
         movimentacaoRepo.save(new Movimentacao(
                 spDestino,

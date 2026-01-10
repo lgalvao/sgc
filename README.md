@@ -82,7 +82,9 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 
 | Tipo | Comando | Descrição |
 | --- | --- | --- |
-| **Unitários Backend** | `cd backend && ./gradlew test` | JUnit 5 com banco em memória (H2). |
+| **Todos Backend** | `cd backend && ./gradlew test` | Executa suite completa (Unitários + Integração). |
+| **Unitários Backend** | `cd backend && ./gradlew unitTest` | Executa apenas testes isolados (Rápido). |
+| **Integração Backend** | `cd backend && ./gradlew integrationTest` | Executa apenas fluxos completos (Mais lento). |
 | **Unitários Frontend** | `cd frontend && npm run test:unit` | Vitest para componentes e lógica. |
 | **End-to-End (E2E)** | `npm run test:e2e` | Playwright simulando fluxos reais. |
 | **Type Check (Front)** | `cd frontend && npm run typecheck` | Verificação estática de tipos TypeScript. |

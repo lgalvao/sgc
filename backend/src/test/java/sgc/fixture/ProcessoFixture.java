@@ -1,9 +1,9 @@
 package sgc.fixture;
 
+import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.organizacao.model.Unidade;
 
 import java.time.LocalDateTime;
 

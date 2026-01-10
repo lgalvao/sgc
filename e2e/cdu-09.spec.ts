@@ -2,7 +2,7 @@ import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
-import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto, abrirHistoricoAnalise} from './helpers/helpers-analise';
+import {abrirHistoricoAnalise, acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
 import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import {Page} from '@playwright/test';

@@ -9,7 +9,6 @@ import sgc.mapa.model.Atividade;
 /**
  * Mapper (usando MapStruct) entre a entidade Atividade e seu DTO.
  */
-@SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Component
 @Mapper(componentModel = "spring")
 public abstract class AtividadeMapper {

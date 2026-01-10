@@ -42,22 +42,22 @@ public abstract class SubprocessoMapper {
 
     public Processo mapProcesso(Long value) {
         if (value == null) return null;
-
-        return processoRepo.findById(value).orElseThrow(() ->
-                new RuntimeException("Processo não encontrado com o código: %d".formatted(value)));
+        return processoRepo.findById(value)
+                .orElseThrow(() -> sgc.comum.erros.ErroEntidadeDeveriaExistir.fkViolada(
+                        "Processo", value, "SubprocessoMapper"));
     }
 
     public Unidade mapUnidade(Long value) {
         if (value == null) return null;
-
-        return unidadeRepo.findById(value).orElseThrow(() ->
-                new RuntimeException("Unidade não encontrada com o código: %d".formatted(value)));
+        return unidadeRepo.findById(value)
+                .orElseThrow(() -> sgc.comum.erros.ErroEntidadeDeveriaExistir.fkViolada(
+                        "Unidade", value, "SubprocessoMapper"));
     }
 
     public Mapa mapMapa(Long value) {
         if (value == null) return null;
-
-        return mapaRepo.findById(value).orElseThrow(() ->
-                new RuntimeException("Mapa não encontrado com o código: %d".formatted(value)));
+        return mapaRepo.findById(value)
+                .orElseThrow(() -> sgc.comum.erros.ErroEntidadeDeveriaExistir.fkViolada(
+                        "Mapa", value, "SubprocessoMapper"));
     }
 }

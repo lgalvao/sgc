@@ -12,27 +12,20 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.AtividadeRepo;
-import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.ConhecimentoRepo;
 import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeMapa;
+import sgc.organizacao.model.UnidadeMapaRepo;
+import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.IniciarProcessoReq;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeMapa;
-import sgc.organizacao.model.UnidadeMapaRepo;
-import sgc.organizacao.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
@@ -50,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-05: Iniciar processo de revisão")
-public class CDU05IntegrationTest extends BaseIntegrationTest {
+class CDU05IntegrationTest extends BaseIntegrationTest {
     private static final String API_PROCESSOS_ID_INICIAR = "/api/processos/{codigo}/iniciar";
 
     @Autowired
@@ -94,7 +87,9 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
             jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 100000"); // Aumentado para evitar conflito com CDU04
             jdbcTemplate.execute("ALTER TABLE SGC.ALERTA ALTER COLUMN CODIGO RESTART WITH 60000");
             jdbcTemplate.execute("ALTER TABLE SGC.MAPA ALTER COLUMN CODIGO RESTART WITH 70000");
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            // Ignorado: erros ao resetar sequências não devem impedir a execução dos testes
+        }
 
         // 1. Criar unidade
         unidade = UnidadeFixture.unidadePadrao();

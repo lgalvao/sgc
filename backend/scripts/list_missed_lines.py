@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-import xml.etree.ElementTree as ET
-import sys
 import os
+import sys
+import xml.etree.ElementTree as ET
+
 
 def process_sourcefile(sourcefile, pname, filter_class):
     sfname = sourcefile.get('name')

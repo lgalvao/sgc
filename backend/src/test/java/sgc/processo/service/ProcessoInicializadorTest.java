@@ -7,6 +7,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeMapa;
+import sgc.organizacao.model.UnidadeMapaRepo;
+import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.erros.ErroUnidadesNaoDefinidas;
 import sgc.processo.model.Processo;
@@ -14,10 +18,6 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.service.SubprocessoFactory;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
-import sgc.organizacao.model.UnidadeMapaRepo;
-import sgc.organizacao.model.UnidadeMapa;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,10 +26,9 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoInicializador Test")
@@ -199,6 +198,6 @@ class ProcessoInicializadorTest {
         when(unidadeRepo.findAllById(any())).thenReturn(List.of()); // Retorna vazio
 
         assertThatThrownBy(() -> inicializador.iniciar(1L, List.of(99L)))
-                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(sgc.comum.erros.ErroEntidadeDeveriaExistir.class);
     }
 }

@@ -7,24 +7,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.processo.service.ProcessoConsultaService;
-import sgc.processo.model.TipoProcesso;
+import sgc.comum.erros.ErroValidacao;
+import sgc.mapa.service.MapaService;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
-import sgc.organizacao.mapper.UsuarioMapper;
-import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.model.Usuario;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaReq;
-import sgc.organizacao.model.AtribuicaoTemporariaRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeMapaRepo;
-import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.mapper.UsuarioMapper;
+import sgc.organizacao.model.*;
+import sgc.processo.model.TipoProcesso;
+import sgc.processo.service.ProcessoConsultaService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Collections;
-import sgc.mapa.service.MapaService;
-import sgc.comum.erros.ErroValidacao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -65,7 +61,7 @@ class UnidadeServiceTest {
             Unidade u1 = new Unidade();
             u1.setCodigo(1L);
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(usuarioMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).build());
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
             // Act
             List<UnidadeDto> result = service.buscarTodasUnidades();
@@ -103,7 +99,7 @@ class UnidadeServiceTest {
             Unidade u1 = new Unidade();
             u1.setCodigo(1L);
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(usuarioMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).build());
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
             // Act & Assert
             assertThat(service.buscarArvore(1L)).isNotNull();
@@ -117,7 +113,7 @@ class UnidadeServiceTest {
             u1.setCodigo(1L);
             u1.setSigla("U1");
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(usuarioMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
 
             // Act
             List<String> result = service.buscarSiglasSubordinadas("U1");
@@ -134,7 +130,7 @@ class UnidadeServiceTest {
             u1.setCodigo(1L);
             u1.setSigla("U1");
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(usuarioMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
 
             // Act & Assert
             assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglasSubordinadas("U2"));
@@ -176,7 +172,7 @@ class UnidadeServiceTest {
             u1.setCodigo(1L);
             u1.setSigla("U1");
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(usuarioMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
 
             // Act
             UnidadeDto result = service.buscarArvore(1L);
@@ -202,9 +198,7 @@ class UnidadeServiceTest {
             Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setSigla("NETO"); u3.setUnidadeSuperior(u2);
             
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1, u2, u3));
-            when(usuarioMapper.toUnidadeDto(u1)).thenReturn(paiDto);
-            when(usuarioMapper.toUnidadeDto(u2)).thenReturn(filhoDto);
-            when(usuarioMapper.toUnidadeDto(u3)).thenReturn(netoDto);
+            when(usuarioMapper.toUnidadeDto(any(Unidade.class), anyBoolean())).thenReturn(paiDto, filhoDto, netoDto);
 
             // Act
             List<String> result = service.buscarSiglasSubordinadas("PAI");
@@ -322,7 +316,7 @@ class UnidadeServiceTest {
         void deveCriarAtribuicaoTemporariaComSucesso() {
             // Arrange
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
-            when(usuarioService.buscarEntidadePorId("123")).thenReturn(new Usuario());
+            when(usuarioService.buscarPorId("123")).thenReturn(new Usuario());
 
             CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
                     "123", java.time.LocalDate.now(), java.time.LocalDate.now().plusDays(1), "Justificativa");
@@ -338,7 +332,7 @@ class UnidadeServiceTest {
         @DisplayName("Deve falhar ao criar atribuição se datas inválidas")
         void deveFalharCriarAtribuicaoDatasInvalidas() {
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
-            when(usuarioService.buscarEntidadePorId("123")).thenReturn(new Usuario());
+            when(usuarioService.buscarPorId("123")).thenReturn(new Usuario());
 
             CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
                     "123", java.time.LocalDate.now().plusDays(1), java.time.LocalDate.now(), "Justificativa");
@@ -362,7 +356,7 @@ class UnidadeServiceTest {
         @DisplayName("Deve criar atribuição com data atual se dataInicio for nula")
         void deveCriarAtribuicaoComDataAtualSeInicioNulo() {
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
-            when(usuarioService.buscarEntidadePorId("123")).thenReturn(new Usuario());
+            when(usuarioService.buscarPorId("123")).thenReturn(new Usuario());
 
             CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
                     "123", null, java.time.LocalDate.now().plusDays(1), "Justificativa");
@@ -486,7 +480,7 @@ class UnidadeServiceTest {
             
             Unidade u1 = new Unidade(); u1.setCodigo(1L);
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(usuarioMapper.toUnidadeDto(u1)).thenReturn(pai);
+            when(usuarioMapper.toUnidadeDto(u1, true)).thenReturn(pai);
             
             assertThat(service.buscarArvore(999L)).isNull();
         }
@@ -499,7 +493,7 @@ class UnidadeServiceTest {
             
             Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setSigla("PAI");
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(usuarioMapper.toUnidadeDto(u1)).thenReturn(pai);
+            when(usuarioMapper.toUnidadeDto(u1, true)).thenReturn(pai);
             
             assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglasSubordinadas("INVALIDA"));
         }
@@ -537,8 +531,8 @@ class UnidadeServiceTest {
         filho.setUnidadeSuperior(pai);
         
         when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(pai, filho));
-        when(usuarioMapper.toUnidadeDto(pai)).thenReturn(UnidadeDto.builder().codigo(1L).sigla("PAI").subunidades(new ArrayList<>()).build());
-        when(usuarioMapper.toUnidadeDto(filho)).thenReturn(UnidadeDto.builder().codigo(2L).sigla("FILHO").subunidades(new ArrayList<>()).build());
+        when(usuarioMapper.toUnidadeDto(pai, true)).thenReturn(UnidadeDto.builder().codigo(1L).sigla("PAI").subunidades(new ArrayList<>()).build());
+        when(usuarioMapper.toUnidadeDto(filho, true)).thenReturn(UnidadeDto.builder().codigo(2L).sigla("FILHO").subunidades(new ArrayList<>()).build());
         
         // Act
         List<UnidadeDto> res = service.buscarTodasUnidades();

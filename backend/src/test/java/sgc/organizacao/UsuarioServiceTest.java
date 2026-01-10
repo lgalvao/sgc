@@ -2,24 +2,20 @@ package sgc.organizacao;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.seguranca.dto.PerfilUnidadeDto;
-import sgc.seguranca.dto.EntrarReq;
-import sgc.comum.erros.ErroAutenticacao;
-import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.*;
-import sgc.organizacao.model.Perfil;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Tag("integration")
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
@@ -59,17 +55,18 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar entidade usuário por login garantindo inicialização")
         void deveBuscarEntidadeUsuarioPorLogin() {
             // Act
-            var usuario = usuarioService.buscarUsuarioPorLogin(TITULO_ADMIN);
+            var usuario = usuarioService.buscarPorLogin(TITULO_ADMIN);
 
             // Assert
             assertNotNull(usuario);
             assertEquals(TITULO_ADMIN, usuario.getTituloEleitoral());
 
-            // Verifica se a coleção foi inicializada (não deve lançar LazyInitializationException)
+            // Verifica se a coleção foi inicializada (não deve lançar
+            // LazyInitializationException)
             assertDoesNotThrow(() -> {
-                 if (usuario.getAtribuicoesTemporarias() != null) {
-                     usuario.getAtribuicoesTemporarias().size();
-                 }
+                if (usuario.getAtribuicoesTemporarias() != null) {
+                    usuario.getAtribuicoesTemporarias().size();
+                }
             });
         }
 
@@ -111,13 +108,6 @@ class UsuarioServiceTest {
             assertEquals(2, result.size());
             assertTrue(result.containsKey(TITULO_CHEFE_UNIT2));
             assertTrue(result.containsKey(TITULO_ADMIN));
-        }
-
-        @Test
-        @DisplayName("Deve carregar atribuições em lote com lista vazia")
-        void deveCarregarAtribuicoesEmLoteVazio() {
-            // Apenas para cobrir o branch da linha 139
-            assertDoesNotThrow(() -> usuarioService.buscarResponsaveisUnidades(List.of()));
         }
     }
 
@@ -242,22 +232,6 @@ class UsuarioServiceTest {
             assertEquals(TITULO_CHEFE_UNIT2, result.get(2L).getTitularTitulo());
             assertEquals("333333333333", result.get(9L).getTitularTitulo());
         }
-
-        @Test
-        @DisplayName("Deve buscar responsáveis de unidades sem chefes")
-        void deveBuscarResponsaveisUnidadesSemChefes() {
-            // No data.sql, unidade 100 não tem chefe (apenas admin tem perfil lá)
-            // Mas admin não é CHEFE, então buscarResponsaveis deve ignorar
-            Map<Long, ResponsavelDto> result = usuarioService.buscarResponsaveisUnidades(List.of(100L));
-            assertTrue(result.isEmpty());
-        }
-
-        @Test
-        @DisplayName("Deve buscar responsável de unidade sem nenhum usuário")
-        void deveBuscarResponsavelUnidadeInexistente() {
-            Optional<ResponsavelDto> res = usuarioService.buscarResponsavelUnidade(9999L);
-            assertTrue(res.isEmpty());
-        }
     }
 
     @Nested
@@ -294,114 +268,6 @@ class UsuarioServiceTest {
             // Assert
             assertTrue(adminUnits.contains(100L));
         }
-
-        @Test
-        @DisplayName("Deve retornar falso ou vazio para usuário inexistente ou sem os perfis")
-        void deveVerificarPerfisUsuarioInexistente() {
-            assertFalse(usuarioService.usuarioTemPerfil("INEXISTENTE", "ADMIN", 100L));
-            assertTrue(usuarioService.buscarUnidadesOndeEhResponsavel("INEXISTENTE").isEmpty());
-            assertTrue(usuarioService.buscarUnidadesPorPerfil("INEXISTENTE", "ADMIN").isEmpty());
-            
-            // Usuário existe mas não tem esse perfil nessa unidade
-            assertFalse(usuarioService.usuarioTemPerfil(TITULO_ADMIN, "CHEFE", 100L));
-            assertFalse(usuarioService.usuarioTemPerfil(TITULO_ADMIN, "ADMIN", 2L));
-        }
-    }
-
-    @Nested
-    @DisplayName("Autenticação e Autorização")
-    class AutenticacaoAutorizacao {
-
-        @Test
-        @DisplayName("Deve autenticar usuário com sucesso")
-        void deveAutenticarComSucesso() {
-            // Act
-            boolean resultado = usuarioService.autenticar(TITULO_ADMIN, "senha");
-
-            // Assert
-            assertTrue(resultado);
-        }
-
-        @Test
-        @DisplayName("Deve impedir autorização sem autenticação prévia")
-        void deveImpedirAutorizacaoSemAutenticacao() {
-            // Usa um usuário diferente que não foi autenticado nos outros testes
-            String usuarioNaoAutenticado = "999999999999";
-            assertThrows(ErroAutenticacao.class,
-                    () -> usuarioService.autorizar(usuarioNaoAutenticado));
-        }
-
-        @Test
-        @DisplayName("Deve autorizar e retornar lista de perfis/unidades")
-        void deveAutorizarERetornarPerfis() {
-            // Arrange
-            usuarioService.autenticar(TITULO_CHEFE_UNIT2, "senha");
-
-            // Act
-            List<PerfilUnidadeDto> resultado = usuarioService.autorizar(TITULO_CHEFE_UNIT2);
-
-            // Assert
-            assertNotNull(resultado);
-            assertFalse(resultado.isEmpty());
-            assertTrue(resultado.stream()
-                    .anyMatch(pu -> pu.getPerfil() == Perfil.CHEFE
-                            && pu.getUnidade().getCodigo().equals(2L)));
-        }
-
-        @Test
-        @DisplayName("Deve retornar false ao autenticar usuário não encontrado")
-        void deveRetornarFalseAoAutenticarUsuarioInexistente() {
-            // Act - usuário inexistente não passa na autenticação em ambiente de testes
-            boolean resultado = usuarioService.autenticar("TITULO_INEXISTENTE_XYZ", "senha");
-
-            // Assert
-            assertFalse(resultado);
-        }
-
-        @Test
-        @DisplayName("Deve entrar no sistema com perfil selecionado")
-        void deveEntrarComSucesso() {
-            // Arrange
-            usuarioService.autenticar(TITULO_CHEFE_UNIT2, "senha");
-            List<PerfilUnidadeDto> perfis = usuarioService.autorizar(TITULO_CHEFE_UNIT2);
-            PerfilUnidadeDto perfilUnidadeDto = perfis.getFirst();
-
-            // Act & Assert
-            assertDoesNotThrow(() -> usuarioService.entrar(TITULO_CHEFE_UNIT2, perfilUnidadeDto));
-        }
-
-        @Test
-        @DisplayName("Deve falhar 'entrar' com sessão expirada")
-        void deveFalharEntrarSessaoExpirada() {
-             // Usa um título que com certeza não foi autenticado recentemente
-             EntrarReq req = new EntrarReq("TITULO_NUNCA_VISTO", "ADMIN", 100L);
-             assertThrows(ErroAutenticacao.class, () -> usuarioService.entrar(req));
-        }
-
-        @Test
-        @DisplayName("Deve falhar 'entrar' com perfil ou unidade não autorizado")
-        void deveFalharEntrarNaoAutorizado() {
-            usuarioService.autenticar(TITULO_CHEFE_UNIT2, "senha");
-            // Tentando entrar como ADMIN na unidade 2 (ele só é CHEFE lá)
-            EntrarReq req = new EntrarReq(TITULO_CHEFE_UNIT2, "ADMIN", 2L);
-            assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () -> usuarioService.entrar(req));
-            
-            usuarioService.autenticar(TITULO_CHEFE_UNIT2, "senha");
-            // Tentando entrar como CHEFE na unidade 100 (não tem perfil lá)
-            EntrarReq req2 = new EntrarReq(TITULO_CHEFE_UNIT2, "CHEFE", 100L);
-            assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () -> usuarioService.entrar(req2));
-        }
-
-        @Test
-        @DisplayName("Deve autorizar e remover do cache de autenticações recentes")
-        void deveRemoverDoCacheAposSucesso() {
-             usuarioService.autenticar(TITULO_CHEFE_UNIT2, "senha");
-             EntrarReq req = new EntrarReq(TITULO_CHEFE_UNIT2, "CHEFE", 2L);
-             usuarioService.entrar(req);
-             
-             // Segunda tentativa com o mesmo login deve falhar por falta de autenticação recente
-             assertThrows(ErroAutenticacao.class, () -> usuarioService.entrar(req));
-        }
     }
 
     @Nested
@@ -412,19 +278,19 @@ class UsuarioServiceTest {
         void deveGerenciarAdministradores() {
             // TITULO_CHEFE_UNIT2 (777) não é admin no data.sql original
             String tituloNovoAdmin = TITULO_CHEFE_UNIT2;
-            
+
             // Adicionar
             usuarioService.adicionarAdministrador(tituloNovoAdmin);
             assertTrue(usuarioService.isAdministrador(tituloNovoAdmin));
-            
+
             // Listar
             List<AdministradorDto> admins = usuarioService.listarAdministradores();
             assertTrue(admins.stream().anyMatch(a -> a.getTituloEleitoral().equals(tituloNovoAdmin)));
-            
+
             // Falhar ao adicionar duplicado
-            assertThrows(sgc.comum.erros.ErroValidacao.class, 
-                () -> usuarioService.adicionarAdministrador(tituloNovoAdmin));
-            
+            assertThrows(sgc.comum.erros.ErroValidacao.class,
+                    () -> usuarioService.adicionarAdministrador(tituloNovoAdmin));
+
             // Remover
             usuarioService.removerAdministrador(tituloNovoAdmin, TITULO_ADMIN);
             assertFalse(usuarioService.isAdministrador(tituloNovoAdmin));
@@ -434,7 +300,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve falhar ao remover a si mesmo")
         void deveFalharRemoverSiMesmo() {
             assertThrows(sgc.comum.erros.ErroValidacao.class,
-                () -> usuarioService.removerAdministrador(TITULO_ADMIN, TITULO_ADMIN));
+                    () -> usuarioService.removerAdministrador(TITULO_ADMIN, TITULO_ADMIN));
         }
 
         @Test
@@ -443,9 +309,9 @@ class UsuarioServiceTest {
             // Remove os admins extras do data.sql para sobrar apenas 1
             usuarioService.removerAdministrador("6", "OUTRO");
             usuarioService.removerAdministrador("999999999999", "OUTRO");
-            
+
             assertThrows(sgc.comum.erros.ErroValidacao.class,
-                () -> usuarioService.removerAdministrador(TITULO_ADMIN, "OUTRO"));
+                    () -> usuarioService.removerAdministrador(TITULO_ADMIN, "OUTRO"));
         }
     }
 }

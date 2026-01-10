@@ -16,18 +16,14 @@ import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.ReabrirProcessoReq;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
-import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
+import sgc.subprocesso.model.*;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
@@ -137,6 +133,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Não deve permitir reabrir revisão de cadastro sem ser ADMIN")
+    @org.springframework.security.test.context.support.WithMockUser(roles = "GESTOR")
     void reabrirRevisaoCadastro_semPermissao_proibido() throws Exception {
         // Given
         ReabrirProcessoReq request = new ReabrirProcessoReq("Tentativa sem permissão");

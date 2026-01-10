@@ -249,5 +249,11 @@
         <module name="CommentsIndentation">
             <property name="tokens" value="SINGLE_LINE_COMMENT, BLOCK_COMMENT_BEGIN"/>
         </module>
+        <!-- Refatoração: Proibir wildcard imports (*) -->
+        <module name="AvoidStarImport">
+            <property name="severity" value="warning"/>
+            <message key="import.avoidStar" 
+                     value="Using star imports (.*) is not allowed. Please import specific classes."/>
+        </module>
     </module>
 </module>

@@ -13,12 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.organizacao.model.Administrador;
-import sgc.organizacao.model.AdministradorRepo;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.*;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.Map;
@@ -27,8 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")

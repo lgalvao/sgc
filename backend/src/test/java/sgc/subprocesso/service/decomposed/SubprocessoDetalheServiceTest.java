@@ -11,10 +11,11 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.Conhecimento;
+import sgc.mapa.service.ConhecimentoService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
@@ -23,9 +24,9 @@ import sgc.organizacao.model.UsuarioPerfil;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
-import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.service.SubprocessoPermissoesService;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.SubprocessoPermissaoCalculator;
 
 import java.util.List;
 import java.util.Set;
@@ -33,7 +34,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes para SubprocessoDetalheService")
@@ -48,7 +49,7 @@ class SubprocessoDetalheServiceTest {
     @Mock
     private MovimentacaoRepo repositorioMovimentacao;
     @Mock
-    private SubprocessoPermissoesService subprocessoPermissoesService;
+    private SubprocessoPermissaoCalculator subprocessoPermissaoCalculator;
     @Mock
     private SubprocessoDetalheMapper subprocessoDetalheMapper;
     @Mock
@@ -59,6 +60,8 @@ class SubprocessoDetalheServiceTest {
     private CompetenciaService competenciaService;
     @Mock
     private MapaAjusteMapper mapaAjusteMapper;
+    @Mock
+    private ConhecimentoService conhecimentoService;
 
     @InjectMocks
     private SubprocessoDetalheService service;
@@ -113,8 +116,8 @@ class SubprocessoDetalheServiceTest {
     }
 
     @Test
-    @DisplayName("Deve listar atividades tratando conhecimentos nulos")
-    void deveListarAtividadesTratandoConhecimentosNulos() {
+    @DisplayName("Deve listar atividades tratando conhecimentos vazios")
+    void deveListarAtividadesTratandoConhecimentosVazios() {
         Subprocesso sp = new Subprocesso();
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
@@ -123,7 +126,7 @@ class SubprocessoDetalheServiceTest {
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         Atividade ativ = new Atividade();
         ativ.setDescricao("Test");
-        ativ.setConhecimentos(null); // Null explicitamente
+        ativ.setConhecimentos(List.of());
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(ativ));
 
         List<AtividadeVisualizacaoDto> result = service.listarAtividadesSubprocesso(1L);
@@ -148,9 +151,9 @@ class SubprocessoDetalheServiceTest {
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
-        when(usuarioService.buscarUsuarioPorLogin("titular")).thenReturn(new Usuario());
+        when(usuarioService.buscarPorLogin("titular")).thenReturn(new Usuario());
 
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, null, admin);
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, admin);
         assertThat(result).isNotNull();
     }
 
@@ -171,16 +174,17 @@ class SubprocessoDetalheServiceTest {
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
-        when(usuarioService.buscarUsuarioPorLogin("titular")).thenThrow(new RuntimeException("Erro"));
+        when(usuarioService.buscarPorLogin("titular")).thenThrow(new RuntimeException("Erro"));
 
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, null, admin);
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, admin);
         assertThat(result).isNotNull();
     }
 
     @Test
     @DisplayName("obterDetalhes falha se perfil null")
     void obterDetalhesFalhaPerfilNull() {
-        assertThatThrownBy(() -> service.obterDetalhes(1L, null, null, new Usuario()))
+        Usuario usuario = new Usuario();
+        assertThatThrownBy(() -> service.obterDetalhes(1L, null, usuario))
             .isInstanceOf(ErroAccessoNegado.class);
     }
 
@@ -204,7 +208,7 @@ class SubprocessoDetalheServiceTest {
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
-        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.CHEFE, 10L, user))
+        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.CHEFE, user))
                 .isInstanceOf(ErroAccessoNegado.class);
     }
 
@@ -231,7 +235,7 @@ class SubprocessoDetalheServiceTest {
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
 
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.GESTOR, null, gestor);
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.GESTOR, gestor);
         assertThat(result).isNotNull();
     }
 
@@ -255,7 +259,7 @@ class SubprocessoDetalheServiceTest {
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
-        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.GESTOR, null, gestor))
+        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.GESTOR, gestor))
                 .isInstanceOf(ErroAccessoNegado.class);
     }
 
@@ -279,7 +283,7 @@ class SubprocessoDetalheServiceTest {
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
 
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.SERVIDOR, null, servidor);
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.SERVIDOR, servidor);
         assertThat(result).isNotNull();
     }
 
@@ -289,7 +293,7 @@ class SubprocessoDetalheServiceTest {
         Usuario user = new Usuario();
         Subprocesso sp = new Subprocesso();
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(subprocessoPermissoesService.calcularPermissoes(sp, user))
+        when(subprocessoPermissaoCalculator.calcular(sp, user))
                 .thenReturn(SubprocessoPermissoesDto.builder().build());
 
         SubprocessoPermissoesDto result = service.obterPermissoes(1L, user);
@@ -333,14 +337,12 @@ class SubprocessoDetalheServiceTest {
         assertThat(service.obterMapaParaAjuste(1L)).isNotNull();
     }
 
-    // ==================== Testes adicionais para cobertura de branches ====================
-
     @Test
     @DisplayName("Obter cadastro com mapa code null")
     void obterCadastroMapaCodeNull() {
         Subprocesso sp = new Subprocesso();
         sp.setMapa(new Mapa());
-        sp.getMapa().setCodigo(null); // código null
+        sp.getMapa().setCodigo(null);
         sp.setUnidade(new Unidade());
         sp.getUnidade().setSigla("U1");
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
@@ -351,22 +353,22 @@ class SubprocessoDetalheServiceTest {
     }
 
     @Test
-    @DisplayName("Obter cadastro com atividades null")
-    void obterCadastroAtividadesNull() {
+    @DisplayName("Obter cadastro com atividades vazias")
+    void obterCadastroAtividadesVazias() {
         Subprocesso sp = new Subprocesso();
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
         sp.setUnidade(new Unidade());
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(null);
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of());
 
         SubprocessoCadastroDto dto = service.obterCadastro(1L);
         assertThat(dto.getAtividades()).isEmpty();
     }
 
     @Test
-    @DisplayName("Obter cadastro com atividades sem conhecimentos (null)")
-    void obterCadastroConhecimentosNull() {
+    @DisplayName("Obter cadastro com atividades sem conhecimentos")
+    void obterCadastroConhecimentosVazios() {
         Subprocesso sp = new Subprocesso();
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
@@ -376,7 +378,7 @@ class SubprocessoDetalheServiceTest {
         Atividade a = new Atividade();
         a.setCodigo(1L);
         a.setDescricao("Test");
-        a.setConhecimentos(null); // null explícito
+        a.setConhecimentos(List.of());
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(a));
 
         SubprocessoCadastroDto dto = service.obterCadastro(1L);
@@ -390,7 +392,7 @@ class SubprocessoDetalheServiceTest {
         Subprocesso sp = new Subprocesso();
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
-        sp.setUnidade(null); // unidade null
+        sp.setUnidade(null);
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of());
 
@@ -410,13 +412,13 @@ class SubprocessoDetalheServiceTest {
         sp.setCodigo(1L);
         sp.setUnidade(new Unidade());
         sp.getUnidade().setSigla("U1");
-        sp.getUnidade().setTituloTitular(null); // titular null
+        sp.getUnidade().setTituloTitular(null);
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
 
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, null, admin);
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, admin);
         assertThat(result).isNotNull();
     }
 
@@ -430,12 +432,11 @@ class SubprocessoDetalheServiceTest {
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
-        sp.setUnidade(null); // unidade null
+        sp.setUnidade(null);
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
-        // Deve lançar erro por unidade null na verificação de permissão
-        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.CHEFE, 10L, admin))
+        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.CHEFE, admin))
                 .isInstanceOf(ErroAccessoNegado.class);
     }
 
@@ -460,9 +461,9 @@ class SubprocessoDetalheServiceTest {
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
-        when(usuarioService.buscarUsuarioPorLogin("titular")).thenReturn(new Usuario());
+        when(usuarioService.buscarPorLogin("titular")).thenReturn(new Usuario());
 
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.CHEFE, 10L, chefe);
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.CHEFE, chefe);
         assertThat(result).isNotNull();
     }
 }

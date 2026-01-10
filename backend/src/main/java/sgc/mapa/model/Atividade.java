@@ -25,11 +25,15 @@ import java.util.Set;
 public class Atividade extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "mapa_codigo")
+    @jakarta.annotation.Nullable
     private Mapa mapa;
+
     @Column(name = "descricao")
     private String descricao;
+
     @OneToMany(mappedBy = "atividade", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Conhecimento> conhecimentos = new ArrayList<>();
+
     @ManyToMany
     @JoinTable(
             name = "competencia_atividade",
@@ -38,12 +42,6 @@ public class Atividade extends EntidadeBase {
             inverseJoinColumns = @JoinColumn(name = "competencia_codigo"))
     private Set<Competencia> competencias = new HashSet<>();
 
-    /**
-     * Construtor para criar uma nova atividade.
-     *
-     * @param mapa      O mapa ao qual a atividade pertence.
-     * @param descricao A descrição da atividade.
-     */
     public Atividade(Mapa mapa, String descricao) {
         super();
         this.mapa = mapa;

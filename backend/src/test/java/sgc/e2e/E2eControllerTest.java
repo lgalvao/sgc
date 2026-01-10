@@ -2,6 +2,7 @@ package sgc.e2e;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -11,14 +12,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.processo.service.ProcessoService;
 import sgc.organizacao.UsuarioService;
+import sgc.processo.service.ProcessoFacade;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Tag("integration")
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
@@ -32,7 +34,7 @@ class E2eControllerTest {
     private DataSource dataSource;
 
     @Mock
-    private ProcessoService processoService;
+    private ProcessoFacade processoFacade;
 
     @Mock
     private UsuarioService usuarioService;
@@ -42,7 +44,7 @@ class E2eControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        controller = new E2eController(jdbcTemplate, dataSource, processoService, usuarioService);
+        controller = new E2eController(jdbcTemplate, dataSource, processoFacade, usuarioService);
     }
 
     @Test

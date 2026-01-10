@@ -1,7 +1,7 @@
 import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
-import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
+import {verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {
     acessarSubprocessoAdmin,
     acessarSubprocessoChefeDireto,
@@ -13,11 +13,7 @@ import {
     disponibilizarCadastro,
     navegarParaAtividades,
 } from './helpers/helpers-atividades';
-import {
-    criarCompetencia,
-    disponibilizarMapa,
-    navegarParaMapa,
-} from './helpers/helpers-mapas';
+import {criarCompetencia, disponibilizarMapa, navegarParaMapa,} from './helpers/helpers-mapas';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import type {Page} from '@playwright/test';
 

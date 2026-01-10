@@ -10,17 +10,15 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.analise.dto.AnaliseHistoricoDto;
-import sgc.analise.dto.AnaliseMapper;
+import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
-import sgc.seguranca.SanitizacaoUtil;
-import sgc.subprocesso.dto.*;
-import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
-import sgc.subprocesso.service.SubprocessoMapaService;
-import sgc.subprocesso.service.SubprocessoService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Usuario;
+import sgc.seguranca.sanitizacao.UtilSanitizacao;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
 import java.util.Map;
@@ -28,17 +26,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
-@Tag(
-        name = "Subprocessos",
-        description = "Endpoints para gerenciamento do workflow de subprocessos")
+@Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoCadastroController {
 
-    private final SubprocessoService subprocessoService;
-    private final SubprocessoCadastroWorkflowService subprocessoWorkflowService;
+    private final SubprocessoFacade subprocessoFacade;
     private final sgc.analise.AnaliseService analiseService;
     private final AnaliseMapper analiseMapper;
-
-    private final SubprocessoMapaService subprocessoMapaService;
     private final UsuarioService usuarioService;
 
     /**
@@ -56,9 +49,11 @@ public class SubprocessoCadastroController {
     }
 
     /**
-     * Disponibiliza o cadastro de atividades de um subprocesso para a próxima etapa de análise.
+     * Disponibiliza o cadastro de atividades de um subprocesso para a próxima etapa
+     * de análise.
      *
-     * <p>Ação restrita a usuários com perfil 'CHEFE' (CDU-08).
+     * <p>
+     * Ação restrita a usuários com perfil 'CHEFE' (CDU-08).
      *
      * @param codSubprocesso O código do subprocesso.
      * @return Um {@link ResponseEntity} com uma mensagem de sucesso.
@@ -70,35 +65,36 @@ public class SubprocessoCadastroController {
             @PathVariable("codigo") Long codSubprocesso,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        List<Atividade> faltando =
-                subprocessoService.obterAtividadesSemConhecimento(codSubprocesso);
-        if (faltando != null && !faltando.isEmpty()) {
-            var lista =
-                    faltando.stream()
-                            .map(
-                                    a ->
-                                            Map.of(
-                                                    "codigo",
-                                                    a.getCodigo(),
-                                                    "descricao",
-                                                    a.getDescricao()))
-                            .toList();
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        List<Atividade> faltando = subprocessoFacade.obterAtividadesSemConhecimento(codSubprocesso);
+        if (!faltando.isEmpty()) {
+            var lista = faltando.stream()
+                    .map(
+                            a -> Map.of(
+                                    "codigo",
+                                    a.getCodigo(),
+                                    "descricao",
+                                    a.getDescricao()))
+                    .toList();
             throw new ErroValidacao(
                     "Existem atividades sem conhecimentos associados.",
                     Map.of("atividadesSemConhecimento", lista));
         }
 
-        subprocessoWorkflowService.disponibilizarCadastro(codSubprocesso, usuario);
+        subprocessoFacade.disponibilizarCadastro(codSubprocesso, usuario);
         return ResponseEntity.ok(new RespostaDto("Cadastro de atividades disponibilizado"));
     }
 
     /**
-     * Disponibiliza a revisão do cadastro de atividades para a próxima etapa de análise.
+     * Disponibiliza a revisão do cadastro de atividades para a próxima etapa de
+     * análise.
      *
-     * <p>Ação restrita a usuários com perfil 'CHEFE' (CDU-12).
+     * <p>
+     * Ação restrita a usuários com perfil 'CHEFE' (CDU-12).
      *
-     * <p>Antes de disponibilizar, o método valida se todas as atividades do subprocesso possuem
+     * <p>
+     * Antes de disponibilizar, o método valida se todas as atividades do
+     * subprocesso possuem
      * pelo menos um conhecimento associado.
      *
      * @param codigo O código do subprocesso.
@@ -111,9 +107,9 @@ public class SubprocessoCadastroController {
     public ResponseEntity<RespostaDto> disponibilizarRevisao(
             @PathVariable Long codigo, @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(codigo);
-        if (faltando != null && !faltando.isEmpty()) {
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        List<Atividade> faltando = subprocessoFacade.obterAtividadesSemConhecimento(codigo);
+        if (!faltando.isEmpty()) {
             var lista = faltando.stream()
                     .map(a -> Map.of("codigo", a.getCodigo(), "descricao", a.getDescricao()))
                     .toList();
@@ -123,7 +119,7 @@ public class SubprocessoCadastroController {
                     Map.of("atividadesSemConhecimento", lista));
         }
 
-        subprocessoWorkflowService.disponibilizarRevisao(codigo, usuario);
+        subprocessoFacade.disponibilizarRevisao(codigo, usuario);
 
         return ResponseEntity.ok(new RespostaDto("Revisão do cadastro de atividades disponibilizada"));
     }
@@ -137,14 +133,16 @@ public class SubprocessoCadastroController {
     @GetMapping("/{codigo}/cadastro")
     @PreAuthorize("isAuthenticated()")
     public SubprocessoCadastroDto obterCadastro(@PathVariable Long codigo) {
-        return subprocessoService.obterCadastro(codigo);
+        return subprocessoFacade.obterCadastro(codigo);
     }
 
     /**
-     * Devolve o cadastro de um subprocesso para o responsável pela unidade para que sejam feitos
+     * Devolve o cadastro de um subprocesso para o responsável pela unidade para que
+     * sejam feitos
      * ajustes.
      *
-     * <p>Ação restrita a usuários com perfil 'ADMIN' ou 'GESTOR' (CDU-13).
+     * <p>
+     * Ação restrita a usuários com perfil 'ADMIN' ou 'GESTOR' (CDU-13).
      *
      * @param codigo  O código do subprocesso.
      * @param request O DTO contendo o motivo e as observações da devolução.
@@ -157,16 +155,18 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
-        subprocessoWorkflowService.devolverCadastro(codigo, sanitizedObservacoes, usuario);
+        subprocessoFacade.devolverCadastro(codigo, sanitizedObservacoes, usuario);
     }
 
     /**
-     * Aceita o cadastro de um subprocesso, movendo-o para a próxima etapa do fluxo de trabalho.
+     * Aceita o cadastro de um subprocesso, movendo-o para a próxima etapa do fluxo
+     * de trabalho.
      *
-     * <p>Ação restrita a usuários com perfil 'ADMIN' ou 'GESTOR' (CDU-13).
+     * <p>
+     * Ação restrita a usuários com perfil 'ADMIN' ou 'GESTOR' (CDU-13).
      *
      * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da aceitação.
@@ -179,16 +179,17 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
-        subprocessoWorkflowService.aceitarCadastro(codigo, sanitizedObservacoes, usuario);
+        subprocessoFacade.aceitarCadastro(codigo, sanitizedObservacoes, usuario);
     }
 
     /**
      * Homologa o cadastro de um subprocesso.
      *
-     * <p>Ação restrita a usuários com perfil 'ADMIN' (CDU-13).
+     * <p>
+     * Ação restrita a usuários com perfil 'ADMIN' (CDU-13).
      *
      * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da homologação.
@@ -201,14 +202,15 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
-        subprocessoWorkflowService.homologarCadastro(codigo, sanitizedObservacoes, usuario);
+        subprocessoFacade.homologarCadastro(codigo, sanitizedObservacoes, usuario);
     }
 
     /**
-     * Devolve a revisão de um cadastro de subprocesso para o responsável pela unidade para que
+     * Devolve a revisão de um cadastro de subprocesso para o responsável pela
+     * unidade para que
      * sejam feitos ajustes.
      *
      * @param codigo  O código do subprocesso.
@@ -222,10 +224,10 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
-        subprocessoWorkflowService.devolverRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
+        subprocessoFacade.devolverRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
     }
 
     /**
@@ -242,16 +244,17 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
-        subprocessoWorkflowService.aceitarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
+        subprocessoFacade.aceitarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
     }
 
     /**
      * Homologa a revisão do cadastro de um subprocesso.
      *
-     * <p>Esta ação é restrita a usuários com o perfil 'ADMIN'.
+     * <p>
+     * Esta ação é restrita a usuários com o perfil 'ADMIN'.
      *
      * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da homologação.
@@ -264,16 +267,17 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
-        subprocessoWorkflowService.homologarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
+        subprocessoFacade.homologarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
     }
 
     /**
      * Importa atividades de um subprocesso de origem para o subprocesso de destino.
      *
-     * <p>Ação restrita a usuários com perfil 'CHEFE'.
+     * <p>
+     * Ação restrita a usuários com perfil 'CHEFE'.
      *
      * @param codigo  O código do subprocesso de destino.
      * @param request O DTO contendo o código do subprocesso de origem.
@@ -285,7 +289,7 @@ public class SubprocessoCadastroController {
     @Operation(summary = "Importa atividades de outro subprocesso")
     public Map<String, String> importarAtividades(
             @PathVariable Long codigo, @RequestBody @Valid ImportarAtividadesReq request) {
-        subprocessoMapaService.importarAtividades(codigo, request.getCodSubprocessoOrigem());
+        subprocessoFacade.importarAtividades(codigo, request.getCodSubprocessoOrigem());
         return Map.of("message", "Atividades importadas.");
     }
 
@@ -297,11 +301,11 @@ public class SubprocessoCadastroController {
     @PreAuthorize("hasAnyRole('GESTOR', 'ADMIN')")
     @Operation(summary = "Aceita cadastros em bloco")
     public void aceitarCadastroEmBloco(@PathVariable Long codigo,
-                                       @RequestBody @Valid ProcessarEmBlocoRequest request,
-                                       @AuthenticationPrincipal Object principal) {
+            @RequestBody @Valid ProcessarEmBlocoRequest request,
+            @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        subprocessoWorkflowService.aceitarCadastroEmBloco(request.getUnidadeCodigos(), codigo, usuario);
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        subprocessoFacade.aceitarCadastroEmBloco(request.getUnidadeCodigos(), codigo, usuario);
     }
 
     /**
@@ -312,17 +316,14 @@ public class SubprocessoCadastroController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Homologa cadastros em bloco")
     public void homologarCadastroEmBloco(@PathVariable Long codigo,
-                                         @RequestBody @Valid ProcessarEmBlocoRequest request,
-                                         @AuthenticationPrincipal Object principal) {
+            @RequestBody @Valid ProcessarEmBlocoRequest request,
+            @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        subprocessoWorkflowService.homologarCadastroEmBloco(request.getUnidadeCodigos(), codigo, usuario);
+        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        subprocessoFacade.homologarCadastroEmBloco(request.getUnidadeCodigos(), codigo, usuario);
     }
 
     private String extractTituloUsuario(Object principal) {
-        if (principal instanceof String string) return string;
-        if (principal instanceof sgc.organizacao.model.Usuario usuario)
-            return usuario.getTituloEleitoral();
-        return principal != null ? principal.toString() : null;
+        return usuarioService.extractTituloUsuario(principal);
     }
 }

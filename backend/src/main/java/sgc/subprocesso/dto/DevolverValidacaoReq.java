@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import sgc.seguranca.SanitizarHtml;
+import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 /**
  * Request para devolver validação do mapa (CDU-20 item 7).
@@ -18,7 +18,7 @@ public class DevolverValidacaoReq {
     /**
      * A justificativa para a devolução.
      */
-    @NotBlank
+    @NotBlank(message = "A justificativa é obrigatória")
     @SanitizarHtml
     private String justificativa;
 }

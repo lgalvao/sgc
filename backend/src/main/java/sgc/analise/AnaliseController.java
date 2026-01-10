@@ -4,14 +4,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import sgc.analise.dto.CriarAnaliseApiRequest;
-import sgc.analise.dto.CriarAnaliseRequest;
+import sgc.analise.dto.CriarAnaliseApiReq;
+import sgc.analise.dto.CriarAnaliseReq;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
-import sgc.subprocesso.service.SubprocessoService;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.List;
 
@@ -55,11 +56,11 @@ public class AnaliseController {
      */
     @PostMapping("/analises-cadastro")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Cria uma nova análise de cadastro")
+    @Operation(summary = "Cria uma análise de cadastro")
     public Analise criarAnaliseCadastro(@PathVariable Long codSubprocesso,
-                                        @RequestBody @Valid CriarAnaliseApiRequest request) {
+                                        @RequestBody @Valid CriarAnaliseApiReq request) {
 
-        return criarAnaliseInterna(codSubprocesso, request, TipoAnalise.CADASTRO);
+        return criarAnalise(codSubprocesso, request, TipoAnalise.CADASTRO);
     }
 
     /**
@@ -71,7 +72,7 @@ public class AnaliseController {
     @GetMapping("/analises-validacao")
     @Operation(summary = "Lista o histórico de análises de validação")
     public List<Analise> listarAnalisesValidacao(@PathVariable Long codSubprocesso) {
-        subprocessoService.buscarSubprocesso(codSubprocesso); // Valida existência
+        subprocessoService.buscarSubprocesso(codSubprocesso); 
         return analiseService.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO);
     }
 
@@ -88,19 +89,16 @@ public class AnaliseController {
      */
     @PostMapping("/analises-validacao")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Cria uma nova análise de validação")
-    public Analise criarAnaliseValidacao(@PathVariable Long codSubprocesso,
-                                         @RequestBody @Valid CriarAnaliseApiRequest request) {
-
-        return criarAnaliseInterna(codSubprocesso, request, TipoAnalise.VALIDACAO);
+    @Operation(summary = "Cria uma análise de validação")
+    public Analise criarAnaliseValidacao(@PathVariable Long codSubprocesso, @RequestBody @Valid CriarAnaliseApiReq request) {
+        return criarAnalise(codSubprocesso, request, TipoAnalise.VALIDACAO);
     }
 
-    private Analise criarAnaliseInterna(Long codSubprocesso, CriarAnaliseApiRequest request, TipoAnalise tipo) {
+    private Analise criarAnalise(Long codSubprocesso, CriarAnaliseApiReq request, TipoAnalise tipo) {
         Subprocesso subprocesso = subprocessoService.buscarSubprocesso(codSubprocesso);
+        String observacoes = StringUtils.stripToEmpty(request.observacoes());
 
-        String observacoes = request.observacoes() != null ? request.observacoes() : "";
-
-        CriarAnaliseRequest criarAnaliseRequest = CriarAnaliseRequest.builder()
+        CriarAnaliseReq criarAnaliseRequest = CriarAnaliseReq.builder()
                 .codSubprocesso(codSubprocesso)
                 .observacoes(observacoes)
                 .tipo(tipo)

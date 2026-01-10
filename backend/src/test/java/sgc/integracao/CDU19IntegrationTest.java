@@ -14,19 +14,18 @@ import sgc.alerta.model.AlertaRepo;
 import sgc.fixture.MapaFixture;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
-import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.*;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 
 import java.util.List;
 
@@ -65,24 +64,17 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Criar hierarquia de unidades via Fixture
-        // Unidade Superior (intermediária)
-        unidadeSuperior = UnidadeFixture.unidadePadrao();
-        unidadeSuperior.setCodigo(null);
-        unidadeSuperior.setNome("Coordenadoria CDU-19");
-        unidadeSuperior.setSigla("COORD19");
-        unidadeSuperior.setUnidadeSuperior(null);
-        unidadeSuperior = unidadeRepo.save(unidadeSuperior);
+        // Use existing units from data.sql to match @WithMockChefe user
+        // Unit 6 (COSIS - INTERMEDIARIA) is the parent
+        // Unit 9 (SEDIA - OPERACIONAL) is subordinate to 6
+        // User '333333333333' has CHEFE profile for unit 9
+        unidadeSuperior = unidadeRepo.findById(6L)
+                .orElseThrow(() -> new RuntimeException("Unit 6 not found in data.sql"));
+        
+        unidade = unidadeRepo.findById(9L)
+                .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
 
-        // Unidade operacional (subordinada)
-        unidade = UnidadeFixture.unidadePadrao();
-        unidade.setCodigo(null);
-        unidade.setNome("Seção CDU-19");
-        unidade.setSigla("SEC19");
-        unidade.setUnidadeSuperior(unidadeSuperior);
-        unidade = unidadeRepo.save(unidade);
-
-        // Criar dados para o teste dinamicamente
+        // Create test process and subprocess
         Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setDescricao("Processo para CDU-19");
@@ -107,7 +99,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName(
                 "Deve apresentar sugestões, alterar status, mas não criar movimentação ou alerta")
-        @WithMockChefe
+        @WithMockChefe("333333333333") // CHEFE of unit 9
         void testApresentarSugestoes_Sucesso() throws Exception {
             String sugestoes = "Minha sugestão de teste";
 
@@ -150,7 +142,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
     class ValidarMapaTest {
         @Test
         @DisplayName("Deve validar o mapa, alterar status, registrar movimentação e criar alerta")
-        @WithMockChefe
+        @WithMockChefe("333333333333") // CHEFE of unit 9
         void testValidarMapa_Sucesso() throws Exception {
             mockMvc.perform(
                             post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())

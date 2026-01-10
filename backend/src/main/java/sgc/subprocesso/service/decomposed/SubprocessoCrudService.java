@@ -3,13 +3,15 @@ package sgc.subprocesso.service.decomposed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.service.MapaService;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
-import sgc.subprocesso.dto.*;
+import sgc.mapa.service.MapaService;
+import sgc.subprocesso.dto.SubprocessoDto;
+import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+
 import java.util.List;
 
 @Service
@@ -29,7 +31,7 @@ public class SubprocessoCrudService {
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
         Subprocesso subprocesso = buscarSubprocesso(codigo);
         if (subprocesso.getMapa() == null) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado");
+            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado", codigo);
         }
         return subprocesso;
     }

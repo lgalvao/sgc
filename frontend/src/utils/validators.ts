@@ -10,6 +10,6 @@ export function validarSenha(senha: string): boolean {
     if (!senha) return false;
     if (senha.length < 8) return false;
     if (!/[A-Za-z]/.test(senha)) return false;
-    if (!/[0-9]/.test(senha)) return false;
-    return true;
+    return /[0-9]/.test(senha);
+
 }

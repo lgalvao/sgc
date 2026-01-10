@@ -39,6 +39,7 @@
                 />
                 Título eleitoral <span class="text-danger" aria-hidden="true">*</span>
               </label>
+              <!-- eslint-disable vuejs-accessibility/no-autofocus -->
               <BFormInput
                   id="titulo"
                   v-model="titulo"
@@ -49,7 +50,9 @@
                   type="text"
                   inputmode="numeric"
                   required
+                  autofocus
               />
+              <!-- eslint-enable vuejs-accessibility/no-autofocus -->
             </div>
             <div class="mb-3">
               <label
@@ -180,6 +183,7 @@ import {
 import {computed, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import type {PerfilUnidade} from "@/mappers/sgrh";
+import {logger} from "@/utils";
 
 import {usePerfilStore} from "@/stores/perfil";
 import {useFeedbackStore} from "@/stores/feedback";
@@ -241,7 +245,7 @@ const handleLogin = async () => {
         feedbackStore.show("Erro no login", "Título ou senha inválidos.", "danger");
       }
     } catch (error: any) {
-      console.error("Erro no login:", error);
+      logger.error("Erro no login:", error);
       if (error.response?.status === 404 || error.response?.status === 401) {
         feedbackStore.show("Erro no login", "Título ou senha inválidos.", "danger");
       } else {
@@ -261,7 +265,7 @@ const handleLogin = async () => {
         );
         await router.push("/painel");
       } catch (error) {
-        console.error("Erro ao selecionar perfil:", error);
+        logger.error("Erro ao selecionar perfil:", error);
         feedbackStore.show("Erro", "Falha ao selecionar o perfil.", "danger");
       } finally {
         isLoading.value = false;

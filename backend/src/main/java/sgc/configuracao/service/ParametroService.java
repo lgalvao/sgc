@@ -3,7 +3,6 @@ package sgc.configuracao.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.configuracao.model.Parametro;
 import sgc.configuracao.model.ParametroRepo;
 
@@ -21,7 +20,8 @@ public class ParametroService {
 
     public Parametro buscarPorChave(String chave) {
         return parametroRepo.findByChave(chave)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Parâmetro não encontrado: " + chave));
+                .orElseThrow(() -> new sgc.comum.erros.ErroConfiguracao(
+                        "Parâmetro '%s' não encontrado. Configure o parâmetro no banco de dados.".formatted(chave)));
     }
 
     @Transactional

@@ -1,107 +1,126 @@
 package sgc;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.PageRequest;
-
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import sgc.alerta.dto.AlertaDto;
+import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.service.MapaSalvamentoService;
 import sgc.mapa.service.MapaService;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.painel.PainelService;
+import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.subprocesso.SubprocessoMapaController;
-import sgc.subprocesso.service.SubprocessoService;
-import sgc.subprocesso.service.SubprocessoContextoService;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroAccessoNegado;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
-import java.util.Optional;
-import java.util.List;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
+import sgc.subprocesso.service.SubprocessoContextoService;
+import sgc.subprocesso.service.SubprocessoService;
+
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-
-// Imports para novos testes
-import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
-import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.UnidadeService;
-import sgc.painel.PainelService;
-import sgc.painel.erros.ErroParametroPainelInvalido;
-import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.model.SituacaoSubprocesso;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Cobertura Extra de Controllers e Services")
 class ControllersServicesCoverageTest {
-
     @Mock
     private SubprocessoService subprocessoService;
     @Mock
     private SubprocessoContextoService subprocessoContextoService;
     @Mock
-    private sgc.organizacao.UsuarioService usuarioService;
-    @Mock
-    private sgc.mapa.service.ImpactoMapaService impactoMapaService;
-    @Mock
     private MapaRepo mapaRepo;
     @Mock
     private CompetenciaRepo competenciaRepo;
     @Mock
-    private sgc.mapa.model.AtividadeRepo atividadeRepo;
-    @Mock
-    private sgc.mapa.mapper.MapaCompletoMapper mapaCompletoMapper;
-    
-    // Mocks para cadastro workflow
-    @Mock
     private SubprocessoRepo repositorioSubprocesso;
     @Mock
-    private UnidadeService unidadeService; // Used in both
-    @Mock
-    private sgc.analise.AnaliseService analiseService;
-    @Mock
-    private sgc.subprocesso.service.SubprocessoTransicaoService transicaoService;
-
-    // Mocks para PainelService
-    @Mock
-    private sgc.processo.service.ProcessoService processoService;
-    @Mock
     private sgc.alerta.AlertaService alertaService;
+    // Removido atividadeRepo não utilizado
+    @Mock
+    private sgc.mapa.mapper.MapaCompletoMapper mapaCompletoMapper;
+    @Mock
+    private MapaSalvamentoService mapaSalvamentoService;
+    @Mock
+    private sgc.mapa.service.ImpactoMapaService impactoMapaService;
+    
+    // Mocks adicionais para preencher construtores e evitar null
+    @Mock private sgc.mapa.service.MapaVisualizacaoService mapaVisualizacaoService;
+    @Mock private sgc.subprocesso.service.SubprocessoMapaService subprocessoMapaService;
+    @Mock private sgc.subprocesso.service.SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
+    @Mock private sgc.subprocesso.service.SubprocessoFacade subprocessoFacade;
+    @Mock private sgc.organizacao.UsuarioService usuarioService;
+    @Mock private sgc.subprocesso.service.SubprocessoTransicaoService transicaoService;
+    @Mock private sgc.organizacao.UnidadeService unidadeService;
+    @Mock private sgc.analise.AnaliseService analiseService;
+    @Mock private sgc.subprocesso.service.SubprocessoWorkflowExecutor workflowExecutor;
+    @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
+    @Mock private sgc.processo.service.ProcessoFacade processoFacade;
 
-    @InjectMocks
     private SubprocessoMapaController subprocessoMapaController;
-
-    @InjectMocks
     private MapaService mapaService;
-
-    @InjectMocks
     private SubprocessoCadastroWorkflowService cadastroService;
-
-    @InjectMocks
     private PainelService painelService;
 
-    // --- SubprocessoMapaController Tests ---
+    @BeforeEach
+    void setUp() {
+        // Instanciação manual para evitar overhead do @InjectMocks e lidar com muitas dependências
+        
+        // SubprocessoMapaController
+        subprocessoMapaController = new SubprocessoMapaController(
+                subprocessoFacade,
+                mapaService, 
+                mapaVisualizacaoService, 
+                impactoMapaService,
+                usuarioService
+        );
+
+        // MapaService
+        mapaService = new MapaService(
+                mapaRepo, competenciaRepo, mapaCompletoMapper, mapaSalvamentoService
+        );
+
+        // SubprocessoCadastroWorkflowService
+        cadastroService = new SubprocessoCadastroWorkflowService(
+                repositorioSubprocesso, transicaoService, unidadeService, analiseService, subprocessoService, impactoMapaService, accessControlService, workflowExecutor
+        );
+
+        // PainelService
+        painelService = new PainelService(
+                processoFacade, alertaService, unidadeService
+        );
+    }
 
     @Test
     @DisplayName("Deve listar atividades")
     void deveListarAtividades() {
-        when(subprocessoService.listarAtividadesSubprocesso(1L)).thenReturn(new ArrayList<>());
+        when(subprocessoFacade.listarAtividadesSubprocesso(1L)).thenReturn(new ArrayList<>());
         ResponseEntity<List<AtividadeVisualizacaoDto>> response = subprocessoMapaController.listarAtividades(1L);
         assertThat(response.getBody()).isNotNull();
     }
@@ -109,44 +128,43 @@ class ControllersServicesCoverageTest {
     @Test
     @DisplayName("Deve obter contexto de edição")
     void deveObterContextoEdicao() {
-        when(subprocessoContextoService.obterContextoEdicao(anyLong(), any(), any())).thenReturn(ContextoEdicaoDto.builder().build());
-        ContextoEdicaoDto dto = subprocessoMapaController.obterContextoEdicao(1L, null, null);
+        when(subprocessoFacade.obterContextoEdicao(anyLong(), any())).thenReturn(ContextoEdicaoDto.builder().build());
+        ContextoEdicaoDto dto = subprocessoMapaController.obterContextoEdicao(1L, null);
         assertThat(dto).isNotNull();
     }
 
     @Test
-    @DisplayName("Deve lançar erro de acesso negado quando usuário nulo em verificarImpactos")
+    @DisplayName("Deve lançar erro de acesso negado quando usuário não autenticado em verificarImpactos")
     void deveLancarErroAcessoNegado() {
-        assertThatThrownBy(() -> subprocessoMapaController.verificarImpactos(1L, null))
+        // Simula usuário não autenticado retornando null ou lançando exceção
+        when(usuarioService.obterUsuarioAutenticado())
+            .thenThrow(new ErroAccessoNegado("Usuário não autenticado"));
+        
+        assertThatThrownBy(() -> subprocessoMapaController.verificarImpactos(1L))
                 .isInstanceOf(ErroAccessoNegado.class);
     }
-
-    // --- MapaService Tests ---
 
     @Test
     @DisplayName("Deve lançar erro ao obter mapa completo inexistente")
     void deveLancarErroObterMapaCompletoInexistente() {
         when(mapaRepo.findById(99L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> mapaService.obterMapaCompleto(99L, 1L))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
-    @DisplayName("Deve lançar erro ao salvar mapa completo inexistente")
-    void deveLancarErroSalvarMapaCompletoInexistente() {
-        when(mapaRepo.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("Deve delegar salvar mapa completo inexistente para MapaSalvamentoService")
+    void deveDelegarSalvarMapaCompletoInexistente() {
         SalvarMapaRequest req = new SalvarMapaRequest();
-        assertThatThrownBy(() -> mapaService.salvarMapaCompleto(99L, req, "123"))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        when(mapaSalvamentoService.salvarMapaCompleto(99L, req))
+            .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 99L));
+        assertThatThrownBy(() -> mapaService.salvarMapaCompleto(99L, req))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
-    @DisplayName("Deve lançar erro ao salvar mapa completo com competência inexistente")
-    void deveLancarErroSalvarCompetenciaInexistente() {
-        Mapa mapa = new Mapa();
-        when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
-        when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(new ArrayList<>());
-
+    @DisplayName("Deve delegar salvar mapa completo com competência inexistente para MapaSalvamentoService")
+    void deveDelegarSalvarCompetenciaInexistente() {
         SalvarMapaRequest req = new SalvarMapaRequest();
         req.setObservacoes("Obs");
         CompetenciaMapaDto compDto = new CompetenciaMapaDto();
@@ -154,9 +172,12 @@ class ControllersServicesCoverageTest {
         compDto.setDescricao("Desc");
         req.setCompetencias(List.of(compDto));
 
-        assertThatThrownBy(() -> mapaService.salvarMapaCompleto(1L, req, "123"))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-            .hasMessageContaining("Competência não encontrada");
+        when(mapaSalvamentoService.salvarMapaCompleto(1L, req))
+            .thenThrow(new ErroEntidadeNaoEncontrada("Competência não encontrada: 99"));
+
+        assertThatThrownBy(() -> mapaService.salvarMapaCompleto(1L, req))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .hasMessageContaining("Competência não encontrada");
     }
 
     @Test
@@ -165,7 +186,7 @@ class ControllersServicesCoverageTest {
         when(mapaRepo.findById(99L)).thenReturn(Optional.empty());
         Mapa mapa = new Mapa();
         assertThatThrownBy(() -> mapaService.atualizar(99L, mapa))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -173,7 +194,7 @@ class ControllersServicesCoverageTest {
     void deveLancarErroExcluirMapaInexistente() {
         when(mapaRepo.existsById(99L)).thenReturn(false);
         assertThatThrownBy(() -> mapaService.excluir(99L))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     // --- SubprocessoCadastroWorkflowService Tests ---
@@ -184,16 +205,16 @@ class ControllersServicesCoverageTest {
         Subprocesso sp = new Subprocesso();
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("123");
-        
+
         Unidade unidade = new Unidade();
         unidade.setTituloTitular("123");
         sp.setUnidade(unidade);
-        
+
         when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
         // Mapa nulo
 
         assertThatThrownBy(() -> cadastroService.disponibilizarCadastro(1L, usuario))
-            .isInstanceOf(ErroMapaNaoAssociado.class);
+                .isInstanceOf(ErroMapaNaoAssociado.class);
     }
 
     @Test
@@ -202,22 +223,40 @@ class ControllersServicesCoverageTest {
         Subprocesso sp = new Subprocesso();
         Unidade unidade = new Unidade(); // Sem superior
         sp.setUnidade(unidade);
-        
+
         when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
 
         assertThatThrownBy(() -> cadastroService.devolverCadastro(1L, "Obs", new Usuario()))
-             .isInstanceOf(sgc.comum.erros.ErroInvarianteViolada.class);
+                .isInstanceOf(sgc.comum.erros.ErroInvarianteViolada.class);
     }
 
-     @Test
+    @Test
     @DisplayName("Deve lançar erro ao devolver revisao se status invalido")
     void deveLancarErroDevolverRevisaoStatusInvalido() {
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO); // Status inválido
+        
+        // Criar unidade com superior para evitar ErroInvarianteViolada
+        Unidade unidadeSuperior = new Unidade();
+        unidadeSuperior.setCodigo(100L);
+        
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+        unidade.setUnidadeSuperior(unidadeSuperior);
+        sp.setUnidade(unidade);
+        
+        Usuario usuario = new Usuario();
+        
         when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+        
+        // Após refatoração de segurança, a validação de situação é feita no AccessControlService
+        // que lança ErroAccessoNegado em vez de ErroProcessoEmSituacaoInvalida
+        doThrow(new ErroAccessoNegado("Situação inválida"))
+                .when(accessControlService)
+                .verificarPermissao(any(), any(), any());
 
-        assertThatThrownBy(() -> cadastroService.devolverRevisaoCadastro(1L, "Obs", new Usuario()))
-             .isInstanceOf(sgc.processo.erros.ErroProcessoEmSituacaoInvalida.class);
+        assertThatThrownBy(() -> cadastroService.devolverRevisaoCadastro(1L, "Obs", usuario))
+                .isInstanceOf(ErroAccessoNegado.class);
     }
 
     @Test
@@ -227,37 +266,35 @@ class ControllersServicesCoverageTest {
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         Unidade unidade = new Unidade(); // Sem superior
         sp.setUnidade(unidade);
-        
+
         when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
 
         assertThatThrownBy(() -> cadastroService.aceitarRevisaoCadastro(1L, "Obs", new Usuario()))
-             .isInstanceOf(sgc.comum.erros.ErroInvarianteViolada.class);
+                .isInstanceOf(sgc.comum.erros.ErroInvarianteViolada.class);
     }
-
-    // --- PainelService Tests ---
 
     @Test
     @DisplayName("Deve lançar erro se perfil for nulo")
     void deveLancarErroSePerfilNulo() {
-         assertThatThrownBy(() -> painelService.listarProcessos(null, 1L, Pageable.unpaged()))
-             .isInstanceOf(ErroParametroPainelInvalido.class);
+        Pageable unpaged = Pageable.unpaged();
+        assertThatThrownBy(() -> painelService.listarProcessos(null, 1L, unpaged))
+                .isInstanceOf(ErroParametroPainelInvalido.class);
     }
 
     @Test
     @DisplayName("Deve listar alertas com ordenação padrão se não informada")
     void deveListarAlertasComOrdenacaoPadrao() {
-        when(alertaService.listarTodos(any())).thenReturn(Page.empty());
-        // PageRequest.of(0, 10) sem sort explicitado deve cair no if e ganhar sort padrão
-        var result = painelService.listarAlertas(null, null, PageRequest.of(0, 10));
-        assertThat(result).isNotNull();
+        when(alertaService.listarPorUnidade(anyLong(), any())).thenReturn(Page.empty());
+        Page<AlertaDto> resultado = painelService.listarAlertas(null, 1L, PageRequest.of(0, 10));
+        assertThat(resultado).isNotNull();
     }
 
     @Test
     @DisplayName("Deve respeitar ordenação informada em listarAlertas")
     void deveRespeitarOrdenacaoEmListarAlertas() {
         Pageable p = PageRequest.of(0, 10, Sort.by("codigo"));
-        when(alertaService.listarTodos(p)).thenReturn(Page.empty());
-        var result = painelService.listarAlertas(null, null, p);
-        assertThat(result).isNotNull();
+        when(alertaService.listarPorUnidade(anyLong(), any())).thenReturn(Page.empty());
+        Page<AlertaDto> resultado = painelService.listarAlertas(null, 1L, p);
+        assertThat(resultado).isNotNull();
     }
 }

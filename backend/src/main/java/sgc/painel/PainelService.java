@@ -8,17 +8,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.alerta.AlertaService;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.Alerta;
-import sgc.alerta.AlertaService;
+import sgc.organizacao.UnidadeService;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
 import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
-import sgc.processo.service.ProcessoService;
 import sgc.processo.model.SituacaoProcesso;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.UnidadeService;
+import sgc.processo.service.ProcessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @Slf4j
 public class PainelService {
-    private final ProcessoService processoService;
+    private final ProcessoFacade processoFacade;
     private final AlertaService alertaService;
     private final UnidadeService unidadeService;
 
@@ -58,10 +58,12 @@ public class PainelService {
         Page<Processo> processos;
 
         if (perfil == Perfil.ADMIN) {
-            processos = processoService.listarTodos(sortedPageable);
+            processos = processoFacade.listarTodos(sortedPageable);
         } else {
-            if (codigoUnidade == null) return Page.empty(sortedPageable);
-
+            if (codigoUnidade == null) {
+                return Page.empty(sortedPageable);
+            }
+            
             List<Long> unidadeIds = new ArrayList<>();
             
             // GESTOR vê processos da unidade e subordinadas
@@ -72,7 +74,7 @@ public class PainelService {
             // Todos os perfis veem processos da própria unidade
             unidadeIds.add(codigoUnidade);
 
-            processos = processoService.listarPorParticipantesIgnorandoCriado(
+            processos = processoFacade.listarPorParticipantesIgnorandoCriado(
                     unidadeIds, sortedPageable);
         }
         return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade));
@@ -110,15 +112,13 @@ public class PainelService {
         }
 
         Page<Alerta> alertasPage;
-    
-        if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
-            alertasPage = alertaService.listarPorUsuario(usuarioTitulo, sortedPageable);
-        } else if (codigoUnidade != null) {
-            List<Long> unidadeIds = new ArrayList<>(unidadeService.buscarIdsDescendentes(codigoUnidade));
-            unidadeIds.add(codigoUnidade);
-            alertasPage = alertaService.listarPorUnidades(unidadeIds, sortedPageable);
+
+        if (codigoUnidade != null) {
+            // Alertas são filtrados pela unidade do usuário (sem subordinadas)
+            alertasPage = alertaService.listarPorUnidade(codigoUnidade, sortedPageable);
         } else {
-            alertasPage = alertaService.listarTodos(sortedPageable);
+            // Sem unidade, retorna vazio
+            return Page.empty(sortedPageable);
         }
 
         return alertasPage.map(
@@ -166,7 +166,8 @@ public class PainelService {
 
         Set<Long> participantesIds = participantesPorCodigo.keySet();
 
-        Set<Long> unidadesVisiveis = selecionarIdsVisiveis(participantesIds);
+        // ⚡ Bolt: Passando o mapa de participantes para evitar DB lookup redundante em loop
+        Set<Long> unidadesVisiveis = selecionarIdsVisiveis(participantesIds, participantesPorCodigo);
         return unidadesVisiveis.stream()
                 .map(participantesPorCodigo::get)
                 .filter(unidade -> unidade != null && unidade.getSigla() != null)
@@ -175,17 +176,21 @@ public class PainelService {
                 .collect(Collectors.joining(", "));
     }
 
-    private Set<Long> selecionarIdsVisiveis(Set<Long> participantesIds) {
+    private Set<Long> selecionarIdsVisiveis(Set<Long> participantesIds, Map<Long, Unidade> participantesPorCodigo) {
         Set<Long> visiveis = new LinkedHashSet<>();
         for (Long unidadeId : participantesIds) {
-            Unidade unidade = null;
-            try {
-                unidade = unidadeService.buscarEntidadePorId(unidadeId);
-            } catch (Exception e) {
-                // ignore
+            // ⚡ Bolt Optimization: Use the object already present in memory instead of fetching again from service/DB
+            Unidade unidade = participantesPorCodigo.get(unidadeId);
+            // Fallback for safety, though it should always be in the map as the IDs come from the map keys
+            if (unidade == null) {
+                try {
+                    unidade = unidadeService.buscarEntidadePorId(unidadeId);
+                } catch (Exception e) {
+                   continue;
+                }
             }
             Long candidato = encontrarMaiorIdVisivel(unidade, participantesIds);
-            if (candidato != null) visiveis.add(candidato);
+            visiveis.add(candidato);
         }
         return visiveis;
     }
@@ -232,7 +237,7 @@ public class PainelService {
                 return null;
             }
         }
-        return null;
+        return "/processo/" + processo.getCodigo();
     }
 
     private AlertaDto paraAlertaDto(Alerta alerta, LocalDateTime dataHoraLeitura) {

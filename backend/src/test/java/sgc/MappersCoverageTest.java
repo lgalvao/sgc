@@ -2,18 +2,16 @@ package sgc;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import sgc.organizacao.mapper.UsuarioMapper;
-import sgc.organizacao.mapper.UsuarioMapperImpl;
+import org.mapstruct.factory.Mappers;
 import sgc.mapa.mapper.ConhecimentoMapper;
-import sgc.mapa.mapper.ConhecimentoMapperImpl;
+import sgc.organizacao.mapper.UsuarioMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Cobertura de Mappers")
 class MappersCoverageTest {
-
-    private final UsuarioMapper usuarioMapper = new UsuarioMapperImpl();
-    private final ConhecimentoMapper conhecimentoMapper = new ConhecimentoMapperImpl();
+    private final ConhecimentoMapper conhecimentoMapper = Mappers.getMapper(ConhecimentoMapper.class);
+    private final UsuarioMapper usuarioMapper = Mappers.getMapper(UsuarioMapper.class);
 
     @Test
     @DisplayName("Deve cobrir nulos no UsuarioMapper")
@@ -48,7 +46,7 @@ class MappersCoverageTest {
         // Test exception
         org.mockito.Mockito.when(repo.findById(1L)).thenReturn(java.util.Optional.empty());
         org.assertj.core.api.Assertions.assertThatThrownBy(() -> conhecimentoMapper.map(1L))
-                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(sgc.comum.erros.ErroEntidadeDeveriaExistir.class);
 
         // Test success
         org.mockito.Mockito.when(repo.findById(2L)).thenReturn(java.util.Optional.of(new sgc.mapa.model.Atividade()));

@@ -17,30 +17,36 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
      * @param situacao Situação do processo (CRIADO, EM_ANDAMENTO, FINALIZADO)
      * @return Lista de processos com a situação especificada
      */
-    @Query("SELECT DISTINCT p FROM Processo p LEFT JOIN FETCH p.participantes WHERE p.situacao = :situacao")
+    @Query("""
+            SELECT DISTINCT p FROM Processo p LEFT JOIN FETCH p.participantes WHERE p.situacao = :situacao
+            """)
     List<Processo> findBySituacao(@Param("situacao") SituacaoProcesso situacao);
 
     List<Processo> findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso situacao);
 
-    Page<Processo> findDistinctByParticipantes_CodigoIn(List<Long> codigos, Pageable pageable);
-
     Page<Processo> findDistinctByParticipantes_CodigoInAndSituacaoNot(
             List<Long> codigos, SituacaoProcesso situacao, Pageable pageable);
 
-    @Query("SELECT distinct u.codigo FROM Processo p JOIN p.participantes u "
-            + "WHERE p.situacao = :situacao AND u.codigo IN :codigos")
+    @Query("""
+            SELECT distinct u.codigo FROM Processo p JOIN p.participantes u
+            WHERE p.situacao = :situacao AND u.codigo IN :codigos
+            """)
     List<Long> findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(
             @Param("situacao") SituacaoProcesso situacao,
             @Param("codigos") List<Long> codigos);
 
-    @Query("SELECT distinct u.codigo FROM Processo p JOIN p.participantes u "
-            + "WHERE p.situacao = :situacao AND p.tipo = :tipo")
+    @Query("""
+            SELECT distinct u.codigo FROM Processo p JOIN p.participantes u
+            WHERE p.situacao = :situacao AND p.tipo = :tipo
+            """)
     List<Long> findUnidadeCodigosBySituacaoAndTipo(
             @Param("situacao") SituacaoProcesso situacao,
             @Param("tipo") TipoProcesso tipo);
 
-    @Query("SELECT distinct u.codigo FROM Processo p JOIN p.participantes u "
-            + "WHERE p.situacao IN :situacoes AND (:idIgnorado IS NULL OR p.codigo <> :idIgnorado)")
+    @Query("""
+            SELECT distinct u.codigo FROM Processo p JOIN p.participantes u
+            WHERE p.situacao IN :situacoes AND (:idIgnorado IS NULL OR p.codigo <> :idIgnorado)
+            """)
     List<Long> findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
             @Param("situacoes") List<SituacaoProcesso> situacoes,
             @Param("idIgnorado") Long idIgnorado);

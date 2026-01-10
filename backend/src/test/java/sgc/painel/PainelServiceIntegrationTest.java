@@ -2,6 +2,7 @@ package sgc.painel;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,18 +10,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.organizacao.model.Perfil;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
-import sgc.organizacao.model.Perfil;
+import sgc.processo.service.ProcessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Tag("integration")
 @SpringBootTest
 @Transactional
 @DisplayName("Testes de Integração do PainelService")
@@ -29,7 +31,7 @@ class PainelServiceIntegrationTest {
     private PainelService painelService;
 
     @Autowired
-    private ProcessoService processoService;
+    private ProcessoFacade processoFacade;
 
     @Nested
     @DisplayName("Listagem de Processos")
@@ -46,7 +48,7 @@ class PainelServiceIntegrationTest {
                     LocalDateTime.now().plusDays(30),
                     List.of(10L) // SESEL
             );
-            processoService.criar(reqMapeamento);
+            processoFacade.criar(reqMapeamento);
 
             // Arrange: Criar processo de revisão
             CriarProcessoReq reqRevisao = new CriarProcessoReq(
@@ -55,7 +57,7 @@ class PainelServiceIntegrationTest {
                     LocalDateTime.now().plusDays(30),
                     List.of(10L) // SESEL
             );
-            var processoRevisaoDto = processoService.criar(reqRevisao);
+            var processoRevisaoDto = processoFacade.criar(reqRevisao);
             Long codigoProcessoRevisao = processoRevisaoDto.getCodigo();
 
             // Act: Listar processos como ADMIN
@@ -103,7 +105,7 @@ class PainelServiceIntegrationTest {
                         LocalDateTime.now().plusDays(30),
                         List.of(10L)
                 );
-                processoService.criar(req);
+                processoFacade.criar(req);
             }
 
             // Act: Listar processos com página grande o suficiente
@@ -131,7 +133,7 @@ class PainelServiceIntegrationTest {
                     LocalDateTime.now().plusDays(30),
                     List.of(10L)
             );
-            ProcessoDto processoSeed = processoService.criar(reqSeedLike);
+            ProcessoDto processoSeed = processoFacade.criar(reqSeedLike);
 
             // Criar processo de Revisão (Alvo do teste)
             CriarProcessoReq reqRevisao = new CriarProcessoReq(
@@ -140,7 +142,7 @@ class PainelServiceIntegrationTest {
                     LocalDateTime.now().plusDays(30),
                     List.of(10L)
             );
-            ProcessoDto processoRevisao = processoService.criar(reqRevisao);
+            ProcessoDto processoRevisao = processoFacade.criar(reqRevisao);
 
             // Act: Buscar processos
             Page<ProcessoResumoDto> page = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 50));

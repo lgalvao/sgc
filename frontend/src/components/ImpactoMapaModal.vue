@@ -107,10 +107,10 @@
                 <i class="bi bi-dot me-1"/> Impactada por: {{ ativ }}
               </li>
               <li
-                  v-if="comp.tipoImpacto"
+                  v-if="comp.tiposImpacto && comp.tiposImpacto.length > 0"
                   class="list-group-item text-muted small fst-italic"
               >
-                Tipo de Impacto: {{ formatTipoImpacto(comp.tipoImpacto) }}
+                Tipos de Impacto: {{ comp.tiposImpacto.map(formatTipoImpacto).join(', ') }}
               </li>
             </ul>
           </BCard>
@@ -163,8 +163,6 @@ function formatTipoImpacto(tipo: TipoImpactoCompetencia): string {
       return "Atividade Removida";
     case TipoImpactoCompetencia.ATIVIDADE_ALTERADA:
       return "Atividade Alterada";
-    case TipoImpactoCompetencia.IMPACTO_GENERICO:
-      return "Alteração no Mapa";
     default:
       return tipo;
   }

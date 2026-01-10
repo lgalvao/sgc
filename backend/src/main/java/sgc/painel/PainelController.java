@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import sgc.alerta.dto.AlertaDto;
-import sgc.processo.dto.ProcessoResumoDto;
 import sgc.organizacao.model.Perfil;
+import sgc.processo.dto.ProcessoResumoDto;
 
 @RestController
 @RequestMapping("/api/painel")

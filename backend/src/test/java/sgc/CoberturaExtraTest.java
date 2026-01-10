@@ -2,10 +2,12 @@ package sgc;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import sgc.comum.erros.*;
-import sgc.subprocesso.erros.*;
+import sgc.comum.erros.ErroConfiguracao;
+import sgc.comum.erros.ErroEstadoImpossivel;
+import sgc.comum.erros.ErroNegocioBase;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
+import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -2,18 +2,19 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseService;
-import sgc.analise.dto.CriarAnaliseRequest;
+import sgc.analise.dto.CriarAnaliseReq;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
 
 @Service
 @RequiredArgsConstructor
@@ -34,13 +35,13 @@ public class SubprocessoWorkflowExecutor {
             Unidade unidadeOrigemTransicao, // Origem da transição
             Unidade unidadeDestinoTransicao, // Destino da transição
             Usuario usuario,
-            String observacoes,
-            String motivoAnalise
+            @Nullable String observacoes,
+            @Nullable String motivoAnalise
     ) {
         // 1. Criar Análise
         analiseService.criarAnalise(
                 sp,
-                CriarAnaliseRequest.builder()
+                CriarAnaliseReq.builder()
                         .codSubprocesso(sp.getCodigo())
                         .observacoes(observacoes)
                         .tipo(tipoAnalise)

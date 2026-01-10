@@ -1,9 +1,9 @@
 package sgc.fixture;
 
+import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.organizacao.model.Unidade;
 
 import java.time.LocalDateTime;
 

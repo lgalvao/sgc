@@ -18,13 +18,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class CompetenciaAjusteDto {
-    @NotNull
+    @NotNull(message = "O código da competência é obrigatório")
     private final Long codCompetencia;
 
-    @NotBlank
+    @NotBlank(message = "O nome da competência é obrigatório")
     private final String nome;
 
-    @NotNull
+    @NotNull(message = "A lista de atividades é obrigatória")
     @Valid
     private final List<AtividadeAjusteDto> atividades;
 }

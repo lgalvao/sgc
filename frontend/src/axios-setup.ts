@@ -2,6 +2,7 @@ import axios from "axios";
 import router from "./router";
 import {useFeedbackStore} from "@/stores/feedback";
 import {normalizeError, notifyError, shouldNotifyGlobally} from '@/utils/apiError';
+import {logger} from "@/utils";
 
 export const apiClient = axios.create({
     baseURL: "http://localhost:10000/api",
@@ -21,7 +22,7 @@ const handleResponseError = (error: any) => {
             'Sua sessão expirou ou você não está autenticado. Faça login novamente.',
             'danger'
         );
-        router.push('/login');
+        router.push('/login').catch(e => logger.error("Erro ao redirecionar:", e));
         return Promise.reject(error);
     }
 
@@ -30,7 +31,7 @@ const handleResponseError = (error: any) => {
         try {
             notifyError(normalized);
         } catch (storeError) {
-            console.error("Erro ao exibir notificação:", storeError);
+            logger.error("Erro ao exibir notificação:", storeError);
         }
     }
 

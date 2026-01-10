@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { mount } from "@vue/test-utils";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {mount} from "@vue/test-utils";
 import ModalAcaoBloco from "../ModalAcaoBloco.vue";
 
 // Mock Bootstrap Modal with hoisted variables

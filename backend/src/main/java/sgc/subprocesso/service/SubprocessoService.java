@@ -7,14 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
-import sgc.subprocesso.dto.*;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.service.decomposed.*;
-import sgc.organizacao.UsuarioService;
-import org.springframework.security.core.context.SecurityContextHolder;
-import sgc.comum.erros.ErroAccessoNegado;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.decomposed.SubprocessoCrudService;
+import sgc.subprocesso.service.decomposed.SubprocessoDetalheService;
+import sgc.subprocesso.service.decomposed.SubprocessoValidacaoService;
+import sgc.subprocesso.service.decomposed.SubprocessoWorkflowService;
 
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class SubprocessoService {
     }
 
     @Transactional(readOnly = true)
-    public SubprocessoSituacaoDto obterStatus(Long codSubprocesso) {
+    public SubprocessoSituacaoDto obterSituacao(Long codSubprocesso) {
         return crudService.obterStatus(codSubprocesso);
     }
 
@@ -98,9 +99,9 @@ public class SubprocessoService {
     }
 
     @Transactional(readOnly = true)
-    public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil, Long codUnidadeUsuario) {
+    public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil) {
         Usuario usuario = obterUsuarioAutenticado();
-        return detalheService.obterDetalhes(codigo, perfil, codUnidadeUsuario, usuario);
+        return detalheService.obterDetalhes(codigo, perfil, usuario);
     }
 
     @Transactional(readOnly = true)
@@ -125,11 +126,6 @@ public class SubprocessoService {
     }
 
     // --- Métodos do SubprocessoValidacaoService ---
-
-    @Transactional(readOnly = true)
-    public void validarPermissaoEdicaoMapa(Long mapaCodigo, String tituloUsuario) {
-        validacaoService.validarPermissaoEdicaoMapa(mapaCodigo, tituloUsuario);
-    }
 
     @Transactional(readOnly = true)
     public List<Atividade> obterAtividadesSemConhecimento(Long codSubprocesso) {
@@ -184,11 +180,6 @@ public class SubprocessoService {
     // --- Helper Methods ---
 
     private Usuario obterUsuarioAutenticado() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication.getName() == null) {
-            throw new ErroAccessoNegado("Usuário não autenticado.");
-        }
-        String username = authentication.getName();
-        return usuarioService.buscarUsuarioPorLogin(username);
+        return usuarioService.obterUsuarioAutenticado();
     }
 }

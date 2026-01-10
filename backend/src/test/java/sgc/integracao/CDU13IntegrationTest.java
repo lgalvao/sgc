@@ -18,22 +18,21 @@ import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
-import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
 import sgc.subprocesso.dto.AceitarCadastroReq;
 import sgc.subprocesso.dto.DevolverCadastroReq;
 import sgc.subprocesso.dto.HomologarCadastroReq;
 import sgc.subprocesso.model.*;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
@@ -99,17 +98,18 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         unidadeSuperior = unidadeRepo.findById(idSuperior).orElseThrow();
         unidade = unidadeRepo.findById(idUnidade).orElseThrow();
 
-        // Criar Usuários via Repo (Usuario não é imutável)
-        Usuario adminUser = UsuarioFixture.usuarioPadrao();
-        adminUser.setTituloEleitoral("101010101010");
-        adminUser.setUnidadeLotacao(unidadeSuperior);
-        adminUser = usuarioRepo.save(adminUser);
-
-        Usuario gestorUser = UsuarioFixture.usuarioPadrao();
-        gestorUser.setTituloEleitoral("202020202020");
-        gestorUser.setNome("Gestor Mock");
-        gestorUser.setUnidadeLotacao(unidadeSuperior);
-        usuarioRepo.save(gestorUser);
+        // Criar Usuários via JDBC (Usuario é @Immutable, não pode ser salvo via Repo)
+        String sqlInsertUsuario = "INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo, MATRICULA) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sqlInsertUsuario, "101010101010", "Admin Mock", "admin@test.com", "1010", idSuperior, "");
+        jdbcTemplate.update(sqlInsertUsuario, "202020202020", "Gestor Mock", "gestor@test.com", "2020", idSuperior, "");
+        
+        // Criar perfis de usuário via JDBC (VW_USUARIO_PERFIL_UNIDADE é uma view)
+        String sqlInsertPerfil = "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sqlInsertPerfil, "101010101010", "ADMIN", idSuperior);
+        jdbcTemplate.update(sqlInsertPerfil, "202020202020", "GESTOR", idSuperior);
+        
+        // Carregar usuários do banco
+        Usuario adminUser = usuarioRepo.findById("101010101010").orElseThrow();
 
         // Criar Processo via Fixture
         Processo processo = ProcessoFixture.processoPadrao();

@@ -18,25 +18,22 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.mapa.service.AtividadeService;
-import sgc.mapa.dto.AtividadeDto;
-import sgc.mapa.dto.ConhecimentoDto;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.AtividadeRepo;
 import sgc.comum.erros.ErroValidacao;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.dto.AtividadeImpactadaDto;
+import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.*;
+import sgc.mapa.service.AtividadeService;
+import sgc.mapa.service.ConhecimentoService;
 import sgc.mapa.service.ImpactoMapaService;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
+import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -45,7 +42,6 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
-import sgc.organizacao.model.UnidadeRepo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -65,13 +61,14 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Import(TestSecurityConfig.class)
 @Slf4j
 class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
-    @Autowired private ProcessoService processoService;
+    @Autowired private ProcessoFacade processoFacade;
     @Autowired private SubprocessoCadastroWorkflowService cadastroWorkflowService;
     @Autowired private SubprocessoMapaWorkflowService mapaWorkflowService;
     @Autowired private AtividadeService atividadeService;
+    @Autowired private ConhecimentoService conhecimentoService;
     @Autowired private SubprocessoRepo subprocessoRepo;
     @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private UsuarioRepo usuarioRepo;
+    @Autowired private UsuarioService usuarioService;
     @Autowired private JdbcTemplate jdbcTemplate;
     @Autowired private CompetenciaRepo competenciaRepo;
     @Autowired private AtividadeRepo atividadeRepo;
@@ -106,23 +103,23 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
         // Chefe SENIC (11): '12' (Taís Condida) - Already in data.sql
         // Ensure profile CHEFE for 11 exists.
         criarUsuarioETitulo("90001", "Chefe Mapeamento", 11L, "CHEFE", 11L);
-        chefeMapeamento = usuarioRepo.findById("90001").orElseThrow();
+        chefeMapeamento = usuarioService.buscarPorLogin("90001");
 
         // Gestor COSINF (7): Need to create one.
         criarUsuarioETitulo("90002", "Gestor Mapeamento", 7L, "GESTOR", 7L);
-        gestorMapeamento = usuarioRepo.findById("90002").orElseThrow();
+        gestorMapeamento = usuarioService.buscarPorLogin("90002");
 
         // Admin: '6' (Ricardo Alves) - STIC (2) - Already in data.sql
-        admin = usuarioRepo.findById("6").orElseThrow();
+        admin = usuarioService.buscarPorLogin("6");
 
         // --- Setup Revisao Users ---
         // Chefe SEDIA (9): '333333333333' - Already in data.sql
         // Ensure titular of SEDIA is correct
         jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET titulo_titular = ? WHERE codigo = ?", "333333333333", 9L);
-        chefeRevisao = usuarioRepo.findById("333333333333").orElseThrow();
+        chefeRevisao = usuarioService.buscarPorLogin("333333333333");
 
         // Gestor COSIS (6): '666666666666' - Already in data.sql
-        gestorRevisao = usuarioRepo.findById("666666666666").orElseThrow();
+        gestorRevisao = usuarioService.buscarPorLogin("666666666666");
     }
 
     private void criarUsuarioETitulo(String titulo, String nome, Long unidadeLotacao, String perfil, Long unidadePerfil) {
@@ -174,14 +171,14 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                         .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
                         .unidades(List.of(codUnidadeMapeamento))
                         .build();
-                var processoDto = processoService.criar(req);
+                var processoDto = processoFacade.criar(req);
                 Long codProcesso = processoDto.getCodigo();
 
                 // 2. Iniciar Processo (Admin)
                 autenticar(admin, "ROLE_ADMIN");
-                processoService.iniciarProcessoMapeamento(codProcesso, List.of(codUnidadeMapeamento));
+                processoFacade.iniciarProcessoMapeamento(codProcesso, List.of(codUnidadeMapeamento));
 
-                SubprocessoDto subprocessoDto = processoService.listarTodosSubprocessos(codProcesso).getFirst();
+                SubprocessoDto subprocessoDto = processoFacade.listarTodosSubprocessos(codProcesso).getFirst();
                 Long codSubprocesso = subprocessoDto.getCodigo();
 
                 verificarSituacao(codSubprocesso, NAO_INICIADO);
@@ -193,14 +190,14 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                         .descricao("Atividade Teste")
                         .mapaCodigo(subprocessoDto.getCodMapa())
                         .build();
-                AtividadeDto ativCriada = atividadeService.criar(ativReq, chefeMapeamento.getTituloEleitoral());
+                AtividadeDto ativCriada = atividadeService.criar(ativReq);
 
                 // Chefe adiciona conhecimento (necessário para validação)
                 autenticar(chefeMapeamento, "ROLE_CHEFE");
                 ConhecimentoDto conReq = ConhecimentoDto.builder()
                         .descricao("Conhecimento Teste")
                         .build();
-                atividadeService.criarConhecimento(ativCriada.getCodigo(), conReq);
+                conhecimentoService.criar(ativCriada.getCodigo(), conReq);
 
                 em.flush();
                 em.clear();
@@ -273,8 +270,8 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
                 // 11. Finalizar Processo
                 autenticar(admin, "ROLE_ADMIN");
-                processoService.finalizar(codProcesso);
-                assertThat(processoService.obterPorId(codProcesso).orElseThrow().getSituacao())
+                processoFacade.finalizar(codProcesso);
+                assertThat(processoFacade.obterPorId(codProcesso).orElseThrow().getSituacao())
                     .isEqualTo(sgc.processo.model.SituacaoProcesso.FINALIZADO);
             } catch (ErroValidacao e) {
                 log.error("VALIDATION ERROR Mapeamento: {}", e.getMessage());
@@ -297,17 +294,16 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
                     .unidades(List.of(codUnidadeMapeamento))
                     .build();
-            Long codProcesso = processoService.criar(req).getCodigo();
-            processoService.iniciarProcessoMapeamento(codProcesso, List.of(codUnidadeMapeamento));
-            Long codSubprocesso = processoService.listarTodosSubprocessos(codProcesso).getFirst().getCodigo();
-            Long codMapa = processoService.listarTodosSubprocessos(codProcesso).getFirst().getCodMapa();
+            Long codProcesso = processoFacade.criar(req).getCodigo();
+            processoFacade.iniciarProcessoMapeamento(codProcesso, List.of(codUnidadeMapeamento));
+            Long codSubprocesso = processoFacade.listarTodosSubprocessos(codProcesso).getFirst().getCodigo();
+            Long codMapa = processoFacade.listarTodosSubprocessos(codProcesso).getFirst().getCodMapa();
 
             // Adicionar dados
             autenticar(chefeMapeamento, "ROLE_CHEFE");
             AtividadeDto ativ = atividadeService.criar(
-                AtividadeDto.builder().descricao("A").mapaCodigo(codMapa).build(),
-                chefeMapeamento.getTituloEleitoral());
-            atividadeService.criarConhecimento(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
+                AtividadeDto.builder().descricao("A").mapaCodigo(codMapa).build());
+            conhecimentoService.criar(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
 
             em.flush();
             em.clear();
@@ -359,13 +355,13 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                         .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
                         .unidades(List.of(codUnidadeRevisao))
                         .build();
-                Long codProcesso = processoService.criar(req).getCodigo();
+                Long codProcesso = processoFacade.criar(req).getCodigo();
 
                 // 2. Iniciar Processo
                 autenticar(admin, "ROLE_ADMIN");
-                processoService.iniciarProcessoRevisao(codProcesso, List.of(codUnidadeRevisao));
+                processoFacade.iniciarProcessoRevisao(codProcesso, List.of(codUnidadeRevisao));
 
-                SubprocessoDto subprocessoDto = processoService.listarTodosSubprocessos(codProcesso).getFirst();
+                SubprocessoDto subprocessoDto = processoFacade.listarTodosSubprocessos(codProcesso).getFirst();
                 Long codSubprocesso = subprocessoDto.getCodigo();
                 Long codMapa = subprocessoDto.getCodMapa();
 
@@ -374,10 +370,9 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 // 3. Chefe inicia revisão (adiciona atividade -> Em Andamento)
                 autenticar(chefeRevisao, "ROLE_CHEFE");
                 AtividadeDto ativ = atividadeService.criar(
-                    AtividadeDto.builder().descricao("Nova Ativ Revisao").mapaCodigo(codMapa).build(),
-                    chefeRevisao.getTituloEleitoral()
+                    AtividadeDto.builder().descricao("Nova Ativ Revisao").mapaCodigo(codMapa).build()
                 );
-                atividadeService.criarConhecimento(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
+                conhecimentoService.criar(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
 
                 // Link activity to ALL competencies to satisfy validation
                 List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
@@ -448,7 +443,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
             // 1. Criar Processo
             autenticar(admin, "ROLE_ADMIN");
-            Long codProcesso = processoService.criar(CriarProcessoReq.builder()
+            Long codProcesso = processoFacade.criar(CriarProcessoReq.builder()
                     .descricao("Rev Sem Impacto")
                     .tipo(TipoProcesso.REVISAO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
@@ -457,17 +452,16 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
             // 2. Iniciar
             autenticar(admin, "ROLE_ADMIN");
-            processoService.iniciarProcessoRevisao(codProcesso, List.of(codUnidadeRevisao));
-            Long codSubprocesso = processoService.listarTodosSubprocessos(codProcesso).getFirst().getCodigo();
-            Long codMapa = processoService.listarTodosSubprocessos(codProcesso).getFirst().getCodMapa();
+            processoFacade.iniciarProcessoRevisao(codProcesso, List.of(codUnidadeRevisao));
+            Long codSubprocesso = processoFacade.listarTodosSubprocessos(codProcesso).getFirst().getCodigo();
+            Long codMapa = processoFacade.listarTodosSubprocessos(codProcesso).getFirst().getCodMapa();
 
             // 3. Chefe faz alteração
             autenticar(chefeRevisao, "ROLE_CHEFE");
             AtividadeDto ativ = atividadeService.criar(
-                AtividadeDto.builder().descricao("Ativ").mapaCodigo(codMapa).build(),
-                chefeRevisao.getTituloEleitoral()
+                AtividadeDto.builder().descricao("Ativ").mapaCodigo(codMapa).build()
             );
-            atividadeService.criarConhecimento(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
+            conhecimentoService.criar(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
 
             em.flush();
             em.clear();

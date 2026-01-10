@@ -3,11 +3,7 @@ package sgc.architecture;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
-import sgc.organizacao.model.AtribuicaoTemporaria;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.model.UsuarioPerfilId;
+import sgc.organizacao.model.*;
 
 class EqualsHashCodeTest {
 

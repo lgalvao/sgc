@@ -3,7 +3,6 @@ package sgc.subprocesso.mapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.model.Analise;
 import sgc.mapa.model.Atividade;
@@ -22,9 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes do MapaAjusteMapper")
 class MapaAjusteMapperTest {
-
-    @InjectMocks
-    private MapaAjusteMapperImpl mapper;
+    private final MapaAjusteMapper mapper = org.mapstruct.factory.Mappers.getMapper(MapaAjusteMapper.class);
 
     @Test
     @DisplayName("Deve mapear corretamente para DTO")

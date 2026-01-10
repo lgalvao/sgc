@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import * as processoService from '../processoService';
 import apiClient from '@/axios-setup';
-import { CriarProcessoRequest, AtualizarProcessoRequest, TipoProcesso } from '@/types/tipos';
+import {AtualizarProcessoRequest, CriarProcessoRequest, TipoProcesso} from '@/types/tipos';
 
 vi.mock('@/axios-setup');
 

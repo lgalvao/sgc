@@ -130,6 +130,7 @@ import {
 } from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
+import {logger} from "@/utils";
 import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";
 import {buscarUnidadePorCodigo} from "@/services/unidadesService";
 import {buscarUsuariosPorUnidade} from "@/services/usuarioService";
@@ -159,7 +160,7 @@ onMounted(async () => {
     }
   } catch (error) {
     erroUsuario.value = "Falha ao carregar dados da unidade ou usuários.";
-    console.error(error);
+    logger.error(error);
   }
 });
 
@@ -186,7 +187,7 @@ async function criarAtribuicao() {
     justificativa.value = "";
   } catch (error) {
     erroApi.value = "Falha ao criar atribuição. Tente novamente.";
-    console.error(error);
+    logger.error(error);
   }
 }
 </script>

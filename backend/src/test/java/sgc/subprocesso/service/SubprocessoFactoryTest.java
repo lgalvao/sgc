@@ -9,17 +9,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.CopiaMapaService;
-import sgc.processo.erros.ErroProcesso;
-import sgc.processo.model.Processo;
-import sgc.subprocesso.model.*;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
 import sgc.organizacao.model.UnidadeMapaRepo;
+import sgc.processo.erros.ErroProcesso;
+import sgc.processo.model.Processo;
+import sgc.subprocesso.model.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -89,7 +90,7 @@ class SubprocessoFactoryTest {
 
         Mapa mapaCopiado = new Mapa();
         mapaCopiado.setCodigo(200L);
-        when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L, 1L)).thenReturn(mapaCopiado);
+        when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L)).thenReturn(mapaCopiado);
         when(mapaRepo.save(any(Mapa.class))).thenAnswer(i -> i.getArgument(0));
 
         factory.criarParaRevisao(processo, unidade, unidadeMapa);
@@ -125,7 +126,7 @@ class SubprocessoFactoryTest {
 
         when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(i -> i.getArgument(0));
 
-        when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L, 1L)).thenReturn(null);
+        when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L)).thenReturn(null);
 
         assertThrows(ErroProcesso.class, () -> factory.criarParaRevisao(processo, unidade, unidadeMapa));
     }
@@ -148,7 +149,7 @@ class SubprocessoFactoryTest {
 
         Mapa mapaCopiado = new Mapa();
         mapaCopiado.setCodigo(200L);
-        when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L, 1L)).thenReturn(mapaCopiado);
+        when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L)).thenReturn(mapaCopiado);
         when(mapaRepo.save(any(Mapa.class))).thenAnswer(i -> i.getArgument(0));
 
         factory.criarParaDiagnostico(processo, unidade, unidadeMapa);
@@ -156,5 +157,17 @@ class SubprocessoFactoryTest {
         // Verifica situacao inicial
         verify(subprocessoRepo, atLeastOnce()).save(argThat(s -> s.getSituacao() == SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO));
         verify(movimentacaoRepo).save(any(Movimentacao.class));
+    }
+
+    @Test
+    @DisplayName("criarParaDiagnostico deve lançar exceção quando unidadeMapa é null")
+    void criarParaDiagnostico_UnidadeMapaNull() {
+        Processo processo = new Processo();
+        Unidade unidade = new Unidade();
+        unidade.setSigla("U1");
+
+        assertThatThrownBy(() -> factory.criarParaDiagnostico(processo, unidade, null))
+                .isInstanceOf(ErroProcesso.class)
+                .hasMessageContaining("não possui mapa vigente");
     }
 }

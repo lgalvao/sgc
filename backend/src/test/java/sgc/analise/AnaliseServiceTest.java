@@ -8,12 +8,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.analise.dto.CriarAnaliseRequest;
+import sgc.analise.dto.CriarAnaliseReq;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAnalise;
-import sgc.subprocesso.model.Subprocesso;
 import sgc.organizacao.UnidadeService;
+import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 
@@ -99,7 +99,7 @@ class AnaliseServiceTest {
             Analise resultado =
                     service.criarAnalise(
                             subprocesso,
-                            CriarAnaliseRequest.builder()
+                            CriarAnaliseReq.builder()
                                     .codSubprocesso(1L)
                                     .observacoes(OBS)
                                     .tipo(TipoAnalise.CADASTRO)
@@ -124,7 +124,7 @@ class AnaliseServiceTest {
             Analise resultado =
                     service.criarAnalise(
                             subprocesso,
-                            CriarAnaliseRequest.builder()
+                            CriarAnaliseReq.builder()
                                     .codSubprocesso(1L)
                                     .observacoes(OBS)
                                     .tipo(TipoAnalise.VALIDACAO)
