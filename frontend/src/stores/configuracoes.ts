@@ -1,6 +1,7 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import {apiClient} from "@/axios-setup";
+import {logger} from "@/utils";
 
 export interface Parametro {
     id?: number;
@@ -21,7 +22,7 @@ export const useConfiguracoesStore = defineStore("configuracoes", () => {
             const response = await apiClient.get<Parametro[]>("/configuracoes");
             parametros.value = response.data;
         } catch (e: any) {
-            console.error("Erro ao carregar configurações:", e);
+            logger.error("Erro ao carregar configurações:", e);
             error.value = "Não foi possível carregar as configurações.";
         } finally {
             loading.value = false;
@@ -36,7 +37,7 @@ export const useConfiguracoesStore = defineStore("configuracoes", () => {
             parametros.value = response.data;
             return true;
         } catch (e: any) {
-            console.error("Erro ao salvar configurações:", e);
+            logger.error("Erro ao salvar configurações:", e);
             error.value = "Não foi possível salvar as configurações.";
             return false;
         } finally {
