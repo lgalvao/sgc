@@ -242,47 +242,91 @@ A análise da arquitetura atual revelou oportunidades de melhoria focadas em:
 
 ---
 
-### FASE 4: Eventos de Domínio Adicionais (3-5 dias)
+### FASE 4: Eventos de Domínio Adicionais (3-5 dias) - ⏳ EM PROGRESSO
 
 **Objetivo**: Implementar eventos faltantes para desacoplamento
 
+#### Análise de Priorização (2026-01-10)
+
+**Eventos de Alto Impacto (Prioridade 1):**
+1. **EventoProcessoAtualizado** - Auditoria de mudanças em processos
+   - Localização: `ProcessoFacade.atualizar()` (linha 172)
+   - Benefício: Rastreabilidade de alterações, notificações
+   
+2. **EventoProcessoExcluido** - Auditoria de exclusões
+   - Localização: `ProcessoFacade.apagar()` (linha 205)
+   - Benefício: Trilha de auditoria, limpeza de dados relacionados
+
+3. **EventoSubprocessoCriado** - Coordenação com outros módulos
+   - Localização: `SubprocessoFacade.criar()` (linha 68)
+   - Benefício: Inicialização de workflows, alertas, preparação de mapas
+
+4. **EventoSubprocessoAtualizado** - Sincronização de cache/índices
+   - Localização: `SubprocessoFacade.atualizar()` (linha 73)
+   - Benefício: Invalidação de cache, atualização de painéis
+
+5. **EventoSubprocessoExcluido** - Limpeza coordenada
+   - Localização: `SubprocessoFacade.excluir()` (linha 78)
+   - Benefício: Limpeza de mapas, alertas, histórico
+
+**Eventos de Médio Impacto (Prioridade 2):**
+6. **EventoAtividadeCriada** - Rastreamento de mudanças em mapas
+   - Localização: `AtividadeFacade.criarAtividade()` (linha 74)
+   - Benefício: Detecção de impactos, validações automáticas
+
+7. **EventoAtividadeAtualizada** - Propagação de mudanças
+   - Localização: `AtividadeFacade.atualizarAtividade()` (linha 97)
+   - Benefício: Recálculo de impactos, validação de mapa
+
+8. **EventoAtividadeExcluida** - Validação de integridade
+   - Localização: `AtividadeFacade.excluirAtividade()` (linha 114)
+   - Benefício: Verificação de competências órfãs, ajuste de mapa
+
+**Eventos de Baixo Impacto (Prioridade 3 - Opcional):**
+9. EventoMapaValidado - Já coberto por EventoTransicaoSubprocesso
+10. EventoMapaHomologado - Já coberto por EventoTransicaoSubprocesso
+
 #### Tarefas:
-1. **Priorizar Eventos**
+1. ✅ **Priorizar Eventos**
    - Analisar lista de 10 eventos potenciais
-   - Selecionar top 5 com maior impacto
+   - Selecionar top 8 com maior impacto (5 processo/subprocesso + 3 atividade)
    - Documentar benefícios esperados
 
-2. **Implementar Eventos de Processo**
-   - EventoProcessoAtualizado
-   - EventoProcessoExcluido
-   - Listeners para auditoria/notificação
+2. **Implementar Eventos de Processo** (Prioridade 1)
+   - [ ] EventoProcessoAtualizado
+   - [ ] EventoProcessoExcluido
+   - [ ] Atualizar listeners para auditoria
 
-3. **Implementar Eventos de Subprocesso**
-   - EventoSubprocessoCriado
-   - EventoSubprocessoAtualizado
-   - Usar padrão de EventoTransicaoSubprocesso (se aplicável)
+3. **Implementar Eventos de Subprocesso** (Prioridade 1)
+   - [ ] EventoSubprocessoCriado
+   - [ ] EventoSubprocessoAtualizado
+   - [ ] EventoSubprocessoExcluido
+   - [ ] Usar padrão consistente com EventoTransicaoSubprocesso
 
-4. **Implementar Eventos de Atividade/Mapa**
-   - EventoAtividadeCriada
-   - EventoAtividadeAtualizada
-   - EventoMapaValidado
+4. **Implementar Eventos de Atividade** (Prioridade 2)
+   - [ ] EventoAtividadeCriada
+   - [ ] EventoAtividadeAtualizada
+   - [ ] EventoAtividadeExcluida
+   - [ ] Criar listener para recálculo de impactos
 
-5. **Refatorar Comunicação Síncrona**
-   - Identificar chamadas inter-módulos síncronas
-   - Avaliar candidatas a eventos
-   - Refatorar para eventos (se apropriado)
+5. **Documentação e Testes**
+   - [ ] Atualizar package-info.java dos pacotes de eventos
+   - [ ] Criar testes unitários para eventos
+   - [ ] Criar testes de integração para listeners
+   - [ ] Documentar fluxo de eventos no ARCHITECTURE.md
 
 **Entregáveis**:
-- [ ] 5-10 novos eventos implementados
-- [ ] Listeners criados/atualizados
-- [ ] Testes de eventos
-- [ ] Documentação de eventos
+- [ ] 8 novos eventos implementados (5 P1 + 3 P2)
+- [ ] Listeners criados/atualizados (mínimo 2)
+- [ ] Testes de eventos (100% cobertura)
+- [ ] Documentação de eventos atualizada
 
 **Critérios de Aceitação**:
-- Eventos implementados e testados
-- Nenhuma regressão em testes existentes
+- Eventos implementados seguindo padrão existente
+- 100% dos testes passando (sem regressões)
 - Comunicação assíncrona onde apropriado
 - Logs de eventos para auditoria
+- ArchUnit tests continuam passando
 
 ---
 
