@@ -83,6 +83,8 @@ public class ArchConsistencyTest {
                             if (dependencyModule != null && !dependencyModule.equals(itemModule)) {
                                 // EXCEÇÃO: O módulo seguranca (LoginService) pode acessar organizacao
                                 // (UsuarioRepo, etc)
+
+                                // TODO não gosto dessa exceção!
                                 if ("seguranca".equals(itemModule) && "organizacao".equals(dependencyModule)) {
                                     continue;
                                 }
@@ -97,14 +99,14 @@ public class ArchConsistencyTest {
                 }
 
                 private String extractModule(String packageName) {
-                    if (!packageName.startsWith("sgc."))
-                        return null;
+                    if (!packageName.startsWith("sgc.")) return null;
+
                     int firstDot = packageName.indexOf('.');
-                    if (firstDot == -1)
-                        return null;
+                    if (firstDot == -1) return null;
+
                     int secondDot = packageName.indexOf('.', firstDot + 1);
-                    if (secondDot == -1)
-                        return packageName.substring(firstDot + 1);
+                    if (secondDot == -1) return packageName.substring(firstDot + 1);
+
                     return packageName.substring(firstDot + 1, secondDot);
                 }
             });

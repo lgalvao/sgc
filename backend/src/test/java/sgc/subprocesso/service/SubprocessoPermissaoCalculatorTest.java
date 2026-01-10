@@ -88,5 +88,14 @@ class SubprocessoPermissaoCalculatorTest {
         assertThat(resultado.isPodeReabrirCadastro()).isFalse();
         assertThat(resultado.isPodeReabrirRevisao()).isFalse();
         assertThat(resultado.isPodeEnviarLembrete()).isFalse();
+    @Test
+    @DisplayName("Deve calcular permissões quando processo é nulo")
+    void deveCalcularPermissoesProcessoNull() {
+        Usuario usuario = new Usuario();
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setProcesso(null);
+
+        SubprocessoPermissoesDto resultado = calculator.calcular(subprocesso, usuario);
+        assertThat(resultado).isNotNull();
     }
 }

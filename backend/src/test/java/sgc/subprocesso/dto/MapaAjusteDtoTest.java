@@ -38,6 +38,7 @@ class MapaAjusteDtoTest {
 
     @Test
     @DisplayName("Deve criar MapaAjusteDto corretamente via método estático 'of'")
+    // TODO esse teste esta muito complexo e pesado e tem asserts demais
     void deveCriarViaOf() {
         when(subprocesso.getMapa()).thenReturn(mapa);
         when(mapa.getCodigo()).thenReturn(100L);

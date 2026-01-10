@@ -98,6 +98,15 @@ class AtividadeAccessPolicyTest {
     }
 
     @Test
+    @DisplayName("Deve negar se mapa não possui subprocesso")
+    void deveNegarSeSubprocessoNull() {
+        atividade.getMapa().setSubprocesso(null);
+        boolean resultado = policy.canExecute(usuarioChefe, CRIAR_ATIVIDADE, atividade);
+        assertThat(resultado).isFalse();
+        assertThat(policy.getMotivoNegacao()).contains("não possui subprocesso associado");
+    }
+
+    @Test
     @DisplayName("Deve negar ação não reconhecida")
     void deveNegarAcaoInvalida() {
         boolean resultado = policy.canExecute(usuarioChefe, LISTAR_SUBPROCESSOS, atividade);

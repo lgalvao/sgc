@@ -79,5 +79,68 @@ class SubprocessoFacadeTest {
 
         facade.importarAtividades(1L, 2L);
         verify(mapaService).importarAtividades(1L, 2L);
+        
+        facade.buscarSubprocessoComMapa(1L);
+        verify(subprocessoService).buscarSubprocessoComMapa(1L);
+        
+        facade.obterPorProcessoEUnidade(1L, 2L);
+        verify(subprocessoService).obterPorProcessoEUnidade(1L, 2L);
+        
+        facade.obterDetalhes(1L, Perfil.ADMIN);
+        verify(subprocessoService).obterDetalhes(1L, Perfil.ADMIN);
+        
+        facade.obterSituacao(1L);
+        verify(subprocessoService).obterSituacao(1L);
+        
+        facade.listarAtividadesSubprocesso(1L);
+        verify(subprocessoService).listarAtividadesSubprocesso(1L);
+        
+        facade.obterAtividadesSemConhecimento(1L);
+        verify(subprocessoService).obterAtividadesSemConhecimento(1L);
+        
+        facade.obterEntidadePorCodigoMapa(1L);
+        verify(subprocessoService).obterEntidadePorCodigoMapa(1L);
+        
+        facade.verificarAcessoUnidadeAoProcesso(1L, Collections.singletonList(2L));
+        verify(subprocessoService).verificarAcessoUnidadeAoProcesso(1L, Collections.singletonList(2L));
+        
+        facade.obterSugestoes(1L);
+        verify(subprocessoService).obterSugestoes(1L);
+        
+        facade.obterMapaParaAjuste(1L);
+        verify(subprocessoService).obterMapaParaAjuste(1L);
+        
+        facade.obterPermissoes(1L);
+        verify(subprocessoService).obterPermissoes(1L);
+        
+        facade.validarCadastro(1L);
+        verify(subprocessoService).validarCadastro(1L);
+        
+        facade.validarExistenciaAtividades(1L);
+        verify(subprocessoService).validarExistenciaAtividades(1L);
+        
+        facade.validarAssociacoesMapa(1L);
+        verify(subprocessoService).validarAssociacoesMapa(1L);
+        
+        facade.atualizarSituacaoParaEmAndamento(1L);
+        verify(subprocessoService).atualizarSituacaoParaEmAndamento(1L);
+        
+        facade.listarSubprocessosHomologados();
+        verify(subprocessoService).listarSubprocessosHomologados();
+        
+        facade.reabrirCadastro(1L, "j");
+        verify(subprocessoService).reabrirCadastro(1L, "j");
+        
+        facade.reabrirRevisaoCadastro(1L, "j");
+        verify(subprocessoService).reabrirRevisaoCadastro(1L, "j");
+        
+        facade.alterarDataLimite(1L, java.time.LocalDate.now());
+        verify(subprocessoService).alterarDataLimite(1L, java.time.LocalDate.now());
+        
+        facade.obterCadastro(1L);
+        verify(subprocessoService).obterCadastro(1L);
+        
+        facade.salvarAjustesMapa(1L, Collections.emptyList(), "t");
+        verify(mapaService).salvarAjustesMapa(1L, Collections.emptyList(), "t");
     }
 }

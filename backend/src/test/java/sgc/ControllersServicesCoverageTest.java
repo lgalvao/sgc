@@ -118,6 +118,7 @@ class ControllersServicesCoverageTest {
 
     @Test
     @DisplayName("Deve listar atividades")
+    // TODO esse teste está muito lento. Listar todas atividades é realmente necessário? Talvez nem precise no cód. producao.
     void deveListarAtividades() {
         when(subprocessoFacade.listarAtividadesSubprocesso(1L)).thenReturn(new ArrayList<>());
         ResponseEntity<List<AtividadeVisualizacaoDto>> response = subprocessoMapaController.listarAtividades(1L);
