@@ -70,8 +70,6 @@ class SubprocessoPermissaoCalculatorTest {
         Usuario usuario = new Usuario();
         Subprocesso subprocesso = new Subprocesso();
 
-        // Todos os podeExecutar retornam false por padrão no mock
-
         SubprocessoPermissoesDto resultado = calculator.calcular(subprocesso, usuario);
 
         assertThat(resultado.isPodeVerPagina()).isFalse();
@@ -88,6 +86,8 @@ class SubprocessoPermissaoCalculatorTest {
         assertThat(resultado.isPodeReabrirCadastro()).isFalse();
         assertThat(resultado.isPodeReabrirRevisao()).isFalse();
         assertThat(resultado.isPodeEnviarLembrete()).isFalse();
+    }
+
     @Test
     @DisplayName("Deve calcular permissões quando processo é nulo")
     void deveCalcularPermissoesProcessoNull() {
