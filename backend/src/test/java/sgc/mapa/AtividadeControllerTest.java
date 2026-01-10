@@ -40,13 +40,7 @@ class AtividadeControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private AtividadeService atividadeService;
-
-    @MockitoBean
     private AtividadeFacade atividadeFacade;
-
-    @MockitoBean
-    private ConhecimentoService conhecimentoService;
 
     @Nested
     @DisplayName("Operações de Atividade")
@@ -56,7 +50,7 @@ class AtividadeControllerTest {
         void deveObterPorId() throws Exception {
             AtividadeDto dto = new AtividadeDto();
             dto.setCodigo(1L);
-            Mockito.when(atividadeService.obterDto(1L)).thenReturn(dto);
+            Mockito.when(atividadeFacade.obterAtividadePorId(1L)).thenReturn(dto);
 
             mockMvc.perform(get("/api/atividades/1").with(user("123")))
                     .andExpect(status().isOk())
@@ -136,7 +130,7 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve listar conhecimentos")
         void deveListarConhecimentos() throws Exception {
-            Mockito.when(conhecimentoService.listarPorAtividade(1L)).thenReturn(List.of());
+            Mockito.when(atividadeFacade.listarConhecimentosPorAtividade(1L)).thenReturn(List.of());
             mockMvc.perform(get("/api/atividades/1/conhecimentos").with(user("123")))
                     .andExpect(status().isOk());
         }
