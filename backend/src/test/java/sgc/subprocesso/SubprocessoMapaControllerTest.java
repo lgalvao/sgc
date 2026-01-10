@@ -43,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class SubprocessoMapaControllerTest {
 
     @MockitoBean
-    private SubprocessoMapaService subprocessoMapaService;
+    private sgc.subprocesso.service.SubprocessoFacade subprocessoFacade;
     @MockitoBean
     private MapaService mapaService;
     @MockitoBean
@@ -51,13 +51,7 @@ class SubprocessoMapaControllerTest {
     @MockitoBean
     private ImpactoMapaService impactoMapaService;
     @MockitoBean
-    private SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
-    @MockitoBean
     private UsuarioService usuarioService;
-    @MockitoBean
-    private sgc.subprocesso.service.SubprocessoService subprocessoService;
-    @MockitoBean
-    private sgc.subprocesso.service.SubprocessoContextoService subprocessoContextoService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -86,7 +80,7 @@ class SubprocessoMapaControllerTest {
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
 
-        when(subprocessoService.buscarSubprocessoComMapa(1L)).thenReturn(sp);
+        when(subprocessoFacade.buscarSubprocessoComMapa(1L)).thenReturn(sp);
         when(mapaService.obterMapaCompleto(10L, 1L)).thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(get("/api/subprocessos/1/mapa")).andExpect(status().isOk());
@@ -110,7 +104,7 @@ class SubprocessoMapaControllerTest {
         req.setObservacoes("obs");
         req.setCompetencias(List.of());
 
-        when(subprocessoMapaWorkflowService.salvarMapaSubprocesso(eq(1L), any()))
+        when(subprocessoFacade.salvarMapaSubprocesso(eq(1L), any()))
                 .thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(
@@ -125,7 +119,7 @@ class SubprocessoMapaControllerTest {
     @DisplayName("obterMapaParaAjuste")
     @WithMockUser
     void obterMapaParaAjuste() throws Exception {
-        when(subprocessoService.obterMapaParaAjuste(1L))
+        when(subprocessoFacade.obterMapaParaAjuste(1L))
                 .thenReturn(MapaAjusteDto.builder().build());
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-ajuste")).andExpect(status().isOk());
@@ -154,7 +148,7 @@ class SubprocessoMapaControllerTest {
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
 
-        when(subprocessoService.buscarSubprocessoComMapa(1L)).thenReturn(sp);
+        when(subprocessoFacade.buscarSubprocessoComMapa(1L)).thenReturn(sp);
         when(mapaService.obterMapaCompleto(10L, 1L)).thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-completo")).andExpect(status().isOk());
@@ -168,7 +162,7 @@ class SubprocessoMapaControllerTest {
         req.setObservacoes("obs");
         req.setCompetencias(List.of());
 
-        when(subprocessoMapaWorkflowService.salvarMapaSubprocesso(eq(1L), any()))
+        when(subprocessoFacade.salvarMapaSubprocesso(eq(1L), any()))
                 .thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(
@@ -187,7 +181,7 @@ class SubprocessoMapaControllerTest {
         req.setDescricao("Comp");
         req.setAtividadesIds(List.of(1L, 2L)); // Corrigido: lista não pode ser vazia
 
-        when(subprocessoMapaWorkflowService.adicionarCompetencia(eq(1L), any()))
+        when(subprocessoFacade.adicionarCompetencia(eq(1L), any()))
                 .thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(
@@ -255,7 +249,7 @@ class SubprocessoMapaControllerTest {
         req.setDescricao("Comp");
         req.setAtividadesIds(List.of(1L)); // Corrigido: lista não pode ser vazia
 
-        when(subprocessoMapaWorkflowService.atualizarCompetencia(eq(1L), eq(10L), any()))
+        when(subprocessoFacade.atualizarCompetencia(eq(1L), eq(10L), any()))
                 .thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(
@@ -270,7 +264,7 @@ class SubprocessoMapaControllerTest {
     @DisplayName("removerCompetencia")
     @WithMockUser
     void removerCompetencia() throws Exception {
-        when(subprocessoMapaWorkflowService.removerCompetencia(1L, 10L))
+        when(subprocessoFacade.removerCompetencia(1L, 10L))
                 .thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(post("/api/subprocessos/1/competencias/10/remover").with(csrf()))

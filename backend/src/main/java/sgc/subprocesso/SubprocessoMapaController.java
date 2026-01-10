@@ -48,7 +48,7 @@ public class SubprocessoMapaController {
     public ContextoEdicaoDto obterContextoEdicao(
             @PathVariable Long codigo,
             @RequestParam(required = false) sgc.organizacao.model.Perfil perfil) {
-        return subprocessoContextoService.obterContextoEdicao(codigo, perfil);
+        return subprocessoFacade.obterContextoEdicao(codigo, perfil);
     }
 
     /**
@@ -77,7 +77,7 @@ public class SubprocessoMapaController {
     @GetMapping("/{codigo}/mapa")
     @PreAuthorize("isAuthenticated()")
     public MapaCompletoDto obterMapa(@PathVariable Long codigo) {
-        Subprocesso subprocesso = subprocessoService.buscarSubprocessoComMapa(codigo);
+        Subprocesso subprocesso = subprocessoFacade.buscarSubprocessoComMapa(codigo);
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
     }
 
@@ -109,7 +109,7 @@ public class SubprocessoMapaController {
     public ResponseEntity<List<AtividadeVisualizacaoDto>> listarAtividades(
             @PathVariable Long codSubprocesso) {
         List<AtividadeVisualizacaoDto> atividades =
-                subprocessoService.listarAtividadesSubprocesso(codSubprocesso);
+                subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso);
         return ResponseEntity.ok(atividades);
     }
 
@@ -140,7 +140,7 @@ public class SubprocessoMapaController {
     @GetMapping("/{codigo}/mapa-ajuste")
     @PreAuthorize("hasRole('ADMIN')")
     public MapaAjusteDto obterMapaParaAjuste(@PathVariable Long codigo) {
-        return subprocessoService.obterMapaParaAjuste(codigo);
+        return subprocessoFacade.obterMapaParaAjuste(codigo);
     }
 
     /**
@@ -156,7 +156,7 @@ public class SubprocessoMapaController {
             @PathVariable Long codigo,
             @RequestBody @Valid SalvarAjustesReq request,
             @AuthenticationPrincipal Object principal) {
-        subprocessoMapaService.salvarAjustesMapa(
+        subprocessoFacade.salvarAjustesMapa(
                 codigo, request.getCompetencias(), extractTituloUsuario(principal));
     }
 
@@ -171,7 +171,7 @@ public class SubprocessoMapaController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtém um mapa completo com competências e atividades (CDU-15)")
     public ResponseEntity<MapaCompletoDto> obterMapaCompleto(@PathVariable Long codigo) {
-        Subprocesso subprocesso = subprocessoService.buscarSubprocessoComMapa(codigo);
+        Subprocesso subprocesso = subprocessoFacade.buscarSubprocessoComMapa(codigo);
         MapaCompletoDto mapa =
                 mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
         return ResponseEntity.ok(mapa);
