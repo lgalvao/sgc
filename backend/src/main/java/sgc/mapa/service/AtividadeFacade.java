@@ -40,7 +40,7 @@ public class AtividadeFacade {
     private final SubprocessoService subprocessoService;
     private final AccessControlService accessControlService;
     private final UsuarioService usuarioService;
-    private final MapaService mapaService;
+    private final MapaFacade mapaFacade;
 
     // ===== Consultas =====
 
@@ -77,7 +77,7 @@ public class AtividadeFacade {
         // Busca usuário autenticado através do contexto Spring Security
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
         
-        Mapa mapa = mapaService.obterPorCodigo(mapaCodigo);
+        Mapa mapa = mapaFacade.obterPorCodigo(mapaCodigo);
         
         // Cria atividade temporária para verificação de acesso
         Atividade atividadeTemp = new Atividade();

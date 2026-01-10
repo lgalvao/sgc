@@ -25,8 +25,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes do MapaService")
-class MapaServiceTest {
+@DisplayName("Testes do MapaFacade")
+class MapaFacadeTest {
 
     @Mock
     private MapaRepo mapaRepo;
@@ -40,7 +40,7 @@ class MapaServiceTest {
     private MapaSalvamentoService mapaSalvamentoService;
 
     @InjectMocks
-    private MapaService service;
+    private MapaFacade service;
 
     @Nested
     @DisplayName("Operações CRUD")

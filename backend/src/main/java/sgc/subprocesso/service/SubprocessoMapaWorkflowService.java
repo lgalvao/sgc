@@ -18,7 +18,7 @@ import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UnidadeService;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -74,7 +74,7 @@ public class SubprocessoMapaWorkflowService {
     private final SubprocessoRepo subprocessoRepo;
     private final CompetenciaService competenciaService;
     private final AtividadeService atividadeService;
-    private final MapaService mapaService;
+    private final MapaFacade mapaFacade;
     private final SubprocessoTransicaoService transicaoService;
     private final AnaliseService analiseService;
     private final UnidadeService unidadeService;
@@ -91,7 +91,7 @@ public class SubprocessoMapaWorkflowService {
         boolean eraVazio = competenciaService.buscarPorCodMapa(codMapa).isEmpty();
         boolean temNovasCompetencias = !request.getCompetencias().isEmpty();
 
-        MapaCompletoDto mapaDto = mapaService.salvarMapaCompleto(codMapa, request);
+        MapaCompletoDto mapaDto = mapaFacade.salvarMapaCompleto(codMapa, request);
 
         if (eraVazio
                 && temNovasCompetencias
@@ -120,7 +120,7 @@ public class SubprocessoMapaWorkflowService {
             subprocessoRepo.save(subprocesso);
         }
 
-        return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
+        return mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 
     public MapaCompletoDto atualizarCompetencia(
@@ -132,7 +132,7 @@ public class SubprocessoMapaWorkflowService {
         competenciaService.atualizarCompetencia(
                 codCompetencia, request.getDescricao(), request.getAtividadesIds());
 
-        return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
+        return mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 
     public MapaCompletoDto removerCompetencia(
@@ -151,7 +151,7 @@ public class SubprocessoMapaWorkflowService {
             log.info("Situação do subprocesso {} alterada para CADASTRO_HOMOLOGADO (mapa ficou vazio)", codSubprocesso);
         }
 
-        return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
+        return mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 
     private Subprocesso getSubprocessoParaEdicao(Long codSubprocesso) {

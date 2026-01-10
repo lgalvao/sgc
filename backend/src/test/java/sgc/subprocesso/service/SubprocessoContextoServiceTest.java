@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
@@ -32,7 +32,7 @@ class SubprocessoContextoServiceTest {
     @Mock
     private UsuarioService usuarioService;
     @Mock
-    private MapaService mapaService;
+    private MapaFacade mapaFacade;
 
     @InjectMocks
     private SubprocessoContextoService service;
@@ -65,7 +65,7 @@ class SubprocessoContextoServiceTest {
         when(subprocessoService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
 
         MapaCompletoDto mapaDto = MapaCompletoDto.builder().codigo(100L).build();
-        when(mapaService.obterMapaCompleto(100L, codSubprocesso)).thenReturn(mapaDto);
+        when(mapaFacade.obterMapaCompleto(100L, codSubprocesso)).thenReturn(mapaDto);
 
         // Mock 4: Atividades
         when(subprocessoService.listarAtividadesSubprocesso(codSubprocesso))

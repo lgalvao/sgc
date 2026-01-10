@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
@@ -34,7 +34,7 @@ class SubprocessoCrudServiceTest {
     @Mock
     private SubprocessoMapper subprocessoMapper;
     @Mock
-    private MapaService mapaService;
+    private MapaFacade mapaFacade;
 
     @InjectMocks
     private SubprocessoCrudService service;
@@ -46,7 +46,7 @@ class SubprocessoCrudServiceTest {
         Subprocesso entity = new Subprocesso();
         when(subprocessoMapper.toEntity(dto)).thenReturn(entity);
         when(repositorioSubprocesso.save(any())).thenReturn(entity);
-        when(mapaService.salvar(any())).thenReturn(new Mapa());
+        when(mapaFacade.salvar(any())).thenReturn(new Mapa());
         when(subprocessoMapper.toDTO(any())).thenReturn(dto);
 
         assertThat(service.criar(dto)).isNotNull();

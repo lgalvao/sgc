@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaReq;
 import sgc.organizacao.dto.UnidadeDto;
@@ -37,7 +37,7 @@ class UnidadeServiceTest {
     @Mock
     private UnidadeMapaRepo unidadeMapaRepo;
     @Mock
-    private MapaService mapaService;
+    private MapaFacade mapaFacade;
     @Mock
     private UsuarioService usuarioService;
     @Mock
@@ -300,7 +300,7 @@ class UnidadeServiceTest {
         @DisplayName("Deve verificar se tem mapa vigente")
         void deveVerificarMapaVigente() {
             // Arrange
-            when(mapaService.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.of(new sgc.mapa.model.Mapa()));
+            when(mapaFacade.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.of(new sgc.mapa.model.Mapa()));
 
             // Act & Assert
             assertThat(service.verificarMapaVigente(1L)).isTrue();

@@ -20,7 +20,7 @@ import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.MapaSalvamentoService;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.painel.PainelService;
@@ -83,7 +83,7 @@ class ControllersServicesCoverageTest {
     @Mock private sgc.processo.service.ProcessoFacade processoFacade;
 
     private SubprocessoMapaController subprocessoMapaController;
-    private MapaService mapaService;
+    private MapaFacade mapaFacade;
     private SubprocessoCadastroWorkflowService cadastroService;
     private PainelService painelService;
 
@@ -94,14 +94,14 @@ class ControllersServicesCoverageTest {
         // SubprocessoMapaController
         subprocessoMapaController = new SubprocessoMapaController(
                 subprocessoFacade,
-                mapaService, 
+                mapaFacade, 
                 mapaVisualizacaoService, 
                 impactoMapaService,
                 usuarioService
         );
 
         // MapaService
-        mapaService = new MapaService(
+        mapaFacade = new MapaFacade(
                 mapaRepo, competenciaRepo, mapaCompletoMapper, mapaSalvamentoService
         );
 
@@ -148,7 +148,7 @@ class ControllersServicesCoverageTest {
     @DisplayName("Deve lançar erro ao obter mapa completo inexistente")
     void deveLancarErroObterMapaCompletoInexistente() {
         when(mapaRepo.findById(99L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> mapaService.obterMapaCompleto(99L, 1L))
+        assertThatThrownBy(() -> mapaFacade.obterMapaCompleto(99L, 1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
@@ -158,7 +158,7 @@ class ControllersServicesCoverageTest {
         SalvarMapaRequest req = new SalvarMapaRequest();
         when(mapaSalvamentoService.salvarMapaCompleto(99L, req))
             .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 99L));
-        assertThatThrownBy(() -> mapaService.salvarMapaCompleto(99L, req))
+        assertThatThrownBy(() -> mapaFacade.salvarMapaCompleto(99L, req))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
@@ -175,7 +175,7 @@ class ControllersServicesCoverageTest {
         when(mapaSalvamentoService.salvarMapaCompleto(1L, req))
             .thenThrow(new ErroEntidadeNaoEncontrada("Competência não encontrada: 99"));
 
-        assertThatThrownBy(() -> mapaService.salvarMapaCompleto(1L, req))
+        assertThatThrownBy(() -> mapaFacade.salvarMapaCompleto(1L, req))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessageContaining("Competência não encontrada");
     }
@@ -185,7 +185,7 @@ class ControllersServicesCoverageTest {
     void deveLancarErroAtualizarMapaInexistente() {
         when(mapaRepo.findById(99L)).thenReturn(Optional.empty());
         Mapa mapa = new Mapa();
-        assertThatThrownBy(() -> mapaService.atualizar(99L, mapa))
+        assertThatThrownBy(() -> mapaFacade.atualizar(99L, mapa))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
@@ -193,7 +193,7 @@ class ControllersServicesCoverageTest {
     @DisplayName("Deve lançar erro ao excluir mapa inexistente")
     void deveLancarErroExcluirMapaInexistente() {
         when(mapaRepo.existsById(99L)).thenReturn(false);
-        assertThatThrownBy(() -> mapaService.excluir(99L))
+        assertThatThrownBy(() -> mapaFacade.excluir(99L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
