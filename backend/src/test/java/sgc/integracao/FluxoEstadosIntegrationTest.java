@@ -59,7 +59,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Transactional
 @DisplayName("Fluxo de Estados: Processo e Subprocesso")
 @Import(TestSecurityConfig.class)
-@Slf4j
+
 class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
     @Autowired private ProcessoFacade processoFacade;
     @Autowired private SubprocessoCadastroWorkflowService cadastroWorkflowService;
@@ -157,6 +157,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Fluxo de Mapeamento")
+    
     class FluxoMapeamento {
 
         @Test
@@ -274,11 +275,8 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 assertThat(processoFacade.obterPorId(codProcesso).orElseThrow().getSituacao())
                     .isEqualTo(sgc.processo.model.SituacaoProcesso.FINALIZADO);
             } catch (ErroValidacao e) {
-                log.error("VALIDATION ERROR Mapeamento: {}", e.getMessage());
-                if (e.getDetails() != null) e.getDetails().forEach((k, v) -> log.error(" - {}: {}", k, v));
                 throw e;
             } catch (Exception e) {
-                log.error("TEST ERROR Mapeamento: {}", e.getMessage(), e);
                 throw e;
             }
         }
@@ -335,6 +333,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Fluxo de Revisão")
+    
     class FluxoRevisao {
 
         @Test
@@ -429,7 +428,6 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 mapaWorkflowService.homologarValidacao(codSubprocesso, admin);
                 verificarSituacao(codSubprocesso, REVISAO_MAPA_HOMOLOGADO);
             } catch (Exception e) {
-                log.error("TEST ERROR Revisao: {}", e.getMessage(), e);
                 throw e;
             }
         }

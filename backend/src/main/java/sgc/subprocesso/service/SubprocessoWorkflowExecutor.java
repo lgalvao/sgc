@@ -16,6 +16,15 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
+/**
+ * @deprecated Consolidado em {@link SubprocessoTransicaoService#registrarAnaliseETransicao}.
+ * Este service foi mantido temporariamente apenas para evitar quebra de testes.
+ * Todas as funcionalidades foram movidas para {@code SubprocessoTransicaoService}.
+ * <p><strong>Remoção planejada:</strong> Próxima release (Sprint 2 Fase 2)
+ * @see SubprocessoTransicaoService
+ * @since 1.0.0
+ */
+@Deprecated(since = "2.0.0", forRemoval = true)
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -24,6 +33,11 @@ public class SubprocessoWorkflowExecutor {
     private final SubprocessoTransicaoService transicaoService;
     private final AnaliseService analiseService;
 
+    /**
+     * @deprecated Consolidado em {@link SubprocessoTransicaoService#registrarAnaliseETransicao}.
+     * Use {@code SubprocessoTransicaoService} diretamente.
+     */
+    @Deprecated(since = "2.0.0", forRemoval = true)
     @Transactional
     public void registrarAnaliseETransicao(
             Subprocesso sp,

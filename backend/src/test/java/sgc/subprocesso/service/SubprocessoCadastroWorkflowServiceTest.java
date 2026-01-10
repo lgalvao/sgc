@@ -49,8 +49,6 @@ class SubprocessoCadastroWorkflowServiceTest {
     @Mock
     private ImpactoMapaService impactoMapaService;
     @Mock
-    private SubprocessoWorkflowExecutor workflowExecutor;
-    @Mock
     private sgc.seguranca.acesso.AccessControlService accessControlService;
 
     @InjectMocks
@@ -209,7 +207,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getDataFimEtapa1()).isNull();
 
-        verify(workflowExecutor).registrarAnaliseETransicao(
+        verify(transicaoService).registrarAnaliseETransicao(
                 eq(sp),
                 eq(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO),
                 eq(TipoTransicao.CADASTRO_DEVOLVIDO),
@@ -242,7 +240,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         service.aceitarCadastro(id, "obs", user);
 
-        verify(workflowExecutor).registrarAnaliseETransicao(
+        verify(transicaoService).registrarAnaliseETransicao(
                 eq(sp),
                 eq(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO),
                 eq(TipoTransicao.CADASTRO_ACEITO),
@@ -360,7 +358,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getDataFimEtapa1()).isNull();
 
-        verify(workflowExecutor).registrarAnaliseETransicao(
+        verify(transicaoService).registrarAnaliseETransicao(
                 eq(sp),
                 eq(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO),
                 eq(TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA),
@@ -398,7 +396,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         
         service.aceitarRevisaoCadastro(id, "obs", user);
 
-        verify(workflowExecutor).registrarAnaliseETransicao(
+        verify(transicaoService).registrarAnaliseETransicao(
                 eq(sp),
                 eq(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA),
                 eq(TipoTransicao.REVISAO_CADASTRO_ACEITA),
