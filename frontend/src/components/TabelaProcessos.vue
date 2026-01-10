@@ -109,8 +109,10 @@ const rowAttr = (item: ProcessoResumo | null, type: string) => {
         @sort-changed="handleSortChange"
     >
       <template #empty>
-        <div class="text-center text-muted">
-          Nenhum processo encontrado.
+        <div class="text-center text-muted py-5" data-testid="empty-state-processos">
+          <i class="bi bi-folder2-open display-4 d-block mb-3" aria-hidden="true"></i>
+          <p class="h5">Nenhum processo encontrado</p>
+          <p class="small">Os processos em que sua unidade participa aparecerão aqui.</p>
         </div>
       </template>
 

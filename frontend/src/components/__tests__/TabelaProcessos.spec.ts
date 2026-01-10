@@ -251,7 +251,7 @@ describe("TabelaProcessos.vue", () => {
             },
         });
 
-        expect(context.wrapper.text()).toContain("Nenhum processo encontrado.");
+        expect(context.wrapper.text()).toContain("Nenhum processo encontrado");
     });
 
     describe("Modo Compacto", () => {
