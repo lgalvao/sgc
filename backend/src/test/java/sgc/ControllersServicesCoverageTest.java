@@ -91,18 +91,17 @@ class ControllersServicesCoverageTest {
     void setUp() {
         // Instanciação manual para evitar overhead do @InjectMocks e lidar com muitas dependências
         
+        // MapaFacade (needs to be created first since SubprocessoMapaController depends on it)
+        mapaFacade = new MapaFacade(
+                mapaRepo, competenciaRepo, mapaCompletoMapper, mapaSalvamentoService,
+                mapaVisualizacaoService, impactoMapaService
+        );
+        
         // SubprocessoMapaController
         subprocessoMapaController = new SubprocessoMapaController(
                 subprocessoFacade,
-                mapaFacade, 
-                mapaVisualizacaoService, 
-                impactoMapaService,
+                mapaFacade,
                 usuarioService
-        );
-
-        // MapaService
-        mapaFacade = new MapaFacade(
-                mapaRepo, competenciaRepo, mapaCompletoMapper, mapaSalvamentoService
         );
 
         // SubprocessoCadastroWorkflowService
