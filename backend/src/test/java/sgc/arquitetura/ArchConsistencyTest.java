@@ -261,6 +261,7 @@ public class ArchConsistencyTest {
 
     /**
      * Garante que eventos de domínio sigam o padrão de nomenclatura.
+     * Exceções: Enums (como TipoTransicao) e Listeners (como EventoProcessoListener).
      */
     @ArchTest
     static final ArchRule domain_events_should_start_with_evento = classes()
@@ -268,6 +269,12 @@ public class ArchConsistencyTest {
             .resideInAPackage("..eventos..")
             .or()
             .resideInAPackage("..evento..")
+            .and()
+            .areNotEnums()
+            .and()
+            .haveSimpleNameNotContaining("package-info")
+            .and()
+            .haveSimpleNameNotEndingWith("Listener")
             .should()
             .haveSimpleNameStartingWith("Evento")
             .because("Domain events should start with 'Evento' prefix for consistency");
