@@ -10,8 +10,6 @@ import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.service.AtividadeFacade;
-import sgc.mapa.service.AtividadeService;
-import sgc.mapa.service.ConhecimentoService;
 import sgc.subprocesso.dto.AtividadeOperacaoResp;
 
 import java.net.URI;
@@ -19,15 +17,17 @@ import java.util.List;
 
 /**
  * Controlador REST para gerenciar Atividades e seus Conhecimentos associados.
+ * 
+ * <p><b>Padrão Arquitetural:</b> Este controller usa APENAS {@link AtividadeFacade}.
+ * Nunca acessa AtividadeService ou ConhecimentoService diretamente, seguindo o padrão Facade
+ * para manter a separação de responsabilidades e encapsulamento.
  */
 @RestController
 @RequestMapping("/api/atividades")
 @RequiredArgsConstructor
 @Tag(name = "Atividades", description = "Gerenciamento de atividades e seus conhecimentos")
 public class AtividadeController {
-    private final AtividadeService atividadeService;
     private final AtividadeFacade atividadeFacade;
-    private final ConhecimentoService conhecimentoService;
 
     /**
      * Busca e retorna uma atividade específica pelo seu código.
@@ -39,7 +39,7 @@ public class AtividadeController {
     @GetMapping("/{codAtividade}")
     @Operation(summary = "Obtém uma atividade pelo código")
     public ResponseEntity<AtividadeDto> obterPorId(@PathVariable Long codAtividade) {
-        return ResponseEntity.ok(atividadeService.obterDto(codAtividade));
+        return ResponseEntity.ok(atividadeFacade.obterAtividadePorId(codAtividade));
     }
 
     /**
@@ -98,7 +98,7 @@ public class AtividadeController {
     @GetMapping("/{codAtividade}/conhecimentos")
     @Operation(summary = "Lista todos os conhecimentos de uma atividade")
     public ResponseEntity<List<ConhecimentoDto>> listarConhecimentos(@PathVariable Long codAtividade) {
-        return ResponseEntity.ok(conhecimentoService.listarPorAtividade(codAtividade));
+        return ResponseEntity.ok(atividadeFacade.listarConhecimentosPorAtividade(codAtividade));
     }
 
     /**

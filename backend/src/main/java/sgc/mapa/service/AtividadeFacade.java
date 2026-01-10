@@ -17,6 +17,8 @@ import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 
+import java.util.List;
+
 import static sgc.seguranca.acesso.Acao.*;
 
 /**
@@ -25,6 +27,9 @@ import static sgc.seguranca.acesso.Acao.*;
  * Remove a lógica de negócio do AtividadeController.
  *
  * <p>Implementa o padrão Facade para simplificar a interface de uso e centralizar a coordenação de serviços.
+ * 
+ * <p><b>IMPORTANTE:</b> Este Facade é o ponto de entrada único para operações de atividades.
+ * Controllers devem usar APENAS este Facade, nunca acessar AtividadeService ou ConhecimentoService diretamente.
  */
 @Service
 @RequiredArgsConstructor
@@ -36,6 +41,32 @@ public class AtividadeFacade {
     private final AccessControlService accessControlService;
     private final UsuarioService usuarioService;
     private final MapaService mapaService;
+
+    // ===== Consultas =====
+
+    /**
+     * Obtém uma atividade por código.
+     *
+     * @param codAtividade O código da atividade
+     * @return DTO da atividade
+     */
+    @Transactional(readOnly = true)
+    public AtividadeDto obterAtividadePorId(Long codAtividade) {
+        return atividadeService.obterDto(codAtividade);
+    }
+
+    /**
+     * Lista todos os conhecimentos associados a uma atividade.
+     *
+     * @param codAtividade O código da atividade
+     * @return Lista de conhecimentos
+     */
+    @Transactional(readOnly = true)
+    public List<ConhecimentoDto> listarConhecimentosPorAtividade(Long codAtividade) {
+        return conhecimentoService.listarPorAtividade(codAtividade);
+    }
+
+    // ===== Operações de Atividade =====
 
     /**
      * Cria uma nova atividade e retorna a resposta formatada.
