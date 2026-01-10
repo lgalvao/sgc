@@ -34,7 +34,6 @@ O modelo de dados é hierárquico:
 | `MapaSalvamentoService` | Processa salvamentos complexos do mapa completo com competências e associações. |
 | `CopiaMapaService` | Realiza cópias profundas de mapas e importação de atividades entre mapas. |
 | `MapaVisualizacaoService` | Monta DTOs complexos para exibir a árvore de competências no frontend. |
-| `MapaAcessoService` | Valida permissões de acesso baseadas em perfil e situação do subprocesso. |
 
 ### Serviços de Análise de Impacto
 
@@ -65,7 +64,6 @@ sgc/mapa/
     ├── DetectorImpactoCompetenciaService.java
     ├── DetectorMudancasAtividadeService.java
     ├── ImpactoMapaService.java
-    ├── MapaAcessoService.java
     ├── MapaSalvamentoService.java
     ├── MapaService.java
     └── MapaVisualizacaoService.java

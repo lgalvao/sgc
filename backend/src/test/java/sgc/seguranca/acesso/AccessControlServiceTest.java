@@ -6,8 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
+import sgc.subprocesso.model.Subprocesso;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -94,6 +97,57 @@ class AccessControlServiceTest {
         assertThat(accessControlService.podeExecutar(usuario, Acao.CRIAR_PROCESSO, processo)).isTrue();
         assertThat(accessControlService.podeExecutar(usuario, Acao.EDITAR_PROCESSO, processo)).isTrue();
         assertThat(accessControlService.podeExecutar(usuario, Acao.EXCLUIR_PROCESSO, processo)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Deve delegar para SubprocessoAccessPolicy quando recurso é Subprocesso")
+    void deveDelegarParaSubprocessoAccessPolicy() {
+        Usuario usuario = criarUsuario("123456789012");
+        Subprocesso subprocesso = new Subprocesso();
+        Acao acao = Acao.EDITAR_SUBPROCESSO;
+
+        when(subprocessoAccessPolicy.canExecute(usuario, acao, subprocesso)).thenReturn(true);
+
+        assertThat(accessControlService.podeExecutar(usuario, acao, subprocesso)).isTrue();
+        verify(subprocessoAccessPolicy).canExecute(usuario, acao, subprocesso);
+    }
+
+    @Test
+    @DisplayName("Deve delegar para AtividadeAccessPolicy quando recurso é Atividade")
+    void deveDelegarParaAtividadeAccessPolicy() {
+        Usuario usuario = criarUsuario("123456789012");
+        Atividade atividade = new Atividade();
+        Acao acao = Acao.EDITAR_ATIVIDADE;
+
+        when(atividadeAccessPolicy.canExecute(usuario, acao, atividade)).thenReturn(true);
+
+        assertThat(accessControlService.podeExecutar(usuario, acao, atividade)).isTrue();
+        verify(atividadeAccessPolicy).canExecute(usuario, acao, atividade);
+    }
+
+    @Test
+    @DisplayName("Deve delegar para MapaAccessPolicy quando recurso é Mapa")
+    void deveDelegarParaMapaAccessPolicy() {
+        Usuario usuario = criarUsuario("123456789012");
+        Mapa mapa = new Mapa();
+        Acao acao = Acao.EDITAR_MAPA;
+
+        when(mapaAccessPolicy.canExecute(usuario, acao, mapa)).thenReturn(true);
+
+        assertThat(accessControlService.podeExecutar(usuario, acao, mapa)).isTrue();
+        verify(mapaAccessPolicy).canExecute(usuario, acao, mapa);
+    }
+
+    @Test
+    @DisplayName("Deve negar acesso para recurso desconhecido")
+    void deveNegarAcessoParaRecursoDesconhecido() {
+        Usuario usuario = criarUsuario("123456789012");
+        Object recursoDesconhecido = new Object();
+        Acao acao = Acao.VISUALIZAR_PROCESSO;
+
+        boolean resultado = accessControlService.podeExecutar(usuario, acao, recursoDesconhecido);
+
+        assertThat(resultado).isFalse();
     }
 
     private Usuario criarUsuario(String tituloEleitoral) {
