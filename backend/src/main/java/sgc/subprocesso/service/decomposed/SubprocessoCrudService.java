@@ -1,18 +1,28 @@
 package sgc.subprocesso.service.decomposed;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
+import sgc.organizacao.UsuarioService;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
+import sgc.subprocesso.eventos.EventoSubprocessoAtualizado;
+import sgc.subprocesso.eventos.EventoSubprocessoCriado;
+import sgc.subprocesso.eventos.EventoSubprocessoExcluido;
 import sgc.subprocesso.mapper.SubprocessoMapper;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Serviço especializado para operações CRUD básicas de Subprocesso.
@@ -33,6 +43,8 @@ public class SubprocessoCrudService {
     private final SubprocessoRepo repositorioSubprocesso;
     private final SubprocessoMapper subprocessoMapper;
     private final MapaFacade mapaFacade;
+    private final ApplicationEventPublisher eventPublisher;
+    private final UsuarioService usuarioService;
 
     public Subprocesso buscarSubprocesso(Long codigo) {
         return repositorioSubprocesso
@@ -83,32 +95,94 @@ public class SubprocessoCrudService {
         subprocessoSalvo.setMapa(mapaSalvo);
         var salvo = repositorioSubprocesso.save(subprocessoSalvo);
 
+        // Publica evento de criação
+        EventoSubprocessoCriado evento = EventoSubprocessoCriado.builder()
+                .subprocesso(salvo)
+                .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
+                .dataHoraCriacao(LocalDateTime.now())
+                .criadoPorProcesso(false)  // TODO: detectar se foi criado automaticamente
+                .codProcesso(salvo.getProcesso() != null ? salvo.getProcesso().getCodigo() : null)
+                .codUnidade(salvo.getUnidade() != null ? salvo.getUnidade().getCodigo() : null)
+                .build();
+        eventPublisher.publishEvent(evento);
+
         return subprocessoMapper.toDTO(salvo);
     }
 
     public SubprocessoDto atualizar(Long codigo, SubprocessoDto subprocessoDto) {
         return repositorioSubprocesso.findById(codigo)
                 .map(subprocesso -> {
+                    // Captura estado anterior para o evento
+                    Set<String> camposAlterados = new HashSet<>();
+                    SituacaoSubprocesso situacaoAnterior = subprocesso.getSituacao();
+
                     if (subprocessoDto.getCodMapa() != null) {
                         Mapa mapa = new Mapa();
                         mapa.setCodigo(subprocessoDto.getCodMapa());
+                        if (!Objects.equals(subprocesso.getMapa(), mapa)) {
+                            camposAlterados.add("mapa");
+                        }
                         subprocesso.setMapa(mapa);
                     } else {
+                        if (subprocesso.getMapa() != null) {
+                            camposAlterados.add("mapa");
+                        }
                         subprocesso.setMapa(null);
                     }
+
+                    if (!Objects.equals(subprocesso.getDataLimiteEtapa1(), subprocessoDto.getDataLimiteEtapa1())) {
+                        camposAlterados.add("dataLimiteEtapa1");
+                    }
+                    if (!Objects.equals(subprocesso.getDataFimEtapa1(), subprocessoDto.getDataFimEtapa1())) {
+                        camposAlterados.add("dataFimEtapa1");
+                    }
+                    if (!Objects.equals(subprocesso.getDataFimEtapa2(), subprocessoDto.getDataFimEtapa2())) {
+                        camposAlterados.add("dataFimEtapa2");
+                    }
+                    if (!Objects.equals(subprocesso.getSituacao(), subprocessoDto.getSituacao())) {
+                        camposAlterados.add("situacao");
+                    }
+
                     subprocesso.setDataLimiteEtapa1(subprocessoDto.getDataLimiteEtapa1());
                     subprocesso.setDataFimEtapa1(subprocessoDto.getDataFimEtapa1());
                     subprocesso.setDataFimEtapa2(subprocessoDto.getDataFimEtapa2());
                     subprocesso.setSituacao(subprocessoDto.getSituacao());
-                    return subprocessoMapper.toDTO(repositorioSubprocesso.save(subprocesso));
+
+                    Subprocesso salvo = repositorioSubprocesso.save(subprocesso);
+
+                    // Publica evento de atualização se houve mudanças
+                    if (!camposAlterados.isEmpty()) {
+                        EventoSubprocessoAtualizado evento = EventoSubprocessoAtualizado.builder()
+                                .subprocesso(salvo)
+                                .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
+                                .camposAlterados(camposAlterados)
+                                .dataHoraAtualizacao(LocalDateTime.now())
+                                .situacaoAnterior(situacaoAnterior != subprocessoDto.getSituacao() ? situacaoAnterior : null)
+                                .build();
+                        eventPublisher.publishEvent(evento);
+                    }
+
+                    return subprocessoMapper.toDTO(salvo);
                 })
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo));
     }
 
     public void excluir(Long codigo) {
-        if (!repositorioSubprocesso.existsById(codigo)) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo);
-        }
+        Subprocesso subprocesso = repositorioSubprocesso.findById(codigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo));
+
+        // Publica evento ANTES da exclusão
+        EventoSubprocessoExcluido evento = EventoSubprocessoExcluido.builder()
+                .codSubprocesso(codigo)
+                .codProcesso(subprocesso.getProcesso() != null ? subprocesso.getProcesso().getCodigo() : null)
+                .codUnidade(subprocesso.getUnidade() != null ? subprocesso.getUnidade().getCodigo() : null)
+                .codMapa(subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null)
+                .situacao(subprocesso.getSituacao())
+                .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
+                .dataHoraExclusao(LocalDateTime.now())
+                .build();
+        eventPublisher.publishEvent(evento);
+
         repositorioSubprocesso.deleteById(codigo);
     }
 
