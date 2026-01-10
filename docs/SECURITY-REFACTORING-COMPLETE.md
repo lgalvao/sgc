@@ -54,15 +54,15 @@ The security refactoring of SGC has been **successfully completed**. All 4 sprin
 
 ## Metrics Achieved
 
-| Metric | Target | Achieved |
-|--------|--------|----------|
-| Centralized files | 5 | 8 (160%) |
-| Verification patterns | 1 | 1 (100%) |
-| Access tests | >30 | 31+ (103%) |
-| **All tests** | **100%** | **✅ 100%** |
-| Endpoints without control | 0 | 0 (100%) |
-| Audit logging | Yes | Yes (100%) |
-| Null-safety | Yes | Yes (100%) |
+| Metric                    | Target   | Achieved   |
+|---------------------------|----------|------------|
+| Centralized files         | 5        | 8 (160%)   |
+| Verification patterns     | 1        | 1 (100%)   |
+| Access tests              | >30      | 31+ (103%) |
+| **All tests**             | **100%** | **✅ 100%** |
+| Endpoints without control | 0        | 0 (100%)   |
+| Audit logging             | Yes      | Yes (100%) |
+| Null-safety               | Yes      | Yes (100%) |
 
 ---
 
@@ -94,7 +94,7 @@ When adding a new endpoint that requires access control:
    ```java
    @PreAuthorize("hasRole('ADMIN')")
    @PostMapping("/criar")
-   public ResponseEntity<?> criar(...) {
+   public ResponseEntity<?> criar(/*...*/) {}
    ```
 
 2. **Call `AccessControlService` in the service method**
@@ -162,28 +162,9 @@ cd backend
 ```
 
 ---
-
-## Next Steps (Optional - Sprint 5)
-
-The refactoring is **complete**. Optional improvements for the future:
-
-1. **E2E Validation** - Run full E2E test suite
-2. **Performance** - Add caching for hierarchy lookups
-3. **UX** - Improve error messages for end users
-4. **Cleanup** - Remove deprecated services after stable period
-5. **Monitoring** - Add metrics dashboard for access denials
-
----
-
 ## Questions?
 
 Refer to:
 - `SECURITY-REFACTORING.md` for quick reference
 - `security-refactoring-plan.md` for detailed architecture and execution history
 - JavaDoc in the code for API documentation
-
----
-
-**Status:** ✅ Ready for code review and merge  
-**Last Updated:** 2026-01-09  
-**Completed By:** GitHub Copilot Agent

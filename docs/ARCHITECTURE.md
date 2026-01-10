@@ -171,8 +171,7 @@ POST /api/processos/{id}/iniciar     - Workflow action
 
 - [Backend Patterns](/regras/backend-padroes.md)
 - [Frontend Patterns](/regras/frontend-padroes.md)
-- [Security Refactoring](/SECURITY-REFACTORING.md)
-- [Refactoring Plan](/refactoring-plan.md)
+- [Security Refactoring](/docs/SECURITY-REFACTORING-COMPLETE.md)
 - [AGENTS.md](/AGENTS.md)
 
 ---
