@@ -50,7 +50,6 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     @Mock private AnaliseService analiseService;
     @Mock private UnidadeService unidadeService;
     @Mock private sgc.subprocesso.service.decomposed.SubprocessoValidacaoService validacaoService;
-    @Mock private SubprocessoWorkflowExecutor workflowExecutor;
     @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
 
     // --- SALVAR MAPA ---

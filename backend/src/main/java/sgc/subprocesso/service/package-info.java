@@ -32,8 +32,14 @@
  *         <li>Ajustar mapa pós-homologação</li>
  *       </ul>
  *   </li>
- *   <li>{@code SubprocessoTransicaoService} - Registra transições de estado no histórico</li>
- *   <li>{@code SubprocessoWorkflowExecutor} - Executor comum de workflows (análise + transição)</li>
+ *   <li>{@code SubprocessoTransicaoService} - Registra transições e executa workflows com análises
+ *       <ul>
+ *         <li>Salva movimentações (trilha de auditoria)</li>
+ *         <li>Publica eventos de transição</li>
+ *         <li>Executa workflows completos (análise + transição)</li>
+ *         <li><em>Consolidado:</em> Absorveu funcionalidades do SubprocessoWorkflowExecutor (removido)</li>
+ *       </ul>
+ *   </li>
  * </ul>
  * 
  * <h3>CRUD Services</h3>
