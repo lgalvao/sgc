@@ -5,6 +5,8 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 plugins {
     java
     jacoco
+    checkstyle
+    pmd
     id("org.springframework.boot") version "4.0.1"
     id("io.spring.dependency-management") version "1.1.7"
     id("info.solidsoft.pitest") version "1.19.0-rc.1"
@@ -270,3 +272,35 @@ configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
     threads.set(8)
     outputFormats.set(setOf("XML", "HTML"))
 }
+
+// Configuração de Checkstyle
+checkstyle {
+    toolVersion = "10.12.4"
+    configFile = file("config/checkstyle/checkstyle.xml")
+    isIgnoreFailures = false
+    maxWarnings = 0
+}
+
+// Configuração de PMD
+pmd {
+    toolVersion = "7.0.0"
+    isConsoleOutput = true
+    isIgnoreFailures = false
+    ruleSets = listOf() // Usar configuração customizada
+    ruleSetFiles = files("config/pmd/pmd-ruleset.xml")
+}
+
+tasks.withType<Checkstyle> {
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
+tasks.withType<Pmd> {
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
