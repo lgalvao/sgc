@@ -192,42 +192,47 @@ A análise da arquitetura atual revelou oportunidades de melhoria focadas em:
 
 ---
 
-### FASE 3: Melhorias de Documentação (2-3 dias)
+### FASE 3: Melhorias de Documentação (2-3 dias) - ⏳ EM PROGRESSO
 
 **Objetivo**: Garantir que toda a arquitetura está bem documentada
 
 #### Tarefas:
-1. **Completar package-info.java Faltantes**
-   - Identificar packages sem package-info
-   - Criar documentação seguindo padrão existente
-   - Incluir exemplos de uso
+1. ⏳ **Completar package-info.java Faltantes**
+   - ✅ sgc (pacote raiz) - Visão geral completa do sistema
+   - ✅ sgc.processo.eventos - Eventos de processo
+   - ✅ sgc.processo.dto - DTOs de processo
+   - ✅ sgc.processo.mapper - Mappers de processo
+   - ✅ sgc.subprocesso.eventos - Eventos de subprocesso (padrão unificado)
+   - [ ] sgc.subprocesso.dto - DTOs de subprocesso
+   - [ ] sgc.subprocesso.mapper - Mappers de subprocesso
+   - [ ] Outros pacotes conforme necessário
 
-2. **Atualizar AGENTS.md**
-   - Adicionar seção sobre padrões arquiteturais
-   - Documentar regras do ArchUnit
-   - Exemplos de uso de Facades
+2. [ ] **Atualizar AGENTS.md**
+   - [ ] Adicionar seção sobre padrões arquiteturais
+   - [ ] Documentar regras do ArchUnit
+   - [ ] Exemplos de uso de Facades
 
-3. **Criar ADRs (Architectural Decision Records)**
-   - Por que Facade Pattern?
-   - Por que AccessControlService centralizado?
-   - Por que DTOs obrigatórios?
-   - Por que EventoTransicaoSubprocesso unificado?
+3. [ ] **Criar ADRs (Architectural Decision Records)**
+   - [ ] Por que Facade Pattern?
+   - [ ] Por que AccessControlService centralizado?
+   - [ ] Por que DTOs obrigatórios?
+   - [ ] Por que EventoTransicaoSubprocesso unificado?
 
-4. **Diagramas de Arquitetura**
-   - Diagrama de camadas (ASCII art melhorado)
-   - Diagrama de módulos e dependências
-   - Fluxo de dados (Command vs Query)
+4. [ ] **Diagramas de Arquitetura**
+   - [ ] Diagrama de camadas (ASCII art melhorado)
+   - [ ] Diagrama de módulos e dependências
+   - [ ] Fluxo de dados (Command vs Query)
 
 **Entregáveis**:
-- [ ] package-info.java completos (100% cobertura)
+- ⏳ package-info.java completos (5/~30 criados)
 - [ ] AGENTS.md atualizado com arquitetura
 - [ ] 4 ADRs criados
 - [ ] 3 diagramas atualizados
 
 **Critérios de Aceitação**:
-- Todos os packages principais com package-info
-- Documentação alinhada com código
-- Diagramas refletem arquitetura atual
+- ⏳ Todos os packages principais com package-info
+- [ ] Documentação alinhada com código
+- [ ] Diagramas refletem arquitetura atual
 
 ---
 
