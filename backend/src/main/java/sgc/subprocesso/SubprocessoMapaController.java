@@ -13,9 +13,7 @@ import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
-import sgc.mapa.service.ImpactoMapaService;
 import sgc.mapa.service.MapaFacade;
-import sgc.mapa.service.MapaVisualizacaoService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
@@ -31,8 +29,6 @@ import java.util.List;
 public class SubprocessoMapaController {
     private final SubprocessoFacade subprocessoFacade;
     private final MapaFacade mapaFacade;
-    private final MapaVisualizacaoService mapaVisualizacaoService;
-    private final ImpactoMapaService impactoMapaService;
     private final UsuarioService usuarioService;
 
     /**
@@ -65,7 +61,7 @@ public class SubprocessoMapaController {
     @Operation(summary = "Verifica os impactos da revisão no mapa de competências")
     public ImpactoMapaDto verificarImpactos(@PathVariable Long codigo) {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
-        return impactoMapaService.verificarImpactos(codigo, usuario);
+        return mapaFacade.verificarImpactos(codigo, usuario);
     }
 
     /**
@@ -91,7 +87,7 @@ public class SubprocessoMapaController {
     @GetMapping("/{codigo}/mapa-visualizacao")
     @PreAuthorize("isAuthenticated()")
     public MapaVisualizacaoDto obterMapaVisualizacao(@PathVariable("codigo") Long codSubprocesso) {
-        return mapaVisualizacaoService.obterMapaParaVisualizacao(codSubprocesso);
+        return mapaFacade.obterMapaParaVisualizacao(codSubprocesso);
     }
 
     /**

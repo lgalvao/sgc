@@ -13,6 +13,10 @@ import java.util.stream.Collectors;
 
 /**
  * Serviço especializado na detecção de alterações em atividades entre duas versões de mapa.
+ * 
+ * <p><b>IMPORTANTE:</b> Este serviço deve ser acessado apenas dentro do pacote mapa.service.
+ * Operações de impacto devem ser realizadas via {@link ImpactoMapaService}.
+ * 
  * Responsável por identificar inserções, remoções e modificações em atividades e seus conhecimentos.
  *
  * <p>Utiliza mapas em memória para otimizar a comparação e evitar excesso de consultas ao banco de dados.
