@@ -160,4 +160,115 @@ public class ArchConsistencyTest {
             .dependOnClassesThat()
             .haveNameMatching(".*Detector.*Service")
             .because("Controllers should use Facades (e.g., MapaFacade, AtividadeFacade) instead of specialized services");
+
+    /**
+     * Garante que todas as classes Facade tenham o sufixo "Facade" no nome.
+     * Isso melhora a consistência e clareza arquitetural.
+     */
+    @ArchTest
+    static final ArchRule facades_should_have_facade_suffix = classes()
+            .that()
+            .resideInAPackage("..service..")
+            .and()
+            .areAnnotatedWith(org.springframework.stereotype.Service.class)
+            .and()
+            .haveSimpleNameContaining("Facade")
+            .should()
+            .haveSimpleNameEndingWith("Facade")
+            .because("Facade classes should have 'Facade' as suffix for consistency");
+
+    /**
+     * Garante que DTOs não sejam entidades JPA.
+     * Entidades JPA nunca devem ser expostas diretamente nas APIs.
+     */
+    @ArchTest
+    static final ArchRule dtos_should_not_be_jpa_entities = noClasses()
+            .that()
+            .haveSimpleNameEndingWith("Dto")
+            .should()
+            .beAnnotatedWith(jakarta.persistence.Entity.class)
+            .because("DTOs should never be JPA entities - use separate entity classes");
+
+    /**
+     * Garante que entidades JPA não sejam retornadas diretamente pelos controllers.
+     * Controllers devem sempre usar DTOs.
+     */
+    @ArchTest
+    static final ArchRule controllers_should_not_return_jpa_entities = noClasses()
+            .that()
+            .areAnnotatedWith(jakarta.persistence.Entity.class)
+            .should()
+            .beInterfaces()
+            .orShould()
+            .beAnnotatedWith(org.springframework.web.bind.annotation.RestController.class)
+            .because("JPA entities should never be exposed directly - use DTOs instead");
+
+    /**
+     * Garante que Services não tenham lógica de controle de acesso direto.
+     * Toda verificação de acesso deve ser feita via AccessControlService.
+     */
+    @ArchTest
+    static final ArchRule services_should_not_throw_access_denied_directly = noClasses()
+            .that()
+            .haveSimpleNameEndingWith("Service")
+            .and()
+            .doNotHaveSimpleName("AccessControlService")
+            .and()
+            .doNotHaveSimpleName("AccessAuditService")
+            .and()
+            .resideOutsideOfPackage("sgc.seguranca.acesso..")
+            .should(new ArchCondition<JavaClass>("throw ErroAccessoNegado directly - use AccessControlService instead") {
+                @Override
+                public void check(JavaClass item, ConditionEvents events) {
+                    // Verificar se o service cria instâncias de ErroAccessoNegado
+                    item.getCodeUnits().forEach(codeUnit -> {
+                        codeUnit.getCallsFromSelf().stream()
+                            .filter(call -> call.getTargetOwner().getSimpleName().equals("ErroAccessoNegado"))
+                            .filter(call -> call.getName().equals("<init>"))
+                            .forEach(call -> {
+                                String message = String.format(
+                                        "Service %s throws ErroAccessoNegado directly in method %s. " +
+                                        "Use AccessControlService.verificarPermissao() instead.",
+                                        item.getSimpleName(), codeUnit.getName());
+                                events.add(SimpleConditionEvent.violated(call, message));
+                            });
+                    });
+                }
+            })
+            .because("Access control should be centralized in AccessControlService");
+
+    /**
+     * Garante nomenclatura consistente de Controllers.
+     */
+    @ArchTest
+    static final ArchRule controllers_should_have_controller_suffix = classes()
+            .that()
+            .areAnnotatedWith(org.springframework.web.bind.annotation.RestController.class)
+            .should()
+            .haveSimpleNameEndingWith("Controller")
+            .because("Controllers should have 'Controller' suffix for consistency");
+
+    /**
+     * Garante nomenclatura consistente de Repositories.
+     */
+    @ArchTest
+    static final ArchRule repositories_should_have_repo_suffix = classes()
+            .that()
+            .areAssignableTo(org.springframework.data.jpa.repository.JpaRepository.class)
+            .should()
+            .haveSimpleNameEndingWith("Repo")
+            .because("Repositories should have 'Repo' suffix for consistency");
+
+    /**
+     * Garante que eventos de domínio sigam o padrão de nomenclatura.
+     */
+    @ArchTest
+    static final ArchRule domain_events_should_start_with_evento = classes()
+            .that()
+            .resideInAPackage("..eventos..")
+            .or()
+            .resideInAPackage("..evento..")
+            .should()
+            .haveSimpleNameStartingWith("Evento")
+            .because("Domain events should start with 'Evento' prefix for consistency");
 }

@@ -149,39 +149,46 @@ A análise da arquitetura atual revelou oportunidades de melhoria focadas em:
 
 ---
 
-### FASE 2: Testes Arquiteturais (2-3 dias)
+### FASE 2: Testes Arquiteturais (2-3 dias) - ⏳ EM PROGRESSO
 
 **Objetivo**: Criar testes que garantam aderência aos padrões arquiteturais
 
 #### Tarefas:
-1. **Implementar ArchUnit Tests**
-   - Controllers devem usar apenas Facades
-   - Facades devem ter sufixo "Facade"
-   - Services especializados não devem ser chamados por Controllers
-   - Entidades JPA não devem ser expostas em APIs
+1. ✅ **Implementar ArchUnit Tests**
+   - ✅ Controllers devem usar apenas Facades
+   - ✅ Facades devem ter sufixo "Facade"
+   - ✅ Services especializados não devem ser chamados por Controllers
+   - ✅ Entidades JPA não devem ser expostas em APIs
+   - ✅ DTOs não devem ser entidades JPA
+   - ✅ Services não devem lançar ErroAccessoNegado diretamente
+   - ✅ Controllers devem ter sufixo "Controller"
+   - ✅ Repositories devem ter sufixo "Repo"
+   - ✅ Eventos de domínio devem começar com "Evento"
 
-2. **Testes de Nomenclatura**
-   - Verificar sufixos: Controller, Service, Facade, Repo, Dto
-   - Verificar padrão de packages
+2. ✅ **Testes de Nomenclatura**
+   - ✅ Verificar sufixos: Controller, Service, Facade, Repo, Dto
+   - ✅ Verificar padrão de eventos (Evento prefix)
 
-3. **Testes de Camadas**
-   - Controllers → Facades → Services
-   - Nenhuma camada pulada
+3. ✅ **Testes de Camadas**
+   - ✅ Controllers → Facades (não services especializados)
+   - ✅ Services → Repositories (apenas do mesmo módulo)
+   - ✅ Null-safety (@NullMarked nos pacotes)
 
-4. **Executar e Documentar Baseline**
-   - Rodar testes arquiteturais
-   - Documentar violações (se houver)
-   - Criar plano de correção
+4. ⏳ **Executar e Documentar Baseline**
+   - [ ] Rodar testes arquiteturais
+   - [ ] Documentar violações (se houver)
+   - [ ] Criar plano de correção
 
 **Entregáveis**:
-- [ ] Classe `ArchitectureConsistencyTest` com ~10 regras
+- ✅ Classe `ArchConsistencyTest` expandida (5→14 regras)
 - [ ] Relatório de conformidade arquitetural
 - [ ] Plano de correção de violações (se houver)
 
 **Critérios de Aceitação**:
-- Testes arquiteturais criados e executando
-- Zero violações críticas (ou plano para corrigir)
-- Documentação de regras arquiteturais
+- ✅ Testes arquiteturais criados e expandidos
+- [ ] Testes executados com sucesso
+- [ ] Zero violações críticas (ou plano para corrigir)
+- [ ] Documentação de regras arquiteturais
 
 ---
 
