@@ -90,6 +90,13 @@ O SGC segue padrões arquiteturais bem definidos, documentados em ADRs (Architec
   * DTOs de Request (entrada) vs. DTOs de Response (saída)
   * Bean Validation para validação de entrada
 
+* **[ADR-005: Controller Organization](/docs/adr/ADR-005-controller-organization.md)** - ✅ Implementado
+  * Controllers organizados por workflow phase, não consolidados em arquivos grandes
+  * Separação clara: CRUD, Cadastro, Mapa, Validação
+  * Mantém arquivos de tamanho gerenciável (~200-300 linhas)
+  * Melhor navegabilidade, testabilidade e documentação Swagger
+  * Aderência ao Single Responsibility Principle
+
 ## 6. Referências e Padrões Detalhados
 
 Para detalhes técnicos e exemplos de código, consulte:
