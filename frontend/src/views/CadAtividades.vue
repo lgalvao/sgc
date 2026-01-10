@@ -200,7 +200,7 @@
 import {BAlert, BButton, BCol, BContainer, BDropdown, BDropdownItem, BForm, BFormInput} from "bootstrap-vue-next";
 import {computed, nextTick, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
-import {badgeClass, situacaoLabel} from "@/utils";
+import {badgeClass, situacaoLabel, logger} from "@/utils";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
@@ -465,7 +465,7 @@ onMounted(async () => {
     codSubprocesso.value = id;
     await subprocessosStore.buscarContextoEdicao(id);
   } else {
-    console.error('[CadAtividades] ERRO: Subprocesso não encontrado!');
+    logger.error('[CadAtividades] ERRO: Subprocesso não encontrado!');
   }
 });
 

@@ -87,6 +87,7 @@
 import {computed, onMounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {BAlert, BButton, BCard, BContainer, BFormSelect, BFormTextarea, BSpinner} from 'bootstrap-vue-next';
+import {logger} from '@/utils';
 import {useMapasStore} from '@/stores/mapas';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useFeedbackStore} from '@/stores/feedback';
@@ -158,7 +159,7 @@ onMounted(async () => {
     });
   } catch (error) {
     feedbackStore.show('Erro', 'Erro ao carregar dados do diagnóstico.', 'danger');
-    console.error(error);
+    logger.error(error);
   } finally {
     loading.value = false;
   }
