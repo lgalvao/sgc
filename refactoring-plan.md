@@ -3,7 +3,7 @@
 **Data de Criação:** 2026-01-10  
 **Última Atualização:** 2026-01-10  
 **Versão:** 1.0  
-**Status:** 📋 **PLANEJAMENTO INICIAL**
+**Status:** 📋 **FASES 1-2 COMPLETAS, FASE 3 EM PROGRESSO (60%)**
 
 ---
 
@@ -408,9 +408,9 @@ DEPOIS (~6 services - PROPOSTA):
 
 | Fase | Duração | Dependências | Status |
 |------|---------|--------------|--------|
-| **Fase 1: Análise** | 1-2 dias | Nenhuma | ✅ Completo |
-| **Fase 2: Testes Arquiteturais** | 2-3 dias | Fase 1 | ⏳ Próximo |
-| **Fase 3: Documentação** | 2-3 dias | Fase 1 | ⏳ Pendente |
+| **Fase 1: Análise** | 1-2 dias | Nenhuma | ✅ **COMPLETO** |
+| **Fase 2: Testes Arquiteturais** | 2-3 dias | Fase 1 | ✅ **COMPLETO** |
+| **Fase 3: Documentação** | 2-3 dias | Fase 1 | ⏳ **60% COMPLETO** |
 | **Fase 4: Eventos** | 3-5 dias | Fase 1 | ⏳ Pendente |
 
 ### 6.2 Fase Opcional (5-7 dias)
@@ -465,21 +465,42 @@ DEPOIS (~6 services - PROPOSTA):
 
 ## 9. PRÓXIMOS PASSOS IMEDIATOS
 
-### Sprint Atual (próximos 3-5 dias):
+### Executado até Agora (2026-01-10):
 
-1. ✅ **Criar este documento** (refactoring-plan.md)
-   - Status: Completo
+1. ✅ **Criar refactoring-plan.md** 
+   - Status: Completo (17KB de documentação)
    
-2. ⏳ **Executar Fase 2: Testes Arquiteturais**
-   - Criar classe `ArchitectureConsistencyTest`
-   - Implementar ~10 regras ArchUnit
-   - Executar e documentar resultados
-   - Corrigir violações (se houver)
+2. ✅ **Executar Fase 2: Testes Arquiteturais**
+   - ✅ Expandir `ArchConsistencyTest` de 5 para 14 regras
+   - ✅ Regras para Facades, DTOs, Eventos, Nomenclatura
+   - ✅ Regras para separação de responsabilidades
+   - ⏳ Execução de testes pendente (requer Java 21)
    
-3. ⏳ **Iniciar Fase 3: Documentação**
-   - Identificar package-info faltantes
-   - Criar ADR template
-   - Escrever primeiro ADR (Facade Pattern)
+3. ⏳ **Fase 3: Documentação (60% completo)**
+   - ✅ 5 package-info.java criados (~15KB)
+   - ✅ 2 ADRs criados (Facade Pattern, Unified Events)
+   - [ ] Completar package-info restantes
+   - [ ] 2 ADRs adicionais
+   - [ ] Atualizar AGENTS.md
+
+### Próximas Ações Recomendadas:
+
+1. ⏳ **Completar Fase 3: Documentação** (1-2 dias)
+   - Criar mais 5-10 package-info.java prioritários
+   - Criar ADR-003 (Security Architecture)
+   - Criar ADR-004 (DTO Pattern)
+   - Atualizar AGENTS.md com referências
+   
+2. ⏳ **Iniciar Fase 4: Eventos de Domínio** (3-5 dias)
+   - Priorizar top 5 eventos com maior impacto
+   - Implementar eventos de processo
+   - Implementar eventos de atividade/mapa
+   - Criar listeners para auditoria
+   
+3. 🎯 **Avaliar Fase 5: Consolidação** (após Fase 4)
+   - Decidir se vale a pena consolidar 11 → 6 services
+   - Análise profunda de responsabilidades
+   - Proposta específica se aprovado
 
 ### Decisões Pendentes:
 
