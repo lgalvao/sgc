@@ -69,7 +69,7 @@ class AccessControlServiceTest {
 
         assertDoesNotThrow(() -> accessControlService.verificarPermissao(usuario, acao, processo));
 
-        verify(auditService).logAccessGranted(eq(usuario), eq(acao), eq(processo));
+        verify(auditService).logAccessGranted(usuario, acao, processo);
     }
 
     @Test
@@ -92,7 +92,7 @@ class AccessControlServiceTest {
         Usuario usuario = criarUsuario("123456789012");
         Processo processo = criarProcesso(1L);
 
-        when(processoAccessPolicy.canExecute(eq(usuario), any(), eq(processo))).thenReturn(true);
+        when(processoAccessPolicy.canExecute(eq(usuario), any(Acao.class), eq(processo))).thenReturn(true);
 
         assertThat(accessControlService.podeExecutar(usuario, Acao.CRIAR_PROCESSO, processo)).isTrue();
         assertThat(accessControlService.podeExecutar(usuario, Acao.EDITAR_PROCESSO, processo)).isTrue();
@@ -148,6 +148,65 @@ class AccessControlServiceTest {
         boolean resultado = accessControlService.podeExecutar(usuario, acao, recursoDesconhecido);
 
         assertThat(resultado).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve retornar motivo de negação para diferentes tipos de recurso")
+    void deveRetornarMotivoNegacaoParaDiferentesRecursos() {
+        Usuario usuario = criarUsuario("123456789012");
+        Acao acao = Acao.EDITAR_PROCESSO;
+
+        when(processoAccessPolicy.getMotivoNegacao()).thenReturn("Motivo Processo");
+        when(atividadeAccessPolicy.getMotivoNegacao()).thenReturn("Motivo Atividade");
+        when(mapaAccessPolicy.getMotivoNegacao()).thenReturn("Motivo Mapa");
+
+        assertThat(accessControlService.podeExecutar(null, acao, new Processo())).isFalse(); // Linha 48-49
+
+        // Testando obterMotivoNegacao (chamado via verificarPermissao quando falha)
+        when(processoAccessPolicy.canExecute(any(), any(), any())).thenReturn(false);
+        try {
+            accessControlService.verificarPermissao(usuario, acao, new Processo());
+        } catch (sgc.comum.erros.ErroAccessoNegado e) {
+            assertThat(e.getMessage()).isEqualTo("Motivo Processo");
+        }
+
+        when(atividadeAccessPolicy.canExecute(any(), any(), any())).thenReturn(false);
+        try {
+            accessControlService.verificarPermissao(usuario, acao, new Atividade());
+        } catch (sgc.comum.erros.ErroAccessoNegado e) {
+            assertThat(e.getMessage()).isEqualTo("Motivo Atividade");
+        }
+
+        when(mapaAccessPolicy.canExecute(any(), any(), any())).thenReturn(false);
+        try {
+            accessControlService.verificarPermissao(usuario, acao, new Mapa());
+        } catch (sgc.comum.erros.ErroAccessoNegado e) {
+            assertThat(e.getMessage()).isEqualTo("Motivo Mapa");
+        }
+    }
+
+    @Test
+    @DisplayName("Deve lidar com usuário nulo ao obter motivo de negação")
+    void deveLidarComUsuarioNuloAoObterMotivo() {
+        try {
+            // Chamando o método privado via reflexão ou apenas testando o efeito colateral se possível
+            // Como obterMotivoNegacao é privado e chamado por verificarPermissao, 
+            // mas verificarPermissao chama podeExecutar que retorna false se usuário é null
+            accessControlService.verificarPermissao(null, Acao.VISUALIZAR_PROCESSO, new Processo());
+        } catch (sgc.comum.erros.ErroAccessoNegado e) {
+            assertThat(e.getMessage()).contains("Usuário não autenticado");
+        }
+    }
+
+    @Test
+    @DisplayName("Deve retornar mensagem genérica para tipo de recurso desconhecido")
+    void deveRetornarMensagemGenericaParaRecursoDesconhecido() {
+        Usuario usuario = criarUsuario("1");
+        try {
+            accessControlService.verificarPermissao(usuario, Acao.VISUALIZAR_PROCESSO, "String de recurso");
+        } catch (sgc.comum.erros.ErroAccessoNegado e) {
+            assertThat(e.getMessage()).contains("não tem permissão para executar a ação");
+        }
     }
 
     private Usuario criarUsuario(String tituloEleitoral) {

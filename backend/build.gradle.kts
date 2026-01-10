@@ -210,6 +210,8 @@ tasks.register<Test>("integrationTest") {
 }
 
 tasks.jacocoTestReport {
+    dependsOn(tasks.named("test"), tasks.named("unitTest"), tasks.named("integrationTest"))
+    
     // Relatório consome dados de qualquer tarefa de teste que rodou
     executionData.setFrom(fileTree(layout.buildDirectory.get().asFile).include("/jacoco/*.exec"))
     

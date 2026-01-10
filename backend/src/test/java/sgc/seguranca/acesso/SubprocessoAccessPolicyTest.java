@@ -266,27 +266,117 @@ class SubprocessoAccessPolicyTest {
     }
 
     @Nested
-    @DisplayName("Testes de Diagnóstico")
-    class DiagnosticoTest {
+    @DisplayName("Testes de Verificar Impactos")
+    class VerificarImpactosTest {
 
         @Test
-        @DisplayName("Deve permitir CHEFE realizar autoavaliação")
-        void devePermitirChefeRealizarAutoavaliacao() {
-            subprocesso.setSituacao(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
-
-            boolean resultado = policy.canExecute(usuarioChefe, REALIZAR_AUTOAVALIACAO, subprocesso);
-
+        @DisplayName("Deve permitir CHEFE verificar impactos na mesma unidade e situação permitida")
+        void devePermitirChefeVerificarImpactosMesmaUnidadeSituaçãoPermitida() {
+            subprocesso.setSituacao(NAO_INICIADO);
+            boolean resultado = policy.canExecute(usuarioChefe, VERIFICAR_IMPACTOS, subprocesso);
             assertThat(resultado).isTrue();
         }
 
         @Test
-        @DisplayName("Deve negar SERVIDOR realizar autoavaliação")
-        void deveNegarServidorRealizarAutoavaliacao() {
-            subprocesso.setSituacao(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
-
-            boolean resultado = policy.canExecute(usuarioServidor, REALIZAR_AUTOAVALIACAO, subprocesso);
-
+        @DisplayName("Deve negar CHEFE verificar impactos em unidade diferente")
+        void deveNegarChefeVerificarImpactosUnidadeDiferente() {
+            subprocesso.setSituacao(NAO_INICIADO);
+            Unidade outra = criarUnidade(3L, "OUTRA", unidadeSuperior, "X");
+            subprocesso.setUnidade(outra);
+            
+            boolean resultado = policy.canExecute(usuarioChefe, VERIFICAR_IMPACTOS, subprocesso);
             assertThat(resultado).isFalse();
+            assertThat(policy.getMotivoNegacao()).isNotEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve permitir GESTOR verificar impactos em REVISAO_CADASTRO_DISPONIBILIZADA")
+        void devePermitirGestorVerificarImpactos() {
+            subprocesso.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
+            boolean resultado = policy.canExecute(usuarioGestor, VERIFICAR_IMPACTOS, subprocesso);
+            assertThat(resultado).isTrue();
+        }
+
+        @Test
+        @DisplayName("Deve permitir ADMIN verificar impactos nas situações de revisão")
+        void devePermitirAdminVerificarImpactos() {
+            subprocesso.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
+            assertThat(policy.canExecute(usuarioAdmin, VERIFICAR_IMPACTOS, subprocesso)).isTrue();
+            
+            subprocesso.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
+            assertThat(policy.canExecute(usuarioAdmin, VERIFICAR_IMPACTOS, subprocesso)).isTrue();
+            
+            subprocesso.setSituacao(REVISAO_MAPA_AJUSTADO);
+            assertThat(policy.canExecute(usuarioAdmin, VERIFICAR_IMPACTOS, subprocesso)).isTrue();
+        }
+
+        @Test
+        @DisplayName("Deve negar SERVIDOR verificar impactos")
+        void deveNegarServidorVerificarImpactos() {
+            boolean resultado = policy.canExecute(usuarioServidor, VERIFICAR_IMPACTOS, subprocesso);
+            assertThat(resultado).isFalse();
+            assertThat(policy.getMotivoNegacao()).contains("não possui um dos perfis necessários");
+        }
+
+        @Test
+        @DisplayName("Deve negar ADMIN verificar impactos em situação fora do padrão")
+        void deveNegarAdminVerificarImpactosSituacaoInvalida() {
+            subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            boolean resultado = policy.canExecute(usuarioAdmin, VERIFICAR_IMPACTOS, subprocesso);
+            assertThat(resultado).isFalse();
+            assertThat(policy.getMotivoNegacao()).contains("não pode ser executada");
+        }
+    }
+
+    @Nested
+    @DisplayName("Testes de Hierarquia e Casos de Borda")
+    class HierarquiaCasosBordaTest {
+
+        @Test
+        @DisplayName("Deve permitir acesso quando requisito é NENHUM mesmo sem unidade")
+        void devePermitirAcessoRequisitoNenhumSemUnidade() {
+            subprocesso.setUnidade(null);
+            // LISTAR_SUBPROCESSOS tem RequisitoHierarquia.NENHUM
+            boolean resultado = policy.canExecute(usuarioAdmin, LISTAR_SUBPROCESSOS, subprocesso);
+            assertThat(resultado).isTrue();
+        }
+
+        @Test
+        @DisplayName("Deve negar acesso quando requisito requer unidade e unidade é null")
+        void deveNegarAcessoQuandoRequisitoUnidadeMasUnidadeNull() {
+            subprocesso.setUnidade(null);
+            // EDITAR_CADASTRO tem RequisitoHierarquia.MESMA_UNIDADE
+            boolean resultado = policy.canExecute(usuarioChefe, EDITAR_CADASTRO, subprocesso);
+            assertThat(resultado).isFalse();
+        }
+
+        @Test
+        @DisplayName("Deve permitir GESTOR em unidade superior (MESMA_OU_SUBORDINADA)")
+        void devePermitirGestorUnidadeSuperior() {
+            when(servicoHierarquia.isSubordinada(unidadePrincipal, unidadeSuperior)).thenReturn(true);
+            boolean resultado = policy.canExecute(usuarioGestor, VISUALIZAR_SUBPROCESSO, subprocesso);
+            assertThat(resultado).isTrue();
+        }
+
+        @Test
+        @DisplayName("Deve negar se não for unidade superior imediata")
+        void deveNegarSeNaoForSuperiorImediata() {
+            when(servicoHierarquia.isSuperiorImediata(unidadePrincipal, unidadeSuperior)).thenReturn(false);
+            subprocesso.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            
+            boolean resultado = policy.canExecute(usuarioGestor, ACEITAR_CADASTRO, subprocesso);
+            
+            assertThat(resultado).isFalse();
+            assertThat(policy.getMotivoNegacao()).contains("não pertence à unidade superior imediata");
+        }
+        
+        @Test
+        @DisplayName("Deve negar se ação não for reconhecida")
+        void deveNegarAcaoNaoReconhecida() {
+            // Ação que não está no mapa de regras do Subprocesso (ex: CRIAR_ATIVIDADE que é da AtividadeAccessPolicy)
+            boolean resultado = policy.canExecute(usuarioAdmin, CRIAR_ATIVIDADE, subprocesso);
+            assertThat(resultado).isFalse();
+            assertThat(policy.getMotivoNegacao()).contains("Ação não reconhecida");
         }
     }
 

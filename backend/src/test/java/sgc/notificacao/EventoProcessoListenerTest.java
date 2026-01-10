@@ -429,12 +429,32 @@ class EventoProcessoListenerTest {
     }
 
     @Test
-    void deveTratarExcecaoGeralAoFinalizarProcesso() {
-        // Cobre o catch global em aoFinalizarProcesso
-        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(99L).build();
-        when(processoFacade.buscarEntidadePorId(99L)).thenThrow(new RuntimeException("Erro Geral"));
+    void deveTratarExcecaoAoIniciarProcesso_CatchGlobal() {
+        // Cobre o catch em aoIniciarProcesso (65-67)
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
+        when(processoFacade.buscarEntidadePorId(1L)).thenThrow(new RuntimeException("Erro Fatal"));
 
+        listener.aoIniciarProcesso(evento);
+        // Sem exceção lançada
+    }
+
+    @Test
+    void deveTratarExcecaoAoProcessarLoopFinalizacao() {
+        // Cobre o catch no loop de finalização (163-166)
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("U1");
+        processo.setParticipantes(Set.of(unidade));
+        
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
+        // Ao retornar nulo para o responsavel, causará NPE na busca do titular
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of());
+
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(1L).build();
         listener.aoFinalizarProcesso(evento);
-        // Sem exceções
+        
+        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
 }

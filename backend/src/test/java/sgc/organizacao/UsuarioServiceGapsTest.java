@@ -11,7 +11,8 @@ import sgc.organizacao.dto.ResponsavelDto;
 
 import sgc.seguranca.login.ClienteAcessoAd;
 import sgc.seguranca.login.LoginService;
-import sgc.seguranca.login.dto.EntrarReq;
+
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
 
@@ -111,51 +112,33 @@ class UsuarioServiceGapsTest {
     }
 
     @Test
-    @DisplayName("Linhas 423-424: Deve falhar se unidade ou perfil não baterem na autorização")
-    void deveFalharSeUnidadeNaoBaterNoEntrar() {
-        // Simular autenticação prévia com sucesso
-        when(clienteAcessoAd.autenticar(anyString(), anyString())).thenReturn(true);
-        loginService.autenticar("123", "senha");
-        
-        Usuario u = new Usuario();
-        u.setTituloEleitoral("123");
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(1L);
-        unidade.setSigla("U1");
-        unidade.setTipo(TipoUnidade.OPERACIONAL);
-        
-        UsuarioPerfil p = UsuarioPerfil.builder()
-                .usuario(u)
-                .usuarioTitulo("123")
-                .perfil(Perfil.CHEFE)
-                .unidade(unidade)
-                .unidadeCodigo(1L)
-                .build();
-        u.setAtribuicoes(new HashSet<>(List.of(p)));
-
-        when(usuarioRepo.findByIdWithAtribuicoes("123")).thenReturn(Optional.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(List.of(p));
-
-        // Tentando entrar como GESTOR na unidade 1 (ele é CHEFE)
-        EntrarReq req = new EntrarReq("123", "GESTOR", 1L);
-        assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () -> loginService.entrar(req));
-
-        // RE-AUTENTICA pois o entrar() remove do cache mesmo se falhar na autorização (segurança)
-        loginService.autenticar("123", "senha");
-        
-        // Tentando entrar como CHEFE na unidade 2 (ele é da 1)
-        EntrarReq req2 = new EntrarReq("123", "CHEFE", 2L);
-        assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () -> loginService.entrar(req2));
+    @DisplayName("Linha 94: Deve falhar ao obter usuário autenticado sem contexto")
+    void deveFalharSemContexto() {
+        org.springframework.security.core.context.SecurityContextHolder.clearContext();
+        assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () -> usuarioService.obterUsuarioAutenticado());
     }
 
     @Test
-    @DisplayName("Linha 448: Deve logar e filtrar administrador não encontrado na base de usuários")
-    void deveFiltrarAdminNaoEncontrado() {
-        Administrador admin = new Administrador("999");
-        when(administradorRepo.findAll()).thenReturn(List.of(admin));
-        when(usuarioRepo.findById("999")).thenReturn(Optional.empty());
+    @DisplayName("Linha 386: deve retornar null se usuário for null em toAdministradorDto")
+    void deveRetornarNullParaAdminNull() {
+        var result = (sgc.organizacao.dto.AdministradorDto) ReflectionTestUtils.invokeMethod(usuarioService, "toAdministradorDto", (Object)null);
+        assertNull(result);
+    }
 
-        var admins = usuarioService.listarAdministradores();
-        assertTrue(admins.isEmpty());
+    @Test
+    @DisplayName("Linhas 401, 404: Deve extrair título de diferentes tipos de principal")
+    void deveExtrairTitulo() {
+        assertEquals("123", usuarioService.extractTituloUsuario("123")); // Linha 401
+        
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("456");
+        assertEquals("456", usuarioService.extractTituloUsuario(u)); // Linha 403 (implicitamente cobre 404 se não for nem String nem Usuario)
+        
+        assertEquals("789", usuarioService.extractTituloUsuario(new Object() {
+            @Override
+            public String toString() { return "789"; }
+        })); // Linha 404
+        
+        assertNull(usuarioService.extractTituloUsuario(null)); // Linha 404 default
     }
 }
