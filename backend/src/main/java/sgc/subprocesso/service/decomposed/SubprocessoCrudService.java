@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
@@ -32,7 +32,7 @@ import java.util.List;
 public class SubprocessoCrudService {
     private final SubprocessoRepo repositorioSubprocesso;
     private final SubprocessoMapper subprocessoMapper;
-    private final MapaService mapaService;
+    private final MapaFacade mapaFacade;
 
     public Subprocesso buscarSubprocesso(Long codigo) {
         return repositorioSubprocesso
@@ -78,7 +78,7 @@ public class SubprocessoCrudService {
 
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocessoSalvo);
-        Mapa mapaSalvo = mapaService.salvar(mapa);
+        Mapa mapaSalvo = mapaFacade.salvar(mapa);
 
         subprocessoSalvo.setMapa(mapaSalvo);
         var salvo = repositorioSubprocesso.save(subprocessoSalvo);

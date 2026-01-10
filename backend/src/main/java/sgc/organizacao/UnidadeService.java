@@ -23,7 +23,7 @@ import java.util.function.Function;
 public class UnidadeService {
     private final UnidadeRepo unidadeRepo;
     private final sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo;
-    private final sgc.mapa.service.MapaService mapaService;
+    private final sgc.mapa.service.MapaFacade mapaFacade;
     private final UsuarioService usuarioService;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     private final ProcessoConsultaService processoConsultaService;
@@ -105,7 +105,7 @@ public class UnidadeService {
     }
 
     public boolean verificarMapaVigente(Long codigoUnidade) {
-        return mapaService.buscarMapaVigentePorUnidade(codigoUnidade).isPresent();
+        return mapaFacade.buscarMapaVigentePorUnidade(codigoUnidade).isPresent();
     }
 
     public List<UsuarioDto> buscarUsuariosPorUnidade(Long codigoUnidade) {

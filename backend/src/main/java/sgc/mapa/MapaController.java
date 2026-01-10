@@ -9,7 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sgc.mapa.dto.MapaDto;
 import sgc.mapa.mapper.MapaMapper;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
 
 import java.net.URI;
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Mapas", description = "Endpoints para gerenciamento de mapas de competências")
 public class MapaController {
-    private final MapaService mapaService;
+    private final MapaFacade mapaFacade;
     private final MapaMapper mapaMapper;
 
     /**
@@ -35,7 +35,7 @@ public class MapaController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Lista todos os mapas")
     public List<MapaDto> listar() {
-        return mapaService.listar().stream().map(mapaMapper::toDto).toList();
+        return mapaFacade.listar().stream().map(mapaMapper::toDto).toList();
     }
 
     /**
@@ -48,7 +48,7 @@ public class MapaController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Obtém um mapa pelo código")
     public ResponseEntity<MapaDto> obterPorId(@PathVariable Long codigo) {
-        var mapa = mapaService.obterPorCodigo(codigo);
+        var mapa = mapaFacade.obterPorCodigo(codigo);
         return ResponseEntity.ok(mapaMapper.toDto(mapa));
     }
 
@@ -64,7 +64,7 @@ public class MapaController {
     @Operation(summary = "Cria um mapa")
     public ResponseEntity<MapaDto> criar(@Valid @RequestBody MapaDto mapaDto) {
         var entidade = mapaMapper.toEntity(mapaDto);
-        var salvo = mapaService.criar(entidade);
+        var salvo = mapaFacade.criar(entidade);
         URI uri = URI.create("/api/mapas/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(mapaMapper.toDto(salvo));
     }
@@ -81,7 +81,7 @@ public class MapaController {
     @Operation(summary = "Atualiza um mapa existente")
     public ResponseEntity<MapaDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody MapaDto mapaDto) {
         var entidade = mapaMapper.toEntity(mapaDto);
-        var atualizado = mapaService.atualizar(codMapa, entidade);
+        var atualizado = mapaFacade.atualizar(codMapa, entidade);
         return ResponseEntity.ok(mapaMapper.toDto(atualizado));
     }
 
@@ -95,7 +95,7 @@ public class MapaController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Exclui um mapa")
     public ResponseEntity<Void> excluir(@PathVariable Long codMapa) {
-        mapaService.excluir(codMapa);
+        mapaFacade.excluir(codMapa);
         return ResponseEntity.noContent().build();
     }
 }

@@ -14,7 +14,7 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.service.ImpactoMapaService;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.mapa.service.MapaVisualizacaoService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Usuario;
@@ -30,7 +30,7 @@ import java.util.List;
 @Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoMapaController {
     private final SubprocessoFacade subprocessoFacade;
-    private final MapaService mapaService;
+    private final MapaFacade mapaFacade;
     private final MapaVisualizacaoService mapaVisualizacaoService;
     private final ImpactoMapaService impactoMapaService;
     private final UsuarioService usuarioService;
@@ -78,7 +78,7 @@ public class SubprocessoMapaController {
     @PreAuthorize("isAuthenticated()")
     public MapaCompletoDto obterMapa(@PathVariable Long codigo) {
         Subprocesso subprocesso = subprocessoFacade.buscarSubprocessoComMapa(codigo);
-        return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
+        return mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
     }
 
     /**
@@ -173,7 +173,7 @@ public class SubprocessoMapaController {
     public ResponseEntity<MapaCompletoDto> obterMapaCompleto(@PathVariable Long codigo) {
         Subprocesso subprocesso = subprocessoFacade.buscarSubprocessoComMapa(codigo);
         MapaCompletoDto mapa =
-                mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
+                mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
         return ResponseEntity.ok(mapa);
     }
 

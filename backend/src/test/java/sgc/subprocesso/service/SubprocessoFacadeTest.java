@@ -23,7 +23,7 @@ class SubprocessoFacadeTest {
     @Mock private SubprocessoCadastroWorkflowService cadastroWorkflowService;
     @Mock private SubprocessoMapaWorkflowService mapaWorkflowService;
     @Mock private SubprocessoContextoService contextoService;
-    @Mock private SubprocessoMapaService mapaService;
+    @Mock private SubprocessoMapaService mapaFacade;
     @Mock private SubprocessoPermissaoCalculator permissaoCalculator;
 
     @InjectMocks
@@ -78,7 +78,7 @@ class SubprocessoFacadeTest {
         verify(contextoService).obterContextoEdicao(1L, Perfil.ADMIN);
 
         facade.importarAtividades(1L, 2L);
-        verify(mapaService).importarAtividades(1L, 2L);
+        verify(mapaFacade).importarAtividades(1L, 2L);
         
         facade.buscarSubprocessoComMapa(1L);
         verify(subprocessoService).buscarSubprocessoComMapa(1L);
@@ -141,6 +141,6 @@ class SubprocessoFacadeTest {
         verify(subprocessoService).obterCadastro(1L);
         
         facade.salvarAjustesMapa(1L, Collections.emptyList(), "t");
-        verify(mapaService).salvarAjustesMapa(1L, Collections.emptyList(), "t");
+        verify(mapaFacade).salvarAjustesMapa(1L, Collections.emptyList(), "t");
     }
 }

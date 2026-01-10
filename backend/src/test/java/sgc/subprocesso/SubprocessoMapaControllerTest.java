@@ -17,7 +17,7 @@ import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.mapa.service.MapaVisualizacaoService;
 import sgc.organizacao.UsuarioService;
 import sgc.subprocesso.dto.CompetenciaReq;
@@ -44,7 +44,7 @@ class SubprocessoMapaControllerTest {
     @MockitoBean
     private sgc.subprocesso.service.SubprocessoFacade subprocessoFacade;
     @MockitoBean
-    private MapaService mapaService;
+    private MapaFacade mapaFacade;
     @MockitoBean
     private MapaVisualizacaoService mapaVisualizacaoService;
     @MockitoBean
@@ -80,7 +80,7 @@ class SubprocessoMapaControllerTest {
         sp.getMapa().setCodigo(10L);
 
         when(subprocessoFacade.buscarSubprocessoComMapa(1L)).thenReturn(sp);
-        when(mapaService.obterMapaCompleto(10L, 1L)).thenReturn(new MapaCompletoDto());
+        when(mapaFacade.obterMapaCompleto(10L, 1L)).thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(get("/api/subprocessos/1/mapa")).andExpect(status().isOk());
     }
@@ -148,7 +148,7 @@ class SubprocessoMapaControllerTest {
         sp.getMapa().setCodigo(10L);
 
         when(subprocessoFacade.buscarSubprocessoComMapa(1L)).thenReturn(sp);
-        when(mapaService.obterMapaCompleto(10L, 1L)).thenReturn(new MapaCompletoDto());
+        when(mapaFacade.obterMapaCompleto(10L, 1L)).thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-completo")).andExpect(status().isOk());
     }

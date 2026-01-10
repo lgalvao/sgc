@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
@@ -29,7 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SubprocessoContextoService {
     private final UsuarioService usuarioService;
-    private final MapaService mapaService;
+    private final MapaFacade mapaFacade;
     private final SubprocessoService subprocessoService;
 
     @Transactional(readOnly = true)
@@ -42,7 +42,7 @@ public class SubprocessoContextoService {
 
         MapaCompletoDto mapaDto = null;
         if (subprocesso.getMapa() != null) {
-            mapaDto = mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
+            mapaDto = mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
         }
 
         List<AtividadeVisualizacaoDto> atividades = subprocessoService.listarAtividadesSubprocesso(codSubprocesso);

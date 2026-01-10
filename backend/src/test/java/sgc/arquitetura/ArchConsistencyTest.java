@@ -34,7 +34,7 @@ public class ArchConsistencyTest {
             .haveNameMatching("sgc.mapa.MapaController")
             .should()
             .onlyAccessClassesThat()
-            .haveNameMatching("sgc.mapa.service.MapaService")
+            .haveNameMatching("sgc.mapa.service.MapaFacade")
             .orShould()
             .accessClassesThat()
             .resideOutsideOfPackage("sgc.mapa..");

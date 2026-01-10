@@ -51,7 +51,7 @@ class AtividadeFacadeTest {
     private UsuarioService usuarioService;
 
     @Mock
-    private MapaService mapaService;
+    private MapaFacade mapaFacade;
 
     @Test
     @DisplayName("Deve criar atividade e retornar status")
@@ -70,7 +70,7 @@ class AtividadeFacadeTest {
         
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
-        when(mapaService.obterPorCodigo(1L)).thenReturn(mapa);
+        when(mapaFacade.obterPorCodigo(1L)).thenReturn(mapa);
         
         // Mock accessControlService to allow access
         doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());

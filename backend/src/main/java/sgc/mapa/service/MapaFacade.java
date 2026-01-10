@@ -17,16 +17,23 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Serviço para operações básicas de CRUD em Mapas.
+ * Facade para operações com Mapas de Competências.
  *
- * <p>A lógica complexa de salvamento do mapa completo foi movida para
- * {@link MapaSalvamentoService}.
+ * <p>Esta classe implementa o padrão Facade para simplificar a interface
+ * de uso e centralizar a coordenação entre múltiplos serviços relacionados a mapas.
+ *
+ * <p><b>Arquitetura:</b> Controllers devem usar APENAS esta Facade, nunca serviços especializados diretamente.
+ *
+ * @see MapaSalvamentoService para lógica complexa de salvamento
+ * @see MapaVisualizacaoService para operações de visualização
+ * @see CompetenciaService para operações de competências
+ * @see AtividadeFacade para operações de atividades
  */
 @Service
 @Transactional
 @Slf4j
 @RequiredArgsConstructor
-public class MapaService {
+public class MapaFacade {
 
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
