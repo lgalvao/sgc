@@ -297,18 +297,8 @@ public class SubprocessoFacade {
     // ===== Operações Administrativas =====
 
     @Transactional
-    public void reabrirCadastro(Long codigo, Usuario usuario) {
-        cadastroWorkflowService.reabrirCadastro(codigo, usuario);
-    }
-
-    @Transactional
     public void reabrirCadastro(Long codigo, String justificativa) {
         subprocessoService.reabrirCadastro(codigo, justificativa);
-    }
-
-    @Transactional
-    public void reabrirRevisao(Long codigo, Usuario usuario) {
-        cadastroWorkflowService.reabrirRevisao(codigo, usuario);
     }
 
     @Transactional
@@ -323,9 +313,9 @@ public class SubprocessoFacade {
 
     // ===== Operações de Mapa (delegadas ao SubprocessoMapaService) =====
 
-    @Transactional(readOnly = true)
-    public MapaCompletoDto obterMapaComDetalhes(Long codMapa, Long codSubprocesso) {
-        return mapaService.obterMapaComDetalhes(codMapa, codSubprocesso);
+    @Transactional
+    public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias, String usuarioTituloEleitoral) {
+        mapaService.salvarAjustesMapa(codSubprocesso, competencias, usuarioTituloEleitoral);
     }
 
     @Transactional

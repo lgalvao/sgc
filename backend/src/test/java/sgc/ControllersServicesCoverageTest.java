@@ -74,6 +74,7 @@ class ControllersServicesCoverageTest {
     @Mock private sgc.mapa.service.MapaVisualizacaoService mapaVisualizacaoService;
     @Mock private sgc.subprocesso.service.SubprocessoMapaService subprocessoMapaService;
     @Mock private sgc.subprocesso.service.SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
+    @Mock private sgc.subprocesso.service.SubprocessoFacade subprocessoFacade;
     @Mock private sgc.organizacao.UsuarioService usuarioService;
     @Mock private sgc.subprocesso.service.SubprocessoTransicaoService transicaoService;
     @Mock private sgc.organizacao.UnidadeService unidadeService;
@@ -93,14 +94,11 @@ class ControllersServicesCoverageTest {
         
         // SubprocessoMapaController
         subprocessoMapaController = new SubprocessoMapaController(
-                subprocessoMapaService,
+                subprocessoFacade,
                 mapaService, 
                 mapaVisualizacaoService, 
                 impactoMapaService,
-                subprocessoMapaWorkflowService, 
-                usuarioService, 
-                subprocessoService, 
-                subprocessoContextoService
+                usuarioService
         );
 
         // MapaService
