@@ -6,9 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
+import sgc.organizacao.UsuarioService;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
@@ -35,6 +37,10 @@ class SubprocessoCrudServiceTest {
     private SubprocessoMapper subprocessoMapper;
     @Mock
     private MapaFacade mapaFacade;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+    @Mock
+    private UsuarioService usuarioService;
 
     @InjectMocks
     private SubprocessoCrudService service;
@@ -189,7 +195,9 @@ class SubprocessoCrudServiceTest {
     @Test
     @DisplayName("Deve excluir subprocesso existente")
     void deveExcluirSubprocesso() {
-        when(repositorioSubprocesso.existsById(1L)).thenReturn(true);
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
         service.excluir(1L);
         verify(repositorioSubprocesso).deleteById(1L);
     }
@@ -197,7 +205,7 @@ class SubprocessoCrudServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao excluir subprocesso inexistente")
     void deveLancarExcecaoAoExcluirInexistente() {
-        when(repositorioSubprocesso.existsById(1L)).thenReturn(false);
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> service.excluir(1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
