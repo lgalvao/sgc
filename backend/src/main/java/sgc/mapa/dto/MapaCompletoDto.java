@@ -23,6 +23,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MapaCompletoDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private Long codigo;
     private Long subprocessoCodigo;
     private String observacoes;

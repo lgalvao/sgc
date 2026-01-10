@@ -18,6 +18,8 @@ import sgc.seguranca.sanitizacao.SanitizarHtml;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ConhecimentoDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private Long codigo;
 
     @NotNull(message = "Código da atividade é obrigatório")

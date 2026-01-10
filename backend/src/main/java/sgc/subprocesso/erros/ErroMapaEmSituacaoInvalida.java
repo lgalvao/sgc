@@ -9,6 +9,8 @@ import sgc.comum.erros.ErroSituacaoInvalida;
  * 'MAPA_AJUSTADO'.
  */
 public class ErroMapaEmSituacaoInvalida extends ErroSituacaoInvalida {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     public ErroMapaEmSituacaoInvalida(String message) {
         super(message, "MAPA_SITUACAO_INVALIDA");
     }

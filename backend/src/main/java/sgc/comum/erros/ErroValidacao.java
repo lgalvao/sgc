@@ -13,6 +13,8 @@ import java.util.Map;
  * <p>Pode incluir detalhes adicionais sobre campos específicos que falharam na validação.
  */
 public class ErroValidacao extends ErroNegocioBase {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     public ErroValidacao(String message) {
         super(message, "VALIDACAO", HttpStatus.UNPROCESSABLE_CONTENT);
     }

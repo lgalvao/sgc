@@ -8,6 +8,8 @@ import java.util.List;
 @Getter
 @Builder
 public class ValidacaoCadastroDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private Boolean valido;
     private List<ErroValidacaoDto> erros;
 }

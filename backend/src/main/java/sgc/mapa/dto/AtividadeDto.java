@@ -12,6 +12,8 @@ import sgc.seguranca.sanitizacao.SanitizarHtml;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AtividadeDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private Long codigo;
     private Long mapaCodigo;
 
