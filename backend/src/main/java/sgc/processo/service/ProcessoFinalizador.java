@@ -1,8 +1,8 @@
 package sgc.processo.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -26,9 +26,12 @@ import java.util.Optional;
  * 
  * <p>Coordena todas as etapas necessárias para finalizar um processo,
  * incluindo validações, publicação de mapas vigentes e eventos.</p>
+ * 
+ * <p><b>Nota sobre Injeção de Dependências:</b>
+ * SubprocessoFacade é injetado com @Lazy para quebrar dependência circular:
+ * ProcessoFacade → ProcessoFinalizador → SubprocessoFacade → ... → ProcessoFacade
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 class ProcessoFinalizador {
     
@@ -37,6 +40,22 @@ class ProcessoFinalizador {
     private final SubprocessoFacade subprocessoFacade;
     private final ProcessoValidador processoValidador;
     private final ApplicationEventPublisher publicadorEventos;
+
+    /**
+     * Constructor com @Lazy para quebrar dependência circular.
+     */
+    public ProcessoFinalizador(
+            ProcessoRepo processoRepo,
+            UnidadeService unidadeService,
+            @Lazy SubprocessoFacade subprocessoFacade,
+            ProcessoValidador processoValidador,
+            ApplicationEventPublisher publicadorEventos) {
+        this.processoRepo = processoRepo;
+        this.unidadeService = unidadeService;
+        this.subprocessoFacade = subprocessoFacade;
+        this.processoValidador = processoValidador;
+        this.publicadorEventos = publicadorEventos;
+    }
 
     /**
      * Finaliza um processo, validando e tornando os mapas vigentes.

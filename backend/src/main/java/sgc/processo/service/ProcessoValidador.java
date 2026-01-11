@@ -1,7 +1,7 @@
 package sgc.processo.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.organizacao.UnidadeService;
@@ -24,14 +24,27 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
  * 
  * <p>Centraliza todas as validações complexas relacionadas a processos,
  * incluindo validação de unidades, subprocessos e regras de finalização.</p>
+ * 
+ * <p><b>Nota sobre Injeção de Dependências:</b>
+ * SubprocessoFacade é injetado com @Lazy para quebrar dependência circular:
+ * ProcessoFacade → ProcessoValidador → SubprocessoFacade → ... → ProcessoFacade
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 class ProcessoValidador {
     
     private final UnidadeService unidadeService;
     private final SubprocessoFacade subprocessoFacade;
+
+    /**
+     * Constructor com @Lazy para quebrar dependência circular.
+     */
+    public ProcessoValidador(
+            UnidadeService unidadeService,
+            @Lazy SubprocessoFacade subprocessoFacade) {
+        this.unidadeService = unidadeService;
+        this.subprocessoFacade = subprocessoFacade;
+    }
 
     /**
      * Valida se todas as unidades especificadas possuem mapa vigente.

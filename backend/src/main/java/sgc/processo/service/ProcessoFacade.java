@@ -1,8 +1,8 @@
 package sgc.processo.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -52,9 +52,12 @@ import static sgc.processo.model.TipoProcesso.REVISAO;
  * <p>
  * Implementa o padrão Facade para simplificar a interface de uso e centralizar
  * a coordenação entre múltiplos serviços relacionados a processos.
+ * 
+ * <p><b>Nota sobre Injeção de Dependências:</b> 
+ * SubprocessoFacade é injetado com @Lazy para quebrar a dependência circular:
+ * ProcessoFacade → SubprocessoFacade → SubprocessoCrudService → MapaFacade → SubprocessoFacade
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class ProcessoFacade {
     private final ProcessoRepo processoRepo;
@@ -73,6 +76,42 @@ public class ProcessoFacade {
     private final ProcessoValidador processoValidador;
     private final ProcessoFinalizador processoFinalizador;
     private final ProcessoConsultaService processoConsultaService;
+
+    /**
+     * Constructor com @Lazy para quebrar dependência circular.
+     * 
+     * @param subprocessoFacade injetado com @Lazy para evitar BeanCurrentlyInCreationException
+     */
+    public ProcessoFacade(
+            ProcessoRepo processoRepo,
+            UnidadeService unidadeService,
+            @Lazy SubprocessoFacade subprocessoFacade,
+            ApplicationEventPublisher publicadorEventos,
+            ProcessoMapper processoMapper,
+            ProcessoDetalheBuilder processoDetalheBuilder,
+            SubprocessoMapper subprocessoMapper,
+            UsuarioService usuarioService,
+            ProcessoInicializador processoInicializador,
+            sgc.alerta.AlertaService alertaService,
+            ProcessoAcessoService processoAcessoService,
+            ProcessoValidador processoValidador,
+            ProcessoFinalizador processoFinalizador,
+            ProcessoConsultaService processoConsultaService) {
+        this.processoRepo = processoRepo;
+        this.unidadeService = unidadeService;
+        this.subprocessoFacade = subprocessoFacade;
+        this.publicadorEventos = publicadorEventos;
+        this.processoMapper = processoMapper;
+        this.processoDetalheBuilder = processoDetalheBuilder;
+        this.subprocessoMapper = subprocessoMapper;
+        this.usuarioService = usuarioService;
+        this.processoInicializador = processoInicializador;
+        this.alertaService = alertaService;
+        this.processoAcessoService = processoAcessoService;
+        this.processoValidador = processoValidador;
+        this.processoFinalizador = processoFinalizador;
+        this.processoConsultaService = processoConsultaService;
+    }
 
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
         return processoAcessoService.checarAcesso(authentication, codProcesso);

@@ -1,6 +1,7 @@
 package sgc.processo.service;
 
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,14 +26,30 @@ import java.util.Set;
  * 
  * <p>Centraliza operações de leitura e consultas complexas, incluindo
  * listagens filtradas, verificações de elegibilidade e queries específicas.</p>
+ * 
+ * <p><b>Nota sobre Injeção de Dependências:</b>
+ * SubprocessoFacade é injetado com @Lazy para quebrar dependência circular:
+ * ProcessoFacade → ProcessoConsultaService → SubprocessoFacade → ... → ProcessoFacade
  */
 @Service
-@RequiredArgsConstructor
+@Slf4j
 public class ProcessoConsultaService {
 
     private final ProcessoRepo processoRepo;
     private final SubprocessoFacade subprocessoFacade;
     private final UsuarioService usuarioService;
+
+    /**
+     * Constructor com @Lazy para quebrar dependência circular.
+     */
+    public ProcessoConsultaService(
+            ProcessoRepo processoRepo,
+            @Lazy SubprocessoFacade subprocessoFacade,
+            UsuarioService usuarioService) {
+        this.processoRepo = processoRepo;
+        this.subprocessoFacade = subprocessoFacade;
+        this.usuarioService = usuarioService;
+    }
 
     @Transactional(readOnly = true)
     public Set<Long> buscarIdsUnidadesEmProcessosAtivos(Long codProcessoIgnorar) {
