@@ -12,6 +12,11 @@
         :striped="alertas.length > 0"
         @sort-changed="handleSortChange"
     >
+      <template #cell(mensagem)="data">
+        <span v-if="!data.item.dataHoraLeitura" class="visually-hidden">Não lido: </span>
+        {{ data.value }}
+      </template>
+
       <template #empty>
         <div class="text-center text-muted py-5" data-testid="empty-state-alertas">
           <i class="bi bi-bell-slash display-4 d-block mb-3" aria-hidden="true"></i>
