@@ -41,115 +41,198 @@
 
 **Goal:** Reduce redundancy and improve maintainability  
 **Estimated Time:** 2 weeks  
-**Status:** 🔴 Not Started
+**Status:** 🟡 In Progress - Analysis Complete, Ready for Implementation  
+**Updated:** 2026-01-11
 
-### Task 1.1: Consolidate UsuarioService Tests ⬜
+### Task 1.1: UsuarioService Tests - NO ACTION NEEDED ✅
 
-**Problem:** 3 test files with 68 tests across 912 lines, significant overlap
+**Analysis Result:** Files are ALREADY CORRECTLY SEPARATED - No consolidation needed!
 
-**Files to Consolidate:**
-- `UsuarioServiceTest.java` (365 lines, 24 tests) - Integration with @SpringBootTest
-- `UsuarioServiceCoverageTest.java` (403 lines, 38 tests) - Unit tests for coverage
-- `UsuarioServiceGapsTest.java` (144 lines, 6 tests) - Gap-filling unit tests
+**Current Structure (CORRECT):**
+- `UsuarioServiceTest.java` (365 lines) - @SpringBootTest Integration tests
+- `UsuarioServiceUnitTest.java` (608 lines) - @MockitoExtension Unit tests
+- **Total: 973 lines across 2 files**
 
-**Target Output:**
-- `UsuarioServiceTest.java` - Unit tests with mocks (<600 lines)
-- `UsuarioControllerIntegrationTest.java` - Integration tests (<400 lines)
+**Reason for No Action:**
+- Clear separation between integration and unit tests
+- Follows best practices (integration vs unit test separation)
+- File sizes are reasonable (<700 lines each)
+- No duplication detected
 
-**Success Criteria:**
-- [ ] All 68 tests still pass
-- [ ] No duplicate test cases
-- [ ] Each file <600 lines
-- [ ] Clear @Nested organization
-- [ ] Run `./gradlew :backend:test --tests "sgc.organizacao.usuario.*"`
+**Decision:** ✅ SKIP THIS TASK - Structure is already optimal
 
-**Notes:**
-- Review each test to identify true duplicates vs. similar tests with different assertions
-- Use @Nested classes: Criacao, Atualizacao, Consultas, Validacao, Seguranca
-- Preserve all unique validations
-
-**Status:** ⬜ Not Started  
-**Assigned:** -  
-**Started:** -  
-**Completed:** -
+**Status:** ✅ ANALYSIS COMPLETE - No changes needed  
+**Assigned:** AI Agent  
+**Started:** 2026-01-11  
+**Completed:** 2026-01-11
 
 ---
 
-### Task 1.2: Split ProcessoFacadeTest ⬜
+### Task 1.2: Split ProcessoFacadeTest ⬜ **PRIORITY 1**
 
-**Problem:** Single file with 1,239 lines + 316 line CoverageTest = 1,555 total lines
+**Problem:** MASSIVE single file + coverage file = 1,332 total lines (CRITICAL!)
 
 **Current Files:**
-- `ProcessoFacadeTest.java` (1,239 lines, 59 tests) - Massive comprehensive suite
-- `ProcessoFacadeCoverageTest.java` (316 lines, 16 tests) - Additional coverage
+- `ProcessoFacadeTest.java` (1,046 lines, 59 tests) - 7 @Nested classes
+- `ProcessoFacadeCoverageTest.java` (286 lines, 16 tests) - Additional coverage
+- **Total: 1,332 lines, 75 tests**
+
+**Nested Class Analysis:**
+- **Criacao**: 7 tests (lines 102-233)
+- **Atualizacao**: 9 tests (lines 235-452)
+- **Exclusao**: 3 tests (lines 454-498)
+- **Consultas**: 17 tests (lines 499-728)
+- **Workflow**: 11 tests (lines 729-888)
+- **Seguranca**: 10 tests (lines 889-1009)
+- **Lembretes**: 2 tests (lines 1010-1045)
 
 **Target Output (4 focused files):**
-- `ProcessoFacadeCrudTest.java` (~300 lines) - criar, atualizar, apagar
-- `ProcessoFacadeWorkflowTest.java` (~300 lines) - iniciar, finalizar, transições
-- `ProcessoFacadeQueryTest.java` (~300 lines) - consultas, listagens, buscas
-- `ProcessoFacadeSecurityTest.java` (~250 lines) - checarAcesso, permissões
 
-**Existing @Nested Classes to Distribute:**
-- Criacao → CrudTest
-- Atualizacao → CrudTest
-- Exclusao → CrudTest
-- Consultas → QueryTest
-- Workflow → WorkflowTest
-- Seguranca → SecurityTest
-- Lembretes → WorkflowTest or QueryTest
+1. **ProcessoFacadeCrudTest.java** (~400 lines, 25 tests)
+   - Merge: Criacao (7) + Atualizacao (9) + Exclusao (3) = 19 tests
+   - Plus relevant tests from CoverageTest (~6 tests)
+   - Focus: criar, atualizar, excluir operations
+
+2. **ProcessoFacadeWorkflowTest.java** (~350 lines, 18 tests)
+   - Merge: Workflow (11) + Lembretes (2) = 13 tests
+   - Plus relevant tests from CoverageTest (~5 tests)
+   - Focus: iniciar, finalizar, transições, lembretes
+
+3. **ProcessoFacadeQueryTest.java** (~350 lines, 20 tests)
+   - Merge: Consultas (17 tests)
+   - Plus relevant tests from CoverageTest (~3 tests)
+   - Focus: obterDetalhes, listar, buscar operations
+
+4. **ProcessoFacadeSecurityTest.java** (~250 lines, 12 tests)
+   - Merge: Seguranca (10 tests)
+   - Plus relevant tests from CoverageTest (~2 tests: checarAcesso)
+   - Focus: checarAcesso, permissões, access control
+
+**Implementation Steps:**
+1. [ ] Create ProcessoFacadeCrudTest.java with shared mocks/setup
+2. [ ] Copy Criacao nested class (lines 102-233)
+3. [ ] Copy Atualizacao nested class (lines 235-452)
+4. [ ] Copy Exclusao nested class (lines 454-498)
+5. [ ] Merge relevant CoverageTest tests (criar, atualizar)
+6. [ ] Create ProcessoFacadeWorkflowTest.java
+7. [ ] Copy Workflow nested class (lines 729-888)
+8. [ ] Copy Lembretes nested class (lines 1010-1045)
+9. [ ] Merge relevant CoverageTest tests (iniciar, finalizar)
+10. [ ] Create ProcessoFacadeQueryTest.java
+11. [ ] Copy Consultas nested class (lines 499-728)
+12. [ ] Merge relevant CoverageTest tests (obterDetalhes, listar)
+13. [ ] Create ProcessoFacadeSecurityTest.java
+14. [ ] Copy Seguranca nested class (lines 889-1009)
+15. [ ] Merge relevant CoverageTest tests (checarAcesso)
+16. [ ] Run tests: `./gradlew :backend:test --tests "sgc.processo.*ProcessoFacade*"`
+17. [ ] Delete ProcessoFacadeTest.java (after verification)
+18. [ ] Delete ProcessoFacadeCoverageTest.java (after verification)
+19. [ ] Final test run to ensure all 75 tests pass
 
 **Success Criteria:**
 - [ ] All 75 tests (59 + 16) still pass
-- [ ] Each file <400 lines
+- [ ] Each new file <450 lines
 - [ ] Clear single responsibility per file
-- [ ] Preserve all @Nested organization
-- [ ] Delete original ProcessoFacadeTest.java
-- [ ] Delete ProcessoFacadeCoverageTest.java
+- [ ] All @Nested organization preserved
+- [ ] Shared mocks/setup properly extracted
+- [ ] No duplicate tests
 - [ ] Run `./gradlew :backend:test --tests "sgc.processo.*ProcessoFacade*"`
 
 **Notes:**
-- This is the most complex consolidation task
-- Take extra care with setup/teardown methods
-- Ensure shared fixtures are properly extracted
-- Document the split strategy in commit message
+- ⚠️ MOST COMPLEX consolidation task in entire plan
+- Take extra care with mock setup - extract to @BeforeEach if shared
+- Some CoverageTest tests may overlap with main tests - review carefully
+- Document the split strategy in commit messages
+- Test after EACH new file creation, not just at the end
 
 **Status:** ⬜ Not Started  
-**Priority:** HIGH - Biggest maintainability issue  
+**Priority:** **CRITICAL** - Biggest single maintainability issue in codebase  
+**Estimated Effort:** 6-8 hours  
 **Assigned:** -  
 **Started:** -  
 **Completed:** -
 
 ---
 
-### Task 1.3: Consolidate PainelService Tests ⬜
+### Task 1.3: Consolidate PainelService Unit Tests ⬜ **PRIORITY 2**
 
-**Problem:** 4 test files for a single service (worst redundancy case)
+**Problem:** 4 test files for a single service - 3 unit test files with redundant setup
 
-**Files to Consolidate:**
-- `PainelServiceTest.java` (355 lines, 19 tests) - Main test suite
-- `PainelServiceCoverageTest.java` (219 lines, 8 tests) - Coverage gap filling
-- `PainelServiceUpdateTest.java` (129 lines, 4 tests) - Update-specific tests
-- `PainelServiceIntegrationTest.java` (? lines, ? tests) - Integration tests
+**Current Files:**
+- `PainelServiceTest.java` (355 lines, 19 tests) - Main unit test suite with @MockitoExtension
+- `PainelServiceCoverageTest.java` (219 lines, 8 tests) - Coverage gap filling with @MockitoExtension
+- `PainelServiceUpdateTest.java` (129 lines, 4 tests) - Update-specific tests with @MockitoExtension
+- `PainelServiceIntegrationTest.java` (167 lines) - Integration tests with @SpringBootTest ✅ **KEEP SEPARATE**
+- **Unit tests total: 703 lines, 31 tests across 3 files**
+
+**Analysis:**
+- All 3 unit test files use @ExtendWith(MockitoExtension)
+- All mock the same dependencies (ProcessoFacade, AlertaService, UnidadeService)
+- Redundant setup/configuration across files
+- No clear reason for separation (Coverage/Update tests should be in main file)
 
 **Target Output:**
-- `PainelServiceTest.java` - Consolidated unit tests (<400 lines)
-- `PainelServiceIntegrationTest.java` - Keep separate, unchanged
+- `PainelServiceTest.java` - Consolidated unit tests (~650 lines, 31 tests)
+- `PainelServiceIntegrationTest.java` - Keep unchanged ✅
+
+**Recommended Organization with @Nested:**
+```java
+@ExtendWith(MockitoExtension.class)
+@DisplayName("PainelService - Testes Unitários")
+class PainelServiceTest {
+    // Shared mocks
+    
+    @Nested
+    @DisplayName("Consultas e Listagens")
+    class ConsultasListagens {
+        // Tests from original PainelServiceTest
+    }
+    
+    @Nested
+    @DisplayName("Atualização e Configuração")
+    class AtualizacaoConfiguracao {
+        // Tests from PainelServiceUpdateTest
+    }
+    
+    @Nested
+    @DisplayName("Cobertura e Casos Especiais")
+    class CoberturaEspeciais {
+        // Tests from PainelServiceCoverageTest
+    }
+}
+```
+
+**Implementation Steps:**
+1. [ ] Backup current files
+2. [ ] Create new @Nested structure in PainelServiceTest.java
+3. [ ] Move all tests from PainelServiceUpdateTest.java
+4. [ ] Move all tests from PainelServiceCoverageTest.java
+5. [ ] Remove duplicate mock setups
+6. [ ] Organize with clear @Nested classes
+7. [ ] Run tests: `./gradlew :backend:test --tests "sgc.painel.PainelServiceTest"`
+8. [ ] Delete PainelServiceUpdateTest.java (after verification)
+9. [ ] Delete PainelServiceCoverageTest.java (after verification)
+10. [ ] Final test run
 
 **Success Criteria:**
-- [ ] All 31+ tests still pass
-- [ ] Clear separation: unit vs integration
-- [ ] No test duplication
-- [ ] Unit test file <400 lines
+- [ ] All 31 tests still pass
+- [ ] Single cohesive unit test file (~650 lines)
+- [ ] Clear @Nested organization
+- [ ] No duplicate mock setups
+- [ ] PainelServiceIntegrationTest.java unchanged and still passes
 - [ ] Delete PainelServiceCoverageTest.java
 - [ ] Delete PainelServiceUpdateTest.java
 - [ ] Run `./gradlew :backend:test --tests "sgc.painel.*"`
 
 **Notes:**
-- Review if UpdateTest tests are truly specific or just normal CRUD
-- Keep integration tests completely separate
-- Integration tests should use real dependencies, not mocks
+- Much simpler than ProcessoFacadeTest split
+- Good candidate to tackle FIRST (learning exercise)
+- Integration tests correctly separated - do NOT touch
+- UpdateTest likely contains normal CRUD operations, not special update logic
 
 **Status:** ⬜ Not Started  
+**Priority:** **HIGH** - Good starting point, easier than Task 1.2  
+**Estimated Effort:** 2-3 hours  
 **Assigned:** -  
 **Started:** -  
 **Completed:** -
