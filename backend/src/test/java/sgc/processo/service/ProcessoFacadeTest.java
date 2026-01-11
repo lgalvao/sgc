@@ -83,6 +83,16 @@ class ProcessoFacadeTest {
     private sgc.processo.service.ProcessoInicializador processoInicializador;
     @Mock
     private AlertaService alertaService;
+    
+    // Specialized services
+    @Mock
+    private ProcessoAcessoService processoAcessoService;
+    @Mock
+    private ProcessoValidador processoValidador;
+    @Mock
+    private ProcessoFinalizador processoFinalizador;
+    @Mock
+    private ProcessoConsultaService processoConsultaService;
 
     @InjectMocks
     private ProcessoFacade processoFacade;

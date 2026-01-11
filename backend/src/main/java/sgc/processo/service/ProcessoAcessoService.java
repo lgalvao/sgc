@@ -1,6 +1,7 @@
 package sgc.processo.service;
 
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,14 +25,30 @@ import java.util.Set;
  * 
  * <p>Implementa a lógica de verificação hierárquica de acesso baseada
  * em unidades organizacionais e perfis de usuário.</p>
+ * 
+ * <p><b>Nota sobre Injeção de Dependências:</b>
+ * SubprocessoFacade é injetado com @Lazy para quebrar dependência circular:
+ * ProcessoFacade → ProcessoAcessoService → SubprocessoFacade → ... → ProcessoFacade
  */
 @Service
-@RequiredArgsConstructor
+@Slf4j
 class ProcessoAcessoService {
     
     private final UnidadeService unidadeService;
     private final UsuarioService usuarioService;
     private final SubprocessoFacade subprocessoFacade;
+
+    /**
+     * Constructor com @Lazy para quebrar dependência circular.
+     */
+    public ProcessoAcessoService(
+            UnidadeService unidadeService,
+            UsuarioService usuarioService,
+            @Lazy SubprocessoFacade subprocessoFacade) {
+        this.unidadeService = unidadeService;
+        this.usuarioService = usuarioService;
+        this.subprocessoFacade = subprocessoFacade;
+    }
 
     /**
      * Verifica se o usuário autenticado tem acesso ao processo.
