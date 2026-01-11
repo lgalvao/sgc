@@ -416,4 +416,79 @@ class SubprocessoAccessPolicyTest {
         sp.setSituacao(situacao);
         return sp;
     }
+
+    @Nested
+    @DisplayName("Testes de Cobertura Extra")
+    class CoberturaExtraTest {
+
+        @Test
+        @DisplayName("Deve formatar resumo de situações quando houver mais de 5")
+        void deveFormatarResumoSituacoes() {
+            // EDITAR_MAPA possui 10 situações permitidas, o que deve ativar o resumo (> 5)
+            subprocesso.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO); // Situação inválida para EDITAR_MAPA
+
+            boolean resultado = policy.canExecute(usuarioChefe, EDITAR_MAPA, subprocesso);
+
+            assertThat(resultado).isFalse();
+            assertThat(policy.getMotivoNegacao()).contains("10 situações");
+        }
+
+        @Test
+        @DisplayName("Deve validar mensagens para Verificar Impactos com múltiplos perfis ou GESTOR")
+        void deveValidarMensagensVerificarImpactos() {
+            // Caso Múltiplos Perfis (ADMIN + GESTOR) em situação inválida
+            adicionarAtribuicao(usuarioAdmin, GESTOR, unidadePrincipal);
+            subprocesso.setSituacao(NAO_INICIADO); // Inválido para ADMIN/GESTOR na verificação de impactos
+
+            policy.canExecute(usuarioAdmin, VERIFICAR_IMPACTOS, subprocesso);
+            assertThat(policy.getMotivoNegacao()).contains("REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA");
+
+            // Caso GESTOR em situação inválida
+            subprocesso.setSituacao(NAO_INICIADO);
+            policy.canExecute(usuarioGestor, VERIFICAR_IMPACTOS, subprocesso);
+            assertThat(policy.getMotivoNegacao()).contains("REVISAO_CADASTRO_DISPONIBILIZADA");
+        }
+
+        @Test
+        @DisplayName("Deve falhar CHEFE verificar impactos se hierarquia incorreta")
+        void deveFalharChefeVerificarImpactosHierarquiaIncorreta() {
+            subprocesso.setSituacao(NAO_INICIADO);
+            // Chefe da unidadePrincipal, mas subprocesso de outra unidade
+            Unidade outra = criarUnidade(99L, "OUTRA", null, null);
+            subprocesso.setUnidade(outra);
+
+            boolean resultado = policy.canExecute(usuarioChefe, VERIFICAR_IMPACTOS, subprocesso);
+
+            assertThat(resultado).isFalse();
+            assertThat(policy.getMotivoNegacao()).contains("não pertence à unidade");
+        }
+
+        @Test
+        @DisplayName("Deve validar mensagens de erro de hierarquia detalhadas")
+        void deveValidarMensagensHierarquia() {
+            // Caso TITULAR_UNIDADE indefinido
+            Unidade unidadeSemTitular = criarUnidade(3L, "SEMTIT", null, "não definido");
+            unidadeSemTitular.setTituloTitular("não definido"); // Explicitando para garantir o teste
+            subprocesso.setUnidade(unidadeSemTitular);
+            subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+            policy.canExecute(usuarioChefe, DISPONIBILIZAR_CADASTRO, subprocesso);
+            assertThat(policy.getMotivoNegacao()).contains("Titular: não definido");
+
+            // Caso TITULAR_UNIDADE definido mas diferente
+            unidadePrincipal.setTituloTitular("999999999999");
+            subprocesso.setUnidade(unidadePrincipal);
+
+            policy.canExecute(usuarioChefe, DISPONIBILIZAR_CADASTRO, subprocesso);
+            assertThat(policy.getMotivoNegacao()).contains("Titular: 999999999999");
+
+            // Caso MESMA_OU_SUBORDINADA falhando
+            when(servicoHierarquia.isSubordinada(any(), any())).thenReturn(false);
+            Unidade unidadeAlheia = criarUnidade(4L, "ALHEIA", null, null);
+            subprocesso.setUnidade(unidadeAlheia);
+
+            policy.canExecute(usuarioChefe, VISUALIZAR_SUBPROCESSO, subprocesso);
+            assertThat(policy.getMotivoNegacao()).contains("nem a uma unidade superior");
+        }
+    }
 }

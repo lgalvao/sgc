@@ -183,6 +183,7 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
 
         @Override
         public boolean canExecute(Usuario usuario, Acao acao, Subprocesso subprocesso) {
+                ultimoMotivoNegacao = "";
                 // Caso especial: VERIFICAR_IMPACTOS tem regras diferentes por perfil
                 if (acao == VERIFICAR_IMPACTOS) {
                         return canExecuteVerificarImpactos(usuario, subprocesso);
@@ -263,6 +264,10 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
                                                 || situacao == REVISAO_CADASTRO_HOMOLOGADA
                                                 || situacao == REVISAO_MAPA_AJUSTADO)) {
                         return true;
+                }
+
+                if (!ultimoMotivoNegacao.isEmpty()) {
+                        return false;
                 }
 
                 definirMotivoNegacaoVerificarImpactos(perfisUsuario, subprocesso);
