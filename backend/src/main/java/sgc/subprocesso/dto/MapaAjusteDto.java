@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 public class MapaAjusteDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
         @NotNull(message = "O código do mapa é obrigatório")
         private final Long codMapa;
         @NotBlank(message = "O nome da unidade é obrigatório")

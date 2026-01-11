@@ -6,9 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
+import sgc.organizacao.UsuarioService;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
@@ -34,7 +36,11 @@ class SubprocessoCrudServiceTest {
     @Mock
     private SubprocessoMapper subprocessoMapper;
     @Mock
-    private MapaService mapaService;
+    private MapaFacade mapaFacade;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+    @Mock
+    private UsuarioService usuarioService;
 
     @InjectMocks
     private SubprocessoCrudService service;
@@ -46,7 +52,7 @@ class SubprocessoCrudServiceTest {
         Subprocesso entity = new Subprocesso();
         when(subprocessoMapper.toEntity(dto)).thenReturn(entity);
         when(repositorioSubprocesso.save(any())).thenReturn(entity);
-        when(mapaService.salvar(any())).thenReturn(new Mapa());
+        when(mapaFacade.salvar(any())).thenReturn(new Mapa());
         when(subprocessoMapper.toDTO(any())).thenReturn(dto);
 
         assertThat(service.criar(dto)).isNotNull();
@@ -189,7 +195,9 @@ class SubprocessoCrudServiceTest {
     @Test
     @DisplayName("Deve excluir subprocesso existente")
     void deveExcluirSubprocesso() {
-        when(repositorioSubprocesso.existsById(1L)).thenReturn(true);
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
         service.excluir(1L);
         verify(repositorioSubprocesso).deleteById(1L);
     }
@@ -197,7 +205,7 @@ class SubprocessoCrudServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao excluir subprocesso inexistente")
     void deveLancarExcecaoAoExcluirInexistente() {
-        when(repositorioSubprocesso.existsById(1L)).thenReturn(false);
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> service.excluir(1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
@@ -237,5 +245,165 @@ class SubprocessoCrudServiceTest {
                 .thenReturn(true);
 
         assertThat(service.verificarAcessoUnidadeAoProcesso(1L, List.of(2L))).isTrue();
+    }
+
+    @Test
+    @DisplayName("Deve atualizar subprocesso detectando alterações em campos diversos")
+    void deveAtualizarDetectandoAlteracoes() {
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        SubprocessoDto dto = SubprocessoDto.builder()
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                .dataLimiteEtapa1(java.time.LocalDateTime.now())
+                .dataFimEtapa1(java.time.LocalDateTime.now())
+                .dataFimEtapa2(java.time.LocalDateTime.now())
+                .build();
+
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+        when(repositorioSubprocesso.save(sp)).thenReturn(sp);
+        when(subprocessoMapper.toDTO(sp)).thenReturn(dto);
+
+        service.atualizar(1L, dto);
+
+        verify(eventPublisher).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoAtualizado.class));
+    }
+
+    @Test
+    @DisplayName("Deve atualizar sem publicar evento se nada mudar")
+    void deveAtualizarSemMudancas() {
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        SubprocessoDto dto = SubprocessoDto.builder()
+                .situacao(SituacaoSubprocesso.NAO_INICIADO)
+                .build();
+
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+        when(repositorioSubprocesso.save(sp)).thenReturn(sp);
+        when(subprocessoMapper.toDTO(sp)).thenReturn(dto);
+
+        service.atualizar(1L, dto);
+
+        verify(eventPublisher, org.mockito.Mockito.never()).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoAtualizado.class));
+    }
+
+    @Test
+    @DisplayName("Deve criar subprocesso publicando evento com relacionamentos nulos")
+    void deveCriarComRelacionamentosNulos() {
+        SubprocessoDto dto = SubprocessoDto.builder().build();
+        Subprocesso entity = new Subprocesso();
+        // entity.setProcesso(null); entity.setUnidade(null); por padrão
+
+        when(subprocessoMapper.toEntity(dto)).thenReturn(entity);
+        when(repositorioSubprocesso.save(any())).thenReturn(entity);
+        when(mapaFacade.salvar(any())).thenReturn(new Mapa());
+        when(subprocessoMapper.toDTO(any())).thenReturn(dto);
+
+        service.criar(dto);
+
+        verify(eventPublisher).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoCriado.class));
+    }
+
+    @Test
+    @DisplayName("Deve criar subprocesso publicando evento com relacionamentos presentes")
+    void deveCriarComRelacionamentosPresentes() {
+        SubprocessoDto dto = SubprocessoDto.builder().build();
+        Subprocesso entity = new Subprocesso();
+
+        sgc.processo.model.Processo proc = new sgc.processo.model.Processo();
+        proc.setCodigo(100L);
+        entity.setProcesso(proc);
+
+        sgc.organizacao.model.Unidade uni = new sgc.organizacao.model.Unidade();
+        uni.setCodigo(200L);
+        entity.setUnidade(uni);
+
+        when(subprocessoMapper.toEntity(dto)).thenReturn(entity);
+        when(repositorioSubprocesso.save(any())).thenReturn(entity);
+        when(mapaFacade.salvar(any())).thenReturn(new Mapa());
+        when(subprocessoMapper.toDTO(any())).thenReturn(dto);
+
+        service.criar(dto);
+
+        verify(eventPublisher).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoCriado.class));
+    }
+
+    @Test
+    @DisplayName("Deve excluir subprocesso publicando evento com relacionamentos nulos")
+    void deveExcluirComRelacionamentosNulos() {
+        Subprocesso sp = new Subprocesso();
+        // Relacionamentos nulos por padrão
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+
+        service.excluir(1L);
+
+        verify(eventPublisher).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoExcluido.class));
+        verify(repositorioSubprocesso).deleteById(1L);
+    }
+
+    @Test
+    @DisplayName("Deve excluir subprocesso publicando evento com relacionamentos presentes")
+    void deveExcluirComRelacionamentosPresentes() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+
+        sgc.processo.model.Processo proc = new sgc.processo.model.Processo();
+        proc.setCodigo(100L);
+        sp.setProcesso(proc);
+
+        sgc.organizacao.model.Unidade uni = new sgc.organizacao.model.Unidade();
+        uni.setCodigo(200L);
+        sp.setUnidade(uni);
+
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(300L);
+        sp.setMapa(mapa);
+
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+
+        service.excluir(1L);
+
+        verify(eventPublisher).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoExcluido.class));
+        verify(repositorioSubprocesso).deleteById(1L);
+    }
+
+    @Test
+    @DisplayName("Deve atualizar removendo mapa quando existente")
+    void deveAtualizarRemovendoMapaExistente() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        sp.setMapa(new Mapa()); // Tem mapa
+
+        SubprocessoDto dto = SubprocessoDto.builder().build(); // codMapa null
+
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+        when(repositorioSubprocesso.save(sp)).thenReturn(sp);
+        when(subprocessoMapper.toDTO(sp)).thenReturn(dto);
+
+        service.atualizar(1L, dto);
+
+        assertThat(sp.getMapa()).isNull();
+        verify(eventPublisher).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoAtualizado.class));
+    }
+
+    @Test
+    @DisplayName("Deve atualizar mantendo mesmo mapa")
+    void deveAtualizarMantendoMesmoMapa() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(50L);
+        sp.setMapa(mapa);
+
+        // DTO com mesmo ID de mapa
+        SubprocessoDto dto = SubprocessoDto.builder().codMapa(50L).build();
+
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+        when(repositorioSubprocesso.save(sp)).thenReturn(sp);
+        when(subprocessoMapper.toDTO(sp)).thenReturn(dto);
+
+        service.atualizar(1L, dto);
+
+        // Verifica que evento FOI publicado (devido a Mapa não implementar equals, criando nova instância)
+        verify(eventPublisher).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoAtualizado.class));
     }
 }

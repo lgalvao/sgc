@@ -101,15 +101,17 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
 
         atividade1.getConhecimentos().addAll(List.of(conhecimento1, conhecimento2));
         atividade2.getConhecimentos().add(conhecimento3);
-        atividadeRepo.saveAll(List.of(atividade1, atividade2));
 
         Competencia competencia1 = new Competencia("Competência 1", mapa);
-        competencia1.setAtividades(Set.of(atividade1));
         competenciaRepo.save(competencia1);
 
         Competencia competencia2 = new Competencia("Competência 2", mapa);
-        competencia2.setAtividades(Set.of(atividade2));
         competenciaRepo.save(competencia2);
+
+        // Configurar relacionamento bidirecional no lado owning (Atividade)
+        atividade1.getCompetencias().add(competencia1);
+        atividade2.getCompetencias().add(competencia2);
+        atividadeRepo.saveAll(List.of(atividade1, atividade2));
     }
 
     @Test

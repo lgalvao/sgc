@@ -7,18 +7,23 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoPermissoesDto;
+import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("unit")
 class SubprocessoDetalheMapperTest {
 
     private SubprocessoDetalheMapper mapper;
@@ -48,5 +53,84 @@ class SubprocessoDetalheMapperTest {
         assertThat(dto).isNotNull();
         assertThat(dto.getSituacao()).isEqualTo("MAPEAMENTO_CADASTRO_EM_ANDAMENTO");
         assertThat(dto.getTipoProcesso()).isEqualTo("MAPEAMENTO");
+    }
+
+    @Test
+    void deveMapearResponsavelTitular() {
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        Unidade unidade = new Unidade();
+        unidade.setTituloTitular("123");
+        sp.setUnidade(unidade);
+
+        Usuario responsavel = new Usuario();
+        responsavel.setTituloEleitoral("123");
+        responsavel.setNome("Titular");
+
+        SubprocessoDetalheDto dto = mapper.toDto(sp, responsavel, null, null, null);
+
+        assertThat(dto.getResponsavel()).isNotNull();
+        assertThat(dto.getResponsavel().getTipoResponsabilidade()).isEqualTo("Titular");
+    }
+
+    @Test
+    void deveMapearResponsavelSubstituto() {
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        Unidade unidade = new Unidade();
+        unidade.setTituloTitular("123");
+        sp.setUnidade(unidade);
+
+        Usuario responsavel = new Usuario();
+        responsavel.setTituloEleitoral("456"); // Diferente do titular
+        responsavel.setNome("Substituto");
+
+        SubprocessoDetalheDto dto = mapper.toDto(sp, responsavel, null, null, null);
+
+        assertThat(dto.getResponsavel()).isNotNull();
+        assertThat(dto.getResponsavel().getTipoResponsabilidade()).isEqualTo("Substituição");
+    }
+
+    @Test
+    void deveMapearResponsavelSemUnidade() {
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setUnidade(null);
+
+        Usuario responsavel = new Usuario();
+        responsavel.setTituloEleitoral("456");
+
+        SubprocessoDetalheDto dto = mapper.toDto(sp, responsavel, null, null, null);
+
+        assertThat(dto.getResponsavel()).isNotNull();
+        assertThat(dto.getResponsavel().getTipoResponsabilidade()).isEqualTo("Substituição"); // Default
+    }
+
+    @Test
+    void deveMapearLocalizacaoAtual() {
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+
+        Unidade destino = new Unidade();
+        destino.setSigla("DEST");
+        Movimentacao mov = new Movimentacao();
+        mov.setUnidadeDestino(destino);
+
+        SubprocessoDetalheDto dto = mapper.toDto(sp, null, null, List.of(mov), null);
+
+        assertThat(dto.getLocalizacaoAtual()).isEqualTo("DEST");
+    }
+
+    @Test
+    void deveMapearLocalizacaoAtualNulaSeSemDestino() {
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+
+        Movimentacao mov = new Movimentacao();
+        mov.setUnidadeDestino(null);
+
+        SubprocessoDetalheDto dto = mapper.toDto(sp, null, null, List.of(mov), null);
+
+        assertThat(dto.getLocalizacaoAtual()).isNull();
     }
 }

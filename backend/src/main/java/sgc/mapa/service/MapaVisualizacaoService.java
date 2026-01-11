@@ -11,24 +11,34 @@ import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
+/**
+ * Service especializado para visualização de mapas de competências.
+ * 
+ * <p><b>IMPORTANTE:</b> Este serviço deve ser acessado APENAS via {@link MapaFacade}.
+ * Controllers não devem injetar este serviço diretamente.
+ */
 @Service
 @Transactional(readOnly = true)
 @Slf4j
 @RequiredArgsConstructor
 public class MapaVisualizacaoService {
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoFacade subprocessoFacade;
     private final CompetenciaRepo competenciaRepo;
     private final AtividadeRepo atividadeRepo;
 
     public MapaVisualizacaoDto obterMapaParaVisualizacao(Long codSubprocesso) {
-        Subprocesso subprocesso = subprocessoService.buscarSubprocesso(codSubprocesso);
+        Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codSubprocesso);
         Mapa mapa = subprocesso.getMapa();
         if (mapa == null) {
             throw new sgc.comum.erros.ErroEstadoImpossivel(
@@ -49,27 +59,36 @@ public class MapaVisualizacaoService {
         Map<Long, AtividadeDto> atividadeDtoMap = atividadesComConhecimentos.stream()
                 .collect(Collectors.toMap(Atividade::getCodigo, this::mapAtividadeToDto));
 
-        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(mapa.getCodigo());
+        // ⚡ Bolt: Usando projeção otimizada para evitar hidratar entidades Atividade redundantes
+        // via JOIN FETCH. Recuperamos apenas (CompID, CompDesc, AtivID)
+        List<Object[]> tuples = competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(mapa.getCodigo());
 
-        List<CompetenciaDto> competenciasDto = competencias.stream()
-                .map(competencia -> {
-                    List<AtividadeDto> atividadesDto =
-                            competencia.getAtividades().stream()
-                                    .map(a -> atividadeDtoMap.get(a.getCodigo()))
-                                    .filter(Objects::nonNull)
-                                    .toList();
+        // Agrupa as competências e suas atividades
+        Map<Long, CompetenciaDto> compMap = new LinkedHashMap<>();
+        Set<Long> atividadesComCompetenciaIds = new HashSet<>();
 
-                    return CompetenciaDto.builder()
-                            .codigo(competencia.getCodigo())
-                            .descricao(competencia.getDescricao())
-                            .atividades(atividadesDto)
-                            .build();
-                }).toList();
+        for (Object[] t : tuples) {
+            Long compId = (Long) t[0];
+            String compDesc = (String) t[1];
+            Long ativId = (Long) t[2];
 
-        var atividadesComCompetenciaIds = competencias.stream()
-                .flatMap(c -> c.getAtividades().stream())
-                .map(Atividade::getCodigo)
-                .collect(Collectors.toSet());
+            compMap.computeIfAbsent(compId, k -> CompetenciaDto.builder()
+                    .codigo(compId)
+                    .descricao(compDesc)
+                    .atividades(new ArrayList<>())
+                    .build());
+
+            if (ativId != null) {
+                atividadesComCompetenciaIds.add(ativId);
+                AtividadeDto ativDto = atividadeDtoMap.get(ativId);
+                // Só adiciona se a atividade existir no mapa de atividades do subprocesso
+                if (ativDto != null) {
+                    compMap.get(compId).getAtividades().add(ativDto);
+                }
+            }
+        }
+
+        List<CompetenciaDto> competenciasDto = new ArrayList<>(compMap.values());
 
         // Buscar atividades sem competência (órfãs)
         List<AtividadeDto> atividadesSemCompetencia =

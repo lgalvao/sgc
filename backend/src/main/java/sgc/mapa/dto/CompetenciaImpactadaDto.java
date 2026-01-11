@@ -19,6 +19,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompetenciaImpactadaDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     /**
      * O código da competência.
      */

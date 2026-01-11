@@ -17,7 +17,7 @@ import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ public class EventoProcessoListener {
     private final NotificacaoModelosService notificacaoModelosService;
     private final UsuarioService usuarioService;
     private final ProcessoFacade processoFacade;
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoFacade subprocessoFacade;
 
     /**
      * Escuta e processa o evento {@link EventoProcessoIniciado}, disparado quando um novo processo
@@ -87,7 +87,7 @@ public class EventoProcessoListener {
         Processo processo = processoFacade.buscarEntidadePorId(evento.getCodProcesso());
 
         List<Subprocesso> subprocessos =
-                subprocessoService.listarEntidadesPorProcesso(evento.getCodProcesso());
+                subprocessoFacade.listarEntidadesPorProcesso(evento.getCodProcesso());
 
         if (subprocessos.isEmpty()) {
             log.warn("Nenhum subprocesso encontrado para o processo {}", evento.getCodProcesso());

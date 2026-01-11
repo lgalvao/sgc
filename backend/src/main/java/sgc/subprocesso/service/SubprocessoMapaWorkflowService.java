@@ -1,6 +1,5 @@
 package sgc.subprocesso.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -18,7 +17,7 @@ import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UnidadeService;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -42,8 +41,14 @@ import java.util.stream.Collectors;
 import static sgc.seguranca.acesso.Acao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
+/**
+ * Serviço responsável pelo workflow do mapa de competências de um subprocesso.
+ * 
+ * <p><b>Nota sobre Injeção de Dependências:</b> 
+ * MapaFacade é injetado com @Lazy para quebrar a dependência circular:
+ * SubprocessoFacade → SubprocessoMapaWorkflowService → MapaFacade → MapaVisualizacaoService → SubprocessoFacade
+ */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class SubprocessoMapaWorkflowService {
     // Strategy Pattern: Maps para eliminar if/else por TipoProcesso
@@ -74,7 +79,7 @@ public class SubprocessoMapaWorkflowService {
     private final SubprocessoRepo subprocessoRepo;
     private final CompetenciaService competenciaService;
     private final AtividadeService atividadeService;
-    private final MapaService mapaService;
+    private final MapaFacade mapaFacade;
     private final SubprocessoTransicaoService transicaoService;
     private final AnaliseService analiseService;
     private final UnidadeService unidadeService;
@@ -85,13 +90,39 @@ public class SubprocessoMapaWorkflowService {
     @Lazy
     private SubprocessoMapaWorkflowService self;
 
+    /**
+     * Constructor with @Lazy injection to break circular dependency.
+     * 
+     * @param mapaFacade injetado com @Lazy para evitar BeanCurrentlyInCreationException
+     */
+    public SubprocessoMapaWorkflowService(
+            SubprocessoRepo subprocessoRepo,
+            CompetenciaService competenciaService,
+            AtividadeService atividadeService,
+            @Lazy MapaFacade mapaFacade,
+            SubprocessoTransicaoService transicaoService,
+            AnaliseService analiseService,
+            UnidadeService unidadeService,
+            SubprocessoValidacaoService validacaoService,
+            AccessControlService accessControlService) {
+        this.subprocessoRepo = subprocessoRepo;
+        this.competenciaService = competenciaService;
+        this.atividadeService = atividadeService;
+        this.mapaFacade = mapaFacade;
+        this.transicaoService = transicaoService;
+        this.analiseService = analiseService;
+        this.unidadeService = unidadeService;
+        this.validacaoService = validacaoService;
+        this.accessControlService = accessControlService;
+    }
+
     public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         Long codMapa = subprocesso.getMapa().getCodigo();
         boolean eraVazio = competenciaService.buscarPorCodMapa(codMapa).isEmpty();
         boolean temNovasCompetencias = !request.getCompetencias().isEmpty();
 
-        MapaCompletoDto mapaDto = mapaService.salvarMapaCompleto(codMapa, request);
+        MapaCompletoDto mapaDto = mapaFacade.salvarMapaCompleto(codMapa, request);
 
         if (eraVazio
                 && temNovasCompetencias
@@ -120,7 +151,7 @@ public class SubprocessoMapaWorkflowService {
             subprocessoRepo.save(subprocesso);
         }
 
-        return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
+        return mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 
     public MapaCompletoDto atualizarCompetencia(
@@ -132,7 +163,7 @@ public class SubprocessoMapaWorkflowService {
         competenciaService.atualizarCompetencia(
                 codCompetencia, request.getDescricao(), request.getAtividadesIds());
 
-        return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
+        return mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 
     public MapaCompletoDto removerCompetencia(
@@ -151,7 +182,7 @@ public class SubprocessoMapaWorkflowService {
             log.info("Situação do subprocesso {} alterada para CADASTRO_HOMOLOGADO (mapa ficou vazio)", codSubprocesso);
         }
 
-        return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
+        return mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 
     private Subprocesso getSubprocessoParaEdicao(Long codSubprocesso) {

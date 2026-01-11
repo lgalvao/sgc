@@ -10,6 +10,8 @@ import java.util.List;
 @Getter
 @Builder
 public class ContextoEdicaoDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private final UnidadeDto unidade;
     private final SubprocessoDetalheDto subprocesso;
     private final MapaCompletoDto mapa;

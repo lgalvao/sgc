@@ -1,6 +1,7 @@
 package sgc.subprocesso.service;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +19,7 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UnidadeService;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Unidade;
@@ -45,13 +46,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("unit")
 @DisplayName("SubprocessoMapaWorkflowService")
 class SubprocessoMapaWorkflowServiceTest {
 
     @Mock private SubprocessoRepo subprocessoRepo;
     @Mock private CompetenciaService competenciaService;
     @Mock private AtividadeService atividadeService;
-    @Mock private MapaService mapaService;
+    @Mock private MapaFacade mapaFacade;
     @Mock private SubprocessoTransicaoService transicaoService;
     @Mock private AnaliseService analiseService;
     @Mock private UnidadeService unidadeService;
@@ -80,7 +82,7 @@ class SubprocessoMapaWorkflowServiceTest {
             service.salvarMapaSubprocesso(1L, req);
 
             verify(subprocessoRepo).save(sp);
-            verify(mapaService).salvarMapaCompleto(10L, req);
+            verify(mapaFacade).salvarMapaCompleto(10L, req);
         }
 
         @Test
@@ -116,7 +118,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.salvarMapaSubprocesso(1L, req);
 
-            verify(mapaService).salvarMapaCompleto(10L, req);
+            verify(mapaFacade).salvarMapaCompleto(10L, req);
         }
 
         @Test
@@ -265,7 +267,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.salvarMapaSubprocesso(1L, req);
 
-            verify(mapaService).salvarMapaCompleto(10L, req);
+            verify(mapaFacade).salvarMapaCompleto(10L, req);
         }
 
         @Test
@@ -299,7 +301,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             // Não deve salvar porque não mudou situação
             verify(subprocessoRepo, never()).save(sp);
-            verify(mapaService).salvarMapaCompleto(10L, req);
+            verify(mapaFacade).salvarMapaCompleto(10L, req);
         }
 
         @Test
@@ -549,7 +551,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.salvarMapaSubprocesso(1L, req);
 
-            verify(mapaService).salvarMapaCompleto(10L, req);
+            verify(mapaFacade).salvarMapaCompleto(10L, req);
         }
 
         @Test
@@ -567,7 +569,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.salvarMapaSubprocesso(1L, req);
 
-            verify(mapaService).salvarMapaCompleto(10L, req);
+            verify(mapaFacade).salvarMapaCompleto(10L, req);
         }
     }
 

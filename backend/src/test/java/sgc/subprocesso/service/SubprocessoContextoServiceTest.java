@@ -9,13 +9,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.decomposed.SubprocessoCrudService;
+import sgc.subprocesso.service.decomposed.SubprocessoDetalheService;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -28,11 +31,13 @@ import static org.mockito.Mockito.when;
 class SubprocessoContextoServiceTest {
 
     @Mock
-    private SubprocessoService subprocessoService;
-    @Mock
     private UsuarioService usuarioService;
     @Mock
-    private MapaService mapaService;
+    private MapaFacade mapaFacade;
+    @Mock
+    private SubprocessoCrudService crudService;
+    @Mock
+    private SubprocessoDetalheService detalheService;
 
     @InjectMocks
     private SubprocessoContextoService service;
@@ -46,29 +51,33 @@ class SubprocessoContextoServiceTest {
         Long codUnidade = 10L;
         Perfil perfil = Perfil.CHEFE;
 
-        // Mock 1: Detalhes (agora via SubprocessoService)
+        // Mock usuário autenticado
+        Usuario usuario = new Usuario();
+        when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+
+        // Mock 1: Detalhes (agora via DetalheService)
         SubprocessoDetalheDto detalheDto = SubprocessoDetalheDto.builder()
                 .unidade(SubprocessoDetalheDto.UnidadeDto.builder().codigo(codUnidade).sigla(SIGLA_TESTE).build())
                 .build();
-        when(subprocessoService.obterDetalhes(codSubprocesso, perfil))
+        when(detalheService.obterDetalhes(codSubprocesso, perfil, usuario))
                 .thenReturn(detalheDto);
 
         // Mock 2: Unidade
         UnidadeDto unidadeDto = UnidadeDto.builder().codigo(codUnidade).sigla(SIGLA_TESTE).build();
         when(usuarioService.buscarUnidadePorSigla(SIGLA_TESTE)).thenReturn(Optional.of(unidadeDto));
 
-        // Mock 3: Mapa (agora via SubprocessoService)
+        // Mock 3: Mapa (agora via CrudService)
         Subprocesso subprocesso = new Subprocesso();
         Mapa mapa = new Mapa();
         mapa.setCodigo(100L);
         subprocesso.setMapa(mapa);
-        when(subprocessoService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
+        when(crudService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
 
         MapaCompletoDto mapaDto = MapaCompletoDto.builder().codigo(100L).build();
-        when(mapaService.obterMapaCompleto(100L, codSubprocesso)).thenReturn(mapaDto);
+        when(mapaFacade.obterMapaCompleto(100L, codSubprocesso)).thenReturn(mapaDto);
 
         // Mock 4: Atividades
-        when(subprocessoService.listarAtividadesSubprocesso(codSubprocesso))
+        when(detalheService.listarAtividadesSubprocesso(codSubprocesso))
                 .thenReturn(Collections.emptyList());
 
         ContextoEdicaoDto resultado = service.obterContextoEdicao(codSubprocesso, perfil);
@@ -86,10 +95,13 @@ class SubprocessoContextoServiceTest {
         Long codSubprocesso = 1L;
         Perfil perfil = Perfil.CHEFE;
 
+        Usuario usuario = new Usuario();
+        when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+
         SubprocessoDetalheDto detalheDto = SubprocessoDetalheDto.builder()
                 .unidade(SubprocessoDetalheDto.UnidadeDto.builder().sigla(SIGLA_TESTE).build())
                 .build();
-        when(subprocessoService.obterDetalhes(codSubprocesso, perfil))
+        when(detalheService.obterDetalhes(codSubprocesso, perfil, usuario))
                 .thenReturn(detalheDto);
 
         when(usuarioService.buscarUnidadePorSigla(SIGLA_TESTE)).thenReturn(Optional.empty());
@@ -106,19 +118,22 @@ class SubprocessoContextoServiceTest {
         Long codUnidade = 10L;
         Perfil perfil = Perfil.CHEFE;
 
+        Usuario usuario = new Usuario();
+        when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+
         SubprocessoDetalheDto detalheDto = SubprocessoDetalheDto.builder()
                 .unidade(SubprocessoDetalheDto.UnidadeDto.builder().codigo(codUnidade).sigla(SIGLA_TESTE).build())
                 .build();
-        when(subprocessoService.obterDetalhes(codSubprocesso, perfil))
+        when(detalheService.obterDetalhes(codSubprocesso, perfil, usuario))
                 .thenReturn(detalheDto);
 
         when(usuarioService.buscarUnidadePorSigla(SIGLA_TESTE)).thenReturn(Optional.of(UnidadeDto.builder().build()));
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setMapa(null);
-        when(subprocessoService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
+        when(crudService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
 
-        when(subprocessoService.listarAtividadesSubprocesso(codSubprocesso))
+        when(detalheService.listarAtividadesSubprocesso(codSubprocesso))
                 .thenReturn(Collections.emptyList());
 
         ContextoEdicaoDto resultado = service.obterContextoEdicao(codSubprocesso, perfil);

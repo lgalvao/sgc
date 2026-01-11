@@ -18,6 +18,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class CompetenciaAjusteDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     @NotNull(message = "O código da competência é obrigatório")
     private final Long codCompetencia;
 

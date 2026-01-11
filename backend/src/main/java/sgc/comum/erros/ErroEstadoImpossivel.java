@@ -23,6 +23,8 @@ package sgc.comum.erros;
  * externamente (ex: via SQL direto no banco).
  */
 public class ErroEstadoImpossivel extends ErroInterno {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     public ErroEstadoImpossivel(String message) {
         super(message);
     }

@@ -2,6 +2,7 @@ package sgc.organizacao;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -23,6 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(UsuarioController.class)
 @Import(RestExceptionHandler.class)
+@Tag("integration")
+@DisplayName("UsuarioController - Testes de Integração")
 class UsuarioControllerTest {
 
         @Autowired

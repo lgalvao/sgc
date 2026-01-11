@@ -1,6 +1,7 @@
 package sgc.subprocesso.service;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +23,7 @@ import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.decomposed.SubprocessoValidacaoService;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +36,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("unit")
 class SubprocessoCadastroWorkflowServiceTest {
 
     @Mock
@@ -45,7 +48,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     @Mock
     private AnaliseService analiseService;
     @Mock
-    private SubprocessoService subprocessoService;
+    private SubprocessoValidacaoService validacaoService;
     @Mock
     private ImpactoMapaService impactoMapaService;
     @Mock
@@ -73,7 +76,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setMapa(mapa);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(subprocessoService.obterAtividadesSemConhecimento(id))
+        when(validacaoService.obterAtividadesSemConhecimento(id))
                 .thenReturn(Collections.emptyList());
 
         service.disponibilizarCadastro(id, user);
@@ -123,7 +126,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(u);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(subprocessoService.obterAtividadesSemConhecimento(id))
+        when(validacaoService.obterAtividadesSemConhecimento(id))
                 .thenReturn(List.of(new Atividade()));
 
         assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
@@ -144,7 +147,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setMapa(null); // Mapa nulo
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(subprocessoService.obterAtividadesSemConhecimento(id))
+        when(validacaoService.obterAtividadesSemConhecimento(id))
                 .thenReturn(Collections.emptyList());
 
         assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
@@ -170,7 +173,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setMapa(mapa);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(subprocessoService.obterAtividadesSemConhecimento(id))
+        when(validacaoService.obterAtividadesSemConhecimento(id))
                 .thenReturn(Collections.emptyList());
 
         service.disponibilizarRevisao(id, user);
@@ -512,7 +515,7 @@ class SubprocessoCadastroWorkflowServiceTest {
                         new ErroValidacao(
                                 "Pelo menos uma atividade deve ser cadastrada antes de"
                                         + " disponibilizar."))
-                .when(subprocessoService)
+                .when(validacaoService)
                 .validarExistenciaAtividades(id);
 
         assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
@@ -541,7 +544,7 @@ class SubprocessoCadastroWorkflowServiceTest {
                         new ErroValidacao(
                                 "Pelo menos uma atividade deve ser cadastrada antes de"
                                         + " disponibilizar."))
-                .when(subprocessoService)
+                .when(validacaoService)
                 .validarExistenciaAtividades(id);
 
         assertThatThrownBy(() -> service.disponibilizarRevisao(id, user))

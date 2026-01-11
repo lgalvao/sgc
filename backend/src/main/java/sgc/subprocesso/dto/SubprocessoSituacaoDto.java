@@ -13,6 +13,8 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 @Data
 @Builder
 public class SubprocessoSituacaoDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private Long codigo;
     private SituacaoSubprocesso situacao;
     private String situacaoLabel;

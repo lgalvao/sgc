@@ -98,6 +98,23 @@ public class UsuarioService {
         return buscarPorLoginInterno(tituloEleitoral);
     }
 
+    /**
+     * Obtém o usuário atualmente autenticado ou null se não houver usuário autenticado.
+     * <p>
+     * Útil para operações que podem ser executadas tanto por usuários autenticados
+     * quanto pelo sistema (ex: criação automática de subprocessos).
+     * 
+     * @return O usuário autenticado ou null
+     */
+    @Transactional(readOnly = true)
+    public @Nullable Usuario obterUsuarioAutenticadoOuNull() {
+        try {
+            return obterUsuarioAutenticado();
+        } catch (ErroAccessoNegado e) {
+            return null;
+        }
+    }
+
     @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String sigla) {
         UnidadeDto unidadeDto = unidadeService.buscarPorSigla(sigla);

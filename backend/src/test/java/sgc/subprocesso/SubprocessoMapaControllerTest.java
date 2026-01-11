@@ -2,6 +2,7 @@ package sgc.subprocesso;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -16,9 +17,7 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.ImpactoMapaService;
-import sgc.mapa.service.MapaService;
-import sgc.mapa.service.MapaVisualizacaoService;
+import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioService;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.MapaAjusteDto;
@@ -39,16 +38,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(SubprocessoMapaController.class)
 @Import(RestExceptionHandler.class)
+@Tag("integration")
 class SubprocessoMapaControllerTest {
 
     @MockitoBean
     private sgc.subprocesso.service.SubprocessoFacade subprocessoFacade;
     @MockitoBean
-    private MapaService mapaService;
-    @MockitoBean
-    private MapaVisualizacaoService mapaVisualizacaoService;
-    @MockitoBean
-    private ImpactoMapaService impactoMapaService;
+    private MapaFacade mapaFacade;
     @MockitoBean
     private UsuarioService usuarioService;
 
@@ -65,7 +61,7 @@ class SubprocessoMapaControllerTest {
     @DisplayName("verificarImpactos")
     @WithMockUser
     void verificarImpactos() throws Exception {
-        when(impactoMapaService.verificarImpactos(eq(1L), any()))
+        when(mapaFacade.verificarImpactos(eq(1L), any()))
                 .thenReturn(ImpactoMapaDto.semImpacto());
 
         mockMvc.perform(get("/api/subprocessos/1/impactos-mapa")).andExpect(status().isOk());
@@ -80,7 +76,7 @@ class SubprocessoMapaControllerTest {
         sp.getMapa().setCodigo(10L);
 
         when(subprocessoFacade.buscarSubprocessoComMapa(1L)).thenReturn(sp);
-        when(mapaService.obterMapaCompleto(10L, 1L)).thenReturn(new MapaCompletoDto());
+        when(mapaFacade.obterMapaCompleto(10L, 1L)).thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(get("/api/subprocessos/1/mapa")).andExpect(status().isOk());
     }
@@ -89,7 +85,7 @@ class SubprocessoMapaControllerTest {
     @DisplayName("obterMapaVisualizacao")
     @WithMockUser
     void obterMapaVisualizacao() throws Exception {
-        when(mapaVisualizacaoService.obterMapaParaVisualizacao(1L))
+        when(mapaFacade.obterMapaParaVisualizacao(1L))
                 .thenReturn(new MapaVisualizacaoDto());
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-visualizacao")).andExpect(status().isOk());
@@ -148,7 +144,7 @@ class SubprocessoMapaControllerTest {
         sp.getMapa().setCodigo(10L);
 
         when(subprocessoFacade.buscarSubprocessoComMapa(1L)).thenReturn(sp);
-        when(mapaService.obterMapaCompleto(10L, 1L)).thenReturn(new MapaCompletoDto());
+        when(mapaFacade.obterMapaCompleto(10L, 1L)).thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-completo")).andExpect(status().isOk());
     }

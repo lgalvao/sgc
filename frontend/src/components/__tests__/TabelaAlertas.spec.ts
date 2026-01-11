@@ -12,7 +12,7 @@ const mockAlertas: Alerta[] = [
         processo: "Proc 1",
         origem: "Origem 1",
         dataHoraFormatada: "01/01/2024",
-        dataHoraLeitura: null,
+        dataHoraLeitura: null, // Não lido
         dataHora: "2024-01-01T00:00:00Z",
         codProcesso: 101,
         unidadeOrigem: "DTI",
@@ -25,7 +25,7 @@ const mockAlertas: Alerta[] = [
         processo: "Proc 2",
         origem: "Origem 2",
         dataHoraFormatada: "02/01/2024",
-        dataHoraLeitura: "2024-01-02T10:00:00Z",
+        dataHoraLeitura: "2024-01-02T10:00:00Z", // Lido
         dataHora: "2024-01-02T00:00:00Z",
         codProcesso: 102,
         unidadeOrigem: "DTI",
@@ -36,17 +36,37 @@ const mockAlertas: Alerta[] = [
 
 describe("TabelaAlertas.vue", () => {
     setupComponentTest();
+
     it("deve passar os alertas para o BTable", () => {
         const wrapper = mount(TabelaAlertas, {
             props: {alertas: mockAlertas},
             global: {
-                stubs: {BTable: true} // Stub do BTable para focar nas props
+                stubs: {BTable: true}
             }
         });
 
         const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
         expect(bTable.exists()).toBe(true);
         expect(bTable.props("items")).toEqual(mockAlertas);
+    });
+
+    it("deve renderizar o texto 'Não lido' para alertas não lidos (acessibilidade)", () => {
+        const wrapper = mount(TabelaAlertas, {
+            props: {alertas: mockAlertas},
+             // Não stubbando BTable permite renderização real dos slots
+             global: {
+                 // stubs: { BTable: false }
+             }
+        });
+
+        // Verifica se o texto visualmente oculto está presente e associado ao alerta não lido
+        const unreadAlertRow = wrapper.findAll('tr')[1]; // Primeira linha de dados (após header)
+        expect(unreadAlertRow.text()).toContain('Não lido:');
+        expect(unreadAlertRow.find('.visually-hidden').text()).toBe('Não lido:');
+
+        // Verifica se o alerta lido não tem o texto
+        const readAlertRow = wrapper.findAll('tr')[2]; // Segunda linha de dados
+        expect(readAlertRow.text()).not.toContain('Não lido:');
     });
 
     it("deve passar a função rowClass correta", () => {
@@ -58,7 +78,6 @@ describe("TabelaAlertas.vue", () => {
         const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
         const rowClassFn = bTable.props("tbodyTrClass");
 
-        // Testar a função passada
         expect(rowClassFn(mockAlertas[0], "row")).toBe("fw-bold"); // Não lido
         expect(rowClassFn(mockAlertas[1], "row")).toBe(""); // Lido
     });
@@ -70,18 +89,9 @@ describe("TabelaAlertas.vue", () => {
         });
 
         const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
-        // BTable do bootstrap-vue-next pode tratar isso como prop ou attr
-        // No stub, vamos checar props primeiro, depois attrs
-
-        // Se for atributo, pode ser que o Vue Test Utils não retorne o valor da prop passada como função se ela não for definida como prop no stub.
-        // Mas vamos tentar acessar via vm.$attrs se necessário.
-
-        // Vamos tentar acessar bTable.vm.$attrs se disponível
         const fn = bTable.props("tbodyTrAttr") || bTable.vm.$attrs["tbody-tr-attr"];
 
         expect(typeof fn).toBe("function");
-
-        // Testar a função passada
         expect(fn(mockAlertas[0], "row")).toEqual({'data-testid': 'row-alerta-1'});
         expect(fn(null, "row")).toEqual({});
     });

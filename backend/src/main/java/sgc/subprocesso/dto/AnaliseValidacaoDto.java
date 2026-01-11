@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnaliseValidacaoDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     /**
      * O código da análise.
      */

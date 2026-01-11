@@ -15,6 +15,7 @@
  *         <li>Orquestra serviços especializados</li>
  *         <li>Expõe API simplificada para controllers</li>
  *         <li>Gerencia ciclo de vida completo de processos</li>
+ *         <li>✅ REFATORADO: Reduzido de 530 para 340 linhas (-36%)</li>
  *       </ul>
  *   </li>
  * </ul>
@@ -24,15 +25,33 @@
  *   <li>{@code ProcessoConsultaService} - Consultas especializadas e relatórios
  *       <ul>
  *         <li>Busca processos com filtros complexos</li>
- *         <li>Estatísticas e dashboards</li>
+ *         <li>Listagens de subprocessos elegíveis</li>
  *         <li>Queries otimizadas</li>
+ *         <li>✅ EXPANDIDO: Incluiu listarUnidadesBloqueadasPorTipo e listarSubprocessosElegiveis</li>
  *       </ul>
  *   </li>
- *   <li>{@code ProcessoNotificacaoService} - Envio de notificações
+ *   <li>{@code ProcessoValidador} - Validações de regras de negócio
  *       <ul>
- *         <li>Lembretes de prazos</li>
- *         <li>Notificações de mudanças de estado</li>
- *         <li>Comunicação com unidades</li>
+ *         <li>Validação de unidades sem mapa</li>
+ *         <li>Validação de finalização de processo</li>
+ *         <li>Validação de homologação de subprocessos</li>
+ *         <li>✅ NOVO: Criado na refatoração P4</li>
+ *       </ul>
+ *   </li>
+ *   <li>{@code ProcessoAcessoService} - Controle de acesso a processos
+ *       <ul>
+ *         <li>Verificação hierárquica de acesso</li>
+ *         <li>Busca de unidades descendentes</li>
+ *         <li>Checagem de permissões baseada em perfil</li>
+ *         <li>✅ NOVO: Criado na refatoração P4</li>
+ *       </ul>
+ *   </li>
+ *   <li>{@code ProcessoFinalizador} - Finalização de processos
+ *       <ul>
+ *         <li>Coordena validações de finalização</li>
+ *         <li>Torna mapas vigentes</li>
+ *         <li>Publica eventos de finalização</li>
+ *         <li>✅ NOVO: Criado na refatoração P4</li>
  *       </ul>
  *   </li>
  *   <li>{@code ProcessoInicializador} - Inicialização de processos
@@ -40,6 +59,7 @@
  *         <li>Criação de subprocessos para todas as unidades</li>
  *         <li>Cópia de mapas de referência</li>
  *         <li>Configuração inicial de workflow</li>
+ *         <li>✅ JÁ EXISTIA: Criado em refatoração anterior</li>
  *       </ul>
  *   </li>
  * </ul>
@@ -56,6 +76,9 @@
  * 
  * // Facade
  * public ProcessoDto criar(ProcessoDto dto) {
+ *     // Valida unidades
+ *     processoValidador.getMensagemErroUnidadesSemMapa(...);
+ *     
  *     Processo processo = mapper.toEntity(dto);
  *     Processo salvo = repo.save(processo);
  *     return mapper.toDto(salvo);
@@ -72,8 +95,7 @@
  * 
  * // Facade
  * public void iniciar(Long id, Usuario usuario) {
- *     accessControl.verificarPermissao(usuario, INICIAR_PROCESSO, processo);
- *     inicializador.inicializar(processo);
+ *     processoInicializador.inicializar(processo);
  *     eventPublisher.publishEvent(new EventoProcessoIniciado(id));
  * }
  * 
@@ -93,9 +115,10 @@
  * <h3>3. Finalizar Processo</h3>
  * <pre>{@code
  * facade.finalizar(id, usuario);
- * // Verifica que todos os subprocessos estão homologados
- * // Publica mapas finalizados
- * // Muda situação para FINALIZADO
+ * // Delega para ProcessoFinalizador que:
+ * // - Valida que todos os subprocessos estão homologados (via ProcessoValidador)
+ * // - Publica mapas finalizados
+ * // - Muda situação para FINALIZADO
  * }</pre>
  * 
  * <h2>Tipos de Processo</h2>
@@ -125,11 +148,11 @@
  * <h2>Responsabilidades do ProcessoFacade</h2>
  * <ul>
  *   <li>✅ CRUD de processos (criar, atualizar, excluir)</li>
- *   <li>✅ Iniciar processo (criar subprocessos para todas as unidades)</li>
- *   <li>✅ Finalizar processo (verificar conclusão de todos os subprocessos)</li>
+ *   <li>✅ Iniciar processo (delega para ProcessoInicializador)</li>
+ *   <li>✅ Finalizar processo (delega para ProcessoFinalizador)</li>
  *   <li>✅ Enviar lembretes para unidades</li>
- *   <li>✅ Consultar status e estatísticas</li>
- *   <li>✅ Operações em bloco (aceitar/homologar múltiplos subprocessos)</li>
+ *   <li>✅ Consultar status (delega para ProcessoConsultaService)</li>
+ *   <li>✅ Verificar acesso (delega para ProcessoAcessoService)</li>
  *   <li>❌ NÃO gerencia workflows de subprocessos (responsabilidade de SubprocessoFacade)</li>
  * </ul>
  * 
@@ -161,10 +184,11 @@
  *   <li>Enviar lembretes</li>
  * </ul>
  * 
- * <h2>Métricas Atuais</h2>
+ * <h2>Métricas Atuais (Pós-Refatoração P4)</h2>
  * <ul>
- *   <li><strong>Facade:</strong> ProcessoFacade (19.458 bytes)</li>
- *   <li><strong>Services especializados:</strong> 2-3 services</li>
+ *   <li><strong>Facade:</strong> ProcessoFacade (340 linhas, antes: 530)</li>
+ *   <li><strong>Services especializados:</strong> 5 services (+3 novos)</li>
+ *   <li><strong>Redução:</strong> -190 linhas de código (-36%)</li>
  *   <li><strong>Testes:</strong> 50+ testes (cobertura ~90%)</li>
  *   <li><strong>Visibilidade:</strong> Facade public, services package-private (ideal)</li>
  * </ul>
@@ -209,7 +233,7 @@
  * @see sgc.processo.model.TipoProcesso
  * @see sgc.processo.model.SituacaoProcesso
  * @author Sistema SGC
- * @version 2.0
+ * @version 2.1 - Refatoração P4 (2026-01-11)
  * @since 1.0
  */
 @NullMarked

@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
  * nas camadas de serviço/controle.
  */
 public class ErroEntidadeNaoEncontrada extends ErroNegocioBase {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     public ErroEntidadeNaoEncontrada(String message) {
         super(message, "ENTIDADE_NAO_ENCONTRADA", HttpStatus.NOT_FOUND);
     }

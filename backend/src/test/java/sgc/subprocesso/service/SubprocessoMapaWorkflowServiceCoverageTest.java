@@ -1,6 +1,7 @@
 package sgc.subprocesso.service;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,7 +14,7 @@ import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UnidadeService;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -37,6 +38,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("unit")
 class SubprocessoMapaWorkflowServiceCoverageTest {
 
     @InjectMocks
@@ -45,7 +47,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     @Mock private SubprocessoRepo subprocessoRepo;
     @Mock private CompetenciaService competenciaService;
     @Mock private AtividadeService atividadeService;
-    @Mock private MapaService mapaService;
+    @Mock private MapaFacade mapaFacade;
     @Mock private SubprocessoTransicaoService transicaoService;
     @Mock private AnaliseService analiseService;
     @Mock private UnidadeService unidadeService;
@@ -95,7 +97,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         SalvarMapaRequest req = new SalvarMapaRequest();
         req.setCompetencias(List.of(new sgc.mapa.dto.CompetenciaMapaDto())); // Tem competencia
 
-        when(mapaService.salvarMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());
+        when(mapaFacade.salvarMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());
 
         service.salvarMapaSubprocesso(1L, req);
 
@@ -119,7 +121,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         CompetenciaReq req = new CompetenciaReq();
         req.setDescricao("Nova");
 
-        when(mapaService.obterMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());
+        when(mapaFacade.obterMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());
 
         service.adicionarCompetencia(1L, req);
 
@@ -142,7 +144,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         // Simula que ficou vazio apos remover
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(Collections.emptyList());
 
-        when(mapaService.obterMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());
+        when(mapaFacade.obterMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());
 
         service.removerCompetencia(1L, 100L);
 

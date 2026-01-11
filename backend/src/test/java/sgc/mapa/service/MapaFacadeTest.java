@@ -1,6 +1,7 @@
 package sgc.mapa.service;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,8 +26,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes do MapaService")
-class MapaServiceTest {
+@Tag("unit")
+@DisplayName("Testes do MapaFacade")
+class MapaFacadeTest {
 
     @Mock
     private MapaRepo mapaRepo;
@@ -40,7 +42,7 @@ class MapaServiceTest {
     private MapaSalvamentoService mapaSalvamentoService;
 
     @InjectMocks
-    private MapaService service;
+    private MapaFacade service;
 
     @Nested
     @DisplayName("Operações CRUD")

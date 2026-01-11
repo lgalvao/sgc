@@ -1,18 +1,28 @@
 package sgc.subprocesso.service.decomposed;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
+import sgc.organizacao.UsuarioService;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
+import sgc.subprocesso.eventos.EventoSubprocessoAtualizado;
+import sgc.subprocesso.eventos.EventoSubprocessoCriado;
+import sgc.subprocesso.eventos.EventoSubprocessoExcluido;
 import sgc.subprocesso.mapper.SubprocessoMapper;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Serviço especializado para operações CRUD básicas de Subprocesso.
@@ -21,18 +31,40 @@ import java.util.List;
  * de subprocessos. Parte da decomposição arquitetural do módulo subprocesso.
  *
  * <p><b>Visibilidade:</b> Package-private - uso interno ao módulo subprocesso.
- * Acesso externo deve ser feito via {@link sgc.subprocesso.service.SubprocessoService}
- * ou {@link sgc.subprocesso.service.SubprocessoFacade}.
+ * Acesso externo deve ser feito via {@link sgc.subprocesso.service.SubprocessoFacade}.
+ *
+ * <p><b>Nota sobre Injeção de Dependências:</b> 
+ * MapaFacade é injetado com @Lazy para quebrar a dependência circular:
+ * SubprocessoFacade → SubprocessoCrudService → MapaFacade → MapaVisualizacaoService → SubprocessoFacade
  *
  * @since 2.0.0 - Tornado package-private na consolidação arquitetural Sprint 2
  */
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class SubprocessoCrudService {
     private final SubprocessoRepo repositorioSubprocesso;
     private final SubprocessoMapper subprocessoMapper;
-    private final MapaService mapaService;
+    private final MapaFacade mapaFacade;
+    private final ApplicationEventPublisher eventPublisher;
+    private final UsuarioService usuarioService;
+
+    /**
+     * Constructor with @Lazy injection to break circular dependency.
+     * 
+     * @param mapaFacade injetado com @Lazy para evitar BeanCurrentlyInCreationException
+     */
+    public SubprocessoCrudService(
+            SubprocessoRepo repositorioSubprocesso,
+            SubprocessoMapper subprocessoMapper,
+            @Lazy MapaFacade mapaFacade,
+            ApplicationEventPublisher eventPublisher,
+            UsuarioService usuarioService) {
+        this.repositorioSubprocesso = repositorioSubprocesso;
+        this.subprocessoMapper = subprocessoMapper;
+        this.mapaFacade = mapaFacade;
+        this.eventPublisher = eventPublisher;
+        this.usuarioService = usuarioService;
+    }
 
     public Subprocesso buscarSubprocesso(Long codigo) {
         return repositorioSubprocesso
@@ -78,10 +110,24 @@ public class SubprocessoCrudService {
 
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocessoSalvo);
-        Mapa mapaSalvo = mapaService.salvar(mapa);
+        Mapa mapaSalvo = mapaFacade.salvar(mapa);
 
         subprocessoSalvo.setMapa(mapaSalvo);
         var salvo = repositorioSubprocesso.save(subprocessoSalvo);
+
+        // Publica evento de criação
+        EventoSubprocessoCriado evento = EventoSubprocessoCriado.builder()
+                .subprocesso(salvo)
+                .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
+                .dataHoraCriacao(LocalDateTime.now())
+                // TODO: Implementar detecção de criação automática
+                // Atualmente sempre false porque SubprocessoFactory usa saveAll() direto
+                // Solução: Migrar SubprocessoFactory para usar este método com parâmetro
+                .criadoPorProcesso(false)
+                .codProcesso(salvo.getProcesso() != null ? salvo.getProcesso().getCodigo() : null)
+                .codUnidade(salvo.getUnidade() != null ? salvo.getUnidade().getCodigo() : null)
+                .build();
+        eventPublisher.publishEvent(evento);
 
         return subprocessoMapper.toDTO(salvo);
     }
@@ -89,26 +135,77 @@ public class SubprocessoCrudService {
     public SubprocessoDto atualizar(Long codigo, SubprocessoDto subprocessoDto) {
         return repositorioSubprocesso.findById(codigo)
                 .map(subprocesso -> {
+                    // Captura estado anterior para o evento
+                    Set<String> camposAlterados = new HashSet<>();
+                    SituacaoSubprocesso situacaoAnterior = subprocesso.getSituacao();
+
                     if (subprocessoDto.getCodMapa() != null) {
                         Mapa mapa = new Mapa();
                         mapa.setCodigo(subprocessoDto.getCodMapa());
+                        if (!Objects.equals(subprocesso.getMapa(), mapa)) {
+                            camposAlterados.add("mapa");
+                        }
                         subprocesso.setMapa(mapa);
                     } else {
+                        if (subprocesso.getMapa() != null) {
+                            camposAlterados.add("mapa");
+                        }
                         subprocesso.setMapa(null);
                     }
+
+                    if (!Objects.equals(subprocesso.getDataLimiteEtapa1(), subprocessoDto.getDataLimiteEtapa1())) {
+                        camposAlterados.add("dataLimiteEtapa1");
+                    }
+                    if (!Objects.equals(subprocesso.getDataFimEtapa1(), subprocessoDto.getDataFimEtapa1())) {
+                        camposAlterados.add("dataFimEtapa1");
+                    }
+                    if (!Objects.equals(subprocesso.getDataFimEtapa2(), subprocessoDto.getDataFimEtapa2())) {
+                        camposAlterados.add("dataFimEtapa2");
+                    }
+                    if (!Objects.equals(subprocesso.getSituacao(), subprocessoDto.getSituacao())) {
+                        camposAlterados.add("situacao");
+                    }
+
                     subprocesso.setDataLimiteEtapa1(subprocessoDto.getDataLimiteEtapa1());
                     subprocesso.setDataFimEtapa1(subprocessoDto.getDataFimEtapa1());
                     subprocesso.setDataFimEtapa2(subprocessoDto.getDataFimEtapa2());
                     subprocesso.setSituacao(subprocessoDto.getSituacao());
-                    return subprocessoMapper.toDTO(repositorioSubprocesso.save(subprocesso));
+
+                    Subprocesso salvo = repositorioSubprocesso.save(subprocesso);
+
+                    // Publica evento de atualização se houve mudanças
+                    if (!camposAlterados.isEmpty()) {
+                        EventoSubprocessoAtualizado evento = EventoSubprocessoAtualizado.builder()
+                                .subprocesso(salvo)
+                                .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
+                                .camposAlterados(camposAlterados)
+                                .dataHoraAtualizacao(LocalDateTime.now())
+                                .situacaoAnterior(situacaoAnterior != subprocessoDto.getSituacao() ? situacaoAnterior : null)
+                                .build();
+                        eventPublisher.publishEvent(evento);
+                    }
+
+                    return subprocessoMapper.toDTO(salvo);
                 })
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo));
     }
 
     public void excluir(Long codigo) {
-        if (!repositorioSubprocesso.existsById(codigo)) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo);
-        }
+        Subprocesso subprocesso = repositorioSubprocesso.findById(codigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo));
+
+        // Publica evento ANTES da exclusão
+        EventoSubprocessoExcluido evento = EventoSubprocessoExcluido.builder()
+                .codSubprocesso(codigo)
+                .codProcesso(subprocesso.getProcesso() != null ? subprocesso.getProcesso().getCodigo() : null)
+                .codUnidade(subprocesso.getUnidade() != null ? subprocesso.getUnidade().getCodigo() : null)
+                .codMapa(subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null)
+                .situacao(subprocesso.getSituacao())
+                .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
+                .dataHoraExclusao(LocalDateTime.now())
+                .build();
+        eventPublisher.publishEvent(evento);
+
         repositorioSubprocesso.deleteById(codigo);
     }
 

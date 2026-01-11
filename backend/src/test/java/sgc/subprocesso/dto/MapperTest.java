@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("unit")
 class MapperTest {
     private final SubprocessoMapper subprocessoMapper = Mappers.getMapper(SubprocessoMapper.class);
     private final MovimentacaoMapper movimentacaoMapper =

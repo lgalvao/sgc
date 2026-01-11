@@ -28,8 +28,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("SubprocessoService")
-class SubprocessoServiceTest {
+@DisplayName("SubprocessoFacade - Testes Complementares")
+class SubprocessoFacadeTest2 {
     @Mock
     private UsuarioService usuarioService;
     @Mock
@@ -42,7 +42,7 @@ class SubprocessoServiceTest {
     private SubprocessoWorkflowService workflowService;
 
     @InjectMocks
-    private SubprocessoService service;
+    private SubprocessoFacade subprocessoFacade;
 
 
 
@@ -59,7 +59,7 @@ class SubprocessoServiceTest {
         void deveVerificarAcessoUnidadeAoProcesso() {
             when(crudService.verificarAcessoUnidadeAoProcesso(1L, List.of(10L, 20L)))
                     .thenReturn(true);
-            assertThat(service.verificarAcessoUnidadeAoProcesso(1L, List.of(10L, 20L))).isTrue();
+            assertThat(subprocessoFacade.verificarAcessoUnidadeAoProcesso(1L, List.of(10L, 20L))).isTrue();
         }
 
         @Test
@@ -67,7 +67,7 @@ class SubprocessoServiceTest {
         void deveListarEntidadesPorProcesso() {
             when(crudService.listarEntidadesPorProcesso(1L))
                     .thenReturn(List.of(new Subprocesso()));
-            assertThat(service.listarEntidadesPorProcesso(1L)).hasSize(1);
+            assertThat(subprocessoFacade.listarEntidadesPorProcesso(1L)).hasSize(1);
         }
 
         @Test
@@ -77,7 +77,7 @@ class SubprocessoServiceTest {
             dto.setDescricao("Atividade Teste");
             when(detalheService.listarAtividadesSubprocesso(1L)).thenReturn(List.of(dto));
 
-            List<AtividadeVisualizacaoDto> result = service.listarAtividadesSubprocesso(1L);
+            List<AtividadeVisualizacaoDto> result = subprocessoFacade.listarAtividadesSubprocesso(1L);
 
             assertThat(result).hasSize(1);
             assertThat(result.getFirst().getDescricao()).isEqualTo("Atividade Teste");
@@ -87,21 +87,21 @@ class SubprocessoServiceTest {
         @DisplayName("Deve retornar situação quando subprocesso existe")
         void deveRetornarSituacaoQuandoSubprocessoExiste() {
             when(crudService.obterStatus(1L)).thenReturn(SubprocessoSituacaoDto.builder().build());
-            assertThat(service.obterSituacao(1L)).isNotNull();
+            assertThat(subprocessoFacade.obterSituacao(1L)).isNotNull();
         }
 
         @Test
         @DisplayName("Deve retornar entidade por código do mapa")
         void deveRetornarEntidadePorCodigoMapa() {
             when(crudService.obterEntidadePorCodigoMapa(100L)).thenReturn(new Subprocesso());
-            assertThat(service.obterEntidadePorCodigoMapa(100L)).isNotNull();
+            assertThat(subprocessoFacade.obterEntidadePorCodigoMapa(100L)).isNotNull();
         }
 
         @Test
         @DisplayName("Deve retornar lista vazia se não houver atividades sem conhecimento")
         void deveRetornarListaVaziaSeNaoHouverAtividadesSemConhecimento() {
             when(validacaoService.obterAtividadesSemConhecimento(1L)).thenReturn(Collections.emptyList());
-            List<Atividade> result = service.obterAtividadesSemConhecimento(1L);
+            List<Atividade> result = subprocessoFacade.obterAtividadesSemConhecimento(1L);
             assertThat(result).isEmpty();
         }
 
@@ -109,14 +109,14 @@ class SubprocessoServiceTest {
         @DisplayName("Deve buscar subprocesso por ID")
         void deveBuscarSubprocessoPorId() {
             when(crudService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
-            assertThat(service.buscarSubprocesso(1L)).isNotNull();
+            assertThat(subprocessoFacade.buscarSubprocesso(1L)).isNotNull();
         }
 
         @Test
         @DisplayName("Deve buscar subprocesso com mapa")
         void deveBuscarSubprocessoComMapa() {
             when(crudService.buscarSubprocessoComMapa(1L)).thenReturn(new Subprocesso());
-            assertThat(service.buscarSubprocessoComMapa(1L)).isNotNull();
+            assertThat(subprocessoFacade.buscarSubprocessoComMapa(1L)).isNotNull();
         }
 
         @Test
@@ -124,14 +124,14 @@ class SubprocessoServiceTest {
         void deveObterAtividadesSemConhecimentoPorMapa() {
             Mapa mapa = new Mapa();
             when(validacaoService.obterAtividadesSemConhecimento(mapa)).thenReturn(Collections.emptyList());
-            assertThat(service.obterAtividadesSemConhecimento(mapa)).isEmpty();
+            assertThat(subprocessoFacade.obterAtividadesSemConhecimento(mapa)).isEmpty();
         }
 
         @Test
         @DisplayName("Deve listar subprocessos homologados")
         void deveListarSubprocessosHomologados() {
             when(workflowService.listarSubprocessosHomologados()).thenReturn(Collections.emptyList());
-            assertThat(service.listarSubprocessosHomologados()).isEmpty();
+            assertThat(subprocessoFacade.listarSubprocessosHomologados()).isEmpty();
         }
     }
 
@@ -143,7 +143,7 @@ class SubprocessoServiceTest {
         void deveCriarSubprocessoComSucesso() {
             SubprocessoDto dto = SubprocessoDto.builder().build();
             when(crudService.criar(dto)).thenReturn(dto);
-            assertThat(service.criar(dto)).isNotNull();
+            assertThat(subprocessoFacade.criar(dto)).isNotNull();
         }
 
         @Test
@@ -151,13 +151,13 @@ class SubprocessoServiceTest {
         void deveAtualizarSubprocessoComSucesso() {
             SubprocessoDto dto = SubprocessoDto.builder().codMapa(100L).build();
             when(crudService.atualizar(1L, dto)).thenReturn(dto);
-            assertThat(service.atualizar(1L, dto)).isNotNull();
+            assertThat(subprocessoFacade.atualizar(1L, dto)).isNotNull();
         }
 
         @Test
         @DisplayName("Deve excluir subprocesso com sucesso")
         void deveExcluirSubprocessoComSucesso() {
-            service.excluir(1L);
+            subprocessoFacade.excluir(1L);
             verify(crudService).excluir(1L);
         }
     }
@@ -168,7 +168,7 @@ class SubprocessoServiceTest {
         @Test
         @DisplayName("Deve validar existência de atividades - Sucesso")
         void deveValidarExistenciaAtividadesSucesso() {
-            service.validarExistenciaAtividades(1L);
+            subprocessoFacade.validarExistenciaAtividades(1L);
             verify(validacaoService).validarExistenciaAtividades(1L);
         }
 
@@ -178,14 +178,14 @@ class SubprocessoServiceTest {
             ValidacaoCadastroDto val = ValidacaoCadastroDto.builder().valido(true).build();
             when(validacaoService.validarCadastro(1L)).thenReturn(val);
 
-            ValidacaoCadastroDto result = service.validarCadastro(1L);
+            ValidacaoCadastroDto result = subprocessoFacade.validarCadastro(1L);
             assertThat(result.getValido()).isTrue();
         }
 
         @Test
         @DisplayName("Deve validar associações do mapa")
         void deveValidarAssociacoesMapa() {
-            service.validarAssociacoesMapa(100L);
+            subprocessoFacade.validarAssociacoesMapa(100L);
             verify(validacaoService).validarAssociacoesMapa(100L);
         }
     }
@@ -196,7 +196,7 @@ class SubprocessoServiceTest {
         @Test
         @DisplayName("Deve atualizar situação para EM ANDAMENTO")
         void deveAtualizarParaEmAndamentoMapeamento() {
-            service.atualizarSituacaoParaEmAndamento(100L);
+            subprocessoFacade.atualizarSituacaoParaEmAndamento(100L);
             verify(workflowService).atualizarSituacaoParaEmAndamento(100L);
         }
 
@@ -204,21 +204,21 @@ class SubprocessoServiceTest {
         @DisplayName("Deve alterar data limite")
         void deveAlterarDataLimite() {
             LocalDate novaData = java.time.LocalDate.now();
-            service.alterarDataLimite(1L, novaData);
+            subprocessoFacade.alterarDataLimite(1L, novaData);
             verify(workflowService).alterarDataLimite(1L, novaData);
         }
 
         @Test
         @DisplayName("Deve reabrir cadastro")
         void deveReabrirCadastro() {
-            service.reabrirCadastro(1L, "Justificativa");
+            subprocessoFacade.reabrirCadastro(1L, "Justificativa");
             verify(workflowService).reabrirCadastro(1L, "Justificativa");
         }
 
         @Test
         @DisplayName("Deve reabrir revisão cadastro")
         void deveReabrirRevisaoCadastro() {
-            service.reabrirRevisaoCadastro(1L, "Justificativa");
+            subprocessoFacade.reabrirRevisaoCadastro(1L, "Justificativa");
             verify(workflowService).reabrirRevisaoCadastro(1L, "Justificativa");
         }
     }
@@ -236,7 +236,7 @@ class SubprocessoServiceTest {
             when(detalheService.obterDetalhes(1L, Perfil.ADMIN, admin))
                     .thenReturn(SubprocessoDetalheDto.builder().build());
 
-            SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN);
+            SubprocessoDetalheDto result = subprocessoFacade.obterDetalhes(1L, Perfil.ADMIN);
             assertThat(result).isNotNull();
         }
 
@@ -249,7 +249,7 @@ class SubprocessoServiceTest {
             when(detalheService.obterPermissoes(1L, user))
                     .thenReturn(SubprocessoPermissoesDto.builder().build());
 
-            SubprocessoPermissoesDto result = service.obterPermissoes(1L);
+            SubprocessoPermissoesDto result = subprocessoFacade.obterPermissoes(1L);
             assertThat(result).isNotNull();
         }
 
@@ -260,7 +260,7 @@ class SubprocessoServiceTest {
                     .thenThrow(new sgc.comum.erros.ErroAccessoNegado("Nenhum usuário autenticado"));
 
             org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () ->
-                    service.obterPermissoes(1L)
+                    subprocessoFacade.obterPermissoes(1L)
             );
         }
 
@@ -271,7 +271,7 @@ class SubprocessoServiceTest {
                     .thenThrow(new sgc.comum.erros.ErroAccessoNegado("Usuário sem nome"));
 
             org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () ->
-                    service.obterPermissoes(1L)
+                    subprocessoFacade.obterPermissoes(1L)
             );
         }
     }
@@ -284,7 +284,7 @@ class SubprocessoServiceTest {
         @DisplayName("obterCadastro")
         void obterCadastro() {
             when(detalheService.obterCadastro(1L)).thenReturn(SubprocessoCadastroDto.builder().subprocessoCodigo(1L).build());
-            SubprocessoCadastroDto result = service.obterCadastro(1L);
+            SubprocessoCadastroDto result = subprocessoFacade.obterCadastro(1L);
             assertThat(result).isNotNull();
             assertThat(result.getSubprocessoCodigo()).isEqualTo(1L);
         }
@@ -293,7 +293,7 @@ class SubprocessoServiceTest {
         @DisplayName("obterSugestoes")
         void obterSugestoes() {
             when(detalheService.obterSugestoes(1L)).thenReturn(SugestoesDto.builder().sugestoes("S").build());
-            SugestoesDto result = service.obterSugestoes(1L);
+            SugestoesDto result = subprocessoFacade.obterSugestoes(1L);
             assertThat(result.getSugestoes()).isEqualTo("S");
         }
 
@@ -301,7 +301,7 @@ class SubprocessoServiceTest {
         @DisplayName("obterMapaParaAjuste")
         void obterMapaParaAjuste() {
             when(detalheService.obterMapaParaAjuste(1L)).thenReturn(MapaAjusteDto.builder().build());
-            MapaAjusteDto result = service.obterMapaParaAjuste(1L);
+            MapaAjusteDto result = subprocessoFacade.obterMapaParaAjuste(1L);
             assertThat(result).isNotNull();
         }
 
@@ -309,7 +309,7 @@ class SubprocessoServiceTest {
         @DisplayName("listar")
         void listar() {
             when(crudService.listar()).thenReturn(List.of(new SubprocessoDto()));
-            List<SubprocessoDto> result = service.listar();
+            List<SubprocessoDto> result = subprocessoFacade.listar();
             assertThat(result).hasSize(1);
         }
 
@@ -317,7 +317,7 @@ class SubprocessoServiceTest {
         @DisplayName("obterPorProcessoEUnidade")
         void obterPorProcessoEUnidade() {
             when(crudService.obterPorProcessoEUnidade(1L, 10L)).thenReturn(SubprocessoDto.builder().codigo(1L).build());
-            SubprocessoDto result = service.obterPorProcessoEUnidade(1L, 10L);
+            SubprocessoDto result = subprocessoFacade.obterPorProcessoEUnidade(1L, 10L);
             assertThat(result).isNotNull();
             assertThat(result.getCodigo()).isEqualTo(1L);
         }

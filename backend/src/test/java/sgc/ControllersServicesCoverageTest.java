@@ -20,7 +20,7 @@ import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.MapaSalvamentoService;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.painel.PainelService;
@@ -34,7 +34,7 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.SubprocessoContextoService;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
 @DisplayName("Cobertura Extra de Controllers e Services")
 class ControllersServicesCoverageTest {
     @Mock
-    private SubprocessoService subprocessoService;
+    private SubprocessoFacade subprocessoFacade;
     @Mock
     private SubprocessoContextoService subprocessoContextoService;
     @Mock
@@ -74,7 +74,7 @@ class ControllersServicesCoverageTest {
     @Mock private sgc.mapa.service.MapaVisualizacaoService mapaVisualizacaoService;
     @Mock private sgc.subprocesso.service.SubprocessoMapaService subprocessoMapaService;
     @Mock private sgc.subprocesso.service.SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
-    @Mock private sgc.subprocesso.service.SubprocessoFacade subprocessoFacade;
+    @Mock private sgc.subprocesso.service.decomposed.SubprocessoValidacaoService validacaoService;
     @Mock private sgc.organizacao.UsuarioService usuarioService;
     @Mock private sgc.subprocesso.service.SubprocessoTransicaoService transicaoService;
     @Mock private sgc.organizacao.UnidadeService unidadeService;
@@ -83,7 +83,7 @@ class ControllersServicesCoverageTest {
     @Mock private sgc.processo.service.ProcessoFacade processoFacade;
 
     private SubprocessoMapaController subprocessoMapaController;
-    private MapaService mapaService;
+    private MapaFacade mapaFacade;
     private SubprocessoCadastroWorkflowService cadastroService;
     private PainelService painelService;
 
@@ -91,23 +91,22 @@ class ControllersServicesCoverageTest {
     void setUp() {
         // Instanciação manual para evitar overhead do @InjectMocks e lidar com muitas dependências
         
+        // MapaFacade (needs to be created first since SubprocessoMapaController depends on it)
+        mapaFacade = new MapaFacade(
+                mapaRepo, competenciaRepo, mapaCompletoMapper, mapaSalvamentoService,
+                mapaVisualizacaoService, impactoMapaService
+        );
+        
         // SubprocessoMapaController
         subprocessoMapaController = new SubprocessoMapaController(
                 subprocessoFacade,
-                mapaService, 
-                mapaVisualizacaoService, 
-                impactoMapaService,
+                mapaFacade,
                 usuarioService
-        );
-
-        // MapaService
-        mapaService = new MapaService(
-                mapaRepo, competenciaRepo, mapaCompletoMapper, mapaSalvamentoService
         );
 
         // SubprocessoCadastroWorkflowService
         cadastroService = new SubprocessoCadastroWorkflowService(
-                repositorioSubprocesso, transicaoService, unidadeService, analiseService, subprocessoService, impactoMapaService, accessControlService
+                repositorioSubprocesso, transicaoService, unidadeService, analiseService, validacaoService, impactoMapaService, accessControlService
         );
 
         // PainelService
@@ -148,7 +147,7 @@ class ControllersServicesCoverageTest {
     @DisplayName("Deve lançar erro ao obter mapa completo inexistente")
     void deveLancarErroObterMapaCompletoInexistente() {
         when(mapaRepo.findById(99L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> mapaService.obterMapaCompleto(99L, 1L))
+        assertThatThrownBy(() -> mapaFacade.obterMapaCompleto(99L, 1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
@@ -158,7 +157,7 @@ class ControllersServicesCoverageTest {
         SalvarMapaRequest req = new SalvarMapaRequest();
         when(mapaSalvamentoService.salvarMapaCompleto(99L, req))
             .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 99L));
-        assertThatThrownBy(() -> mapaService.salvarMapaCompleto(99L, req))
+        assertThatThrownBy(() -> mapaFacade.salvarMapaCompleto(99L, req))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
@@ -175,7 +174,7 @@ class ControllersServicesCoverageTest {
         when(mapaSalvamentoService.salvarMapaCompleto(1L, req))
             .thenThrow(new ErroEntidadeNaoEncontrada("Competência não encontrada: 99"));
 
-        assertThatThrownBy(() -> mapaService.salvarMapaCompleto(1L, req))
+        assertThatThrownBy(() -> mapaFacade.salvarMapaCompleto(1L, req))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessageContaining("Competência não encontrada");
     }
@@ -185,7 +184,7 @@ class ControllersServicesCoverageTest {
     void deveLancarErroAtualizarMapaInexistente() {
         when(mapaRepo.findById(99L)).thenReturn(Optional.empty());
         Mapa mapa = new Mapa();
-        assertThatThrownBy(() -> mapaService.atualizar(99L, mapa))
+        assertThatThrownBy(() -> mapaFacade.atualizar(99L, mapa))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
@@ -193,7 +192,7 @@ class ControllersServicesCoverageTest {
     @DisplayName("Deve lançar erro ao excluir mapa inexistente")
     void deveLancarErroExcluirMapaInexistente() {
         when(mapaRepo.existsById(99L)).thenReturn(false);
-        assertThatThrownBy(() -> mapaService.excluir(99L))
+        assertThatThrownBy(() -> mapaFacade.excluir(99L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 

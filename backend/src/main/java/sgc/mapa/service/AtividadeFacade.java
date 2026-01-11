@@ -1,11 +1,15 @@
 package sgc.mapa.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
+import sgc.mapa.evento.EventoAtividadeAtualizada;
+import sgc.mapa.evento.EventoAtividadeCriada;
+import sgc.mapa.evento.EventoAtividadeExcluida;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioService;
@@ -15,15 +19,19 @@ import sgc.subprocesso.dto.AtividadeOperacaoResp;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import static sgc.seguranca.acesso.Acao.*;
 
 /**
  * Facade para orquestrar operações de atividades e conhecimentos,
- * lidando com a interação entre AtividadeService, ConhecimentoService e SubprocessoService.
+ * lidando com a interação entre AtividadeService, ConhecimentoService e SubprocessoFacade.
  * Remove a lógica de negócio do AtividadeController.
  *
  * <p>Implementa o padrão Facade para simplificar a interface de uso e centralizar a coordenação de serviços.
@@ -37,10 +45,11 @@ import static sgc.seguranca.acesso.Acao.*;
 public class AtividadeFacade {
     private final AtividadeService atividadeService;
     private final ConhecimentoService conhecimentoService;
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoFacade subprocessoFacade;
     private final AccessControlService accessControlService;
     private final UsuarioService usuarioService;
-    private final MapaService mapaService;
+    private final MapaFacade mapaFacade;
+    private final ApplicationEventPublisher eventPublisher;
 
     // ===== Consultas =====
 
@@ -77,7 +86,7 @@ public class AtividadeFacade {
         // Busca usuário autenticado através do contexto Spring Security
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
         
-        Mapa mapa = mapaService.obterPorCodigo(mapaCodigo);
+        Mapa mapa = mapaFacade.obterPorCodigo(mapaCodigo);
         
         // Cria atividade temporária para verificação de acesso
         Atividade atividadeTemp = new Atividade();
@@ -87,6 +96,20 @@ public class AtividadeFacade {
         accessControlService.verificarPermissao(usuario, CRIAR_ATIVIDADE, atividadeTemp);
         
         AtividadeDto salvo = atividadeService.criar(atividadeDto);
+
+        // Publica evento de criação
+        Atividade atividadeCriada = atividadeService.obterPorCodigo(salvo.getCodigo());
+        Subprocesso subprocesso = mapa.getSubprocesso();
+        
+        EventoAtividadeCriada evento = EventoAtividadeCriada.builder()
+                .atividade(atividadeCriada)
+                .codMapa(mapaCodigo)
+                .codSubprocesso(subprocesso != null ? subprocesso.getCodigo() : null)
+                .usuario(usuario)
+                .dataHoraCriacao(LocalDateTime.now())
+                .totalAtividadesNoMapa(atividadeService.contarPorMapa(mapaCodigo))
+                .build();
+        eventPublisher.publishEvent(evento);
 
         return criarRespostaOperacaoPorMapaCodigo(mapaCodigo, salvo.getCodigo(), true);
     }
@@ -102,8 +125,38 @@ public class AtividadeFacade {
         
         // Verifica permissão
         accessControlService.verificarPermissao(usuario, EDITAR_ATIVIDADE, atividade);
+
+        // Captura estado anterior para detectar mudanças
+        String descricaoAnterior = atividade.getDescricao();
+        Set<String> camposAlterados = new HashSet<>();
+
+        if (!Objects.equals(atividade.getDescricao(), atividadeDto.getDescricao())) {
+            camposAlterados.add("descricao");
+        }
+        // Nota: Competências são afetadas apenas via conhecimentos (endpoints separados)
+        // Este método atualiza somente a descrição da atividade
         
         atividadeService.atualizar(codigo, atividadeDto);
+
+        // Busca estado atualizado
+        Atividade atividadeAtualizada = atividadeService.obterPorCodigo(codigo);
+        Long codMapa = atividadeAtualizada.getMapa().getCodigo();
+        Subprocesso subprocesso = atividadeAtualizada.getMapa().getSubprocesso();
+
+        // Publica evento de atualização se houve mudanças
+        if (!camposAlterados.isEmpty()) {
+            EventoAtividadeAtualizada evento = EventoAtividadeAtualizada.builder()
+                    .atividade(atividadeAtualizada)
+                    .codMapa(codMapa)
+                    .codSubprocesso(subprocesso != null ? subprocesso.getCodigo() : null)
+                    .usuario(usuario)
+                    .camposAlterados(camposAlterados)
+                    .dataHoraAtualizacao(LocalDateTime.now())
+                    // Nota: false pois este método atualiza apenas descrição, não competências
+                    .afetouCompetencias(false)
+                    .build();
+            eventPublisher.publishEvent(evento);
+        }
 
         return criarRespostaOperacaoPorAtividade(codigo);
     }
@@ -120,6 +173,26 @@ public class AtividadeFacade {
         
         // Verifica permissão
         accessControlService.verificarPermissao(usuario, EXCLUIR_ATIVIDADE, atividade);
+
+        // Captura dados para o evento ANTES da exclusão
+        String descricao = atividade.getDescricao();
+        Subprocesso subprocesso = atividade.getMapa().getSubprocesso();
+        int quantidadeConhecimentos = atividade.getConhecimentos() != null 
+                ? atividade.getConhecimentos().size() : 0;
+        int totalAntes = atividadeService.contarPorMapa(codMapa);
+
+        // Publica evento ANTES da exclusão
+        EventoAtividadeExcluida evento = EventoAtividadeExcluida.builder()
+                .codAtividade(codigo)
+                .descricao(descricao)
+                .codMapa(codMapa)
+                .codSubprocesso(subprocesso != null ? subprocesso.getCodigo() : null)
+                .usuario(usuario)
+                .quantidadeConhecimentos(quantidadeConhecimentos)
+                .dataHoraExclusao(LocalDateTime.now())
+                .totalAtividadesRestantes(totalAntes - 1)
+                .build();
+        eventPublisher.publishEvent(evento);
         
         atividadeService.excluir(codigo);
 
@@ -187,7 +260,7 @@ public class AtividadeFacade {
     }
 
     private Long obterCodigoSubprocessoPorMapa(Long codMapa) {
-        Subprocesso subprocesso = subprocessoService.obterEntidadePorCodigoMapa(codMapa);
+        Subprocesso subprocesso = subprocessoFacade.obterEntidadePorCodigoMapa(codMapa);
         return subprocesso.getCodigo();
     }
 
@@ -197,10 +270,10 @@ public class AtividadeFacade {
     }
 
     private AtividadeOperacaoResp criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
-        SubprocessoSituacaoDto situacaoDto = subprocessoService.obterSituacao(codSubprocesso);
+        SubprocessoSituacaoDto situacaoDto = subprocessoFacade.obterSituacao(codSubprocesso);
         AtividadeVisualizacaoDto atividadeVis = null;
         if (incluirAtividade) {
-            atividadeVis = subprocessoService.listarAtividadesSubprocesso(codSubprocesso)
+            atividadeVis = subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso)
                     .stream()
                     .filter(a -> a.getCodigo().equals(codigoAtividade))
                     .findFirst()

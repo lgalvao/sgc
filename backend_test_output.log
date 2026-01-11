@@ -1,0 +1,24 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:test
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses UP-TO-DATE
+> Task :backend:test
+  Results: SUCCESS
+  Total:     1149 tests run
+  ✓ Passed:  1149
+  ✗ Failed:  0
+  ○ Ignored: 0
+  Time:     162.533s
+
+Testes mais lentos (> 1s):
+  - 6495ms: sgc.arquitetura.ArchConsistencyTest > controllers_should_not_access_repositories
+  - 3668ms: sgc.ControllersServicesCoverageTest > deveListarAtividades()
+  - 1348ms: sgc.subprocesso.dto.MapaAjusteDtoTest > deveCriarViaOf()
+  - 1233ms: sgc.seguranca.acesso.AccessControlServiceTest > deveRetornarTrueParaPodeExecutarNaImplementacaoInicial()
+
+BUILD SUCCESSFUL in 2m 53s
+5 actionable tasks: 1 executed, 4 up-to-date
+Configuration cache entry stored.

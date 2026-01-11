@@ -1,6 +1,7 @@
 package sgc.mapa.service;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,7 +11,7 @@ import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
 import java.util.Set;
@@ -20,11 +21,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("unit")
 @DisplayName("Testes do Serviço de Visualização de Mapa")
 class MapaVisualizacaoServiceTest {
 
     @Mock
-    private SubprocessoService subprocessoService;
+    private SubprocessoFacade subprocessoFacade;
     @Mock
     private CompetenciaRepo competenciaRepo;
     @Mock
@@ -60,9 +62,13 @@ class MapaVisualizacaoServiceTest {
         comp.setDescricao("C1");
         comp.setAtividades(Set.of(ativ1));
 
-        when(subprocessoService.buscarSubprocesso(subId)).thenReturn(sub);
+        // Mocking the new projection method
+        List<Object[]> projectionResult = new java.util.ArrayList<>();
+        projectionResult.add(new Object[]{50L, "C1", 1L});
+
+        when(subprocessoFacade.buscarSubprocesso(subId)).thenReturn(sub);
         when(atividadeRepo.findByMapaCodigoWithConhecimentos(10L)).thenReturn(List.of(ativ1, ativ2));
-        when(competenciaRepo.findByMapaCodigo(10L)).thenReturn(List.of(comp));
+        when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(10L)).thenReturn(projectionResult);
 
         MapaVisualizacaoDto dto = service.obterMapaParaVisualizacao(subId);
 
@@ -79,7 +85,7 @@ class MapaVisualizacaoServiceTest {
         Subprocesso sub = new Subprocesso();
         // Mapa null
 
-        when(subprocessoService.buscarSubprocesso(subId)).thenReturn(sub);
+        when(subprocessoFacade.buscarSubprocesso(subId)).thenReturn(sub);
 
         assertThatThrownBy(() -> service.obterMapaParaVisualizacao(subId))
                 .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);

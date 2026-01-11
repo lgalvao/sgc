@@ -7,6 +7,8 @@ import sgc.comum.erros.ErroNegocioBase;
  * Lançada quando um subprocesso não possui um mapa associado.
  */
 public class ErroMapaNaoAssociado extends ErroNegocioBase {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     public ErroMapaNaoAssociado(String message) {
         super(message, "MAPA_NAO_ASSOCIADO", HttpStatus.UNPROCESSABLE_CONTENT);
     }

@@ -14,6 +14,8 @@ import sgc.subprocesso.model.Subprocesso;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SugestoesDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     /**
      * O texto das sugestões.
      */

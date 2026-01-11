@@ -13,9 +13,7 @@ import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
-import sgc.mapa.service.ImpactoMapaService;
-import sgc.mapa.service.MapaService;
-import sgc.mapa.service.MapaVisualizacaoService;
+import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
@@ -30,9 +28,7 @@ import java.util.List;
 @Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoMapaController {
     private final SubprocessoFacade subprocessoFacade;
-    private final MapaService mapaService;
-    private final MapaVisualizacaoService mapaVisualizacaoService;
-    private final ImpactoMapaService impactoMapaService;
+    private final MapaFacade mapaFacade;
     private final UsuarioService usuarioService;
 
     /**
@@ -65,7 +61,7 @@ public class SubprocessoMapaController {
     @Operation(summary = "Verifica os impactos da revisão no mapa de competências")
     public ImpactoMapaDto verificarImpactos(@PathVariable Long codigo) {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
-        return impactoMapaService.verificarImpactos(codigo, usuario);
+        return mapaFacade.verificarImpactos(codigo, usuario);
     }
 
     /**
@@ -78,7 +74,7 @@ public class SubprocessoMapaController {
     @PreAuthorize("isAuthenticated()")
     public MapaCompletoDto obterMapa(@PathVariable Long codigo) {
         Subprocesso subprocesso = subprocessoFacade.buscarSubprocessoComMapa(codigo);
-        return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
+        return mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
     }
 
     /**
@@ -91,7 +87,7 @@ public class SubprocessoMapaController {
     @GetMapping("/{codigo}/mapa-visualizacao")
     @PreAuthorize("isAuthenticated()")
     public MapaVisualizacaoDto obterMapaVisualizacao(@PathVariable("codigo") Long codSubprocesso) {
-        return mapaVisualizacaoService.obterMapaParaVisualizacao(codSubprocesso);
+        return mapaFacade.obterMapaParaVisualizacao(codSubprocesso);
     }
 
     /**
@@ -173,7 +169,7 @@ public class SubprocessoMapaController {
     public ResponseEntity<MapaCompletoDto> obterMapaCompleto(@PathVariable Long codigo) {
         Subprocesso subprocesso = subprocessoFacade.buscarSubprocessoComMapa(codigo);
         MapaCompletoDto mapa =
-                mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
+                mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
         return ResponseEntity.ok(mapa);
     }
 

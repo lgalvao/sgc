@@ -12,6 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MapaVisualizacaoDto {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private UnidadeDto unidade;
     private List<CompetenciaDto> competencias;
     private List<AtividadeDto> atividadesSemCompetencia;

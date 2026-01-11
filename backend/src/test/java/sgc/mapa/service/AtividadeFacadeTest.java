@@ -1,11 +1,13 @@
 package sgc.mapa.service;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.dto.ConhecimentoDto;
@@ -20,7 +22,7 @@ import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -29,6 +31,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("unit")
 @DisplayName("Testes para AtividadeFacade")
 class AtividadeFacadeTest {
 
@@ -42,7 +45,7 @@ class AtividadeFacadeTest {
     private ConhecimentoService conhecimentoService;
 
     @Mock
-    private SubprocessoService subprocessoService;
+    private SubprocessoFacade subprocessoFacade;
 
     @Mock
     private AccessControlService accessControlService;
@@ -51,7 +54,10 @@ class AtividadeFacadeTest {
     private UsuarioService usuarioService;
 
     @Mock
-    private MapaService mapaService;
+    private MapaFacade mapaFacade;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @Test
     @DisplayName("Deve criar atividade e retornar status")
@@ -70,7 +76,7 @@ class AtividadeFacadeTest {
         
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
-        when(mapaService.obterPorCodigo(1L)).thenReturn(mapa);
+        when(mapaFacade.obterPorCodigo(1L)).thenReturn(mapa);
         
         // Mock accessControlService to allow access
         doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());
@@ -78,18 +84,18 @@ class AtividadeFacadeTest {
         // Facade then gets Subprocesso code by Map code
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(10L);
-        when(subprocessoService.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
+        when(subprocessoFacade.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
         when(atividadeService.criar(request)).thenReturn(created);
 
         // Facade gets status
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().situacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO).build();
-        when(subprocessoService.obterSituacao(10L)).thenReturn(status);
+        when(subprocessoFacade.obterSituacao(10L)).thenReturn(status);
 
         // Facade searches for activity in list to return visualization
         AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
         vis.setCodigo(100L);
-        when(subprocessoService.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
+        when(subprocessoFacade.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
         AtividadeOperacaoResp response = facade.criarAtividade(request);
 
@@ -121,10 +127,10 @@ class AtividadeFacadeTest {
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(10L);
-        when(subprocessoService.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
+        when(subprocessoFacade.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
-        when(subprocessoService.obterSituacao(10L)).thenReturn(status);
+        when(subprocessoFacade.obterSituacao(10L)).thenReturn(status);
 
         AtividadeOperacaoResp response = facade.atualizarAtividade(codigo, request);
 
@@ -152,10 +158,10 @@ class AtividadeFacadeTest {
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(10L);
-        when(subprocessoService.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
+        when(subprocessoFacade.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
-        when(subprocessoService.obterSituacao(10L)).thenReturn(status);
+        when(subprocessoFacade.obterSituacao(10L)).thenReturn(status);
 
         AtividadeOperacaoResp response = facade.excluirAtividade(codigo);
 
@@ -198,14 +204,14 @@ class AtividadeFacadeTest {
         when(atividadeService.obterPorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(10L);
-        when(subprocessoService.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
+        when(subprocessoFacade.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
-        when(subprocessoService.obterSituacao(10L)).thenReturn(status);
+        when(subprocessoFacade.obterSituacao(10L)).thenReturn(status);
 
         AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
         vis.setCodigo(codigoAtividade);
-        when(subprocessoService.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
+        when(subprocessoFacade.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
         ResultadoOperacaoConhecimento resultado = facade.criarConhecimento(codigoAtividade, dto);
 
@@ -236,14 +242,14 @@ class AtividadeFacadeTest {
         when(atividadeService.obterPorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(10L);
-        when(subprocessoService.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
+        when(subprocessoFacade.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
-        when(subprocessoService.obterSituacao(10L)).thenReturn(status);
+        when(subprocessoFacade.obterSituacao(10L)).thenReturn(status);
 
         AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
         vis.setCodigo(codigoAtividade);
-        when(subprocessoService.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
+        when(subprocessoFacade.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
         AtividadeOperacaoResp response = facade.atualizarConhecimento(codigoAtividade, codigoConhecimento, dto);
 
@@ -273,14 +279,14 @@ class AtividadeFacadeTest {
         when(atividadeService.obterPorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(10L);
-        when(subprocessoService.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
+        when(subprocessoFacade.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
-        when(subprocessoService.obterSituacao(10L)).thenReturn(status);
+        when(subprocessoFacade.obterSituacao(10L)).thenReturn(status);
 
         AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
         vis.setCodigo(codigoAtividade);
-        when(subprocessoService.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
+        when(subprocessoFacade.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
         AtividadeOperacaoResp response = facade.excluirConhecimento(codigoAtividade, codigoConhecimento);
 

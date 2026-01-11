@@ -7,10 +7,16 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.decomposed.SubprocessoCrudService;
+import sgc.subprocesso.service.decomposed.SubprocessoDetalheService;
+import sgc.subprocesso.service.decomposed.SubprocessoValidacaoService;
+import sgc.subprocesso.service.decomposed.SubprocessoWorkflowService;
 
 import java.util.List;
 
@@ -25,7 +31,10 @@ import java.util.List;
  * Esta classe é o ponto de entrada único para todas as operações de subprocesso,
  * delegando para serviços especializados internos que são package-private.
  * 
- * @see SubprocessoService Para operações CRUD básicas
+ * @see SubprocessoCrudService Para operações CRUD básicas
+ * @see SubprocessoDetalheService Para construção de detalhes
+ * @see SubprocessoValidacaoService Para validações
+ * @see SubprocessoWorkflowService Para operações de workflow genéricas
  * @see SubprocessoCadastroWorkflowService Para workflow de cadastro
  * @see SubprocessoMapaWorkflowService Para workflow de mapa
  * @see SubprocessoContextoService Para contexto de edição
@@ -35,70 +44,85 @@ import java.util.List;
 @Slf4j
 public class SubprocessoFacade {
 
-    private final SubprocessoService subprocessoService;
+    // Services decomposed (package-private)
+    private final SubprocessoCrudService crudService;
+    private final SubprocessoDetalheService detalheService;
+    private final SubprocessoValidacaoService validacaoService;
+    private final SubprocessoWorkflowService workflowService;
+    
+    // Services especializados
     private final SubprocessoCadastroWorkflowService cadastroWorkflowService;
     private final SubprocessoMapaWorkflowService mapaWorkflowService;
     private final SubprocessoContextoService contextoService;
     private final SubprocessoMapaService mapaService;
     private final SubprocessoPermissaoCalculator permissaoCalculator;
+    
+    // Utility services
+    private final UsuarioService usuarioService;
 
     // ===== Operações CRUD =====
 
     @Transactional(readOnly = true)
     public Subprocesso buscarSubprocesso(Long codigo) {
-        return subprocessoService.buscarSubprocesso(codigo);
+        return crudService.buscarSubprocesso(codigo);
     }
 
     @Transactional(readOnly = true)
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
-        return subprocessoService.buscarSubprocessoComMapa(codigo);
+        return crudService.buscarSubprocessoComMapa(codigo);
     }
 
     @Transactional(readOnly = true)
     public List<SubprocessoDto> listar() {
-        return subprocessoService.listar();
+        return crudService.listar();
     }
 
     @Transactional(readOnly = true)
     public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
-        return subprocessoService.obterPorProcessoEUnidade(codProcesso, codUnidade);
+        return crudService.obterPorProcessoEUnidade(codProcesso, codUnidade);
     }
 
     @Transactional
     public SubprocessoDto criar(SubprocessoDto subprocessoDto) {
-        return subprocessoService.criar(subprocessoDto);
+        return crudService.criar(subprocessoDto);
     }
 
     @Transactional
     public SubprocessoDto atualizar(Long codigo, SubprocessoDto subprocessoDto) {
-        return subprocessoService.atualizar(codigo, subprocessoDto);
+        return crudService.atualizar(codigo, subprocessoDto);
     }
 
     @Transactional
     public void excluir(Long codigo) {
-        subprocessoService.excluir(codigo);
+        crudService.excluir(codigo);
     }
 
     // ===== Consultas e Detalhes =====
 
     @Transactional(readOnly = true)
     public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil) {
-        return subprocessoService.obterDetalhes(codigo, perfil);
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        return detalheService.obterDetalhes(codigo, perfil, usuario);
     }
 
     @Transactional(readOnly = true)
     public SubprocessoSituacaoDto obterSituacao(Long codigo) {
-        return subprocessoService.obterSituacao(codigo);
+        return crudService.obterStatus(codigo);
     }
 
     @Transactional(readOnly = true)
     public List<AtividadeVisualizacaoDto> listarAtividadesSubprocesso(Long codigo) {
-        return subprocessoService.listarAtividadesSubprocesso(codigo);
+        return detalheService.listarAtividadesSubprocesso(codigo);
     }
 
     @Transactional(readOnly = true)
     public List<Atividade> obterAtividadesSemConhecimento(Long codigo) {
-        return subprocessoService.obterAtividadesSemConhecimento(codigo);
+        return validacaoService.obterAtividadesSemConhecimento(codigo);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Atividade> obterAtividadesSemConhecimento(Mapa mapa) {
+        return validacaoService.obterAtividadesSemConhecimento(mapa);
     }
 
     @Transactional(readOnly = true)
@@ -108,57 +132,63 @@ public class SubprocessoFacade {
 
     @Transactional(readOnly = true)
     public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
-        return subprocessoService.obterEntidadePorCodigoMapa(codMapa);
+        return crudService.obterEntidadePorCodigoMapa(codMapa);
     }
 
     @Transactional(readOnly = true)
     public boolean verificarAcessoUnidadeAoProcesso(Long codProcesso, List<Long> codigosUnidadesHierarquia) {
-        return subprocessoService.verificarAcessoUnidadeAoProcesso(codProcesso, codigosUnidadesHierarquia);
+        return crudService.verificarAcessoUnidadeAoProcesso(codProcesso, codigosUnidadesHierarquia);
     }
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listarEntidadesPorProcesso(Long codProcesso) {
-        return subprocessoService.listarEntidadesPorProcesso(codProcesso);
+        return crudService.listarEntidadesPorProcesso(codProcesso);
     }
 
     @Transactional(readOnly = true)
     public SugestoesDto obterSugestoes(Long codigo) {
-        return subprocessoService.obterSugestoes(codigo);
+        return detalheService.obterSugestoes(codigo);
     }
 
     @Transactional(readOnly = true)
     public MapaAjusteDto obterMapaParaAjuste(Long codigo) {
-        return subprocessoService.obterMapaParaAjuste(codigo);
+        return detalheService.obterMapaParaAjuste(codigo);
     }
 
     @Transactional(readOnly = true)
     public SubprocessoPermissoesDto obterPermissoes(Long codigo) {
-        return subprocessoService.obterPermissoes(codigo);
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        return detalheService.obterPermissoes(codigo, usuario);
     }
 
     @Transactional(readOnly = true)
     public ValidacaoCadastroDto validarCadastro(Long codigo) {
-        return subprocessoService.validarCadastro(codigo);
+        return validacaoService.validarCadastro(codigo);
     }
 
     @Transactional
     public void validarExistenciaAtividades(Long codigo) {
-        subprocessoService.validarExistenciaAtividades(codigo);
+        validacaoService.validarExistenciaAtividades(codigo);
     }
 
     @Transactional
     public void validarAssociacoesMapa(Long mapaId) {
-        subprocessoService.validarAssociacoesMapa(mapaId);
+        validacaoService.validarAssociacoesMapa(mapaId);
     }
 
     @Transactional
     public void atualizarSituacaoParaEmAndamento(Long mapaCodigo) {
-        subprocessoService.atualizarSituacaoParaEmAndamento(mapaCodigo);
+        workflowService.atualizarSituacaoParaEmAndamento(mapaCodigo);
     }
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listarSubprocessosHomologados() {
-        return subprocessoService.listarSubprocessosHomologados();
+        return workflowService.listarSubprocessosHomologados();
+    }
+
+    @Transactional(readOnly = true)
+    public SubprocessoCadastroDto obterCadastro(Long codigo) {
+        return detalheService.obterCadastro(codigo);
     }
 
     // ===== Permissões =====
@@ -296,17 +326,17 @@ public class SubprocessoFacade {
 
     @Transactional
     public void reabrirCadastro(Long codigo, String justificativa) {
-        subprocessoService.reabrirCadastro(codigo, justificativa);
+        workflowService.reabrirCadastro(codigo, justificativa);
     }
 
     @Transactional
     public void reabrirRevisaoCadastro(Long codigo, String justificativa) {
-        subprocessoService.reabrirRevisaoCadastro(codigo, justificativa);
+        workflowService.reabrirRevisaoCadastro(codigo, justificativa);
     }
 
     @Transactional
     public void alterarDataLimite(Long codigo, java.time.LocalDate novaDataLimite) {
-        subprocessoService.alterarDataLimite(codigo, novaDataLimite);
+        workflowService.alterarDataLimite(codigo, novaDataLimite);
     }
 
     // ===== Operações de Mapa (delegadas ao SubprocessoMapaService) =====
@@ -319,10 +349,5 @@ public class SubprocessoFacade {
     @Transactional
     public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
         mapaService.importarAtividades(codSubprocessoDestino, codSubprocessoOrigem);
-    }
-
-    @Transactional(readOnly = true)
-    public SubprocessoCadastroDto obterCadastro(Long codigo) {
-        return subprocessoService.obterCadastro(codigo);
     }
 }

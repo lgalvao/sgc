@@ -42,10 +42,13 @@
  *   </li>
  * </ul>
  * 
- * <h3>CRUD Services</h3>
- * <p><strong>Função:</strong> Operações básicas de persistência</p>
+ * <h3>CRUD Services (Decomposed)</h3>
+ * <p><strong>Função:</strong> Operações básicas de persistência (package-private)</p>
  * <ul>
- *   <li>{@code SubprocessoService} - CRUD básico (criar, atualizar, excluir, buscar)</li>
+ *   <li>{@code SubprocessoCrudService} - CRUD básico (criar, atualizar, excluir, buscar)</li>
+ *   <li>{@code SubprocessoDetalheService} - Montagem de DTOs detalhados</li>
+ *   <li>{@code SubprocessoValidacaoService} - Validações de negócio</li>
+ *   <li>{@code SubprocessoWorkflowService} - Operações genéricas de workflow</li>
  * </ul>
  * 
  * <h3>Support Services</h3>
@@ -88,7 +91,8 @@
  * public class SubprocessoFacade {
  *     private final SubprocessoCadastroWorkflowService cadastroWorkflow;
  *     private final SubprocessoMapaWorkflowService mapaWorkflow;
- *     private final SubprocessoService subprocessoService;
+ *     private final SubprocessoCrudService crudService;
+ *     private final SubprocessoDetalheService detalheService;
  *     
  *     public void disponibilizarCadastro(Long id, Usuario usuario) {
  *         cadastroWorkflow.disponibilizar(id, usuario);
@@ -151,7 +155,7 @@
  * <ul>
  *   <li><strong>sgc.seguranca.acesso:</strong> AccessControlService (autorização)</li>
  *   <li><strong>sgc.analise:</strong> AnaliseService (registro de análises)</li>
- *   <li><strong>sgc.mapa:</strong> MapaService, CompetenciaService (mapas de competências)</li>
+ *   <li><strong>sgc.mapa:</strong> MapaFacade, CompetenciaService (mapas de competências)</li>
  *   <li><strong>sgc.organizacao:</strong> UsuarioService, UnidadeService (estrutura organizacional)</li>
  *   <li><strong>sgc.notificacao:</strong> NotificacaoEmailService (opcional, via eventos)</li>
  * </ul>

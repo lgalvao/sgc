@@ -10,12 +10,22 @@ import sgc.organizacao.dto.CriarAtribuicaoTemporariaReq;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.mapper.UsuarioMapper;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.AtribuicaoTemporaria;
+import sgc.organizacao.model.AtribuicaoTemporariaRepo;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoConsultaService;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 @Service
@@ -23,7 +33,7 @@ import java.util.function.Function;
 public class UnidadeService {
     private final UnidadeRepo unidadeRepo;
     private final sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo;
-    private final sgc.mapa.service.MapaService mapaService;
+    private final sgc.mapa.service.MapaFacade mapaFacade;
     private final UsuarioService usuarioService;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     private final ProcessoConsultaService processoConsultaService;
@@ -105,7 +115,7 @@ public class UnidadeService {
     }
 
     public boolean verificarMapaVigente(Long codigoUnidade) {
-        return mapaService.buscarMapaVigentePorUnidade(codigoUnidade).isPresent();
+        return mapaFacade.buscarMapaVigentePorUnidade(codigoUnidade).isPresent();
     }
 
     public List<UsuarioDto> buscarUsuariosPorUnidade(Long codigoUnidade) {
@@ -292,10 +302,14 @@ public class UnidadeService {
 
     private UnidadeDto buscarNaHierarquia(List<UnidadeDto> lista, Long codigo) {
         for (UnidadeDto u : lista) {
-            if (u.getCodigo().equals(codigo)) return u;
+            if (u.getCodigo().equals(codigo)) {
+                return u;
+            }
             if (u.getSubunidades() != null) {
                 UnidadeDto found = buscarNaHierarquia(u.getSubunidades(), codigo);
-                if (found != null) return found;
+                if (found != null) {
+                    return found;
+                }
             }
         }
         return null;
@@ -303,10 +317,14 @@ public class UnidadeService {
 
     private UnidadeDto buscarNaHierarquiaPorSigla(List<UnidadeDto> lista, String sigla) {
         for (UnidadeDto u : lista) {
-            if (u.getSigla().equals(sigla)) return u;
+            if (u.getSigla().equals(sigla)) {
+                return u;
+            }
             if (u.getSubunidades() != null) {
                 UnidadeDto found = buscarNaHierarquiaPorSigla(u.getSubunidades(), sigla);
-                if (found != null) return found;
+                if (found != null) {
+                    return found;
+                }
             }
         }
         return null;

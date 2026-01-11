@@ -1,7 +1,7 @@
 package sgc.mapa.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -17,21 +17,48 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Serviço para operações básicas de CRUD em Mapas.
+ * Facade para operações com Mapas de Competências.
  *
- * <p>A lógica complexa de salvamento do mapa completo foi movida para
- * {@link MapaSalvamentoService}.
+ * <p>Esta classe implementa o padrão Facade para simplificar a interface
+ * de uso e centralizar a coordenação entre múltiplos serviços relacionados a mapas.
+ *
+ * <p><b>Arquitetura:</b> Controllers devem usar APENAS esta Facade, nunca serviços especializados diretamente.
+ *
+ * @see MapaSalvamentoService para lógica complexa de salvamento
+ * @see MapaVisualizacaoService para operações de visualização
+ * @see CompetenciaService para operações de competências
+ * @see AtividadeFacade para operações de atividades
  */
 @Service
 @Transactional
 @Slf4j
-@RequiredArgsConstructor
-public class MapaService {
+public class MapaFacade {
 
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
     private final MapaCompletoMapper mapaCompletoMapper;
     private final MapaSalvamentoService mapaSalvamentoService;
+    private final MapaVisualizacaoService mapaVisualizacaoService;
+    private final ImpactoMapaService impactoMapaService;
+
+    /**
+     * Constructor with @Lazy injection to break circular dependency.
+     * MapaFacade → MapaVisualizacaoService → SubprocessoFacade → SubprocessoCrudService → MapaFacade
+     */
+    public MapaFacade(
+            MapaRepo mapaRepo,
+            CompetenciaRepo competenciaRepo,
+            MapaCompletoMapper mapaCompletoMapper,
+            MapaSalvamentoService mapaSalvamentoService,
+            @Lazy MapaVisualizacaoService mapaVisualizacaoService,
+            @Lazy ImpactoMapaService impactoMapaService) {
+        this.mapaRepo = mapaRepo;
+        this.competenciaRepo = competenciaRepo;
+        this.mapaCompletoMapper = mapaCompletoMapper;
+        this.mapaSalvamentoService = mapaSalvamentoService;
+        this.mapaVisualizacaoService = mapaVisualizacaoService;
+        this.impactoMapaService = impactoMapaService;
+    }
 
     // ===================================================================================
     // Operações de leitura
@@ -111,5 +138,37 @@ public class MapaService {
     public MapaCompletoDto salvarMapaCompleto(
             Long codMapa, SalvarMapaRequest request) {
         return mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
+    }
+
+    // ===================================================================================
+    // Operações de visualização e análise
+    // ===================================================================================
+
+    /**
+     * Obtém uma representação aninhada e formatada do mapa de um subprocesso.
+     * Delega para {@link MapaVisualizacaoService}.
+     *
+     * @param codSubprocesso O código do subprocesso.
+     * @return Um {@link sgc.mapa.dto.visualizacao.MapaVisualizacaoDto} com a estrutura hierárquica completa do mapa.
+     */
+    @Transactional(readOnly = true)
+    public sgc.mapa.dto.visualizacao.MapaVisualizacaoDto obterMapaParaVisualizacao(Long codSubprocesso) {
+        return mapaVisualizacaoService.obterMapaParaVisualizacao(codSubprocesso);
+    }
+
+    /**
+     * Analisa e retorna os impactos de uma revisão de mapa de competências.
+     * Delega para {@link ImpactoMapaService}.
+     *
+     * <p>Compara o mapa em elaboração no subprocesso com o mapa vigente da unidade para identificar
+     * atividades inseridas, removidas ou alteradas, e as competências afetadas.
+     *
+     * @param codSubprocesso O código do subprocesso em revisão.
+     * @param usuario O usuário autenticado (para verificação de permissões).
+     * @return Um {@link sgc.mapa.dto.ImpactoMapaDto} com o detalhamento dos impactos.
+     */
+    @Transactional(readOnly = true)
+    public sgc.mapa.dto.ImpactoMapaDto verificarImpactos(Long codSubprocesso, sgc.organizacao.model.Usuario usuario) {
+        return impactoMapaService.verificarImpactos(codSubprocesso, usuario);
     }
 }

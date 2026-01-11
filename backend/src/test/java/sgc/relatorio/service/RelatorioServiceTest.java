@@ -20,7 +20,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -38,7 +38,7 @@ class RelatorioServiceTest {
     @Mock
     private ProcessoFacade processoFacade;
     @Mock
-    private SubprocessoService subprocessoService;
+    private SubprocessoFacade subprocessoFacade;
     @Mock
     private UsuarioService usuarioService;
     @Mock
@@ -70,7 +70,7 @@ class RelatorioServiceTest {
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(usuarioService.buscarResponsavelUnidade(1L)).thenReturn(Optional.of(ResponsavelDto.builder().titularNome("Resp").build()));
 
         OutputStream out = new ByteArrayOutputStream();
@@ -95,7 +95,7 @@ class RelatorioServiceTest {
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(usuarioService.buscarResponsavelUnidade(1L)).thenReturn(Optional.empty());
 
         OutputStream out = new ByteArrayOutputStream();
@@ -132,7 +132,7 @@ class RelatorioServiceTest {
         c.setAtividades(java.util.Set.of(a));
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
@@ -154,7 +154,7 @@ class RelatorioServiceTest {
         Subprocesso sp2 = new Subprocesso(); sp2.setUnidade(u2); sp2.setMapa(new Mapa()); sp2.getMapa().setCodigo(20L);
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
 
         OutputStream out = new ByteArrayOutputStream();
@@ -174,7 +174,7 @@ class RelatorioServiceTest {
         sp.setMapa(null); // Mapa nulo
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(1L, 1L, out);
@@ -194,7 +194,7 @@ class RelatorioServiceTest {
         c.setAtividades(java.util.Set.of()); // Atividades vazias
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
@@ -218,7 +218,7 @@ class RelatorioServiceTest {
         c.setAtividades(java.util.Set.of(a));
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
@@ -235,7 +235,7 @@ class RelatorioServiceTest {
         Unidade u = new Unidade(); u.setCodigo(1L); sp.setUnidade(u);
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(usuarioService.buscarResponsavelUnidade(1L)).thenThrow(new RuntimeException("Falha simulada"));
 
         OutputStream out = new ByteArrayOutputStream();
@@ -247,7 +247,7 @@ class RelatorioServiceTest {
     @DisplayName("Deve cobrir erro ao gerar PDF")
     void deveCobrirErroGerarPdf() throws DocumentException {
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(new Processo());
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
         when(pdfFactory.createDocument()).thenReturn(document);
         doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
 
@@ -260,7 +260,7 @@ class RelatorioServiceTest {
     @DisplayName("Deve cobrir erro ao gerar PDF de mapas")
     void deveCobrirErroGerarPdfMapas() throws DocumentException {
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(new Processo());
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
         when(pdfFactory.createDocument()).thenReturn(document);
         doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
 
