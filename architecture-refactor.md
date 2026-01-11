@@ -327,6 +327,25 @@ Consolidar em um único `MapaImpactoService` com seções claras:
 
 **Progresso Total:** 1/8 completos (12.5%) + 1 analisado
 
+### Resumo de Impacto Atual
+
+**Métricas Antes vs. Depois:**
+
+| Métrica | Meta Original | Após P1 | Melhoria |
+|---------|---------------|---------|----------|
+| Services totais | 37 → ~30 | 37 → 36 | ✅ -2.7% |
+| Services em subprocesso | 12 → ~8 | 12 → 11 | ✅ -8.3% |
+| Dependências circulares (@Lazy) | 6 → 0 | 6 → 6* | ⏸️ Analisado |
+| Maior service (linhas) | 530 → ~300 | 530 | ⏸️ Pendente (P4) |
+
+*3 mantidos por decisão arquitetural, 1 para refatorar, 2 para adiar
+
+**Conquistas:**
+- ✅ Anti-pattern crítico eliminado (facade duplicada)
+- ✅ Arquitetura mais clara (SubprocessoFacade como único ponto de entrada)
+- ✅ ~185 linhas de código de delegação pura removidas
+- ✅ 15 arquivos limpos (imports e referências corrigidas)
+
 ---
 
 ## 📝 Log de Atividades
@@ -383,7 +402,79 @@ Consolidar em um único `MapaImpactoService` com seções claras:
 3. ✅ ~~Atualizar `SubprocessoFacade` para usar services decomposed~~
 4. ✅ ~~Remover `SubprocessoService`~~
 5. ⏸️ Aguardar CI para validar compilação e testes (requer Java 21)
-6. 🔄 Prosseguir com P2: Resolver dependências circulares (@Lazy)
+6. 🔄 Prosseguir com P3, P4, P5 (prioridade sobre P2 completo)
+
+---
+
+## 🎯 Recomendações para Próximas Iterações
+
+### Prioridade Imediata (Próxima Sprint)
+
+**1. P4: Dividir ProcessoFacade (530 → ~250 linhas)**
+- ✅ **ROI Alto**: Arquivo muito grande é difícil de manter
+- ✅ **Risco Baixo**: ProcessoInicializador já foi extraído com sucesso (precedente)
+- ✅ **Esforço**: ~1 dia
+- 💡 **Benefício**: Melhora significativa na manutenibilidade
+
+**2. P5: Consolidar Detector/Impacto Services (3 → 1)**
+- ✅ **ROI Médio-Alto**: Reduz fragmentação e confusão de nomenclatura
+- ✅ **Pode resolver**: MapaFacade circular dependencies (P2 Caso 4)
+- ✅ **Esforço**: 6-8 horas
+- 💡 **Benefício**: Simplifica módulo `mapa` e pode eliminar 1-2 @Lazy
+
+### Prioridade Média
+
+**3. P3: Consolidar Workflow Services**
+- ⚠️ **Requer análise**: Verificar se `SubprocessoWorkflowService` genérico é usado
+- ✅ **Esforço**: 4-6 horas
+- 💡 **Benefício**: Elimina duplicação se confirmado não-uso
+
+**4. P7: Criar Mappers Faltantes (12 → 20)**
+- ✅ **ROI Baixo-Médio**: Código mais limpo, menos erros
+- ✅ **Risco Muito Baixo**: MapStruct é seguro
+- ✅ **Esforço**: 1 dia
+- 💡 **Benefício**: Qualidade de código
+
+### Prioridade Baixa
+
+**5. P8: Reduzir DTOs de Subprocesso (35 → ~25)**
+- ⚠️ **Requer análise cuidadosa**: Não quebrar compatibilidade
+- ✅ **Esforço**: 4-6 horas
+- 💡 **Benefício**: Menos arquivos para manter
+
+**6. P2 (Completo): Refatorar SubprocessoMapaWorkflowService self-injection**
+- ⚠️ **Risco Médio**: Mexer com @Transactional é delicado
+- ✅ **Esforço**: 4-6 horas
+- 💡 **Benefício**: Eliminar 1 @Lazy
+
+### Bloqueado / Documentar
+
+**7. P6: Documentar REST POST/GET apenas**
+- ✅ **Ação**: Criar ADR-006 documentando decisão
+- ✅ **Esforço**: 1-2 horas
+- 💡 **Benefício**: Clareza para futuros desenvolvedores
+
+---
+
+## 📋 Roadmap Atualizado
+
+### Sprint 1: Limpeza Crítica (Em Andamento - 50% completo)
+- [x] P1: Eliminar SubprocessoService ✅
+- [x] P2: Analisar dependências circulares ✅
+- [ ] P4: Dividir ProcessoFacade (recomendado próximo)
+- **Meta**: Eliminar anti-patterns críticos
+
+### Sprint 2: Consolidação (Planejado)
+- [ ] P5: Consolidar Detector/Impacto Services
+- [ ] P3: Consolidar Workflow Services (se aplicável)
+- [ ] P2: Refatorar self-injection (se tempo permitir)
+- **Meta**: Reduzir fragmentação
+
+### Sprint 3: Padronização (Planejado)
+- [ ] P7: Criar Mappers faltantes
+- [ ] P8: Reduzir DTOs subprocesso
+- [ ] P6: Documentar REST POST/GET (ADR-006)
+- **Meta**: Melhorar consistência e documentação
 
 ---
 
@@ -397,4 +488,5 @@ Consolidar em um único `MapaImpactoService` com seções claras:
 ---
 
 **Última Atualização:** 2026-01-11  
-**Responsável:** GitHub Copilot AI Agent
+**Responsável:** GitHub Copilot AI Agent  
+**Status:** ✅ P1 Completo, 📊 P2 Analisado, Roadmap Atualizado
