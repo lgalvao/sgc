@@ -22,4 +22,19 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
             SELECT DISTINCT c FROM Competencia c LEFT JOIN FETCH c.atividades WHERE c.mapa.codigo = :mapaCodigo
             """)
     List<Competencia> findByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
+
+    /**
+     * Busca dados projetados (id, descricao, id_atividade) das competências de um mapa.
+     * Otimizado para visualização, evitando carregar entidades Atividade completas duplicadas.
+     *
+     * @param mapaCodigo Código do mapa
+     * @return Lista de arrays de objetos [Long competenciaId, String descricao, Long atividadeId]
+     */
+    @Query("""
+            SELECT c.codigo, c.descricao, a.codigo
+            FROM Competencia c
+            LEFT JOIN c.atividades a
+            WHERE c.mapa.codigo = :mapaCodigo
+            """)
+    List<Object[]> findCompetenciaAndAtividadeIdsByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
 }

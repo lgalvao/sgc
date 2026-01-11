@@ -60,9 +60,13 @@ class MapaVisualizacaoServiceTest {
         comp.setDescricao("C1");
         comp.setAtividades(Set.of(ativ1));
 
+        // Mocking the new projection method
+        List<Object[]> projectionResult = new java.util.ArrayList<>();
+        projectionResult.add(new Object[]{50L, "C1", 1L});
+
         when(subprocessoService.buscarSubprocesso(subId)).thenReturn(sub);
         when(atividadeRepo.findByMapaCodigoWithConhecimentos(10L)).thenReturn(List.of(ativ1, ativ2));
-        when(competenciaRepo.findByMapaCodigo(10L)).thenReturn(List.of(comp));
+        when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(10L)).thenReturn(projectionResult);
 
         MapaVisualizacaoDto dto = service.obterMapaParaVisualizacao(subId);
 
