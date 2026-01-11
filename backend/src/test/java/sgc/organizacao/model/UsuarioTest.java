@@ -3,6 +3,7 @@ package sgc.organizacao.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.GrantedAuthority;
 import sgc.fixture.UnidadeFixture;
@@ -15,6 +16,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Tag("unit")
 @DisplayName("Testes para Usuario")
 class UsuarioTest {
     private Usuario usuario;

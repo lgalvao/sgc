@@ -1,6 +1,7 @@
 package sgc.organizacao.mapper;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import sgc.organizacao.dto.UnidadeDto;
@@ -10,6 +11,7 @@ import sgc.organizacao.model.Usuario;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Tag("unit")
 @DisplayName("Testes de Mapper: UsuarioMapper")
 class UsuarioMapperTest {
 

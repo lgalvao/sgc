@@ -315,18 +315,24 @@ grep -rn "@Test" backend/src/test --include="*.java" -A 1 | grep "void" | grep -
 - [ ] Run: `./gradlew test --tests "*unit*"` works
 - [ ] Run: `./gradlew test --tests "*integration*"` works
 
-**Status:** 🟡 In Progress (1/~120 files tagged)  
+**Status:** 🟡 In Progress (22/~120 files tagged)  
 **Assigned:** AI Agent  
 **Started:** 2026-01-11  
 **Completed:** -  
 
 **Progress:**
-- ✅ Tagged ConfigCorsTest with @Tag("unit")
-- ⏳ Remaining: ~64 unit test files
-- ⏳ Remaining: ~52 integration test files
+- ✅ Session 1: Tagged ConfigCorsTest (1 file)
+- ✅ Session 2: Tagged all security module tests (12 files)
+- ✅ Session 2: Tagged all organizacao module tests (9 files)
+- ⏳ Remaining: ~50 unit test files
+- ⏳ Remaining: ~48 integration test files
 - ⏳ Specialized tags to add
 
-**Next File:** Continue with other unit tests in security module
+**Files Tagged (22 total):**
+- Security Module (13 files): ConfigCorsTest, LoginServiceTest, GerenciadorJwtTest, AccessControlServiceTest, SubprocessoAccessPolicyTest, AccessAuditServiceTest, MapaAccessPolicyTest, ProcessoAccessPolicyTest, AtividadeAccessPolicyTest, LimitadorTentativasLoginTest, GerenciadorJwtSecurityTest, AutenticarReqValidationTest, LoginControllerTest, LoginServiceMemoryLeakTest (already tagged)
+- Organizacao Module (11 files, 2 already tagged): UnidadeServiceTest, UnidadeServiceHierarchyTest, ValidadorDadosOrganizacionaisTest, ServicoHierarquiaTest, UsuarioMapperTest, UnidadeTest, UsuarioTest, UnidadeControllerTest, UsuarioControllerTest, UsuarioServiceTest (already tagged), UsuarioServiceUnitTest (already tagged)
+
+**Next Modules:** Processo, Subprocesso, Mapa, Painel, Alerta
 
 ---
 
