@@ -1,6 +1,7 @@
 package sgc;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroEstadoImpossivel;
@@ -12,6 +13,7 @@ import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Cobertura Extra de Erros e Modelos")
+@Tag("unit")
 class CoberturaExtraTest {
 
     @Test

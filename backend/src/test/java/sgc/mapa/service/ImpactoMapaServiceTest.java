@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -161,30 +160,83 @@ class ImpactoMapaServiceTest {
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
             when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSubprocesso));
 
-            // Setup atividades - vigente tem A1, subprocesso está vazio (A1 foi removida)
-            Atividade a1 = new Atividade();
-            a1.setCodigo(100L);
-            a1.setDescricao("Ativ 1");
-            a1.setConhecimentos(new ArrayList<>());
+            // Setup atividades
+            // Vigente: A1
+            Atividade a1Vigente = new Atividade();
+            a1Vigente.setCodigo(100L);
+            a1Vigente.setDescricao("Ativ 1");
+            a1Vigente.setConhecimentos(new ArrayList<>());
 
-            when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1)); // Vigente
-            when(atividadeService.buscarPorMapaCodigoComConhecimentos(2L)).thenReturn(List.of()); // Subprocesso (vazio)
+            // Subprocesso: A2 (Inserida), A1 com novo conhecimento (Alterada)
+            Atividade a1Atual = new Atividade();
+            a1Atual.setCodigo(101L);
+            a1Atual.setDescricao("Ativ 1");
+            a1Atual.setConhecimentos(List.of(new Conhecimento(1L, "C1", a1Atual)));
 
-            // Setup competências - sem competências impactadas para simplificar
-            when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of());
+            Atividade a2Atual = new Atividade();
+            a2Atual.setCodigo(200L);
+            a2Atual.setDescricao("Ativ 2");
+            a2Atual.setConhecimentos(new ArrayList<>());
+
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1Vigente));
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(2L)).thenReturn(List.of(a1Atual, a2Atual));
+
+            // Setup competências: C1 ligada a A1Vigente
+            Competencia c1 = new Competencia();
+            c1.setCodigo(500L);
+            c1.setDescricao("Comp 1");
+            c1.setAtividades(new java.util.HashSet<>(List.of(a1Vigente)));
+
+            when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(c1));
 
             ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
 
             assertNotNull(resultado);
-            // Verificar que os campos não são nulos
-            assertNotNull(resultado.getAtividadesInseridas());
-            assertNotNull(resultado.getAtividadesRemovidas());
-            assertNotNull(resultado.getAtividadesAlteradas());
-            assertNotNull(resultado.getCompetenciasImpactadas());
-            // Verificar que detectou a remoção
-            assertFalse(resultado.getAtividadesRemovidas().isEmpty());
+            // Inseriu A2
+            assertEquals(1, resultado.getAtividadesInseridas().size());
+            assertEquals("Ativ 2", resultado.getAtividadesInseridas().get(0).getDescricao());
+            
+            // Alterou A1 (conhecimentos)
+            assertEquals(1, resultado.getAtividadesAlteradas().size());
+            assertEquals("Ativ 1", resultado.getAtividadesAlteradas().get(0).getDescricao());
+
+            // Impactou C1 (pois A1 ligada a ela foi alterada)
+            assertEquals(1, resultado.getCompetenciasImpactadas().size());
+            assertEquals("Comp 1", resultado.getCompetenciasImpactadas().get(0).getDescricao());
+        }
+
+        @Test
+        @DisplayName("Deve detectar remoção e seu impacto em competência")
+        void detectarRemocaoEImpacto() {
+            Mapa mapaVigente = new Mapa();
+            mapaVigente.setCodigo(1L);
+            Mapa mapaSubprocesso = new Mapa();
+            mapaSubprocesso.setCodigo(2L);
+
+            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+            when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSubprocesso));
+
+            Atividade a1Vigente = new Atividade();
+            a1Vigente.setCodigo(100L);
+            a1Vigente.setDescricao("Ativ 1");
+
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1Vigente));
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(2L)).thenReturn(List.of());
+
+            Competencia c1 = new Competencia();
+            c1.setCodigo(500L);
+            c1.setDescricao("Comp 1");
+            c1.setAtividades(new java.util.HashSet<>(List.of(a1Vigente)));
+
+            when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(c1));
+
+            ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
+
             assertEquals(1, resultado.getAtividadesRemovidas().size());
-            assertEquals("Ativ 1", resultado.getAtividadesRemovidas().get(0).getDescricao());
+            assertEquals(1, resultado.getCompetenciasImpactadas().size());
+            assertEquals(sgc.mapa.model.TipoImpactoCompetencia.ATIVIDADE_REMOVIDA, 
+                         resultado.getCompetenciasImpactadas().get(0).getTiposImpacto().get(0));
         }
     }
 }

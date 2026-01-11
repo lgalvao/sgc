@@ -1,6 +1,7 @@
 package sgc.comum.json;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @DisplayName("Testes para DeserializadorHtmlSanitizado")
+@Tag("unit")
 class DeserializadorHtmlSanitizadoTest {
 
     private DeserializadorHtmlSanitizado deserializador;

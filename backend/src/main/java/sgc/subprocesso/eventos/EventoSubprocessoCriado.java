@@ -51,7 +51,7 @@ public class EventoSubprocessoCriado {
      * Usuário que criou o subprocesso.
      * <p>Pode ser null se criado automaticamente pelo sistema (ex: ao iniciar processo).
      */
-    private Usuario usuario;
+    private @org.jspecify.annotations.Nullable Usuario usuario;
 
     /**
      * Data e hora da criação.
@@ -67,10 +67,10 @@ public class EventoSubprocessoCriado {
     /**
      * Código do processo pai.
      */
-    private Long codProcesso;
+    private @org.jspecify.annotations.Nullable Long codProcesso;
 
     /**
      * Código da unidade responsável pelo subprocesso.
      */
-    private Long codUnidade;
+    private @org.jspecify.annotations.Nullable Long codUnidade;
 }

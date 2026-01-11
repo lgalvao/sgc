@@ -1,12 +1,14 @@
 package sgc.comum.util;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Sleeper")
+@Tag("unit")
 class SleeperTest {
 
     @Test

@@ -5,17 +5,9 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 plugins {
     java
     jacoco
-    checkstyle
-    pmd
     id("org.springframework.boot") version "4.0.1"
     id("io.spring.dependency-management") version "1.1.7"
     id("info.solidsoft.pitest") version "1.19.0-rc.1"
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
 }
 
 tasks.withType<JavaCompile> {
@@ -214,7 +206,6 @@ tasks.register<Test>("integrationTest") {
 
 tasks.jacocoTestReport {
     dependsOn(tasks.named("test"))
-    
     // Relatório consome dados de qualquer tarefa de teste que rodou
     executionData.setFrom(fileTree(layout.buildDirectory.get().asFile).include("/jacoco/*.exec"))
     
@@ -247,7 +238,7 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "BRANCH"
-                minimum = "0.83".toBigDecimal()
+                minimum = "0.90".toBigDecimal()
             }
         }
         rule {
@@ -276,35 +267,4 @@ configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
     ))
     threads.set(8)
     outputFormats.set(setOf("XML", "HTML"))
-}
-
-// Configuração de Checkstyle
-checkstyle {
-    toolVersion = "10.12.4"
-    configFile = file("config/checkstyle/checkstyle.xml")
-    isIgnoreFailures = true
-    maxWarnings = 0
-}
-
-// Configuração de PMD
-pmd {
-    toolVersion = "7.0.0"
-    isConsoleOutput = true
-    isIgnoreFailures = true
-    ruleSets = listOf() // Usar configuração customizada
-    ruleSetFiles = files("config/pmd/pmd-ruleset.xml")
-}
-
-tasks.withType<Checkstyle> {
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-    }
-}
-
-tasks.withType<Pmd> {
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-    }
 }

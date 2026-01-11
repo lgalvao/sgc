@@ -55,7 +55,6 @@ public class SubprocessoFacade {
     private final SubprocessoMapaWorkflowService mapaWorkflowService;
     private final SubprocessoContextoService contextoService;
     private final SubprocessoMapaService mapaService;
-    private final SubprocessoPermissaoCalculator permissaoCalculator;
     
     // Utility services
     private final UsuarioService usuarioService;
@@ -195,7 +194,7 @@ public class SubprocessoFacade {
 
     @Transactional(readOnly = true)
     public SubprocessoPermissoesDto calcularPermissoes(Subprocesso subprocesso, Usuario usuario) {
-        return permissaoCalculator.calcular(subprocesso, usuario);
+        return detalheService.calcularPermissoes(subprocesso, usuario);
     }
 
     // ===== Workflow de Cadastro =====

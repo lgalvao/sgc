@@ -1,6 +1,7 @@
 package sgc.integracao;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -45,6 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 @ActiveProfiles("test")
 @org.springframework.transaction.annotation.Transactional
+@Tag("integration")
 class CDU15IntegrationTest extends BaseIntegrationTest {
 
     private static final String API_SUBPROCESSO_MAPA = "/api/subprocessos/{codigo}/mapa";

@@ -13,7 +13,6 @@ import sgc.subprocesso.model.Subprocesso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -55,7 +54,7 @@ public class MapaAjusteDto {
                                                                                 .nome(con.getDescricao())
                                                                                 .incluido(isLinked)
                                                                                 .build())
-                                                .collect(Collectors.toList());
+                                                .toList();
 
                                 atividadeDtos.add(
                                                 AtividadeAjusteDto.builder()

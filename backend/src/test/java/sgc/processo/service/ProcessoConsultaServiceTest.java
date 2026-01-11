@@ -7,8 +7,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import sgc.organizacao.UsuarioService;
+import sgc.organizacao.dto.PerfilDto;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.dto.SubprocessoElegivelDto;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +28,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,6 +42,12 @@ class ProcessoConsultaServiceTest {
 
     @Mock
     private ProcessoRepo processoRepo;
+
+    @Mock
+    private SubprocessoFacade subprocessoFacade;
+
+    @Mock
+    private UsuarioService usuarioService;
 
     @Test
     @DisplayName("Deve buscar IDs de unidades em processos ativos")
@@ -49,8 +67,8 @@ class ProcessoConsultaServiceTest {
         assertThat(resultado).hasSize(3).containsExactlyInAnyOrder(1L, 2L, 3L);
 
         verify(processoRepo).findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
-                eq(Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO)),
-                eq(processoIgnorar)
+                Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
+                processoIgnorar
         );
     }
 
@@ -69,5 +87,93 @@ class ProcessoConsultaServiceTest {
 
         // Assert
         assertThat(resultado).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve listar unidades bloqueadas por tipo")
+    void deveListarUnidadesBloqueadasPorTipo() {
+        when(processoRepo.findUnidadeCodigosBySituacaoAndTipo(SituacaoProcesso.EM_ANDAMENTO, sgc.processo.model.TipoProcesso.MAPEAMENTO))
+                .thenReturn(List.of(10L, 20L));
+
+        List<Long> ids = processoConsultaService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
+
+        assertThat(ids).containsExactly(10L, 20L);
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia se não houver autenticação")
+    void deveRetornarVazioSemAutenticacao() {
+        SecurityContextHolder.clearContext();
+        List<SubprocessoElegivelDto> res = processoConsultaService.listarSubprocessosElegiveis(1L);
+        assertThat(res).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve listar subprocessos para Admin (apenas REVISAO_MAPA_AJUSTADO)")
+    void deveListarParaAdmin() {
+        mockAuth("admin", true);
+        
+        Subprocesso s1 = Subprocesso.builder().situacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).unidade(new Unidade("U1", "S1")).build();
+        s1.setCodigo(1L);
+        Subprocesso s2 = Subprocesso.builder().situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO).unidade(new Unidade("U2", "S2")).build();
+        s2.setCodigo(2L);
+        
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1, s2));
+
+        List<SubprocessoElegivelDto> res = processoConsultaService.listarSubprocessosElegiveis(1L);
+
+        assertThat(res).hasSize(1);
+        assertThat(res.get(0).getCodSubprocesso()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("Deve listar subprocessos para Usuário Comum por Unidade")
+    void deveListarParaUsuarioComum() {
+        mockAuth("user", false);
+        
+        Unidade u1 = new Unidade("U1", "S1");
+        u1.setCodigo(100L);
+        
+        Subprocesso s1 = Subprocesso.builder().situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO).unidade(u1).build();
+        s1.setCodigo(1L);
+        Subprocesso s2 = Subprocesso.builder().situacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).unidade(u1).build();
+        s2.setCodigo(2L);
+        Subprocesso s3 = Subprocesso.builder().situacao(SituacaoSubprocesso.NAO_INICIADO).unidade(u1).build();
+        s3.setCodigo(3L);
+        
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1, s2, s3));
+        when(usuarioService.buscarPerfisUsuario("user")).thenReturn(List.of(
+                PerfilDto.builder().unidadeCodigo(100L).build()
+        ));
+
+        List<SubprocessoElegivelDto> res = processoConsultaService.listarSubprocessosElegiveis(1L);
+
+        assertThat(res).hasSize(2);
+        assertThat(res).extracting(SubprocessoElegivelDto::getCodSubprocesso).containsExactly(1L, 2L);
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia se usuário comum não tiver unidade vinculada")
+    void deveRetornarVazioUsuarioSemUnidade() {
+        mockAuth("user_no_unit", false);
+        when(usuarioService.buscarPerfisUsuario("user_no_unit")).thenReturn(List.of(
+                PerfilDto.builder().unidadeCodigo(null).build()
+        ));
+
+        List<SubprocessoElegivelDto> res = processoConsultaService.listarSubprocessosElegiveis(1L);
+        assertThat(res).isEmpty();
+    }
+
+    private void mockAuth(String username, boolean isAdmin) {
+        Authentication auth = mock(Authentication.class);
+        when(auth.getName()).thenReturn(username);
+        if (isAdmin) {
+            when(auth.getAuthorities()).thenAnswer(m -> List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+        } else {
+            when(auth.getAuthorities()).thenAnswer(m -> List.of());
+        }
+        SecurityContext context = mock(SecurityContext.class);
+        when(context.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(context);
     }
 }

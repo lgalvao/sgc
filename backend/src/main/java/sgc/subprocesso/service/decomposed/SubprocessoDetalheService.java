@@ -18,7 +18,6 @@ import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.ConhecimentoService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
@@ -26,7 +25,7 @@ import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoPermissaoCalculator;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +39,13 @@ public class SubprocessoDetalheService {
     private final AtividadeService atividadeService;
     private final MovimentacaoRepo repositorioMovimentacao;
     private final UsuarioService usuarioService;
-    private final SubprocessoPermissaoCalculator subprocessoPermissaoCalculator;
     private final SubprocessoDetalheMapper subprocessoDetalheMapper;
     private final ConhecimentoMapper conhecimentoMapper;
     private final AnaliseService analiseService;
     private final CompetenciaService competenciaService;
     private final ConhecimentoService conhecimentoService;
     private final MapaAjusteMapper mapaAjusteMapper;
+    private final sgc.seguranca.acesso.AccessControlService accessControlService;
 
     public List<AtividadeVisualizacaoDto> listarAtividadesSubprocesso(Long codSubprocesso) {
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
@@ -78,7 +77,9 @@ public class SubprocessoDetalheService {
             throw new ErroAccessoNegado("Perfil inválido para acesso aos detalhes do subprocesso.");
         }
         Subprocesso sp = crudService.buscarSubprocesso(codigo);
-        verificarPermissaoVisualizacao(sp, perfil, usuarioAutenticado);
+        
+        // Centralized security check
+        accessControlService.verificarPermissao(usuarioAutenticado, sgc.seguranca.acesso.Acao.VISUALIZAR_SUBPROCESSO, sp);
 
         Usuario responsavel = usuarioService.buscarResponsavelAtual(sp.getUnidade().getSigla());
         Usuario titular = null;
@@ -91,38 +92,9 @@ public class SubprocessoDetalheService {
         }
 
         List<Movimentacao> movimentacoes = repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
-        SubprocessoPermissoesDto permissoes = subprocessoPermissaoCalculator.calcular(sp, usuarioAutenticado);
+        SubprocessoPermissoesDto permissoes = calcularPermissoes(sp, usuarioAutenticado);
 
         return subprocessoDetalheMapper.toDto(sp, responsavel, titular, movimentacoes, permissoes);
-    }
-
-    private void verificarPermissaoVisualizacao(Subprocesso sp, Perfil perfil, Usuario usuario) {
-        boolean hasPerfil = usuario.getTodasAtribuicoes().stream().anyMatch(a -> a.getPerfil() == perfil);
-        if (!hasPerfil) throw new ErroAccessoNegado("Perfil inválido para o usuário.");
-        if (perfil == Perfil.ADMIN) return;
-
-        Unidade unidadeAlvo = sp.getUnidade();
-        if (unidadeAlvo == null) throw new ErroAccessoNegado("Unidade não identificada.");
-
-        boolean hasPermission = usuario.getTodasAtribuicoes().stream()
-                .filter(a -> a.getPerfil() == perfil)
-                .anyMatch(a -> {
-                    Unidade unidadeUsuario = a.getUnidade();
-                    if (perfil == Perfil.GESTOR) {
-                        return isMesmaUnidadeOuSubordinada(unidadeAlvo, unidadeUsuario);
-                    }
-                    return unidadeAlvo.getCodigo().equals(unidadeUsuario.getCodigo());
-                });
-        if (!hasPermission) throw new ErroAccessoNegado("Usuário sem permissão para visualizar este subprocesso.");
-    }
-
-    private boolean isMesmaUnidadeOuSubordinada(Unidade alvo, Unidade superior) {
-        Unidade atual = alvo;
-        while (atual != null) {
-            if (atual.getCodigo().equals(superior.getCodigo())) return true;
-            atual = atual.getUnidadeSuperior();
-        }
-        return false;
     }
 
     public SubprocessoCadastroDto obterCadastro(Long codSubprocesso) {
@@ -158,11 +130,51 @@ public class SubprocessoDetalheService {
         List<Competencia> competencias = competenciaService.buscarPorCodMapa(codMapa);
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(codMapa);
         List<Conhecimento> conhecimentos = conhecimentoService.listarPorMapa(codMapa);
-        return mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos);
+        @Nullable Analise analiseVal = analise;
+        return mapaAjusteMapper.toDto(sp, analiseVal, competencias, atividades, conhecimentos);
     }
 
     public SubprocessoPermissoesDto obterPermissoes(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        return subprocessoPermissaoCalculator.calcular(sp, usuario);
+        return calcularPermissoes(sp, usuario);
+    }
+
+    public SubprocessoPermissoesDto calcularPermissoes(Subprocesso subprocesso, Usuario usuario) {
+        // Determina as ações baseado no tipo de processo
+        boolean isRevisao = subprocesso.getProcesso() != null 
+                && subprocesso.getProcesso().getTipo() == sgc.processo.model.TipoProcesso.REVISAO;
+        
+        sgc.seguranca.acesso.Acao acaoDisponibilizarCadastro = isRevisao 
+                ? sgc.seguranca.acesso.Acao.DISPONIBILIZAR_REVISAO_CADASTRO 
+                : sgc.seguranca.acesso.Acao.DISPONIBILIZAR_CADASTRO;
+        
+        sgc.seguranca.acesso.Acao acaoDevolverCadastro = isRevisao 
+                ? sgc.seguranca.acesso.Acao.DEVOLVER_REVISAO_CADASTRO 
+                : sgc.seguranca.acesso.Acao.DEVOLVER_CADASTRO;
+        
+        sgc.seguranca.acesso.Acao acaoAceitarCadastro = isRevisao 
+                ? sgc.seguranca.acesso.Acao.ACEITAR_REVISAO_CADASTRO 
+                : sgc.seguranca.acesso.Acao.ACEITAR_CADASTRO;
+        
+        return SubprocessoPermissoesDto.builder()
+                .podeVerPagina(podeExecutar(usuario, sgc.seguranca.acesso.Acao.VISUALIZAR_SUBPROCESSO, subprocesso))
+                .podeEditarMapa(podeExecutar(usuario, sgc.seguranca.acesso.Acao.EDITAR_MAPA, subprocesso))
+                .podeVisualizarMapa(podeExecutar(usuario, sgc.seguranca.acesso.Acao.VISUALIZAR_MAPA, subprocesso))
+                .podeDisponibilizarMapa(podeExecutar(usuario, sgc.seguranca.acesso.Acao.DISPONIBILIZAR_MAPA, subprocesso))
+                .podeDisponibilizarCadastro(podeExecutar(usuario, acaoDisponibilizarCadastro, subprocesso))
+                .podeDevolverCadastro(podeExecutar(usuario, acaoDevolverCadastro, subprocesso))
+                .podeAceitarCadastro(podeExecutar(usuario, acaoAceitarCadastro, subprocesso))
+                .podeVisualizarDiagnostico(podeExecutar(usuario, sgc.seguranca.acesso.Acao.VISUALIZAR_DIAGNOSTICO, subprocesso))
+                .podeAlterarDataLimite(podeExecutar(usuario, sgc.seguranca.acesso.Acao.ALTERAR_DATA_LIMITE, subprocesso))
+                .podeVisualizarImpacto(podeExecutar(usuario, sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS, subprocesso))
+                .podeRealizarAutoavaliacao(podeExecutar(usuario, sgc.seguranca.acesso.Acao.REALIZAR_AUTOAVALIACAO, subprocesso))
+                .podeReabrirCadastro(podeExecutar(usuario, sgc.seguranca.acesso.Acao.REABRIR_CADASTRO, subprocesso))
+                .podeReabrirRevisao(podeExecutar(usuario, sgc.seguranca.acesso.Acao.REABRIR_REVISAO, subprocesso))
+                .podeEnviarLembrete(podeExecutar(usuario, sgc.seguranca.acesso.Acao.ENVIAR_LEMBRETE_PROCESSO, subprocesso))
+                .build();
+    }
+
+    private boolean podeExecutar(Usuario usuario, sgc.seguranca.acesso.Acao acao, Subprocesso subprocesso) {
+        return accessControlService.podeExecutar(usuario, acao, subprocesso);
     }
 }

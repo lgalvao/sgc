@@ -3,6 +3,7 @@ package sgc.analise;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -34,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AnaliseController.class)
 @Import(RestExceptionHandler.class)
+@Tag("unit")
 @DisplayName("Testes do AnaliseController")
 class AnaliseControllerTest {
     private static final String OBSERVACAO_1 = "Observação 1";

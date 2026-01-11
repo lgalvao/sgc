@@ -1,6 +1,7 @@
 package sgc;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,6 +48,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
+@Tag("unit")
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Cobertura Extra de Controllers e Services")
 class ControllersServicesCoverageTest {
@@ -117,7 +119,6 @@ class ControllersServicesCoverageTest {
 
     @Test
     @DisplayName("Deve listar atividades")
-    // TODO esse teste está muito lento. Listar todas atividades é realmente necessário? Talvez nem precise no cód. producao.
     void deveListarAtividades() {
         when(subprocessoFacade.listarAtividadesSubprocesso(1L)).thenReturn(new ArrayList<>());
         ResponseEntity<List<AtividadeVisualizacaoDto>> response = subprocessoMapaController.listarAtividades(1L);

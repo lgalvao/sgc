@@ -57,18 +57,18 @@ public class EventoSubprocessoExcluido {
     /**
      * Código do processo pai.
      */
-    private Long codProcesso;
+    private @org.jspecify.annotations.Nullable Long codProcesso;
 
     /**
      * Código da unidade responsável.
      */
-    private Long codUnidade;
+    private @org.jspecify.annotations.Nullable Long codUnidade;
 
     /**
      * Código do mapa de competências associado (se existir).
      * <p>Pode ser null se o subprocesso não tinha mapa criado.
      */
-    private Long codMapa;
+    private @org.jspecify.annotations.Nullable Long codMapa;
 
     /**
      * Situação do subprocesso no momento da exclusão.
@@ -78,7 +78,7 @@ public class EventoSubprocessoExcluido {
     /**
      * Usuário que realizou a exclusão.
      */
-    private Usuario usuario;
+    private @org.jspecify.annotations.Nullable Usuario usuario;
 
     /**
      * Data e hora da exclusão.

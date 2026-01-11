@@ -42,6 +42,7 @@ import java.util.Set;
 @Service
 @Transactional
 public class SubprocessoCrudService {
+    private static final String MSG_SUBPROCESSO_NAO_ENCONTRADO = "Subprocesso não encontrado";
     private final SubprocessoRepo repositorioSubprocesso;
     private final SubprocessoMapper subprocessoMapper;
     private final MapaFacade mapaFacade;
@@ -69,7 +70,7 @@ public class SubprocessoCrudService {
     public Subprocesso buscarSubprocesso(Long codigo) {
         return repositorioSubprocesso
                 .findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(MSG_SUBPROCESSO_NAO_ENCONTRADO, codigo));
     }
 
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
@@ -100,10 +101,14 @@ public class SubprocessoCrudService {
         return repositorioSubprocesso
                 .findByMapaCodigo(codMapa)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                        "Subprocesso não encontrado para o mapa com código %d".formatted(codMapa)));
+                        "%s para o mapa com código %d".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codMapa)));
     }
 
     public SubprocessoDto criar(SubprocessoDto subprocessoDto) {
+        return criar(subprocessoDto, false);
+    }
+
+    public SubprocessoDto criar(SubprocessoDto subprocessoDto, boolean criadoPorProcesso) {
         var entity = subprocessoMapper.toEntity(subprocessoDto);
         entity.setMapa(null);
         var subprocessoSalvo = repositorioSubprocesso.save(entity);
@@ -120,10 +125,7 @@ public class SubprocessoCrudService {
                 .subprocesso(salvo)
                 .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
                 .dataHoraCriacao(LocalDateTime.now())
-                // TODO: Implementar detecção de criação automática
-                // Atualmente sempre false porque SubprocessoFactory usa saveAll() direto
-                // Solução: Migrar SubprocessoFactory para usar este método com parâmetro
-                .criadoPorProcesso(false)
+                .criadoPorProcesso(criadoPorProcesso || salvo.getProcesso() != null)
                 .codProcesso(salvo.getProcesso() != null ? salvo.getProcesso().getCodigo() : null)
                 .codUnidade(salvo.getUnidade() != null ? salvo.getUnidade().getCodigo() : null)
                 .build();
@@ -135,41 +137,8 @@ public class SubprocessoCrudService {
     public SubprocessoDto atualizar(Long codigo, SubprocessoDto subprocessoDto) {
         return repositorioSubprocesso.findById(codigo)
                 .map(subprocesso -> {
-                    // Captura estado anterior para o evento
-                    Set<String> camposAlterados = new HashSet<>();
                     SituacaoSubprocesso situacaoAnterior = subprocesso.getSituacao();
-
-                    if (subprocessoDto.getCodMapa() != null) {
-                        Mapa mapa = new Mapa();
-                        mapa.setCodigo(subprocessoDto.getCodMapa());
-                        if (!Objects.equals(subprocesso.getMapa(), mapa)) {
-                            camposAlterados.add("mapa");
-                        }
-                        subprocesso.setMapa(mapa);
-                    } else {
-                        if (subprocesso.getMapa() != null) {
-                            camposAlterados.add("mapa");
-                        }
-                        subprocesso.setMapa(null);
-                    }
-
-                    if (!Objects.equals(subprocesso.getDataLimiteEtapa1(), subprocessoDto.getDataLimiteEtapa1())) {
-                        camposAlterados.add("dataLimiteEtapa1");
-                    }
-                    if (!Objects.equals(subprocesso.getDataFimEtapa1(), subprocessoDto.getDataFimEtapa1())) {
-                        camposAlterados.add("dataFimEtapa1");
-                    }
-                    if (!Objects.equals(subprocesso.getDataFimEtapa2(), subprocessoDto.getDataFimEtapa2())) {
-                        camposAlterados.add("dataFimEtapa2");
-                    }
-                    if (!Objects.equals(subprocesso.getSituacao(), subprocessoDto.getSituacao())) {
-                        camposAlterados.add("situacao");
-                    }
-
-                    subprocesso.setDataLimiteEtapa1(subprocessoDto.getDataLimiteEtapa1());
-                    subprocesso.setDataFimEtapa1(subprocessoDto.getDataFimEtapa1());
-                    subprocesso.setDataFimEtapa2(subprocessoDto.getDataFimEtapa2());
-                    subprocesso.setSituacao(subprocessoDto.getSituacao());
+                    Set<String> camposAlterados = processarAlteracoes(subprocesso, subprocessoDto);
 
                     Subprocesso salvo = repositorioSubprocesso.save(subprocesso);
 
@@ -187,12 +156,52 @@ public class SubprocessoCrudService {
 
                     return subprocessoMapper.toDTO(salvo);
                 })
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(MSG_SUBPROCESSO_NAO_ENCONTRADO, codigo));
+    }
+
+    private Set<String> processarAlteracoes(Subprocesso subprocesso, SubprocessoDto dto) {
+        Set<String> campos = new HashSet<>();
+
+        java.util.Optional.ofNullable(dto.getCodMapa()).ifPresentOrElse(
+            cod -> {
+                Mapa m = new Mapa();
+                m.setCodigo(cod);
+                if (!Objects.equals(subprocesso.getMapa(), m)) {
+                    campos.add("mapa");
+                    subprocesso.setMapa(m);
+                }
+            },
+            () -> {
+                if (subprocesso.getMapa() != null) {
+                    campos.add("mapa");
+                    subprocesso.setMapa(null);
+                }
+            }
+        );
+
+        if (!Objects.equals(subprocesso.getDataLimiteEtapa1(), dto.getDataLimiteEtapa1())) {
+            campos.add("dataLimiteEtapa1");
+            subprocesso.setDataLimiteEtapa1(dto.getDataLimiteEtapa1());
+        }
+        if (!Objects.equals(subprocesso.getDataFimEtapa1(), dto.getDataFimEtapa1())) {
+            campos.add("dataFimEtapa1");
+            subprocesso.setDataFimEtapa1(dto.getDataFimEtapa1());
+        }
+        if (!Objects.equals(subprocesso.getDataFimEtapa2(), dto.getDataFimEtapa2())) {
+            campos.add("dataFimEtapa2");
+            subprocesso.setDataFimEtapa2(dto.getDataFimEtapa2());
+        }
+        if (!Objects.equals(subprocesso.getSituacao(), dto.getSituacao())) {
+            campos.add("situacao");
+            subprocesso.setSituacao(dto.getSituacao());
+        }
+
+        return campos;
     }
 
     public void excluir(Long codigo) {
         Subprocesso subprocesso = repositorioSubprocesso.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(MSG_SUBPROCESSO_NAO_ENCONTRADO, codigo));
 
         // Publica evento ANTES da exclusão
         EventoSubprocessoExcluido evento = EventoSubprocessoExcluido.builder()
@@ -218,7 +227,9 @@ public class SubprocessoCrudService {
     public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
         Subprocesso sp = repositorioSubprocesso
                 .findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o processo %d e unidade %d".formatted(codProcesso, codUnidade)));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
+                        "%s para o processo %s e unidade %s".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codProcesso,
+                                codUnidade)));
         return subprocessoMapper.toDTO(sp);
     }
 

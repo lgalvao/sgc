@@ -1,12 +1,14 @@
 package sgc.comum.model;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("EntidadeBase")
+@Tag("unit")
 class EntidadeBaseTest {
     private static class EntidadeTeste extends EntidadeBase {
         public EntidadeTeste(Long codigo) {

@@ -10,9 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.organizacao.model.UsuarioRepo;
-import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UsuarioService;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.TipoUnidade;
@@ -22,7 +21,6 @@ import sgc.seguranca.login.dto.EntrarReq;
 import sgc.seguranca.login.dto.PerfilUnidadeDto;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,8 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LoginService {
     private static final String ENTIDADE_USUARIO = "Usuário";
 
-    private final UsuarioRepo usuarioRepo;
-    private final UsuarioPerfilRepo usuarioPerfilRepo;
+    private final UsuarioService usuarioService;
     private final GerenciadorJwt gerenciadorJwt;
     private final ClienteAcessoAd clienteAcessoAd;
     @Lazy
@@ -48,13 +45,11 @@ public class LoginService {
 
     private final Map<String, LocalDateTime> autenticacoesRecentes = new ConcurrentHashMap<>();
 
-    public LoginService(UsuarioRepo usuarioRepo,
-            UsuarioPerfilRepo usuarioPerfilRepo,
+    public LoginService(UsuarioService usuarioService,
             GerenciadorJwt gerenciadorJwt,
             @Autowired(required = false) ClienteAcessoAd clienteAcessoAd,
             @Lazy UnidadeService unidadeService) {
-        this.usuarioRepo = usuarioRepo;
-        this.usuarioPerfilRepo = usuarioPerfilRepo;
+        this.usuarioService = usuarioService;
         this.gerenciadorJwt = gerenciadorJwt;
         this.clienteAcessoAd = clienteAcessoAd;
         this.unidadeService = unidadeService;
@@ -81,7 +76,7 @@ public class LoginService {
         boolean autenticado = false;
         if (clienteAcessoAd == null) {
             if (ambienteTestes) {
-                autenticado = usuarioRepo.existsById(tituloEleitoral);
+                autenticado = usuarioService.carregarUsuarioParaAutenticacao(tituloEleitoral) != null;
             } else {
                 log.error(
                         "ERRO CRÍTICO DE SEGURANÇA: Tentativa de autenticação sem provedor configurado em ambiente produtivo. Usuário: {}",
@@ -161,11 +156,10 @@ public class LoginService {
     }
 
     private List<PerfilUnidadeDto> buscarAutorizacoesInterno(String tituloEleitoral) {
-        Usuario usuario = usuarioRepo
-                .findByIdWithAtribuicoes(tituloEleitoral)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, tituloEleitoral));
-
-        carregarAtribuicoes(usuario);
+        Usuario usuario = usuarioService.carregarUsuarioParaAutenticacao(tituloEleitoral);
+        if (usuario == null) {
+            throw new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, tituloEleitoral);
+        }
 
         return usuario.getTodasAtribuicoes().stream()
                 .map(atribuicao -> new PerfilUnidadeDto(
@@ -174,10 +168,7 @@ public class LoginService {
                 .toList();
     }
 
-    private void carregarAtribuicoes(Usuario usuario) {
-        var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral());
-        usuario.setAtribuicoes(new HashSet<>(atribuicoes));
-    }
+
 
     private UnidadeDto toUnidadeDto(Unidade unidade) {
         Unidade superior = unidade.getUnidadeSuperior();

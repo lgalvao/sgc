@@ -1,0 +1,80 @@
+package sgc.subprocesso.mapper;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
+import sgc.organizacao.model.Unidade;
+import sgc.subprocesso.dto.MovimentacaoDto;
+import sgc.subprocesso.model.Movimentacao;
+
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@Tag("unit")
+@DisplayName("MovimentacaoMapper")
+class MovimentacaoMapperTest {
+
+    private MovimentacaoMapper mapper;
+
+    @BeforeEach
+    void setUp() {
+        mapper = Mappers.getMapper(MovimentacaoMapper.class);
+    }
+
+    @Test
+    @DisplayName("Deve mapear Movimentacao para MovimentacaoDto")
+    void deveMapearParaDto() {
+        Unidade origem = new Unidade();
+        origem.setCodigo(1L);
+        origem.setSigla("ORG");
+        origem.setNome("Origem");
+
+        Unidade destino = new Unidade();
+        destino.setCodigo(2L);
+        destino.setSigla("DES");
+        destino.setNome("Destino");
+
+        Movimentacao mov = new Movimentacao();
+        mov.setCodigo(10L);
+        mov.setDescricao("Movimentacao Teste");
+        mov.setDataHora(LocalDateTime.now());
+        mov.setUnidadeOrigem(origem);
+        mov.setUnidadeDestino(destino);
+
+        MovimentacaoDto dto = mapper.toDTO(mov);
+
+        assertThat(dto).isNotNull();
+        assertThat(dto.getCodigo()).isEqualTo(10L);
+        assertThat(dto.getDescricao()).isEqualTo("Movimentacao Teste");
+        assertThat(dto.getUnidadeOrigemCodigo()).isEqualTo(1L);
+        assertThat(dto.getUnidadeOrigemSigla()).isEqualTo("ORG");
+        assertThat(dto.getUnidadeOrigemNome()).isEqualTo("Origem");
+        assertThat(dto.getUnidadeDestinoCodigo()).isEqualTo(2L);
+        assertThat(dto.getUnidadeDestinoSigla()).isEqualTo("DES");
+        assertThat(dto.getUnidadeDestinoNome()).isEqualTo("Destino");
+    }
+
+    @Test
+    @DisplayName("Deve retornar null quando entrada é null")
+    void deveRetornarNullQuandoNull() {
+        assertThat(mapper.toDTO(null)).isNull();
+    }
+
+    @Test
+    @DisplayName("Deve lidar com unidades null")
+    void deveLidarComUnidadesNull() {
+        Movimentacao mov = new Movimentacao();
+        mov.setCodigo(10L);
+        mov.setUnidadeOrigem(null);
+        mov.setUnidadeDestino(null);
+
+        MovimentacaoDto dto = mapper.toDTO(mov);
+
+        assertThat(dto).isNotNull();
+        assertThat(dto.getUnidadeOrigemCodigo()).isNull();
+        assertThat(dto.getUnidadeDestinoCodigo()).isNull();
+    }
+}

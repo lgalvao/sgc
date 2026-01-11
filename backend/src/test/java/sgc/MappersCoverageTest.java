@@ -1,6 +1,7 @@
 package sgc;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import sgc.mapa.mapper.ConhecimentoMapper;
@@ -9,6 +10,7 @@ import sgc.organizacao.mapper.UsuarioMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Cobertura de Mappers")
+@Tag("unit")
 class MappersCoverageTest {
     private final ConhecimentoMapper conhecimentoMapper = Mappers.getMapper(ConhecimentoMapper.class);
     private final UsuarioMapper usuarioMapper = Mappers.getMapper(UsuarioMapper.class);

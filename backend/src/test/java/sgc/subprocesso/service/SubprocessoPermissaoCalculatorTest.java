@@ -14,6 +14,8 @@ import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.Subprocesso;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -88,6 +90,29 @@ class SubprocessoPermissaoCalculatorTest {
         assertThat(resultado.isPodeReabrirCadastro()).isFalse();
         assertThat(resultado.isPodeReabrirRevisao()).isFalse();
         assertThat(resultado.isPodeEnviarLembrete()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve calcular permissões quando processo é do tipo REVISAO")
+    void deveCalcularPermissoesProcessoRevisao() {
+        Usuario usuario = new Usuario();
+        
+        sgc.processo.model.Processo processo = new sgc.processo.model.Processo();
+        processo.setTipo(sgc.processo.model.TipoProcesso.REVISAO);
+        
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setProcesso(processo);
+
+        // Verificamos se as ações de REVISAO são chamadas
+        lenient().when(accessControlService.podeExecutar(eq(usuario), eq(Acao.DISPONIBILIZAR_REVISAO_CADASTRO), eq(subprocesso))).thenReturn(true);
+        lenient().when(accessControlService.podeExecutar(eq(usuario), eq(Acao.DEVOLVER_REVISAO_CADASTRO), eq(subprocesso))).thenReturn(true);
+        lenient().when(accessControlService.podeExecutar(eq(usuario), eq(Acao.ACEITAR_REVISAO_CADASTRO), eq(subprocesso))).thenReturn(true);
+
+        SubprocessoPermissoesDto resultado = calculator.calcular(subprocesso, usuario);
+
+        assertThat(resultado.isPodeDisponibilizarCadastro()).isTrue();
+        assertThat(resultado.isPodeDevolverCadastro()).isTrue();
+        assertThat(resultado.isPodeAceitarCadastro()).isTrue();
     }
 
     @Test

@@ -11,15 +11,16 @@ import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.Tag;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
+@Tag("architecture")
 @AnalyzeClasses(packages = "sgc", importOptions = { ImportOption.DoNotIncludeTests.class,
         ImportOption.DoNotIncludeJars.class })
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class ArchConsistencyTest {
-
     @ArchTest
     static final ArchRule controllers_should_not_access_repositories = noClasses()
             .that()
@@ -81,14 +82,6 @@ public class ArchConsistencyTest {
                             // Check if dependency is in a recognized module and if it matches the item's
                             // module
                             if (dependencyModule != null && !dependencyModule.equals(itemModule)) {
-                                // EXCEÇÃO: O módulo seguranca (LoginService) pode acessar organizacao
-                                // (UsuarioRepo, etc)
-
-                                // TODO não gosto dessa exceção!
-                                if ("seguranca".equals(itemModule) && "organizacao".equals(dependencyModule)) {
-                                    continue;
-                                }
-
                                 String message = String.format(
                                         "Service %s (module %s) accesses Repository %s (module %s)",
                                         item.getName(), itemModule, targetClass.getName(), dependencyModule);

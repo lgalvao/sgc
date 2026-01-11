@@ -24,7 +24,7 @@ public interface MapaAjusteMapper {
     @Mapping(target = "unidadeNome", source = "sp.unidade.nome")
     @Mapping(target = "competencias", expression = "java(mapCompetencias(competencias, atividades, conhecimentos))")
     @Mapping(target = "justificativaDevolucao", source = "analise.observacoes")
-    MapaAjusteDto toDto(Subprocesso sp, Analise analise, List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos);
+    MapaAjusteDto toDto(Subprocesso sp, @org.jspecify.annotations.Nullable Analise analise, List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos);
 
     default List<CompetenciaAjusteDto> mapCompetencias(List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos) {
         // ⚡ Bolt: Agrupando conhecimentos por atividade para evitar filtragem repetida (O(N) vs O(N^2))
@@ -49,7 +49,7 @@ public interface MapaAjusteMapper {
                                         .nome(con.getDescricao())
                                         .incluido(isLinked)
                                         .build())
-                                .collect(Collectors.toList());
+                                .toList();
 
                 atividadeDtos.add(
                         AtividadeAjusteDto.builder()

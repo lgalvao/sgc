@@ -27,7 +27,8 @@ import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoPermissaoCalculator;
+import sgc.seguranca.acesso.AccessControlService;
+import sgc.seguranca.acesso.Acao;
 
 import java.util.List;
 import java.util.Set;
@@ -35,7 +36,10 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -51,7 +55,7 @@ class SubprocessoDetalheServiceTest {
     @Mock
     private MovimentacaoRepo repositorioMovimentacao;
     @Mock
-    private SubprocessoPermissaoCalculator subprocessoPermissaoCalculator;
+    private AccessControlService accessControlService;
     @Mock
     private SubprocessoDetalheMapper subprocessoDetalheMapper;
     @Mock
@@ -157,6 +161,7 @@ class SubprocessoDetalheServiceTest {
 
         SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, admin);
         assertThat(result).isNotNull();
+        verify(accessControlService).verificarPermissao(admin, Acao.VISUALIZAR_SUBPROCESSO, sp);
     }
 
     @Test
@@ -191,47 +196,28 @@ class SubprocessoDetalheServiceTest {
     }
 
     @Test
-    @DisplayName("obterDetalhes falha acesso negado")
+    @DisplayName("obterDetalhes falha acesso negado via AccessControlService")
     void obterDetalhesFalhaAcesso() {
         Usuario user = new Usuario();
-        Unidade u1 = new Unidade();
-        u1.setCodigo(10L);
-
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setPerfil(Perfil.CHEFE);
-        up.setUnidade(u1);
-        user.setAtribuicoes(Set.of(up));
-
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
-        Unidade u2 = new Unidade();
-        u2.setCodigo(20L);
-        sp.setUnidade(u2);
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+        doThrow(new ErroAccessoNegado("Acesso negado")).when(accessControlService)
+                .verificarPermissao(user, Acao.VISUALIZAR_SUBPROCESSO, sp);
 
         assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.CHEFE, user))
-                .isInstanceOf(ErroAccessoNegado.class);
+                .isInstanceOf(ErroAccessoNegado.class)
+                .hasMessage("Acesso negado");
     }
 
     @Test
-    @DisplayName("obterDetalhes sucesso GESTOR unidade subordinada")
-    void obterDetalhesSucessoGestorSubordinada() {
+    @DisplayName("obterDetalhes sucesso GESTOR")
+    void obterDetalhesSucessoGestor() {
         Usuario gestor = new Usuario();
-        Unidade uSuperior = new Unidade();
-        uSuperior.setCodigo(100L);
-
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setPerfil(Perfil.GESTOR);
-        up.setUnidade(uSuperior);
-        gestor.setAtribuicoes(Set.of(up));
-
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
-        Unidade uSubordinada = new Unidade();
-        uSubordinada.setCodigo(101L);
-        uSubordinada.setUnidadeSuperior(uSuperior);
-        sp.setUnidade(uSubordinada);
+        sp.setUnidade(new Unidade());
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
@@ -239,47 +225,18 @@ class SubprocessoDetalheServiceTest {
 
         SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.GESTOR, gestor);
         assertThat(result).isNotNull();
+        verify(accessControlService).verificarPermissao(gestor, Acao.VISUALIZAR_SUBPROCESSO, sp);
     }
 
-    @Test
-    @DisplayName("obterDetalhes falha GESTOR unidade nao subordinada")
-    void obterDetalhesFalhaGestorNaoSubordinada() {
-        Usuario gestor = new Usuario();
-        Unidade uGestor = new Unidade();
-        uGestor.setCodigo(100L);
 
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setPerfil(Perfil.GESTOR);
-        up.setUnidade(uGestor);
-        gestor.setAtribuicoes(Set.of(up));
-
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(1L);
-        Unidade uOutra = new Unidade();
-        uOutra.setCodigo(200L);
-        sp.setUnidade(uOutra);
-
-        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-
-        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.GESTOR, gestor))
-                .isInstanceOf(ErroAccessoNegado.class);
-    }
 
     @Test
-    @DisplayName("obterDetalhes sucesso SERVIDOR mesma unidade")
-    void obterDetalhesSucessoServidorMesmaUnidade() {
+    @DisplayName("obterDetalhes sucesso SERVIDOR")
+    void obterDetalhesSucessoServidor() {
         Usuario servidor = new Usuario();
-        Unidade u1 = new Unidade();
-        u1.setCodigo(10L);
-
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setPerfil(Perfil.SERVIDOR);
-        up.setUnidade(u1);
-        servidor.setAtribuicoes(Set.of(up));
-
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
-        sp.setUnidade(u1);
+        sp.setUnidade(new Unidade());
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
@@ -295,11 +252,12 @@ class SubprocessoDetalheServiceTest {
         Usuario user = new Usuario();
         Subprocesso sp = new Subprocesso();
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(subprocessoPermissaoCalculator.calcular(sp, user))
-                .thenReturn(SubprocessoPermissoesDto.builder().build());
-
+        
         SubprocessoPermissoesDto result = service.obterPermissoes(1L, user);
         assertThat(result).isNotNull();
+        // Verifica se houve chamadas para verificar as diversas permissões no DTO
+        org.mockito.Mockito.verify(accessControlService, org.mockito.Mockito.atLeastOnce())
+                .podeExecutar(eq(user), any(Acao.class), eq(sp));
     }
 
     @Test
@@ -425,36 +383,28 @@ class SubprocessoDetalheServiceTest {
     }
 
     @Test
-    @DisplayName("Obter detalhes com unidade null")
+    @DisplayName("Obter detalhes falha se unidade null")
     void obterDetalhesUnidadeNull() {
         Usuario admin = new Usuario();
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setPerfil(Perfil.ADMIN);
-        admin.setAtribuicoes(Set.of(up));
-
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
         sp.setUnidade(null);
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+        doThrow(new ErroAccessoNegado("Unidade não identificada.")).when(accessControlService)
+                .verificarPermissao(admin, Acao.VISUALIZAR_SUBPROCESSO, sp);
 
         assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.CHEFE, admin))
                 .isInstanceOf(ErroAccessoNegado.class);
     }
 
     @Test
-    @DisplayName("Obter detalhes com CHEFE mesma unidade")
-    void obterDetalhesChefeMesmaUnidade() {
+    @DisplayName("Obter detalhes com CHEFE")
+    void obterDetalhesChefe() {
         Usuario chefe = new Usuario();
         Unidade u1 = new Unidade();
-        u1.setCodigo(10L);
         u1.setSigla("U1");
         u1.setTituloTitular("titular");
-
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setPerfil(Perfil.CHEFE);
-        up.setUnidade(u1);
-        chefe.setAtribuicoes(Set.of(up));
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
@@ -467,5 +417,6 @@ class SubprocessoDetalheServiceTest {
 
         SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.CHEFE, chefe);
         assertThat(result).isNotNull();
+        verify(accessControlService).verificarPermissao(chefe, Acao.VISUALIZAR_SUBPROCESSO, sp);
     }
 }

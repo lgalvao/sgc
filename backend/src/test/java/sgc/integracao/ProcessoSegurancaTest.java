@@ -1,6 +1,7 @@
 package sgc.integracao;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -17,6 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Import(TestSecurityConfig.class)
+@Tag("integration")
 class ProcessoSegurancaTest extends BaseIntegrationTest {
 
     @Test
