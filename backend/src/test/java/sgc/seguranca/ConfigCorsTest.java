@@ -1,6 +1,7 @@
 package sgc.seguranca;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -10,10 +11,12 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Tag("unit")
+@DisplayName("ConfigCors - Testes de Configuração CORS")
 class ConfigCorsTest {
     @Test
-    @DisplayName("Should configure CORS source with allowed origins")
-    void shouldConfigureCorsSource() {
+    @DisplayName("Deve configurar origem CORS com origens permitidas")
+    void deveConfigurarOrigemCorsComOrigensPermitidas() {
         ConfigCors config = new ConfigCors();
         config.setAllowedOrigins(List.of("http://example.com"));
         config.setAllowedMethods(List.of("GET", "POST"));
