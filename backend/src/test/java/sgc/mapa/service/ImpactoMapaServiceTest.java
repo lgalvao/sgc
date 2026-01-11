@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("unit")
 @DisplayName("Testes para ImpactoMapaService")
 class ImpactoMapaServiceTest {
     @InjectMocks

@@ -23,6 +23,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("unit")
 class SubprocessoDetalheMapperTest {
 
     private SubprocessoDetalheMapper mapper;
