@@ -25,7 +25,7 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.time.LocalDateTime;
 
@@ -53,7 +53,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
-    private SubprocessoService subprocessoService;
+    private SubprocessoFacade subprocessoFacade;
     @Autowired
     private UsuarioRepo usuarioRepo;
     @Autowired
@@ -252,7 +252,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
         void falhaSubprocessoInexistente() {
             assertThrows(
                     ErroEntidadeNaoEncontrada.class,
-                    () -> subprocessoService.obterDetalhes(99999L, Perfil.ADMIN));
+                    () -> subprocessoFacade.obterDetalhes(99999L, Perfil.ADMIN));
         }
     }
 }

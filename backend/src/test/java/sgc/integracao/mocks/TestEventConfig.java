@@ -11,7 +11,7 @@ import sgc.notificacao.NotificacaoModelosService;
 import sgc.organizacao.UsuarioService;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.service.ProcessoFacade;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 /**
  * Configuração de teste que permite a execução de todos os eventos, exceto aoIniciarProcesso
@@ -30,7 +30,7 @@ public class TestEventConfig {
             NotificacaoModelosService notificacaoModelosService,
             UsuarioService usuarioService,
             ProcessoFacade processoFacade,
-            SubprocessoService subprocessoService) {
+            SubprocessoFacade subprocessoFacade) {
 
         // Retorna uma subclasse anônima com as dependências reais injetadas
         return new EventoProcessoListener(
@@ -39,7 +39,7 @@ public class TestEventConfig {
                 notificacaoModelosService,
                 usuarioService,
                 processoFacade,
-                subprocessoService) {
+                subprocessoFacade) {
 
             @Override
             public void aoIniciarProcesso(EventoProcessoIniciado evento) {

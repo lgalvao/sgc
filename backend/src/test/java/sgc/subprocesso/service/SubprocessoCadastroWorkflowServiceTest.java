@@ -45,7 +45,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     @Mock
     private AnaliseService analiseService;
     @Mock
-    private SubprocessoService subprocessoService;
+    private SubprocessoFacade subprocessoFacade;
     @Mock
     private ImpactoMapaService impactoMapaService;
     @Mock
@@ -73,7 +73,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setMapa(mapa);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(subprocessoService.obterAtividadesSemConhecimento(id))
+        when(subprocessoFacade.obterAtividadesSemConhecimento(id))
                 .thenReturn(Collections.emptyList());
 
         service.disponibilizarCadastro(id, user);
@@ -123,7 +123,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(u);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(subprocessoService.obterAtividadesSemConhecimento(id))
+        when(subprocessoFacade.obterAtividadesSemConhecimento(id))
                 .thenReturn(List.of(new Atividade()));
 
         assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
@@ -144,7 +144,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setMapa(null); // Mapa nulo
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(subprocessoService.obterAtividadesSemConhecimento(id))
+        when(subprocessoFacade.obterAtividadesSemConhecimento(id))
                 .thenReturn(Collections.emptyList());
 
         assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
@@ -170,7 +170,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setMapa(mapa);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(subprocessoService.obterAtividadesSemConhecimento(id))
+        when(subprocessoFacade.obterAtividadesSemConhecimento(id))
                 .thenReturn(Collections.emptyList());
 
         service.disponibilizarRevisao(id, user);
@@ -512,7 +512,7 @@ class SubprocessoCadastroWorkflowServiceTest {
                         new ErroValidacao(
                                 "Pelo menos uma atividade deve ser cadastrada antes de"
                                         + " disponibilizar."))
-                .when(subprocessoService)
+                .when(subprocessoFacade)
                 .validarExistenciaAtividades(id);
 
         assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
@@ -541,7 +541,7 @@ class SubprocessoCadastroWorkflowServiceTest {
                         new ErroValidacao(
                                 "Pelo menos uma atividade deve ser cadastrada antes de"
                                         + " disponibilizar."))
-                .when(subprocessoService)
+                .when(subprocessoFacade)
                 .validarExistenciaAtividades(id);
 
         assertThatThrownBy(() -> service.disponibilizarRevisao(id, user))

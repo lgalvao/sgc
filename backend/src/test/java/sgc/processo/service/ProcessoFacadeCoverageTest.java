@@ -25,7 +25,7 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.Collections;
 import java.util.List;
@@ -45,7 +45,7 @@ class ProcessoFacadeCoverageTest {
 
     @Mock private ProcessoRepo processoRepo;
     @Mock private UnidadeService unidadeService;
-    @Mock private SubprocessoService subprocessoService;
+    @Mock private SubprocessoFacade subprocessoFacade;
     @Mock private ApplicationEventPublisher publicadorEventos;
     @Mock private AlertaService alertaService;
     @Mock private ProcessoMapper processoMapper;
@@ -216,7 +216,7 @@ class ProcessoFacadeCoverageTest {
         // unidade null
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
-        when(subprocessoService.listarEntidadesPorProcesso(any())).thenReturn(List.of(sp));
+        when(subprocessoFacade.listarEntidadesPorProcesso(any())).thenReturn(List.of(sp));
         
         assertThatThrownBy(() -> facade.finalizar(1L))
             .isInstanceOf(ErroProcesso.class)
@@ -233,7 +233,7 @@ class ProcessoFacadeCoverageTest {
         // mapa null
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
-        when(subprocessoService.listarEntidadesPorProcesso(any())).thenReturn(List.of(sp));
+        when(subprocessoFacade.listarEntidadesPorProcesso(any())).thenReturn(List.of(sp));
 
         assertThatThrownBy(() -> facade.finalizar(1L))
             .isInstanceOf(ErroProcesso.class)
@@ -256,7 +256,7 @@ class ProcessoFacadeCoverageTest {
         sp.setMapa(m);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
 
         facade.finalizar(1L);
 
