@@ -265,28 +265,49 @@ grep -r "SubprocessoWorkflowService" --include="*.java" | grep -v "class Subproc
 
 ---
 
-#### ⏸️ P5: Consolidar Detector/Impacto Services (3 → 1)
-**Status:** ⏸️ Planejado  
+#### 🔄 P5: Consolidar Detector/Impacto Services (3 → 1)
+**Status:** 📊 Analisado - Pronto para execução  
 **Esforço:** 6-8 horas  
 **Risco:** Médio
 
 **Problema:**
 3 services com responsabilidades sobrepostas:
-- `DetectorMudancasAtividadeService` (182 linhas)
-- `DetectorImpactoCompetenciaService` (159 linhas)
-- `ImpactoMapaService` (118 linhas)
+- `DetectorMudancasAtividadeService` (182 linhas) - detecta mudanças em atividades
+- `DetectorImpactoCompetenciaService` (159 linhas) - analisa impactos em competências  
+- `ImpactoMapaService` (118 linhas) - orquestra os dois detectores
 
-**Solução:**
-Consolidar em um único `MapaImpactoService` com seções claras:
-1. Detecção de mudanças
-2. Cálculo de impactos
-3. Análise de mapa
+**Análise Realizada:**
+✅ Os dois detector services são usados APENAS por ImpactoMapaService (nenhum uso externo)
+✅ Documentação já indica que devem ser acessados via ImpactoMapaService
+✅ Forte acoplamento entre os 3 services (pipeline de processamento)
+✅ Total: ~459 linhas que podem ser consolidadas em um único service
+
+**Solução Proposta:**
+1. Manter `ImpactoMapaService` como service público (renomear para MapaImpactoService opcional)
+2. Converter métodos públicos dos detectores em métodos privados de ImpactoMapaService:
+   - `DetectorMudancasAtividadeService` → seção "Detecção de Mudanças" (private methods)
+   - `DetectorImpactoCompetenciaService` → seção "Análise de Impactos" (private methods)
+   - Manter classe interna `CompetenciaImpactoAcumulador`
+3. Manter estrutura de código clara com comentários de seção
+4. Remover os dois detector services
+5. Atualizar referências (@Lazy em MapaFacade pode ser resolvido)
+
+**Benefícios Esperados:**
+- ✅ Redução de 3 services para 1 (-66%)
+- ✅ Eliminação de delegação desnecessária
+- ✅ Código mais coeso e fácil de entender (pipeline completo em um lugar)
+- ✅ Pode resolver dependência circular MapaFacade → ImpactoMapaService (P2 Caso 4)
+- ✅ Service resultante: ~450-470 linhas (aceitável para complexidade do domínio)
 
 **Checklist:**
-- [ ] Criar novo `MapaImpactoService`
-- [ ] Migrar lógica dos 3 services
-- [ ] Atualizar referências
-- [ ] Remover services antigos
+- [x] Analisar uso dos detector services (SOMENTE ImpactoMapaService)
+- [x] Confirmar que não há uso externo
+- [ ] Converter DetectorMudancasAtividadeService para métodos privados
+- [ ] Converter DetectorImpactoCompetenciaService para métodos privados  
+- [ ] Organizar código em seções claras com comentários
+- [ ] Atualizar MapaFacade (remover @Lazy se possível)
+- [ ] Remover os dois detector services
+- [ ] Atualizar documentação
 - [ ] Executar testes
 
 ---
@@ -479,17 +500,19 @@ não em evitar decomposição que melhore responsabilidades e manutenibilidade.
 
 ### Prioridade Imediata (Próxima Sprint)
 
-**1. P4: Dividir ProcessoFacade (530 → ~250 linhas)**
+**1. P5: Consolidar Detector/Impacto Services (3 → 1)** ⭐ PRONTO PARA EXECUÇÃO
+- ✅ **Análise Completa**: Todos os 3 services analisados
+- ✅ **ROI Alto**: Reduz 3 services para 1 (-66%), elimina delegação
+- ✅ **Risco Médio**: Services bem encapsulados, sem uso externo
+- ✅ **Esforço**: 6-8 horas
+- 💡 **Benefício Adicional**: Pode resolver MapaFacade circular dependency (P2 Caso 4)
+- 🎯 **Recomendação**: EXECUTAR PRIMEIRO - maior impacto na redução de fragmentação
+
+**2. P4: Dividir ProcessoFacade (530 → ~250 linhas)** ✅ COMPLETO
 - ✅ **ROI Alto**: Arquivo muito grande é difícil de manter
 - ✅ **Risco Baixo**: ProcessoInicializador já foi extraído com sucesso (precedente)
-- ✅ **Esforço**: ~1 dia
-- 💡 **Benefício**: Melhora significativa na manutenibilidade
-
-**2. P5: Consolidar Detector/Impacto Services (3 → 1)**
-- ✅ **ROI Médio-Alto**: Reduz fragmentação e confusão de nomenclatura
-- ✅ **Pode resolver**: MapaFacade circular dependencies (P2 Caso 4)
-- ✅ **Esforço**: 6-8 horas
-- 💡 **Benefício**: Simplifica módulo `mapa` e pode eliminar 1-2 @Lazy
+- ✅ **Esforço**: ~1 dia (concluído em 2 horas)
+- 💡 **Resultado**: 530 → 340 linhas (-36%), 3 services especializados criados
 
 ### Prioridade Média
 
