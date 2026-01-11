@@ -14,6 +14,7 @@ public class ContextoEdicaoDto {
     private static final long serialVersionUID = 1L;
     private final UnidadeDto unidade;
     private final SubprocessoDetalheDto subprocesso;
+    @jakarta.annotation.Nullable
     private final MapaCompletoDto mapa;
     private final List<AtividadeVisualizacaoDto> atividadesDisponiveis;
 }

@@ -104,7 +104,7 @@ public class AtividadeFacade {
         EventoAtividadeCriada evento = EventoAtividadeCriada.builder()
                 .atividade(atividadeCriada)
                 .codMapa(mapaCodigo)
-                .codSubprocesso(subprocesso != null ? subprocesso.getCodigo() : null)
+                .codSubprocesso(subprocesso.getCodigo())
                 .usuario(usuario)
                 .dataHoraCriacao(LocalDateTime.now())
                 .totalAtividadesNoMapa(atividadeService.contarPorMapa(mapaCodigo))
@@ -127,7 +127,7 @@ public class AtividadeFacade {
         accessControlService.verificarPermissao(usuario, EDITAR_ATIVIDADE, atividade);
 
         // Captura estado anterior para detectar mudanças
-        String descricaoAnterior = atividade.getDescricao();
+        
         Set<String> camposAlterados = new HashSet<>();
 
         if (!Objects.equals(atividade.getDescricao(), atividadeDto.getDescricao())) {
@@ -148,7 +148,7 @@ public class AtividadeFacade {
             EventoAtividadeAtualizada evento = EventoAtividadeAtualizada.builder()
                     .atividade(atividadeAtualizada)
                     .codMapa(codMapa)
-                    .codSubprocesso(subprocesso != null ? subprocesso.getCodigo() : null)
+                    .codSubprocesso(subprocesso.getCodigo())
                     .usuario(usuario)
                     .camposAlterados(camposAlterados)
                     .dataHoraAtualizacao(LocalDateTime.now())
@@ -177,8 +177,7 @@ public class AtividadeFacade {
         // Captura dados para o evento ANTES da exclusão
         String descricao = atividade.getDescricao();
         Subprocesso subprocesso = atividade.getMapa().getSubprocesso();
-        int quantidadeConhecimentos = atividade.getConhecimentos() != null 
-                ? atividade.getConhecimentos().size() : 0;
+        int quantidadeConhecimentos = atividade.getConhecimentos().size();
         int totalAntes = atividadeService.contarPorMapa(codMapa);
 
         // Publica evento ANTES da exclusão
@@ -186,7 +185,7 @@ public class AtividadeFacade {
                 .codAtividade(codigo)
                 .descricao(descricao)
                 .codMapa(codMapa)
-                .codSubprocesso(subprocesso != null ? subprocesso.getCodigo() : null)
+                .codSubprocesso(subprocesso.getCodigo())
                 .usuario(usuario)
                 .quantidadeConhecimentos(quantidadeConhecimentos)
                 .dataHoraExclusao(LocalDateTime.now())

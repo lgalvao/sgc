@@ -34,7 +34,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -62,8 +61,8 @@ class PainelServiceTest {
         @Test
         @DisplayName("listarProcessos deve lançar erro se perfil for nulo")
         void listarProcessos_PerfilNulo() {
-            Pageable pageable = Pageable.unpaged();
-            assertThatThrownBy(() -> painelService.listarProcessos(null, 1L, pageable))
+            Pageable unpaged = Pageable.unpaged();
+            assertThatThrownBy(() -> painelService.listarProcessos(null, 1L, unpaged))
                     .isInstanceOf(ErroParametroPainelInvalido.class);
         }
 
@@ -223,14 +222,12 @@ class PainelServiceTest {
         @Test
         @DisplayName("Calcula link destino com exceção na busca de unidade")
         void calculaLinkComExcecaoUnidade() {
-            // Cenário: Perfil SERVIDOR, processo em andamento, mas falha ao buscar unidade p/ link
             Processo p = new Processo();
             p.setCodigo(1L);
             p.setTipo(TipoProcesso.MAPEAMENTO);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             p.setParticipantes(Collections.emptySet());
 
-            when(unidadeService.buscarIdsDescendentes(any())).thenReturn(Collections.emptyList());
             when(processoFacade.listarPorParticipantesIgnorandoCriado(any(), any()))
                 .thenReturn(new PageImpl<>(List.of(p)));
 
@@ -397,12 +394,12 @@ class PainelServiceTest {
         @Test
         @DisplayName("garantirOrdenacaoPadrao deve retornar pageable original se já estiver ordenado")
         void garantirOrdenacaoPadrao_JaOrdenado() {
-            PageRequest pageable = PageRequest.of(0, 10, org.springframework.data.domain.Sort.by("descricao"));
-            when(processoFacade.listarTodos(pageable)).thenReturn(Page.empty(pageable));
+            PageRequest pageRequestWithSort = PageRequest.of(0, 10, org.springframework.data.domain.Sort.by("descricao"));
+            when(processoFacade.listarTodos(pageRequestWithSort)).thenReturn(Page.empty(pageRequestWithSort));
             
-            painelService.listarProcessos(Perfil.ADMIN, null, pageable);
+            painelService.listarProcessos(Perfil.ADMIN, null, pageRequestWithSort);
             
-            verify(processoFacade).listarTodos(pageable);
+            verify(processoFacade).listarTodos(pageRequestWithSort);
         }
 
         @Test

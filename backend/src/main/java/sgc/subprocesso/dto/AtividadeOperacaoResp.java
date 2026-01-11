@@ -17,6 +17,7 @@ public class AtividadeOperacaoResp {
      * A atividade que foi criada, atualizada ou afetada pela operação.
      * Pode ser null em caso de exclusão.
      */
+    @jakarta.annotation.Nullable
     private AtividadeVisualizacaoDto atividade;
 
     /**

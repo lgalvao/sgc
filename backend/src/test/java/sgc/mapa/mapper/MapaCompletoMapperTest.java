@@ -1,5 +1,6 @@
 package sgc.mapa.mapper;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import sgc.mapa.dto.MapaCompletoDto;

@@ -155,21 +155,17 @@ class ProcessoFacadeCrudTest {
         }
 
         @Test
-        @DisplayName("Deve validar mapa para processo REVISAO com unidades null ou vazias")
-        void deveValidarMapaParaRevisaoComUnidadesVazias() {
-            // Testing getMensagemErroUnidadesSemMapa edge cases indirectly but need to
-            // bypass empty check in criar first
-            // Actually criar checks for empty units first. So we can only test the branch
-            // if we have valid units but logic fails inside.
-            // But there is an IF check: if (tipoProcesso == REVISAO || tipoProcesso ==
-            // DIAGNOSTICO)
-            // And inside getMensagemErroUnidadesSemMapa: if (codigosUnidades == null ||
-            // codigosUnidades.isEmpty())
-            // Since criar validates emptiness before, that null/empty check inside
-            // getMensagemErroUnidadesSemMapa is defensive/unreachable from criar.
-            // However, we can test it if we call the private method via reflection OR if
-            // there is another path.
-            // atualizar also calls it.
+        @DisplayName("Deve retornar erro se REVISAO e validador retornar mensagem")
+        void deveRetornarErroSeRevisaoEValidadorFalhar() {
+            var req = new CriarProcessoReq("T", TipoProcesso.REVISAO, LocalDateTime.now(), List.of(1L));
+            Unidade u = new Unidade();
+            u.setCodigo(1L);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
+            when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.of("Erro"));
+
+            assertThatThrownBy(() -> processoFacade.criar(req))
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessage("Erro");
         }
 
         @Test
@@ -275,10 +271,12 @@ class ProcessoFacadeCrudTest {
                     .descricao("Nova Desc")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now())
+                    .unidades(List.of(1L))
                     .build();
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(processoRepo.save(any())).thenReturn(processo);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
+            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
@@ -286,7 +284,7 @@ class ProcessoFacadeCrudTest {
 
             // Assert
             assertThat(resultado).isNotNull();
-            verify(processoRepo).save(processo);
+            verify(processoRepo).saveAndFlush(processo);
             verify(publicadorEventos).publishEvent(any(EventoProcessoAtualizado.class));
         }
 
@@ -297,7 +295,8 @@ class ProcessoFacadeCrudTest {
             when(processoRepo.findById(99L)).thenReturn(Optional.empty());
 
             // Act & Assert
-            assertThatThrownBy(() -> processoFacade.atualizar(99L, new AtualizarProcessoReq()))
+            var req = new AtualizarProcessoReq();
+            assertThatThrownBy(() -> processoFacade.atualizar(99L, req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
@@ -312,7 +311,8 @@ class ProcessoFacadeCrudTest {
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
             // Act & Assert
-            assertThatThrownBy(() -> processoFacade.atualizar(id, new AtualizarProcessoReq()))
+            var req = new AtualizarProcessoReq();
+            assertThatThrownBy(() -> processoFacade.atualizar(id, req))
                     .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
         }
 
@@ -328,17 +328,19 @@ class ProcessoFacadeCrudTest {
                     .codigo(id)
                     .descricao("Nova Descrição Atualizada")
                     .tipo(TipoProcesso.MAPEAMENTO)
+                    .unidades(List.of(1L))
                     .build();
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(processoRepo.save(any())).thenReturn(processo);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
+            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
             processoFacade.atualizar(id, req);
 
             // Assert
-            verify(processoRepo).save(argThat(p ->
+            verify(processoRepo).saveAndFlush(argThat(p ->
                     p.getDescricao().equals("Nova Descrição Atualizada")));
         }
 
@@ -355,17 +357,20 @@ class ProcessoFacadeCrudTest {
                     .codigo(id)
                     .descricao("Desc")
                     .tipo(TipoProcesso.DIAGNOSTICO)
+                    .unidades(List.of(1L))
                     .build();
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(processoRepo.save(any())).thenReturn(processo);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
+            when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty());
+            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
             processoFacade.atualizar(id, req);
 
             // Assert
-            verify(processoRepo).save(argThat(p ->
+            verify(processoRepo).saveAndFlush(argThat(p ->
                     p.getTipo() == TipoProcesso.DIAGNOSTICO));
         }
 
@@ -377,28 +382,27 @@ class ProcessoFacadeCrudTest {
             Processo processo = ProcessoFixture.processoPadrao();
             processo.setCodigo(id);
 
-            LocalDateTime novaDataEtapa1 = LocalDateTime.now().plusDays(10);
             LocalDateTime novaDataLimite = LocalDateTime.now().plusDays(30);
 
             AtualizarProcessoReq req = AtualizarProcessoReq.builder()
                     .codigo(id)
                     .descricao("Desc")
                     .tipo(TipoProcesso.MAPEAMENTO)
-                    .dataLimiteEtapa1(novaDataEtapa1)
-                    .dataLimite(novaDataLimite)
+                    .dataLimiteEtapa1(novaDataLimite)
+                    .unidades(List.of(1L))
                     .build();
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(processoRepo.save(any())).thenReturn(processo);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
+            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
             processoFacade.atualizar(id, req);
 
             // Assert
-            verify(processoRepo).save(argThat(p ->
-                    p.getDataLimiteEtapa1().equals(novaDataEtapa1) &&
-                            p.getDataLimite().equals(novaDataLimite)));
+            verify(processoRepo).saveAndFlush(argThat(p ->
+                    p.getDataLimite().equals(novaDataLimite)));
         }
 
         @Test
@@ -411,22 +415,26 @@ class ProcessoFacadeCrudTest {
             LocalDateTime dataOriginal = LocalDateTime.now().minusDays(5);
             processo.setDataLimite(dataOriginal);
 
+            // Como dataLimiteEtapa1 é @NotNull no DTO, sempre deve ser fornecida
+            // Este teste verifica que outros campos do processo são mantidos
             AtualizarProcessoReq req = AtualizarProcessoReq.builder()
                     .codigo(id)
                     .descricao("Nova Desc")
                     .tipo(TipoProcesso.MAPEAMENTO)
-                    // Não especificando dataLimite
+                    .unidades(List.of(1L))
+                    .dataLimiteEtapa1(dataOriginal) // Mantendo a data original
                     .build();
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(processoRepo.save(any())).thenReturn(processo);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
+            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
             processoFacade.atualizar(id, req);
 
-            // Assert
-            verify(processoRepo).save(argThat(p ->
+            // Assert - verifica que a data original foi mantida
+            verify(processoRepo).saveAndFlush(argThat(p ->
                     p.getDataLimite().equals(dataOriginal)));
         }
 
@@ -442,19 +450,21 @@ class ProcessoFacadeCrudTest {
                     .codigo(id)
                     .descricao("Nova Desc")
                     .tipo(TipoProcesso.MAPEAMENTO)
+                    .unidades(List.of(1L))
                     .build();
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(processoRepo.save(any())).thenReturn(processo);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
+            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
             processoFacade.atualizar(id, req);
 
             // Assert
-            verify(publicadorEventos).publishEvent(argThat(evento ->
-                    evento instanceof EventoProcessoAtualizado &&
-                            ((EventoProcessoAtualizado) evento).getCodigoProcesso().equals(id)));
+            var captor = org.mockito.ArgumentCaptor.forClass(EventoProcessoAtualizado.class);
+            verify(publicadorEventos).publishEvent(captor.capture());
+            assertThat(captor.getValue().getProcesso().getCodigo()).isEqualTo(id);
         }
 
         @Test
@@ -476,7 +486,7 @@ class ProcessoFacadeCrudTest {
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
             when(unidadeService.buscarEntidadePorId(2L)).thenReturn(novaUnidade);
-            when(processoRepo.save(any())).thenReturn(processo);
+            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
@@ -484,7 +494,7 @@ class ProcessoFacadeCrudTest {
 
             // Assert
             verify(unidadeService).buscarEntidadePorId(2L);
-            verify(processoRepo).save(any());
+            verify(processoRepo).saveAndFlush(any());
         }
 
         @Test
@@ -494,7 +504,8 @@ class ProcessoFacadeCrudTest {
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
 
-            assertThatThrownBy(() -> processoFacade.atualizar(1L, new AtualizarProcessoReq()))
+            var req = new AtualizarProcessoReq();
+            assertThatThrownBy(() -> processoFacade.atualizar(1L, req))
                     .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
         }
     }

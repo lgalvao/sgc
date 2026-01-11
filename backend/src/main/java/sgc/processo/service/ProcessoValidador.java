@@ -12,7 +12,6 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +51,6 @@ class ProcessoValidador {
      * @param codigosUnidades lista de códigos de unidades a validar
      * @return Optional com mensagem de erro se alguma unidade não possuir mapa vigente
      */
-    @Transactional(readOnly = true)
     public Optional<String> getMensagemErroUnidadesSemMapa(List<Long> codigosUnidades) {
         if (codigosUnidades == null || codigosUnidades.isEmpty()) {
             return Optional.empty();
@@ -92,7 +90,6 @@ class ProcessoValidador {
      * @param processo processo a validar
      * @throws ErroProcesso se algum subprocesso não estiver homologado
      */
-    @Transactional(readOnly = true)
     public void validarTodosSubprocessosHomologados(Processo processo) {
         List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(processo.getCodigo());
         List<String> pendentes = subprocessos.stream().filter(sp -> sp.getSituacao() != MAPEAMENTO_MAPA_HOMOLOGADO

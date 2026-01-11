@@ -58,7 +58,7 @@
  * 
  * <h2>Convenções de Código</h2>
  * <ul>
- *   <li><strong>Idioma</strong>: TODO em Português Brasileiro (código, comentários, mensagens)</li>
+ *   <li><strong>Idioma</strong>: Inteiramente em Português Brasileiro (código, comentários, mensagens)</li>
  *   <li><strong>IDs</strong>: Usar "codigo" em vez de "id" (convenção do projeto)</li>
  *   <li><strong>Classes</strong>: PascalCase</li>
  *   <li><strong>Métodos</strong>: camelCase</li>
