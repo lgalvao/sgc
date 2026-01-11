@@ -581,8 +581,7 @@ class ProcessoFacadeTest {
         @DisplayName("Deve listar unidades bloqueadas por tipo")
         void deveListarUnidadesBloqueadasPorTipo() {
             // Arrange
-            when(processoRepo.findUnidadeCodigosBySituacaoAndTipo(
-                    SituacaoProcesso.EM_ANDAMENTO, TipoProcesso.MAPEAMENTO))
+            when(processoConsultaService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO"))
                     .thenReturn(List.of(1L));
 
             // Act
@@ -607,27 +606,11 @@ class ProcessoFacadeTest {
         @DisplayName("Deve listar subprocessos elegíveis para Admin")
         void deveListarSubprocessosElegiveisParaAdmin() {
             // Arrange
-            Authentication auth = mock(Authentication.class);
-            SecurityContext securityContext = mock(SecurityContext.class);
-            when(securityContext.getAuthentication()).thenReturn(auth);
-            SecurityContextHolder.setContext(securityContext);
-
-            when(auth.getName()).thenReturn("admin");
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-            doReturn(authorities).when(auth).getAuthorities();
-
-            Unidade u = UnidadeFixture.unidadePadrao();
-            // SP1: Elegível
-            Subprocesso sp1 = SubprocessoFixture.subprocessoPadrao(null, u);
-            sp1.setCodigo(1L);
-            sp1.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
-            // SP2: Não elegível (para testar o filtro)
-            Subprocesso sp2 = SubprocessoFixture.subprocessoPadrao(null, u);
-            sp2.setCodigo(2L);
-            sp2.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-
-            when(subprocessoFacade.listarEntidadesPorProcesso(100L)).thenReturn(List.of(sp1, sp2));
+            SubprocessoElegivelDto dto = SubprocessoElegivelDto.builder()
+                    .codSubprocesso(1L)
+                    .build();
+            when(processoConsultaService.listarSubprocessosElegiveis(100L))
+                    .thenReturn(List.of(dto));
 
             // Act
             List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
@@ -641,48 +624,20 @@ class ProcessoFacadeTest {
         @DisplayName("Deve listar subprocessos elegíveis para Gestor")
         void deveListarSubprocessosElegiveisParaGestor() {
             // Arrange
-            Authentication auth = mock(Authentication.class);
-            SecurityContext securityContext = mock(SecurityContext.class);
-            when(securityContext.getAuthentication()).thenReturn(auth);
-            SecurityContextHolder.setContext(securityContext);
-
-            when(auth.getName()).thenReturn("gestor");
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
-            doReturn(authorities).when(auth).getAuthorities();
-
-            PerfilDto perfil = PerfilDto.builder().unidadeCodigo(10L).build();
-            when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
-
-            Unidade u = UnidadeFixture.unidadeComId(10L);
-
-            // SP1: Elegível (MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
-            Subprocesso sp1 = SubprocessoFixture.subprocessoPadrao(null, u);
-            sp1.setCodigo(1L);
-            sp1.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-
-            // SP2: Elegível (REVISAO_CADASTRO_DISPONIBILIZADA)
-            Subprocesso sp2 = SubprocessoFixture.subprocessoPadrao(null, u);
-            sp2.setCodigo(2L);
-            sp2.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-
-            // SP3: Não elegível (Outra unidade)
-            Unidade outra = UnidadeFixture.unidadeComId(20L);
-            Subprocesso sp3 = SubprocessoFixture.subprocessoPadrao(null, outra);
-            sp3.setCodigo(3L);
-            sp3.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-
-            // SP4: Não elegível (Unidade null - defensiva)
-            Subprocesso sp4 = SubprocessoFixture.subprocessoPadrao(null, null);
-            sp4.setCodigo(4L);
-
-            when(subprocessoFacade.listarEntidadesPorProcesso(100L)).thenReturn(List.of(sp1, sp2, sp3, sp4));
+            SubprocessoElegivelDto dto1 = SubprocessoElegivelDto.builder()
+                    .codSubprocesso(1L)
+                    .build();
+            SubprocessoElegivelDto dto2 = SubprocessoElegivelDto.builder()
+                    .codSubprocesso(2L)
+                    .build();
+            when(processoConsultaService.listarSubprocessosElegiveis(100L))
+                    .thenReturn(List.of(dto1, dto2));
 
             // Act
             List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
 
             // Assert
-            assertThat(res).hasSize(2); // Apenas sp1 e sp2
+            assertThat(res).hasSize(2);
             assertThat(res).extracting(SubprocessoElegivelDto::getCodSubprocesso).containsExactlyInAnyOrder(1L, 2L);
         }
 
@@ -690,18 +645,8 @@ class ProcessoFacadeTest {
         @DisplayName("Deve retornar vazio ao listar subprocessos se usuário sem unidade")
         void deveRetornarVazioAoListarSubprocessosSeUsuarioSemUnidade() {
             // Arrange
-            Authentication auth = mock(Authentication.class);
-            SecurityContext securityContext = mock(SecurityContext.class);
-            when(securityContext.getAuthentication()).thenReturn(auth);
-            SecurityContextHolder.setContext(securityContext);
-
-            when(auth.getName()).thenReturn("gestor");
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
-            doReturn(authorities).when(auth).getAuthorities();
-
-            when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of());
-            when(subprocessoFacade.listarEntidadesPorProcesso(100L)).thenReturn(List.of());
+            when(processoConsultaService.listarSubprocessosElegiveis(100L))
+                    .thenReturn(List.of());
 
             // Act
             List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
@@ -721,6 +666,9 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve lançar exceção para tipo de processo inválido")
         void deveLancarExcecaoParaTipoInvalido() {
+            when(processoConsultaService.listarUnidadesBloqueadasPorTipo("TIPO_INEXISTENTE"))
+                    .thenThrow(new IllegalArgumentException("No enum constant"));
+
             assertThatThrownBy(() -> processoFacade.listarUnidadesBloqueadasPorTipo("TIPO_INEXISTENTE"))
                     .isInstanceOf(IllegalArgumentException.class);
         }
@@ -729,9 +677,8 @@ class ProcessoFacadeTest {
         @DisplayName("Deve retornar vazio ao listar subprocessos se authentication for null")
         void deveRetornarVazioSeAuthenticationNull() {
             // Arrange
-            SecurityContext securityContext = mock(SecurityContext.class);
-            when(securityContext.getAuthentication()).thenReturn(null);
-            SecurityContextHolder.setContext(securityContext);
+            when(processoConsultaService.listarSubprocessosElegiveis(100L))
+                    .thenReturn(List.of());
 
             // Act
             List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
@@ -743,13 +690,14 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve retornar vazio ao listar subprocessos se name for null")
         void deveRetornarVazioSeNameNull() {
-            Authentication auth = mock(Authentication.class);
-            when(auth.getName()).thenReturn(null);
-            SecurityContext securityContext = mock(SecurityContext.class);
-            when(securityContext.getAuthentication()).thenReturn(auth);
-            SecurityContextHolder.setContext(securityContext);
+            // Arrange
+            when(processoConsultaService.listarSubprocessosElegiveis(100L))
+                    .thenReturn(List.of());
 
+            // Act
             List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
+
+            // Assert
             assertThat(res).isEmpty();
         }
 
@@ -763,10 +711,8 @@ class ProcessoFacadeTest {
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
             when(processoDetalheBuilder.build(processo)).thenReturn(detalhes);
-
-            SecurityContext securityContext = mock(SecurityContext.class);
-            when(securityContext.getAuthentication()).thenReturn(null);
-            SecurityContextHolder.setContext(securityContext);
+            when(processoConsultaService.listarSubprocessosElegiveis(id))
+                    .thenReturn(List.of());
 
             // Act
             var res = processoFacade.obterContextoCompleto(id);
@@ -774,7 +720,6 @@ class ProcessoFacadeTest {
             // Assert
             assertThat(res).isNotNull();
             assertThat(res.getProcesso()).isEqualTo(detalhes);
-            // listarSubprocessosElegiveis retorna lista vazia quando auth é null
             assertThat(res.getElegiveis()).isEmpty();
         }
     }
@@ -857,17 +802,9 @@ class ProcessoFacadeTest {
         void deveFalharAoFinalizarSeSubprocessosNaoHomologados() {
             // Arrange
             Long id = 100L;
-            Processo processo = ProcessoFixture.processoEmAndamento();
-            processo.setCodigo(id);
 
-            Unidade u = UnidadeFixture.unidadePadrao();
-            Subprocesso sp = SubprocessoFixture.subprocessoPadrao(processo, u);
-            Mapa m = MapaFixture.mapaPadrao(sp);
-            sp.setMapa(m);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO); // Não homologado
-
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(subprocessoFacade.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
+            doThrow(new ErroProcesso("Não é possível encerrar o processo. Unidades pendentes de homologação:\n- U1 (Situação: MAPEAMENTO_CADASTRO_EM_ANDAMENTO)"))
+                    .when(processoFinalizador).finalizar(id);
 
             // Act & Assert
             assertThatThrownBy(() -> processoFacade.finalizar(id))
@@ -880,9 +817,9 @@ class ProcessoFacadeTest {
         void deveFalharAoFinalizarSeProcessoNaoEmAndamento() {
             // Arrange
             Long id = 100L;
-            Processo processo = ProcessoFixture.processoPadrao();
-            processo.setCodigo(id);
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+
+            doThrow(new ErroProcesso("Apenas processos 'EM ANDAMENTO' podem ser finalizados."))
+                    .when(processoFinalizador).finalizar(id);
 
             // Act & Assert
             assertThatThrownBy(() -> processoFacade.finalizar(id))
@@ -895,26 +832,12 @@ class ProcessoFacadeTest {
         void deveFinalizarProcessoQuandoTudoHomologado() {
             // Arrange
             Long id = 100L;
-            Processo processo = ProcessoFixture.processoEmAndamento();
-            processo.setCodigo(id);
-
-            Unidade u = UnidadeFixture.unidadeComId(1L);
-            Mapa m = MapaFixture.mapaPadrao(null);
-
-            Subprocesso sp = SubprocessoFixture.subprocessoPadrao(processo, u);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-            sp.setMapa(m);
-
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(subprocessoFacade.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
 
             // Act
             processoFacade.finalizar(id);
 
             // Assert
-            assertThat(processo.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
-            verify(unidadeService).definirMapaVigente(any(), any());
-            verify(publicadorEventos).publishEvent(any(EventoProcessoFinalizado.class));
+            verify(processoFinalizador).finalizar(id);
         }
 
         @Test
@@ -922,14 +845,9 @@ class ProcessoFacadeTest {
         void deveFalharAoFinalizarSeSubprocessoSemUnidade() {
             // Arrange
             Long id = 100L;
-            Processo processo = ProcessoFixture.processoEmAndamento();
-            processo.setCodigo(id);
 
-            Subprocesso sp = SubprocessoFixture.subprocessoPadrao(processo, null);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(subprocessoFacade.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
+            doThrow(new ErroProcesso("Subprocesso 1 sem unidade associada."))
+                    .when(processoFinalizador).finalizar(id);
 
             // Act & Assert
             assertThatThrownBy(() -> processoFacade.finalizar(id))
@@ -942,16 +860,9 @@ class ProcessoFacadeTest {
         void deveFalharAoFinalizarSeSubprocessoSemMapa() {
             // Arrange
             Long id = 100L;
-            Processo processo = ProcessoFixture.processoEmAndamento();
-            processo.setCodigo(id);
 
-            Unidade u = UnidadeFixture.unidadeComId(1L);
-            Subprocesso sp = SubprocessoFixture.subprocessoPadrao(processo, u);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-            sp.setMapa(null); // Sem mapa
-
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(subprocessoFacade.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
+            doThrow(new ErroProcesso("Subprocesso 1 sem mapa associado."))
+                    .when(processoFinalizador).finalizar(id);
 
             // Act & Assert
             assertThatThrownBy(() -> processoFacade.finalizar(id))
@@ -963,15 +874,9 @@ class ProcessoFacadeTest {
         @DisplayName("Deve formatar mensagem de erro corretamente para subprocesso sem unidade ao finalizar")
         void deveFormatarMensagemErroParaSubprocessoSemUnidade() {
             Long id = 100L;
-            Processo processo = ProcessoFixture.processoEmAndamento();
-            processo.setCodigo(id);
 
-            Subprocesso sp = SubprocessoFixture.subprocessoPadrao(processo, null);
-            sp.setCodigo(55L);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO); // Pendente
-
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(subprocessoFacade.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
+            doThrow(new ErroProcesso("Não é possível encerrar o processo. Unidades pendentes de homologação:\n- Subprocesso 55 (Situação: MAPEAMENTO_CADASTRO_EM_ANDAMENTO)"))
+                    .when(processoFinalizador).finalizar(id);
 
             assertThatThrownBy(() -> processoFacade.finalizar(id))
                     .isInstanceOf(ErroProcesso.class)
@@ -987,7 +892,8 @@ class ProcessoFacadeTest {
         void deveNegarAcessoQuandoNaoAutenticado() {
             // Arrange
             Authentication auth = mock(Authentication.class);
-            when(auth.isAuthenticated()).thenReturn(false);
+            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
+            when(processoAcessoService.checarAcesso(null, 1L)).thenReturn(false);
 
             // Act & Assert
             assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
@@ -998,8 +904,7 @@ class ProcessoFacadeTest {
         @DisplayName("Deve negar acesso quando name é null")
         void deveNegarAcessoQuandoNameNull() {
             Authentication auth = mock(Authentication.class);
-            when(auth.isAuthenticated()).thenReturn(true);
-            when(auth.getName()).thenReturn(null);
+            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
 
             assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
         }
@@ -1009,12 +914,7 @@ class ProcessoFacadeTest {
         void deveNegarAcessoQuandoUsuarioSemPermissao() {
             // Arrange
             Authentication auth = mock(Authentication.class);
-            when(auth.isAuthenticated()).thenReturn(true);
-            when(auth.getName()).thenReturn("user");
-
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-            doReturn(authorities).when(auth).getAuthorities();
+            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
 
             // Act & Assert
             assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
@@ -1025,14 +925,7 @@ class ProcessoFacadeTest {
         void deveNegarAcessoQuandoUsuarioSemUnidade() {
             // Arrange
             Authentication auth = mock(Authentication.class);
-            when(auth.isAuthenticated()).thenReturn(true);
-            when(auth.getName()).thenReturn("gestor");
-
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
-            doReturn(authorities).when(auth).getAuthorities();
-
-            when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of());
+            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
 
             // Act & Assert
             assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
@@ -1042,19 +935,7 @@ class ProcessoFacadeTest {
         @DisplayName("Deve negar acesso quando codUnidadeUsuario é null no perfil")
         void deveNegarAcessoQuandoUnidadeNull() {
             Authentication auth = mock(Authentication.class);
-            when(auth.isAuthenticated()).thenReturn(true);
-            when(auth.getName()).thenReturn("gestor");
-
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
-            doReturn(authorities).when(auth).getAuthorities();
-
-            PerfilDto perfil = PerfilDto.builder()
-                    .usuarioTitulo("gestor")
-                    .perfil("GESTOR")
-                    .unidadeCodigo(null) // Null
-                    .build();
-            when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
+            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
 
             assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
         }
@@ -1062,19 +943,11 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve negar acesso se hierarquia vazia")
         void deveNegarAcessoSeHierarquiaVazia() {
-            // Configurar auth
+            // Arrange
             Authentication auth = mock(Authentication.class);
-            when(auth.isAuthenticated()).thenReturn(true);
-            when(auth.getName()).thenReturn("gestor");
-            doReturn(List.of(new SimpleGrantedAuthority("ROLE_GESTOR"))).when(auth).getAuthorities();
+            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
 
-            // Configurar perfil
-            PerfilDto perfil = PerfilDto.builder().unidadeCodigo(10L).build();
-            when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
-
-            when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of()); // Nenhuma unidade no
-                                                                                            // sistema
-
+            // Act & Assert
             assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
         }
 
@@ -1083,31 +956,7 @@ class ProcessoFacadeTest {
         void devePermitirAcessoQuandoGestorDeUnidadeParticipante() {
             // Arrange
             Authentication auth = mock(Authentication.class);
-            when(auth.isAuthenticated()).thenReturn(true);
-            when(auth.getName()).thenReturn("gestor");
-
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
-            doReturn(authorities).when(auth).getAuthorities();
-
-            PerfilDto perfil = PerfilDto.builder()
-                    .usuarioTitulo("gestor")
-                    .perfil("GESTOR")
-                    .unidadeCodigo(10L)
-                    .build();
-            when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
-
-            // Necessário para o metodo privado buscarCodigosDescendentes
-            Unidade pai = new Unidade();
-            pai.setCodigo(10L);
-            Unidade filho = new Unidade();
-            filho.setCodigo(20L);
-            filho.setUnidadeSuperior(pai);
-
-            when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(pai, filho));
-
-            when(subprocessoFacade.verificarAcessoUnidadeAoProcesso(eq(1L),
-                    argThat(list -> list.contains(10L) && list.contains(20L)))).thenReturn(true);
+            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(true);
 
             // Act & Assert
             assertThat(processoFacade.checarAcesso(auth, 1L)).isTrue();
@@ -1118,27 +967,7 @@ class ProcessoFacadeTest {
         void devePermitirAcessoEmHierarquiaComplexa() {
             // Arrange
             Authentication auth = mock(Authentication.class);
-            when(auth.isAuthenticated()).thenReturn(true);
-            when(auth.getName()).thenReturn("chefe");
-            doReturn(List.of(new SimpleGrantedAuthority("ROLE_CHEFE"))).when(auth).getAuthorities();
-
-            PerfilDto perfil = PerfilDto.builder().unidadeCodigo(100L).build(); // Avô
-            when(usuarioService.buscarPerfisUsuario("chefe")).thenReturn(List.of(perfil));
-
-            // Hierarquia: 100 (Avô) -> 101 (Pai) -> 102 (Neto)
-            Unidade avo = UnidadeFixture.unidadeComId(100L);
-            Unidade pai = UnidadeFixture.unidadeComId(101L);
-            pai.setUnidadeSuperior(avo);
-            Unidade neto = UnidadeFixture.unidadeComId(102L);
-            neto.setUnidadeSuperior(pai);
-            Unidade solta = UnidadeFixture.unidadeComId(200L); // Unidade solta sem pai
-
-            when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(avo, pai, neto, solta));
-
-            // Mock da verificação final: espera-se que a lista inclua 100, 101 e 102
-            when(subprocessoFacade.verificarAcessoUnidadeAoProcesso(eq(1L), argThat(
-                    list -> list.contains(100L) && list.contains(101L) && list.contains(102L) && !list.contains(200L))))
-                    .thenReturn(true);
+            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(true);
 
             // Act
             boolean acesso = processoFacade.checarAcesso(auth, 1L);
@@ -1152,20 +981,7 @@ class ProcessoFacadeTest {
         void devePermitirAcessoComUnidadeSuperiorNula() {
             // Arrange
             Authentication auth = mock(Authentication.class);
-            when(auth.isAuthenticated()).thenReturn(true);
-            when(auth.getName()).thenReturn("chefe");
-            doReturn(List.of(new SimpleGrantedAuthority("ROLE_CHEFE"))).when(auth).getAuthorities();
-
-            PerfilDto perfil = PerfilDto.builder().unidadeCodigo(100L).build();
-            when(usuarioService.buscarPerfisUsuario("chefe")).thenReturn(List.of(perfil));
-
-            // Unidade raiz (sem superior)
-            Unidade raiz = UnidadeFixture.unidadeComId(100L);
-            raiz.setUnidadeSuperior(null);
-
-            when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(raiz));
-
-            when(subprocessoFacade.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenReturn(true);
+            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(true);
 
             // Act
             boolean acesso = processoFacade.checarAcesso(auth, 1L);
@@ -1179,21 +995,7 @@ class ProcessoFacadeTest {
         void deveTratarCiclosNaHierarquia() {
             // Arrange
             Authentication auth = mock(Authentication.class);
-            when(auth.isAuthenticated()).thenReturn(true);
-            when(auth.getName()).thenReturn("chefe");
-            doReturn(List.of(new SimpleGrantedAuthority("ROLE_CHEFE"))).when(auth).getAuthorities();
-
-            PerfilDto perfil = PerfilDto.builder().unidadeCodigo(100L).build();
-            when(usuarioService.buscarPerfisUsuario("chefe")).thenReturn(List.of(perfil));
-
-            Unidade u1 = UnidadeFixture.unidadeComId(100L);
-            Unidade u2 = UnidadeFixture.unidadeComId(101L);
-            u2.setUnidadeSuperior(u1);
-            u1.setUnidadeSuperior(u2); // Ciclo: 100 <-> 101
-
-            when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(u1, u2));
-            // A verificação deve receber a lista de IDs sem entrar em loop infinito
-            when(subprocessoFacade.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenReturn(true);
+            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(true);
 
             // Act
             boolean acesso = processoFacade.checarAcesso(auth, 1L);
