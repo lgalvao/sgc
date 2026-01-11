@@ -36,7 +36,7 @@ import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -71,7 +71,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
 public class ProcessoFacade {
     private final ProcessoRepo processoRepo;
     private final UnidadeService unidadeService;
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoFacade subprocessoFacade;
     private final ApplicationEventPublisher publicadorEventos;
     private final ProcessoMapper processoMapper;
     private final ProcessoDetalheBuilder processoDetalheBuilder;
@@ -107,7 +107,7 @@ public class ProcessoFacade {
 
         List<Long> codigosUnidadesHierarquia = buscarCodigosDescendentes(codUnidadeUsuario);
 
-        return subprocessoService.verificarAcessoUnidadeAoProcesso(
+        return subprocessoFacade.verificarAcessoUnidadeAoProcesso(
                 codProcesso, codigosUnidadesHierarquia);
     }
 
@@ -431,7 +431,7 @@ public class ProcessoFacade {
     }
 
     private void validarTodosSubprocessosHomologados(Processo processo) {
-        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(processo.getCodigo());
+        List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(processo.getCodigo());
         List<String> pendentes = subprocessos.stream().filter(sp -> sp.getSituacao() != MAPEAMENTO_MAPA_HOMOLOGADO
                 && sp.getSituacao() != REVISAO_MAPA_HOMOLOGADO)
                 .map(sp -> {
@@ -453,7 +453,7 @@ public class ProcessoFacade {
 
     private void tornarMapasVigentes(Processo processo) {
         log.info("Mapa vigente definido para o processo {}", processo.getCodigo());
-        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(processo.getCodigo());
+        List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(processo.getCodigo());
 
         for (Subprocesso subprocesso : subprocessos) {
             Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())
@@ -488,7 +488,7 @@ public class ProcessoFacade {
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
 
-        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
+        List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(codProcesso);
         if (isAdmin) {
             return subprocessos.stream()
                     .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)
@@ -514,7 +514,7 @@ public class ProcessoFacade {
 
     @Transactional(readOnly = true)
     public List<SubprocessoDto> listarTodosSubprocessos(Long codProcesso) {
-        return subprocessoService.listarEntidadesPorProcesso(codProcesso).stream()
+        return subprocessoFacade.listarEntidadesPorProcesso(codProcesso).stream()
                 .map(subprocessoMapper::toDTO)
                 .toList();
     }

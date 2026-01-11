@@ -13,7 +13,7 @@ import sgc.mapa.model.*;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ import static sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS;
 @Slf4j
 @RequiredArgsConstructor
 public class ImpactoMapaService {
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoFacade subprocessoFacade;
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
     private final AtividadeService atividadeService;
@@ -61,7 +61,7 @@ public class ImpactoMapaService {
      */
     @Transactional(readOnly = true)
     public ImpactoMapaDto verificarImpactos(Long codSubprocesso, Usuario usuario) {
-        Subprocesso subprocesso = subprocessoService.buscarSubprocesso(codSubprocesso);
+        Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codSubprocesso);
         
         // Verificação centralizada de acesso
         accessControlService.verificarPermissao(usuario, VERIFICAR_IMPACTOS, subprocesso);

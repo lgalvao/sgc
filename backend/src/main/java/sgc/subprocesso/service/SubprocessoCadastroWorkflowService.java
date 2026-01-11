@@ -21,6 +21,7 @@ import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.decomposed.SubprocessoValidacaoService;
 
 import static sgc.seguranca.acesso.Acao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
@@ -33,7 +34,7 @@ public class SubprocessoCadastroWorkflowService {
     private final SubprocessoTransicaoService transicaoService;
     private final UnidadeService unidadeService;
     private final AnaliseService analiseService;
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoValidacaoService validacaoService;
     private final ImpactoMapaService impactoMapaService;
     private final AccessControlService accessControlService;
 
@@ -72,9 +73,9 @@ public class SubprocessoCadastroWorkflowService {
     }
 
     private void validarRequisitosNegocioParaDisponibilizacao(Long codSubprocesso, Subprocesso sp) {
-        subprocessoService.validarExistenciaAtividades(codSubprocesso);
+        validacaoService.validarExistenciaAtividades(codSubprocesso);
 
-        if (!subprocessoService.obterAtividadesSemConhecimento(codSubprocesso).isEmpty()) {
+        if (!validacaoService.obterAtividadesSemConhecimento(codSubprocesso).isEmpty()) {
             throw new ErroValidacao("Existem atividades sem conhecimentos associados.");
         }
 

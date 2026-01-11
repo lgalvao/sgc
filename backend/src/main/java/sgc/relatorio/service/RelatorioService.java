@@ -15,7 +15,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.io.OutputStream;
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RelatorioService {
     private final ProcessoFacade processoFacade;
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoFacade subprocessoFacade;
     private final UsuarioService usuarioService;
     private final CompetenciaService competenciaService;
     private final PdfFactory pdfFactory;
@@ -32,7 +32,7 @@ public class RelatorioService {
     @Transactional(readOnly = true)
     public void gerarRelatorioAndamento(Long codProcesso, OutputStream outputStream) {
         Processo processo = processoFacade.buscarEntidadePorId(codProcesso);
-        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
+        List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(codProcesso);
 
         try (Document document = pdfFactory.createDocument()) {
             pdfFactory.createWriter(document, outputStream);
@@ -66,7 +66,7 @@ public class RelatorioService {
     @Transactional(readOnly = true)
     public void gerarRelatorioMapas(Long codProcesso, Long codUnidade, OutputStream outputStream) {
         Processo processo = processoFacade.buscarEntidadePorId(codProcesso);
-        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
+        List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(codProcesso);
 
         subprocessos = subprocessos.stream()
                 .filter(sp -> sp.getUnidade() != null && sp.getUnidade().getCodigo() != null && sp.getUnidade().getCodigo().equals(codUnidade))
