@@ -78,36 +78,99 @@
 ---
 
 #### ⏸️ P2: Resolver Dependências Circulares (@Lazy)
-**Status:** ⏸️ Planejado  
-**Esforço:** 1 dia  
-**Risco:** Médio
+**Status:** 📊 Analisado  
+**Esforço:** 1-2 dias  
+**Risco:** Alto
 
 **Problema:**
-6 usos de `@Lazy` indicando dependências circulares:
-1. `UsuarioService` ↔ `UnidadeService`
-2. `SubprocessoMapaWorkflowService` → self (auto-injeção)
-3. `MapaFacade` → `MapaVisualizacaoService` + `ImpactoMapaService`
+6 usos de `@Lazy` indicando dependências circulares identificadas:
 
-**Soluções Planejadas:**
+**Casos Identificados:**
 
-**Caso 1: UsuarioService ↔ UnidadeService**
-- Extrair lógica compartilhada para `OrganizacaoService`
-- OU usar eventos de domínio para comunicação assíncrona
+**Caso 1: UsuarioService ↔ UnidadeService (Organização)**
+```java
+// UsuarioService usa UnidadeService para:
+- buscarPorSigla()
+- buscarPorCodigo()
+- buscarTodasUnidades()
+- listarSubordinadas()
+- buscarArvoreHierarquica()
 
-**Caso 2: Self-injection em SubprocessoMapaWorkflowService**
-- Mover lógica transacional para método separado
-- OU usar `TransactionTemplate` explicitamente
+// UnidadeService usa UsuarioService para:
+- buscarPorId()
+- buscarUsuariosPorUnidade()
+```
+**Análise:** Dependência bidirecional real. Ambos os services precisam um do outro.
 
-**Caso 3: MapaFacade circulares**
-- Revisar se services realmente precisam de Facade
-- Refatorar para eliminar dependência reversa
+**Soluções Possíveis:**
+- A) Criar `OrganizacaoService` que coordena ambos
+- B) Usar eventos de domínio para comunicação assíncrona
+- C) Manter @Lazy (aceitável para operações de leitura)
+
+**Recomendação:** Manter @Lazy por enquanto. Baixo risco, operações de leitura.
+
+**Caso 2: LoginService → UnidadeService**
+```java
+@Lazy UnidadeService unidadeService
+```
+**Análise:** Similar ao Caso 1, parte do mesmo módulo organizacional.
+
+**Recomendação:** Manter @Lazy.
+
+**Caso 3: SubprocessoMapaWorkflowService (Self-Injection)**
+```java
+@Autowired
+@Lazy
+private SubprocessoMapaWorkflowService self;
+
+// Usado para chamar métodos @Transactional internamente:
+self.disponibilizarMapa(...)
+self.aceitarValidacao(...)
+self.homologarValidacao(...)
+```
+**Análise:** Padrão técnico para suportar @Transactional em chamadas internas.
+
+**Soluções Possíveis:**
+- A) Usar `TransactionTemplate` explicitamente
+- B) Extrair métodos para service separado
+- C) Usar AspectJ load-time weaving (complexo)
+
+**Recomendação:** Refatorar para usar `TransactionTemplate` ou extrair para service separado.
+
+**Caso 4: MapaFacade → MapaVisualizacaoService + ImpactoMapaService**
+```java
+@Lazy MapaVisualizacaoService mapaVisualizacaoService
+@Lazy ImpactoMapaService impactoMapaService
+
+// Cadeia de dependência circular:
+// MapaFacade → MapaVisualizacaoService → SubprocessoFacade → 
+// SubprocessoCrudService → MapaFacade
+```
+**Análise:** Dependência circular complexa envolvendo múltiplos módulos.
+
+**Soluções Possíveis:**
+- A) Revisar se MapaVisualizacaoService/ImpactoMapaService realmente precisam de SubprocessoFacade
+- B) Usar eventos de domínio
+- C) Refatorar para eliminar dependência reversa
+
+**Recomendação:** Requer análise mais profunda. Possivelmente P5 (consolidar Detector/Impacto) resolverá isso.
+
+**Caso 5: FiltroJwt**
+```java
+@Lazy // A ser analisado
+```
+
+**Decisão:** 
+- ⏸️ MANTER @Lazy em UsuarioService ↔ UnidadeService (Casos 1, 2, 5)
+- 🔄 REFATORAR SubprocessoMapaWorkflowService self-injection (Caso 3)
+- ⏸️ ADIAR MapaFacade circular dependencies até P5 (Caso 4)
 
 **Checklist:**
-- [ ] Mapear todas as dependências circulares
-- [ ] Analisar cada caso individualmente
-- [ ] Implementar solução apropriada para cada caso
-- [ ] Remover todos os `@Lazy`
+- [x] Mapear todas as dependências circulares
+- [x] Analisar cada caso individualmente
+- [ ] Refatorar SubprocessoMapaWorkflowService self-injection
 - [ ] Executar testes completos
+- [ ] Revisar MapaFacade após P5
 
 ---
 
@@ -254,7 +317,7 @@ Consolidar em um único `MapaImpactoService` com seções claras:
 | ID | Problema | Prioridade | Status | Progresso |
 |----|----------|------------|--------|-----------|
 | P1 | Eliminar SubprocessoService | 🔴 CRÍTICA | ✅ Completo | 100% |
-| P2 | Resolver @Lazy (ciclos) | 🔴 CRÍTICA | ⏸️ Planejado | 0% |
+| P2 | Resolver @Lazy (ciclos) | 🔴 CRÍTICA | 📊 Analisado | 50% |
 | P3 | Consolidar Workflow Services | 🟡 ALTA | ⏸️ Planejado | 0% |
 | P4 | Dividir ProcessoFacade | 🟡 ALTA | ⏸️ Planejado | 0% |
 | P5 | Consolidar Detector/Impacto | 🟡 ALTA | ⏸️ Planejado | 0% |
@@ -262,7 +325,7 @@ Consolidar em um único `MapaImpactoService` com seções claras:
 | P7 | Criar Mappers faltantes | 🟢 MÉDIA | ⏸️ Planejado | 0% |
 | P8 | Reduzir DTOs subprocesso | 🟢 MÉDIA | ⏸️ Planejado | 0% |
 
-**Progresso Total:** 1/8 completos (12.5%)
+**Progresso Total:** 1/8 completos (12.5%) + 1 analisado
 
 ---
 
@@ -291,6 +354,25 @@ Consolidar em um único `MapaImpactoService` com seções claras:
 - Linhas de código removidas: ~185
 - Camadas de delegação eliminadas: 1
 - Clareza arquitetural: Significativamente melhorada
+
+---
+
+#### P2: Resolver Dependências Circulares (ANALISADO) 📊
+- ✅ Mapeadas 6 ocorrências de @Lazy em 5 arquivos
+- ✅ Analisados 5 casos de dependências circulares:
+  - Caso 1-2: UsuarioService ↔ UnidadeService (Organização)
+  - Caso 3: SubprocessoMapaWorkflowService (self-injection)
+  - Caso 4: MapaFacade → MapaVisualizacaoService/ImpactoMapaService
+  - Caso 5: FiltroJwt
+- ✅ Decisões tomadas:
+  - MANTER @Lazy para Organização (UsuarioService ↔ UnidadeService) - baixo risco
+  - REFATORAR SubprocessoMapaWorkflowService self-injection (planejado)
+  - ADIAR MapaFacade até P5 (consolidar Detector/Impacto)
+
+**Recomendação:** 
+- Priorizar P3, P4, P5 antes de resolver completamente P2
+- P5 pode resolver naturalmente o Caso 4
+- SubprocessoMapaWorkflowService self-injection requer mais análise
 
 ---
 
