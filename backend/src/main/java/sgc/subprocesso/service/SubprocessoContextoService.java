@@ -1,6 +1,7 @@
 package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -27,14 +28,33 @@ import java.util.List;
  *
  * <p><b>Nota arquitetural:</b> Uso deveria ser via {@link SubprocessoFacade},
  * mas mantido público temporariamente para compatibilidade com testes.
+ * 
+ * <p><b>Nota sobre Injeção de Dependências:</b> 
+ * MapaFacade é injetado com @Lazy para quebrar a dependência circular:
+ * SubprocessoFacade → SubprocessoContextoService → MapaFacade → MapaVisualizacaoService → SubprocessoFacade
  */
 @Service
-@RequiredArgsConstructor
 public class SubprocessoContextoService {
     private final UsuarioService usuarioService;
     private final MapaFacade mapaFacade;
     private final SubprocessoCrudService crudService;
     private final SubprocessoDetalheService detalheService;
+
+    /**
+     * Constructor with @Lazy injection to break circular dependency.
+     * 
+     * @param mapaFacade injetado com @Lazy para evitar BeanCurrentlyInCreationException
+     */
+    public SubprocessoContextoService(
+            UsuarioService usuarioService,
+            @Lazy MapaFacade mapaFacade,
+            SubprocessoCrudService crudService,
+            SubprocessoDetalheService detalheService) {
+        this.usuarioService = usuarioService;
+        this.mapaFacade = mapaFacade;
+        this.crudService = crudService;
+        this.detalheService = detalheService;
+    }
 
     @Transactional(readOnly = true)
     public ContextoEdicaoDto obterContextoEdicao(Long codSubprocesso, Perfil perfil) {

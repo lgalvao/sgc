@@ -1,6 +1,5 @@
 package sgc.subprocesso.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -42,8 +41,14 @@ import java.util.stream.Collectors;
 import static sgc.seguranca.acesso.Acao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
+/**
+ * Serviço responsável pelo workflow do mapa de competências de um subprocesso.
+ * 
+ * <p><b>Nota sobre Injeção de Dependências:</b> 
+ * MapaFacade é injetado com @Lazy para quebrar a dependência circular:
+ * SubprocessoFacade → SubprocessoMapaWorkflowService → MapaFacade → MapaVisualizacaoService → SubprocessoFacade
+ */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class SubprocessoMapaWorkflowService {
     // Strategy Pattern: Maps para eliminar if/else por TipoProcesso
@@ -84,6 +89,32 @@ public class SubprocessoMapaWorkflowService {
     @Autowired
     @Lazy
     private SubprocessoMapaWorkflowService self;
+
+    /**
+     * Constructor with @Lazy injection to break circular dependency.
+     * 
+     * @param mapaFacade injetado com @Lazy para evitar BeanCurrentlyInCreationException
+     */
+    public SubprocessoMapaWorkflowService(
+            SubprocessoRepo subprocessoRepo,
+            CompetenciaService competenciaService,
+            AtividadeService atividadeService,
+            @Lazy MapaFacade mapaFacade,
+            SubprocessoTransicaoService transicaoService,
+            AnaliseService analiseService,
+            UnidadeService unidadeService,
+            SubprocessoValidacaoService validacaoService,
+            AccessControlService accessControlService) {
+        this.subprocessoRepo = subprocessoRepo;
+        this.competenciaService = competenciaService;
+        this.atividadeService = atividadeService;
+        this.mapaFacade = mapaFacade;
+        this.transicaoService = transicaoService;
+        this.analiseService = analiseService;
+        this.unidadeService = unidadeService;
+        this.validacaoService = validacaoService;
+        this.accessControlService = accessControlService;
+    }
 
     public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
