@@ -43,7 +43,7 @@ public class MapaFacade {
 
     /**
      * Constructor with @Lazy injection to break circular dependency.
-     * MapaFacade → MapaVisualizacaoService → SubprocessoService → SubprocessoCrudService → MapaFacade
+     * MapaFacade → MapaVisualizacaoService → SubprocessoFacade → SubprocessoCrudService → MapaFacade
      */
     public MapaFacade(
             MapaRepo mapaRepo,

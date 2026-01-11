@@ -11,7 +11,7 @@ import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -33,12 +33,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class MapaVisualizacaoService {
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoFacade subprocessoFacade;
     private final CompetenciaRepo competenciaRepo;
     private final AtividadeRepo atividadeRepo;
 
     public MapaVisualizacaoDto obterMapaParaVisualizacao(Long codSubprocesso) {
-        Subprocesso subprocesso = subprocessoService.buscarSubprocesso(codSubprocesso);
+        Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codSubprocesso);
         Mapa mapa = subprocesso.getMapa();
         if (mapa == null) {
             throw new sgc.comum.erros.ErroEstadoImpossivel(

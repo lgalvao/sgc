@@ -31,8 +31,7 @@ import java.util.Set;
  * de subprocessos. Parte da decomposição arquitetural do módulo subprocesso.
  *
  * <p><b>Visibilidade:</b> Package-private - uso interno ao módulo subprocesso.
- * Acesso externo deve ser feito via {@link sgc.subprocesso.service.SubprocessoService}
- * ou {@link sgc.subprocesso.service.SubprocessoFacade}.
+ * Acesso externo deve ser feito via {@link sgc.subprocesso.service.SubprocessoFacade}.
  *
  * @since 2.0.0 - Tornado package-private na consolidação arquitetural Sprint 2
  */

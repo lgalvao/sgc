@@ -19,7 +19,7 @@ import sgc.subprocesso.dto.AtividadeOperacaoResp;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -31,7 +31,7 @@ import static sgc.seguranca.acesso.Acao.*;
 
 /**
  * Facade para orquestrar operações de atividades e conhecimentos,
- * lidando com a interação entre AtividadeService, ConhecimentoService e SubprocessoService.
+ * lidando com a interação entre AtividadeService, ConhecimentoService e SubprocessoFacade.
  * Remove a lógica de negócio do AtividadeController.
  *
  * <p>Implementa o padrão Facade para simplificar a interface de uso e centralizar a coordenação de serviços.
@@ -45,7 +45,7 @@ import static sgc.seguranca.acesso.Acao.*;
 public class AtividadeFacade {
     private final AtividadeService atividadeService;
     private final ConhecimentoService conhecimentoService;
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoFacade subprocessoFacade;
     private final AccessControlService accessControlService;
     private final UsuarioService usuarioService;
     private final MapaFacade mapaFacade;
@@ -260,7 +260,7 @@ public class AtividadeFacade {
     }
 
     private Long obterCodigoSubprocessoPorMapa(Long codMapa) {
-        Subprocesso subprocesso = subprocessoService.obterEntidadePorCodigoMapa(codMapa);
+        Subprocesso subprocesso = subprocessoFacade.obterEntidadePorCodigoMapa(codMapa);
         return subprocesso.getCodigo();
     }
 
@@ -270,10 +270,10 @@ public class AtividadeFacade {
     }
 
     private AtividadeOperacaoResp criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
-        SubprocessoSituacaoDto situacaoDto = subprocessoService.obterSituacao(codSubprocesso);
+        SubprocessoSituacaoDto situacaoDto = subprocessoFacade.obterSituacao(codSubprocesso);
         AtividadeVisualizacaoDto atividadeVis = null;
         if (incluirAtividade) {
-            atividadeVis = subprocessoService.listarAtividadesSubprocesso(codSubprocesso)
+            atividadeVis = subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso)
                     .stream()
                     .filter(a -> a.getCodigo().equals(codigoAtividade))
                     .findFirst()
