@@ -94,12 +94,13 @@
             :disabled="loadingAdicionar"
             placeholder="Nova atividade"
             type="text"
+            required
         />
       </BCol>
       <BCol cols="auto">
         <BButton
             aria-label="Adicionar atividade"
-            :disabled="!codSubprocesso || !permissoes?.podeEditarMapa || loadingAdicionar"
+            :disabled="!codSubprocesso || !permissoes?.podeEditarMapa || loadingAdicionar || !novaAtividade.trim()"
             data-testid="btn-adicionar-atividade"
             size="sm"
             title="Adicionar atividade"
