@@ -1,7 +1,6 @@
 package sgc.alerta.dto;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import sgc.alerta.mapper.AlertaMapper;
 import sgc.alerta.model.Alerta;
@@ -11,7 +10,6 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("AlertaMapper")
-@Tag("unit")
 class AlertaMapperTest {
 
     private final AlertaMapper mapper = new AlertaMapperStub();
