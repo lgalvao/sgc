@@ -157,9 +157,8 @@ class ProcessoFacadeTest {
 
             Unidade u = UnidadeFixture.unidadeComId(1L);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
-            when(unidadeService.buscarEntidadesPorIds(List.of(1L))).thenReturn(List.of(u));
-            when(unidadeService.verificarExistenciaMapaVigente(1L)).thenReturn(false);
-            when(unidadeService.buscarSiglasPorIds(List.of(1L))).thenReturn(List.of("U1"));
+            when(processoValidador.getMensagemErroUnidadesSemMapa(anyList()))
+                    .thenReturn(Optional.of("Unidades sem mapa vigente: U1"));
 
             assertThatThrownBy(() -> processoFacade.criar(req))
                     .isInstanceOf(ErroProcesso.class)
@@ -206,8 +205,7 @@ class ProcessoFacadeTest {
 
             Unidade u = UnidadeFixture.unidadeComId(1L);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
-            when(unidadeService.buscarEntidadesPorIds(List.of(1L))).thenReturn(List.of(u));
-            when(unidadeService.verificarExistenciaMapaVigente(1L)).thenReturn(true); // Tem mapa
+            when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty()); // No error - all units have maps
             when(processoRepo.saveAndFlush(any())).thenReturn(new Processo());
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
@@ -223,8 +221,7 @@ class ProcessoFacadeTest {
 
             Unidade u = UnidadeFixture.unidadeComId(1L);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
-            when(unidadeService.buscarEntidadesPorIds(List.of(1L))).thenReturn(List.of(u));
-            when(unidadeService.verificarExistenciaMapaVigente(1L)).thenReturn(true);
+            when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty()); // No error - all units have maps
             when(processoRepo.saveAndFlush(any())).thenReturn(new Processo());
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
@@ -281,10 +278,8 @@ class ProcessoFacadeTest {
                     .build();
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            Unidade u = UnidadeFixture.unidadeComId(1L);
-            when(unidadeService.buscarEntidadesPorIds(List.of(1L))).thenReturn(List.of(u));
-            when(unidadeService.verificarExistenciaMapaVigente(1L)).thenReturn(false);
-            when(unidadeService.buscarSiglasPorIds(List.of(1L))).thenReturn(List.of("U1"));
+            when(processoValidador.getMensagemErroUnidadesSemMapa(anyList()))
+                    .thenReturn(Optional.of("Unidades sem mapa vigente: U1"));
 
             assertThatThrownBy(() -> processoFacade.atualizar(id, req))
                     .isInstanceOf(ErroProcesso.class)
@@ -383,8 +378,7 @@ class ProcessoFacadeTest {
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
             Unidade u = UnidadeFixture.unidadeComId(1L);
-            when(unidadeService.buscarEntidadesPorIds(List.of(1L))).thenReturn(List.of(u));
-            when(unidadeService.verificarExistenciaMapaVigente(1L)).thenReturn(true);
+            when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty());
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
             when(processoRepo.saveAndFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
@@ -443,8 +437,7 @@ class ProcessoFacadeTest {
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
             Unidade u = UnidadeFixture.unidadeComId(1L);
             // Simula validacao ok
-            when(unidadeService.buscarEntidadesPorIds(any())).thenReturn(List.of(u));
-            when(unidadeService.verificarExistenciaMapaVigente(any())).thenReturn(true);
+            when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty());
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
 
             when(processoRepo.saveAndFlush(any())).thenReturn(processo);

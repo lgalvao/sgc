@@ -1,7 +1,7 @@
 package sgc.subprocesso.service.decomposed;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -33,10 +33,13 @@ import java.util.Set;
  * <p><b>Visibilidade:</b> Package-private - uso interno ao módulo subprocesso.
  * Acesso externo deve ser feito via {@link sgc.subprocesso.service.SubprocessoFacade}.
  *
+ * <p><b>Nota sobre Injeção de Dependências:</b> 
+ * MapaFacade é injetado com @Lazy para quebrar a dependência circular:
+ * SubprocessoFacade → SubprocessoCrudService → MapaFacade → MapaVisualizacaoService → SubprocessoFacade
+ *
  * @since 2.0.0 - Tornado package-private na consolidação arquitetural Sprint 2
  */
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class SubprocessoCrudService {
     private final SubprocessoRepo repositorioSubprocesso;
@@ -44,6 +47,24 @@ public class SubprocessoCrudService {
     private final MapaFacade mapaFacade;
     private final ApplicationEventPublisher eventPublisher;
     private final UsuarioService usuarioService;
+
+    /**
+     * Constructor with @Lazy injection to break circular dependency.
+     * 
+     * @param mapaFacade injetado com @Lazy para evitar BeanCurrentlyInCreationException
+     */
+    public SubprocessoCrudService(
+            SubprocessoRepo repositorioSubprocesso,
+            SubprocessoMapper subprocessoMapper,
+            @Lazy MapaFacade mapaFacade,
+            ApplicationEventPublisher eventPublisher,
+            UsuarioService usuarioService) {
+        this.repositorioSubprocesso = repositorioSubprocesso;
+        this.subprocessoMapper = subprocessoMapper;
+        this.mapaFacade = mapaFacade;
+        this.eventPublisher = eventPublisher;
+        this.usuarioService = usuarioService;
+    }
 
     public Subprocesso buscarSubprocesso(Long codigo) {
         return repositorioSubprocesso
