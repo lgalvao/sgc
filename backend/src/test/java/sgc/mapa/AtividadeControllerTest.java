@@ -1,6 +1,7 @@
 package sgc.mapa;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AtividadeController.class)
 @Import({TestSecurityConfig.class, RestExceptionHandler.class})
+@Tag("integration")
 @DisplayName("Testes do Controlador de Atividades")
 class AtividadeControllerTest {
 
