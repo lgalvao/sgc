@@ -271,6 +271,54 @@ class UsuarioServiceTest {
     }
 
     @Nested
+    @DisplayName("Cobertura Extra")
+    class CoberturaExtra {
+        @Test
+        @DisplayName("Deve retornar null se não houver usuário autenticado")
+        void deveRetornarNullSeNaoAutenticado() {
+            // Limpa contexto
+            org.springframework.security.core.context.SecurityContextHolder.clearContext();
+
+            assertNull(usuarioService.obterUsuarioAutenticadoOuNull());
+
+            assertThrows(sgc.comum.erros.ErroAccessoNegado.class,
+                    () -> usuarioService.obterUsuarioAutenticado());
+        }
+
+        @Test
+        @DisplayName("Deve extrair título de principal")
+        void deveExtrairTituloDePrincipal() {
+            assertNull(usuarioService.extractTituloUsuario(null));
+            assertEquals("123", usuarioService.extractTituloUsuario("123"));
+
+            sgc.organizacao.model.Usuario u = new sgc.organizacao.model.Usuario();
+            u.setTituloEleitoral("456");
+            assertEquals("456", usuarioService.extractTituloUsuario(u));
+
+            assertEquals("100", usuarioService.extractTituloUsuario(100L));
+        }
+
+        @Test
+        @DisplayName("Deve buscar responsáveis ignorando unidades sem chefe")
+        void deveBuscarResponsaveisIgnorandoSemChefe() {
+            // Unidade 9999 não existe ou não tem chefe
+            Map<Long, ResponsavelDto> res = usuarioService.buscarResponsaveisUnidades(List.of(9999L));
+            assertTrue(res.isEmpty());
+        }
+
+        @Test
+        @DisplayName("Deve retornar false se usuário não tiver perfil na unidade")
+        void deveRetornarFalseSeNaoTiverPerfil() {
+            // Usuário 777 é CHEFE na unidade 2.
+            // Verifica se é CHEFE na unidade 99 (não é)
+            assertFalse(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, "CHEFE", 99L));
+
+            // Verifica se é GESTOR na unidade 2 (não é)
+            assertFalse(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, "GESTOR", 2L));
+        }
+    }
+
+    @Nested
     @DisplayName("Gestão de Administradores")
     class GestaoAdministradores {
         @Test

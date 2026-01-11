@@ -30,6 +30,7 @@ import sgc.processo.dto.*;
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
+import sgc.processo.eventos.EventoProcessoAtualizado;
 import sgc.processo.eventos.EventoProcessoCriado;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.model.Processo;
@@ -186,6 +187,40 @@ class ProcessoFacadeTest {
             assertThatThrownBy(() -> processoFacade.criar(req))
                     .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
         }
+
+        @Test
+        @DisplayName("Deve criar processo de REVISAO quando todas unidades tem mapa vigente")
+        void deveCriarProcessoRevisaoQuandoUnidadesTemMapa() {
+            CriarProcessoReq req = new CriarProcessoReq(
+                    "Revisao", TipoProcesso.REVISAO, LocalDateTime.now(), List.of(1L));
+
+            Unidade u = UnidadeFixture.unidadeComId(1L);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
+            when(unidadeService.buscarEntidadesPorIds(List.of(1L))).thenReturn(List.of(u));
+            when(unidadeService.verificarExistenciaMapaVigente(1L)).thenReturn(true); // Tem mapa
+            when(processoRepo.saveAndFlush(any())).thenReturn(new Processo());
+            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
+
+            ProcessoDto resultado = processoFacade.criar(req);
+            assertThat(resultado).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Deve criar processo de DIAGNOSTICO quando todas unidades tem mapa vigente")
+        void deveCriarProcessoDiagnosticoQuandoUnidadesTemMapa() {
+            CriarProcessoReq req = new CriarProcessoReq(
+                    "Diagnostico", TipoProcesso.DIAGNOSTICO, LocalDateTime.now(), List.of(1L));
+
+            Unidade u = UnidadeFixture.unidadeComId(1L);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
+            when(unidadeService.buscarEntidadesPorIds(List.of(1L))).thenReturn(List.of(u));
+            when(unidadeService.verificarExistenciaMapaVigente(1L)).thenReturn(true);
+            when(processoRepo.saveAndFlush(any())).thenReturn(new Processo());
+            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
+
+            ProcessoDto resultado = processoFacade.criar(req);
+            assertThat(resultado).isNotNull();
+        }
     }
 
     @Nested
@@ -319,6 +354,95 @@ class ProcessoFacadeTest {
 
             assertThatThrownBy(() -> processoFacade.atualizar(999L, req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
+
+        @Test
+        @DisplayName("Deve atualizar processo de REVISAO quando unidades tem mapa")
+        void deveAtualizarProcessoRevisaoQuandoUnidadesTemMapa() {
+            Long id = 100L;
+            Processo processo = ProcessoFixture.processoPadrao();
+            processo.setCodigo(id);
+
+            AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+                    .codigo(id)
+                    .descricao("Nova Desc")
+                    .tipo(TipoProcesso.REVISAO)
+                    .dataLimiteEtapa1(LocalDateTime.now())
+                    .unidades(List.of(1L))
+                    .build();
+
+            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            Unidade u = UnidadeFixture.unidadeComId(1L);
+            when(unidadeService.buscarEntidadesPorIds(List.of(1L))).thenReturn(List.of(u));
+            when(unidadeService.verificarExistenciaMapaVigente(1L)).thenReturn(true);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
+            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
+            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
+
+            processoFacade.atualizar(id, req);
+            verify(processoRepo).saveAndFlush(processo);
+        }
+
+        @Test
+        @DisplayName("Deve atualizar sem publicar evento se nada mudar")
+        void deveAtualizarSemPublicarEventoSeNadaMudar() {
+            Long id = 100L;
+            Processo processo = ProcessoFixture.processoPadrao();
+            processo.setCodigo(id);
+            Unidade u = UnidadeFixture.unidadeComId(1L);
+            processo.setParticipantes(java.util.Set.of(u));
+
+            // Requisicao identica ao processo existente
+            AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+                    .codigo(id)
+                    .descricao(processo.getDescricao())
+                    .tipo(processo.getTipo())
+                    .dataLimiteEtapa1(processo.getDataLimite())
+                    .unidades(List.of(1L))
+                    .build();
+
+            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
+            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
+            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
+
+            processoFacade.atualizar(id, req);
+
+            verify(publicadorEventos, never()).publishEvent(any(EventoProcessoAtualizado.class));
+        }
+
+        @Test
+        @DisplayName("Deve atualizar processo apenas com campos modificados")
+        void deveAtualizarApenasCamposModificados() {
+            // Testa branches onde descricao e data limite NÃO mudam, mas tipo muda
+            Long id = 100L;
+            Processo processo = ProcessoFixture.processoPadrao();
+            processo.setCodigo(id);
+            processo.setDescricao("Mesma Descricao");
+            processo.setTipo(TipoProcesso.MAPEAMENTO);
+            processo.setDataLimite(LocalDateTime.now());
+
+            AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+                    .codigo(id)
+                    .descricao("Mesma Descricao") // Igual
+                    .tipo(TipoProcesso.DIAGNOSTICO) // Mudou
+                    .dataLimiteEtapa1(processo.getDataLimite()) // Igual
+                    .unidades(List.of(1L))
+                    .build();
+
+            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            Unidade u = UnidadeFixture.unidadeComId(1L);
+            // Simula validacao ok
+            when(unidadeService.buscarEntidadesPorIds(any())).thenReturn(List.of(u));
+            when(unidadeService.verificarExistenciaMapaVigente(any())).thenReturn(true);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
+
+            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
+            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
+
+            processoFacade.atualizar(id, req);
+
+            verify(publicadorEventos).publishEvent(any(EventoProcessoAtualizado.class));
         }
     }
 
@@ -491,11 +615,16 @@ class ProcessoFacadeTest {
             doReturn(authorities).when(auth).getAuthorities();
 
             Unidade u = UnidadeFixture.unidadePadrao();
-            Subprocesso sp = SubprocessoFixture.subprocessoPadrao(null, u);
-            sp.setCodigo(1L);
-            sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+            // SP1: Elegível
+            Subprocesso sp1 = SubprocessoFixture.subprocessoPadrao(null, u);
+            sp1.setCodigo(1L);
+            sp1.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+            // SP2: Não elegível (para testar o filtro)
+            Subprocesso sp2 = SubprocessoFixture.subprocessoPadrao(null, u);
+            sp2.setCodigo(2L);
+            sp2.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
 
-            when(subprocessoService.listarEntidadesPorProcesso(100L)).thenReturn(List.of(sp));
+            when(subprocessoService.listarEntidadesPorProcesso(100L)).thenReturn(List.of(sp1, sp2));
 
             // Act
             List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
@@ -523,17 +652,35 @@ class ProcessoFacadeTest {
             when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
 
             Unidade u = UnidadeFixture.unidadeComId(10L);
-            Subprocesso sp = SubprocessoFixture.subprocessoPadrao(null, u);
-            sp.setCodigo(1L);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
-            when(subprocessoService.listarEntidadesPorProcesso(100L)).thenReturn(List.of(sp));
+            // SP1: Elegível (MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
+            Subprocesso sp1 = SubprocessoFixture.subprocessoPadrao(null, u);
+            sp1.setCodigo(1L);
+            sp1.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+
+            // SP2: Elegível (REVISAO_CADASTRO_DISPONIBILIZADA)
+            Subprocesso sp2 = SubprocessoFixture.subprocessoPadrao(null, u);
+            sp2.setCodigo(2L);
+            sp2.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+
+            // SP3: Não elegível (Outra unidade)
+            Unidade outra = UnidadeFixture.unidadeComId(20L);
+            Subprocesso sp3 = SubprocessoFixture.subprocessoPadrao(null, outra);
+            sp3.setCodigo(3L);
+            sp3.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+
+            // SP4: Não elegível (Unidade null - defensiva)
+            Subprocesso sp4 = SubprocessoFixture.subprocessoPadrao(null, null);
+            sp4.setCodigo(4L);
+
+            when(subprocessoService.listarEntidadesPorProcesso(100L)).thenReturn(List.of(sp1, sp2, sp3, sp4));
 
             // Act
             List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
 
             // Assert
-            assertThat(res).hasSize(1);
+            assertThat(res).hasSize(2); // Apenas sp1 e sp2
+            assertThat(res).extracting(SubprocessoElegivelDto::getCodSubprocesso).containsExactlyInAnyOrder(1L, 2L);
         }
 
         @Test
@@ -989,6 +1136,61 @@ class ProcessoFacadeTest {
             when(subprocessoService.verificarAcessoUnidadeAoProcesso(eq(1L), argThat(
                     list -> list.contains(100L) && list.contains(101L) && list.contains(102L) && !list.contains(200L))))
                     .thenReturn(true);
+
+            // Act
+            boolean acesso = processoFacade.checarAcesso(auth, 1L);
+
+            // Assert
+            assertThat(acesso).isTrue();
+        }
+
+        @Test
+        @DisplayName("Deve permitir acesso quando unidade superior é nula na construção da hierarquia")
+        void devePermitirAcessoComUnidadeSuperiorNula() {
+            // Arrange
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getName()).thenReturn("chefe");
+            doReturn(List.of(new SimpleGrantedAuthority("ROLE_CHEFE"))).when(auth).getAuthorities();
+
+            PerfilDto perfil = PerfilDto.builder().unidadeCodigo(100L).build();
+            when(usuarioService.buscarPerfisUsuario("chefe")).thenReturn(List.of(perfil));
+
+            // Unidade raiz (sem superior)
+            Unidade raiz = UnidadeFixture.unidadeComId(100L);
+            raiz.setUnidadeSuperior(null);
+
+            when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(raiz));
+
+            when(subprocessoService.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenReturn(true);
+
+            // Act
+            boolean acesso = processoFacade.checarAcesso(auth, 1L);
+
+            // Assert
+            assertThat(acesso).isTrue();
+        }
+
+        @Test
+        @DisplayName("Deve tratar ciclos na hierarquia ao checar acesso")
+        void deveTratarCiclosNaHierarquia() {
+            // Arrange
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getName()).thenReturn("chefe");
+            doReturn(List.of(new SimpleGrantedAuthority("ROLE_CHEFE"))).when(auth).getAuthorities();
+
+            PerfilDto perfil = PerfilDto.builder().unidadeCodigo(100L).build();
+            when(usuarioService.buscarPerfisUsuario("chefe")).thenReturn(List.of(perfil));
+
+            Unidade u1 = UnidadeFixture.unidadeComId(100L);
+            Unidade u2 = UnidadeFixture.unidadeComId(101L);
+            u2.setUnidadeSuperior(u1);
+            u1.setUnidadeSuperior(u2); // Ciclo: 100 <-> 101
+
+            when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(u1, u2));
+            // A verificação deve receber a lista de IDs sem entrar em loop infinito
+            when(subprocessoService.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenReturn(true);
 
             // Act
             boolean acesso = processoFacade.checarAcesso(auth, 1L);

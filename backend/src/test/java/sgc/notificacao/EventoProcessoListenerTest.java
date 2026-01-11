@@ -457,4 +457,44 @@ class EventoProcessoListenerTest {
         
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
+
+    @Test
+    void deveIgnorarProcessamentoSeNaoHouverSubprocessosAoIniciar() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
+        listener.aoIniciarProcesso(evento);
+
+        verify(servicoAlertas, never()).criarAlertasProcessoIniciado(any(), any());
+    }
+
+    @Test
+    void deveEnviarParaOperacionalAoFinalizar() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setDescricao("P1");
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("U1");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        processo.setParticipantes(Set.of(unidade));
+
+        ResponsavelDto responsavel = ResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("123").build();
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
+
+        UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("123").email("op@mail.com").build();
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("123", titular));
+
+        when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("<html></html>");
+
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(1L).build();
+        listener.aoFinalizarProcesso(evento);
+
+        verify(notificacaoEmailService).enviarEmailHtml(eq("op@mail.com"), contains("Finalização"), any());
+    }
 }
