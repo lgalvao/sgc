@@ -42,7 +42,7 @@ import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ class ProcessoFacadeTest {
     @Mock
     private UnidadeService unidadeService;
     @Mock
-    private SubprocessoService subprocessoService;
+    private SubprocessoFacade subprocessoFacade;
     @Mock
     private ApplicationEventPublisher publicadorEventos;
     @Mock
@@ -592,7 +592,7 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve listar todos subprocessos")
         void deveListarTodosSubprocessos() {
-            when(subprocessoService.listarEntidadesPorProcesso(100L))
+            when(subprocessoFacade.listarEntidadesPorProcesso(100L))
                     .thenReturn(List.of(SubprocessoFixture.subprocessoPadrao(null, null)));
             when(subprocessoMapper.toDTO(any())).thenReturn(SubprocessoDto.builder().build());
 
@@ -624,7 +624,7 @@ class ProcessoFacadeTest {
             sp2.setCodigo(2L);
             sp2.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
 
-            when(subprocessoService.listarEntidadesPorProcesso(100L)).thenReturn(List.of(sp1, sp2));
+            when(subprocessoFacade.listarEntidadesPorProcesso(100L)).thenReturn(List.of(sp1, sp2));
 
             // Act
             List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
@@ -673,7 +673,7 @@ class ProcessoFacadeTest {
             Subprocesso sp4 = SubprocessoFixture.subprocessoPadrao(null, null);
             sp4.setCodigo(4L);
 
-            when(subprocessoService.listarEntidadesPorProcesso(100L)).thenReturn(List.of(sp1, sp2, sp3, sp4));
+            when(subprocessoFacade.listarEntidadesPorProcesso(100L)).thenReturn(List.of(sp1, sp2, sp3, sp4));
 
             // Act
             List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
@@ -698,7 +698,7 @@ class ProcessoFacadeTest {
             doReturn(authorities).when(auth).getAuthorities();
 
             when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of());
-            when(subprocessoService.listarEntidadesPorProcesso(100L)).thenReturn(List.of());
+            when(subprocessoFacade.listarEntidadesPorProcesso(100L)).thenReturn(List.of());
 
             // Act
             List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
@@ -864,7 +864,7 @@ class ProcessoFacadeTest {
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO); // Não homologado
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(subprocessoService.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
+            when(subprocessoFacade.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
 
             // Act & Assert
             assertThatThrownBy(() -> processoFacade.finalizar(id))
@@ -903,7 +903,7 @@ class ProcessoFacadeTest {
             sp.setMapa(m);
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(subprocessoService.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
+            when(subprocessoFacade.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
 
             // Act
             processoFacade.finalizar(id);
@@ -926,7 +926,7 @@ class ProcessoFacadeTest {
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(subprocessoService.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
+            when(subprocessoFacade.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
 
             // Act & Assert
             assertThatThrownBy(() -> processoFacade.finalizar(id))
@@ -948,7 +948,7 @@ class ProcessoFacadeTest {
             sp.setMapa(null); // Sem mapa
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(subprocessoService.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
+            when(subprocessoFacade.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
 
             // Act & Assert
             assertThatThrownBy(() -> processoFacade.finalizar(id))
@@ -968,7 +968,7 @@ class ProcessoFacadeTest {
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO); // Pendente
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(subprocessoService.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
+            when(subprocessoFacade.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
 
             assertThatThrownBy(() -> processoFacade.finalizar(id))
                     .isInstanceOf(ErroProcesso.class)
@@ -1103,7 +1103,7 @@ class ProcessoFacadeTest {
 
             when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(pai, filho));
 
-            when(subprocessoService.verificarAcessoUnidadeAoProcesso(eq(1L),
+            when(subprocessoFacade.verificarAcessoUnidadeAoProcesso(eq(1L),
                     argThat(list -> list.contains(10L) && list.contains(20L)))).thenReturn(true);
 
             // Act & Assert
@@ -1133,7 +1133,7 @@ class ProcessoFacadeTest {
             when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(avo, pai, neto, solta));
 
             // Mock da verificação final: espera-se que a lista inclua 100, 101 e 102
-            when(subprocessoService.verificarAcessoUnidadeAoProcesso(eq(1L), argThat(
+            when(subprocessoFacade.verificarAcessoUnidadeAoProcesso(eq(1L), argThat(
                     list -> list.contains(100L) && list.contains(101L) && list.contains(102L) && !list.contains(200L))))
                     .thenReturn(true);
 
@@ -1162,7 +1162,7 @@ class ProcessoFacadeTest {
 
             when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(raiz));
 
-            when(subprocessoService.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenReturn(true);
+            when(subprocessoFacade.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenReturn(true);
 
             // Act
             boolean acesso = processoFacade.checarAcesso(auth, 1L);
@@ -1190,7 +1190,7 @@ class ProcessoFacadeTest {
 
             when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(u1, u2));
             // A verificação deve receber a lista de IDs sem entrar em loop infinito
-            when(subprocessoService.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenReturn(true);
+            when(subprocessoFacade.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenReturn(true);
 
             // Act
             boolean acesso = processoFacade.checarAcesso(auth, 1L);

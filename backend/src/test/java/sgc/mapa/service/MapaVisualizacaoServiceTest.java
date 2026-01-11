@@ -10,7 +10,7 @@ import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
 import java.util.Set;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 class MapaVisualizacaoServiceTest {
 
     @Mock
-    private SubprocessoService subprocessoService;
+    private SubprocessoFacade subprocessoFacade;
     @Mock
     private CompetenciaRepo competenciaRepo;
     @Mock
@@ -64,7 +64,7 @@ class MapaVisualizacaoServiceTest {
         List<Object[]> projectionResult = new java.util.ArrayList<>();
         projectionResult.add(new Object[]{50L, "C1", 1L});
 
-        when(subprocessoService.buscarSubprocesso(subId)).thenReturn(sub);
+        when(subprocessoFacade.buscarSubprocesso(subId)).thenReturn(sub);
         when(atividadeRepo.findByMapaCodigoWithConhecimentos(10L)).thenReturn(List.of(ativ1, ativ2));
         when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(10L)).thenReturn(projectionResult);
 
@@ -83,7 +83,7 @@ class MapaVisualizacaoServiceTest {
         Subprocesso sub = new Subprocesso();
         // Mapa null
 
-        when(subprocessoService.buscarSubprocesso(subId)).thenReturn(sub);
+        when(subprocessoFacade.buscarSubprocesso(subId)).thenReturn(sub);
 
         assertThatThrownBy(() -> service.obterMapaParaVisualizacao(subId))
                 .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);

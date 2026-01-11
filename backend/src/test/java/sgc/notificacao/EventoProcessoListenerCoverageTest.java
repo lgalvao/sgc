@@ -19,7 +19,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,7 +41,7 @@ class EventoProcessoListenerCoverageTest {
     @Mock private NotificacaoModelosService notificacaoModelosService;
     @Mock private UsuarioService usuarioService;
     @Mock private ProcessoFacade processoFacade;
-    @Mock private SubprocessoService subprocessoService;
+    @Mock private SubprocessoFacade subprocessoFacade;
 
     // --- AO INICIAR PROCESSO ---
 
@@ -58,7 +58,7 @@ class EventoProcessoListenerCoverageTest {
     void aoIniciarProcesso_SemSubprocessos() {
         Processo p = new Processo();
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(Collections.emptyList());
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(Collections.emptyList());
 
         listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
         verify(servicoAlertas, never()).criarAlertasProcessoIniciado(any(), any());
@@ -78,7 +78,7 @@ class EventoProcessoListenerCoverageTest {
         sOp.setUnidade(uOp);
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sOp));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sOp));
 
         ResponsavelDto resp = ResponsavelDto.builder()
             .unidadeCodigo(1L)
@@ -113,7 +113,7 @@ class EventoProcessoListenerCoverageTest {
         Subprocesso s = new Subprocesso(); s.setUnidade(u);
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
 
         // Simular erro ao buscar responsáveis
         when(usuarioService.buscarResponsaveisUnidades(any())).thenThrow(new RuntimeException("Erro DB"));

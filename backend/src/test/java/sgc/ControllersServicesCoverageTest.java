@@ -34,7 +34,7 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.SubprocessoContextoService;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
 @DisplayName("Cobertura Extra de Controllers e Services")
 class ControllersServicesCoverageTest {
     @Mock
-    private SubprocessoService subprocessoService;
+    private SubprocessoFacade subprocessoFacade;
     @Mock
     private SubprocessoContextoService subprocessoContextoService;
     @Mock
@@ -74,7 +74,7 @@ class ControllersServicesCoverageTest {
     @Mock private sgc.mapa.service.MapaVisualizacaoService mapaVisualizacaoService;
     @Mock private sgc.subprocesso.service.SubprocessoMapaService subprocessoMapaService;
     @Mock private sgc.subprocesso.service.SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
-    @Mock private sgc.subprocesso.service.SubprocessoFacade subprocessoFacade;
+    @Mock private sgc.subprocesso.service.decomposed.SubprocessoValidacaoService validacaoService;
     @Mock private sgc.organizacao.UsuarioService usuarioService;
     @Mock private sgc.subprocesso.service.SubprocessoTransicaoService transicaoService;
     @Mock private sgc.organizacao.UnidadeService unidadeService;
@@ -106,7 +106,7 @@ class ControllersServicesCoverageTest {
 
         // SubprocessoCadastroWorkflowService
         cadastroService = new SubprocessoCadastroWorkflowService(
-                repositorioSubprocesso, transicaoService, unidadeService, analiseService, subprocessoService, impactoMapaService, accessControlService
+                repositorioSubprocesso, transicaoService, unidadeService, analiseService, validacaoService, impactoMapaService, accessControlService
         );
 
         // PainelService

@@ -17,7 +17,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -39,7 +39,7 @@ class EventoProcessoListenerTest {
     @Mock private NotificacaoModelosService notificacaoModelosService;
     @Mock private UsuarioService usuarioService;
     @Mock private ProcessoFacade processoFacade;
-    @Mock private SubprocessoService subprocessoService;
+    @Mock private SubprocessoFacade subprocessoFacade;
 
     @Test
     void deveTratarExcecaoAoEnviarEmailProcessoIniciado() {
@@ -63,7 +63,7 @@ class EventoProcessoListenerTest {
         subprocesso.setUnidade(unidade);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now());
 
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
 
         // Mock Responsaveis
         ResponsavelDto responsavel = ResponsavelDto.builder()
@@ -110,7 +110,7 @@ class EventoProcessoListenerTest {
         subprocesso.setCodigo(100L);
         subprocesso.setUnidade(unidade);
 
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
 
         // Configura substituto
         ResponsavelDto responsavel = ResponsavelDto.builder()
@@ -154,7 +154,7 @@ class EventoProcessoListenerTest {
         unidade.setCodigo(10L);
         unidade.setTipo(TipoUnidade.OPERACIONAL);
         subprocesso.setUnidade(unidade);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
 
         ResponsavelDto responsavel = ResponsavelDto.builder()
                 .unidadeCodigo(10L)
@@ -193,7 +193,7 @@ class EventoProcessoListenerTest {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(200L);
         subprocesso.setUnidade(unidade);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
 
         ResponsavelDto responsavel = ResponsavelDto.builder().unidadeCodigo(20L).titularTitulo("333").build();
         when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(20L, responsavel));
@@ -292,7 +292,7 @@ class EventoProcessoListenerTest {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(999L);
         subprocesso.setUnidade(unidade);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
 
         ResponsavelDto responsavel = ResponsavelDto.builder().unidadeCodigo(99L).titularTitulo("999").build();
         when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(99L, responsavel));
@@ -329,7 +329,7 @@ class EventoProcessoListenerTest {
         subprocesso.setUnidade(intermediaria);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
 
-        when(subprocessoService.listarEntidadesPorProcesso(5L)).thenReturn(List.of(subprocesso));
+        when(subprocessoFacade.listarEntidadesPorProcesso(5L)).thenReturn(List.of(subprocesso));
 
         ResponsavelDto responsavel = ResponsavelDto.builder()
                 .unidadeCodigo(100L)
@@ -385,7 +385,7 @@ class EventoProcessoListenerTest {
         unidadeRuim.setTipo(TipoUnidade.OPERACIONAL);
         subprocessoRuim.setUnidade(unidadeRuim);
 
-        when(subprocessoService.listarEntidadesPorProcesso(6L))
+        when(subprocessoFacade.listarEntidadesPorProcesso(6L))
                 .thenReturn(List.of(subprocessoBom, subprocessoRuim));
 
         // Fornece responsável apenas para a unidade 50, não para 99
@@ -463,7 +463,7 @@ class EventoProcessoListenerTest {
         Processo processo = new Processo();
         processo.setCodigo(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
 
         EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
         listener.aoIniciarProcesso(evento);
