@@ -8,17 +8,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.model.AtividadeRepo;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.ConhecimentoRepo;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.*;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,28 +31,16 @@ class ImpactoMapaServiceTest {
     private ImpactoMapaService impactoMapaService;
 
     @Mock
-    private SubprocessoService subprocessoService;
+    private SubprocessoFacade subprocessoFacade;
 
     @Mock
     private MapaRepo mapaRepo;
-
-    @Mock
-    private AtividadeRepo atividadeRepo;
-
-    @Mock
-    private ConhecimentoRepo conhecimentoRepo;
 
     @Mock
     private CompetenciaRepo competenciaRepo;
 
     @Mock
     private AtividadeService atividadeService;
-
-    @Mock
-    private DetectorMudancasAtividadeService detectorAtividades;
-
-    @Mock
-    private DetectorImpactoCompetenciaService analisadorCompetencias;
 
     @Mock
     private AccessControlService accessControlService;
@@ -112,7 +98,7 @@ class ImpactoMapaServiceTest {
         @DisplayName("Deve chamar AccessControlService para verificar acesso")
         void deveChamarServicoAcesso() {
             // Após refatoração de segurança, verificação de acesso é feita via AccessControlService
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
 
             // Scenario 1: Access Granted (delegation happens)
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
@@ -127,7 +113,7 @@ class ImpactoMapaServiceTest {
         @Test
         @DisplayName("Deve propagar erro se acesso negado")
         void devePropagarErroAcesso() {
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             org.mockito.Mockito.doThrow(new ErroAccessoNegado("Acesso negado"))
                     .when(accessControlService).verificarPermissao(
                         org.mockito.Mockito.any(Usuario.class),
@@ -147,7 +133,7 @@ class ImpactoMapaServiceTest {
         @Test
         @DisplayName("Deve retornar sem impacto se não houver mapa vigente")
         void semImpactoSeNaoHouverMapaVigente() {
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
 
             ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
@@ -165,50 +151,39 @@ class ImpactoMapaServiceTest {
         @Test
         @DisplayName("Deve detectar impactos quando há diferenças entre mapas")
         void comImpacto() {
-            sgc.mapa.model.Mapa mapaVigente = new sgc.mapa.model.Mapa();
+            Mapa mapaVigente = new Mapa();
             mapaVigente.setCodigo(1L);
-            sgc.mapa.model.Mapa mapaSubprocesso = new sgc.mapa.model.Mapa();
+            Mapa mapaSubprocesso = new Mapa();
             mapaSubprocesso.setCodigo(2L);
 
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
             when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSubprocesso));
 
-            // Setup for new service structure
-            sgc.mapa.model.Atividade a1 = new sgc.mapa.model.Atividade();
+            // Setup atividades - vigente tem A1, subprocesso está vazio (A1 foi removida)
+            Atividade a1 = new Atividade();
             a1.setCodigo(100L);
             a1.setDescricao("Ativ 1");
+            a1.setConhecimentos(new ArrayList<>());
 
-            // Using atividadeService now instead of repo directly
             when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1)); // Vigente
-            when(atividadeService.buscarPorMapaCodigoComConhecimentos(2L)).thenReturn(List.of()); // Subprocesso (vazio, então a1 foi removida)
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(2L)).thenReturn(List.of()); // Subprocesso (vazio)
 
+            // Setup competências - sem competências impactadas para simplificar
             when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of());
-
-            // Mocking specialized services behavior
-            sgc.mapa.dto.AtividadeImpactadaDto removida = sgc.mapa.dto.AtividadeImpactadaDto.builder()
-                    .codigo(100L)
-                    .descricao("Ativ 1")
-                    .tipoImpacto(sgc.mapa.model.TipoImpactoAtividade.REMOVIDA)
-                    .build();
-
-            // Use specific matchers to disambiguate overloaded methods
-            when(detectorAtividades.detectarRemovidas(anyMap(), anyList(), anyMap())).thenReturn(List.of(removida));
-            when(detectorAtividades.detectarInseridas(anyList(), anySet())).thenReturn(List.of());
-            when(detectorAtividades.detectarAlteradas(anyList(), anyMap(), anyMap())).thenReturn(List.of());
-            when(analisadorCompetencias.competenciasImpactadas(anyList(), anyList(), anyList(), anyList())).thenReturn(List.of());
-
 
             ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
 
             assertNotNull(resultado);
-            // Killing NullReturnValsMutator
+            // Verificar que os campos não são nulos
             assertNotNull(resultado.getAtividadesInseridas());
             assertNotNull(resultado.getAtividadesRemovidas());
             assertNotNull(resultado.getAtividadesAlteradas());
             assertNotNull(resultado.getCompetenciasImpactadas());
-            // Killing EmptyObjectReturnValsMutator
+            // Verificar que detectou a remoção
             assertFalse(resultado.getAtividadesRemovidas().isEmpty());
+            assertEquals(1, resultado.getAtividadesRemovidas().size());
+            assertEquals("Ativ 1", resultado.getAtividadesRemovidas().get(0).getDescricao());
         }
     }
 }

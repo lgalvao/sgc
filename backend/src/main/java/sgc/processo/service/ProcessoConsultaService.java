@@ -28,7 +28,7 @@ import java.util.Set;
  */
 @Service
 @RequiredArgsConstructor
-class ProcessoConsultaService {
+public class ProcessoConsultaService {
 
     private final ProcessoRepo processoRepo;
     private final SubprocessoFacade subprocessoFacade;
