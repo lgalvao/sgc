@@ -71,7 +71,7 @@ class CopiaMapaServiceTest {
         when(atividadeRepo.findByMapaCodigoWithConhecimentos(origemId)).thenReturn(List.of(atividadeOrigem));
         when(atividadeRepo.save(any(Atividade.class))).thenReturn(atividadeSalva);
         when(competenciaRepo.findByMapaCodigo(origemId)).thenReturn(List.of(competenciaOrigem));
-        when(competenciaRepo.save(any(Competencia.class))).thenAnswer(i -> i.getArgument(0));
+        // when(competenciaRepo.save(any(Competencia.class))).thenAnswer(i -> i.getArgument(0)); // Removido pois agora usa saveAll
 
         Mapa resultado = service.copiarMapaParaUnidade(origemId);
 
@@ -80,10 +80,12 @@ class CopiaMapaServiceTest {
         verify(atividadeRepo).save(any(Atividade.class));
         verify(conhecimentoRepo).saveAll(anyList());
 
-        ArgumentCaptor<Competencia> captor = ArgumentCaptor.forClass(Competencia.class);
-        verify(competenciaRepo).save(captor.capture());
+        ArgumentCaptor<List<Competencia>> captor = ArgumentCaptor.forClass(List.class);
+        verify(competenciaRepo).saveAll(captor.capture());
 
-        Competencia competenciaSalva = captor.getValue();
+        List<Competencia> competenciasSalvas = captor.getValue();
+        assertThat(competenciasSalvas).hasSize(1);
+        Competencia competenciaSalva = competenciasSalvas.get(0);
         assertThat(competenciaSalva.getAtividades()).hasSize(1);
         Atividade atividadeAssociada = competenciaSalva.getAtividades().iterator().next();
         assertThat(atividadeAssociada.getCodigo()).isEqualTo(20L);

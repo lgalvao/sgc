@@ -182,8 +182,6 @@ class SubprocessoMapaServiceTest {
         // Simula lista de atividades origem para não sair no early return
         Atividade ativ = new Atividade();
         ativ.setDescricao("Ativ 1");
-        when(atividadeService.buscarPorMapaCodigo(11L)).thenReturn(List.of(ativ));
-        when(atividadeService.buscarPorMapaCodigo(22L)).thenReturn(Collections.emptyList());
 
         subprocessoMapaService.importarAtividades(2L, 1L);
 

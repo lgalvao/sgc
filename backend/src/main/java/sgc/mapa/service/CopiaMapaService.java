@@ -118,6 +118,8 @@ public class CopiaMapaService {
         List<Competencia> competenciasFonte = competenciaRepo.findByMapaCodigo(codMapaFonte);
         if (competenciasFonte == null || competenciasFonte.isEmpty()) return;
 
+        List<Competencia> novasCompetencias = new ArrayList<>();
+
         for (Competencia competenciaFonte : competenciasFonte) {
             Competencia novaCompetencia = new Competencia()
                     .setDescricao(competenciaFonte.getDescricao())
@@ -132,9 +134,10 @@ public class CopiaMapaService {
                 }
             }
             novaCompetencia.setAtividades(novasAtividadesAssociadas);
-
-            competenciaRepo.save(novaCompetencia);
+            novasCompetencias.add(novaCompetencia);
         }
+
+        competenciaRepo.saveAll(novasCompetencias);
     }
 
     private Set<String> obterDescricoesExistentes(Long mapaDestinoId) {
