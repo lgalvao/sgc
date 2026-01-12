@@ -14,7 +14,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.dto.ResponsavelDto;
-import sgc.organizacao.dto.UnidadeDto;
+
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
 import sgc.seguranca.login.ClienteAcessoAd;
@@ -56,7 +56,7 @@ class UsuarioServiceUnitTest {
     @Mock
     private AdministradorRepo administradorRepo;
     @Mock
-    private UnidadeService unidadeService;
+    private UnidadeRepo unidadeRepo;
     @Mock
     private ClienteAcessoAd clienteAcessoAd;
     @Mock
@@ -251,8 +251,9 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve lançar erro se chefe não encontrado na busca simples")
         void deveLancarErroSeChefeNaoEncontradoNaBuscaSimples() {
-            UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
-            when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(dto);
+            Unidade unidade = new Unidade("Nome", "SIGLA");
+            ReflectionTestUtils.setField(unidade, "codigo", 1L);
+            when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.of(unidade));
             when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> service.buscarResponsavelAtual("SIGLA"))
@@ -262,8 +263,9 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve lançar erro se chefe não encontrado na busca completa")
         void deveLancarErroSeChefeNaoEncontradoNaBuscaCompleta() {
-            UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
-            when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(dto);
+            Unidade unidade = new Unidade("Nome", "SIGLA");
+            ReflectionTestUtils.setField(unidade, "codigo", 1L);
+            when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.of(unidade));
 
             Usuario chefeSimples = new Usuario();
             chefeSimples.setTituloEleitoral("user");
@@ -317,8 +319,10 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar unidade por código")
         void deveRetornarUnidadePorCodigo() {
-            UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
-            when(unidadeService.buscarPorCodigo(1L)).thenReturn(dto);
+            Unidade unidade = new Unidade("Nome", "Sigla");
+            ReflectionTestUtils.setField(unidade, "codigo", 1L);
+            ReflectionTestUtils.setField(unidade, "tipo", TipoUnidade.OPERACIONAL);
+            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
             
             assertThat(service.buscarUnidadePorCodigo(1L)).isPresent();
         }
@@ -326,8 +330,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar empty se unidade não encontrada por código")
         void deveRetornarEmptySeUnidadeNaoEncontradaPorCodigo() {
-            when(unidadeService.buscarPorCodigo(1L))
-                    .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 1L));
+            when(unidadeRepo.findById(1L)).thenReturn(Optional.empty());
             
             assertThat(service.buscarUnidadePorCodigo(1L)).isEmpty();
         }
@@ -335,8 +338,10 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar unidade por sigla")
         void deveRetornarUnidadePorSigla() {
-            UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
-            when(unidadeService.buscarPorSigla("S")).thenReturn(dto);
+            Unidade unidade = new Unidade("Nome", "S");
+            ReflectionTestUtils.setField(unidade, "codigo", 1L);
+            ReflectionTestUtils.setField(unidade, "tipo", TipoUnidade.OPERACIONAL);
+            when(unidadeRepo.findBySigla("S")).thenReturn(Optional.of(unidade));
             
             assertThat(service.buscarUnidadePorSigla("S")).isPresent();
         }
@@ -344,8 +349,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar empty se unidade não encontrada por sigla")
         void deveRetornarEmptySeUnidadeNaoEncontradaPorSigla() {
-            when(unidadeService.buscarPorSigla("S"))
-                    .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "S"));
+            when(unidadeRepo.findBySigla("S")).thenReturn(Optional.empty());
             
             assertThat(service.buscarUnidadePorSigla("S")).isEmpty();
         }
@@ -355,7 +359,7 @@ class UsuarioServiceUnitTest {
         void deveBuscarUnidadesAtivasChamandoService() {
             service.buscarUnidadesAtivas();
             
-            verify(unidadeService).buscarTodasUnidades();
+            verify(unidadeRepo).findAllWithHierarquia();
         }
 
         @Test
@@ -365,7 +369,7 @@ class UsuarioServiceUnitTest {
             ReflectionTestUtils.setField(u, "codigo", 2L);
             ReflectionTestUtils.setField(u, "tipo", TipoUnidade.OPERACIONAL);
 
-            when(unidadeService.listarSubordinadas(1L)).thenReturn(List.of(u));
+            when(unidadeRepo.findByUnidadeSuperiorCodigo(1L)).thenReturn(List.of(u));
             
             var res = service.buscarSubunidades(1L);
             
@@ -377,7 +381,7 @@ class UsuarioServiceUnitTest {
         void deveConstruirArvoreHierarquicaChamandoService() {
             service.construirArvoreHierarquica();
             
-            verify(unidadeService).buscarArvoreHierarquica();
+            verify(unidadeRepo).findAllWithHierarquia();
         }
     }
 

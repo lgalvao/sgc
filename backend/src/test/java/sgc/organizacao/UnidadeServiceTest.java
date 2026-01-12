@@ -222,6 +222,7 @@ class UnidadeServiceTest {
             Unidade u1 = new Unidade();
             u1.setCodigo(1L);
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
             // Act
             List<UnidadeDto> result = service.buscarArvoreComElegibilidade(false, Collections.emptySet());
 
@@ -237,6 +238,7 @@ class UnidadeServiceTest {
             u1.setCodigo(1L);
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
             when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L));
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
             // Act
             List<UnidadeDto> result = service.buscarArvoreComElegibilidade(true, Collections.emptySet());
 
@@ -254,6 +256,7 @@ class UnidadeServiceTest {
 
             // Unidade 1 não está na lista de mapas vigentes
             when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(2L));
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
             // Act
             List<UnidadeDto> result = service.buscarArvoreComElegibilidade(true, Collections.emptySet());
 
@@ -269,6 +272,7 @@ class UnidadeServiceTest {
             Unidade u1 = new Unidade();
             u1.setCodigo(1L);
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
             // Unidade 1 está em processo ativo
             // Act
@@ -489,6 +493,7 @@ class UnidadeServiceTest {
         Unidade filho = new Unidade(); filho.setCodigo(2L); filho.setUnidadeSuperior(pai);
         
         when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(pai, filho));
+        when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().build());
         service.buscarArvoreComElegibilidade(false, Collections.emptySet());
         
         verify(usuarioMapper).toUnidadeDto(eq(filho), anyBoolean());
