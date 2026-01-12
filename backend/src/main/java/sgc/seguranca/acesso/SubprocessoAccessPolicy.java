@@ -29,11 +29,9 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
  */
 @Component
 @RequiredArgsConstructor
-public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
+public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
 
         private final ServicoHierarquia servicoHierarquia;
-
-        private String ultimoMotivoNegacao = "";
 
         /**
          * Mapeamento de ações para regras de acesso
@@ -125,23 +123,23 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
                         Map.entry(EDITAR_MAPA, new RegrasAcao(
                                         EnumSet.of(ADMIN, GESTOR, CHEFE),
                                         EnumSet.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                                                        MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO,
-                                                        MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO,
-                                                        REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO,
-                                                        REVISAO_MAPA_COM_SUGESTOES,
-                                                        DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO),
+                                                         MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO,
+                                                         MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO,
+                                                         REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO,
+                                                         REVISAO_MAPA_COM_SUGESTOES,
+                                                         DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO),
                                         RequisitoHierarquia.MESMA_UNIDADE)),
                         Map.entry(DISPONIBILIZAR_MAPA, new RegrasAcao(
                                         EnumSet.of(ADMIN),
                                         EnumSet.of(MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO,
-                                                        MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA,
-                                                        REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES),
+                                                         MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA,
+                                                         REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES),
                                         RequisitoHierarquia.NENHUM)),
                         Map.entry(VERIFICAR_IMPACTOS, new RegrasAcao(
                                         EnumSet.of(ADMIN, GESTOR, CHEFE),
                                         EnumSet.of(NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO,
-                                                        REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA,
-                                                        REVISAO_MAPA_AJUSTADO),
+                                                         REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA,
+                                                         REVISAO_MAPA_AJUSTADO),
                                         RequisitoHierarquia.MESMA_UNIDADE)),
                         Map.entry(APRESENTAR_SUGESTOES, new RegrasAcao(
                                         EnumSet.of(CHEFE),
@@ -154,17 +152,17 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
                         Map.entry(DEVOLVER_MAPA, new RegrasAcao(
                                         EnumSet.of(ADMIN, GESTOR),
                                         EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
-                                                        REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO),
+                                                         REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO),
                                         RequisitoHierarquia.SUPERIOR_IMEDIATA)),
                         Map.entry(ACEITAR_MAPA, new RegrasAcao(
                                         EnumSet.of(ADMIN, GESTOR),
                                         EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
-                                                        REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO),
+                                                         REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO),
                                         RequisitoHierarquia.SUPERIOR_IMEDIATA)),
                         Map.entry(HOMOLOGAR_MAPA, new RegrasAcao(
                                         EnumSet.of(ADMIN),
                                         EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
-                                                        REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO),
+                                                         REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO),
                                         RequisitoHierarquia.NENHUM)),
                         Map.entry(AJUSTAR_MAPA, new RegrasAcao(
                                         EnumSet.of(ADMIN),
@@ -183,7 +181,6 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
 
         @Override
         public boolean canExecute(Usuario usuario, Acao acao, Subprocesso subprocesso) {
-                ultimoMotivoNegacao = "";
                 // Caso especial: VERIFICAR_IMPACTOS tem regras diferentes por perfil
                 if (acao == VERIFICAR_IMPACTOS) {
                         return canExecuteVerificarImpactos(usuario, subprocesso);
@@ -191,26 +188,23 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
 
                 RegrasAcao regras = REGRAS.get(acao);
                 if (regras == null) {
-                        ultimoMotivoNegacao = "Ação não reconhecida: " + acao;
+                        definirMotivoNegacao("Ação não reconhecida: " + acao);
                         return false;
                 }
 
                 // 1. Verifica perfil
                 if (!temPerfilPermitido(usuario, regras.perfisPermitidos)) {
-                        ultimoMotivoNegacao = String.format(
-                                        "Usuário '%s' não possui um dos perfis necessários: %s",
-                                        usuario.getTituloEleitoral(),
-                                        formatarPerfis(regras.perfisPermitidos));
+                        definirMotivoNegacao(usuario, regras.perfisPermitidos, acao);
                         return false;
                 }
 
                 // 2. Verifica situação do subprocesso
                 if (!regras.situacoesPermitidas.contains(subprocesso.getSituacao())) {
-                        ultimoMotivoNegacao = String.format(
+                        definirMotivoNegacao(String.format(
                                         "Ação '%s' não pode ser executada com o subprocesso na situação '%s'. Situações permitidas: %s",
                                         acao.getDescricao(),
                                         subprocesso.getSituacao().getDescricao(),
-                                        formatarSituacoes(regras.situacoesPermitidas));
+                                        formatarSituacoes(regras.situacoesPermitidas)));
                         return false;
                 }
 
@@ -227,8 +221,8 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
                 }
 
                 if (!verificaHierarquia(usuario, subprocesso, regras.requisitoHierarquia)) {
-                        ultimoMotivoNegacao = obterMotivoNegacaoHierarquia(
-                                        usuario, subprocesso, regras.requisitoHierarquia);
+                        definirMotivoNegacao(obterMotivoNegacaoHierarquia(
+                                        usuario, subprocesso, regras.requisitoHierarquia));
                         return false;
                 }
 
@@ -280,8 +274,8 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
                         if (verificaHierarquia(usuario, subprocesso, RequisitoHierarquia.MESMA_UNIDADE)) {
                                 return true;
                         }
-                        ultimoMotivoNegacao = obterMotivoNegacaoHierarquia(
-                                        usuario, subprocesso, RequisitoHierarquia.MESMA_UNIDADE);
+                        definirMotivoNegacao(obterMotivoNegacaoHierarquia(
+                                        usuario, subprocesso, RequisitoHierarquia.MESMA_UNIDADE));
                         return false;
                 }
                 return false;
@@ -289,7 +283,7 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
 
         private void definirMotivoNegacaoVerificarImpactos(Set<Perfil> perfis, Subprocesso subprocesso) {
                 if (!perfis.contains(CHEFE) && !perfis.contains(GESTOR) && !perfis.contains(ADMIN)) {
-                        ultimoMotivoNegacao = "O usuário não possui um dos perfis necessários: ADMIN, GESTOR, CHEFE";
+                        definirMotivoNegacao("O usuário não possui um dos perfis necessários: ADMIN, GESTOR, CHEFE");
                         return;
                 }
 
@@ -306,22 +300,12 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
                         situacoesPermitidas = "REVISAO_CADASTRO_DISPONIBILIZADA";
                 }
 
-                ultimoMotivoNegacao = String.format(
+                definirMotivoNegacao(String.format(
                                 "Ação 'VERIFICAR_IMPACTOS' não pode ser executada com o subprocesso na situação '%s'. "
                                                 +
                                                 "Situações permitidas para o perfil do usuário: %s",
                                 subprocesso.getSituacao().getDescricao(),
-                                situacoesPermitidas);
-        }
-
-        @Override
-        public String getMotivoNegacao() {
-                return ultimoMotivoNegacao;
-        }
-
-        private boolean temPerfilPermitido(Usuario usuario, EnumSet<Perfil> perfisPermitidos) {
-                return usuario.getTodasAtribuicoes().stream()
-                                .anyMatch(a -> perfisPermitidos.contains(a.getPerfil()));
+                                situacoesPermitidas));
         }
 
         private boolean verificaHierarquia(
@@ -337,21 +321,21 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
 
                         case MESMA_UNIDADE -> usuario.getTodasAtribuicoes().stream()
                                         .anyMatch(a -> a.getUnidade() != null
-                                                        && Objects.equals(a.getUnidade().getCodigo(),
-                                                                        unidadeSubprocesso.getCodigo()));
+                                                         && Objects.equals(a.getUnidade().getCodigo(),
+                                                                         unidadeSubprocesso.getCodigo()));
 
                         case MESMA_OU_SUBORDINADA -> usuario.getTodasAtribuicoes().stream()
                                         .anyMatch(a -> a.getUnidade() != null
-                                                        && (Objects.equals(a.getUnidade().getCodigo(),
-                                                                        unidadeSubprocesso.getCodigo())
-                                                                        || servicoHierarquia.isSubordinada(
-                                                                                        unidadeSubprocesso,
-                                                                                        a.getUnidade())));
+                                                         && (Objects.equals(a.getUnidade().getCodigo(),
+                                                                         unidadeSubprocesso.getCodigo())
+                                                                         || servicoHierarquia.isSubordinada(
+                                                                                         unidadeSubprocesso,
+                                                                                         a.getUnidade())));
 
                         case SUPERIOR_IMEDIATA -> usuario.getTodasAtribuicoes().stream()
                                         .anyMatch(a -> a.getUnidade() != null
-                                                        && servicoHierarquia.isSuperiorImediata(unidadeSubprocesso,
-                                                                        a.getUnidade()));
+                                                         && servicoHierarquia.isSuperiorImediata(unidadeSubprocesso,
+                                                                         a.getUnidade()));
 
                         case TITULAR_UNIDADE -> {
                                 String tituloTitular = unidadeSubprocesso.getTituloTitular();
@@ -411,13 +395,6 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
                         }
                         case NENHUM -> "Erro inesperado na verificação de hierarquia";
                 };
-        }
-
-        private String formatarPerfis(EnumSet<Perfil> perfis) {
-                return perfis.stream()
-                                .map(Perfil::name)
-                                .reduce((a, b) -> a + ", " + b)
-                                .orElse("nenhum");
         }
 
         private String formatarSituacoes(EnumSet<SituacaoSubprocesso> situacoes) {

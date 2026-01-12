@@ -2,6 +2,7 @@ package sgc.subprocesso.eventos;
 
 import lombok.Builder;
 import lombok.Data;
+import org.jspecify.annotations.Nullable;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
@@ -11,16 +12,6 @@ import sgc.subprocesso.model.Subprocesso;
  *
  * <p>Este evento único substitui as 19+ classes de evento anteriores (EventoSubprocessoCadastroDisponibilizado,
  * EventoSubprocessoCadastroDevolvido, etc.), centralizando a comunicação de transições.
- *
- * <p>O campo {@link #tipo} determina qual transição ocorreu e contém os metadados para:
- * <ul>
- *   <li>Descrição da movimentação (trilha de auditoria)</li>
- *   <li>Template do alerta interno</li>
- *   <li>Template do e-mail de notificação</li>
- * </ul>
- *
- * <p>O listener {@code SubprocessoComunicacaoListener} processa este evento para criar
- * alertas e enviar e-mails conforme o tipo de transição.
  */
 @Data
 @Builder
@@ -44,17 +35,19 @@ public class EventoTransicaoSubprocesso {
     /**
      * Unidade de origem da transição (de onde o subprocesso está saindo).
      */
+    @Nullable
     private Unidade unidadeOrigem;
 
     /**
      * Unidade de destino da transição (para onde o subprocesso está indo).
      */
+    @Nullable
     private Unidade unidadeDestino;
 
     /**
      * Observações opcionais associadas à transição.
-     * <p>Usado para: motivo de devolução, sugestões, justificativas, etc.
      */
+    @Nullable
     private String observacoes;
 }
 

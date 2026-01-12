@@ -54,19 +54,20 @@ public class AccessControlService {
         
         // Delega para a policy apropriada baseado no tipo do recurso
         switch (recurso) {
-            case Subprocesso subprocesso -> {
-                return subprocessoAccessPolicy.canExecute(usuario, acao, subprocesso);
+            case Subprocesso sp -> {
+                return subprocessoAccessPolicy.canExecute(usuario, acao, sp);
             }
-            case Processo processo -> {
-                return processoAccessPolicy.canExecute(usuario, acao, processo);
+            case Processo p -> {
+                return processoAccessPolicy.canExecute(usuario, acao, p);
             }
-            case Atividade atividade -> {
-                return atividadeAccessPolicy.canExecute(usuario, acao, atividade);
+            case Atividade a -> {
+                return atividadeAccessPolicy.canExecute(usuario, acao, a);
             }
-            case Mapa mapa -> {
-                return mapaAccessPolicy.canExecute(usuario, acao, mapa);
+            case Mapa m -> {
+                return mapaAccessPolicy.canExecute(usuario, acao, m);
             }
             case null, default -> {
+                // Não executa nada para outros tipos ou null
             }
         }
 
@@ -86,10 +87,10 @@ public class AccessControlService {
         
         // Obtém o motivo da policy apropriada
         return switch (recurso) {
-            case Subprocesso subprocesso -> subprocessoAccessPolicy.getMotivoNegacao();
-            case Processo processo -> processoAccessPolicy.getMotivoNegacao();
-            case Atividade atividade -> atividadeAccessPolicy.getMotivoNegacao();
-            case Mapa mapa -> mapaAccessPolicy.getMotivoNegacao();
+            case Subprocesso s -> subprocessoAccessPolicy.getMotivoNegacao();
+            case Processo p -> processoAccessPolicy.getMotivoNegacao();
+            case Atividade a -> atividadeAccessPolicy.getMotivoNegacao();
+            case Mapa m -> mapaAccessPolicy.getMotivoNegacao();
             case null, default ->
 
                 // Mensagem genérica para outros tipos

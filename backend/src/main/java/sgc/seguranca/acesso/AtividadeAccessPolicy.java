@@ -22,9 +22,7 @@ import static sgc.seguranca.acesso.Acao.*;
  */
 @Component
 @RequiredArgsConstructor
-public class AtividadeAccessPolicy implements AccessPolicy<Atividade> {
-
-    private String ultimoMotivoNegacao = "";
+public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
 
     /**
      * Mapeamento de ações para regras de acesso
@@ -53,17 +51,13 @@ public class AtividadeAccessPolicy implements AccessPolicy<Atividade> {
     public boolean canExecute(Usuario usuario, Acao acao, Atividade atividade) {
         RegrasAcaoAtividade regras = REGRAS.get(acao);
         if (regras == null) {
-            ultimoMotivoNegacao = "Ação não reconhecida: " + acao;
+            definirMotivoNegacao("Ação não reconhecida: " + acao);
             return false;
         }
 
         // 1. Verifica perfil
         if (!temPerfilPermitido(usuario, regras.perfisPermitidos)) {
-            ultimoMotivoNegacao = String.format(
-                    "Usuário '%s' não possui um dos perfis necessários: %s",
-                    usuario.getTituloEleitoral(),
-                    formatarPerfis(regras.perfisPermitidos)
-            );
+            definirMotivoNegacao(usuario, regras.perfisPermitidos, acao);
             return false;
         }
 
@@ -71,52 +65,35 @@ public class AtividadeAccessPolicy implements AccessPolicy<Atividade> {
         if (regras.requerTitular) {
             Mapa mapa = atividade.getMapa();
             if (mapa == null) {
-                ultimoMotivoNegacao = "Atividade não possui mapa associado";
+                definirMotivoNegacao("Atividade não possui mapa associado");
                 return false;
             }
 
             // Subprocesso pode ser null em cenários de dados inconsistentes ou mocks incompletos
             Subprocesso subprocesso = mapa.getSubprocesso();
             if (subprocesso == null) {
-                ultimoMotivoNegacao = "Mapa não possui subprocesso associado";
+                definirMotivoNegacao("Mapa não possui subprocesso associado");
                 return false;
             }
             Unidade unidade = subprocesso.getUnidade();
             if (unidade == null) {
-                ultimoMotivoNegacao = "Subprocesso não possui unidade associada";
+                definirMotivoNegacao("Subprocesso não possui unidade associada");
                 return false;
             }
 
             String tituloTitular = unidade.getTituloTitular();
             if (!usuario.getTituloEleitoral().equals(tituloTitular)) {
-                ultimoMotivoNegacao = String.format(
+                definirMotivoNegacao(String.format(
                         "Usuário '%s' não é o titular da unidade '%s'. Titular: %s",
                         usuario.getTituloEleitoral(),
                         unidade.getSigla(),
                         java.util.Objects.toString(tituloTitular, "não definido")
-                );
+                ));
                 return false;
             }
         }
 
         return true;
-    }
-
-    @Override
-    public String getMotivoNegacao() {
-        return ultimoMotivoNegacao;
-    }
-
-    private boolean temPerfilPermitido(Usuario usuario, EnumSet<Perfil> perfisPermitidos) {
-        return usuario.getTodasAtribuicoes().stream()
-                .anyMatch(a -> perfisPermitidos.contains(a.getPerfil()));
-    }
-
-    private String formatarPerfis(EnumSet<Perfil> perfis) {
-        return perfis.stream()
-                .map(Perfil::name)
-                .reduce((a, b) -> a + ", " + b)
-                .orElse("nenhum");
     }
 
     /**

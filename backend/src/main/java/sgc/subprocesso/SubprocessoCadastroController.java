@@ -64,8 +64,7 @@ public class SubprocessoCadastroController {
     public ResponseEntity<RespostaDto> disponibilizarCadastro(
             @PathVariable("codigo") Long codSubprocesso,
             @AuthenticationPrincipal Object principal) {
-        String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        Usuario usuario = obterUsuarioAutenticado(principal);
         List<Atividade> faltando = subprocessoFacade.obterAtividadesSemConhecimento(codSubprocesso);
         if (!faltando.isEmpty()) {
             var lista = faltando.stream()
@@ -106,8 +105,7 @@ public class SubprocessoCadastroController {
     @Operation(summary = "Disponibiliza a revisão do cadastro de atividades para análise")
     public ResponseEntity<RespostaDto> disponibilizarRevisao(
             @PathVariable Long codigo, @AuthenticationPrincipal Object principal) {
-        String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        Usuario usuario = obterUsuarioAutenticado(principal);
         List<Atividade> faltando = subprocessoFacade.obterAtividadesSemConhecimento(codigo);
         if (!faltando.isEmpty()) {
             var lista = faltando.stream()
@@ -154,8 +152,7 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Object principal) {
-        String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
         subprocessoFacade.devolverCadastro(codigo, sanitizedObservacoes, usuario);
@@ -178,8 +175,7 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
-        String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
         subprocessoFacade.aceitarCadastro(codigo, sanitizedObservacoes, usuario);
@@ -201,8 +197,7 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
-        String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
         subprocessoFacade.homologarCadastro(codigo, sanitizedObservacoes, usuario);
@@ -223,8 +218,7 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Object principal) {
-        String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
         subprocessoFacade.devolverRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
@@ -243,8 +237,7 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
-        String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
         subprocessoFacade.aceitarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
@@ -266,8 +259,7 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
-        String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
 
         subprocessoFacade.homologarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
@@ -303,8 +295,7 @@ public class SubprocessoCadastroController {
     public void aceitarCadastroEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,
             @AuthenticationPrincipal Object principal) {
-        String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        Usuario usuario = obterUsuarioAutenticado(principal);
         subprocessoFacade.aceitarCadastroEmBloco(request.getUnidadeCodigos(), codigo, usuario);
     }
 
@@ -318,12 +309,12 @@ public class SubprocessoCadastroController {
     public void homologarCadastroEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,
             @AuthenticationPrincipal Object principal) {
-        String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = usuarioService.buscarPorLogin(tituloUsuario);
+        Usuario usuario = obterUsuarioAutenticado(principal);
         subprocessoFacade.homologarCadastroEmBloco(request.getUnidadeCodigos(), codigo, usuario);
     }
 
-    private String extractTituloUsuario(Object principal) {
-        return usuarioService.extractTituloUsuario(principal);
+    private Usuario obterUsuarioAutenticado(Object principal) {
+        String titulo = usuarioService.extractTituloUsuario(principal);
+        return usuarioService.buscarPorLogin(titulo);
     }
 }

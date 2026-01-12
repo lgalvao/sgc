@@ -50,7 +50,7 @@ public class E2eController {
                     jdbcTemplate.queryForList(
                             "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA ="
                                     + " 'SGC'",
-                            String.class).stream().filter(java.util.Objects::nonNull).toList();
+                            String.class);
 
             for (String table : tables) {
                 jdbcTemplate.execute("TRUNCATE TABLE sgc." + table);
@@ -73,8 +73,7 @@ public class E2eController {
     public void limparProcessoComDependentes(@PathVariable Long codigo) {
         String sqlMapas =
                 "SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo IN (SELECT codigo FROM" + SQL_SUBPROCESSO_POR_PROCESSO;
-        List<Long> mapaIds = jdbcTemplate.queryForList(sqlMapas, Long.class, codigo).stream()
-                .filter(java.util.Objects::nonNull).toList();
+        List<Long> mapaIds = jdbcTemplate.queryForList(sqlMapas, Long.class, codigo);
 
         jdbcTemplate.update(
                 "DELETE FROM sgc.analise WHERE subprocesso_codigo IN (SELECT codigo FROM"

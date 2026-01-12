@@ -44,38 +44,33 @@ public class SubprocessoCadastroWorkflowService {
     private final ImpactoMapaService impactoMapaService;
     private final AccessControlService accessControlService;
 
+    @org.springframework.context.annotation.Lazy
+    private final SubprocessoCadastroWorkflowService self;
+
     @Transactional
     public void disponibilizarCadastro(Long codSubprocesso, Usuario usuario) {
-        Subprocesso sp = buscarSubprocesso(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, DISPONIBILIZAR_CADASTRO, sp);
-        validarRequisitosNegocioParaDisponibilizacao(codSubprocesso, sp);
-        
-        Unidade origem = sp.getUnidade();
-        Unidade destino = origem != null ? origem.getUnidadeSuperior() : null;
-        
-        sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-        sp.setDataFimEtapa1(java.time.LocalDateTime.now());
-        repositorioSubprocesso.save(sp);
-
-        analiseService.removerPorSubprocesso(sp.getCodigo());
-        transicaoService.registrar(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, origem, destino, usuario);
+        disponibilizar(codSubprocesso, usuario, DISPONIBILIZAR_CADASTRO, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO);
     }
 
     @Transactional
     public void disponibilizarRevisao(Long codSubprocesso, Usuario usuario) {
+        disponibilizar(codSubprocesso, usuario, DISPONIBILIZAR_REVISAO_CADASTRO, REVISAO_CADASTRO_DISPONIBILIZADA, TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA);
+    }
+
+    private void disponibilizar(Long codSubprocesso, Usuario usuario, sgc.seguranca.acesso.Acao acao, sgc.subprocesso.model.SituacaoSubprocesso novaSituacao, TipoTransicao transicao) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, DISPONIBILIZAR_REVISAO_CADASTRO, sp);
+        accessControlService.verificarPermissao(usuario, acao, sp);
         validarRequisitosNegocioParaDisponibilizacao(codSubprocesso, sp);
         
         Unidade origem = sp.getUnidade();
         Unidade destino = origem != null ? origem.getUnidadeSuperior() : null;
         
-        sp.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
+        sp.setSituacao(novaSituacao);
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
         analiseService.removerPorSubprocesso(sp.getCodigo());
-        transicaoService.registrar(sp, TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA, origem, destino, usuario);
+        transicaoService.registrar(sp, transicao, origem, destino, usuario);
     }
 
     private void validarRequisitosNegocioParaDisponibilizacao(Long codSubprocesso, Subprocesso sp) {
@@ -92,7 +87,7 @@ public class SubprocessoCadastroWorkflowService {
     }
 
     @Transactional
-    public void devolverCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
+    public void devolverCadastro(Long codSubprocesso, @org.jspecify.annotations.Nullable String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, DEVOLVER_CADASTRO, sp);
 
@@ -123,7 +118,7 @@ public class SubprocessoCadastroWorkflowService {
     }
 
     @Transactional
-    public void aceitarCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
+    public void aceitarCadastro(Long codSubprocesso, @org.jspecify.annotations.Nullable String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, ACEITAR_CADASTRO, sp);
 
@@ -149,7 +144,7 @@ public class SubprocessoCadastroWorkflowService {
     }
 
     @Transactional
-    public void homologarCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
+    public void homologarCadastro(Long codSubprocesso, @org.jspecify.annotations.Nullable String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, HOMOLOGAR_CADASTRO, sp);
 
@@ -161,7 +156,7 @@ public class SubprocessoCadastroWorkflowService {
     }
 
     @Transactional
-    public void devolverRevisaoCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
+    public void devolverRevisaoCadastro(Long codSubprocesso, @org.jspecify.annotations.Nullable String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, DEVOLVER_REVISAO_CADASTRO, sp);
 
@@ -192,7 +187,7 @@ public class SubprocessoCadastroWorkflowService {
     }
 
     @Transactional
-    public void aceitarRevisaoCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
+    public void aceitarRevisaoCadastro(Long codSubprocesso, @org.jspecify.annotations.Nullable String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, ACEITAR_REVISAO_CADASTRO, sp);
 
@@ -224,7 +219,7 @@ public class SubprocessoCadastroWorkflowService {
     }
 
     @Transactional
-    public void homologarRevisaoCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
+    public void homologarRevisaoCadastro(Long codSubprocesso, @org.jspecify.annotations.Nullable String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, HOMOLOGAR_REVISAO_CADASTRO, sp);
 
@@ -253,7 +248,7 @@ public class SubprocessoCadastroWorkflowService {
             Subprocesso target = repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
                     .orElseThrow(() -> new ErroEntidadeDeveriaExistir("Subprocesso", "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo), "Workflow em bloco - subprocesso deveria ter sido criado no início do processo"));
 
-            aceitarCadastro(target.getCodigo(), "De acordo com o cadastro de atividades da unidade (Em Bloco)", usuario);
+            self.aceitarCadastro(target.getCodigo(), "De acordo com o cadastro de atividades da unidade (Em Bloco)", usuario);
         });
     }
 
@@ -267,7 +262,7 @@ public class SubprocessoCadastroWorkflowService {
                             "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo),
                             "Workflow em bloco - subprocesso deveria ter sido criado no início do processo"));
 
-            homologarCadastro(target.getCodigo(), "Homologação em bloco", usuario);
+            self.homologarCadastro(target.getCodigo(), "Homologação em bloco", usuario);
         });
     }
 }

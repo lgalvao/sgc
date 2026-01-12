@@ -108,7 +108,7 @@ class ControllersServicesCoverageTest {
 
         // SubprocessoCadastroWorkflowService
         cadastroService = new SubprocessoCadastroWorkflowService(
-                repositorioSubprocesso, transicaoService, unidadeService, analiseService, validacaoService, impactoMapaService, accessControlService
+                repositorioSubprocesso, transicaoService, unidadeService, analiseService, validacaoService, impactoMapaService, accessControlService, null
         );
 
         // PainelService

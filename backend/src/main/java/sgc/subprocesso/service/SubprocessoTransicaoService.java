@@ -62,8 +62,8 @@ public class SubprocessoTransicaoService {
     public void registrar(
             Subprocesso subprocesso,
             TipoTransicao tipo,
-            Unidade origem,
-            Unidade destino,
+            @Nullable Unidade origem,
+            @Nullable Unidade destino,
             Usuario usuario,
             @Nullable String observacoes) {
 
@@ -98,8 +98,8 @@ public class SubprocessoTransicaoService {
     public void registrar(
             Subprocesso subprocesso,
             TipoTransicao tipo,
-            Unidade origem,
-            Unidade destino,
+            @Nullable Unidade origem,
+            @Nullable Unidade destino,
             Usuario usuario) {
         registrar(subprocesso, tipo, origem, destino, usuario, null);
     }
@@ -116,7 +116,7 @@ public class SubprocessoTransicaoService {
             TipoAnalise tipoAnalise,
             TipoAcaoAnalise tipoAcaoAnalise,
             Unidade unidadeAnalise,
-            Unidade unidadeOrigemTransicao,
+            @Nullable Unidade unidadeOrigemTransicao,
             @Nullable Unidade unidadeDestinoTransicao,
             Usuario usuario,
             @Nullable String observacoes,

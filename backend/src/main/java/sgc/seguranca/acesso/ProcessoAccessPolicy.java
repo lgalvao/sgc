@@ -19,9 +19,7 @@ import static sgc.seguranca.acesso.Acao.*;
  */
 @Component
 @RequiredArgsConstructor
-public class ProcessoAccessPolicy implements AccessPolicy<Processo> {
-
-    private String ultimoMotivoNegacao = "";
+public class ProcessoAccessPolicy extends AbstractAccessPolicy<Processo> {
 
     /**
      * Mapeamento de ações para regras de acesso.
@@ -41,39 +39,17 @@ public class ProcessoAccessPolicy implements AccessPolicy<Processo> {
     public boolean canExecute(Usuario usuario, Acao acao, Processo processo) {
         RegrasAcaoProcesso regras = REGRAS.get(acao);
         if (regras == null) {
-            ultimoMotivoNegacao = "Ação não reconhecida: " + acao;
+            definirMotivoNegacao("Ação não reconhecida: " + acao);
             return false;
         }
 
         // Verifica se o usuário tem um dos perfis permitidos
         if (!temPerfilPermitido(usuario, regras.perfisPermitidos)) {
-            ultimoMotivoNegacao = String.format(
-                    "Usuário '%s' não possui um dos perfis necessários: %s. Ação: %s",
-                    usuario.getTituloEleitoral(),
-                    formatarPerfis(regras.perfisPermitidos),
-                    acao.getDescricao()
-            );
+            definirMotivoNegacao(usuario, regras.perfisPermitidos, acao);
             return false;
         }
 
         return true;
-    }
-
-    @Override
-    public String getMotivoNegacao() {
-        return ultimoMotivoNegacao;
-    }
-
-    private boolean temPerfilPermitido(Usuario usuario, EnumSet<Perfil> perfisPermitidos) {
-        return usuario.getTodasAtribuicoes().stream()
-                .anyMatch(a -> perfisPermitidos.contains(a.getPerfil()));
-    }
-
-    private String formatarPerfis(EnumSet<Perfil> perfis) {
-        return perfis.stream()
-                .map(Perfil::name)
-                .reduce((a, b) -> a + ", " + b)
-                .orElse("nenhum");
     }
 
     /**
