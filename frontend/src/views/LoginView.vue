@@ -157,7 +157,7 @@
                   aria-hidden="true"
                   class="bi bi-box-arrow-in-right me-2"
               />
-              Entrar
+              {{ isLoading ? 'Entrando...' : 'Entrar' }}
             </BButton>
           </BForm>
         </BCard>
