@@ -60,12 +60,23 @@
 
         <BButton
             v-if="!!permissoes?.podeDisponibilizarCadastro"
+            :disabled="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
             title="Disponibilizar"
             variant="success"
             @click="disponibilizarCadastro"
         >
-          <i class="bi bi-check-lg me-1"/> Disponibilizar
+          <span
+              v-if="loadingValidacao"
+              aria-hidden="true"
+              class="spinner-border spinner-border-sm me-1"
+              role="status"
+          />
+          <i
+              v-else
+              class="bi bi-check-lg me-1"
+          />
+          {{ loadingValidacao ? 'Validando...' : 'Disponibilizar' }}
         </BButton>
       </div>
     </div>
@@ -279,6 +290,7 @@ const historicoAnalises = computed(() => {
 
 const novaAtividade = ref("");
 const loadingAdicionar = ref(false);
+const loadingValidacao = ref(false);
 
 // Modais
 const mostrarModalImpacto = ref(false);
@@ -506,6 +518,7 @@ async function disponibilizarCadastro() {
   }
 
   if (codSubprocesso.value) {
+    loadingValidacao.value = true;
     errosValidacao.value = [];
     erroGlobal.value = null;
     try {
@@ -526,6 +539,8 @@ async function disponibilizarCadastro() {
       }
     } catch {
       feedbackStore.show("Erro na validação", "Não foi possível validar o cadastro.", "danger");
+    } finally {
+      loadingValidacao.value = false;
     }
   }
 }
