@@ -8,8 +8,7 @@ import lombok.ToString;
 @Builder
 @ToString
 public class SubprocessoPermissoesDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     private final boolean podeVerPagina;
     private final boolean podeEditarMapa;
     private final boolean podeVisualizarMapa;

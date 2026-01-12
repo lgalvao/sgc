@@ -24,12 +24,6 @@ import java.util.List;
  *
  * <p>Encapsula a lógica para construir o DTO de contexto com informações
  * necessárias para edição (mapas, atividades, permissões).
- *
- * <p><b>Nota arquitetural:</b> Uso deveria ser via {@link SubprocessoFacade},
- * mas mantido público temporariamente para compatibilidade com testes.
- * 
- * <p><b>Nota sobre Injeção de Dependências:</b>
- * MapaFacade injetado normalmente. Dependência circular verificada e refutada.
  */
 @Service
 @RequiredArgsConstructor

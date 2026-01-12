@@ -17,8 +17,7 @@ package sgc.comum.erros;
  * <p>Geralmente detectada durante a inicialização da aplicação ou primeiro uso de um componente.
  */
 public class ErroConfiguracao extends ErroInterno {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     
     public ErroConfiguracao(String message) {
         super(message);

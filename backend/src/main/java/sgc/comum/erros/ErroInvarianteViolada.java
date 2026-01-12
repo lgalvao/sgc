@@ -19,8 +19,7 @@ package sgc.comum.erros;
  * lógica de negócio que permitiu o sistema chegar em estado inconsistente.
  */
 public class ErroInvarianteViolada extends ErroInterno {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     public ErroInvarianteViolada(String message) {
         super(message);
     }

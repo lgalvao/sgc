@@ -13,8 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmailDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     /**
      * Endereço de e-mail do destinatário.
      */

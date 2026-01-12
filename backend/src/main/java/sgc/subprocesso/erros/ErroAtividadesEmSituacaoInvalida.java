@@ -9,8 +9,7 @@ import sgc.comum.erros.ErroSituacaoInvalida;
  * 'CADASTRO_EM_ANDAMENTO'.
  */
 public class ErroAtividadesEmSituacaoInvalida extends ErroSituacaoInvalida {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     public ErroAtividadesEmSituacaoInvalida(String message) {
         super(message, "ATIVIDADES_SITUACAO_INVALIDA");
     }

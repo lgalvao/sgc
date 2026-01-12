@@ -210,19 +210,13 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getDataFimEtapa1()).isNull();
 
-        verify(transicaoService).registrarAnaliseETransicao(
-                eq(sp),
-                eq(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO),
-                eq(TipoTransicao.CADASTRO_DEVOLVIDO),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                eq(user),
-                eq("obs"),
-                eq(null)
-        );
+        verify(transicaoService).registrarAnaliseETransicao(argThat(req ->
+                req.sp().equals(sp) &&
+                req.novaSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO &&
+                req.tipoTransicao() == TipoTransicao.CADASTRO_DEVOLVIDO &&
+                req.usuario().equals(user) &&
+                "obs".equals(req.observacoes())
+        ));
     }
 
     // --- Aceitar Cadastro ---
@@ -243,19 +237,13 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         service.aceitarCadastro(id, "obs", user);
 
-        verify(transicaoService).registrarAnaliseETransicao(
-                eq(sp),
-                eq(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO),
-                eq(TipoTransicao.CADASTRO_ACEITO),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                eq(user),
-                eq("obs"),
-                eq(null)
-        );
+        verify(transicaoService).registrarAnaliseETransicao(argThat(req ->
+                req.sp().equals(sp) &&
+                req.novaSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO &&
+                req.tipoTransicao() == TipoTransicao.CADASTRO_ACEITO &&
+                req.usuario().equals(user) &&
+                "obs".equals(req.observacoes())
+        ));
     }
 
     @Test
@@ -361,19 +349,13 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getDataFimEtapa1()).isNull();
 
-        verify(transicaoService).registrarAnaliseETransicao(
-                eq(sp),
-                eq(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO),
-                eq(TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                eq(user),
-                eq("obs"),
-                eq(null)
-        );
+        verify(transicaoService).registrarAnaliseETransicao(argThat(req ->
+                req.sp().equals(sp) &&
+                req.novaSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO &&
+                req.tipoTransicao() == TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA &&
+                req.usuario().equals(user) &&
+                "obs".equals(req.observacoes())
+        ));
     }
 
     // --- Aceitar Revisão Cadastro ---
@@ -399,19 +381,13 @@ class SubprocessoCadastroWorkflowServiceTest {
         
         service.aceitarRevisaoCadastro(id, "obs", user);
 
-        verify(transicaoService).registrarAnaliseETransicao(
-                eq(sp),
-                eq(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA),
-                eq(TipoTransicao.REVISAO_CADASTRO_ACEITA),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                eq(user),
-                eq("obs"),
-                eq(null)
-        );
+        verify(transicaoService).registrarAnaliseETransicao(argThat(req ->
+                req.sp().equals(sp) &&
+                req.novaSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA &&
+                req.tipoTransicao() == TipoTransicao.REVISAO_CADASTRO_ACEITA &&
+                req.usuario().equals(user) &&
+                "obs".equals(req.observacoes())
+        ));
     }
 
     @Test
@@ -598,8 +574,10 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         service.aceitarRevisaoCadastro(id, "obs", new Usuario());
 
-        verify(transicaoService).registrarAnaliseETransicao(
-                any(), any(), any(), any(), any(), eq(sup), eq(sup), eq(sup), any(), any(), any()
-        );
+        verify(transicaoService).registrarAnaliseETransicao(argThat(req ->
+                req.unidadeAnalise().equals(sup) &&
+                req.unidadeOrigemTransicao().equals(sup) &&
+                req.unidadeDestinoTransicao().equals(sup)
+        ));
     }
 }

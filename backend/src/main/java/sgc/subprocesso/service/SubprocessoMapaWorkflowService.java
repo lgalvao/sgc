@@ -2,6 +2,7 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -87,9 +88,12 @@ public class SubprocessoMapaWorkflowService {
     private final SubprocessoValidacaoService validacaoService;
     private final AccessControlService accessControlService;
 
-    @Autowired
-    @Lazy
     private SubprocessoMapaWorkflowService self;
+
+    @Autowired
+    public void setSelf(@Lazy SubprocessoMapaWorkflowService self) {
+        this.self = self;
+    }
 
     public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
@@ -196,7 +200,7 @@ public class SubprocessoMapaWorkflowService {
         sp.getMapa().setSugestoes(null);
         analiseService.removerPorSubprocesso(codSubprocesso);
         
-        if (request.getObservacoes() != null && !request.getObservacoes().isBlank()) {
+        if (org.springframework.util.StringUtils.hasText(request.getObservacoes())) {
             sp.getMapa().setSugestoes(request.getObservacoes());
         }
 
@@ -249,7 +253,7 @@ public class SubprocessoMapaWorkflowService {
     }
 
     @Transactional
-    public void apresentarSugestoes(Long codSubprocesso, String sugestoes, Usuario usuario) {
+    public void apresentarSugestoes(Long codSubprocesso, @Nullable String sugestoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, APRESENTAR_SUGESTOES, sp);
 
@@ -287,14 +291,14 @@ public class SubprocessoMapaWorkflowService {
     }
 
     @Transactional
-    public void devolverValidacao(Long codSubprocesso, String justificativa, Usuario usuario) {
+    public void devolverValidacao(Long codSubprocesso, @Nullable String justificativa, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, DEVOLVER_MAPA, sp);
 
         SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo());
         sp.setDataFimEtapa2(null);
 
-        transicaoService.registrarAnaliseETransicao(
+        transicaoService.registrarAnaliseETransicao(new SubprocessoTransicaoService.RegistrarWorkflowReq(
                 sp,
                 novaSituacao,
                 TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA,
@@ -306,7 +310,7 @@ public class SubprocessoMapaWorkflowService {
                 usuario,
                 justificativa,
                 justificativa
-        );
+        ));
     }
 
     @Transactional
@@ -319,8 +323,8 @@ public class SubprocessoMapaWorkflowService {
         // Se não tem próxima unidade (é o topo ou estrutura rasa), homologar direto
         if (proximaUnidade == null) {
             // Caso especial: Fim da cadeia de validação (Homologação Implícita?)
-            String siglaUnidade = sp.getUnidade().getUnidadeSuperior() != null ?
-                    sp.getUnidade().getUnidadeSuperior().getSigla() : sp.getUnidade().getSigla();
+            Unidade sup = sp.getUnidade().getUnidadeSuperior();
+            String siglaUnidade = sup != null ? sup.getSigla() : sp.getUnidade().getSigla();
 
             analiseService.criarAnalise(sp, CriarAnaliseReq.builder()
                         .codSubprocesso(codSubprocesso)
@@ -328,7 +332,7 @@ public class SubprocessoMapaWorkflowService {
                         .tipo(TipoAnalise.VALIDACAO)
                         .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
                         .siglaUnidade(siglaUnidade)
-                        .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
+                        .tituloUsuario(usuario.getTituloEleitoral())
                         .motivo(null)
                         .build());
 
@@ -336,7 +340,7 @@ public class SubprocessoMapaWorkflowService {
             subprocessoRepo.save(sp);
         } else {
             SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo());
-            transicaoService.registrarAnaliseETransicao(
+            transicaoService.registrarAnaliseETransicao(new SubprocessoTransicaoService.RegistrarWorkflowReq(
                     sp,
                     novaSituacao,
                     TipoTransicao.MAPA_VALIDACAO_ACEITA,
@@ -348,7 +352,7 @@ public class SubprocessoMapaWorkflowService {
                     usuario,
                     "Aceite da validação",
                     null
-            );
+            ));
         }
     }
 

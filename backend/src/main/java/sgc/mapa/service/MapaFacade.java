@@ -148,7 +148,6 @@ public class MapaFacade {
      * Obtém uma representação aninhada e formatada do mapa de um subprocesso.
      * Delega para {@link MapaVisualizacaoService}.
      *
-     * @param codSubprocesso O código do subprocesso.
      * @return Um {@link sgc.mapa.dto.visualizacao.MapaVisualizacaoDto} com a estrutura hierárquica completa do mapa.
      */
     @Transactional(readOnly = true)
@@ -163,7 +162,6 @@ public class MapaFacade {
      * <p>Compara o mapa em elaboração no subprocesso com o mapa vigente da unidade para identificar
      * atividades inseridas, removidas ou alteradas, e as competências afetadas.
      *
-     * @param codSubprocesso O código do subprocesso em revisão.
      * @param usuario O usuário autenticado (para verificação de permissões).
      * @return Um {@link sgc.mapa.dto.ImpactoMapaDto} com o detalhamento dos impactos.
      */

@@ -13,8 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponsavelDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     private Long unidadeCodigo;
     private String titularTitulo;
     private String titularNome;

@@ -181,12 +181,12 @@ public class UsuarioService {
 
     public Optional<UnidadeDto> buscarUnidadePorCodigo(Long codigo) {
         return unidadeRepo.findById(codigo)
-                .map(u -> toUnidadeDto(u));
+                .map(this::toUnidadeDto);
     }
 
     public Optional<UnidadeDto> buscarUnidadePorSigla(String sigla) {
         return unidadeRepo.findBySigla(sigla)
-                .map(u -> toUnidadeDto(u));
+                .map(this::toUnidadeDto);
     }
 
     public List<UnidadeDto> buscarUnidadesAtivas() {

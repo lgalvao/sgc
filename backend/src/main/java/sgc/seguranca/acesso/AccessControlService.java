@@ -53,22 +53,23 @@ public class AccessControlService {
                 usuario.getTituloEleitoral(), acao, recurso);
         
         // Delega para a policy apropriada baseado no tipo do recurso
-        if (recurso instanceof Subprocesso subprocesso) {
-            return subprocessoAccessPolicy.canExecute(usuario, acao, subprocesso);
+        switch (recurso) {
+            case Subprocesso subprocesso -> {
+                return subprocessoAccessPolicy.canExecute(usuario, acao, subprocesso);
+            }
+            case Processo processo -> {
+                return processoAccessPolicy.canExecute(usuario, acao, processo);
+            }
+            case Atividade atividade -> {
+                return atividadeAccessPolicy.canExecute(usuario, acao, atividade);
+            }
+            case Mapa mapa -> {
+                return mapaAccessPolicy.canExecute(usuario, acao, mapa);
+            }
+            case null, default -> {
+            }
         }
-        
-        if (recurso instanceof Processo processo) {
-            return processoAccessPolicy.canExecute(usuario, acao, processo);
-        }
-        
-        if (recurso instanceof Atividade atividade) {
-            return atividadeAccessPolicy.canExecute(usuario, acao, atividade);
-        }
-        
-        if (recurso instanceof Mapa mapa) {
-            return mapaAccessPolicy.canExecute(usuario, acao, mapa);
-        }
-        
+
         // Tipo de recurso não reconhecido - nega acesso por segurança
         log.warn("Tipo de recurso não reconhecido para verificação de acesso: {}", 
                 recurso != null ? recurso.getClass().getName() : "null");
@@ -84,24 +85,17 @@ public class AccessControlService {
         }
         
         // Obtém o motivo da policy apropriada
-        if (recurso instanceof Subprocesso) {
-            return subprocessoAccessPolicy.getMotivoNegacao();
-        }
-        
-        if (recurso instanceof Processo) {
-            return processoAccessPolicy.getMotivoNegacao();
-        }
-        
-        if (recurso instanceof Atividade) {
-            return atividadeAccessPolicy.getMotivoNegacao();
-        }
-        
-        if (recurso instanceof Mapa) {
-            return mapaAccessPolicy.getMotivoNegacao();
-        }
-        
-        // Mensagem genérica para outros tipos
-        return String.format("Usuário '%s' não tem permissão para executar a ação '%s'", 
-                usuario.getTituloEleitoral(), acao.getDescricao());
+        return switch (recurso) {
+            case Subprocesso subprocesso -> subprocessoAccessPolicy.getMotivoNegacao();
+            case Processo processo -> processoAccessPolicy.getMotivoNegacao();
+            case Atividade atividade -> atividadeAccessPolicy.getMotivoNegacao();
+            case Mapa mapa -> mapaAccessPolicy.getMotivoNegacao();
+            case null, default ->
+
+                // Mensagem genérica para outros tipos
+                    String.format("Usuário '%s' não tem permissão para executar a ação '%s'",
+                            usuario.getTituloEleitoral(), acao.getDescricao());
+        };
+
     }
 }

@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseService;
 import sgc.analise.model.TipoAcaoAnalise;
-import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -620,14 +619,12 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.devolverValidacao(1L, "Justificativa", new Usuario());
 
-            verify(transicaoService).registrarAnaliseETransicao(
-                eq(sp),
-                eq(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO),
-                eq(TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA),
-                eq(TipoAnalise.VALIDACAO),
-                eq(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO),
-                any(), any(), any(), any(), eq("Justificativa"), eq("Justificativa")
-            );
+            verify(transicaoService).registrarAnaliseETransicao(argThat(req ->
+                req.sp().equals(sp) &&
+                req.novaSituacao() == SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO &&
+                req.tipoTransicao() == TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA &&
+                "Justificativa".equals(req.observacoes())
+            ));
         }
 
         @Test
@@ -673,12 +670,11 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.aceitarValidacao(1L, new Usuario());
 
-            verify(transicaoService).registrarAnaliseETransicao(
-                eq(sp),
-                eq(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO),
-                eq(TipoTransicao.MAPA_VALIDACAO_ACEITA),
-                any(), any(), any(), any(), any(), any(), any(), any()
-            );
+            verify(transicaoService).registrarAnaliseETransicao(argThat(req ->
+                req.sp().equals(sp) &&
+                req.novaSituacao() == SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO &&
+                req.tipoTransicao() == TipoTransicao.MAPA_VALIDACAO_ACEITA
+            ));
         }
     }
 

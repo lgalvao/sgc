@@ -13,8 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProcessoDetalheDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     @Builder.Default
     private final List<UnidadeParticipanteDto> unidades = new ArrayList<>();
     @Builder.Default

@@ -13,8 +13,7 @@ import sgc.organizacao.model.Perfil;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class PerfilUnidadeDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     private Perfil perfil;
     private UnidadeDto unidade;
 }

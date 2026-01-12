@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RespostaDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     private String message;
 }

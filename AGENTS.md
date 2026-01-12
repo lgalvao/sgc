@@ -10,6 +10,10 @@ Este documento resume as diretrizes essenciais para o desenvolvimento no projeto
   * **Backend:** Classes `PascalCase`, métodos `camelCase`. Sufixos: `Controller`, `Service`, `Repo`, `Dto`, `Mapper`. Exceções iniciam com `Erro` (ex: `ErroNegocio`).
   * **Frontend:** Componentes `PascalCase` (`ProcessoCard.vue`), arquivos TS `camelCase`. Stores seguem `use{Nome}Store`.
 
+* **Qualidade de Código:**
+  * **Limite de Parâmetros:** Métodos devem ter no máximo **7 parâmetros**. Se ultrapassar, use um objeto de transporte (Record ou DTO).
+  * **Código Depreciado:** Código marcado como `@Deprecated` deve ser removido sumariamente assim que não houver mais dependências internas (especialmente após consolidações arquiteturais).
+
 ## 2. Backend (Java / Spring Boot 4)
 
 * **Arquitetura:** Módulos de domínio com uma **Service Facade** (ex: `MapaService`) que orquestra serviços especializados. Controllers interagem *apenas* com a Facade.

@@ -12,8 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompetenciaDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     private Long codigo;
     private String descricao;
     private List<AtividadeDto> atividades;

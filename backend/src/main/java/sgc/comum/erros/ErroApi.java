@@ -14,8 +14,7 @@ import java.util.Map;
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErroApi {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private final LocalDateTime timestamp;
     private int status;

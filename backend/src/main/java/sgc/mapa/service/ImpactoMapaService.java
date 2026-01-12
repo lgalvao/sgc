@@ -50,7 +50,6 @@ public class ImpactoMapaService {
      * <p>O acesso a esta funcionalidade é restrito por perfil e pela situação atual do subprocesso
      * para garantir que a análise de impacto seja feita no momento correto do fluxo de trabalho.
      *
-     * @param codSubprocesso O código do subprocesso cujo mapa será analisado.
      * @param usuario        O usuário autenticado que realiza a operação.
      * @return Um {@link ImpactoMapaDto} que encapsula todos os impactos encontrados. Retorna um DTO
      * sem impactos se a unidade não possuir um mapa vigente.

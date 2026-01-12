@@ -12,8 +12,7 @@ import java.util.List;
 @Getter
 @Builder
 public class SubprocessoDetalheDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     private final UnidadeDto unidade;
     private final ResponsavelDto titular;
     private final ResponsavelDto responsavel;

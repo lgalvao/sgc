@@ -1,5 +1,6 @@
 package sgc.mapa.model;
 
+import org.jspecify.annotations.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,7 +25,7 @@ public class Mapa extends EntidadeBase {
     private String observacoesDisponibilizacao;
     
     @Column(name = "sugestoes", length = 1000)
-    private String sugestoes;
+    private @Nullable String sugestoes;
     
     @Column(name = "data_hora_homologado")
     private LocalDateTime dataHoraHomologado;

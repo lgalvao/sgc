@@ -18,8 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AtividadeImpactadaDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     /**
      * O código da atividade.
      */

@@ -13,8 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PerfilDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     private String usuarioTitulo;
     private Long unidadeCodigo;
     private String unidadeNome;

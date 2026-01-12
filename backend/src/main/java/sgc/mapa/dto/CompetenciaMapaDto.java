@@ -17,8 +17,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 public class CompetenciaMapaDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     /**
      * O código da competência (pode ser nulo para novas competências).
      */

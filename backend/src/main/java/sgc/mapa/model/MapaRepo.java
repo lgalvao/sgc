@@ -10,13 +10,13 @@ import java.util.Optional;
 @Repository
 public interface MapaRepo extends JpaRepository<Mapa, Long> {
     @Query("""
-            SELECT um.mapaVigente FROM UnidadeMapa um 
+            SELECT um.mapaVigente FROM UnidadeMapa um
             WHERE um.unidadeCodigo = :unidadeCodigo
             """)
     Optional<Mapa> findMapaVigenteByUnidade(@Param("unidadeCodigo") Long unidadeCodigo);
 
     @Query("""
-            SELECT m FROM Mapa m 
+            SELECT m FROM Mapa m
             WHERE m.subprocesso.codigo = :subprocessoCodigo
             """)
     Optional<Mapa> findBySubprocessoCodigo(@Param("subprocessoCodigo") Long subprocessoCodigo);

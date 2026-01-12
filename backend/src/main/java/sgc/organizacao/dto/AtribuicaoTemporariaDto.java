@@ -12,8 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AtribuicaoTemporariaDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     private Long codigo;
     private UnidadeDto unidade;
     private UsuarioDto usuario;

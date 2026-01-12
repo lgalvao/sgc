@@ -144,8 +144,7 @@ public class SubprocessoMapaService {
             switch (tipoProcesso) {
                 case MAPEAMENTO -> spDestino.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
                 case REVISAO -> spDestino.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
-                case null, default -> {
-                }
+                case null, default -> log.debug("Tipo de processo {} não requer atualização automática de situação no import.", tipoProcesso);
             }
             subprocessoRepo.save(spDestino);
         }

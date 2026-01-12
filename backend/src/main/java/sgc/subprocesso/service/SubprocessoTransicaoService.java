@@ -107,38 +107,9 @@ public class SubprocessoTransicaoService {
     // ===== Execução de Workflow Completo (Consolidado de SubprocessoWorkflowExecutor) =====
 
     /**
-     * Executa um workflow completo com análise e transição.
-     *
-     * <p><b>Consolidação Arquitetural:</b> Este método absorve a funcionalidade
-     * do antigo {@code SubprocessoWorkflowExecutor.registrarAnaliseETransicao()},
-     * eliminando duplicação e centralizando a lógica de workflow.
-     *
-     * <p>Sequência de execução:
-     * <ol>
-     *   <li>Cria análise do subprocesso</li>
-     *   <li>Atualiza estado do subprocesso</li>
-     *   <li>Registra transição com evento</li>
-     * </ol>
-     *
-     * <p>Utilizado principalmente em workflows de aprovação/devolução onde
-     * é necessário registrar análise + mudança de estado.
-     *
-     * @param sp                       O subprocesso alvo
-     * @param novaSituacao             O novo estado do subprocesso
-     * @param tipoTransicao            O tipo da transição
-     * @param tipoAnalise              O tipo da análise
-     * @param tipoAcaoAnalise          A ação da análise (aprovar, devolver, etc)
-     * @param unidadeAnalise           A unidade que realizou a análise
-     * @param unidadeOrigemTransicao   A unidade de origem da transição
-     * @param unidadeDestinoTransicao  A unidade de destino da transição (pode ser null)
-     * @param usuario                  O usuário que executou o workflow
-     * @param observacoes              Observações (pode ser null)
-     * @param motivoAnalise            Motivo da análise (pode ser null)
-     *
-     * @since 2.0.0 Consolidado de SubprocessoWorkflowExecutor
+     * Parâmetros para registro de workflow completo.
      */
-    @Transactional
-    public void registrarAnaliseETransicao(
+    public record RegistrarWorkflowReq(
             Subprocesso sp,
             SituacaoSubprocesso novaSituacao,
             TipoTransicao tipoTransicao,
@@ -150,34 +121,46 @@ public class SubprocessoTransicaoService {
             Usuario usuario,
             @Nullable String observacoes,
             @Nullable String motivoAnalise
-    ) {
+    ) {}
+
+    /**
+     * Executa um workflow completo com análise e transição.
+     *
+     * <p>Utilizado principalmente em workflows de aprovação/devolução onde
+     * é necessário registrar análise + mudança de estado.
+     *
+     * @param req Objeto contendo todos os parâmetros da transição de workflow
+     * @since 2.1.0 Refatorado para usar Record (limite de parâmetros)
+     */
+    @Transactional
+    public void registrarAnaliseETransicao(RegistrarWorkflowReq req) {
         // 1. Criar Análise
         analiseService.criarAnalise(
-                sp,
+                req.sp(),
                 CriarAnaliseReq.builder()
-                        .codSubprocesso(sp.getCodigo())
-                        .observacoes(observacoes)
-                        .tipo(tipoAnalise)
-                        .acao(tipoAcaoAnalise)
-                        .siglaUnidade(unidadeAnalise.getSigla())
-                        .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
-                        .motivo(motivoAnalise)
+                        .codSubprocesso(req.sp().getCodigo())
+                        .observacoes(req.observacoes())
+                        .tipo(req.tipoAnalise())
+                        .acao(req.tipoAcaoAnalise())
+                        .siglaUnidade(req.unidadeAnalise().getSigla())
+                        .tituloUsuario(req.usuario().getTituloEleitoral())
+                        .motivo(req.motivoAnalise())
                         .build());
 
         // 2. Atualizar Estado
-        sp.setSituacao(novaSituacao);
-        repositorioSubprocesso.save(sp);
+        req.sp().setSituacao(req.novaSituacao());
+        repositorioSubprocesso.save(req.sp());
 
         // 3. Registrar Transição
         registrar(
-                sp,
-                tipoTransicao,
-                unidadeOrigemTransicao,
-                unidadeDestinoTransicao,
-                usuario,
-                observacoes);
+                req.sp(),
+                req.tipoTransicao(),
+                req.unidadeOrigemTransicao(),
+                req.unidadeDestinoTransicao(),
+                req.usuario(),
+                req.observacoes());
 
         log.info("Workflow executado: Subprocesso {} -> {}, Transição {}",
-                sp.getCodigo(), novaSituacao, tipoTransicao);
+                req.sp().getCodigo(), req.novaSituacao(), req.tipoTransicao());
     }
 }

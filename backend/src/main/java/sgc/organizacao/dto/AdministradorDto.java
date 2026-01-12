@@ -6,8 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class AdministradorDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     private String tituloEleitoral;
     private String nome;
     private String matricula;

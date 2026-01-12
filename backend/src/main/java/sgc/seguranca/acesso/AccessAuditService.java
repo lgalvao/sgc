@@ -62,19 +62,15 @@ public class AccessAuditService {
      * @return String identificadora do recurso
      */
     private String getResourceId(Object recurso) {
-        if (recurso == null) {
-            return "null";
-        }
-        
-        if (recurso instanceof Subprocesso sp) {
-            return "Subprocesso:" + sp.getCodigo();
-        }
-        
-        if (recurso instanceof Processo p) {
-            return "Processo:" + p.getCodigo();
-        }
-        
-        // Para outros tipos de recursos
-        return recurso.getClass().getSimpleName();
+        return switch (recurso) {
+            case null -> "null";
+            case Subprocesso sp -> "Subprocesso:" + sp.getCodigo();
+            case Processo p -> "Processo:" + p.getCodigo();
+            default ->
+
+                // Para outros tipos de recursos
+                    recurso.getClass().getSimpleName();
+        };
+
     }
 }

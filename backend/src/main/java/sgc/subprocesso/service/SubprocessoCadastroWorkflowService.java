@@ -107,7 +107,19 @@ public class SubprocessoCadastroWorkflowService {
         }
 
         sp.setDataFimEtapa1(null);
-        transicaoService.registrarAnaliseETransicao(sp, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoTransicao.CADASTRO_DEVOLVIDO, TipoAnalise.CADASTRO, TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO, unidadeAnalise, unidadeAnalise, sp.getUnidade(), usuario, observacoes, null);
+        transicaoService.registrarAnaliseETransicao(new SubprocessoTransicaoService.RegistrarWorkflowReq(
+                sp,
+                MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                TipoTransicao.CADASTRO_DEVOLVIDO,
+                TipoAnalise.CADASTRO,
+                TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO,
+                unidadeAnalise,
+                unidadeAnalise,
+                sp.getUnidade(),
+                usuario,
+                observacoes,
+                null
+        ));
     }
 
     @Transactional
@@ -121,7 +133,19 @@ public class SubprocessoCadastroWorkflowService {
             throw new ErroInvarianteViolada("Não foi possível identificar a unidade superior para enviar a análise.");
         }
 
-        transicaoService.registrarAnaliseETransicao(sp, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_ACEITO, TipoAnalise.CADASTRO, TipoAcaoAnalise.ACEITE_MAPEAMENTO, unidadeDestino, unidadeOrigem, unidadeDestino, usuario, observacoes, null);
+        transicaoService.registrarAnaliseETransicao(new SubprocessoTransicaoService.RegistrarWorkflowReq(
+                sp,
+                MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                TipoTransicao.CADASTRO_ACEITO,
+                TipoAnalise.CADASTRO,
+                TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+                unidadeDestino,
+                unidadeOrigem,
+                unidadeDestino,
+                usuario,
+                observacoes,
+                null
+        ));
     }
 
     @Transactional
@@ -152,7 +176,19 @@ public class SubprocessoCadastroWorkflowService {
         }
 
         sp.setDataFimEtapa1(null);
-        transicaoService.registrarAnaliseETransicao(sp, REVISAO_CADASTRO_EM_ANDAMENTO, TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA, TipoAnalise.CADASTRO, TipoAcaoAnalise.DEVOLUCAO_REVISAO, unidadeAnalise, unidadeAnalise, sp.getUnidade(), usuario, observacoes, null);
+        transicaoService.registrarAnaliseETransicao(new SubprocessoTransicaoService.RegistrarWorkflowReq(
+                sp,
+                REVISAO_CADASTRO_EM_ANDAMENTO,
+                TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA,
+                TipoAnalise.CADASTRO,
+                TipoAcaoAnalise.DEVOLUCAO_REVISAO,
+                unidadeAnalise,
+                unidadeAnalise,
+                sp.getUnidade(),
+                usuario,
+                observacoes,
+                null
+        ));
     }
 
     @Transactional
@@ -172,7 +208,19 @@ public class SubprocessoCadastroWorkflowService {
 
         Unidade unidadeDestino = unidadeAnalise.getUnidadeSuperior() != null ? unidadeAnalise.getUnidadeSuperior() : unidadeAnalise;
 
-        transicaoService.registrarAnaliseETransicao(sp, REVISAO_CADASTRO_DISPONIBILIZADA, TipoTransicao.REVISAO_CADASTRO_ACEITA, TipoAnalise.CADASTRO, TipoAcaoAnalise.ACEITE_REVISAO, unidadeAnalise, unidadeAnalise, unidadeDestino, usuario, observacoes, null);
+        transicaoService.registrarAnaliseETransicao(new SubprocessoTransicaoService.RegistrarWorkflowReq(
+                sp,
+                REVISAO_CADASTRO_DISPONIBILIZADA,
+                TipoTransicao.REVISAO_CADASTRO_ACEITA,
+                TipoAnalise.CADASTRO,
+                TipoAcaoAnalise.ACEITE_REVISAO,
+                unidadeAnalise,
+                unidadeAnalise,
+                unidadeDestino,
+                usuario,
+                observacoes,
+                null
+        ));
     }
 
     @Transactional

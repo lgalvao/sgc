@@ -14,8 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class AnaliseHistoricoDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     LocalDateTime dataHora;
     String observacoes;
     TipoAcaoAnalise acao;

@@ -12,8 +12,8 @@ public interface ConhecimentoRepo extends JpaRepository<Conhecimento, Long> {
     List<Conhecimento> findByAtividadeCodigo(Long atividadeCodigo);
 
     @Query("""
-            SELECT c FROM Conhecimento c 
-            JOIN c.atividade a 
+            SELECT c FROM Conhecimento c
+            JOIN c.atividade a
             WHERE a.mapa.codigo = :codMapa
             """)
     List<Conhecimento> findByMapaCodigo(@Param("codMapa") Long codMapa);

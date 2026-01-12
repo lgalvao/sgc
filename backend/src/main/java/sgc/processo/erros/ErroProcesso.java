@@ -8,8 +8,7 @@ import sgc.comum.erros.ErroNegocioBase;
  * especialmente em validações de estado e transições de processos.
  */
 public class ErroProcesso extends ErroNegocioBase {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     public ErroProcesso(String message) {
         super(message, "ERRO_PROCESSO", HttpStatus.CONFLICT);
     }

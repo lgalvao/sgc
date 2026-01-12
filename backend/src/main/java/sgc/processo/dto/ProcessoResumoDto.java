@@ -10,8 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProcessoResumoDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     private Long codigo;
     private String descricao;
     private SituacaoProcesso situacao;

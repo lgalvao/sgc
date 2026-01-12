@@ -12,8 +12,7 @@ package sgc.comum.erros;
  * </ul>
  */
 public class ErroEntidadeDeveriaExistir extends ErroInterno {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     
     public ErroEntidadeDeveriaExistir(String message) {
         super(message);

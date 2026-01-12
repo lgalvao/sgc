@@ -14,8 +14,7 @@ import java.util.List;
 @Getter
 @Builder
 public class SubprocessoCadastroDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     private final Long subprocessoCodigo;
     private final @org.jspecify.annotations.Nullable String unidadeSigla;
     private final List<AtividadeCadastroDto> atividades;

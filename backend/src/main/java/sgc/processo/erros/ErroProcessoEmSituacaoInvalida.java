@@ -8,8 +8,7 @@ import sgc.comum.erros.ErroSituacaoInvalida;
  * <p>Exemplo: tentar iniciar um processo que não está no estado 'CRIADO'.
  */
 public class ErroProcessoEmSituacaoInvalida extends ErroSituacaoInvalida {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     public ErroProcessoEmSituacaoInvalida(String message) {
         super(message, "PROCESSO_SITUACAO_INVALIDA");
     }

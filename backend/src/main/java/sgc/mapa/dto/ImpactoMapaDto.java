@@ -16,8 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // to encourage use of factory methods
 public class ImpactoMapaDto {
-    @java.io.Serial
-    private static final long serialVersionUID = 1L;
+
     private boolean temImpactos;
     private int totalAtividadesInseridas;
     private int totalAtividadesRemovidas;
