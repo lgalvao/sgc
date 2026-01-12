@@ -61,7 +61,8 @@ public class SubprocessoMapaController {
     @Operation(summary = "Verifica os impactos da revisão no mapa de competências")
     public ImpactoMapaDto verificarImpactos(@PathVariable Long codigo) {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
-        return mapaFacade.verificarImpactos(codigo, usuario);
+        Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codigo);
+        return mapaFacade.verificarImpactos(subprocesso, usuario);
     }
 
     /**
@@ -87,7 +88,8 @@ public class SubprocessoMapaController {
     @GetMapping("/{codigo}/mapa-visualizacao")
     @PreAuthorize("isAuthenticated()")
     public MapaVisualizacaoDto obterMapaVisualizacao(@PathVariable("codigo") Long codSubprocesso) {
-        return mapaFacade.obterMapaParaVisualizacao(codSubprocesso);
+        Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codSubprocesso);
+        return mapaFacade.obterMapaParaVisualizacao(subprocesso);
     }
 
     /**

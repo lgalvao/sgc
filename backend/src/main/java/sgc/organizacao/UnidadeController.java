@@ -21,6 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UnidadeController {
     private final UnidadeService unidadeService;
+    private final sgc.processo.service.ProcessoConsultaService processoConsultaService;
 
     /**
      * Cria uma nova atribuição temporária para um usuário em uma unidade.
@@ -69,8 +70,12 @@ public class UnidadeController {
             @RequestParam("tipoProcesso") String tipoProcesso,
             @RequestParam(value = "codProcesso", required = false) Long codProcesso) {
 
-        List<UnidadeDto> arvore = unidadeService.buscarArvoreComElegibilidade(
-                TipoProcesso.valueOf(tipoProcesso), codProcesso);
+        TipoProcesso tipo = TipoProcesso.valueOf(tipoProcesso);
+        boolean requerMapaVigente = tipo == TipoProcesso.REVISAO || tipo == TipoProcesso.DIAGNOSTICO;
+        
+        java.util.Set<Long> bloqueadas = processoConsultaService.buscarIdsUnidadesEmProcessosAtivos(codProcesso);
+        
+        List<UnidadeDto> arvore = unidadeService.buscarArvoreComElegibilidade(requerMapaVigente, bloqueadas);
 
         return ResponseEntity.ok(arvore);
     }

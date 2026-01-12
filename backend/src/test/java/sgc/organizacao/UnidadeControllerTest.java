@@ -14,13 +14,11 @@ import sgc.comum.erros.RestExceptionHandler;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaReq;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
-import sgc.processo.model.TipoProcesso;
 
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -37,6 +35,9 @@ class UnidadeControllerTest {
 
     @MockitoBean
     private UnidadeService unidadeService;
+
+    @MockitoBean
+    private sgc.processo.service.ProcessoConsultaService processoConsultaService;
 
     @MockitoBean
     private sgc.seguranca.login.GerenciadorJwt gerenciadorJwt;
@@ -88,7 +89,9 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornarArvoreDeElegibilidade() throws Exception {
         // Arrange
-        when(unidadeService.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, null))
+        when(processoConsultaService.buscarIdsUnidadesEmProcessosAtivos(any()))
+                .thenReturn(Collections.emptySet());
+        when(unidadeService.buscarArvoreComElegibilidade(anyBoolean(), any()))
                 .thenReturn(Collections.emptyList());
 
         // Act & Assert

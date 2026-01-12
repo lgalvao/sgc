@@ -18,8 +18,10 @@ import sgc.subprocesso.model.Subprocesso;
 import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static sgc.organizacao.model.Perfil.*;
-import static sgc.seguranca.acesso.Acao.*;
+import static sgc.organizacao.model.Perfil.CHEFE;
+import static sgc.organizacao.model.Perfil.SERVIDOR;
+import static sgc.seguranca.acesso.Acao.CRIAR_ATIVIDADE;
+import static sgc.seguranca.acesso.Acao.LISTAR_SUBPROCESSOS;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

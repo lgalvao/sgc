@@ -11,11 +11,8 @@ import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
@@ -26,11 +23,7 @@ import static org.mockito.Mockito.when;
 class MapaVisualizacaoServiceTest {
 
     @Mock
-    private SubprocessoFacade subprocessoFacade;
-    @Mock
     private CompetenciaRepo competenciaRepo;
-    @Mock
-    private ConhecimentoRepo conhecimentoRepo;
     @Mock
     private AtividadeRepo atividadeRepo;
 
@@ -40,8 +33,8 @@ class MapaVisualizacaoServiceTest {
     @Test
     @DisplayName("Deve obter mapa para visualização")
     void deveObterMapaParaVisualizacao() {
-        Long subId = 1L;
         Subprocesso sub = new Subprocesso();
+        sub.setCodigo(1L);
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
         sub.setMapa(mapa);
@@ -57,20 +50,14 @@ class MapaVisualizacaoServiceTest {
         ativ2.setCodigo(2L);
         ativ2.setDescricao("A2");
 
-        Competencia comp = new Competencia();
-        comp.setCodigo(50L);
-        comp.setDescricao("C1");
-        comp.setAtividades(Set.of(ativ1));
-
         // Mocking the new projection method
         List<Object[]> projectionResult = new java.util.ArrayList<>();
         projectionResult.add(new Object[]{50L, "C1", 1L});
 
-        when(subprocessoFacade.buscarSubprocesso(subId)).thenReturn(sub);
         when(atividadeRepo.findByMapaCodigoWithConhecimentos(10L)).thenReturn(List.of(ativ1, ativ2));
         when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(10L)).thenReturn(projectionResult);
 
-        MapaVisualizacaoDto dto = service.obterMapaParaVisualizacao(subId);
+        MapaVisualizacaoDto dto = service.obterMapaParaVisualizacao(sub);
 
         assertThat(dto).isNotNull();
         assertThat(dto.getCompetencias()).hasSize(1);
@@ -81,13 +68,11 @@ class MapaVisualizacaoServiceTest {
     @Test
     @DisplayName("Deve lançar erro se subprocesso não tem mapa")
     void deveLancarErroSeSemMapa() {
-        Long subId = 1L;
         Subprocesso sub = new Subprocesso();
+        sub.setCodigo(1L);
         // Mapa null
 
-        when(subprocessoFacade.buscarSubprocesso(subId)).thenReturn(sub);
-
-        assertThatThrownBy(() -> service.obterMapaParaVisualizacao(subId))
+        assertThatThrownBy(() -> service.obterMapaParaVisualizacao(sub))
                 .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
     }
 }

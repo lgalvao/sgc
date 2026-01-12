@@ -26,24 +26,24 @@
  * 
  * <h3>Serviços Centrais</h3>
  * <ul>
- *   <li>{@link AccessControlService} - Ponto central de verificação de permissões</li>
+ *   <li>{@link sgc.seguranca.acesso.AccessControlService} - Ponto central de verificação de permissões</li>
  *   <li>{@link HierarchyService} - Gerencia hierarquia de unidades organizacionais</li>
- *   <li>{@link AccessAuditService} - Auditoria de decisões de acesso</li>
+ *   <li>{@link sgc.seguranca.acesso.AccessAuditService} - Auditoria de decisões de acesso</li>
  * </ul>
  * 
  * <h3>Políticas de Acesso</h3>
  * <p>Cada tipo de recurso tem uma política específica:</p>
  * <ul>
- *   <li>{@link ProcessoAccessPolicy} - Regras para processos</li>
- *   <li>{@link SubprocessoAccessPolicy} - Regras para subprocessos (mais complexa)</li>
- *   <li>{@link AtividadeAccessPolicy} - Regras para atividades</li>
- *   <li>{@link MapaAccessPolicy} - Regras para mapas de competências</li>
+ *   <li>{@link sgc.seguranca.acesso.ProcessoAccessPolicy} - Regras para processos</li>
+ *   <li>{@link sgc.seguranca.acesso.SubprocessoAccessPolicy} - Regras para subprocessos (mais complexa)</li>
+ *   <li>{@link sgc.seguranca.acesso.AtividadeAccessPolicy} - Regras para atividades</li>
+ *   <li>{@link sgc.seguranca.acesso.MapaAccessPolicy} - Regras para mapas de competências</li>
  * </ul>
  * 
  * <h3>Ações e Recursos</h3>
  * <ul>
- *   <li>{@link Acao} - Enumeração de todas as ações possíveis no sistema</li>
- *   <li>{@link AccessPolicy} - Interface base para políticas</li>
+ *   <li>{@link sgc.seguranca.acesso.Acao} - Enumeração de todas as ações possíveis no sistema</li>
+ *   <li>{@link sgc.seguranca.acesso.AccessPolicy} - Interface base para políticas</li>
  * </ul>
  * 
  * <h2>Exemplo de Uso</h2>
@@ -121,9 +121,9 @@
  *   <li><a href="/docs/ARCHITECTURE.md">System Architecture</a></li>
  * </ul>
  * 
- * @see AccessControlService
- * @see AccessPolicy
- * @see Acao
+ * @see sgc.seguranca.acesso.AccessControlService
+ * @see sgc.seguranca.acesso.AccessPolicy
+ * @see sgc.seguranca.acesso.Acao
  * @author GitHub Copilot AI Agent (Security Refactoring 2026-01-08)
  * @version 2.0
  * @since 2.0

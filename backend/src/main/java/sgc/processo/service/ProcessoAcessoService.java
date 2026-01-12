@@ -11,14 +11,7 @@ import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.service.SubprocessoFacade;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Serviço responsável pelo controle de acesso a processos.

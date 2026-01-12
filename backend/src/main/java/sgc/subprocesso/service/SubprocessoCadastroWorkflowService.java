@@ -1,7 +1,6 @@
 package sgc.subprocesso.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseService;
@@ -55,7 +54,7 @@ public class SubprocessoCadastroWorkflowService {
             UnidadeService unidadeService,
             AnaliseService analiseService,
             SubprocessoValidacaoService validacaoService,
-            @Lazy ImpactoMapaService impactoMapaService,
+            ImpactoMapaService impactoMapaService,
             AccessControlService accessControlService) {
         this.repositorioSubprocesso = repositorioSubprocesso;
         this.transicaoService = transicaoService;
@@ -202,7 +201,7 @@ public class SubprocessoCadastroWorkflowService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, HOMOLOGAR_REVISAO_CADASTRO, sp);
 
-        var impactos = impactoMapaService.verificarImpactos(codSubprocesso, usuario);
+        var impactos = impactoMapaService.verificarImpactos(sp, usuario);
         if (impactos.isTemImpactos()) {
             Unidade sedoc = unidadeService.buscarEntidadePorSigla("SEDOC");
             sp.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);

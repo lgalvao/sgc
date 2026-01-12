@@ -3,7 +3,6 @@ package sgc.seguranca.login;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +36,6 @@ public class LoginService {
     private final UsuarioService usuarioService;
     private final GerenciadorJwt gerenciadorJwt;
     private final ClienteAcessoAd clienteAcessoAd;
-    @Lazy
     private final UnidadeService unidadeService;
 
     @Value("${aplicacao.ambiente-testes:false}")
@@ -48,7 +46,7 @@ public class LoginService {
     public LoginService(UsuarioService usuarioService,
             GerenciadorJwt gerenciadorJwt,
             @Autowired(required = false) ClienteAcessoAd clienteAcessoAd,
-            @Lazy UnidadeService unidadeService) {
+            UnidadeService unidadeService) {
         this.usuarioService = usuarioService;
         this.gerenciadorJwt = gerenciadorJwt;
         this.clienteAcessoAd = clienteAcessoAd;

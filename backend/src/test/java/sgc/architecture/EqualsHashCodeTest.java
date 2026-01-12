@@ -2,8 +2,8 @@ package sgc.architecture;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import sgc.organizacao.model.*;
 
 @Tag("unit")

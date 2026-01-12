@@ -22,9 +22,7 @@ import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

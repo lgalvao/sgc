@@ -10,7 +10,7 @@
  * 
  * <h3>Facade (Public API)</h3>
  * <ul>
- *   <li>{@link ProcessoFacade} - Ponto de entrada único para todas as operações de processo
+ *   <li>{@link sgc.processo.service.ProcessoFacade} - Ponto de entrada único para todas as operações de processo
  *       <ul>
  *         <li>Orquestra serviços especializados</li>
  *         <li>Expõe API simplificada para controllers</li>
@@ -169,8 +169,8 @@
  * <h2>Eventos de Domínio</h2>
  * <p>Este módulo publica eventos para comunicação assíncrona:</p>
  * <ul>
- *   <li>{@link EventoProcessoIniciado} - Quando processo é iniciado</li>
- *   <li>{@link EventoProcessoFinalizado} - Quando processo é finalizado</li>
+ *   <li>{@link sgc.processo.eventos.EventoProcessoIniciado} - Quando processo é iniciado</li>
+ *   <li>{@link sgc.processo.eventos.EventoProcessoFinalizado} - Quando processo é finalizado</li>
  * </ul>
  * 
  * <h2>Segurança</h2>
@@ -227,7 +227,7 @@
  *   </tr>
  * </table>
  * 
- * @see ProcessoFacade
+ * @see sgc.processo.service.ProcessoFacade
  * @see sgc.subprocesso.service.SubprocessoFacade
  * @see sgc.processo.model.Processo
  * @see sgc.processo.model.TipoProcesso

@@ -198,7 +198,7 @@ class SubprocessoServiceActionsTest {
             Subprocesso subprocessoAposAceite = subprocessoRepo.findById(subprocesso.getCodigo())
                             .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após aceite da revisão."));
 
-            when(impactoMapaService.verificarImpactos(anyLong(), any(Usuario.class))).thenReturn(ImpactoMapaDto.semImpacto());
+            when(impactoMapaService.verificarImpactos(any(Subprocesso.class), any(Usuario.class))).thenReturn(ImpactoMapaDto.semImpacto());
 
             // Homologação requer perfil ADMIN
             subprocessoWorkflowService.homologarRevisaoCadastro(subprocessoAposAceite.getCodigo(), OBSERVACOES, admin);

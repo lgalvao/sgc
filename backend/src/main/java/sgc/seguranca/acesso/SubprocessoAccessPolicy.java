@@ -366,7 +366,10 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
          * hierarquia.
          */
         private boolean isAcaoAdministrativaOuEdicaoMapa(Acao acao) {
-                return acao == EDITAR_MAPA
+                return acao == VISUALIZAR_SUBPROCESSO
+                                || acao == VISUALIZAR_MAPA
+                                || acao == VISUALIZAR_DIAGNOSTICO
+                                || acao == EDITAR_MAPA
                                 || acao == DEVOLVER_CADASTRO
                                 || acao == ACEITAR_CADASTRO
                                 || acao == HOMOLOGAR_CADASTRO

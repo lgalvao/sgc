@@ -444,7 +444,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         ImpactoMapaDto impactoDto = ImpactoMapaDto.builder().temImpactos(true).build();
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(impactoMapaService.verificarImpactos(id, user)).thenReturn(impactoDto);
+        when(impactoMapaService.verificarImpactos(any(Subprocesso.class), eq(user))).thenReturn(impactoDto);
         when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
 
         service.homologarRevisaoCadastro(id, "obs", user);
@@ -468,7 +468,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         Usuario user = new Usuario();
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(impactoMapaService.verificarImpactos(id, user))
+        when(impactoMapaService.verificarImpactos(any(Subprocesso.class), eq(user)))
                 .thenReturn(ImpactoMapaDto.semImpacto());
 
         service.homologarRevisaoCadastro(id, "obs", user);

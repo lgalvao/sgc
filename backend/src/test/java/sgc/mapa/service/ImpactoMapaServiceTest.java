@@ -14,14 +14,13 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -29,9 +28,6 @@ import static org.mockito.Mockito.when;
 class ImpactoMapaServiceTest {
     @InjectMocks
     private ImpactoMapaService impactoMapaService;
-
-    @Mock
-    private SubprocessoFacade subprocessoFacade;
 
     @Mock
     private MapaRepo mapaRepo;
@@ -91,38 +87,34 @@ class ImpactoMapaServiceTest {
     @Nested
     @DisplayName("Testes de verificação de acesso")
     class AcessoTestes {
-        // Access tests are now covered by AccessControlService and SubprocessoAccessPolicy
-        // Here we just verify that the service is called
 
         @Test
         @DisplayName("Deve chamar AccessControlService para verificar acesso")
         void deveChamarServicoAcesso() {
             // Após refatoração de segurança, verificação de acesso é feita via AccessControlService
-            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-
+            
             // Scenario 1: Access Granted (delegation happens)
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
-            assertDoesNotThrow(() -> impactoMapaService.verificarImpactos(1L, chefe));
-            org.mockito.Mockito.verify(accessControlService).verificarPermissao(
-                org.mockito.Mockito.eq(chefe), 
-                org.mockito.Mockito.eq(sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS), 
-                org.mockito.Mockito.eq(subprocesso)
+            assertDoesNotThrow(() -> impactoMapaService.verificarImpactos(subprocesso, chefe));
+            verify(accessControlService).verificarPermissao(
+                eq(chefe), 
+                eq(sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS), 
+                eq(subprocesso)
             );
         }
 
         @Test
         @DisplayName("Deve propagar erro se acesso negado")
         void devePropagarErroAcesso() {
-            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            org.mockito.Mockito.doThrow(new ErroAccessoNegado("Acesso negado"))
+            doThrow(new ErroAccessoNegado("Acesso negado"))
                     .when(accessControlService).verificarPermissao(
-                        org.mockito.Mockito.any(Usuario.class),
-                        org.mockito.Mockito.any(sgc.seguranca.acesso.Acao.class),
-                        org.mockito.Mockito.any()
+                        any(Usuario.class),
+                        any(sgc.seguranca.acesso.Acao.class),
+                        any()
                     );
 
             assertThrows(
-                    ErroAccessoNegado.class, () -> impactoMapaService.verificarImpactos(1L, chefe));
+                    ErroAccessoNegado.class, () -> impactoMapaService.verificarImpactos(subprocesso, chefe));
         }
     }
 
@@ -133,10 +125,9 @@ class ImpactoMapaServiceTest {
         @Test
         @DisplayName("Deve retornar sem impacto se não houver mapa vigente")
         void semImpactoSeNaoHouverMapaVigente() {
-            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
 
-            ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
+            ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(subprocesso, chefe);
 
             assertNotNull(resultado);
             assertFalse(resultado.isTemImpactos());
@@ -156,7 +147,6 @@ class ImpactoMapaServiceTest {
             Mapa mapaSubprocesso = new Mapa();
             mapaSubprocesso.setCodigo(2L);
 
-            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
             when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSubprocesso));
 
@@ -189,7 +179,7 @@ class ImpactoMapaServiceTest {
 
             when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(c1));
 
-            ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
+            ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(subprocesso, chefe);
 
             assertNotNull(resultado);
             // Inseriu A2
@@ -213,7 +203,6 @@ class ImpactoMapaServiceTest {
             Mapa mapaSubprocesso = new Mapa();
             mapaSubprocesso.setCodigo(2L);
 
-            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
             when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSubprocesso));
 
@@ -231,7 +220,7 @@ class ImpactoMapaServiceTest {
 
             when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(c1));
 
-            ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
+            ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(subprocesso, chefe);
 
             assertEquals(1, resultado.getAtividadesRemovidas().size());
             assertEquals(1, resultado.getCompetenciasImpactadas().size());

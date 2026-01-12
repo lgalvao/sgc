@@ -12,18 +12,9 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.mapper.MapaCompletoMapper;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.AtividadeRepo;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.*;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;

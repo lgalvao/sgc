@@ -15,7 +15,8 @@ import sgc.processo.model.Processo;
 import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static sgc.organizacao.model.Perfil.*;
+import static sgc.organizacao.model.Perfil.ADMIN;
+import static sgc.organizacao.model.Perfil.GESTOR;
 import static sgc.seguranca.acesso.Acao.*;
 
 @ExtendWith(MockitoExtension.class)

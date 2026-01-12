@@ -17,7 +17,6 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoDto;
 
-
 import java.util.List;
 
 import static org.mockito.Mockito.*;

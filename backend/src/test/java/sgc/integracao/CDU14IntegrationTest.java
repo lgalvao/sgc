@@ -1,10 +1,6 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -17,7 +13,9 @@ import sgc.fixture.MapaFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.model.*;
 import sgc.organizacao.UsuarioService;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.ProcessoDto;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;

@@ -61,7 +61,8 @@ class SubprocessoMapaControllerTest {
     @DisplayName("verificarImpactos")
     @WithMockUser
     void verificarImpactos() throws Exception {
-        when(mapaFacade.verificarImpactos(eq(1L), any()))
+        when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
+        when(mapaFacade.verificarImpactos(any(Subprocesso.class), any()))
                 .thenReturn(ImpactoMapaDto.semImpacto());
 
         mockMvc.perform(get("/api/subprocessos/1/impactos-mapa")).andExpect(status().isOk());
@@ -85,7 +86,8 @@ class SubprocessoMapaControllerTest {
     @DisplayName("obterMapaVisualizacao")
     @WithMockUser
     void obterMapaVisualizacao() throws Exception {
-        when(mapaFacade.obterMapaParaVisualizacao(1L))
+        when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
+        when(mapaFacade.obterMapaParaVisualizacao(any(Subprocesso.class)))
                 .thenReturn(new MapaVisualizacaoDto());
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-visualizacao")).andExpect(status().isOk());

@@ -22,13 +22,13 @@ import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
+import sgc.seguranca.acesso.Acao;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.seguranca.acesso.AccessControlService;
-import sgc.seguranca.acesso.Acao;
 
 import java.util.List;
 import java.util.Set;
@@ -37,9 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

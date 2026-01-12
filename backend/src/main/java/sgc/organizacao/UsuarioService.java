@@ -2,7 +2,6 @@ package sgc.organizacao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAccessoNegado;
@@ -23,8 +22,7 @@ public class UsuarioService {
     private final UsuarioRepo usuarioRepo;
     private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final AdministradorRepo administradorRepo;
-    @Lazy
-    private final UnidadeService unidadeService;
+    private final UnidadeRepo unidadeRepo;
 
     @Transactional(readOnly = true)
     public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
@@ -39,11 +37,11 @@ public class UsuarioService {
     public UsuarioService(UsuarioRepo usuarioRepo,
             UsuarioPerfilRepo usuarioPerfilRepo,
             AdministradorRepo administradorRepo,
-            @Lazy UnidadeService unidadeService) {
+            UnidadeRepo unidadeRepo) {
         this.usuarioRepo = usuarioRepo;
         this.usuarioPerfilRepo = usuarioPerfilRepo;
         this.administradorRepo = administradorRepo;
-        this.unidadeService = unidadeService;
+        this.unidadeRepo = unidadeRepo;
     }
 
     public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
@@ -117,11 +115,12 @@ public class UsuarioService {
 
     @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String sigla) {
-        UnidadeDto unidadeDto = unidadeService.buscarPorSigla(sigla);
+        Unidade unidade = unidadeRepo.findBySigla(sigla)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", sigla));
 
         // Primeiro busca o chefe (pode ser lazy)
         Usuario usuarioSimples = usuarioRepo
-                .chefePorCodUnidade(unidadeDto.getCodigo())
+                .chefePorCodUnidade(unidade.getCodigo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Responsável da unidade", sigla));
 
         // Recarrega com join fetch para garantir as atribuições
@@ -181,33 +180,29 @@ public class UsuarioService {
     }
 
     public Optional<UnidadeDto> buscarUnidadePorCodigo(Long codigo) {
-        try {
-            return Optional.of(unidadeService.buscarPorCodigo(codigo));
-        } catch (ErroEntidadeNaoEncontrada e) {
-            return Optional.empty();
-        }
+        return unidadeRepo.findById(codigo)
+                .map(u -> toUnidadeDto(u));
     }
 
     public Optional<UnidadeDto> buscarUnidadePorSigla(String sigla) {
-        try {
-            return Optional.of(unidadeService.buscarPorSigla(sigla));
-        } catch (ErroEntidadeNaoEncontrada e) {
-            return Optional.empty();
-        }
+        return unidadeRepo.findBySigla(sigla)
+                .map(u -> toUnidadeDto(u));
     }
 
     public List<UnidadeDto> buscarUnidadesAtivas() {
-        return unidadeService.buscarTodasUnidades();
+        return unidadeRepo.findAllWithHierarquia().stream()
+                .map(this::toUnidadeDto)
+                .toList();
     }
 
     public List<UnidadeDto> buscarSubunidades(Long codigoPai) {
-        return unidadeService.listarSubordinadas(codigoPai).stream()
+        return unidadeRepo.findByUnidadeSuperiorCodigo(codigoPai).stream()
                 .map(this::toUnidadeDto)
                 .toList();
     }
 
     public List<UnidadeDto> construirArvoreHierarquica() {
-        return unidadeService.buscarArvoreHierarquica();
+        return buscarUnidadesAtivas();
     }
 
     public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {

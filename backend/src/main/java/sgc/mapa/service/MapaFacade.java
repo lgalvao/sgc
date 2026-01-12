@@ -1,7 +1,6 @@
 package sgc.mapa.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -12,6 +11,7 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
+import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 import java.util.Optional;
@@ -50,8 +50,8 @@ public class MapaFacade {
             CompetenciaRepo competenciaRepo,
             MapaCompletoMapper mapaCompletoMapper,
             MapaSalvamentoService mapaSalvamentoService,
-            @Lazy MapaVisualizacaoService mapaVisualizacaoService,
-            @Lazy ImpactoMapaService impactoMapaService) {
+            MapaVisualizacaoService mapaVisualizacaoService,
+            ImpactoMapaService impactoMapaService) {
         this.mapaRepo = mapaRepo;
         this.competenciaRepo = competenciaRepo;
         this.mapaCompletoMapper = mapaCompletoMapper;
@@ -152,8 +152,8 @@ public class MapaFacade {
      * @return Um {@link sgc.mapa.dto.visualizacao.MapaVisualizacaoDto} com a estrutura hierárquica completa do mapa.
      */
     @Transactional(readOnly = true)
-    public sgc.mapa.dto.visualizacao.MapaVisualizacaoDto obterMapaParaVisualizacao(Long codSubprocesso) {
-        return mapaVisualizacaoService.obterMapaParaVisualizacao(codSubprocesso);
+    public sgc.mapa.dto.visualizacao.MapaVisualizacaoDto obterMapaParaVisualizacao(Subprocesso subprocesso) {
+        return mapaVisualizacaoService.obterMapaParaVisualizacao(subprocesso);
     }
 
     /**
@@ -168,7 +168,7 @@ public class MapaFacade {
      * @return Um {@link sgc.mapa.dto.ImpactoMapaDto} com o detalhamento dos impactos.
      */
     @Transactional(readOnly = true)
-    public sgc.mapa.dto.ImpactoMapaDto verificarImpactos(Long codSubprocesso, sgc.organizacao.model.Usuario usuario) {
-        return impactoMapaService.verificarImpactos(codSubprocesso, usuario);
+    public sgc.mapa.dto.ImpactoMapaDto verificarImpactos(Subprocesso subprocesso, sgc.organizacao.model.Usuario usuario) {
+        return impactoMapaService.verificarImpactos(subprocesso, usuario);
     }
 }

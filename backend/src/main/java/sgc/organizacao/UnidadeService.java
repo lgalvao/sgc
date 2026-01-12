@@ -1,6 +1,5 @@
 package sgc.organizacao;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,34 +9,34 @@ import sgc.organizacao.dto.CriarAtribuicaoTemporariaReq;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.mapper.UsuarioMapper;
-import sgc.organizacao.model.AtribuicaoTemporaria;
-import sgc.organizacao.model.AtribuicaoTemporariaRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
-import sgc.organizacao.model.Usuario;
-import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoConsultaService;
+import sgc.organizacao.model.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
-@RequiredArgsConstructor
 public class UnidadeService {
+    private static final String MSG_NAO_ENCONTRADA = " não encontrada";
+
     private final UnidadeRepo unidadeRepo;
     private final sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo;
-    private final sgc.mapa.service.MapaFacade mapaFacade;
-    private final UsuarioService usuarioService;
+    private final UsuarioRepo usuarioRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
-    private final ProcessoConsultaService processoConsultaService;
     private final UsuarioMapper usuarioMapper;
+
+    public UnidadeService(
+            UnidadeRepo unidadeRepo,
+            sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo,
+            UsuarioRepo usuarioRepo,
+            AtribuicaoTemporariaRepo atribuicaoTemporariaRepo,
+            UsuarioMapper usuarioMapper) {
+        this.unidadeRepo = unidadeRepo;
+        this.unidadeMapaRepo = unidadeMapaRepo;
+        this.usuarioRepo = usuarioRepo;
+        this.atribuicaoTemporariaRepo = atribuicaoTemporariaRepo;
+        this.usuarioMapper = usuarioMapper;
+    }
 
     public List<UnidadeDto> buscarArvoreHierarquica() {
         List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
@@ -55,18 +54,15 @@ public class UnidadeService {
     }
 
     public List<UnidadeDto> buscarArvoreComElegibilidade(
-            TipoProcesso tipoProcesso, Long codProcesso) {
-        boolean requerMapaVigente =
-                tipoProcesso == TipoProcesso.REVISAO || tipoProcesso == TipoProcesso.DIAGNOSTICO;
-
+            boolean requerMapaVigente, java.util.Set<Long> unidadesBloqueadas) {
         List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
 
-        return montarHierarquiaComElegibilidade(todasUnidades, requerMapaVigente, codProcesso);
+        return montarHierarquiaComElegibilidade(todasUnidades, requerMapaVigente, unidadesBloqueadas);
     }
 
     private List<UnidadeDto> montarHierarquiaComElegibilidade(
-            List<Unidade> unidades, boolean requerMapaVigente, Long codProcessoIgnorar) {
-        Set<Long> unidadesEmProcessoAtivo = getUnidadesEmProcessosAtivos(codProcessoIgnorar);
+            List<Unidade> unidades, boolean requerMapaVigente, Set<Long> unidadesBloqueadas) {
+        Set<Long> unidadesEmProcessoAtivo = unidadesBloqueadas != null ? unidadesBloqueadas : Collections.emptySet();
 
         Set<Long> unidadesComMapa = requerMapaVigente
                 ? new HashSet<>(unidadeMapaRepo.findAllUnidadeCodigos())
@@ -80,9 +76,6 @@ public class UnidadeService {
         return montarHierarquia(unidades, elegibilidadeChecker);
     }
 
-    private Set<Long> getUnidadesEmProcessosAtivos(Long codProcessoIgnorar) {
-        return processoConsultaService.buscarIdsUnidadesEmProcessosAtivos(codProcessoIgnorar);
-    }
 
     public void criarAtribuicaoTemporaria(
             Long codUnidade, CriarAtribuicaoTemporariaReq request) {
@@ -94,9 +87,10 @@ public class UnidadeService {
                                         new ErroEntidadeNaoEncontrada(
                                                 "Unidade com codigo "
                                                         + codUnidade
-                                                        + " não encontrada"));
+                                                        + MSG_NAO_ENCONTRADA));
 
-        Usuario usuario = usuarioService.buscarPorId(request.tituloEleitoralUsuario());
+        Usuario usuario = usuarioRepo.findById(request.tituloEleitoralUsuario())
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", request.tituloEleitoralUsuario()));
 
         java.time.LocalDate inicio = request.dataInicio() != null ? request.dataInicio() : java.time.LocalDate.now();
         if (request.dataTermino().isBefore(inicio)) {
@@ -115,11 +109,13 @@ public class UnidadeService {
     }
 
     public boolean verificarMapaVigente(Long codigoUnidade) {
-        return mapaFacade.buscarMapaVigentePorUnidade(codigoUnidade).isPresent();
+        return unidadeMapaRepo.existsById(codigoUnidade);
     }
 
     public List<UsuarioDto> buscarUsuariosPorUnidade(Long codigoUnidade) {
-        return usuarioService.buscarUsuariosPorUnidade(codigoUnidade);
+        return usuarioRepo.findByUnidadeLotacaoCodigo(codigoUnidade).stream()
+                .map(usuarioMapper::toUsuarioDto)
+                .toList();
     }
 
     private List<UnidadeDto> montarHierarquia(List<Unidade> unidades) {
@@ -186,7 +182,7 @@ public class UnidadeService {
                 .orElseThrow(
                         () ->
                                 new ErroEntidadeNaoEncontrada(
-                                        "Unidade com sigla " + sigla + " não encontrada"));
+                                        "Unidade com sigla " + sigla + MSG_NAO_ENCONTRADA));
     }
 
     public UnidadeDto buscarPorCodigo(Long codigo) {
@@ -202,7 +198,7 @@ public class UnidadeService {
                                 new ErroEntidadeNaoEncontrada(
                                         "Unidade com codigo "
                                                 + codigo
-                                                + " não encontrada"));
+                                                + MSG_NAO_ENCONTRADA));
     }
 
     public boolean existePorId(Long codigo) {
@@ -292,7 +288,7 @@ public class UnidadeService {
                         .orElseThrow(
                                 () ->
                                         new ErroEntidadeNaoEncontrada(
-                                                "Unidade com sigla " + sigla + " não encontrada"));
+                                                "Unidade com sigla " + sigla + MSG_NAO_ENCONTRADA));
 
         if (unidade.getUnidadeSuperior() != null) {
             return unidade.getUnidadeSuperior().getSigla();

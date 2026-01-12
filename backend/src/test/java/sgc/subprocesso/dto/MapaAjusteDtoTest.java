@@ -1,10 +1,6 @@
 package sgc.subprocesso.dto;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import sgc.analise.model.Analise;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;

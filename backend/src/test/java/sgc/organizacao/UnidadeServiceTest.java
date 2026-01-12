@@ -5,18 +5,14 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaReq;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
-import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoConsultaService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,18 +35,23 @@ class UnidadeServiceTest {
     @Mock
     private UnidadeMapaRepo unidadeMapaRepo;
     @Mock
-    private MapaFacade mapaFacade;
-    @Mock
-    private UsuarioService usuarioService;
+    private UsuarioRepo usuarioRepo;
     @Mock
     private AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     @Mock
-    private ProcessoConsultaService processoConsultaService;
-    @Mock
     private UsuarioMapper usuarioMapper;
 
-    @InjectMocks
     private UnidadeService service;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        service = new UnidadeService(
+                unidadeRepo,
+                unidadeMapaRepo,
+                usuarioRepo,
+                atribuicaoTemporariaRepo,
+                usuarioMapper);
+    }
 
     @Nested
     @DisplayName("Busca de Unidades e Hierarquia")
@@ -221,12 +222,8 @@ class UnidadeServiceTest {
             Unidade u1 = new Unidade();
             u1.setCodigo(1L);
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(processoConsultaService.buscarIdsUnidadesEmProcessosAtivos(any()))
-                    .thenReturn(Collections.emptySet());
-            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
-
             // Act
-            List<UnidadeDto> result = service.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, null);
+            List<UnidadeDto> result = service.buscarArvoreComElegibilidade(false, Collections.emptySet());
 
             // Assert
             assertThat(result).hasSize(1);
@@ -240,12 +237,8 @@ class UnidadeServiceTest {
             u1.setCodigo(1L);
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
             when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L));
-            when(processoConsultaService.buscarIdsUnidadesEmProcessosAtivos(any()))
-                    .thenReturn(Collections.emptySet());
-            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
-
             // Act
-            List<UnidadeDto> result = service.buscarArvoreComElegibilidade(TipoProcesso.REVISAO, null);
+            List<UnidadeDto> result = service.buscarArvoreComElegibilidade(true, Collections.emptySet());
 
             // Assert
             assertThat(result).hasSize(1);
@@ -261,14 +254,8 @@ class UnidadeServiceTest {
 
             // Unidade 1 não está na lista de mapas vigentes
             when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(2L));
-            when(processoConsultaService.buscarIdsUnidadesEmProcessosAtivos(any()))
-                    .thenReturn(Collections.emptySet());
-
-            // Mock deve ser chamado com elegivel=false
-            when(usuarioMapper.toUnidadeDto(u1, false)).thenReturn(UnidadeDto.builder().codigo(1L).build());
-
             // Act
-            List<UnidadeDto> result = service.buscarArvoreComElegibilidade(TipoProcesso.REVISAO, null);
+            List<UnidadeDto> result = service.buscarArvoreComElegibilidade(true, Collections.emptySet());
 
             // Assert
             assertThat(result).hasSize(1);
@@ -284,14 +271,8 @@ class UnidadeServiceTest {
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
 
             // Unidade 1 está em processo ativo
-            when(processoConsultaService.buscarIdsUnidadesEmProcessosAtivos(any()))
-                    .thenReturn(new java.util.HashSet<>(List.of(1L)));
-
-            // Mock deve ser chamado com elegivel=false
-            when(usuarioMapper.toUnidadeDto(u1, false)).thenReturn(UnidadeDto.builder().codigo(1L).build());
-
             // Act
-            List<UnidadeDto> result = service.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, null);
+            List<UnidadeDto> result = service.buscarArvoreComElegibilidade(false, new java.util.HashSet<>(List.of(1L)));
 
             // Assert
             assertThat(result).hasSize(1);
@@ -302,7 +283,7 @@ class UnidadeServiceTest {
         @DisplayName("Deve verificar se tem mapa vigente")
         void deveVerificarMapaVigente() {
             // Arrange
-            when(mapaFacade.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.of(new sgc.mapa.model.Mapa()));
+            when(unidadeMapaRepo.existsById(1L)).thenReturn(true);
 
             // Act & Assert
             assertThat(service.verificarMapaVigente(1L)).isTrue();
@@ -318,7 +299,7 @@ class UnidadeServiceTest {
         void deveCriarAtribuicaoTemporariaComSucesso() {
             // Arrange
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
-            when(usuarioService.buscarPorId("123")).thenReturn(new Usuario());
+            when(usuarioRepo.findById("123")).thenReturn(Optional.of(new Usuario()));
 
             CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
                     "123", java.time.LocalDate.now(), java.time.LocalDate.now().plusDays(1), "Justificativa");
@@ -334,7 +315,7 @@ class UnidadeServiceTest {
         @DisplayName("Deve falhar ao criar atribuição se datas inválidas")
         void deveFalharCriarAtribuicaoDatasInvalidas() {
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
-            when(usuarioService.buscarPorId("123")).thenReturn(new Usuario());
+            when(usuarioRepo.findById("123")).thenReturn(Optional.of(new Usuario()));
 
             CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
                     "123", java.time.LocalDate.now().plusDays(1), java.time.LocalDate.now(), "Justificativa");
@@ -358,7 +339,7 @@ class UnidadeServiceTest {
         @DisplayName("Deve criar atribuição com data atual se dataInicio for nula")
         void deveCriarAtribuicaoComDataAtualSeInicioNulo() {
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
-            when(usuarioService.buscarPorId("123")).thenReturn(new Usuario());
+            when(usuarioRepo.findById("123")).thenReturn(Optional.of(new Usuario()));
 
             CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
                     "123", null, java.time.LocalDate.now().plusDays(1), "Justificativa");
@@ -372,7 +353,7 @@ class UnidadeServiceTest {
         @DisplayName("Deve buscar usuários por unidade")
         void deveBuscarUsuariosPorUnidade() {
             // Arrange
-            when(usuarioService.buscarUsuariosPorUnidade(1L)).thenReturn(List.of(sgc.organizacao.dto.UsuarioDto.builder().build()));
+            when(usuarioRepo.findByUnidadeLotacaoCodigo(1L)).thenReturn(List.of(new Usuario()));
 
             // Act & Assert
             assertThat(service.buscarUsuariosPorUnidade(1L)).hasSize(1);
@@ -508,12 +489,7 @@ class UnidadeServiceTest {
         Unidade filho = new Unidade(); filho.setCodigo(2L); filho.setUnidadeSuperior(pai);
         
         when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(pai, filho));
-        when(processoConsultaService.buscarIdsUnidadesEmProcessosAtivos(null)).thenReturn(Collections.emptySet());
-        
-        when(usuarioMapper.toUnidadeDto(eq(pai), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
-        when(usuarioMapper.toUnidadeDto(eq(filho), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(2L).build());
-        
-        service.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, null);
+        service.buscarArvoreComElegibilidade(false, Collections.emptySet());
         
         verify(usuarioMapper).toUnidadeDto(eq(filho), anyBoolean());
     }

@@ -13,7 +13,6 @@ import sgc.mapa.model.*;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,7 +35,6 @@ import static sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS;
 @Slf4j
 @RequiredArgsConstructor
 public class ImpactoMapaService {
-    private final SubprocessoFacade subprocessoFacade;
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
     private final AtividadeService atividadeService;
@@ -61,8 +59,7 @@ public class ImpactoMapaService {
      *                                   situação atual do subprocesso.
      */
     @Transactional(readOnly = true)
-    public ImpactoMapaDto verificarImpactos(Long codSubprocesso, Usuario usuario) {
-        Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codSubprocesso);
+    public ImpactoMapaDto verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
         
         // Verificação centralizada de acesso
         accessControlService.verificarPermissao(usuario, VERIFICAR_IMPACTOS, subprocesso);
@@ -74,8 +71,8 @@ public class ImpactoMapaService {
         }
 
         Mapa mapaVigente = mapaVigenteOpt.get();
-        Mapa mapaSubprocesso = mapaRepo.findBySubprocessoCodigo(codSubprocesso).orElseThrow(
-                () -> new ErroEntidadeNaoEncontrada("Mapa não encontrado para subprocesso", codSubprocesso)
+        Mapa mapaSubprocesso = mapaRepo.findBySubprocessoCodigo(subprocesso.getCodigo()).orElseThrow(
+                () -> new ErroEntidadeNaoEncontrada("Mapa não encontrado para subprocesso", subprocesso.getCodigo())
         );
 
         List<Atividade> atividadesAtuais = obterAtividadesDoMapa(mapaSubprocesso);

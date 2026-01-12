@@ -12,12 +12,7 @@ import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.organizacao.UnidadeService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Unidade;
-import sgc.processo.dto.AtualizarProcessoReq;
-import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.dto.ProcessoContextoDto;
-import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.dto.ProcessoDto;
-import sgc.processo.dto.SubprocessoElegivelDto;
+import sgc.processo.dto.*;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.eventos.EventoProcessoAtualizado;
@@ -33,12 +28,7 @@ import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static sgc.organizacao.model.TipoUnidade.INTERMEDIARIA;

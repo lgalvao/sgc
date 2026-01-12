@@ -3,14 +3,14 @@
  * 
  * <h2>Visão Geral</h2>
  * <p>Este pacote contém os serviços que implementam a lógica de negócio do módulo de subprocessos.
- * Segue o <strong>padrão Facade</strong> onde controllers interagem APENAS com {@link SubprocessoFacade},
+ * Segue o <strong>padrão Facade</strong> onde controllers interagem APENAS com {@link sgc.subprocesso.service.SubprocessoFacade},
  * que por sua vez orquestra os services especializados.</p>
  * 
  * <h2>Arquitetura de Services</h2>
  * 
  * <h3>Facade (Public API)</h3>
  * <ul>
- *   <li>{@link SubprocessoFacade} - Ponto de entrada único para todas as operações de subprocesso</li>
+ *   <li>{@link sgc.subprocesso.service.SubprocessoFacade} - Ponto de entrada único para todas as operações de subprocesso</li>
  * </ul>
  * 
  * <h3>Workflow Services (Especializado)</h3>
@@ -182,7 +182,7 @@
  *   <li><strong>Visibilidade:</strong> Todos public (deveria ser package-private exceto Facade)</li>
  * </ul>
  * 
- * @see SubprocessoFacade
+ * @see sgc.subprocesso.service.SubprocessoFacade
  * @see sgc.subprocesso.service.decomposed
  * @see sgc.seguranca.acesso.AccessControlService
  * @author Sistema SGC
