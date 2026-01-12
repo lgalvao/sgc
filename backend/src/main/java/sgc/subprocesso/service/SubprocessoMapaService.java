@@ -112,27 +112,10 @@ public class SubprocessoMapaService {
             throw new ErroMapaNaoAssociado("Subprocesso de origem ou destino não possui mapa associado.");
         }
 
-        List<Atividade> atividadesOrigem = atividadeService.buscarPorMapaCodigo(spOrigem.getMapa().getCodigo());
-
-        if (atividadesOrigem == null || atividadesOrigem.isEmpty()) {
-            return;
-        }
-
-        List<String> descricoesExistentes =
-                atividadeService.buscarPorMapaCodigo(spDestino.getMapa().getCodigo()).stream()
-                        .map(Atividade::getDescricao)
-                        .toList();
-
-        for (Atividade atividadeOrigem : atividadesOrigem) {
-            if (descricoesExistentes.contains(atividadeOrigem.getDescricao())) {
-                continue;
-            }
-
-            AtividadeDto novaDto = new AtividadeDto();
-            novaDto.setDescricao(atividadeOrigem.getDescricao());
-            novaDto.setMapaCodigo(spDestino.getMapa().getCodigo());
-        }
-
+        // ⚡ Bolt: Remoção de lógica redundante.
+        // A lógica de busca e verificação de duplicatas já é tratada internamente
+        // pelo CopiaMapaService.importarAtividadesDeOutroMapa.
+        // O código anterior buscava todas as atividades e criava DTOs que eram descartados.
         copiaMapaService.importarAtividadesDeOutroMapa(
                 spOrigem.getMapa().getCodigo(),
                 spDestino.getMapa().getCodigo()
