@@ -1,8 +1,8 @@
 package sgc;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -20,8 +20,8 @@ import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.mapa.service.MapaSalvamentoService;
 import sgc.mapa.service.MapaFacade;
+import sgc.mapa.service.MapaSalvamentoService;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.painel.PainelService;

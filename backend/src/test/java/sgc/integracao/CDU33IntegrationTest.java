@@ -42,6 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-33: Reabrir revisão de cadastro")
 class CDU33IntegrationTest extends BaseIntegrationTest {
+    private static final String API_REABRIR_REVISAO = "/api/subprocessos/{codigo}/reabrir-revisao-cadastro";
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -64,17 +65,15 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
-    private Unidade unidade;
-    private Processo processo;
     private Subprocesso subprocesso;
 
     @BeforeEach
     void setUp() {
         // Obter Unidade
-        unidade = unidadeRepo.findById(1L).orElseThrow();
+        Unidade unidade = unidadeRepo.findById(1L).orElseThrow();
 
         // Criar Processo de REVISAO
-        processo = ProcessoFixture.processoPadrao();
+        Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.REVISAO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -104,7 +103,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
 
         // When
         mockMvc.perform(
-                post("/api/subprocessos/{codigo}/reabrir-revisao-cadastro", subprocesso.getCodigo())
+                post(API_REABRIR_REVISAO, subprocesso.getCodigo())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -128,7 +127,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
         // Verificar se foi criado um alerta
         boolean alertaExiste = alertaRepo.findAll().stream()
                 .anyMatch(a -> a.getUnidadeDestino() != null &&
-                        a.getUnidadeDestino().getCodigo().equals(unidade.getCodigo()) &&
+                        a.getUnidadeDestino().getCodigo().equals(reaberto.getUnidade().getCodigo()) &&
                         a.getDescricao().contains("reaberta"));
         assertThat(alertaExiste).isTrue();
     }
@@ -142,7 +141,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
 
         // When/Then
         mockMvc.perform(
-                post("/api/subprocessos/{codigo}/reabrir-revisao-cadastro", subprocesso.getCodigo())
+                post(API_REABRIR_REVISAO, subprocesso.getCodigo())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -158,7 +157,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
 
         // When/Then
         mockMvc.perform(
-                post("/api/subprocessos/{codigo}/reabrir-revisao-cadastro", subprocesso.getCodigo())
+                post(API_REABRIR_REVISAO, subprocesso.getCodigo())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))

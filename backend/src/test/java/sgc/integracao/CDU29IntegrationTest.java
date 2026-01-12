@@ -42,8 +42,6 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
     private EntityManager entityManager;
 
     private Processo processoFinalizado1;
-    private Processo processoFinalizado2;
-    private Processo processoEmAndamento;
 
     @BeforeEach
     void setUp() {
@@ -57,20 +55,20 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
         processoFinalizado1 = processoRepo.save(processoFinalizado1);
 
         // Criar processo finalizado 2
-        processoFinalizado2 = ProcessoFixture.processoPadrao();
+        Processo processoFinalizado2 = ProcessoFixture.processoPadrao();
         processoFinalizado2.setCodigo(null);
         processoFinalizado2.setDescricao("Processo Finalizado 2");
         processoFinalizado2.setSituacao(SituacaoProcesso.FINALIZADO);
         processoFinalizado2.setTipo(TipoProcesso.REVISAO);
         processoFinalizado2.setDataFinalizacao(LocalDateTime.now().minusDays(1));
-        processoFinalizado2 = processoRepo.save(processoFinalizado2);
+        processoRepo.save(processoFinalizado2);
 
         // Criar processo em andamento (não deve aparecer)
-        processoEmAndamento = ProcessoFixture.processoPadrao();
+        Processo processoEmAndamento = ProcessoFixture.processoPadrao();
         processoEmAndamento.setCodigo(null);
         processoEmAndamento.setDescricao("Processo Em Andamento");
         processoEmAndamento.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processoEmAndamento = processoRepo.save(processoEmAndamento);
+        processoRepo.save(processoEmAndamento);
 
         entityManager.flush();
         entityManager.clear();

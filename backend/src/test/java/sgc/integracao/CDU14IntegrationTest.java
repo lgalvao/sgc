@@ -50,6 +50,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 })
 @org.springframework.transaction.annotation.Transactional
 class CDU14IntegrationTest extends BaseIntegrationTest {
+    private static final String APPLICATION_JSON = "application/json";
+    private static final String API_SUBPROCESSOS_ID_DISPONIBILIZAR = "/api/subprocessos/{id}/disponibilizar-revisao";
+    private static final String API_SUBPROCESSOS_ID_ACEITAR = "/api/subprocessos/{id}/aceitar-revisao-cadastro";
+    private static final String API_SUBPROCESSOS_ID_HOMOLOGAR = "/api/subprocessos/{id}/homologar-revisao-cadastro";
+    private static final String JSON_OBS_OK = "{\"observacoes\": \"OK\"}";
+
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -152,7 +158,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                 post("/api/processos")
                                         .with(csrf())
                                         .with(user(admin))
-                                        .contentType("application/json")
+                                        .contentType(APPLICATION_JSON)
                                         .content(reqJson))
                         .andExpect(status().isCreated())
                         .andReturn()
@@ -169,7 +175,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                         post("/api/processos/{codigo}/iniciar", processoDto.getCodigo())
                                 .with(csrf())
                                 .with(user(admin))
-                                .contentType("application/json")
+                                .contentType(APPLICATION_JSON)
                                 .content(iniciarReqJson))
                 .andExpect(status().isOk());
 
@@ -188,7 +194,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             Long subprocessoId = criarEComecarProcessoDeRevisao();
 
             mockMvc.perform(
-                            post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
+                            post(API_SUBPROCESSOS_ID_DISPONIBILIZAR, subprocessoId)
                                     .with(csrf())
                                     .with(user(chefe)))
                     .andExpect(status().isOk());
@@ -197,7 +203,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                             post("/api/subprocessos/{id}/devolver-revisao-cadastro", subprocessoId)
                                     .with(csrf())
                                     .with(user(gestor))
-                                    .contentType("application/json")
+                                    .contentType(APPLICATION_JSON)
                                     .content(
                                             "{\"motivo\": \"Teste\", \"observacoes\":"
                                                     + " \"Ajustar\"}"))
@@ -221,17 +227,17 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         void gestorAceitaRevisao() throws Exception {
             Long subprocessoId = criarEComecarProcessoDeRevisao();
             mockMvc.perform(
-                            post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
+                            post(API_SUBPROCESSOS_ID_DISPONIBILIZAR, subprocessoId)
                                     .with(csrf())
                                     .with(user(chefe)))
                     .andExpect(status().isOk());
 
             mockMvc.perform(
-                            post("/api/subprocessos/{id}/aceitar-revisao-cadastro", subprocessoId)
+                            post(API_SUBPROCESSOS_ID_ACEITAR, subprocessoId)
                                     .with(csrf())
                                     .with(user(gestor))
-                                    .contentType("application/json")
-                                    .content("{\"observacoes\": \"OK\"}"))
+                                    .contentType(APPLICATION_JSON)
+                                    .content(JSON_OBS_OK))
                     .andExpect(status().isOk());
 
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
@@ -253,16 +259,16 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         void setUpHomologacao() throws Exception {
             subprocessoId = criarEComecarProcessoDeRevisao();
             mockMvc.perform(
-                            post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
+                            post(API_SUBPROCESSOS_ID_DISPONIBILIZAR, subprocessoId)
                                     .with(csrf())
                                     .with(user(chefe)))
                     .andExpect(status().isOk());
             mockMvc.perform(
-                            post("/api/subprocessos/{id}/aceitar-revisao-cadastro", subprocessoId)
+                            post(API_SUBPROCESSOS_ID_ACEITAR, subprocessoId)
                                     .with(csrf())
                                     .with(user(gestor))
-                                    .contentType("application/json")
-                                    .content("{\"observacoes\": \"OK\"}"))
+                                    .contentType(APPLICATION_JSON)
+                                    .content(JSON_OBS_OK))
                     .andExpect(status().isOk());
         }
 
@@ -270,10 +276,10 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         @DisplayName("ADMIN homologa SEM impactos, alterando status para MAPA_HOMOLOGADO")
         void adminHomologaSemImpactos() throws Exception {
             mockMvc.perform(
-                            post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
+                            post(API_SUBPROCESSOS_ID_HOMOLOGAR, subprocessoId)
                                     .with(csrf())
                                     .with(user(admin))
-                                    .contentType("application/json")
+                                    .contentType(APPLICATION_JSON)
                                     .content("{\"observacoes\": \"Homologado\"}"))
                     .andExpect(status().isOk());
 
@@ -294,10 +300,10 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             entityManager.flush();
 
             mockMvc.perform(
-                            post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
+                            post(API_SUBPROCESSOS_ID_HOMOLOGAR, subprocessoId)
                                     .with(csrf())
                                     .with(user(admin))
-                                    .contentType("application/json")
+                                    .contentType(APPLICATION_JSON)
                                     .content("{\"observacoes\": \"Homologado com impacto\"}"))
                     .andExpect(status().isOk());
 
@@ -315,7 +321,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         void deveRetornarHistoricoDeAnalise() throws Exception {
             Long subprocessoId = criarEComecarProcessoDeRevisao();
             mockMvc.perform(
-                            post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
+                            post(API_SUBPROCESSOS_ID_DISPONIBILIZAR, subprocessoId)
                                     .with(csrf())
                                     .with(user(chefe)))
                     .andExpect(status().isOk());
@@ -324,7 +330,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                             post("/api/subprocessos/{id}/devolver-revisao-cadastro", subprocessoId)
                                     .with(csrf())
                                     .with(user(gestor))
-                                    .contentType("application/json")
+                                    .contentType(APPLICATION_JSON)
                                     .content(
                                             "{\"motivo\": \"Teste Histórico\", \"observacoes\":"
                                                     + " \"Registrando análise\"}"))
@@ -374,23 +380,23 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         void chefeNaoPodeHomologar() throws Exception {
             Long subprocessoId = criarEComecarProcessoDeRevisao();
             mockMvc.perform(
-                            post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
+                            post(API_SUBPROCESSOS_ID_DISPONIBILIZAR, subprocessoId)
                                     .with(csrf())
                                     .with(user(chefe)))
                     .andExpect(status().isOk());
             mockMvc.perform(
-                            post("/api/subprocessos/{id}/aceitar-revisao-cadastro", subprocessoId)
+                            post(API_SUBPROCESSOS_ID_ACEITAR, subprocessoId)
                                     .with(csrf())
                                     .with(user(gestor))
-                                    .contentType("application/json")
-                                    .content("{\"observacoes\": \"OK\"}"))
+                                    .contentType(APPLICATION_JSON)
+                                    .content(JSON_OBS_OK))
                     .andExpect(status().isOk());
 
             mockMvc.perform(
-                            post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
+                            post(API_SUBPROCESSOS_ID_HOMOLOGAR, subprocessoId)
                                     .with(csrf())
                                     .with(user(chefe))
-                                    .contentType("application/json")
+                                    .contentType(APPLICATION_JSON)
                                     .content("{\"observacoes\": \"Tudo certo por mim\"}"))
                     .andExpect(status().isForbidden());
         }
@@ -404,10 +410,10 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             // Retorna 403 (Forbidden) em vez de 422 (Unprocessable Entity)
             // Isso é mais correto do ponto de vista de segurança: verificar permissões antes de validações de negócio
             mockMvc.perform(
-                            post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
+                            post(API_SUBPROCESSOS_ID_HOMOLOGAR, subprocessoId)
                                     .with(csrf())
                                     .with(user(admin))
-                                    .contentType("application/json")
+                                    .contentType(APPLICATION_JSON)
                                     .content("{\"observacoes\": \"Homologado fora de hora\"}"))
                     .andExpect(status().isForbidden());
         }

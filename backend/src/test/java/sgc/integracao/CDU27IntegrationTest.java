@@ -62,17 +62,15 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
-    private Unidade unidade;
-    private Processo processo;
     private Subprocesso subprocesso;
 
     @BeforeEach
     void setUp() {
         // Obter Unidade
-        unidade = unidadeRepo.findById(1L).orElseThrow();
+        Unidade unidade = unidadeRepo.findById(1L).orElseThrow();
 
         // Criar Processo
-        processo = ProcessoFixture.processoPadrao();
+        Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -120,7 +118,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
         // Verify Alerta
         boolean alertaExiste = alertaRepo.findAll().stream()
                 .anyMatch(a -> a.getUnidadeDestino() != null &&
-                        a.getUnidadeDestino().getCodigo().equals(unidade.getCodigo()) &&
+                        a.getUnidadeDestino().getCodigo().equals(atualizado.getUnidade().getCodigo()) &&
                         a.getDescricao().contains("Data limite"));
         assertThat(alertaExiste).isTrue();
     }

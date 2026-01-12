@@ -201,7 +201,7 @@
 import {BAlert, BButton, BCol, BContainer, BDropdown, BDropdownItem, BForm, BFormInput} from "bootstrap-vue-next";
 import {computed, nextTick, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
-import {badgeClass, situacaoLabel, logger} from "@/utils";
+import {badgeClass, logger, situacaoLabel} from "@/utils";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";

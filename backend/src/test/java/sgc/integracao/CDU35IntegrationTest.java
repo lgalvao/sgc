@@ -39,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-35: Gerar relatório de andamento")
 class CDU35IntegrationTest extends BaseIntegrationTest {
+    private static final String API_REL_ANDAMENTO = "/api/relatorios/andamento/{codProcesso}";
 
     @Autowired
     private ProcessoRepo processoRepo;
@@ -52,14 +53,12 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
-    private Unidade unidade;
     private Processo processo;
-    private Subprocesso subprocesso;
 
     @BeforeEach
     void setUp() {
         // Obter Unidade
-        unidade = unidadeRepo.findById(1L).orElseThrow();
+        Unidade unidade = unidadeRepo.findById(1L).orElseThrow();
 
         // Criar Processo
         processo = ProcessoFixture.processoPadrao();
@@ -70,11 +69,11 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
         processo = processoRepo.save(processo);
 
         // Criar Subprocesso
-        subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
+        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
-        subprocesso = subprocessoRepo.save(subprocesso);
+        subprocessoRepo.save(subprocesso);
 
         entityManager.flush();
         entityManager.clear();
@@ -86,7 +85,7 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
     void gerarRelatorioAndamento_comoAdmin_sucesso() throws Exception {
         // When/Then
         mockMvc.perform(
-                get("/api/relatorios/andamento/{codProcesso}", processo.getCodigo())
+                get(API_REL_ANDAMENTO, processo.getCodigo())
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "application/pdf"))
@@ -99,7 +98,7 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
     void gerarRelatorioAndamento_semPermissao_proibido() throws Exception {
         // When/Then
         mockMvc.perform(
-                get("/api/relatorios/andamento/{codProcesso}", processo.getCodigo())
+                get(API_REL_ANDAMENTO, processo.getCodigo())
                         .with(csrf()))
                 .andExpect(status().isForbidden());
     }
@@ -110,7 +109,7 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
     void gerarRelatorioAndamento_processoInexistente_erro() throws Exception {
         // When/Then
         mockMvc.perform(
-                get("/api/relatorios/andamento/{codProcesso}", 99999L)
+                get(API_REL_ANDAMENTO, 99999L)
                         .with(csrf()))
                 .andExpect(status().is4xxClientError());
     }

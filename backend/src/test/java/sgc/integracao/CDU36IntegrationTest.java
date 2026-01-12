@@ -41,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-36: Gerar relatório de mapas")
 class CDU36IntegrationTest extends BaseIntegrationTest {
+    private static final String API_REL_MAPAS = "/api/relatorios/mapas/{codProcesso}";
 
     @Autowired
     private ProcessoRepo processoRepo;
@@ -59,8 +60,6 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
 
     private Unidade unidade;
     private Processo processo;
-    private Subprocesso subprocesso;
-    private Mapa mapa;
 
     @BeforeEach
     void setUp() {
@@ -76,14 +75,14 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
         processo = processoRepo.save(processo);
 
         // Criar Subprocesso
-        subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
+        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocesso = subprocessoRepo.save(subprocesso);
 
         // Criar Mapa (opcional, mas ajuda a tornar o teste mais realista)
-        mapa = new Mapa();
+        Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocesso);
         mapaRepo.save(mapa);
 
@@ -97,7 +96,7 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
     void gerarRelatorioMapas_comoAdmin_sucesso() throws Exception {
         // When/Then - Relatório de todos os mapas do processo
         mockMvc.perform(
-                get("/api/relatorios/mapas/{codProcesso}", processo.getCodigo())
+                get(API_REL_MAPAS, processo.getCodigo())
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "application/pdf"))
@@ -110,7 +109,7 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
     void gerarRelatorioMapas_filtradoPorUnidade_sucesso() throws Exception {
         // When/Then - Relatório filtrado por unidade específica
         mockMvc.perform(
-                get("/api/relatorios/mapas/{codProcesso}", processo.getCodigo())
+                get(API_REL_MAPAS, processo.getCodigo())
                         .param("codUnidade", unidade.getCodigo().toString())
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -124,7 +123,7 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
     void gerarRelatorioMapas_semPermissao_proibido() throws Exception {
         // When/Then
         mockMvc.perform(
-                get("/api/relatorios/mapas/{codProcesso}", processo.getCodigo())
+                get(API_REL_MAPAS, processo.getCodigo())
                         .with(csrf()))
                 .andExpect(status().isForbidden());
     }
@@ -135,7 +134,7 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
     void gerarRelatorioMapas_processoInexistente_erro() throws Exception {
         // When/Then
         mockMvc.perform(
-                get("/api/relatorios/mapas/{codProcesso}", 99999L)
+                get(API_REL_MAPAS, 99999L)
                         .with(csrf()))
                 .andExpect(status().is4xxClientError());
     }

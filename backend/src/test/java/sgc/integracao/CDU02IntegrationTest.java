@@ -1,5 +1,6 @@
 package sgc.integracao;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,9 +37,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-02: Visualizar Painel")
 @Import(TestSecurityConfig.class)
+@Slf4j
 class CDU02IntegrationTest extends BaseIntegrationTest {
     private static final String API_PAINEL_PROCESSOS = "/api/painel/processos";
     private static final String API_PAINEL_ALERTAS = "/api/painel/alertas";
+    private static final String PERFIL = "perfil";
+    private static final String UNIDADE = "unidade";
+    private static final String GESTOR = "GESTOR";
+    private static final String CHEFE = "CHEFE";
+    private static final String PROCESSO_RAIZ_JSON_PATH = "$.content[?(@.descricao == 'Processo Raiz')]";
+    private static final String PROCESSO_FILHA_1_JSON_PATH = "$.content[?(@.descricao == 'Processo Filha 1')]";
 
     @Autowired
     private UnidadeRepo unidadeRepo;
@@ -66,7 +74,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             jdbcTemplate.execute("ALTER TABLE SGC.ALERTA ALTER COLUMN CODIGO RESTART WITH 90000");
         } catch (Exception e) {
             // Ignora se o DB não suportar (H2 suporta)
-            System.err.println("Aviso: Não foi possível reiniciar sequências: " + e.getMessage());
+            log.warn("Aviso: Não foi possível reiniciar sequências: {}", e.getMessage());
         }
 
         // Setup Programático - Não depende do data.sql
@@ -162,29 +170,29 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         @Test
         @WithMockAdmin
         @DisplayName("ADMIN deve ver todos os processos, incluindo os com status 'Criado'")
-        void testListarProcessos_Admin_VeTodos() throws Exception {
+        void testListarProcessosAdminVeTodos() throws Exception {
             // Admin vê tudo, inclusive os 3 criados no setup
-            mockMvc.perform(get(API_PAINEL_PROCESSOS).param("perfil", "ADMIN"))
+            mockMvc.perform(get(API_PAINEL_PROCESSOS).param(PERFIL, "ADMIN"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Raiz')]").exists())
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Filha 1')]").exists())
+                    .andExpect(jsonPath(PROCESSO_RAIZ_JSON_PATH).exists())
+                    .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).exists())
                     .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Criado Teste')]").exists());
         }
 
         @Test
         @DisplayName("GESTOR da unidade raiz deve ver todos os processos da sua unidade e de todas as subordinadas")
         @org.springframework.security.test.context.support.WithMockUser(username = "99001")
-        void testListarProcessos_GestorRaiz_VeTodos() throws Exception {
-            setupSecurityContext("99001", unidadeRaiz, "GESTOR");
+        void testListarProcessosGestorRaizVeTodos() throws Exception {
+            setupSecurityContext("99001", unidadeRaiz, GESTOR);
 
             mockMvc.perform(
                     get(API_PAINEL_PROCESSOS)
-                            .param("perfil", "GESTOR")
-                            .param("unidade", unidadeRaiz.getCodigo().toString()))
+                            .param(PERFIL, GESTOR)
+                            .param(UNIDADE, unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
                     // Deve ver o da Raiz e o da Filha
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Raiz')]").exists())
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Filha 1')]").exists())
+                    .andExpect(jsonPath(PROCESSO_RAIZ_JSON_PATH).exists())
+                    .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).exists())
                     // GESTOR não vê processos com status CRIADO (regra confirmada)
                     .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Criado Teste')]").doesNotExist());
         }
@@ -192,24 +200,24 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("CHEFE da unidade Filha 2 não deve ver processos de outras unidades")
         @org.springframework.security.test.context.support.WithMockUser(username = "99002")
-        void testListarProcessos_ChefeUnidadeFilha2_NaoVeProcessosDeOutros() throws Exception {
-            setupSecurityContext("99002", unidadeFilha2, "CHEFE");
+        void testListarProcessosChefeUnidadeFilha2NaoVeProcessosDeOutros() throws Exception {
+            setupSecurityContext("99002", unidadeFilha2, CHEFE);
 
             // Unidade Filha 2 não tem processos no setup
             mockMvc.perform(
                     get(API_PAINEL_PROCESSOS)
-                            .param("perfil", "CHEFE")
-                            .param("unidade", unidadeFilha2.getCodigo().toString()))
+                            .param(PERFIL, CHEFE)
+                            .param(UNIDADE, unidadeFilha2.getCodigo().toString()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Raiz')]").doesNotExist())
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Filha 1')]").doesNotExist());
+                    .andExpect(jsonPath(PROCESSO_RAIZ_JSON_PATH).doesNotExist())
+                    .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).doesNotExist());
         }
 
         @Test
         @DisplayName("Nenhum perfil, exceto ADMIN, deve ver processos com status 'Criado' (Exceto da própria unidade)")
         @org.springframework.security.test.context.support.WithMockUser(username = "99003")
-        void testListarProcessos_NaoAdmin_NaoVeProcessosCriados() throws Exception {
-            setupSecurityContext("99003", unidadeRaiz, "GESTOR");
+        void testListarProcessosNaoAdminNaoVeProcessosCriados() throws Exception {
+            setupSecurityContext("99003", unidadeRaiz, GESTOR);
 
             // Vamos replicar o cenário: Processo Criado numa unidade FILHA.
             Processo processoCriadoFilha = ProcessoFixture.processoPadrao();
@@ -220,11 +228,11 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                     get(API_PAINEL_PROCESSOS)
-                            .param("perfil", "GESTOR")
-                            .param("unidade", unidadeRaiz.getCodigo().toString()))
+                            .param(PERFIL, GESTOR)
+                            .param(UNIDADE, unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
                     // Deve ver Raiz e Filha (Em Andamento)
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Filha 1')]").exists())
+                    .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).exists())
                     // NÃO deve ver Criado Filha (Se a regra for essa)
                     .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Criado Filha')]").doesNotExist());
         }
@@ -236,8 +244,8 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Usuário deve ver alertas direcionados a ele")
         @org.springframework.security.test.context.support.WithMockUser(username = "99004")
-        void testListarAlertas_UsuarioVeSeusAlertas() throws Exception {
-            Usuario usuario = setupSecurityContext("99004", unidadeRaiz, "GESTOR");
+        void testListarAlertasUsuarioVeSeusAlertas() throws Exception {
+            Usuario usuario = setupSecurityContext("99004", unidadeRaiz, GESTOR);
 
             Alerta alerta = AlertaFixture.alertaParaUsuario(processoRaiz, usuario);
             alerta.setCodigo(null);
@@ -246,7 +254,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(get(API_PAINEL_ALERTAS)
                             .param("usuarioTitulo", usuario.getTituloEleitoral())
-                            .param("unidade", unidadeRaiz.getCodigo().toString()))
+                            .param(UNIDADE, unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta Pessoal Teste')]").exists());
         }
@@ -254,8 +262,8 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Usuário deve ver alertas direcionados à sua unidade e às suas subordinadas")
         @org.springframework.security.test.context.support.WithMockUser(username = "99005")
-        void testListarAlertas_UsuarioVeAlertasDaSuaUnidade() throws Exception {
-            setupSecurityContext("99005", unidadeRaiz, "GESTOR");
+        void testListarAlertasUsuarioVeAlertasDaSuaUnidade() throws Exception {
+            setupSecurityContext("99005", unidadeRaiz, GESTOR);
             // Alerta para Unidade Filha 1 (Subordinada à Raiz)
             Alerta alerta = AlertaFixture.alertaParaUnidade(processoFilha1, unidadeFilha1);
             alerta.setCodigo(null);
@@ -263,7 +271,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             alertaRepo.save(alerta);
 
             mockMvc.perform(get(API_PAINEL_ALERTAS)
-                    .param("unidade", unidadeRaiz.getCodigo().toString()))
+                    .param(UNIDADE, unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
                     // Painel não mostra alertas de subordinadas (regra atual do código)
                     .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta Subordinada Teste')]").doesNotExist());
@@ -272,8 +280,8 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Usuário não deve ver alertas de outros usuários ou unidades")
         @org.springframework.security.test.context.support.WithMockUser(username = "99006")
-        void testListarAlertas_UsuarioNaoVeAlertasDeOutros() throws Exception {
-            Usuario usuario = setupSecurityContext("99006", unidadeFilha2, "CHEFE");
+        void testListarAlertasUsuarioNaoVeAlertasDeOutros() throws Exception {
+            Usuario usuario = setupSecurityContext("99006", unidadeFilha2, CHEFE);
 
             // Alerta para Unidade Filha 1 (Irmã, não subordinada)
             Alerta alerta = AlertaFixture.alertaParaUnidade(processoFilha1, unidadeFilha1);
@@ -284,7 +292,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             mockMvc.perform(
                     get(API_PAINEL_ALERTAS)
                             .param("usuarioTitulo", usuario.getTituloEleitoral())
-                            .param("unidade", unidadeFilha2.getCodigo().toString()))
+                            .param(UNIDADE, unidadeFilha2.getCodigo().toString()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta Outra Unidade')]").doesNotExist());
         }
