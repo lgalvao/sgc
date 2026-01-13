@@ -81,7 +81,11 @@ public class SubprocessoDetalheService {
         // Centralized security check
         accessControlService.verificarPermissao(usuarioAutenticado, sgc.seguranca.acesso.Acao.VISUALIZAR_SUBPROCESSO, sp);
 
-        Usuario responsavel = usuarioService.buscarResponsavelAtual(sp.getUnidade().getSigla());
+        Usuario responsavel = null;
+        if (sp.getUnidade() != null) {
+            responsavel = usuarioService.buscarResponsavelAtual(sp.getUnidade().getSigla());
+        }
+
         Usuario titular = null;
         if (sp.getUnidade() != null && sp.getUnidade().getTituloTitular() != null) {
             try {

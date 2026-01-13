@@ -417,4 +417,42 @@ class SubprocessoDetalheServiceTest {
         assertThat(result).isNotNull();
         verify(accessControlService).verificarPermissao(chefe, Acao.VISUALIZAR_SUBPROCESSO, sp);
     }
+
+    @Test
+    @DisplayName("Calcular permissões para Processo de REVISAO")
+    void calcularPermissoesRevisao() {
+        Usuario user = new Usuario();
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(new sgc.processo.model.Processo());
+        sp.getProcesso().setTipo(sgc.processo.model.TipoProcesso.REVISAO);
+
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+
+        SubprocessoPermissoesDto result = service.obterPermissoes(1L, user);
+
+        assertThat(result).isNotNull();
+        // Verifica se usou a ação correta (DISPONIBILIZAR_REVISAO_CADASTRO)
+        verify(accessControlService).podeExecutar(user, Acao.DISPONIBILIZAR_REVISAO_CADASTRO, sp);
+        verify(accessControlService, never()).podeExecutar(user, Acao.DISPONIBILIZAR_CADASTRO, sp);
+    }
+
+    @Test
+    @DisplayName("Obter detalhes com unidade nula e sucesso na permissão")
+    void obterDetalhesUnidadeNulaSucesso() {
+        Usuario admin = new Usuario();
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        sp.setUnidade(null); // Unidade NULA
+
+        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+        // accessControlService.verificarPermissao não lança exceção (mock void)
+        when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
+                .thenReturn(SubprocessoDetalheDto.builder().build());
+
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, admin);
+        assertThat(result).isNotNull();
+        // Garante que passou pelo bloco de buscar titular (que deve ser ignorado) sem erro
+        verify(usuarioService, never()).buscarPorLogin(any());
+        verify(usuarioService, never()).buscarResponsavelAtual(any());
+    }
 }

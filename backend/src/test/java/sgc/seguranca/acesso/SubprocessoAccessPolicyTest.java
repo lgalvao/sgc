@@ -378,6 +378,103 @@ class SubprocessoAccessPolicyTest {
         }
     }
 
+    @Nested
+    @DisplayName("Testes de Cobertura Avançada")
+    class CoberturaAvancadaTest {
+
+        @Test
+        @DisplayName("Deve negar VERIFICAR_IMPACTOS se usuário não tiver perfil adequado")
+        void deveNegarVerificarImpactosSemPerfil() {
+            Usuario usuarioSemPerfil = criarUsuario("000000000000", "Sem Perfil");
+            // Não adiciona atribuições
+
+            boolean resultado = policy.canExecute(usuarioSemPerfil, VERIFICAR_IMPACTOS, subprocesso);
+
+            assertThat(resultado).isFalse();
+            assertThat(policy.getMotivoNegacao()).contains("não possui um dos perfis necessários");
+        }
+
+        @Test
+        @DisplayName("Deve negar VERIFICAR_IMPACTOS para CHEFE em situação inválida")
+        void deveNegarVerificarImpactosChefeSituacaoInvalida() {
+            // CHEFE só pode em NAO_INICIADO ou REVISAO_CADASTRO_EM_ANDAMENTO
+            subprocesso.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
+
+            boolean resultado = policy.canExecute(usuarioChefe, VERIFICAR_IMPACTOS, subprocesso);
+
+            assertThat(resultado).isFalse();
+            // A mensagem específica depende da lógica de prioridade nos ifs
+        }
+
+        @Test
+        @DisplayName("Deve negar VERIFICAR_IMPACTOS para GESTOR em situação inválida")
+        void deveNegarVerificarImpactosGestorSituacaoInvalida() {
+            // GESTOR só pode em REVISAO_CADASTRO_DISPONIBILIZADA
+            subprocesso.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
+
+            boolean resultado = policy.canExecute(usuarioGestor, VERIFICAR_IMPACTOS, subprocesso);
+
+            assertThat(resultado).isFalse();
+            assertThat(policy.getMotivoNegacao()).contains("Ação 'VERIFICAR_IMPACTOS' não pode ser executada");
+        }
+
+        @Test
+        @DisplayName("Deve negar VERIFICAR_IMPACTOS para ADMIN em situação inválida")
+        void deveNegarVerificarImpactosAdminSituacaoInvalida() {
+            // ADMIN: DISPONIBILIZADA, HOMOLOGADA, AJUSTADO
+            subprocesso.setSituacao(NAO_INICIADO);
+
+            boolean resultado = policy.canExecute(usuarioAdmin, VERIFICAR_IMPACTOS, subprocesso);
+
+            assertThat(resultado).isFalse();
+            assertThat(policy.getMotivoNegacao()).contains("Ação 'VERIFICAR_IMPACTOS' não pode ser executada");
+        }
+
+        @Test
+        @DisplayName("Deve tratar subprocesso sem unidade na verificação de hierarquia")
+        void deveTratarSubprocessoSemUnidade() {
+            subprocesso.setUnidade(null);
+
+            // Ação que exige hierarquia (ex: EDITAR_CADASTRO -> MESMA_UNIDADE)
+            boolean resultado = policy.canExecute(usuarioChefe, EDITAR_CADASTRO, subprocesso);
+
+            assertThat(resultado).isFalse();
+            // Verifica se gera mensagem de erro adequada (caindo no switch de motivo)
+            assertThat(policy.getMotivoNegacao()).contains("não definida");
+        }
+
+        @Test
+        @DisplayName("Deve ignorar atribuições com unidade nula na verificação de hierarquia")
+        void deveIgnorarAtribuicoesComUnidadeNula() {
+            // Adiciona atribuição com unidade nula ao usuário
+            // Vamos criar manualmente para evitar NPE no helper
+            UsuarioPerfil atribNula = new UsuarioPerfil();
+            atribNula.setUsuario(usuarioChefe);
+            atribNula.setPerfil(CHEFE);
+            atribNula.setUnidade(null);
+            usuarioChefe.getAtribuicoes().add(atribNula);
+
+            // Ação que exige mesma unidade
+            boolean resultado = policy.canExecute(usuarioChefe, EDITAR_CADASTRO, subprocesso);
+            // Deve continuar funcionando (true) por causa da outra atribuição válida que ele já tem no @BeforeEach
+            assertThat(resultado).isTrue();
+
+            // Agora remove a atribuição válida para testar só com a nula
+            usuarioChefe.getAtribuicoes().removeIf(a -> a.getUnidade() != null);
+            boolean resultado2 = policy.canExecute(usuarioChefe, EDITAR_CADASTRO, subprocesso);
+            assertThat(resultado2).isFalse();
+        }
+
+        @Test
+        @DisplayName("Deve negar explicitamente GESTOR tentar VERIFICAR_IMPACTOS em situação de CHEFE")
+        void deveNegarGestorEmSituacaoDeChefe() {
+            subprocesso.setSituacao(NAO_INICIADO);
+            boolean resultado = policy.canExecute(usuarioGestor, VERIFICAR_IMPACTOS, subprocesso);
+            assertThat(resultado).isFalse();
+            assertThat(policy.getMotivoNegacao()).contains("REVISAO_CADASTRO_DISPONIBILIZADA");
+        }
+    }
+
     // Métodos auxiliares
 
     private Usuario criarUsuario(String titulo, String nome) {
