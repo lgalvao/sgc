@@ -11,6 +11,7 @@
 1. Em qualquer tela do sistema, na barra de navegação, usuário clica `Histórico`.
 
 2. Sistema apresenta uma tabela com todos os processos com situação 'Finalizado', com:
+
    - `Processo`: Descrição do processo.
    - `Tipo`: Tipo do processo.
    - `Finalizado em`: Data de finalização do processo

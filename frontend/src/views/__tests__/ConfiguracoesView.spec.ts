@@ -189,7 +189,7 @@ describe('ConfiguracoesView', () => {
         });
 
         it('deve abrir modal ao clicar em Adicionar', async () => {
-            const btn = wrapper.findAll('button').find((b: any) => b.text().includes('Adicionar Administrador'));
+            const btn = wrapper.findAll('button').find((b: any) => b.text().includes('Adicionar administrador'));
             await btn.trigger('click');
             expect(wrapper.vm.mostrarModalAdicionarAdmin).toBe(true);
         });

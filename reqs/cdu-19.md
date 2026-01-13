@@ -87,10 +87,8 @@ Ator: CHEFE
       - `Data/hora`: Data/hora atual
       - `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO]
       - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
-      - `Descrição`: "Apresentação de sugestões para o mapa de competências", ou "Validação do mapa de competências",
-      conforme o caso.
+      - `Descrição`: "Apresentação de sugestões para o mapa de competências", ou "Validação do mapa de competências", conforme o caso.
 
-7. O sistema define a data/hora de conclusão da etapa 2 do subprocesso da unidade como sendo a atual, e exclui o
-   histórico de análise de validação do mapa do subprocesso da unidade.
+7. O sistema define a data/hora de conclusão da etapa 2 do subprocesso da unidade como sendo a atual, e exclui o histórico de análise de validação do mapa do subprocesso da unidade.
 
 8. O sistema redireciona para o Painel.

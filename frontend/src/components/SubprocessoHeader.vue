@@ -64,7 +64,7 @@
             @click="handleReabrirCadastro"
         >
           <i class="bi bi-arrow-counterclockwise me-1"/>
-          Reabrir Cadastro
+          Reabrir cadastro
         </BButton>
 
         <BButton
@@ -85,7 +85,7 @@
             @click="handleEnviarLembrete"
         >
           <i class="bi bi-bell me-1"/>
-          Enviar Lembrete
+          Enviar lembrete
         </BButton>
       </div>
     </BCardBody>

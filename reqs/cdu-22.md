@@ -33,26 +33,26 @@
 
    8.1. O sistema registra uma análise de cadastro para o subprocesso:
 
-        - `Data/hora`: [Data/hora atual]
-        - `Unidade`: [SIGLA_UNIDADE_ATUAL]
-        - `Resultado`: "Aceite"
-        - `Observação`: "De acordo com o cadastro de atividades da unidade"
+     - `Data/hora`: [Data/hora atual]
+     - `Unidade`: [SIGLA_UNIDADE_ATUAL]
+     - `Resultado`: "Aceite"
+     - `Observação`: "De acordo com o cadastro de atividades da unidade"
 
    8.2. O sistema registra uma movimentação para o subprocesso:
 
-        - `Data/hora`: [Data/hora atual]
-        - `Unidade origem`: [SIGLA_UNIDADE_ATUAL]
-        - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
-        - `Descrição`: "Cadastro de atividades e conhecimentos aceito"
+     - `Data/hora`: [Data/hora atual]
+     - `Unidade origem`: [SIGLA_UNIDADE_ATUAL]
+     - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
+     - `Descrição`: "Cadastro de atividades e conhecimentos aceito"
 
    8.3. O sistema cria internamente um alerta:
 
-        - `Descrição`: "Cadastro de atividades da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
-        - `Processo`: [DESCRIÇÃO_PROCESSO]
-        - `Data/hora`: [Data/hora atual]
-        - `Unidade de origem`: [SIGLA_UNIDADE_ATUAL]
-        - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
-
+     - `Descrição`: "Cadastro de atividades da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
+     - `Processo`: [DESCRIÇÃO_PROCESSO]
+     - `Data/hora`: [Data/hora atual]
+     - `Unidade de origem`: [SIGLA_UNIDADE_ATUAL]
+     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
+"
    8.4. O sistema envia esta notificação por e-mail para a unidade superior:
 
     ```text

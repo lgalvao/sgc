@@ -8,7 +8,7 @@
 
 ## Fluxo principal
 
-1. ADMIN clica em `Unidade` no menu (este é o comando equivalente a `Minha unidade`, visto por outros perfis.
+1. ADMIN clica em `Unidade` no menu (este é o comando equivalente a `Minha unidade`, visto por outros perfis).
 
 2. Sistema mostra a árvore completa de unidades.
 	

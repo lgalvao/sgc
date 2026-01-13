@@ -5,7 +5,7 @@
       <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Administradores do Sistema</h5>
         <button class="btn btn-light btn-sm" @click="abrirModalAdicionarAdmin">
-          <i class="bi bi-person-plus"></i> Adicionar Administrador
+          <i class="bi bi-person-plus"></i> Adicionar administrador
         </button>
       </div>
       <div class="card-body">
@@ -121,11 +121,11 @@
       </div>
     </div>
 
-    <!-- Modal: Adicionar Administrador -->
-    <BModal v-model="mostrarModalAdicionarAdmin" title="Adicionar Administrador" hide-footer>
+    <!-- Modal: Adicionar administrador -->
+    <BModal v-model="mostrarModalAdicionarAdmin" title="Adicionar administrador" hide-footer>
       <form @submit.prevent="adicionarAdmin">
         <div class="mb-3">
-          <label for="usuarioTitulo" class="form-label">Título Eleitoral do Usuário</label>
+          <label for="usuarioTitulo" class="form-label">Título</label>
           <input
             id="usuarioTitulo"
             v-model="novoAdminTitulo"

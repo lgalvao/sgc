@@ -32,23 +32,26 @@
 
 9. O sistema atua, para cada unidade selecionada, da seguinte forma:
    9.1. O sistema registra uma análise de validação para o subprocesso:
-        - `Data/hora`: [Data/hora atual]
-        - `Unidade`: [SIGLA_UNIDADE_ATUAL]
-        - `Resultado`: "Aceite"
-        - `Observação`: "De acordo com a validação do mapa realizada pela unidade"
+
+    - `Data/hora`: [Data/hora atual]
+    - `Unidade`: [SIGLA_UNIDADE_ATUAL]
+    - `Resultado`: "Aceite"
+    - `Observação`: "De acordo com a validação do mapa realizada pela unidade"
 
    9.2. O sistema registra uma movimentação para o subprocesso:
-        - `Data/hora`: [Data/hora atual]
-        - `Unidade origem`: [SIGLA_UNIDADE_ATUAL]
-        - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
-        - `Descrição`: "Mapa de competências aceito"
+
+    - `Data/hora`: [Data/hora atual]
+    - `Unidade origem`: [SIGLA_UNIDADE_ATUAL]
+    - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
+    - `Descrição`: "Mapa de competências aceito"
 
    9.3. O sistema cria internamente um alerta:
-        - `Descrição`: "Validação do mapa de competências da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetida para análise"
-        - `Processo`: [DESCRIÇÃO_PROCESSO]
-        - `Data/hora`: [Data/hora atual]
-        - `Unidade de origem`: [SIGLA_UNIDADE_ATUAL]
-        - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
+
+    - `Descrição`: "Validação do mapa de competências da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetida para análise"
+    - `Processo`: [DESCRIÇÃO_PROCESSO]
+    - `Data/hora`: [Data/hora atual]
+    - `Unidade de origem`: [SIGLA_UNIDADE_ATUAL]
+    - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
    9.4. O sistema envia esta notificação por e-mail para a unidade superior:
 

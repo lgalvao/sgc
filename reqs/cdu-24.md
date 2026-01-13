@@ -11,7 +11,7 @@
 
 1. No Painel, ADMIN acessa um processo de mapeamento ou revisão em andamento.
 
-2. O sistema mostra tela Detalhes do processo.
+2. O sistema mostra tela `Detalhes do processo`.
 
 3. O sistema identifica que existem unidades com subprocessos com mapas criados ou ajustados mas ainda não disponibilizados.
 
@@ -41,10 +41,10 @@
 
     10.3. O sistema registra uma movimentação para o subprocesso com os campos:
 
-        - `Data/hora`: Data/hora atual
-        - `Unidade origem`: SEDOC
-        - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
-        - `Descrição`: 'Disponibilização do mapa de competências'
+    - `Data/hora`: Data/hora atual
+    - `Unidade origem`: SEDOC
+    - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+    - `Descrição`: 'Disponibilização do mapa de competências'
 
     10.4. O sistema notifica a unidade do subprocesso quanto à disponibilização, com e-mail no modelo abaixo:
 
@@ -60,11 +60,11 @@
 
     10.5. O sistema cria internamente um alerta:
 
-        - `Descrição`: "Mapa de competências da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise"
-        - `Processo`: [DESCRIÇÃO DO PROCESSO]
-        - `Data/hora`: Data/hora atual
-        - `Unidade de origem`: SEDOC
-        - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO].
+    - `Descrição`: "Mapa de competências da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise"
+    - `Processo`: [DESCRIÇÃO DO PROCESSO]
+    - `Data/hora`: Data/hora atual
+    - `Unidade de origem`: SEDOC
+    - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO].
 
     10.6. O sistema exclui as sugestões apresentadas e o histórico de análise do mapa de competência do subprocesso da unidade.
 

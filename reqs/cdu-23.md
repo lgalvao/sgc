@@ -15,7 +15,7 @@
 
 2. O sistema mostra a tela Detalhes do processo.
 
-3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para homologação em bloco do cadastro de atividades (de acordo com as pré-condições do caso de uso) e exibe, na seção Unidades Participantes, abaixo da árvore de unidades, o botão `Homologar cadastro em bloco`.
+3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para homologação em bloco do cadastro de atividades (de acordo com as pré-condições) e exibe, na seção `Unidades Participantes`, abaixo da árvore de unidades, o botão `Homologar cadastro em bloco`.
 
 4. O usuário clica no botão `Homologar cadastro em bloco`.
 
@@ -34,20 +34,20 @@
 
    8.1. O sistema registra uma movimentação para o subprocesso:
 
-        - `Data/hora`: [Data/hora atual]
-        - `Unidade origem`: "SEDOC"
-        - `Unidade destino`: "SEDOC"
-        - `Descrição`: "Cadastro de atividades e conhecimentos homologado"
+     - `Data/hora`: [Data/hora atual]
+     - `Unidade origem`: "SEDOC"
+     - `Unidade destino`: "SEDOC"
+     - `Descrição`: "Cadastro de atividades e conhecimentos homologado"
 
    8.2. O sistema altera a situação do subprocesso da unidade para 'Cadastro homologado'.
 
    8.3. O sistema cria internamente um alerta:
 
-        - `Descrição`: "Cadastro de atividades da unidade [SIGLA_UNIDADE_SUBPROCESSO] homologado"
-        - `Processo`: [DESCRIÇÃO_PROCESSO]
-        - `Data/hora`: [Data/hora atual]
-        - `Unidade de origem`: SEDOC
-        - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+     - `Descrição`: "Cadastro de atividades da unidade [SIGLA_UNIDADE_SUBPROCESSO] homologado"
+     - `Processo`: [DESCRIÇÃO_PROCESSO]
+     - `Data/hora`: [Data/hora atual]
+     - `Unidade de origem`: SEDOC
+     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 
    8.4. O sistema envia notificação por e-mail para a unidade do subprocesso:
 
@@ -61,4 +61,4 @@
     Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
     ```
 
-9. O sistema mostra mensagem de confirmação: "Cadastros homologados em bloco" e permanece na tela Detalhes do processo.
+9. O sistema mostra mensagem de confirmação: "Cadastros homologados em bloco" e permanece na tela `Detalhes do processo`.

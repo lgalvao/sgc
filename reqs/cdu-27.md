@@ -9,7 +9,7 @@
 
 ## Fluxo principal
 
-1. No Painel, ADMIN acessa um processo ativo e na tela Detalhes do processo, clica em uma unidade com subprocesso ativo.
+1. No Painel, ADMIN acessa um processo ativo e na tela `Detalhes do processo`, clica em uma unidade que tenha subprocesso ainda nao finalizado.
 2. Sistema mostra tela Detalhes do subprocesso.
 3. ADMIN clica no botão `Alterar data limite`.
 4. Sistema abre modal "Alterar data limite" com campo de data preenchido com a data limite atual da etapa em andamento, e apresenta botões `Cancelar` e `Confirmar`.

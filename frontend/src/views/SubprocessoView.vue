@@ -50,7 +50,7 @@
   <!-- Modal para reabrir cadastro/revisão -->
   <BModal
       v-model="mostrarModalReabrir"
-      :title="tipoReabertura === 'cadastro' ? 'Reabrir Cadastro' : 'Reabrir Revisão'"
+      :title="tipoReabertura === 'cadastro' ? 'Reabrir cadastro' : 'Reabrir Revisão'"
       centered
       @ok="confirmarReabertura"
   >

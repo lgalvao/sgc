@@ -15,7 +15,7 @@ import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
  * 
  * Fluxo principal:
  * 1. ADMIN acessa subprocesso da unidade
- * 2. ADMIN seleciona opção "Reabrir Cadastro"
+ * 2. ADMIN seleciona opção "Reabrir cadastro"
  * 3. Sistema solicita justificativa
  * 4. ADMIN preenche justificativa e confirma
  * 5. Sistema altera situação e envia notificações
@@ -102,7 +102,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
             .toHaveText(/Cadastro disponibilizado/i);
     });
 
-    test('Cenario 2: ADMIN visualiza botão Reabrir Cadastro', async ({page}) => {
+    test('Cenario 2: ADMIN visualiza botão Reabrir cadastro', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
@@ -131,7 +131,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
 
             const modal = page.getByRole('dialog');
             await expect(modal).toBeVisible();
-            await expect(modal.getByText(/Reabrir Cadastro/i)).toBeVisible();
+            await expect(modal.getByText(/Reabrir cadastro/i)).toBeVisible();
             await expect(page.getByTestId('inp-justificativa-reabrir')).toBeVisible();
             await expect(page.getByTestId('btn-confirmar-reabrir')).toBeVisible();
         }

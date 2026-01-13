@@ -2,13 +2,6 @@
 
 **Ator:** Sistema/ADMIN
 
-## Regras de Negócio
-
-- O lembrete deve ser enviado para o titular da unidade e seus substitutos imediatos (se houver).
-- O sistema deve permitir o envio manual pelo Administrador.
-- O sistema pode ter uma rotina automática (job) para envio de lembretes X dias antes do prazo.
-- O envio do lembrete deve gerar um registro de notificação no sistema.
-
 ## Fluxo principal
 
 1. O usuário (Administrador) acessa a tela de Acompanhamento de Processos.
@@ -17,7 +10,7 @@
 
 3. O usuário seleciona uma ou mais unidades/subprocessos que possuem pendências.
 
-4. O usuário aciona a opção "Enviar Lembrete".
+4. O usuário aciona a opção "Enviar lembrete".
 
 5. O sistema exibe um modelo da mensagem que será enviada para confirmação.
 

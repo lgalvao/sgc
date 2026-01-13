@@ -13,7 +13,7 @@ import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
  * 1. ADMIN acessa tela de Acompanhamento de Processos
  * 2. Sistema exibe processos com indicadores de prazo
  * 3. ADMIN seleciona unidades com pendências
- * 4. ADMIN aciona "Enviar Lembrete"
+ * 4. ADMIN aciona "Enviar lembrete"
  * 5. Sistema exibe modelo da mensagem
  * 6. ADMIN confirma envio
  * 7. Sistema envia e-mail e registra no histórico
@@ -115,7 +115,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
                 
                 const itemLembrete = page.getByRole('menuitem', {name: /Lembrete/i});
                 const itemVisivel = await itemLembrete.isVisible().catch(() => false);
-                console.log('Opção Enviar Lembrete disponível:', itemVisivel);
+                console.log('Opção Enviar lembrete disponível:', itemVisivel);
             }
         } else {
             await expect(btnLembrete).toBeEnabled();
