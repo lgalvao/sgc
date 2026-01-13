@@ -40,6 +40,7 @@ class CopiaMapaServiceTest {
 
     @Test
     @DisplayName("Deve copiar mapa com sucesso")
+    @SuppressWarnings("unchecked")
     void deveCopiarMapaComSucesso() {
         Long origemId = 1L;
 

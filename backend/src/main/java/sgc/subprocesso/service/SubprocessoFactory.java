@@ -86,6 +86,10 @@ public class SubprocessoFactory {
      * Cria subprocesso para processo de revisão e copia o mapa vigente da unidade.
      */
     public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa) {
+        if (unidadeMapa == null) {
+            throw new ErroProcesso("Unidade %s não possui mapa vigente para iniciar revisão.".formatted(unidade.getSigla()));
+        }
+
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
         
         Subprocesso subprocesso = Subprocesso.builder()

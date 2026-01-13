@@ -2,6 +2,7 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseService;
@@ -30,11 +31,11 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
  * Serviço responsável pelo workflow do cadastro de atividades de um subprocesso.
  *
  * <p><b>Nota sobre Injeção de Dependências:</b>
- * ImpactoMapaService injetado normalmente. Dependência circular verificada e refutada.
+ * ImpactoMapaService e SubprocessoValidacaoService injetados com @Lazy.
+ * Dependência circular verificada e tratada.
  */
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class SubprocessoCadastroWorkflowService {
     private final SubprocessoRepo repositorioSubprocesso;
     private final SubprocessoTransicaoService transicaoService;
@@ -43,9 +44,29 @@ public class SubprocessoCadastroWorkflowService {
     private final SubprocessoValidacaoService validacaoService;
     private final ImpactoMapaService impactoMapaService;
     private final AccessControlService accessControlService;
-
-    @org.springframework.context.annotation.Lazy
     private final SubprocessoCadastroWorkflowService self;
+
+    /**
+     * Construtor manual para garantir injeção correta de dependências lazy.
+     */
+    public SubprocessoCadastroWorkflowService(
+            SubprocessoRepo repositorioSubprocesso,
+            SubprocessoTransicaoService transicaoService,
+            UnidadeService unidadeService,
+            AnaliseService analiseService,
+            @Lazy SubprocessoValidacaoService validacaoService,
+            @Lazy ImpactoMapaService impactoMapaService,
+            AccessControlService accessControlService,
+            @Lazy SubprocessoCadastroWorkflowService self) {
+        this.repositorioSubprocesso = repositorioSubprocesso;
+        this.transicaoService = transicaoService;
+        this.unidadeService = unidadeService;
+        this.analiseService = analiseService;
+        this.validacaoService = validacaoService;
+        this.impactoMapaService = impactoMapaService;
+        this.accessControlService = accessControlService;
+        this.self = self;
+    }
 
     @Transactional
     public void disponibilizarCadastro(Long codSubprocesso, Usuario usuario) {
