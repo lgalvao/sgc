@@ -47,26 +47,81 @@
 
     <div v-if="unidade">
       <div class="mb-4 mt-3">
-        <BButton
-            v-if="podeEditarMapa"
-            class="mb-3"
-            data-testid="btn-abrir-criar-competencia"
-            variant="outline-primary"
-            @click="abrirModalCriarLimpo"
-        >
-          <i class="bi bi-plus-lg"/> Criar competência
-        </BButton>
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <BButton
+              v-if="podeEditarMapa"
+              data-testid="btn-abrir-criar-competencia"
+              variant="outline-primary"
+              @click="abrirModalCriarLimpo"
+          >
+            <i class="bi bi-plus-lg"/> Criar competência
+          </BButton>
 
-        <CompetenciaCard
-            v-for="comp in competencias"
-            :key="comp.codigo"
-            :atividades="atividades"
-            :competencia="comp"
-            :pode-editar="podeEditarMapa"
-            @editar="iniciarEdicaoCompetencia"
-            @excluir="excluirCompetencia"
-            @remover-atividade="removerAtividadeAssociada"
-        />
+          <div
+              v-if="competencias.length > 0"
+              class="flex-grow-1 col-12 col-md-5"
+          >
+            <BInputGroup>
+              <BInputGroupText>
+                <i class="bi bi-search" aria-hidden="true"/>
+              </BInputGroupText>
+              <BFormInput
+                  v-model="searchQuery"
+                  aria-label="Filtrar competências"
+                  placeholder="Filtrar competências..."
+                  type="search"
+                  data-testid="inp-filtro-competencias"
+              />
+              <BButton
+                  v-if="searchQuery"
+                  variant="outline-secondary"
+                  aria-label="Limpar filtro"
+                  @click="searchQuery = ''"
+              >
+                <i class="bi bi-x-lg" aria-hidden="true"/>
+              </BButton>
+            </BInputGroup>
+          </div>
+        </div>
+
+        <div v-if="competenciasFiltradas.length > 0">
+          <CompetenciaCard
+              v-for="comp in competenciasFiltradas"
+              :key="comp.codigo"
+              :atividades="atividades"
+              :competencia="comp"
+              :pode-editar="podeEditarMapa"
+              @editar="iniciarEdicaoCompetencia"
+              @excluir="excluirCompetencia"
+              @remover-atividade="removerAtividadeAssociada"
+          />
+        </div>
+        <div
+            v-else-if="searchQuery"
+            class="text-center text-muted py-5 border rounded bg-light"
+            data-testid="empty-state-search"
+        >
+          <i class="bi bi-search display-4 d-block mb-3" aria-hidden="true"/>
+          <p class="h5">Nenhuma competência encontrada</p>
+          <p class="small">
+            Não encontramos competências correspondentes a "{{ searchQuery }}".
+          </p>
+          <BButton
+              variant="link"
+              class="text-decoration-none"
+              @click="searchQuery = ''"
+          >
+            Limpar filtro
+          </BButton>
+        </div>
+        <div
+            v-else-if="competencias.length === 0"
+            class="text-center text-muted py-5 border rounded bg-light"
+        >
+          <i class="bi bi-list-check display-4 d-block mb-3" aria-hidden="true"/>
+          <p class="h5">Nenhuma competência cadastrada</p>
+          <p class="small">Use o botão "Criar competência" para começar.</p>
+        </div>
       </div>
     </div>
     <div v-else>
@@ -111,7 +166,14 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BContainer,} from "bootstrap-vue-next";
+import {
+  BAlert,
+  BButton,
+  BContainer,
+  BFormInput,
+  BInputGroup,
+  BInputGroupText,
+} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -203,6 +265,18 @@ const atividades = computed<Atividade[]>(() => {
 });
 
 const competencias = computed(() => mapaCompleto.value?.competencias || []);
+const searchQuery = ref("");
+
+const competenciasFiltradas = computed(() => {
+  if (!searchQuery.value.trim()) {
+    return competencias.value;
+  }
+  const term = searchQuery.value.toLowerCase();
+  return competencias.value.filter((comp) =>
+      comp.descricao.toLowerCase().includes(term)
+  );
+});
+
 const competenciaSendoEditada = ref<Competencia | null>(null);
 
 const mostrarModalCriarNovaCompetencia = ref(false);
