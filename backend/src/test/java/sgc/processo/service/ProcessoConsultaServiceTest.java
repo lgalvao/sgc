@@ -110,13 +110,11 @@ class ProcessoConsultaServiceTest {
     @DisplayName("Deve listar subprocessos para Admin (apenas REVISAO_MAPA_AJUSTADO)")
     void deveListarParaAdmin() {
         mockAuth("admin", true);
-        
+
         Subprocesso s1 = Subprocesso.builder().situacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).unidade(new Unidade("U1", "S1")).build();
         s1.setCodigo(1L);
-        Subprocesso s2 = Subprocesso.builder().situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO).unidade(new Unidade("U2", "S2")).build();
-        s2.setCodigo(2L);
-        
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1, s2));
+
+        when(subprocessoFacade.listarPorProcessoESituacao(1L, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)).thenReturn(List.of(s1));
 
         List<SubprocessoElegivelDto> res = processoConsultaService.listarSubprocessosElegiveis(1L);
 
@@ -128,21 +126,20 @@ class ProcessoConsultaServiceTest {
     @DisplayName("Deve listar subprocessos para Usuário Comum por Unidade")
     void deveListarParaUsuarioComum() {
         mockAuth("user", false);
-        
+
         Unidade u1 = new Unidade("U1", "S1");
         u1.setCodigo(100L);
-        
+
         Subprocesso s1 = Subprocesso.builder().situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO).unidade(u1).build();
         s1.setCodigo(1L);
         Subprocesso s2 = Subprocesso.builder().situacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).unidade(u1).build();
         s2.setCodigo(2L);
-        Subprocesso s3 = Subprocesso.builder().situacao(SituacaoSubprocesso.NAO_INICIADO).unidade(u1).build();
-        s3.setCodigo(3L);
-        
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1, s2, s3));
+
         when(usuarioService.buscarPerfisUsuario("user")).thenReturn(List.of(
                 PerfilDto.builder().unidadeCodigo(100L).build()
         ));
+
+        when(subprocessoFacade.listarPorProcessoUnidadeESituacoes(eq(1L), eq(100L), anyList())).thenReturn(List.of(s1, s2));
 
         List<SubprocessoElegivelDto> res = processoConsultaService.listarSubprocessosElegiveis(1L);
 

@@ -87,10 +87,9 @@ public class ProcessoConsultaService {
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
 
-        List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(codProcesso);
         if (isAdmin) {
-            return subprocessos.stream()
-                    .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)
+            return subprocessoFacade.listarPorProcessoESituacao(codProcesso, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)
+                    .stream()
                     .map(this::toSubprocessoElegivelDto)
                     .toList();
         }
@@ -102,10 +101,9 @@ public class ProcessoConsultaService {
             return List.of();
         }
 
-        return subprocessos.stream()
-                .filter(sp -> sp.getUnidade().getCodigo().equals(codUnidadeUsuario))
-                .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO
-                        || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA)
+        return subprocessoFacade.listarPorProcessoUnidadeESituacoes(codProcesso, codUnidadeUsuario,
+                        List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA))
+                .stream()
                 .map(this::toSubprocessoElegivelDto)
                 .toList();
     }
