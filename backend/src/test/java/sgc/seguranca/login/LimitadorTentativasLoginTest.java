@@ -131,7 +131,7 @@ class LimitadorTentativasLoginTest {
     }
 
     @Test
-    void deveLimparTudoSeCacheCheioEEntradasRecentes() {
+    void deveBloquearNovosIpsSeCacheCheioEEntradasRecentes() {
         // Cache minúsculo
         int limiteTeste = 5;
         LimitadorTentativasLogin limitadorTeste = new LimitadorTentativasLogin(environment, limiteTeste, clock);
@@ -143,11 +143,30 @@ class LimitadorTentativasLoginTest {
         assertEquals(limiteTeste, limitadorTeste.getCacheSize());
 
         // Tenta adicionar mais um, SEM avançar o tempo
-        // limparCachePeriodico roda, mas nao remove nada.
-        // Entao deve cair no fallback de limpar tudo.
-        limitadorTeste.verificar("IpNovo");
+        // Deve lançar erro indicando sobrecarga
+        assertThrows(ErroMuitasTentativas.class, () -> limitadorTeste.verificar("IpNovo"));
 
-        // Deve ter limpado tudo e adicionado o novo. Size = 1.
-        assertEquals(1, limitadorTeste.getCacheSize());
+        // O cache NÃO deve ter sido limpo. Size = limiteTeste.
+        assertEquals(limiteTeste, limitadorTeste.getCacheSize());
+    }
+
+    @Test
+    void devePermitirIpJaExistenteMesmoComCacheCheio() {
+        int limiteTeste = 5;
+        LimitadorTentativasLogin limitadorTeste = new LimitadorTentativasLogin(environment, limiteTeste, clock);
+
+        // Enche o cache
+        for (int i = 0; i < limiteTeste; i++) {
+            limitadorTeste.verificar("Ip" + i);
+        }
+
+        // Tenta verificar um IP JÁ existente no cache ("Ip0")
+        // Deve permitir (não lançar erro) pois ele já está sendo rastreado
+        assertDoesNotThrow(() -> limitadorTeste.verificar("Ip0"));
+
+        // Verifica se contou a tentativa (Ip0 agora deve ter 2 tentativas)
+        // Se eu chamar mais 3 vezes (total 5), deve bloquear na 6ª.
+        IntStream.range(0, 3).forEach(i -> limitadorTeste.verificar("Ip0")); // Total 5
+        assertThrows(ErroMuitasTentativas.class, () -> limitadorTeste.verificar("Ip0")); // 6ª
     }
 }
