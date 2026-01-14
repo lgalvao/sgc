@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseService;
-import sgc.analise.dto.CriarAnaliseReq;
+import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeDeveriaExistir;
@@ -326,7 +326,7 @@ public class SubprocessoMapaWorkflowService {
             Unidade sup = sp.getUnidade().getUnidadeSuperior();
             String siglaUnidade = sup != null ? sup.getSigla() : sp.getUnidade().getSigla();
 
-            analiseService.criarAnalise(sp, CriarAnaliseReq.builder()
+            analiseService.criarAnalise(sp, CriarAnaliseCommand.builder()
                         .codSubprocesso(codSubprocesso)
                         .observacoes("Aceite da validação")
                         .tipo(TipoAnalise.VALIDACAO)

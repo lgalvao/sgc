@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import sgc.analise.dto.CriarAnaliseApiReq;
-import sgc.analise.dto.CriarAnaliseReq;
+import sgc.analise.dto.CriarAnaliseCommand;
+import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.subprocesso.model.Subprocesso;
@@ -58,7 +58,7 @@ public class AnaliseController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de cadastro")
     public Analise criarAnaliseCadastro(@PathVariable Long codSubprocesso,
-                                        @RequestBody @Valid CriarAnaliseApiReq request) {
+                                        @RequestBody @Valid CriarAnaliseRequest request) {
 
         return criarAnalise(codSubprocesso, request, TipoAnalise.CADASTRO);
     }
@@ -90,15 +90,15 @@ public class AnaliseController {
     @PostMapping("/analises-validacao")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de validação")
-    public Analise criarAnaliseValidacao(@PathVariable Long codSubprocesso, @RequestBody @Valid CriarAnaliseApiReq request) {
+    public Analise criarAnaliseValidacao(@PathVariable Long codSubprocesso, @RequestBody @Valid CriarAnaliseRequest request) {
         return criarAnalise(codSubprocesso, request, TipoAnalise.VALIDACAO);
     }
 
-    private Analise criarAnalise(Long codSubprocesso, CriarAnaliseApiReq request, TipoAnalise tipo) {
+    private Analise criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo) {
         Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codSubprocesso);
         String observacoes = StringUtils.stripToEmpty(request.observacoes());
 
-        CriarAnaliseReq criarAnaliseRequest = CriarAnaliseReq.builder()
+        CriarAnaliseCommand command = CriarAnaliseCommand.builder()
                 .codSubprocesso(codSubprocesso)
                 .observacoes(observacoes)
                 .tipo(tipo)
@@ -108,6 +108,6 @@ public class AnaliseController {
                 .motivo(request.motivo())
                 .build();
 
-        return analiseService.criarAnalise(subprocesso, criarAnaliseRequest);
+        return analiseService.criarAnalise(subprocesso, command);
     }
 }

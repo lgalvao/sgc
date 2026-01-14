@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseService;
-import sgc.analise.dto.CriarAnaliseReq;
+import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
 import sgc.organizacao.model.Unidade;
@@ -137,7 +137,7 @@ public class SubprocessoTransicaoService {
         // 1. Criar Análise
         analiseService.criarAnalise(
                 req.sp(),
-                CriarAnaliseReq.builder()
+                CriarAnaliseCommand.builder()
                         .codSubprocesso(req.sp().getCodigo())
                         .observacoes(req.observacoes())
                         .tipo(req.tipoAnalise())
