@@ -87,6 +87,16 @@ public class SubprocessoCrudService {
     }
 
     @Transactional(readOnly = true)
+    public List<Subprocesso> listarPorProcessoESituacao(Long codProcesso, SituacaoSubprocesso situacao) {
+        return repositorioSubprocesso.findByProcessoCodigoAndSituacaoWithUnidade(codProcesso, situacao);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Subprocesso> listarPorProcessoUnidadeESituacoes(Long codProcesso, Long codUnidade, List<SituacaoSubprocesso> situacoes) {
+        return repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso, codUnidade, situacoes);
+    }
+
+    @Transactional(readOnly = true)
     public SubprocessoSituacaoDto obterStatus(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
         return SubprocessoSituacaoDto.builder()

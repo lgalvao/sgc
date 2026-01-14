@@ -12,6 +12,7 @@ import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.decomposed.SubprocessoCrudService;
 import sgc.subprocesso.service.decomposed.SubprocessoDetalheService;
@@ -142,6 +143,16 @@ public class SubprocessoFacade {
     @Transactional(readOnly = true)
     public List<Subprocesso> listarEntidadesPorProcesso(Long codProcesso) {
         return crudService.listarEntidadesPorProcesso(codProcesso);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Subprocesso> listarPorProcessoESituacao(Long codProcesso, SituacaoSubprocesso situacao) {
+        return crudService.listarPorProcessoESituacao(codProcesso, situacao);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Subprocesso> listarPorProcessoUnidadeESituacoes(Long codProcesso, Long codUnidade, List<SituacaoSubprocesso> situacoes) {
+        return crudService.listarPorProcessoUnidadeESituacoes(codProcesso, codUnidade, situacoes);
     }
 
     @Transactional(readOnly = true)
