@@ -228,12 +228,25 @@ Para cada DTO bidirecionail:
 3. Atualizar controllers
 4. Depreciar DTO original ou transformar em base
 
+### DTOs Bidirecionais Identificados
+
+| DTO | Módulo | Uso | Validação | Prioridade |
+|-----|--------|-----|-----------|------------|
+| `SubprocessoDto` | subprocesso | GET + POST | ✅ `@NotNull` | 🔴 Alta |
+| `MapaDto` | mapa | GET + POST/PUT | ❌ | 🟠 Média |
+| `MapaAjusteDto` | subprocesso | GET (com factory methods) | ✅ `@NotNull`, `@NotBlank` | 🟠 Média |
+| `ProcessoDto` | processo | GET (apenas response) | ❌ | 🟡 Baixa |
+| `UsuarioDto` | organizacao | GET (apenas response) | ❌ | 🟡 Baixa |
+| `UnidadeDto` | organizacao | GET (apenas response) | ❌ | 🟡 Baixa |
+
 ### Checklist
 
 - [ ] `SubprocessoDto` → `SubprocessoRequest` + `SubprocessoResponse`
-- [ ] `ProcessoDto` (avaliar necessidade)
-- [ ] `UsuarioDto` (avaliar necessidade)
-- [ ] `UnidadeDto` (avaliar necessidade)
+- [ ] `MapaDto` → `MapaRequest` + `MapaResponse`
+- [ ] `MapaAjusteDto` → `MapaAjusteRequest` + `MapaAjusteResponse`
+- [ ] ~~`ProcessoDto`~~ (na verdade apenas response - baixa prioridade)
+- [ ] ~~`UsuarioDto`~~ (na verdade apenas response - baixa prioridade)
+- [ ] ~~`UnidadeDto`~~ (na verdade apenas response - baixa prioridade)
 
 ---
 
@@ -256,7 +269,26 @@ Para cada DTO bidirecionail:
 - Thread-safe
 - Performance otimizada
 
-### Candidatos
+### Candidatos Identificados
+
+**DTOs Simples (já usando @Getter + @Builder):**
+| DTO | Linhas | Validação | Uso | Adequado para Record? |
+|-----|--------|-----------|-----|---------------------|
+| `ErroValidacaoDto` | 11 | ❌ | Response | ✅ Sim |
+| `ValidacaoCadastroDto` | 10 | ❌ | Response | ✅ Sim |
+| `ProcessoContextoDto` | 10 | ❌ | Response | ✅ Sim |
+| `ContextoEdicaoDto` | 15 | ❌ | Response | ✅ Sim |
+| `SubprocessoPermissoesDto` | 23 | ❌ | Response | ✅ Sim |
+| `ProcessoResumoDto` | 20 | ❌ | Response | ✅ Sim |
+| `SubprocessoCadastroDto` | 19 | ❌ | Response | ⚠️ Avaliar |
+| `ConhecimentoAjusteDto` | 19 | ✅ | Bidirecional | ❌ Não (precisa separar primeiro) |
+| `AtividadeAjusteDto` | 22 | ✅ | Bidirecional | ❌ Não (precisa separar primeiro) |
+| `CompetenciaAjusteDto` | 22 | ✅ | Bidirecional | ❌ Não (precisa separar primeiro) |
+
+**Observações:**
+- DTOs com validação devem ser separados em Request/Response antes (Fase 3)
+- DTOs usando `@Builder` atualmente exigirão ajustes para manter builder pattern com records
+- Records com `@Builder` em Lombok requerem `lombok-mapstruct-binding` (já configurado)
 
 **Request DTOs sem lógica customizada:**
 - Avaliar após Fases 2-4
