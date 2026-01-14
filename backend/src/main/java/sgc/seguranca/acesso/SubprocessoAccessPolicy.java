@@ -313,6 +313,11 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
 
                 Unidade unidadeSubprocesso = subprocesso.getUnidade();
 
+                if (unidadeSubprocesso == null) {
+                    // Se não há unidade, apenas requisitos NENHUM passam
+                    return requisito == RequisitoHierarquia.NENHUM;
+                }
+
                 return switch (requisito) {
                         case NENHUM -> true;
 
