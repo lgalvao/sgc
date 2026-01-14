@@ -61,7 +61,7 @@ class SubprocessoFacadeTest {
     @Test
     void deveDelegarOutrosServicos() {
         facade.obterContextoEdicao(1L, Perfil.ADMIN);
-        verify(contextoService).obterContextoEdicao(1L, Perfil.ADMIN);
+        verify(contextoService).obterContextoEdicao(1L);
 
         facade.importarAtividades(1L, 2L);
         verify(mapaService).importarAtividades(1L, 2L);
@@ -75,7 +75,7 @@ class SubprocessoFacadeTest {
         Usuario mockUser = new Usuario();
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(mockUser);
         facade.obterDetalhes(1L, Perfil.ADMIN);
-        verify(detalheService).obterDetalhes(1L, Perfil.ADMIN, mockUser);
+        verify(detalheService).obterDetalhes(1L, mockUser);
         
         facade.obterSituacao(1L);
         verify(crudService).obterStatus(1L);

@@ -76,7 +76,7 @@ public class SubprocessoCrudController {
             @PathVariable Long codigo,
             @RequestParam(required = false) sgc.organizacao.model.Perfil perfil,
             @RequestParam(required = false) Long unidadeUsuario) {
-        return subprocessoFacade.obterDetalhes(codigo, perfil);
+        return subprocessoFacade.obterDetalhes(codigo, null);
     }
 
     /**

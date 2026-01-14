@@ -13,7 +13,6 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
@@ -51,7 +50,6 @@ class SubprocessoContextoServiceTest {
     void obterContextoEdicaoSucesso() {
         Long codSubprocesso = 1L;
         Long codUnidade = 10L;
-        Perfil perfil = Perfil.CHEFE;
 
         // Mock usuário autenticado
         Usuario usuario = new Usuario();
@@ -61,7 +59,7 @@ class SubprocessoContextoServiceTest {
         SubprocessoDetalheDto detalheDto = SubprocessoDetalheDto.builder()
                 .unidade(SubprocessoDetalheDto.UnidadeDto.builder().codigo(codUnidade).sigla(SIGLA_TESTE).build())
                 .build();
-        when(detalheService.obterDetalhes(codSubprocesso, perfil, usuario))
+        when(detalheService.obterDetalhes(codSubprocesso, usuario))
                 .thenReturn(detalheDto);
 
         // Mock 2: Unidade
@@ -82,7 +80,7 @@ class SubprocessoContextoServiceTest {
         when(detalheService.listarAtividadesSubprocesso(codSubprocesso))
                 .thenReturn(Collections.emptyList());
 
-        ContextoEdicaoDto resultado = service.obterContextoEdicao(codSubprocesso, perfil);
+        ContextoEdicaoDto resultado = service.obterContextoEdicao(codSubprocesso);
 
         assertThat(resultado).isNotNull();
         assertThat(resultado.getUnidade()).isEqualTo(unidadeDto);
@@ -95,7 +93,6 @@ class SubprocessoContextoServiceTest {
     @DisplayName("obterContextoEdicao deve lançar erro se unidade não encontrada")
     void obterContextoEdicaoErroUnidade() {
         Long codSubprocesso = 1L;
-        Perfil perfil = Perfil.CHEFE;
 
         Usuario usuario = new Usuario();
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
@@ -103,13 +100,13 @@ class SubprocessoContextoServiceTest {
         SubprocessoDetalheDto detalheDto = SubprocessoDetalheDto.builder()
                 .unidade(SubprocessoDetalheDto.UnidadeDto.builder().sigla(SIGLA_TESTE).build())
                 .build();
-        when(detalheService.obterDetalhes(codSubprocesso, perfil, usuario))
+        when(detalheService.obterDetalhes(codSubprocesso, usuario))
                 .thenReturn(detalheDto);
 
         when(usuarioService.buscarUnidadePorSigla(SIGLA_TESTE)).thenReturn(Optional.empty());
 
         assertThrows(ErroEntidadeNaoEncontrada.class, () ->
-            service.obterContextoEdicao(codSubprocesso, perfil)
+            service.obterContextoEdicao(codSubprocesso)
         );
     }
 
@@ -118,7 +115,6 @@ class SubprocessoContextoServiceTest {
     void obterContextoEdicaoSemMapa() {
         Long codSubprocesso = 1L;
         Long codUnidade = 10L;
-        Perfil perfil = Perfil.CHEFE;
 
         Usuario usuario = new Usuario();
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
@@ -126,7 +122,7 @@ class SubprocessoContextoServiceTest {
         SubprocessoDetalheDto detalheDto = SubprocessoDetalheDto.builder()
                 .unidade(SubprocessoDetalheDto.UnidadeDto.builder().codigo(codUnidade).sigla(SIGLA_TESTE).build())
                 .build();
-        when(detalheService.obterDetalhes(codSubprocesso, perfil, usuario))
+        when(detalheService.obterDetalhes(codSubprocesso, usuario))
                 .thenReturn(detalheDto);
 
         when(usuarioService.buscarUnidadePorSigla(SIGLA_TESTE)).thenReturn(Optional.of(UnidadeDto.builder().build()));
@@ -138,7 +134,7 @@ class SubprocessoContextoServiceTest {
         when(detalheService.listarAtividadesSubprocesso(codSubprocesso))
                 .thenReturn(Collections.emptyList());
 
-        ContextoEdicaoDto resultado = service.obterContextoEdicao(codSubprocesso, perfil);
+        ContextoEdicaoDto resultado = service.obterContextoEdicao(codSubprocesso);
 
         assertThat(resultado.getMapa()).isNull();
     }

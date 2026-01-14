@@ -8,7 +8,6 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
@@ -34,9 +33,9 @@ public class SubprocessoContextoService {
     private final SubprocessoDetalheService detalheService;
 
     @Transactional(readOnly = true)
-    public ContextoEdicaoDto obterContextoEdicao(Long codSubprocesso, Perfil perfil) {
+    public ContextoEdicaoDto obterContextoEdicao(Long codSubprocesso) {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
-        SubprocessoDetalheDto subprocessoDto = detalheService.obterDetalhes(codSubprocesso, perfil, usuario);
+        SubprocessoDetalheDto subprocessoDto = detalheService.obterDetalhes(codSubprocesso, usuario);
         String siglaUnidade = subprocessoDto.getUnidade().getSigla();
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
         UnidadeDto unidadeDto = usuarioService.buscarUnidadePorSigla(siglaUnidade)

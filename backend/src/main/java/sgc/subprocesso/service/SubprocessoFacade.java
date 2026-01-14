@@ -101,7 +101,7 @@ public class SubprocessoFacade {
     @Transactional(readOnly = true)
     public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil) {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
-        return detalheService.obterDetalhes(codigo, perfil, usuario);
+        return detalheService.obterDetalhes(codigo, usuario);
     }
 
     @Transactional(readOnly = true)
@@ -126,7 +126,7 @@ public class SubprocessoFacade {
 
     @Transactional(readOnly = true)
     public ContextoEdicaoDto obterContextoEdicao(Long codigo, Perfil perfil) {
-        return contextoService.obterContextoEdicao(codigo, perfil);
+        return contextoService.obterContextoEdicao(codigo);
     }
 
     @Transactional(readOnly = true)

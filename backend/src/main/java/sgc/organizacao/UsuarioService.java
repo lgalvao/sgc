@@ -394,9 +394,6 @@ public class UsuarioService {
     }
 
     private AdministradorDto toAdministradorDto(Usuario usuario) {
-        if (usuario == null)
-            return null;
-
         Unidade unidadeLotacao = usuario.getUnidadeLotacao();
 
         return AdministradorDto.builder()

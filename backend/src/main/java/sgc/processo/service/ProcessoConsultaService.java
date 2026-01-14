@@ -103,8 +103,7 @@ public class ProcessoConsultaService {
         }
 
         return subprocessos.stream()
-                .filter(sp -> sp.getUnidade() != null
-                        && sp.getUnidade().getCodigo().equals(codUnidadeUsuario))
+                .filter(sp -> sp.getUnidade().getCodigo().equals(codUnidadeUsuario))
                 .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO
                         || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA)
                 .map(this::toSubprocessoElegivelDto)

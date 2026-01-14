@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseService;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
-import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.Atividade;
@@ -18,7 +17,6 @@ import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.ConhecimentoService;
 import sgc.organizacao.UsuarioService;
-import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
@@ -72,10 +70,7 @@ public class SubprocessoDetalheService {
                 .build();
     }
 
-    public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil, Usuario usuarioAutenticado) {
-        if (perfil == null) {
-            throw new ErroAccessoNegado("Perfil inválido para acesso aos detalhes do subprocesso.");
-        }
+    public SubprocessoDetalheDto obterDetalhes(Long codigo, Usuario usuarioAutenticado) {
         Subprocesso sp = crudService.buscarSubprocesso(codigo);
         
         // Centralized security check
@@ -83,7 +78,7 @@ public class SubprocessoDetalheService {
 
         Usuario responsavel = usuarioService.buscarResponsavelAtual(sp.getUnidade().getSigla());
         Usuario titular = null;
-        if (sp.getUnidade() != null && sp.getUnidade().getTituloTitular() != null) {
+        if (sp.getUnidade().getTituloTitular() != null) {
             try {
                 titular = usuarioService.buscarPorLogin(sp.getUnidade().getTituloTitular());
             } catch (Exception e) {
@@ -100,7 +95,7 @@ public class SubprocessoDetalheService {
     public SubprocessoCadastroDto obterCadastro(Long codSubprocesso) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
         List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos = new ArrayList<>();
-        if (sp.getMapa() != null && sp.getMapa().getCodigo() != null) {
+        if (sp.getMapa() != null) {
             List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
             for (Atividade a : atividades) {
                 List<ConhecimentoDto> ksDto = a.getConhecimentos().stream().map(conhecimentoMapper::toDto).toList();
@@ -113,7 +108,7 @@ public class SubprocessoDetalheService {
         }
         return SubprocessoCadastroDto.builder()
                 .subprocessoCodigo(sp.getCodigo())
-                .unidadeSigla(sp.getUnidade() != null ? sp.getUnidade().getSigla() : null)
+                .unidadeSigla(sp.getUnidade().getSigla())
                 .atividades(atividadesComConhecimentos)
                 .build();
     }

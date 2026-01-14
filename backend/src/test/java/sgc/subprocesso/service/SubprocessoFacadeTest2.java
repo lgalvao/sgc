@@ -234,7 +234,7 @@ class SubprocessoFacadeTest2 {
             Usuario admin = new Usuario();
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(admin);
 
-            when(detalheService.obterDetalhes(1L, Perfil.ADMIN, admin))
+        when(detalheService.obterDetalhes(1L, admin))
                     .thenReturn(SubprocessoDetalheDto.builder().build());
 
             SubprocessoDetalheDto result = subprocessoFacade.obterDetalhes(1L, Perfil.ADMIN);

@@ -69,17 +69,8 @@ public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
                 return false;
             }
 
-            // Subprocesso pode ser null em cenários de dados inconsistentes ou mocks incompletos
             Subprocesso subprocesso = mapa.getSubprocesso();
-            if (subprocesso == null) {
-                definirMotivoNegacao("Mapa não possui subprocesso associado");
-                return false;
-            }
             Unidade unidade = subprocesso.getUnidade();
-            if (unidade == null) {
-                definirMotivoNegacao("Subprocesso não possui unidade associada");
-                return false;
-            }
 
             String tituloTitular = unidade.getTituloTitular();
             if (!usuario.getTituloEleitoral().equals(tituloTitular)) {

@@ -11,20 +11,15 @@ import sgc.organizacao.model.Usuario;
 @Mapper(componentModel = "spring")
 public interface UsuarioMapper {
     default UnidadeDto toUnidadeDto(Unidade unidade, boolean isElegivel) {
-        UnidadeDto dto = UnidadeDto.builder().build();
-        if (unidade == null) {
-            dto.setSubunidades(new java.util.ArrayList<>());
-            dto.setElegivel(isElegivel);
-            return dto;
-        }
-
         Unidade unidadeSuperior = unidade.getUnidadeSuperior();
+
+        UnidadeDto dto = UnidadeDto.builder().build();
 
         dto.setCodigo(unidade.getCodigo())
                 .setNome(unidade.getNome())
                 .setSigla(unidade.getSigla())
                 .setCodigoPai(unidadeSuperior != null ? unidadeSuperior.getCodigo() : null)
-                .setTipo(unidade.getTipo() != null ? unidade.getTipo().name() : null)
+                .setTipo(unidade.getTipo().name())
                 .setSubunidades(new java.util.ArrayList<>())
                 .setElegivel(isElegivel)
                 .setTituloTitular(unidade.getTituloTitular());
@@ -43,19 +38,12 @@ public interface UsuarioMapper {
      * @return O DTO de usuário.
      */
     default UsuarioDto toUsuarioDto(Usuario usuario) {
-        if (usuario == null) {
-            return UsuarioDto.builder().build();
-        }
-
-        Object tituloObj = usuario.getTituloEleitoral();
-        String titulo = tituloObj != null ? tituloObj.toString() : null;
-
         return UsuarioDto.builder()
                 .nome(usuario.getNome())
-                .tituloEleitoral(titulo)
+                .tituloEleitoral(usuario.getTituloEleitoral())
                 .email(usuario.getEmail())
                 .matricula(usuario.getMatricula())
-                .unidadeCodigo(usuario.getUnidadeLotacao() != null ? usuario.getUnidadeLotacao().getCodigo() : null)
+                .unidadeCodigo(usuario.getUnidadeLotacao().getCodigo())
                 .build();
     }
 
