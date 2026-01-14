@@ -564,6 +564,65 @@ class UsuarioServiceUnitTest {
         }
 
         @Test
+        @DisplayName("Deve falhar se autenticação existir mas não estiver autenticado")
+        void deveFalharSeNaoAutenticado() {
+            org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(false);
+            org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
+
+            assertThrows(ErroAccessoNegado.class, () -> service.obterUsuarioAutenticado());
+        }
+
+        @Test
+        @DisplayName("Deve falhar se autenticação for Anônima")
+        void deveFalharSeAnonimo() {
+            org.springframework.security.authentication.AnonymousAuthenticationToken auth =
+                mock(org.springframework.security.authentication.AnonymousAuthenticationToken.class);
+            when(auth.isAuthenticated()).thenReturn(true); // Mesmo se true, é anônimo
+            org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
+
+            assertThrows(ErroAccessoNegado.class, () -> service.obterUsuarioAutenticado());
+        }
+
+        @Test
+        @DisplayName("Deve filtrar atribuições de outras unidades na busca de responsáveis")
+        void deveFiltrarOutrasUnidades() {
+            Long codAlvo = 1L;
+            Long codOutro = 2L;
+            List<Long> solicitados = List.of(codAlvo);
+
+            Usuario chefe = new Usuario();
+            chefe.setTituloEleitoral("1");
+            chefe.setNome("Chefe");
+
+            // Atribuição na unidade alvo
+            UsuarioPerfil p1 = new UsuarioPerfil();
+            p1.setUsuarioTitulo("1");
+            p1.setPerfil(Perfil.CHEFE);
+            p1.setUnidadeCodigo(codAlvo);
+            p1.setUsuario(chefe);
+
+            // Atribuição em outra unidade (não solicitada)
+            UsuarioPerfil p2 = new UsuarioPerfil();
+            p2.setUsuarioTitulo("1");
+            p2.setPerfil(Perfil.CHEFE);
+            p2.setUnidadeCodigo(codOutro);
+            p2.setUsuario(chefe);
+
+            chefe.setAtribuicoes(new HashSet<>(List.of(p1, p2)));
+
+            when(usuarioRepo.findChefesByUnidadesCodigos(solicitados)).thenReturn(List.of(chefe));
+            when(usuarioRepo.findByIdInWithAtribuicoes(any())).thenReturn(List.of(chefe));
+            // carregarAtribuicoesEmLote vai ser chamado
+            when(usuarioPerfilRepo.findByUsuarioTituloIn(any())).thenReturn(List.of(p1, p2));
+
+            Map<Long, ResponsavelDto> res = service.buscarResponsaveisUnidades(solicitados);
+
+            assertTrue(res.containsKey(codAlvo));
+            assertFalse(res.containsKey(codOutro));
+        }
+
+        @Test
         @DisplayName("Deve retornar null se usuário for null em toAdministradorDto")
         void deveRetornarNullParaAdminNull() {
             var result = (AdministradorDto) ReflectionTestUtils.invokeMethod(

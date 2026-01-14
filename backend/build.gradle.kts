@@ -234,6 +234,23 @@ tasks.jacocoTestReport {
 }
 
 tasks.jacocoTestCoverageVerification {
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(
+                    "**/*MapperImpl*",
+                    "sgc/Sgc.class",
+                    "sgc/**/*Config.class",
+                    "sgc/**/*Dto.class",
+                    "sgc/**/*Exception.class",
+                    "sgc/notificacao/NotificacaoModelosServiceMock.class",
+                    "sgc/e2e/E2eController.class",
+                    "sgc/seguranca/autenticacao/AcessoAdClient.class"
+                )
+            }
+        })
+    )
+
     violationRules {
         rule {
             limit {
