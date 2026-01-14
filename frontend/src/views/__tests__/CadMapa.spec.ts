@@ -340,7 +340,11 @@ describe("CadMapa.vue", () => {
             subprocesso: {
                 situacao: 'EM_ANDAMENTO',
                 situacaoLabel: 'Em Andamento',
-                permissoes: { podeVisualizarImpacto: true }
+                permissoes: {
+                    podeVisualizarImpacto: true,
+                    podeEditarMapa: true,
+                    podeDisponibilizarMapa: true
+                }
             },
             mapa: mockMapaCompleto,
             atividades: mockAtividades,
