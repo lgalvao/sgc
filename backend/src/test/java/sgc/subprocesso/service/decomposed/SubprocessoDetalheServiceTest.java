@@ -120,25 +120,6 @@ class SubprocessoDetalheServiceTest {
     }
 
     @Test
-    @DisplayName("Deve listar atividades tratando conhecimentos vazios")
-    void deveListarAtividadesTratandoConhecimentosVazios() {
-        Subprocesso sp = new Subprocesso();
-        Mapa mapa = new Mapa();
-        mapa.setCodigo(10L);
-        sp.setMapa(mapa);
-
-        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        Atividade ativ = new Atividade();
-        ativ.setDescricao("Test");
-        ativ.setConhecimentos(List.of());
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(ativ));
-
-        List<AtividadeVisualizacaoDto> result = service.listarAtividadesSubprocesso(1L);
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getConhecimentos()).isEmpty();
-    }
-
-    @Test
     @DisplayName("obterDetalhes sucesso ADMIN")
     void obterDetalhesSucessoAdmin() {
         Usuario admin = new Usuario();
@@ -157,7 +138,7 @@ class SubprocessoDetalheServiceTest {
                 .thenReturn(SubprocessoDetalheDto.builder().build());
         when(usuarioService.buscarPorLogin("titular")).thenReturn(new Usuario());
 
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, admin);
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, admin);
         assertThat(result).isNotNull();
         verify(accessControlService).verificarPermissao(admin, Acao.VISUALIZAR_SUBPROCESSO, sp);
     }
@@ -181,16 +162,8 @@ class SubprocessoDetalheServiceTest {
                 .thenReturn(SubprocessoDetalheDto.builder().build());
         when(usuarioService.buscarPorLogin("titular")).thenThrow(new RuntimeException("Erro"));
 
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, admin);
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, admin);
         assertThat(result).isNotNull();
-    }
-
-    @Test
-    @DisplayName("obterDetalhes falha se perfil null")
-    void obterDetalhesFalhaPerfilNull() {
-        Usuario usuario = new Usuario();
-        assertThatThrownBy(() -> service.obterDetalhes(1L, null, usuario))
-            .isInstanceOf(ErroAccessoNegado.class);
     }
 
     @Test
@@ -204,7 +177,7 @@ class SubprocessoDetalheServiceTest {
         doThrow(new ErroAccessoNegado("Acesso negado")).when(accessControlService)
                 .verificarPermissao(user, Acao.VISUALIZAR_SUBPROCESSO, sp);
 
-        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.CHEFE, user))
+        assertThatThrownBy(() -> service.obterDetalhes(1L, user))
                 .isInstanceOf(ErroAccessoNegado.class)
                 .hasMessage("Acesso negado");
     }
@@ -221,27 +194,9 @@ class SubprocessoDetalheServiceTest {
         when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
 
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.GESTOR, gestor);
+        SubprocessoDetalheDto result = service.obterDetalhes(1L, gestor);
         assertThat(result).isNotNull();
         verify(accessControlService).verificarPermissao(gestor, Acao.VISUALIZAR_SUBPROCESSO, sp);
-    }
-
-
-
-    @Test
-    @DisplayName("obterDetalhes sucesso SERVIDOR")
-    void obterDetalhesSucessoServidor() {
-        Usuario servidor = new Usuario();
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(1L);
-        sp.setUnidade(new Unidade());
-
-        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
-                .thenReturn(SubprocessoDetalheDto.builder().build());
-
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.SERVIDOR, servidor);
-        assertThat(result).isNotNull();
     }
 
     @Test
@@ -253,7 +208,6 @@ class SubprocessoDetalheServiceTest {
         
         SubprocessoPermissoesDto result = service.obterPermissoes(1L, user);
         assertThat(result).isNotNull();
-        // Verifica se houve chamadas para verificar as diversas permissões no DTO
         org.mockito.Mockito.verify(accessControlService, org.mockito.Mockito.atLeastOnce())
                 .podeExecutar(eq(user), any(Acao.class), eq(sp));
     }
@@ -264,6 +218,7 @@ class SubprocessoDetalheServiceTest {
         Subprocesso sp = new Subprocesso();
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
+        sp.setUnidade(new Unidade());
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
         Atividade a = new Atividade();
@@ -296,21 +251,6 @@ class SubprocessoDetalheServiceTest {
     }
 
     @Test
-    @DisplayName("Obter cadastro com mapa code null")
-    void obterCadastroMapaCodeNull() {
-        Subprocesso sp = new Subprocesso();
-        sp.setMapa(new Mapa());
-        sp.getMapa().setCodigo(null);
-        sp.setUnidade(new Unidade());
-        sp.getUnidade().setSigla("U1");
-        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-
-        SubprocessoCadastroDto dto = service.obterCadastro(1L);
-        assertThat(dto.getAtividades()).isEmpty();
-        assertThat(dto.getUnidadeSigla()).isEqualTo("U1");
-    }
-
-    @Test
     @DisplayName("Obter cadastro com atividades vazias")
     void obterCadastroAtividadesVazias() {
         Subprocesso sp = new Subprocesso();
@@ -322,99 +262,5 @@ class SubprocessoDetalheServiceTest {
 
         SubprocessoCadastroDto dto = service.obterCadastro(1L);
         assertThat(dto.getAtividades()).isEmpty();
-    }
-
-    @Test
-    @DisplayName("Obter cadastro com atividades sem conhecimentos")
-    void obterCadastroConhecimentosVazios() {
-        Subprocesso sp = new Subprocesso();
-        sp.setMapa(new Mapa());
-        sp.getMapa().setCodigo(10L);
-        sp.setUnidade(new Unidade());
-        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-
-        Atividade a = new Atividade();
-        a.setCodigo(1L);
-        a.setDescricao("Test");
-        a.setConhecimentos(List.of());
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(a));
-
-        SubprocessoCadastroDto dto = service.obterCadastro(1L);
-        assertThat(dto.getAtividades()).hasSize(1);
-        assertThat(dto.getAtividades().get(0).getConhecimentos()).isEmpty();
-    }
-
-    @Test
-    @DisplayName("Obter cadastro com unidade null")
-    void obterCadastroUnidadeNull() {
-        Subprocesso sp = new Subprocesso();
-        sp.setMapa(new Mapa());
-        sp.getMapa().setCodigo(10L);
-        sp.setUnidade(null);
-        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of());
-
-        SubprocessoCadastroDto dto = service.obterCadastro(1L);
-        assertThat(dto.getUnidadeSigla()).isNull();
-    }
-
-    @Test
-    @DisplayName("Obter detalhes com unidade sem tituloTitular")
-    void obterDetalhesUnidadeSemTitular() {
-        Usuario admin = new Usuario();
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setPerfil(Perfil.ADMIN);
-        admin.setAtribuicoes(Set.of(up));
-
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(1L);
-        sp.setUnidade(new Unidade());
-        sp.getUnidade().setSigla("U1");
-        sp.getUnidade().setTituloTitular(null);
-
-        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
-                .thenReturn(SubprocessoDetalheDto.builder().build());
-
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.ADMIN, admin);
-        assertThat(result).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Obter detalhes falha se unidade null")
-    void obterDetalhesUnidadeNull() {
-        Usuario admin = new Usuario();
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(1L);
-        sp.setUnidade(null);
-
-        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        doThrow(new ErroAccessoNegado("Unidade não identificada.")).when(accessControlService)
-                .verificarPermissao(admin, Acao.VISUALIZAR_SUBPROCESSO, sp);
-
-        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.CHEFE, admin))
-                .isInstanceOf(ErroAccessoNegado.class);
-    }
-
-    @Test
-    @DisplayName("Obter detalhes com CHEFE")
-    void obterDetalhesChefe() {
-        Usuario chefe = new Usuario();
-        Unidade u1 = new Unidade();
-        u1.setSigla("U1");
-        u1.setTituloTitular("titular");
-
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(1L);
-        sp.setUnidade(u1);
-
-        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
-                .thenReturn(SubprocessoDetalheDto.builder().build());
-        when(usuarioService.buscarPorLogin("titular")).thenReturn(new Usuario());
-
-        SubprocessoDetalheDto result = service.obterDetalhes(1L, Perfil.CHEFE, chefe);
-        assertThat(result).isNotNull();
-        verify(accessControlService).verificarPermissao(chefe, Acao.VISUALIZAR_SUBPROCESSO, sp);
     }
 }

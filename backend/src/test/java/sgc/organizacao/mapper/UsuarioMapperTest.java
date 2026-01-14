@@ -25,6 +25,7 @@ class UsuarioMapperTest {
         unidade.setCodigo(1L);
         unidade.setNome("Unidade Teste");
         unidade.setSigla("UT");
+        unidade.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
 
         // Act
         UnidadeDto dto = mapper.toUnidadeDto(unidade);

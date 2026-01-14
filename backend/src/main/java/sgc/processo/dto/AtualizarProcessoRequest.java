@@ -21,7 +21,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AtualizarProcessoRequestuest {
+public class AtualizarProcessoRequest {
     private Long codigo;
 
     @NotBlank(message = "Preencha a descrição")

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EnviarLembreteRequestuest {
+public class EnviarLembreteRequest {
     @NotNull(message = "O código da unidade é obrigatório")
     private Long unidadeCodigo;
 }

@@ -19,7 +19,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CriarProcessoRequestuest {
+public class CriarProcessoRequest {
 
     @NotBlank(message = "Preencha a descrição")
     private String descricao;
@@ -36,7 +36,7 @@ public class CriarProcessoRequestuest {
     private List<Long> unidades;
 
     public List<Long> getUnidades() {
-        return unidades == null ? null : new ArrayList<>(unidades);
+        return unidades == null ? java.util.Collections.emptyList() : new ArrayList<>(unidades);
     }
 
     public void setUnidades(List<Long> unidades) {
