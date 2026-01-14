@@ -167,7 +167,7 @@ public class SubprocessoCrudController {
     @Operation(summary = "Reabre o cadastro de um subprocesso")
     public ResponseEntity<Void> reabrirCadastro(
             @PathVariable Long codigo,
-            @RequestBody @Valid ReabrirProcessoReq request) {
+            @RequestBody @Valid ReabrirProcessoRequest request) {
         subprocessoFacade.reabrirCadastro(codigo, request.getJustificativa());
         return ResponseEntity.ok().build();
     }
@@ -181,7 +181,7 @@ public class SubprocessoCrudController {
     @Operation(summary = "Reabre a revisão de cadastro de um subprocesso")
     public ResponseEntity<Void> reabrirRevisaoCadastro(
             @PathVariable Long codigo,
-            @RequestBody @Valid ReabrirProcessoReq request) {
+            @RequestBody @Valid ReabrirProcessoRequest request) {
         subprocessoFacade.reabrirRevisaoCadastro(codigo, request.getJustificativa());
         return ResponseEntity.ok().build();
     }

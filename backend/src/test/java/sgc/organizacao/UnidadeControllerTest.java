@@ -11,7 +11,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
-import sgc.organizacao.dto.CriarAtribuicaoTemporariaReq;
+import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
 
@@ -70,7 +70,7 @@ class UnidadeControllerTest {
                 .andExpect(status().isCreated());
 
         verify(unidadeService)
-                .criarAtribuicaoTemporaria(eq(1L), any(CriarAtribuicaoTemporariaReq.class));
+                .criarAtribuicaoTemporaria(eq(1L), any(CriarAtribuicaoTemporariaRequest.class));
     }
 
     @Test

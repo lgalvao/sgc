@@ -15,7 +15,7 @@ import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.organizacao.model.*;
-import sgc.seguranca.login.dto.EntrarReq;
+import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.util.TestUtil;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -65,7 +65,7 @@ public class SecurityAuthBypassTest extends BaseIntegrationTest {
                 usuario.getTituloEleitoral(), "ADMIN", unidade.getCodigo());
 
         // 2. Try to "login" (entrar) directly, skipping /autenticar
-        EntrarReq entrarReq = EntrarReq.builder()
+        EntrarRequest entrarReq = EntrarRequest.builder()
                 .tituloEleitoral(usuario.getTituloEleitoral())
                 .perfil("ADMIN")
                 .unidadeCodigo(unidade.getCodigo())

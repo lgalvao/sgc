@@ -16,7 +16,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("unit")
-@DisplayName("Testes de Validação: AutenticarReq")
+@DisplayName("Testes de Validação: AutenticarRequest")
 class AutenticarReqValidationTest {
 
     private Validator validator;
@@ -31,13 +31,13 @@ class AutenticarReqValidationTest {
     @DisplayName("Deve aceitar inputs normais")
     void deveAceitarInputsNormais() {
         // Arrange
-        AutenticarReq req = AutenticarReq.builder()
+        AutenticarRequest req = AutenticarRequest.builder()
                 .tituloEleitoral("123456789012")
                 .senha("senha123")
                 .build();
 
         // Act
-        Set<ConstraintViolation<AutenticarReq>> violations = validator.validate(req);
+        Set<ConstraintViolation<AutenticarRequest>> violations = validator.validate(req);
 
         // Assert
         assertThat(violations).isEmpty();
@@ -55,13 +55,13 @@ class AutenticarReqValidationTest {
         String tituloLongo = "a".repeat(tamanhoTitulo);
         String senhaLonga = "b".repeat(tamanhoSenha);
 
-        AutenticarReq req = AutenticarReq.builder()
+        AutenticarRequest req = AutenticarRequest.builder()
                 .tituloEleitoral(tituloLongo)
                 .senha(senhaLonga)
                 .build();
 
         // Act
-        Set<ConstraintViolation<AutenticarReq>> violations = validator.validate(req);
+        Set<ConstraintViolation<AutenticarRequest>> violations = validator.validate(req);
 
         // Assert
         assertThat(violations).isNotEmpty();

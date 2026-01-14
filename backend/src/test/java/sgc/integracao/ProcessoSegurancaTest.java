@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.organizacao.model.Unidade;
-import sgc.processo.dto.CriarProcessoReq;
+import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.model.TipoProcesso;
 
 import java.time.LocalDateTime;
@@ -28,7 +28,7 @@ class ProcessoSegurancaTest extends BaseIntegrationTest {
         // Busca uma unidade existente para usar no request
         Unidade unidade = unidadeRepo.findAll().stream().findFirst().orElseThrow();
 
-        CriarProcessoReq req = CriarProcessoReq.builder()
+        CriarProcessoRequest req = CriarProcessoRequest.builder()
                 .descricao("Processo Indevido")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))

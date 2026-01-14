@@ -24,7 +24,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.dto.DevolverValidacaoReq;
+import sgc.subprocesso.dto.DevolverValidacaoRequest;
 import sgc.subprocesso.model.*;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -114,7 +114,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Devolução e aceitação da validação do mapa com verificação do histórico")
     void devolucaoEAceitacaoComVerificacaoHistorico() throws Exception {
         // Devolução do mapa (GESTOR of unit 6 devolves to subordinate unit 9)
-        DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");
+        DevolverValidacaoRequest devolverReq = new DevolverValidacaoRequest("Justificativa da devolução");
         mockMvc.perform(post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
                                 .with(user(usuarioGestor))
                                 .with(csrf())

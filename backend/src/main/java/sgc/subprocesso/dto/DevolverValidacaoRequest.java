@@ -14,7 +14,7 @@ import sgc.seguranca.sanitizacao.SanitizarHtml;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DevolverValidacaoReq {
+public class DevolverValidacaoRequest {
     /**
      * A justificativa para a devolução.
      */

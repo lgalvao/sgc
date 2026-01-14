@@ -13,7 +13,7 @@ import sgc.Sgc;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
-import sgc.processo.dto.CriarProcessoReq;
+import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -71,8 +71,8 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
         // ============================================================
         // PASSO 1: Admin cria processo de mapeamento
         // ============================================================
-        CriarProcessoReq criarReq =
-                CriarProcessoReq.builder()
+        CriarProcessoRequest criarReq =
+                CriarProcessoRequest.builder()
                         .descricao("Processo de Mapeamento para Teste")
                         .tipo(TipoProcesso.MAPEAMENTO)
                         .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))

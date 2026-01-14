@@ -135,7 +135,7 @@
  * MapaCompletoDto mapa = mapaService.buscarMapaCompleto(codSubprocesso);
  * 
  * // CHEFE valida e pode apresentar sugestões
- * ApresentarSugestoesReq sugestoes = ...;
+ * ApresentarSugestoesRequest sugestoes = ...;
  * mapaService.apresentarSugestoes(codSubprocesso, sugestoes);
  * }</pre>
  *

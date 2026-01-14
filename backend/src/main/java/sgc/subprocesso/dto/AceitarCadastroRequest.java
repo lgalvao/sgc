@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AceitarCadastroReq {
+public class AceitarCadastroRequest {
     /**
      * Observações adicionais.
      */

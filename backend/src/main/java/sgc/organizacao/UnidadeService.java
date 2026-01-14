@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
-import sgc.organizacao.dto.CriarAtribuicaoTemporariaReq;
+import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.mapper.UsuarioMapper;
@@ -78,7 +78,7 @@ public class UnidadeService {
 
 
     public void criarAtribuicaoTemporaria(
-            Long codUnidade, CriarAtribuicaoTemporariaReq request) {
+            Long codUnidade, CriarAtribuicaoTemporariaRequest request) {
         Unidade unidade =
                 unidadeRepo
                         .findById(codUnidade)

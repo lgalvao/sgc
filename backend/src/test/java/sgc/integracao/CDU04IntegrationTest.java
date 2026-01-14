@@ -23,8 +23,8 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.organizacao.model.*;
-import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.dto.IniciarProcessoReq;
+import sgc.processo.dto.CriarProcessoRequest;
+import sgc.processo.dto.IniciarProcessoRequest;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -129,7 +129,7 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve iniciar processo de mapeamento com sucesso e gerar subprocessos, alertas e notificações")
     void deveIniciarProcessoMapeamento() throws Exception {
         // 1. Arrange: Criar um processo em estado 'CRIADO'
-        CriarProcessoReq criarReq = new CriarProcessoReq(
+        CriarProcessoRequest criarReq = new CriarProcessoRequest(
                 "Processo Mapeamento Teste CDU-04",
                 TipoProcesso.MAPEAMENTO,
                 LocalDateTime.now().plusDays(10),
@@ -146,7 +146,7 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // 2. Act: Iniciar Processo
-        IniciarProcessoReq iniciarReq = new IniciarProcessoReq(TipoProcesso.MAPEAMENTO, List.of(unidadeLivre.getCodigo()));
+        IniciarProcessoRequest iniciarReq = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(unidadeLivre.getCodigo()));
 
         mockMvc.perform(post("/api/processos/{id}/iniciar", processoId)
                         .with(csrf())

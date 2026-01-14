@@ -12,7 +12,7 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.organizacao.UnidadeService;
 import sgc.organizacao.UsuarioService;
-import sgc.seguranca.login.dto.EntrarReq;
+import sgc.seguranca.login.dto.EntrarRequest;
 
 import java.util.Collections;
 
@@ -61,7 +61,7 @@ class LoginServiceTest {
     @DisplayName("Linha 154: Deve negar acesso se usuário não tiver a atribuição solicitada em entrar")
     void deveNegarAcessoSemAtribuicao() {
         String titulo = "123";
-        EntrarReq req = EntrarReq.builder()
+        EntrarRequest req = EntrarRequest.builder()
                 .tituloEleitoral(titulo)
                 .perfil("GESTOR")
                 .unidadeCodigo(1L)

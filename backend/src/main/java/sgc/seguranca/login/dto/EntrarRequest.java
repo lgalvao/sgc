@@ -12,7 +12,7 @@ import lombok.Value;
  */
 @Value
 @Builder
-public class EntrarReq {
+public class EntrarRequest {
     @NotNull(message = "O título eleitoral é obrigatório.")
     @Size(max = 20, message = "O título eleitoral deve ter no máximo 20 caracteres.")
     String tituloEleitoral;
@@ -25,7 +25,7 @@ public class EntrarReq {
     Long unidadeCodigo;
 
     @JsonCreator
-    public EntrarReq(
+    public EntrarRequest(
             @JsonProperty("tituloEleitoral") String tituloEleitoral,
             @JsonProperty("perfil") String perfil,
             @JsonProperty("unidadeCodigo") Long unidadeCodigo) {

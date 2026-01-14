@@ -11,7 +11,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("unit")
-@DisplayName("Testes de Validação: EntrarReq")
+@DisplayName("Testes de Validação: EntrarRequest")
 class EntrarReqValidationTest {
 
     private Validator validator;
@@ -29,13 +29,13 @@ class EntrarReqValidationTest {
         @Test
         @DisplayName("Deve aceitar requisição com todos os campos preenchidos corretamente")
         void deveAceitarRequisicaoCompleta() {
-            EntrarReq req = EntrarReq.builder()
+            EntrarRequest req = EntrarRequest.builder()
                     .tituloEleitoral("123456789012")
                     .perfil("ADMIN")
                     .unidadeCodigo(1L)
                     .build();
 
-            Set<ConstraintViolation<EntrarReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<EntrarRequest>> violations = validator.validate(req);
 
             assertThat(violations).isEmpty();
         }
@@ -46,13 +46,13 @@ class EntrarReqValidationTest {
             String[] perfisValidos = {"ADMIN", "GESTOR", "CHEFE", "SERVIDOR"};
             
             for (String perfil : perfisValidos) {
-                EntrarReq req = EntrarReq.builder()
+                EntrarRequest req = EntrarRequest.builder()
                         .tituloEleitoral("123456789012")
                         .perfil(perfil)
                         .unidadeCodigo(1L)
                         .build();
 
-                Set<ConstraintViolation<EntrarReq>> violations = validator.validate(req);
+                Set<ConstraintViolation<EntrarRequest>> violations = validator.validate(req);
 
                 assertThat(violations)
                         .as("Perfil %s deve ser válido", perfil)
@@ -68,13 +68,13 @@ class EntrarReqValidationTest {
         @Test
         @DisplayName("Deve rejeitar título eleitoral nulo")
         void deveRejeitarTituloNulo() {
-            EntrarReq req = EntrarReq.builder()
+            EntrarRequest req = EntrarRequest.builder()
                     .tituloEleitoral(null)
                     .perfil("ADMIN")
                     .unidadeCodigo(1L)
                     .build();
 
-            Set<ConstraintViolation<EntrarReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<EntrarRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -85,13 +85,13 @@ class EntrarReqValidationTest {
         @Test
         @DisplayName("Deve rejeitar título eleitoral muito longo")
         void deveRejeitarTituloMuitoLongo() {
-            EntrarReq req = EntrarReq.builder()
+            EntrarRequest req = EntrarRequest.builder()
                     .tituloEleitoral("a".repeat(21))  // > 20 caracteres
                     .perfil("ADMIN")
                     .unidadeCodigo(1L)
                     .build();
 
-            Set<ConstraintViolation<EntrarReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<EntrarRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -102,13 +102,13 @@ class EntrarReqValidationTest {
         @Test
         @DisplayName("Deve aceitar título eleitoral no limite máximo")
         void deveAceitarTituloNoLimite() {
-            EntrarReq req = EntrarReq.builder()
+            EntrarRequest req = EntrarRequest.builder()
                     .tituloEleitoral("a".repeat(20))  // exatamente 20 caracteres
                     .perfil("ADMIN")
                     .unidadeCodigo(1L)
                     .build();
 
-            Set<ConstraintViolation<EntrarReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<EntrarRequest>> violations = validator.validate(req);
 
             assertThat(violations).isEmpty();
         }
@@ -121,13 +121,13 @@ class EntrarReqValidationTest {
         @Test
         @DisplayName("Deve rejeitar perfil nulo")
         void deveRejeitarPerfilNulo() {
-            EntrarReq req = EntrarReq.builder()
+            EntrarRequest req = EntrarRequest.builder()
                     .tituloEleitoral("123456789012")
                     .perfil(null)
                     .unidadeCodigo(1L)
                     .build();
 
-            Set<ConstraintViolation<EntrarReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<EntrarRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -138,13 +138,13 @@ class EntrarReqValidationTest {
         @Test
         @DisplayName("Deve rejeitar perfil muito longo")
         void deveRejeitarPerfilMuitoLongo() {
-            EntrarReq req = EntrarReq.builder()
+            EntrarRequest req = EntrarRequest.builder()
                     .tituloEleitoral("123456789012")
                     .perfil("a".repeat(51))  // > 50 caracteres
                     .unidadeCodigo(1L)
                     .build();
 
-            Set<ConstraintViolation<EntrarReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<EntrarRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -160,13 +160,13 @@ class EntrarReqValidationTest {
         @Test
         @DisplayName("Deve rejeitar código de unidade nulo")
         void deveRejeitarUnidadeNula() {
-            EntrarReq req = EntrarReq.builder()
+            EntrarRequest req = EntrarRequest.builder()
                     .tituloEleitoral("123456789012")
                     .perfil("ADMIN")
                     .unidadeCodigo(null)
                     .build();
 
-            Set<ConstraintViolation<EntrarReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<EntrarRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -182,13 +182,13 @@ class EntrarReqValidationTest {
         @Test
         @DisplayName("Deve reportar todas as violações quando múltiplos campos são inválidos")
         void deveReportarTodasViolacoes() {
-            EntrarReq req = EntrarReq.builder()
+            EntrarRequest req = EntrarRequest.builder()
                     .tituloEleitoral(null)
                     .perfil(null)
                     .unidadeCodigo(null)
                     .build();
 
-            Set<ConstraintViolation<EntrarReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<EntrarRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(3)

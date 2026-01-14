@@ -23,7 +23,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.dto.ReabrirProcessoReq;
+import sgc.subprocesso.dto.ReabrirProcessoRequest;
 import sgc.subprocesso.model.*;
 import tools.jackson.databind.ObjectMapper;
 
@@ -99,7 +99,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void reabrirRevisaoCadastro_comoAdmin_sucesso() throws Exception {
         // Given
-        ReabrirProcessoReq request = new ReabrirProcessoReq("Necessário corrigir erros identificados na revisão");
+        ReabrirProcessoRequest request = new ReabrirProcessoRequest("Necessário corrigir erros identificados na revisão");
 
         // When
         mockMvc.perform(
@@ -137,7 +137,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
     @org.springframework.security.test.context.support.WithMockUser(roles = "GESTOR")
     void reabrirRevisaoCadastro_semPermissao_proibido() throws Exception {
         // Given
-        ReabrirProcessoReq request = new ReabrirProcessoReq("Tentativa sem permissão");
+        ReabrirProcessoRequest request = new ReabrirProcessoRequest("Tentativa sem permissão");
 
         // When/Then
         mockMvc.perform(
@@ -153,7 +153,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void reabrirRevisaoCadastro_semJustificativa_erro() throws Exception {
         // Given
-        ReabrirProcessoReq request = new ReabrirProcessoReq("");
+        ReabrirProcessoRequest request = new ReabrirProcessoRequest("");
 
         // When/Then
         mockMvc.perform(

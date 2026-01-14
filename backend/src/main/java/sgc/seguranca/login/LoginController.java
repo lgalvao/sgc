@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.login.dto.AutenticarReq;
-import sgc.seguranca.login.dto.EntrarReq;
+import sgc.seguranca.login.dto.AutenticarRequest;
+import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.seguranca.login.dto.EntrarResp;
 import sgc.seguranca.login.dto.PerfilUnidadeDto;
 
@@ -45,7 +45,7 @@ public class LoginController {
     @PostMapping("/autenticar")
     @Operation(summary = "Autentica um usuário com título e senha")
     public ResponseEntity<Boolean> autenticar(
-            @Valid @RequestBody AutenticarReq request,
+            @Valid @RequestBody AutenticarRequest request,
             HttpServletRequest httpRequest) {
 
         String ip = extrairIp(httpRequest);
@@ -80,7 +80,7 @@ public class LoginController {
      */
     @PostMapping("/entrar")
     @Operation(summary = "Finaliza o login e retorna o token JWT")
-    public ResponseEntity<EntrarResp> entrar(@Valid @RequestBody EntrarReq request) {
+    public ResponseEntity<EntrarResp> entrar(@Valid @RequestBody EntrarRequest request) {
         String token = loginService.entrar(request);
         Usuario usuario = usuarioService.buscarPorLogin(request.getTituloEleitoral());
 

@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ImportarAtividadesReq {
+public class ImportarAtividadesRequest {
     /**
      * O código do subprocesso do qual as atividades serão importadas.
      */

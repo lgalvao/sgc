@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SubmeterMapaAjustadoReq {
+public class SubmeterMapaAjustadoRequest {
     @NotBlank(message = "O campo 'observacoes' é obrigatório.")
     @SanitizarHtml
     private String observacoes;

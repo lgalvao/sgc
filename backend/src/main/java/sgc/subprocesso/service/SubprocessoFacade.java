@@ -287,17 +287,17 @@ public class SubprocessoFacade {
     }
 
     @Transactional
-    public void submeterMapaAjustado(Long codigo, SubmeterMapaAjustadoReq request, Usuario usuario) {
+    public void submeterMapaAjustado(Long codigo, SubmeterMapaAjustadoRequest request, Usuario usuario) {
         mapaWorkflowService.submeterMapaAjustado(codigo, request, usuario);
     }
 
     @Transactional
-    public MapaCompletoDto adicionarCompetencia(Long codigo, CompetenciaReq request) {
+    public MapaCompletoDto adicionarCompetencia(Long codigo, CompetenciaRequest request) {
         return mapaWorkflowService.adicionarCompetencia(codigo, request);
     }
 
     @Transactional
-    public MapaCompletoDto atualizarCompetencia(Long codigo, Long codCompetencia, CompetenciaReq request) {
+    public MapaCompletoDto atualizarCompetencia(Long codigo, Long codCompetencia, CompetenciaRequest request) {
         return mapaWorkflowService.atualizarCompetencia(codigo, codCompetencia, request);
     }
 

@@ -256,7 +256,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve adicionar uma nova competência a um mapa")
         void deveAdicionarCompetencia() throws Exception {
             var request =
-                    new sgc.subprocesso.dto.CompetenciaReq(
+                    new sgc.subprocesso.dto.CompetenciaRequest(
                             "Nova Competência", List.of(atividade1.getCodigo()));
 
             mockMvc.perform(
@@ -277,7 +277,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         void deveAtualizarCompetencia() throws Exception {
             // Adicionar primeiro
             var addRequest =
-                    new sgc.subprocesso.dto.CompetenciaReq(
+                    new sgc.subprocesso.dto.CompetenciaRequest(
                             "Competência Original", List.of(atividade1.getCodigo()));
             var result =
                     mockMvc.perform(
@@ -296,7 +296,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
 
             // Atualizar
             var updateRequest =
-                    new sgc.subprocesso.dto.CompetenciaReq(
+                    new sgc.subprocesso.dto.CompetenciaRequest(
                             "Competência Atualizada",
                             List.of(atividade1.getCodigo(), atividade2.getCodigo()));
             mockMvc.perform(
@@ -319,7 +319,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         void deveRemoverCompetencia() throws Exception {
             // Adicionar primeiro
             var addRequest =
-                    new sgc.subprocesso.dto.CompetenciaReq(
+                    new sgc.subprocesso.dto.CompetenciaRequest(
                             "Competência a ser removida", List.of(atividade1.getCodigo()));
             var result =
                     mockMvc.perform(
@@ -356,7 +356,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
             subprocessoRepo.save(subprocesso);
 
             var request =
-                    new sgc.subprocesso.dto.CompetenciaReq(
+                    new sgc.subprocesso.dto.CompetenciaRequest(
                             "Nova Competência", List.of(atividade1.getCodigo()));
 
             mockMvc.perform(

@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CompetenciaReq {
+public class CompetenciaRequest {
     @NotBlank(message = "A descrição da competência é obrigatória")
     private String descricao;
 

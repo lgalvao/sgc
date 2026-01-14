@@ -25,9 +25,9 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
 import sgc.seguranca.acesso.AccessControlService;
-import sgc.subprocesso.dto.CompetenciaReq;
+import sgc.subprocesso.dto.CompetenciaRequest;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
-import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
+import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -114,7 +114,7 @@ public class SubprocessoMapaWorkflowService {
         return mapaDto;
     }
 
-    public MapaCompletoDto adicionarCompetencia(Long codSubprocesso, CompetenciaReq request) {
+    public MapaCompletoDto adicionarCompetencia(Long codSubprocesso, CompetenciaRequest request) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
 
         Long codMapa = subprocesso.getMapa().getCodigo();
@@ -136,7 +136,7 @@ public class SubprocessoMapaWorkflowService {
     public MapaCompletoDto atualizarCompetencia(
             Long codSubprocesso,
             Long codCompetencia,
-            CompetenciaReq request) {
+            CompetenciaRequest request) {
 
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         competenciaService.atualizarCompetencia(
@@ -369,7 +369,7 @@ public class SubprocessoMapaWorkflowService {
     }
 
     @Transactional
-    public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoReq request, Usuario usuario) {
+    public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoRequest request, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, AJUSTAR_MAPA, sp);
         validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());

@@ -26,9 +26,9 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.dto.AceitarCadastroReq;
-import sgc.subprocesso.dto.DevolverCadastroReq;
-import sgc.subprocesso.dto.HomologarCadastroReq;
+import sgc.subprocesso.dto.AceitarCadastroRequest;
+import sgc.subprocesso.dto.DevolverCadastroRequest;
+import sgc.subprocesso.dto.HomologarCadastroRequest;
 import sgc.subprocesso.model.*;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -153,7 +153,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         void devolverCadastro_deveFuncionarCorretamente() throws Exception {
             // Given
             String observacoes = "Favor revisar a atividade X e Y.";
-            DevolverCadastroReq requestBody = new DevolverCadastroReq(observacoes);
+            DevolverCadastroRequest requestBody = new DevolverCadastroRequest(observacoes);
 
             // When
             mockMvc.perform(
@@ -204,7 +204,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         @WithMockGestor("202020202020")
         void aceitarCadastro_deveFuncionarCorretamente() throws Exception {
             String observacoes = "Cadastro parece OK.";
-            AceitarCadastroReq requestBody = new AceitarCadastroReq(observacoes);
+            AceitarCadastroRequest requestBody = new AceitarCadastroRequest(observacoes);
 
             mockMvc.perform(
                             post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
@@ -248,7 +248,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve homologar cadastro, alterar situação e registrar movimentação da SEDOC")
         @WithMockAdmin
         void homologarCadastro_deveFuncionarCorretamente() throws Exception {
-            HomologarCadastroReq requestBody = new HomologarCadastroReq("Homologado via teste.");
+            HomologarCadastroRequest requestBody = new HomologarCadastroRequest("Homologado via teste.");
 
             mockMvc.perform(
                             post(
@@ -289,7 +289,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         @WithMockGestor("202020202020")
         void getHistorico_deveRetornarAcoesOrdenadas() throws Exception {
             String obsDevolucao = "Falta atividade Z";
-            DevolverCadastroReq devolverReq = new DevolverCadastroReq(obsDevolucao);
+            DevolverCadastroRequest devolverReq = new DevolverCadastroRequest(obsDevolucao);
 
             mockMvc.perform(
                             post(
@@ -305,7 +305,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
             subprocessoRepo.saveAndFlush(subprocesso);
 
             String obsAceite = "Agora sim, completo.";
-            AceitarCadastroReq aceitarReq = new AceitarCadastroReq(obsAceite);
+            AceitarCadastroRequest aceitarReq = new AceitarCadastroRequest(obsAceite);
             mockMvc.perform(
                             post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
                                     .with(csrf())

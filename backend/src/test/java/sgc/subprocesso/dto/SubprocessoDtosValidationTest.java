@@ -26,7 +26,7 @@ class SubprocessoDtosValidationTest {
     }
 
     @Nested
-    @DisplayName("AceitarCadastroReq")
+    @DisplayName("AceitarCadastroRequest")
     class AceitarCadastroReqTests {
 
         @ParameterizedTest
@@ -34,11 +34,11 @@ class SubprocessoDtosValidationTest {
         @ValueSource(strings = {"Cadastro aceito conforme revisão.", "Observação qualquer"})
         @DisplayName("Deve aceitar observações válidas (nulas, vazias ou preenchidas)")
         void deveAceitarObservacoesValidas(String observacao) {
-            AceitarCadastroReq req = AceitarCadastroReq.builder()
+            AceitarCadastroRequest req = AceitarCadastroRequest.builder()
                     .observacoes(observacao)
                     .build();
 
-            Set<ConstraintViolation<AceitarCadastroReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<AceitarCadastroRequest>> violations = validator.validate(req);
 
             assertThat(violations).isEmpty();
         }
@@ -46,11 +46,11 @@ class SubprocessoDtosValidationTest {
         @Test
         @DisplayName("Deve aceitar observações no limite máximo")
         void deveAceitarObservacoesNoLimite() {
-            AceitarCadastroReq req = AceitarCadastroReq.builder()
+            AceitarCadastroRequest req = AceitarCadastroRequest.builder()
                     .observacoes("a".repeat(500))
                     .build();
 
-            Set<ConstraintViolation<AceitarCadastroReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<AceitarCadastroRequest>> violations = validator.validate(req);
 
             assertThat(violations).isEmpty();
         }
@@ -58,11 +58,11 @@ class SubprocessoDtosValidationTest {
         @Test
         @DisplayName("Deve rejeitar observações acima do limite")
         void deveRejeitarObservacoesAcimaDoLimite() {
-            AceitarCadastroReq req = AceitarCadastroReq.builder()
+            AceitarCadastroRequest req = AceitarCadastroRequest.builder()
                     .observacoes("a".repeat(501))
                     .build();
 
-            Set<ConstraintViolation<AceitarCadastroReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<AceitarCadastroRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -72,17 +72,17 @@ class SubprocessoDtosValidationTest {
     }
 
     @Nested
-    @DisplayName("DevolverCadastroReq")
+    @DisplayName("DevolverCadastroRequest")
     class DevolverCadastroReqTests {
 
         @Test
         @DisplayName("Deve aceitar observações válidas")
         void deveAceitarObservacoesValidas() {
-            DevolverCadastroReq req = DevolverCadastroReq.builder()
+            DevolverCadastroRequest req = DevolverCadastroRequest.builder()
                     .observacoes("Cadastro devolvido para correções.")
                     .build();
 
-            Set<ConstraintViolation<DevolverCadastroReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<DevolverCadastroRequest>> violations = validator.validate(req);
 
             assertThat(violations).isEmpty();
         }
@@ -90,11 +90,11 @@ class SubprocessoDtosValidationTest {
         @Test
         @DisplayName("Deve aceitar observações nulas (campo opcional)")
         void deveAceitarObservacoesNulas() {
-            DevolverCadastroReq req = DevolverCadastroReq.builder()
+            DevolverCadastroRequest req = DevolverCadastroRequest.builder()
                     .observacoes(null)
                     .build();
 
-            Set<ConstraintViolation<DevolverCadastroReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<DevolverCadastroRequest>> violations = validator.validate(req);
 
             assertThat(violations).isEmpty();
         }
@@ -102,11 +102,11 @@ class SubprocessoDtosValidationTest {
         @Test
         @DisplayName("Deve rejeitar observações acima do limite")
         void deveRejeitarObservacoesAcimaDoLimite() {
-            DevolverCadastroReq req = DevolverCadastroReq.builder()
+            DevolverCadastroRequest req = DevolverCadastroRequest.builder()
                     .observacoes("a".repeat(501))
                     .build();
 
-            Set<ConstraintViolation<DevolverCadastroReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<DevolverCadastroRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -116,17 +116,17 @@ class SubprocessoDtosValidationTest {
     }
 
     @Nested
-    @DisplayName("HomologarCadastroReq")
+    @DisplayName("HomologarCadastroRequest")
     class HomologarCadastroReqTests {
 
         @Test
         @DisplayName("Deve aceitar observações válidas")
         void deveAceitarObservacoesValidas() {
-            HomologarCadastroReq req = HomologarCadastroReq.builder()
+            HomologarCadastroRequest req = HomologarCadastroRequest.builder()
                     .observacoes("Cadastro homologado.")
                     .build();
 
-            Set<ConstraintViolation<HomologarCadastroReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<HomologarCadastroRequest>> violations = validator.validate(req);
 
             assertThat(violations).isEmpty();
         }
@@ -134,11 +134,11 @@ class SubprocessoDtosValidationTest {
         @Test
         @DisplayName("Deve aceitar observações nulas (campo opcional)")
         void deveAceitarObservacoesNulas() {
-            HomologarCadastroReq req = HomologarCadastroReq.builder()
+            HomologarCadastroRequest req = HomologarCadastroRequest.builder()
                     .observacoes(null)
                     .build();
 
-            Set<ConstraintViolation<HomologarCadastroReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<HomologarCadastroRequest>> violations = validator.validate(req);
 
             assertThat(violations).isEmpty();
         }
@@ -146,11 +146,11 @@ class SubprocessoDtosValidationTest {
         @Test
         @DisplayName("Deve rejeitar observações acima do limite")
         void deveRejeitarObservacoesAcimaDoLimite() {
-            HomologarCadastroReq req = HomologarCadastroReq.builder()
+            HomologarCadastroRequest req = HomologarCadastroRequest.builder()
                     .observacoes("a".repeat(501))
                     .build();
 
-            Set<ConstraintViolation<HomologarCadastroReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<HomologarCadastroRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -160,17 +160,17 @@ class SubprocessoDtosValidationTest {
     }
 
     @Nested
-    @DisplayName("DevolverValidacaoReq")
+    @DisplayName("DevolverValidacaoRequest")
     class DevolverValidacaoReqTests {
 
         @Test
         @DisplayName("Deve aceitar justificativa válida")
         void deveAceitarJustificativaValida() {
-            DevolverValidacaoReq req = DevolverValidacaoReq.builder()
+            DevolverValidacaoRequest req = DevolverValidacaoRequest.builder()
                     .justificativa("Validação devolvida por falta de competências.")
                     .build();
 
-            Set<ConstraintViolation<DevolverValidacaoReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<DevolverValidacaoRequest>> violations = validator.validate(req);
 
             assertThat(violations).isEmpty();
         }
@@ -178,11 +178,11 @@ class SubprocessoDtosValidationTest {
         @Test
         @DisplayName("Deve rejeitar justificativa nula")
         void deveRejeitarJustificativaNula() {
-            DevolverValidacaoReq req = DevolverValidacaoReq.builder()
+            DevolverValidacaoRequest req = DevolverValidacaoRequest.builder()
                     .justificativa(null)
                     .build();
 
-            Set<ConstraintViolation<DevolverValidacaoReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<DevolverValidacaoRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -193,11 +193,11 @@ class SubprocessoDtosValidationTest {
         @Test
         @DisplayName("Deve rejeitar justificativa em branco")
         void deveRejeitarJustificativaEmBranco() {
-            DevolverValidacaoReq req = DevolverValidacaoReq.builder()
+            DevolverValidacaoRequest req = DevolverValidacaoRequest.builder()
                     .justificativa("   ")
                     .build();
 
-            Set<ConstraintViolation<DevolverValidacaoReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<DevolverValidacaoRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)

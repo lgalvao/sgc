@@ -18,8 +18,8 @@ import sgc.mapa.service.CopiaMapaService;
 import sgc.organizacao.UnidadeService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Unidade;
-import sgc.processo.dto.AtualizarProcessoReq;
-import sgc.processo.dto.CriarProcessoReq;
+import sgc.processo.dto.AtualizarProcessoRequest;
+import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
@@ -93,7 +93,7 @@ class ProcessoFacadeCrudTest {
         @DisplayName("Deve criar processo quando dados válidos")
         void deveCriarProcessoQuandoDadosValidos() {
             // Arrange
-            CriarProcessoReq req = new CriarProcessoReq(
+            CriarProcessoRequest req = new CriarProcessoRequest(
                     "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
             Unidade unidade = UnidadeFixture.unidadeComId(1L);
 
@@ -127,7 +127,7 @@ class ProcessoFacadeCrudTest {
         @DisplayName("Deve lançar exceção quando unidade não encontrada")
         void deveLancarExcecaoQuandoUnidadeNaoEncontrada() {
             // Arrange
-            CriarProcessoReq req = new CriarProcessoReq(
+            CriarProcessoRequest req = new CriarProcessoRequest(
                     "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(99L));
             when(unidadeService.buscarEntidadePorId(99L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 99L));
 
@@ -141,7 +141,7 @@ class ProcessoFacadeCrudTest {
         @Test
         @DisplayName("Deve validar mapa para processo REVISAO")
         void deveValidarMapaParaRevisao() {
-            CriarProcessoReq req = new CriarProcessoReq(
+            CriarProcessoRequest req = new CriarProcessoRequest(
                     "Teste", TipoProcesso.REVISAO, LocalDateTime.now(), List.of(1L));
 
             Unidade u = UnidadeFixture.unidadeComId(1L);
@@ -157,7 +157,7 @@ class ProcessoFacadeCrudTest {
         @Test
         @DisplayName("Deve retornar erro se REVISAO e validador retornar mensagem")
         void deveRetornarErroSeRevisaoEValidadorFalhar() {
-            var req = new CriarProcessoReq("T", TipoProcesso.REVISAO, LocalDateTime.now(), List.of(1L));
+            var req = new CriarProcessoRequest("T", TipoProcesso.REVISAO, LocalDateTime.now(), List.of(1L));
             Unidade u = new Unidade();
             u.setCodigo(1L);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
@@ -171,7 +171,7 @@ class ProcessoFacadeCrudTest {
         @Test
         @DisplayName("Deve falhar se unidade participamente for INTERMEDIARIA")
         void deveFalharSeUnidadeIntermediaria() {
-            CriarProcessoReq req = new CriarProcessoReq(
+            CriarProcessoRequest req = new CriarProcessoRequest(
                     "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
 
             Unidade u = UnidadeFixture.unidadeComId(1L);
@@ -185,7 +185,7 @@ class ProcessoFacadeCrudTest {
         @Test
         @DisplayName("Deve criar processo de REVISAO quando todas unidades tem mapa vigente")
         void deveCriarProcessoRevisaoQuandoUnidadesTemMapa() {
-            CriarProcessoReq req = new CriarProcessoReq(
+            CriarProcessoRequest req = new CriarProcessoRequest(
                     "Revisao", TipoProcesso.REVISAO, LocalDateTime.now(), List.of(1L));
 
             Unidade u = UnidadeFixture.unidadeComId(1L);
@@ -201,7 +201,7 @@ class ProcessoFacadeCrudTest {
         @Test
         @DisplayName("Deve criar processo de DIAGNOSTICO quando todas unidades tem mapa vigente")
         void deveCriarProcessoDiagnosticoQuandoUnidadesTemMapa() {
-            CriarProcessoReq req = new CriarProcessoReq(
+            CriarProcessoRequest req = new CriarProcessoRequest(
                     "Diagnostico", TipoProcesso.DIAGNOSTICO, LocalDateTime.now(), List.of(1L));
 
             Unidade u = UnidadeFixture.unidadeComId(1L);
@@ -217,7 +217,7 @@ class ProcessoFacadeCrudTest {
         @Test
         @DisplayName("criar: erro se REVISAO e unidades sem mapa")
         void criar_ErroRevisaoSemMapa() {
-            CriarProcessoReq req = new CriarProcessoReq();
+            CriarProcessoRequest req = new CriarProcessoRequest();
             req.setDescricao("Teste");
             req.setUnidades(List.of(1L));
             req.setTipo(TipoProcesso.REVISAO);
@@ -236,7 +236,7 @@ class ProcessoFacadeCrudTest {
         @Test
         @DisplayName("criar: sucesso se REVISAO e unidades com mapa")
         void criar_SucessoRevisaoComMapa() {
-            CriarProcessoReq req = new CriarProcessoReq();
+            CriarProcessoRequest req = new CriarProcessoRequest();
             req.setDescricao("Teste");
             req.setUnidades(List.of(1L));
             req.setTipo(TipoProcesso.REVISAO);
@@ -266,7 +266,7 @@ class ProcessoFacadeCrudTest {
             Processo processo = ProcessoFixture.processoPadrao();
             processo.setCodigo(id);
 
-            AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+            AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
                     .codigo(id)
                     .descricao("Nova Desc")
                     .tipo(TipoProcesso.MAPEAMENTO)
@@ -295,7 +295,7 @@ class ProcessoFacadeCrudTest {
             when(processoRepo.findById(99L)).thenReturn(Optional.empty());
 
             // Act & Assert
-            var req = new AtualizarProcessoReq();
+            var req = new AtualizarProcessoRequest();
             assertThatThrownBy(() -> processoFacade.atualizar(99L, req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
@@ -311,7 +311,7 @@ class ProcessoFacadeCrudTest {
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
             // Act & Assert
-            var req = new AtualizarProcessoReq();
+            var req = new AtualizarProcessoRequest();
             assertThatThrownBy(() -> processoFacade.atualizar(id, req))
                     .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
         }
@@ -324,7 +324,7 @@ class ProcessoFacadeCrudTest {
             Processo processo = ProcessoFixture.processoPadrao();
             processo.setCodigo(id);
 
-            AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+            AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
                     .codigo(id)
                     .descricao("Nova Descrição Atualizada")
                     .tipo(TipoProcesso.MAPEAMENTO)
@@ -353,7 +353,7 @@ class ProcessoFacadeCrudTest {
             processo.setCodigo(id);
             processo.setTipo(TipoProcesso.MAPEAMENTO);
 
-            AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+            AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
                     .codigo(id)
                     .descricao("Desc")
                     .tipo(TipoProcesso.DIAGNOSTICO)
@@ -384,7 +384,7 @@ class ProcessoFacadeCrudTest {
 
             LocalDateTime novaDataLimite = LocalDateTime.now().plusDays(30);
 
-            AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+            AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
                     .codigo(id)
                     .descricao("Desc")
                     .tipo(TipoProcesso.MAPEAMENTO)
@@ -417,7 +417,7 @@ class ProcessoFacadeCrudTest {
 
             // Como dataLimiteEtapa1 é @NotNull no DTO, sempre deve ser fornecida
             // Este teste verifica que outros campos do processo são mantidos
-            AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+            AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
                     .codigo(id)
                     .descricao("Nova Desc")
                     .tipo(TipoProcesso.MAPEAMENTO)
@@ -446,7 +446,7 @@ class ProcessoFacadeCrudTest {
             Processo processo = ProcessoFixture.processoPadrao();
             processo.setCodigo(id);
 
-            AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+            AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
                     .codigo(id)
                     .descricao("Nova Desc")
                     .tipo(TipoProcesso.MAPEAMENTO)
@@ -477,7 +477,7 @@ class ProcessoFacadeCrudTest {
 
             Unidade novaUnidade = UnidadeFixture.unidadeComId(2L);
 
-            AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+            AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
                     .codigo(id)
                     .descricao("Desc")
                     .tipo(TipoProcesso.MAPEAMENTO)
@@ -504,7 +504,7 @@ class ProcessoFacadeCrudTest {
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
 
-            var req = new AtualizarProcessoReq();
+            var req = new AtualizarProcessoRequest();
             assertThatThrownBy(() -> processoFacade.atualizar(1L, req))
                     .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
         }

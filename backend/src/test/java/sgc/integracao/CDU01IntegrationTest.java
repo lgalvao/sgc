@@ -13,8 +13,8 @@ import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.organizacao.model.*;
-import sgc.seguranca.login.dto.AutenticarReq;
-import sgc.seguranca.login.dto.EntrarReq;
+import sgc.seguranca.login.dto.AutenticarRequest;
+import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.util.TestUtil;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -121,7 +121,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                 void testLoginCompleto_sucessoUsuarioUnicoPerfil() throws Exception {
                         String tituloEleitoral = usuarioAdmin.getTituloEleitoral();
                         String senha = "password";
-                        AutenticarReq authRequest = AutenticarReq.builder().tituloEleitoral(tituloEleitoral)
+                        AutenticarRequest authRequest = AutenticarRequest.builder().tituloEleitoral(tituloEleitoral)
                                         .senha(senha).build();
 
                         mockMvc.perform(post(BASE_URL + "/autenticar")
@@ -140,7 +140,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                                         .andExpect(jsonPath("$[0].unidade.sigla").value(unidadeAdmin.getSigla()));
 
                         // Act & Assert: Etapa 3 - Entrar
-                        EntrarReq entrarReq = EntrarReq.builder()
+                        EntrarRequest entrarReq = EntrarRequest.builder()
                                         .tituloEleitoral(tituloEleitoral)
                                         .perfil("ADMIN")
                                         .unidadeCodigo(unidadeAdmin.getCodigo())
@@ -158,7 +158,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                 void testLoginCompleto_sucessoUsuarioMultiplosPerfis() throws Exception {
                         String tituloEleitoral = usuarioGestor.getTituloEleitoral();
                         String senha = "password";
-                        AutenticarReq authRequest = AutenticarReq.builder().tituloEleitoral(tituloEleitoral)
+                        AutenticarRequest authRequest = AutenticarRequest.builder().tituloEleitoral(tituloEleitoral)
                                         .senha(senha).build();
 
                         mockMvc.perform(post(BASE_URL + "/autenticar")
@@ -178,7 +178,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                                                         .value(containsInAnyOrder("ADMIN", "GESTOR")));
 
                         // Entrar como GESTOR na unidadeGestor
-                        EntrarReq entrarReq = EntrarReq.builder()
+                        EntrarRequest entrarReq = EntrarRequest.builder()
                                         .tituloEleitoral(tituloEleitoral)
                                         .perfil("GESTOR")
                                         .unidadeCodigo(unidadeGestor.getCodigo())
@@ -219,7 +219,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                         long codigoUnidadeInexistente = 999999L;
 
                         // Pre-authenticate (Required by security fix)
-                        AutenticarReq authRequest = AutenticarReq.builder()
+                        AutenticarRequest authRequest = AutenticarRequest.builder()
                                         .tituloEleitoral(tituloEleitoral)
                                         .senha("any")
                                         .build();
@@ -228,7 +228,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .content(testUtil.toJson(authRequest)));
 
-                        EntrarReq entrarReq = EntrarReq.builder()
+                        EntrarRequest entrarReq = EntrarRequest.builder()
                                         .tituloEleitoral(tituloEleitoral)
                                         .perfil("ADMIN")
                                         .unidadeCodigo(codigoUnidadeInexistente)
