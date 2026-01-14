@@ -31,8 +31,6 @@ class CopiaMapaServiceTest {
     @Mock
     private AtividadeRepo atividadeRepo;
     @Mock
-    private ConhecimentoRepo conhecimentoRepo;
-    @Mock
     private CompetenciaRepo competenciaRepo;
 
     @InjectMocks
@@ -58,11 +56,6 @@ class CopiaMapaServiceTest {
         conhecimentoOrigem.setDescricao("Conhecimento 1");
         atividadeOrigem.setConhecimentos(new java.util.ArrayList<>(List.of(conhecimentoOrigem))); // Mutable list
 
-        Atividade atividadeSalva = new Atividade();
-        atividadeSalva.setCodigo(20L);
-        atividadeSalva.setDescricao("Atividade 1");
-        atividadeSalva.setConhecimentos(new java.util.ArrayList<>());
-
         Competencia competenciaOrigem = new Competencia();
         competenciaOrigem.setDescricao("Competencia 1");
         competenciaOrigem.setAtividades(Set.of(atividadeOrigem));
@@ -70,16 +63,20 @@ class CopiaMapaServiceTest {
         when(mapaRepo.findById(origemId)).thenReturn(Optional.of(mapaOrigem));
         when(mapaRepo.save(any(Mapa.class))).thenReturn(mapaSalvo);
         when(atividadeRepo.findByMapaCodigoWithConhecimentos(origemId)).thenReturn(List.of(atividadeOrigem));
-        when(atividadeRepo.save(any(Atividade.class))).thenReturn(atividadeSalva);
+
+        when(atividadeRepo.saveAll(anyList())).thenAnswer(invocation -> {
+            List<Atividade> list = invocation.getArgument(0);
+            list.forEach(a -> a.setCodigo(20L));
+            return list;
+        });
+
         when(competenciaRepo.findByMapaCodigo(origemId)).thenReturn(List.of(competenciaOrigem));
-        // when(competenciaRepo.save(any(Competencia.class))).thenAnswer(i -> i.getArgument(0)); // Removido pois agora usa saveAll
 
         Mapa resultado = service.copiarMapaParaUnidade(origemId);
 
         assertThat(resultado).isNotNull();
         verify(mapaRepo).save(any(Mapa.class));
-        verify(atividadeRepo).save(any(Atividade.class));
-        verify(conhecimentoRepo).saveAll(anyList());
+        verify(atividadeRepo).saveAll(anyList());
 
         ArgumentCaptor<List<Competencia>> captor = ArgumentCaptor.forClass(List.class);
         verify(competenciaRepo).saveAll(captor.capture());
@@ -90,6 +87,33 @@ class CopiaMapaServiceTest {
         assertThat(competenciaSalva.getAtividades()).hasSize(1);
         Atividade atividadeAssociada = competenciaSalva.getAtividades().iterator().next();
         assertThat(atividadeAssociada.getCodigo()).isEqualTo(20L);
+    }
+
+    @Test
+    @DisplayName("Deve importar atividades de outro mapa com sucesso")
+    void deveImportarAtividades() {
+        Long origemId = 1L;
+        Long destinoId = 2L;
+
+        Mapa mapaDestino = new Mapa();
+        mapaDestino.setCodigo(destinoId);
+
+        Atividade atividadeOrigem = new Atividade();
+        atividadeOrigem.setCodigo(10L);
+        atividadeOrigem.setDescricao("Atividade Única");
+        Conhecimento conhecimentoOrigem = new Conhecimento();
+        conhecimentoOrigem.setDescricao("Conhecimento 1");
+        atividadeOrigem.setConhecimentos(new java.util.ArrayList<>(List.of(conhecimentoOrigem)));
+
+        when(atividadeRepo.findByMapaCodigoWithConhecimentos(origemId)).thenReturn(List.of(atividadeOrigem));
+        when(atividadeRepo.findByMapaCodigo(destinoId)).thenReturn(Collections.emptyList());
+        when(mapaRepo.findById(destinoId)).thenReturn(Optional.of(mapaDestino));
+        when(atividadeRepo.save(any(Atividade.class))).thenAnswer(i -> i.getArgument(0));
+
+        service.importarAtividadesDeOutroMapa(origemId, destinoId);
+
+        verify(atividadeRepo).save(any(Atividade.class));
+        verify(atividadeRepo, never()).saveAll(anyList()); // Import uses singular save
     }
 
     @Test
@@ -115,7 +139,7 @@ class CopiaMapaServiceTest {
         Mapa resultado = service.copiarMapaParaUnidade(origemId);
 
         assertThat(resultado).isNotNull();
-        verify(atividadeRepo, never()).save(any(Atividade.class));
-        verify(competenciaRepo, never()).save(any(Competencia.class));
+        verify(atividadeRepo, never()).saveAll(anyList());
+        verify(competenciaRepo, never()).saveAll(anyList());
     }
 }

@@ -21,7 +21,6 @@ import java.util.*;
 public class CopiaMapaService {
     private final MapaRepo repositorioMapa;
     private final AtividadeRepo atividadeRepo;
-    private final ConhecimentoRepo conhecimentoRepo;
     private final CompetenciaRepo competenciaRepo;
 
     @Transactional
@@ -79,39 +78,41 @@ public class CopiaMapaService {
         List<Atividade> atividadesFonte = atividadeRepo.findByMapaCodigoWithConhecimentos(codMapaFonte);
         if (atividadesFonte == null) atividadesFonte = List.of();
 
+        List<Atividade> atividadesParaSalvar = new ArrayList<>();
+
         for (Atividade atividadeFonte : atividadesFonte) {
-            Atividade novaAtividade = copiarAtividadeComConhecimentos(atividadeFonte, mapaSalvo);
+            Atividade novaAtividade = prepararAtividadeCopia(atividadeFonte, mapaSalvo);
             mapaAtividades.put(atividadeFonte.getCodigo(), novaAtividade);
+            atividadesParaSalvar.add(novaAtividade);
+        }
+
+        if (!atividadesParaSalvar.isEmpty()) {
+            atividadeRepo.saveAll(atividadesParaSalvar);
         }
 
         return mapaAtividades;
     }
 
-    private Atividade copiarAtividadeComConhecimentos(Atividade atividadeFonte, Mapa mapaDestino) {
-        Atividade novaAtividade = new Atividade();
-        novaAtividade.setDescricao(atividadeFonte.getDescricao());
-        novaAtividade.setMapa(mapaDestino);
-        Atividade atividadeSalva = atividadeRepo.save(novaAtividade);
-
-        copiarConhecimentos(atividadeFonte, atividadeSalva);
-
-        return atividadeSalva;
+    private void copiarAtividadeComConhecimentos(Atividade atividadeFonte, Mapa mapaDestino) {
+        Atividade novaAtividade = prepararAtividadeCopia(atividadeFonte, mapaDestino);
+        atividadeRepo.save(novaAtividade);
     }
 
-    private void copiarConhecimentos(Atividade atividadeFonte, Atividade atividadeSalva) {
+    private Atividade prepararAtividadeCopia(Atividade atividadeFonte, Mapa mapaDestino) {
+        Atividade novaAtividade = new Atividade()
+                .setDescricao(atividadeFonte.getDescricao())
+                .setMapa(mapaDestino);
+
         List<Conhecimento> conhecimentosFonte = atividadeFonte.getConhecimentos();
-        if (conhecimentosFonte == null || conhecimentosFonte.isEmpty()) return;
-
-        List<Conhecimento> novosConhecimentos = new ArrayList<>();
-        for (Conhecimento conhecimentoFonte : conhecimentosFonte) {
-            Conhecimento novoConhecimento = new Conhecimento()
-                    .setAtividade(atividadeSalva)
-                    .setDescricao(conhecimentoFonte.getDescricao());
-
-            atividadeSalva.getConhecimentos().add(novoConhecimento);
-            novosConhecimentos.add(novoConhecimento);
+        if (conhecimentosFonte != null && !conhecimentosFonte.isEmpty()) {
+            for (Conhecimento k : conhecimentosFonte) {
+                Conhecimento novoK = new Conhecimento()
+                        .setDescricao(k.getDescricao())
+                        .setAtividade(novaAtividade);
+                novaAtividade.getConhecimentos().add(novoK);
+            }
         }
-        conhecimentoRepo.saveAll(novosConhecimentos);
+        return novaAtividade;
     }
 
     private void copiarCompetencias(Long codMapaFonte, Mapa mapaSalvo, Map<Long, Atividade> mapaAtividades) {
