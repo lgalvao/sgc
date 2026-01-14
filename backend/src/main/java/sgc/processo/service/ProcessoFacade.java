@@ -73,7 +73,7 @@ public class ProcessoFacade {
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public ProcessoDto criar(CriarProcessoReq req) {
+    public ProcessoDto criar(CriarProcessoRequest req) {
         Set<Unidade> participantes = new HashSet<>();
         for (Long codigoUnidade : req.getUnidades()) {
             Unidade unidade = unidadeService.buscarEntidadePorId(codigoUnidade);
@@ -111,7 +111,7 @@ public class ProcessoFacade {
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public ProcessoDto atualizar(Long codigo, AtualizarProcessoReq requisicao) {
+    public ProcessoDto atualizar(Long codigo, AtualizarProcessoRequest requisicao) {
         Processo processo = processoRepo.findById(codigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
