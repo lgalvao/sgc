@@ -50,7 +50,7 @@ public class ProcessoController {
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ProcessoDto> criar(@Valid @RequestBody CriarProcessoReq requisicao) {
+    public ResponseEntity<ProcessoDto> criar(@Valid @RequestBody CriarProcessoRequest requisicao) {
         ProcessoDto criado = processoFacade.criar(requisicao);
         URI uri = URI.create("/api/processos/%d".formatted(criado.getCodigo()));
         return ResponseEntity.created(uri).body(criado);
@@ -97,7 +97,7 @@ public class ProcessoController {
     @PostMapping("/{codigo}/atualizar")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProcessoDto> atualizar(
-            @PathVariable Long codigo, @Valid @RequestBody AtualizarProcessoReq requisicao) {
+            @PathVariable Long codigo, @Valid @RequestBody AtualizarProcessoRequest requisicao) {
         ProcessoDto atualizado = processoFacade.atualizar(codigo, requisicao);
         return ResponseEntity.ok(atualizado);
     }
@@ -169,7 +169,7 @@ public class ProcessoController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Inicia um processo (CDU-03)")
     public ResponseEntity<Object> iniciar(
-            @PathVariable Long codigo, @Valid @RequestBody IniciarProcessoReq req) {
+            @PathVariable Long codigo, @Valid @RequestBody IniciarProcessoRequest req) {
 
         var processador = getProcessadoresInicio().get(req.tipo());
         if (processador == null) {
@@ -258,7 +258,7 @@ public class ProcessoController {
     @Operation(summary = "Envia lembrete de prazo para unidade")
     public void enviarLembrete(
             @PathVariable Long codigo,
-            @RequestBody @Valid EnviarLembreteReq request) {
+            @RequestBody @Valid EnviarLembreteRequest request) {
         processoFacade.enviarLembrete(codigo, request.getUnidadeCodigo());
     }
 }

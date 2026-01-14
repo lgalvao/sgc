@@ -15,7 +15,7 @@ import sgc.Sgc;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.organizacao.dto.CriarAtribuicaoTemporariaReq;
+import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Usuario;
@@ -73,7 +73,7 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void criarAtribuicaoTemporaria_sucesso() throws Exception {
         // Given
-        CriarAtribuicaoTemporariaReq request = new CriarAtribuicaoTemporariaReq(
+        CriarAtribuicaoTemporariaRequest request = new CriarAtribuicaoTemporariaRequest(
             usuario.getTituloEleitoral(),
             LocalDate.now(),
             LocalDate.now().plusDays(30),
@@ -115,7 +115,7 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void criarAtribuicaoTemporaria_datasInvalidas_erro() throws Exception {
         // Given: Data término antes do início
-        CriarAtribuicaoTemporariaReq request = new CriarAtribuicaoTemporariaReq(
+        CriarAtribuicaoTemporariaRequest request = new CriarAtribuicaoTemporariaRequest(
             usuario.getTituloEleitoral(),
             LocalDate.now().plusDays(10),
             LocalDate.now(),

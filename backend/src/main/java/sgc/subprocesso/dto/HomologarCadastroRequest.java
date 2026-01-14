@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HomologarCadastroReq {
+public class HomologarCadastroRequest {
     /**
      * Observações adicionais.
      */

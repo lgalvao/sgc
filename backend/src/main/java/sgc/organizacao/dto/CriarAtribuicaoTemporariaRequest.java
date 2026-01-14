@@ -2,7 +2,7 @@ package sgc.organizacao.dto;
 
 import java.time.LocalDate;
 
-public record CriarAtribuicaoTemporariaReq(
+public record CriarAtribuicaoTemporariaRequest(
         String tituloEleitoralUsuario,
         LocalDate dataInicio,
         LocalDate dataTermino,

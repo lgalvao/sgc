@@ -20,7 +20,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.dto.CompetenciaReq;
+import sgc.subprocesso.dto.CompetenciaRequest;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -118,7 +118,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(Collections.emptyList());
 
-        CompetenciaReq req = new CompetenciaReq();
+        CompetenciaRequest req = new CompetenciaRequest();
         req.setDescricao("Nova");
 
         when(mapaFacade.obterMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());

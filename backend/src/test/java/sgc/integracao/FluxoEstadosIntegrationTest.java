@@ -26,11 +26,11 @@ import sgc.mapa.service.ImpactoMapaService;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Usuario;
-import sgc.processo.dto.CriarProcessoReq;
+import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
-import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
+import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -162,7 +162,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             try {
                 // 1. Criar Processo (Admin)
                 autenticar(admin, "ROLE_ADMIN");
-                CriarProcessoReq req = CriarProcessoReq.builder()
+                CriarProcessoRequest req = CriarProcessoRequest.builder()
                         .descricao("Processo Mapeamento Teste")
                         .tipo(TipoProcesso.MAPEAMENTO)
                         .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
@@ -280,7 +280,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
         void fluxoMapeamentoDevolucaoCadastro() {
             // Setup inicial
             autenticar(admin, "ROLE_ADMIN");
-            CriarProcessoReq req = CriarProcessoReq.builder()
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
                     .descricao("Processo Mapeamento Devolucao")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
@@ -342,7 +342,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
                 // 1. Criar Processo Revisão (Admin)
                 autenticar(admin, "ROLE_ADMIN");
-                CriarProcessoReq req = CriarProcessoReq.builder()
+                CriarProcessoRequest req = CriarProcessoRequest.builder()
                         .descricao("Processo Revisão Teste")
                         .tipo(TipoProcesso.REVISAO)
                         .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
@@ -405,7 +405,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
                 // 7. Submeter Mapa Ajustado (Admin)
                 autenticar(admin, "ROLE_ADMIN");
-                SubmeterMapaAjustadoReq ajusteReq = SubmeterMapaAjustadoReq.builder()
+                SubmeterMapaAjustadoRequest ajusteReq = SubmeterMapaAjustadoRequest.builder()
                         .dataLimiteEtapa2(LocalDateTime.now().plusDays(5))
                         .build();
                 mapaWorkflowService.submeterMapaAjustado(codSubprocesso, ajusteReq, admin);
@@ -435,7 +435,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
             // 1. Criar Processo
             autenticar(admin, "ROLE_ADMIN");
-            Long codProcesso = processoFacade.criar(CriarProcessoReq.builder()
+            Long codProcesso = processoFacade.criar(CriarProcessoRequest.builder()
                     .descricao("Rev Sem Impacto")
                     .tipo(TipoProcesso.REVISAO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))

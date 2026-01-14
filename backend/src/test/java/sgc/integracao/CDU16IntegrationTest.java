@@ -23,8 +23,8 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
-import sgc.subprocesso.dto.SalvarAjustesReq;
-import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
+import sgc.subprocesso.dto.SalvarAjustesRequest;
+import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -130,7 +130,7 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve submeter o mapa ajustado e alterar a situação do subprocesso")
     void deveSubmeterMapaAjustadoComSucesso() throws Exception {
         var request =
-                new SubmeterMapaAjustadoReq(
+                new SubmeterMapaAjustadoRequest(
                         "Ajustes realizados conforme solicitado.",
                         LocalDateTime.now().plusDays(10));
 
@@ -160,7 +160,7 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
             Atividade a1 = atividadeRepo.findAll().stream().filter(a -> a.getDescricao().equals("Atividade 1")).findFirst().orElseThrow();
 
             var request =
-                    new SalvarAjustesReq(
+                    new SalvarAjustesRequest(
                             List.of(
                                     CompetenciaAjusteDto.builder()
                                             .codCompetencia(c1.getCodigo())
@@ -198,7 +198,7 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
             subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
             subprocessoRepo.save(subprocesso);
 
-            var request = new SalvarAjustesReq(List.of());
+            var request = new SalvarAjustesRequest(List.of());
 
             mockMvc.perform(
                             post(API_SUBPROCESSO_MAPA_AJUSTE, subprocesso.getCodigo())

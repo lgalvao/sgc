@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DevolverCadastroReq {
+public class DevolverCadastroRequest {
     /**
      * Observações adicionais.
      */

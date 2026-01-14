@@ -19,7 +19,7 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
-import sgc.processo.dto.EnviarLembreteReq;
+import sgc.processo.dto.EnviarLembreteRequest;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -99,7 +99,7 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void enviarLembrete_comoAdmin_sucesso() throws Exception {
         // Given
-        EnviarLembreteReq request = new EnviarLembreteReq();
+        EnviarLembreteRequest request = new EnviarLembreteRequest();
         request.setUnidadeCodigo(unidade.getCodigo());
 
         // When
@@ -127,7 +127,7 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
     @org.springframework.security.test.context.support.WithMockUser(roles = "GESTOR")
     void enviarLembrete_semPermissao_proibido() throws Exception {
         // Given
-        EnviarLembreteReq request = new EnviarLembreteReq();
+        EnviarLembreteRequest request = new EnviarLembreteRequest();
         request.setUnidadeCodigo(unidade.getCodigo());
 
         // When/Then
@@ -144,7 +144,7 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void enviarLembrete_unidadeInexistente_erro() throws Exception {
         // Given
-        EnviarLembreteReq request = new EnviarLembreteReq();
+        EnviarLembreteRequest request = new EnviarLembreteRequest();
         request.setUnidadeCodigo(99999L);
 
         // When/Then

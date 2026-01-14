@@ -26,7 +26,7 @@ import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.dto.DisponibilizarMapaReq;
+import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.model.*;
 import tools.jackson.databind.ObjectMapper;
 
@@ -152,7 +152,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
 
             LocalDate dataLimite = LocalDate.now().plusDays(10);
             String observacoes = "Observações de teste para o mapa.";
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq(dataLimite, observacoes);
+            DisponibilizarMapaRequest request = new DisponibilizarMapaRequest(dataLimite, observacoes);
 
             // Print error if 500
             mockMvc.perform(
@@ -206,8 +206,8 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Não deve disponibilizar mapa com usuário sem permissão (não ADMIN)")
         @WithMockGestor
         void disponibilizarMapa_semPermissao_retornaForbidden() throws Exception {
-            DisponibilizarMapaReq request =
-                    new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);
+            DisponibilizarMapaRequest request =
+                    new DisponibilizarMapaRequest(LocalDate.now().plusDays(10), OBS_LITERAL);
 
             mockMvc.perform(
                             post(API_URL, subprocesso.getCodigo())
@@ -224,8 +224,8 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
             subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             subprocessoRepo.save(subprocesso);
 
-            DisponibilizarMapaReq request =
-                    new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);
+            DisponibilizarMapaRequest request =
+                    new DisponibilizarMapaRequest(LocalDate.now().plusDays(10), OBS_LITERAL);
 
             mockMvc.perform(
                             post(API_URL, subprocesso.getCodigo())
@@ -243,8 +243,8 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
             Atividade atividadeSolta = new Atividade(mapa, "Atividade Solta");
             atividadeRepo.save(atividadeSolta);
 
-            DisponibilizarMapaReq request =
-                    new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);
+            DisponibilizarMapaRequest request =
+                    new DisponibilizarMapaRequest(LocalDate.now().plusDays(10), OBS_LITERAL);
 
             mockMvc.perform(
                             post(API_URL, subprocesso.getCodigo())
@@ -262,8 +262,8 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         void disponibilizarMapa_comCompetenciaNaoAssociada_retornaBadRequest() throws Exception {
             competenciaRepo.save(new Competencia("Competência Solta", mapa));
 
-            DisponibilizarMapaReq request =
-                    new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);
+            DisponibilizarMapaRequest request =
+                    new DisponibilizarMapaRequest(LocalDate.now().plusDays(10), OBS_LITERAL);
 
             mockMvc.perform(
                             post(API_URL, subprocesso.getCodigo())

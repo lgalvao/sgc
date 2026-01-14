@@ -14,7 +14,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("unit")
-@DisplayName("Testes de Validação: CriarProcessoReq")
+@DisplayName("Testes de Validação: CriarProcessoRequest")
 class CriarProcessoReqValidationTest {
 
     private Validator validator;
@@ -32,14 +32,14 @@ class CriarProcessoReqValidationTest {
         @Test
         @DisplayName("Deve aceitar requisição com todos os campos preenchidos corretamente")
         void deveAceitarRequisicaoCompleta() {
-            CriarProcessoReq req = CriarProcessoReq.builder()
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
                     .descricao("Mapeamento 2026")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
                     .unidades(List.of(1L, 2L, 3L))
                     .build();
 
-            Set<ConstraintViolation<CriarProcessoReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
 
             assertThat(violations).isEmpty();
         }
@@ -47,14 +47,14 @@ class CriarProcessoReqValidationTest {
         @Test
         @DisplayName("Deve aceitar requisição com uma única unidade")
         void deveAceitarRequisicaoComUmaUnidade() {
-            CriarProcessoReq req = CriarProcessoReq.builder()
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
                     .descricao("Revisão 2026")
                     .tipo(TipoProcesso.REVISAO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(15))
                     .unidades(List.of(1L))
                     .build();
 
-            Set<ConstraintViolation<CriarProcessoReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
 
             assertThat(violations).isEmpty();
         }
@@ -67,14 +67,14 @@ class CriarProcessoReqValidationTest {
         @Test
         @DisplayName("Deve rejeitar descrição nula")
         void deveRejeitarDescricaoNula() {
-            CriarProcessoReq req = CriarProcessoReq.builder()
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
                     .descricao(null)
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
                     .unidades(List.of(1L))
                     .build();
 
-            Set<ConstraintViolation<CriarProcessoReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -85,14 +85,14 @@ class CriarProcessoReqValidationTest {
         @Test
         @DisplayName("Deve rejeitar descrição em branco")
         void deveRejeitarDescricaoEmBranco() {
-            CriarProcessoReq req = CriarProcessoReq.builder()
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
                     .descricao("   ")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
                     .unidades(List.of(1L))
                     .build();
 
-            Set<ConstraintViolation<CriarProcessoReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -103,14 +103,14 @@ class CriarProcessoReqValidationTest {
         @Test
         @DisplayName("Deve rejeitar descrição vazia")
         void deveRejeitarDescricaoVazia() {
-            CriarProcessoReq req = CriarProcessoReq.builder()
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
                     .descricao("")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
                     .unidades(List.of(1L))
                     .build();
 
-            Set<ConstraintViolation<CriarProcessoReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .extracting(v -> v.getPropertyPath().toString())
@@ -125,14 +125,14 @@ class CriarProcessoReqValidationTest {
         @Test
         @DisplayName("Deve rejeitar tipo nulo")
         void deveRejeitarTipoNulo() {
-            CriarProcessoReq req = CriarProcessoReq.builder()
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
                     .descricao("Processo Teste")
                     .tipo(null)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
                     .unidades(List.of(1L))
                     .build();
 
-            Set<ConstraintViolation<CriarProcessoReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -148,14 +148,14 @@ class CriarProcessoReqValidationTest {
         @Test
         @DisplayName("Deve rejeitar data limite nula")
         void deveRejeitarDataLimiteNula() {
-            CriarProcessoReq req = CriarProcessoReq.builder()
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
                     .descricao("Processo Teste")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(null)
                     .unidades(List.of(1L))
                     .build();
 
-            Set<ConstraintViolation<CriarProcessoReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -166,14 +166,14 @@ class CriarProcessoReqValidationTest {
         @Test
         @DisplayName("Deve rejeitar data limite no passado")
         void deveRejeitarDataLimiteNoPassado() {
-            CriarProcessoReq req = CriarProcessoReq.builder()
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
                     .descricao("Processo Teste")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().minusDays(1))
                     .unidades(List.of(1L))
                     .build();
 
-            Set<ConstraintViolation<CriarProcessoReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -184,14 +184,14 @@ class CriarProcessoReqValidationTest {
         @Test
         @DisplayName("Deve rejeitar data limite igual a agora")
         void deveRejeitarDataLimiteIgualAgora() {
-            CriarProcessoReq req = CriarProcessoReq.builder()
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
                     .descricao("Processo Teste")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now())
                     .unidades(List.of(1L))
                     .build();
 
-            Set<ConstraintViolation<CriarProcessoReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .extracting(v -> v.getPropertyPath().toString())
@@ -206,14 +206,14 @@ class CriarProcessoReqValidationTest {
         @Test
         @DisplayName("Deve rejeitar lista de unidades nula")
         void deveRejeitarUnidadesNulas() {
-            CriarProcessoReq req = CriarProcessoReq.builder()
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
                     .descricao("Processo Teste")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
                     .unidades(null)
                     .build();
 
-            Set<ConstraintViolation<CriarProcessoReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -224,14 +224,14 @@ class CriarProcessoReqValidationTest {
         @Test
         @DisplayName("Deve rejeitar lista de unidades vazia")
         void deveRejeitarUnidadesVazias() {
-            CriarProcessoReq req = CriarProcessoReq.builder()
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
                     .descricao("Processo Teste")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
                     .unidades(List.of())
                     .build();
 
-            Set<ConstraintViolation<CriarProcessoReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(1)
@@ -247,14 +247,14 @@ class CriarProcessoReqValidationTest {
         @Test
         @DisplayName("Deve reportar todas as violações quando múltiplos campos são inválidos")
         void deveReportarTodasViolacoes() {
-            CriarProcessoReq req = CriarProcessoReq.builder()
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
                     .descricao(null)
                     .tipo(null)
                     .dataLimiteEtapa1(null)
                     .unidades(null)
                     .build();
 
-            Set<ConstraintViolation<CriarProcessoReq>> violations = validator.validate(req);
+            Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
 
             assertThat(violations)
                     .hasSize(4)

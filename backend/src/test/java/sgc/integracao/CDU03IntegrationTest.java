@@ -17,8 +17,8 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
-import sgc.processo.dto.AtualizarProcessoReq;
-import sgc.processo.dto.CriarProcessoReq;
+import sgc.processo.dto.AtualizarProcessoRequest;
+import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.model.TipoProcesso;
 import tools.jackson.databind.ObjectMapper;
 
@@ -81,14 +81,14 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
         unidade2 = unidadeRepo.saveAndFlush(unidade2);
     }
 
-    private CriarProcessoReq criarCriarProcessoReq(
+    private CriarProcessoRequest criarCriarProcessoReq(
             String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
-        return new CriarProcessoReq(descricao, TipoProcesso.MAPEAMENTO, dataLimiteEtapa1, unidades);
+        return new CriarProcessoRequest(descricao, TipoProcesso.MAPEAMENTO, dataLimiteEtapa1, unidades);
     }
 
-    private AtualizarProcessoReq criarAtualizarProcessoReq(
+    private AtualizarProcessoRequest criarAtualizarProcessoReq(
             Long codigo, String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
-        return new AtualizarProcessoReq(
+        return new AtualizarProcessoRequest(
                 codigo, descricao, TipoProcesso.MAPEAMENTO, dataLimiteEtapa1, unidades);
     }
 
@@ -96,7 +96,7 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
     void testCriarProcesso_sucesso() throws Exception {
         List<Long> unidades = List.of(unidade1.getCodigo());
 
-        CriarProcessoReq requestDTO =
+        CriarProcessoRequest requestDTO =
                 criarCriarProcessoReq(
                         "Processo de Mapeamento Teste", unidades, LocalDateTime.now().plusDays(30));
 
@@ -118,7 +118,7 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
     void testCriarProcesso_descricaoVazia_falha() throws Exception {
         List<Long> unidades = List.of(unidade1.getCodigo());
 
-        CriarProcessoReq requestDTO =
+        CriarProcessoRequest requestDTO =
                 criarCriarProcessoReq(
                         "", // Descrição vazia
                         unidades,
@@ -136,7 +136,7 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testCriarProcesso_semUnidades_falha() throws Exception {
-        CriarProcessoReq requestDTO =
+        CriarProcessoRequest requestDTO =
                 criarCriarProcessoReq(
                         "Processo sem unidades",
                         Collections.emptyList(), // Sem unidades
@@ -176,7 +176,7 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
     void testEditarProcesso_sucesso() throws Exception {
         // 1. Criar um processo para ser editado
         List<Long> unidadesIniciais = List.of(unidade1.getCodigo());
-        CriarProcessoReq criarRequestDTO =
+        CriarProcessoRequest criarRequestDTO =
                 criarCriarProcessoReq(
                         "Processo para Edição", unidadesIniciais, LocalDateTime.now().plusDays(20));
 
@@ -200,7 +200,7 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
         unidadesEditadas.add(unidade1.getCodigo());
         unidadesEditadas.add(unidade2.getCodigo()); // Adiciona outra unidade
 
-        AtualizarProcessoReq editarRequestDTO =
+        AtualizarProcessoRequest editarRequestDTO =
                 criarAtualizarProcessoReq(
                         processoId,
                         "Processo Editado",
@@ -223,7 +223,7 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
     void testEditarProcesso_processoNaoEncontrado_falha() throws Exception {
         List<Long> unidades = List.of(unidade1.getCodigo());
 
-        AtualizarProcessoReq editarRequestDTO =
+        AtualizarProcessoRequest editarRequestDTO =
                 criarAtualizarProcessoReq(
                         99999L, // Código que não existe
                         "Processo Inexistente",
@@ -244,7 +244,7 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
     void testRemoverProcesso_sucesso() throws Exception {
         // 1. Criar um processo para ser removido
         List<Long> unidadesIniciais = List.of(unidade1.getCodigo());
-        CriarProcessoReq criarRequestDTO =
+        CriarProcessoRequest criarRequestDTO =
                 criarCriarProcessoReq(
                         "Processo para Remoção",
                         unidadesIniciais,

@@ -22,24 +22,24 @@
  * <h3>2. DTOs de Comando (Request)</h3>
  * <ul>
  *   <li>{@link sgc.subprocesso.dto.AlterarDataLimiteRequest} - Alteração de data limite (ADMIN)</li>
- *   <li>{@link sgc.subprocesso.dto.ReabrirProcessoReq} - Reabertura de cadastro/revisão (ADMIN)</li>
+ *   <li>{@link sgc.subprocesso.dto.ReabrirProcessoRequest} - Reabertura de cadastro/revisão (ADMIN)</li>
  *   <li>{@link sgc.subprocesso.dto.ProcessarEmBlocoRequest} - Operações em bloco</li>
  * </ul>
  *
  * <h3>3. DTOs de Workflow - Cadastro</h3>
  * <ul>
- *   <li>{@link sgc.subprocesso.dto.AceitarCadastroReq} - Aceitar cadastro (GESTOR/ADMIN)</li>
- *   <li>{@link sgc.subprocesso.dto.DevolverCadastroReq} - Devolver cadastro (GESTOR/ADMIN)</li>
- *   <li>{@link sgc.subprocesso.dto.HomologarCadastroReq} - Homologar cadastro (ADMIN)</li>
+ *   <li>{@link sgc.subprocesso.dto.AceitarCadastroRequest} - Aceitar cadastro (GESTOR/ADMIN)</li>
+ *   <li>{@link sgc.subprocesso.dto.DevolverCadastroRequest} - Devolver cadastro (GESTOR/ADMIN)</li>
+ *   <li>{@link sgc.subprocesso.dto.HomologarCadastroRequest} - Homologar cadastro (ADMIN)</li>
  *   <li>{@link sgc.subprocesso.dto.SubprocessoCadastroDto} - Dados de cadastro</li>
  *   <li>{@link sgc.subprocesso.dto.ValidacaoCadastroDto} - Validações de cadastro</li>
  * </ul>
  *
  * <h3>4. DTOs de Workflow - Mapa</h3>
  * <ul>
- *   <li>{@link sgc.subprocesso.dto.DisponibilizarMapaReq} - Disponibilizar mapa (ADMIN)</li>
- *   <li>{@link sgc.subprocesso.dto.ApresentarSugestoesReq} - Apresentar sugestões (CHEFE)</li>
- *   <li>{@link sgc.subprocesso.dto.DevolverValidacaoReq} - Devolver validação (GESTOR/ADMIN)</li>
+ *   <li>{@link sgc.subprocesso.dto.DisponibilizarMapaRequest} - Disponibilizar mapa (ADMIN)</li>
+ *   <li>{@link sgc.subprocesso.dto.ApresentarSugestoesRequest} - Apresentar sugestões (CHEFE)</li>
+ *   <li>{@link sgc.subprocesso.dto.DevolverValidacaoRequest} - Devolver validação (GESTOR/ADMIN)</li>
  *   <li>{@link sgc.subprocesso.dto.AnaliseValidacaoDto} - Análise de validação</li>
  *   <li>{@link sgc.subprocesso.dto.SugestoesDto} - Sugestões do CHEFE</li>
  * </ul>
@@ -47,8 +47,8 @@
  * <h3>5. DTOs de Ajuste de Mapa</h3>
  * <ul>
  *   <li>{@link sgc.subprocesso.dto.MapaAjusteDto} - Ajustes no mapa</li>
- *   <li>{@link sgc.subprocesso.dto.SalvarAjustesReq} - Salvar ajustes (ADMIN)</li>
- *   <li>{@link sgc.subprocesso.dto.SubmeterMapaAjustadoReq} - Submeter mapa ajustado (ADMIN)</li>
+ *   <li>{@link sgc.subprocesso.dto.SalvarAjustesRequest} - Salvar ajustes (ADMIN)</li>
+ *   <li>{@link sgc.subprocesso.dto.SubmeterMapaAjustadoRequest} - Submeter mapa ajustado (ADMIN)</li>
  *   <li>{@link sgc.subprocesso.dto.AtividadeAjusteDto} - Ajuste de atividade</li>
  *   <li>{@link sgc.subprocesso.dto.CompetenciaAjusteDto} - Ajuste de competência</li>
  *   <li>{@link sgc.subprocesso.dto.ConhecimentoAjusteDto} - Ajuste de conhecimento</li>
@@ -59,8 +59,8 @@
  *   <li>{@link sgc.subprocesso.dto.AtividadeVisualizacaoDto} - Visualização de atividade</li>
  *   <li>{@link sgc.subprocesso.dto.AtividadeOperacaoResp} - Resposta de operação em atividade</li>
  *   <li>{@link sgc.subprocesso.dto.ConhecimentoVisualizacaoDto} - Visualização de conhecimento</li>
- *   <li>{@link sgc.subprocesso.dto.CompetenciaReq} - Requisição de competência</li>
- *   <li>{@link sgc.subprocesso.dto.ImportarAtividadesReq} - Importar atividades</li>
+ *   <li>{@link sgc.subprocesso.dto.CompetenciaRequest} - Requisição de competência</li>
+ *   <li>{@link sgc.subprocesso.dto.ImportarAtividadesRequest} - Importar atividades</li>
  * </ul>
  *
  * <h3>7. DTOs Auxiliares</h3>
@@ -112,7 +112,7 @@
  * @PostMapping("/{id}/cadastro/aceitar")
  * public ResponseEntity<RespostaDto> aceitarCadastro(
  *     @PathVariable Long id,
- *     @RequestBody @Valid AceitarCadastroReq request,
+ *     @RequestBody @Valid AceitarCadastroRequest request,
  *     Authentication auth
  * ) {
  *     // Controller recebe DTO, delega para Facade

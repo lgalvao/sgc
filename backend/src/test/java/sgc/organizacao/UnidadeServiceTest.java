@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
-import sgc.organizacao.dto.CriarAtribuicaoTemporariaReq;
+import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
@@ -305,7 +305,7 @@ class UnidadeServiceTest {
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
             when(usuarioRepo.findById("123")).thenReturn(Optional.of(new Usuario()));
 
-            CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
+            CriarAtribuicaoTemporariaRequest req = new CriarAtribuicaoTemporariaRequest(
                     "123", java.time.LocalDate.now(), java.time.LocalDate.now().plusDays(1), "Justificativa");
 
             // Act
@@ -321,7 +321,7 @@ class UnidadeServiceTest {
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
             when(usuarioRepo.findById("123")).thenReturn(Optional.of(new Usuario()));
 
-            CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
+            CriarAtribuicaoTemporariaRequest req = new CriarAtribuicaoTemporariaRequest(
                     "123", java.time.LocalDate.now().plusDays(1), java.time.LocalDate.now(), "Justificativa");
 
             assertThrows(ErroValidacao.class, () -> service.criarAtribuicaoTemporaria(1L, req));
@@ -332,7 +332,7 @@ class UnidadeServiceTest {
         void deveFalharCriarAtribuicaoSeUnidadeNaoEncontrada() {
             when(unidadeRepo.findById(99L)).thenReturn(Optional.empty());
 
-            CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
+            CriarAtribuicaoTemporariaRequest req = new CriarAtribuicaoTemporariaRequest(
                     "123", java.time.LocalDate.now(), java.time.LocalDate.now().plusDays(1), "Justificativa");
 
             assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class,
@@ -345,7 +345,7 @@ class UnidadeServiceTest {
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
             when(usuarioRepo.findById("123")).thenReturn(Optional.of(new Usuario()));
 
-            CriarAtribuicaoTemporariaReq req = new CriarAtribuicaoTemporariaReq(
+            CriarAtribuicaoTemporariaRequest req = new CriarAtribuicaoTemporariaRequest(
                     "123", null, java.time.LocalDate.now().plusDays(1), "Justificativa");
 
             service.criarAtribuicaoTemporaria(1L, req);

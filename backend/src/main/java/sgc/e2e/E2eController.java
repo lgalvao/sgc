@@ -16,7 +16,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.dto.UnidadeDto;
-import sgc.processo.dto.CriarProcessoReq;
+import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
@@ -192,8 +192,8 @@ public class E2eController {
             descricao = "Processo Fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
         }
 
-        CriarProcessoReq criarReq =
-                CriarProcessoReq.builder()
+        CriarProcessoRequest criarReq =
+                CriarProcessoRequest.builder()
                         .descricao(descricao)
                         .tipo(tipo)
                         .dataLimiteEtapa1(dataLimite)

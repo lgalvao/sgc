@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SalvarAjustesReq {
+public class SalvarAjustesRequest {
     /**
      * A lista de competências com os ajustes a serem salvos.
      */

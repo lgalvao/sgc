@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReabrirProcessoReq {
+public class ReabrirProcessoRequest {
     @NotBlank(message = "A justificativa é obrigatória")
     private String justificativa;
 }

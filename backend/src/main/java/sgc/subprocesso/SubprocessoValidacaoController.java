@@ -44,7 +44,7 @@ public class SubprocessoValidacaoController {
     @Operation(summary = "Disponibiliza o mapa de competências para as unidades")
     public ResponseEntity<RespostaDto> disponibilizarMapa(
         @PathVariable Long codigo, 
-        @RequestBody @Valid DisponibilizarMapaReq request,
+        @RequestBody @Valid DisponibilizarMapaRequest request,
         @AuthenticationPrincipal Usuario usuario) {
 
         DisponibilizarMapaRequest serviceRequest = DisponibilizarMapaRequest.builder()
@@ -70,7 +70,7 @@ public class SubprocessoValidacaoController {
     @Operation(summary = "Apresenta sugestões de melhoria para o mapa")
     public void apresentarSugestoes(
         @PathVariable Long codigo, 
-        @RequestBody @Valid ApresentarSugestoesReq request, 
+        @RequestBody @Valid ApresentarSugestoesRequest request, 
         @AuthenticationPrincipal Usuario usuario) {
 
         subprocessoFacade.apresentarSugestoes(codigo, request.getSugestoes(), usuario);
@@ -131,7 +131,7 @@ public class SubprocessoValidacaoController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @Operation(summary = "Devolve a validação do mapa para a unidade de negócio")
     public void devolverValidacao(@PathVariable Long codigo, 
-        @RequestBody @Valid DevolverValidacaoReq request, 
+        @RequestBody @Valid DevolverValidacaoRequest request, 
         @AuthenticationPrincipal Usuario usuario) {
 
         subprocessoFacade.devolverValidacao(codigo, request.getJustificativa(), usuario);
@@ -180,7 +180,7 @@ public class SubprocessoValidacaoController {
     @PostMapping("/{codigo}/submeter-mapa-ajustado")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Submete o mapa ajustado para nova validação")
-    public void submeterMapaAjustado(@PathVariable Long codigo, @RequestBody @Valid SubmeterMapaAjustadoReq request, 
+    public void submeterMapaAjustado(@PathVariable Long codigo, @RequestBody @Valid SubmeterMapaAjustadoRequest request, 
         @AuthenticationPrincipal Usuario usuario) {
         subprocessoFacade.submeterMapaAjustado(codigo, request, usuario);
     }

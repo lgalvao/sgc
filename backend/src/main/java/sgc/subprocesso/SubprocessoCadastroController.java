@@ -150,7 +150,7 @@ public class SubprocessoCadastroController {
     @Operation(summary = "Devolve o cadastro de atividades para o responsável")
     public void devolverCadastro(
             @PathVariable Long codigo,
-            @Valid @RequestBody DevolverCadastroReq request,
+            @Valid @RequestBody DevolverCadastroRequest request,
             @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
@@ -173,7 +173,7 @@ public class SubprocessoCadastroController {
     @Operation(summary = "Aceita o cadastro de atividades")
     public void aceitarCadastro(
             @PathVariable Long codigo,
-            @Valid @RequestBody AceitarCadastroReq request,
+            @Valid @RequestBody AceitarCadastroRequest request,
             @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
@@ -195,7 +195,7 @@ public class SubprocessoCadastroController {
     @Operation(summary = "Homologa o cadastro de atividades")
     public void homologarCadastro(
             @PathVariable Long codigo,
-            @Valid @RequestBody HomologarCadastroReq request,
+            @Valid @RequestBody HomologarCadastroRequest request,
             @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
@@ -216,7 +216,7 @@ public class SubprocessoCadastroController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     public void devolverRevisaoCadastro(
             @PathVariable Long codigo,
-            @Valid @RequestBody DevolverCadastroReq request,
+            @Valid @RequestBody DevolverCadastroRequest request,
             @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
@@ -235,7 +235,7 @@ public class SubprocessoCadastroController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     public void aceitarRevisaoCadastro(
             @PathVariable Long codigo,
-            @Valid @RequestBody AceitarCadastroReq request,
+            @Valid @RequestBody AceitarCadastroRequest request,
             @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
@@ -257,7 +257,7 @@ public class SubprocessoCadastroController {
     @PreAuthorize("hasRole('ADMIN')")
     public void homologarRevisaoCadastro(
             @PathVariable Long codigo,
-            @Valid @RequestBody HomologarCadastroReq request,
+            @Valid @RequestBody HomologarCadastroRequest request,
             @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
@@ -280,7 +280,7 @@ public class SubprocessoCadastroController {
     @Transactional
     @Operation(summary = "Importa atividades de outro subprocesso")
     public Map<String, String> importarAtividades(
-            @PathVariable Long codigo, @RequestBody @Valid ImportarAtividadesReq request) {
+            @PathVariable Long codigo, @RequestBody @Valid ImportarAtividadesRequest request) {
         subprocessoFacade.importarAtividades(codigo, request.getCodSubprocessoOrigem());
         return Map.of("message", "Atividades importadas.");
     }

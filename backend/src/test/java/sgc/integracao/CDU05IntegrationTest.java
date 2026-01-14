@@ -22,8 +22,8 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
 import sgc.organizacao.model.UnidadeMapaRepo;
 import sgc.organizacao.model.UnidadeRepo;
-import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.dto.IniciarProcessoReq;
+import sgc.processo.dto.CriarProcessoRequest;
+import sgc.processo.dto.IniciarProcessoRequest;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -117,9 +117,9 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         unidadeMapaRepo.save(new UnidadeMapa(unidade.getCodigo(), mapaOriginal));
     }
 
-    private CriarProcessoReq criarCriarProcessoReq(
+    private CriarProcessoRequest criarCriarProcessoReq(
             String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
-        return new CriarProcessoReq(descricao, TipoProcesso.REVISAO, dataLimiteEtapa1, unidades);
+        return new CriarProcessoRequest(descricao, TipoProcesso.REVISAO, dataLimiteEtapa1, unidades);
     }
 
     @Test
@@ -127,7 +127,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         // 1. Criar um processo de revisão para ser iniciado
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidade.getCodigo());
-        CriarProcessoReq criarRequestDTO = criarCriarProcessoReq("Processo de Revisão para Iniciar", unidades,
+        CriarProcessoRequest criarRequestDTO = criarCriarProcessoReq("Processo de Revisão para Iniciar", unidades,
                 LocalDateTime.now().plusDays(30));
 
         MvcResult result = mockMvc.perform(post("/api/processos")
@@ -138,7 +138,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                 .andReturn();
 
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
-        var iniciarReq = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
+        var iniciarReq = new IniciarProcessoRequest(TipoProcesso.REVISAO, unidades);
 
         // 2. Iniciar o processo de revisão
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId)
@@ -185,7 +185,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
 
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidadeSemMapa.getCodigo());
-        CriarProcessoReq criarRequestDTO = criarCriarProcessoReq("Processo de Revisão para Unidade Sem Mapa", unidades,
+        CriarProcessoRequest criarRequestDTO = criarCriarProcessoReq("Processo de Revisão para Unidade Sem Mapa", unidades,
                 LocalDateTime.now().plusDays(30));
 
         // A validação agora ocorre na criação do processo
@@ -198,7 +198,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testIniciarProcessoRevisao_processoNaoEncontrado_falha() throws Exception {
-        var iniciarReq = new IniciarProcessoReq(TipoProcesso.REVISAO, List.of(unidade.getCodigo()));
+        var iniciarReq = new IniciarProcessoRequest(TipoProcesso.REVISAO, List.of(unidade.getCodigo()));
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, 99999L)
                 .with(csrf()) // código que não existe
                 .contentType(MediaType.APPLICATION_JSON)
@@ -211,7 +211,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         // 1. Criar e iniciar um processo de revisão
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidade.getCodigo());
-        CriarProcessoReq criarRequestDTO = criarCriarProcessoReq("Processo de Revisão para Iniciar Duas Vezes", unidades,
+        CriarProcessoRequest criarRequestDTO = criarCriarProcessoReq("Processo de Revisão para Iniciar Duas Vezes", unidades,
                 LocalDateTime.now().plusDays(30));
 
         MvcResult result =
@@ -223,7 +223,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                         .andReturn();
 
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
-        var iniciarReq = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
+        var iniciarReq = new IniciarProcessoRequest(TipoProcesso.REVISAO, unidades);
 
         // Inicia o processo a primeira vez
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId)

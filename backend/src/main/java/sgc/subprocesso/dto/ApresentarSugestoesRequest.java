@@ -16,7 +16,7 @@ import sgc.seguranca.sanitizacao.SanitizarHtml;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApresentarSugestoesReq {
+public class ApresentarSugestoesRequest {
     /**
      * Texto com as sugestões do CHEFE (obrigatório).
      */

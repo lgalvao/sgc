@@ -52,10 +52,10 @@ public class ProcessoControllerTest {
     private ObjectMapper objectMapper;
 
     @org.mockito.Captor
-    private org.mockito.ArgumentCaptor<CriarProcessoReq> criarCaptor;
+    private org.mockito.ArgumentCaptor<CriarProcessoRequest> criarCaptor;
 
     @org.mockito.Captor
-    private org.mockito.ArgumentCaptor<AtualizarProcessoReq> atualizarCaptor;
+    private org.mockito.ArgumentCaptor<AtualizarProcessoRequest> atualizarCaptor;
 
     @BeforeEach
     void setUp() {
@@ -72,7 +72,7 @@ public class ProcessoControllerTest {
         void deveRetornarCreatedQuandoProcessoValido() throws Exception {
             // Arrange
             var req =
-                    new CriarProcessoReq(
+                    new CriarProcessoRequest(
                             NOVO_PROCESSO,
                             TipoProcesso.MAPEAMENTO,
                             LocalDateTime.now().plusDays(30),
@@ -86,7 +86,7 @@ public class ProcessoControllerTest {
                             .tipo(TipoProcesso.MAPEAMENTO.name())
                             .build();
 
-            when(processoFacade.criar(any(CriarProcessoReq.class))).thenReturn(dto);
+            when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(dto);
 
             // Act & Assert
             mockMvc.perform(
@@ -100,7 +100,7 @@ public class ProcessoControllerTest {
                     .andExpect(jsonPath(DESCRICAO_JSON_PATH).value(NOVO_PROCESSO));
 
             verify(processoFacade).criar(criarCaptor.capture());
-            CriarProcessoReq capturado = criarCaptor.getValue();
+            CriarProcessoRequest capturado = criarCaptor.getValue();
             assertEquals(NOVO_PROCESSO, capturado.getDescricao());
         }
 
@@ -110,7 +110,7 @@ public class ProcessoControllerTest {
         void deveRetornarBadRequestQuandoProcessoInvalido() throws Exception {
             // Arrange
             var req =
-                    new CriarProcessoReq(
+                    new CriarProcessoRequest(
                             "", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(30), List.of(1L));
 
             // Act & Assert
@@ -127,7 +127,7 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar 400 Bad Request quando data limite é nula")
         void deveRetornarBadRequestQuandoDataLimiteNull() throws Exception {
             // Arrange
-            var req = new CriarProcessoReq(NOVO_PROCESSO, TipoProcesso.MAPEAMENTO, null, List.of(1L));
+            var req = new CriarProcessoRequest(NOVO_PROCESSO, TipoProcesso.MAPEAMENTO, null, List.of(1L));
 
             // Act & Assert
             mockMvc.perform(
@@ -144,7 +144,7 @@ public class ProcessoControllerTest {
         void deveRetornarBadRequestQuandoDataLimiteNoPassado() throws Exception {
             // Arrange
             var req =
-                    new CriarProcessoReq(
+                    new CriarProcessoRequest(
                             NOVO_PROCESSO,
                             TipoProcesso.MAPEAMENTO,
                             LocalDateTime.now().minusDays(1),
@@ -165,7 +165,7 @@ public class ProcessoControllerTest {
         void deveRetornarBadRequestQuandoListaUnidadesVazia() throws Exception {
             // Arrange
             var req =
-                    new CriarProcessoReq(
+                    new CriarProcessoRequest(
                             NOVO_PROCESSO,
                             TipoProcesso.MAPEAMENTO,
                             LocalDateTime.now().plusDays(30),
@@ -281,7 +281,7 @@ public class ProcessoControllerTest {
         void deveRetornarOkAoAtualizarQuandoProcessoExiste() throws Exception {
             // Arrange
             var req =
-                    new AtualizarProcessoReq(
+                    new AtualizarProcessoRequest(
                             1L,
                             PROCESSO_ATUALIZADO,
                             TipoProcesso.REVISAO,
@@ -296,7 +296,7 @@ public class ProcessoControllerTest {
                             .tipo(TipoProcesso.REVISAO.name())
                             .build();
 
-            when(processoFacade.atualizar(eq(1L), any(AtualizarProcessoReq.class))).thenReturn(dto);
+            when(processoFacade.atualizar(eq(1L), any(AtualizarProcessoRequest.class))).thenReturn(dto);
 
             // Act & Assert
             mockMvc.perform(
@@ -309,7 +309,7 @@ public class ProcessoControllerTest {
                     .andExpect(jsonPath(DESCRICAO_JSON_PATH).value(PROCESSO_ATUALIZADO));
 
             verify(processoFacade).atualizar(eq(1L), atualizarCaptor.capture());
-            AtualizarProcessoReq capturado = atualizarCaptor.getValue();
+            AtualizarProcessoRequest capturado = atualizarCaptor.getValue();
             assertEquals(PROCESSO_ATUALIZADO, capturado.getDescricao());
         }
 
@@ -319,7 +319,7 @@ public class ProcessoControllerTest {
         void deveRetornarNotFoundAoAtualizarQuandoProcessoNaoEncontrado() throws Exception {
             // Arrange
             var req =
-                    new AtualizarProcessoReq(
+                    new AtualizarProcessoRequest(
                             999L,
                             "Teste",
                             TipoProcesso.MAPEAMENTO,
@@ -328,7 +328,7 @@ public class ProcessoControllerTest {
 
             doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
                     .when(processoFacade)
-                    .atualizar(eq(999L), any(AtualizarProcessoReq.class));
+                    .atualizar(eq(999L), any(AtualizarProcessoRequest.class));
 
             // Act & Assert
             mockMvc.perform(
@@ -345,7 +345,7 @@ public class ProcessoControllerTest {
         void deveRetornarConflictAoAtualizarQuandoEstadoInvalido() throws Exception {
             // Arrange
             var req =
-                    new AtualizarProcessoReq(
+                    new AtualizarProcessoRequest(
                             1L,
                             "Teste",
                             TipoProcesso.MAPEAMENTO,
@@ -354,7 +354,7 @@ public class ProcessoControllerTest {
 
             doThrow(new IllegalStateException())
                     .when(processoFacade)
-                    .atualizar(eq(1L), any(AtualizarProcessoReq.class));
+                    .atualizar(eq(1L), any(AtualizarProcessoRequest.class));
 
             // Act & Assert
             mockMvc.perform(
@@ -415,7 +415,7 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar 200 OK ao iniciar mapeamento com sucesso")
         void deveRetornarOkAoIniciarMapeamentoQuandoValido() throws Exception {
             // Arrange
-            var req = new IniciarProcessoReq(TipoProcesso.MAPEAMENTO, List.of(1L));
+            var req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
             var processo = ProcessoDto.builder().codigo(1L).descricao("Processo Teste").build();
 
             when(processoFacade.obterPorId(1L)).thenReturn(Optional.of(processo));
@@ -439,7 +439,7 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar 200 OK ao iniciar revisão com sucesso")
         void deveRetornarOkAoIniciarRevisaoQuandoValido() throws Exception {
             // Arrange
-            var req = new IniciarProcessoReq(TipoProcesso.REVISAO, List.of(1L));
+            var req = new IniciarProcessoRequest(TipoProcesso.REVISAO, List.of(1L));
             var processo = ProcessoDto.builder().codigo(1L).descricao("Processo Teste").build();
 
             when(processoFacade.obterPorId(1L)).thenReturn(Optional.of(processo));
@@ -463,7 +463,7 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar 400 Bad Request ao iniciar processo com requisição inválida")
         void deveRetornarBadRequestAoIniciarProcessoQuandoInvalido() throws Exception {
             // Arrange
-            var req = new IniciarProcessoReq(null, List.of(1L));
+            var req = new IniciarProcessoRequest(null, List.of(1L));
 
             // Act & Assert
             mockMvc.perform(
@@ -644,7 +644,7 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar 200 OK ao iniciar diagnóstico com sucesso")
         void deveRetornarOkAoIniciarDiagnosticoQuandoValido() throws Exception {
             // Arrange
-            var req = new IniciarProcessoReq(TipoProcesso.DIAGNOSTICO, List.of(1L));
+            var req = new IniciarProcessoRequest(TipoProcesso.DIAGNOSTICO, List.of(1L));
             var processo = ProcessoDto.builder().codigo(1L).descricao("Processo Diagnóstico").build();
 
             when(processoFacade.obterPorId(1L)).thenReturn(Optional.of(processo));
@@ -668,7 +668,7 @@ public class ProcessoControllerTest {
         @DisplayName("Deve retornar 400 Bad Request quando iniciar processo retorna erros")
         void deveRetornarBadRequestQuandoIniciarRetornaErros() throws Exception {
             // Arrange
-            var req = new IniciarProcessoReq(TipoProcesso.MAPEAMENTO, List.of(1L));
+            var req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
 
             when(processoFacade.iniciarProcessoMapeamento(eq(1L), anyList()))
                     .thenReturn(List.of("Erro 1", "Erro 2"));

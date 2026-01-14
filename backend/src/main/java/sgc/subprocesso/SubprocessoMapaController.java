@@ -152,7 +152,7 @@ public class SubprocessoMapaController {
     @Transactional
     public void salvarAjustesMapa(
             @PathVariable Long codigo,
-            @RequestBody @Valid SalvarAjustesReq request,
+            @RequestBody @Valid SalvarAjustesRequest request,
             @AuthenticationPrincipal Object principal) {
         subprocessoFacade.salvarAjustesMapa(
                 codigo, request.getCompetencias(), extractTituloUsuario(principal));
@@ -220,7 +220,7 @@ public class SubprocessoMapaController {
     @Operation(summary = "Adiciona uma nova competência a um mapa")
     public ResponseEntity<MapaCompletoDto> adicionarCompetencia(
             @PathVariable Long codigo,
-            @RequestBody @Valid CompetenciaReq request,
+            @RequestBody @Valid CompetenciaRequest request,
             @AuthenticationPrincipal Object principal) {
         MapaCompletoDto mapa =
                 subprocessoFacade.adicionarCompetencia(
@@ -235,7 +235,7 @@ public class SubprocessoMapaController {
     public ResponseEntity<MapaCompletoDto> atualizarCompetencia(
             @PathVariable Long codigo,
             @PathVariable Long codCompetencia,
-            @RequestBody @Valid CompetenciaReq request,
+            @RequestBody @Valid CompetenciaRequest request,
             @AuthenticationPrincipal Object principal) {
 
         MapaCompletoDto mapa = subprocessoFacade.atualizarCompetencia(

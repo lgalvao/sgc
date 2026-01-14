@@ -16,7 +16,7 @@ import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.login.dto.EntrarReq;
+import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.seguranca.login.dto.PerfilUnidadeDto;
 
 import java.time.LocalDateTime;
@@ -120,7 +120,7 @@ public class LoginService {
      * @return Token JWT
      */
     @Transactional(readOnly = true)
-    public String entrar(EntrarReq request) {
+    public String entrar(EntrarRequest request) {
         LocalDateTime ultimoAcesso = autenticacoesRecentes.get(request.getTituloEleitoral());
 
         if (ultimoAcesso == null || ultimoAcesso.isBefore(LocalDateTime.now().minusMinutes(5))) {

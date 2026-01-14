@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.analise.dto.CriarAnaliseReq;
+import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAnalise;
@@ -43,26 +43,26 @@ public class AnaliseService {
      * Cria e persiste uma análise com base nos dados fornecidos.
      *
      * @param subprocesso A entidade do subprocesso.
-     * @param req O DTO contendo todas as informações necessárias para criar a análise.
+     * @param command O comando contendo todas as informações necessárias para criar a análise.
      * @return A entidade {@link Analise} que foi criada e salva no banco de dados.
      */
     @Transactional
-    public Analise criarAnalise(Subprocesso subprocesso, CriarAnaliseReq req) {
+    public Analise criarAnalise(Subprocesso subprocesso, CriarAnaliseCommand command) {
         Unidade unidade = null;
-        if (req.getSiglaUnidade() != null) {
-            var unidadeDto = unidadeService.buscarPorSigla(req.getSiglaUnidade());
+        if (command.siglaUnidade() != null) {
+            var unidadeDto = unidadeService.buscarPorSigla(command.siglaUnidade());
             unidade = unidadeService.buscarEntidadePorId(unidadeDto.getCodigo());
         }
 
         Analise analise = Analise.builder()
                 .subprocesso(subprocesso)
                 .dataHora(LocalDateTime.now())
-                .observacoes(req.getObservacoes())
-                .tipo(req.getTipo())
-                .acao(req.getAcao())
+                .observacoes(command.observacoes())
+                .tipo(command.tipo())
+                .acao(command.acao())
                 .unidadeCodigo(unidade != null ? unidade.getCodigo() : null)
-                .usuarioTitulo(req.getTituloUsuario())
-                .motivo(req.getMotivo())
+                .usuarioTitulo(command.tituloUsuario())
+                .motivo(command.motivo())
                 .build();
 
         return analiseRepo.save(analise);

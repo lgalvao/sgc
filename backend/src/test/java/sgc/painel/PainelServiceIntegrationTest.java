@@ -11,7 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.organizacao.model.Perfil;
-import sgc.processo.dto.CriarProcessoReq;
+import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.TipoProcesso;
@@ -42,7 +42,7 @@ class PainelServiceIntegrationTest {
         @DisplayName("Admin deve ver processo de revisão recém-criado na listagem")
         void deveVerProcessoRevisaoNaListagem() {
             // Arrange: Criar processo de mapeamento
-            CriarProcessoReq reqMapeamento = new CriarProcessoReq(
+            CriarProcessoRequest reqMapeamento = new CriarProcessoRequest(
                     "Processo Mapeamento Teste",
                     TipoProcesso.MAPEAMENTO,
                     LocalDateTime.now().plusDays(30),
@@ -51,7 +51,7 @@ class PainelServiceIntegrationTest {
             processoFacade.criar(reqMapeamento);
 
             // Arrange: Criar processo de revisão
-            CriarProcessoReq reqRevisao = new CriarProcessoReq(
+            CriarProcessoRequest reqRevisao = new CriarProcessoRequest(
                     "Processo Revisão Teste",
                     TipoProcesso.REVISAO,
                     LocalDateTime.now().plusDays(30),
@@ -99,7 +99,7 @@ class PainelServiceIntegrationTest {
         void deveIncluirTodosProcessosNaPaginacao() {
             // Arrange: Criar múltiplos processos
             for (int i = 1; i <= 5; i++) {
-                CriarProcessoReq req = new CriarProcessoReq(
+                CriarProcessoRequest req = new CriarProcessoRequest(
                         "Processo Teste " + i,
                         TipoProcesso.MAPEAMENTO,
                         LocalDateTime.now().plusDays(30),
@@ -127,7 +127,7 @@ class PainelServiceIntegrationTest {
         @DisplayName("Deve retornar links corretos quando existem processos finalizados e em andamento")
         void deveRetornarLinksCorretosComMixDeProcessos() {
             // Arrange: Simular o Processo Seed 99 (Finalizado)
-            CriarProcessoReq reqSeedLike = new CriarProcessoReq(
+            CriarProcessoRequest reqSeedLike = new CriarProcessoRequest(
                     "Processo Seed Like",
                     TipoProcesso.MAPEAMENTO,
                     LocalDateTime.now().plusDays(30),
@@ -136,7 +136,7 @@ class PainelServiceIntegrationTest {
             ProcessoDto processoSeed = processoFacade.criar(reqSeedLike);
 
             // Criar processo de Revisão (Alvo do teste)
-            CriarProcessoReq reqRevisao = new CriarProcessoReq(
+            CriarProcessoRequest reqRevisao = new CriarProcessoRequest(
                     "Processo Revisão Alvo",
                     TipoProcesso.REVISAO,
                     LocalDateTime.now().plusDays(30),
