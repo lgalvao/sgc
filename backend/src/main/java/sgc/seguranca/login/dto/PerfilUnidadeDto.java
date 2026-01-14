@@ -7,11 +7,9 @@ import sgc.organizacao.model.Perfil;
 /**
  * DTO que representa um par perfil/unidade para autorização.
  */
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 public class PerfilUnidadeDto {
 
     private Perfil perfil;

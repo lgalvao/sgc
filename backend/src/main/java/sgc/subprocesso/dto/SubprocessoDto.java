@@ -6,8 +6,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
