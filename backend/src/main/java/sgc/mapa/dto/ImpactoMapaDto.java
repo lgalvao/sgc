@@ -10,8 +10,7 @@ import java.util.List;
  *
  * <p>CDU-12 - Verificar impactos no mapa de competências
  */
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // to encourage use of factory methods
@@ -63,10 +62,10 @@ public class ImpactoMapaDto {
                 .totalAtividadesRemovidas(atividadesRemovidas.size())
                 .totalAtividadesAlteradas(atividadesAlteradas.size())
                 .totalCompetenciasImpactadas(competenciasImpactadas.size())
-                .atividadesInseridas(List.copyOf(atividadesInseridas))
-                .atividadesRemovidas(List.copyOf(atividadesRemovidas))
-                .atividadesAlteradas(List.copyOf(atividadesAlteradas))
-                .competenciasImpactadas(List.copyOf(competenciasImpactadas))
+                .atividadesInseridas(atividadesInseridas)
+                .atividadesRemovidas(atividadesRemovidas)
+                .atividadesAlteradas(atividadesAlteradas)
+                .competenciasImpactadas(competenciasImpactadas)
                 .build();
     }
 }
