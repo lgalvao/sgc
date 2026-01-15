@@ -32,4 +32,7 @@
  * @see sgc.processo.service.ProcessoInicializador
  * @since 1.0
  */
+@NullMarked
 package sgc.subprocesso.service.factory;
+
+import org.jspecify.annotations.NullMarked;
