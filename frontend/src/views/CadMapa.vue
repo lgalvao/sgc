@@ -46,7 +46,24 @@
     </div>
 
     <div v-if="unidade">
-      <div class="mb-4 mt-3">
+      <div v-if="competencias.length === 0" class="mb-4 mt-3">
+        <EmptyState
+            icon="bi-journal-plus"
+            title="Vamos começar?"
+            description="Nenhuma competência cadastrada para esta unidade."
+        >
+          <BButton
+              v-if="podeEditarMapa"
+              data-testid="btn-abrir-criar-competencia-empty"
+              variant="primary"
+              @click="abrirModalCriarLimpo"
+          >
+            <i class="bi bi-plus-lg me-2"/> Criar primeira competência
+          </BButton>
+        </EmptyState>
+      </div>
+
+      <div v-else class="mb-4 mt-3">
         <BButton
             v-if="podeEditarMapa"
             class="mb-3"
@@ -112,6 +129,7 @@
 
 <script lang="ts" setup>
 import {BAlert, BButton, BContainer,} from "bootstrap-vue-next";
+import EmptyState from "@/components/EmptyState.vue";
 import {storeToRefs} from "pinia";
 import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
