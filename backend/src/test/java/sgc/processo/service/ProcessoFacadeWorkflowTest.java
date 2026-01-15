@@ -9,7 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-import sgc.alerta.AlertaService;
+import sgc.alerta.AlertaFacade;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.UnidadeFixture;
 import sgc.mapa.model.MapaRepo;
@@ -61,7 +61,7 @@ class ProcessoFacadeWorkflowTest {
     @Mock
     private ProcessoInicializador processoInicializador;
     @Mock
-    private AlertaService alertaService;
+    private AlertaFacade alertaService;
     
     // Specialized services
     @Mock

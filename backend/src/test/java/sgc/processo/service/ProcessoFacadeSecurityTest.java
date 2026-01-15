@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
-import sgc.alerta.AlertaService;
+import sgc.alerta.AlertaFacade;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.CopiaMapaService;
 import sgc.organizacao.UnidadeService;
@@ -53,7 +53,7 @@ class ProcessoFacadeSecurityTest {
     @Mock
     private ProcessoInicializador processoInicializador;
     @Mock
-    private AlertaService alertaService;
+    private AlertaFacade alertaService;
     
     // Specialized services
     @Mock

@@ -6,7 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.AlertaService;
+import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.dto.ResponsavelDto;
@@ -43,7 +43,7 @@ import static sgc.organizacao.model.TipoUnidade.*;
 @RequiredArgsConstructor
 @Slf4j
 public class EventoProcessoListener {
-    private final AlertaService servicoAlertas;
+    private final AlertaFacade servicoAlertas;
     private final NotificacaoEmailService notificacaoEmailService;
     private final NotificacaoModelosService notificacaoModelosService;
     private final UsuarioService usuarioService;

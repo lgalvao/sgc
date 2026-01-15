@@ -13,7 +13,7 @@ devolução de um mapa para ajuste.
 ## Arquitetura e Funcionamento
 
 A principal característica deste módulo é seu **baixo acoplamento**. Ele não é invocado diretamente. Em vez disso, o
-`EventoProcessoListener` (localizado no pacote `notificacao`) ouve os eventos de domínio e invoca o `AlertaService` para
+`EventoProcessoListener` (localizado no pacote `notificacao`) ouve os eventos de domínio e invoca o `AlertaFacade` para
 criar os alertas correspondentes.
 
 ```mermaid
@@ -31,7 +31,7 @@ graph TD
     end
 
     subgraph "Módulo Alerta (este pacote)"
-        Service(AlertaService)
+        Service(AlertaFacade)
         Controle(AlertaController)
         Repo[AlertaRepo]
     end
@@ -54,7 +54,7 @@ graph TD
 
 1. **Publicação do Evento:** Um módulo de negócio, como o `processo`, publica um evento (ex: `ProcessoIniciadoEvento`).
 2. **Escuta do Evento:** O `EventoProcessoListener` (do pacote `notificacao`) captura o evento.
-3. **Criação do Alerta:** O listener invoca o `AlertaService` (deste pacote), que contém a lógica para:
+3. **Criação do Alerta:** O listener invoca o `AlertaFacade` (deste pacote), que contém a lógica para:
     * Construir a mensagem de alerta apropriada.
     * Consultar o `SgrhService` para identificar os usuários destinatários (ex: chefe da unidade).
     * Persistir as entidades `Alerta` e `AlertaUsuario` no banco de dados.
@@ -65,7 +65,7 @@ graph TD
 
 ### Controladores e Serviços
 
-- **`AlertaService`**: Contém a lógica de negócio para criar, formatar e persistir os alertas, além de gerenciar sua
+- **`AlertaFacade`**: Contém a lógica de negócio para criar, formatar e persistir os alertas, além de gerenciar sua
   leitura. É invocado pelo `EventoProcessoListener` central.
 - **`AlertaController`**: Expõe endpoints REST (`GET /api/alertas`, `POST /api/alertas/{codigo}/marcar-como-lido`) para
   o frontend.

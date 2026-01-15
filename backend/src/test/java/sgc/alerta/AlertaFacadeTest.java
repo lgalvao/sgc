@@ -33,7 +33,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
- * Testes unitários consolidados do AlertaService.
+ * Testes unitários consolidados do AlertaFacade.
  * 
  * Consolida testes de:
  * - AlertaServiceTest.java (15 testes)
@@ -41,8 +41,8 @@ import static org.mockito.Mockito.*;
  */
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AlertaService - Testes Unitários")
-class AlertaServiceTest {
+@DisplayName("AlertaFacade - Testes Unitários")
+class AlertaFacadeTest {
     @Mock
     private AlertaRepo alertaRepo;
 
@@ -59,7 +59,7 @@ class AlertaServiceTest {
     private UnidadeService unidadeService;
 
     @InjectMocks
-    private AlertaService service;
+    private AlertaFacade service;
 
     private Unidade criarSedocMock() {
         Unidade sedoc = new Unidade();

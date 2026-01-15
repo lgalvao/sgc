@@ -63,7 +63,7 @@ class ControllersServicesCoverageTest {
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
     @Mock
-    private sgc.alerta.AlertaService alertaService;
+    private sgc.alerta.AlertaFacade alertaService;
     // Removido atividadeRepo não utilizado
     @Mock
     private sgc.mapa.mapper.MapaCompletoMapper mapaCompletoMapper;

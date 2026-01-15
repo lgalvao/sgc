@@ -4,7 +4,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import sgc.alerta.AlertaService;
+import sgc.alerta.AlertaFacade;
 import sgc.notificacao.EventoProcessoListener;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
@@ -25,7 +25,7 @@ public class TestEventConfig {
     @Bean
     @Primary
     public EventoProcessoListener eventoProcessoListener(
-            AlertaService servicoAlertas,
+            AlertaFacade servicoAlertas,
             NotificacaoEmailService notificacaoEmailService,
             NotificacaoModelosService notificacaoModelosService,
             UsuarioService usuarioService,

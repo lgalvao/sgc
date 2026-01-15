@@ -32,7 +32,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AlertaService {
+public class AlertaFacade {
     private final AlertaRepo alertaRepo;
     private final AlertaUsuarioRepo alertaUsuarioRepo;
     private final UsuarioService usuarioService;

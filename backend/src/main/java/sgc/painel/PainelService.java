@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.AlertaService;
+import sgc.alerta.AlertaFacade;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.Alerta;
 import sgc.organizacao.UnidadeService;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PainelService {
     private final ProcessoFacade processoFacade;
-    private final AlertaService alertaService;
+    private final AlertaFacade alertaService;
     private final UnidadeService unidadeService;
 
     /**

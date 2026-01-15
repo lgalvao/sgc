@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.alerta.AlertaService;
+import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.dto.ResponsavelDto;
@@ -38,7 +38,7 @@ class EventoProcessoListenerCoverageTest {
     @InjectMocks
     private EventoProcessoListener listener;
 
-    @Mock private AlertaService servicoAlertas;
+    @Mock private AlertaFacade servicoAlertas;
     @Mock private NotificacaoEmailService notificacaoEmailService;
     @Mock private NotificacaoModelosService notificacaoModelosService;
     @Mock private UsuarioService usuarioService;

@@ -257,7 +257,7 @@ User Request + DTO → Controller (@Valid) → Facade
 * **Entidades:** `Analise`, `TipoAnalise`, `TipoAcaoAnalise`
 
 #### `sgc.notificacao` e `sgc.alerta`
-* **Services:** `NotificacaoEmailService`, `AlertaService`
+* **Services:** `NotificacaoEmailService`, `AlertaFacade`
 * **Responsabilidade:** Comunicação reativa com usuários
 * **Integração:** Reage a eventos de domínio
 

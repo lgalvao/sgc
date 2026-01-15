@@ -12,7 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import sgc.alerta.AlertaService;
+import sgc.alerta.AlertaFacade;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.Alerta;
 import sgc.organizacao.UnidadeService;
@@ -45,7 +45,7 @@ class PainelServiceTest {
     @Mock
     private ProcessoFacade processoFacade;
     @Mock
-    private AlertaService alertaService;
+    private AlertaFacade alertaService;
     @Mock
     private UnidadeService unidadeService;
 

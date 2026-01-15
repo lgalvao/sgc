@@ -59,7 +59,7 @@ public class ProcessoFacade {
     private final SubprocessoMapper subprocessoMapper;
     private final UsuarioService usuarioService;
     private final ProcessoInicializador processoInicializador;
-    private final sgc.alerta.AlertaService alertaService;
+    private final sgc.alerta.AlertaFacade alertaService;
     
     // Services especializados
     private final ProcessoAcessoService processoAcessoService;
