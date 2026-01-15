@@ -1,19 +1,19 @@
 package sgc.subprocesso.dto;
 
 import lombok.Builder;
-import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.organizacao.dto.UnidadeDto;
 
 import java.util.List;
 
-@Getter
+/**
+ * DTO de resposta contendo o contexto completo para edição de um subprocesso.
+ */
 @Builder
-public class ContextoEdicaoDto {
-
-    private final UnidadeDto unidade;
-    private final SubprocessoDetalheDto subprocesso;
-    @jakarta.annotation.Nullable
-    private final MapaCompletoDto mapa;
-    private final List<AtividadeVisualizacaoDto> atividadesDisponiveis;
-}
+public record ContextoEdicaoDto(
+    UnidadeDto unidade,
+    SubprocessoDetalheDto subprocesso,
+    @Nullable MapaCompletoDto mapa,
+    List<AtividadeVisualizacaoDto> atividadesDisponiveis
+) {}

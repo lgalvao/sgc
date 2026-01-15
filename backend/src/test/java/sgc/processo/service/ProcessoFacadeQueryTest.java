@@ -306,8 +306,8 @@ class ProcessoFacadeQueryTest {
 
             // Assert
             assertThat(res).isNotNull();
-            assertThat(res.getProcesso()).isEqualTo(detalhes);
-            assertThat(res.getElegiveis()).isEmpty();
+            assertThat(res.processo()).isEqualTo(detalhes);
+            assertThat(res.elegiveis()).isEmpty();
         }
 
         @Test

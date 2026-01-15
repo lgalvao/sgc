@@ -10,7 +10,7 @@ import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.service.AtividadeFacade;
-import sgc.subprocesso.dto.AtividadeOperacaoResp;
+import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 
 import java.net.URI;
 import java.util.List;
@@ -46,13 +46,13 @@ public class AtividadeController {
      * Cria uma nova atividade no sistema.
      *
      * @param atividadeDto O DTO contendo os dados da atividade a ser criada.
-     * @return Um {@link ResponseEntity} com status 201 Created e {@link AtividadeOperacaoResp}
+     * @return Um {@link ResponseEntity} com status 201 Created e {@link AtividadeOperacaoResponse}
      * contendo a atividade criada e o status do subprocesso.
      */
     @PostMapping
     @Operation(summary = "Cria uma atividade")
-    public ResponseEntity<AtividadeOperacaoResp> criar(@Valid @RequestBody AtividadeDto atividadeDto) {
-        AtividadeOperacaoResp resp = atividadeFacade.criarAtividade(atividadeDto);
+    public ResponseEntity<AtividadeOperacaoResponse> criar(@Valid @RequestBody AtividadeDto atividadeDto) {
+        AtividadeOperacaoResponse resp = atividadeFacade.criarAtividade(atividadeDto);
 
         URI uri = URI.create("/api/atividades/%d".formatted(resp.getAtividade().getCodigo()));
         return ResponseEntity.created(uri).body(resp);
@@ -62,13 +62,13 @@ public class AtividadeController {
      * Atualiza os dados de uma atividade existente.
      *
      * @param atividadeDto O DTO com os novos dados da atividade. A descrição será sanitizada.
-     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResp} contendo
+     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse} contendo
      * a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codigo}/atualizar")
     @Operation(summary = "Atualiza atividade existente")
-    public ResponseEntity<AtividadeOperacaoResp> atualizar(@PathVariable Long codigo, @RequestBody @Valid AtividadeDto atividadeDto) {
-        AtividadeOperacaoResp response = atividadeFacade.atualizarAtividade(codigo, atividadeDto);
+    public ResponseEntity<AtividadeOperacaoResponse> atualizar(@PathVariable Long codigo, @RequestBody @Valid AtividadeDto atividadeDto) {
+        AtividadeOperacaoResponse response = atividadeFacade.atualizarAtividade(codigo, atividadeDto);
         return ResponseEntity.ok(response);
     }
 
@@ -79,13 +79,13 @@ public class AtividadeController {
      * resposta 404 Not Found. Retorna o status atualizado do subprocesso.
      *
      * @param codAtividade O código da atividade a ser excluída.
-     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResp} contendo
+     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse} contendo
      * o status atualizado do subprocesso (atividade será null).
      */
     @PostMapping("/{codAtividade}/excluir")
     @Operation(summary = "Exclui uma atividade")
-    public ResponseEntity<AtividadeOperacaoResp> excluir(@PathVariable Long codAtividade) {
-        AtividadeOperacaoResp response = atividadeFacade.excluirAtividade(codAtividade);
+    public ResponseEntity<AtividadeOperacaoResponse> excluir(@PathVariable Long codAtividade) {
+        AtividadeOperacaoResponse response = atividadeFacade.excluirAtividade(codAtividade);
         return ResponseEntity.ok(response);
     }
 
@@ -106,12 +106,12 @@ public class AtividadeController {
      *
      * @param codAtividade    O código da atividade à qual o conhecimento será associado.
      * @param conhecimentoDto O DTO com os dados do conhecimento a ser criado.
-     * @return Um {@link ResponseEntity} com status 201 Created e {@link AtividadeOperacaoResp}
+     * @return Um {@link ResponseEntity} com status 201 Created e {@link AtividadeOperacaoResponse}
      * contendo a atividade atualizada com o novo conhecimento e o situação do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos")
     @Operation(summary = "Cria um conhecimento para uma atividade")
-    public ResponseEntity<AtividadeOperacaoResp> criarConhecimento(
+    public ResponseEntity<AtividadeOperacaoResponse> criarConhecimento(
             @PathVariable Long codAtividade,
             @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
 
@@ -126,17 +126,17 @@ public class AtividadeController {
      * @param codAtividade    O código da atividade pai.
      * @param codConhecimento O código do conhecimento a ser atualizado.
      * @param conhecimentoDto O DTO com os novos dados do conhecimento.
-     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResp} contendo
+     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse} contendo
      * a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/atualizar")
     @Operation(summary = "Atualiza um conhecimento existente em uma atividade")
-    public ResponseEntity<AtividadeOperacaoResp> atualizarConhecimento(
+    public ResponseEntity<AtividadeOperacaoResponse> atualizarConhecimento(
             @PathVariable Long codAtividade,
             @PathVariable Long codConhecimento,
             @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
 
-        AtividadeOperacaoResp response = atividadeFacade.atualizarConhecimento(codAtividade, codConhecimento, conhecimentoDto);
+        AtividadeOperacaoResponse response = atividadeFacade.atualizarConhecimento(codAtividade, codConhecimento, conhecimentoDto);
         return ResponseEntity.ok(response);
     }
 
@@ -145,16 +145,16 @@ public class AtividadeController {
      *
      * @param codAtividade    O código da atividade pai.
      * @param codConhecimento O código do conhecimento a ser excluído.
-     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResp} contendo
+     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse} contendo
      * a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/excluir")
     @Operation(summary = "Exclui um conhecimento de uma atividade")
-    public ResponseEntity<AtividadeOperacaoResp> excluirConhecimento(
+    public ResponseEntity<AtividadeOperacaoResponse> excluirConhecimento(
             @PathVariable Long codAtividade,
             @PathVariable Long codConhecimento) {
 
-        AtividadeOperacaoResp response = atividadeFacade.excluirConhecimento(codAtividade, codConhecimento);
+        AtividadeOperacaoResponse response = atividadeFacade.excluirConhecimento(codAtividade, codConhecimento);
         return ResponseEntity.ok(response);
     }
 }

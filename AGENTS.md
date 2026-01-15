@@ -42,7 +42,7 @@ Este documento resume as diretrizes essenciais para o desenvolvimento no projeto
 * **Erros:** Use `normalizeError` em services/stores. Componentes decidem como exibir (preferencialmente `BAlert` inline para erros de negócio).
 * **Roteamento:** Modularizado (cada módulo tem seu arquivo `.routes.ts`).
 * **Logging:**
-  * **NUNCA** use `console.log`, `console.warn`, ou `console.debug` em código de produção
+  * **NAO** use `console.log`, `console.warn`, ou `console.debug` em código de produção
   * **USE** o logger estruturado: `import { logger } from '@/utils'`
   * **Métodos disponíveis:**
     * `logger.info(message, ...args)` - Informações gerais (apenas em desenvolvimento)
@@ -91,8 +91,19 @@ O SGC segue padrões arquiteturais bem definidos, documentados em ADRs (Architec
   * DTOs obrigatórios em TODAS as APIs REST
   * Entidades JPA NUNCA são expostas diretamente
   * Mappers implementados com MapStruct para conversão Entidade ↔ DTO
-  * DTOs de Request (entrada) vs. DTOs de Response (saída)
-  * Bean Validation para validação de entrada
+  * **Taxonomia de DTOs:**
+    * `*Request` - Entrada de API (com Bean Validation)
+    * `*Response` - Saída de API (sem validação)
+    * `*Command` - Ação entre Services (record imutável)
+    * `*Query` - Parâmetros de busca (record imutável)
+    * `*View` - Projeções reutilizáveis (record imutável)
+    * `*Dto` - Mapeamento interno entre camadas (class)
+    * `Evento*` - Spring ApplicationEvent (prefixo em português)
+  * **Regras de Ouro:**
+    * Validação Bean Validation (`@NotNull`, `@Valid`) apenas em `*Request`
+    * Preferir `record` para DTOs imutáveis, `class` quando mutabilidade é necessária
+    * Lombok: `@Builder` para todos, `@Data` apenas para classes
+  * **Documentação completa:** Ver [`backend/regras-dtos.md`](/backend/regras-dtos.md)
 
 * **[ADR-005: Controller Organization](/docs/adr/ADR-005-controller-organization.md)** - ✅ Implementado
   * Controllers organizados por workflow phase, não consolidados em arquivos grandes
@@ -108,13 +119,12 @@ Para detalhes técnicos e exemplos de código, consulte:
 * **Padrões de Código:**
   * [Backend Patterns](/regras/backend-padroes.md)
   * [Frontend Patterns](/regras/frontend-padroes.md)
+  * [Regras de DTOs](/backend/regras-dtos.md) - Taxonomia e convenções de DTOs
   * [Regras para execução de testes e2e e correção de bugs](/regras/e2e_regras.md)
 
 * **Arquitetura e Decisões:**
   * [ARCHITECTURE.md](/docs/ARCHITECTURE.md) - Visão geral da arquitetura
   * [ADRs](/docs/adr/) - Decisões arquiteturais documentadas
-  * [Refactoring Plan](/refactoring-plan.md) - Plano de melhorias arquiteturais
-  * [Security Refactoring Plan](/security-refactoring-plan.md) - Refatoração de segurança (completa)
 
 * **Módulo-Específico:**
   * `README.md` de cada módulo e diretório para responsabilidades específicas

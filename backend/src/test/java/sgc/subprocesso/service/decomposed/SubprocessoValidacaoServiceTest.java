@@ -165,8 +165,8 @@ class SubprocessoValidacaoServiceTest {
         Subprocesso sp = new Subprocesso();
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         ValidacaoCadastroDto res = service.validarCadastro(1L);
-        assertThat(res.getValido()).isFalse();
-        assertThat(res.getErros().getFirst().getTipo()).isEqualTo("MAPA_INEXISTENTE");
+        assertThat(res.valido()).isFalse();
+        assertThat(res.erros().getFirst().tipo()).isEqualTo("MAPA_INEXISTENTE");
     }
 
     @Test
@@ -178,8 +178,8 @@ class SubprocessoValidacaoServiceTest {
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of());
 
         ValidacaoCadastroDto res = service.validarCadastro(1L);
-        assertThat(res.getValido()).isFalse();
-        assertThat(res.getErros().getFirst().getTipo()).isEqualTo("SEM_ATIVIDADES");
+        assertThat(res.valido()).isFalse();
+        assertThat(res.erros().getFirst().tipo()).isEqualTo("SEM_ATIVIDADES");
     }
 
     @Test
@@ -193,8 +193,8 @@ class SubprocessoValidacaoServiceTest {
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
 
         ValidacaoCadastroDto res = service.validarCadastro(1L);
-        assertThat(res.getValido()).isFalse();
-        assertThat(res.getErros().getFirst().getTipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
+        assertThat(res.valido()).isFalse();
+        assertThat(res.erros().getFirst().tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
     }
 
     @Test
@@ -208,6 +208,6 @@ class SubprocessoValidacaoServiceTest {
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
 
         ValidacaoCadastroDto res = service.validarCadastro(1L);
-        assertThat(res.getValido()).isTrue();
+        assertThat(res.valido()).isTrue();
     }
 }

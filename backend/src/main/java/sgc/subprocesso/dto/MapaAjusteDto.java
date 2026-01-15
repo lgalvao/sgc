@@ -1,8 +1,5 @@
 package sgc.subprocesso.dto;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import sgc.analise.model.Analise;
@@ -14,16 +11,20 @@ import sgc.subprocesso.model.Subprocesso;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DTO de resposta para visualização do mapa na tela de ajustes.
+ * 
+ * <p>Usado exclusivamente como resposta de API pelo endpoint
+ * {@code GET /subprocessos/{codigo}/mapa-ajuste}.
+ * 
+ * <p>Para enviar ajustes, use {@link SalvarAjustesRequest}.
+ */
 @Getter
 @Builder
 public class MapaAjusteDto {
 
-        @NotNull(message = "O código do mapa é obrigatório")
         private final Long codMapa;
-        @NotBlank(message = "O nome da unidade é obrigatório")
         private final String unidadeNome;
-        @NotNull(message = "A lista de competências é obrigatória")
-        @Valid
         private final List<CompetenciaAjusteDto> competencias;
         private final String justificativaDevolucao;
 

@@ -10,7 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.dto.SubprocessoDto;
+import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
+import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.service.decomposed.SubprocessoCrudService;
 import sgc.subprocesso.service.decomposed.SubprocessoDetalheService;
 import sgc.subprocesso.service.decomposed.SubprocessoValidacaoService;
@@ -47,12 +48,13 @@ class SubprocessoFacadeTest {
         facade.listar();
         verify(crudService).listar();
 
-        SubprocessoDto dto = new SubprocessoDto();
-        facade.criar(dto);
-        verify(crudService).criar(dto);
+        CriarSubprocessoRequest criarRequest = new CriarSubprocessoRequest();
+        facade.criar(criarRequest);
+        verify(crudService).criar(criarRequest);
 
-        facade.atualizar(1L, dto);
-        verify(crudService).atualizar(1L, dto);
+        AtualizarSubprocessoRequest atualizarRequest = new AtualizarSubprocessoRequest();
+        facade.atualizar(1L, atualizarRequest);
+        verify(crudService).atualizar(1L, atualizarRequest);
 
         facade.excluir(1L);
         verify(crudService).excluir(1L);

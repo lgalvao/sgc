@@ -1,14 +1,14 @@
 package sgc.subprocesso.dto;
 
 import lombok.Builder;
-import lombok.Getter;
 
 import java.util.List;
 
-@Getter
+/**
+ * DTO de resposta para validação de cadastro de subprocesso.
+ */
 @Builder
-public class ValidacaoCadastroDto {
-
-    private Boolean valido;
-    private List<ErroValidacaoDto> erros;
-}
+public record ValidacaoCadastroDto(
+    Boolean valido,
+    List<ErroValidacaoDto> erros
+) {}

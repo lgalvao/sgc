@@ -6,7 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.dto.CriarAnaliseCommand;
-import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAnalise;
@@ -82,8 +81,6 @@ class AnaliseServiceTest {
                     .isEqualTo(TipoAnalise.VALIDACAO);
             verify(analiseRepo).findBySubprocessoCodigoOrderByDataHoraDesc(1L);
         }
-
-        // Teste de exceção "deveLancarExcecaoSeSubprocessoNaoEncontrado" removido pois a validação foi movida para o Controller
     }
 
     @Nested
@@ -137,8 +134,6 @@ class AnaliseServiceTest {
             assertThat(resultado.getTipo()).isEqualTo(TipoAnalise.VALIDACAO);
             verify(analiseRepo).save(any(Analise.class));
         }
-
-        // Teste de exceção "deveLancarExcecaoSeSubprocessoNaoEncontradoAoCriar" removido pois o serviço não busca mais o subprocesso
     }
 
     @Nested

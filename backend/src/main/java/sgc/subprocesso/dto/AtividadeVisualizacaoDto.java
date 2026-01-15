@@ -15,7 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AtividadeVisualizacaoDto {
-
     private Long codigo;
     private String descricao;
     private List<ConhecimentoVisualizacaoDto> conhecimentos;

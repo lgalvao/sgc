@@ -83,10 +83,10 @@ class SubprocessoContextoServiceTest {
         ContextoEdicaoDto resultado = service.obterContextoEdicao(codSubprocesso);
 
         assertThat(resultado).isNotNull();
-        assertThat(resultado.getUnidade()).isEqualTo(unidadeDto);
-        assertThat(resultado.getSubprocesso()).isEqualTo(detalheDto);
-        assertThat(resultado.getMapa()).isEqualTo(mapaDto);
-        assertThat(resultado.getAtividadesDisponiveis()).isEmpty();
+        assertThat(resultado.unidade()).isEqualTo(unidadeDto);
+        assertThat(resultado.subprocesso()).isEqualTo(detalheDto);
+        assertThat(resultado.mapa()).isEqualTo(mapaDto);
+        assertThat(resultado.atividadesDisponiveis()).isEmpty();
     }
 
     @Test
@@ -136,6 +136,6 @@ class SubprocessoContextoServiceTest {
 
         ContextoEdicaoDto resultado = service.obterContextoEdicao(codSubprocesso);
 
-        assertThat(resultado.getMapa()).isNull();
+        assertThat(resultado.mapa()).isNull();
     }
 }

@@ -144,7 +144,7 @@ class PainelServiceTest {
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
 
-            assertThat(result.getContent().get(0).getLinkDestino()).contains("/processo/cadastro?codProcesso=1");
+            assertThat(result.getContent().get(0).linkDestino()).contains("/processo/cadastro?codProcesso=1");
         }
 
         @Test
@@ -164,7 +164,7 @@ class PainelServiceTest {
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, 1L, PageRequest.of(0, 10));
 
-            assertThat(result.getContent().get(0).getLinkDestino()).isEqualTo("/processo/1/U1");
+            assertThat(result.getContent().get(0).linkDestino()).isEqualTo("/processo/1/U1");
         }
 
         @Test
@@ -184,7 +184,7 @@ class PainelServiceTest {
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, codigoUnidade, pageable);
 
-            assertThat(result.getContent().get(0).getLinkDestino()).isEqualTo("/processo/100/SIGLA");
+            assertThat(result.getContent().get(0).linkDestino()).isEqualTo("/processo/100/SIGLA");
         }
 
         @Test
@@ -198,7 +198,7 @@ class PainelServiceTest {
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, 2L, PageRequest.of(0, 10));
 
-            assertThat(result.getContent().get(0).getLinkDestino()).isNull();
+            assertThat(result.getContent().get(0).linkDestino()).isNull();
         }
 
         @Test
@@ -216,7 +216,7 @@ class PainelServiceTest {
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, codigoUnidade, pageable);
 
-            assertThat(result.getContent().get(0).getLinkDestino()).isNull();
+            assertThat(result.getContent().get(0).linkDestino()).isNull();
         }
 
         @Test
@@ -237,7 +237,7 @@ class PainelServiceTest {
             Page<ProcessoResumoDto> res = painelService.listarProcessos(Perfil.SERVIDOR, 1L, PageRequest.of(0, 10));
 
             assertThat(res.getContent()).hasSize(1);
-            assertThat(res.getContent().get(0).getLinkDestino()).isNull();
+            assertThat(res.getContent().get(0).linkDestino()).isNull();
         }
 
         @Test
@@ -251,7 +251,7 @@ class PainelServiceTest {
             
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, 999L, PageRequest.of(0, 10));
             assertThat(result.getContent()).isNotEmpty();
-            assertThat(result.getContent().get(0).getLinkDestino()).isNull(); // Cai no catch do calcularLinkDestinoProcesso
+            assertThat(result.getContent().get(0).linkDestino()).isNull(); // Cai no catch do calcularLinkDestinoProcesso
         }
     }
 
@@ -285,8 +285,8 @@ class PainelServiceTest {
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
             
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
-            assertThat(result.getContent().get(0).getUnidadeCodigo()).isNull();
-            assertThat(result.getContent().get(0).getUnidadesParticipantes()).isEmpty();
+            assertThat(result.getContent().get(0).unidadeCodigo()).isNull();
+            assertThat(result.getContent().get(0).unidadesParticipantes()).isEmpty();
         }
 
         @Test
@@ -320,7 +320,7 @@ class PainelServiceTest {
             u1.setSigla(null);
             
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
-            assertThat(result.getContent().get(0).getUnidadesParticipantes()).isEmpty();
+            assertThat(result.getContent().get(0).unidadesParticipantes()).isEmpty();
         }
 
         @Test
@@ -343,7 +343,7 @@ class PainelServiceTest {
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, pageable);
 
-            assertThat(result.getContent().get(0).getUnidadesParticipantes()).isEqualTo("PAI");
+            assertThat(result.getContent().get(0).unidadesParticipantes()).isEqualTo("PAI");
         }
 
         @Test
@@ -363,7 +363,7 @@ class PainelServiceTest {
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, pageable);
 
-            assertThat(result.getContent().get(0).getUnidadesParticipantes()).isEqualTo("FILHO");
+            assertThat(result.getContent().get(0).unidadesParticipantes()).isEqualTo("FILHO");
         }
 
         @Test
@@ -383,7 +383,7 @@ class PainelServiceTest {
             Page<ProcessoResumoDto> res = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
 
             assertThat(res).isNotEmpty();
-            assertThat(res.getContent().get(0).getUnidadesParticipantes()).contains("U99");
+            assertThat(res.getContent().get(0).unidadesParticipantes()).contains("U99");
         }
     }
 

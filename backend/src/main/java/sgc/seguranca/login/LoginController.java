@@ -16,7 +16,7 @@ import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.login.dto.AutenticarRequest;
 import sgc.seguranca.login.dto.EntrarRequest;
-import sgc.seguranca.login.dto.EntrarResp;
+import sgc.seguranca.login.dto.EntrarResponse;
 import sgc.seguranca.login.dto.PerfilUnidadeDto;
 
 import java.util.List;
@@ -80,11 +80,11 @@ public class LoginController {
      */
     @PostMapping("/entrar")
     @Operation(summary = "Finaliza o login e retorna o token JWT")
-    public ResponseEntity<EntrarResp> entrar(@Valid @RequestBody EntrarRequest request) {
+    public ResponseEntity<EntrarResponse> entrar(@Valid @RequestBody EntrarRequest request) {
         String token = loginService.entrar(request);
         Usuario usuario = usuarioService.buscarPorLogin(request.getTituloEleitoral());
 
-        EntrarResp response = EntrarResp.builder()
+        EntrarResponse response = EntrarResponse.builder()
                 .tituloEleitoral(request.getTituloEleitoral())
                 .nome(usuario.getNome())
                 .perfil(Perfil.valueOf(request.getPerfil()))

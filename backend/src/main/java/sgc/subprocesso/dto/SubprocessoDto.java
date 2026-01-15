@@ -1,11 +1,16 @@
 package sgc.subprocesso.dto;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO de resposta contendo dados de um subprocesso.
+ * 
+ * <p>Usado exclusivamente como saída de API. Para criar ou atualizar
+ * subprocessos, use {@link CriarSubprocessoRequest} ou {@link AtualizarSubprocessoRequest}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,10 +18,7 @@ import java.time.LocalDateTime;
 public class SubprocessoDto {
 
     private Long codigo;
-
-    @NotNull(message = "O código do processo é obrigatório")
     private Long codProcesso;
-
     private Long codUnidade;
     private Long codMapa;
 
@@ -28,3 +30,4 @@ public class SubprocessoDto {
 
     private SituacaoSubprocesso situacao;
 }
+

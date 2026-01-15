@@ -17,7 +17,7 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.AccessControlService;
-import sgc.subprocesso.dto.AtividadeOperacaoResp;
+import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -98,12 +98,12 @@ class AtividadeFacadeTest {
         vis.setCodigo(100L);
         when(subprocessoFacade.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
-        AtividadeOperacaoResp response = facade.criarAtividade(request);
+        AtividadeOperacaoResponse response = facade.criarAtividade(request);
 
         verify(accessControlService).verificarPermissao(eq(usuario), any(), any());
         assertThat(response.getAtividade().getCodigo()).isEqualTo(100L);
         assertThat(response.getSubprocesso()).isNotNull();
-        assertThat(response.getSubprocesso().getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        assertThat(response.getSubprocesso().situacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
     }
 
     @Test
@@ -134,7 +134,7 @@ class AtividadeFacadeTest {
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
         when(subprocessoFacade.obterSituacao(10L)).thenReturn(status);
 
-        AtividadeOperacaoResp response = facade.atualizarAtividade(codigo, request);
+        AtividadeOperacaoResponse response = facade.atualizarAtividade(codigo, request);
 
         verify(atividadeService).atualizar(codigo, request);
         assertThat(response.getSubprocesso()).isNotNull();
@@ -166,7 +166,7 @@ class AtividadeFacadeTest {
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
         when(subprocessoFacade.obterSituacao(10L)).thenReturn(status);
 
-        AtividadeOperacaoResp response = facade.excluirAtividade(codigo);
+        AtividadeOperacaoResponse response = facade.excluirAtividade(codigo);
 
         verify(atividadeService).excluir(codigo);
         assertThat(response.getAtividade()).isNull();
@@ -256,7 +256,7 @@ class AtividadeFacadeTest {
         vis.setCodigo(codigoAtividade);
         when(subprocessoFacade.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
-        AtividadeOperacaoResp response = facade.atualizarConhecimento(codigoAtividade, codigoConhecimento, dto);
+        AtividadeOperacaoResponse response = facade.atualizarConhecimento(codigoAtividade, codigoConhecimento, dto);
 
         verify(conhecimentoService).atualizar(codigoAtividade, codigoConhecimento, dto);
         assertThat(response.getAtividade()).isNotNull();
@@ -294,7 +294,7 @@ class AtividadeFacadeTest {
         vis.setCodigo(codigoAtividade);
         when(subprocessoFacade.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
-        AtividadeOperacaoResp response = facade.excluirConhecimento(codigoAtividade, codigoConhecimento);
+        AtividadeOperacaoResponse response = facade.excluirConhecimento(codigoAtividade, codigoConhecimento);
 
         verify(conhecimentoService).excluir(codigoAtividade, codigoConhecimento);
         assertThat(response.getAtividade()).isNotNull();

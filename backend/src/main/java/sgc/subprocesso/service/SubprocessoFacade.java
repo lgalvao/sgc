@@ -83,13 +83,13 @@ public class SubprocessoFacade {
     }
 
     @Transactional
-    public SubprocessoDto criar(SubprocessoDto subprocessoDto) {
-        return crudService.criar(subprocessoDto);
+    public SubprocessoDto criar(CriarSubprocessoRequest request) {
+        return crudService.criar(request);
     }
 
     @Transactional
-    public SubprocessoDto atualizar(Long codigo, SubprocessoDto subprocessoDto) {
-        return crudService.atualizar(codigo, subprocessoDto);
+    public SubprocessoDto atualizar(Long codigo, AtualizarSubprocessoRequest request) {
+        return crudService.atualizar(codigo, request);
     }
 
     @Transactional

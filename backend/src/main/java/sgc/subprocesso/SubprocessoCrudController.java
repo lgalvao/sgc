@@ -101,14 +101,14 @@ public class SubprocessoCrudController {
      *
      * <p>Ação restrita a usuários com perfil 'ADMIN'.
      *
-     * @param subprocessoDto O DTO com os dados do subprocesso a ser criado.
+     * @param request O DTO com os dados do subprocesso a ser criado.
      * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo subprocesso e o
      * {@link SubprocessoDto} criado no corpo da resposta.
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<SubprocessoDto> criar(@Valid @RequestBody SubprocessoDto subprocessoDto) {
-        var salvo = subprocessoFacade.criar(subprocessoDto);
+    public ResponseEntity<SubprocessoDto> criar(@Valid @RequestBody CriarSubprocessoRequest request) {
+        var salvo = subprocessoFacade.criar(request);
         URI uri = URI.create("/api/subprocessos/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(salvo);
     }
@@ -118,15 +118,15 @@ public class SubprocessoCrudController {
      *
      * <p>Ação restrita a usuários com perfil 'ADMIN'.
      *
-     * @param codigo         O código do subprocesso a ser atualizado.
-     * @param subprocessoDto O DTO com os novos dados do subprocesso.
+     * @param codigo O código do subprocesso a ser atualizado.
+     * @param request O DTO com os novos dados do subprocesso.
      * @return Um {@link ResponseEntity} com status 200 OK e o {@link SubprocessoDto} atualizado.
      */
     @PostMapping("/{codigo}/atualizar")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SubprocessoDto> atualizar(
-            @PathVariable Long codigo, @Valid @RequestBody SubprocessoDto subprocessoDto) {
-        var atualizado = subprocessoFacade.atualizar(codigo, subprocessoDto);
+            @PathVariable Long codigo, @Valid @RequestBody AtualizarSubprocessoRequest request) {
+        var atualizado = subprocessoFacade.atualizar(codigo, request);
         return ResponseEntity.ok(atualizado);
     }
 

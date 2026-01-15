@@ -15,7 +15,7 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioService;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.AccessControlService;
-import sgc.subprocesso.dto.AtividadeOperacaoResp;
+import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
@@ -80,7 +80,7 @@ public class AtividadeFacade {
     /**
      * Cria uma nova atividade e retorna a resposta formatada.
      */
-    public AtividadeOperacaoResp criarAtividade(AtividadeDto atividadeDto) {
+    public AtividadeOperacaoResponse criarAtividade(AtividadeDto atividadeDto) {
         Long mapaCodigo = atividadeDto.getMapaCodigo();
         
         // Busca usuário autenticado através do contexto Spring Security
@@ -117,7 +117,7 @@ public class AtividadeFacade {
     /**
      * Atualiza uma atividade e retorna a resposta formatada.
      */
-    public AtividadeOperacaoResp atualizarAtividade(Long codigo, AtividadeDto atividadeDto) {
+    public AtividadeOperacaoResponse atualizarAtividade(Long codigo, AtividadeDto atividadeDto) {
         Atividade atividade = atividadeService.obterPorCodigo(codigo);
         
         // Busca usuário autenticado através do contexto Spring Security
@@ -164,7 +164,7 @@ public class AtividadeFacade {
     /**
      * Exclui uma atividade e retorna a resposta formatada.
      */
-    public AtividadeOperacaoResp excluirAtividade(Long codigo) {
+    public AtividadeOperacaoResponse excluirAtividade(Long codigo) {
         Atividade atividade = atividadeService.obterPorCodigo(codigo);
         Long codMapa = atividade.getMapa().getCodigo();
         
@@ -219,7 +219,7 @@ public class AtividadeFacade {
     /**
      * Atualiza um conhecimento e retorna a resposta formatada.
      */
-    public AtividadeOperacaoResp atualizarConhecimento(Long codAtividade, Long codConhecimento, ConhecimentoDto conhecimentoDto) {
+    public AtividadeOperacaoResponse atualizarConhecimento(Long codAtividade, Long codConhecimento, ConhecimentoDto conhecimentoDto) {
         Atividade atividade = atividadeService.obterPorCodigo(codAtividade);
         
         // Busca usuário autenticado
@@ -235,7 +235,7 @@ public class AtividadeFacade {
     /**
      * Exclui um conhecimento e retorna a resposta formatada.
      */
-    public AtividadeOperacaoResp excluirConhecimento(Long codAtividade, Long codConhecimento) {
+    public AtividadeOperacaoResponse excluirConhecimento(Long codAtividade, Long codConhecimento) {
         Atividade atividade = atividadeService.obterPorCodigo(codAtividade);
         
         // Busca usuário autenticado
@@ -248,12 +248,12 @@ public class AtividadeFacade {
         return criarRespostaOperacaoPorAtividade(codAtividade);
     }
 
-    private AtividadeOperacaoResp criarRespostaOperacaoPorAtividade(Long codigoAtividade) {
+    private AtividadeOperacaoResponse criarRespostaOperacaoPorAtividade(Long codigoAtividade) {
         Long codSubprocesso = obterCodigoSubprocessoPorAtividade(codigoAtividade);
         return criarRespostaOperacao(codSubprocesso, codigoAtividade, true);
     }
 
-    private AtividadeOperacaoResp criarRespostaOperacaoPorMapaCodigo(Long mapaCodigo, Long codigoAtividade, boolean incluirAtividade) {
+    private AtividadeOperacaoResponse criarRespostaOperacaoPorMapaCodigo(Long mapaCodigo, Long codigoAtividade, boolean incluirAtividade) {
         Long codSubprocesso = obterCodigoSubprocessoPorMapa(mapaCodigo);
         return criarRespostaOperacao(codSubprocesso, codigoAtividade, incluirAtividade);
     }
@@ -268,7 +268,7 @@ public class AtividadeFacade {
         return obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
     }
 
-    private AtividadeOperacaoResp criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
+    private AtividadeOperacaoResponse criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
         SubprocessoSituacaoDto situacaoDto = subprocessoFacade.obterSituacao(codSubprocesso);
         AtividadeVisualizacaoDto atividadeVis = null;
         if (incluirAtividade) {
@@ -279,7 +279,7 @@ public class AtividadeFacade {
                     .orElse(null);
         }
 
-        return AtividadeOperacaoResp.builder()
+        return AtividadeOperacaoResponse.builder()
                 .atividade(atividadeVis)
                 .subprocesso(situacaoDto)
                 .build();

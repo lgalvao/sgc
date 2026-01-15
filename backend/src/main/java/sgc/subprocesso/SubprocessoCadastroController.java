@@ -61,7 +61,7 @@ public class SubprocessoCadastroController {
     @PostMapping("/{codigo}/cadastro/disponibilizar")
     @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Disponibiliza o cadastro de atividades para análise")
-    public ResponseEntity<RespostaDto> disponibilizarCadastro(
+    public ResponseEntity<MensagemResponse> disponibilizarCadastro(
             @PathVariable("codigo") Long codSubprocesso,
             @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
@@ -81,7 +81,7 @@ public class SubprocessoCadastroController {
         }
 
         subprocessoFacade.disponibilizarCadastro(codSubprocesso, usuario);
-        return ResponseEntity.ok(new RespostaDto("Cadastro de atividades disponibilizado"));
+        return ResponseEntity.ok(new MensagemResponse("Cadastro de atividades disponibilizado"));
     }
 
     /**
@@ -103,7 +103,7 @@ public class SubprocessoCadastroController {
     @PostMapping("/{codigo}/disponibilizar-revisao")
     @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Disponibiliza a revisão do cadastro de atividades para análise")
-    public ResponseEntity<RespostaDto> disponibilizarRevisao(
+    public ResponseEntity<MensagemResponse> disponibilizarRevisao(
             @PathVariable Long codigo, @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         List<Atividade> faltando = subprocessoFacade.obterAtividadesSemConhecimento(codigo);
@@ -119,7 +119,7 @@ public class SubprocessoCadastroController {
 
         subprocessoFacade.disponibilizarRevisao(codigo, usuario);
 
-        return ResponseEntity.ok(new RespostaDto("Revisão do cadastro de atividades disponibilizada"));
+        return ResponseEntity.ok(new MensagemResponse("Revisão do cadastro de atividades disponibilizada"));
     }
 
     /**

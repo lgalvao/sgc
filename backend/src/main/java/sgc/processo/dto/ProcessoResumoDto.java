@@ -1,24 +1,23 @@
 package sgc.processo.dto;
 
-import lombok.*;
+import lombok.Builder;
 import sgc.processo.model.SituacaoProcesso;
 
 import java.time.LocalDateTime;
 
-@Getter
+/**
+ * DTO de resposta com resumo de um processo.
+ */
 @Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ProcessoResumoDto {
-
-    private Long codigo;
-    private String descricao;
-    private SituacaoProcesso situacao;
-    private String tipo;
-    private LocalDateTime dataLimite;
-    private LocalDateTime dataCriacao;
-    private Long unidadeCodigo;
-    private String unidadeNome;
-    private String unidadesParticipantes;
-    private String linkDestino;
-}
+public record ProcessoResumoDto(
+    Long codigo,
+    String descricao,
+    SituacaoProcesso situacao,
+    String tipo,
+    LocalDateTime dataLimite,
+    LocalDateTime dataCriacao,
+    Long unidadeCodigo,
+    String unidadeNome,
+    String unidadesParticipantes,
+    String linkDestino
+) {}

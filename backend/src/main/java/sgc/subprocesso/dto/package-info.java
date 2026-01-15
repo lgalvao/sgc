@@ -57,7 +57,7 @@
  * <h3>6. DTOs de Atividades e Competências</h3>
  * <ul>
  *   <li>{@link sgc.subprocesso.dto.AtividadeVisualizacaoDto} - Visualização de atividade</li>
- *   <li>{@link sgc.subprocesso.dto.AtividadeOperacaoResp} - Resposta de operação em atividade</li>
+ *   <li>{@link sgc.subprocesso.dto.AtividadeOperacaoResponse} - Resposta de operação em atividade</li>
  *   <li>{@link sgc.subprocesso.dto.ConhecimentoVisualizacaoDto} - Visualização de conhecimento</li>
  *   <li>{@link sgc.subprocesso.dto.CompetenciaRequest} - Requisição de competência</li>
  *   <li>{@link sgc.subprocesso.dto.ImportarAtividadesRequest} - Importar atividades</li>
@@ -66,7 +66,7 @@
  * <h3>7. DTOs Auxiliares</h3>
  * <ul>
  *   <li>{@link sgc.subprocesso.dto.MovimentacaoDto} - Movimentação de subprocesso</li>
- *   <li>{@link sgc.subprocesso.dto.RespostaDto} - Resposta genérica</li>
+ *   <li>{@link sgc.subprocesso.dto.MensagemResponse} - Resposta genérica</li>
  *   <li>{@link sgc.subprocesso.dto.ErroValidacaoDto} - Erro de validação</li>
  * </ul>
  *
@@ -110,13 +110,13 @@
  * <h3>Em Controllers</h3>
  * <pre>{@code
  * @PostMapping("/{id}/cadastro/aceitar")
- * public ResponseEntity<RespostaDto> aceitarCadastro(
+ * public ResponseEntity<MensagemResponse> aceitarCadastro(
  *     @PathVariable Long id,
  *     @RequestBody @Valid AceitarCadastroRequest request,
  *     Authentication auth
  * ) {
  *     // Controller recebe DTO, delega para Facade
- *     RespostaDto resposta = subprocessoFacade.aceitarCadastro(id, request, auth);
+ *     MensagemResponse resposta = subprocessoFacade.aceitarCadastro(id, request, auth);
  *     return ResponseEntity.ok(resposta);
  * }
  * }</pre>

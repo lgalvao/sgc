@@ -1,14 +1,14 @@
 package sgc.subprocesso.dto;
 
 import lombok.Builder;
-import lombok.Getter;
 
-@Getter
+/**
+ * DTO de erro de validação retornado na lista de erros de {@link ValidacaoCadastroDto}.
+ */
 @Builder
-public class ErroValidacaoDto {
-
-    private String tipo; // "ATIVIDADE_SEM_CONHECIMENTO", "SEM_ATIVIDADES", etc.
-    private Long atividadeCodigo;
-    private String descricaoAtividade;
-    private String mensagem;
-}
+public record ErroValidacaoDto(
+    String tipo, // "ATIVIDADE_SEM_CONHECIMENTO", "SEM_ATIVIDADES", etc.
+    Long atividadeCodigo,
+    String descricaoAtividade,
+    String mensagem
+) {}

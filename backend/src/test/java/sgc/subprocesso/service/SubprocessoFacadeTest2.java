@@ -1,6 +1,5 @@
 package sgc.subprocesso.service;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -44,12 +43,6 @@ class SubprocessoFacadeTest2 {
 
     @InjectMocks
     private SubprocessoFacade subprocessoFacade;
-
-
-
-    @AfterEach
-    void tearDown() {
-    }
 
     @Nested
     @DisplayName("Cenários de Leitura")
@@ -142,17 +135,19 @@ class SubprocessoFacadeTest2 {
         @Test
         @DisplayName("Deve criar subprocesso com sucesso")
         void deveCriarSubprocessoComSucesso() {
-            SubprocessoDto dto = SubprocessoDto.builder().build();
-            when(crudService.criar(dto)).thenReturn(dto);
-            assertThat(subprocessoFacade.criar(dto)).isNotNull();
+            CriarSubprocessoRequest request = CriarSubprocessoRequest.builder().codProcesso(1L).codUnidade(1L).build();
+            SubprocessoDto response = SubprocessoDto.builder().build();
+            when(crudService.criar(request)).thenReturn(response);
+            assertThat(subprocessoFacade.criar(request)).isNotNull();
         }
 
         @Test
         @DisplayName("Deve atualizar subprocesso com sucesso")
         void deveAtualizarSubprocessoComSucesso() {
-            SubprocessoDto dto = SubprocessoDto.builder().codMapa(100L).build();
-            when(crudService.atualizar(1L, dto)).thenReturn(dto);
-            assertThat(subprocessoFacade.atualizar(1L, dto)).isNotNull();
+            AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder().codMapa(100L).build();
+            SubprocessoDto response = SubprocessoDto.builder().codMapa(100L).build();
+            when(crudService.atualizar(1L, request)).thenReturn(response);
+            assertThat(subprocessoFacade.atualizar(1L, request)).isNotNull();
         }
 
         @Test
@@ -180,7 +175,7 @@ class SubprocessoFacadeTest2 {
             when(validacaoService.validarCadastro(1L)).thenReturn(val);
 
             ValidacaoCadastroDto result = subprocessoFacade.validarCadastro(1L);
-            assertThat(result.getValido()).isTrue();
+            assertThat(result.valido()).isTrue();
         }
 
         @Test

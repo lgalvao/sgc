@@ -1,7 +1,7 @@
 package sgc.subprocesso.dto;
 
 import lombok.Builder;
-import lombok.Data;
+import org.jspecify.annotations.Nullable;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 
 /**
@@ -10,11 +10,9 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
  * <p>Usado para retornar informações básicas de status sem precisar
  * carregar o processo ou subprocesso completo.
  */
-@Data
 @Builder
-public class SubprocessoSituacaoDto {
-
-    private Long codigo;
-    private SituacaoSubprocesso situacao;
-    private @org.jspecify.annotations.Nullable String situacaoLabel;
-}
+public record SubprocessoSituacaoDto(
+    Long codigo,
+    SituacaoSubprocesso situacao,
+    @Nullable String situacaoLabel
+) {}

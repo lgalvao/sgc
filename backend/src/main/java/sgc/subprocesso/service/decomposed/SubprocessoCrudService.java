@@ -8,6 +8,8 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioService;
+import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
+import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.eventos.EventoSubprocessoAtualizado;
@@ -114,13 +116,27 @@ public class SubprocessoCrudService {
                         "%s para o mapa com código %d".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codMapa)));
     }
 
-    public SubprocessoDto criar(SubprocessoDto subprocessoDto) {
-        return criar(subprocessoDto, false);
+    public SubprocessoDto criar(CriarSubprocessoRequest request) {
+        return criar(request, false);
     }
 
-    public SubprocessoDto criar(SubprocessoDto subprocessoDto, boolean criadoPorProcesso) {
-        var entity = subprocessoMapper.toEntity(subprocessoDto);
+    public SubprocessoDto criar(CriarSubprocessoRequest request, boolean criadoPorProcesso) {
+        var entity = new Subprocesso();
+        // Mapear manualmente do Request
+        if (request.getCodProcesso() != null) {
+            var processo = new sgc.processo.model.Processo();
+            processo.setCodigo(request.getCodProcesso());
+            entity.setProcesso(processo);
+        }
+        if (request.getCodUnidade() != null) {
+            var unidade = new sgc.organizacao.model.Unidade();
+            unidade.setCodigo(request.getCodUnidade());
+            entity.setUnidade(unidade);
+        }
+        entity.setDataLimiteEtapa1(request.getDataLimiteEtapa1());
+        entity.setDataLimiteEtapa2(request.getDataLimiteEtapa2());
         entity.setMapa(null);
+        
         var subprocessoSalvo = repositorioSubprocesso.save(entity);
 
         Mapa mapa = new Mapa();
@@ -144,11 +160,11 @@ public class SubprocessoCrudService {
         return subprocessoMapper.toDTO(salvo);
     }
 
-    public SubprocessoDto atualizar(Long codigo, SubprocessoDto subprocessoDto) {
+    public SubprocessoDto atualizar(Long codigo, AtualizarSubprocessoRequest request) {
         return repositorioSubprocesso.findById(codigo)
                 .map(subprocesso -> {
                     SituacaoSubprocesso situacaoAnterior = subprocesso.getSituacao();
-                    Set<String> camposAlterados = processarAlteracoes(subprocesso, subprocessoDto);
+                    Set<String> camposAlterados = processarAlteracoes(subprocesso, request);
 
                     Subprocesso salvo = repositorioSubprocesso.save(subprocesso);
 
@@ -159,7 +175,7 @@ public class SubprocessoCrudService {
                                 .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
                                 .camposAlterados(camposAlterados)
                                 .dataHoraAtualizacao(LocalDateTime.now())
-                                .situacaoAnterior(situacaoAnterior != subprocessoDto.getSituacao() ? situacaoAnterior : null)
+                                .situacaoAnterior(situacaoAnterior)
                                 .build();
                         eventPublisher.publishEvent(evento);
                     }
@@ -169,10 +185,10 @@ public class SubprocessoCrudService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(MSG_SUBPROCESSO_NAO_ENCONTRADO, codigo));
     }
 
-    private Set<String> processarAlteracoes(Subprocesso subprocesso, SubprocessoDto dto) {
+    private Set<String> processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
         Set<String> campos = new HashSet<>();
 
-        java.util.Optional.ofNullable(dto.getCodMapa()).ifPresentOrElse(
+        java.util.Optional.ofNullable(request.getCodMapa()).ifPresentOrElse(
             cod -> {
                 Mapa m = new Mapa();
                 m.setCodigo(cod);
@@ -189,21 +205,17 @@ public class SubprocessoCrudService {
             }
         );
 
-        if (!Objects.equals(subprocesso.getDataLimiteEtapa1(), dto.getDataLimiteEtapa1())) {
+        if (!Objects.equals(subprocesso.getDataLimiteEtapa1(), request.getDataLimiteEtapa1())) {
             campos.add("dataLimiteEtapa1");
-            subprocesso.setDataLimiteEtapa1(dto.getDataLimiteEtapa1());
+            subprocesso.setDataLimiteEtapa1(request.getDataLimiteEtapa1());
         }
-        if (!Objects.equals(subprocesso.getDataFimEtapa1(), dto.getDataFimEtapa1())) {
+        if (!Objects.equals(subprocesso.getDataFimEtapa1(), request.getDataFimEtapa1())) {
             campos.add("dataFimEtapa1");
-            subprocesso.setDataFimEtapa1(dto.getDataFimEtapa1());
+            subprocesso.setDataFimEtapa1(request.getDataFimEtapa1());
         }
-        if (!Objects.equals(subprocesso.getDataFimEtapa2(), dto.getDataFimEtapa2())) {
+        if (!Objects.equals(subprocesso.getDataFimEtapa2(), request.getDataFimEtapa2())) {
             campos.add("dataFimEtapa2");
-            subprocesso.setDataFimEtapa2(dto.getDataFimEtapa2());
-        }
-        if (!Objects.equals(subprocesso.getSituacao(), dto.getSituacao())) {
-            campos.add("situacao");
-            subprocesso.setSituacao(dto.getSituacao());
+            subprocesso.setDataFimEtapa2(request.getDataFimEtapa2());
         }
 
         return campos;

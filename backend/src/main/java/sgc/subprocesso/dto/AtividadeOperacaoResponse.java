@@ -1,5 +1,7 @@
 package sgc.subprocesso.dto;
 
+import org.jspecify.annotations.Nullable;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,12 +14,12 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class AtividadeOperacaoResp {
+public class AtividadeOperacaoResponse {
     /**
      * A atividade que foi criada, atualizada ou afetada pela operação.
      * Pode ser null em caso de exclusão.
      */
-    @jakarta.annotation.Nullable
+    @Nullable
     private AtividadeVisualizacaoDto atividade;
 
     /**

@@ -47,14 +47,14 @@ class MovimentacaoMapperTest {
         MovimentacaoDto dto = mapper.toDTO(mov);
 
         assertThat(dto).isNotNull();
-        assertThat(dto.getCodigo()).isEqualTo(10L);
-        assertThat(dto.getDescricao()).isEqualTo("Movimentacao Teste");
-        assertThat(dto.getUnidadeOrigemCodigo()).isEqualTo(1L);
-        assertThat(dto.getUnidadeOrigemSigla()).isEqualTo("ORG");
-        assertThat(dto.getUnidadeOrigemNome()).isEqualTo("Origem");
-        assertThat(dto.getUnidadeDestinoCodigo()).isEqualTo(2L);
-        assertThat(dto.getUnidadeDestinoSigla()).isEqualTo("DES");
-        assertThat(dto.getUnidadeDestinoNome()).isEqualTo("Destino");
+        assertThat(dto.codigo()).isEqualTo(10L);
+        assertThat(dto.descricao()).isEqualTo("Movimentacao Teste");
+        assertThat(dto.unidadeOrigemCodigo()).isEqualTo(1L);
+        assertThat(dto.unidadeOrigemSigla()).isEqualTo("ORG");
+        assertThat(dto.unidadeOrigemNome()).isEqualTo("Origem");
+        assertThat(dto.unidadeDestinoCodigo()).isEqualTo(2L);
+        assertThat(dto.unidadeDestinoSigla()).isEqualTo("DES");
+        assertThat(dto.unidadeDestinoNome()).isEqualTo("Destino");
     }
 
     @Test
@@ -74,7 +74,7 @@ class MovimentacaoMapperTest {
         MovimentacaoDto dto = mapper.toDTO(mov);
 
         assertThat(dto).isNotNull();
-        assertThat(dto.getUnidadeOrigemCodigo()).isNull();
-        assertThat(dto.getUnidadeDestinoCodigo()).isNull();
+        assertThat(dto.unidadeOrigemCodigo()).isNull();
+        assertThat(dto.unidadeDestinoCodigo()).isNull();
     }
 }

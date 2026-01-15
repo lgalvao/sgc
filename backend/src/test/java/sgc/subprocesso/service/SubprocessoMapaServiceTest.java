@@ -40,17 +40,21 @@ import static org.mockito.Mockito.when;
 @Tag("unit")
 @DisplayName("SubprocessoMapaService")
 class SubprocessoMapaServiceTest {
-
     @Mock
     private SubprocessoRepo subprocessoRepo;
+
     @Mock
     private SubprocessoMovimentacaoRepo movimentacaoRepo;
+
     @Mock
     private AtividadeService atividadeService;
+
     @Mock
     private CompetenciaService competenciaService;
+
     @Mock
     private AtividadeMapper atividadeMapper;
+
     @Mock
     private CopiaMapaService copiaMapaService;
 

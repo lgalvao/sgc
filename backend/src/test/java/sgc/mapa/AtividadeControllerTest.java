@@ -16,7 +16,7 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.service.AtividadeFacade;
-import sgc.subprocesso.dto.AtividadeOperacaoResp;
+import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 
@@ -63,7 +63,7 @@ class AtividadeControllerTest {
             AtividadeVisualizacaoDto dto = new AtividadeVisualizacaoDto();
             dto.setCodigo(10L);
 
-            AtividadeOperacaoResp response = AtividadeOperacaoResp.builder()
+            AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
                     .atividade(dto)
                     .subprocesso(SubprocessoSituacaoDto.builder().build())
                     .build();
@@ -96,7 +96,7 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve atualizar atividade")
         void deveAtualizarAtividade() throws Exception {
-            AtividadeOperacaoResp response = AtividadeOperacaoResp.builder().build();
+            AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder().build();
             Mockito.when(atividadeFacade.atualizarAtividade(eq(1L), any())).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/atualizar")
@@ -112,7 +112,7 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve excluir atividade")
         void deveExcluirAtividade() throws Exception {
-            AtividadeOperacaoResp response = AtividadeOperacaoResp.builder().build();
+            AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder().build();
             Mockito.when(atividadeFacade.excluirAtividade(1L)).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/excluir")
@@ -138,7 +138,7 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve criar conhecimento")
         void deveCriarConhecimento() throws Exception {
-            AtividadeOperacaoResp response = AtividadeOperacaoResp.builder().build();
+            AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder().build();
             ResultadoOperacaoConhecimento resultado = new ResultadoOperacaoConhecimento(999L, response);
             Mockito.when(atividadeFacade.criarConhecimento(eq(1L), any())).thenReturn(resultado);
 
@@ -156,7 +156,7 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve atualizar conhecimento")
         void deveAtualizarConhecimento() throws Exception {
-            AtividadeOperacaoResp response = AtividadeOperacaoResp.builder().build();
+            AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder().build();
             Mockito.when(atividadeFacade.atualizarConhecimento(eq(1L), eq(2L), any())).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/conhecimentos/2/atualizar")
@@ -172,7 +172,7 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve excluir conhecimento")
         void deveExcluirConhecimento() throws Exception {
-            AtividadeOperacaoResp response = AtividadeOperacaoResp.builder().build();
+            AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder().build();
             Mockito.when(atividadeFacade.excluirConhecimento(1L, 2L)).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/conhecimentos/2/excluir")

@@ -42,7 +42,7 @@ public class SubprocessoValidacaoController {
     @PostMapping("/{codigo}/disponibilizar-mapa")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Disponibiliza o mapa de competências para as unidades")
-    public ResponseEntity<RespostaDto> disponibilizarMapa(
+    public ResponseEntity<MensagemResponse> disponibilizarMapa(
         @PathVariable Long codigo, 
         @RequestBody @Valid DisponibilizarMapaRequest request,
         @AuthenticationPrincipal Usuario usuario) {
@@ -53,7 +53,7 @@ public class SubprocessoValidacaoController {
                 .build();
 
         subprocessoFacade.disponibilizarMapa(codigo, serviceRequest, usuario);
-        return ResponseEntity.ok(new RespostaDto("Mapa de competências disponibilizado."));
+        return ResponseEntity.ok(new MensagemResponse("Mapa de competências disponibilizado."));
     }
 
     /**

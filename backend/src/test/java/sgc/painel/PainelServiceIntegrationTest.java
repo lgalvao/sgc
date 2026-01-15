@@ -72,7 +72,7 @@ class PainelServiceIntegrationTest {
 
             // Verificar que existe pelo menos um processo com a descrição esperada
             boolean processoRevisaoEncontrado = listaProcessos.stream()
-                    .anyMatch(p -> p.getDescricao().equals("Processo Revisão Teste"));
+                    .anyMatch(p -> p.descricao().equals("Processo Revisão Teste"));
 
             assertThat(processoRevisaoEncontrado)
                     .withFailMessage("Processo de revisão não encontrado na listagem. " +
@@ -81,15 +81,15 @@ class PainelServiceIntegrationTest {
 
             // Verificar que o linkDestino está correto
             ProcessoResumoDto processoRevisao = listaProcessos.stream()
-                    .filter(p -> p.getDescricao().equals("Processo Revisão Teste"))
+                    .filter(p -> p.descricao().equals("Processo Revisão Teste"))
                     .findFirst()
                     .orElse(null);
 
             assertThat(processoRevisao).isNotNull();
-            assertThat(processoRevisao.getLinkDestino())
+            assertThat(processoRevisao.linkDestino())
                     .withFailMessage("LinkDestino incorreto para processo " + codigoProcessoRevisao +
                             ". Esperado: /processo/cadastro?codProcesso=" + codigoProcessoRevisao +
-                            ", Obtido: " + processoRevisao.getLinkDestino())
+                            ", Obtido: " + processoRevisao.linkDestino())
                     .isEqualTo("/processo/cadastro?codProcesso=" + codigoProcessoRevisao);
         }
 
@@ -149,19 +149,19 @@ class PainelServiceIntegrationTest {
             List<ProcessoResumoDto> lista = page.getContent();
 
             ProcessoResumoDto dtoSeed = lista.stream()
-                    .filter(p -> p.getCodigo().equals(processoSeed.getCodigo()))
+                    .filter(p -> p.codigo().equals(processoSeed.getCodigo()))
                     .findFirst().orElseThrow();
 
             ProcessoResumoDto dtoRevisao = lista.stream()
-                    .filter(p -> p.getCodigo().equals(processoRevisao.getCodigo()))
+                    .filter(p -> p.codigo().equals(processoRevisao.getCodigo()))
                     .findFirst().orElseThrow();
 
             // Assert: Links devem corresponder aos seus IDs
-            assertThat(dtoSeed.getLinkDestino()).contains(processoSeed.getCodigo().toString());
-            assertThat(dtoRevisao.getLinkDestino()).contains(processoRevisao.getCodigo().toString());
+            assertThat(dtoSeed.linkDestino()).contains(processoSeed.getCodigo().toString());
+            assertThat(dtoRevisao.linkDestino()).contains(processoRevisao.getCodigo().toString());
 
             // Garantir que um não tem o ID do outro
-            assertThat(dtoRevisao.getLinkDestino()).doesNotContain(processoSeed.getCodigo().toString());
+            assertThat(dtoRevisao.linkDestino()).doesNotContain(processoSeed.getCodigo().toString());
         }
     }
 }

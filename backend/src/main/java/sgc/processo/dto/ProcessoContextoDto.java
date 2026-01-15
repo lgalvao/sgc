@@ -1,14 +1,14 @@
 package sgc.processo.dto;
 
 import lombok.Builder;
-import lombok.Getter;
 
 import java.util.List;
 
-@Getter
+/**
+ * DTO de resposta contendo o contexto completo de um processo.
+ */
 @Builder
-public class ProcessoContextoDto {
-
-    private final ProcessoDetalheDto processo;
-    private final List<SubprocessoElegivelDto> elegiveis;
-}
+public record ProcessoContextoDto(
+    ProcessoDetalheDto processo,
+    List<SubprocessoElegivelDto> elegiveis
+) {}

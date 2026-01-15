@@ -1,26 +1,24 @@
 package sgc.subprocesso.dto;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
 
-@Getter
+/**
+ * DTO de resposta contendo as permissões do usuário sobre um subprocesso.
+ */
 @Builder
-@ToString
-public class SubprocessoPermissoesDto {
-
-    private final boolean podeVerPagina;
-    private final boolean podeEditarMapa;
-    private final boolean podeVisualizarMapa;
-    private final boolean podeDisponibilizarMapa;
-    private final boolean podeDisponibilizarCadastro;
-    private final boolean podeDevolverCadastro;
-    private final boolean podeAceitarCadastro;
-    private final boolean podeVisualizarDiagnostico;
-    private final boolean podeAlterarDataLimite;
-    private final boolean podeVisualizarImpacto;
-    private final boolean podeRealizarAutoavaliacao;
-    private final boolean podeReabrirCadastro;
-    private final boolean podeReabrirRevisao;
-    private final boolean podeEnviarLembrete;
-}
+public record SubprocessoPermissoesDto(
+    boolean podeVerPagina,
+    boolean podeEditarMapa,
+    boolean podeVisualizarMapa,
+    boolean podeDisponibilizarMapa,
+    boolean podeDisponibilizarCadastro,
+    boolean podeDevolverCadastro,
+    boolean podeAceitarCadastro,
+    boolean podeVisualizarDiagnostico,
+    boolean podeAlterarDataLimite,
+    boolean podeVisualizarImpacto,
+    boolean podeRealizarAutoavaliacao,
+    boolean podeReabrirCadastro,
+    boolean podeReabrirRevisao,
+    boolean podeEnviarLembrete
+) {}

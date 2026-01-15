@@ -87,7 +87,7 @@ class SubprocessoCrudControllerTest {
         when(subprocessoFacade.criar(any())).thenReturn(dto);
 
         mockMvc.perform(post("/api/subprocessos").with(csrf()).contentType(MediaType.APPLICATION_JSON)
-                .content("{\"codProcesso\": 1}"))
+                .content("{\"codProcesso\": 1, \"codUnidade\": 10}"))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/subprocessos/1"));
     }

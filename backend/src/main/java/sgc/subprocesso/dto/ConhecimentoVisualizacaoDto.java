@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ConhecimentoVisualizacaoDto {
-
     private Long codigo;
     private String descricao;
 }
