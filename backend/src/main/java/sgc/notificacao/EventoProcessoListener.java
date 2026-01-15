@@ -3,6 +3,7 @@ package sgc.notificacao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaService;
@@ -26,7 +27,7 @@ import java.util.Map;
 import static sgc.organizacao.model.TipoUnidade.*;
 
 /**
- * Listener para eventos de processo.
+ * Listener assíncrono para eventos de processo.
  *
  * <p>Processa eventos de processo iniciado e finalizado, criando alertas e enviando e-mails para as unidades
  * participantes de forma diferenciada, conforme o tipo de unidade.
@@ -34,6 +35,9 @@ import static sgc.organizacao.model.TipoUnidade.*;
  * <p><strong>Pré-requisito:</strong> As invariantes de dados organizacionais são validadas na inicialização
  * do sistema pelo {@link sgc.organizacao.ValidadorDadosOrganizacionais}. Este listener assume que os dados
  * são válidos (toda unidade tem titular, todo titular tem email, etc.).
+ *
+ * <p><b>Fase 3 (ADR-002):</b> Tornado assíncrono para desacoplamento completo entre
+ * workflow de processo e comunicação/notificação.
  */
 @Component
 @RequiredArgsConstructor
@@ -55,9 +59,12 @@ public class EventoProcessoListener {
      * (Operacional, Intermediária, etc.), garantindo que cada participante receba instruções
      * relevantes para sua função.
      *
+     * <p>Executado de forma assíncrona para não bloquear a transação principal do workflow.
+     *
      * @param evento O evento contendo os detalhes do processo que foi iniciado.
      */
     @EventListener
+    @Async
     @Transactional
     public void aoIniciarProcesso(EventoProcessoIniciado evento) {
         try {
@@ -71,9 +78,12 @@ public class EventoProcessoListener {
      * Escuta e processa o evento {@link EventoProcessoFinalizado}, disparado quando um processo
      * é concluído.
      *
+     * <p>Executado de forma assíncrona para não bloquear a transação principal do workflow.
+     *
      * @param evento O evento contendo os detalhes do processo que foi finalizado.
      */
     @EventListener
+    @Async
     @Transactional
     public void aoFinalizarProcesso(EventoProcessoFinalizado evento) {
         try {
