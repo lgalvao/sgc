@@ -124,35 +124,49 @@ public class ArchConsistencyTest {
             })
             .because("Controllers e Services devem estar em pacotes @NullMarked para garantir null-safety");
 
+    /**
+     * Garante que Controllers usem apenas Facades, nunca services especializados.
+     * Isso força o padrão Facade (ADR-001) e garante encapsulamento adequado.
+     *
+     * <p><b>Implementado como parte da Fase 2 da proposta de arquitetura (ADR-006).</b>
+     *
+     * <p>Services especializados (que não são Facades) não devem ser acessados diretamente
+     * por Controllers. Toda interação deve passar pela Facade apropriada.
+     *
+     * <p><b>Nota:</b> Esta regra substitui verificações anteriores específicas por serviço,
+     * criando uma regra geral que se aplica a TODOS os services não-Facade.
+     *
+     * @see <a href="/proposta-arquitetura.md">Proposta de Arquitetura - Fase 2</a>
+     * @see <a href="/docs/adr/ADR-001-facade-pattern.md">ADR-001: Facade Pattern</a>
+     * @see <a href="/docs/adr/ADR-006-domain-aggregates-organization.md">ADR-006</a>
+     */
     @ArchTest
-    static final ArchRule controllers_should_only_use_facades_not_specialized_services = noClasses()
+    static final ArchRule controllers_should_only_use_facades_not_specialized_services = classes()
             .that()
             .haveNameMatching(".*Controller")
-            .should()
-            .dependOnClassesThat()
-            .haveNameMatching(".*MapaVisualizacaoService")
-            .orShould()
-            .dependOnClassesThat()
-            .haveNameMatching(".*ImpactoMapaService")
-            .orShould()
-            .dependOnClassesThat()
-            .haveNameMatching(".*MapaSalvamentoService")
-            .orShould()
-            .dependOnClassesThat()
-            .haveNameMatching(".*AtividadeService")
-            .orShould()
-            .dependOnClassesThat()
-            .haveNameMatching(".*CompetenciaService")
-            .orShould()
-            .dependOnClassesThat()
-            .haveNameMatching(".*ConhecimentoService")
-            .orShould()
-            .dependOnClassesThat()
-            .haveNameMatching(".*CopiaMapaService")
-            .orShould()
-            .dependOnClassesThat()
-            .haveNameMatching(".*Detector.*Service")
-            .because("Controllers should use Facades (e.g., MapaFacade, AtividadeFacade) instead of specialized services");
+            .should(new ArchCondition<JavaClass>("only depend on Facade services, not specialized services") {
+                @Override
+                public void check(JavaClass controller, ConditionEvents events) {
+                    for (Dependency dependency : controller.getDirectDependenciesFromSelf()) {
+                        JavaClass targetClass = dependency.getTargetClass();
+                        
+                        // Verifica se é um @Service
+                        boolean isService = targetClass.isAnnotatedWith(org.springframework.stereotype.Service.class);
+                        
+                        // Verifica se NÃO é um Facade
+                        boolean isNotFacade = !targetClass.getSimpleName().endsWith("Facade");
+                        
+                        if (isService && isNotFacade) {
+                            String message = String.format(
+                                    "Controller %s depends on specialized service %s. " +
+                                    "Controllers should only use Facades (ADR-001, ADR-006 Phase 2)",
+                                    controller.getSimpleName(), targetClass.getSimpleName());
+                            events.add(SimpleConditionEvent.violated(dependency, message));
+                        }
+                    }
+                }
+            })
+            .because("Controllers should only use Facades (ADR-001, ADR-006 Phase 2) - specialized services must be accessed through Facades");
 
     /**
      * Garante que todas as classes Facade tenham o sufixo "Facade" no nome.
