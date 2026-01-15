@@ -17,8 +17,8 @@ import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.decomposed.SubprocessoCrudService;
-import sgc.subprocesso.service.decomposed.SubprocessoDetalheService;
+import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.subprocesso.service.SubprocessoDetalheService;
 
 import java.util.Collections;
 import java.util.Optional;

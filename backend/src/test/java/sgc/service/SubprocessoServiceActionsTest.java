@@ -23,7 +23,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
 
 import java.util.List;
 import java.util.Optional;

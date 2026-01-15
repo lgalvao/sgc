@@ -1,4 +1,4 @@
-package sgc.subprocesso.service.decomposed;
+package sgc.subprocesso.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -29,6 +29,7 @@ import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.List;
 import java.util.Set;

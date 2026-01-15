@@ -13,8 +13,7 @@ import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.decomposed.SubprocessoCrudService;
-import sgc.subprocesso.service.decomposed.SubprocessoDetalheService;
+import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.List;
 

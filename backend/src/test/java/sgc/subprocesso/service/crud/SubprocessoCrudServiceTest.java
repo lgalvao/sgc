@@ -1,4 +1,4 @@
-package sgc.subprocesso.service.decomposed;
+package sgc.subprocesso.service.crud;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
