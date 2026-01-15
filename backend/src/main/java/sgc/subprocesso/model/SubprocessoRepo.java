@@ -55,4 +55,13 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
     boolean existsByProcessoCodigoAndUnidadeCodigoIn(Long processoCodigo, List<Long> unidadesCodigos);
 
     List<Subprocesso> findBySituacao(SituacaoSubprocesso situacao);
+
+    @Query("""
+            SELECT s FROM Subprocesso s
+            JOIN FETCH s.processo
+            JOIN FETCH s.unidade
+            LEFT JOIN FETCH s.mapa
+            WHERE s.situacao = :situacao
+            """)
+    List<Subprocesso> findBySituacaoWithFetch(@Param("situacao") SituacaoSubprocesso situacao);
 }

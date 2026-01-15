@@ -74,7 +74,8 @@ public class SubprocessoWorkflowService {
     }
 
     public List<Subprocesso> listarSubprocessosHomologados() {
-        return repositorioSubprocesso.findBySituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        // ⚡ Bolt: Usando query com FETCH JOIN para evitar problema de N+1 ao acessar Unidade e Processo
+        return repositorioSubprocesso.findBySituacaoWithFetch(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
     }
 
     public void reabrirCadastro(Long codigo, String justificativa) {

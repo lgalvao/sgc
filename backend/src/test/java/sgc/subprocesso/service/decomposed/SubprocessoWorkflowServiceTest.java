@@ -239,7 +239,7 @@ class SubprocessoWorkflowServiceTest {
     @DisplayName("Buscar subprocessos homologados")
     void buscarSubprocessosHomologados() {
         service.listarSubprocessosHomologados();
-        verify(repositorioSubprocesso).findBySituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        verify(repositorioSubprocesso).findBySituacaoWithFetch(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
     }
 
     @Test
