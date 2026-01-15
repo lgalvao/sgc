@@ -5,13 +5,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
 import sgc.notificacao.NotificacaoEmailAsyncExecutor;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
+import java.util.concurrent.Executor;
+
 @Configuration
-public class TestConfig {
+public class TestConfig implements AsyncConfigurer {
     @Bean
     public JavaMailSender javaMailSender() {
         return Mockito.mock(JavaMailSender.class);
@@ -27,5 +31,20 @@ public class TestConfig {
     @Profile({"test", "e2e", "secure-test"})
     public NotificacaoEmailAsyncExecutor notificacaoEmailAsyncExecutor() {
         return Mockito.mock(NotificacaoEmailAsyncExecutor.class);
+    }
+
+    /**
+     * Configuração para executar métodos @Async de forma síncrona em testes.
+     *
+     * <p>Isso permite que os testes verifiquem o comportamento dos listeners de eventos
+     * imediatamente após publicar eventos, sem precisar aguardar threads assíncronas.
+     *
+     * <p>Fase 3: Necessário após tornar listeners assíncronos com @Async.
+     */
+    @Override
+    @Bean(name = "taskExecutor")
+    @Profile({"test", "e2e", "secure-test"})
+    public Executor getAsyncExecutor() {
+        return new SyncTaskExecutor();
     }
 }
