@@ -195,6 +195,11 @@ public class AlertaService {
     public List<AlertaDto> listarAlertasPorUsuario(String usuarioTitulo) {
         Usuario usuario = usuarioService.buscarPorId(usuarioTitulo);
         Unidade lotacao = usuario.getUnidadeLotacao();
+
+        if (lotacao == null) {
+            return Collections.emptyList();
+        }
+
         List<Alerta> alertasUnidade = alertaRepo.findByUnidadeDestino_Codigo(lotacao.getCodigo());
 
         // Maps alerts to DTOs with read timestamps

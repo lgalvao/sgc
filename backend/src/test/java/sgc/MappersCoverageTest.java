@@ -18,8 +18,8 @@ class MappersCoverageTest {
     @Test
     @DisplayName("Deve cobrir nulos no UsuarioMapper")
     void deveCobrirNulosUsuarioMapper() {
-        assertThat(usuarioMapper.toUnidadeDto(null, true)).isNotNull();
-        assertThat(usuarioMapper.toUsuarioDto(null)).isNotNull();
+        assertThat(usuarioMapper.toUnidadeDto(null, true)).isNull();
+        assertThat(usuarioMapper.toUsuarioDto(null)).isNull();
         assertThat(usuarioMapper.toAtribuicaoTemporariaDto(null)).isNull();
     }
 

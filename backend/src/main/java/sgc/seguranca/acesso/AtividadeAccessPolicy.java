@@ -70,7 +70,16 @@ public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
             }
 
             Subprocesso subprocesso = mapa.getSubprocesso();
+            if (subprocesso == null) {
+                definirMotivoNegacao("Mapa não possui subprocesso associado");
+                return false;
+            }
+
             Unidade unidade = subprocesso.getUnidade();
+            if (unidade == null) {
+                definirMotivoNegacao("Subprocesso não possui unidade associada");
+                return false;
+            }
 
             String tituloTitular = unidade.getTituloTitular();
             if (!usuario.getTituloEleitoral().equals(tituloTitular)) {

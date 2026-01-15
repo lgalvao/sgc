@@ -11,6 +11,10 @@ import sgc.organizacao.model.Usuario;
 @Mapper(componentModel = "spring")
 public interface UsuarioMapper {
     default UnidadeDto toUnidadeDto(Unidade unidade, boolean isElegivel) {
+        if (unidade == null) {
+            return null;
+        }
+
         Unidade unidadeSuperior = unidade.getUnidadeSuperior();
 
         UnidadeDto dto = UnidadeDto.builder().build();
@@ -38,6 +42,10 @@ public interface UsuarioMapper {
      * @return O DTO de usuário.
      */
     default UsuarioDto toUsuarioDto(Usuario usuario) {
+        if (usuario == null) {
+            return null;
+        }
+
         return UsuarioDto.builder()
                 .nome(usuario.getNome())
                 .tituloEleitoral(usuario.getTituloEleitoral())
