@@ -30,4 +30,7 @@
  * @see sgc.subprocesso.eventos.EventoTransicaoSubprocesso
  * @since 1.0
  */
+@NullMarked
 package sgc.subprocesso.service.notificacao;
+
+import org.jspecify.annotations.NullMarked;

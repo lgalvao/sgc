@@ -25,4 +25,7 @@
  * @see sgc.subprocesso.model.Subprocesso
  * @since 1.0
  */
+@NullMarked
 package sgc.subprocesso.service.crud;
+
+import org.jspecify.annotations.NullMarked;
