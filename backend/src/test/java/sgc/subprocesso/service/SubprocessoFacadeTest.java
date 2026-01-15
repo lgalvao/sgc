@@ -12,10 +12,14 @@ import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
-import sgc.subprocesso.service.decomposed.SubprocessoCrudService;
-import sgc.subprocesso.service.decomposed.SubprocessoDetalheService;
-import sgc.subprocesso.service.decomposed.SubprocessoValidacaoService;
-import sgc.subprocesso.service.decomposed.SubprocessoWorkflowService;
+import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.subprocesso.service.detalhe.SubprocessoDetalheService;
+import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
+import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
+import sgc.subprocesso.service.contexto.SubprocessoContextoService;
+import sgc.subprocesso.service.mapa.SubprocessoMapaService;
 
 import java.util.Collections;
 

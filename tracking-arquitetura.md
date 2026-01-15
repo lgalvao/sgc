@@ -172,10 +172,42 @@ O teste detectou violações em vários controllers:
 - EventoMapaHomologado
 - Listeners assíncronos
 
-### Fase 4: Organização de Sub-pacotes
-- Criar sub-pacotes em subprocesso/service/
-- Mover services para sub-pacotes apropriados
-- Unificar decomposed/ com service/
+### ✅ Fase 4: Organização de Sub-pacotes - CONCLUÍDA
+**Status:** ✅ Concluída em 2026-01-17
+
+**Objetivo:** Reorganizar services em sub-pacotes lógicos, eliminando decomposed/
+
+**Implementação:**
+- ✅ Criados 8 sub-pacotes: workflow/, crud/, detalhe/, contexto/, mapa/, notificacao/, factory/, listener/
+- ✅ Movidos 12 services usando git mv (preservação de histórico)
+- ✅ Atualizado package declaration em todos os arquivos movidos
+- ✅ Atualizados TODOS os imports (main + test)
+- ✅ Removido diretório decomposed/
+- ✅ Criados package-info.java para todos os sub-pacotes
+- ✅ Atualizado package-info.java do pacote service/ principal
+- ✅ Compilação sem erros (backend:compileJava + backend:compileTestJava)
+- ✅ Todos os 200 testes passando (sgc.subprocesso.service.*)
+
+**Estrutura Final:**
+```
+service/
+├── SubprocessoFacade.java (public API)
+├── workflow/ (4 services - gerenciamento de workflow)
+├── crud/ (2 services - operações CRUD e validação)
+├── detalhe/ (1 service - consultas detalhadas)
+├── contexto/ (1 service - contexto operacional)
+├── mapa/ (1 service - operações de mapa)
+├── notificacao/ (1 service - envio de emails)
+├── factory/ (1 service - criação de entidades)
+└── listener/ (1 component - eventos)
+```
+
+**Métricas:**
+- Services reorganizados: 12
+- Package-info.java criados: 8
+- Imports atualizados: ~50+ arquivos
+- Testes executados: 200 (100% sucesso)
+- Tempo de compilação: ~60s
 
 ### Fase 5: Consolidar Services (13 → 6-7)
 - SubprocessoWorkflowService unificado
@@ -190,7 +222,7 @@ O teste detectou violações em vários controllers:
 
 ## 🎯 Status Geral
 
-**Progresso Total:** 40% (Fases 1 e 2 completas)
+**Progresso Total:** 60% (Fases 1, 2 e 4 completas)
 
 **Decisão Arquitetural Principal:** ArchUnit para encapsulamento (melhor que package-private)
 
@@ -224,6 +256,15 @@ O teste detectou violações em vários controllers:
 
 ## 📝 Log de Mudanças
 
+### 2026-01-17
+- ✅ Fase 4 concluída: Reorganização de sub-pacotes
+- ✅ Criados 8 sub-pacotes lógicos (workflow, crud, detalhe, etc.)
+- ✅ Movidos 12 services usando git mv (histórico preservado)
+- ✅ Eliminado diretório decomposed/
+- ✅ Atualizados ~50+ imports em todo o projeto
+- ✅ Criados 8 package-info.java documentando responsabilidades
+- ✅ Compilação e testes passando (200 testes)
+
 ### 2026-01-15
 
 #### Manhã
@@ -243,6 +284,6 @@ O teste detectou violações em vários controllers:
 
 ---
 
-**Última Atualização:** 2026-01-15 (Fase 2 concluída)  
+**Última Atualização:** 2026-01-17 (Fase 4 concluída)  
 **Responsável:** GitHub Copilot AI Agent
 

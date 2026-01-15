@@ -33,8 +33,8 @@ import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
-import sgc.subprocesso.service.SubprocessoContextoService;
+import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
+import sgc.subprocesso.service.contexto.SubprocessoContextoService;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.ArrayList;
@@ -74,11 +74,11 @@ class ControllersServicesCoverageTest {
     
     // Mocks adicionais para preencher construtores e evitar null
     @Mock private sgc.mapa.service.MapaVisualizacaoService mapaVisualizacaoService;
-    @Mock private sgc.subprocesso.service.SubprocessoMapaService subprocessoMapaService;
-    @Mock private sgc.subprocesso.service.SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
-    @Mock private sgc.subprocesso.service.decomposed.SubprocessoValidacaoService validacaoService;
+    @Mock private sgc.subprocesso.service.mapa.SubprocessoMapaService subprocessoMapaService;
+    @Mock private sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
+    @Mock private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
     @Mock private sgc.organizacao.UsuarioService usuarioService;
-    @Mock private sgc.subprocesso.service.SubprocessoTransicaoService transicaoService;
+    @Mock private sgc.subprocesso.service.workflow.SubprocessoTransicaoService transicaoService;
     @Mock private sgc.organizacao.UnidadeService unidadeService;
     @Mock private sgc.analise.AnaliseService analiseService;
     @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;

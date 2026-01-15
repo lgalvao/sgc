@@ -13,61 +13,56 @@
  *   <li>{@link sgc.subprocesso.service.SubprocessoFacade} - Ponto de entrada único para todas as operações de subprocesso</li>
  * </ul>
  * 
- * <h3>Workflow Services (Especializado)</h3>
+ * <h3>Workflow Services ({@link sgc.subprocesso.service.workflow})</h3>
  * <p><strong>Função:</strong> Gerenciar transições de estado (workflows)</p>
  * <ul>
- *   <li>{@code SubprocessoCadastroWorkflowService} - Workflow de cadastro de atividades
- *       <ul>
- *         <li>Disponibilizar cadastro/revisão</li>
- *         <li>Devolver, aceitar, homologar cadastro</li>
- *         <li>Operações em bloco</li>
- *       </ul>
- *   </li>
- *   <li>{@code SubprocessoMapaWorkflowService} - Workflow de mapa de competências
- *       <ul>
- *         <li>Editar mapa (adicionar/remover competências)</li>
- *         <li>Disponibilizar mapa para validação</li>
- *         <li>Apresentar sugestões, validar</li>
- *         <li>Devolver, aceitar, homologar validação</li>
- *         <li>Ajustar mapa pós-homologação</li>
- *       </ul>
- *   </li>
- *   <li>{@code SubprocessoTransicaoService} - Registra transições e executa workflows com análises
- *       <ul>
- *         <li>Salva movimentações (trilha de auditoria)</li>
- *         <li>Publica eventos de transição</li>
- *         <li>Executa workflows completos (análise + transição)</li>
- *         <li><em>Consolidado:</em> Absorveu funcionalidades do SubprocessoWorkflowExecutor (removido)</li>
- *       </ul>
- *   </li>
+ *   <li>{@link sgc.subprocesso.service.workflow.SubprocessoWorkflowService} - Operações genéricas de workflow</li>
+ *   <li>{@link sgc.subprocesso.service.workflow.SubprocessoTransicaoService} - Registra transições e executa workflows com análises</li>
+ *   <li>{@link sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService} - Workflow de cadastro de atividades</li>
+ *   <li>{@link sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService} - Workflow de mapa de competências</li>
  * </ul>
  * 
- * <h3>CRUD Services (Decomposed)</h3>
- * <p><strong>Função:</strong> Operações básicas de persistência (package-private)</p>
+ * <h3>CRUD Services ({@link sgc.subprocesso.service.crud})</h3>
+ * <p><strong>Função:</strong> Operações básicas de persistência</p>
  * <ul>
- *   <li>{@code SubprocessoCrudService} - CRUD básico (criar, atualizar, excluir, buscar)</li>
- *   <li>{@code SubprocessoDetalheService} - Montagem de DTOs detalhados</li>
- *   <li>{@code SubprocessoValidacaoService} - Validações de negócio</li>
- *   <li>{@code SubprocessoWorkflowService} - Operações genéricas de workflow</li>
+ *   <li>{@link sgc.subprocesso.service.crud.SubprocessoCrudService} - CRUD básico (criar, atualizar, excluir, buscar)</li>
+ *   <li>{@link sgc.subprocesso.service.crud.SubprocessoValidacaoService} - Validações de negócio</li>
  * </ul>
  * 
- * <h3>Support Services</h3>
- * <p><strong>Função:</strong> Serviços auxiliares especializados</p>
+ * <h3>Detalhe Services ({@link sgc.subprocesso.service.detalhe})</h3>
+ * <p><strong>Função:</strong> Consultas detalhadas e agregações</p>
  * <ul>
- *   <li>{@code SubprocessoContextoService} - Monta contexto de edição (subprocesso + mapa + atividades)</li>
- *   <li>{@code SubprocessoPermissaoCalculator} - Calcula permissões do usuário para um subprocesso</li>
- *   <li>{@code SubprocessoEmailService} - Envio de emails relacionados a subprocessos</li>
- *   <li>{@code SubprocessoMapaService} - Operações específicas de mapa dentro de subprocesso</li>
- *   <li>{@code SubprocessoFactory} - Factory para criação de subprocessos</li>
+ *   <li>{@link sgc.subprocesso.service.detalhe.SubprocessoDetalheService} - Montagem de DTOs detalhados</li>
  * </ul>
  * 
- * <h3>Services Decompostos (Subpacote)</h3>
- * <p>Localizado em {@link sgc.subprocesso.service.decomposed}</p>
+ * <h3>Contexto Services ({@link sgc.subprocesso.service.contexto})</h3>
+ * <p><strong>Função:</strong> Gerenciamento de contexto operacional</p>
  * <ul>
- *   <li>{@code SubprocessoCrudService} - Operações CRUD especializadas</li>
- *   <li>{@code SubprocessoDetalheService} - Montagem de DTOs detalhados</li>
- *   <li>{@code SubprocessoValidacaoService} - Validações de negócio</li>
- *   <li>{@code SubprocessoWorkflowService} - Operações de workflow (decomposed)</li>
+ *   <li>{@link sgc.subprocesso.service.contexto.SubprocessoContextoService} - Monta contexto de edição (subprocesso + mapa + atividades)</li>
+ * </ul>
+ * 
+ * <h3>Mapa Services ({@link sgc.subprocesso.service.mapa})</h3>
+ * <p><strong>Função:</strong> Operações de mapa de competências</p>
+ * <ul>
+ *   <li>{@link sgc.subprocesso.service.mapa.SubprocessoMapaService} - Operações específicas de mapa dentro de subprocesso</li>
+ * </ul>
+ * 
+ * <h3>Notificacao Services ({@link sgc.subprocesso.service.notificacao})</h3>
+ * <p><strong>Função:</strong> Envio de notificações</p>
+ * <ul>
+ *   <li>{@link sgc.subprocesso.service.notificacao.SubprocessoEmailService} - Envio de emails relacionados a subprocessos</li>
+ * </ul>
+ * 
+ * <h3>Factory ({@link sgc.subprocesso.service.factory})</h3>
+ * <p><strong>Função:</strong> Criação de entidades</p>
+ * <ul>
+ *   <li>{@link sgc.subprocesso.service.factory.SubprocessoFactory} - Factory para criação de subprocessos</li>
+ * </ul>
+ * 
+ * <h3>Listeners ({@link sgc.subprocesso.service.listener})</h3>
+ * <p><strong>Função:</strong> Processamento de eventos</p>
+ * <ul>
+ *   <li>{@link sgc.subprocesso.service.listener.SubprocessoComunicacaoListener} - Listener de eventos de comunicação</li>
  * </ul>
  * 
  * <h2>Fluxo de Uso</h2>
@@ -166,24 +161,23 @@
  *   <li><strong>Assíncrona:</strong> Via Spring Events (ex: EventoTransicaoEfetuada)</li>
  * </ul>
  * 
- * <h2>Oportunidades de Melhoria</h2>
- * <ul>
- *   <li>🎯 Consolidar SubprocessoCadastroWorkflowService + SubprocessoMapaWorkflowService → único WorkflowService</li>
- *   <li>🎯 Mover lógica de SubprocessoContextoService para SubprocessoFacade</li>
- *   <li>🎯 Tornar todos os services (exceto Facade) package-private</li>
- *   <li>🎯 Reduzir de 12 → ~6 services (50% redução)</li>
- * </ul>
- * 
  * <h2>Métricas Atuais</h2>
  * <ul>
- *   <li><strong>Services totais:</strong> 12</li>
+ *   <li><strong>Services totais:</strong> 12 (organizados em 8 sub-pacotes lógicos)</li>
  *   <li><strong>Linhas de código:</strong> ~2.200</li>
  *   <li><strong>Testes:</strong> 200+ testes (cobertura ~95%)</li>
- *   <li><strong>Visibilidade:</strong> Todos public (deveria ser package-private exceto Facade)</li>
+ *   <li><strong>Estrutura:</strong> Modularizada por responsabilidade funcional</li>
  * </ul>
  * 
  * @see sgc.subprocesso.service.SubprocessoFacade
- * @see sgc.subprocesso.service.decomposed
+ * @see sgc.subprocesso.service.workflow
+ * @see sgc.subprocesso.service.crud
+ * @see sgc.subprocesso.service.detalhe
+ * @see sgc.subprocesso.service.contexto
+ * @see sgc.subprocesso.service.mapa
+ * @see sgc.subprocesso.service.notificacao
+ * @see sgc.subprocesso.service.factory
+ * @see sgc.subprocesso.service.listener
  * @see sgc.seguranca.acesso.AccessControlService
  * @author Sistema SGC
  * @version 2.0
