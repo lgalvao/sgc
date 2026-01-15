@@ -1,4 +1,4 @@
-package sgc.subprocesso.service.decomposed;
+package sgc.subprocesso.service.crud;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;

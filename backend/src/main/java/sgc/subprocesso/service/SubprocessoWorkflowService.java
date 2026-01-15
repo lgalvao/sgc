@@ -1,4 +1,4 @@
-package sgc.subprocesso.service.decomposed;
+package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +10,7 @@ import sgc.organizacao.UnidadeService;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package sgc.subprocesso.service;
+package sgc.subprocesso.service.workflow;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -21,7 +21,7 @@ import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.decomposed.SubprocessoValidacaoService;
+import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
 import static sgc.seguranca.acesso.Acao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;

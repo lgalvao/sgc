@@ -1,4 +1,4 @@
-package sgc.subprocesso.service;
+package sgc.subprocesso.service.workflow;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

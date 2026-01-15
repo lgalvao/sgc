@@ -1,4 +1,4 @@
-package sgc.subprocesso.service;
+package sgc.subprocesso.service.factory;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;

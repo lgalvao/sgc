@@ -14,7 +14,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.service.SubprocessoFactory;
+import sgc.subprocesso.service.factory.SubprocessoFactory;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
