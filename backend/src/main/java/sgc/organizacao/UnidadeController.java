@@ -21,7 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UnidadeController {
     private final UnidadeFacade unidadeService;
-    private final sgc.processo.service.ProcessoConsultaService processoConsultaService;
+    private final sgc.processo.service.ProcessoFacade processoFacade;
 
     /**
      * Cria uma nova atribuição temporária para um usuário em uma unidade.
@@ -73,7 +73,7 @@ public class UnidadeController {
         TipoProcesso tipo = TipoProcesso.valueOf(tipoProcesso);
         boolean requerMapaVigente = tipo == TipoProcesso.REVISAO || tipo == TipoProcesso.DIAGNOSTICO;
         
-        java.util.Set<Long> bloqueadas = processoConsultaService.buscarIdsUnidadesEmProcessosAtivos(codProcesso);
+        java.util.Set<Long> bloqueadas = processoFacade.buscarIdsUnidadesEmProcessosAtivos(codProcesso);
         
         List<UnidadeDto> arvore = unidadeService.buscarArvoreComElegibilidade(requerMapaVigente, bloqueadas);
 
