@@ -337,7 +337,7 @@ describe("CadAtividades.vue", () => {
         await flushPromises();
 
         // Change state
-        subprocessosStore.subprocessoDetalhe!.situacao = SituacaoSubprocesso.AGUARDANDO_ANALISE_CADASTRO;
+        subprocessosStore.subprocessoDetalhe!.situacao = SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
 
         await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
         await flushPromises();
@@ -445,7 +445,6 @@ describe("CadAtividades.vue", () => {
         await flushPromises();
         expect((wrapper.vm as any).mostrarModalImpacto).toBe(true);
 
-        const modal = wrapper.findComponent({name: 'ImpactoMapaModal'}); // Using name if component is stubbed with true or partial
         // Since we stubbed with ImpactoMapaModal: true, it renders <impacto-mapa-modal-stub>
         // We can find it by component definition or name if we knew it.
         // Actually, let's just trigger the close event on the stub if possible or check variable

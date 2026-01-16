@@ -2,6 +2,7 @@ import {createPinia, setActivePinia} from "pinia";
 import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from "vitest";
 import router from "@/router";
 import {useFeedbackStore} from "@/stores/feedback";
+import {logger} from "@/utils";
 
 // Hoist mock instance so it's shared between module and test
 const {mockInstance} = vi.hoisted(() => {
@@ -23,9 +24,22 @@ const {mockInstance} = vi.hoisted(() => {
 // Mock router
 vi.mock("@/router", () => ({
     default: {
-        push: vi.fn(),
+        push: vi.fn().mockResolvedValue(undefined),
     },
 }));
+
+// Mock logger
+vi.mock("@/utils", async (importOriginal) => {
+    const actual = await importOriginal<any>();
+    return {
+        ...actual,
+        logger: {
+            error: vi.fn(),
+            warn: vi.fn(),
+            info: vi.fn(),
+        }
+    }
+});
 
 // Mock axios
 vi.mock("axios", async (importOriginal) => {
@@ -173,13 +187,11 @@ describe("axios-setup", () => {
         vi.spyOn(feedbackStore, "show").mockImplementation(() => {
             throw new Error("Store error");
         });
-        const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {
-        });
 
         const error = new Error("Generic failure");
 
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
 
-        expect(consoleSpy).toHaveBeenCalledWith("Erro ao exibir notificação:", expect.any(Error));
+        expect(logger.error).toHaveBeenCalledWith("Erro ao exibir notificação:", expect.any(Error));
     });
 });

@@ -70,7 +70,7 @@ export function mapImpactoMapaDtoToModel(dto: any): ImpactoMapa {
                 codigo: c.codigo,
                 descricao: c.descricao,
                 atividadesAfetadas: c.atividadesAfetadas || [],
-                tipoImpacto: c.tipoImpacto,
+                tiposImpacto: c.tipoImpacto,
             }),
         ),
     };

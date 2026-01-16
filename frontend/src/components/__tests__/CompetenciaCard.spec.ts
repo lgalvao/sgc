@@ -11,6 +11,9 @@ const stubs = {
   BCardBody: {
     template: '<div class="card-body"><slot /></div>',
   },
+  BCardHeader: {
+    template: '<div class="card-header"><slot /></div>',
+  },
   BButton: {
     props: ['title', 'variant'],
     template: '<button :title="title" :class="variant" @click="$emit(\'click\')"><slot /></button>',
@@ -34,6 +37,7 @@ describe("CompetenciaCard.vue", () => {
       props: {
         competencia: mockCompetencia,
         atividades: mockAtividades,
+        podeEditar: true,
       },
       global: {stubs, directives: {"b-tooltip": {}}},
     });
@@ -46,6 +50,7 @@ describe("CompetenciaCard.vue", () => {
       props: {
         competencia: mockCompetencia,
         atividades: mockAtividades,
+        podeEditar: true,
       },
       global: {stubs, directives: {"b-tooltip": {}}},
     });
@@ -59,6 +64,7 @@ describe("CompetenciaCard.vue", () => {
       props: {
         competencia: mockCompetencia,
         atividades: mockAtividades,
+        podeEditar: true,
       },
       global: {stubs, directives: {"b-tooltip": {}}},
     });
@@ -73,6 +79,7 @@ describe("CompetenciaCard.vue", () => {
       props: {
         competencia: mockCompetencia,
         atividades: mockAtividades,
+        podeEditar: true,
       },
       global: {stubs, directives: {"b-tooltip": {}}},
     });
@@ -87,6 +94,7 @@ describe("CompetenciaCard.vue", () => {
       props: {
         competencia: mockCompetencia,
         atividades: mockAtividades,
+        podeEditar: true,
       },
       global: {stubs, directives: {"b-tooltip": {}}},
     });
