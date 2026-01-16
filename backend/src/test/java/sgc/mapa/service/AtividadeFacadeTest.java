@@ -10,7 +10,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.AtualizarAtividadeRequest;
+import sgc.mapa.dto.AtualizarConhecimentoRequest;
 import sgc.mapa.dto.ConhecimentoDto;
+import sgc.mapa.dto.CriarAtividadeRequest;
+import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
@@ -62,8 +66,9 @@ class AtividadeFacadeTest {
     @Test
     @DisplayName("Deve criar atividade e retornar status")
     void deveCriarAtividade() {
-        AtividadeDto request = AtividadeDto.builder()
+        CriarAtividadeRequest request = CriarAtividadeRequest.builder()
                 .mapaCodigo(1L)
+                .descricao("Teste")
                 .build();
         // Facade calls: criar -> (returns dto)
         AtividadeDto created = AtividadeDto.builder()
@@ -112,7 +117,9 @@ class AtividadeFacadeTest {
     @DisplayName("Deve atualizar atividade e retornar status")
     void deveAtualizarAtividade() {
         Long codigo = 100L;
-        AtividadeDto request = AtividadeDto.builder().build();
+        AtualizarAtividadeRequest request = AtualizarAtividadeRequest.builder()
+                .descricao("Nova descrição")
+                .build();
 
         Atividade atividadeEntity = new Atividade();
         atividadeEntity.setCodigo(codigo);
@@ -188,7 +195,10 @@ class AtividadeFacadeTest {
     @DisplayName("Deve criar conhecimento e retornar status")
     void deveCriarConhecimento() {
         Long codigoAtividade = 100L;
-        ConhecimentoDto dto = ConhecimentoDto.builder().build();
+        CriarConhecimentoRequest request = CriarConhecimentoRequest.builder()
+                .atividadeCodigo(codigoAtividade)
+                .descricao("Teste")
+                .build();
         ConhecimentoDto salvo = ConhecimentoDto.builder()
                 .codigo(200L)
                 .build();
@@ -207,7 +217,7 @@ class AtividadeFacadeTest {
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
         doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());
 
-        when(conhecimentoService.criar(codigoAtividade, dto)).thenReturn(salvo);
+        when(conhecimentoService.criar(codigoAtividade, request)).thenReturn(salvo);
 
         // Mocks for creating response
         when(atividadeService.obterPorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
@@ -220,7 +230,7 @@ class AtividadeFacadeTest {
         vis.setCodigo(codigoAtividade);
         when(subprocessoFacade.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
-        ResultadoOperacaoConhecimento resultado = facade.criarConhecimento(codigoAtividade, dto);
+        ResultadoOperacaoConhecimento resultado = facade.criarConhecimento(codigoAtividade, request);
 
         assertThat(resultado.getNovoConhecimentoId()).isEqualTo(200L);
         assertThat(resultado.getResponse().getAtividade()).isNotNull();
@@ -232,7 +242,9 @@ class AtividadeFacadeTest {
     void deveAtualizarConhecimento() {
         Long codigoAtividade = 100L;
         Long codigoConhecimento = 200L;
-        ConhecimentoDto dto = ConhecimentoDto.builder().build();
+        AtualizarConhecimentoRequest request = AtualizarConhecimentoRequest.builder()
+                .descricao("Nova descrição")
+                .build();
 
         Atividade atividadeEntity = new Atividade();
         atividadeEntity.setCodigo(codigoAtividade);
@@ -259,9 +271,9 @@ class AtividadeFacadeTest {
         vis.setCodigo(codigoAtividade);
         when(subprocessoFacade.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
-        AtividadeOperacaoResponse response = facade.atualizarConhecimento(codigoAtividade, codigoConhecimento, dto);
+        AtividadeOperacaoResponse response = facade.atualizarConhecimento(codigoAtividade, codigoConhecimento, request);
 
-        verify(conhecimentoService).atualizar(codigoAtividade, codigoConhecimento, dto);
+        verify(conhecimentoService).atualizar(codigoAtividade, codigoConhecimento, request);
         assertThat(response.getAtividade()).isNotNull();
         assertThat(response.getAtividade().getCodigo()).isEqualTo(codigoAtividade);
     }

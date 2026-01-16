@@ -50,6 +50,19 @@ public class ConhecimentoService {
     }
 
     /**
+     * Lista conhecimentos como Response.
+     */
+    @Transactional(readOnly = true)
+    public List<sgc.mapa.dto.ConhecimentoResponse> listarPorAtividadeResponse(Long codAtividade) {
+        if (!atividadeRepo.existsById(codAtividade)) {
+            throw new ErroEntidadeNaoEncontrada("Atividade", codAtividade);
+        }
+        return conhecimentoRepo.findByAtividadeCodigo(codAtividade).stream()
+                .map(conhecimentoMapper::toResponse)
+                .toList();
+    }
+
+    /**
      * Lista conhecimentos de uma atividade (Entidades).
      */
     @Transactional(readOnly = true)
@@ -85,6 +98,18 @@ public class ConhecimentoService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codAtividade));
     }
 
+    public ConhecimentoDto criar(Long codAtividade, sgc.mapa.dto.CriarConhecimentoRequest request) {
+        return atividadeRepo.findById(codAtividade)
+                .map(atividade -> {
+                    notificarAlteracaoMapa(atividade.getMapa().getCodigo());
+                    var conhecimento = conhecimentoMapper.toEntity(request);
+                    conhecimento.setAtividade(atividade);
+                    var salvo = conhecimentoRepo.save(conhecimento);
+                    return conhecimentoMapper.toDto(salvo);
+                })
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codAtividade));
+    }
+
     /**
      * Atualiza um conhecimento existente, verificando se ele pertence à atividade especificada.
      *
@@ -99,6 +124,21 @@ public class ConhecimentoService {
                 .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
                 .map(existente -> atualizarExistente(conhecimentoDto, existente))
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento));
+    }
+
+    public void atualizar(Long codAtividade, Long codConhecimento, sgc.mapa.dto.AtualizarConhecimentoRequest request) {
+        conhecimentoRepo.findById(codConhecimento)
+                .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
+                .ifPresentOrElse(
+                        existente -> {
+                            notificarAlteracaoMapa(existente.getAtividade().getMapa().getCodigo());
+                            var paraAtualizar = conhecimentoMapper.toEntity(request);
+                            existente.setDescricao(paraAtualizar.getDescricao());
+                            conhecimentoRepo.save(existente);
+                        },
+                        () -> {
+                            throw new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento);
+                        });
     }
 
     private ConhecimentoDto atualizarExistente(ConhecimentoDto dto, Conhecimento existente) {

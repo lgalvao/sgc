@@ -8,7 +8,11 @@ import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 /**
  * DTO para Atividade usado nas APIs (entrada/saída).
+ * 
+ * @deprecated Use {@link CriarAtividadeRequest}, {@link AtualizarAtividadeRequest} ou {@link AtividadeResponse} 
+ * dependendo do contexto. Este DTO será removido após migração completa.
  */
+@Deprecated(since = "2026-01-17", forRemoval = true)
 @Getter
 @Builder
 @AllArgsConstructor

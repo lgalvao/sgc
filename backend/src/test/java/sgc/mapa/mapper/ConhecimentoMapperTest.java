@@ -108,7 +108,7 @@ class ConhecimentoMapperTest {
         @Test
         @DisplayName("Deve retornar null quando DTO é null")
         void deveRetornarNullQuandoDtoNull() {
-            assertThat(mapper.toEntity(null)).isNull();
+            assertThat(mapper.toEntity((ConhecimentoDto) null)).isNull();
         }
     }
 }
