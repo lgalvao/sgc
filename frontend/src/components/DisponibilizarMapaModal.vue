@@ -55,6 +55,7 @@
     </BAlert>
     <template #footer>
       <BButton
+          :disabled="loading"
           data-testid="btn-disponibilizar-mapa-cancelar"
           variant="secondary"
           @click="fechar"
@@ -62,12 +63,18 @@
         Cancelar
       </BButton>
       <BButton
-          :disabled="!dataLimiteValidacao"
+          :disabled="!dataLimiteValidacao || loading"
           data-testid="btn-disponibilizar-mapa-confirmar"
           variant="success"
           @click="disponibilizar"
       >
-        Disponibilizar
+        <span
+            v-if="loading"
+            aria-hidden="true"
+            class="spinner-border spinner-border-sm me-1"
+            role="status"
+        />
+        {{ loading ? 'Disponibilizando...' : 'Disponibilizar' }}
       </BButton>
     </template>
   </BModal>
@@ -80,6 +87,7 @@ import {ref, watch} from "vue";
 const props = defineProps<{
   mostrar: boolean;
   notificacao?: string;
+  loading?: boolean;
   fieldErrors?: {
     dataLimite?: string;
     observacoes?: string;

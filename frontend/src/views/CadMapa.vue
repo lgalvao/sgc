@@ -101,6 +101,7 @@
 
     <DisponibilizarMapaModal
         :field-errors="fieldErrors"
+        :loading="loadingDisponibilizacao"
         :mostrar="mostrarModalDisponibilizar"
         :notificacao="notificacaoDisponibilizacao"
         @disponibilizar="disponibilizarMapa"
@@ -228,6 +229,7 @@ const mostrarModalDisponibilizar = ref(false);
 const mostrarModalExcluirCompetencia = ref(false);
 const competenciaParaExcluir = ref<Competencia | null>(null);
 const notificacaoDisponibilizacao = ref("");
+const loadingDisponibilizacao = ref(false);
 
 const {errors: fieldErrors, setFromNormalizedError, clearErrors} = useFormErrors([
   'descricao',
@@ -348,6 +350,7 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
 async function disponibilizarMapa(payload: { dataLimite: string; observacoes: string }) {
   if (!codSubprocesso.value) return;
   mapasStore.clearError();
+  loadingDisponibilizacao.value = true;
 
   try {
     await mapasStore.disponibilizarMapa(codSubprocesso.value, payload);
@@ -355,6 +358,8 @@ async function disponibilizarMapa(payload: { dataLimite: string; observacoes: st
     await router.push({name: "Painel"});
   } catch {
     handleErrors(mapasStore);
+  } finally {
+    loadingDisponibilizacao.value = false;
   }
 }
 
