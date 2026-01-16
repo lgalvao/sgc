@@ -34,7 +34,6 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
-import sgc.subprocesso.service.SubprocessoContextoService;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.ArrayList;
@@ -54,8 +53,6 @@ import static org.mockito.Mockito.when;
 class ControllersServicesCoverageTest {
     @Mock
     private SubprocessoFacade subprocessoFacade;
-    @Mock
-    private SubprocessoContextoService subprocessoContextoService;
     @Mock
     private MapaRepo mapaRepo;
     @Mock
