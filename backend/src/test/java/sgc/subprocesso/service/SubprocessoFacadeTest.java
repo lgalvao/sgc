@@ -38,7 +38,6 @@ class SubprocessoFacadeTest {
     @Mock private SubprocessoCrudService crudService;
     @Mock private SubprocessoValidacaoService validacaoService;
     @Mock private SubprocessoWorkflowService workflowService;
-    @Mock private SubprocessoMapaService mapaService;
     @Mock private UsuarioFacade usuarioService;
     @Mock private MapaFacade mapaFacade;
     @Mock private AtividadeService atividadeService;
@@ -50,6 +49,10 @@ class SubprocessoFacadeTest {
     @Mock private ConhecimentoService conhecimentoService;
     @Mock private MapaAjusteMapper mapaAjusteMapper;
     @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
+    @Mock private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    @Mock private sgc.subprocesso.model.SubprocessoMovimentacaoRepo movimentacaoRepo;
+    @Mock private sgc.mapa.service.CopiaMapaService copiaMapaService;
+    @Mock private sgc.mapa.mapper.AtividadeMapper atividadeMapper;
 
     @InjectMocks
     private SubprocessoFacade facade;
@@ -76,9 +79,6 @@ class SubprocessoFacadeTest {
 
     @Test
     void deveDelegarOutrosServicos() {
-        facade.importarAtividades(1L, 2L);
-        verify(mapaService).importarAtividades(1L, 2L);
-        
         facade.buscarSubprocessoComMapa(1L);
         verify(crudService).buscarSubprocessoComMapa(1L);
         
@@ -120,8 +120,5 @@ class SubprocessoFacadeTest {
         
         facade.alterarDataLimite(1L, java.time.LocalDate.now());
         verify(workflowService).alterarDataLimite(1L, java.time.LocalDate.now());
-        
-        facade.salvarAjustesMapa(1L, Collections.emptyList(), "t");
-        verify(mapaService).salvarAjustesMapa(1L, Collections.emptyList(), "t");
     }
 }

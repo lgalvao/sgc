@@ -71,7 +71,6 @@ class ControllersServicesCoverageTest {
     
     // Mocks adicionais para preencher construtores e evitar null
     @Mock private sgc.mapa.service.MapaVisualizacaoService mapaVisualizacaoService;
-    @Mock private sgc.subprocesso.service.SubprocessoMapaService subprocessoMapaService;
     @Mock private sgc.subprocesso.service.workflow.SubprocessoWorkflowService subprocessoWorkflowService;
     @Mock private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
     @Mock private sgc.organizacao.UsuarioFacade usuarioService;

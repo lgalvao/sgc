@@ -45,7 +45,6 @@
  * 
  * <h4>📁 service/ (raiz) - Services de Suporte</h4>
  * <ul>
- *   <li>{@code SubprocessoMapaService} - Operações específicas de mapa</li>
  *   <li>{@code SubprocessoWorkflowService} - Operações genéricas de workflow</li>
  * </ul>
  * 
@@ -179,7 +178,7 @@
  * 
  * <h2>Métricas Atuais (Pós-Fase 4)</h2>
  * <ul>
- *   <li><strong>Services totais:</strong> 11 (reduzido de 13 após Fase 5 Step 2-3)</li>
+ *   <li><strong>Services totais:</strong> 10 (reduzido de 13 após Fase 5 Step 2-4)</li>
  *   <li><strong>Sub-pacotes criados:</strong> 4 (workflow, crud, notificacao, factory)</li>
  *   <li><strong>Linhas de código:</strong> ~2.500</li>
  *   <li><strong>Testes:</strong> 281 testes (100% passando)</li>

@@ -49,8 +49,6 @@ class SubprocessoFacadeTest2 {
     @Mock
     private SubprocessoWorkflowService workflowService;
     @Mock
-    private SubprocessoMapaService mapaService;
-    @Mock
     private MapaFacade mapaFacade;
     @Mock
     private AtividadeService atividadeService;
@@ -70,6 +68,14 @@ class SubprocessoFacadeTest2 {
     private MapaAjusteMapper mapaAjusteMapper;
     @Mock
     private sgc.seguranca.acesso.AccessControlService accessControlService;
+    @Mock
+    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    @Mock
+    private sgc.subprocesso.model.SubprocessoMovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private sgc.mapa.service.CopiaMapaService copiaMapaService;
+    @Mock
+    private sgc.mapa.mapper.AtividadeMapper atividadeMapper;
 
     @InjectMocks
     private SubprocessoFacade subprocessoFacade;
