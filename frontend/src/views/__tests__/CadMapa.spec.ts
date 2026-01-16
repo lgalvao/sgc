@@ -262,7 +262,10 @@ describe("CadMapa.vue", () => {
             props: ['modelValue', 'titulo', 'mensagem'],
             template: '<div v-if="modelValue" data-testid="mdl-excluir-competencia"><slot /></div>',
             emits: ['update:modelValue', 'confirmar']
-        }
+        },
+        EmptyState: {
+            template: '<div data-testid="empty-state"><slot /></div>',
+        },
     };
 
     function createWrapper(customState = {}) {
@@ -333,14 +336,14 @@ describe("CadMapa.vue", () => {
         ).mockResolvedValue({codigo: 123} as any);
 
         vi.mocked(subprocessoService.buscarSubprocessoDetalhe).mockResolvedValue({
-            permissoes: {podeVisualizarImpacto: true},
+            permissoes: {podeVisualizarImpacto: true, podeEditarMapa: true, podeDisponibilizarMapa: true},
         } as any);
 
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
             subprocesso: {
                 situacao: 'EM_ANDAMENTO',
                 situacaoLabel: 'Em Andamento',
-                permissoes: { podeVisualizarImpacto: true }
+                permissoes: { podeVisualizarImpacto: true, podeEditarMapa: true, podeDisponibilizarMapa: true }
             },
             mapa: mockMapaCompleto,
             atividades: mockAtividades,
@@ -377,6 +380,26 @@ describe("CadMapa.vue", () => {
 
         expect(wrapper.text()).toContain("TESTE - Teste");
         expect(wrapper.text()).toContain("Competencia A");
+    });
+
+    it("deve mostrar empty state quando não houver competências", async () => {
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+            subprocesso: {
+                situacao: 'EM_ANDAMENTO',
+                situacaoLabel: 'Em Andamento',
+                permissoes: { podeEditarMapa: true, podeVisualizarImpacto: true }
+            },
+            mapa: { ...mockMapaCompleto, competencias: [] },
+            atividades: mockAtividades,
+            unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
+        } as any);
+
+        const {wrapper} = createWrapper();
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-abrir-criar-competencia-empty"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-abrir-criar-competencia"]').exists()).toBe(false);
     });
 
     it("deve abrir modal e criar nova competência", async () => {
