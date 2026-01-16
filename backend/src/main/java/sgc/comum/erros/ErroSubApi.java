@@ -1,7 +1,7 @@
 package sgc.comum.erros;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 /**
  * Representa um erro específico de validação dentro de uma estrutura de erro de API.
@@ -14,11 +14,11 @@ import lombok.Data;
  *
  * @see ErroApi
  */
-@Data
+@Getter
 @AllArgsConstructor
 public class ErroSubApi {
 
-    private String object;
-    private String field;
-    private String message;
+    private final String object;
+    private final String field;
+    private final String message;
 }

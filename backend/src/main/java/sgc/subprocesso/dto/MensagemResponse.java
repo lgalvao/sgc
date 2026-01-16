@@ -2,8 +2,7 @@ package sgc.subprocesso.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 /**
  * DTO de resposta genérica contendo uma mensagem de confirmação.
@@ -11,11 +10,10 @@ import lombok.NoArgsConstructor;
  * <p>Usado para retornar mensagens simples de sucesso em operações que não
  * precisam retornar dados específicos.
  */
-@Data
+@Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class MensagemResponse {
 
-    private String message;
+    private final String message;
 }

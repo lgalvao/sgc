@@ -95,11 +95,12 @@ public class ProcessoInicializador {
 
         // Publicar evento
         publicadorEventos.publishEvent(
-                new EventoProcessoIniciado(
-                        processo.getCodigo(),
-                        processo.getTipo().name(),
-                        LocalDateTime.now(),
-                        codigosUnidades));
+                EventoProcessoIniciado.builder()
+                        .codProcesso(processo.getCodigo())
+                        .tipo(processo.getTipo().name())
+                        .dataHoraInicio(LocalDateTime.now())
+                        .codUnidades(codigosUnidades)
+                        .build());
 
         log.info("Processo de {} {} iniciado para {} unidade(s).",
                 tipo.name().toLowerCase(), codigo, codigosUnidades.size());

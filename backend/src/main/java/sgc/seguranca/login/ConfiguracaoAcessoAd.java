@@ -20,7 +20,7 @@ public class ConfiguracaoAcessoAd {
     @Bean
     public RestClient acessoAdRestClient() {
         return RestClient.builder()
-                .baseUrl(properties.getBaseUrl())
+                .baseUrl(properties.baseUrl())
                 .build();
     }
 }

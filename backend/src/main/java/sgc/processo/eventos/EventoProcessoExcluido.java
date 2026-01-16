@@ -1,7 +1,7 @@
 package sgc.processo.eventos;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
 
@@ -45,7 +45,7 @@ import java.util.Set;
  * @see EventoProcessoCriado
  * @see EventoProcessoAtualizado
  */
-@Data
+@Getter
 @Builder
 public class EventoProcessoExcluido {
 

@@ -2,19 +2,25 @@ package sgc.mapa.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 /**
  * DTO que representa uma competência no contexto do mapa completo. Contém os dados da competência e
  * os códigos das atividades vinculadas.
+ * 
+ * <p>Requer @NoArgsConstructor e @Setter para deserialização Jackson em endpoints de entrada.
  */
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class CompetenciaMapaDto {
 
     /**
@@ -33,10 +39,4 @@ public class CompetenciaMapaDto {
      */
     @NotNull(message = "Lista de atividades não pode ser nula")
     private List<Long> atividadesCodigos;
-
-    public CompetenciaMapaDto(Long codigo, String descricao, List<Long> atividadesCodigos) {
-        this.codigo = codigo;
-        this.descricao = descricao;
-        this.atividadesCodigos = atividadesCodigos;
-    }
 }

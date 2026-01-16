@@ -39,7 +39,7 @@ class GerenciadorJwtTest {
     @Test
     @DisplayName("Deve inicializar com sucesso se segredo seguro em produção")
     void initSecureProd() {
-        when(jwtProperties.getSecret()).thenReturn(SECURE_SECRET);
+        when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
         assertThatCode(() -> gerenciador.verificarSegurancaChave())
                 .doesNotThrowAnyException();
     }
@@ -47,7 +47,7 @@ class GerenciadorJwtTest {
     @Test
     @DisplayName("Deve alertar (warn) se segredo padrão em ambiente de teste")
     void warnDefaultTest() {
-        when(jwtProperties.getSecret()).thenReturn(DEFAULT_SECRET);
+        when(jwtProperties.secret()).thenReturn(DEFAULT_SECRET);
         // Correctly match the Profiles.of argument using an ArgumentMatcher
         when(environment.acceptsProfiles(any(Profiles.class))).thenReturn(true);
 
@@ -58,7 +58,7 @@ class GerenciadorJwtTest {
     @Test
     @DisplayName("Deve falhar se segredo padrão em produção")
     void failDefaultProd() {
-        when(jwtProperties.getSecret()).thenReturn(DEFAULT_SECRET);
+        when(jwtProperties.secret()).thenReturn(DEFAULT_SECRET);
         when(environment.acceptsProfiles(any(Profiles.class))).thenReturn(false);
 
         assertThatThrownBy(() -> gerenciador.verificarSegurancaChave())
@@ -69,8 +69,8 @@ class GerenciadorJwtTest {
     @Test
     @DisplayName("Deve falhar se segredo muito curto")
     void failShortSecret() {
-        // Mock getSecret calls in verification and generation
-        when(jwtProperties.getSecret()).thenReturn(DEFAULT_SECRET_SHORT);
+        // Mock secret() calls in verification and generation
+        when(jwtProperties.secret()).thenReturn(DEFAULT_SECRET_SHORT);
 
         // init check doesn't check length, only equality to default.
         // length check happens on signing key generation which happens on usage.
@@ -83,8 +83,8 @@ class GerenciadorJwtTest {
     @Test
     @DisplayName("Deve validar token com sucesso")
     void validateSuccess() {
-        when(jwtProperties.getSecret()).thenReturn(SECURE_SECRET);
-        when(jwtProperties.getExpiracaoMinutos()).thenReturn(60);
+        when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
+        when(jwtProperties.expiracaoMinutos()).thenReturn(60);
 
         String token = gerenciador.gerarToken("123", Perfil.ADMIN, 1L);
 
@@ -99,7 +99,7 @@ class GerenciadorJwtTest {
     @Test
     @DisplayName("Deve retornar empty para token inválido")
     void validateInvalid() {
-        when(jwtProperties.getSecret()).thenReturn(SECURE_SECRET);
+        when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
         Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken("invalid.token.here");
         assertThat(result).isEmpty();
     }
@@ -107,7 +107,7 @@ class GerenciadorJwtTest {
     @Test
     @DisplayName("Deve retornar empty para token com claims faltando (simulado)")
     void validateMissingClaims() {
-        when(jwtProperties.getSecret()).thenReturn(SECURE_SECRET);
+        when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
 
         // Gerar token "mal formado" (business logic wise) mas valido (crypto wise)
         String token = io.jsonwebtoken.Jwts.builder()

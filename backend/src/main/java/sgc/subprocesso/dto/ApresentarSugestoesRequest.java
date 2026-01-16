@@ -3,8 +3,7 @@ package sgc.subprocesso.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 /**
@@ -12,9 +11,8 @@ import sgc.seguranca.sanitizacao.SanitizarHtml;
  * Usado pelo CHEFE da
  * unidade para fornecer feedback sobre o mapa disponibilizado.
  */
-@Data
+@Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class ApresentarSugestoesRequest {
     /**
@@ -22,5 +20,5 @@ public class ApresentarSugestoesRequest {
      */
     @NotBlank(message = "As sugestões são obrigatórias")
     @SanitizarHtml
-    private String sugestoes;
+    private final String sugestoes;
 }

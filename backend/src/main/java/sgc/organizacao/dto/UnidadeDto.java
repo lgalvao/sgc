@@ -1,19 +1,24 @@
 package sgc.organizacao.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 /**
  * DTO para dados de unidade do SGRH. Suporta estrutura hierárquica com subunidades.
+ * 
+ * <p>Requer @NoArgsConstructor e @Setter para uso em mappers e construção de árvore.
  */
-@Data
+@Getter
+@Setter
 @Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor
 public class UnidadeDto {
 
     private Long codigo;

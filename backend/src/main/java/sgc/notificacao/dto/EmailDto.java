@@ -2,37 +2,35 @@ package sgc.notificacao.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 /**
  * DTO para envio de e-mails.
  */
-@Data
+@Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class EmailDto {
 
     /**
      * Endereço de e-mail do destinatário.
      */
-    private String destinatario;
+    private final String destinatario;
 
     /**
      * Assunto do e-mail.
      */
-    private String assunto;
+    private final String assunto;
 
     /**
      * Conteúdo do e-mail (texto ou HTML).
      */
-    private String corpo;
+    private final String corpo;
 
     /**
      * Se true, o corpo será tratado como HTML; se false, como texto simples.
      */
-    private boolean html;
+    private final boolean html;
 
     /**
      * Construtor para e-mails de texto simples.

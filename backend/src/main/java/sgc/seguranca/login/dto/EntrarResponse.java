@@ -2,21 +2,19 @@ package sgc.seguranca.login.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 import sgc.organizacao.model.Perfil;
 
 /**
  * DTO para resposta de login.
  */
-@Data
+@Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class EntrarResponse {
-    private String tituloEleitoral;
-    private String nome;
-    private Perfil perfil;
-    private Long unidadeCodigo;
-    private String token;
+    private final String tituloEleitoral;
+    private final String nome;
+    private final Perfil perfil;
+    private final Long unidadeCodigo;
+    private final String token;
 }

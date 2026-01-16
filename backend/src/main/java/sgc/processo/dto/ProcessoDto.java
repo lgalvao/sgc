@@ -1,14 +1,24 @@
 package sgc.processo.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import sgc.processo.model.SituacaoProcesso;
 
 import java.time.LocalDateTime;
 
-@Data
+/**
+ * DTO de resposta contendo dados de um processo.
+ * 
+ * <p>Requer @NoArgsConstructor e @Setter para uso em mappers.
+ */
+@Getter
+@Setter
 @Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProcessoDto {
 
     private Long codigo;

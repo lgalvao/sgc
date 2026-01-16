@@ -1,6 +1,10 @@
 package sgc.subprocesso.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 
 import java.time.LocalDateTime;
@@ -10,11 +14,14 @@ import java.time.LocalDateTime;
  * 
  * <p>Usado exclusivamente como saída de API. Para criar ou atualizar
  * subprocessos, use {@link CriarSubprocessoRequest} ou {@link AtualizarSubprocessoRequest}.
+ * 
+ * <p>Requer @NoArgsConstructor e @Setter para uso em testes.
  */
-@Data
+@Getter
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class SubprocessoDto {
 
     private Long codigo;
@@ -30,4 +37,3 @@ public class SubprocessoDto {
 
     private SituacaoSubprocesso situacao;
 }
-

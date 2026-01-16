@@ -3,8 +3,9 @@ package sgc.subprocesso.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -13,8 +14,11 @@ import java.time.LocalDateTime;
  * 
  * <p>Usado exclusivamente como entrada de API para o endpoint de criação.
  * A validação Bean Validation é aplicada neste DTO.
+ * 
+ * <p>Requer @NoArgsConstructor e @Setter para deserialização Jackson.
  */
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

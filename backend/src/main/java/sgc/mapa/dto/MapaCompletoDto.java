@@ -2,8 +2,9 @@ package sgc.mapa.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -17,8 +18,11 @@ import java.util.List;
  * inclui metadados como datas de disponibilização e homologação. Este DTO se foca na estrutura
  * hierárquica mapa → competências → atividades, sendo mais adequado para operações que manipulam a
  * composição completa do mapa.
+ * 
+ * <p>Requer @NoArgsConstructor e @Setter para uso em testes.
  */
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

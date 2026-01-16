@@ -1,11 +1,16 @@
 package sgc.seguranca.login.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * DTO para representar um usuário retornado pelo serviço AcessoAD.
+ * 
+ * <p>Usa @Setter pois é deserializado pelo Jackson via setters.
+ * Caso excepcional onde mutabilidade é necessária para integração externa.
  */
-@Data
+@Getter
+@Setter
 public class UsuarioAcessoAd {
     private String login;
     private String nome;
@@ -15,7 +20,8 @@ public class UsuarioAcessoAd {
     private String tipo;
     private String email;
 
-    @Data
+    @Getter
+    @Setter
     public static class LotacaoAd {
         private Integer codigo;
         private String sigla;

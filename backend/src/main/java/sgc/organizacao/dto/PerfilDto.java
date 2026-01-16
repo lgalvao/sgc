@@ -2,20 +2,18 @@ package sgc.organizacao.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 /**
  * DTO para perfil de usuário em uma unidade.
  */
-@Data
+@Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class PerfilDto {
 
-    private String usuarioTitulo;
-    private Long unidadeCodigo;
-    private String unidadeNome;
-    private String perfil; // ADMIN, GESTOR, CHEFE, SERVIDOR
+    private final String usuarioTitulo;
+    private final Long unidadeCodigo;
+    private final String unidadeNome;
+    private final String perfil; // ADMIN, GESTOR, CHEFE, SERVIDOR
 }

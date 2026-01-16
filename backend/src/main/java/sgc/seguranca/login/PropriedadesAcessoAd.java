@@ -1,14 +1,22 @@
 package sgc.seguranca.login;
 
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Propriedades de configuração para integração com o serviço AcessoAD.
+ *
+ * <p>Record imutável com valores default via compact constructor.
  */
 @ConfigurationProperties(prefix = "aplicacao.acesso-ad")
-@Data
-public class PropriedadesAcessoAd {
-    private String baseUrl = "https://sedesenvdev01.tre-pe.gov.br/acessoAD";
-    private String codigoSistema = "SGC";
+public record PropriedadesAcessoAd(
+    String baseUrl,
+    String codigoSistema
+) {
+    private static final String DEFAULT_BASE_URL = "https://sedesenvdev01.tre-pe.gov.br/acessoAD";
+    private static final String DEFAULT_CODIGO_SISTEMA = "SGC";
+
+    public PropriedadesAcessoAd {
+        baseUrl = baseUrl != null ? baseUrl : DEFAULT_BASE_URL;
+        codigoSistema = codigoSistema != null ? codigoSistema : DEFAULT_CODIGO_SISTEMA;
+    }
 }

@@ -1,9 +1,7 @@
 package sgc.processo.eventos;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
@@ -14,11 +12,9 @@ import java.time.LocalDateTime;
  * vigentes e as notificações de conclusão foram enviadas. Pode ser usado para acionar lógicas de
  * pós-processamento, como arquivamento ou geração de relatórios consolidados.
  */
-@Data
+@Getter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class EventoProcessoFinalizado {
-    private Long codProcesso;
-    private LocalDateTime dataHoraFinalizacao;
+    private final Long codProcesso;
+    private final LocalDateTime dataHoraFinalizacao;
 }

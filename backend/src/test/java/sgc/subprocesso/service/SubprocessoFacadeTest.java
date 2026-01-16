@@ -14,8 +14,6 @@ import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.ConhecimentoService;
 import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
@@ -28,7 +26,6 @@ import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 import java.util.Collections;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

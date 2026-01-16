@@ -77,7 +77,10 @@ class ProcessoFinalizador {
 
         processoRepo.save(processo);
         publicadorEventos.publishEvent(
-                new EventoProcessoFinalizado(processo.getCodigo(), LocalDateTime.now()));
+                EventoProcessoFinalizado.builder()
+                        .codProcesso(processo.getCodigo())
+                        .dataHoraFinalizacao(LocalDateTime.now())
+                        .build());
 
         log.info("Processo {} finalizado", codigo);
     }

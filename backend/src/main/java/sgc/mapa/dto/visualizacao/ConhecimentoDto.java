@@ -2,10 +2,17 @@ package sgc.mapa.dto.visualizacao;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+/**
+ * DTO para visualização de conhecimento.
+ * 
+ * <p>Requer @NoArgsConstructor e @Setter para uso em testes.
+ */
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

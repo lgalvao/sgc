@@ -34,7 +34,7 @@ public class GerenciadorJwt {
 
     @PostConstruct
     public void verificarSegurancaChave() {
-        if (DEFAULT_SECRET.equals(jwtProperties.getSecret())) {
+        if (DEFAULT_SECRET.equals(jwtProperties.secret())) {
             if (environment.acceptsProfiles(Profiles.of("test", "e2e", "local"))) {
                 log.warn("⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão.");
             } else {
@@ -49,7 +49,7 @@ public class GerenciadorJwt {
     }
 
     private SecretKey getSigningKey() {
-        String secret = jwtProperties.getSecret();
+        String secret = jwtProperties.secret();
         if (secret.length() < 32) {
             throw new ErroConfiguracao("JWT secret deve ter no mínimo 32 caracteres");
         }
@@ -58,7 +58,7 @@ public class GerenciadorJwt {
 
     public String gerarToken(String tituloEleitoral, Perfil perfil, Long unidadeCodigo) {
         Instant now = Instant.now();
-        Instant expiration = now.plus(jwtProperties.getExpiracaoMinutos(), ChronoUnit.MINUTES);
+        Instant expiration = now.plus(jwtProperties.expiracaoMinutos(), ChronoUnit.MINUTES);
 
         return Jwts.builder()
                 .subject(tituloEleitoral)

@@ -3,16 +3,14 @@ package sgc.subprocesso.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 /**
  * Request para devolver validação do mapa (CDU-20 item 7).
  */
-@Data
+@Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class DevolverValidacaoRequest {
     /**
@@ -20,5 +18,5 @@ public class DevolverValidacaoRequest {
      */
     @NotBlank(message = "A justificativa é obrigatória")
     @SanitizarHtml
-    private String justificativa;
+    private final String justificativa;
 }

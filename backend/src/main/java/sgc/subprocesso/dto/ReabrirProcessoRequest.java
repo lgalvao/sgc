@@ -2,13 +2,13 @@ package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
-@Data
-@NoArgsConstructor
+@Getter
+@Builder
 @AllArgsConstructor
 public class ReabrirProcessoRequest {
     @NotBlank(message = "A justificativa é obrigatória")
-    private String justificativa;
+    private final String justificativa;
 }

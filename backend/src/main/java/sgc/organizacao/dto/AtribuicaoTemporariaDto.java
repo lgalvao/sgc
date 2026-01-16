@@ -2,21 +2,19 @@ package sgc.organizacao.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class AtribuicaoTemporariaDto {
 
-    private Long codigo;
-    private UnidadeDto unidade;
-    private UsuarioDto usuario;
-    private LocalDateTime dataInicio;
-    private LocalDateTime dataTermino;
-    private String justificativa;
+    private final Long codigo;
+    private final UnidadeDto unidade;
+    private final UsuarioDto usuario;
+    private final LocalDateTime dataInicio;
+    private final LocalDateTime dataTermino;
+    private final String justificativa;
 }

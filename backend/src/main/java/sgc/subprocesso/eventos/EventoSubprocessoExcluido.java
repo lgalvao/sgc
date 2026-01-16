@@ -1,7 +1,7 @@
 package sgc.subprocesso.eventos;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 
@@ -44,7 +44,7 @@ import java.time.LocalDateTime;
  * @see EventoSubprocessoAtualizado
  * @see EventoTransicaoSubprocesso
  */
-@Data
+@Getter
 @Builder
 public class EventoSubprocessoExcluido {
 

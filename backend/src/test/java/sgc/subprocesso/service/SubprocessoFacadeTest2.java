@@ -16,8 +16,6 @@ import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.ConhecimentoService;
 import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
@@ -32,8 +30,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

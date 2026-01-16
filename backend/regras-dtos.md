@@ -276,17 +276,68 @@ public class EventoProcessoCriado extends ApplicationEvent {
 
 ## Convenções Lombok
 
-| Tipo | Estrutura | Anotações Lombok |
-|------|-----------|------------------|
-| **Request** (class) | class | `@Data @Builder @NoArgsConstructor @AllArgsConstructor` |
-| **Request** (record) | record | `@Builder` |
-| **Response** (class) | class | `@Data @Builder @NoArgsConstructor @AllArgsConstructor` |
-| **Response** (record) | record | `@Builder` |
-| **Command** | record | `@Builder` |
-| **Query** | record | `@Builder` |
-| **View** | record | `@Builder` |
-| **Dto** | class | `@Data @Builder @NoArgsConstructor @AllArgsConstructor` |
-| **Evento** | class | `@Getter` |
+### 🚫 Proibição de `@Data`
+
+A anotação `@Data` está **PROIBIDA** em todo o projeto. Motivos:
+
+1. **Gera setters desnecessários** → Quebra imutabilidade
+2. **Gera equals/hashCode automáticos** → Problemático com JPA (lazy loading)
+3. **Gera toString com todos os campos** → Expõe dados sensíveis em logs
+4. **Redundante com @Builder** → Se tem builder, não precisa de setters
+
+### Tabela de Anotações
+
+| Tipo | Estrutura | Anotações Lombok | Notas |
+|------|-----------|------------------|-------|
+| **Request** (class) | class | `@Getter @Builder @AllArgsConstructor` | Imutável, sem setters |
+| **Request** (record) | record | `@Builder` | ✅ Preferido |
+| **Response** (class) | class | `@Getter @Builder @AllArgsConstructor` | Imutável, sem setters |
+| **Response** (record) | record | `@Builder` | ✅ Preferido |
+| **Command** | record | `@Builder` | Sempre record |
+| **Query** | record | `@Builder` | Sempre record |
+| **View** | record | `@Builder` | Sempre record |
+| **Dto** | class | `@Getter @Builder @AllArgsConstructor` | Imutável, sem setters |
+| **Dto** | record | `@Builder` | ✅ Preferido para novos DTOs |
+| **Evento** | class | `@Getter` | Imutável, extends ApplicationEvent |
+| **Configuração** | record | Nenhuma | ✅ Record com constructor binding |
+
+### Exemplos
+
+```java
+// ✅ CORRETO - Request imutável
+@Getter
+@Builder
+@AllArgsConstructor
+public class CriarProcessoRequest {
+    @NotBlank private final String descricao;
+    @NotNull private final TipoProcesso tipo;
+}
+
+// ✅ CORRETO - Record (preferido)
+@Builder
+public record CriarProcessoRequest(
+    @NotBlank String descricao,
+    @NotNull TipoProcesso tipo
+) {}
+
+// ✅ CORRETO - Configuração Spring com Record (constructor binding)
+@ConfigurationProperties(prefix = "aplicacao.cors")
+public record ConfigCors(
+    List<String> allowedOrigins,
+    List<String> allowedMethods,
+    boolean allowCredentials
+) {
+    public ConfigCors {
+        // Valores default no compact constructor
+        allowedOrigins = allowedOrigins != null ? allowedOrigins : List.of("http://localhost:5173");
+        allowedMethods = allowedMethods != null ? allowedMethods : List.of("GET", "POST", "PUT", "DELETE");
+    }
+}
+
+// ❌ PROIBIDO - @Data em qualquer contexto
+@Data
+public class QualquerClasse { ... }
+```
 
 ---
 
@@ -296,9 +347,10 @@ public class EventoProcessoCriado extends ApplicationEvent {
 2. **Sempre** use `*Request` para entrada de dados do cliente
 3. **Prefira** `*Response` para saída de dados para o cliente
 4. **Validação** Bean Validation apenas em `*Request`
-5. **`@Data`** preferido sobre `@Getter/@Setter` separados
-6. **Records** para DTOs simples e imutáveis
-7. **Classes** para DTOs com métodos auxiliares ou que precisam de mutabilidade
+5. **🚫 `@Data` está PROIBIDO** em todo o projeto
+6. **`@Getter` + `@Builder`** para classes imutáveis
+7. **Records** são a estrutura preferida para novos DTOs e configurações
 8. **`*Query`** quando método tem mais de 3-4 parâmetros de filtro
 9. **`*View`** para projeções reutilizadas em múltiplos endpoints
 10. **`Evento*`** permanece em português (padrão consolidado)
+

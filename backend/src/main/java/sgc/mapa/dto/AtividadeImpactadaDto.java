@@ -2,8 +2,7 @@ package sgc.mapa.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 import sgc.mapa.model.TipoImpactoAtividade;
 
 import java.util.List;
@@ -13,34 +12,33 @@ import java.util.List;
  *
  * <p>CDU-12 - Verificar impactos no mapa de competências
  */
-@Data
+@Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class AtividadeImpactadaDto {
 
     /**
      * O código da atividade.
      */
-    private Long codigo;
+    private final Long codigo;
 
     /**
      * A descrição atual da atividade.
      */
-    private String descricao;
+    private final String descricao;
 
     /**
      * O tipo de impacto (INSERIDA, REMOVIDA, ALTERADA).
      */
-    private TipoImpactoAtividade tipoImpacto;
+    private final TipoImpactoAtividade tipoImpacto;
 
     /**
      * A descrição anterior da atividade (apenas para tipo ALTERADA).
      */
-    private String descricaoAnterior;
+    private final String descricaoAnterior;
 
     /**
      * Nomes das competências vinculadas a esta atividade.
      */
-    private List<String> competenciasVinculadas;
+    private final List<String> competenciasVinculadas;
 }

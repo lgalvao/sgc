@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import sgc.seguranca.config.ConfigCors;
+import sgc.seguranca.config.ConfigCorsProperties;
 
 import java.util.List;
 
@@ -17,11 +18,16 @@ class ConfigCorsTest {
     @Test
     @DisplayName("Deve configurar origem CORS com origens permitidas")
     void deveConfigurarOrigemCorsComOrigensPermitidas() {
-        ConfigCors config = new ConfigCors();
-        config.setAllowedOrigins(List.of("http://example.com"));
-        config.setAllowedMethods(List.of("GET", "POST"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+        // Cria record de propriedades imutável
+        ConfigCorsProperties properties = new ConfigCorsProperties(
+            List.of("http://example.com"),
+            List.of("GET", "POST"),
+            List.of("*"),
+            true
+        );
+        
+        // Injeta no bean de configuração
+        ConfigCors config = new ConfigCors(properties);
 
         CorsConfigurationSource source = config.corsConfigurationSource();
         org.springframework.mock.web.MockHttpServletRequest request = new org.springframework.mock.web.MockHttpServletRequest();
@@ -34,5 +40,16 @@ class ConfigCorsTest {
         assertThat(configuration.getAllowedMethods()).containsExactly("GET", "POST");
         assertThat(configuration.getAllowedHeaders()).containsExactly("*");
         assertThat(configuration.getAllowCredentials()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Deve usar valores padrão quando propriedades são null")
+    void deveUsarValoresPadraoQuandoPropriedadesSaoNull() {
+        // Compact constructor aplica valores default
+        ConfigCorsProperties properties = new ConfigCorsProperties(null, null, null, false);
+        
+        assertThat(properties.allowedOrigins()).containsExactly("http://localhost:5173");
+        assertThat(properties.allowedMethods()).contains("GET", "POST", "PUT", "DELETE", "OPTIONS");
+        assertThat(properties.allowedHeaders()).containsExactly("*");
     }
 }

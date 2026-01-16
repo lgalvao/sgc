@@ -1,13 +1,20 @@
 package sgc.seguranca.config;
 
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
+/**
+ * Propriedades de configuração JWT.
+ *
+ * <p>Record imutável com valor default para expiração.
+ */
 @ConfigurationProperties(prefix = "aplicacao.jwt")
-@Component
-@Data
-public class JwtProperties {
-    private String secret;
-    private int expiracaoMinutos = 120;
+public record JwtProperties(
+    String secret,
+    int expiracaoMinutos
+) {
+    private static final int EXPIRACAO_PADRAO = 120;
+
+    public JwtProperties {
+        expiracaoMinutos = expiracaoMinutos > 0 ? expiracaoMinutos : EXPIRACAO_PADRAO;
+    }
 }

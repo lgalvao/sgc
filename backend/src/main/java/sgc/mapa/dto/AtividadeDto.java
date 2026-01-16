@@ -3,11 +3,18 @@ package sgc.mapa.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import sgc.seguranca.sanitizacao.SanitizarHtml;
 
-@Data
+/**
+ * DTO para Atividade usado nas APIs (entrada/saída).
+ * 
+ * <p>Requer @NoArgsConstructor e @Setter para deserialização Jackson em endpoints de entrada.
+ */
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

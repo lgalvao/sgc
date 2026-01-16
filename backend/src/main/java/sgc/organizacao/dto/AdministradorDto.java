@@ -1,15 +1,15 @@
 package sgc.organizacao.dto;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @Builder
 public class AdministradorDto {
 
-    private String tituloEleitoral;
-    private String nome;
-    private String matricula;
-    private Long unidadeCodigo;
-    private String unidadeSigla;
+    private final String tituloEleitoral;
+    private final String nome;
+    private final String matricula;
+    private final Long unidadeCodigo;
+    private final String unidadeSigla;
 }

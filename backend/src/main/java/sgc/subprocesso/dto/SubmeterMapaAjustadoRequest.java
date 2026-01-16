@@ -5,13 +5,20 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 import java.time.LocalDateTime;
 
-@Data
+/**
+ * DTO de requisição para submeter mapa ajustado.
+ * 
+ * <p>Requer @NoArgsConstructor e @Setter para deserialização Jackson.
+ */
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

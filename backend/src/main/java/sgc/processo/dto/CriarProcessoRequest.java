@@ -7,15 +7,23 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import sgc.processo.model.TipoProcesso;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-@Data
+/**
+ * DTO de requisição para criar um processo.
+ * 
+ * <p>Requer @NoArgsConstructor e @Setter para deserialização Jackson.
+ */
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,11 +43,10 @@ public class CriarProcessoRequest {
     @NotEmpty(message = "Pelo menos uma unidade participante deve ser incluída.")
     private List<Long> unidades;
 
+    /**
+     * Retorna cópia defensiva da lista de unidades.
+     */
     public List<Long> getUnidades() {
-        return unidades == null ? java.util.Collections.emptyList() : new ArrayList<>(unidades);
-    }
-
-    public void setUnidades(List<Long> unidades) {
-        this.unidades = unidades == null ? null : new ArrayList<>(unidades);
+        return unidades == null ? Collections.emptyList() : new ArrayList<>(unidades);
     }
 }

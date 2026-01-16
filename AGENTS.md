@@ -87,7 +87,7 @@ O SGC segue padrões arquiteturais bem definidos, documentados em ADRs (Architec
   * `AccessAuditService` para auditoria completa de decisões de acesso
   * **CRÍTICO:** Services NUNCA fazem verificações de acesso diretas
   
-* **[ADR-004: DTO Pattern](/docs/adr/ADR-004-dto-pattern.md)** - ✅ Implementado
+* **[ADR-004: DTO Pattern](/docs/adr/ADR-004-dto-pattern.md)** 
   * DTOs obrigatórios em TODAS as APIs REST
   * Entidades JPA NUNCA são expostas diretamente
   * Mappers implementados com MapStruct para conversão Entidade ↔ DTO
@@ -99,10 +99,10 @@ O SGC segue padrões arquiteturais bem definidos, documentados em ADRs (Architec
     * `*View` - Projeções reutilizáveis (record imutável)
     * `*Dto` - Mapeamento interno entre camadas (class)
     * `Evento*` - Spring ApplicationEvent (prefixo em português)
-  * **Regras de Ouro:**
-    * Validação Bean Validation (`@NotNull`, `@Valid`) apenas em `*Request`
+  * **Regras:**
+    * Validação com Bean Validation (`@NotNull`, `@Valid`) apenas em `*Request`
     * Preferir `record` para DTOs imutáveis, `class` quando mutabilidade é necessária
-    * Lombok: `@Builder` para todos, `@Data` apenas para classes
+    * Lombok: `@Builder` para todos; **`@Data` está PROIBIDO**; classes usam `@Getter` + `@Builder`; preferir `record`
   * **Documentação completa:** Ver [`backend/regras-dtos.md`](/backend/regras-dtos.md)
 
 * **[ADR-005: Controller Organization](/docs/adr/ADR-005-controller-organization.md)** - ✅ Implementado

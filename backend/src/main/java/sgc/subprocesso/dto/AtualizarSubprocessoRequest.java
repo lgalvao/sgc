@@ -2,8 +2,9 @@ package sgc.subprocesso.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -12,8 +13,11 @@ import java.time.LocalDateTime;
  * 
  * <p>Usado exclusivamente como entrada de API para o endpoint de atualização.
  * Diferente da criação, não requer codProcesso pois o subprocesso já existe.
+ * 
+ * <p>Requer @NoArgsConstructor e @Setter para deserialização Jackson.
  */
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

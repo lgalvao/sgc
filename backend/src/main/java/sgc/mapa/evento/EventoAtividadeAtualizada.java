@@ -1,7 +1,7 @@
 package sgc.mapa.evento;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import sgc.mapa.model.Atividade;
 import sgc.organizacao.model.Usuario;
 
@@ -40,7 +40,7 @@ import java.util.Set;
  * @see EventoAtividadeExcluida
  * @see EventoMapaAlterado
  */
-@Data
+@Getter
 @Builder
 public class EventoAtividadeAtualizada {
 

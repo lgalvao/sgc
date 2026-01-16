@@ -4,16 +4,20 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 /**
  * Request DTO para salvar um mapa completo. Usado para criar ou atualizar o mapa com todas as suas
  * competências e vínculos com atividades de uma vez.
+ * 
+ * <p>Requer @NoArgsConstructor e @Setter para deserialização Jackson.
  */
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

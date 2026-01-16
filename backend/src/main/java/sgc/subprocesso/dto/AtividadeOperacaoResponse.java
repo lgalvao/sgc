@@ -2,8 +2,9 @@ package sgc.subprocesso.dto;
 
 import org.jspecify.annotations.Nullable;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
 /**
  * DTO de resposta para operações CRUD em atividades.
@@ -12,19 +13,20 @@ import lombok.Data;
  * permitindo que o frontend atualize a UI sem precisar fazer chamadas adicionais
  * para buscar o processo completo.
  */
-@Data
+@Getter
 @Builder
+@AllArgsConstructor
 public class AtividadeOperacaoResponse {
     /**
      * A atividade que foi criada, atualizada ou afetada pela operação.
      * Pode ser null em caso de exclusão.
      */
     @Nullable
-    private AtividadeVisualizacaoDto atividade;
+    private final AtividadeVisualizacaoDto atividade;
 
     /**
      * Status atualizado do subprocesso após a operação.
      * Inclui situação, label e timestamp.
      */
-    private SubprocessoSituacaoDto subprocesso;
+    private final SubprocessoSituacaoDto subprocesso;
 }

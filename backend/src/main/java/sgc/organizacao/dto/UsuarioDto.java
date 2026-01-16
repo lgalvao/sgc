@@ -2,8 +2,7 @@ package sgc.organizacao.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 /**
  * DTO para dados de usuário do SGRH.
@@ -11,17 +10,16 @@ import lombok.NoArgsConstructor;
  * <p>Usado nos endpoints que retornam dados de usuários,
  * incluindo GET /api/unidades/{codigoUnidade}/usuarios.
  */
-@Data
+@Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class UsuarioDto {
 
-    private String nome;
-    private String tituloEleitoral;
-    private String email;
-    private String matricula;
+    private final String nome;
+    private final String tituloEleitoral;
+    private final String email;
+    private final String matricula;
 
     /** Código da unidade de lotação do usuário. */
-    private Long unidadeCodigo;
+    private final Long unidadeCodigo;
 }

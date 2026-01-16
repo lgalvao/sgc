@@ -7,8 +7,9 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import sgc.processo.model.TipoProcesso;
 
 import java.time.LocalDateTime;
@@ -16,8 +17,11 @@ import java.util.List;
 
 /**
  * DTO usado para atualizar um processo existente.
+ * 
+ * <p>Requer @NoArgsConstructor e @Setter para deserialização Jackson.
  */
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
