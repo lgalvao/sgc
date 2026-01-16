@@ -1,4 +1,4 @@
-package sgc.configuracao.service;
+package sgc.configuracao;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ParametroService {
+public class ConfiguracaoFacade {
 
     private final ParametroRepo parametroRepo;
 
