@@ -4,3 +4,7 @@
 ## 2024-05-22 - Visual Loading States
 **Learning:** Playwright's network interception (`page.route`) is essential for verifying 'loading' states when a backend is not available or too fast. By intentionally not fulfilling a route, we can freeze the UI in a pending state to capture screenshots.
 **Action:** Use this pattern for all future async UI verification.
+
+## 2025-02-18 - Modal Async Feedback
+**Learning:** Users lack feedback during critical async modal actions (like 'Disponibilizar'), leading to potential double-submissions.
+**Action:** Standardize passing a `loading` prop to all action modals to drive button disabled states and spinners.

@@ -93,4 +93,16 @@ describe("DisponibilizarMapaModal.vue", () => {
             observacoes: ""
         }]);
     });
+
+    it("deve exibir estado de carregamento quando loading for true", () => {
+        const wrapper = createWrapper({ mostrar: true, loading: true });
+
+        const btnConfirmar = wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]');
+        expect(btnConfirmar.attributes("disabled")).toBeDefined();
+        expect(btnConfirmar.text()).toContain("Disponibilizando...");
+        expect(btnConfirmar.find(".spinner-border").exists()).toBe(true);
+
+        const btnCancelar = wrapper.find('[data-testid="btn-disponibilizar-mapa-cancelar"]');
+        expect(btnCancelar.attributes("disabled")).toBeDefined();
+    });
 });
