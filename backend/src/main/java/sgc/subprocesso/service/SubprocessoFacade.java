@@ -16,8 +16,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
-import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 
 import java.util.List;
 
@@ -35,9 +34,7 @@ import java.util.List;
  * @see SubprocessoCrudService Para operações CRUD básicas
  * @see SubprocessoDetalheService Para construção de detalhes
  * @see SubprocessoValidacaoService Para validações
- * @see SubprocessoWorkflowService Para operações de workflow genéricas
- * @see SubprocessoCadastroWorkflowService Para workflow de cadastro
- * @see SubprocessoMapaWorkflowService Para workflow de mapa
+ * @see SubprocessoWorkflowService Para operações de workflow (unificado)
  * @see SubprocessoContextoService Para contexto de edição
  */
 @Service
@@ -50,10 +47,6 @@ public class SubprocessoFacade {
     private final SubprocessoDetalheService detalheService;
     private final SubprocessoValidacaoService validacaoService;
     private final SubprocessoWorkflowService workflowService;
-    
-    // Services especializados
-    private final SubprocessoCadastroWorkflowService cadastroWorkflowService;
-    private final SubprocessoMapaWorkflowService mapaWorkflowService;
     private final SubprocessoContextoService contextoService;
     private final SubprocessoMapaService mapaService;
     
@@ -212,124 +205,124 @@ public class SubprocessoFacade {
 
     @Transactional
     public void disponibilizarCadastro(Long codigo, Usuario usuario) {
-        cadastroWorkflowService.disponibilizarCadastro(codigo, usuario);
+        workflowService.disponibilizarCadastro(codigo, usuario);
     }
 
     @Transactional
     public void disponibilizarRevisao(Long codigo, Usuario usuario) {
-        cadastroWorkflowService.disponibilizarRevisao(codigo, usuario);
+        workflowService.disponibilizarRevisao(codigo, usuario);
     }
 
     @Transactional
     public void devolverCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.devolverCadastro(codigo, observacoes, usuario);
+        workflowService.devolverCadastro(codigo, observacoes, usuario);
     }
 
     @Transactional
     public void aceitarCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.aceitarCadastro(codigo, observacoes, usuario);
+        workflowService.aceitarCadastro(codigo, observacoes, usuario);
     }
 
     @Transactional
     public void homologarCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.homologarCadastro(codigo, observacoes, usuario);
+        workflowService.homologarCadastro(codigo, observacoes, usuario);
     }
 
     @Transactional
     public void devolverRevisaoCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.devolverRevisaoCadastro(codigo, observacoes, usuario);
+        workflowService.devolverRevisaoCadastro(codigo, observacoes, usuario);
     }
 
     @Transactional
     public void aceitarRevisaoCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.aceitarRevisaoCadastro(codigo, observacoes, usuario);
+        workflowService.aceitarRevisaoCadastro(codigo, observacoes, usuario);
     }
 
     @Transactional
     public void homologarRevisaoCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.homologarRevisaoCadastro(codigo, observacoes, usuario);
+        workflowService.homologarRevisaoCadastro(codigo, observacoes, usuario);
     }
 
     @Transactional
     public void aceitarCadastroEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        cadastroWorkflowService.aceitarCadastroEmBloco(codUnidades, codProcesso, usuario);
+        workflowService.aceitarCadastroEmBloco(codUnidades, codProcesso, usuario);
     }
 
     @Transactional
     public void homologarCadastroEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        cadastroWorkflowService.homologarCadastroEmBloco(codUnidades, codProcesso, usuario);
+        workflowService.homologarCadastroEmBloco(codUnidades, codProcesso, usuario);
     }
 
     // ===== Workflow de Mapa =====
 
     @Transactional
     public MapaCompletoDto salvarMapaSubprocesso(Long codigo, SalvarMapaRequest request) {
-        return mapaWorkflowService.salvarMapaSubprocesso(codigo, request);
+        return workflowService.salvarMapaSubprocesso(codigo, request);
     }
 
     @Transactional
     public void disponibilizarMapa(Long codigo, DisponibilizarMapaRequest request, Usuario usuario) {
-        mapaWorkflowService.disponibilizarMapa(codigo, request, usuario);
+        workflowService.disponibilizarMapa(codigo, request, usuario);
     }
 
     @Transactional
     public void apresentarSugestoes(Long codigo, String sugestoes, Usuario usuario) {
-        mapaWorkflowService.apresentarSugestoes(codigo, sugestoes, usuario);
+        workflowService.apresentarSugestoes(codigo, sugestoes, usuario);
     }
 
     @Transactional
     public void validarMapa(Long codigo, Usuario usuario) {
-        mapaWorkflowService.validarMapa(codigo, usuario);
+        workflowService.validarMapa(codigo, usuario);
     }
 
     @Transactional
     public void devolverValidacao(Long codigo, String observacoes, Usuario usuario) {
-        mapaWorkflowService.devolverValidacao(codigo, observacoes, usuario);
+        workflowService.devolverValidacao(codigo, observacoes, usuario);
     }
 
     @Transactional
     public void aceitarValidacao(Long codigo, Usuario usuario) {
-        mapaWorkflowService.aceitarValidacao(codigo, usuario);
+        workflowService.aceitarValidacao(codigo, usuario);
     }
 
     @Transactional
     public void homologarValidacao(Long codigo, Usuario usuario) {
-        mapaWorkflowService.homologarValidacao(codigo, usuario);
+        workflowService.homologarValidacao(codigo, usuario);
     }
 
     @Transactional
     public void submeterMapaAjustado(Long codigo, SubmeterMapaAjustadoRequest request, Usuario usuario) {
-        mapaWorkflowService.submeterMapaAjustado(codigo, request, usuario);
+        workflowService.submeterMapaAjustado(codigo, request, usuario);
     }
 
     @Transactional
     public MapaCompletoDto adicionarCompetencia(Long codigo, CompetenciaRequest request) {
-        return mapaWorkflowService.adicionarCompetencia(codigo, request);
+        return workflowService.adicionarCompetencia(codigo, request);
     }
 
     @Transactional
     public MapaCompletoDto atualizarCompetencia(Long codigo, Long codCompetencia, CompetenciaRequest request) {
-        return mapaWorkflowService.atualizarCompetencia(codigo, codCompetencia, request);
+        return workflowService.atualizarCompetencia(codigo, codCompetencia, request);
     }
 
     @Transactional
     public MapaCompletoDto removerCompetencia(Long codigo, Long codCompetencia) {
-        return mapaWorkflowService.removerCompetencia(codigo, codCompetencia);
+        return workflowService.removerCompetencia(codigo, codCompetencia);
     }
 
     @Transactional
     public void disponibilizarMapaEmBloco(List<Long> codUnidades, Long codProcesso, DisponibilizarMapaRequest request, Usuario usuario) {
-        mapaWorkflowService.disponibilizarMapaEmBloco(codUnidades, codProcesso, request, usuario);
+        workflowService.disponibilizarMapaEmBloco(codUnidades, codProcesso, request, usuario);
     }
 
     @Transactional
     public void aceitarValidacaoEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        mapaWorkflowService.aceitarValidacaoEmBloco(codUnidades, codProcesso, usuario);
+        workflowService.aceitarValidacaoEmBloco(codUnidades, codProcesso, usuario);
     }
 
     @Transactional
     public void homologarValidacaoEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        mapaWorkflowService.homologarValidacaoEmBloco(codUnidades, codProcesso, usuario);
+        workflowService.homologarValidacaoEmBloco(codUnidades, codProcesso, usuario);
     }
 
     // ===== Operações Administrativas =====

@@ -23,7 +23,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +41,7 @@ class SubprocessoServiceActionsTest {
     private static final String OBSERVACOES = "Observações de teste";
 
     @Autowired
-    private SubprocessoCadastroWorkflowService subprocessoWorkflowService;
+    private SubprocessoWorkflowService subprocessoWorkflowService;
 
     @Autowired
     private SubprocessoRepo subprocessoRepo;

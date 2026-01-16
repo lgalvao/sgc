@@ -17,7 +17,7 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.SubprocessoDetalheService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.subprocesso.service.SubprocessoWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 
 import java.time.LocalDate;
 import java.util.Collections;

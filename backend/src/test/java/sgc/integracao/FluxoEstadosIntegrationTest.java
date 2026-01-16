@@ -35,8 +35,7 @@ import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
-import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -58,8 +57,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
     @Autowired private ProcessoFacade processoFacade;
-    @Autowired private SubprocessoCadastroWorkflowService cadastroWorkflowService;
-    @Autowired private SubprocessoMapaWorkflowService mapaWorkflowService;
+    @Autowired private SubprocessoWorkflowService workflowService;
     @Autowired private AtividadeService atividadeService;
     @Autowired private ConhecimentoService conhecimentoService;
     @Autowired private SubprocessoRepo subprocessoRepo;
@@ -211,17 +209,17 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
                 // 4. Disponibilizar Cadastro (Chefe)
                 autenticar(chefeMapeamento, "ROLE_CHEFE");
-                cadastroWorkflowService.disponibilizarCadastro(codSubprocesso, chefeMapeamento);
+                workflowService.disponibilizarCadastro(codSubprocesso, chefeMapeamento);
                 verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
                 // 5. Aceitar Cadastro (Gestor)
                 autenticar(gestorMapeamento, "ROLE_GESTOR");
-                cadastroWorkflowService.aceitarCadastro(codSubprocesso, "Aceito pelo Gestor", gestorMapeamento);
+                workflowService.aceitarCadastro(codSubprocesso, "Aceito pelo Gestor", gestorMapeamento);
                 verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
                 // 6. Homologar Cadastro (Admin)
                 autenticar(admin, "ROLE_ADMIN");
-                cadastroWorkflowService.homologarCadastro(codSubprocesso, "Homologado pelo Admin", admin);
+                workflowService.homologarCadastro(codSubprocesso, "Homologado pelo Admin", admin);
                 verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_HOMOLOGADO);
 
                 // 7. Disponibilizar Mapa (Admin - SEDOC cria mapa)
@@ -242,7 +240,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 em.flush(); // Ensure DB is updated
                 em.clear(); // Ensure clean state for validation query
 
-                mapaWorkflowService.disponibilizarMapa(codSubprocesso,
+                workflowService.disponibilizarMapa(codSubprocesso,
                         DisponibilizarMapaRequest.builder()
                                 .observacoes("Mapa Inicial")
                                 .dataLimite(LocalDate.now().plusDays(5))
@@ -252,17 +250,17 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
                 // 8. Validar Mapa (Chefe)
                 autenticar(chefeMapeamento, "ROLE_CHEFE");
-                mapaWorkflowService.validarMapa(codSubprocesso, chefeMapeamento);
+                workflowService.validarMapa(codSubprocesso, chefeMapeamento);
                 verificarSituacao(codSubprocesso, MAPEAMENTO_MAPA_VALIDADO);
 
                 // 9. Aceitar Validação (Gestor)
                 autenticar(gestorMapeamento, "ROLE_GESTOR");
-                mapaWorkflowService.aceitarValidacao(codSubprocesso, gestorMapeamento);
+                workflowService.aceitarValidacao(codSubprocesso, gestorMapeamento);
                 verificarSituacao(codSubprocesso, MAPEAMENTO_MAPA_VALIDADO);
 
                 // 10. Homologar Validação (Admin)
                 autenticar(admin, "ROLE_ADMIN");
-                mapaWorkflowService.homologarValidacao(codSubprocesso, admin);
+                workflowService.homologarValidacao(codSubprocesso, admin);
                 verificarSituacao(codSubprocesso, MAPEAMENTO_MAPA_HOMOLOGADO);
 
                 // 11. Finalizar Processo
@@ -310,17 +308,17 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
             // Disponibilizar
             autenticar(chefeMapeamento, "ROLE_CHEFE");
-            cadastroWorkflowService.disponibilizarCadastro(codSubprocesso, chefeMapeamento);
+            workflowService.disponibilizarCadastro(codSubprocesso, chefeMapeamento);
             verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
             // Gestor DEVOLVE
             autenticar(gestorMapeamento, "ROLE_GESTOR");
-            cadastroWorkflowService.devolverCadastro(codSubprocesso, "Ajuste necessário", gestorMapeamento);
+            workflowService.devolverCadastro(codSubprocesso, "Ajuste necessário", gestorMapeamento);
             verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
             // Chefe ajusta (não precisa fazer nada real, só tentar disponibilizar de novo)
             autenticar(chefeMapeamento, "ROLE_CHEFE");
-            cadastroWorkflowService.disponibilizarCadastro(codSubprocesso, chefeMapeamento);
+            workflowService.disponibilizarCadastro(codSubprocesso, chefeMapeamento);
             verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         }
     }
@@ -390,17 +388,17 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
                 // 4. Disponibilizar Revisão
                 autenticar(chefeRevisao, "ROLE_CHEFE");
-                cadastroWorkflowService.disponibilizarRevisao(codSubprocesso, chefeRevisao);
+                workflowService.disponibilizarRevisao(codSubprocesso, chefeRevisao);
                 verificarSituacao(codSubprocesso, REVISAO_CADASTRO_DISPONIBILIZADA);
 
                 // 5. Aceitar Revisão (Gestor)
                 autenticar(gestorRevisao, "ROLE_GESTOR");
-                cadastroWorkflowService.aceitarRevisaoCadastro(codSubprocesso, "Ok", gestorRevisao);
+                workflowService.aceitarRevisaoCadastro(codSubprocesso, "Ok", gestorRevisao);
                 verificarSituacao(codSubprocesso, REVISAO_CADASTRO_DISPONIBILIZADA);
 
                 // 6. Homologar Revisão (Admin) - Com Impactos (Simulado)
                 autenticar(admin, "ROLE_ADMIN");
-                cadastroWorkflowService.homologarRevisaoCadastro(codSubprocesso, "Homologado", admin);
+                workflowService.homologarRevisaoCadastro(codSubprocesso, "Homologado", admin);
                 verificarSituacao(codSubprocesso, REVISAO_CADASTRO_HOMOLOGADA);
 
                 // 7. Submeter Mapa Ajustado (Admin)
@@ -408,18 +406,18 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 SubmeterMapaAjustadoRequest ajusteReq = SubmeterMapaAjustadoRequest.builder()
                         .dataLimiteEtapa2(LocalDateTime.now().plusDays(5))
                         .build();
-                mapaWorkflowService.submeterMapaAjustado(codSubprocesso, ajusteReq, admin);
+                workflowService.submeterMapaAjustado(codSubprocesso, ajusteReq, admin);
                 verificarSituacao(codSubprocesso, REVISAO_MAPA_DISPONIBILIZADO);
 
                 // 8. Validar Mapa (Chefe)
                 autenticar(chefeRevisao, "ROLE_CHEFE");
-                mapaWorkflowService.validarMapa(codSubprocesso, chefeRevisao);
+                workflowService.validarMapa(codSubprocesso, chefeRevisao);
                 verificarSituacao(codSubprocesso, REVISAO_MAPA_VALIDADO);
 
                 // 9. Homologar Validação (Admin) (Pula gestor só pra variar, assumindo hierarquia permite ou admin força?
                 // Na verdade, homologarValidacao checa estado. Se estado é REVISAO_MAPA_VALIDADO, admin pode homologar)
                 autenticar(admin, "ROLE_ADMIN");
-                mapaWorkflowService.homologarValidacao(codSubprocesso, admin);
+                workflowService.homologarValidacao(codSubprocesso, admin);
                 verificarSituacao(codSubprocesso, REVISAO_MAPA_HOMOLOGADO);
             } catch (Exception e) {
                 throw e;
@@ -468,11 +466,11 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
             // 4. Disponibilizar
             autenticar(chefeRevisao, "ROLE_CHEFE");
-            cadastroWorkflowService.disponibilizarRevisao(codSubprocesso, chefeRevisao);
+            workflowService.disponibilizarRevisao(codSubprocesso, chefeRevisao);
 
             // 5. Homologar (Admin) - Sem Impactos
             autenticar(admin, "ROLE_ADMIN");
-            cadastroWorkflowService.homologarRevisaoCadastro(codSubprocesso, "Ok", admin);
+            workflowService.homologarRevisaoCadastro(codSubprocesso, "Ok", admin);
 
             // Deve ir direto para MAPA_HOMOLOGADO (ou REVISAO_MAPA_HOMOLOGADO)
             verificarSituacao(codSubprocesso, REVISAO_MAPA_HOMOLOGADO);

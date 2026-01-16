@@ -14,8 +14,7 @@ import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
-import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 
 import java.util.Collections;
 
@@ -31,8 +30,6 @@ class SubprocessoFacadeTest {
     @Mock private SubprocessoDetalheService detalheService;
     @Mock private SubprocessoValidacaoService validacaoService;
     @Mock private SubprocessoWorkflowService workflowService;
-    @Mock private SubprocessoCadastroWorkflowService cadastroWorkflowService;
-    @Mock private SubprocessoMapaWorkflowService mapaWorkflowService;
     @Mock private SubprocessoContextoService contextoService;
     @Mock private SubprocessoMapaService mapaService;
     @Mock private UsuarioFacade usuarioService;

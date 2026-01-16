@@ -59,7 +59,7 @@ class SubprocessoMapaWorkflowServiceTest {
     @Mock private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
     @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
 
-    @InjectMocks private SubprocessoMapaWorkflowService service;
+    @InjectMocks private SubprocessoWorkflowService service;
 
     @Nested
     @DisplayName("Edição de Mapa")
@@ -684,7 +684,7 @@ class SubprocessoMapaWorkflowServiceTest {
          @org.junit.jupiter.api.BeforeEach
          void injectSelf() throws Exception {
              // Inject self reference for @Lazy self-injection pattern
-             java.lang.reflect.Field selfField = SubprocessoMapaWorkflowService.class.getDeclaredField("self");
+             java.lang.reflect.Field selfField = SubprocessoWorkflowService.class.getDeclaredField("self");
              selfField.setAccessible(true);
              selfField.set(service, service);
          }
