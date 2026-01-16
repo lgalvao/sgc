@@ -20,7 +20,7 @@ import java.util.Map;
 @RequestMapping("/api/unidades")
 @RequiredArgsConstructor
 public class UnidadeController {
-    private final UnidadeService unidadeService;
+    private final UnidadeFacade unidadeService;
     private final sgc.processo.service.ProcessoConsultaService processoConsultaService;
 
     /**

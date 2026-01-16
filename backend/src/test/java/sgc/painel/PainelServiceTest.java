@@ -15,7 +15,7 @@ import org.springframework.data.domain.Pageable;
 import sgc.alerta.AlertaFacade;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.Alerta;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
@@ -47,7 +47,7 @@ class PainelServiceTest {
     @Mock
     private AlertaFacade alertaService;
     @Mock
-    private UnidadeService unidadeService;
+    private UnidadeFacade unidadeService;
 
     @InjectMocks
     private PainelFacade painelService;

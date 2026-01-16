@@ -111,7 +111,7 @@ mapaFacade.obterMapaCompleto(...)
 - `SubprocessoMapaControllerTest.java`
 - `SubprocessoMapaWorkflowServiceTest.java`
 - `SubprocessoContextoServiceTest.java`
-- `UnidadeServiceTest.java`
+- `UnidadeFacadeTest.java`
 - `ControllersServicesCoverageTest.java`
 - `ArchConsistencyTest.java`
 - E outros...

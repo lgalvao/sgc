@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroEstadoImpossivel;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.*;
@@ -51,7 +51,7 @@ import static sgc.processo.model.TipoProcesso.REVISAO;
 @RequiredArgsConstructor
 public class ProcessoFacade {
     private final ProcessoRepo processoRepo;
-    private final UnidadeService unidadeService;
+    private final UnidadeFacade unidadeService;
     private final SubprocessoFacade subprocessoFacade;
     private final ApplicationEventPublisher publicadorEventos;
     private final ProcessoMapper processoMapper;

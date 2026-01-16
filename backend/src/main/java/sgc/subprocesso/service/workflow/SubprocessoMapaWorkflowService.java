@@ -20,7 +20,7 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
@@ -84,7 +84,7 @@ public class SubprocessoMapaWorkflowService {
     private final MapaFacade mapaFacade;
     private final SubprocessoTransicaoService transicaoService;
     private final AnaliseFacade analiseFacade;
-    private final UnidadeService unidadeService;
+    private final UnidadeFacade unidadeService;
     private final SubprocessoValidacaoService validacaoService;
     private final AccessControlService accessControlService;
 

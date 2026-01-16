@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.seguranca.login.dto.EntrarRequest;
 
@@ -28,7 +28,7 @@ class LoginServiceTest {
     @Mock private UsuarioFacade usuarioService;
     @Mock private GerenciadorJwt gerenciadorJwt;
     @Mock private ClienteAcessoAd clienteAcessoAd;
-    @Mock private UnidadeService unidadeService;
+    @Mock private UnidadeFacade unidadeService;
 
     private LoginService loginService;
 

@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import sgc.alerta.AlertaFacade;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.CopiaMapaService;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.ProcessoRepo;
@@ -31,7 +31,7 @@ class ProcessoFacadeSecurityTest {
     @Mock
     private ProcessoRepo processoRepo;
     @Mock
-    private UnidadeService unidadeService;
+    private UnidadeFacade unidadeService;
     @Mock
     private SubprocessoFacade subprocessoFacade;
     @Mock

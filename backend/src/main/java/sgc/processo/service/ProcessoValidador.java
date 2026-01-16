@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
@@ -32,14 +32,14 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
 @Slf4j
 class ProcessoValidador {
     
-    private final UnidadeService unidadeService;
+    private final UnidadeFacade unidadeService;
     private final SubprocessoFacade subprocessoFacade;
 
     /**
      * Constructor com @Lazy para quebrar dependência circular.
      */
     public ProcessoValidador(
-            UnidadeService unidadeService,
+            UnidadeFacade unidadeService,
             @Lazy SubprocessoFacade subprocessoFacade) {
         this.unidadeService = unidadeService;
         this.subprocessoFacade = subprocessoFacade;

@@ -13,7 +13,7 @@ import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.alerta.model.AlertaUsuario;
 import sgc.alerta.model.AlertaUsuarioRepo;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
@@ -37,7 +37,7 @@ public class AlertaFacade {
     private final AlertaUsuarioRepo alertaUsuarioRepo;
     private final UsuarioFacade usuarioService;
     private final AlertaMapper alertaMapper;
-    private final UnidadeService unidadeService;
+    private final UnidadeFacade unidadeService;
 
     private @Nullable Unidade sedoc;
 

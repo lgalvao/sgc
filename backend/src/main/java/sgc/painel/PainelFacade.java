@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.Alerta;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.painel.erros.ErroParametroPainelInvalido;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class PainelFacade {
     private final ProcessoFacade processoFacade;
     private final AlertaFacade alertaService;
-    private final UnidadeService unidadeService;
+    private final UnidadeFacade unidadeService;
 
     /**
      * Lista processos com base no perfil e na unidade do usuário.

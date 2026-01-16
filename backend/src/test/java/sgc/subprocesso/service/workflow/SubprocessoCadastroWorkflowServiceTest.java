@@ -15,7 +15,7 @@ import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
@@ -44,7 +44,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     @Mock
     private SubprocessoTransicaoService transicaoService;
     @Mock
-    private UnidadeService unidadeService;
+    private UnidadeFacade unidadeService;
     @Mock
     private AnaliseFacade analiseFacade;
     @Mock

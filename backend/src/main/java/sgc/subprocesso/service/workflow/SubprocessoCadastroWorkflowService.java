@@ -13,7 +13,7 @@ import sgc.comum.erros.ErroInvarianteViolada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.AccessControlService;
@@ -38,7 +38,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 public class SubprocessoCadastroWorkflowService {
     private final SubprocessoRepo repositorioSubprocesso;
     private final SubprocessoTransicaoService transicaoService;
-    private final UnidadeService unidadeService;
+    private final UnidadeFacade unidadeService;
     private final AnaliseFacade analiseFacade;
     private final SubprocessoValidacaoService validacaoService;
     private final ImpactoMapaService impactoMapaService;
@@ -51,7 +51,7 @@ public class SubprocessoCadastroWorkflowService {
     public SubprocessoCadastroWorkflowService(
             SubprocessoRepo repositorioSubprocesso,
             SubprocessoTransicaoService transicaoService,
-            UnidadeService unidadeService,
+            UnidadeFacade unidadeService,
             AnaliseFacade analiseFacade,
             @Lazy SubprocessoValidacaoService validacaoService,
             @Lazy ImpactoMapaService impactoMapaService,

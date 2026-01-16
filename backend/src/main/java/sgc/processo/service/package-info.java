@@ -160,7 +160,7 @@
  * <p>Services deste pacote dependem de:</p>
  * <ul>
  *   <li><strong>sgc.subprocesso:</strong> SubprocessoFacade (criação e gestão de subprocessos)</li>
- *   <li><strong>sgc.organizacao:</strong> UnidadeService (listar unidades para criar subprocessos)</li>
+ *   <li><strong>sgc.organizacao:</strong> UnidadeFacade (listar unidades para criar subprocessos)</li>
  *   <li><strong>sgc.seguranca.acesso:</strong> AccessControlService (autorização)</li>
  *   <li><strong>sgc.notificacao:</strong> NotificacaoEmailService (envio de lembretes)</li>
  *   <li><strong>sgc.mapa:</strong> MapaService (cópia de mapas de referência)</li>

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.eventos.EventoProcessoFinalizado;
@@ -36,7 +36,7 @@ import java.util.Optional;
 class ProcessoFinalizador {
     
     private final ProcessoRepo processoRepo;
-    private final UnidadeService unidadeService;
+    private final UnidadeFacade unidadeService;
     private final SubprocessoFacade subprocessoFacade;
     private final ProcessoValidador processoValidador;
     private final ApplicationEventPublisher publicadorEventos;
@@ -46,7 +46,7 @@ class ProcessoFinalizador {
      */
     public ProcessoFinalizador(
             ProcessoRepo processoRepo,
-            UnidadeService unidadeService,
+            UnidadeFacade unidadeService,
             @Lazy SubprocessoFacade subprocessoFacade,
             ProcessoValidador processoValidador,
             ApplicationEventPublisher publicadorEventos) {

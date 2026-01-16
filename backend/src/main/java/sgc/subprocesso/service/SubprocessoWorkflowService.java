@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroValidacao;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.*;
@@ -23,7 +23,7 @@ public class SubprocessoWorkflowService {
     private final SubprocessoRepo repositorioSubprocesso;
     private final SubprocessoCrudService crudService;
     private final AlertaFacade alertaService;
-    private final UnidadeService unidadeService;
+    private final UnidadeFacade unidadeService;
     private final MovimentacaoRepo repositorioMovimentacao;
 
     public void alterarDataLimite(Long codSubprocesso, java.time.LocalDate novaDataLimite) {

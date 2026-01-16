@@ -9,7 +9,7 @@ import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAnalise;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
@@ -27,7 +27,7 @@ class AnaliseFacadeTest {
     private AnaliseRepo analiseRepo;
 
     @Mock
-    private UnidadeService unidadeService;
+    private UnidadeFacade unidadeService;
 
     @InjectMocks
     private AnaliseFacade service;

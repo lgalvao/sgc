@@ -27,8 +27,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
-@DisplayName("Testes do Serviço UnidadeService")
-class UnidadeServiceTest {
+@DisplayName("Testes do Serviço UnidadeFacade")
+class UnidadeFacadeTest {
 
     @Mock
     private UnidadeRepo unidadeRepo;
@@ -41,11 +41,11 @@ class UnidadeServiceTest {
     @Mock
     private UsuarioMapper usuarioMapper;
 
-    private UnidadeService service;
+    private UnidadeFacade service;
 
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
-        service = new UnidadeService(
+        service = new UnidadeFacade(
                 unidadeRepo,
                 unidadeMapaRepo,
                 usuarioRepo,

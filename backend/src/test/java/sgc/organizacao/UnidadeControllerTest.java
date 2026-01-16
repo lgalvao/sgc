@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UnidadeControllerTest {
 
     @MockitoBean
-    private UnidadeService unidadeService;
+    private UnidadeFacade unidadeService;
 
     @MockitoBean
     private sgc.processo.service.ProcessoConsultaService processoConsultaService;
