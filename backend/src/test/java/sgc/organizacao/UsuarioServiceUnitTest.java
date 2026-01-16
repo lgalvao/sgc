@@ -60,6 +60,8 @@ class UsuarioServiceUnitTest {
     private ClienteAcessoAd clienteAcessoAd;
     @Mock
     private LoginFacade loginFacade;
+    @Mock
+    private sgc.comum.repo.RepositorioComum repo;
 
     // ========== MÉTODOS DE BUSCA E MAPEAMENTO ==========
 
@@ -154,7 +156,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve lançar erro se usuário não encontrado por ID")
         void deveLancarErroSeUsuarioNaoEncontradoPorId() {
-            when(usuarioRepo.findById("user")).thenReturn(Optional.empty());
+            when(repo.buscar(Usuario.class, "user")).thenThrow(new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), "user"));
             
             assertThatThrownBy(() -> service.buscarPorId("user"))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -405,7 +407,7 @@ class UsuarioServiceUnitTest {
         void deveLancarErroAoAdicionarAdministradorQueJaExiste() {
             Usuario u = new Usuario();
             u.setTituloEleitoral("user");
-            when(usuarioRepo.findById("user")).thenReturn(Optional.of(u));
+            when(repo.buscar(Usuario.class, "user")).thenReturn(u);
             when(administradorRepo.existsById("user")).thenReturn(true);
 
             assertThatThrownBy(() -> service.adicionarAdministrador("user"))
@@ -417,7 +419,7 @@ class UsuarioServiceUnitTest {
         void deveAdicionarAdministradorComSucesso() {
             Usuario u = new Usuario();
             u.setTituloEleitoral("user");
-            when(usuarioRepo.findById("user")).thenReturn(Optional.of(u));
+            when(repo.buscar(Usuario.class, "user")).thenReturn(u);
             when(administradorRepo.existsById("user")).thenReturn(false);
 
             service.adicionarAdministrador("user");
@@ -561,15 +563,6 @@ class UsuarioServiceUnitTest {
             org.springframework.security.core.context.SecurityContextHolder.clearContext();
             
             assertThrows(ErroAccessoNegado.class, () -> service.obterUsuarioAutenticado());
-        }
-
-        @Test
-        @DisplayName("Deve retornar null se usuário for null em toAdministradorDto")
-        void deveRetornarNullParaAdminNull() {
-            var result = (AdministradorDto) ReflectionTestUtils.invokeMethod(
-                    service, "toAdministradorDto", (Object) null);
-            
-            assertNull(result);
         }
 
         @Test

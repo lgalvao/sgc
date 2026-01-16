@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.DefaultApplicationArguments;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.ValidadorDadosOrgService;
 
 import java.util.List;
 
@@ -20,9 +21,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
-@DisplayName("Testes do ValidadorDadosOrganizacionais")
-class ValidadorDadosOrganizacionaisTest {
-
+@DisplayName("Testes do ValidadorDadosOrgService")
+class ValidadorDadosOrgServiceTest {
     @Mock
     private UnidadeRepo unidadeRepo;
 
@@ -30,7 +30,7 @@ class ValidadorDadosOrganizacionaisTest {
     private UsuarioRepo usuarioRepo;
 
     @InjectMocks
-    private ValidadorDadosOrganizacionais validador;
+    private ValidadorDadosOrgService validador;
 
     private Unidade criarUnidadeValida(Long codigo, String sigla, TipoUnidade tipo) {
         Unidade u = new Unidade();
@@ -53,7 +53,6 @@ class ValidadorDadosOrganizacionaisTest {
     @Nested
     @DisplayName("Cenários de Sucesso")
     class CenariosSucesso {
-
         @Test
         @DisplayName("Deve validar com sucesso quando todos os dados estão corretos")
         void deveValidarComSucesso() {
@@ -80,8 +79,7 @@ class ValidadorDadosOrganizacionaisTest {
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(inativa));
 
             // Act & Assert
-            assertThatCode(() -> validador.run(new DefaultApplicationArguments()))
-                    .doesNotThrowAnyException();
+            assertThatCode(() -> validador.run(new DefaultApplicationArguments())).doesNotThrowAnyException();
         }
 
         @Test
@@ -116,8 +114,7 @@ class ValidadorDadosOrganizacionaisTest {
                     .thenReturn(List.of(titularPai, titularFilha));
 
             // Act & Assert
-            assertThatCode(() -> validador.run(new DefaultApplicationArguments()))
-                    .doesNotThrowAnyException();
+            assertThatCode(() -> validador.run(new DefaultApplicationArguments())).doesNotThrowAnyException();
         }
     }
 

@@ -433,7 +433,6 @@ class PainelServiceTest {
             painelService.listarProcessos(Perfil.GESTOR, raizId, org.springframework.data.domain.PageRequest.of(0, 10));
 
             verify(unidadeService, times(1)).buscarIdsDescendentes(raizId);
-            verify(unidadeService, never()).listarSubordinadas(any());
         }
     }
 

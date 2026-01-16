@@ -40,6 +40,7 @@ public class MapaFacade {
     private final MapaSalvamentoService mapaSalvamentoService;
     private final MapaVisualizacaoService mapaVisualizacaoService;
     private final ImpactoMapaService impactoMapaService;
+    private final sgc.comum.repo.RepositorioComum repo;
 
     /**
      * Constructor with @Lazy injection to break circular dependency.
@@ -51,13 +52,15 @@ public class MapaFacade {
             MapaCompletoMapper mapaCompletoMapper,
             MapaSalvamentoService mapaSalvamentoService,
             MapaVisualizacaoService mapaVisualizacaoService,
-            ImpactoMapaService impactoMapaService) {
+            ImpactoMapaService impactoMapaService,
+            sgc.comum.repo.RepositorioComum repo) {
         this.mapaRepo = mapaRepo;
         this.competenciaRepo = competenciaRepo;
         this.mapaCompletoMapper = mapaCompletoMapper;
         this.mapaSalvamentoService = mapaSalvamentoService;
         this.mapaVisualizacaoService = mapaVisualizacaoService;
         this.impactoMapaService = impactoMapaService;
+        this.repo = repo;
     }
 
     // ===================================================================================
@@ -71,8 +74,7 @@ public class MapaFacade {
 
     @Transactional(readOnly = true)
     public Mapa obterPorCodigo(Long codigo) {
-        return mapaRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codigo));
+        return repo.buscar(Mapa.class, codigo);
     }
 
     @Transactional(readOnly = true)
@@ -87,8 +89,7 @@ public class MapaFacade {
 
     @Transactional(readOnly = true)
     public MapaCompletoDto obterMapaCompleto(Long codMapa, Long codSubprocesso) {
-        Mapa mapa = mapaRepo.findById(codMapa)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa não encontrado: %d".formatted(codMapa)));
+        Mapa mapa = repo.buscar(Mapa.class, codMapa);
 
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
         return mapaCompletoMapper.toDto(mapa, codSubprocesso, competencias);
@@ -107,14 +108,11 @@ public class MapaFacade {
     }
 
     public Mapa atualizar(Long codigo, Mapa mapa) {
-        return mapaRepo.findById(codigo)
-                .map(existente -> {
-                    existente.setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado());
-                    existente.setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao());
-                    existente.setDataHoraHomologado(mapa.getDataHoraHomologado());
-                    return mapaRepo.save(existente);
-                })
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codigo));
+        Mapa existente = repo.buscar(Mapa.class, codigo);
+        existente.setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado());
+        existente.setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao());
+        existente.setDataHoraHomologado(mapa.getDataHoraHomologado());
+        return mapaRepo.save(existente);
     }
 
     public void excluir(Long codigo) {

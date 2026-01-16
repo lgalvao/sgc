@@ -102,7 +102,7 @@
  * public abstract class ConhecimentoMapper {
  *     
  *     @Autowired
- *     protected AtividadeRepo atividadeRepo;
+ *     protected RepositorioComum repo;
  *     
  *     @Mapping(source = "atividadeCodigo", target = "atividade")
  *     public abstract Conhecimento toEntity(ConhecimentoDto dto);
@@ -110,9 +110,7 @@
  *     // Método de resolução de FK
  *     public Atividade map(Long codigo) {
  *         return codigo != null
- *             ? atividadeRepo.findById(codigo)
- *                 .orElseThrow(() -> ErroEntidadeDeveriaExistir.fkViolada(
- *                     "Atividade", codigo, "ConhecimentoMapper"))
+ *             ? repo.buscar(Atividade.class, codigo)
  *             : null;
  *     }
  * }
@@ -164,8 +162,8 @@
  * @Mapper(componentModel = "spring")
  * public abstract class ConhecimentoMapper {
  *     
- *     @Autowired  // Injeta repository
- *     protected AtividadeRepo atividadeRepo;
+ *     @Autowired  // Injeta o repositório comum centralizado
+ *     protected RepositorioComum repo;
  *     
  *     // ... métodos de mapeamento
  * }
@@ -212,8 +210,7 @@
  * <h3>3. Validação de FKs</h3>
  * <ul>
  *   <li>Sempre valide FKs ao resolver relacionamentos</li>
- *   <li>Use {@link sgc.comum.erros.ErroEntidadeDeveriaExistir#fkViolada} para erros de FK</li>
- *   <li>Inclua nome do mapper no erro para debugging</li>
+ *   <li>Use {@code repo.buscar(Classe.class, id)} para garantir a existência</li>
  * </ul>
  *
  * <h3>4. Testes</h3>

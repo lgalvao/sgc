@@ -12,8 +12,8 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
-
-import java.util.Optional;
+import sgc.comum.repo.RepositorioComum;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -27,6 +27,7 @@ class SubprocessoMapperTest {
     @Mock private ProcessoRepo processoRepo;
     @Mock private UnidadeRepo unidadeRepo;
     @Mock private MapaRepo mapaRepo;
+    @Mock private RepositorioComum repo;
 
     private SubprocessoMapper mapper;
 
@@ -36,6 +37,7 @@ class SubprocessoMapperTest {
         mapper.processoRepo = processoRepo;
         mapper.unidadeRepo = unidadeRepo;
         mapper.mapaRepo = mapaRepo;
+        mapper.repo = repo;
     }
 
     @Test
@@ -43,7 +45,7 @@ class SubprocessoMapperTest {
     void deveMapearProcesso() {
         Processo p = new Processo();
         p.setCodigo(1L);
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(repo.buscar(Processo.class, 1L)).thenReturn(p);
 
         Processo res = mapper.mapProcesso(1L);
         assertThat(res).isEqualTo(p);
@@ -52,10 +54,9 @@ class SubprocessoMapperTest {
     @Test
     @DisplayName("Deve lançar erro se Processo não encontrado")
     void deveLancarErroProcessoNaoEncontrado() {
-        when(processoRepo.findById(1L)).thenReturn(Optional.empty());
+        when(repo.buscar(Processo.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 1L));
         assertThatThrownBy(() -> mapper.mapProcesso(1L))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("FK violada em SubprocessoMapper");
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -69,7 +70,7 @@ class SubprocessoMapperTest {
     void deveMapearUnidade() {
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        when(unidadeRepo.findById(1L)).thenReturn(Optional.of(u));
+        when(repo.buscar(Unidade.class, 1L)).thenReturn(u);
 
         Unidade res = mapper.mapUnidade(1L);
         assertThat(res).isEqualTo(u);
@@ -78,10 +79,9 @@ class SubprocessoMapperTest {
     @Test
     @DisplayName("Deve lançar erro se Unidade não encontrada")
     void deveLancarErroUnidadeNaoEncontrada() {
-        when(unidadeRepo.findById(1L)).thenReturn(Optional.empty());
+        when(repo.buscar(Unidade.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 1L));
         assertThatThrownBy(() -> mapper.mapUnidade(1L))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("FK violada em SubprocessoMapper");
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -95,7 +95,7 @@ class SubprocessoMapperTest {
     void deveMapearMapa() {
         Mapa m = new Mapa();
         m.setCodigo(1L);
-        when(mapaRepo.findById(1L)).thenReturn(Optional.of(m));
+        when(repo.buscar(Mapa.class, 1L)).thenReturn(m);
 
         Mapa res = mapper.mapMapa(1L);
         assertThat(res).isEqualTo(m);
@@ -104,10 +104,9 @@ class SubprocessoMapperTest {
     @Test
     @DisplayName("Deve lançar erro se Mapa não encontrado")
     void deveLancarErroMapaNaoEncontrado() {
-        when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
+        when(repo.buscar(Mapa.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
         assertThatThrownBy(() -> mapper.mapMapa(1L))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("FK violada em SubprocessoMapper");
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test

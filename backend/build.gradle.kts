@@ -115,7 +115,7 @@ tasks.withType<Test> {
     
     testLogging {
         events(TestLogEvent.SKIPPED, TestLogEvent.FAILED)
-        exceptionFormat = TestExceptionFormat.SHORT
+        exceptionFormat = TestExceptionFormat.FULL
         showStackTraces = true
         showCauses = true
         showStandardStreams = false

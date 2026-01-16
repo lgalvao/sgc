@@ -12,6 +12,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
+import sgc.comum.repo.RepositorioComum;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.MovimentacaoRepo;
@@ -43,7 +44,25 @@ class SubprocessoWorkflowServiceTest {
     @Mock
     private UnidadeFacade unidadeService;
     @Mock
+    private RepositorioComum repo;
+    @Mock
     private MovimentacaoRepo repositorioMovimentacao;
+    @Mock
+    private sgc.subprocesso.service.workflow.SubprocessoTransicaoService transicaoService;
+    @Mock
+    private sgc.analise.AnaliseFacade analiseFacade;
+    @Mock
+    private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
+    @Mock
+    private sgc.mapa.service.ImpactoMapaService impactoMapaService;
+    @Mock
+    private sgc.seguranca.acesso.AccessControlService accessControlService;
+    @Mock
+    private sgc.mapa.service.CompetenciaService competenciaService;
+    @Mock
+    private sgc.mapa.service.AtividadeService atividadeService;
+    @Mock
+    private sgc.mapa.service.MapaFacade mapaFacade;
 
     @InjectMocks
     private SubprocessoWorkflowService service;

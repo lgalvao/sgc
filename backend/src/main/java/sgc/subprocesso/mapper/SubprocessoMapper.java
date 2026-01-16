@@ -12,6 +12,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.comum.repo.RepositorioComum;
 
 /**
  * Mapper (usando MapStruct) entre a entidade Subprocesso e seu DTO.
@@ -29,6 +30,9 @@ public abstract class SubprocessoMapper {
     @Autowired
     protected MapaRepo mapaRepo;
 
+    @Autowired
+    protected RepositorioComum repo;
+
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidade.codigo", target = "codUnidade")
     @Mapping(source = "mapa.codigo", target = "codMapa")
@@ -42,22 +46,16 @@ public abstract class SubprocessoMapper {
 
     public Processo mapProcesso(Long value) {
         if (value == null) return null;
-        return processoRepo.findById(value)
-                .orElseThrow(() -> sgc.comum.erros.ErroEntidadeDeveriaExistir.fkViolada(
-                        "Processo", value, "SubprocessoMapper"));
+        return repo.buscar(Processo.class, value);
     }
 
     public Unidade mapUnidade(Long value) {
         if (value == null) return null;
-        return unidadeRepo.findById(value)
-                .orElseThrow(() -> sgc.comum.erros.ErroEntidadeDeveriaExistir.fkViolada(
-                        "Unidade", value, "SubprocessoMapper"));
+        return repo.buscar(Unidade.class, value);
     }
 
     public Mapa mapMapa(Long value) {
         if (value == null) return null;
-        return mapaRepo.findById(value)
-                .orElseThrow(() -> sgc.comum.erros.ErroEntidadeDeveriaExistir.fkViolada(
-                        "Mapa", value, "SubprocessoMapper"));
+        return repo.buscar(Mapa.class, value);
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import sgc.alerta.AlertaFacade;
-import sgc.notificacao.EventoProcessoListener;
+import sgc.processo.listener.EventoProcessoListener;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
 import sgc.organizacao.UsuarioFacade;

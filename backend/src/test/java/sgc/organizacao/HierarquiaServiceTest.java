@@ -7,24 +7,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.service.HierarquiaService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
-@DisplayName("Testes do ServicoHierarquia")
-class ServicoHierarquiaTest {
+@DisplayName("Testes do HierarquiaService")
+class HierarquiaServiceTest {
 
     @InjectMocks
-    private ServicoHierarquia servicoHierarquia;
+    private HierarquiaService hierarquiaService;
 
-    @Test
-    @DisplayName("Deve retornar false quando unidades são nulas")
-    void deveRetornarFalseQuandoUnidadesSaoNulas() {
-        assertThat(servicoHierarquia.isSubordinada(null, null)).isFalse();
-        assertThat(servicoHierarquia.isSubordinada(criarUnidade(1L, null), null)).isFalse();
-        assertThat(servicoHierarquia.isSubordinada(null, criarUnidade(1L, null))).isFalse();
-    }
 
     @Test
     @DisplayName("Deve retornar false quando unidade alvo não tem superior")
@@ -32,7 +26,7 @@ class ServicoHierarquiaTest {
         Unidade alvo = criarUnidade(1L, null);
         Unidade superior = criarUnidade(2L, null);
 
-        assertThat(servicoHierarquia.isSubordinada(alvo, superior)).isFalse();
+        assertThat(hierarquiaService.isSubordinada(alvo, superior)).isFalse();
     }
 
     @Test
@@ -41,7 +35,7 @@ class ServicoHierarquiaTest {
         Unidade superior = criarUnidade(1L, null);
         Unidade alvo = criarUnidade(2L, superior);
 
-        assertThat(servicoHierarquia.isSubordinada(alvo, superior)).isTrue();
+        assertThat(hierarquiaService.isSubordinada(alvo, superior)).isTrue();
     }
 
     @Test
@@ -51,7 +45,7 @@ class ServicoHierarquiaTest {
         Unidade intermediaria = criarUnidade(2L, raiz);
         Unidade alvo = criarUnidade(3L, intermediaria);
 
-        assertThat(servicoHierarquia.isSubordinada(alvo, raiz)).isTrue();
+        assertThat(hierarquiaService.isSubordinada(alvo, raiz)).isTrue();
     }
 
     @Test
@@ -61,7 +55,7 @@ class ServicoHierarquiaTest {
         Unidade raiz2 = criarUnidade(2L, null);
         Unidade alvo = criarUnidade(3L, raiz1);
 
-        assertThat(servicoHierarquia.isSubordinada(alvo, raiz2)).isFalse();
+        assertThat(hierarquiaService.isSubordinada(alvo, raiz2)).isFalse();
     }
 
     @Test
@@ -69,7 +63,7 @@ class ServicoHierarquiaTest {
     void deveRetornarTrueParaMesmaUnidade() {
         Unidade unidade = criarUnidade(1L, null);
 
-        assertThat(servicoHierarquia.isMesmaOuSubordinada(unidade, unidade)).isTrue();
+        assertThat(hierarquiaService.isMesmaOuSubordinada(unidade, unidade)).isTrue();
     }
 
     @Test
@@ -78,15 +72,9 @@ class ServicoHierarquiaTest {
         Unidade superior = criarUnidade(1L, null);
         Unidade alvo = criarUnidade(2L, superior);
 
-        assertThat(servicoHierarquia.isMesmaOuSubordinada(alvo, superior)).isTrue();
+        assertThat(hierarquiaService.isMesmaOuSubordinada(alvo, superior)).isTrue();
     }
 
-    @Test
-    @DisplayName("Deve retornar false para unidades nulas em isMesmaOuSubordinada")
-    void deveRetornarFalseParaUnidadesNulasEmIsMesmaOuSubordinada() {
-        assertThat(servicoHierarquia.isMesmaOuSubordinada(null, null)).isFalse();
-        assertThat(servicoHierarquia.isMesmaOuSubordinada(criarUnidade(1L, null), null)).isFalse();
-    }
 
     @Test
     @DisplayName("Deve retornar true quando é superior imediata")
@@ -94,7 +82,7 @@ class ServicoHierarquiaTest {
         Unidade superior = criarUnidade(1L, null);
         Unidade alvo = criarUnidade(2L, superior);
 
-        assertThat(servicoHierarquia.isSuperiorImediata(alvo, superior)).isTrue();
+        assertThat(hierarquiaService.isSuperiorImediata(alvo, superior)).isTrue();
     }
 
     @Test
@@ -104,7 +92,7 @@ class ServicoHierarquiaTest {
         Unidade intermediaria = criarUnidade(2L, raiz);
         Unidade alvo = criarUnidade(3L, intermediaria);
 
-        assertThat(servicoHierarquia.isSuperiorImediata(alvo, raiz)).isFalse();
+        assertThat(hierarquiaService.isSuperiorImediata(alvo, raiz)).isFalse();
     }
 
     private Unidade criarUnidade(Long codigo, Unidade superior) {

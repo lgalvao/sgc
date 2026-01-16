@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import sgc.alerta.dto.AlertaDto;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroInvarianteViolada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.CompetenciaRepo;
@@ -38,7 +39,6 @@ import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -51,25 +51,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Cobertura Extra de Controllers e Services")
 class ControllersServicesCoverageTest {
-    @Mock
-    private SubprocessoFacade subprocessoFacade;
-    @Mock
-    private MapaRepo mapaRepo;
-    @Mock
-    private CompetenciaRepo competenciaRepo;
-    @Mock
-    private SubprocessoRepo repositorioSubprocesso;
-    @Mock
-    private sgc.alerta.AlertaFacade alertaService;
-    // Removido atividadeRepo não utilizado
-    @Mock
-    private sgc.mapa.mapper.MapaCompletoMapper mapaCompletoMapper;
-    @Mock
-    private MapaSalvamentoService mapaSalvamentoService;
-    @Mock
-    private sgc.mapa.service.ImpactoMapaService impactoMapaService;
-    
-    // Mocks adicionais para preencher construtores e evitar null
+    @Mock private SubprocessoFacade subprocessoFacade;
+    @Mock private MapaRepo mapaRepo;
+    @Mock private CompetenciaRepo competenciaRepo;
+    @Mock private SubprocessoRepo repositorioSubprocesso;
+    @Mock private sgc.alerta.AlertaFacade alertaService;
+    @Mock private sgc.mapa.mapper.MapaCompletoMapper mapaCompletoMapper;
+    @Mock private MapaSalvamentoService mapaSalvamentoService;
+    @Mock private sgc.mapa.service.ImpactoMapaService impactoMapaService;
     @Mock private sgc.mapa.service.MapaVisualizacaoService mapaVisualizacaoService;
     @Mock private sgc.subprocesso.service.workflow.SubprocessoWorkflowService subprocessoWorkflowService;
     @Mock private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
@@ -83,6 +72,7 @@ class ControllersServicesCoverageTest {
     @Mock private sgc.subprocesso.model.MovimentacaoRepo movimentacaoRepo;
     @Mock private sgc.mapa.service.CompetenciaService competenciaService;
     @Mock private sgc.mapa.service.AtividadeService atividadeService;
+    @Mock private sgc.comum.repo.RepositorioComum repo;
 
     private SubprocessoMapaController subprocessoMapaController;
     private MapaFacade mapaFacade;
@@ -91,22 +81,17 @@ class ControllersServicesCoverageTest {
 
     @BeforeEach
     void setUp() {
-        // Instanciação manual para evitar overhead do @InjectMocks e lidar com muitas dependências
-        
-        // MapaFacade (needs to be created first since SubprocessoMapaController depends on it)
         mapaFacade = new MapaFacade(
                 mapaRepo, competenciaRepo, mapaCompletoMapper, mapaSalvamentoService,
-                mapaVisualizacaoService, impactoMapaService
+                mapaVisualizacaoService, impactoMapaService, repo
         );
         
-        // SubprocessoMapaController
         subprocessoMapaController = new SubprocessoMapaController(
                 subprocessoFacade,
                 mapaFacade,
                 usuarioService
         );
 
-        // SubprocessoWorkflowService (unified)
         cadastroService = new SubprocessoWorkflowService(
                 repositorioSubprocesso,
                 crudService,
@@ -120,10 +105,10 @@ class ControllersServicesCoverageTest {
                 accessControlService,
                 competenciaService,
                 atividadeService,
-                mapaFacade
+                mapaFacade,
+                repo
         );
 
-        // PainelFacade
         painelService = new PainelFacade(
                 processoFacade, alertaService, unidadeService
         );
@@ -148,7 +133,6 @@ class ControllersServicesCoverageTest {
     @Test
     @DisplayName("Deve lançar erro de acesso negado quando usuário não autenticado em verificarImpactos")
     void deveLancarErroAcessoNegado() {
-        // Simula usuário não autenticado retornando null ou lançando exceção
         when(usuarioService.obterUsuarioAutenticado())
             .thenThrow(new ErroAccessoNegado("Usuário não autenticado"));
         
@@ -159,7 +143,7 @@ class ControllersServicesCoverageTest {
     @Test
     @DisplayName("Deve lançar erro ao obter mapa completo inexistente")
     void deveLancarErroObterMapaCompletoInexistente() {
-        when(mapaRepo.findById(99L)).thenReturn(Optional.empty());
+        when(repo.buscar(Mapa.class, 99L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 99L));
         assertThatThrownBy(() -> mapaFacade.obterMapaCompleto(99L, 1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
@@ -179,6 +163,7 @@ class ControllersServicesCoverageTest {
     void deveDelegarSalvarCompetenciaInexistente() {
         SalvarMapaRequest req = new SalvarMapaRequest();
         req.setObservacoes("Obs");
+
         CompetenciaMapaDto compDto = new CompetenciaMapaDto();
         compDto.setCodigo(99L);
         compDto.setDescricao("Desc");
@@ -195,7 +180,7 @@ class ControllersServicesCoverageTest {
     @Test
     @DisplayName("Deve lançar erro ao atualizar mapa inexistente")
     void deveLancarErroAtualizarMapaInexistente() {
-        when(mapaRepo.findById(99L)).thenReturn(Optional.empty());
+        when(repo.buscar(Mapa.class, 99L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 99L));
         Mapa mapa = new Mapa();
         assertThatThrownBy(() -> mapaFacade.atualizar(99L, mapa))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -209,8 +194,6 @@ class ControllersServicesCoverageTest {
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
-    // --- SubprocessoCadastroWorkflowService Tests ---
-
     @Test
     @DisplayName("Deve lançar erro ao validar disponibilização sem mapa")
     void deveLancarErroAoValidarDisponibilizacaoSemMapa() {
@@ -222,7 +205,7 @@ class ControllersServicesCoverageTest {
         unidade.setTituloTitular("123");
         sp.setUnidade(unidade);
 
-        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         // Mapa nulo
 
         assertThatThrownBy(() -> cadastroService.disponibilizarCadastro(1L, usuario))
@@ -236,7 +219,7 @@ class ControllersServicesCoverageTest {
         Unidade unidade = new Unidade(); // Sem superior
         sp.setUnidade(unidade);
 
-        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
         assertThatThrownBy(() -> cadastroService.devolverCadastro(1L, "Obs", new Usuario()))
                 .isInstanceOf(sgc.comum.erros.ErroInvarianteViolada.class);
@@ -259,10 +242,8 @@ class ControllersServicesCoverageTest {
         
         Usuario usuario = new Usuario();
         
-        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         
-        // Após refatoração de segurança, a validação de situação é feita no AccessControlService
-        // que lança ErroAccessoNegado em vez de ErroProcessoEmSituacaoInvalida
         doThrow(new ErroAccessoNegado("Situação inválida"))
                 .when(accessControlService)
                 .verificarPermissao(any(), any(), any());
@@ -279,10 +260,10 @@ class ControllersServicesCoverageTest {
         Unidade unidade = new Unidade(); // Sem superior
         sp.setUnidade(unidade);
 
-        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
         assertThatThrownBy(() -> cadastroService.aceitarRevisaoCadastro(1L, "Obs", new Usuario()))
-                .isInstanceOf(sgc.comum.erros.ErroInvarianteViolada.class);
+                .isInstanceOf(ErroInvarianteViolada.class);
     }
 
     @Test

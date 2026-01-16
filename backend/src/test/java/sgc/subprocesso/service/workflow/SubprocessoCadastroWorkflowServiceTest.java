@@ -11,6 +11,7 @@ import sgc.analise.AnaliseFacade;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroInvarianteViolada;
 import sgc.comum.erros.ErroValidacao;
+import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
@@ -27,7 +28,6 @@ import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -53,6 +53,18 @@ class SubprocessoCadastroWorkflowServiceTest {
     private ImpactoMapaService impactoMapaService;
     @Mock
     private sgc.seguranca.acesso.AccessControlService accessControlService;
+    @Mock
+    private RepositorioComum repo;
+    @Mock
+    private sgc.mapa.service.CompetenciaService competenciaService;
+    @Mock
+    private sgc.mapa.service.AtividadeService atividadeService;
+    @Mock
+    private sgc.mapa.service.MapaFacade mapaFacade;
+    @Mock
+    private sgc.subprocesso.model.MovimentacaoRepo repositorioMovimentacao;
+    @Mock
+    private sgc.subprocesso.service.crud.SubprocessoCrudService crudService;
 
     @InjectMocks
     private SubprocessoWorkflowService service;
@@ -75,7 +87,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(u);
         sp.setMapa(mapa);
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         when(validacaoService.obterAtividadesSemConhecimento(id))
                 .thenReturn(Collections.emptyList());
 
@@ -105,7 +117,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(u);
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         doThrow(new ErroAccessoNegado("Acesso negado para teste"))
                 .when(accessControlService).verificarPermissao(any(), any(), any());
 
@@ -125,7 +137,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(u);
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         when(validacaoService.obterAtividadesSemConhecimento(id))
                 .thenReturn(List.of(new Atividade()));
 
@@ -146,7 +158,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(u);
         sp.setMapa(null); // Mapa nulo
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         when(validacaoService.obterAtividadesSemConhecimento(id))
                 .thenReturn(Collections.emptyList());
 
@@ -172,7 +184,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(u);
         sp.setMapa(mapa);
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         when(validacaoService.obterAtividadesSemConhecimento(id))
                 .thenReturn(Collections.emptyList());
 
@@ -204,7 +216,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(u);
         u.setUnidadeSuperior(new Unidade());
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
 
         service.devolverCadastro(id, "obs", user);
 
@@ -233,7 +245,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(u);
         Usuario user = new Usuario();
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
 
         service.aceitarCadastro(id, "obs", user);
 
@@ -256,7 +268,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(u);
         Usuario user = new Usuario();
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
 
         assertThatThrownBy(() -> service.aceitarCadastro(id, "obs", user))
                 .isInstanceOf(ErroInvarianteViolada.class);
@@ -275,7 +287,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(u);
         Usuario user = new Usuario();
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
 
         assertThatThrownBy(() -> service.devolverRevisaoCadastro(id, "obs", user))
                 .isInstanceOf(ErroInvarianteViolada.class);
@@ -292,7 +304,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         Usuario user = new Usuario();
         Unidade sedoc = new Unidade();
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(sedoc);
 
         service.homologarCadastro(id, "obs", user);
@@ -315,7 +327,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         Usuario user = new Usuario();
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         doThrow(new ErroProcessoEmSituacaoInvalida("Situação inválida"))
                 .when(accessControlService).verificarPermissao(any(), any(), any());
 
@@ -343,7 +355,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         Usuario user = new Usuario();
         user.setUnidadeLotacao(u);
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         
         service.devolverRevisaoCadastro(id, "obs", user);
 
@@ -377,7 +389,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         Usuario user = new Usuario();
         user.setUnidadeLotacao(u);
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         
         service.aceitarRevisaoCadastro(id, "obs", user);
 
@@ -401,7 +413,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(u);
         Usuario user = new Usuario();
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
 
         assertThatThrownBy(() -> service.aceitarRevisaoCadastro(id, "obs", user))
                 .isInstanceOf(ErroInvarianteViolada.class);
@@ -419,7 +431,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         ImpactoMapaDto impactoDto = ImpactoMapaDto.builder().temImpactos(true).build();
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         when(impactoMapaService.verificarImpactos(any(Subprocesso.class), eq(user))).thenReturn(impactoDto);
         when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
 
@@ -443,7 +455,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         Usuario user = new Usuario();
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         when(impactoMapaService.verificarImpactos(any(Subprocesso.class), eq(user)))
                 .thenReturn(ImpactoMapaDto.semImpacto());
 
@@ -460,7 +472,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         Usuario user = new Usuario();
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         doThrow(new ErroProcessoEmSituacaoInvalida("Estado inválido"))
                 .when(accessControlService).verificarPermissao(any(), any(), any());
 
@@ -485,7 +497,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(u);
         sp.setMapa(mapa);
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         // Removed unnecessary stubbing
         org.mockito.Mockito.doThrow(
                         new ErroValidacao(
@@ -514,7 +526,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(u);
         sp.setMapa(mapa);
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         // Removed unnecessary stubbing
         org.mockito.Mockito.doThrow(
                         new ErroValidacao(
@@ -536,7 +548,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         
         service.disponibilizarCadastro(id, new Usuario());
         
@@ -553,7 +565,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         mapa.setCodigo(null);
         sp.setMapa(mapa);
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
 
         assertThatThrownBy(() -> service.disponibilizarCadastro(id, new Usuario()))
                 .isInstanceOf(sgc.subprocesso.erros.ErroMapaNaoAssociado.class);
@@ -570,7 +582,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         u.setUnidadeSuperior(sup);
         sp.setUnidade(u);
 
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
 
         service.aceitarRevisaoCadastro(id, "obs", new Usuario());
 

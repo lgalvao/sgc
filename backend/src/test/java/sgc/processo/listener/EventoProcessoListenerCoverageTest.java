@@ -1,4 +1,4 @@
-package sgc.notificacao;
+package sgc.processo.listener;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroEstadoImpossivel;
+import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.NotificacaoModelosService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;

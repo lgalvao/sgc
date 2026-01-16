@@ -147,9 +147,7 @@ public class ProcessoInicializador {
                 for (Long codUnidade : codigosUnidades) {
                     Unidade unidade = mapaUnidades.get(codUnidade);
                     if (unidade == null) {
-                         throw new sgc.comum.erros.ErroEntidadeDeveriaExistir(
-                                 "Unidade", codUnidade,
-                                 "ProcessoInicializador - unidade deveria existir ao iniciar processo");
+                         throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
                     }
                     sgc.organizacao.model.UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
                     subprocessoFactory.criarParaRevisao(processo, unidade, um);

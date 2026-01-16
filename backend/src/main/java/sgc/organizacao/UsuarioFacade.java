@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
+import sgc.comum.repo.RepositorioComum;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
@@ -17,12 +18,14 @@ import static java.util.stream.Collectors.toMap;
 
 @Service
 @Slf4j
+@lombok.RequiredArgsConstructor
 public class UsuarioFacade {
     private static final String ENTIDADE_USUARIO = "Usuário";
     private final UsuarioRepo usuarioRepo;
     private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final AdministradorRepo administradorRepo;
     private final UnidadeRepo unidadeRepo;
+    private final RepositorioComum repo;
 
     @Transactional(readOnly = true)
     public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
@@ -32,16 +35,6 @@ public class UsuarioFacade {
             usuario.getAuthorities();
         }
         return usuario;
-    }
-
-    public UsuarioFacade(UsuarioRepo usuarioRepo,
-            UsuarioPerfilRepo usuarioPerfilRepo,
-            AdministradorRepo administradorRepo,
-            UnidadeRepo unidadeRepo) {
-        this.usuarioRepo = usuarioRepo;
-        this.usuarioPerfilRepo = usuarioPerfilRepo;
-        this.administradorRepo = administradorRepo;
-        this.unidadeRepo = unidadeRepo;
     }
 
     public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
@@ -56,9 +49,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public Usuario buscarPorId(String titulo) {
-        return usuarioRepo
-                .findById(titulo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, titulo));
+        return repo.buscar(Usuario.class, titulo);
     }
 
     @Transactional(readOnly = true)
@@ -76,41 +67,31 @@ public class UsuarioFacade {
     }
 
     /**
-     * Obtém o usuário atualmente autenticado a partir do contexto de segurança do
-     * Spring.
-     * 
-     * @return O usuário autenticado
-     * @throws ErroAccessoNegado se não houver usuário autenticado
+     * Obtém o título do usuário autenticado do contexto de segurança.
      */
-    @Transactional(readOnly = true)
-    public Usuario obterUsuarioAutenticado() {
+    private Optional<String> getTituloUsuarioAutenticado() {
         org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
                 .getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()
                 || authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken) {
-            throw new ErroAccessoNegado("Nenhum usuário autenticado no contexto");
+            return Optional.empty();
         }
-
-        String tituloEleitoral = authentication.getName();
-        return buscarPorLoginInterno(tituloEleitoral);
+        return Optional.of(authentication.getName());
     }
 
-    /**
-     * Obtém o usuário atualmente autenticado ou null se não houver usuário autenticado.
-     * <p>
-     * Útil para operações que podem ser executadas tanto por usuários autenticados
-     * quanto pelo sistema (ex: criação automática de subprocessos).
-     * 
-     * @return O usuário autenticado ou null
-     */
+    @Transactional(readOnly = true)
+    public Usuario obterUsuarioAutenticado() {
+        return getTituloUsuarioAutenticado()
+                .map(this::buscarPorLoginInterno)
+                .orElseThrow(() -> new ErroAccessoNegado("Nenhum usuário autenticado no contexto"));
+    }
+
     @Transactional(readOnly = true)
     public @Nullable Usuario obterUsuarioAutenticadoOuNull() {
-        try {
-            return obterUsuarioAutenticado();
-        } catch (ErroAccessoNegado e) {
-            return null;
-        }
+        return getTituloUsuarioAutenticado()
+                .map(this::buscarPorLoginInterno)
+                .orElse(null);
     }
 
     @Transactional(readOnly = true)
@@ -118,12 +99,10 @@ public class UsuarioFacade {
         Unidade unidade = unidadeRepo.findBySigla(sigla)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", sigla));
 
-        // Primeiro busca o chefe (pode ser lazy)
         Usuario usuarioSimples = usuarioRepo
                 .chefePorCodUnidade(unidade.getCodigo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Responsável da unidade", sigla));
 
-        // Recarrega com join fetch para garantir as atribuições
         Usuario usuarioCompleto = usuarioRepo.findByIdWithAtribuicoes(usuarioSimples.getTituloEleitoral())
                 .orElseThrow(
                         () -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, usuarioSimples.getTituloEleitoral()));
@@ -150,8 +129,7 @@ public class UsuarioFacade {
     }
 
     private void carregarAtribuicoesEmLote(List<Usuario> usuarios) {
-        if (usuarios.isEmpty())
-            return;
+        if (usuarios.isEmpty()) return;
 
         List<String> titulos = usuarios.stream()
                 .map(Usuario::getTituloEleitoral)
@@ -220,14 +198,11 @@ public class UsuarioFacade {
             return Collections.emptyMap();
         }
 
-        // Carrega todos os usuários com atribuições em uma única query (elimina N+1)
         List<String> titulos = todosChefes.stream()
                 .map(Usuario::getTituloEleitoral)
                 .toList();
 
         List<Usuario> chefesCompletos = usuarioRepo.findByIdInWithAtribuicoes(titulos);
-
-        // Carrega perfis em lote
         carregarAtribuicoesEmLote(chefesCompletos);
 
         Map<Long, List<Usuario>> chefesPorUnidade = chefesCompletos.stream()
@@ -340,8 +315,6 @@ public class UsuarioFacade {
                 .build();
     }
 
-    // ===================== ADMINISTRADORES =====================
-
     @Transactional(readOnly = true)
     public List<AdministradorDto> listarAdministradores() {
         return administradorRepo.findAll().stream()
@@ -353,8 +326,7 @@ public class UsuarioFacade {
 
     @Transactional
     public AdministradorDto adicionarAdministrador(String usuarioTitulo) {
-        Usuario usuario = usuarioRepo.findById(usuarioTitulo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, usuarioTitulo));
+        Usuario usuario = repo.buscar(Usuario.class, usuarioTitulo);
 
         if (administradorRepo.existsById(usuarioTitulo)) {
             throw new ErroValidacao("Usuário já é administrador");
@@ -394,10 +366,6 @@ public class UsuarioFacade {
     }
 
     private AdministradorDto toAdministradorDto(Usuario usuario) {
-        if (usuario == null) {
-            return null;
-        }
-
         Unidade unidadeLotacao = usuario.getUnidadeLotacao();
 
         return AdministradorDto.builder()
@@ -410,10 +378,9 @@ public class UsuarioFacade {
     }
 
     public @Nullable String extractTituloUsuario(@Nullable Object principal) {
-        if (principal instanceof String string)
-            return string;
-        if (principal instanceof Usuario usuario)
-            return usuario.getTituloEleitoral();
+        if (principal instanceof String string) return string;
+        if (principal instanceof Usuario usuario) return usuario.getTituloEleitoral();
+
         return principal != null ? principal.toString() : null;
     }
 }

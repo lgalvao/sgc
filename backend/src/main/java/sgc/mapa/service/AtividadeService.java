@@ -5,14 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.evento.EventoMapaAlterado;
 import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
 
 import java.util.List;
 
@@ -21,11 +20,9 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class AtividadeService {
-    private static final String ENTIDADE_ATIVIDADE = "Atividade";
-    private static final String ENTIDADE_MAPA = "Mapa";
 
     private final AtividadeRepo atividadeRepo;
-    private final MapaRepo mapaRepo;
+    private final RepositorioComum repo;
     private final AtividadeMapper atividadeMapper;
     private final ConhecimentoService conhecimentoService;
     private final ApplicationEventPublisher eventPublisher;
@@ -37,15 +34,12 @@ public class AtividadeService {
 
     @Transactional(readOnly = true)
     public AtividadeDto obterDto(Long codAtividade) {
-        return atividadeRepo.findById(codAtividade)
-                .map(atividadeMapper::toDto)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_ATIVIDADE, codAtividade));
+        return atividadeMapper.toDto(obterPorCodigo(codAtividade));
     }
 
     @Transactional(readOnly = true)
     public Atividade obterPorCodigo(Long codAtividade) {
-        return atividadeRepo.findById(codAtividade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_ATIVIDADE, codAtividade));
+        return repo.buscar(Atividade.class, codAtividade);
     }
 
     @Transactional(readOnly = true)
@@ -54,11 +48,10 @@ public class AtividadeService {
     }
 
     public AtividadeDto criar(AtividadeDto atividadeDto) {
-        Mapa mapa = mapaRepo.findById(atividadeDto.getMapaCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_MAPA, atividadeDto.getMapaCodigo()));
+        Mapa mapa = repo.buscar(Mapa.class, atividadeDto.getMapaCodigo());
 
         if (mapa.getSubprocesso() == null) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso", null);
+            throw new sgc.comum.erros.ErroEntidadeNaoEncontrada("Subprocesso", null);
         }
 
         notificarAlteracaoMapa(atividadeDto.getMapaCodigo());
@@ -71,8 +64,7 @@ public class AtividadeService {
     }
 
     public void atualizar(Long codigo, AtividadeDto atividadeDto) {
-        Atividade existente = atividadeRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_ATIVIDADE, codigo));
+        Atividade existente = repo.buscar(Atividade.class, codigo);
 
         atualizarAtividadeExistente(atividadeDto, existente);
     }
@@ -89,8 +81,7 @@ public class AtividadeService {
     }
 
     public void excluir(Long codAtividade) {
-        Atividade atividade = atividadeRepo.findById(codAtividade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_ATIVIDADE, codAtividade));
+        Atividade atividade = repo.buscar(Atividade.class, codAtividade);
 
         excluirAtividadeEConhecimentos(atividade);
     }

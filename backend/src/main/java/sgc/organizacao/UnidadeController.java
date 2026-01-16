@@ -12,6 +12,10 @@ import sgc.processo.model.TipoProcesso;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
+import static sgc.processo.model.TipoProcesso.REVISAO;
 
 /**
  * Controle para operações relacionadas a unidades organizacionais
@@ -33,6 +37,7 @@ public class UnidadeController {
     @PostMapping("/{codUnidade}/atribuicoes-temporarias")
     public ResponseEntity<Void> criarAtribuicaoTemporaria(
             @PathVariable Long codUnidade, @RequestBody CriarAtribuicaoTemporariaRequest request) {
+
         unidadeService.criarAtribuicaoTemporaria(codUnidade, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -71,10 +76,9 @@ public class UnidadeController {
             @RequestParam(value = "codProcesso", required = false) Long codProcesso) {
 
         TipoProcesso tipo = TipoProcesso.valueOf(tipoProcesso);
-        boolean requerMapaVigente = tipo == TipoProcesso.REVISAO || tipo == TipoProcesso.DIAGNOSTICO;
-        
-        java.util.Set<Long> bloqueadas = processoFacade.buscarIdsUnidadesEmProcessosAtivos(codProcesso);
-        
+        boolean requerMapaVigente = tipo == REVISAO || tipo == DIAGNOSTICO;
+
+        Set<Long> bloqueadas = processoFacade.buscarIdsUnidadesEmProcessosAtivos(codProcesso);
         List<UnidadeDto> arvore = unidadeService.buscarArvoreComElegibilidade(requerMapaVigente, bloqueadas);
 
         return ResponseEntity.ok(arvore);
@@ -88,8 +92,7 @@ public class UnidadeController {
      * @return Um objeto com o campo temMapaVigente (boolean)
      */
     @GetMapping("/{codigoUnidade}/mapa-vigente")
-    public ResponseEntity<Map<String, Boolean>> verificarMapaVigente(
-            @PathVariable Long codigoUnidade) {
+    public ResponseEntity<Map<String, Boolean>> verificarMapaVigente(@PathVariable Long codigoUnidade) {
         boolean temMapaVigente = unidadeService.verificarMapaVigente(codigoUnidade);
         return ResponseEntity.ok(Map.of("temMapaVigente", temMapaVigente));
     }
@@ -101,8 +104,7 @@ public class UnidadeController {
      * @return Lista de usuários da unidade
      */
     @GetMapping("/{codigoUnidade}/usuarios")
-    public ResponseEntity<List<UsuarioDto>> buscarUsuariosPorUnidade(
-            @PathVariable Long codigoUnidade) {
+    public ResponseEntity<List<UsuarioDto>> buscarUsuariosPorUnidade(@PathVariable Long codigoUnidade) {
         List<UsuarioDto> usuarios = unidadeService.buscarUsuariosPorUnidade(codigoUnidade);
         return ResponseEntity.ok(usuarios);
     }
@@ -110,12 +112,12 @@ public class UnidadeController {
     /**
      * Busca uma unidade específica pela sua sigla.
      *
-     * @param sigla A sigla da unidade.
+     * @param siglaUnidade A sigla da unidade.
      * @return Os dados da unidade.
      */
-    @GetMapping("/sigla/{sigla}")
-    public ResponseEntity<UnidadeDto> buscarUnidadePorSigla(@PathVariable String sigla) {
-        UnidadeDto unidade = unidadeService.buscarPorSigla(sigla);
+    @GetMapping("/sigla/{siglaUnidade}")
+    public ResponseEntity<UnidadeDto> buscarUnidadePorSigla(@PathVariable String siglaUnidade) {
+        UnidadeDto unidade = unidadeService.buscarPorSigla(siglaUnidade);
         return ResponseEntity.ok(unidade);
     }
 
@@ -139,11 +141,7 @@ public class UnidadeController {
      */
     @GetMapping("/{codigo}/arvore")
     public ResponseEntity<UnidadeDto> buscarArvoreUnidade(@PathVariable Long codigo) {
-        UnidadeDto unidade = unidadeService.buscarArvore(codigo);
-        if (unidade == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(unidade);
+        return ResponseEntity.ok(unidadeService.buscarArvore(codigo));
     }
 
     /**
@@ -166,10 +164,9 @@ public class UnidadeController {
      */
     @GetMapping("/sigla/{sigla}/superior")
     public ResponseEntity<String> buscarSiglaSuperior(@PathVariable String sigla) {
-        String siglaSuperior = unidadeService.buscarSiglaSuperior(sigla);
-        if (siglaSuperior == null) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(siglaSuperior);
+        return unidadeService
+                .buscarSiglaSuperior(sigla)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 }

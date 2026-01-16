@@ -36,8 +36,6 @@ public class UsuarioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // ===================== ADMINISTRADORES =====================
-
     @GetMapping("/administradores")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lista todos os administradores")
@@ -67,3 +65,4 @@ public class UsuarioController {
         return ResponseEntity.ok().build();
     }
 }
+

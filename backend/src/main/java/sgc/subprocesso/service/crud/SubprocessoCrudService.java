@@ -4,7 +4,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioFacade;
@@ -50,6 +50,7 @@ public class SubprocessoCrudService {
     private final MapaFacade mapaFacade;
     private final ApplicationEventPublisher eventPublisher;
     private final UsuarioFacade usuarioService;
+    private final RepositorioComum repo;
 
     /**
      * Constructor with @Lazy injection to break circular dependency.
@@ -61,24 +62,24 @@ public class SubprocessoCrudService {
             SubprocessoMapper subprocessoMapper,
             @Lazy MapaFacade mapaFacade,
             ApplicationEventPublisher eventPublisher,
-            UsuarioFacade usuarioService) {
+            UsuarioFacade usuarioService,
+            RepositorioComum repo) {
         this.repositorioSubprocesso = repositorioSubprocesso;
         this.subprocessoMapper = subprocessoMapper;
         this.mapaFacade = mapaFacade;
         this.eventPublisher = eventPublisher;
         this.usuarioService = usuarioService;
+        this.repo = repo;
     }
 
     public Subprocesso buscarSubprocesso(Long codigo) {
-        return repositorioSubprocesso
-                .findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(MSG_SUBPROCESSO_NAO_ENCONTRADO, codigo));
+        return repo.buscar(Subprocesso.class, codigo);
     }
 
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
         Subprocesso subprocesso = buscarSubprocesso(codigo);
         if (subprocesso.getMapa() == null) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado", codigo);
+            throw new sgc.comum.erros.ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado", codigo);
         }
         return subprocesso;
     }
@@ -112,7 +113,7 @@ public class SubprocessoCrudService {
     public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
         return repositorioSubprocesso
                 .findByMapaCodigo(codMapa)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
+                .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada(
                         "%s para o mapa com código %d".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codMapa)));
     }
 
@@ -161,28 +162,25 @@ public class SubprocessoCrudService {
     }
 
     public SubprocessoDto atualizar(Long codigo, AtualizarSubprocessoRequest request) {
-        return repositorioSubprocesso.findById(codigo)
-                .map(subprocesso -> {
-                    SituacaoSubprocesso situacaoAnterior = subprocesso.getSituacao();
-                    Set<String> camposAlterados = processarAlteracoes(subprocesso, request);
+        Subprocesso subprocesso = buscarSubprocesso(codigo);
+        SituacaoSubprocesso situacaoAnterior = subprocesso.getSituacao();
+        Set<String> camposAlterados = processarAlteracoes(subprocesso, request);
 
-                    Subprocesso salvo = repositorioSubprocesso.save(subprocesso);
+        Subprocesso salvo = repositorioSubprocesso.save(subprocesso);
 
-                    // Publica evento de atualização se houve mudanças
-                    if (!camposAlterados.isEmpty()) {
-                        EventoSubprocessoAtualizado evento = EventoSubprocessoAtualizado.builder()
-                                .subprocesso(salvo)
-                                .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
-                                .camposAlterados(camposAlterados)
-                                .dataHoraAtualizacao(LocalDateTime.now())
-                                .situacaoAnterior(situacaoAnterior)
-                                .build();
-                        eventPublisher.publishEvent(evento);
-                    }
+        // Publica evento de atualização se houve mudanças
+        if (!camposAlterados.isEmpty()) {
+            EventoSubprocessoAtualizado evento = EventoSubprocessoAtualizado.builder()
+                    .subprocesso(salvo)
+                    .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
+                    .camposAlterados(camposAlterados)
+                    .dataHoraAtualizacao(LocalDateTime.now())
+                    .situacaoAnterior(situacaoAnterior)
+                    .build();
+            eventPublisher.publishEvent(evento);
+        }
 
-                    return subprocessoMapper.toDTO(salvo);
-                })
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(MSG_SUBPROCESSO_NAO_ENCONTRADO, codigo));
+        return subprocessoMapper.toDTO(salvo);
     }
 
     private Set<String> processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
@@ -222,8 +220,7 @@ public class SubprocessoCrudService {
     }
 
     public void excluir(Long codigo) {
-        Subprocesso subprocesso = repositorioSubprocesso.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(MSG_SUBPROCESSO_NAO_ENCONTRADO, codigo));
+        Subprocesso subprocesso = buscarSubprocesso(codigo);
 
         // Publica evento ANTES da exclusão
         EventoSubprocessoExcluido evento = EventoSubprocessoExcluido.builder()
@@ -249,7 +246,7 @@ public class SubprocessoCrudService {
     public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
         Subprocesso sp = repositorioSubprocesso
                 .findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
+                .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada(
                         "%s para o processo %s e unidade %s".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codProcesso,
                                 codUnidade)));
         return subprocessoMapper.toDTO(sp);

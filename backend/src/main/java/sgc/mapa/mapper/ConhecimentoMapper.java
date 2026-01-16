@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sgc.comum.erros.ErroEntidadeDeveriaExistir;
+import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.AtividadeRepo;
@@ -17,6 +17,9 @@ public abstract class ConhecimentoMapper {
     @Autowired
     protected AtividadeRepo atividadeRepo;
 
+    @Autowired
+    protected RepositorioComum repo;
+
     @Mapping(source = "atividade.codigo", target = "atividadeCodigo")
     public abstract ConhecimentoDto toDto(Conhecimento conhecimento);
 
@@ -25,10 +28,7 @@ public abstract class ConhecimentoMapper {
 
     public Atividade map(Long codigo) {
         return codigo != null
-                ? atividadeRepo
-                .findById(codigo)
-                .orElseThrow(() -> ErroEntidadeDeveriaExistir.fkViolada(
-                        "Atividade", codigo, "ConhecimentoMapper"))
+                ? repo.buscar(Atividade.class, codigo)
                 : null;
     }
 }

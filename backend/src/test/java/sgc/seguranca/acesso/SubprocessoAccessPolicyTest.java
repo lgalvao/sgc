@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.organizacao.service.HierarquiaService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -27,7 +28,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 class SubprocessoAccessPolicyTest {
 
     @Mock
-    private sgc.organizacao.ServicoHierarquia servicoHierarquia;
+    private HierarquiaService hierarquiaService;
 
     @InjectMocks
     private SubprocessoAccessPolicy policy;
@@ -95,7 +96,7 @@ class SubprocessoAccessPolicyTest {
         @Test
         @DisplayName("Deve permitir visualizar subprocesso se usuário da mesma unidade ou superior")
         void devePermitirVisualizarSeHierarquiaCorreta() {
-            when(servicoHierarquia.isSubordinada(any(), any())).thenReturn(true);
+            when(hierarquiaService.isSubordinada(any(), any())).thenReturn(true);
 
             assertThat(policy.canExecute(usuarioChefe, VISUALIZAR_SUBPROCESSO, subprocesso)).isTrue();
             assertThat(policy.canExecute(usuarioGestor, VISUALIZAR_SUBPROCESSO, subprocesso)).isTrue();
@@ -143,7 +144,7 @@ class SubprocessoAccessPolicyTest {
         @Test
         @DisplayName("Deve permitir GESTOR devolver cadastro se for superior imediata")
         void devePermitirGestorDevolverCadastroSeForSuperiorImediata() {
-            when(servicoHierarquia.isSuperiorImediata(unidadePrincipal, unidadeSuperior)).thenReturn(true);
+            when(hierarquiaService.isSuperiorImediata(unidadePrincipal, unidadeSuperior)).thenReturn(true);
             subprocesso.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
             boolean resultado = policy.canExecute(usuarioGestor, DEVOLVER_CADASTRO, subprocesso);
@@ -189,7 +190,7 @@ class SubprocessoAccessPolicyTest {
         @Test
         @DisplayName("Deve permitir GESTOR aceitar revisão de cadastro")
         void devePermitirGestorAceitarRevisaoCadastro() {
-            when(servicoHierarquia.isSuperiorImediata(unidadePrincipal, unidadeSuperior)).thenReturn(true);
+            when(hierarquiaService.isSuperiorImediata(unidadePrincipal, unidadeSuperior)).thenReturn(true);
             subprocesso.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
 
             boolean resultado = policy.canExecute(usuarioGestor, ACEITAR_REVISAO_CADASTRO, subprocesso);
@@ -351,7 +352,7 @@ class SubprocessoAccessPolicyTest {
         @Test
         @DisplayName("Deve permitir GESTOR em unidade superior (MESMA_OU_SUBORDINADA)")
         void devePermitirGestorUnidadeSuperior() {
-            when(servicoHierarquia.isSubordinada(unidadePrincipal, unidadeSuperior)).thenReturn(true);
+            when(hierarquiaService.isSubordinada(unidadePrincipal, unidadeSuperior)).thenReturn(true);
             boolean resultado = policy.canExecute(usuarioGestor, VISUALIZAR_SUBPROCESSO, subprocesso);
             assertThat(resultado).isTrue();
         }
@@ -359,7 +360,7 @@ class SubprocessoAccessPolicyTest {
         @Test
         @DisplayName("Deve negar se não for unidade superior imediata")
         void deveNegarSeNaoForSuperiorImediata() {
-            when(servicoHierarquia.isSuperiorImediata(unidadePrincipal, unidadeSuperior)).thenReturn(false);
+            when(hierarquiaService.isSuperiorImediata(unidadePrincipal, unidadeSuperior)).thenReturn(false);
             subprocesso.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             
             boolean resultado = policy.canExecute(usuarioGestor, ACEITAR_CADASTRO, subprocesso);
@@ -481,7 +482,7 @@ class SubprocessoAccessPolicyTest {
             assertThat(policy.getMotivoNegacao()).contains("Titular: 999999999999");
 
             // Caso MESMA_OU_SUBORDINADA falhando
-            when(servicoHierarquia.isSubordinada(any(), any())).thenReturn(false);
+            when(hierarquiaService.isSubordinada(any(), any())).thenReturn(false);
             Unidade unidadeAlheia = criarUnidade(4L, "ALHEIA", null, null);
             subprocesso.setUnidade(unidadeAlheia);
 

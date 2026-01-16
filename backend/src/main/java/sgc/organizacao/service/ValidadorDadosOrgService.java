@@ -40,7 +40,7 @@ import static sgc.organizacao.model.TipoUnidade.*;
 @ConditionalOnProperty(name = "sgc.validacao.startup", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
 @Slf4j
-public class ValidadorDadosOrganizacionais implements ApplicationRunner {
+public class ValidadorDadosOrgService implements ApplicationRunner {
 
     private static final Set<TipoUnidade> TIPOS_QUE_PARTICIPAM = Set.of(OPERACIONAL, INTEROPERACIONAL, INTERMEDIARIA);
 

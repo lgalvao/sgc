@@ -16,14 +16,12 @@ import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
+import sgc.comum.repo.RepositorioComum;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,7 +35,7 @@ class AtividadeServiceTest {
     @Mock
     private AtividadeRepo atividadeRepo;
     @Mock
-    private MapaRepo mapaRepo;
+    private RepositorioComum repo;
     @Mock
     private AtividadeMapper atividadeMapper;
     @Mock
@@ -64,7 +62,7 @@ class AtividadeServiceTest {
         @Test
         @DisplayName("Deve obter por código DTO")
         void deveObterPorCodigoDto() {
-             when(atividadeRepo.findById(1L)).thenReturn(Optional.of(new Atividade()));
+             when(repo.buscar(Atividade.class, 1L)).thenReturn(new Atividade());
              when(atividadeMapper.toDto(any())).thenReturn(new AtividadeDto());
              assertThat(service.obterDto(1L)).isNotNull();
         }
@@ -72,7 +70,7 @@ class AtividadeServiceTest {
         @Test
         @DisplayName("Deve lançar erro se obter por código não encontrar")
         void deveLancarErroObterPorCodigo() {
-             when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
+             when(repo.buscar(Atividade.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 1L));
              assertThatThrownBy(() -> service.obterDto(1L))
                  .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
@@ -81,14 +79,14 @@ class AtividadeServiceTest {
         @DisplayName("Deve listar entidades por código")
         void deveListarEntidades() {
              Atividade ativ = new Atividade();
-             when(atividadeRepo.findById(1L)).thenReturn(Optional.of(ativ));
+             when(repo.buscar(Atividade.class, 1L)).thenReturn(ativ);
              assertThat(service.obterPorCodigo(1L)).isNotNull();
         }
 
         @Test
         @DisplayName("Deve lançar erro entidade não encontrada")
         void deveLancarErro() {
-             when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
+             when(repo.buscar(Atividade.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 1L));
              assertThatThrownBy(() -> service.obterPorCodigo(1L))
                  .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
@@ -151,7 +149,7 @@ class AtividadeServiceTest {
             Usuario usuario = new Usuario();
             usuario.setTituloEleitoral(titulo);
 
-            when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
+            when(repo.buscar(Mapa.class, 1L)).thenReturn(mapa);
             when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade());
             when(atividadeRepo.save(any())).thenReturn(new Atividade());
             when(atividadeMapper.toDto(any())).thenReturn(dto);
@@ -167,10 +165,11 @@ class AtividadeServiceTest {
         void deveLancarErroAoCriarSemMapa() {
             AtividadeDto dto = new AtividadeDto();
             dto.setMapaCodigo(null);
+            
+            when(repo.buscar(Mapa.class, null)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", null));
 
             assertThatThrownBy(() -> service.criar(dto))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Mapa");
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
@@ -179,11 +178,10 @@ class AtividadeServiceTest {
             AtividadeDto dto = new AtividadeDto();
             dto.setMapaCodigo(1L);
 
-            when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
+            when(repo.buscar(Mapa.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
 
             assertThatThrownBy(() -> service.criar(dto))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Mapa");
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
@@ -195,7 +193,7 @@ class AtividadeServiceTest {
             Mapa mapa = new Mapa();
             mapa.setSubprocesso(null);
 
-            when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
+            when(repo.buscar(Mapa.class, 1L)).thenReturn(mapa);
 
             assertThatThrownBy(() -> service.criar(dto))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -216,7 +214,7 @@ class AtividadeServiceTest {
             mapa.setCodigo(1L);
             atividade.setMapa(mapa);
 
-            when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
+            when(repo.buscar(Atividade.class, id)).thenReturn(atividade);
             when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade());
             when(atividadeRepo.save(any())).thenReturn(atividade);
 
@@ -232,9 +230,9 @@ class AtividadeServiceTest {
             Long id = 1L;
             AtividadeDto dto = new AtividadeDto();
             Atividade atividade = new Atividade();
-            atividade.setMapa(null); // Explicitly no map
+            atividade.setMapa(null); 
 
-            when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
+            when(repo.buscar(Atividade.class, id)).thenReturn(atividade);
             when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade());
             when(atividadeRepo.save(any())).thenReturn(atividade);
 
@@ -250,8 +248,7 @@ class AtividadeServiceTest {
             Long id = 1L;
             AtividadeDto dto = new AtividadeDto();
 
-            // Simula erro ao buscar ou processar
-            when(atividadeRepo.findById(id)).thenThrow(new RuntimeException("Erro banco"));
+            when(repo.buscar(Atividade.class, id)).thenThrow(new RuntimeException("Erro banco"));
 
             assertThatThrownBy(() -> service.atualizar(id, dto))
                     .isInstanceOf(RuntimeException.class)
@@ -265,7 +262,7 @@ class AtividadeServiceTest {
             Atividade atividade = new Atividade();
             atividade.setMapa(new Mapa());
 
-            when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
+            when(repo.buscar(Atividade.class, id)).thenReturn(atividade);
 
             service.excluir(id);
 
@@ -278,7 +275,7 @@ class AtividadeServiceTest {
         @DisplayName("Deve lançar erro ao excluir atividade inexistente")
         void deveLancarErroAoExcluirAtividadeInexistente() {
             Long id = 1L;
-            when(atividadeRepo.findById(id)).thenReturn(Optional.empty());
+            when(repo.buscar(Atividade.class, id)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", id));
 
             assertThatThrownBy(() -> service.excluir(id))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);

@@ -7,12 +7,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
+import sgc.comum.repo.RepositorioComum;
+import sgc.mapa.model.Mapa;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +43,8 @@ class UnidadeFacadeTest {
     private AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     @Mock
     private UsuarioMapper usuarioMapper;
+    @Mock
+    private RepositorioComum repo;
 
     private UnidadeFacade service;
 
@@ -50,7 +55,8 @@ class UnidadeFacadeTest {
                 unidadeMapaRepo,
                 usuarioRepo,
                 atribuicaoTemporariaRepo,
-                usuarioMapper);
+                usuarioMapper,
+                repo);
     }
 
     @Nested
@@ -88,7 +94,7 @@ class UnidadeFacadeTest {
         @DisplayName("Deve buscar unidade por código")
         void deveBuscarPorCodigo() {
             // Arrange
-            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
+            when(repo.buscar(Unidade.class, 1L)).thenReturn(new Unidade());
             when(usuarioMapper.toUnidadeDto(any(), eq(false))).thenReturn(UnidadeDto.builder().build());
 
             // Act & Assert
@@ -151,12 +157,12 @@ class UnidadeFacadeTest {
             when(unidadeRepo.findBySigla("FILHO")).thenReturn(Optional.of(u));
 
             // Act & Assert
-            assertThat(service.buscarSiglaSuperior("FILHO")).isEqualTo("PAI");
+            assertThat(service.buscarSiglaSuperior("FILHO")).contains("PAI");
         }
 
         @Test
-        @DisplayName("Deve retornar null se unidade não tiver superior ao buscar sigla superior")
-        void deveRetornarNullSeSemSuperior() {
+        @DisplayName("Deve retornar vazio se unidade não tiver superior ao buscar sigla superior")
+        void deveRetornarVazioSeSemSuperior() {
             // Arrange
             Unidade u = new Unidade();
             u.setUnidadeSuperior(null);
@@ -164,7 +170,7 @@ class UnidadeFacadeTest {
             when(unidadeRepo.findBySigla("RAIZ")).thenReturn(Optional.of(u));
 
             // Act & Assert
-            assertThat(service.buscarSiglaSuperior("RAIZ")).isNull();
+            assertThat(service.buscarSiglaSuperior("RAIZ")).isEmpty();
         }
 
         @Test
@@ -193,8 +199,6 @@ class UnidadeFacadeTest {
             UnidadeDto paiDto = UnidadeDto.builder().codigo(1L).sigla("PAI").subunidades(List.of(filhoDto)).build();
 
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(Collections.emptyList()); // Not used because we mock more levels
-            // We need to mock the full hierarchy return from buscarTodasUnidades
-            // which calls buscarArvoreHierarquica -> montarHierarquia
             
             Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setSigla("PAI");
             Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setSigla("FILHO"); u2.setUnidadeSuperior(u1);
@@ -214,7 +218,6 @@ class UnidadeFacadeTest {
     @Nested
     @DisplayName("Elegibilidade e Mapas")
     class ElegibilidadeMapas {
-
         @Test
         @DisplayName("Deve buscar árvore com elegibilidade")
         void deveBuscarArvoreComElegibilidade() {
@@ -274,8 +277,8 @@ class UnidadeFacadeTest {
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
             when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
-            // Unidade 1 está em processo ativo
             // Act
+            // Unidade 1 está em processo ativo
             List<UnidadeDto> result = service.buscarArvoreComElegibilidade(false, new java.util.HashSet<>(List.of(1L)));
 
             // Assert
@@ -297,13 +300,12 @@ class UnidadeFacadeTest {
     @Nested
     @DisplayName("Gestão de Atribuições e Usuários")
     class GestaoAtribuicoesUsuarios {
-
         @Test
         @DisplayName("Deve criar atribuição temporária com sucesso")
         void deveCriarAtribuicaoTemporariaComSucesso() {
             // Arrange
-            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
-            when(usuarioRepo.findById("123")).thenReturn(Optional.of(new Usuario()));
+            when(repo.buscar(Unidade.class, 1L)).thenReturn(new Unidade());
+            when(repo.buscar(Usuario.class, "123")).thenReturn(new Usuario());
 
             CriarAtribuicaoTemporariaRequest req = new CriarAtribuicaoTemporariaRequest(
                     "123", java.time.LocalDate.now(), java.time.LocalDate.now().plusDays(1), "Justificativa");
@@ -318,8 +320,8 @@ class UnidadeFacadeTest {
         @Test
         @DisplayName("Deve falhar ao criar atribuição se datas inválidas")
         void deveFalharCriarAtribuicaoDatasInvalidas() {
-            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
-            when(usuarioRepo.findById("123")).thenReturn(Optional.of(new Usuario()));
+            when(repo.buscar(Unidade.class, 1L)).thenReturn(new Unidade());
+            when(repo.buscar(Usuario.class, "123")).thenReturn(new Usuario());
 
             CriarAtribuicaoTemporariaRequest req = new CriarAtribuicaoTemporariaRequest(
                     "123", java.time.LocalDate.now().plusDays(1), java.time.LocalDate.now(), "Justificativa");
@@ -330,7 +332,7 @@ class UnidadeFacadeTest {
         @Test
         @DisplayName("Deve falhar ao criar atribuição se unidade não encontrada")
         void deveFalharCriarAtribuicaoSeUnidadeNaoEncontrada() {
-            when(unidadeRepo.findById(99L)).thenReturn(Optional.empty());
+            when(repo.buscar(Unidade.class, 99L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 99L));
 
             CriarAtribuicaoTemporariaRequest req = new CriarAtribuicaoTemporariaRequest(
                     "123", java.time.LocalDate.now(), java.time.LocalDate.now().plusDays(1), "Justificativa");
@@ -342,8 +344,8 @@ class UnidadeFacadeTest {
         @Test
         @DisplayName("Deve criar atribuição com data atual se dataInicio for nula")
         void deveCriarAtribuicaoComDataAtualSeInicioNulo() {
-            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
-            when(usuarioRepo.findById("123")).thenReturn(Optional.of(new Usuario()));
+            when(repo.buscar(Unidade.class, 1L)).thenReturn(new Unidade());
+            when(repo.buscar(Usuario.class, "123")).thenReturn(new Usuario());
 
             CriarAtribuicaoTemporariaRequest req = new CriarAtribuicaoTemporariaRequest(
                     "123", null, java.time.LocalDate.now().plusDays(1), "Justificativa");
@@ -395,13 +397,6 @@ class UnidadeFacadeTest {
         }
 
         @Test
-        @DisplayName("Listar subordinadas")
-        void listarSubordinadas() {
-            service.listarSubordinadas(1L);
-            verify(unidadeRepo).findByUnidadeSuperiorCodigo(1L);
-        }
-
-        @Test
         @DisplayName("Buscar entidades por IDs")
         void buscarEntidadesPorIds() {
             service.buscarEntidadesPorIds(List.of(1L));
@@ -440,28 +435,28 @@ class UnidadeFacadeTest {
         @Test
         @DisplayName("Definir mapa vigente (atualização)")
         void definirMapaVigenteAtualizacao() {
-            when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(new sgc.organizacao.model.UnidadeMapa()));
-            service.definirMapaVigente(1L, new sgc.mapa.model.Mapa());
+            when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(new UnidadeMapa()));
+            service.definirMapaVigente(1L, new Mapa());
             verify(unidadeMapaRepo).save(any());
         }
 
         @Test
         @DisplayName("Deve falhar ao buscar entidade por ID inexistente")
         void deveFalharAoBuscarEntidadePorIdInexistente() {
-            when(unidadeRepo.findById(999L)).thenReturn(Optional.empty());
-            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(999L));
+            when(repo.buscar(Unidade.class, 999L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 999L));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(999L));
         }
 
         @Test
         @DisplayName("Deve falhar ao buscar sigla superior de unidade inexistente")
         void deveFalharAoBuscarSiglaSuperiorInexistente() {
             when(unidadeRepo.findBySigla("INVALIDO")).thenReturn(Optional.empty());
-            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglaSuperior("INVALIDO"));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglaSuperior("INVALIDO"));
         }
 
         @Test
-        @DisplayName("Deve buscar na hierarquia recursivamente (não encontrado)")
-        void deveBuscarNaHierarquiaRecursivamenteNaoEncontrado() {
+        @DisplayName("Deve falhar ao buscar na hierarquia recursivamente (não encontrado)")
+        void deveFalharAoBuscarNaHierarquiaRecursivamenteNaoEncontrado() {
             UnidadeDto filho = UnidadeDto.builder().codigo(2L).subunidades(new ArrayList<>()).build();
             UnidadeDto pai = UnidadeDto.builder().codigo(1L).subunidades(List.of(filho)).build();
             
@@ -469,7 +464,7 @@ class UnidadeFacadeTest {
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
             when(usuarioMapper.toUnidadeDto(u1, true)).thenReturn(pai);
             
-            assertThat(service.buscarArvore(999L)).isNull();
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarArvore(999L));
         }
 
         @Test
@@ -482,7 +477,7 @@ class UnidadeFacadeTest {
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
             when(usuarioMapper.toUnidadeDto(u1, true)).thenReturn(pai);
             
-            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglasSubordinadas("INVALIDA"));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglasSubordinadas("INVALIDA"));
         }
     }
 
@@ -502,7 +497,6 @@ class UnidadeFacadeTest {
     @Test
     @DisplayName("Deve construir unidades com hierarquia (cobertura caminhos recursivos)")
     void deveTestarHierarquiaRecursiva() {
-
         // Arrange
         Unidade pai = new Unidade();
         pai.setCodigo(1L);

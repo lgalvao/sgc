@@ -7,8 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroEntidadeDeveriaExistir;
-import sgc.comum.erros.ErroValidacao;
+import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.mapper.MapaCompletoMapper;
@@ -28,6 +27,7 @@ class MapaSalvamentoServiceTest {
     @Mock private MapaRepo mapaRepo;
     @Mock private CompetenciaRepo competenciaRepo;
     @Mock private AtividadeRepo atividadeRepo;
+    @Mock private RepositorioComum repo;
     @Mock private MapaCompletoMapper mapaCompletoMapper;
 
     @InjectMocks
@@ -44,11 +44,11 @@ class MapaSalvamentoServiceTest {
         request.setCompetencias(List.of(compDto));
 
         Mapa mapa = new Mapa();
-        when(mapaRepo.findById(codMapa)).thenReturn(Optional.of(mapa));
+        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
         when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(Collections.emptyList());
         when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(Collections.emptyList());
 
-        assertThrows(ErroEntidadeDeveriaExistir.class, () -> 
+        assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> 
             mapaSalvamentoService.salvarMapaCompleto(codMapa, request));
     }
 
@@ -67,12 +67,12 @@ class MapaSalvamentoServiceTest {
         ativ1.setCodigo(1L); // O mapa só tem atividade ID 1
         ativ1.setMapa(mapa);
 
-        when(mapaRepo.findById(codMapa)).thenReturn(Optional.of(mapa));
+        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
         when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(Collections.emptyList());
         when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of(ativ1));
         when(competenciaRepo.saveAll(any())).thenAnswer(i -> i.getArgument(0));
 
-        assertThrows(ErroValidacao.class, () -> 
+        assertThrows(sgc.comum.erros.ErroValidacao.class, () -> 
             mapaSalvamentoService.salvarMapaCompleto(codMapa, request));
     }
 
@@ -92,7 +92,7 @@ class MapaSalvamentoServiceTest {
         ativ1.setMapa(mapa);
         ativ1.setCompetencias(new HashSet<>(List.of(compExistente)));
 
-        when(mapaRepo.findById(codMapa)).thenReturn(Optional.of(mapa));
+        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
         when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(List.of(compExistente));
         when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of(ativ1));
         when(competenciaRepo.saveAll(any())).thenAnswer(i -> i.getArgument(0));

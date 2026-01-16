@@ -13,6 +13,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
+import sgc.comum.repo.RepositorioComum;
 import sgc.subprocesso.mapper.MovimentacaoMapper;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.Movimentacao;
@@ -20,7 +21,6 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -38,6 +38,8 @@ class MapperTest {
     private UnidadeRepo unidadeRepo;
     @Mock
     private MapaRepo mapaRepo;
+    @Mock
+    private RepositorioComum repo;
 
     @BeforeEach
     void setUp() throws NoSuchFieldException, IllegalAccessException {
@@ -55,6 +57,11 @@ class MapperTest {
                 SubprocessoMapper.class.getDeclaredField("mapaRepo");
         mapaRepoField.setAccessible(true);
         mapaRepoField.set(subprocessoMapper, mapaRepo);
+
+        java.lang.reflect.Field repoField =
+                SubprocessoMapper.class.getDeclaredField("repo");
+        repoField.setAccessible(true);
+        repoField.set(subprocessoMapper, repo);
     }
 
     @Test
@@ -91,29 +98,28 @@ class MapperTest {
 
     @Test
     void subprocessoMapper_MapsDtoToEntityCorrectly() {
-        SubprocessoDto dto =
-                new SubprocessoDto(
-                        1L,
-                        100L,
-                        200L,
-                        300L,
-                        LocalDateTime.now(),
-                        LocalDateTime.now(),
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusDays(10),
-                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        SubprocessoDto dto = new SubprocessoDto(
+                1L,
+                100L,
+                200L,
+                300L,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                LocalDateTime.now().plusDays(10),
+                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         Processo processo = new Processo();
         processo.setCodigo(100L);
-        when(processoRepo.findById(100L)).thenReturn(Optional.of(processo));
+        when(repo.buscar(Processo.class, 100L)).thenReturn(processo);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(200L);
-        when(unidadeRepo.findById(200L)).thenReturn(Optional.of(unidade));
+        when(repo.buscar(Unidade.class, 200L)).thenReturn(unidade);
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(300L);
-        when(mapaRepo.findById(300L)).thenReturn(Optional.of(mapa));
+        when(repo.buscar(Mapa.class, 300L)).thenReturn(mapa);
 
         Subprocesso entity = subprocessoMapper.toEntity(dto);
 

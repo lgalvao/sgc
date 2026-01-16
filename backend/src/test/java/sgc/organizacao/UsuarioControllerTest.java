@@ -28,7 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 @DisplayName("UsuarioController - Testes de Integração")
 class UsuarioControllerTest {
-
         @Autowired
         private MockMvc mockMvc;
 
@@ -63,7 +62,6 @@ class UsuarioControllerTest {
                                 .andExpect(status().isNotFound());
         }
 
-        // ===================== ADMINISTRADORES =====================
         @Test
         @DisplayName("GET /api/usuarios/administradores - Deve listar (ADMIN)")
         @WithMockUser(roles = "ADMIN")

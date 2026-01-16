@@ -2,7 +2,7 @@ package sgc.seguranca.acesso;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import sgc.organizacao.ServicoHierarquia;
+import sgc.organizacao.service.HierarquiaService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -31,7 +31,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @RequiredArgsConstructor
 public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
 
-        private final ServicoHierarquia servicoHierarquia;
+        private final HierarquiaService hierarquiaService;
 
         /**
          * Mapeamento de ações para regras de acesso
@@ -330,13 +330,13 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                                         .anyMatch(a -> a.getUnidade() != null
                                                          && (Objects.equals(a.getUnidade().getCodigo(),
                                                                          unidadeSubprocesso.getCodigo())
-                                                                         || servicoHierarquia.isSubordinada(
+                                                                         || hierarquiaService.isSubordinada(
                                                                                          unidadeSubprocesso,
                                                                                          a.getUnidade())));
 
                         case SUPERIOR_IMEDIATA -> usuario.getTodasAtribuicoes().stream()
                                         .anyMatch(a -> a.getUnidade() != null
-                                                         && servicoHierarquia.isSuperiorImediata(unidadeSubprocesso,
+                                                         && hierarquiaService.isSuperiorImediata(unidadeSubprocesso,
                                                                          a.getUnidade()));
 
                         case TITULAR_UNIDADE -> {

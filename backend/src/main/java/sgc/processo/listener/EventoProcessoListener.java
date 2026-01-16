@@ -1,4 +1,4 @@
-package sgc.notificacao;
+package sgc.processo.listener;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,11 +8,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroEstadoImpossivel;
+import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.NotificacaoModelosService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.service.ValidadorDadosOrgService;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
@@ -33,7 +36,7 @@ import static sgc.organizacao.model.TipoUnidade.*;
  * participantes de forma diferenciada, conforme o tipo de unidade.
  *
  * <p><strong>Pré-requisito:</strong> As invariantes de dados organizacionais são validadas na inicialização
- * do sistema pelo {@link sgc.organizacao.ValidadorDadosOrganizacionais}. Este listener assume que os dados
+ * do sistema pelo {@link ValidadorDadosOrgService}. Este listener assume que os dados
  * são válidos (toda unidade tem titular, todo titular tem email, etc.).
  *
  * <p><b>Fase 3 (ADR-002):</b> Tornado assíncrono para desacoplamento completo entre

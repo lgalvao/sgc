@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseFacade;
 import sgc.comum.erros.ErroValidacao;
+import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Mapa;
@@ -29,7 +30,6 @@ import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -53,6 +53,11 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     @Mock private UnidadeFacade unidadeService;
     @Mock private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
     @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
+    @Mock private RepositorioComum repo;
+    @Mock private sgc.alerta.AlertaFacade alertaService;
+    @Mock private sgc.subprocesso.model.MovimentacaoRepo repositorioMovimentacao;
+    @Mock private sgc.mapa.service.ImpactoMapaService impactoMapaService;
+    @Mock private sgc.subprocesso.service.crud.SubprocessoCrudService crudService;
 
     // --- SALVAR MAPA ---
 
@@ -62,7 +67,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO); // Invalido
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
         SalvarMapaRequest request = new SalvarMapaRequest();
         assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, request))
@@ -76,7 +81,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         sp.setMapa(null);
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
         SalvarMapaRequest request = new SalvarMapaRequest();
         assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, request))
@@ -91,7 +96,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         Mapa mapa = new Mapa(); mapa.setCodigo(10L);
         sp.setMapa(mapa);
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(Collections.emptyList());
 
         SalvarMapaRequest req = new SalvarMapaRequest();
@@ -115,7 +120,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         Mapa mapa = new Mapa(); mapa.setCodigo(10L);
         sp.setMapa(mapa);
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(Collections.emptyList());
 
         CompetenciaRequest req = new CompetenciaRequest();
@@ -139,7 +144,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         Mapa mapa = new Mapa(); mapa.setCodigo(10L);
         sp.setMapa(mapa);
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
         // Simula que ficou vazio apos remover
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(Collections.emptyList());
@@ -162,7 +167,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         Mapa mapa = new Mapa(); mapa.setCodigo(10L);
         sp.setMapa(mapa);
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         // Validacoes de mapa passam
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(Collections.emptyList());
         when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(Collections.emptyList());
@@ -183,7 +188,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         Mapa mapa = new Mapa(); mapa.setCodigo(10L);
         sp.setMapa(mapa);
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
         sgc.mapa.model.Competencia comp = new sgc.mapa.model.Competencia();
         comp.setAtividades(Collections.emptySet()); // Sem atividade
@@ -205,7 +210,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         Mapa mapa = new Mapa(); mapa.setCodigo(10L);
         sp.setMapa(mapa);
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
         // Competencia com atividade 1
         sgc.mapa.model.Competencia comp = new sgc.mapa.model.Competencia();
@@ -238,7 +243,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         Unidade u = new Unidade(); u.setUnidadeSuperior(new Unidade());
         sp.setUnidade(u);
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
         service.apresentarSugestoes(1L, "Obs", new Usuario());
 
@@ -258,7 +263,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         sp.setUnidade(u);
         // pai.unidadeSuperior é null -> fim da cadeia
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         Usuario user = new Usuario(); user.setTituloEleitoral("123");
 
         service.aceitarValidacao(1L, user);

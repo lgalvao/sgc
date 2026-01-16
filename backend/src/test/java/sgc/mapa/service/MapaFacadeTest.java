@@ -40,6 +40,12 @@ class MapaFacadeTest {
     private MapaCompletoMapper mapaCompletoMapper;
     @Mock
     private MapaSalvamentoService mapaSalvamentoService;
+    @Mock
+    private MapaVisualizacaoService mapaVisualizacaoService;
+    @Mock
+    private ImpactoMapaService impactoMapaService;
+    @Mock
+    private sgc.comum.repo.RepositorioComum repo;
 
     @InjectMocks
     private MapaFacade service;
@@ -66,14 +72,14 @@ class MapaFacadeTest {
         @Test
         @DisplayName("Deve obter mapa por código")
         void deveObterPorCodigo() {
-            when(mapaRepo.findById(1L)).thenReturn(Optional.of(new Mapa()));
+            when(repo.buscar(Mapa.class, 1L)).thenReturn(new Mapa());
             assertThat(service.obterPorCodigo(1L)).isNotNull();
         }
 
         @Test
         @DisplayName("Deve lançar exceção se mapa não encontrado")
         void deveLancarExcecaoSeNaoEncontrado() {
-            when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
+            when(repo.buscar(Mapa.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
             assertThatThrownBy(() -> service.obterPorCodigo(1L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
@@ -101,7 +107,7 @@ class MapaFacadeTest {
             Mapa novosDados = new Mapa();
             novosDados.setObservacoesDisponibilizacao("Obs");
 
-            when(mapaRepo.findById(1L)).thenReturn(Optional.of(existente));
+            when(repo.buscar(Mapa.class, 1L)).thenReturn(existente);
             when(mapaRepo.save(existente)).thenReturn(existente);
 
             Mapa atualizado = service.atualizar(1L, novosDados);
@@ -111,7 +117,7 @@ class MapaFacadeTest {
         @Test
         @DisplayName("Deve lançar erro ao atualizar mapa inexistente")
         void deveLancarErroAoAtualizarInexistente() {
-            when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
+            when(repo.buscar(Mapa.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
             Mapa mapa = new Mapa();
             assertThatThrownBy(() -> service.atualizar(1L, mapa))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -172,7 +178,7 @@ class MapaFacadeTest {
         @Test
         @DisplayName("Deve obter mapa completo DTO")
         void deveObterMapaCompleto() {
-            when(mapaRepo.findById(1L)).thenReturn(Optional.of(new Mapa()));
+            when(repo.buscar(Mapa.class, 1L)).thenReturn(new Mapa());
             when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(new Competencia()));
             when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(new MapaCompletoDto());
 
@@ -183,7 +189,7 @@ class MapaFacadeTest {
         @Test
         @DisplayName("Deve obter mapa completo DTO sem competências")
         void deveObterMapaCompletoSemCompetencias() {
-            when(mapaRepo.findById(1L)).thenReturn(Optional.of(new Mapa()));
+            when(repo.buscar(Mapa.class, 1L)).thenReturn(new Mapa());
             when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of());
             when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(new MapaCompletoDto());
 

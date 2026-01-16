@@ -1,9 +1,10 @@
-package sgc.notificacao;
+package sgc.notificacao.mock;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import sgc.notificacao.NotificacaoModelosService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
 @Slf4j
 public class NotificacaoModelosServiceMock extends NotificacaoModelosService {
     public NotificacaoModelosServiceMock() {
-        super(null); // SpringTemplateEngine will be null, but methods are overridden
+        super(null);
         log.info("NotificacaoModelosServiceMock ATIVADO - Modelos de e-mail serão mockados");
     }
 

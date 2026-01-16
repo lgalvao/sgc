@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.comum.erros.ErroValidacao;
+import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Atividade;
@@ -20,7 +21,6 @@ import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UnidadeFacade;
-import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
@@ -58,6 +58,11 @@ class SubprocessoMapaWorkflowServiceTest {
     @Mock private UnidadeFacade unidadeService;
     @Mock private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
     @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
+    @Mock private RepositorioComum repo;
+    @Mock private sgc.mapa.service.ImpactoMapaService impactoMapaService;
+    @Mock private sgc.alerta.AlertaFacade alertaService;
+    @Mock private sgc.subprocesso.model.MovimentacaoRepo repositorioMovimentacao;
+    @Mock private sgc.subprocesso.service.crud.SubprocessoCrudService crudService;
 
     @InjectMocks private SubprocessoWorkflowService service;
 
@@ -381,8 +386,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             Unidade sedoc = new Unidade();
             sedoc.setCodigo(99L);
-            when(unidadeService.buscarPorSigla("SEDOC")).thenReturn(UnidadeDto.builder().codigo(99L).build());
-            when(unidadeService.buscarEntidadePorId(99L)).thenReturn(sedoc);
+            when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(sedoc);
 
             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
             req.setDataLimite(LocalDate.now());
@@ -406,8 +410,7 @@ class SubprocessoMapaWorkflowServiceTest {
             c.setAtividades(new HashSet<>(List.of(new Atividade())));
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
             when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of());
-            when(unidadeService.buscarPorSigla("SEDOC")).thenReturn(UnidadeDto.builder().codigo(99L).build());
-            when(unidadeService.buscarEntidadePorId(99L)).thenReturn(new Unidade());
+            when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
 
             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
             req.setDataLimite(LocalDate.now());
@@ -495,8 +498,7 @@ class SubprocessoMapaWorkflowServiceTest {
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
             when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of());
 
-            when(unidadeService.buscarPorSigla("SEDOC")).thenReturn(UnidadeDto.builder().codigo(99L).build());
-            when(unidadeService.buscarEntidadePorId(99L)).thenReturn(new Unidade());
+            when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
 
             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
             req.setDataLimite(LocalDate.now());
@@ -510,7 +512,7 @@ class SubprocessoMapaWorkflowServiceTest {
         }
 
         @Test
-        @DisplayName("Deve disponibilizar mapa sem definir sugestões quando observações blank")
+        @DisplayName("Deve disponibilizar mapa com observações blank")
         void deveDisponibilizarMapaComObservacoesBlank() {
             Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
             Mapa mapa = mock(Mapa.class);
@@ -522,8 +524,7 @@ class SubprocessoMapaWorkflowServiceTest {
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
             when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of());
 
-            when(unidadeService.buscarPorSigla("SEDOC")).thenReturn(UnidadeDto.builder().codigo(99L).build());
-            when(unidadeService.buscarEntidadePorId(99L)).thenReturn(new Unidade());
+            when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
 
             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
             req.setDataLimite(LocalDate.now());
@@ -701,8 +702,8 @@ class SubprocessoMapaWorkflowServiceTest {
              Mapa mapa = mock(Mapa.class); when(mapa.getCodigo()).thenReturn(20L); when(target.getMapa()).thenReturn(mapa);
              Competencia c = new Competencia(); c.setAtividades(new HashSet<>(List.of(new Atividade())));
              when(competenciaService.buscarPorCodMapa(20L)).thenReturn(List.of(c));
-             when(unidadeService.buscarPorSigla("SEDOC")).thenReturn(UnidadeDto.builder().codigo(99L).build());
-             when(unidadeService.buscarEntidadePorId(99L)).thenReturn(new Unidade());
+             when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
+             when(atividadeService.buscarPorMapaCodigo(20L)).thenReturn(List.of());
 
              DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
              req.setDataLimite(LocalDate.now());
@@ -720,8 +721,7 @@ class SubprocessoMapaWorkflowServiceTest {
              Subprocesso target = mockSubprocesso(2L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
              when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(100L, 10L)).thenReturn(Optional.of(target));
 
-             when(unidadeService.buscarPorSigla("SEDOC")).thenReturn(UnidadeDto.builder().codigo(99L).build());
-             when(unidadeService.buscarEntidadePorId(99L)).thenReturn(new Unidade());
+             when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
 
              service.homologarValidacaoEmBloco(List.of(10L), 1L, new Usuario());
 
@@ -811,7 +811,7 @@ class SubprocessoMapaWorkflowServiceTest {
     @Test
     @DisplayName("Deve falhar ao buscar subprocesso inexistente")
     void deveFalharSubprocessoInexistente() {
-        when(subprocessoRepo.findById(999L)).thenReturn(Optional.empty());
+        when(repo.buscar(Subprocesso.class, 999L)).thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Subprocesso", 999L));
         assertThatThrownBy(() -> service.adicionarCompetencia(999L, new CompetenciaRequest()))
             .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
     }
@@ -819,7 +819,9 @@ class SubprocessoMapaWorkflowServiceTest {
     private Subprocesso mockSubprocesso(Long codigo, SituacaoSubprocesso situacao) {
         Subprocesso sp = mock(Subprocesso.class);
         lenient().when(sp.getCodigo()).thenReturn(codigo);
+        // Suporte para ambos os padrões enquanto migramos os testes
         lenient().when(subprocessoRepo.findById(codigo)).thenReturn(Optional.of(sp));
+        lenient().when(repo.buscar(Subprocesso.class, codigo)).thenReturn(sp);
 
         Processo p = new Processo();
         p.setTipo(TipoProcesso.MAPEAMENTO);

@@ -1,9 +1,13 @@
 package sgc.organizacao;
 
+import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
+import sgc.comum.repo.RepositorioComum;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeDto;
@@ -11,11 +15,13 @@ import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class UnidadeFacade {
     private static final String MSG_NAO_ENCONTRADA = " não encontrada";
 
@@ -24,19 +30,7 @@ public class UnidadeFacade {
     private final UsuarioRepo usuarioRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     private final UsuarioMapper usuarioMapper;
-
-    public UnidadeFacade(
-            UnidadeRepo unidadeRepo,
-            sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo,
-            UsuarioRepo usuarioRepo,
-            AtribuicaoTemporariaRepo atribuicaoTemporariaRepo,
-            UsuarioMapper usuarioMapper) {
-        this.unidadeRepo = unidadeRepo;
-        this.unidadeMapaRepo = unidadeMapaRepo;
-        this.usuarioRepo = usuarioRepo;
-        this.atribuicaoTemporariaRepo = atribuicaoTemporariaRepo;
-        this.usuarioMapper = usuarioMapper;
-    }
+    private final RepositorioComum repo;
 
     public List<UnidadeDto> buscarArvoreHierarquica() {
         List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
@@ -62,48 +56,39 @@ public class UnidadeFacade {
 
     private List<UnidadeDto> montarHierarquiaComElegibilidade(
             List<Unidade> unidades, boolean requerMapaVigente, Set<Long> unidadesBloqueadas) {
-        Set<Long> unidadesEmProcessoAtivo = unidadesBloqueadas != null ? unidadesBloqueadas : Collections.emptySet();
 
         Set<Long> unidadesComMapa = requerMapaVigente
                 ? new HashSet<>(unidadeMapaRepo.findAllUnidadeCodigos())
                 : Collections.emptySet();
 
-        Function<Unidade, Boolean> elegibilidadeChecker = u -> 
+        Function<Unidade, Boolean> elegibilidadeChecker = u ->
                 u.getTipo() != sgc.organizacao.model.TipoUnidade.INTERMEDIARIA
-                && (!requerMapaVigente || unidadesComMapa.contains(u.getCodigo()))
-                && !unidadesEmProcessoAtivo.contains(u.getCodigo());
+                        && (!requerMapaVigente || unidadesComMapa.contains(u.getCodigo()))
+                        && !unidadesBloqueadas.contains(u.getCodigo());
 
         return montarHierarquia(unidades, elegibilidadeChecker);
     }
 
 
-    public void criarAtribuicaoTemporaria(
-            Long codUnidade, CriarAtribuicaoTemporariaRequest request) {
-        Unidade unidade =
-                unidadeRepo
-                        .findById(codUnidade)
-                        .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Unidade com codigo "
-                                                        + codUnidade
-                                                        + MSG_NAO_ENCONTRADA));
+    public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoTemporariaRequest request) {
+        Unidade unidade = repo.buscar(Unidade.class, codUnidade);
 
-        Usuario usuario = usuarioRepo.findById(request.tituloEleitoralUsuario())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", request.tituloEleitoralUsuario()));
+        String titulo = request.tituloEleitoralUsuario();
+        Usuario usuario = repo.buscar(Usuario.class, titulo);
 
-        java.time.LocalDate inicio = request.dataInicio() != null ? request.dataInicio() : java.time.LocalDate.now();
+        LocalDate inicio = request.dataInicio() != null ? request.dataInicio() : LocalDate.now();
+
         if (request.dataTermino().isBefore(inicio)) {
-            throw new sgc.comum.erros.ErroValidacao("A data de término deve ser posterior à data de início.");
+            throw new ErroValidacao("A data de término deve ser posterior à data de início.");
         }
 
-        AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
-        atribuicao.setUnidade(unidade);
-        atribuicao.setUsuarioTitulo(usuario.getTituloEleitoral());
-        atribuicao.setUsuarioMatricula(usuario.getMatricula());
-        atribuicao.setDataInicio(request.dataInicio() != null ? request.dataInicio().atStartOfDay() : LocalDateTime.now());
-        atribuicao.setDataTermino(request.dataTermino().atTime(23, 59, 59));
-        atribuicao.setJustificativa(request.justificativa());
+        AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria()
+                .setUnidade(unidade)
+                .setUsuarioTitulo(usuario.getTituloEleitoral())
+                .setUsuarioMatricula(usuario.getMatricula())
+                .setDataInicio(request.dataInicio() != null ? request.dataInicio().atStartOfDay() : LocalDateTime.now())
+                .setDataTermino(request.dataTermino().atTime(23, 59, 59))
+                .setJustificativa(request.justificativa());
 
         atribuicaoTemporariaRepo.save(atribuicao);
     }
@@ -122,8 +107,7 @@ public class UnidadeFacade {
         return montarHierarquia(unidades, null);
     }
 
-    private List<UnidadeDto> montarHierarquia(List<Unidade> unidades,
-            @org.jspecify.annotations.Nullable Function<Unidade, Boolean> elegibilidadeChecker) {
+    private List<UnidadeDto> montarHierarquia(List<Unidade> unidades, @Nullable Function<Unidade, Boolean> elegibilidadeChecker) {
         Map<Long, UnidadeDto> mapaUnidades = new HashMap<>();
         Map<Long, List<UnidadeDto>> mapaFilhas = new HashMap<>();
         List<UnidadeDto> raizes = new ArrayList<>();
@@ -147,27 +131,21 @@ public class UnidadeFacade {
             }
         }
 
-        List<UnidadeDto> resultado = new ArrayList<>();
-        for (UnidadeDto raiz : raizes) {
-            resultado.add(montarComSubunidades(raiz, mapaFilhas));
-        }
-
-        return resultado;
+        return raizes.stream().map(raiz -> montarComSubunidades(raiz, mapaFilhas)).toList();
     }
 
-    private UnidadeDto montarComSubunidades(
-            UnidadeDto dto, Map<Long, List<UnidadeDto>> mapaFilhas) {
+    private UnidadeDto montarComSubunidades(UnidadeDto dto, Map<Long, List<UnidadeDto>> mapaFilhas) {
         List<UnidadeDto> filhas = mapaFilhas.get(dto.getCodigo());
         if (filhas == null || filhas.isEmpty()) {
             return dto;
         }
 
-        List<UnidadeDto> subunidadesCompletas = new ArrayList<>();
-        for (UnidadeDto filha : filhas) {
-            subunidadesCompletas.add(montarComSubunidades(filha, mapaFilhas));
-        }
+        List<UnidadeDto> subunidadesCompletas = filhas.stream()
+                .map(filha -> montarComSubunidades(filha, mapaFilhas))
+                .toList();
 
         dto.setSubunidades(subunidadesCompletas);
+
         return dto;
     }
 
@@ -179,10 +157,7 @@ public class UnidadeFacade {
     public Unidade buscarEntidadePorSigla(String sigla) {
         return unidadeRepo
                 .findBySigla(sigla)
-                .orElseThrow(
-                        () ->
-                                new ErroEntidadeNaoEncontrada(
-                                        "Unidade com sigla " + sigla + MSG_NAO_ENCONTRADA));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com sigla %s%s".formatted(sigla, MSG_NAO_ENCONTRADA)));
     }
 
     public UnidadeDto buscarPorCodigo(Long codigo) {
@@ -191,22 +166,7 @@ public class UnidadeFacade {
     }
 
     public Unidade buscarEntidadePorId(Long codigo) {
-        return unidadeRepo
-                .findById(codigo)
-                .orElseThrow(
-                        () ->
-                                new ErroEntidadeNaoEncontrada(
-                                        "Unidade com codigo "
-                                                + codigo
-                                                + MSG_NAO_ENCONTRADA));
-    }
-
-    public boolean existePorId(Long codigo) {
-        return unidadeRepo.existsById(codigo);
-    }
-
-    public List<Unidade> listarSubordinadas(Long codigoPai) {
-        return unidadeRepo.findByUnidadeSuperiorCodigo(codigoPai);
+        return repo.buscar(Unidade.class, codigo);
     }
 
     @Cacheable(value = "unidadeDescendentes", key = "#codigoUnidade")
@@ -264,66 +224,57 @@ public class UnidadeFacade {
 
     public UnidadeDto buscarArvore(Long codigo) {
         List<UnidadeDto> todas = buscarTodasUnidades();
-        return buscarNaHierarquia(todas, codigo);
+        return buscarNaHierarquia(todas, codigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigo));
     }
 
     public List<String> buscarSiglasSubordinadas(String sigla) {
         List<UnidadeDto> todas = buscarTodasUnidades();
-        UnidadeDto raiz = buscarNaHierarquiaPorSigla(todas, sigla);
-
-        if (raiz == null) {
-            throw new ErroEntidadeNaoEncontrada(
-                    "Unidade com sigla " + sigla + " não encontrada na hierarquia");
-        }
-
-        List<String> resultado = new ArrayList<>();
-        coletarSiglas(raiz, resultado);
-        return resultado;
+        return buscarNaHierarquiaPorSigla(todas, sigla)
+                .map(raiz -> {
+                    List<String> resultado = new ArrayList<>();
+                    coletarSiglas(raiz, resultado);
+                    return resultado;
+                })
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", sigla));
     }
 
-    public String buscarSiglaSuperior(String sigla) {
-        Unidade unidade =
-                unidadeRepo
-                        .findBySigla(sigla)
-                        .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Unidade com sigla " + sigla + MSG_NAO_ENCONTRADA));
+    public Optional<String> buscarSiglaSuperior(String sigla) {
+        Unidade unidade = unidadeRepo
+                .findBySigla(sigla)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com sigla %s%s".formatted(sigla, MSG_NAO_ENCONTRADA)));
 
-        if (unidade.getUnidadeSuperior() != null) {
-            return unidade.getUnidadeSuperior().getSigla();
-        }
-        return null;
+        return Optional.ofNullable(unidade.getUnidadeSuperior()).map(Unidade::getSigla);
     }
 
-    private UnidadeDto buscarNaHierarquia(List<UnidadeDto> lista, Long codigo) {
+    private Optional<UnidadeDto> buscarNaHierarquia(List<UnidadeDto> lista, Long codigo) {
         for (UnidadeDto u : lista) {
             if (u.getCodigo().equals(codigo)) {
-                return u;
+                return Optional.of(u);
             }
             if (u.getSubunidades() != null) {
-                UnidadeDto found = buscarNaHierarquia(u.getSubunidades(), codigo);
-                if (found != null) {
+                Optional<UnidadeDto> found = buscarNaHierarquia(u.getSubunidades(), codigo);
+                if (found.isPresent()) {
                     return found;
                 }
             }
         }
-        return null;
+        return Optional.empty();
     }
 
-    private UnidadeDto buscarNaHierarquiaPorSigla(List<UnidadeDto> lista, String sigla) {
+    private Optional<UnidadeDto> buscarNaHierarquiaPorSigla(List<UnidadeDto> lista, String sigla) {
         for (UnidadeDto u : lista) {
             if (u.getSigla().equals(sigla)) {
-                return u;
+                return Optional.of(u);
             }
             if (u.getSubunidades() != null) {
-                UnidadeDto found = buscarNaHierarquiaPorSigla(u.getSubunidades(), sigla);
-                if (found != null) {
+                Optional<UnidadeDto> found = buscarNaHierarquiaPorSigla(u.getSubunidades(), sigla);
+                if (found.isPresent()) {
                     return found;
                 }
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     private void coletarSiglas(UnidadeDto unidade, List<String> resultado) {

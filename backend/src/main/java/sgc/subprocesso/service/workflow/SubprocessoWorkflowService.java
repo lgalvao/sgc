@@ -12,6 +12,7 @@ import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.*;
+import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Atividade;
@@ -83,8 +84,6 @@ public class SubprocessoWorkflowService {
     ));
 
     private static final String ENTIDADE_SUBPROCESSO = "Subprocesso";
-    private static final String DETALHE_SUBPROCESSO_FMT = "processo=%d, unidade=%d";
-    private static final String MSG_ERRO_WORKFLOW_BLOCO = "Workflow em bloco - subprocesso deveria ter sido criado no início do processo";
 
     private final SubprocessoRepo repositorioSubprocesso;
     private final SubprocessoCrudService crudService;
@@ -99,6 +98,7 @@ public class SubprocessoWorkflowService {
     private final CompetenciaService competenciaService;
     private final AtividadeService atividadeService;
     private final MapaFacade mapaFacade;
+    private final RepositorioComum repo;
 
     private SubprocessoWorkflowService self;
 
@@ -118,7 +118,8 @@ public class SubprocessoWorkflowService {
             AccessControlService accessControlService,
             CompetenciaService competenciaService,
             AtividadeService atividadeService,
-            MapaFacade mapaFacade) {
+            MapaFacade mapaFacade,
+            RepositorioComum repo) {
         this.repositorioSubprocesso = repositorioSubprocesso;
         this.crudService = crudService;
         this.alertaService = alertaService;
@@ -132,6 +133,7 @@ public class SubprocessoWorkflowService {
         this.competenciaService = competenciaService;
         this.atividadeService = atividadeService;
         this.mapaFacade = mapaFacade;
+        this.repo = repo;
     }
 
     @Autowired
@@ -170,9 +172,7 @@ public class SubprocessoWorkflowService {
 
     public void atualizarSituacaoParaEmAndamento(Long mapaCodigo) {
         var subprocesso = repositorioSubprocesso.findByMapaCodigo(mapaCodigo)
-            .orElseThrow(() -> new ErroEntidadeDeveriaExistir(
-                    "Subprocesso", mapaCodigo,
-                    "SubprocessoWorkflowService - mapa deveria estar associado a um subprocesso"));
+            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso do mapa", mapaCodigo));
 
         if (subprocesso.getSituacao() == NAO_INICIADO) {
             if (subprocesso.getProcesso() == null) {
@@ -454,9 +454,9 @@ public class SubprocessoWorkflowService {
     @Transactional
     public void aceitarCadastroEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
         unidadeCodigos.forEach(unidadeCodigo -> {
-            Subprocesso base = buscarSubprocesso(codSubprocessoBase);
+            Subprocesso base = repo.buscar(Subprocesso.class, codSubprocessoBase);
             Subprocesso target = repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeDeveriaExistir("Subprocesso", "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo), "Workflow em bloco - subprocesso deveria ter sido criado no início do processo"));
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_SUBPROCESSO, "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo)));
 
             self.aceitarCadastro(target.getCodigo(), "De acordo com o cadastro de atividades da unidade (Em Bloco)", usuario);
         });
@@ -465,12 +465,9 @@ public class SubprocessoWorkflowService {
     @Transactional
     public void homologarCadastroEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
         unidadeCodigos.forEach(unidadeCodigo -> {
-            Subprocesso base = buscarSubprocesso(codSubprocessoBase);
+            Subprocesso base = repo.buscar(Subprocesso.class, codSubprocessoBase);
             Subprocesso target = repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeDeveriaExistir(
-                            "Subprocesso",
-                            "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo),
-                            "Workflow em bloco - subprocesso deveria ter sido criado no início do processo"));
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_SUBPROCESSO, "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo)));
 
             self.homologarCadastro(target.getCodigo(), "Homologação em bloco", usuario);
         });
@@ -548,7 +545,7 @@ public class SubprocessoWorkflowService {
     }
 
     private Subprocesso getSubprocessoParaEdicao(Long codSubprocesso) {
-        Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
+        Subprocesso subprocesso = repo.buscar(Subprocesso.class, codSubprocesso);
 
         SituacaoSubprocesso situacao = subprocesso.getSituacao();
         if (situacao != MAPEAMENTO_CADASTRO_HOMOLOGADO
@@ -593,7 +590,7 @@ public class SubprocessoWorkflowService {
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
-        Unidade sedoc = unidadeService.buscarEntidadePorId(unidadeService.buscarPorSigla("SEDOC").getCodigo());
+        Unidade sedoc = unidadeService.buscarEntidadePorSigla("SEDOC");
 
         transicaoService.registrar(
                 sp,
@@ -637,7 +634,7 @@ public class SubprocessoWorkflowService {
 
     @Transactional
     public void apresentarSugestoes(Long codSubprocesso, @Nullable String sugestoes, Usuario usuario) {
-        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        Subprocesso sp = repo.buscar(Subprocesso.class, codSubprocesso);
         accessControlService.verificarPermissao(usuario, APRESENTAR_SUGESTOES, sp);
 
         if (sp.getMapa() != null) {
@@ -662,7 +659,7 @@ public class SubprocessoWorkflowService {
 
     @Transactional
     public void validarMapa(Long codSubprocesso, Usuario usuario) {
-        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        Subprocesso sp = repo.buscar(Subprocesso.class, codSubprocesso);
         accessControlService.verificarPermissao(usuario, VALIDAR_MAPA, sp);
 
         sp.setSituacao(SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo()));
@@ -675,7 +672,7 @@ public class SubprocessoWorkflowService {
 
     @Transactional
     public void devolverValidacao(Long codSubprocesso, @Nullable String justificativa, Usuario usuario) {
-        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        Subprocesso sp = repo.buscar(Subprocesso.class, codSubprocesso);
         accessControlService.verificarPermissao(usuario, DEVOLVER_MAPA, sp);
 
         SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo());
@@ -698,7 +695,7 @@ public class SubprocessoWorkflowService {
 
     @Transactional
     public void aceitarValidacao(Long codSubprocesso, Usuario usuario) {
-        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        Subprocesso sp = repo.buscar(Subprocesso.class, codSubprocesso);
         accessControlService.verificarPermissao(usuario, ACEITAR_MAPA, sp);
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
         Unidade proximaUnidade = unidadeSuperior != null ? unidadeSuperior.getUnidadeSuperior() : null;
@@ -741,19 +738,19 @@ public class SubprocessoWorkflowService {
 
     @Transactional
     public void homologarValidacao(Long codSubprocesso, Usuario usuario) {
-        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        Subprocesso sp = repo.buscar(Subprocesso.class, codSubprocesso);
         accessControlService.verificarPermissao(usuario, HOMOLOGAR_MAPA, sp);
 
         sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
         repositorioSubprocesso.save(sp);
 
-        Unidade sedoc = unidadeService.buscarEntidadePorId(unidadeService.buscarPorSigla("SEDOC").getCodigo());
+        Unidade sedoc = unidadeService.buscarEntidadePorSigla("SEDOC");
         transicaoService.registrar(sp, TipoTransicao.MAPA_HOMOLOGADO, sedoc, sedoc, usuario);
     }
 
     @Transactional
     public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoRequest request, Usuario usuario) {
-        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        Subprocesso sp = repo.buscar(Subprocesso.class, codSubprocesso);
         accessControlService.verificarPermissao(usuario, AJUSTAR_MAPA, sp);
         validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
         sp.setSituacao(SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo()));
@@ -772,12 +769,9 @@ public class SubprocessoWorkflowService {
     @Transactional
     public void disponibilizarMapaEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase, DisponibilizarMapaRequest request, Usuario usuario) {
         unidadeCodigos.forEach(unidadeCodigo -> {
-            Subprocesso base = buscarSubprocesso(codSubprocessoBase);
+            Subprocesso base = repo.buscar(Subprocesso.class, codSubprocessoBase);
             Subprocesso target = repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeDeveriaExistir(
-                            ENTIDADE_SUBPROCESSO,
-                            DETALHE_SUBPROCESSO_FMT.formatted(base.getProcesso().getCodigo(), unidadeCodigo),
-                            MSG_ERRO_WORKFLOW_BLOCO));
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_SUBPROCESSO, "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo)));
 
             self.disponibilizarMapa(target.getCodigo(), request, usuario);
         });
@@ -786,12 +780,9 @@ public class SubprocessoWorkflowService {
     @Transactional
     public void aceitarValidacaoEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
         unidadeCodigos.forEach(unidadeCodigo -> {
-            Subprocesso base = buscarSubprocesso(codSubprocessoBase);
+            Subprocesso base = repo.buscar(Subprocesso.class, codSubprocessoBase);
             Subprocesso target = repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeDeveriaExistir(
-                            ENTIDADE_SUBPROCESSO,
-                            DETALHE_SUBPROCESSO_FMT.formatted(base.getProcesso().getCodigo(), unidadeCodigo),
-                            MSG_ERRO_WORKFLOW_BLOCO));
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_SUBPROCESSO, "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo)));
 
             self.aceitarValidacao(target.getCodigo(), usuario);
         });
@@ -800,12 +791,9 @@ public class SubprocessoWorkflowService {
     @Transactional
     public void homologarValidacaoEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
         unidadeCodigos.forEach(unidadeCodigo -> {
-            Subprocesso base = buscarSubprocesso(codSubprocessoBase);
+            Subprocesso base = repo.buscar(Subprocesso.class, codSubprocessoBase);
             Subprocesso target = repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeDeveriaExistir(
-                            ENTIDADE_SUBPROCESSO,
-                            DETALHE_SUBPROCESSO_FMT.formatted(base.getProcesso().getCodigo(), unidadeCodigo),
-                            MSG_ERRO_WORKFLOW_BLOCO));
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_SUBPROCESSO, "processo=%d, unidade=%d".formatted(base.getProcesso().getCodigo(), unidadeCodigo)));
 
             self.homologarValidacao(target.getCodigo(), usuario);
         });
@@ -814,8 +802,6 @@ public class SubprocessoWorkflowService {
     // ===== HELPER METHODS =====
 
     private Subprocesso buscarSubprocesso(Long codSubprocesso) {
-        return repositorioSubprocesso
-                .findById(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + codSubprocesso));
+        return repo.buscar(Subprocesso.class, codSubprocesso);
     }
 }

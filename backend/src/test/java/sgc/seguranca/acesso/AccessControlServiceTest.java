@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
+import sgc.organizacao.service.HierarquiaService;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Subprocesso;
@@ -29,7 +30,7 @@ class AccessControlServiceTest {
     private AccessAuditService auditService;
 
     @Mock
-    private sgc.organizacao.ServicoHierarquia servicoHierarquia;
+    private HierarquiaService hierarquiaService;
 
     @Mock
     private SubprocessoAccessPolicy subprocessoAccessPolicy;

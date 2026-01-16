@@ -33,9 +33,9 @@ class MappersCoverageTest {
     @DisplayName("Deve cobrir método map do ConhecimentoMapper")
     void deveCobrirMetodoMap() {
         // Inject mock repo
-        sgc.mapa.model.AtividadeRepo repo = org.mockito.Mockito.mock(sgc.mapa.model.AtividadeRepo.class);
+        sgc.comum.repo.RepositorioComum repo = org.mockito.Mockito.mock(sgc.comum.repo.RepositorioComum.class);
         try {
-            java.lang.reflect.Field field = sgc.mapa.mapper.ConhecimentoMapper.class.getDeclaredField("atividadeRepo");
+            java.lang.reflect.Field field = sgc.mapa.mapper.ConhecimentoMapper.class.getDeclaredField("repo");
             field.setAccessible(true);
             field.set(conhecimentoMapper, repo);
         } catch (Exception e) {
@@ -46,12 +46,14 @@ class MappersCoverageTest {
         assertThat(conhecimentoMapper.map(null)).isNull();
 
         // Test exception
-        org.mockito.Mockito.when(repo.findById(1L)).thenReturn(java.util.Optional.empty());
+        org.mockito.Mockito.when(repo.buscar(sgc.mapa.model.Atividade.class, 1L))
+                .thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Atividade", 1L));
         org.assertj.core.api.Assertions.assertThatThrownBy(() -> conhecimentoMapper.map(1L))
-                .isInstanceOf(sgc.comum.erros.ErroEntidadeDeveriaExistir.class);
+                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
 
         // Test success
-        org.mockito.Mockito.when(repo.findById(2L)).thenReturn(java.util.Optional.of(new sgc.mapa.model.Atividade()));
+        org.mockito.Mockito.when(repo.buscar(sgc.mapa.model.Atividade.class, 2L))
+                .thenReturn(new sgc.mapa.model.Atividade());
         assertThat(conhecimentoMapper.map(2L)).isNotNull();
     }
 }

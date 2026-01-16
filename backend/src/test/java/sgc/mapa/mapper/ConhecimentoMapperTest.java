@@ -9,8 +9,8 @@ import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Conhecimento;
-
-import java.util.Optional;
+import sgc.comum.repo.RepositorioComum;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -26,10 +26,14 @@ class ConhecimentoMapperTest {
     @Mock
     private AtividadeRepo atividadeRepo;
 
+    @Mock
+    private RepositorioComum repo;
+
     @BeforeEach
     void setUp() {
         mapper = Mappers.getMapper(ConhecimentoMapper.class);
         mapper.atividadeRepo = atividadeRepo;
+        mapper.repo = repo;
     }
 
     @Nested
@@ -72,7 +76,7 @@ class ConhecimentoMapperTest {
             Atividade atividade = new Atividade();
             atividade.setCodigo(10L);
 
-            when(atividadeRepo.findById(10L)).thenReturn(Optional.of(atividade));
+            when(repo.buscar(Atividade.class, 10L)).thenReturn(atividade);
 
             ConhecimentoDto dto = new ConhecimentoDto();
             dto.setCodigo(1L);
@@ -90,14 +94,13 @@ class ConhecimentoMapperTest {
         @Test
         @DisplayName("Deve lançar erro se atividade não encontrada")
         void deveLancarErroSeAtividadeNaoEncontrada() {
-            when(atividadeRepo.findById(99L)).thenReturn(Optional.empty());
+            when(repo.buscar(Atividade.class, 99L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 99L));
 
             ConhecimentoDto dto = new ConhecimentoDto();
             dto.setAtividadeCodigo(99L);
 
             assertThatThrownBy(() -> mapper.toEntity(dto))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("FK violada em ConhecimentoMapper");
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test

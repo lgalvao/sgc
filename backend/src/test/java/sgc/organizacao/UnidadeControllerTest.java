@@ -151,7 +151,7 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornar404AoBuscarArvoreDeUnidadeInexistente() throws Exception {
         // Arrange
-        when(unidadeService.buscarArvore(99L)).thenReturn(null);
+        when(unidadeService.buscarArvore(99L)).thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Unidade não encontrada"));
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/99/arvore"))
@@ -187,7 +187,7 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornarSiglaSuperior() throws Exception {
         // Arrange
-        when(unidadeService.buscarSiglaSuperior("FILHA")).thenReturn("SIGLA");
+        when(unidadeService.buscarSiglaSuperior("FILHA")).thenReturn(java.util.Optional.of("SIGLA"));
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/sigla/FILHA/superior"))
@@ -199,7 +199,7 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornar204AoBuscarSiglaSuperiorDeRaiz() throws Exception {
         // Arrange
-        when(unidadeService.buscarSiglaSuperior("RAIZ")).thenReturn(null);
+        when(unidadeService.buscarSiglaSuperior("RAIZ")).thenReturn(java.util.Optional.empty());
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/sigla/RAIZ/superior"))
