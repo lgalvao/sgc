@@ -1,8 +1,9 @@
 package sgc.seguranca.sanitizacao;
 
-import tools.jackson.core.JsonParser;
-import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import java.io.IOException;
 
 /**
  * Deserializador JSON customizado que sanitiza conteúdo HTML em campos String.
@@ -15,7 +16,7 @@ public class DeserializadorHtmlSanitizado extends StdDeserializer<String> {
     }
 
     @Override
-    public String deserialize(JsonParser parser, DeserializationContext ctxt) {
+    public String deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException {
         String value = parser.getValueAsString();
         if (value == null || value.isBlank()) {
             return value;

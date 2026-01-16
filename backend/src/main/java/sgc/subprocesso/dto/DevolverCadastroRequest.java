@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 /**
  * DTO para requisição de devolução de cadastro (CDU-13 item 9 e CDU-14 item
@@ -17,5 +18,6 @@ public class DevolverCadastroRequest {
      * Observações adicionais.
      */
     @Size(max = 500, message = "Observações devem ter no máximo 500 caracteres")
+    @SanitizarHtml
     private final String observacoes;
 }
