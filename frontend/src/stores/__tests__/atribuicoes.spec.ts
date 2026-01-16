@@ -4,6 +4,7 @@ import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 import type {AtribuicaoTemporaria} from "@/types/tipos";
 import {useAtribuicaoTemporariaStore} from "../atribuicoes";
 import {normalizeError} from "@/utils/apiError";
+import {logger} from "@/utils";
 
 // Define mock data shape that matches what the service returns
 const serviceMockData = [
@@ -38,6 +39,19 @@ const serviceMockData = [
 vi.mock("@/services/atribuicaoTemporariaService", () => ({
     buscarTodasAtribuicoes: vi.fn(),
 }));
+
+// Mock logger
+vi.mock("@/utils", async (importOriginal) => {
+    const actual = await importOriginal<any>();
+    return {
+        ...actual,
+        logger: {
+            error: vi.fn(),
+            warn: vi.fn(),
+            info: vi.fn(),
+        }
+    }
+});
 
 describe("useAtribuicaoTemporariaStore", () => {
     const context = setupStoreTest(useAtribuicaoTemporariaStore);
@@ -80,7 +94,6 @@ describe("useAtribuicaoTemporariaStore", () => {
         });
 
         it("buscarAtribuicoes deve lidar com resposta inválida (não array)", async () => {
-            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
             (atribuicaoTemporariaService.buscarTodasAtribuicoes as any).mockResolvedValue({
                 foo: 'bar'
             });
@@ -88,8 +101,7 @@ describe("useAtribuicaoTemporariaStore", () => {
             await context.store.buscarAtribuicoes();
 
             expect(context.store.atribuicoes).toEqual([]);
-            expect(consoleSpy).toHaveBeenCalledWith("Expected array but got:", undefined);
-            consoleSpy.mockRestore();
+            expect(logger.error).toHaveBeenCalledWith("Expected array but got:", undefined);
         });
 
         it("buscarAtribuicoes deve lidar com erros", async () => {

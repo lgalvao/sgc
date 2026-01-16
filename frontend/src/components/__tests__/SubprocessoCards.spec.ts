@@ -22,7 +22,8 @@ describe('SubprocessoCards.vue', () => {
             podeAceitarCadastro: false,
             podeVisualizarImpacto: false,
             podeAlterarDataLimite: false,
-            podeRealizarAutoavaliacao: false
+            podeRealizarAutoavaliacao: false,
+            podeDisponibilizarMapa: false
         },
         codSubprocesso: 100,
         codProcesso: 1,

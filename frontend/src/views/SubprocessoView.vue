@@ -30,7 +30,7 @@
         :cod-processo="props.codProcesso"
         :cod-subprocesso="codSubprocesso"
         :mapa="mapa"
-        :permissoes="subprocesso.permissoes || { podeEditarMapa: true, podeVisualizarMapa: true, podeVisualizarDiagnostico: true, podeAlterarDataLimite: false, podeDisponibilizarCadastro: false, podeDevolverCadastro: false, podeAceitarCadastro: false, podeVisualizarImpacto: false, podeVerPagina: true, podeRealizarAutoavaliacao: false }"
+        :permissoes="subprocesso.permissoes || { podeEditarMapa: true, podeVisualizarMapa: true, podeVisualizarDiagnostico: true, podeAlterarDataLimite: false, podeDisponibilizarCadastro: false, podeDevolverCadastro: false, podeAceitarCadastro: false, podeVisualizarImpacto: false, podeVerPagina: true, podeRealizarAutoavaliacao: false, podeDisponibilizarMapa: false }"
         :sigla-unidade="props.siglaUnidade"
         :situacao="subprocesso.situacao"
         :tipo-processo="subprocesso.tipoProcesso || TipoProcesso.MAPEAMENTO"
