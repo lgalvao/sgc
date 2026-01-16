@@ -25,7 +25,7 @@ import java.util.List;
 @Tag(name = "Subprocessos", description = "Gerenciamento do workflow de subprocessos")
 public class SubprocessoValidacaoController {
     private final SubprocessoFacade subprocessoFacade;
-    private final sgc.analise.AnaliseService analiseService;
+    private final sgc.analise.AnaliseFacade analiseFacade;
     private final AnaliseMapper analiseMapper;
 
     /**
@@ -112,7 +112,7 @@ public class SubprocessoValidacaoController {
     @GetMapping("/{codigo}/historico-validacao")
     @PreAuthorize("isAuthenticated()")
     public List<AnaliseValidacaoHistoricoDto> obterHistoricoValidacao(@PathVariable Long codigo) {
-        return analiseService.listarPorSubprocesso(codigo, TipoAnalise.VALIDACAO).stream()
+        return analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.VALIDACAO).stream()
                 .map(analiseMapper::toAnaliseValidacaoHistoricoDto)
                 .toList();
     }

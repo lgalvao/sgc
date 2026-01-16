@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.analise.AnaliseService;
+import sgc.analise.AnaliseFacade;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.mapa.dto.ConhecimentoDto;
@@ -40,7 +40,7 @@ public class SubprocessoDetalheService {
     private final UsuarioService usuarioService;
     private final SubprocessoDetalheMapper subprocessoDetalheMapper;
     private final ConhecimentoMapper conhecimentoMapper;
-    private final AnaliseService analiseService;
+    private final AnaliseFacade analiseFacade;
     private final CompetenciaService competenciaService;
     private final ConhecimentoService conhecimentoService;
     private final MapaAjusteMapper mapaAjusteMapper;
@@ -122,7 +122,7 @@ public class SubprocessoDetalheService {
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
         Subprocesso sp = crudService.buscarSubprocessoComMapa(codSubprocesso);
         Long codMapa = sp.getMapa().getCodigo();
-        Analise analise = analiseService.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst().orElse(null);
+        Analise analise = analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst().orElse(null);
         List<Competencia> competencias = competenciaService.buscarPorCodMapa(codMapa);
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(codMapa);
         List<Conhecimento> conhecimentos = conhecimentoService.listarPorMapa(codMapa);

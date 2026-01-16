@@ -24,7 +24,7 @@ import sgc.mapa.service.MapaFacade;
 import sgc.mapa.service.MapaSalvamentoService;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.painel.PainelService;
+import sgc.painel.PainelFacade;
 import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.subprocesso.SubprocessoMapaController;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
@@ -80,14 +80,14 @@ class ControllersServicesCoverageTest {
     @Mock private sgc.organizacao.UsuarioService usuarioService;
     @Mock private sgc.subprocesso.service.workflow.SubprocessoTransicaoService transicaoService;
     @Mock private sgc.organizacao.UnidadeService unidadeService;
-    @Mock private sgc.analise.AnaliseService analiseService;
+    @Mock private sgc.analise.AnaliseFacade analiseFacade;
     @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
     @Mock private sgc.processo.service.ProcessoFacade processoFacade;
 
     private SubprocessoMapaController subprocessoMapaController;
     private MapaFacade mapaFacade;
     private SubprocessoCadastroWorkflowService cadastroService;
-    private PainelService painelService;
+    private PainelFacade painelService;
 
     @BeforeEach
     void setUp() {
@@ -108,11 +108,11 @@ class ControllersServicesCoverageTest {
 
         // SubprocessoCadastroWorkflowService
         cadastroService = new SubprocessoCadastroWorkflowService(
-                repositorioSubprocesso, transicaoService, unidadeService, analiseService, validacaoService, impactoMapaService, accessControlService, null
+                repositorioSubprocesso, transicaoService, unidadeService, analiseFacade, validacaoService, impactoMapaService, accessControlService, null
         );
 
-        // PainelService
-        painelService = new PainelService(
+        // PainelFacade
+        painelService = new PainelFacade(
                 processoFacade, alertaService, unidadeService
         );
     }

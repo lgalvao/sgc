@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.analise.AnaliseService;
+import sgc.analise.AnaliseFacade;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -49,7 +49,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     @Mock private AtividadeService atividadeService;
     @Mock private MapaFacade mapaFacade;
     @Mock private SubprocessoTransicaoService transicaoService;
-    @Mock private AnaliseService analiseService;
+    @Mock private AnaliseFacade analiseFacade;
     @Mock private UnidadeService unidadeService;
     @Mock private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
     @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
@@ -264,6 +264,6 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         service.aceitarValidacao(1L, user);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-        verify(analiseService).criarAnalise(any(), any());
+        verify(analiseFacade).criarAnalise(any(), any());
     }
 }

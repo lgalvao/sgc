@@ -12,7 +12,7 @@ os tipos de análise. Um enum, `TipoAnalise`, é usado para diferenciar os conte
 
 ## Arquitetura e Componentes
 
-O `AnaliseService` é invocado pelo `SubprocessoService` (ou diretamente pelo `AnaliseController` para operações
+O `AnaliseFacade` é invocado pelo `SubprocessoFacade` (ou diretamente pelo `AnaliseController` para operações
 específicas) sempre que uma transição de estado que requer uma justificativa ocorre (ex: `devolverCadastro`). A API
 exposta pelo `AnaliseController` permite ao frontend registrar novas análises e consultar o histórico de um subprocesso,
 usando endpoints distintos para cada tipo de análise.
@@ -20,11 +20,11 @@ usando endpoints distintos para cada tipo de análise.
 ```mermaid
 graph TD
     subgraph "Módulo de Workflow"
-        SP[SubprocessoService]
+        SP[SubprocessoFacade]
     end
 
     subgraph "Módulo de Análise"
-        Service(AnaliseService)
+        Service(AnaliseFacade)
         Controle(AnaliseController)
         subgraph "Modelo de Dados Genérico"
             Analise[Analise]
@@ -49,7 +49,7 @@ graph TD
 
 ### Controladores e Serviços
 
-- **`AnaliseService`**: Centraliza a lógica de negócio para criar os registros de análise. É chamado por serviços de
+- **`AnaliseFacade`**: Centraliza a lógica de negócio para criar os registros de análise. É chamado por serviços de
   nível superior para garantir que as ações de workflow sejam devidamente auditadas.
 - **`AnaliseController`**: Expõe endpoints REST para o frontend criar e consultar o histórico de cada tipo de análise.
     - `GET /api/subprocessos/{codigo}/analises-cadastro`

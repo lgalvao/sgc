@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.analise.AnaliseService;
+import sgc.analise.AnaliseFacade;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeDeveriaExistir;
@@ -39,7 +39,7 @@ public class SubprocessoCadastroWorkflowService {
     private final SubprocessoRepo repositorioSubprocesso;
     private final SubprocessoTransicaoService transicaoService;
     private final UnidadeService unidadeService;
-    private final AnaliseService analiseService;
+    private final AnaliseFacade analiseFacade;
     private final SubprocessoValidacaoService validacaoService;
     private final ImpactoMapaService impactoMapaService;
     private final AccessControlService accessControlService;
@@ -52,7 +52,7 @@ public class SubprocessoCadastroWorkflowService {
             SubprocessoRepo repositorioSubprocesso,
             SubprocessoTransicaoService transicaoService,
             UnidadeService unidadeService,
-            AnaliseService analiseService,
+            AnaliseFacade analiseFacade,
             @Lazy SubprocessoValidacaoService validacaoService,
             @Lazy ImpactoMapaService impactoMapaService,
             AccessControlService accessControlService,
@@ -60,7 +60,7 @@ public class SubprocessoCadastroWorkflowService {
         this.repositorioSubprocesso = repositorioSubprocesso;
         this.transicaoService = transicaoService;
         this.unidadeService = unidadeService;
-        this.analiseService = analiseService;
+        this.analiseFacade = analiseFacade;
         this.validacaoService = validacaoService;
         this.impactoMapaService = impactoMapaService;
         this.accessControlService = accessControlService;
@@ -89,7 +89,7 @@ public class SubprocessoCadastroWorkflowService {
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
-        analiseService.removerPorSubprocesso(sp.getCodigo());
+        analiseFacade.removerPorSubprocesso(sp.getCodigo());
         transicaoService.registrar(sp, transicao, origem, destino, usuario);
     }
 

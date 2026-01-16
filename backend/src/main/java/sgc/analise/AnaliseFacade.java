@@ -21,7 +21,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AnaliseService {
+public class AnaliseFacade {
     private final AnaliseRepo analiseRepo;
     private final UnidadeService unidadeService;
 

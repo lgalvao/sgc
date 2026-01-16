@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.analise.AnaliseService;
+import sgc.analise.AnaliseFacade;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.mapper.ConhecimentoMapper;
@@ -60,7 +60,7 @@ class SubprocessoDetalheServiceTest {
     @Mock
     private ConhecimentoMapper conhecimentoMapper;
     @Mock
-    private AnaliseService analiseService;
+    private AnaliseFacade analiseFacade;
     @Mock
     private CompetenciaService competenciaService;
     @Mock

@@ -19,8 +19,8 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
-@DisplayName("Testes para AnaliseService")
-class AnaliseServiceTest {
+@DisplayName("Testes para AnaliseFacade")
+class AnaliseFacadeTest {
     private static final String OBS = "Observação";
 
     @Mock
@@ -30,7 +30,7 @@ class AnaliseServiceTest {
     private UnidadeService unidadeService;
 
     @InjectMocks
-    private AnaliseService service;
+    private AnaliseFacade service;
 
     private Subprocesso subprocesso;
 

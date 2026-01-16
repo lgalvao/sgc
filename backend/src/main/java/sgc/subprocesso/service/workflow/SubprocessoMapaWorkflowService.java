@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.analise.AnaliseService;
+import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
@@ -83,7 +83,7 @@ public class SubprocessoMapaWorkflowService {
     private final AtividadeService atividadeService;
     private final MapaFacade mapaFacade;
     private final SubprocessoTransicaoService transicaoService;
-    private final AnaliseService analiseService;
+    private final AnaliseFacade analiseFacade;
     private final UnidadeService unidadeService;
     private final SubprocessoValidacaoService validacaoService;
     private final AccessControlService accessControlService;
@@ -198,7 +198,7 @@ public class SubprocessoMapaWorkflowService {
         }
 
         sp.getMapa().setSugestoes(null);
-        analiseService.removerPorSubprocesso(codSubprocesso);
+        analiseFacade.removerPorSubprocesso(codSubprocesso);
         
         if (org.springframework.util.StringUtils.hasText(request.getObservacoes())) {
             sp.getMapa().setSugestoes(request.getObservacoes());
@@ -266,7 +266,7 @@ public class SubprocessoMapaWorkflowService {
         sp.setDataFimEtapa2(java.time.LocalDateTime.now());
         subprocessoRepo.save(sp);
 
-        analiseService.removerPorSubprocesso(sp.getCodigo());
+        analiseFacade.removerPorSubprocesso(sp.getCodigo());
 
         transicaoService.registrar(
                 sp,
@@ -326,7 +326,7 @@ public class SubprocessoMapaWorkflowService {
             Unidade sup = sp.getUnidade().getUnidadeSuperior();
             String siglaUnidade = sup != null ? sup.getSigla() : sp.getUnidade().getSigla();
 
-            analiseService.criarAnalise(sp, CriarAnaliseCommand.builder()
+            analiseFacade.criarAnalise(sp, CriarAnaliseCommand.builder()
                         .codSubprocesso(codSubprocesso)
                         .observacoes("Aceite da validação")
                         .tipo(TipoAnalise.VALIDACAO)

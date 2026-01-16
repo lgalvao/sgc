@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.analise.AnaliseService;
+import sgc.analise.AnaliseFacade;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroInvarianteViolada;
 import sgc.comum.erros.ErroValidacao;
@@ -46,7 +46,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     @Mock
     private UnidadeService unidadeService;
     @Mock
-    private AnaliseService analiseService;
+    private AnaliseFacade analiseFacade;
     @Mock
     private SubprocessoValidacaoService validacaoService;
     @Mock
@@ -83,7 +83,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getSituacao())
                 .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-        verify(analiseService).removerPorSubprocesso(id);
+        verify(analiseFacade).removerPorSubprocesso(id);
         verify(transicaoService).registrar(
                 eq(sp),
                 eq(TipoTransicao.CADASTRO_DISPONIBILIZADO),
@@ -180,7 +180,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getSituacao())
                 .isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        verify(analiseService).removerPorSubprocesso(id);
+        verify(analiseFacade).removerPorSubprocesso(id);
         verify(transicaoService).registrar(
                 eq(sp),
                 eq(TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA),

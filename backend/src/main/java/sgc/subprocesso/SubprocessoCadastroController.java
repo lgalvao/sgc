@@ -30,7 +30,7 @@ import java.util.Map;
 public class SubprocessoCadastroController {
 
     private final SubprocessoFacade subprocessoFacade;
-    private final sgc.analise.AnaliseService analiseService;
+    private final sgc.analise.AnaliseFacade analiseFacade;
     private final AnaliseMapper analiseMapper;
     private final UsuarioService usuarioService;
 
@@ -43,7 +43,7 @@ public class SubprocessoCadastroController {
     @GetMapping("/{codigo}/historico-cadastro")
     @PreAuthorize("isAuthenticated()")
     public List<AnaliseHistoricoDto> obterHistoricoCadastro(@PathVariable Long codigo) {
-        return analiseService.listarPorSubprocesso(codigo, TipoAnalise.CADASTRO).stream()
+        return analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.CADASTRO).stream()
                 .map(analiseMapper::toAnaliseHistoricoDto)
                 .toList();
     }
