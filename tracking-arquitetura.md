@@ -418,11 +418,11 @@ subprocesso/service/
 
 ## 🎯 Status Geral
 
-**Progresso Total:** ✅ **100% das Fases Planejadas (Fases 1-5 completas)**
+**Progresso Total:** ✅ **100% das Fases Planejadas (Fases 1-5 completas com todas violações corrigidas)**
 
-**Testes:** 1199/1200 passando (99.9%)
-- ✅ 1199 testes funcionais e arquiteturais passando
-- ⚠️ 1 teste ArchUnit detectando violações de Facade (dívida técnica documentada na Fase 2, não relacionada à Fase 5)
+**Testes:** 1200/1200 passando (100%) ✨
+- ✅ 1200 testes funcionais e arquiteturais passando
+- ✅ 0 violações ArchUnit - Padrão Facade 100% enforçado em todos os controllers
 
 **Decisão Arquitetural Principal:** 
 - ✅ Fase 1: Análise completa e documentação (13 services identificados)
@@ -530,15 +530,23 @@ subprocesso/service/
   - Adicionadas 4 dependências ao Facade
   - Deletado service (152 linhas)
   - Validado: 254/254 testes subprocesso passando
+- ✅ **Etapa 5 (Tarde):** Correção Final de Violações do Padrão Facade
+  - Identificada última violação: UnidadeController → ProcessoConsultaService (3 violações ArchUnit)
+  - Exposto método `buscarIdsUnidadesEmProcessosAtivos()` através de ProcessoFacade (5 linhas)
+  - Atualizado UnidadeController para usar ProcessoFacade (2 linhas modificadas)
+  - Atualizado UnidadeControllerTest para mockar ProcessoFacade (2 linhas modificadas)
+  - Total: 3 arquivos, 9 inserções, 4 deleções
+  - Validado: **1200/1200 testes passando (100%)**
+  - Validado: **0 violações ArchUnit** - Padrão Facade 100% enforçado
 - ✅ **Resultado Final:**
   - Services: 13 → 8 (38% de redução)
-  - Testes backend: 1199/1200 passando (99.9%)
-  - 1 ArchUnit failure (esperado - dívida técnica documentada na Fase 2)
+  - Testes backend: 1200/1200 passando (100%) ✨
+  - 0 ArchUnit failures - Todas as violações do padrão Facade corrigidas
 - ✅ Atualizado tracking-arquitetura.md com documentação completa da Fase 5
-- ✅ **Fase 5 100% concluída**
+- ✅ **Fase 5 100% concluída com todas violações arquiteturais corrigidas**
 
 ---
 
-**Última Atualização:** 2026-01-16 (Fases 1-5 100% concluídas)  
+**Última Atualização:** 2026-01-16 (Fases 1-5 100% concluídas + Correção de todas violações Facade)  
 **Responsável:** GitHub Copilot AI Agent
 

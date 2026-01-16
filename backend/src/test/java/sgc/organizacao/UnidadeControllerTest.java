@@ -37,7 +37,7 @@ class UnidadeControllerTest {
     private UnidadeFacade unidadeService;
 
     @MockitoBean
-    private sgc.processo.service.ProcessoConsultaService processoConsultaService;
+    private sgc.processo.service.ProcessoFacade processoFacade;
 
     @MockitoBean
     private sgc.seguranca.login.GerenciadorJwt gerenciadorJwt;
@@ -89,7 +89,7 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornarArvoreDeElegibilidade() throws Exception {
         // Arrange
-        when(processoConsultaService.buscarIdsUnidadesEmProcessosAtivos(any()))
+        when(processoFacade.buscarIdsUnidadesEmProcessosAtivos(any()))
                 .thenReturn(Collections.emptySet());
         when(unidadeService.buscarArvoreComElegibilidade(anyBoolean(), any()))
                 .thenReturn(Collections.emptyList());

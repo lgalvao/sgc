@@ -320,6 +320,11 @@ public class ProcessoFacade {
     }
 
     @Transactional(readOnly = true)
+    public Set<Long> buscarIdsUnidadesEmProcessosAtivos(Long codProcessoIgnorar) {
+        return processoConsultaService.buscarIdsUnidadesEmProcessosAtivos(codProcessoIgnorar);
+    }
+
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     public List<SubprocessoElegivelDto> listarSubprocessosElegiveis(Long codProcesso) {
         return processoConsultaService.listarSubprocessosElegiveis(codProcesso);
