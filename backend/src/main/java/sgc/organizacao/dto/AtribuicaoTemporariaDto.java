@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public class AtribuicaoTemporariaDto {
-
     private final Long codigo;
     private final UnidadeDto unidade;
     private final UsuarioDto usuario;

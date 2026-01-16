@@ -88,24 +88,24 @@ public class UnidadeController {
      * Verifica se a unidade possui mapa de competências vigente Usado pelo frontend para determinar
      * se deve exibir opções de revisão
      *
-     * @param codigoUnidade O código da unidade
+     * @param codUnidade O código da unidade
      * @return Um objeto com o campo temMapaVigente (boolean)
      */
-    @GetMapping("/{codigoUnidade}/mapa-vigente")
-    public ResponseEntity<Map<String, Boolean>> verificarMapaVigente(@PathVariable Long codigoUnidade) {
-        boolean temMapaVigente = unidadeService.verificarMapaVigente(codigoUnidade);
+    @GetMapping("/{codUnidade}/mapa-vigente")
+    public ResponseEntity<Map<String, Boolean>> verificarMapaVigente(@PathVariable Long codUnidade) {
+        boolean temMapaVigente = unidadeService.verificarMapaVigente(codUnidade);
         return ResponseEntity.ok(Map.of("temMapaVigente", temMapaVigente));
     }
 
     /**
      * Busca usuários de uma unidade específica.
      *
-     * @param codigoUnidade O código da unidade
+     * @param codUnidade O código da unidade
      * @return Lista de usuários da unidade
      */
-    @GetMapping("/{codigoUnidade}/usuarios")
-    public ResponseEntity<List<UsuarioDto>> buscarUsuariosPorUnidade(@PathVariable Long codigoUnidade) {
-        List<UsuarioDto> usuarios = unidadeService.buscarUsuariosPorUnidade(codigoUnidade);
+    @GetMapping("/{codUnidade}/usuarios")
+    public ResponseEntity<List<UsuarioDto>> buscarUsuariosPorUnidade(@PathVariable Long codUnidade) {
+        List<UsuarioDto> usuarios = unidadeService.buscarUsuariosPorUnidade(codUnidade);
         return ResponseEntity.ok(usuarios);
     }
 

@@ -15,7 +15,6 @@ import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.service.ValidadorDadosOrgService;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
@@ -34,13 +33,6 @@ import static sgc.organizacao.model.TipoUnidade.*;
  *
  * <p>Processa eventos de processo iniciado e finalizado, criando alertas e enviando e-mails para as unidades
  * participantes de forma diferenciada, conforme o tipo de unidade.
- *
- * <p><strong>Pré-requisito:</strong> As invariantes de dados organizacionais são validadas na inicialização
- * do sistema pelo {@link ValidadorDadosOrgService}. Este listener assume que os dados
- * são válidos (toda unidade tem titular, todo titular tem email, etc.).
- *
- * <p><b>Fase 3 (ADR-002):</b> Tornado assíncrono para desacoplamento completo entre
- * workflow de processo e comunicação/notificação.
  */
 @Component
 @RequiredArgsConstructor

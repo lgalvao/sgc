@@ -11,7 +11,6 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class PerfilDto {
-
     private final String usuarioTitulo;
     private final Long unidadeCodigo;
     private final String unidadeNome;
