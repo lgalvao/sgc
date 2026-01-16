@@ -4,11 +4,11 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import sgc.alerta.AlertaService;
+import sgc.alerta.AlertaFacade;
 import sgc.notificacao.EventoProcessoListener;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -25,10 +25,10 @@ public class TestEventConfig {
     @Bean
     @Primary
     public EventoProcessoListener eventoProcessoListener(
-            AlertaService servicoAlertas,
+            AlertaFacade servicoAlertas,
             NotificacaoEmailService notificacaoEmailService,
             NotificacaoModelosService notificacaoModelosService,
-            UsuarioService usuarioService,
+            UsuarioFacade usuarioService,
             ProcessoFacade processoFacade,
             SubprocessoFacade subprocessoFacade) {
 

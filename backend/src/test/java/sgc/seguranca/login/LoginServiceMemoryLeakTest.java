@@ -14,20 +14,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag("integration")
 @SpringBootTest
 @ActiveProfiles("test")
-@DisplayName("Verificação de Correção de Vulnerabilidade de Memória - LoginService")
+@DisplayName("Verificação de Correção de Vulnerabilidade de Memória - LoginFacade")
 class LoginServiceMemoryLeakTest {
 
     @Autowired
-    private LoginService loginService;
+    private LoginFacade loginFacade;
 
     @Autowired
     private UsuarioRepo usuarioRepo;
 
     @Test
-    @DisplayName("Deve limpar autenticações expiradas no LoginService")
+    @DisplayName("Deve limpar autenticações expiradas no LoginFacade")
     void deveLimparAutenticacoesExpiradas() {
         // Arrange
-        int tamanhoInicial = loginService.getAutenticacoesRecentesSize();
+        int tamanhoInicial = loginFacade.getAutenticacoesRecentesSize();
 
         // Act - Simula 100 autenticações
         for (int i = 0; i < 100; i++) {
@@ -44,23 +44,23 @@ class LoginServiceMemoryLeakTest {
                 usuarioRepo.save(u);
             }
 
-            loginService.autenticar(tituloFalso, "senha");
+            loginFacade.autenticar(tituloFalso, "senha");
         }
 
         // Assert - O mapa deve ter crescido
-        int tamanhoAposAutenticacao = loginService.getAutenticacoesRecentesSize();
+        int tamanhoAposAutenticacao = loginFacade.getAutenticacoesRecentesSize();
         assertTrue(tamanhoAposAutenticacao >= tamanhoInicial + 100,
                 "Mapa deveria ter crescido. Inicial: " + tamanhoInicial + ", Atual: " + tamanhoAposAutenticacao);
 
         // Manipula os tempos para simular expiração usando método de teste
-        loginService.expireAllAuthenticationsForTest();
+        loginFacade.expireAllAuthenticationsForTest();
 
         // Executa a limpeza
-        loginService.limparAutenticacoesExpiradas();
+        loginFacade.limparAutenticacoesExpiradas();
 
         // Assert - O mapa deve ter reduzido (pelo menos os 100 removidos, possivelmente
         // mais se outros expiraram)
-        int tamanhoFinal = loginService.getAutenticacoesRecentesSize();
+        int tamanhoFinal = loginFacade.getAutenticacoesRecentesSize();
         assertTrue(tamanhoFinal < tamanhoAposAutenticacao,
                 "A limpeza deveria ter removido itens expirados. Antes: " + tamanhoAposAutenticacao + ", Depois: "
                         + tamanhoFinal);

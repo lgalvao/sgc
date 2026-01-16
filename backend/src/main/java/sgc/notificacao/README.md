@@ -8,7 +8,7 @@ Este pacote tem uma dupla responsabilidade:
 1. **Envio de Notificações:** É responsável pelo envio de **notificações por e-mail** para os usuários de forma robusta
    e desacoplada.
 2. **Orquestração de Eventos:** Contém o `EventoProcessoListener`, o principal listener de eventos de domínio da
-   aplicação, que também orquestra a criação de **alertas** ao invocar o `AlertaService`.
+   aplicação, que também orquestra a criação de **alertas** ao invocar o `AlertaFacade`.
 
 ## Arquitetura Orientada a Eventos
 
@@ -32,7 +32,7 @@ graph TD
     end
 
     subgraph "Módulo de Alerta"
-        AlertaService
+        AlertaFacade
     end
 
     subgraph "Infraestrutura de E-mail"
@@ -41,7 +41,7 @@ graph TD
 
     ProcessoService -- 1. Publica evento --> EventBus
     EventBus -- 2. Notifica --> Listener
-    Listener -- 3. Invoca --> AlertaService
+    Listener -- 3. Invoca --> AlertaFacade
     Listener -- 4. Usa --> TemplateService
     Listener -- 5. Invoca --> EmailService
     TemplateService -- Gera HTML --> Listener
@@ -53,7 +53,7 @@ graph TD
 1. **Ação de Negócio:** O `ProcessoService` executa uma ação (ex: inicia um processo).
 2. **Publicação do Evento:** Ele publica um evento de domínio (ex: `ProcessoIniciadoEvento`).
 3. **Captura do Evento:** O `EventoProcessoListener` captura este evento.
-4. **Criação de Alertas:** O listener invoca o `AlertaService` para criar os alertas internos.
+4. **Criação de Alertas:** O listener invoca o `AlertaFacade` para criar os alertas internos.
 5. **Criação do E-mail:** O listener usa o `NotificacaoModelosService` para gerar o conteúdo HTML do e-mail.
 6. **Envio do E-mail:** O listener invoca o `NotificacaoEmailService` para enviar o e-mail.
 

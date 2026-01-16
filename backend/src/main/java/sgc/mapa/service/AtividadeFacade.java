@@ -12,7 +12,7 @@ import sgc.mapa.evento.EventoAtividadeCriada;
 import sgc.mapa.evento.EventoAtividadeExcluida;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
@@ -47,7 +47,7 @@ public class AtividadeFacade {
     private final ConhecimentoService conhecimentoService;
     private final SubprocessoFacade subprocessoFacade;
     private final AccessControlService accessControlService;
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
     private final MapaFacade mapaFacade;
     private final ApplicationEventPublisher eventPublisher;
 

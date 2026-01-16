@@ -12,7 +12,7 @@ import sgc.analise.model.AnaliseRepo;
 import sgc.fixture.MapaFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.model.*;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Usuario;
@@ -63,7 +63,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UnidadeRepo unidadeRepo;
     @Autowired
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
     @Autowired
     private AlertaRepo alertaRepo;
     @Autowired

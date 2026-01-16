@@ -7,12 +7,12 @@ O pacote `organizacao` é responsável pelo gerenciamento de **usuários** e **u
 ## Responsabilidades Principais
 
 1. **Gestão de Usuários:**
-   - Autenticação e autorização via `UsuarioService`
+   - Autenticação e autorização via `UsuarioFacade`
    - Gerenciamento de perfis (`ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR`)
    - Administração de usuários com papel de administrador
 
 2. **Gestão de Unidades:**
-   - Hierarquia organizacional via `UnidadeService`
+   - Hierarquia organizacional via `UnidadeFacade`
    - Mapa vigente por unidade
    - Atribuições temporárias de servidores
 
@@ -25,8 +25,8 @@ O pacote `organizacao` é responsável pelo gerenciamento de **usuários** e **u
 
 ### Serviços
 
-- **`UsuarioService`**: Lógica de autenticação, autorização e gestão de administradores
-- **`UnidadeService`**: Hierarquia de unidades, elegibilidade e atribuições temporárias
+- **`UsuarioFacade`**: Lógica de autenticação, autorização e gestão de administradores
+- **`UnidadeFacade`**: Hierarquia de unidades, elegibilidade e atribuições temporárias
 
 ### Modelo (`model/`)
 

@@ -9,8 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import sgc.organizacao.UnidadeService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -32,10 +32,10 @@ class ProcessoAcessoServiceTest {
     private ProcessoAcessoService processoAcessoService;
 
     @Mock
-    private UnidadeService unidadeService;
+    private UnidadeFacade unidadeService;
 
     @Mock
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
 
     @Mock
     private SubprocessoFacade subprocessoFacade;

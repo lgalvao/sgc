@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-@DisplayName("Testes do Serviço UsuarioService")
+@DisplayName("Testes do Serviço UsuarioFacade")
 class UsuarioServiceTest {
 
     // Data from backend/src/test/resources/data.sql
@@ -34,7 +34,7 @@ class UsuarioServiceTest {
     private static final String TITULO_CHEFE_UNIT2 = "777"; // Chefe STIC Teste
 
     @Autowired
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
 
     @Nested
     @DisplayName("Consultas de Usuário")

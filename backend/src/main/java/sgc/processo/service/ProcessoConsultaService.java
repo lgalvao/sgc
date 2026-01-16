@@ -6,7 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.processo.dto.SubprocessoElegivelDto;
 import sgc.processo.model.ProcessoRepo;
@@ -37,7 +37,7 @@ public class ProcessoConsultaService {
 
     private final ProcessoRepo processoRepo;
     private final SubprocessoFacade subprocessoFacade;
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
 
     /**
      * Constructor com @Lazy para quebrar dependência circular.
@@ -45,7 +45,7 @@ public class ProcessoConsultaService {
     public ProcessoConsultaService(
             ProcessoRepo processoRepo,
             @Lazy SubprocessoFacade subprocessoFacade,
-            UsuarioService usuarioService) {
+            UsuarioFacade usuarioService) {
         this.processoRepo = processoRepo;
         this.subprocessoFacade = subprocessoFacade;
         this.usuarioService = usuarioService;

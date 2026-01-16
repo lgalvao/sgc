@@ -9,7 +9,7 @@ import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAnalise;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
@@ -19,18 +19,18 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
-@DisplayName("Testes para AnaliseService")
-class AnaliseServiceTest {
+@DisplayName("Testes para AnaliseFacade")
+class AnaliseFacadeTest {
     private static final String OBS = "Observação";
 
     @Mock
     private AnaliseRepo analiseRepo;
 
     @Mock
-    private UnidadeService unidadeService;
+    private UnidadeFacade unidadeService;
 
     @InjectMocks
-    private AnaliseService service;
+    private AnaliseFacade service;
 
     private Subprocesso subprocesso;
 

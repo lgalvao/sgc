@@ -236,7 +236,7 @@ User Request + DTO → Controller (@Valid) → Facade
 * **Services:** `CompetenciaService`, `ConhecimentoService`, `MapaSalvamentoService`, etc.
 
 #### `sgc.organizacao`
-* **Services:** `UsuarioService`, `UnidadeService`
+* **Services:** `UsuarioFacade`, `UnidadeFacade`
 * **Responsabilidade:** Estrutura organizacional (usuários, unidades, perfis)
 * **Entidades:** `Usuario`, `Unidade`, `Perfil`
 
@@ -249,7 +249,7 @@ User Request + DTO → Controller (@Valid) → Facade
   * `HierarchyService` - Hierarquia de unidades
   * `AccessAuditService` - Auditoria
 * **Pacote:** `sgc.seguranca.login` - Autenticação
-  * `LoginService`, `JwtService`, `ConfigSeguranca`
+  * `LoginFacade`, `JwtService`, `ConfigSeguranca`
 
 #### `sgc.analise`
 * **Service:** `AnaliseService`
@@ -257,7 +257,7 @@ User Request + DTO → Controller (@Valid) → Facade
 * **Entidades:** `Analise`, `TipoAnalise`, `TipoAcaoAnalise`
 
 #### `sgc.notificacao` e `sgc.alerta`
-* **Services:** `NotificacaoEmailService`, `AlertaService`
+* **Services:** `NotificacaoEmailService`, `AlertaFacade`
 * **Responsabilidade:** Comunicação reativa com usuários
 * **Integração:** Reage a eventos de domínio
 

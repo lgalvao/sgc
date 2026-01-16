@@ -14,7 +14,7 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.CompetenciaService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
@@ -34,15 +34,15 @@ import static org.mockito.Mockito.*;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-@DisplayName("RelatorioService Test")
-class RelatorioServiceTest {
+@DisplayName("RelatorioFacade Test")
+class RelatorioFacadeTest {
 
     @Mock
     private ProcessoFacade processoFacade;
     @Mock
     private SubprocessoFacade subprocessoFacade;
     @Mock
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
     @Mock
     private CompetenciaService competenciaService;
 
@@ -53,7 +53,7 @@ class RelatorioServiceTest {
     private Document document;
 
     @InjectMocks
-    private RelatorioService relatorioService;
+    private RelatorioFacade relatorioService;
 
     @Test
     @DisplayName("Deve gerar relatório de andamento")

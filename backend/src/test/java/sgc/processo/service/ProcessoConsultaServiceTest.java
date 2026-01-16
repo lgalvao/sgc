@@ -11,7 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.SubprocessoElegivelDto;
@@ -45,7 +45,7 @@ class ProcessoConsultaServiceTest {
     private SubprocessoFacade subprocessoFacade;
 
     @Mock
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
 
     @Test
     @DisplayName("Deve buscar IDs de unidades em processos ativos")

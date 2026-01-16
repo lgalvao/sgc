@@ -81,7 +81,7 @@ NUNCA expor entidades JPA. Sempre usar DTOs + Mappers.
 - **Função:** Gerencia mapas de competências
 
 ### `organizacao`
-- **Services:** `UsuarioService`, `UnidadeService`
+- **Services:** `UsuarioFacade`, `UnidadeFacade`
 - **Função:** Estrutura organizacional
 
 ### `seguranca`

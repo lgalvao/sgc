@@ -7,10 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.alerta.AlertaService;
+import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
@@ -38,9 +38,9 @@ class SubprocessoWorkflowServiceTest {
     @Mock
     private SubprocessoCrudService crudService;
     @Mock
-    private AlertaService alertaService;
+    private AlertaFacade alertaService;
     @Mock
-    private UnidadeService unidadeService;
+    private UnidadeFacade unidadeService;
     @Mock
     private MovimentacaoRepo repositorioMovimentacao;
 

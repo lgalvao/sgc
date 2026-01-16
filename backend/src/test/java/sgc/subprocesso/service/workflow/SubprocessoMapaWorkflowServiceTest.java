@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.analise.AnaliseService;
+import sgc.analise.AnaliseFacade;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.CompetenciaMapaDto;
@@ -19,7 +19,7 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -54,8 +54,8 @@ class SubprocessoMapaWorkflowServiceTest {
     @Mock private AtividadeService atividadeService;
     @Mock private MapaFacade mapaFacade;
     @Mock private SubprocessoTransicaoService transicaoService;
-    @Mock private AnaliseService analiseService;
-    @Mock private UnidadeService unidadeService;
+    @Mock private AnaliseFacade analiseFacade;
+    @Mock private UnidadeFacade unidadeService;
     @Mock private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
     @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
 
@@ -640,7 +640,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.aceitarValidacao(1L, new Usuario());
 
-            verify(analiseService).criarAnalise(eq(sp), argThat(req -> req.acao() == TipoAcaoAnalise.ACEITE_MAPEAMENTO));
+            verify(analiseFacade).criarAnalise(eq(sp), argThat(req -> req.acao() == TipoAcaoAnalise.ACEITE_MAPEAMENTO));
             verify(subprocessoRepo).save(sp);
         }
 
@@ -654,7 +654,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.aceitarValidacao(1L, new Usuario());
 
-            verify(analiseService).criarAnalise(eq(sp), argThat(req -> req.acao() == TipoAcaoAnalise.ACEITE_MAPEAMENTO));
+            verify(analiseFacade).criarAnalise(eq(sp), argThat(req -> req.acao() == TipoAcaoAnalise.ACEITE_MAPEAMENTO));
             verify(subprocessoRepo).save(sp);
         }
 
@@ -772,7 +772,7 @@ class SubprocessoMapaWorkflowServiceTest {
              service.aceitarValidacaoEmBloco(List.of(10L), 1L, new Usuario());
 
              verify(subprocessoRepo).save(target);
-             verify(analiseService).criarAnalise(eq(target), any());
+             verify(analiseFacade).criarAnalise(eq(target), any());
          }
     }
 

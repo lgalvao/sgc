@@ -11,7 +11,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 class SubprocessoContextoServiceTest {
 
     @Mock
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
     @Mock
     private MapaFacade mapaFacade;
     @Mock

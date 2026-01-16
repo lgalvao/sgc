@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.organizacao.UnidadeService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.TipoUnidade;
@@ -30,23 +30,23 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service
 @Slf4j
-public class LoginService {
+public class LoginFacade {
     private static final String ENTIDADE_USUARIO = "Usuário";
 
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
     private final GerenciadorJwt gerenciadorJwt;
     private final ClienteAcessoAd clienteAcessoAd;
-    private final UnidadeService unidadeService;
+    private final UnidadeFacade unidadeService;
 
     @Value("${aplicacao.ambiente-testes:false}")
     private boolean ambienteTestes;
 
     private final Map<String, LocalDateTime> autenticacoesRecentes = new ConcurrentHashMap<>();
 
-    public LoginService(UsuarioService usuarioService,
+    public LoginFacade(UsuarioFacade usuarioService,
             GerenciadorJwt gerenciadorJwt,
             @Autowired(required = false) ClienteAcessoAd clienteAcessoAd,
-            UnidadeService unidadeService) {
+            UnidadeFacade unidadeService) {
         this.usuarioService = usuarioService;
         this.gerenciadorJwt = gerenciadorJwt;
         this.clienteAcessoAd = clienteAcessoAd;

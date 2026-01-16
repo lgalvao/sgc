@@ -1,4 +1,4 @@
-package sgc.configuracao.service;
+package sgc.configuracao;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -20,11 +20,11 @@ import static org.mockito.Mockito.*;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ParametroService")
-class ParametroServiceTest {
+@DisplayName("ConfiguracaoFacade")
+class ConfiguracaoFacadeTest {
 
     @InjectMocks
-    private ParametroService parametroService;
+    private ConfiguracaoFacade configuracaoFacade;
 
     @Mock
     private ParametroRepo parametroRepo;
@@ -38,7 +38,7 @@ class ParametroServiceTest {
         when(parametroRepo.findAll()).thenReturn(List.of(p1, p2));
 
         // Act
-        List<Parametro> resultado = parametroService.buscarTodos();
+        List<Parametro> resultado = configuracaoFacade.buscarTodos();
 
         // Assert
         assertThat(resultado).hasSize(2).contains(p1, p2);
@@ -54,7 +54,7 @@ class ParametroServiceTest {
         when(parametroRepo.findByChave(chave)).thenReturn(Optional.of(parametro));
 
         // Act
-        Parametro resultado = parametroService.buscarPorChave(chave);
+        Parametro resultado = configuracaoFacade.buscarPorChave(chave);
 
         // Assert
         assertThat(resultado).isEqualTo(parametro);
@@ -69,7 +69,7 @@ class ParametroServiceTest {
         when(parametroRepo.findByChave(chave)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThatThrownBy(() -> parametroService.buscarPorChave(chave))
+        assertThatThrownBy(() -> configuracaoFacade.buscarPorChave(chave))
                 .isInstanceOf(ErroConfiguracao.class)
                 .hasMessageContaining(chave);
     }
@@ -83,7 +83,7 @@ class ParametroServiceTest {
         when(parametroRepo.saveAll(lista)).thenReturn(lista);
 
         // Act
-        List<Parametro> resultado = parametroService.salvar(lista);
+        List<Parametro> resultado = configuracaoFacade.salvar(lista);
 
         // Assert
         assertThat(resultado).isEqualTo(lista);
@@ -103,7 +103,7 @@ class ParametroServiceTest {
         when(parametroRepo.save(any(Parametro.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        Parametro resultado = parametroService.atualizar(chave, novoValor);
+        Parametro resultado = configuracaoFacade.atualizar(chave, novoValor);
 
         // Assert
         assertThat(resultado.getValor()).isEqualTo(novoValor);
@@ -119,7 +119,7 @@ class ParametroServiceTest {
         when(parametroRepo.findByChave(chave)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThatThrownBy(() -> parametroService.atualizar(chave, "novo"))
+        assertThatThrownBy(() -> configuracaoFacade.atualizar(chave, "novo"))
                 .isInstanceOf(ErroConfiguracao.class);
         verify(parametroRepo, never()).save(any());
     }

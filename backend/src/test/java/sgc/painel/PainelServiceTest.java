@@ -12,10 +12,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import sgc.alerta.AlertaService;
+import sgc.alerta.AlertaFacade;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.Alerta;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
@@ -39,18 +39,18 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
-@DisplayName("PainelService - Testes Unitários")
+@DisplayName("PainelFacade - Testes Unitários")
 class PainelServiceTest {
 
     @Mock
     private ProcessoFacade processoFacade;
     @Mock
-    private AlertaService alertaService;
+    private AlertaFacade alertaService;
     @Mock
-    private UnidadeService unidadeService;
+    private UnidadeFacade unidadeService;
 
     @InjectMocks
-    private PainelService painelService;
+    private PainelFacade painelService;
 
     private Pageable pageable = PageRequest.of(0, 10);
 

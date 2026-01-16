@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
@@ -26,7 +26,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class SubprocessoContextoService {
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
     private final MapaFacade mapaFacade;
     private final SubprocessoCrudService crudService;
     private final SubprocessoDetalheService detalheService;

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.analise.AnaliseService;
+import sgc.analise.AnaliseFacade;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroInvarianteViolada;
 import sgc.comum.erros.ErroValidacao;
@@ -15,7 +15,7 @@ import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
@@ -44,9 +44,9 @@ class SubprocessoCadastroWorkflowServiceTest {
     @Mock
     private SubprocessoTransicaoService transicaoService;
     @Mock
-    private UnidadeService unidadeService;
+    private UnidadeFacade unidadeService;
     @Mock
-    private AnaliseService analiseService;
+    private AnaliseFacade analiseFacade;
     @Mock
     private SubprocessoValidacaoService validacaoService;
     @Mock
@@ -83,7 +83,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getSituacao())
                 .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-        verify(analiseService).removerPorSubprocesso(id);
+        verify(analiseFacade).removerPorSubprocesso(id);
         verify(transicaoService).registrar(
                 eq(sp),
                 eq(TipoTransicao.CADASTRO_DISPONIBILIZADO),
@@ -180,7 +180,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getSituacao())
                 .isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        verify(analiseService).removerPorSubprocesso(id);
+        verify(analiseFacade).removerPorSubprocesso(id);
         verify(transicaoService).registrar(
                 eq(sp),
                 eq(TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA),

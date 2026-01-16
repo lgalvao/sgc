@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
@@ -35,7 +35,7 @@ class SubprocessoFacadeTest {
     @Mock private SubprocessoMapaWorkflowService mapaWorkflowService;
     @Mock private SubprocessoContextoService contextoService;
     @Mock private SubprocessoMapaService mapaService;
-    @Mock private UsuarioService usuarioService;
+    @Mock private UsuarioFacade usuarioService;
 
     @InjectMocks
     private SubprocessoFacade facade;

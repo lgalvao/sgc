@@ -17,8 +17,8 @@ import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.alerta.model.AlertaUsuario;
 import sgc.alerta.model.AlertaUsuarioRepo;
-import sgc.organizacao.UnidadeService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -33,7 +33,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
- * Testes unitários consolidados do AlertaService.
+ * Testes unitários consolidados do AlertaFacade.
  * 
  * Consolida testes de:
  * - AlertaServiceTest.java (15 testes)
@@ -41,8 +41,8 @@ import static org.mockito.Mockito.*;
  */
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AlertaService - Testes Unitários")
-class AlertaServiceTest {
+@DisplayName("AlertaFacade - Testes Unitários")
+class AlertaFacadeTest {
     @Mock
     private AlertaRepo alertaRepo;
 
@@ -50,16 +50,16 @@ class AlertaServiceTest {
     private AlertaUsuarioRepo alertaUsuarioRepo;
 
     @Mock
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
 
     @Mock
     private AlertaMapper alertaMapper;
 
     @Mock
-    private UnidadeService unidadeService;
+    private UnidadeFacade unidadeService;
 
     @InjectMocks
-    private AlertaService service;
+    private AlertaFacade service;
 
     private Unidade criarSedocMock() {
         Unidade sedoc = new Unidade();

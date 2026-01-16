@@ -33,7 +33,7 @@ class UsuarioControllerTest {
         private MockMvc mockMvc;
 
         @MockitoBean
-        private UsuarioService usuarioService;
+        private UsuarioFacade usuarioService;
 
         @BeforeEach
         void setUp() {

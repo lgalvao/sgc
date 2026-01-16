@@ -18,7 +18,7 @@ import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.subprocesso.dto.CompetenciaRequest;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesRequest;
@@ -45,7 +45,7 @@ class SubprocessoMapaControllerTest {
     @MockitoBean
     private MapaFacade mapaFacade;
     @MockitoBean
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
 
     @Autowired
     private MockMvc mockMvc;

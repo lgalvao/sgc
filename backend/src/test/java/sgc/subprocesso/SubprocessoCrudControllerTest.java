@@ -12,7 +12,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -33,7 +33,7 @@ class SubprocessoCrudControllerTest {
     private sgc.subprocesso.service.SubprocessoFacade subprocessoFacade;
 
     @MockitoBean
-    private UnidadeService unidadeService;
+    private UnidadeFacade unidadeService;
 
     @Autowired
     private MockMvc mockMvc;

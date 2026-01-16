@@ -18,7 +18,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Tag(name = "Alertas", description = "Gerenciamento de alertas para usuários")
 public class AlertaController {
-    private final AlertaService alertaService;
+    private final AlertaFacade alertaService;
 
     @GetMapping
     @Operation(summary = "Lista todos os alertas do usuário autenticado")

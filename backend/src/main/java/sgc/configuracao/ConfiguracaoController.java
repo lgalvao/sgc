@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sgc.configuracao.model.Parametro;
-import sgc.configuracao.service.ParametroService;
 
 import java.util.List;
 
@@ -15,19 +14,19 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Configurações", description = "Gerenciamento de configurações")
 public class ConfiguracaoController {
-    private final ParametroService parametroService;
+    private final ConfiguracaoFacade configuracaoFacade;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Listar todas as configurações")
     public List<Parametro> listar() {
-        return parametroService.buscarTodos();
+        return configuracaoFacade.buscarTodos();
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualizar configurações em bloco")
     public List<Parametro> atualizar(@RequestBody List<Parametro> parametros) {
-        return parametroService.salvar(parametros);
+        return configuracaoFacade.salvar(parametros);
     }
 }

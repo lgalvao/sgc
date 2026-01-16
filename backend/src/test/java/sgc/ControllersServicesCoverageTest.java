@@ -24,7 +24,7 @@ import sgc.mapa.service.MapaFacade;
 import sgc.mapa.service.MapaSalvamentoService;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.painel.PainelService;
+import sgc.painel.PainelFacade;
 import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.subprocesso.SubprocessoMapaController;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
@@ -63,7 +63,7 @@ class ControllersServicesCoverageTest {
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
     @Mock
-    private sgc.alerta.AlertaService alertaService;
+    private sgc.alerta.AlertaFacade alertaService;
     // Removido atividadeRepo não utilizado
     @Mock
     private sgc.mapa.mapper.MapaCompletoMapper mapaCompletoMapper;
@@ -77,17 +77,17 @@ class ControllersServicesCoverageTest {
     @Mock private sgc.subprocesso.service.SubprocessoMapaService subprocessoMapaService;
     @Mock private sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
     @Mock private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
-    @Mock private sgc.organizacao.UsuarioService usuarioService;
+    @Mock private sgc.organizacao.UsuarioFacade usuarioService;
     @Mock private sgc.subprocesso.service.workflow.SubprocessoTransicaoService transicaoService;
-    @Mock private sgc.organizacao.UnidadeService unidadeService;
-    @Mock private sgc.analise.AnaliseService analiseService;
+    @Mock private sgc.organizacao.UnidadeFacade unidadeService;
+    @Mock private sgc.analise.AnaliseFacade analiseFacade;
     @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
     @Mock private sgc.processo.service.ProcessoFacade processoFacade;
 
     private SubprocessoMapaController subprocessoMapaController;
     private MapaFacade mapaFacade;
     private SubprocessoCadastroWorkflowService cadastroService;
-    private PainelService painelService;
+    private PainelFacade painelService;
 
     @BeforeEach
     void setUp() {
@@ -108,11 +108,11 @@ class ControllersServicesCoverageTest {
 
         // SubprocessoCadastroWorkflowService
         cadastroService = new SubprocessoCadastroWorkflowService(
-                repositorioSubprocesso, transicaoService, unidadeService, analiseService, validacaoService, impactoMapaService, accessControlService, null
+                repositorioSubprocesso, transicaoService, unidadeService, analiseFacade, validacaoService, impactoMapaService, accessControlService, null
         );
 
-        // PainelService
-        painelService = new PainelService(
+        // PainelFacade
+        painelService = new PainelFacade(
                 processoFacade, alertaService, unidadeService
         );
     }

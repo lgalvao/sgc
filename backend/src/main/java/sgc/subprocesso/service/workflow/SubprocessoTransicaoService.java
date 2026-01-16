@@ -6,7 +6,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.analise.AnaliseService;
+import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
@@ -47,7 +47,7 @@ public class SubprocessoTransicaoService {
     private final MovimentacaoRepo movimentacaoRepo;
     private final ApplicationEventPublisher eventPublisher;
     private final SubprocessoRepo repositorioSubprocesso;
-    private final AnaliseService analiseService;
+    private final AnaliseFacade analiseFacade;
 
     /**
      * Registra uma transição de subprocesso: salva movimentação e publica evento.
@@ -135,7 +135,7 @@ public class SubprocessoTransicaoService {
     @Transactional
     public void registrarAnaliseETransicao(RegistrarWorkflowReq req) {
         // 1. Criar Análise
-        analiseService.criarAnalise(
+        analiseFacade.criarAnalise(
                 req.sp(),
                 CriarAnaliseCommand.builder()
                         .codSubprocesso(req.sp().getCodigo())

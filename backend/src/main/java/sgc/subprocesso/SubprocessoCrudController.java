@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -21,7 +21,7 @@ import java.util.List;
 @Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoCrudController {
     private final SubprocessoFacade subprocessoFacade;
-    private final UnidadeService unidadeService;
+    private final UnidadeFacade unidadeService;
 
     /**
      * Obtém as permissões do usuário para um subprocesso.

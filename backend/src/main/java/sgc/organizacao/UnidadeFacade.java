@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.function.Function;
 
 @Service
-public class UnidadeService {
+public class UnidadeFacade {
     private static final String MSG_NAO_ENCONTRADA = " não encontrada";
 
     private final UnidadeRepo unidadeRepo;
@@ -25,7 +25,7 @@ public class UnidadeService {
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     private final UsuarioMapper usuarioMapper;
 
-    public UnidadeService(
+    public UnidadeFacade(
             UnidadeRepo unidadeRepo,
             sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo,
             UsuarioRepo usuarioRepo,

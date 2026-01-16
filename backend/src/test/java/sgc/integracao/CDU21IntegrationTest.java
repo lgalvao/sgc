@@ -18,7 +18,7 @@ import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.notificacao.NotificacaoEmailService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.Unidade;
@@ -66,7 +66,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
     private UsuarioRepo usuarioRepo;
 
     @MockitoBean
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
 
     @MockitoBean
     private NotificacaoEmailService notificacaoEmailService;
@@ -147,7 +147,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         sp2.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         subprocessoRepo.save(sp2);
 
-        // Configurar mocks do UsuarioService com dados dinâmicos
+        // Configurar mocks do UsuarioFacade com dados dinâmicos
         when(usuarioService.buscarResponsaveisUnidades(anyList()))
                 .thenReturn(
                         Map.of(

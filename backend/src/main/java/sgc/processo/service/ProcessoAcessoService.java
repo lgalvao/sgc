@@ -5,8 +5,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.organizacao.UnidadeService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -27,16 +27,16 @@ import java.util.*;
 @Slf4j
 class ProcessoAcessoService {
     
-    private final UnidadeService unidadeService;
-    private final UsuarioService usuarioService;
+    private final UnidadeFacade unidadeService;
+    private final UsuarioFacade usuarioService;
     private final SubprocessoFacade subprocessoFacade;
 
     /**
      * Constructor com @Lazy para quebrar dependência circular.
      */
     public ProcessoAcessoService(
-            UnidadeService unidadeService,
-            UsuarioService usuarioService,
+            UnidadeFacade unidadeService,
+            UsuarioFacade usuarioService,
             @Lazy SubprocessoFacade subprocessoFacade) {
         this.unidadeService = unidadeService;
         this.usuarioService = usuarioService;

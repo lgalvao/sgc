@@ -25,10 +25,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("integration")
 @SpringBootTest
 @Transactional
-@DisplayName("Testes de Integração do PainelService")
+@DisplayName("Testes de Integração do PainelFacade")
 class PainelServiceIntegrationTest {
     @Autowired
-    private PainelService painelService;
+    private PainelFacade painelService;
 
     @Autowired
     private ProcessoFacade processoFacade;

@@ -8,7 +8,7 @@ import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAnalise;
-import sgc.organizacao.UnidadeService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -21,9 +21,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AnaliseService {
+public class AnaliseFacade {
     private final AnaliseRepo analiseRepo;
-    private final UnidadeService unidadeService;
+    private final UnidadeFacade unidadeService;
 
     /**
      * Lista todas as análises de um determinado tipoAnalise para um subprocesso específico.

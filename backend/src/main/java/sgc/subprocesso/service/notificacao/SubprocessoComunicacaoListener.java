@@ -6,7 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.AlertaService;
+import sgc.alerta.AlertaFacade;
 import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
@@ -24,7 +24,7 @@ import sgc.subprocesso.model.Subprocesso;
 @RequiredArgsConstructor
 @Slf4j
 public class SubprocessoComunicacaoListener {
-    private final AlertaService alertaService;
+    private final AlertaFacade alertaService;
     private final SubprocessoEmailService emailService;
 
     /**

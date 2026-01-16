@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 @DisplayName("SubprocessoFacade - Testes Complementares")
 class SubprocessoFacadeTest2 {
     @Mock
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
     @Mock
     private SubprocessoCrudService crudService;
     @Mock

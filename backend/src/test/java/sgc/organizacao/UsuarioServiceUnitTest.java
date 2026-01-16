@@ -17,7 +17,7 @@ import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
 import sgc.seguranca.login.ClienteAcessoAd;
-import sgc.seguranca.login.LoginService;
+import sgc.seguranca.login.LoginFacade;
 
 import java.util.*;
 
@@ -29,7 +29,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
 /**
- * Testes unitários consolidados do UsuarioService.
+ * Testes unitários consolidados do UsuarioFacade.
  * 
  * Este arquivo consolida:
  * - UsuarioServiceCoverageTest.java (38 testes)
@@ -42,11 +42,11 @@ import static org.mockito.Mockito.*;
  */
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UsuarioService - Testes Unitários")
+@DisplayName("UsuarioFacade - Testes Unitários")
 class UsuarioServiceUnitTest {
 
     @InjectMocks
-    private UsuarioService service;
+    private UsuarioFacade service;
 
     @Mock
     private UsuarioRepo usuarioRepo;
@@ -59,7 +59,7 @@ class UsuarioServiceUnitTest {
     @Mock
     private ClienteAcessoAd clienteAcessoAd;
     @Mock
-    private LoginService loginService;
+    private LoginFacade loginFacade;
 
     // ========== MÉTODOS DE BUSCA E MAPEAMENTO ==========
 

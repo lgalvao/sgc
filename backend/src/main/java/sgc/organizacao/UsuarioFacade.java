@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.toMap;
 
 @Service
 @Slf4j
-public class UsuarioService {
+public class UsuarioFacade {
     private static final String ENTIDADE_USUARIO = "Usuário";
     private final UsuarioRepo usuarioRepo;
     private final UsuarioPerfilRepo usuarioPerfilRepo;
@@ -34,7 +34,7 @@ public class UsuarioService {
         return usuario;
     }
 
-    public UsuarioService(UsuarioRepo usuarioRepo,
+    public UsuarioFacade(UsuarioRepo usuarioRepo,
             UsuarioPerfilRepo usuarioPerfilRepo,
             AdministradorRepo administradorRepo,
             UnidadeRepo unidadeRepo) {

@@ -48,7 +48,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
         private EntityManager entityManager;
 
         @Autowired
-        private sgc.seguranca.login.LoginService loginService;
+        private sgc.seguranca.login.LoginFacade loginFacade;
 
         private Unidade unidadeAdmin;
         private Unidade unidadeGestor;
@@ -197,7 +197,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                         String tituloEleitoral = "888888888888"; // Usuário inexistente
 
                         // Tenta autenticar, mas falhará porque o usuário não existe no banco de teste
-                        loginService.autenticar(tituloEleitoral, "senha-qualquer");
+                        loginFacade.autenticar(tituloEleitoral, "senha-qualquer");
 
                         // Act & Assert
                         // Como a autenticação falhou, a tentativa de autorizar deve ser rejeitada com

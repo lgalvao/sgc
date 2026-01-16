@@ -41,10 +41,10 @@ class LoginControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private LoginService loginService;
+    private LoginFacade loginFacade;
 
     @MockitoBean
-    private sgc.organizacao.UsuarioService usuarioService;
+    private sgc.organizacao.UsuarioFacade usuarioService;
 
     @MockitoBean
     private LimitadorTentativasLogin limitadorTentativasLogin;
@@ -64,7 +64,7 @@ class LoginControllerTest {
                 .build();
 
         doNothing().when(limitadorTentativasLogin).verificar(anyString());
-        when(loginService.autenticar("123", "senha")).thenReturn(true);
+        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
 
         mockMvc.perform(post("/api/usuarios/autenticar")
                 .with(csrf())
@@ -85,7 +85,7 @@ class LoginControllerTest {
                 .senha("senha")
                 .build();
 
-        when(loginService.autenticar("123", "senha")).thenReturn(true);
+        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
 
         mockMvc.perform(post("/api/usuarios/autenticar")
                 .with(csrf())
@@ -103,7 +103,7 @@ class LoginControllerTest {
     void autorizar_Sucesso() throws Exception {
         UnidadeDto unidadeDto = UnidadeDto.builder().codigo(1L).nome("AdmUnit").sigla("ADM").build();
         PerfilUnidadeDto pu = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
-        when(loginService.autorizar("123")).thenReturn(List.of(pu));
+        when(loginFacade.autorizar("123")).thenReturn(List.of(pu));
 
         mockMvc.perform(post("/api/usuarios/autorizar")
                 .with(csrf())
@@ -126,7 +126,7 @@ class LoginControllerTest {
         usuario.setNome("Admin User");
         usuario.setTituloEleitoral("123");
 
-        when(loginService.entrar(any(EntrarRequest.class))).thenReturn("token-jwt");
+        when(loginFacade.entrar(any(EntrarRequest.class))).thenReturn("token-jwt");
         when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
 
         mockMvc.perform(post("/api/usuarios/entrar")

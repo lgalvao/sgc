@@ -134,8 +134,8 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         // Note: WithMockChefe uses a default user or checks DB.
         // We might need to ensure user '121212121212' exists and is Chefe of 'unidade'.
         // For now, we rely on WithMockChefe mocking the Principal/Authorities,
-        // but if the service checks DB (UsuarioService), we need data.
-        // Assuming test mocks UsuarioService or we add data if it fails.
+        // but if the service checks DB (UsuarioFacade), we need data.
+        // Assuming test mocks UsuarioFacade or we add data if it fails.
     }
 
     private void vincularAtividadeCompetencia(Competencia competencia, Atividade atividade) {

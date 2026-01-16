@@ -27,7 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Análises", description = "Endpoints para gerenciar as análises de cadastro e validação de subprocessos")
 public class AnaliseController {
-    private final AnaliseService analiseService;
+    private final AnaliseFacade analiseFacade;
     private final SubprocessoFacade subprocessoFacade;
 
     /**
@@ -40,7 +40,7 @@ public class AnaliseController {
     @Operation(summary = "Lista o histórico de análises de cadastro")
     public List<Analise> listarAnalisesCadastro(@PathVariable("codSubprocesso") Long codigo) {
         subprocessoFacade.buscarSubprocesso(codigo); // Valida existência (lança 404 se não existir)
-        return analiseService.listarPorSubprocesso(codigo, TipoAnalise.CADASTRO);
+        return analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.CADASTRO);
     }
 
     /**
@@ -73,7 +73,7 @@ public class AnaliseController {
     @Operation(summary = "Lista o histórico de análises de validação")
     public List<Analise> listarAnalisesValidacao(@PathVariable Long codSubprocesso) {
         subprocessoFacade.buscarSubprocesso(codSubprocesso); 
-        return analiseService.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO);
+        return analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO);
     }
 
     /**
@@ -108,6 +108,6 @@ public class AnaliseController {
                 .motivo(request.motivo())
                 .build();
 
-        return analiseService.criarAnalise(subprocesso, command);
+        return analiseFacade.criarAnalise(subprocesso, command);
     }
 }
