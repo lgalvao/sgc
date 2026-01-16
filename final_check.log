@@ -1,0 +1,105 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:unitTest :backend:integrationTest
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+
+> Task :backend:compileTestJava
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:190: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+                AtividadeDto ativCriada = atividadeService.criar(ativReq);
+                ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:297: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto ativ = atividadeService.criar(
+            ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:366: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+                AtividadeDto ativ = atividadeService.criar(
+                ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:454: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto ativ = atividadeService.criar(
+            ^
+/app/backend/src/test/java/sgc/mapa/service/ConhecimentoServiceTest.java:55: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            when(conhecimentoMapper.toDto(any())).thenReturn(ConhecimentoDto.builder().build());
+                                                             ^
+/app/backend/src/test/java/sgc/mapa/service/ConhecimentoServiceTest.java:116: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = ConhecimentoDto.builder().build();
+            ^
+/app/backend/src/test/java/sgc/mapa/service/ConhecimentoServiceTest.java:116: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = ConhecimentoDto.builder().build();
+                                  ^
+/app/backend/src/test/java/sgc/mapa/service/ConhecimentoServiceTest.java:154: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = ConhecimentoDto.builder().build();
+            ^
+/app/backend/src/test/java/sgc/mapa/service/ConhecimentoServiceTest.java:154: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = ConhecimentoDto.builder().build();
+                                  ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeFacadeTest.java:75: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+        AtividadeDto created = AtividadeDto.builder()
+        ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeFacadeTest.java:75: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+        AtividadeDto created = AtividadeDto.builder()
+                               ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeFacadeTest.java:203: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+        ConhecimentoDto salvo = ConhecimentoDto.builder()
+        ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeFacadeTest.java:203: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+        ConhecimentoDto salvo = ConhecimentoDto.builder()
+                                ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:59: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+             when(atividadeMapper.toDto(any())).thenReturn(AtividadeDto.builder().build());
+                                                           ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:69: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+             when(atividadeMapper.toDto(any())).thenReturn(AtividadeDto.builder().build());
+                                                           ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:143: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder()
+            ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:143: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder()
+                               ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:164: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto res = service.criar(request);
+            ^
+/app/backend/src/test/java/sgc/mapa/mapper/ConhecimentoMapperTest.java:57: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = mapper.toDto(conhecimento);
+            ^
+/app/backend/src/test/java/sgc/mapa/mapper/AtividadeMapperTest.java:40: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = mapper.toDto(atividade);
+            ^
+/app/backend/src/test/java/sgc/mapa/mapper/AtividadeMapperTest.java:51: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = mapper.toDto(null);
+            ^
+/app/backend/src/test/java/sgc/mapa/mapper/AtividadeMapperTest.java:64: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = mapper.toDto(atividade);
+            ^
+22 warnings
+
+> Task :backend:testClasses
+> Task :backend:integrationTest
+> Task :backend:unitTest
+  Results: SUCCESS
+  Total:     891 tests run
+  ✓ Passed:  891
+  ✗ Failed:  0
+  ○ Ignored: 0
+  Time:     55.046s
+
+Testes mais lentos (> 1s):
+  - 7257ms: sgc.arquitetura.ArchConsistencyTest > controllers_should_not_access_repositories
+  - 5832ms: sgc.ControllersServicesCoverageTest > deveListarAtividades()
+
+> Task :backend:integrationTest
+  Results: SUCCESS
+  Total:     300 tests run
+  ✓ Passed:  300
+  ✗ Failed:  0
+  ○ Ignored: 0
+  Time:     144.318s
+
+Testes mais lentos (> 1s):
+  - 1792ms: sgc.e2e.E2eFixtureEndpointTest > deveGerarDescricaoAutomaticaQuandoNaoFornecida()
+
+[Incubating] Problems report is available at: file:///app/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 2m 27s
+6 actionable tasks: 3 executed, 3 up-to-date
+Configuration cache entry stored.

@@ -3,6 +3,8 @@ package sgc.mapa.mapper;
 import org.junit.jupiter.api.*;
 import org.mapstruct.factory.Mappers;
 import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.AtualizarAtividadeRequest;
+import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 
@@ -10,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("unit")
 @DisplayName("AtividadeMapper")
+@SuppressWarnings("deprecation")
 class AtividadeMapperTest {
 
     private AtividadeMapper mapper;
@@ -70,29 +73,38 @@ class AtividadeMapperTest {
     class ToEntityTests {
 
         @Test
-        @DisplayName("Deve mapear DTO para entidade")
-        void deveMapearDtoParaEntidade() {
-            AtividadeDto dto = AtividadeDto.builder()
-                    .codigo(1L)
+        @DisplayName("Deve mapear CriarAtividadeRequest para entidade")
+        void deveMapearCriarAtividadeRequestParaEntidade() {
+            CriarAtividadeRequest request = CriarAtividadeRequest.builder()
                     .descricao("Atividade de Teste")
                     .mapaCodigo(10L)
                     .build();
 
-            Atividade atividade = mapper.toEntity((AtividadeDto) dto);
+            Atividade atividade = mapper.toEntity(request);
 
             assertThat(atividade).isNotNull();
-            assertThat(atividade.getCodigo()).isEqualTo(1L);
             assertThat(atividade.getDescricao()).isEqualTo("Atividade de Teste");
-            // Mapa deve ser ignorado no mapeamento manual/automático simples
             assertThat(atividade.getMapa()).isNull();
         }
 
         @Test
-        @DisplayName("Deve retornar null quando DTO é null")
-        void deveRetornarNullQuandoDtoNull() {
-            Atividade atividade = mapper.toEntity((AtividadeDto) null);
+        @DisplayName("Deve mapear AtualizarAtividadeRequest para entidade")
+        void deveMapearAtualizarAtividadeRequestParaEntidade() {
+            AtualizarAtividadeRequest request = AtualizarAtividadeRequest.builder()
+                    .descricao("Atividade Atualizada")
+                    .build();
 
-            assertThat(atividade).isNull();
+            Atividade atividade = mapper.toEntity(request);
+
+            assertThat(atividade).isNotNull();
+            assertThat(atividade.getDescricao()).isEqualTo("Atividade Atualizada");
+        }
+
+        @Test
+        @DisplayName("Deve retornar null quando request é null")
+        void deveRetornarNullQuandoRequestNull() {
+            assertThat(mapper.toEntity((CriarAtividadeRequest) null)).isNull();
+            assertThat(mapper.toEntity((AtualizarAtividadeRequest) null)).isNull();
         }
     }
 }

@@ -15,6 +15,7 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
@@ -142,7 +143,7 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve criar e excluir atividade com sucesso")
     void deveCriarEExcluirAtividade() throws Exception {
         // Criar Atividade
-        AtividadeDto request = AtividadeDto.builder()
+        CriarAtividadeRequest request = CriarAtividadeRequest.builder()
                 .descricao("Atividade Temporária")
                 .mapaCodigo(mapa.getCodigo())
                 .build();
@@ -176,7 +177,7 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve validar cadastro: Atividade sem conhecimento gera erro")
     void deveValidarAtividadeSemConhecimento() throws Exception {
         // Criar Atividade sem conhecimento
-        AtividadeDto request = AtividadeDto.builder()
+        CriarAtividadeRequest request = CriarAtividadeRequest.builder()
                 .descricao("Atividade Incompleta")
                 .mapaCodigo(mapa.getCodigo())
                 .build();

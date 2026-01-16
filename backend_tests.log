@@ -1,0 +1,210 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:unitTest
+> Task :backend:processTestResources
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+
+> Task :backend:compileTestJava
+/app/backend/src/test/java/sgc/integracao/AtividadeFluxoIntegrationTest.java:145: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+        AtividadeDto request = AtividadeDto.builder()
+        ^
+/app/backend/src/test/java/sgc/integracao/AtividadeFluxoIntegrationTest.java:145: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+        AtividadeDto request = AtividadeDto.builder()
+                               ^
+/app/backend/src/test/java/sgc/integracao/AtividadeFluxoIntegrationTest.java:179: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+        AtividadeDto request = AtividadeDto.builder()
+        ^
+/app/backend/src/test/java/sgc/integracao/AtividadeFluxoIntegrationTest.java:179: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+        AtividadeDto request = AtividadeDto.builder()
+                               ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:184: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+                AtividadeDto ativReq = AtividadeDto.builder()
+                ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:184: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+                AtividadeDto ativReq = AtividadeDto.builder()
+                                       ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:188: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+                AtividadeDto ativCriada = atividadeService.criar(ativReq);
+                ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:192: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+                ConhecimentoDto conReq = ConhecimentoDto.builder()
+                ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:192: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+                ConhecimentoDto conReq = ConhecimentoDto.builder()
+                                         ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:294: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto ativ = atividadeService.criar(
+            ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:295: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+                AtividadeDto.builder().descricao("A").mapaCodigo(codMapa).build());
+                ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:296: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            conhecimentoService.criar(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
+                                                        ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:363: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+                AtividadeDto ativ = atividadeService.criar(
+                ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:364: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+                    AtividadeDto.builder().descricao("Nova Ativ Revisao").mapaCodigo(codMapa).build()
+                    ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:366: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+                conhecimentoService.criar(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
+                                                            ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:451: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto ativ = atividadeService.criar(
+            ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:452: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+                AtividadeDto.builder().descricao("Ativ").mapaCodigo(codMapa).build()
+                ^
+/app/backend/src/test/java/sgc/integracao/FluxoEstadosIntegrationTest.java:454: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            conhecimentoService.criar(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
+                                                        ^
+/app/backend/src/test/java/sgc/mapa/service/ConhecimentoServiceTest.java:52: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            when(conhecimentoMapper.toDto(any())).thenReturn(ConhecimentoDto.builder().build());
+                                                             ^
+/app/backend/src/test/java/sgc/mapa/service/ConhecimentoServiceTest.java:112: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = ConhecimentoDto.builder().build();
+            ^
+/app/backend/src/test/java/sgc/mapa/service/ConhecimentoServiceTest.java:112: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = ConhecimentoDto.builder().build();
+                                  ^
+/app/backend/src/test/java/sgc/mapa/service/ConhecimentoServiceTest.java:133: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = ConhecimentoDto.builder().build();
+            ^
+/app/backend/src/test/java/sgc/mapa/service/ConhecimentoServiceTest.java:133: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = ConhecimentoDto.builder().build();
+                                  ^
+/app/backend/src/test/java/sgc/mapa/service/ConhecimentoServiceTest.java:149: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = ConhecimentoDto.builder().build();
+            ^
+/app/backend/src/test/java/sgc/mapa/service/ConhecimentoServiceTest.java:149: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = ConhecimentoDto.builder().build();
+                                  ^
+/app/backend/src/test/java/sgc/mapa/service/ConhecimentoServiceTest.java:180: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            assertThatThrownBy(() -> service.atualizar(ativId, conhId, ConhecimentoDto.builder().build()))
+                                                                       ^
+/app/backend/src/test/java/sgc/mapa/service/ConhecimentoServiceTest.java:191: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            assertThatThrownBy(() -> service.atualizar(ativId, conhId, ConhecimentoDto.builder().build()))
+                                                                       ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeFacadeTest.java:74: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+        AtividadeDto created = AtividadeDto.builder()
+        ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeFacadeTest.java:74: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+        AtividadeDto created = AtividadeDto.builder()
+                               ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeFacadeTest.java:202: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+        ConhecimentoDto salvo = ConhecimentoDto.builder()
+        ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeFacadeTest.java:202: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+        ConhecimentoDto salvo = ConhecimentoDto.builder()
+                                ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:56: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+             when(atividadeMapper.toDto(any())).thenReturn(AtividadeDto.builder().build());
+                                                           ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:66: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+             when(atividadeMapper.toDto(any())).thenReturn(AtividadeDto.builder().build());
+                                                           ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:137: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder()
+            ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:137: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder()
+                               ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:158: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto res = service.criar(dto);
+            ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:167: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder()
+            ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:167: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder()
+                               ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:180: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder()
+            ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:180: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder()
+                               ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:193: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder()
+            ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:193: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder()
+                               ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:215: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder().build();
+            ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:215: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder().build();
+                               ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:235: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder().build();
+            ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:235: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder().build();
+                               ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:253: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder().build();
+            ^
+/app/backend/src/test/java/sgc/mapa/service/AtividadeServiceTest.java:253: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder().build();
+                               ^
+/app/backend/src/test/java/sgc/mapa/mapper/ConhecimentoMapperTest.java:54: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = mapper.toDto(conhecimento);
+            ^
+/app/backend/src/test/java/sgc/mapa/mapper/ConhecimentoMapperTest.java:81: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = ConhecimentoDto.builder()
+            ^
+/app/backend/src/test/java/sgc/mapa/mapper/ConhecimentoMapperTest.java:81: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = ConhecimentoDto.builder()
+                                  ^
+/app/backend/src/test/java/sgc/mapa/mapper/ConhecimentoMapperTest.java:100: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = ConhecimentoDto.builder()
+            ^
+/app/backend/src/test/java/sgc/mapa/mapper/ConhecimentoMapperTest.java:100: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            ConhecimentoDto dto = ConhecimentoDto.builder()
+                                  ^
+/app/backend/src/test/java/sgc/mapa/mapper/ConhecimentoMapperTest.java:111: warning: [removal] ConhecimentoDto in sgc.mapa.dto has been deprecated and marked for removal
+            assertThat(mapper.toEntity((ConhecimentoDto) null)).isNull();
+                                        ^
+/app/backend/src/test/java/sgc/mapa/mapper/AtividadeMapperTest.java:37: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = mapper.toDto(atividade);
+            ^
+/app/backend/src/test/java/sgc/mapa/mapper/AtividadeMapperTest.java:48: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = mapper.toDto(null);
+            ^
+/app/backend/src/test/java/sgc/mapa/mapper/AtividadeMapperTest.java:61: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = mapper.toDto(atividade);
+            ^
+/app/backend/src/test/java/sgc/mapa/mapper/AtividadeMapperTest.java:75: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder()
+            ^
+/app/backend/src/test/java/sgc/mapa/mapper/AtividadeMapperTest.java:75: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            AtividadeDto dto = AtividadeDto.builder()
+                               ^
+/app/backend/src/test/java/sgc/mapa/mapper/AtividadeMapperTest.java:81: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            Atividade atividade = mapper.toEntity((AtividadeDto) dto);
+                                                   ^
+/app/backend/src/test/java/sgc/mapa/mapper/AtividadeMapperTest.java:93: warning: [removal] AtividadeDto in sgc.mapa.dto has been deprecated and marked for removal
+            Atividade atividade = mapper.toEntity((AtividadeDto) null);
+                                                   ^
+61 warnings
+
+> Task :backend:testClasses
+> Task :backend:unitTest
+  Results: SUCCESS
+  Total:     889 tests run
+  ✓ Passed:  889
+  ✗ Failed:  0
+  ○ Ignored: 0
+  Time:     40.511s
+
+Testes mais lentos (> 1s):
+  - 5185ms: sgc.arquitetura.ArchConsistencyTest > controllers_should_not_access_repositories
+  - 3507ms: sgc.ControllersServicesCoverageTest > deveListarAtividades()
+
+[Incubating] Problems report is available at: file:///app/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 1m 5s
+5 actionable tasks: 3 executed, 2 up-to-date
+Configuration cache entry stored.

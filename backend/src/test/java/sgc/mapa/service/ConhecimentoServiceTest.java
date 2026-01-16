@@ -10,7 +10,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.mapa.dto.AtualizarConhecimentoRequest;
 import sgc.mapa.dto.ConhecimentoDto;
+import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.evento.EventoMapaAlterado;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.*;
@@ -27,6 +29,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("Testes do Serviço de Conhecimento")
+@SuppressWarnings("deprecation")
 class ConhecimentoServiceTest {
 
     @Mock
@@ -109,17 +112,18 @@ class ConhecimentoServiceTest {
         @DisplayName("Deve criar conhecimento com sucesso")
         void deveCriarConhecimento() {
             Long ativId = 1L;
+            CriarConhecimentoRequest request = CriarConhecimentoRequest.builder().build();
             ConhecimentoDto dto = ConhecimentoDto.builder().build();
             Atividade atividade = new Atividade();
             atividade.setMapa(new Mapa());
             Conhecimento conhecimento = new Conhecimento();
 
             when(atividadeRepo.findById(ativId)).thenReturn(Optional.of(atividade));
-            when(conhecimentoMapper.toEntity(dto)).thenReturn(new Conhecimento());
+            when(conhecimentoMapper.toEntity(request)).thenReturn(new Conhecimento());
             when(conhecimentoRepo.save(any())).thenReturn(conhecimento);
             when(conhecimentoMapper.toDto(any())).thenReturn(dto);
 
-            var resultado = service.criar(ativId, dto);
+            var resultado = service.criar(ativId, request);
 
             assertThat(resultado).isNotNull();
             verify(conhecimentoRepo).save(any());
@@ -130,10 +134,10 @@ class ConhecimentoServiceTest {
         @DisplayName("Deve lançar erro ao criar conhecimento para atividade inexistente")
         void deveLancarErroAoCriarConhecimentoAtividadeInexistente() {
             Long ativId = 1L;
-            ConhecimentoDto dto = ConhecimentoDto.builder().build();
+            CriarConhecimentoRequest request = CriarConhecimentoRequest.builder().build();
             when(atividadeRepo.findById(ativId)).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> service.criar(ativId, dto))
+            assertThatThrownBy(() -> service.criar(ativId, request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
@@ -146,6 +150,7 @@ class ConhecimentoServiceTest {
         void deveAtualizarConhecimento() {
             Long ativId = 1L;
             Long conhId = 2L;
+            AtualizarConhecimentoRequest request = AtualizarConhecimentoRequest.builder().build();
             ConhecimentoDto dto = ConhecimentoDto.builder().build();
             Conhecimento conhecimento = new Conhecimento();
             conhecimento.setCodigo(conhId);
@@ -155,11 +160,10 @@ class ConhecimentoServiceTest {
             conhecimento.setAtividade(atividade);
 
             when(conhecimentoRepo.findById(conhId)).thenReturn(Optional.of(conhecimento));
-            when(conhecimentoMapper.toEntity(dto)).thenReturn(new Conhecimento());
+            when(conhecimentoMapper.toEntity(request)).thenReturn(new Conhecimento());
             when(conhecimentoRepo.save(any())).thenReturn(conhecimento);
-            when(conhecimentoMapper.toDto(any())).thenReturn(dto);
 
-            service.atualizar(ativId, conhId, dto);
+            service.atualizar(ativId, conhId, request);
 
             verify(conhecimentoRepo).save(conhecimento);
             verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
@@ -174,10 +178,11 @@ class ConhecimentoServiceTest {
             Atividade outraAtividade = new Atividade();
             outraAtividade.setCodigo(99L);
             conhecimento.setAtividade(outraAtividade);
+            AtualizarConhecimentoRequest request = AtualizarConhecimentoRequest.builder().build();
 
             when(conhecimentoRepo.findById(conhId)).thenReturn(Optional.of(conhecimento));
 
-            assertThatThrownBy(() -> service.atualizar(ativId, conhId, ConhecimentoDto.builder().build()))
+            assertThatThrownBy(() -> service.atualizar(ativId, conhId, request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
@@ -186,9 +191,10 @@ class ConhecimentoServiceTest {
         void deveLancarErroAoAtualizarConhecimentoInexistente() {
             Long ativId = 1L;
             Long conhId = 2L;
+            AtualizarConhecimentoRequest request = AtualizarConhecimentoRequest.builder().build();
             when(conhecimentoRepo.findById(conhId)).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> service.atualizar(ativId, conhId, ConhecimentoDto.builder().build()))
+            assertThatThrownBy(() -> service.atualizar(ativId, conhId, request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
