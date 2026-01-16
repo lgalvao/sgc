@@ -12,6 +12,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
+import sgc.comum.repo.RepositorioComum;
 import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
@@ -44,24 +45,22 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UsuarioFacade - Testes Unitários")
 class UsuarioServiceUnitTest {
-
     @InjectMocks
     private UsuarioFacade service;
-
     @Mock
     private UsuarioRepo usuarioRepo;
+    @Mock
+    private UnidadeRepo unidadeRepo;
     @Mock
     private UsuarioPerfilRepo usuarioPerfilRepo;
     @Mock
     private AdministradorRepo administradorRepo;
     @Mock
-    private UnidadeRepo unidadeRepo;
-    @Mock
     private ClienteAcessoAd clienteAcessoAd;
     @Mock
     private LoginFacade loginFacade;
     @Mock
-    private sgc.comum.repo.RepositorioComum repo;
+    private RepositorioComum repo;
 
     // ========== MÉTODOS DE BUSCA E MAPEAMENTO ==========
 
@@ -289,19 +288,20 @@ class UsuarioServiceUnitTest {
 
             when(usuarioRepo.findChefesByUnidadesCodigos(anyList())).thenReturn(List.of(t, s));
 
-            Optional<ResponsavelDto> res = service.buscarResponsavelUnidade(1L);
+            ResponsavelDto res = service.buscarResponsavelUnidade(1L);
             
-            assertThat(res).isPresent();
-            assertThat(res.get().getTitularTitulo()).isEqualTo("t");
-            assertThat(res.get().getSubstitutoTitulo()).isEqualTo("s");
+            assertThat(res).isNotNull();
+            assertThat(res.getTitularTitulo()).isEqualTo("t");
+            assertThat(res.getSubstitutoTitulo()).isEqualTo("s");
         }
 
         @Test
-        @DisplayName("Deve retornar empty se não houver chefe")
-        void deveRetornarEmptySeNaoHouverChefe() {
+        @DisplayName("Deve lançar erro se não houver chefe")
+        void deveLancarErroSeNaoHouverChefe() {
             when(usuarioRepo.findChefesByUnidadesCodigos(anyList())).thenReturn(Collections.emptyList());
             
-            assertThat(service.buscarResponsavelUnidade(1L)).isEmpty();
+            assertThatThrownBy(() -> service.buscarResponsavelUnidade(1L))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
@@ -313,78 +313,7 @@ class UsuarioServiceUnitTest {
         }
     }
 
-    @Nested
-    @DisplayName("Busca de Unidades")
-    class BuscaUnidades {
 
-        @Test
-        @DisplayName("Deve retornar unidade por código")
-        void deveRetornarUnidadePorCodigo() {
-            Unidade unidade = new Unidade("Nome", "Sigla");
-            ReflectionTestUtils.setField(unidade, "codigo", 1L);
-            ReflectionTestUtils.setField(unidade, "tipo", TipoUnidade.OPERACIONAL);
-            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
-            
-            assertThat(service.buscarUnidadePorCodigo(1L)).isPresent();
-        }
-
-        @Test
-        @DisplayName("Deve retornar empty se unidade não encontrada por código")
-        void deveRetornarEmptySeUnidadeNaoEncontradaPorCodigo() {
-            when(unidadeRepo.findById(1L)).thenReturn(Optional.empty());
-            
-            assertThat(service.buscarUnidadePorCodigo(1L)).isEmpty();
-        }
-
-        @Test
-        @DisplayName("Deve retornar unidade por sigla")
-        void deveRetornarUnidadePorSigla() {
-            Unidade unidade = new Unidade("Nome", "S");
-            ReflectionTestUtils.setField(unidade, "codigo", 1L);
-            ReflectionTestUtils.setField(unidade, "tipo", TipoUnidade.OPERACIONAL);
-            when(unidadeRepo.findBySigla("S")).thenReturn(Optional.of(unidade));
-            
-            assertThat(service.buscarUnidadePorSigla("S")).isPresent();
-        }
-
-        @Test
-        @DisplayName("Deve retornar empty se unidade não encontrada por sigla")
-        void deveRetornarEmptySeUnidadeNaoEncontradaPorSigla() {
-            when(unidadeRepo.findBySigla("S")).thenReturn(Optional.empty());
-            
-            assertThat(service.buscarUnidadePorSigla("S")).isEmpty();
-        }
-
-        @Test
-        @DisplayName("Deve buscar unidades ativas chamando service")
-        void deveBuscarUnidadesAtivasChamandoService() {
-            service.buscarUnidadesAtivas();
-            
-            verify(unidadeRepo).findAllWithHierarquia();
-        }
-
-        @Test
-        @DisplayName("Deve mapear lista de subunidades")
-        void deveMapearListaDeSubunidades() {
-            Unidade u = new Unidade("Nome", "Sigla");
-            ReflectionTestUtils.setField(u, "codigo", 2L);
-            ReflectionTestUtils.setField(u, "tipo", TipoUnidade.OPERACIONAL);
-
-            when(unidadeRepo.findByUnidadeSuperiorCodigo(1L)).thenReturn(List.of(u));
-            
-            var res = service.buscarSubunidades(1L);
-            
-            assertThat(res).hasSize(1);
-        }
-
-        @Test
-        @DisplayName("Deve construir árvore hierárquica chamando service")
-        void deveConstruirArvoreHierarquicaChamandoService() {
-            service.construirArvoreHierarquica();
-            
-            verify(unidadeRepo).findAllWithHierarquia();
-        }
-    }
 
     // ========== ADMINISTRAÇÃO DE USUÁRIOS ==========
 
@@ -582,23 +511,22 @@ class UsuarioServiceUnitTest {
         @DisplayName("Deve extrair título de diferentes tipos de principal")
         void deveExtrairTitulo() {
             // String direto
-            assertEquals("123", service.extractTituloUsuario("123"));
+            assertEquals("123", service.extrairTituloUsuario("123"));
             
             // Usuario objeto
             Usuario u = new Usuario();
             u.setTituloEleitoral("456");
-            assertEquals("456", service.extractTituloUsuario(u));
+            assertEquals("456", service.extrairTituloUsuario(u));
             
             // Objeto genérico (toString)
-            assertEquals("789", service.extractTituloUsuario(new Object() {
+            assertEquals("789", service.extrairTituloUsuario(new Object() {
                 @Override
                 public String toString() { 
                     return "789"; 
                 }
             }));
             
-            // Null
-            assertNull(service.extractTituloUsuario(null));
+            assertNull(service.extrairTituloUsuario(null));
         }
     }
 }

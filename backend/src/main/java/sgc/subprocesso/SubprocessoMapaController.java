@@ -259,6 +259,6 @@ public class SubprocessoMapaController {
     }
 
     private String extractTituloUsuario(Object principal) {
-        return usuarioService.extractTituloUsuario(principal);
+        return usuarioService.extrairTituloUsuario(principal);
     }
 }

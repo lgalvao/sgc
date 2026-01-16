@@ -165,6 +165,12 @@ public class UnidadeFacade {
         return usuarioMapper.toUnidadeDto(unidade, false);
     }
 
+    public List<UnidadeDto> buscarSubordinadas(Long codUnidade) {
+        return unidadeRepo.findByUnidadeSuperiorCodigo(codUnidade).stream()
+                .map(u -> usuarioMapper.toUnidadeDto(u, true))
+                .toList();
+    }
+
     public Unidade buscarEntidadePorId(Long codigo) {
         return repo.buscar(Unidade.class, codigo);
     }

@@ -314,7 +314,7 @@ public class SubprocessoCadastroController {
     }
 
     private Usuario obterUsuarioAutenticado(Object principal) {
-        String titulo = usuarioService.extractTituloUsuario(principal);
+        String titulo = usuarioService.extrairTituloUsuario(principal);
         return usuarioService.buscarPorLogin(titulo);
     }
 }

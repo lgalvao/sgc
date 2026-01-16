@@ -20,6 +20,7 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.ConhecimentoService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
@@ -65,6 +66,7 @@ public class SubprocessoFacade {
     
     // Utility services
     private final UsuarioFacade usuarioService;
+    private final UnidadeFacade unidadeFacade;
     private final sgc.mapa.service.MapaFacade mapaFacade;
     
     // Dependencies for detail/context operations (previously in SubprocessoDetalheService/SubprocessoContextoService)
@@ -520,8 +522,7 @@ public class SubprocessoFacade {
         SubprocessoDetalheDto subprocessoDto = obterDetalhesInterno(codSubprocesso, usuario);
         String siglaUnidade = subprocessoDto.getUnidade().getSigla();
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
-        UnidadeDto unidadeDto = usuarioService.buscarUnidadePorSigla(siglaUnidade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", siglaUnidade));
+        UnidadeDto unidadeDto = unidadeFacade.buscarPorSigla(siglaUnidade);
 
         MapaCompletoDto mapaDto = null;
         if (subprocesso.getMapa() != null) {

@@ -36,6 +36,9 @@ class UsuarioServiceTest {
     @Autowired
     private UsuarioFacade usuarioService;
 
+    @Autowired
+    private UnidadeFacade unidadeService;
+
     @Nested
     @DisplayName("Consultas de Usuário")
     class ConsultasUsuario {
@@ -120,19 +123,19 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar unidade por código")
         void deveBuscarUnidadePorCodigo() {
             // Act
-            Optional<UnidadeDto> result = usuarioService.buscarUnidadePorCodigo(COD_UNIT_SEC1);
+            UnidadeDto result = unidadeService.buscarPorCodigo(COD_UNIT_SEC1);
 
             // Assert
-            assertTrue(result.isPresent());
-            assertEquals(COD_UNIT_SEC1, result.get().getCodigo());
-            assertEquals(NOME_UNIT_SEC1, result.get().getNome());
+            assertNotNull(result);
+            assertEquals(COD_UNIT_SEC1, result.getCodigo());
+            assertEquals(NOME_UNIT_SEC1, result.getNome());
         }
 
         @Test
         @DisplayName("Deve buscar unidades ativas")
         void deveBuscarUnidadesAtivas() {
             // Act
-            List<UnidadeDto> result = usuarioService.buscarUnidadesAtivas();
+            List<UnidadeDto> result = unidadeService.buscarTodasUnidades();
 
             // Assert
             assertNotNull(result);
@@ -144,7 +147,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar subunidades")
         void deveBuscarSubunidades() {
             // Act
-            List<UnidadeDto> result = usuarioService.buscarSubunidades(COD_UNIT_SEC1);
+            List<UnidadeDto> result = unidadeService.buscarSubordinadas(COD_UNIT_SEC1);
 
             // Assert
             assertNotNull(result);
@@ -158,7 +161,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve construir árvore hierárquica")
         void deveConstruirArvoreHierarquica() {
             // Act
-            List<UnidadeDto> result = usuarioService.construirArvoreHierarquica();
+            List<UnidadeDto> result = unidadeService.buscarArvoreHierarquica();
 
             // Assert
             assertNotNull(result);
@@ -177,15 +180,15 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar usuários por unidade de lotação")
         void deveBuscarPorUnidadeLotacao() {
             // Unidade 2 tem usuários no data.sql
-            List<UsuarioDto> res = usuarioService.buscarUsuariosPorUnidade(2L);
+            List<UsuarioDto> res = unidadeService.buscarUsuariosPorUnidade(2L);
             assertFalse(res.isEmpty());
         }
 
         @Test
-        @DisplayName("Deve retornar vazio ao buscar unidade inexistente por código ou sigla")
-        void deveRetornarVazioAoBuscarUnidadeInexistente() {
-            assertTrue(usuarioService.buscarUnidadePorCodigo(9999L).isEmpty());
-            assertTrue(usuarioService.buscarUnidadePorSigla("SIGLA_NAO_EXISTE").isEmpty());
+        @DisplayName("Deve lançar erro ao buscar unidade inexistente por código ou sigla")
+        void deveRetornarErroAoBuscarUnidadeInexistente() {
+            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> unidadeService.buscarPorCodigo(9999L));
+            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> unidadeService.buscarPorSigla("SIGLA_NAO_EXISTE"));
         }
     }
 
@@ -197,12 +200,12 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar responsável da unidade")
         void deveBuscarResponsavelUnidade() {
             // Act
-            Optional<ResponsavelDto> result = usuarioService.buscarResponsavelUnidade(2L);
+            ResponsavelDto result = usuarioService.buscarResponsavelUnidade(2L);
 
             // Assert
-            assertTrue(result.isPresent());
-            assertEquals(2L, result.get().getUnidadeCodigo());
-            assertEquals(TITULO_CHEFE_UNIT2, result.get().getTitularTitulo());
+            assertNotNull(result);
+            assertEquals(2L, result.getUnidadeCodigo());
+            assertEquals(TITULO_CHEFE_UNIT2, result.getTitularTitulo());
         }
 
         @Test
@@ -289,14 +292,14 @@ class UsuarioServiceTest {
         @Test
         @DisplayName("Deve extrair título de principal")
         void deveExtrairTituloDePrincipal() {
-            assertNull(usuarioService.extractTituloUsuario(null));
-            assertEquals("123", usuarioService.extractTituloUsuario("123"));
+            assertNull(usuarioService.extrairTituloUsuario(null));
+            assertEquals("123", usuarioService.extrairTituloUsuario("123"));
 
             sgc.organizacao.model.Usuario u = new sgc.organizacao.model.Usuario();
             u.setTituloEleitoral("456");
-            assertEquals("456", usuarioService.extractTituloUsuario(u));
+            assertEquals("456", usuarioService.extrairTituloUsuario(u));
 
-            assertEquals("100", usuarioService.extractTituloUsuario(100L));
+            assertEquals("100", usuarioService.extrairTituloUsuario(100L));
         }
 
         @Test

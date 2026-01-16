@@ -26,7 +26,6 @@ import sgc.subprocesso.service.SubprocessoFacade;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -73,7 +72,7 @@ class RelatorioFacadeTest {
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(usuarioService.buscarResponsavelUnidade(1L)).thenReturn(Optional.of(ResponsavelDto.builder().titularNome("Resp").build()));
+        when(usuarioService.buscarResponsavelUnidade(1L)).thenReturn(ResponsavelDto.builder().titularNome("Resp").build());
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);
@@ -98,7 +97,7 @@ class RelatorioFacadeTest {
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(usuarioService.buscarResponsavelUnidade(1L)).thenReturn(Optional.empty());
+        when(usuarioService.buscarResponsavelUnidade(1L)).thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Responsável", 1L));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);

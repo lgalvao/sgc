@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
@@ -39,7 +39,7 @@ public class E2eController {
     private final JdbcTemplate jdbcTemplate;
     private final DataSource dataSource;
     private final ProcessoFacade processoFacade;
-    private final UsuarioFacade usuarioService;
+    private final UnidadeFacade unidadeFacade;
 
     @PostMapping("/reset-database")
     public void resetDatabase() throws SQLException {
@@ -169,15 +169,7 @@ public class E2eController {
         }
 
         // Buscar unidade pela sigla
-        UnidadeDto unidade =
-                usuarioService
-                        .buscarUnidadePorSigla(request.unidadeSigla())
-                        .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Unidade com sigla "
-                                                        + request.unidadeSigla()
-                                                        + " não encontrada"));
+        UnidadeDto unidade = unidadeFacade.buscarPorSigla(request.unidadeSigla());
 
         // Calcular data limite
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;

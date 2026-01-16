@@ -47,9 +47,7 @@ public class RelatorioFacade {
 
                 try {
                      var respDto = usuarioService.buscarResponsavelUnidade(unidade.getCodigo());
-                     if (respDto.isPresent()) {
-                         responsavel = respDto.get().getTitularNome();
-                     }
+                     responsavel = respDto.getTitularNome();
                 } catch (Exception e) {
                     // Ignora erro ao buscar responsável
                 }

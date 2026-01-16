@@ -1,7 +1,11 @@
 package sgc.organizacao;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAccessoNegado;
@@ -18,14 +22,14 @@ import static java.util.stream.Collectors.toMap;
 
 @Service
 @Slf4j
-@lombok.RequiredArgsConstructor
+@RequiredArgsConstructor
 public class UsuarioFacade {
     private static final String ENTIDADE_USUARIO = "Usuário";
     private final UsuarioRepo usuarioRepo;
     private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final AdministradorRepo administradorRepo;
-    private final UnidadeRepo unidadeRepo;
     private final RepositorioComum repo;
+    private final UnidadeRepo unidadeRepo;
 
     @Transactional(readOnly = true)
     public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
@@ -66,15 +70,9 @@ public class UsuarioFacade {
         return usuario;
     }
 
-    /**
-     * Obtém o título do usuário autenticado do contexto de segurança.
-     */
-    private Optional<String> getTituloUsuarioAutenticado() {
-        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
-                .getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()
-                || authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken) {
+    private Optional<String> obterTituloUsuarioAutenticado() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
             return Optional.empty();
         }
         return Optional.of(authentication.getName());
@@ -82,14 +80,14 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public Usuario obterUsuarioAutenticado() {
-        return getTituloUsuarioAutenticado()
+        return obterTituloUsuarioAutenticado()
                 .map(this::buscarPorLoginInterno)
                 .orElseThrow(() -> new ErroAccessoNegado("Nenhum usuário autenticado no contexto"));
     }
 
     @Transactional(readOnly = true)
     public @Nullable Usuario obterUsuarioAutenticadoOuNull() {
-        return getTituloUsuarioAutenticado()
+        return obterTituloUsuarioAutenticado()
                 .map(this::buscarPorLoginInterno)
                 .orElse(null);
     }
@@ -104,8 +102,7 @@ public class UsuarioFacade {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Responsável da unidade", sigla));
 
         Usuario usuarioCompleto = usuarioRepo.findByIdWithAtribuicoes(usuarioSimples.getTituloEleitoral())
-                .orElseThrow(
-                        () -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, usuarioSimples.getTituloEleitoral()));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, usuarioSimples.getTituloEleitoral()));
 
         carregarAtribuicoes(usuarioCompleto);
         return usuarioCompleto;
@@ -125,7 +122,7 @@ public class UsuarioFacade {
 
     private void carregarAtribuicoes(Usuario usuario) {
         var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral());
-        usuario.setAtribuicoes(new java.util.HashSet<>(atribuicoes));
+        usuario.setAtribuicoes(new HashSet<>(atribuicoes));
     }
 
     private void carregarAtribuicoesEmLote(List<Usuario> usuarios) {
@@ -138,9 +135,7 @@ public class UsuarioFacade {
         List<UsuarioPerfil> todasAtribuicoes = usuarioPerfilRepo.findByUsuarioTituloIn(titulos);
 
         Map<String, Set<UsuarioPerfil>> atribuicoesPorUsuario = todasAtribuicoes.stream()
-                .collect(Collectors.groupingBy(
-                        UsuarioPerfil::getUsuarioTitulo,
-                        Collectors.toSet()));
+                .collect(Collectors.groupingBy(UsuarioPerfil::getUsuarioTitulo, Collectors.toSet()));
 
         for (Usuario usuario : usuarios) {
             Set<UsuarioPerfil> atribuicoes = atribuicoesPorUsuario
@@ -157,72 +152,37 @@ public class UsuarioFacade {
         return usuarioRepo.findAll().stream().map(this::toUsuarioDto).toList();
     }
 
-    public Optional<UnidadeDto> buscarUnidadePorCodigo(Long codigo) {
-        return unidadeRepo.findById(codigo)
-                .map(this::toUnidadeDto);
-    }
 
-    public Optional<UnidadeDto> buscarUnidadePorSigla(String sigla) {
-        return unidadeRepo.findBySigla(sigla)
-                .map(this::toUnidadeDto);
-    }
-
-    public List<UnidadeDto> buscarUnidadesAtivas() {
-        return unidadeRepo.findAllWithHierarquia().stream()
-                .map(this::toUnidadeDto)
-                .toList();
-    }
-
-    public List<UnidadeDto> buscarSubunidades(Long codigoPai) {
-        return unidadeRepo.findByUnidadeSuperiorCodigo(codigoPai).stream()
-                .map(this::toUnidadeDto)
-                .toList();
-    }
-
-    public List<UnidadeDto> construirArvoreHierarquica() {
-        return buscarUnidadesAtivas();
-    }
-
-    public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {
+    public ResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
         List<Usuario> chefes = usuarioRepo.findChefesByUnidadesCodigos(List.of(unidadeCodigo));
-        return chefes.isEmpty()
-                ? Optional.empty()
-                : Optional.of(montarResponsavelDto(unidadeCodigo, chefes));
+        if (chefes.isEmpty()) {
+             throw new ErroEntidadeNaoEncontrada("Responsável da unidade", unidadeCodigo);
+        }
+        return montarResponsavelDto(unidadeCodigo, chefes);
     }
 
     @Transactional(readOnly = true)
     public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
+        if (unidadesCodigos.isEmpty()) return Collections.emptyMap();
+
         List<Usuario> todosChefes = usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos);
+        if (todosChefes.isEmpty()) return Collections.emptyMap();
 
-        if (todosChefes.isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        List<String> titulos = todosChefes.stream()
-                .map(Usuario::getTituloEleitoral)
-                .toList();
-
+        List<String> titulos = todosChefes.stream().map(Usuario::getTituloEleitoral).toList();
         List<Usuario> chefesCompletos = usuarioRepo.findByIdInWithAtribuicoes(titulos);
         carregarAtribuicoesEmLote(chefesCompletos);
 
         Map<Long, List<Usuario>> chefesPorUnidade = chefesCompletos.stream()
                 .flatMap(u -> u.getTodasAtribuicoes().stream()
-                        .filter(a -> a.getPerfil() == Perfil.CHEFE
-                                && unidadesCodigos.contains(
-                                        a.getUnidadeCodigo()))
+                        .filter(a -> a.getPerfil() == Perfil.CHEFE && unidadesCodigos.contains(a.getUnidadeCodigo()))
                         .map(a -> new AbstractMap.SimpleEntry<>(a.getUnidadeCodigo(), u)))
-                .collect(Collectors.groupingBy(
-                        Map.Entry::getKey,
-                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+                .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
 
-        Map<Long, ResponsavelDto> resultado = new HashMap<>();
-        for (Long codigo : unidadesCodigos) {
-            List<Usuario> chefes = chefesPorUnidade.getOrDefault(codigo, Collections.emptyList());
-            if (!chefes.isEmpty()) {
-                resultado.put(codigo, montarResponsavelDto(codigo, chefes));
-            }
-        }
-        return resultado;
+        return chefesPorUnidade.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> montarResponsavelDto(e.getKey(), e.getValue())
+                ));
     }
 
     public Map<String, UsuarioDto> buscarUsuariosPorTitulos(List<String> titulos) {
@@ -272,26 +232,16 @@ public class UsuarioFacade {
     }
 
     private UsuarioDto toUsuarioDto(Usuario usuario) {
+        Unidade lotacao = usuario.getUnidadeLotacao();
         return UsuarioDto.builder()
                 .tituloEleitoral(usuario.getTituloEleitoral())
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
                 .matricula(usuario.getMatricula())
-                .unidadeCodigo(usuario.getUnidadeLotacao() != null ? usuario.getUnidadeLotacao().getCodigo() : null)
+                .unidadeCodigo(lotacao != null ? lotacao.getCodigo() : null)
                 .build();
     }
 
-    private UnidadeDto toUnidadeDto(Unidade unidade) {
-        Unidade superior = unidade.getUnidadeSuperior();
-        return UnidadeDto.builder()
-                .codigo(unidade.getCodigo())
-                .nome(unidade.getNome())
-                .sigla(unidade.getSigla())
-                .codigoPai(superior != null ? superior.getCodigo() : null)
-                .tipo(unidade.getTipo().name())
-                .isElegivel(unidade.getTipo() != TipoUnidade.INTERMEDIARIA)
-                .build();
-    }
 
     private PerfilDto toPerfilDto(UsuarioPerfil atribuicao) {
         return PerfilDto.builder()
@@ -341,12 +291,6 @@ public class UsuarioFacade {
 
     @Transactional
     public void removerAdministrador(String usuarioTitulo, String usuarioAtualTitulo) {
-        log.info("Removendo administrador: {}", usuarioTitulo);
-
-        if (!administradorRepo.existsById(usuarioTitulo)) {
-            throw new ErroValidacao("Usuário não é administrador");
-        }
-
         if (usuarioTitulo.equals(usuarioAtualTitulo)) {
             throw new ErroValidacao("Não é permitido remover a si mesmo como administrador");
         }
@@ -377,7 +321,7 @@ public class UsuarioFacade {
                 .build();
     }
 
-    public @Nullable String extractTituloUsuario(@Nullable Object principal) {
+    public @Nullable String extrairTituloUsuario(@Nullable Object principal) {
         if (principal instanceof String string) return string;
         if (principal instanceof Usuario usuario) return usuario.getTituloEleitoral();
 
