@@ -22,7 +22,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class RelatorioService {
+public class RelatorioFacade {
     private final ProcessoFacade processoFacade;
     private final SubprocessoFacade subprocessoFacade;
     private final UsuarioService usuarioService;

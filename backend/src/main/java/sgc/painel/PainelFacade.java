@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Slf4j
-public class PainelService {
+public class PainelFacade {
     private final ProcessoFacade processoFacade;
     private final AlertaFacade alertaService;
     private final UnidadeService unidadeService;

@@ -145,8 +145,8 @@ O teste detectou violações em vários controllers:
 - `ConfiguracaoController` → `ParametroService`
 - `E2eController` → `UsuarioService`
 - `LoginController` → `LoginService`, `UsuarioService`
-- `PainelController` → `PainelService`
-- `RelatorioController` → `RelatorioService`
+- `PainelController` → `PainelFacade`
+- `RelatorioController` → `RelatorioFacade`
 - `SubprocessoCadastroController` → `AnaliseService`, `UsuarioService`
 - E outros...
 

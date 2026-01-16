@@ -34,8 +34,8 @@ import static org.mockito.Mockito.*;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-@DisplayName("RelatorioService Test")
-class RelatorioServiceTest {
+@DisplayName("RelatorioFacade Test")
+class RelatorioFacadeTest {
 
     @Mock
     private ProcessoFacade processoFacade;
@@ -53,7 +53,7 @@ class RelatorioServiceTest {
     private Document document;
 
     @InjectMocks
-    private RelatorioService relatorioService;
+    private RelatorioFacade relatorioService;
 
     @Test
     @DisplayName("Deve gerar relatório de andamento")

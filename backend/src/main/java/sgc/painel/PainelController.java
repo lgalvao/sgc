@@ -20,7 +20,7 @@ import sgc.processo.dto.ProcessoResumoDto;
 @RequiredArgsConstructor
 @Tag(name = "Painel", description = "Endpoints para o painel de controle (dashboard)")
 public class PainelController {
-    private final PainelService painelService;
+    private final PainelFacade painelService;
 
     /**
      * Lista os processos a serem exibidos no painel do usuário.

@@ -39,7 +39,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
-@DisplayName("PainelService - Testes Unitários")
+@DisplayName("PainelFacade - Testes Unitários")
 class PainelServiceTest {
 
     @Mock
@@ -50,7 +50,7 @@ class PainelServiceTest {
     private UnidadeService unidadeService;
 
     @InjectMocks
-    private PainelService painelService;
+    private PainelFacade painelService;
 
     private Pageable pageable = PageRequest.of(0, 10);
 

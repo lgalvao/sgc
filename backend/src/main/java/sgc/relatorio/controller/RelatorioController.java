@@ -8,7 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import sgc.relatorio.service.RelatorioService;
+import sgc.relatorio.service.RelatorioFacade;
 
 import java.io.IOException;
 
@@ -17,7 +17,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Tag(name = "Relatórios", description = "Endpoints para geração de relatórios em PDF")
 public class RelatorioController {
-    private final RelatorioService relatorioService;
+    private final RelatorioFacade relatorioService;
 
     @GetMapping("/andamento/{codProcesso}")
     @PreAuthorize("hasRole('ADMIN')")
