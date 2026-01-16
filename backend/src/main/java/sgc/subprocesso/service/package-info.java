@@ -45,9 +45,6 @@
  * 
  * <h4>📁 service/ (raiz) - Services de Suporte</h4>
  * <ul>
- *   <li>{@code SubprocessoContextoService} - Montagem de contexto de edição</li>
- *   <li>{@code SubprocessoMapaService} - Operações específicas de mapa</li>
- *   <li>{@code SubprocessoDetalheService} - Montagem de DTOs detalhados</li>
  *   <li>{@code SubprocessoWorkflowService} - Operações genéricas de workflow</li>
  * </ul>
  * 
@@ -167,7 +164,7 @@
  *   <li><strong>Fase 5:</strong> Consolidar services (13 → 6-7)
  *       <ul>
  *         <li>🎯 Unificar workflows em SubprocessoWorkflowService único</li>
- *         <li>🎯 Mover lógica de SubprocessoDetalheService para Facade</li>
+ *         <li>✅ Lógica movida de SubprocessoDetalheService e SubprocessoContextoService para Facade</li>
  *         <li>🎯 Resolver violações ArchUnit detectadas na Fase 2</li>
  *       </ul>
  *   </li>
@@ -181,7 +178,7 @@
  * 
  * <h2>Métricas Atuais (Pós-Fase 4)</h2>
  * <ul>
- *   <li><strong>Services totais:</strong> 13 (inalterado, apenas reorganizados)</li>
+ *   <li><strong>Services totais:</strong> 10 (reduzido de 13 após Fase 5 Step 2-4)</li>
  *   <li><strong>Sub-pacotes criados:</strong> 4 (workflow, crud, notificacao, factory)</li>
  *   <li><strong>Linhas de código:</strong> ~2.500</li>
  *   <li><strong>Testes:</strong> 281 testes (100% passando)</li>

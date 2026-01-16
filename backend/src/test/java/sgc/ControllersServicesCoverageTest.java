@@ -33,8 +33,7 @@ import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
-import sgc.subprocesso.service.SubprocessoContextoService;
+import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.ArrayList;
@@ -55,8 +54,6 @@ class ControllersServicesCoverageTest {
     @Mock
     private SubprocessoFacade subprocessoFacade;
     @Mock
-    private SubprocessoContextoService subprocessoContextoService;
-    @Mock
     private MapaRepo mapaRepo;
     @Mock
     private CompetenciaRepo competenciaRepo;
@@ -74,8 +71,7 @@ class ControllersServicesCoverageTest {
     
     // Mocks adicionais para preencher construtores e evitar null
     @Mock private sgc.mapa.service.MapaVisualizacaoService mapaVisualizacaoService;
-    @Mock private sgc.subprocesso.service.SubprocessoMapaService subprocessoMapaService;
-    @Mock private sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
+    @Mock private sgc.subprocesso.service.workflow.SubprocessoWorkflowService subprocessoWorkflowService;
     @Mock private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
     @Mock private sgc.organizacao.UsuarioFacade usuarioService;
     @Mock private sgc.subprocesso.service.workflow.SubprocessoTransicaoService transicaoService;
@@ -83,10 +79,14 @@ class ControllersServicesCoverageTest {
     @Mock private sgc.analise.AnaliseFacade analiseFacade;
     @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
     @Mock private sgc.processo.service.ProcessoFacade processoFacade;
+    @Mock private sgc.subprocesso.service.crud.SubprocessoCrudService crudService;
+    @Mock private sgc.subprocesso.model.MovimentacaoRepo movimentacaoRepo;
+    @Mock private sgc.mapa.service.CompetenciaService competenciaService;
+    @Mock private sgc.mapa.service.AtividadeService atividadeService;
 
     private SubprocessoMapaController subprocessoMapaController;
     private MapaFacade mapaFacade;
-    private SubprocessoCadastroWorkflowService cadastroService;
+    private SubprocessoWorkflowService cadastroService;
     private PainelFacade painelService;
 
     @BeforeEach
@@ -106,9 +106,21 @@ class ControllersServicesCoverageTest {
                 usuarioService
         );
 
-        // SubprocessoCadastroWorkflowService
-        cadastroService = new SubprocessoCadastroWorkflowService(
-                repositorioSubprocesso, transicaoService, unidadeService, analiseFacade, validacaoService, impactoMapaService, accessControlService, null
+        // SubprocessoWorkflowService (unified)
+        cadastroService = new SubprocessoWorkflowService(
+                repositorioSubprocesso,
+                crudService,
+                alertaService,
+                unidadeService,
+                movimentacaoRepo,
+                transicaoService,
+                analiseFacade,
+                validacaoService,
+                impactoMapaService,
+                accessControlService,
+                competenciaService,
+                atividadeService,
+                mapaFacade
         );
 
         // PainelFacade

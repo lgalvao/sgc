@@ -19,6 +19,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -30,7 +31,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
-@DisplayName("SubprocessoWorkflowService Test")
+@DisplayName("SubprocessoWorkflowService Test (Administrative Operations)")
 class SubprocessoWorkflowServiceTest {
 
     @Mock

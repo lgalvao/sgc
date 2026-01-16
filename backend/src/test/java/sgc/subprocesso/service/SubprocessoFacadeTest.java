@@ -7,15 +7,23 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.analise.AnaliseFacade;
+import sgc.mapa.mapper.ConhecimentoMapper;
+import sgc.mapa.service.AtividadeService;
+import sgc.mapa.service.CompetenciaService;
+import sgc.mapa.service.ConhecimentoService;
+import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
+import sgc.subprocesso.mapper.MapaAjusteMapper;
+import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
-import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 
 import java.util.Collections;
 
@@ -28,14 +36,23 @@ import static org.mockito.Mockito.when;
 class SubprocessoFacadeTest {
 
     @Mock private SubprocessoCrudService crudService;
-    @Mock private SubprocessoDetalheService detalheService;
     @Mock private SubprocessoValidacaoService validacaoService;
     @Mock private SubprocessoWorkflowService workflowService;
-    @Mock private SubprocessoCadastroWorkflowService cadastroWorkflowService;
-    @Mock private SubprocessoMapaWorkflowService mapaWorkflowService;
-    @Mock private SubprocessoContextoService contextoService;
-    @Mock private SubprocessoMapaService mapaService;
     @Mock private UsuarioFacade usuarioService;
+    @Mock private MapaFacade mapaFacade;
+    @Mock private AtividadeService atividadeService;
+    @Mock private MovimentacaoRepo repositorioMovimentacao;
+    @Mock private SubprocessoDetalheMapper subprocessoDetalheMapper;
+    @Mock private ConhecimentoMapper conhecimentoMapper;
+    @Mock private AnaliseFacade analiseFacade;
+    @Mock private CompetenciaService competenciaService;
+    @Mock private ConhecimentoService conhecimentoService;
+    @Mock private MapaAjusteMapper mapaAjusteMapper;
+    @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
+    @Mock private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    @Mock private sgc.subprocesso.model.SubprocessoMovimentacaoRepo movimentacaoRepo;
+    @Mock private sgc.mapa.service.CopiaMapaService copiaMapaService;
+    @Mock private sgc.mapa.mapper.AtividadeMapper atividadeMapper;
 
     @InjectMocks
     private SubprocessoFacade facade;
@@ -62,28 +79,14 @@ class SubprocessoFacadeTest {
 
     @Test
     void deveDelegarOutrosServicos() {
-        facade.obterContextoEdicao(1L, Perfil.ADMIN);
-        verify(contextoService).obterContextoEdicao(1L);
-
-        facade.importarAtividades(1L, 2L);
-        verify(mapaService).importarAtividades(1L, 2L);
-        
         facade.buscarSubprocessoComMapa(1L);
         verify(crudService).buscarSubprocessoComMapa(1L);
         
         facade.obterPorProcessoEUnidade(1L, 2L);
         verify(crudService).obterPorProcessoEUnidade(1L, 2L);
         
-        Usuario mockUser = new Usuario();
-        when(usuarioService.obterUsuarioAutenticado()).thenReturn(mockUser);
-        facade.obterDetalhes(1L, Perfil.ADMIN);
-        verify(detalheService).obterDetalhes(1L, mockUser);
-        
         facade.obterSituacao(1L);
         verify(crudService).obterStatus(1L);
-        
-        facade.listarAtividadesSubprocesso(1L);
-        verify(detalheService).listarAtividadesSubprocesso(1L);
         
         facade.obterAtividadesSemConhecimento(1L);
         verify(validacaoService).obterAtividadesSemConhecimento(1L);
@@ -93,15 +96,6 @@ class SubprocessoFacadeTest {
         
         facade.verificarAcessoUnidadeAoProcesso(1L, Collections.singletonList(2L));
         verify(crudService).verificarAcessoUnidadeAoProcesso(1L, Collections.singletonList(2L));
-        
-        facade.obterSugestoes(1L);
-        verify(detalheService).obterSugestoes(1L);
-        
-        facade.obterMapaParaAjuste(1L);
-        verify(detalheService).obterMapaParaAjuste(1L);
-        
-        facade.obterPermissoes(1L);
-        verify(detalheService).obterPermissoes(1L, mockUser);
         
         facade.validarCadastro(1L);
         verify(validacaoService).validarCadastro(1L);
@@ -126,11 +120,5 @@ class SubprocessoFacadeTest {
         
         facade.alterarDataLimite(1L, java.time.LocalDate.now());
         verify(workflowService).alterarDataLimite(1L, java.time.LocalDate.now());
-        
-        facade.obterCadastro(1L);
-        verify(detalheService).obterCadastro(1L);
-        
-        facade.salvarAjustesMapa(1L, Collections.emptyList(), "t");
-        verify(mapaService).salvarAjustesMapa(1L, Collections.emptyList(), "t");
     }
 }

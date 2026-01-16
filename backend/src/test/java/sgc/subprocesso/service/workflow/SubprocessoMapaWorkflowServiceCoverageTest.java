@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
 class SubprocessoMapaWorkflowServiceCoverageTest {
 
     @InjectMocks
-    private SubprocessoMapaWorkflowService service;
+    private SubprocessoWorkflowService service;
 
     @Mock private SubprocessoRepo subprocessoRepo;
     @Mock private CompetenciaService competenciaService;

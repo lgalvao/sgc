@@ -55,7 +55,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     private sgc.seguranca.acesso.AccessControlService accessControlService;
 
     @InjectMocks
-    private SubprocessoCadastroWorkflowService service;
+    private SubprocessoWorkflowService service;
 
     // --- Disponibilizar Cadastro ---
 
