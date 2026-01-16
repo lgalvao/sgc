@@ -19,7 +19,7 @@ import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.*;
 import sgc.processo.model.Processo;
@@ -64,7 +64,7 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
     private JdbcTemplate jdbcTemplate;
 
     @MockitoBean
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
 
     private Processo processo;
     private Unidade unidade;

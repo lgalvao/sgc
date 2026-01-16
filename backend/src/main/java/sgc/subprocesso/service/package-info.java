@@ -136,7 +136,7 @@
  *   <li><strong>sgc.seguranca.acesso:</strong> AccessControlService (autorização)</li>
  *   <li><strong>sgc.analise:</strong> AnaliseFacade (registro de análises)</li>
  *   <li><strong>sgc.mapa:</strong> MapaFacade, CompetenciaService (mapas de competências)</li>
- *   <li><strong>sgc.organizacao:</strong> UsuarioService, UnidadeService (estrutura organizacional)</li>
+ *   <li><strong>sgc.organizacao:</strong> UsuarioFacade, UnidadeService (estrutura organizacional)</li>
  *   <li><strong>sgc.notificacao:</strong> NotificacaoEmailService (opcional, via eventos)</li>
  * </ul>
  * 

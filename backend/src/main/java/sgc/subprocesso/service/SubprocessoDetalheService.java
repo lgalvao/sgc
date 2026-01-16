@@ -16,7 +16,7 @@ import sgc.mapa.model.Conhecimento;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.ConhecimentoService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
@@ -37,7 +37,7 @@ public class SubprocessoDetalheService {
     private final SubprocessoCrudService crudService;
     private final AtividadeService atividadeService;
     private final MovimentacaoRepo repositorioMovimentacao;
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
     private final SubprocessoDetalheMapper subprocessoDetalheMapper;
     private final ConhecimentoMapper conhecimentoMapper;
     private final AnaliseFacade analiseFacade;

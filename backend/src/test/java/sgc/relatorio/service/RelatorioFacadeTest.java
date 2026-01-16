@@ -14,7 +14,7 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.CompetenciaService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
@@ -42,7 +42,7 @@ class RelatorioFacadeTest {
     @Mock
     private SubprocessoFacade subprocessoFacade;
     @Mock
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
     @Mock
     private CompetenciaService competenciaService;
 

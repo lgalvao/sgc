@@ -14,7 +14,7 @@ import sgc.alerta.model.AlertaRepo;
 import sgc.alerta.model.AlertaUsuario;
 import sgc.alerta.model.AlertaUsuarioRepo;
 import sgc.organizacao.UnidadeService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -35,7 +35,7 @@ import java.util.*;
 public class AlertaFacade {
     private final AlertaRepo alertaRepo;
     private final AlertaUsuarioRepo alertaUsuarioRepo;
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
     private final AlertaMapper alertaMapper;
     private final UnidadeService unidadeService;
 

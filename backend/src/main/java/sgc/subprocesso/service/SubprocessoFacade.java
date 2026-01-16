@@ -8,7 +8,7 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
@@ -58,7 +58,7 @@ public class SubprocessoFacade {
     private final SubprocessoMapaService mapaService;
     
     // Utility services
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
 
     // ===== Operações CRUD =====
 

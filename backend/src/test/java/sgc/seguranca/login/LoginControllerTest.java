@@ -44,7 +44,7 @@ class LoginControllerTest {
     private LoginService loginService;
 
     @MockitoBean
-    private sgc.organizacao.UsuarioService usuarioService;
+    private sgc.organizacao.UsuarioFacade usuarioService;
 
     @MockitoBean
     private LimitadorTentativasLogin limitadorTentativasLogin;

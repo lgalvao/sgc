@@ -10,7 +10,7 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.UnidadeService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.TipoUnidade;
@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LoginService {
     private static final String ENTIDADE_USUARIO = "Usuário";
 
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
     private final GerenciadorJwt gerenciadorJwt;
     private final ClienteAcessoAd clienteAcessoAd;
     private final UnidadeService unidadeService;
@@ -43,7 +43,7 @@ public class LoginService {
 
     private final Map<String, LocalDateTime> autenticacoesRecentes = new ConcurrentHashMap<>();
 
-    public LoginService(UsuarioService usuarioService,
+    public LoginService(UsuarioFacade usuarioService,
             GerenciadorJwt gerenciadorJwt,
             @Autowired(required = false) ClienteAcessoAd clienteAcessoAd,
             UnidadeService unidadeService) {

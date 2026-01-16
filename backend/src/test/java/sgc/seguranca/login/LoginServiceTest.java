@@ -11,7 +11,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.organizacao.UnidadeService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.seguranca.login.dto.EntrarRequest;
 
 import java.util.Collections;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 @DisplayName("LoginService - Gaps de Cobertura")
 class LoginServiceTest {
 
-    @Mock private UsuarioService usuarioService;
+    @Mock private UsuarioFacade usuarioService;
     @Mock private GerenciadorJwt gerenciadorJwt;
     @Mock private ClienteAcessoAd clienteAcessoAd;
     @Mock private UnidadeService unidadeService;

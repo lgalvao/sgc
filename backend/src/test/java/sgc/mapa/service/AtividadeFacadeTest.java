@@ -14,7 +14,7 @@ import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
@@ -51,7 +51,7 @@ class AtividadeFacadeTest {
     private AccessControlService accessControlService;
 
     @Mock
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
 
     @Mock
     private MapaFacade mapaFacade;

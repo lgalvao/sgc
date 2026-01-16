@@ -11,7 +11,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -44,7 +44,7 @@ class SubprocessoCrudServiceTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
     @Mock
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
 
     @InjectMocks
     private SubprocessoCrudService service;

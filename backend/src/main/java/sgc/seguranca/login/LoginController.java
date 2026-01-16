@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.login.dto.AutenticarRequest;
@@ -32,7 +32,7 @@ import java.util.List;
 @Tag(name = "Login", description = "Autenticação e autorização de usuários")
 public class LoginController {
     private final LoginService loginService;
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
     private final LimitadorTentativasLogin limitadorTentativasLogin;
 
     /**

@@ -14,7 +14,7 @@ import sgc.alerta.AlertaFacade;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.CopiaMapaService;
 import sgc.organizacao.UnidadeService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.ProcessoRepo;
 import sgc.subprocesso.mapper.SubprocessoMapper;
@@ -49,7 +49,7 @@ class ProcessoFacadeSecurityTest {
     @Mock
     private CopiaMapaService servicoDeCopiaDeMapa;
     @Mock
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
     @Mock
     private ProcessoInicializador processoInicializador;
     @Mock

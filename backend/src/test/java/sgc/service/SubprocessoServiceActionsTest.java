@@ -15,7 +15,7 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.notificacao.NotificacaoEmailService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Usuario;
@@ -50,7 +50,7 @@ class SubprocessoServiceActionsTest {
     private UnidadeRepo unidadeRepo;
 
     @Autowired
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
 
     @Autowired
     private AnaliseRepo analiseRepo;

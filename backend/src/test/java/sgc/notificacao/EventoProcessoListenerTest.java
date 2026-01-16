@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaFacade;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.TipoUnidade;
@@ -39,7 +39,7 @@ class EventoProcessoListenerTest {
     @Mock private AlertaFacade servicoAlertas;
     @Mock private NotificacaoEmailService notificacaoEmailService;
     @Mock private NotificacaoModelosService notificacaoModelosService;
-    @Mock private UsuarioService usuarioService;
+    @Mock private UsuarioFacade usuarioService;
     @Mock private ProcessoFacade processoFacade;
     @Mock private SubprocessoFacade subprocessoFacade;
 

@@ -21,7 +21,7 @@ import java.util.Map;
 @Slf4j
 @Tag(name = "Usuários", description = "Gerenciamento de usuários e administradores")
 public class UsuarioController {
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
 
     /**
      * Busca um usuário pelo título de eleitor.

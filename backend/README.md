@@ -236,7 +236,7 @@ User Request + DTO → Controller (@Valid) → Facade
 * **Services:** `CompetenciaService`, `ConhecimentoService`, `MapaSalvamentoService`, etc.
 
 #### `sgc.organizacao`
-* **Services:** `UsuarioService`, `UnidadeService`
+* **Services:** `UsuarioFacade`, `UnidadeService`
 * **Responsabilidade:** Estrutura organizacional (usuários, unidades, perfis)
 * **Entidades:** `Usuario`, `Unidade`, `Perfil`
 

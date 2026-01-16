@@ -16,7 +16,7 @@ import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Usuario;
@@ -58,7 +58,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
     private UnidadeRepo unidadeRepo;
 
     @Autowired
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
 
     @Autowired
     private AlertaRepo alertaRepo;

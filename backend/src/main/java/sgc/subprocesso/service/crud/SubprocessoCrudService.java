@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -49,7 +49,7 @@ public class SubprocessoCrudService {
     private final SubprocessoMapper subprocessoMapper;
     private final MapaFacade mapaFacade;
     private final ApplicationEventPublisher eventPublisher;
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
 
     /**
      * Constructor with @Lazy injection to break circular dependency.
@@ -61,7 +61,7 @@ public class SubprocessoCrudService {
             SubprocessoMapper subprocessoMapper,
             @Lazy MapaFacade mapaFacade,
             ApplicationEventPublisher eventPublisher,
-            UsuarioService usuarioService) {
+            UsuarioFacade usuarioService) {
         this.repositorioSubprocesso = repositorioSubprocesso;
         this.subprocessoMapper = subprocessoMapper;
         this.mapaFacade = mapaFacade;

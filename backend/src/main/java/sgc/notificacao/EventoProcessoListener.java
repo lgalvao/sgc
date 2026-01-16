@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroEstadoImpossivel;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.TipoUnidade;
@@ -46,7 +46,7 @@ public class EventoProcessoListener {
     private final AlertaFacade servicoAlertas;
     private final NotificacaoEmailService notificacaoEmailService;
     private final NotificacaoModelosService notificacaoModelosService;
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
     private final ProcessoFacade processoFacade;
     private final SubprocessoFacade subprocessoFacade;
 

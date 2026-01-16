@@ -15,7 +15,7 @@ import sgc.fixture.UnidadeFixture;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.CopiaMapaService;
 import sgc.organizacao.UnidadeService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.mapper.ProcessoMapper;
@@ -57,7 +57,7 @@ class ProcessoFacadeWorkflowTest {
     @Mock
     private CopiaMapaService servicoDeCopiaDeMapa;
     @Mock
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
     @Mock
     private ProcessoInicializador processoInicializador;
     @Mock

@@ -16,7 +16,7 @@ import sgc.fixture.SubprocessoFixture;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.CopiaMapaService;
 import sgc.organizacao.UnidadeService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.dto.SubprocessoElegivelDto;
@@ -62,7 +62,7 @@ class ProcessoFacadeQueryTest {
     @Mock
     private CopiaMapaService servicoDeCopiaDeMapa;
     @Mock
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
     @Mock
     private ProcessoInicializador processoInicializador;
     @Mock

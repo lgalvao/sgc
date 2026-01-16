@@ -18,7 +18,7 @@ import sgc.alerta.model.AlertaRepo;
 import sgc.alerta.model.AlertaUsuario;
 import sgc.alerta.model.AlertaUsuarioRepo;
 import sgc.organizacao.UnidadeService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -50,7 +50,7 @@ class AlertaFacadeTest {
     private AlertaUsuarioRepo alertaUsuarioRepo;
 
     @Mock
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
 
     @Mock
     private AlertaMapper alertaMapper;

@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.organizacao.UnidadeService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.*;
 import sgc.processo.erros.ErroProcesso;
@@ -57,7 +57,7 @@ public class ProcessoFacade {
     private final ProcessoMapper processoMapper;
     private final ProcessoDetalheBuilder processoDetalheBuilder;
     private final SubprocessoMapper subprocessoMapper;
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
     private final ProcessoInicializador processoInicializador;
     private final sgc.alerta.AlertaFacade alertaService;
     

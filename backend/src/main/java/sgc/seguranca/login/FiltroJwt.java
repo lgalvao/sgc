@@ -12,7 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ import java.io.IOException;
 public class FiltroJwt extends OncePerRequestFilter {
     private final GerenciadorJwt gerenciadorJwt;
     @Lazy
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
 
     @Override
     protected void doFilterInternal(

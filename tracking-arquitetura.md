@@ -143,11 +143,11 @@ O teste detectou violações em vários controllers:
 - `AlertaController` → `AlertaService`
 - `AnaliseController` → `AnaliseService`
 - `ConfiguracaoController` → `ParametroService`
-- `E2eController` → `UsuarioService`
-- `LoginController` → `LoginService`, `UsuarioService`
+- `E2eController` → `UsuarioFacade`
+- `LoginController` → `LoginService`, `UsuarioFacade`
 - `PainelController` → `PainelFacade`
 - `RelatorioController` → `RelatorioFacade`
-- `SubprocessoCadastroController` → `AnaliseService`, `UsuarioService`
+- `SubprocessoCadastroController` → `AnaliseService`, `UsuarioFacade`
 - E outros...
 
 **Ação:** Estas violações representam dívida técnica a ser endereçada em fases futuras (provavelmente Fase 5 - Consolidação de Services).

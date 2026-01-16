@@ -29,7 +29,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
 /**
- * Testes unitários consolidados do UsuarioService.
+ * Testes unitários consolidados do UsuarioFacade.
  * 
  * Este arquivo consolida:
  * - UsuarioServiceCoverageTest.java (38 testes)
@@ -42,11 +42,11 @@ import static org.mockito.Mockito.*;
  */
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UsuarioService - Testes Unitários")
+@DisplayName("UsuarioFacade - Testes Unitários")
 class UsuarioServiceUnitTest {
 
     @InjectMocks
-    private UsuarioService service;
+    private UsuarioFacade service;
 
     @Mock
     private UsuarioRepo usuarioRepo;

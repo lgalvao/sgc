@@ -14,7 +14,7 @@ import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.sanitizacao.UtilSanitizacao;
 import sgc.subprocesso.dto.*;
@@ -32,7 +32,7 @@ public class SubprocessoCadastroController {
     private final SubprocessoFacade subprocessoFacade;
     private final sgc.analise.AnaliseFacade analiseFacade;
     private final AnaliseMapper analiseMapper;
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
 
     /**
      * Obtém o histórico de análises da fase de cadastro de um subprocesso.

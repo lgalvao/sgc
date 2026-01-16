@@ -8,7 +8,7 @@ import sgc.alerta.AlertaFacade;
 import sgc.notificacao.EventoProcessoListener;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -28,7 +28,7 @@ public class TestEventConfig {
             AlertaFacade servicoAlertas,
             NotificacaoEmailService notificacaoEmailService,
             NotificacaoModelosService notificacaoModelosService,
-            UsuarioService usuarioService,
+            UsuarioFacade usuarioService,
             ProcessoFacade processoFacade,
             SubprocessoFacade subprocessoFacade) {
 

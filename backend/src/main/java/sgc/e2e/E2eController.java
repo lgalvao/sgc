@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
@@ -39,7 +39,7 @@ public class E2eController {
     private final JdbcTemplate jdbcTemplate;
     private final DataSource dataSource;
     private final ProcessoFacade processoFacade;
-    private final UsuarioService usuarioService;
+    private final UsuarioFacade usuarioService;
 
     @PostMapping("/reset-database")
     public void resetDatabase() throws SQLException {

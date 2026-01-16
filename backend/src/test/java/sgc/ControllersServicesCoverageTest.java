@@ -77,7 +77,7 @@ class ControllersServicesCoverageTest {
     @Mock private sgc.subprocesso.service.SubprocessoMapaService subprocessoMapaService;
     @Mock private sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
     @Mock private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
-    @Mock private sgc.organizacao.UsuarioService usuarioService;
+    @Mock private sgc.organizacao.UsuarioFacade usuarioService;
     @Mock private sgc.subprocesso.service.workflow.SubprocessoTransicaoService transicaoService;
     @Mock private sgc.organizacao.UnidadeService unidadeService;
     @Mock private sgc.analise.AnaliseFacade analiseFacade;

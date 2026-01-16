@@ -99,8 +99,8 @@ static final ArchRule controllers_should_only_use_facades_not_specialized_servic
 **Exemplos:**
 - `AlertaController` → `AlertaService`
 - `AnaliseController` → `AnaliseService`
-- `LoginController` → `LoginService`, `UsuarioService`
-- `SubprocessoCadastroController` → `AnaliseService`, `UsuarioService`
+- `LoginController` → `LoginService`, `UsuarioFacade`
+- `SubprocessoCadastroController` → `AnaliseService`, `UsuarioFacade`
 - E outros...
 
 **Ação:** Documentadas como dívida técnica a ser endereçada na Fase 5 (Consolidação de Services).

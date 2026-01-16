@@ -48,7 +48,7 @@ graph TD
 
 O idioma oficial do projeto é o **Português Brasileiro**.
 
-- **Classes:** PascalCase (ex: `UsuarioService`, `MapaController`).
+- **Classes:** PascalCase (ex: `UsuarioFacade`, `MapaController`).
 - **Métodos e Variáveis:** camelCase (ex: `buscarPorId`, `dataCriacao`).
 - **Pacotes:** minúsculo, sem separadores, representando o domínio (ex: `sgc.processo`, `sgc.mapa`).
 - **Exceções:** Prefixo `Erro` (ex: `ErroEntidadeNaoEncontrada`).

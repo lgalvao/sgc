@@ -16,7 +16,7 @@ import sgc.fixture.UnidadeFixture;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.CopiaMapaService;
 import sgc.organizacao.UnidadeService;
-import sgc.organizacao.UsuarioService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.AtualizarProcessoRequest;
 import sgc.processo.dto.CriarProcessoRequest;
@@ -67,7 +67,7 @@ class ProcessoFacadeCrudTest {
     @Mock
     private CopiaMapaService servicoDeCopiaDeMapa;
     @Mock
-    private UsuarioService usuarioService;
+    private UsuarioFacade usuarioService;
     @Mock
     private ProcessoInicializador processoInicializador;
     @Mock
