@@ -68,10 +68,7 @@ public class Usuario implements UserDetails {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        // Tenta carregar atribuições temporárias, mas tolera LazyInitializationException
         try {
-            // Verifica se a coleção não é nula antes de iterar
-            // A iteração irá tentar inicializar a coleção lazy, o que pode causar LazyInitializationException
             if (atribuicoesTemporarias != null) {
                 for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
                     if ((temp.getDataInicio() == null || 
@@ -119,7 +116,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public String getPassword() {
-        return null; // Not used
+        return null;
     }
 
     @Override

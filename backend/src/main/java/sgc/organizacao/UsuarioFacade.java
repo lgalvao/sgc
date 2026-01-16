@@ -295,6 +295,10 @@ public class UsuarioFacade {
             throw new ErroValidacao("Não é permitido remover a si mesmo como administrador");
         }
 
+        if (!administradorRepo.existsById(usuarioTitulo)) {
+            throw new ErroValidacao("Usuário informado não é um administrador");
+        }
+
         long totalAdministradores = administradorRepo.count();
         if (totalAdministradores <= 1) {
             throw new ErroValidacao("Não é permitido remover o único administrador do sistema");
@@ -316,8 +320,8 @@ public class UsuarioFacade {
                 .tituloEleitoral(usuario.getTituloEleitoral())
                 .nome(usuario.getNome())
                 .matricula(usuario.getMatricula())
-                .unidadeCodigo(unidadeLotacao != null ? unidadeLotacao.getCodigo() : null)
-                .unidadeSigla(unidadeLotacao != null ? unidadeLotacao.getSigla() : null)
+                .unidadeCodigo(unidadeLotacao.getCodigo())
+                .unidadeSigla(unidadeLotacao.getSigla())
                 .build();
     }
 

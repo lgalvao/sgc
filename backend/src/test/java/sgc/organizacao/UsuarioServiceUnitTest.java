@@ -13,7 +13,6 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.RepositorioComum;
-import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
@@ -348,6 +347,10 @@ class UsuarioServiceUnitTest {
         void deveAdicionarAdministradorComSucesso() {
             Usuario u = new Usuario();
             u.setTituloEleitoral("user");
+            Unidade unidade = new Unidade("Nome", "SIGLA");
+            unidade.setCodigo(1L);
+            u.setUnidadeLotacao(unidade);
+
             when(repo.buscar(Usuario.class, "user")).thenReturn(u);
             when(administradorRepo.existsById("user")).thenReturn(false);
 
@@ -368,8 +371,6 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve lançar erro ao remover a si mesmo")
         void deveLancarErroAoRemoverASiMesmo() {
-            when(administradorRepo.existsById("user")).thenReturn(true);
-            
             assertThatThrownBy(() -> service.removerAdministrador("user", "user"))
                     .isInstanceOf(ErroValidacao.class);
         }
@@ -478,12 +479,7 @@ class UsuarioServiceUnitTest {
             var map = service.buscarUsuariosPorTitulos(List.of("123"));
             assertNull(map.get("123").getUnidadeCodigo());
 
-            // Via listarAdministradores (toAdministradorDto)
-            Administrador admin = new Administrador("123");
-            when(administradorRepo.findAll()).thenReturn(List.of(admin));
-            when(usuarioRepo.findById("123")).thenReturn(Optional.of(u));
-            var admins = service.listarAdministradores();
-            assertNull(admins.get(0).getUnidadeCodigo());
+
         }
 
         @Test
@@ -494,18 +490,7 @@ class UsuarioServiceUnitTest {
             assertThrows(ErroAccessoNegado.class, () -> service.obterUsuarioAutenticado());
         }
 
-        @Test
-        @DisplayName("Deve retornar null se unidade lotação for null em toAdministradorDto")
-        void deveRetornarNullSeUnidadeLotacaoForNull() {
-            Usuario u = new Usuario();
-            u.setTituloEleitoral("user");
-            u.setUnidadeLotacao(null);
 
-            AdministradorDto dto = ReflectionTestUtils.invokeMethod(service, "toAdministradorDto", u);
-
-            assertThat(dto).isNotNull();
-            assertThat(dto.getUnidadeCodigo()).isNull();
-        }
 
         @Test
         @DisplayName("Deve extrair título de diferentes tipos de principal")
