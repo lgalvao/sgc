@@ -37,11 +37,13 @@ class MapaSalvamentoServiceTest {
     @DisplayName("Linhas 135-136: Deve falhar ao salvar competência inexistente que deveria existir")
     void deveFalharCompetenciaInexistente() {
         Long codMapa = 1L;
-        SalvarMapaRequest request = new SalvarMapaRequest();
-        CompetenciaMapaDto compDto = new CompetenciaMapaDto();
-        compDto.setCodigo(999L); // Código que não existe no mapa
-        compDto.setDescricao("Desc");
-        request.setCompetencias(List.of(compDto));
+        CompetenciaMapaDto compDto = CompetenciaMapaDto.builder()
+                .codigo(999L)
+                .descricao("Desc")
+                .build();
+        SalvarMapaRequest request = SalvarMapaRequest.builder()
+                .competencias(List.of(compDto))
+                .build();
 
         Mapa mapa = new Mapa();
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
@@ -56,11 +58,13 @@ class MapaSalvamentoServiceTest {
     @DisplayName("Linha 188: Deve falhar ao associar atividade que não pertence ao mapa")
     void deveFalharAtividadeNaoPertenceAoMapa() {
         Long codMapa = 1L;
-        SalvarMapaRequest request = new SalvarMapaRequest();
-        CompetenciaMapaDto compDto = new CompetenciaMapaDto();
-        compDto.setDescricao("Desc");
-        compDto.setAtividadesCodigos(new java.util.ArrayList<>(Set.of(2L))); // Atividade ID 2
-        request.setCompetencias(List.of(compDto));
+        CompetenciaMapaDto compDto = CompetenciaMapaDto.builder()
+                .descricao("Desc")
+                .atividadesCodigos(new java.util.ArrayList<>(Set.of(2L)))
+                .build();
+        SalvarMapaRequest request = SalvarMapaRequest.builder()
+                .competencias(List.of(compDto))
+                .build();
 
         Mapa mapa = new Mapa();
         Atividade ativ1 = new Atividade();
@@ -80,8 +84,9 @@ class MapaSalvamentoServiceTest {
     @DisplayName("Linhas 102-106, 216-217: Deve remover competência obsoleta e logar warn para gap")
     void deveRemoverObsoleta() {
         Long codMapa = 1L;
-        SalvarMapaRequest request = new SalvarMapaRequest();
-        request.setCompetencias(Collections.emptyList()); // Nenhuma competência na requisição
+        SalvarMapaRequest request = SalvarMapaRequest.builder()
+                .competencias(Collections.emptyList())
+                .build();
 
         Mapa mapa = new Mapa();
         Competencia compExistente = new Competencia("Existente", mapa);

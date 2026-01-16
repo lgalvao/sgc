@@ -147,9 +147,10 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
         List<Long> unidadesSelecionadas = List.of(unidade1.getCodigo(), unidade2.getCodigo());
         LocalDate dataLimite = LocalDate.now().plusDays(15);
 
-        ProcessarEmBlocoRequest request = new ProcessarEmBlocoRequest();
-        request.setUnidadeCodigos(unidadesSelecionadas);
-        request.setDataLimite(dataLimite);
+        ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
+                .unidadeCodigos(unidadesSelecionadas)
+                .dataLimite(dataLimite)
+                .build();
 
         // When
         mockMvc.perform(

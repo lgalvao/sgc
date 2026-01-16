@@ -13,7 +13,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.service.AtividadeFacade;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
@@ -48,9 +48,10 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve obter por ID")
         void deveObterPorId() throws Exception {
-            AtividadeDto dto = new AtividadeDto();
-            dto.setCodigo(1L);
-            Mockito.when(atividadeFacade.obterAtividadePorId(1L)).thenReturn(dto);
+            AtividadeResponse response = AtividadeResponse.builder()
+                    .codigo(1L)
+                    .build();
+            Mockito.when(atividadeFacade.obterAtividadePorId(1L)).thenReturn(response);
 
             mockMvc.perform(get("/api/atividades/1").with(user("123")))
                     .andExpect(status().isOk())

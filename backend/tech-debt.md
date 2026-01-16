@@ -4,11 +4,13 @@ Este documento registra dívidas técnicas identificadas que devem ser tratadas 
 
 ---
 
-## TD-001: DTOs Request com Setters (Mutabilidade Desnecessária)
+## TD-001: DTOs Request com Setters (Mutabilidade Desnecessária) ✅ RESOLVIDO
 
 **Data de Identificação:** 2026-01-16  
+**Data de Resolução:** 2026-01-17  
 **Prioridade:** Média  
-**Esforço Estimado:** Alto (muitos testes a refatorar)
+**Esforço Estimado:** Alto (muitos testes a refatorar)  
+**Status:** ✅ COMPLETO
 
 ### Descrição
 
@@ -110,11 +112,13 @@ Refatorar para usar builders ou records requer atualizar muitos arquivos de test
 
 ---
 
-## TD-002: Separar DTOs Bidirecionais em Request/Response
+## TD-002: Separar DTOs Bidirecionais em Request/Response ✅ RESOLVIDO
 
 **Data de Identificação:** 2026-01-16  
+**Data de Resolução:** 2026-01-17  
 **Prioridade:** Média  
-**Esforço Estimado:** Médio
+**Esforço Estimado:** Médio  
+**Status:** ✅ COMPLETO
 
 ### Descrição
 
@@ -215,4 +219,42 @@ public record AtividadeResponse(
 
 ---
 
-*Última atualização: 2026-01-16*
+## Resumo de Resolução
+
+### TD-001 - Resolução Completa ✅
+
+**Ações Realizadas:**
+1. ✅ Removidos `@Setter` e `@NoArgsConstructor` de todos os Request DTOs
+2. ✅ Adicionado `final` a todos os campos
+3. ✅ Refatorados 37 arquivos de teste para usar o padrão Builder
+4. ✅ Todos os 1189 testes continuam passando
+
+**Arquivos Afetados:**
+- 22 Request DTOs refatorados
+- 37 arquivos de teste atualizados
+- 1 arquivo de produção (SubprocessoFacade.java)
+
+### TD-002 - Resolução Completa ✅
+
+**Ações Realizadas:**
+1. ✅ Criados 6 novos DTOs (Request/Response separados)
+2. ✅ Atualizados Controllers para usar novos tipos
+3. ✅ Atualizados Services com métodos sobrecarregados
+4. ✅ Atualizados Mappers com conversões para novos tipos
+5. ✅ DTOs antigos marcados como `@Deprecated`
+6. ✅ Todos os testes continuam passando
+
+**Novos DTOs Criados:**
+- `CriarAtividadeRequest` / `AtualizarAtividadeRequest` / `AtividadeResponse`
+- `CriarConhecimentoRequest` / `AtualizarConhecimentoRequest` / `ConhecimentoResponse`
+
+**DTOs Depreciados:**
+- `AtividadeDto` - usar Request/Response específicos
+- `ConhecimentoDto` - usar Request/Response específicos
+
+**CompetenciaMapaDto:** Mantido como está (uso correto dentro de contexto específico)
+
+---
+
+*Última atualização: 2026-01-17*  
+*Status Geral: Todas as dívidas técnicas documentadas foram resolvidas ✅*

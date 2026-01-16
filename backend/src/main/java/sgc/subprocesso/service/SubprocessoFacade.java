@@ -566,8 +566,11 @@ public class SubprocessoFacade {
             for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
                 var atividade = atividadeService.obterPorCodigo(ativDto.getCodAtividade());
 
-                sgc.mapa.dto.AtividadeDto dto = atividadeMapper.toDto(atividade);
-                dto.setDescricao(ativDto.getNome());
+                sgc.mapa.dto.AtividadeDto dto = sgc.mapa.dto.AtividadeDto.builder()
+                        .codigo(atividade.getCodigo())
+                        .mapaCodigo(atividade.getMapa() != null ? atividade.getMapa().getCodigo() : null)
+                        .descricao(ativDto.getNome())
+                        .build();
                 atividadeService.atualizar(atividade.getCodigo(), dto);
 
                 atividades.add(atividadeService.obterPorCodigo(atividade.getCodigo()));

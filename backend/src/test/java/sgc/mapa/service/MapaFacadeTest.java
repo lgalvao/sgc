@@ -206,8 +206,9 @@ class MapaFacadeTest {
         @DisplayName("Deve delegar salvar mapa completo ao MapaSalvamentoService")
         void deveDelegarSalvarMapaCompleto() {
             Long mapaId = 1L;
-            SalvarMapaRequest req = new SalvarMapaRequest();
-            req.setObservacoes("Obs");
+            SalvarMapaRequest req = SalvarMapaRequest.builder()
+                    .observacoes("Obs")
+                    .build();
             MapaCompletoDto expectedDto = new MapaCompletoDto();
 
             when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req)).thenReturn(expectedDto);
@@ -222,7 +223,7 @@ class MapaFacadeTest {
         @DisplayName("Deve propagar erro do MapaSalvamentoService")
         void devePropagarErroDoMapaSalvamentoService() {
             Long mapaId = 1L;
-            SalvarMapaRequest req = new SalvarMapaRequest();
+            SalvarMapaRequest req = SalvarMapaRequest.builder().build();
 
             when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req))
                 .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", mapaId));
@@ -235,7 +236,7 @@ class MapaFacadeTest {
         @DisplayName("Deve propagar ErroValidacao do MapaSalvamentoService")
         void devePropagarErroValidacao() {
             Long mapaId = 1L;
-            SalvarMapaRequest req = new SalvarMapaRequest();
+            SalvarMapaRequest req = SalvarMapaRequest.builder().build();
 
             when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req))
                 .thenThrow(new ErroValidacao("Atividade 99 não pertence ao mapa"));

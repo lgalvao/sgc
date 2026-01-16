@@ -4,26 +4,24 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 /**
  * DTO para Atividade usado nas APIs (entrada/saída).
  * 
- * <p>Requer @NoArgsConstructor e @Setter para deserialização Jackson em endpoints de entrada.
+ * @deprecated Use {@link CriarAtividadeRequest}, {@link AtualizarAtividadeRequest} ou {@link AtividadeResponse} 
+ * dependendo do contexto. Este DTO será removido após migração completa.
  */
+@Deprecated(since = "2026-01-17", forRemoval = true)
 @Getter
-@Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class AtividadeDto {
 
-    private Long codigo;
-    private Long mapaCodigo;
+    private final Long codigo;
+    private final Long mapaCodigo;
 
     @NotBlank(message = "Descrição não pode ser vazia")
     @SanitizarHtml
-    private String descricao;
+    private final String descricao;
 }

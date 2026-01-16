@@ -53,7 +53,7 @@ class AtividadeServiceTest {
         @DisplayName("Deve listar todas as atividades")
         void deveListarTodas() {
              when(atividadeRepo.findAll()).thenReturn(List.of(new Atividade()));
-             when(atividadeMapper.toDto(any())).thenReturn(new AtividadeDto());
+             when(atividadeMapper.toDto(any())).thenReturn(AtividadeDto.builder().build());
              assertThat(service.listar())
                  .isNotNull()
                  .hasSize(1);
@@ -63,7 +63,7 @@ class AtividadeServiceTest {
         @DisplayName("Deve obter por código DTO")
         void deveObterPorCodigoDto() {
              when(repo.buscar(Atividade.class, 1L)).thenReturn(new Atividade());
-             when(atividadeMapper.toDto(any())).thenReturn(new AtividadeDto());
+             when(atividadeMapper.toDto(any())).thenReturn(AtividadeDto.builder().build());
              assertThat(service.obterDto(1L)).isNotNull();
         }
 
@@ -134,8 +134,9 @@ class AtividadeServiceTest {
         @Test
         @DisplayName("Deve criar atividade com sucesso")
         void deveCriarAtividade() {
-            AtividadeDto dto = new AtividadeDto();
-            dto.setMapaCodigo(1L);
+            AtividadeDto dto = AtividadeDto.builder()
+                    .mapaCodigo(1L)
+                    .build();
             String titulo = "123";
 
             Mapa mapa = new Mapa();
@@ -163,8 +164,9 @@ class AtividadeServiceTest {
         @Test
         @DisplayName("Deve lançar erro ao criar atividade sem mapa")
         void deveLancarErroAoCriarSemMapa() {
-            AtividadeDto dto = new AtividadeDto();
-            dto.setMapaCodigo(null);
+            AtividadeDto dto = AtividadeDto.builder()
+                    .mapaCodigo(null)
+                    .build();
             
             when(repo.buscar(Mapa.class, null)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", null));
 
@@ -175,8 +177,9 @@ class AtividadeServiceTest {
         @Test
         @DisplayName("Deve lançar erro ao criar atividade em mapa inexistente")
         void deveLancarErroAoCriarEmMapaInexistente() {
-            AtividadeDto dto = new AtividadeDto();
-            dto.setMapaCodigo(1L);
+            AtividadeDto dto = AtividadeDto.builder()
+                    .mapaCodigo(1L)
+                    .build();
 
             when(repo.buscar(Mapa.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
 
@@ -187,8 +190,9 @@ class AtividadeServiceTest {
         @Test
         @DisplayName("Deve lançar erro ao criar atividade se mapa não tem subprocesso")
         void deveLancarErroAoCriarSemSubprocesso() {
-            AtividadeDto dto = new AtividadeDto();
-            dto.setMapaCodigo(1L);
+            AtividadeDto dto = AtividadeDto.builder()
+                    .mapaCodigo(1L)
+                    .build();
 
             Mapa mapa = new Mapa();
             mapa.setSubprocesso(null);
@@ -208,7 +212,7 @@ class AtividadeServiceTest {
         @DisplayName("Deve atualizar atividade")
         void deveAtualizarAtividade() {
             Long id = 1L;
-            AtividadeDto dto = new AtividadeDto();
+            AtividadeDto dto = AtividadeDto.builder().build();
             Atividade atividade = new Atividade();
             Mapa mapa = new Mapa();
             mapa.setCodigo(1L);
@@ -228,7 +232,7 @@ class AtividadeServiceTest {
         @DisplayName("Deve atualizar atividade sem mapa associado (sem publicar evento)")
         void deveAtualizarAtividadeSemMapa() {
             Long id = 1L;
-            AtividadeDto dto = new AtividadeDto();
+            AtividadeDto dto = AtividadeDto.builder().build();
             Atividade atividade = new Atividade();
             atividade.setMapa(null); 
 
@@ -246,7 +250,7 @@ class AtividadeServiceTest {
         @DisplayName("Deve lançar exceção ao atualizar se ocorrer erro inesperado")
         void deveRelancarExcecaoAoAtualizar() {
             Long id = 1L;
-            AtividadeDto dto = new AtividadeDto();
+            AtividadeDto dto = AtividadeDto.builder().build();
 
             when(repo.buscar(Atividade.class, id)).thenThrow(new RuntimeException("Erro banco"));
 

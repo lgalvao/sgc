@@ -97,8 +97,9 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
     void alterarDataLimite_comoAdmin_sucesso() throws Exception {
         // Given
         LocalDate novaData = LocalDate.now().plusDays(20);
-        AlterarDataLimiteRequest request = new AlterarDataLimiteRequest();
-        request.setNovaDataLimite(novaData);
+        AlterarDataLimiteRequest request = AlterarDataLimiteRequest.builder()
+                .novaDataLimite(novaData)
+                .build();
 
         // When
         mockMvc.perform(
@@ -129,8 +130,9 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
     void alterarDataLimite_semPermissao_proibido() throws Exception {
         // Given
         LocalDate novaData = LocalDate.now().plusDays(20);
-        AlterarDataLimiteRequest request = new AlterarDataLimiteRequest();
-        request.setNovaDataLimite(novaData);
+        AlterarDataLimiteRequest request = AlterarDataLimiteRequest.builder()
+                .novaDataLimite(novaData)
+                .build();
 
         // When/Then
         mockMvc.perform(

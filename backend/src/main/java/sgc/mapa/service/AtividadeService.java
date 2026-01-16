@@ -38,6 +38,11 @@ public class AtividadeService {
     }
 
     @Transactional(readOnly = true)
+    public sgc.mapa.dto.AtividadeResponse obterResponse(Long codAtividade) {
+        return atividadeMapper.toResponse(obterPorCodigo(codAtividade));
+    }
+
+    @Transactional(readOnly = true)
     public Atividade obterPorCodigo(Long codAtividade) {
         return repo.buscar(Atividade.class, codAtividade);
     }
@@ -63,10 +68,39 @@ public class AtividadeService {
         return atividadeMapper.toDto(salvo);
     }
 
+    public AtividadeDto criar(sgc.mapa.dto.CriarAtividadeRequest request) {
+        Mapa mapa = repo.buscar(Mapa.class, request.mapaCodigo());
+
+        if (mapa.getSubprocesso() == null) {
+            throw new sgc.comum.erros.ErroEntidadeNaoEncontrada("Subprocesso", null);
+        }
+
+        notificarAlteracaoMapa(request.mapaCodigo());
+
+        Atividade entidade = atividadeMapper.toEntity(request);
+        entidade.setMapa(mapa);
+
+        Atividade salvo = atividadeRepo.save(entidade);
+        return atividadeMapper.toDto(salvo);
+    }
+
     public void atualizar(Long codigo, AtividadeDto atividadeDto) {
         Atividade existente = repo.buscar(Atividade.class, codigo);
 
         atualizarAtividadeExistente(atividadeDto, existente);
+    }
+
+    public void atualizar(Long codigo, sgc.mapa.dto.AtualizarAtividadeRequest request) {
+        Atividade existente = repo.buscar(Atividade.class, codigo);
+
+        if (existente.getMapa() != null) {
+            notificarAlteracaoMapa(existente.getMapa().getCodigo());
+        }
+
+        var entidadeParaAtualizar = atividadeMapper.toEntity(request);
+        existente.setDescricao(entidadeParaAtualizar.getDescricao());
+
+        atividadeRepo.save(existente);
     }
 
     private void atualizarAtividadeExistente(AtividadeDto atividadeDto, Atividade existente) {

@@ -80,8 +80,9 @@ class SubprocessoMapaWorkflowServiceTest {
 
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of()); // Era vazio
 
-            SalvarMapaRequest req = new SalvarMapaRequest();
-            req.setCompetencias(List.of(new CompetenciaMapaDto())); // Tem novas
+            SalvarMapaRequest req = SalvarMapaRequest.builder()
+                    .competencias(List.of(CompetenciaMapaDto.builder().build()))
+                    .build();
 
             service.salvarMapaSubprocesso(1L, req);
 
@@ -99,8 +100,9 @@ class SubprocessoMapaWorkflowServiceTest {
 
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of()); // Era vazio (mas status já avançado)
 
-            SalvarMapaRequest req = new SalvarMapaRequest();
-            req.setCompetencias(List.of(new CompetenciaMapaDto()));
+            SalvarMapaRequest req = SalvarMapaRequest.builder()
+                    .competencias(List.of(CompetenciaMapaDto.builder().build()))
+                    .build();
 
             service.salvarMapaSubprocesso(1L, req);
 
@@ -117,8 +119,9 @@ class SubprocessoMapaWorkflowServiceTest {
             when(sp.getMapa()).thenReturn(mapa);
 
             // Mock to prevent NPE on req.getCompetencias().isEmpty()
-            SalvarMapaRequest req = new SalvarMapaRequest();
-            req.setCompetencias(List.of());
+            SalvarMapaRequest req = SalvarMapaRequest.builder()
+                    .competencias(List.of())
+                    .build();
 
             service.salvarMapaSubprocesso(1L, req);
 
@@ -130,8 +133,9 @@ class SubprocessoMapaWorkflowServiceTest {
         void deveFalharEditarMapaSituacaoInvalida() {
             mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-            SalvarMapaRequest req = new SalvarMapaRequest();
-            req.setCompetencias(List.of(new CompetenciaMapaDto()));
+            SalvarMapaRequest req = SalvarMapaRequest.builder()
+                    .competencias(List.of(CompetenciaMapaDto.builder().build()))
+                    .build();
 
             assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, req))
                 .isInstanceOf(ErroMapaEmSituacaoInvalida.class);
@@ -146,9 +150,10 @@ class SubprocessoMapaWorkflowServiceTest {
             when(sp.getMapa()).thenReturn(mapa);
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
 
-            CompetenciaRequest req = new CompetenciaRequest();
-            req.setDescricao("Nova Comp");
-            req.setAtividadesIds(List.of(1L));
+            CompetenciaRequest req = CompetenciaRequest.builder()
+                    .descricao("Nova Comp")
+                    .atividadesIds(List.of(1L))
+                    .build();
 
             service.adicionarCompetencia(1L, req);
 
@@ -165,8 +170,9 @@ class SubprocessoMapaWorkflowServiceTest {
             when(sp.getMapa()).thenReturn(mapa);
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
 
-            CompetenciaRequest req = new CompetenciaRequest();
-            req.setDescricao("Nova Comp");
+            CompetenciaRequest req = CompetenciaRequest.builder()
+                    .descricao("Nova Comp")
+                    .build();
 
             service.adicionarCompetencia(1L, req);
 
@@ -184,8 +190,9 @@ class SubprocessoMapaWorkflowServiceTest {
             // Já tem uma competência
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(new Competencia()));
 
-            CompetenciaRequest req = new CompetenciaRequest();
-            req.setDescricao("Nova Comp");
+            CompetenciaRequest req = CompetenciaRequest.builder()
+                    .descricao("Nova Comp")
+                    .build();
 
             service.adicionarCompetencia(1L, req);
 
@@ -200,9 +207,10 @@ class SubprocessoMapaWorkflowServiceTest {
             when(mapa.getCodigo()).thenReturn(10L);
             when(sp.getMapa()).thenReturn(mapa);
 
-            CompetenciaRequest req = new CompetenciaRequest();
-            req.setDescricao("Comp Atualizada");
-            req.setAtividadesIds(List.of(2L));
+            CompetenciaRequest req = CompetenciaRequest.builder()
+                    .descricao("Comp Atualizada")
+                    .atividadesIds(List.of(2L))
+                    .build();
 
             service.atualizarCompetencia(1L, 5L, req);
 
@@ -266,8 +274,9 @@ class SubprocessoMapaWorkflowServiceTest {
             when(mapa.getCodigo()).thenReturn(10L);
             when(sp.getMapa()).thenReturn(mapa);
 
-            SalvarMapaRequest req = new SalvarMapaRequest();
-            req.setCompetencias(List.of());
+            SalvarMapaRequest req = SalvarMapaRequest.builder()
+                    .competencias(List.of())
+                    .build();
 
             service.salvarMapaSubprocesso(1L, req);
 
@@ -280,7 +289,7 @@ class SubprocessoMapaWorkflowServiceTest {
             Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
             when(sp.getMapa()).thenReturn(null);
             
-            SalvarMapaRequest req = new SalvarMapaRequest();
+            SalvarMapaRequest req = SalvarMapaRequest.builder().build();
             assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, req))
                 .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class)
                 .hasMessageContaining("Mapa");
@@ -298,8 +307,9 @@ class SubprocessoMapaWorkflowServiceTest {
             Competencia c = new Competencia();
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
 
-            SalvarMapaRequest req = new SalvarMapaRequest();
-            req.setCompetencias(List.of(new CompetenciaMapaDto()));
+            SalvarMapaRequest req = SalvarMapaRequest.builder()
+                    .competencias(List.of(CompetenciaMapaDto.builder().build()))
+                    .build();
 
             service.salvarMapaSubprocesso(1L, req);
 
@@ -318,8 +328,9 @@ class SubprocessoMapaWorkflowServiceTest {
 
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of()); // Era vazio
 
-            SalvarMapaRequest req = new SalvarMapaRequest();
-            req.setCompetencias(List.of()); // Sem novas competências
+            SalvarMapaRequest req = SalvarMapaRequest.builder()
+                    .competencias(List.of())
+                    .build();
 
             service.salvarMapaSubprocesso(1L, req);
 
@@ -337,9 +348,10 @@ class SubprocessoMapaWorkflowServiceTest {
             // Mapa não era vazio
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(new Competencia()));
 
-            CompetenciaRequest req = new CompetenciaRequest();
-            req.setDescricao("Nova Comp");
-            req.setAtividadesIds(List.of(1L));
+            CompetenciaRequest req = CompetenciaRequest.builder()
+                    .descricao("Nova Comp")
+                    .atividadesIds(List.of(1L))
+                    .build();
 
             service.adicionarCompetencia(1L, req);
 
@@ -388,9 +400,10 @@ class SubprocessoMapaWorkflowServiceTest {
             sedoc.setCodigo(99L);
             when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(sedoc);
 
-            DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
-            req.setDataLimite(LocalDate.now());
-            req.setObservacoes("Obs");
+            DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder()
+                    .dataLimite(LocalDate.now())
+                    .observacoes("Obs")
+                    .build();
 
             service.disponibilizarMapa(1L, req, new Usuario());
 
@@ -412,9 +425,10 @@ class SubprocessoMapaWorkflowServiceTest {
             when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of());
             when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
 
-            DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
-            req.setDataLimite(LocalDate.now());
-            req.setObservacoes(""); // Vazio
+            DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder()
+                    .dataLimite(LocalDate.now())
+                    .observacoes("")
+                    .build();
 
             service.disponibilizarMapa(1L, req, new Usuario());
 
@@ -433,7 +447,7 @@ class SubprocessoMapaWorkflowServiceTest {
             c.setAtividades(new HashSet<>()); // Vazia
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
 
-            DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
+            DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder().build();
             Usuario usuario = new Usuario();
 
             assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, usuario))
@@ -457,7 +471,7 @@ class SubprocessoMapaWorkflowServiceTest {
             Atividade a2 = new Atividade(); a2.setCodigo(2L); a2.setDescricao("Orfã");
             when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of(a1, a2));
 
-            DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
+            DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder().build();
             Usuario usuario = new Usuario();
 
             assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, usuario))
@@ -476,8 +490,9 @@ class SubprocessoMapaWorkflowServiceTest {
             }}));
             when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of());
 
-            DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
-            req.setDataLimite(null);
+            DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder()
+                    .dataLimite(null)
+                    .build();
 
             Usuario user = new Usuario();
             assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, user))
@@ -500,9 +515,10 @@ class SubprocessoMapaWorkflowServiceTest {
 
             when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
 
-            DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
-            req.setDataLimite(LocalDate.now());
-            req.setObservacoes(null); // Observações null
+            DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder()
+                    .dataLimite(LocalDate.now())
+                    .observacoes(null)
+                    .build();
 
             service.disponibilizarMapa(1L, req, new Usuario());
 
@@ -526,9 +542,10 @@ class SubprocessoMapaWorkflowServiceTest {
 
             when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
 
-            DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
-            req.setDataLimite(LocalDate.now());
-            req.setObservacoes("   "); // Observações blank
+            DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder()
+                    .dataLimite(LocalDate.now())
+                    .observacoes("   ")
+                    .build();
 
             service.disponibilizarMapa(1L, req, new Usuario());
 
@@ -546,8 +563,9 @@ class SubprocessoMapaWorkflowServiceTest {
             when(sp.getMapa()).thenReturn(mapa);
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
 
-            SalvarMapaRequest req = new SalvarMapaRequest();
-            req.setCompetencias(List.of());
+            SalvarMapaRequest req = SalvarMapaRequest.builder()
+                    .competencias(List.of())
+                    .build();
 
             service.salvarMapaSubprocesso(1L, req);
 
@@ -564,8 +582,9 @@ class SubprocessoMapaWorkflowServiceTest {
             when(sp.getMapa()).thenReturn(mapa);
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
 
-            SalvarMapaRequest req = new SalvarMapaRequest();
-            req.setCompetencias(List.of());
+            SalvarMapaRequest req = SalvarMapaRequest.builder()
+                    .competencias(List.of())
+                    .build();
 
             service.salvarMapaSubprocesso(1L, req);
 
@@ -705,8 +724,9 @@ class SubprocessoMapaWorkflowServiceTest {
              when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
              when(atividadeService.buscarPorMapaCodigo(20L)).thenReturn(List.of());
 
-             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
-             req.setDataLimite(LocalDate.now());
+             DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder()
+                     .dataLimite(LocalDate.now())
+                     .build();
 
              service.disponibilizarMapaEmBloco(List.of(10L), 1L, req, new Usuario());
 
@@ -785,8 +805,9 @@ class SubprocessoMapaWorkflowServiceTest {
             sp.getProcesso().setTipo(TipoProcesso.REVISAO); // Revisão
             Mapa m = mock(Mapa.class); when(sp.getMapa()).thenReturn(m);
 
-            SubmeterMapaAjustadoRequest req = new SubmeterMapaAjustadoRequest();
-            req.setDataLimiteEtapa2(java.time.LocalDateTime.now());
+            SubmeterMapaAjustadoRequest req = SubmeterMapaAjustadoRequest.builder()
+                    .dataLimiteEtapa2(java.time.LocalDateTime.now())
+                    .build();
 
             service.submeterMapaAjustado(1L, req, new Usuario());
 
@@ -802,7 +823,7 @@ class SubprocessoMapaWorkflowServiceTest {
             sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
             when(sp.getMapa()).thenReturn(mock(Mapa.class));
 
-            service.submeterMapaAjustado(1L, new SubmeterMapaAjustadoRequest(), new Usuario());
+            service.submeterMapaAjustado(1L, SubmeterMapaAjustadoRequest.builder().build(), new Usuario());
 
             verify(sp).setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         }
@@ -812,7 +833,7 @@ class SubprocessoMapaWorkflowServiceTest {
     @DisplayName("Deve falhar ao buscar subprocesso inexistente")
     void deveFalharSubprocessoInexistente() {
         when(repo.buscar(Subprocesso.class, 999L)).thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Subprocesso", 999L));
-        assertThatThrownBy(() -> service.adicionarCompetencia(999L, new CompetenciaRequest()))
+        assertThatThrownBy(() -> service.adicionarCompetencia(999L, CompetenciaRequest.builder().build()))
             .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
     }
 

@@ -96,9 +96,10 @@ class SubprocessoMapaControllerTest {
     @DisplayName("salvarMapa")
     @WithMockUser
     void salvarMapa() throws Exception {
-        SalvarMapaRequest req = new SalvarMapaRequest();
-        req.setObservacoes("obs");
-        req.setCompetencias(List.of());
+        SalvarMapaRequest req = SalvarMapaRequest.builder()
+                .observacoes("obs")
+                .competencias(List.of())
+                .build();
 
         when(subprocessoFacade.salvarMapaSubprocesso(eq(1L), any()))
                 .thenReturn(new MapaCompletoDto());
@@ -125,8 +126,9 @@ class SubprocessoMapaControllerTest {
     @DisplayName("salvarAjustesMapa")
     @WithMockUser
     void salvarAjustesMapa() throws Exception {
-        SalvarAjustesRequest req = new SalvarAjustesRequest();
-        req.setCompetencias(List.of());
+        SalvarAjustesRequest req = SalvarAjustesRequest.builder()
+                .competencias(List.of())
+                .build();
 
         mockMvc.perform(
                         post("/api/subprocessos/1/mapa-ajuste/atualizar")
@@ -154,9 +156,10 @@ class SubprocessoMapaControllerTest {
     @DisplayName("salvarMapaCompleto")
     @WithMockUser
     void salvarMapaCompleto() throws Exception {
-        SalvarMapaRequest req = new SalvarMapaRequest();
-        req.setObservacoes("obs");
-        req.setCompetencias(List.of());
+        SalvarMapaRequest req = SalvarMapaRequest.builder()
+                .observacoes("obs")
+                .competencias(List.of())
+                .build();
 
         when(subprocessoFacade.salvarMapaSubprocesso(eq(1L), any()))
                 .thenReturn(new MapaCompletoDto());
@@ -173,9 +176,10 @@ class SubprocessoMapaControllerTest {
     @DisplayName("adicionarCompetencia")
     @WithMockUser
     void adicionarCompetencia() throws Exception {
-        CompetenciaRequest req = new CompetenciaRequest();
-        req.setDescricao("Comp");
-        req.setAtividadesIds(List.of(1L, 2L)); // Corrigido: lista não pode ser vazia
+        CompetenciaRequest req = CompetenciaRequest.builder()
+                .descricao("Comp")
+                .atividadesIds(List.of(1L, 2L)) // Corrigido: lista não pode ser vazia
+                .build();
 
         when(subprocessoFacade.adicionarCompetencia(eq(1L), any()))
                 .thenReturn(new MapaCompletoDto());
@@ -192,9 +196,10 @@ class SubprocessoMapaControllerTest {
     @DisplayName("adicionarCompetencia - deve retornar 400 quando descrição está vazia")
     @WithMockUser
     void adicionarCompetencia_DeveRetornar400QuandoDescricaoVazia() throws Exception {
-        CompetenciaRequest req = new CompetenciaRequest();
-        req.setDescricao(""); // Descrição vazia - deve falhar
-        req.setAtividadesIds(List.of(1L));
+        CompetenciaRequest req = CompetenciaRequest.builder()
+                .descricao("") // Descrição vazia - deve falhar
+                .atividadesIds(List.of(1L))
+                .build();
 
         mockMvc.perform(
                         post("/api/subprocessos/1/competencias")
@@ -208,9 +213,10 @@ class SubprocessoMapaControllerTest {
     @DisplayName("adicionarCompetencia - deve retornar 400 quando lista de atividades está vazia")
     @WithMockUser
     void adicionarCompetencia_DeveRetornar400QuandoAtividadesVazio() throws Exception {
-        CompetenciaRequest req = new CompetenciaRequest();
-        req.setDescricao("Competência válida");
-        req.setAtividadesIds(List.of()); // Lista vazia - deve falhar
+        CompetenciaRequest req = CompetenciaRequest.builder()
+                .descricao("Competência válida")
+                .atividadesIds(List.of()) // Lista vazia - deve falhar
+                .build();
 
         mockMvc.perform(
                         post("/api/subprocessos/1/competencias")
@@ -224,9 +230,10 @@ class SubprocessoMapaControllerTest {
     @DisplayName("adicionarCompetencia - deve retornar 400 quando lista de atividades é null")
     @WithMockUser
     void adicionarCompetencia_DeveRetornar400QuandoAtividadesNull() throws Exception {
-        CompetenciaRequest req = new CompetenciaRequest();
-        req.setDescricao("Competência válida");
-        req.setAtividadesIds(null); // Null - deve falhar
+        CompetenciaRequest req = CompetenciaRequest.builder()
+                .descricao("Competência válida")
+                .atividadesIds(null) // Null - deve falhar
+                .build();
 
         mockMvc.perform(
                         post("/api/subprocessos/1/competencias")
@@ -241,9 +248,10 @@ class SubprocessoMapaControllerTest {
     @DisplayName("atualizarCompetencia")
     @WithMockUser
     void atualizarCompetencia() throws Exception {
-        CompetenciaRequest req = new CompetenciaRequest();
-        req.setDescricao("Comp");
-        req.setAtividadesIds(List.of(1L)); // Corrigido: lista não pode ser vazia
+        CompetenciaRequest req = CompetenciaRequest.builder()
+                .descricao("Comp")
+                .atividadesIds(List.of(1L)) // Corrigido: lista não pode ser vazia
+                .build();
 
         when(subprocessoFacade.atualizarCompetencia(eq(1L), eq(10L), any()))
                 .thenReturn(new MapaCompletoDto());

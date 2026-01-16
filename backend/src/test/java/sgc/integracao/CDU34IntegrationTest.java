@@ -99,8 +99,9 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void enviarLembrete_comoAdmin_sucesso() throws Exception {
         // Given
-        EnviarLembreteRequest request = new EnviarLembreteRequest();
-        request.setUnidadeCodigo(unidade.getCodigo());
+        EnviarLembreteRequest request = EnviarLembreteRequest.builder()
+                .unidadeCodigo(unidade.getCodigo())
+                .build();
 
         // When
         mockMvc.perform(
@@ -127,8 +128,9 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
     @org.springframework.security.test.context.support.WithMockUser(roles = "GESTOR")
     void enviarLembrete_semPermissao_proibido() throws Exception {
         // Given
-        EnviarLembreteRequest request = new EnviarLembreteRequest();
-        request.setUnidadeCodigo(unidade.getCodigo());
+        EnviarLembreteRequest request = EnviarLembreteRequest.builder()
+                .unidadeCodigo(unidade.getCodigo())
+                .build();
 
         // When/Then
         mockMvc.perform(
@@ -144,8 +146,9 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void enviarLembrete_unidadeInexistente_erro() throws Exception {
         // Given
-        EnviarLembreteRequest request = new EnviarLembreteRequest();
-        request.setUnidadeCodigo(99999L);
+        EnviarLembreteRequest request = EnviarLembreteRequest.builder()
+                .unidadeCodigo(99999L)
+                .build();
 
         // When/Then
         mockMvc.perform(

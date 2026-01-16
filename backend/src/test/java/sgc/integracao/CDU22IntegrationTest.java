@@ -129,8 +129,9 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         Long codigoContexto = subprocesso1.getCodigo();
         List<Long> unidadesSelecionadas = List.of(unidade1.getCodigo(), unidade2.getCodigo());
 
-        ProcessarEmBlocoRequest request = new ProcessarEmBlocoRequest();
-        request.setUnidadeCodigos(unidadesSelecionadas);
+        ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
+                .unidadeCodigos(unidadesSelecionadas)
+                .build();
 
         // When
         mockMvc.perform(

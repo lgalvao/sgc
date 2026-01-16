@@ -57,11 +57,11 @@ public class AtividadeFacade {
      * Obtém uma atividade por código.
      *
      * @param codAtividade O código da atividade
-     * @return DTO da atividade
+     * @return Response da atividade
      */
     @Transactional(readOnly = true)
-    public AtividadeDto obterAtividadePorId(Long codAtividade) {
-        return atividadeService.obterDto(codAtividade);
+    public sgc.mapa.dto.AtividadeResponse obterAtividadePorId(Long codAtividade) {
+        return atividadeService.obterResponse(codAtividade);
     }
 
     /**
@@ -71,8 +71,8 @@ public class AtividadeFacade {
      * @return Lista de conhecimentos
      */
     @Transactional(readOnly = true)
-    public List<ConhecimentoDto> listarConhecimentosPorAtividade(Long codAtividade) {
-        return conhecimentoService.listarPorAtividade(codAtividade);
+    public List<sgc.mapa.dto.ConhecimentoResponse> listarConhecimentosPorAtividade(Long codAtividade) {
+        return conhecimentoService.listarPorAtividadeResponse(codAtividade);
     }
 
     // ===== Operações de Atividade =====
@@ -80,8 +80,8 @@ public class AtividadeFacade {
     /**
      * Cria uma nova atividade e retorna a resposta formatada.
      */
-    public AtividadeOperacaoResponse criarAtividade(AtividadeDto atividadeDto) {
-        Long mapaCodigo = atividadeDto.getMapaCodigo();
+    public AtividadeOperacaoResponse criarAtividade(sgc.mapa.dto.CriarAtividadeRequest request) {
+        Long mapaCodigo = request.mapaCodigo();
         
         // Busca usuário autenticado através do contexto Spring Security
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
@@ -95,7 +95,7 @@ public class AtividadeFacade {
         // Verifica permissão usando AccessControlService
         accessControlService.verificarPermissao(usuario, CRIAR_ATIVIDADE, atividadeTemp);
         
-        AtividadeDto salvo = atividadeService.criar(atividadeDto);
+        AtividadeDto salvo = atividadeService.criar(request);
 
         // Publica evento de criação
         Atividade atividadeCriada = atividadeService.obterPorCodigo(salvo.getCodigo());
@@ -117,7 +117,7 @@ public class AtividadeFacade {
     /**
      * Atualiza uma atividade e retorna a resposta formatada.
      */
-    public AtividadeOperacaoResponse atualizarAtividade(Long codigo, AtividadeDto atividadeDto) {
+    public AtividadeOperacaoResponse atualizarAtividade(Long codigo, sgc.mapa.dto.AtualizarAtividadeRequest request) {
         Atividade atividade = atividadeService.obterPorCodigo(codigo);
         
         // Busca usuário autenticado através do contexto Spring Security
@@ -130,13 +130,13 @@ public class AtividadeFacade {
         
         Set<String> camposAlterados = new HashSet<>();
 
-        if (!Objects.equals(atividade.getDescricao(), atividadeDto.getDescricao())) {
+        if (!Objects.equals(atividade.getDescricao(), request.descricao())) {
             camposAlterados.add("descricao");
         }
         // Nota: Competências são afetadas apenas via conhecimentos (endpoints separados)
         // Este método atualiza somente a descrição da atividade
         
-        atividadeService.atualizar(codigo, atividadeDto);
+        atividadeService.atualizar(codigo, request);
 
         // Busca estado atualizado
         Atividade atividadeAtualizada = atividadeService.obterPorCodigo(codigo);
@@ -201,7 +201,7 @@ public class AtividadeFacade {
     /**
      * Cria um conhecimento e retorna a resposta formatada junto com o ID criado.
      */
-    public ResultadoOperacaoConhecimento criarConhecimento(Long codAtividade, ConhecimentoDto conhecimentoDto) {
+    public ResultadoOperacaoConhecimento criarConhecimento(Long codAtividade, sgc.mapa.dto.CriarConhecimentoRequest request) {
         Atividade atividade = atividadeService.obterPorCodigo(codAtividade);
         
         // Busca usuário autenticado
@@ -210,7 +210,7 @@ public class AtividadeFacade {
         // Verifica permissão usando a ação ASSOCIAR_CONHECIMENTOS
         accessControlService.verificarPermissao(usuario, ASSOCIAR_CONHECIMENTOS, atividade);
         
-        var salvo = conhecimentoService.criar(codAtividade, conhecimentoDto);
+        var salvo = conhecimentoService.criar(codAtividade, request);
         var response = criarRespostaOperacaoPorAtividade(codAtividade);
 
         return new ResultadoOperacaoConhecimento(salvo.getCodigo(), response);
@@ -219,7 +219,7 @@ public class AtividadeFacade {
     /**
      * Atualiza um conhecimento e retorna a resposta formatada.
      */
-    public AtividadeOperacaoResponse atualizarConhecimento(Long codAtividade, Long codConhecimento, ConhecimentoDto conhecimentoDto) {
+    public AtividadeOperacaoResponse atualizarConhecimento(Long codAtividade, Long codConhecimento, sgc.mapa.dto.AtualizarConhecimentoRequest request) {
         Atividade atividade = atividadeService.obterPorCodigo(codAtividade);
         
         // Busca usuário autenticado
@@ -228,7 +228,7 @@ public class AtividadeFacade {
         // Verifica permissão
         accessControlService.verificarPermissao(usuario, ASSOCIAR_CONHECIMENTOS, atividade);
         
-        conhecimentoService.atualizar(codAtividade, codConhecimento, conhecimentoDto);
+        conhecimentoService.atualizar(codAtividade, codConhecimento, request);
         return criarRespostaOperacaoPorAtividade(codAtividade);
     }
 

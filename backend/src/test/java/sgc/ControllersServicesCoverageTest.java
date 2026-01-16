@@ -151,7 +151,7 @@ class ControllersServicesCoverageTest {
     @Test
     @DisplayName("Deve delegar salvar mapa completo inexistente para MapaSalvamentoService")
     void deveDelegarSalvarMapaCompletoInexistente() {
-        SalvarMapaRequest req = new SalvarMapaRequest();
+        SalvarMapaRequest req = SalvarMapaRequest.builder().build();
         when(mapaSalvamentoService.salvarMapaCompleto(99L, req))
             .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 99L));
         assertThatThrownBy(() -> mapaFacade.salvarMapaCompleto(99L, req))
@@ -161,13 +161,14 @@ class ControllersServicesCoverageTest {
     @Test
     @DisplayName("Deve delegar salvar mapa completo com competência inexistente para MapaSalvamentoService")
     void deveDelegarSalvarCompetenciaInexistente() {
-        SalvarMapaRequest req = new SalvarMapaRequest();
-        req.setObservacoes("Obs");
-
-        CompetenciaMapaDto compDto = new CompetenciaMapaDto();
-        compDto.setCodigo(99L);
-        compDto.setDescricao("Desc");
-        req.setCompetencias(List.of(compDto));
+        CompetenciaMapaDto compDto = CompetenciaMapaDto.builder()
+                .codigo(99L)
+                .descricao("Desc")
+                .build();
+        SalvarMapaRequest req = SalvarMapaRequest.builder()
+                .observacoes("Obs")
+                .competencias(List.of(compDto))
+                .build();
 
         when(mapaSalvamentoService.salvarMapaCompleto(1L, req))
             .thenThrow(new ErroEntidadeNaoEncontrada("Competência não encontrada: 99"));
