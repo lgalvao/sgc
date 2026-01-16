@@ -72,10 +72,11 @@ class AtividadeMapperTest {
         @Test
         @DisplayName("Deve mapear DTO para entidade")
         void deveMapearDtoParaEntidade() {
-            AtividadeDto dto = new AtividadeDto();
-            dto.setCodigo(1L);
-            dto.setDescricao("Atividade de Teste");
-            dto.setMapaCodigo(10L);
+            AtividadeDto dto = AtividadeDto.builder()
+                    .codigo(1L)
+                    .descricao("Atividade de Teste")
+                    .mapaCodigo(10L)
+                    .build();
 
             Atividade atividade = mapper.toEntity(dto);
 

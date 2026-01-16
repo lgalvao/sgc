@@ -62,11 +62,11 @@ class SubprocessoFacadeTest {
         facade.listar();
         verify(crudService).listar();
 
-        CriarSubprocessoRequest criarRequest = new CriarSubprocessoRequest();
+        CriarSubprocessoRequest criarRequest = CriarSubprocessoRequest.builder().build();
         facade.criar(criarRequest);
         verify(crudService).criar(criarRequest);
 
-        AtualizarSubprocessoRequest atualizarRequest = new AtualizarSubprocessoRequest();
+        AtualizarSubprocessoRequest atualizarRequest = AtualizarSubprocessoRequest.builder().build();
         facade.atualizar(1L, atualizarRequest);
         verify(crudService).atualizar(1L, atualizarRequest);
 

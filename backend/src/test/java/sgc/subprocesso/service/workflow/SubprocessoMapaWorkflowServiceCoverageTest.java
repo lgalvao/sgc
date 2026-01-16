@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseFacade;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.RepositorioComum;
+import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Mapa;
@@ -69,7 +70,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
-        SalvarMapaRequest request = new SalvarMapaRequest();
+        SalvarMapaRequest request = SalvarMapaRequest.builder().build();
         assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, request))
             .isInstanceOf(ErroMapaEmSituacaoInvalida.class);
     }
@@ -83,7 +84,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
-        SalvarMapaRequest request = new SalvarMapaRequest();
+        SalvarMapaRequest request = SalvarMapaRequest.builder().build();
         assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, request))
             .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
     }
@@ -99,8 +100,9 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(Collections.emptyList());
 
-        SalvarMapaRequest req = new SalvarMapaRequest();
-        req.setCompetencias(List.of(new sgc.mapa.dto.CompetenciaMapaDto())); // Tem competencia
+        SalvarMapaRequest req = SalvarMapaRequest.builder()
+                .competencias(List.of(CompetenciaMapaDto.builder().build())) // Tem competencia
+                .build();
 
         when(mapaFacade.salvarMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());
 
@@ -123,8 +125,9 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(Collections.emptyList());
 
-        CompetenciaRequest req = new CompetenciaRequest();
-        req.setDescricao("Nova");
+        CompetenciaRequest req = CompetenciaRequest.builder()
+                .descricao("Nova")
+                .build();
 
         when(mapaFacade.obterMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());
 
@@ -172,7 +175,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(Collections.emptyList());
         when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(Collections.emptyList());
 
-        DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
+        DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder().build();
         Usuario user = new Usuario();
 
         assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, user))
@@ -195,7 +198,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
 
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(comp));
 
-        DisponibilizarMapaRequest request = new DisponibilizarMapaRequest();
+        DisponibilizarMapaRequest request = DisponibilizarMapaRequest.builder().build();
         Usuario user = new Usuario();
         assertThatThrownBy(() -> service.disponibilizarMapa(1L, request, user))
             .isInstanceOf(ErroValidacao.class)
@@ -223,7 +226,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         sgc.mapa.model.Atividade a2 = new sgc.mapa.model.Atividade(); a2.setCodigo(200L); a2.setDescricao("A2");
         when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of(a1, a2));
 
-        DisponibilizarMapaRequest request = new DisponibilizarMapaRequest();
+        DisponibilizarMapaRequest request = DisponibilizarMapaRequest.builder().build();
         Usuario user = new Usuario();
         assertThatThrownBy(() -> service.disponibilizarMapa(1L, request, user))
             .isInstanceOf(ErroValidacao.class)

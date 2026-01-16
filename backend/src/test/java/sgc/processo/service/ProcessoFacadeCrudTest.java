@@ -217,10 +217,11 @@ class ProcessoFacadeCrudTest {
         @Test
         @DisplayName("criar: erro se REVISAO e unidades sem mapa")
         void criar_ErroRevisaoSemMapa() {
-            CriarProcessoRequest req = new CriarProcessoRequest();
-            req.setDescricao("Teste");
-            req.setUnidades(List.of(1L));
-            req.setTipo(TipoProcesso.REVISAO);
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
+                    .descricao("Teste")
+                    .unidades(List.of(1L))
+                    .tipo(TipoProcesso.REVISAO)
+                    .build();
 
             Unidade u = new Unidade();
             u.setCodigo(1L);
@@ -236,10 +237,11 @@ class ProcessoFacadeCrudTest {
         @Test
         @DisplayName("criar: sucesso se REVISAO e unidades com mapa")
         void criar_SucessoRevisaoComMapa() {
-            CriarProcessoRequest req = new CriarProcessoRequest();
-            req.setDescricao("Teste");
-            req.setUnidades(List.of(1L));
-            req.setTipo(TipoProcesso.REVISAO);
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
+                    .descricao("Teste")
+                    .unidades(List.of(1L))
+                    .tipo(TipoProcesso.REVISAO)
+                    .build();
 
             Unidade u = new Unidade();
             u.setCodigo(1L);
@@ -295,7 +297,7 @@ class ProcessoFacadeCrudTest {
             when(processoRepo.findById(99L)).thenReturn(Optional.empty());
 
             // Act & Assert
-            var req = new AtualizarProcessoRequest();
+            var req = AtualizarProcessoRequest.builder().build();
             assertThatThrownBy(() -> processoFacade.atualizar(99L, req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
@@ -311,7 +313,7 @@ class ProcessoFacadeCrudTest {
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
             // Act & Assert
-            var req = new AtualizarProcessoRequest();
+            var req = AtualizarProcessoRequest.builder().build();
             assertThatThrownBy(() -> processoFacade.atualizar(id, req))
                     .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
         }
@@ -504,7 +506,7 @@ class ProcessoFacadeCrudTest {
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
 
-            var req = new AtualizarProcessoRequest();
+            var req = AtualizarProcessoRequest.builder().build();
             assertThatThrownBy(() -> processoFacade.atualizar(1L, req))
                     .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
         }

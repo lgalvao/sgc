@@ -62,12 +62,14 @@ class AtividadeFacadeTest {
     @Test
     @DisplayName("Deve criar atividade e retornar status")
     void deveCriarAtividade() {
-        AtividadeDto request = new AtividadeDto();
-        request.setMapaCodigo(1L);
+        AtividadeDto request = AtividadeDto.builder()
+                .mapaCodigo(1L)
+                .build();
         // Facade calls: criar -> (returns dto)
-        AtividadeDto created = new AtividadeDto();
-        created.setCodigo(100L);
-        created.setMapaCodigo(1L);
+        AtividadeDto created = AtividadeDto.builder()
+                .codigo(100L)
+                .mapaCodigo(1L)
+                .build();
 
         // Mock usuario autenticado
         Usuario usuario = new Usuario();
@@ -110,7 +112,7 @@ class AtividadeFacadeTest {
     @DisplayName("Deve atualizar atividade e retornar status")
     void deveAtualizarAtividade() {
         Long codigo = 100L;
-        AtividadeDto request = new AtividadeDto();
+        AtividadeDto request = AtividadeDto.builder().build();
 
         Atividade atividadeEntity = new Atividade();
         atividadeEntity.setCodigo(codigo);
@@ -186,9 +188,10 @@ class AtividadeFacadeTest {
     @DisplayName("Deve criar conhecimento e retornar status")
     void deveCriarConhecimento() {
         Long codigoAtividade = 100L;
-        ConhecimentoDto dto = new ConhecimentoDto();
-        ConhecimentoDto salvo = new ConhecimentoDto();
-        salvo.setCodigo(200L);
+        ConhecimentoDto dto = ConhecimentoDto.builder().build();
+        ConhecimentoDto salvo = ConhecimentoDto.builder()
+                .codigo(200L)
+                .build();
 
         Atividade atividadeEntity = new Atividade();
         atividadeEntity.setCodigo(codigoAtividade);
@@ -229,7 +232,7 @@ class AtividadeFacadeTest {
     void deveAtualizarConhecimento() {
         Long codigoAtividade = 100L;
         Long codigoConhecimento = 200L;
-        ConhecimentoDto dto = new ConhecimentoDto();
+        ConhecimentoDto dto = ConhecimentoDto.builder().build();
 
         Atividade atividadeEntity = new Atividade();
         atividadeEntity.setCodigo(codigoAtividade);

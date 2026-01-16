@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -14,24 +12,20 @@ import java.time.LocalDateTime;
  * 
  * <p>Usado exclusivamente como entrada de API para o endpoint de criação.
  * A validação Bean Validation é aplicada neste DTO.
- * 
- * <p>Requer @NoArgsConstructor e @Setter para deserialização Jackson.
  */
 @Getter
-@Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class CriarSubprocessoRequest {
 
     @NotNull(message = "O código do processo é obrigatório")
-    private Long codProcesso;
+    private final Long codProcesso;
 
     @NotNull(message = "O código da unidade é obrigatório")
-    private Long codUnidade;
+    private final Long codUnidade;
 
-    private Long codMapa;
+    private final Long codMapa;
 
-    private LocalDateTime dataLimiteEtapa1;
-    private LocalDateTime dataLimiteEtapa2;
+    private final LocalDateTime dataLimiteEtapa1;
+    private final LocalDateTime dataLimiteEtapa2;
 }

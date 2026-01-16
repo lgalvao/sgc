@@ -78,10 +78,11 @@ class ConhecimentoMapperTest {
 
             when(repo.buscar(Atividade.class, 10L)).thenReturn(atividade);
 
-            ConhecimentoDto dto = new ConhecimentoDto();
-            dto.setCodigo(1L);
-            dto.setDescricao("Conhecimento de Teste");
-            dto.setAtividadeCodigo(10L);
+            ConhecimentoDto dto = ConhecimentoDto.builder()
+                    .codigo(1L)
+                    .descricao("Conhecimento de Teste")
+                    .atividadeCodigo(10L)
+                    .build();
 
             Conhecimento conhecimento = mapper.toEntity(dto);
 
@@ -96,8 +97,9 @@ class ConhecimentoMapperTest {
         void deveLancarErroSeAtividadeNaoEncontrada() {
             when(repo.buscar(Atividade.class, 99L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 99L));
 
-            ConhecimentoDto dto = new ConhecimentoDto();
-            dto.setAtividadeCodigo(99L);
+            ConhecimentoDto dto = ConhecimentoDto.builder()
+                    .atividadeCodigo(99L)
+                    .build();
 
             assertThatThrownBy(() -> mapper.toEntity(dto))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);

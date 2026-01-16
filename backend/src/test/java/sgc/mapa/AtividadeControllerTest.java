@@ -48,8 +48,9 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve obter por ID")
         void deveObterPorId() throws Exception {
-            AtividadeDto dto = new AtividadeDto();
-            dto.setCodigo(1L);
+            AtividadeDto dto = AtividadeDto.builder()
+                    .codigo(1L)
+                    .build();
             Mockito.when(atividadeFacade.obterAtividadePorId(1L)).thenReturn(dto);
 
             mockMvc.perform(get("/api/atividades/1").with(user("123")))

@@ -5,20 +5,14 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.List;
 
 /**
  * Request para salvar ajustes no mapa de competências. CDU-16 item 5
- * 
- * <p>Requer @NoArgsConstructor e @Setter para deserialização Jackson.
  */
 @Getter
-@Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class SalvarAjustesRequest {
     /**
@@ -26,5 +20,5 @@ public class SalvarAjustesRequest {
      */
     @NotNull(message = "A lista de competências é obrigatória")
     @Valid
-    private List<CompetenciaAjusteDto> competencias;
+    private final List<CompetenciaAjusteDto> competencias;
 }
