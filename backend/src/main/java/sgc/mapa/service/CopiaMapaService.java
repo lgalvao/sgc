@@ -21,7 +21,6 @@ import java.util.*;
 public class CopiaMapaService {
     private final MapaRepo repositorioMapa;
     private final AtividadeRepo atividadeRepo;
-    private final ConhecimentoRepo conhecimentoRepo;
     private final CompetenciaRepo competenciaRepo;
 
     @Transactional
@@ -55,10 +54,15 @@ public class CopiaMapaService {
         Mapa mapaDestino = repositorioMapa.findById(mapaDestinoId)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", mapaDestinoId));
 
+        List<Atividade> atividadesParaSalvar = new ArrayList<>();
         for (Atividade atividadeOrigem : atividadesOrigem) {
             if (!descricoesExistentes.contains(atividadeOrigem.getDescricao())) {
-                copiarAtividadeComConhecimentos(atividadeOrigem, mapaDestino);
+                atividadesParaSalvar.add(prepararCopiaAtividade(atividadeOrigem, mapaDestino));
             }
+        }
+
+        if (!atividadesParaSalvar.isEmpty()) {
+            atividadeRepo.saveAll(atividadesParaSalvar);
         }
     }
 
@@ -79,39 +83,45 @@ public class CopiaMapaService {
         List<Atividade> atividadesFonte = atividadeRepo.findByMapaCodigoWithConhecimentos(codMapaFonte);
         if (atividadesFonte == null) atividadesFonte = List.of();
 
+        List<Atividade> novasAtividades = new ArrayList<>();
+        // Use IdentityHashMap to map unsaved object -> source ID, to later map source ID -> saved object
+        Map<Atividade, Long> atividadeParaFonteId = new IdentityHashMap<>();
+
         for (Atividade atividadeFonte : atividadesFonte) {
-            Atividade novaAtividade = copiarAtividadeComConhecimentos(atividadeFonte, mapaSalvo);
-            mapaAtividades.put(atividadeFonte.getCodigo(), novaAtividade);
+            Atividade novaAtividade = prepararCopiaAtividade(atividadeFonte, mapaSalvo);
+            novasAtividades.add(novaAtividade);
+            atividadeParaFonteId.put(novaAtividade, atividadeFonte.getCodigo());
+        }
+
+        if (!novasAtividades.isEmpty()) {
+            atividadeRepo.saveAll(novasAtividades);
+
+            for (Atividade nova : novasAtividades) {
+                Long fonteId = atividadeParaFonteId.get(nova);
+                mapaAtividades.put(fonteId, nova);
+            }
         }
 
         return mapaAtividades;
     }
 
-    private Atividade copiarAtividadeComConhecimentos(Atividade atividadeFonte, Mapa mapaDestino) {
+    private Atividade prepararCopiaAtividade(Atividade atividadeFonte, Mapa mapaDestino) {
         Atividade novaAtividade = new Atividade();
         novaAtividade.setDescricao(atividadeFonte.getDescricao());
         novaAtividade.setMapa(mapaDestino);
-        Atividade atividadeSalva = atividadeRepo.save(novaAtividade);
 
-        copiarConhecimentos(atividadeFonte, atividadeSalva);
-
-        return atividadeSalva;
-    }
-
-    private void copiarConhecimentos(Atividade atividadeFonte, Atividade atividadeSalva) {
         List<Conhecimento> conhecimentosFonte = atividadeFonte.getConhecimentos();
-        if (conhecimentosFonte == null || conhecimentosFonte.isEmpty()) return;
+        if (conhecimentosFonte != null && !conhecimentosFonte.isEmpty()) {
+            for (Conhecimento conhecimentoFonte : conhecimentosFonte) {
+                Conhecimento novoConhecimento = new Conhecimento()
+                        .setAtividade(novaAtividade)
+                        .setDescricao(conhecimentoFonte.getDescricao());
 
-        List<Conhecimento> novosConhecimentos = new ArrayList<>();
-        for (Conhecimento conhecimentoFonte : conhecimentosFonte) {
-            Conhecimento novoConhecimento = new Conhecimento()
-                    .setAtividade(atividadeSalva)
-                    .setDescricao(conhecimentoFonte.getDescricao());
-
-            atividadeSalva.getConhecimentos().add(novoConhecimento);
-            novosConhecimentos.add(novoConhecimento);
+                novaAtividade.getConhecimentos().add(novoConhecimento);
+            }
         }
-        conhecimentoRepo.saveAll(novosConhecimentos);
+
+        return novaAtividade;
     }
 
     private void copiarCompetencias(Long codMapaFonte, Mapa mapaSalvo, Map<Long, Atividade> mapaAtividades) {
