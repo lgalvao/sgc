@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
-@DisplayName("LoginService - Gaps de Cobertura")
+@DisplayName("LoginFacade - Gaps de Cobertura")
 class LoginServiceTest {
 
     @Mock private UsuarioFacade usuarioService;
@@ -30,18 +30,18 @@ class LoginServiceTest {
     @Mock private ClienteAcessoAd clienteAcessoAd;
     @Mock private UnidadeFacade unidadeService;
 
-    private LoginService loginService;
+    private LoginFacade loginFacade;
 
     @BeforeEach
     void setUp() {
-        loginService = new LoginService(usuarioService, gerenciadorJwt, clienteAcessoAd, unidadeService);
-        ReflectionTestUtils.setField(loginService, "ambienteTestes", false);
+        loginFacade = new LoginFacade(usuarioService, gerenciadorJwt, clienteAcessoAd, unidadeService);
+        ReflectionTestUtils.setField(loginFacade, "ambienteTestes", false);
     }
 
     @Test
     @DisplayName("Linhas 86, 89: Deve falhar autenticação se AD for null e não for ambiente de testes")
     void deveFalharAutenticacaoSemAdEmProducao() {
-        LoginService serviceSemAd = new LoginService(usuarioService, gerenciadorJwt, null, unidadeService);
+        LoginFacade serviceSemAd = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService);
         ReflectionTestUtils.setField(serviceSemAd, "ambienteTestes", false);
 
         boolean result = serviceSemAd.autenticar("123", "senha");
@@ -53,7 +53,7 @@ class LoginServiceTest {
     void deveLidarComErroAd() {
         when(clienteAcessoAd.autenticar("123", "senha")).thenThrow(new ErroAutenticacao("Falha AD"));
         
-        boolean result = loginService.autenticar("123", "senha");
+        boolean result = loginFacade.autenticar("123", "senha");
         assertFalse(result);
     }
 
@@ -69,7 +69,7 @@ class LoginServiceTest {
 
         // Prepara a autenticação recente
         when(clienteAcessoAd.autenticar(titulo, "senha")).thenReturn(true);
-        loginService.autenticar(titulo, "senha");
+        loginFacade.autenticar(titulo, "senha");
 
         // Simula busca de autorizações retornando lista vazia ou sem o perfil/unidade
         sgc.organizacao.model.Usuario usuario = new sgc.organizacao.model.Usuario();
@@ -78,6 +78,6 @@ class LoginServiceTest {
         
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
 
-        assertThrows(ErroAccessoNegado.class, () -> loginService.entrar(req));
+        assertThrows(ErroAccessoNegado.class, () -> loginFacade.entrar(req));
     }
 }

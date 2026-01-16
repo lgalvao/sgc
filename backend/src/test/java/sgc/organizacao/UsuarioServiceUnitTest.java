@@ -17,7 +17,7 @@ import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
 import sgc.seguranca.login.ClienteAcessoAd;
-import sgc.seguranca.login.LoginService;
+import sgc.seguranca.login.LoginFacade;
 
 import java.util.*;
 
@@ -59,7 +59,7 @@ class UsuarioServiceUnitTest {
     @Mock
     private ClienteAcessoAd clienteAcessoAd;
     @Mock
-    private LoginService loginService;
+    private LoginFacade loginFacade;
 
     // ========== MÉTODOS DE BUSCA E MAPEAMENTO ==========
 

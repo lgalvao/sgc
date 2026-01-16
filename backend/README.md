@@ -249,7 +249,7 @@ User Request + DTO → Controller (@Valid) → Facade
   * `HierarchyService` - Hierarquia de unidades
   * `AccessAuditService` - Auditoria
 * **Pacote:** `sgc.seguranca.login` - Autenticação
-  * `LoginService`, `JwtService`, `ConfigSeguranca`
+  * `LoginFacade`, `JwtService`, `ConfigSeguranca`
 
 #### `sgc.analise`
 * **Service:** `AnaliseService`

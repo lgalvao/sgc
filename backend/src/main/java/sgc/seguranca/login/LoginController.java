@@ -31,7 +31,7 @@ import java.util.List;
 @Slf4j
 @Tag(name = "Login", description = "Autenticação e autorização de usuários")
 public class LoginController {
-    private final LoginService loginService;
+    private final LoginFacade loginFacade;
     private final UsuarioFacade usuarioService;
     private final LimitadorTentativasLogin limitadorTentativasLogin;
 
@@ -51,7 +51,7 @@ public class LoginController {
         String ip = extrairIp(httpRequest);
         limitadorTentativasLogin.verificar(ip);
 
-        boolean autenticado = loginService.autenticar(request.getTituloEleitoral(), request.getSenha());
+        boolean autenticado = loginFacade.autenticar(request.getTituloEleitoral(), request.getSenha());
         return ResponseEntity.ok(autenticado);
     }
 
@@ -66,7 +66,7 @@ public class LoginController {
     @PostMapping("/autorizar")
     @Operation(summary = "Retorna os perfis e unidades disponíveis para o usuário")
     public ResponseEntity<List<PerfilUnidadeDto>> autorizar(@RequestBody String tituloEleitoral) {
-        List<PerfilUnidadeDto> perfis = loginService.autorizar(tituloEleitoral);
+        List<PerfilUnidadeDto> perfis = loginFacade.autorizar(tituloEleitoral);
         return ResponseEntity.ok(perfis);
     }
 
@@ -81,7 +81,7 @@ public class LoginController {
     @PostMapping("/entrar")
     @Operation(summary = "Finaliza o login e retorna o token JWT")
     public ResponseEntity<EntrarResponse> entrar(@Valid @RequestBody EntrarRequest request) {
-        String token = loginService.entrar(request);
+        String token = loginFacade.entrar(request);
         Usuario usuario = usuarioService.buscarPorLogin(request.getTituloEleitoral());
 
         EntrarResponse response = EntrarResponse.builder()

@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service
 @Slf4j
-public class LoginService {
+public class LoginFacade {
     private static final String ENTIDADE_USUARIO = "Usuário";
 
     private final UsuarioFacade usuarioService;
@@ -43,7 +43,7 @@ public class LoginService {
 
     private final Map<String, LocalDateTime> autenticacoesRecentes = new ConcurrentHashMap<>();
 
-    public LoginService(UsuarioFacade usuarioService,
+    public LoginFacade(UsuarioFacade usuarioService,
             GerenciadorJwt gerenciadorJwt,
             @Autowired(required = false) ClienteAcessoAd clienteAcessoAd,
             UnidadeFacade unidadeService) {
