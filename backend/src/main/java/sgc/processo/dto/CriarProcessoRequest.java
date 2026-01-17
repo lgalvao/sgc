@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import sgc.processo.model.TipoProcesso;
+import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.List;
 public class CriarProcessoRequest {
 
     @NotBlank(message = "Preencha a descrição")
+    @SanitizarHtml
     private final String descricao;
 
     @NotNull(message = "Tipo do processo é obrigatório")
