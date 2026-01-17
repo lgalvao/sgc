@@ -113,7 +113,6 @@ import {useProcessosStore} from "@/stores/processos";
 import {useFeedbackStore} from "@/stores/feedback";
 import type {Processo, UnidadeParticipante} from "@/types/tipos";
 import {SituacaoSubprocesso} from "@/types/tipos";
-import * as subprocessoService from "@/services/subprocessoService";
 
 interface TreeTableItem {
   codigo: number | string;
@@ -339,71 +338,10 @@ function abrirModalBloco(acao: 'aceitar' | 'homologar' | 'disponibilizar') {
 async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) {
     if (!acaoBlocoAtual.value || !processo.value) return;
 
-    // Assumir o contexto baseado na situação das unidades selecionadas
-    // Simplificação: Pegamos a primeira unidade selecionada para decidir qual endpoint chamar
-    const unidadeExemplo = participantesHierarquia.value.find(u => u.codUnidade === dados.ids[0])
-        || unidadesElegiveis.value.find(u => u.codigo === dados.ids[0]);
-
-    if (!unidadeExemplo) {
-        feedbackStore.show('Erro', 'Não foi possível identificar o contexto do subprocesso.', 'danger');
-        return;
-    }
-
-    // Precisamos de um ID de subprocesso válido para usar como base na API
-    // Se unidadeExemplo veio de participantesHierarquia, ela tem codSubprocesso.
-    // Se veio de unidadesElegiveis (UnidadeSelecao), não tem codSubprocesso explícito no tipo atual,
-    // mas a computação de unidadesElegiveis mapeia codUnidade.
-    // Vamos tentar encontrar o subprocesso correspondente nos participantes para garantir o ID.
-
-    // Fallback: search in full tree if unidadeExemplo doesn't have codSubprocesso (e.g. if it came from a simplified object)
-    let codSubprocessoBase = (unidadeExemplo as any).codSubprocesso;
-
-    if (!codSubprocessoBase) {
-        const fullNode = participantesHierarquia.value.find(u => u.codUnidade === dados.ids[0]);
-        if (fullNode) codSubprocessoBase = fullNode.codSubprocesso;
-    }
-
-    // Se ainda não achou (ex: unidade não carregada na árvore inicial?), abortar ou usar heurística
-    if (!codSubprocessoBase) {
-        feedbackStore.show('Erro', 'Não foi possível identificar o contexto do subprocesso.', 'danger');
-        return;
-    }
-
-    // Type assertion is safe here as we check properties or fallbacks
-    const situacao = toSituacao((unidadeExemplo as any).situacaoSubprocesso || (unidadeExemplo as any).situacao);
-
-    const payload = {
-        unidadeCodigos: dados.ids,
-        dataLimite: dados.dataLimite
-    };
-
     try {
-        if (acaoBlocoAtual.value === 'aceitar') {
-            if (situacao === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-                situacao === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
-                await subprocessoService.aceitarCadastroEmBloco(codSubprocessoBase, payload);
-            } else if (situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
-                       situacao === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO) {
-                await subprocessoService.aceitarValidacaoEmBloco(codSubprocessoBase, payload);
-            }
-        } else if (acaoBlocoAtual.value === 'homologar') {
-            if (situacao === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-                situacao === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
-                await subprocessoService.homologarCadastroEmBloco(codSubprocessoBase, payload);
-            } else if (situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
-                       situacao === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO) {
-                await subprocessoService.homologarValidacaoEmBloco(codSubprocessoBase, payload);
-            }
-        } else if (acaoBlocoAtual.value === 'disponibilizar') {
-            await subprocessoService.disponibilizarMapaEmBloco(codSubprocessoBase, payload);
-        }
-
+        await processosStore.executarAcaoBloco(acaoBlocoAtual.value, dados.ids, dados.dataLimite);
         feedbackStore.show('Sucesso', `Ação ${acaoBlocoAtual.value} realizada em bloco.`, 'success');
         modalBlocoRef.value?.fechar();
-
-        // Recarregar
-        await processosStore.buscarContextoCompleto(codProcesso.value);
-
     } catch (e: any) {
         modalBlocoRef.value?.setErro(e.message || "Erro ao processar em bloco.");
         modalBlocoRef.value?.setProcessando(false);

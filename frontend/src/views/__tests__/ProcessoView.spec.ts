@@ -268,8 +268,7 @@ describe("ProcessoView.vue", () => {
         const dadosConfirmacao = { ids: [101] };
         await modal.vm.$emit("confirmar", dadosConfirmacao);
 
-        expect(subprocessoService.aceitarCadastroEmBloco).toHaveBeenCalledWith(1001, { unidadeCodigos: [101], dataLimite: undefined });
-        expect(processosStore.buscarContextoCompleto).toHaveBeenCalledWith(1);
+        expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('aceitar', [101], undefined);
         expect(feedbackStore.show).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("realizada"), "success");
         expect(ModalAcaoBlocoStub.methods.fechar).toHaveBeenCalled();
     });
@@ -293,7 +292,7 @@ describe("ProcessoView.vue", () => {
         const dadosConfirmacao = { ids: [103] };
         await modal.vm.$emit("confirmar", dadosConfirmacao);
 
-        expect(subprocessoService.aceitarValidacaoEmBloco).toHaveBeenCalledWith(1003, { unidadeCodigos: [103], dataLimite: undefined });
+        expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('aceitar', [103], undefined);
     });
 
     // --- Testes para Homologar em Bloco ---
@@ -314,7 +313,7 @@ describe("ProcessoView.vue", () => {
         // ID 101 -> Cadastro Disponibilizado
         await modal.vm.$emit("confirmar", { ids: [101] });
 
-        expect(subprocessoService.homologarCadastroEmBloco).toHaveBeenCalledWith(1001, { unidadeCodigos: [101], dataLimite: undefined });
+        expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('homologar', [101], undefined);
     });
 
     it("deve executar ação em bloco com sucesso (Homologar Validação)", async () => {
@@ -333,7 +332,7 @@ describe("ProcessoView.vue", () => {
         // ID 103 -> Mapa Validado
         await modal.vm.$emit("confirmar", { ids: [103] });
 
-        expect(subprocessoService.homologarValidacaoEmBloco).toHaveBeenCalledWith(1003, { unidadeCodigos: [103], dataLimite: undefined });
+        expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('homologar', [103], undefined);
     });
 
     // --- Teste para Disponibilizar em Bloco ---
@@ -354,7 +353,7 @@ describe("ProcessoView.vue", () => {
         // ID 104 -> Mapa Criado
         await modal.vm.$emit("confirmar", { ids: [104], dataLimite: '2024-12-31' });
 
-        expect(subprocessoService.disponibilizarMapaEmBloco).toHaveBeenCalledWith(1004, { unidadeCodigos: [104], dataLimite: '2024-12-31' });
+        expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('disponibilizar', [104], '2024-12-31');
     });
 
      it("deve lidar com erro na execução da ação em bloco", async () => {
@@ -369,14 +368,15 @@ describe("ProcessoView.vue", () => {
         await flushPromises();
 
         const errorMsg = "Falha ao aceitar";
-        (subprocessoService.aceitarCadastroEmBloco as any).mockRejectedValue(new Error(errorMsg));
+        // Mock implementation of the action to throw error
+        processosStore.executarAcaoBloco.mockRejectedValue(new Error(errorMsg));
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await wrapper.find("button.btn-success").trigger("click"); // Abrir modal
 
         await modal.vm.$emit("confirmar", { ids: [101] });
 
-        expect(subprocessoService.aceitarCadastroEmBloco).toHaveBeenCalled();
+        expect(processosStore.executarAcaoBloco).toHaveBeenCalled();
         expect(ModalAcaoBlocoStub.methods.setErro).toHaveBeenCalledWith(errorMsg);
         expect(ModalAcaoBlocoStub.methods.setProcessando).toHaveBeenCalledWith(false);
     });
@@ -393,13 +393,16 @@ describe("ProcessoView.vue", () => {
         await nextTick();
         await flushPromises();
 
+        const errorMsg = "Unidade selecionada não encontrada no contexto do processo.";
+        processosStore.executarAcaoBloco.mockRejectedValue(new Error(errorMsg));
+
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await wrapper.find("button.btn-success").trigger("click");
 
         // ID inexistente
         await modal.vm.$emit("confirmar", { ids: [9999] });
 
-        expect(feedbackStore.show).toHaveBeenCalledWith('Erro', expect.stringContaining("Não foi possível identificar"), 'danger');
+        expect(ModalAcaoBlocoStub.methods.setErro).toHaveBeenCalledWith(errorMsg);
     });
 
     it("deve redirecionar para detalhes da unidade ao clicar na tabela (Gestor)", async () => {

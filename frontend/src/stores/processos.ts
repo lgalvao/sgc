@@ -9,9 +9,11 @@ import type {
     SubprocessoElegivel,
     TipoProcesso,
 } from "@/types/tipos";
+import { SituacaoSubprocesso } from "@/types/tipos";
 import {type NormalizedError, normalizeError} from "@/utils/apiError";
 import * as painelService from "../services/painelService";
 import * as processoService from "../services/processoService";
+import * as subprocessoService from "../services/subprocessoService";
 
 export const useProcessosStore = defineStore("processos", () => {
     const processosPainel = ref<ProcessoResumo[]>([]);
@@ -232,6 +234,85 @@ export const useProcessosStore = defineStore("processos", () => {
         }
     }
 
+    async function executarAcaoBloco(
+        acao: 'aceitar' | 'homologar' | 'disponibilizar',
+        ids: number[],
+        dataLimite?: string
+    ) {
+        lastError.value = null;
+        if (!processoDetalhe.value) {
+            const err = new Error("Detalhes do processo não carregados.");
+            lastError.value = normalizeError(err);
+            throw err;
+        }
+
+        const flatten = (nodes: any[]): any[] => {
+            let res: any[] = [];
+            for (const node of nodes) {
+                res.push(node);
+                if (node.filhos) res = res.concat(flatten(node.filhos));
+            }
+            return res;
+        };
+        const all = flatten(processoDetalhe.value.unidades || []);
+
+        const unidadeExemplo = all.find((u) => u.codUnidade === ids[0]);
+
+        if (!unidadeExemplo) {
+            const err = new Error("Unidade selecionada não encontrada no contexto do processo.");
+            lastError.value = normalizeError(err);
+            throw err;
+        }
+
+        const codSubprocessoBase = unidadeExemplo.codSubprocesso;
+        const situacao = unidadeExemplo.situacaoSubprocesso;
+
+        const payload = {
+            unidadeCodigos: ids,
+            dataLimite: dataLimite,
+        };
+
+        try {
+            if (acao === 'aceitar') {
+                if (
+                    situacao === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
+                    situacao === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
+                ) {
+                    await subprocessoService.aceitarCadastroEmBloco(codSubprocessoBase, payload);
+                } else if (
+                    situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
+                    situacao === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO
+                ) {
+                    await subprocessoService.aceitarValidacaoEmBloco(codSubprocessoBase, payload);
+                } else {
+                    throw new Error(`Situação ${situacao} não permite ação de aceitar em bloco.`);
+                }
+            } else if (acao === 'homologar') {
+                if (
+                    situacao === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
+                    situacao === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
+                ) {
+                    await subprocessoService.homologarCadastroEmBloco(codSubprocessoBase, payload);
+                } else if (
+                    situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
+                    situacao === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO
+                ) {
+                    await subprocessoService.homologarValidacaoEmBloco(codSubprocessoBase, payload);
+                } else {
+                    throw new Error(`Situação ${situacao} não permite ação de homologar em bloco.`);
+                }
+            } else if (acao === 'disponibilizar') {
+                await subprocessoService.disponibilizarMapaEmBloco(codSubprocessoBase, payload);
+            }
+
+            // Reload details
+            await buscarProcessoDetalhe(processoDetalhe.value.codigo);
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
+    }
+
     return {
         processosPainel,
         processosPainelPage,
@@ -256,6 +337,7 @@ export const useProcessosStore = defineStore("processos", () => {
         validarMapa,
         homologarValidacao,
         aceitarValidacao,
+        executarAcaoBloco,
         clearError,
     };
 });

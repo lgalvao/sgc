@@ -34,6 +34,14 @@ export const usePerfilStore = defineStore("perfil", () => {
     const isAdmin = computed(() => perfis.value.includes("ADMIN" as Perfil));
     const isGestor = computed(() => perfis.value.includes("GESTOR" as Perfil));
 
+    const unidadeAtual = computed(() => {
+        if (!perfilSelecionado.value) return null;
+        if (unidadeSelecionada.value) return unidadeSelecionada.value;
+
+        const pu = perfisUnidades.value.find((p) => p.perfil === perfilSelecionado.value);
+        return pu ? pu.unidade.codigo : null;
+    });
+
     function clearError() {
         lastError.value = null;
     }
@@ -166,6 +174,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         perfis,
         isAdmin,
         isGestor,
+        unidadeAtual,
         lastError,
         clearError,
         definirUsuarioCodigo,

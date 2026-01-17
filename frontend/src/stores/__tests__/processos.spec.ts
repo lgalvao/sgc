@@ -8,6 +8,7 @@ import {normalizeError} from "@/utils/apiError";
 // Mocks
 vi.mock("@/services/painelService");
 vi.mock("@/services/processoService");
+vi.mock("@/services/subprocessoService");
 vi.mock("../unidades", () => ({useUnidadesStore: vi.fn(() => ({}))}));
 vi.mock("../alertas", () => ({useAlertasStore: vi.fn(() => ({}))}));
 
@@ -18,6 +19,7 @@ describe("useProcessosStore", () => {
     // Services mocks precisam ser carregados
     let painelService: Mocked<typeof import("@/services/painelService")>;
     let processoService: Mocked<typeof import("@/services/processoService")>;
+    let subprocessoService: Mocked<typeof import("@/services/subprocessoService")>;
 
     const MOCK_ERROR = new Error("Service failed");
     const MOCK_PROCESSO_DETALHE: Processo = {
@@ -39,6 +41,9 @@ describe("useProcessosStore", () => {
         >;
         processoService = (await import("@/services/processoService")) as Mocked<
             typeof import("@/services/processoService")
+        >;
+        subprocessoService = (await import("@/services/subprocessoService")) as Mocked<
+            typeof import("@/services/subprocessoService")
         >;
     });
 
@@ -450,6 +455,84 @@ describe("useProcessosStore", () => {
             });
         });
 
+
+        describe("executarAcaoBloco", () => {
+            const MOCK_PROCESSO_WITH_UNITS = {
+                codigo: 1,
+                unidades: [
+                    { codUnidade: 101, situacaoSubprocesso: 'MAPEAMENTO_CADASTRO_DISPONIBILIZADO', codSubprocesso: 1001, filhos: [] },
+                    { codUnidade: 102, situacaoSubprocesso: 'MAPEAMENTO_MAPA_VALIDADO', codSubprocesso: 1002, filhos: [] },
+                    { codUnidade: 104, situacaoSubprocesso: 'MAPEAMENTO_MAPA_CRIADO', codSubprocesso: 1004, filhos: [] },
+                    { codUnidade: 105, situacaoSubprocesso: 'NAO_INICIADO', codSubprocesso: 1005, filhos: [] }
+                ]
+            } as any;
+
+            it("deve lançar erro se processoDetalhe não estiver carregado", async () => {
+                context.store.processoDetalhe = null;
+                await expect(context.store.executarAcaoBloco('aceitar', [101])).rejects.toThrow("Detalhes do processo não carregados");
+            });
+
+            it("deve lançar erro se unidade não for encontrada", async () => {
+                context.store.processoDetalhe = MOCK_PROCESSO_WITH_UNITS;
+                await expect(context.store.executarAcaoBloco('aceitar', [999])).rejects.toThrow("Unidade selecionada não encontrada");
+            });
+
+            it("deve executar aceitarCadastroEmBloco corretamente", async () => {
+                context.store.processoDetalhe = MOCK_PROCESSO_WITH_UNITS;
+                subprocessoService.aceitarCadastroEmBloco.mockResolvedValue(undefined);
+                processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_WITH_UNITS);
+
+                await context.store.executarAcaoBloco('aceitar', [101]);
+
+                expect(subprocessoService.aceitarCadastroEmBloco).toHaveBeenCalledWith(1001, { unidadeCodigos: [101], dataLimite: undefined });
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
+            });
+
+            it("deve executar aceitarValidacaoEmBloco corretamente", async () => {
+                context.store.processoDetalhe = MOCK_PROCESSO_WITH_UNITS;
+                subprocessoService.aceitarValidacaoEmBloco.mockResolvedValue(undefined);
+                processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_WITH_UNITS);
+
+                await context.store.executarAcaoBloco('aceitar', [102]);
+
+                expect(subprocessoService.aceitarValidacaoEmBloco).toHaveBeenCalledWith(1002, { unidadeCodigos: [102], dataLimite: undefined });
+            });
+
+            it("deve lançar erro se tentar aceitar unidade em situação inválida", async () => {
+                context.store.processoDetalhe = MOCK_PROCESSO_WITH_UNITS;
+                await expect(context.store.executarAcaoBloco('aceitar', [105])).rejects.toThrow("não permite ação de aceitar em bloco");
+            });
+
+            it("deve executar homologarCadastroEmBloco corretamente", async () => {
+                context.store.processoDetalhe = MOCK_PROCESSO_WITH_UNITS;
+                subprocessoService.homologarCadastroEmBloco.mockResolvedValue(undefined);
+                processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_WITH_UNITS);
+
+                await context.store.executarAcaoBloco('homologar', [101]);
+
+                expect(subprocessoService.homologarCadastroEmBloco).toHaveBeenCalledWith(1001, { unidadeCodigos: [101], dataLimite: undefined });
+            });
+
+            it("deve executar homologarValidacaoEmBloco corretamente", async () => {
+                context.store.processoDetalhe = MOCK_PROCESSO_WITH_UNITS;
+                subprocessoService.homologarValidacaoEmBloco.mockResolvedValue(undefined);
+                processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_WITH_UNITS);
+
+                await context.store.executarAcaoBloco('homologar', [102]);
+
+                expect(subprocessoService.homologarValidacaoEmBloco).toHaveBeenCalledWith(1002, { unidadeCodigos: [102], dataLimite: undefined });
+            });
+
+            it("deve executar disponibilizarMapaEmBloco corretamente", async () => {
+                context.store.processoDetalhe = MOCK_PROCESSO_WITH_UNITS;
+                subprocessoService.disponibilizarMapaEmBloco.mockResolvedValue(undefined);
+                processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_WITH_UNITS);
+
+                await context.store.executarAcaoBloco('disponibilizar', [104], '2024-12-31');
+
+                expect(subprocessoService.disponibilizarMapaEmBloco).toHaveBeenCalledWith(1004, { unidadeCodigos: [104], dataLimite: '2024-12-31' });
+            });
+        });
 
         describe("obterUnidadesDoProcesso (Getter)", () => {
             it("deve retornar unidades do processo correto", () => {
