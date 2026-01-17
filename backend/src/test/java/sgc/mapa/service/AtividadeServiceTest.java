@@ -11,6 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.AtualizarAtividadeRequest;
+import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.evento.EventoMapaAlterado;
 import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.model.Atividade;
@@ -30,6 +32,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("Testes do Serviço de Atividade")
+@SuppressWarnings("deprecation")
 class AtividadeServiceTest {
 
     @Mock
@@ -134,6 +137,9 @@ class AtividadeServiceTest {
         @Test
         @DisplayName("Deve criar atividade com sucesso")
         void deveCriarAtividade() {
+            CriarAtividadeRequest request = CriarAtividadeRequest.builder()
+                    .mapaCodigo(1L)
+                    .build();
             AtividadeDto dto = AtividadeDto.builder()
                     .mapaCodigo(1L)
                     .build();
@@ -151,11 +157,11 @@ class AtividadeServiceTest {
             usuario.setTituloEleitoral(titulo);
 
             when(repo.buscar(Mapa.class, 1L)).thenReturn(mapa);
-            when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade());
+            when(atividadeMapper.toEntity(request)).thenReturn(new Atividade());
             when(atividadeRepo.save(any())).thenReturn(new Atividade());
             when(atividadeMapper.toDto(any())).thenReturn(dto);
 
-            AtividadeDto res = service.criar(dto);
+            AtividadeDto res = service.criar(request);
 
             assertThat(res).isNotNull();
             verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
@@ -164,33 +170,33 @@ class AtividadeServiceTest {
         @Test
         @DisplayName("Deve lançar erro ao criar atividade sem mapa")
         void deveLancarErroAoCriarSemMapa() {
-            AtividadeDto dto = AtividadeDto.builder()
+            CriarAtividadeRequest request = CriarAtividadeRequest.builder()
                     .mapaCodigo(null)
                     .build();
-            
+
             when(repo.buscar(Mapa.class, null)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", null));
 
-            assertThatThrownBy(() -> service.criar(dto))
+            assertThatThrownBy(() -> service.criar(request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
         @DisplayName("Deve lançar erro ao criar atividade em mapa inexistente")
         void deveLancarErroAoCriarEmMapaInexistente() {
-            AtividadeDto dto = AtividadeDto.builder()
+            CriarAtividadeRequest request = CriarAtividadeRequest.builder()
                     .mapaCodigo(1L)
                     .build();
 
             when(repo.buscar(Mapa.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
 
-            assertThatThrownBy(() -> service.criar(dto))
+            assertThatThrownBy(() -> service.criar(request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
         @DisplayName("Deve lançar erro ao criar atividade se mapa não tem subprocesso")
         void deveLancarErroAoCriarSemSubprocesso() {
-            AtividadeDto dto = AtividadeDto.builder()
+            CriarAtividadeRequest request = CriarAtividadeRequest.builder()
                     .mapaCodigo(1L)
                     .build();
 
@@ -199,7 +205,7 @@ class AtividadeServiceTest {
 
             when(repo.buscar(Mapa.class, 1L)).thenReturn(mapa);
 
-            assertThatThrownBy(() -> service.criar(dto))
+            assertThatThrownBy(() -> service.criar(request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                     .hasMessageContaining("Subprocesso");
         }
@@ -212,17 +218,17 @@ class AtividadeServiceTest {
         @DisplayName("Deve atualizar atividade")
         void deveAtualizarAtividade() {
             Long id = 1L;
-            AtividadeDto dto = AtividadeDto.builder().build();
+            AtualizarAtividadeRequest request = AtualizarAtividadeRequest.builder().build();
             Atividade atividade = new Atividade();
             Mapa mapa = new Mapa();
             mapa.setCodigo(1L);
             atividade.setMapa(mapa);
 
             when(repo.buscar(Atividade.class, id)).thenReturn(atividade);
-            when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade());
+            when(atividadeMapper.toEntity(request)).thenReturn(new Atividade());
             when(atividadeRepo.save(any())).thenReturn(atividade);
 
-            service.atualizar(id, dto);
+            service.atualizar(id, request);
 
             verify(atividadeRepo).save(atividade);
             verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
@@ -232,15 +238,15 @@ class AtividadeServiceTest {
         @DisplayName("Deve atualizar atividade sem mapa associado (sem publicar evento)")
         void deveAtualizarAtividadeSemMapa() {
             Long id = 1L;
-            AtividadeDto dto = AtividadeDto.builder().build();
+            AtualizarAtividadeRequest request = AtualizarAtividadeRequest.builder().build();
             Atividade atividade = new Atividade();
-            atividade.setMapa(null); 
+            atividade.setMapa(null);
 
             when(repo.buscar(Atividade.class, id)).thenReturn(atividade);
-            when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade());
+            when(atividadeMapper.toEntity(request)).thenReturn(new Atividade());
             when(atividadeRepo.save(any())).thenReturn(atividade);
 
-            service.atualizar(id, dto);
+            service.atualizar(id, request);
 
             verify(atividadeRepo).save(atividade);
             verify(eventPublisher, never()).publishEvent(any());
@@ -250,11 +256,11 @@ class AtividadeServiceTest {
         @DisplayName("Deve lançar exceção ao atualizar se ocorrer erro inesperado")
         void deveRelancarExcecaoAoAtualizar() {
             Long id = 1L;
-            AtividadeDto dto = AtividadeDto.builder().build();
+            AtualizarAtividadeRequest request = AtualizarAtividadeRequest.builder().build();
 
             when(repo.buscar(Atividade.class, id)).thenThrow(new RuntimeException("Erro banco"));
 
-            assertThatThrownBy(() -> service.atualizar(id, dto))
+            assertThatThrownBy(() -> service.atualizar(id, request))
                     .isInstanceOf(RuntimeException.class)
                     .hasMessage("Erro banco");
         }

@@ -5,7 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.mapa.dto.AtualizarConhecimentoRequest;
 import sgc.mapa.dto.ConhecimentoDto;
+import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Conhecimento;
@@ -19,6 +21,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("ConhecimentoMapper")
+@SuppressWarnings("deprecation")
 class ConhecimentoMapperTest {
 
     private ConhecimentoMapper mapper;
@@ -71,44 +74,56 @@ class ConhecimentoMapperTest {
     class ToEntityTests {
 
         @Test
-        @DisplayName("Deve mapear DTO para entidade")
-        void deveMapearDtoParaEntidade() {
+        @DisplayName("Deve mapear CriarConhecimentoRequest para entidade")
+        void deveMapearCriarConhecimentoRequestParaEntidade() {
             Atividade atividade = new Atividade();
             atividade.setCodigo(10L);
 
             when(repo.buscar(Atividade.class, 10L)).thenReturn(atividade);
 
-            ConhecimentoDto dto = ConhecimentoDto.builder()
-                    .codigo(1L)
+            CriarConhecimentoRequest request = CriarConhecimentoRequest.builder()
                     .descricao("Conhecimento de Teste")
                     .atividadeCodigo(10L)
                     .build();
 
-            Conhecimento conhecimento = mapper.toEntity(dto);
+            Conhecimento conhecimento = mapper.toEntity(request);
 
             assertThat(conhecimento).isNotNull();
-            assertThat(conhecimento.getCodigo()).isEqualTo(1L);
             assertThat(conhecimento.getDescricao()).isEqualTo("Conhecimento de Teste");
             assertThat(conhecimento.getAtividade()).isEqualTo(atividade);
         }
 
         @Test
-        @DisplayName("Deve lançar erro se atividade não encontrada")
+        @DisplayName("Deve lançar erro se atividade não encontrada (CriarRequest)")
         void deveLancarErroSeAtividadeNaoEncontrada() {
             when(repo.buscar(Atividade.class, 99L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 99L));
 
-            ConhecimentoDto dto = ConhecimentoDto.builder()
+            CriarConhecimentoRequest request = CriarConhecimentoRequest.builder()
                     .atividadeCodigo(99L)
                     .build();
 
-            assertThatThrownBy(() -> mapper.toEntity(dto))
+            assertThatThrownBy(() -> mapper.toEntity(request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
-        @DisplayName("Deve retornar null quando DTO é null")
-        void deveRetornarNullQuandoDtoNull() {
-            assertThat(mapper.toEntity((ConhecimentoDto) null)).isNull();
+        @DisplayName("Deve mapear AtualizarConhecimentoRequest para entidade")
+        void deveMapearAtualizarConhecimentoRequestParaEntidade() {
+            AtualizarConhecimentoRequest request = AtualizarConhecimentoRequest.builder()
+                    .descricao("Descricao Atualizada")
+                    .build();
+
+            Conhecimento conhecimento = mapper.toEntity(request);
+
+            assertThat(conhecimento).isNotNull();
+            assertThat(conhecimento.getDescricao()).isEqualTo("Descricao Atualizada");
+        }
+
+        @Test
+        @DisplayName("Deve retornar null quando request é null")
+        void deveRetornarNullQuandoRequestNull() {
+            assertThat(mapper.toEntity((CriarConhecimentoRequest) null)).isNull();
+            assertThat(mapper.toEntity((AtualizarConhecimentoRequest) null)).isNull();
         }
     }
 }

@@ -37,6 +37,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("Testes para AtividadeFacade")
+@SuppressWarnings("deprecation")
 class AtividadeFacadeTest {
 
     @InjectMocks

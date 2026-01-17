@@ -18,6 +18,8 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.ConhecimentoDto;
+import sgc.mapa.dto.CriarAtividadeRequest;
+import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.*;
 import sgc.mapa.service.AtividadeService;
@@ -54,7 +56,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Transactional
 @DisplayName("Fluxo de Estados: Processo e Subprocesso")
 @Import(TestSecurityConfig.class)
-
+@SuppressWarnings("deprecation")
 class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
     @Autowired private ProcessoFacade processoFacade;
     @Autowired private SubprocessoWorkflowService workflowService;
@@ -181,7 +183,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 // 3. Adicionar Atividade/Conhecimento (Chefe)
                 // Chefe adiciona atividade
                 autenticar(chefeMapeamento, "ROLE_CHEFE");
-                AtividadeDto ativReq = AtividadeDto.builder()
+                CriarAtividadeRequest ativReq = CriarAtividadeRequest.builder()
                         .descricao("Atividade Teste")
                         .mapaCodigo(subprocessoDto.getCodMapa())
                         .build();
@@ -189,8 +191,9 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
                 // Chefe adiciona conhecimento (necessário para validação)
                 autenticar(chefeMapeamento, "ROLE_CHEFE");
-                ConhecimentoDto conReq = ConhecimentoDto.builder()
+                CriarConhecimentoRequest conReq = CriarConhecimentoRequest.builder()
                         .descricao("Conhecimento Teste")
+                        .atividadeCodigo(ativCriada.getCodigo())
                         .build();
                 conhecimentoService.criar(ativCriada.getCodigo(), conReq);
 
@@ -292,8 +295,8 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             // Adicionar dados
             autenticar(chefeMapeamento, "ROLE_CHEFE");
             AtividadeDto ativ = atividadeService.criar(
-                AtividadeDto.builder().descricao("A").mapaCodigo(codMapa).build());
-            conhecimentoService.criar(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
+                CriarAtividadeRequest.builder().descricao("A").mapaCodigo(codMapa).build());
+            conhecimentoService.criar(ativ.getCodigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.getCodigo()).build());
 
             em.flush();
             em.clear();
@@ -361,9 +364,9 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 // 3. Chefe inicia revisão (adiciona atividade -> Em Andamento)
                 autenticar(chefeRevisao, "ROLE_CHEFE");
                 AtividadeDto ativ = atividadeService.criar(
-                    AtividadeDto.builder().descricao("Nova Ativ Revisao").mapaCodigo(codMapa).build()
+                    CriarAtividadeRequest.builder().descricao("Nova Ativ Revisao").mapaCodigo(codMapa).build()
                 );
-                conhecimentoService.criar(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
+                conhecimentoService.criar(ativ.getCodigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.getCodigo()).build());
 
                 // Link activity to ALL competencies to satisfy validation
                 List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
@@ -449,9 +452,9 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             // 3. Chefe faz alteração
             autenticar(chefeRevisao, "ROLE_CHEFE");
             AtividadeDto ativ = atividadeService.criar(
-                AtividadeDto.builder().descricao("Ativ").mapaCodigo(codMapa).build()
+                CriarAtividadeRequest.builder().descricao("Ativ").mapaCodigo(codMapa).build()
             );
-            conhecimentoService.criar(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
+            conhecimentoService.criar(ativ.getCodigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.getCodigo()).build());
 
             em.flush();
             em.clear();
