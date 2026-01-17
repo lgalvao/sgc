@@ -71,21 +71,27 @@ const asc = ref(true);
 
 async function carregarDados() {
   if (perfil.perfilSelecionado && perfil.unidadeSelecionada) {
-    await processosStore.buscarProcessosPainel(
-        perfil.perfilSelecionado,
-        Number(perfil.unidadeSelecionada),
-        0,
-        10,
-    ); // Paginação inicial
-
-    if (perfil.usuarioCodigo) {
-      await alertasStore.buscarAlertas(
-          Number(perfil.usuarioCodigo),
+    const promises = [
+      processosStore.buscarProcessosPainel(
+          perfil.perfilSelecionado,
           Number(perfil.unidadeSelecionada),
           0,
           10,
-      ); // Paginação inicial
+      ), // Paginação inicial
+    ];
+
+    if (perfil.usuarioCodigo) {
+      promises.push(
+          alertasStore.buscarAlertas(
+              Number(perfil.usuarioCodigo),
+              Number(perfil.unidadeSelecionada),
+              0,
+              10,
+          ), // Paginação inicial
+      );
     }
+
+    await Promise.all(promises);
   }
 }
 
