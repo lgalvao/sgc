@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import sgc.processo.model.TipoProcesso;
+import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,6 +24,7 @@ public class AtualizarProcessoRequest {
     private final Long codigo;
 
     @NotBlank(message = "Preencha a descrição")
+    @SanitizarHtml
     private final String descricao;
 
     @NotNull(message = "Tipo do processo é obrigatório")
