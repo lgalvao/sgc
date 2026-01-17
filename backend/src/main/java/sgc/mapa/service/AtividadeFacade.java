@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.dto.AtividadeDto;
-import sgc.mapa.dto.ConhecimentoDto;
+import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.evento.EventoAtividadeAtualizada;
 import sgc.mapa.evento.EventoAtividadeCriada;
@@ -72,7 +71,7 @@ public class AtividadeFacade {
      */
     @Transactional(readOnly = true)
     public List<sgc.mapa.dto.ConhecimentoResponse> listarConhecimentosPorAtividade(Long codAtividade) {
-        return conhecimentoService.listarPorAtividadeResponse(codAtividade);
+        return conhecimentoService.listarPorAtividade(codAtividade);
     }
 
     // ===== Operações de Atividade =====
@@ -95,10 +94,10 @@ public class AtividadeFacade {
         // Verifica permissão usando AccessControlService
         accessControlService.verificarPermissao(usuario, CRIAR_ATIVIDADE, atividadeTemp);
         
-        AtividadeDto salvo = atividadeService.criar(request);
+        AtividadeResponse salvo = atividadeService.criar(request);
 
         // Publica evento de criação
-        Atividade atividadeCriada = atividadeService.obterPorCodigo(salvo.getCodigo());
+        Atividade atividadeCriada = atividadeService.obterPorCodigo(salvo.codigo());
         Subprocesso subprocesso = mapa.getSubprocesso();
         
         EventoAtividadeCriada evento = EventoAtividadeCriada.builder()
@@ -111,7 +110,7 @@ public class AtividadeFacade {
                 .build();
         eventPublisher.publishEvent(evento);
 
-        return criarRespostaOperacaoPorMapaCodigo(mapaCodigo, salvo.getCodigo(), true);
+        return criarRespostaOperacaoPorMapaCodigo(mapaCodigo, salvo.codigo(), true);
     }
 
     /**
@@ -213,7 +212,7 @@ public class AtividadeFacade {
         var salvo = conhecimentoService.criar(codAtividade, request);
         var response = criarRespostaOperacaoPorAtividade(codAtividade);
 
-        return new ResultadoOperacaoConhecimento(salvo.getCodigo(), response);
+        return new ResultadoOperacaoConhecimento(salvo.codigo(), response);
     }
 
     /**

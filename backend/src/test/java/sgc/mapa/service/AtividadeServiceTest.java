@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.AtualizarAtividadeRequest;
 import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.evento.EventoMapaAlterado;
@@ -32,7 +32,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("Testes do Serviço de Atividade")
-@SuppressWarnings("deprecation")
 class AtividadeServiceTest {
 
     @Mock
@@ -56,25 +55,25 @@ class AtividadeServiceTest {
         @DisplayName("Deve listar todas as atividades")
         void deveListarTodas() {
              when(atividadeRepo.findAll()).thenReturn(List.of(new Atividade()));
-             when(atividadeMapper.toDto(any())).thenReturn(AtividadeDto.builder().build());
+             when(atividadeMapper.toResponse(any())).thenReturn(AtividadeResponse.builder().build());
              assertThat(service.listar())
                  .isNotNull()
                  .hasSize(1);
         }
 
         @Test
-        @DisplayName("Deve obter por código DTO")
+        @DisplayName("Deve obter por código Response")
         void deveObterPorCodigoDto() {
              when(repo.buscar(Atividade.class, 1L)).thenReturn(new Atividade());
-             when(atividadeMapper.toDto(any())).thenReturn(AtividadeDto.builder().build());
-             assertThat(service.obterDto(1L)).isNotNull();
+             when(atividadeMapper.toResponse(any())).thenReturn(AtividadeResponse.builder().build());
+             assertThat(service.obterResponse(1L)).isNotNull();
         }
 
         @Test
         @DisplayName("Deve lançar erro se obter por código não encontrar")
         void deveLancarErroObterPorCodigo() {
              when(repo.buscar(Atividade.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 1L));
-             assertThatThrownBy(() -> service.obterDto(1L))
+             assertThatThrownBy(() -> service.obterResponse(1L))
                  .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
@@ -140,7 +139,7 @@ class AtividadeServiceTest {
             CriarAtividadeRequest request = CriarAtividadeRequest.builder()
                     .mapaCodigo(1L)
                     .build();
-            AtividadeDto dto = AtividadeDto.builder()
+            AtividadeResponse dto = AtividadeResponse.builder()
                     .mapaCodigo(1L)
                     .build();
             String titulo = "123";
@@ -159,9 +158,9 @@ class AtividadeServiceTest {
             when(repo.buscar(Mapa.class, 1L)).thenReturn(mapa);
             when(atividadeMapper.toEntity(request)).thenReturn(new Atividade());
             when(atividadeRepo.save(any())).thenReturn(new Atividade());
-            when(atividadeMapper.toDto(any())).thenReturn(dto);
+            when(atividadeMapper.toResponse(any())).thenReturn(dto);
 
-            AtividadeDto res = service.criar(request);
+            AtividadeResponse res = service.criar(request);
 
             assertThat(res).isNotNull();
             verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));

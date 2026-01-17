@@ -15,9 +15,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.dto.AtividadeImpactadaDto;
-import sgc.mapa.dto.ConhecimentoDto;
+import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.dto.ImpactoMapaDto;
@@ -56,7 +55,6 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Transactional
 @DisplayName("Fluxo de Estados: Processo e Subprocesso")
 @Import(TestSecurityConfig.class)
-@SuppressWarnings("deprecation")
 class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
     @Autowired private ProcessoFacade processoFacade;
     @Autowired private SubprocessoWorkflowService workflowService;
@@ -187,15 +185,15 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                         .descricao("Atividade Teste")
                         .mapaCodigo(subprocessoDto.getCodMapa())
                         .build();
-                AtividadeDto ativCriada = atividadeService.criar(ativReq);
+                AtividadeResponse ativCriada = atividadeService.criar(ativReq);
 
                 // Chefe adiciona conhecimento (necessário para validação)
                 autenticar(chefeMapeamento, "ROLE_CHEFE");
                 CriarConhecimentoRequest conReq = CriarConhecimentoRequest.builder()
                         .descricao("Conhecimento Teste")
-                        .atividadeCodigo(ativCriada.getCodigo())
+                        .atividadeCodigo(ativCriada.codigo())
                         .build();
-                conhecimentoService.criar(ativCriada.getCodigo(), conReq);
+                conhecimentoService.criar(ativCriada.codigo(), conReq);
 
                 em.flush();
                 em.clear();
@@ -236,7 +234,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 comp = competenciaRepo.save(comp);
 
                 // Link using JPA properly
-                Atividade ativEntity = atividadeRepo.findById(ativCriada.getCodigo()).orElseThrow();
+                Atividade ativEntity = atividadeRepo.findById(ativCriada.codigo()).orElseThrow();
                 ativEntity.setCompetencias(new HashSet<>(Collections.singletonList(comp)));
                 atividadeRepo.save(ativEntity);
 
@@ -294,9 +292,9 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
             // Adicionar dados
             autenticar(chefeMapeamento, "ROLE_CHEFE");
-            AtividadeDto ativ = atividadeService.criar(
+            AtividadeResponse ativ = atividadeService.criar(
                 CriarAtividadeRequest.builder().descricao("A").mapaCodigo(codMapa).build());
-            conhecimentoService.criar(ativ.getCodigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.getCodigo()).build());
+            conhecimentoService.criar(ativ.codigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.codigo()).build());
 
             em.flush();
             em.clear();
@@ -363,15 +361,15 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
                 // 3. Chefe inicia revisão (adiciona atividade -> Em Andamento)
                 autenticar(chefeRevisao, "ROLE_CHEFE");
-                AtividadeDto ativ = atividadeService.criar(
+                AtividadeResponse ativ = atividadeService.criar(
                     CriarAtividadeRequest.builder().descricao("Nova Ativ Revisao").mapaCodigo(codMapa).build()
                 );
-                conhecimentoService.criar(ativ.getCodigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.getCodigo()).build());
+                conhecimentoService.criar(ativ.codigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.codigo()).build());
 
                 // Link activity to ALL competencies to satisfy validation
                 List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
                 if (!competencias.isEmpty()) {
-                    Atividade atividadeEntity = atividadeRepo.findById(ativ.getCodigo()).orElseThrow();
+                    Atividade atividadeEntity = atividadeRepo.findById(ativ.codigo()).orElseThrow();
                     atividadeEntity.setCompetencias(new HashSet<>(competencias));
                     atividadeRepo.save(atividadeEntity);
                 }
@@ -451,10 +449,10 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
             // 3. Chefe faz alteração
             autenticar(chefeRevisao, "ROLE_CHEFE");
-            AtividadeDto ativ = atividadeService.criar(
+            AtividadeResponse ativ = atividadeService.criar(
                 CriarAtividadeRequest.builder().descricao("Ativ").mapaCodigo(codMapa).build()
             );
-            conhecimentoService.criar(ativ.getCodigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.getCodigo()).build());
+            conhecimentoService.criar(ativ.codigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.codigo()).build());
 
             em.flush();
             em.clear();

@@ -6,7 +6,7 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.dto.AtualizarConhecimentoRequest;
-import sgc.mapa.dto.ConhecimentoDto;
+import sgc.mapa.dto.ConhecimentoResponse;
 import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.AtividadeRepo;
@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("ConhecimentoMapper")
-@SuppressWarnings("deprecation")
 class ConhecimentoMapperTest {
 
     private ConhecimentoMapper mapper;
@@ -40,12 +39,12 @@ class ConhecimentoMapperTest {
     }
 
     @Nested
-    @DisplayName("toDto")
-    class ToDtoTests {
+    @DisplayName("toResponse")
+    class ToResponseTests {
 
         @Test
-        @DisplayName("Deve mapear entidade para DTO")
-        void deveMapearEntidadeParaDto() {
+        @DisplayName("Deve mapear entidade para Response")
+        void deveMapearEntidadeParaResponse() {
             Atividade atividade = new Atividade();
             atividade.setCodigo(10L);
 
@@ -54,18 +53,18 @@ class ConhecimentoMapperTest {
             conhecimento.setDescricao("Conhecimento de Teste");
             conhecimento.setAtividade(atividade);
 
-            ConhecimentoDto dto = mapper.toDto(conhecimento);
+            ConhecimentoResponse dto = mapper.toResponse(conhecimento);
 
             assertThat(dto).isNotNull();
-            assertThat(dto.getCodigo()).isEqualTo(1L);
-            assertThat(dto.getDescricao()).isEqualTo("Conhecimento de Teste");
-            assertThat(dto.getAtividadeCodigo()).isEqualTo(10L);
+            assertThat(dto.codigo()).isEqualTo(1L);
+            assertThat(dto.descricao()).isEqualTo("Conhecimento de Teste");
+            assertThat(dto.atividadeCodigo()).isEqualTo(10L);
         }
 
         @Test
         @DisplayName("Deve retornar null quando entidade é null")
         void deveRetornarNullQuandoEntidadeNull() {
-            assertThat(mapper.toDto(null)).isNull();
+            assertThat(mapper.toResponse(null)).isNull();
         }
     }
 

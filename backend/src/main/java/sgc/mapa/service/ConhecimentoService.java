@@ -6,7 +6,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.dto.ConhecimentoDto;
+import sgc.mapa.dto.AtualizarConhecimentoRequest;
+import sgc.mapa.dto.ConhecimentoResponse;
+import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.evento.EventoMapaAlterado;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.Atividade;
@@ -36,24 +38,11 @@ public class ConhecimentoService {
      * Lista todos os conhecimentos associados a uma atividade específica.
      *
      * @param codAtividade O código da atividade.
-     * @return Uma {@link List} de {@link ConhecimentoDto}.
+     * @return Uma {@link List} de {@link ConhecimentoResponse}.
      * @throws ErroEntidadeNaoEncontrada se a atividade não for encontrada.
      */
     @Transactional(readOnly = true)
-    public List<ConhecimentoDto> listarPorAtividade(Long codAtividade) {
-        if (!atividadeRepo.existsById(codAtividade)) {
-            throw new ErroEntidadeNaoEncontrada("Atividade", codAtividade);
-        }
-        return conhecimentoRepo.findByAtividadeCodigo(codAtividade).stream()
-                .map(conhecimentoMapper::toDto)
-                .toList();
-    }
-
-    /**
-     * Lista conhecimentos como Response.
-     */
-    @Transactional(readOnly = true)
-    public List<sgc.mapa.dto.ConhecimentoResponse> listarPorAtividadeResponse(Long codAtividade) {
+    public List<ConhecimentoResponse> listarPorAtividade(Long codAtividade) {
         if (!atividadeRepo.existsById(codAtividade)) {
             throw new ErroEntidadeNaoEncontrada("Atividade", codAtividade);
         }
@@ -78,55 +67,19 @@ public class ConhecimentoService {
         return conhecimentoRepo.findByMapaCodigo(codMapa);
     }
 
-    /**
-     * Cria um novo conhecimento e o associa a uma atividade existente.
-     *
-     * @param codAtividade    O código da atividade à qual o conhecimento será associado.
-     * @param conhecimentoDto O DTO com os dados do novo conhecimento.
-     * @return O {@link ConhecimentoDto} do conhecimento criado.
-     * @throws ErroEntidadeNaoEncontrada se a atividade não for encontrada.
-     */
-    public ConhecimentoDto criar(Long codAtividade, ConhecimentoDto conhecimentoDto) {
-        return atividadeRepo.findById(codAtividade)
-                .map(atividade -> {
-                    notificarAlteracaoMapa(atividade.getMapa().getCodigo());
-                    var conhecimento = conhecimentoMapper.toEntity(conhecimentoDto);
-                    conhecimento.setAtividade(atividade);
-                    var salvo = conhecimentoRepo.save(conhecimento);
-                    return conhecimentoMapper.toDto(salvo);
-                })
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codAtividade));
-    }
-
-    public ConhecimentoDto criar(Long codAtividade, sgc.mapa.dto.CriarConhecimentoRequest request) {
+    public ConhecimentoResponse criar(Long codAtividade, CriarConhecimentoRequest request) {
         return atividadeRepo.findById(codAtividade)
                 .map(atividade -> {
                     notificarAlteracaoMapa(atividade.getMapa().getCodigo());
                     var conhecimento = conhecimentoMapper.toEntity(request);
                     conhecimento.setAtividade(atividade);
                     var salvo = conhecimentoRepo.save(conhecimento);
-                    return conhecimentoMapper.toDto(salvo);
+                    return conhecimentoMapper.toResponse(salvo);
                 })
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codAtividade));
     }
 
-    /**
-     * Atualiza um conhecimento existente, verificando se ele pertence à atividade especificada.
-     *
-     * @param codAtividade    O código da atividade pai.
-     * @param codConhecimento O código do conhecimento a ser atualizado.
-     * @param conhecimentoDto O DTO com os novos dados do conhecimento.
-     * @throws ErroEntidadeNaoEncontrada se o conhecimento não for encontrado ou não pertencer à
-     *                                   atividade.
-     */
-    public void atualizar(Long codAtividade, Long codConhecimento, ConhecimentoDto conhecimentoDto) {
-        conhecimentoRepo.findById(codConhecimento)
-                .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
-                .map(existente -> atualizarExistente(conhecimentoDto, existente))
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento));
-    }
-
-    public void atualizar(Long codAtividade, Long codConhecimento, sgc.mapa.dto.AtualizarConhecimentoRequest request) {
+    public void atualizar(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
         conhecimentoRepo.findById(codConhecimento)
                 .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
                 .ifPresentOrElse(
@@ -139,16 +92,6 @@ public class ConhecimentoService {
                         () -> {
                             throw new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento);
                         });
-    }
-
-    private ConhecimentoDto atualizarExistente(ConhecimentoDto dto, Conhecimento existente) {
-        notificarAlteracaoMapa(existente.getAtividade().getMapa().getCodigo());
-
-        var paraAtualizar = conhecimentoMapper.toEntity(dto);
-        existente.setDescricao(paraAtualizar.getDescricao());
-
-        var atualizado = conhecimentoRepo.save(existente);
-        return conhecimentoMapper.toDto(atualizado);
     }
 
     /**

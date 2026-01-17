@@ -9,7 +9,8 @@ import sgc.analise.AnaliseFacade;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.dto.ConhecimentoDto;
+import sgc.mapa.dto.AtualizarAtividadeRequest;
+import sgc.mapa.dto.ConhecimentoResponse;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.mapper.ConhecimentoMapper;
@@ -442,7 +443,7 @@ public class SubprocessoFacade {
         if (sp.getMapa() != null) {
             List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
             for (Atividade a : atividades) {
-                List<ConhecimentoDto> ksDto = a.getConhecimentos().stream().map(conhecimentoMapper::toDto).toList();
+                List<ConhecimentoResponse> ksDto = a.getConhecimentos().stream().map(conhecimentoMapper::toResponse).toList();
                 atividadesComConhecimentos.add(SubprocessoCadastroDto.AtividadeCadastroDto.builder()
                         .codigo(a.getCodigo())
                         .descricao(a.getDescricao())
@@ -566,12 +567,10 @@ public class SubprocessoFacade {
             for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
                 var atividade = atividadeService.obterPorCodigo(ativDto.getCodAtividade());
 
-                sgc.mapa.dto.AtividadeDto dto = sgc.mapa.dto.AtividadeDto.builder()
-                        .codigo(atividade.getCodigo())
-                        .mapaCodigo(atividade.getMapa() != null ? atividade.getMapa().getCodigo() : null)
+                AtualizarAtividadeRequest request = AtualizarAtividadeRequest.builder()
                         .descricao(ativDto.getNome())
                         .build();
-                atividadeService.atualizar(atividade.getCodigo(), dto);
+                atividadeService.atualizar(atividade.getCodigo(), request);
 
                 atividades.add(atividadeService.obterPorCodigo(atividade.getCodigo()));
             }
