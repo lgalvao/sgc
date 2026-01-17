@@ -68,6 +68,9 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("net.jqwik:jqwik:1.9.3")
     testImplementation("nl.jqno.equalsverifier:equalsverifier:3.18.1")
+    testImplementation("io.rest-assured:rest-assured:5.5.0")
+    testImplementation("org.apache.groovy:groovy:4.0.24")
+    testImplementation("org.apache.groovy:groovy-xml:4.0.24")
 
     // Documentação da API
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
