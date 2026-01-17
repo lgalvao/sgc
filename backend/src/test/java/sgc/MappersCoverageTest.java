@@ -26,7 +26,7 @@ class MappersCoverageTest {
     @Test
     @DisplayName("Deve cobrir nulos no ConhecimentoMapper")
     void deveCobrirNulosConhecimentoMapper() {
-        assertThat(conhecimentoMapper.toDto(null)).isNull();
+        assertThat(conhecimentoMapper.toResponse(null)).isNull();
     }
 
     @Test

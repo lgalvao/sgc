@@ -9,10 +9,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.AtualizarAtividadeRequest;
 import sgc.mapa.dto.AtualizarConhecimentoRequest;
-import sgc.mapa.dto.ConhecimentoDto;
+import sgc.mapa.dto.ConhecimentoResponse;
 import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
@@ -37,7 +37,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("Testes para AtividadeFacade")
-@SuppressWarnings("deprecation")
 class AtividadeFacadeTest {
 
     @InjectMocks
@@ -72,7 +71,7 @@ class AtividadeFacadeTest {
                 .descricao("Teste")
                 .build();
         // Facade calls: criar -> (returns dto)
-        AtividadeDto created = AtividadeDto.builder()
+        AtividadeResponse created = AtividadeResponse.builder()
                 .codigo(100L)
                 .mapaCodigo(1L)
                 .build();
@@ -200,7 +199,7 @@ class AtividadeFacadeTest {
                 .atividadeCodigo(codigoAtividade)
                 .descricao("Teste")
                 .build();
-        ConhecimentoDto salvo = ConhecimentoDto.builder()
+        ConhecimentoResponse salvo = ConhecimentoResponse.builder()
                 .codigo(200L)
                 .build();
 

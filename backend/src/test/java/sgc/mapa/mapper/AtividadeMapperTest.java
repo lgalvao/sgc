@@ -2,7 +2,7 @@ package sgc.mapa.mapper;
 
 import org.junit.jupiter.api.*;
 import org.mapstruct.factory.Mappers;
-import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.AtualizarAtividadeRequest;
 import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.model.Atividade;
@@ -12,7 +12,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("unit")
 @DisplayName("AtividadeMapper")
-@SuppressWarnings("deprecation")
 class AtividadeMapperTest {
 
     private AtividadeMapper mapper;
@@ -23,12 +22,12 @@ class AtividadeMapperTest {
     }
 
     @Nested
-    @DisplayName("toDto")
-    class ToDtoTests {
+    @DisplayName("toResponse")
+    class ToResponseTests {
 
         @Test
-        @DisplayName("Deve mapear entidade para DTO")
-        void deveMapearEntidadeParaDto() {
+        @DisplayName("Deve mapear entidade para Response")
+        void deveMapearEntidadeParaResponse() {
             Mapa mapa = new Mapa();
             mapa.setCodigo(10L);
 
@@ -37,18 +36,18 @@ class AtividadeMapperTest {
             atividade.setDescricao("Atividade de Teste");
             atividade.setMapa(mapa);
 
-            AtividadeDto dto = mapper.toDto(atividade);
+            AtividadeResponse dto = mapper.toResponse(atividade);
 
             assertThat(dto).isNotNull();
-            assertThat(dto.getCodigo()).isEqualTo(1L);
-            assertThat(dto.getDescricao()).isEqualTo("Atividade de Teste");
-            assertThat(dto.getMapaCodigo()).isEqualTo(10L);
+            assertThat(dto.codigo()).isEqualTo(1L);
+            assertThat(dto.descricao()).isEqualTo("Atividade de Teste");
+            assertThat(dto.mapaCodigo()).isEqualTo(10L);
         }
 
         @Test
         @DisplayName("Deve retornar null quando entidade é null")
         void deveRetornarNullQuandoEntidadeNull() {
-            AtividadeDto dto = mapper.toDto(null);
+            AtividadeResponse dto = mapper.toResponse(null);
 
             assertThat(dto).isNull();
         }
@@ -61,10 +60,10 @@ class AtividadeMapperTest {
             atividade.setDescricao("Atividade de Teste");
             atividade.setMapa(null);
 
-            AtividadeDto dto = mapper.toDto(atividade);
+            AtividadeResponse dto = mapper.toResponse(atividade);
 
             assertThat(dto).isNotNull();
-            assertThat(dto.getMapaCodigo()).isNull();
+            assertThat(dto.mapaCodigo()).isNull();
         }
     }
 

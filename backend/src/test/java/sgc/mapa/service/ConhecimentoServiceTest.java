@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtualizarConhecimentoRequest;
-import sgc.mapa.dto.ConhecimentoDto;
+import sgc.mapa.dto.ConhecimentoResponse;
 import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.evento.EventoMapaAlterado;
 import sgc.mapa.mapper.ConhecimentoMapper;
@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("Testes do Serviço de Conhecimento")
-@SuppressWarnings("deprecation")
 class ConhecimentoServiceTest {
 
     @Mock
@@ -52,7 +51,7 @@ class ConhecimentoServiceTest {
         void deveListarConhecimentosDto() {
             when(atividadeRepo.existsById(1L)).thenReturn(true);
             when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(List.of(new Conhecimento()));
-            when(conhecimentoMapper.toDto(any())).thenReturn(ConhecimentoDto.builder().build());
+            when(conhecimentoMapper.toResponse(any())).thenReturn(ConhecimentoResponse.builder().build());
 
             var resultado = service.listarPorAtividade(1L);
 
@@ -113,7 +112,7 @@ class ConhecimentoServiceTest {
         void deveCriarConhecimento() {
             Long ativId = 1L;
             CriarConhecimentoRequest request = CriarConhecimentoRequest.builder().build();
-            ConhecimentoDto dto = ConhecimentoDto.builder().build();
+            ConhecimentoResponse dto = ConhecimentoResponse.builder().build();
             Atividade atividade = new Atividade();
             atividade.setMapa(new Mapa());
             Conhecimento conhecimento = new Conhecimento();
@@ -121,7 +120,7 @@ class ConhecimentoServiceTest {
             when(atividadeRepo.findById(ativId)).thenReturn(Optional.of(atividade));
             when(conhecimentoMapper.toEntity(request)).thenReturn(new Conhecimento());
             when(conhecimentoRepo.save(any())).thenReturn(conhecimento);
-            when(conhecimentoMapper.toDto(any())).thenReturn(dto);
+            when(conhecimentoMapper.toResponse(any())).thenReturn(dto);
 
             var resultado = service.criar(ativId, request);
 
@@ -151,7 +150,6 @@ class ConhecimentoServiceTest {
             Long ativId = 1L;
             Long conhId = 2L;
             AtualizarConhecimentoRequest request = AtualizarConhecimentoRequest.builder().build();
-            ConhecimentoDto dto = ConhecimentoDto.builder().build();
             Conhecimento conhecimento = new Conhecimento();
             conhecimento.setCodigo(conhId);
             Atividade atividade = new Atividade();

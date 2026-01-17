@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
-import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Mapa;

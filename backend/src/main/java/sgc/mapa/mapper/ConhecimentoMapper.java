@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.AtualizarConhecimentoRequest;
-import sgc.mapa.dto.ConhecimentoDto;
 import sgc.mapa.dto.ConhecimentoResponse;
 import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.model.Atividade;
@@ -22,12 +21,6 @@ public abstract class ConhecimentoMapper {
 
     @Autowired
     protected RepositorioComum repo;
-
-    @Mapping(source = "atividade.codigo", target = "atividadeCodigo")
-    public abstract ConhecimentoDto toDto(Conhecimento conhecimento);
-
-    @Mapping(source = "atividadeCodigo", target = "atividade")
-    public abstract Conhecimento toEntity(ConhecimentoDto conhecimentoDTO);
 
     @Mapping(source = "atividade.codigo", target = "atividadeCodigo")
     public abstract ConhecimentoResponse toResponse(Conhecimento conhecimento);
