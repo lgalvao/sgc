@@ -1,5 +1,6 @@
 import type {
     AtividadeImpactada,
+    CompetenciaCompleta,
     CompetenciaImpactada,
     ImpactoMapa,
     Mapa,
@@ -26,19 +27,21 @@ export function mapMapaCompletoDtoToModel(dto: any): MapaCompleto {
         codigo: dto.codigo,
         subprocessoCodigo: dto.subprocessoCodigo,
         observacoes: dto.observacoes,
-        competencias: (dto.competencias || []).map((c: any) => ({
-            codigo: c.codigo,
-            descricao: c.descricao,
-            atividadesAssociadas: c.atividadesCodigos || [],
-            atividades: (c.atividades || []).map((a: any) => ({
-                codigo: a.codigo,
-                descricao: a.descricao,
-                conhecimentos: (a.conhecimentos || []).map((k: any) => ({
-                    codigo: k.codigo,
-                    descricao: k.descricao,
+        competencias: (dto.competencias || []).map(
+            (c: any): CompetenciaCompleta => ({
+                codigo: c.codigo,
+                descricao: c.descricao,
+                atividadesAssociadas: c.atividadesCodigos || [],
+                atividades: (c.atividades || []).map((a: any) => ({
+                    codigo: a.codigo,
+                    descricao: a.descricao,
+                    conhecimentos: (a.conhecimentos || []).map((k: any) => ({
+                        codigo: k.codigo,
+                        descricao: k.descricao,
+                    })),
                 })),
-            })),
-        })),
+            }),
+        ),
         situacao: dto.situacao || "",
     };
 }

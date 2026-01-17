@@ -104,6 +104,10 @@ export interface Competencia {
     atividadesAssociadas: number[];
 }
 
+export interface CompetenciaCompleta extends Competencia {
+    atividades: Atividade[];
+}
+
 export interface Mapa {
     codigo: number;
     descricao: string;
@@ -372,7 +376,7 @@ export interface MapaCompleto {
     codigo: number;
     subprocessoCodigo: number;
     observacoes: string;
-    competencias: Competencia[];
+    competencias: CompetenciaCompleta[];
     situacao: string;
 }
 

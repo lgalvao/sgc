@@ -105,7 +105,6 @@ describe("mappers/mapas", () => {
         expect(model.dataFinalizacao).toBeUndefined();
     });
 
-    // TODO: Fix this test or the mapper. The mapper mapMapaCompletoDtoToModel currently does not map 'atividades' structure from the input DTO, causing this test to fail.
     it("mapMapaCompletoDtoToModel should map nested structures", () => {
         const dto = {
             codigo: 1,
@@ -117,9 +116,9 @@ describe("mappers/mapas", () => {
             ],
         };
         const model = mapMapaCompletoDtoToModel(dto);
-        expect(
-            (model.competencias[0] as any).atividades[0].conhecimentos[0].codigo,
-        ).toBe(1000);
+        expect(model.competencias[0].atividades[0].conhecimentos[0].codigo).toBe(
+            1000,
+        );
     });
 
     it("mapImpactoMapaDtoToModel deve mapear campos de impacto incluindo mudanças de atividade", () => {

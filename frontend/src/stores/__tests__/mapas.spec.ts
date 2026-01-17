@@ -68,7 +68,12 @@ describe("useMapasStore", () => {
                 subprocessoCodigo: 1,
                 observacoes: "teste",
                 competencias: [
-                    { codigo: 1, descricao: "Nova", atividadesAssociadas: [] },
+                    {
+                        codigo: 1,
+                        descricao: "Nova",
+                        atividadesAssociadas: [],
+                        atividades: [],
+                    },
                 ],
                 situacao: "EM_ANDAMENTO",
             };
@@ -182,7 +187,12 @@ describe("useMapasStore", () => {
                 subprocessoCodigo: 1,
                 observacoes: "teste",
                 competencias: [
-                    { codigo: 1, descricao: "Nova", atividadesAssociadas: [] },
+                    {
+                        codigo: 1,
+                        descricao: "Nova",
+                        atividadesAssociadas: [],
+                        atividades: [],
+                    },
                 ],
                 situacao: "EM_ANDAMENTO",
             };
@@ -223,7 +233,12 @@ describe("useMapasStore", () => {
                 subprocessoCodigo: 1,
                 observacoes: "teste",
                 competencias: [
-                    { codigo: 1, descricao: "Nova", atividadesAssociadas: [] },
+                    {
+                        codigo: 1,
+                        descricao: "Nova",
+                        atividadesAssociadas: [],
+                        atividades: [],
+                    },
                 ],
                 situacao: "EM_ANDAMENTO",
             };
@@ -273,7 +288,12 @@ describe("useMapasStore", () => {
                 subprocessoCodigo: 1,
                 observacoes: "teste",
                 competencias: [
-                    { codigo: 1, descricao: "Nova", atividadesAssociadas: [] },
+                    {
+                        codigo: 1,
+                        descricao: "Nova",
+                        atividadesAssociadas: [],
+                        atividades: [],
+                    },
                 ],
                 situacao: "EM_ANDAMENTO",
             };
