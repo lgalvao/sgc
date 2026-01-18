@@ -287,17 +287,13 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                         return;
                 }
 
-                String situacoesPermitidas = switch (perfis.stream().findFirst().orElse(null)) {
-                        case ADMIN ->
-                                "REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO";
-                        case GESTOR -> "REVISAO_CADASTRO_DISPONIBILIZADA";
-                        default -> "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO";
-                };
-
+                String situacoesPermitidas;
                 if (perfis.contains(ADMIN)) {
                         situacoesPermitidas = "REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO";
                 } else if (perfis.contains(GESTOR)) {
                         situacoesPermitidas = "REVISAO_CADASTRO_DISPONIBILIZADA";
+                } else {
+                        situacoesPermitidas = "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO";
                 }
 
                 definirMotivoNegacao(String.format(
@@ -313,30 +309,22 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
 
                 Unidade unidadeSubprocesso = subprocesso.getUnidade();
 
-                if (unidadeSubprocesso == null) {
-                    // Se não há unidade, apenas requisitos NENHUM passam
-                    return requisito == RequisitoHierarquia.NENHUM;
-                }
-
                 return switch (requisito) {
                         case NENHUM -> true;
 
                         case MESMA_UNIDADE -> usuario.getTodasAtribuicoes().stream()
-                                        .anyMatch(a -> a.getUnidade() != null
-                                                         && Objects.equals(a.getUnidade().getCodigo(),
+                                        .anyMatch(a -> Objects.equals(a.getUnidade().getCodigo(),
                                                                          unidadeSubprocesso.getCodigo()));
 
                         case MESMA_OU_SUBORDINADA -> usuario.getTodasAtribuicoes().stream()
-                                        .anyMatch(a -> a.getUnidade() != null
-                                                         && (Objects.equals(a.getUnidade().getCodigo(),
+                                        .anyMatch(a -> Objects.equals(a.getUnidade().getCodigo(),
                                                                          unidadeSubprocesso.getCodigo())
                                                                          || hierarquiaService.isSubordinada(
                                                                                          unidadeSubprocesso,
-                                                                                         a.getUnidade())));
+                                                                                         a.getUnidade()));
 
                         case SUPERIOR_IMEDIATA -> usuario.getTodasAtribuicoes().stream()
-                                        .anyMatch(a -> a.getUnidade() != null
-                                                         && hierarquiaService.isSuperiorImediata(unidadeSubprocesso,
+                                        .anyMatch(a -> hierarquiaService.isSuperiorImediata(unidadeSubprocesso,
                                                                          a.getUnidade()));
 
                         case TITULAR_UNIDADE -> {

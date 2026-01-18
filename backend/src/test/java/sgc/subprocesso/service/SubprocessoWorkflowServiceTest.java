@@ -148,20 +148,6 @@ class SubprocessoWorkflowServiceTest {
     }
 
     @Test
-    @DisplayName("Atualizar situacao falha se processo null")
-    void atualizarSituacaoProcessoNull() {
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(1L);
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        sp.setProcesso(null);
-
-        when(repositorioSubprocesso.findByMapaCodigo(10L)).thenReturn(Optional.of(sp));
-
-        assertThatThrownBy(() -> service.atualizarSituacaoParaEmAndamento(10L))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
-
-    @Test
     @DisplayName("Reabrir cadastro sucesso")
     void reabrirCadastroSucesso() {
         Subprocesso sp = new Subprocesso();

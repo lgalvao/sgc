@@ -93,15 +93,6 @@ class AtividadeAccessPolicyTest {
     }
 
     @Test
-    @DisplayName("Deve negar se subprocesso não possui unidade")
-    void deveNegarSeUnidadeNull() {
-        atividade.getMapa().getSubprocesso().setUnidade(null);
-        boolean resultado = policy.canExecute(usuarioChefe, CRIAR_ATIVIDADE, atividade);
-        assertThat(resultado).isFalse();
-        assertThat(policy.getMotivoNegacao()).contains("não possui unidade associada");
-    }
-
-    @Test
     @DisplayName("Deve negar se mapa não possui subprocesso")
     void deveNegarSeSubprocessoNull() {
         atividade.getMapa().setSubprocesso(null);

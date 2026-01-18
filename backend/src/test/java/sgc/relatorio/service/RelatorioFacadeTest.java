@@ -314,34 +314,4 @@ class RelatorioFacadeTest {
         relatorioService.gerarRelatorioMapas(1L, 1L, out);
         verify(document, atLeastOnce()).add(any());
     }
-
-    @Test
-    @DisplayName("Deve filtrar subprocesso com unidade ou código nulo no stream")
-    void deveFiltrarSubprocessoComUnidadeOuCodigoNulo() {
-        when(pdfFactory.createDocument()).thenReturn(document);
-        Processo p = new Processo();
-
-        Subprocesso spValid = new Subprocesso();
-        Unidade u = new Unidade(); u.setCodigo(1L); u.setSigla("U1"); u.setNome("U1");
-        spValid.setUnidade(u);
-        spValid.setMapa(new Mapa()); spValid.getMapa().setCodigo(10L);
-
-        Subprocesso spNullUnit = new Subprocesso();
-        spNullUnit.setUnidade(null);
-
-        Subprocesso spNullCode = new Subprocesso();
-        Unidade u2 = new Unidade(); u2.setCodigo(null);
-        spNullCode.setUnidade(u2);
-
-        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(spValid, spNullUnit, spNullCode));
-        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
-
-        OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioMapas(1L, 1L, out);
-
-        // Deve ter processado apenas o válido
-        verify(document, atLeastOnce()).add(any());
-        // Could verify more strictly but ensure it doesn't throw NPE
-    }
 }

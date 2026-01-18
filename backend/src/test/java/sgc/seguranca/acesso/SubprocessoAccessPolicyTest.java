@@ -218,18 +218,7 @@ class SubprocessoAccessPolicyTest {
         Usuario u = criarUsuario(Perfil.SERVIDOR, 1L);
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 1L);
 
-        // Caso Unidade Nula
-        sp.setUnidade(null);
-        // Ação EDITAR_MAPA requer MESMA_UNIDADE, então deve falhar se unidade é nula
-        assertFalse(policy.canExecute(u, Acao.EDITAR_MAPA, sp));
-
-        // Ação LISTAR_SUBPROCESSOS requer NENHUM, deve passar
-        Usuario uAdmin = criarUsuario(Perfil.ADMIN, 1L);
-        assertTrue(policy.canExecute(uAdmin, Acao.LISTAR_SUBPROCESSOS, sp));
-
-        // Re-setup unidade
-        sp.setUnidade(new Unidade());
-        sp.getUnidade().setCodigo(1L);
+        // Ensure unit properties needed for tests
         sp.getUnidade().setSigla("SIGLA");
         sp.getUnidade().setTituloTitular("TITULAR");
 

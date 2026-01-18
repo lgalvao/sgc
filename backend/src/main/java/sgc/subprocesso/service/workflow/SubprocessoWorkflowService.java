@@ -162,9 +162,7 @@ public class SubprocessoWorkflowService {
 
         try {
             String novaDataStr = novaDataLimite.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            if (sp.getUnidade() != null) {
-                alertaService.criarAlertaAlteracaoDataLimite(sp.getProcesso(), sp.getUnidade(), novaDataStr, etapa);
-            }
+            alertaService.criarAlertaAlteracaoDataLimite(sp.getProcesso(), sp.getUnidade(), novaDataStr, etapa);
         } catch (Exception e) {
             log.error("Erro ao enviar notificações de alteração de prazo: {}", e.getMessage());
         }
@@ -175,9 +173,8 @@ public class SubprocessoWorkflowService {
             .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso do mapa", mapaCodigo));
 
         if (subprocesso.getSituacao() == NAO_INICIADO) {
-            if (subprocesso.getProcesso() == null) {
-                throw new ErroEntidadeNaoEncontrada("Processo associado não encontrado para subprocesso %d".formatted(subprocesso.getCodigo()));
-            }
+            assert subprocesso.getProcesso() != null :
+                    "Invariante violada: Subprocesso deve ter processo quando situação != NAO_INICIADO";
             var tipoProcesso = subprocesso.getProcesso().getTipo();
             if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
                 subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
@@ -279,7 +276,7 @@ public class SubprocessoWorkflowService {
         validarRequisitosNegocioParaDisponibilizacao(codSubprocesso, sp);
         
         Unidade origem = sp.getUnidade();
-        Unidade destino = origem != null ? origem.getUnidadeSuperior() : null;
+        Unidade destino = origem.getUnidadeSuperior();
         
         sp.setSituacao(novaSituacao);
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
@@ -308,10 +305,6 @@ public class SubprocessoWorkflowService {
         accessControlService.verificarPermissao(usuario, DEVOLVER_CADASTRO, sp);
 
         Unidade unidadeSubprocesso = sp.getUnidade();
-        if (unidadeSubprocesso == null) {
-            throw new ErroInvarianteViolada("Unidade não encontrada para o subprocesso " + codSubprocesso);
-        }
-        
         Unidade unidadeAnalise = unidadeSubprocesso.getUnidadeSuperior();
         if (unidadeAnalise == null) {
             throw new ErroInvarianteViolada("Unidade superior não encontrada para o subprocesso " + codSubprocesso);
@@ -377,10 +370,6 @@ public class SubprocessoWorkflowService {
         accessControlService.verificarPermissao(usuario, DEVOLVER_REVISAO_CADASTRO, sp);
 
         Unidade unidadeSubprocesso = sp.getUnidade();
-        if (unidadeSubprocesso == null) {
-            throw new ErroInvarianteViolada("Unidade não encontrada para o subprocesso " + codSubprocesso);
-        }
-
         Unidade unidadeAnalise = unidadeSubprocesso.getUnidadeSuperior();
         if (unidadeAnalise == null) {
             throw new ErroInvarianteViolada("Unidade superior não encontrada para o subprocesso " + codSubprocesso);
@@ -408,10 +397,6 @@ public class SubprocessoWorkflowService {
         accessControlService.verificarPermissao(usuario, ACEITAR_REVISAO_CADASTRO, sp);
 
         Unidade unidadeSubprocesso = sp.getUnidade();
-        if (unidadeSubprocesso == null) {
-            throw new ErroInvarianteViolada("Unidade não encontrada para o subprocesso " + codSubprocesso);
-        }
-        
         Unidade unidadeAnalise = unidadeSubprocesso.getUnidadeSuperior();
         if (unidadeAnalise == null) {
             throw new ErroInvarianteViolada("Unidade superior não encontrada para o subprocesso " + codSubprocesso);

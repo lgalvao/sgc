@@ -2,6 +2,7 @@ package sgc.subprocesso.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.jspecify.annotations.NonNull;
 import sgc.comum.model.EntidadeBase;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
@@ -80,6 +81,14 @@ public class Subprocesso extends EntidadeBase {
 
     public Mapa getMapa() {
         return this.mapa == null ? null : this.mapa;
+    }
+
+    public @NonNull Processo getProcesso() {
+        return processo;
+    }
+
+    public @NonNull Unidade getUnidade() {
+        return unidade;
     }
 
     public boolean isEmAndamento() {

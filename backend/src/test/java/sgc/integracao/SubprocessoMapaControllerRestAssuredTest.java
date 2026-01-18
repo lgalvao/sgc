@@ -40,11 +40,11 @@ class SubprocessoMapaControllerRestAssuredTest extends BaseRestAssuredTest {
 
     @BeforeEach
     void setupDados() {
+        mapaRepo.deleteAll();
         subprocessoRepo.deleteAll();
         processoRepo.deleteAll();
         usuarioRepo.deleteAll();
         unidadeRepo.deleteAll();
-        mapaRepo.deleteAll();
 
         unidade = new Unidade();
         unidade.setSigla("ADM_SUB_MAPA");
@@ -58,10 +58,6 @@ class SubprocessoMapaControllerRestAssuredTest extends BaseRestAssuredTest {
         usuarioAdmin.setUnidadeLotacao(unidade);
         usuarioAdmin = usuarioRepo.save(usuarioAdmin);
 
-        mapa = new Mapa();
-        mapa.setObservacoesDisponibilizacao("Obs Subprocesso");
-        mapa = mapaRepo.save(mapa);
-
         Processo processo = new Processo();
         processo.setDescricao("Processo Sub Mapa");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -72,8 +68,15 @@ class SubprocessoMapaControllerRestAssuredTest extends BaseRestAssuredTest {
         subprocesso = new Subprocesso();
         subprocesso.setProcesso(processo);
         subprocesso.setUnidade(unidade);
-        subprocesso.setMapa(mapa);
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        subprocesso = subprocessoRepo.save(subprocesso);
+
+        mapa = new Mapa();
+        mapa.setObservacoesDisponibilizacao("Obs Subprocesso");
+        mapa.setSubprocesso(subprocesso);
+        mapa = mapaRepo.save(mapa);
+
+        subprocesso.setMapa(mapa);
         subprocesso = subprocessoRepo.save(subprocesso);
     }
 
