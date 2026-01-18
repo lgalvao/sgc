@@ -79,8 +79,13 @@ public class Subprocesso extends EntidadeBase {
         this.dataLimiteEtapa1 = dataLimiteEtapa1;
     }
 
-    public Mapa getMapa() {
-        return this.mapa == null ? null : this.mapa;
+    /**
+     * Retorna o mapa de competências.
+     *
+     * @return Mapa sempre não-nulo (criado no construtor ou em criar())
+     */
+    public @NonNull Mapa getMapa() {
+        return mapa;
     }
 
     public @NonNull Processo getProcesso() {

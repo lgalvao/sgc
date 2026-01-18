@@ -42,6 +42,10 @@ public class Usuario implements UserDetails {
     @JoinColumn(name = "unidade_lot_codigo")
     private Unidade unidadeLotacao;
 
+    public @org.jspecify.annotations.NonNull Unidade getUnidadeLotacao() {
+        return unidadeLotacao;
+    }
+
     @ManyToOne
     @JoinColumn(name = "unidade_comp_codigo")
     private Unidade unidadeCompetencia;

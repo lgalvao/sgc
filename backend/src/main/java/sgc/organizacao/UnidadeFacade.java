@@ -123,12 +123,13 @@ public class UnidadeFacade {
         for (Unidade u : unidades) {
             UnidadeDto dto = mapaUnidades.get(u.getCodigo());
 
-            if (u.getUnidadeSuperior() == null) {
-                raizes.add(dto);
-            } else {
-                Long codigoPai = u.getUnidadeSuperior().getCodigo();
-                mapaFilhas.computeIfAbsent(codigoPai, k -> new ArrayList<>()).add(dto);
-            }
+            Optional.ofNullable(u.getUnidadeSuperior()).ifPresentOrElse(
+                    superior -> {
+                        Long codigoPai = superior.getCodigo();
+                        mapaFilhas.computeIfAbsent(codigoPai, k -> new ArrayList<>()).add(dto);
+                    },
+                    () -> raizes.add(dto)
+            );
         }
 
         return raizes.stream().map(raiz -> montarComSubunidades(raiz, mapaFilhas)).toList();
@@ -181,10 +182,9 @@ public class UnidadeFacade {
 
         Map<Long, List<Long>> mapPaiFilhos = new HashMap<>();
         for (Unidade u : todas) {
-            if (u.getUnidadeSuperior() != null) {
-                mapPaiFilhos.computeIfAbsent(u.getUnidadeSuperior().getCodigo(), k -> new ArrayList<>())
-                        .add(u.getCodigo());
-            }
+            Optional.ofNullable(u.getUnidadeSuperior()).ifPresent(superior ->
+                    mapPaiFilhos.computeIfAbsent(superior.getCodigo(), k -> new ArrayList<>()).add(u.getCodigo())
+            );
         }
 
         List<Long> descendentes = new ArrayList<>();
@@ -258,11 +258,9 @@ public class UnidadeFacade {
             if (u.getCodigo().equals(codigo)) {
                 return Optional.of(u);
             }
-            if (u.getSubunidades() != null) {
-                Optional<UnidadeDto> found = buscarNaHierarquia(u.getSubunidades(), codigo);
-                if (found.isPresent()) {
-                    return found;
-                }
+            Optional<UnidadeDto> found = buscarNaHierarquia(u.getSubunidades(), codigo);
+            if (found.isPresent()) {
+                return found;
             }
         }
         return Optional.empty();
@@ -273,11 +271,9 @@ public class UnidadeFacade {
             if (u.getSigla().equals(sigla)) {
                 return Optional.of(u);
             }
-            if (u.getSubunidades() != null) {
-                Optional<UnidadeDto> found = buscarNaHierarquiaPorSigla(u.getSubunidades(), sigla);
-                if (found.isPresent()) {
-                    return found;
-                }
+            Optional<UnidadeDto> found = buscarNaHierarquiaPorSigla(u.getSubunidades(), sigla);
+            if (found.isPresent()) {
+                return found;
             }
         }
         return Optional.empty();
@@ -285,10 +281,8 @@ public class UnidadeFacade {
 
     private void coletarSiglas(UnidadeDto unidade, List<String> resultado) {
         resultado.add(unidade.getSigla());
-        if (unidade.getSubunidades() != null) {
-            for (UnidadeDto filha : unidade.getSubunidades()) {
-                coletarSiglas(filha, resultado);
-            }
+        for (UnidadeDto filha : unidade.getSubunidades()) {
+            coletarSiglas(filha, resultado);
         }
     }
 }

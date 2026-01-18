@@ -392,9 +392,6 @@ public class SubprocessoFacade {
 
     private List<AtividadeVisualizacaoDto> listarAtividadesSubprocessoInterno(Long codSubprocesso) {
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
-        if (subprocesso.getMapa() == null) {
-            return List.of();
-        }
         // ⚡ Bolt: Usando 'buscarPorMapaCodigoComConhecimentos' para evitar N+1 queries
         // ao carregar conhecimentos para cada atividade
         List<Atividade> todasAtividades = atividadeService.buscarPorMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
@@ -440,16 +437,14 @@ public class SubprocessoFacade {
     private SubprocessoCadastroDto obterCadastroInterno(Long codSubprocesso) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
         List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos = new ArrayList<>();
-        if (sp.getMapa() != null) {
-            List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
-            for (Atividade a : atividades) {
-                List<ConhecimentoResponse> ksDto = a.getConhecimentos().stream().map(conhecimentoMapper::toResponse).toList();
-                atividadesComConhecimentos.add(SubprocessoCadastroDto.AtividadeCadastroDto.builder()
-                        .codigo(a.getCodigo())
-                        .descricao(a.getDescricao())
-                        .conhecimentos(ksDto)
-                        .build());
-            }
+        List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
+        for (Atividade a : atividades) {
+            List<ConhecimentoResponse> ksDto = a.getConhecimentos().stream().map(conhecimentoMapper::toResponse).toList();
+            atividadesComConhecimentos.add(SubprocessoCadastroDto.AtividadeCadastroDto.builder()
+                    .codigo(a.getCodigo())
+                    .descricao(a.getDescricao())
+                    .conhecimentos(ksDto)
+                    .build());
         }
         return SubprocessoCadastroDto.builder()
                 .subprocessoCodigo(sp.getCodigo())
@@ -525,10 +520,7 @@ public class SubprocessoFacade {
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
         UnidadeDto unidadeDto = unidadeFacade.buscarPorSigla(siglaUnidade);
 
-        MapaCompletoDto mapaDto = null;
-        if (subprocesso.getMapa() != null) {
-            mapaDto = mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
-        }
+        MapaCompletoDto mapaDto = mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
 
         List<AtividadeVisualizacaoDto> atividades = listarAtividadesSubprocessoInterno(codSubprocesso);
         return ContextoEdicaoDto.builder()
