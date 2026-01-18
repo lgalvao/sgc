@@ -29,6 +29,14 @@ public class CompetenciaService {
         competenciaRepo.save(competencia);
     }
 
+    public void salvarTodas(List<Competencia> competencias) {
+        competenciaRepo.saveAll(competencias);
+    }
+
+    public List<Competencia> buscarPorCodigos(List<Long> codigos) {
+        return competenciaRepo.findAllById(codigos);
+    }
+
     /**
      * Creates and persists competencia with associated activities
      */
