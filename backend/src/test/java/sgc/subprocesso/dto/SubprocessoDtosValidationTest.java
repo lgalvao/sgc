@@ -30,9 +30,8 @@ class SubprocessoDtosValidationTest {
     class AceitarCadastroReqTests {
 
         @ParameterizedTest
-        @NullAndEmptySource
         @ValueSource(strings = {"Cadastro aceito conforme revisão.", "Observação qualquer"})
-        @DisplayName("Deve aceitar observações válidas (nulas, vazias ou preenchidas)")
+        @DisplayName("Deve aceitar observações válidas")
         void deveAceitarObservacoesValidas(String observacao) {
             AceitarCadastroRequest req = AceitarCadastroRequest.builder()
                     .observacoes(observacao)
@@ -41,6 +40,22 @@ class SubprocessoDtosValidationTest {
             Set<ConstraintViolation<AceitarCadastroRequest>> violations = validator.validate(req);
 
             assertThat(violations).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Não deve aceitar observações nulas")
+        void naoDeveAceitarObservacoesNulas() {
+            AceitarCadastroRequest req = AceitarCadastroRequest.builder().observacoes(null).build();
+            Set<ConstraintViolation<AceitarCadastroRequest>> violations = validator.validate(req);
+            assertThat(violations).isNotEmpty();
+        }
+
+        @Test
+        @DisplayName("Não deve aceitar observações vazias")
+        void naoDeveAceitarObservacoesVazias() {
+            AceitarCadastroRequest req = AceitarCadastroRequest.builder().observacoes("").build();
+            Set<ConstraintViolation<AceitarCadastroRequest>> violations = validator.validate(req);
+            assertThat(violations).isNotEmpty();
         }
 
         @Test
@@ -88,15 +103,15 @@ class SubprocessoDtosValidationTest {
         }
 
         @Test
-        @DisplayName("Deve aceitar observações nulas (campo opcional)")
-        void deveAceitarObservacoesNulas() {
+        @DisplayName("Não deve aceitar observações nulas")
+        void naoDeveAceitarObservacoesNulas() {
             DevolverCadastroRequest req = DevolverCadastroRequest.builder()
                     .observacoes(null)
                     .build();
 
             Set<ConstraintViolation<DevolverCadastroRequest>> violations = validator.validate(req);
 
-            assertThat(violations).isEmpty();
+            assertThat(violations).isNotEmpty();
         }
 
         @Test

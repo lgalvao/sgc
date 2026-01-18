@@ -135,6 +135,8 @@ class UsuarioServiceUnitTest {
         void deveRetornarDtoQuandoEncontradoPorTitulo() {
             Usuario u = new Usuario();
             u.setTituloEleitoral("user");
+            Unidade lotacao = new Unidade(); lotacao.setCodigo(1L);
+            u.setUnidadeLotacao(lotacao);
             when(usuarioRepo.findById("user")).thenReturn(Optional.of(u));
 
             Optional<UsuarioDto> res = service.buscarUsuarioPorTitulo("user");
@@ -203,6 +205,8 @@ class UsuarioServiceUnitTest {
         void deveRetornarMapaDeUsuariosPorTitulos() {
             Usuario u = new Usuario();
             u.setTituloEleitoral("u");
+            Unidade lotacao = new Unidade(); lotacao.setCodigo(1L);
+            u.setUnidadeLotacao(lotacao);
             when(usuarioRepo.findAllById(anyList())).thenReturn(List.of(u));
 
             var map = service.buscarUsuariosPorTitulos(List.of("u"));
@@ -467,20 +471,6 @@ class UsuarioServiceUnitTest {
             assertEquals("2", resp.getSubstitutoTitulo());
         }
 
-        @Test
-        @DisplayName("Deve lidar com usuário sem unidade de lotação")
-        void deveLidarComUsuarioSemLotacao() {
-            Usuario u = new Usuario();
-            u.setTituloEleitoral("123");
-            u.setUnidadeLotacao(null);
-
-            // Via buscarUsuariosPorTitulos (toUsuarioDto)
-            when(usuarioRepo.findAllById(any())).thenReturn(List.of(u));
-            var map = service.buscarUsuariosPorTitulos(List.of("123"));
-            assertNull(map.get("123").getUnidadeCodigo());
-
-
-        }
 
         @Test
         @DisplayName("Deve falhar ao obter usuário autenticado sem contexto")

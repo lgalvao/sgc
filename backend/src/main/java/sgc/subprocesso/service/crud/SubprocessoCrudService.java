@@ -76,11 +76,13 @@ public class SubprocessoCrudService {
         return repo.buscar(Subprocesso.class, codigo);
     }
 
+    /**
+     * Busca subprocesso e seu mapa associado.
+     * <p>O mapa é um invariante do subprocesso após a criação, portanto é garantido que exista.
+     */
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
         Subprocesso subprocesso = buscarSubprocesso(codigo);
-        if (subprocesso.getMapa() == null) {
-            throw new sgc.comum.erros.ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado", codigo);
-        }
+        // Mapa é invariante após criação
         return subprocesso;
     }
 

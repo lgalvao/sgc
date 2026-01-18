@@ -77,10 +77,6 @@ public class ProcessoFacade {
         Set<Unidade> participantes = new HashSet<>();
         for (Long codigoUnidade : req.getUnidades()) {
             Unidade unidade = unidadeService.buscarEntidadePorId(codigoUnidade);
-
-            if (unidade.getTipo() == INTERMEDIARIA) {
-                throw new ErroEstadoImpossivel("Erro interno: unidade não elegível foi enviada ao backend");
-            }
             participantes.add(unidade);
         }
 

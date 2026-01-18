@@ -170,7 +170,6 @@ public class PainelFacade {
         Set<Long> unidadesVisiveis = selecionarIdsVisiveis(participantesIds, participantesPorCodigo);
         return unidadesVisiveis.stream()
                 .map(participantesPorCodigo::get)
-                .filter(unidade -> unidade != null && unidade.getSigla() != null)
                 .map(Unidade::getSigla)
                 .sorted()
                 .collect(Collectors.joining(", "));
