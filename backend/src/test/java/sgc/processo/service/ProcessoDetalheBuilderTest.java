@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -206,5 +207,80 @@ class ProcessoDetalheBuilderTest {
         assertThat(paiDto.getMapaCodigo()).isEqualTo(100L);
         assertThat(paiDto.getFilhos()).hasSize(1);
         assertThat(paiDto.getFilhos().get(0).getSigla()).isEqualTo("FILHO");
+    }
+
+    @Test
+    @DisplayName("Deve retornar false para chefe/coordenador se principal não for Usuario")
+    void deveRetornarFalseSePrincipalNaoForUsuario() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setParticipantes(Set.of());
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
+
+        SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication auth = mock(Authentication.class);
+        when(auth.isAuthenticated()).thenReturn(true);
+        when(auth.getPrincipal()).thenReturn("principalString"); // Not Usuario
+        when(securityContext.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(securityContext);
+
+        ProcessoDetalheDto dto = builder.build(processo);
+        assertThat(dto.isPodeHomologarCadastro()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve retornar false para chefe/coordenador se usuário não é participante")
+    void deveRetornarFalseSeUsuarioNaoParticipante() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        Unidade u1 = new Unidade(); u1.setCodigo(1L);
+        processo.setParticipantes(Set.of(u1));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
+
+        SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication auth = mock(Authentication.class);
+        when(auth.isAuthenticated()).thenReturn(true);
+
+        sgc.organizacao.model.Usuario usuario = new sgc.organizacao.model.Usuario();
+        sgc.organizacao.model.UsuarioPerfil atribuicao = new sgc.organizacao.model.UsuarioPerfil();
+        Unidade u2 = new Unidade(); u2.setCodigo(2L); // Different unit
+        atribuicao.setUnidade(u2);
+        usuario.setAtribuicoes(Set.of(atribuicao));
+
+        when(auth.getPrincipal()).thenReturn(usuario);
+        when(securityContext.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(securityContext);
+
+        ProcessoDetalheDto dto = builder.build(processo);
+        assertThat(dto.isPodeHomologarCadastro()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve lidar com unidade filha cujo pai não está nos participantes")
+    void deveLidarComPaiNaoParticipanteNaHierarquia() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+
+        Unidade pai = new Unidade(); pai.setCodigo(1L); pai.setSigla("PAI");
+        Unidade filho = new Unidade(); filho.setCodigo(2L); filho.setSigla("FILHO");
+        filho.setUnidadeSuperior(pai);
+
+        // Apenas filho participa
+        processo.setParticipantes(Set.of(filho));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
+
+        SecurityContextHolder.setContext(mock(SecurityContext.class));
+
+        ProcessoDetalheDto dto = builder.build(processo);
+
+        // Filho deve aparecer na raiz pois pai não participa
+        assertThat(dto.getUnidades()).hasSize(1);
+        assertThat(dto.getUnidades().get(0).getSigla()).isEqualTo("FILHO");
     }
 }

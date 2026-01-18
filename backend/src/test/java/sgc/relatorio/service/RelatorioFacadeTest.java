@@ -269,4 +269,79 @@ class RelatorioFacadeTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Erro ao gerar PDF");
     }
+
+    @Test
+    @DisplayName("Deve processar competência com atividades nulas")
+    void deveProcessarCompetenciaComAtividadesNulas() {
+        when(pdfFactory.createDocument()).thenReturn(document);
+        Processo p = new Processo();
+        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1"); u.setCodigo(1L);
+        Subprocesso sp = new Subprocesso(); sp.setUnidade(u); sp.setMapa(new Mapa()); sp.getMapa().setCodigo(10L);
+
+        Competencia c = new Competencia();
+        c.setDescricao("Comp 1");
+        c.setAtividades(null); // Explicitamente nulo
+
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioMapas(1L, 1L, out);
+        verify(document, atLeastOnce()).add(any());
+    }
+
+    @Test
+    @DisplayName("Deve processar atividade com conhecimentos nulos")
+    void deveProcessarAtividadeComConhecimentosNulos() {
+        when(pdfFactory.createDocument()).thenReturn(document);
+        Processo p = new Processo();
+        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1"); u.setCodigo(1L);
+        Subprocesso sp = new Subprocesso(); sp.setUnidade(u); sp.setMapa(new Mapa()); sp.getMapa().setCodigo(10L);
+
+        Competencia c = new Competencia();
+        c.setDescricao("Comp 1");
+        Atividade a = new Atividade();
+        a.setDescricao("Ativ 1");
+        a.setConhecimentos(null); // Explicitamente nulo
+        c.setAtividades(java.util.Set.of(a));
+
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioMapas(1L, 1L, out);
+        verify(document, atLeastOnce()).add(any());
+    }
+
+    @Test
+    @DisplayName("Deve filtrar subprocesso com unidade ou código nulo no stream")
+    void deveFiltrarSubprocessoComUnidadeOuCodigoNulo() {
+        when(pdfFactory.createDocument()).thenReturn(document);
+        Processo p = new Processo();
+
+        Subprocesso spValid = new Subprocesso();
+        Unidade u = new Unidade(); u.setCodigo(1L); u.setSigla("U1"); u.setNome("U1");
+        spValid.setUnidade(u);
+        spValid.setMapa(new Mapa()); spValid.getMapa().setCodigo(10L);
+
+        Subprocesso spNullUnit = new Subprocesso();
+        spNullUnit.setUnidade(null);
+
+        Subprocesso spNullCode = new Subprocesso();
+        Unidade u2 = new Unidade(); u2.setCodigo(null);
+        spNullCode.setUnidade(u2);
+
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(spValid, spNullUnit, spNullCode));
+        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioMapas(1L, 1L, out);
+
+        // Deve ter processado apenas o válido
+        verify(document, atLeastOnce()).add(any());
+        // Could verify more strictly but ensure it doesn't throw NPE
+    }
 }

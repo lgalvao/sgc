@@ -8,18 +8,27 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseFacade;
+import sgc.analise.model.Analise;
+import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.ConhecimentoService;
 import sgc.mapa.service.MapaFacade;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
+import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
@@ -30,6 +39,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,6 +49,8 @@ import static org.mockito.Mockito.when;
 class SubprocessoFacadeTest2 {
     @Mock
     private UsuarioFacade usuarioService;
+    @Mock
+    private UnidadeFacade unidadeFacade;
     @Mock
     private SubprocessoCrudService crudService;
     @Mock
@@ -99,7 +112,6 @@ class SubprocessoFacadeTest2 {
         @Test
         @DisplayName("Deve listar atividades do subprocesso convertidas para DTO")
         void deveListarAtividadesSubprocesso() {
-            // Now mocking internal dependencies that Facade uses
             Subprocesso sp = new Subprocesso();
             Mapa mapa = new Mapa();
             mapa.setCodigo(1L);
@@ -111,6 +123,17 @@ class SubprocessoFacadeTest2 {
             List<AtividadeVisualizacaoDto> result = subprocessoFacade.listarAtividadesSubprocesso(1L);
 
             assertThat(result).isNotNull();
+        }
+
+        @Test
+        @DisplayName("listarAtividadesSubprocesso deve retornar vazio se mapa for nulo")
+        void listarAtividadesSubprocessoMapaNulo() {
+            Subprocesso sp = new Subprocesso();
+            sp.setMapa(null);
+            when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
+
+            List<AtividadeVisualizacaoDto> result = subprocessoFacade.listarAtividadesSubprocesso(1L);
+            assertThat(result).isEmpty();
         }
 
         @Test
@@ -258,9 +281,6 @@ class SubprocessoFacadeTest2 {
     @Nested
     @DisplayName("Cenários de Permissões e Detalhes")
     class PermissaoDetalheTests {
-        // Tests removed - these now test internal implementation details
-        // Integration tests provide full coverage of this functionality
-
 
         @Test
         @DisplayName("obterPermissoes lança exceção quando não autenticado")
@@ -283,6 +303,164 @@ class SubprocessoFacadeTest2 {
                     subprocessoFacade.obterPermissoes(1L)
             );
         }
+
+        @Test
+        @DisplayName("Deve obter permissoes com sucesso")
+        void deveObterPermissoes() {
+            Long codigo = 1L;
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(codigo);
+            Usuario usuario = new Usuario();
+
+            when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            // We can mock 'podeExecutar' calls implicitly returning false by default boolean mock
+
+            SubprocessoPermissoesDto result = subprocessoFacade.obterPermissoes(codigo);
+            assertThat(result).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Deve obter detalhes do subprocesso")
+        void deveObterDetalhes() {
+            Long codigo = 1L;
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(codigo);
+            Unidade unidade = new Unidade();
+            unidade.setSigla("SIGLA");
+            unidade.setTituloTitular("TITULAR");
+            sp.setUnidade(unidade);
+
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("123");
+
+            when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(usuarioService.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
+            when(usuarioService.buscarPorLogin("TITULAR")).thenReturn(new Usuario());
+            when(repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
+
+            when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().unidade(SubprocessoDetalheDto.UnidadeDto.builder().sigla("SIGLA").build()).build());
+
+            SubprocessoDetalheDto result = subprocessoFacade.obterDetalhes(codigo, sgc.organizacao.model.Perfil.ADMIN);
+
+            assertThat(result).isNotNull();
+            verify(accessControlService).verificarPermissao(usuario, sgc.seguranca.acesso.Acao.VISUALIZAR_SUBPROCESSO, sp);
+        }
+
+        @Test
+        @DisplayName("obterDetalhes deve lidar com titular nulo")
+        void obterDetalhesTitularNulo() {
+            Long codigo = 1L;
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(codigo);
+            Unidade unidade = new Unidade();
+            unidade.setSigla("SIGLA");
+            unidade.setTituloTitular(null);
+            sp.setUnidade(unidade);
+
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("123");
+
+            when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(usuarioService.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
+            // Titular null, should not call buscarPorLogin
+            when(repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
+            when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().build());
+
+            subprocessoFacade.obterDetalhes(codigo, sgc.organizacao.model.Perfil.ADMIN);
+
+            // Should pass without error
+        }
+
+        @Test
+        @DisplayName("obterDetalhes deve lidar com exceção ao buscar titular")
+        void obterDetalhesTitularException() {
+            Long codigo = 1L;
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(codigo);
+            Unidade unidade = new Unidade();
+            unidade.setSigla("SIGLA");
+            unidade.setTituloTitular("TITULAR");
+            sp.setUnidade(unidade);
+
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("123");
+
+            when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(usuarioService.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
+            when(usuarioService.buscarPorLogin("TITULAR")).thenThrow(new RuntimeException("Erro"));
+            when(repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
+            when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().build());
+
+            subprocessoFacade.obterDetalhes(codigo, sgc.organizacao.model.Perfil.ADMIN);
+
+            // Should pass without error
+        }
+
+        @Test
+        @DisplayName("Deve obter contexto de edição")
+        void deveObterContextoEdicao() {
+            Long codigo = 1L;
+            Usuario usuario = new Usuario();
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(codigo);
+            Unidade unidade = new Unidade();
+            unidade.setSigla("SIGLA");
+            sp.setUnidade(unidade);
+
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+            when(repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
+
+            sgc.organizacao.dto.UnidadeDto unidadeDto = sgc.organizacao.dto.UnidadeDto.builder().sigla("SIGLA").build();
+            SubprocessoDetalheDto.UnidadeDto subUnidadeDto = SubprocessoDetalheDto.UnidadeDto.builder().sigla("SIGLA").build();
+            when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().unidade(subUnidadeDto).build());
+            when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(unidadeDto);
+
+            ContextoEdicaoDto result = subprocessoFacade.obterContextoEdicao(codigo, sgc.organizacao.model.Perfil.ADMIN);
+            assertThat(result).isNotNull();
+        }
+
+        @Test
+        @DisplayName("obterPermissoes para processo REVISAO")
+        void obterPermissoesProcessoRevisao() {
+            Long codigo = 1L;
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(codigo);
+            sgc.processo.model.Processo proc = new sgc.processo.model.Processo();
+            proc.setTipo(sgc.processo.model.TipoProcesso.REVISAO);
+            sp.setProcesso(proc);
+
+            Usuario usuario = new Usuario();
+
+            when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+
+            SubprocessoPermissoesDto result = subprocessoFacade.obterPermissoes(codigo);
+            assertThat(result).isNotNull();
+        }
+
+        @Test
+        @DisplayName("obterPermissoes para processo MAPEAMENTO")
+        void obterPermissoesProcessoMapeamento() {
+            Long codigo = 1L;
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(codigo);
+            sgc.processo.model.Processo proc = new sgc.processo.model.Processo();
+            proc.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+            sp.setProcesso(proc);
+
+            Usuario usuario = new Usuario();
+
+            when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+
+            SubprocessoPermissoesDto result = subprocessoFacade.obterPermissoes(codigo);
+            assertThat(result).isNotNull();
+        }
     }
 
     @Nested
@@ -300,9 +478,6 @@ class SubprocessoFacadeTest2 {
             assertThat(result).isNotNull();
         }
 
-        // obterCadastro and obterMapaParaAjuste tests removed - they test internal implementation details
-        // Integration tests provide full coverage of this functionality
-
         @Test
         @DisplayName("listar")
         void listar() {
@@ -318,6 +493,240 @@ class SubprocessoFacadeTest2 {
             SubprocessoDto result = subprocessoFacade.obterPorProcessoEUnidade(1L, 10L);
             assertThat(result).isNotNull();
             assertThat(result.getCodigo()).isEqualTo(1L);
+        }
+
+        @Test
+        @DisplayName("Deve obter cadastro")
+        void deveObterCadastro() {
+             Long codigo = 1L;
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(codigo);
+            sp.setUnidade(new Unidade());
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(10L);
+            sp.setMapa(mapa);
+
+            when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+            Atividade ativ = new Atividade();
+            ativ.setCodigo(100L);
+            ativ.setConhecimentos(List.of());
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(ativ));
+
+            SubprocessoCadastroDto result = subprocessoFacade.obterCadastro(codigo);
+            assertThat(result).isNotNull();
+            assertThat(result.getAtividades()).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve obter mapa para ajuste")
+        void deveObterMapaParaAjuste() {
+            Long codigo = 1L;
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(codigo);
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(10L);
+            sp.setMapa(mapa);
+
+            when(crudService.buscarSubprocessoComMapa(codigo)).thenReturn(sp);
+            when(analiseFacade.listarPorSubprocesso(codigo, sgc.analise.model.TipoAnalise.VALIDACAO)).thenReturn(List.of());
+            when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
+            when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of());
+            when(conhecimentoService.listarPorMapa(10L)).thenReturn(List.of());
+            when(mapaAjusteMapper.toDto(any(), any(), any(), any(), any())).thenReturn(MapaAjusteDto.builder().build());
+
+            MapaAjusteDto result = subprocessoFacade.obterMapaParaAjuste(codigo);
+            assertThat(result).isNotNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("Cenários Complexos")
+    class ComplexTests {
+        @Test
+        @DisplayName("Deve salvar ajustes do mapa")
+        void deveSalvarAjustesMapa() {
+            Long codigo = 1L;
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(codigo);
+            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+
+            when(subprocessoRepo.findById(codigo)).thenReturn(java.util.Optional.of(sp));
+
+            CompetenciaAjusteDto compDto = CompetenciaAjusteDto.builder()
+                    .codCompetencia(10L)
+                    .nome("Nova Comp")
+                    .atividades(List.of())
+                    .build();
+
+            Competencia comp = new Competencia();
+            comp.setCodigo(10L);
+            when(competenciaService.buscarPorCodigo(10L)).thenReturn(comp);
+
+            subprocessoFacade.salvarAjustesMapa(codigo, List.of(compDto), "user");
+
+            verify(competenciaService).salvar(comp);
+            verify(subprocessoRepo).save(sp);
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+        }
+
+        @Test
+        @DisplayName("salvarAjustesMapa deve aceitar REVISAO_MAPA_AJUSTADO")
+        void salvarAjustesMapaAceitaRevisaoMapaAjustado() {
+            Long codigo = 1L;
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(codigo);
+            sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+
+            when(subprocessoRepo.findById(codigo)).thenReturn(java.util.Optional.of(sp));
+            // empty list of adjustments
+            subprocessoFacade.salvarAjustesMapa(codigo, List.of(), "user");
+
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+        }
+
+        @Test
+        @DisplayName("salvarAjustesMapa deve lançar exceção se situação inválida")
+        void salvarAjustesMapaSituacaoInvalida() {
+            Long codigo = 1L;
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(codigo);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+            when(subprocessoRepo.findById(codigo)).thenReturn(java.util.Optional.of(sp));
+
+            org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () ->
+                subprocessoFacade.salvarAjustesMapa(codigo, List.of(), "user")
+            );
+        }
+
+        @Test
+        @DisplayName("Deve importar atividades")
+        void deveImportarAtividades() {
+            Long dest = 1L;
+            Long orig = 2L;
+
+            Subprocesso spDest = new Subprocesso();
+            spDest.setCodigo(dest);
+            spDest.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+            Mapa mapaDest = new Mapa();
+            mapaDest.setCodigo(10L);
+            spDest.setMapa(mapaDest);
+            sgc.processo.model.Processo processo = new sgc.processo.model.Processo();
+            processo.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+            spDest.setProcesso(processo);
+            spDest.setUnidade(new Unidade());
+
+            Subprocesso spOrig = new Subprocesso();
+            spOrig.setCodigo(orig);
+            Mapa mapaOrig = new Mapa();
+            mapaOrig.setCodigo(20L);
+            spOrig.setMapa(mapaOrig);
+            spOrig.setUnidade(new Unidade());
+
+            when(subprocessoRepo.findById(dest)).thenReturn(java.util.Optional.of(spDest));
+            when(subprocessoRepo.findById(orig)).thenReturn(java.util.Optional.of(spOrig));
+
+            subprocessoFacade.importarAtividades(dest, orig);
+
+            verify(copiaMapaService).importarAtividadesDeOutroMapa(20L, 10L);
+            verify(movimentacaoRepo).save(any());
+            assertThat(spDest.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        }
+
+        @Test
+        @DisplayName("importarAtividades falha se situação destino inválida")
+        void importarAtividadesSituacaoDestinoInvalida() {
+            Long dest = 1L;
+            Subprocesso spDest = new Subprocesso();
+            spDest.setCodigo(dest);
+            spDest.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO); // Invalid for import
+
+            when(subprocessoRepo.findById(dest)).thenReturn(java.util.Optional.of(spDest));
+
+            org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida.class, () ->
+                subprocessoFacade.importarAtividades(dest, 2L)
+            );
+        }
+
+        @Test
+        @DisplayName("importarAtividades falha se mapa nulo")
+        void importarAtividadesMapaNulo() {
+            Long dest = 1L;
+            Subprocesso spDest = new Subprocesso();
+            spDest.setCodigo(dest);
+            spDest.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+            spDest.setMapa(null); // Null map
+
+            Long orig = 2L;
+            Subprocesso spOrig = new Subprocesso();
+            spOrig.setMapa(new Mapa());
+
+            when(subprocessoRepo.findById(dest)).thenReturn(java.util.Optional.of(spDest));
+            when(subprocessoRepo.findById(orig)).thenReturn(java.util.Optional.of(spOrig));
+
+            org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaNaoAssociado.class, () ->
+                subprocessoFacade.importarAtividades(dest, orig)
+            );
+        }
+
+        @Test
+        @DisplayName("importarAtividades lida com tipo processo REVISAO e Default")
+        void importarAtividadesTiposProcesso() {
+             // Case REVISAO
+            Long dest = 1L;
+            Subprocesso spDest = new Subprocesso();
+            spDest.setCodigo(dest);
+            spDest.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+            spDest.setMapa(new Mapa());
+            spDest.setUnidade(new Unidade());
+            sgc.processo.model.Processo proc = new sgc.processo.model.Processo();
+            proc.setTipo(sgc.processo.model.TipoProcesso.REVISAO);
+            spDest.setProcesso(proc);
+
+            Long orig = 2L;
+            Subprocesso spOrig = new Subprocesso();
+            spOrig.setMapa(new Mapa());
+            spOrig.setUnidade(new Unidade()); // Origem unidade not null
+
+            when(subprocessoRepo.findById(dest)).thenReturn(java.util.Optional.of(spDest));
+            when(subprocessoRepo.findById(orig)).thenReturn(java.util.Optional.of(spOrig));
+
+            subprocessoFacade.importarAtividades(dest, orig);
+            assertThat(spDest.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+
+            // Case Default/Null (using unknown type if possible or just verifying default behavior)
+            // Assuming TipoProcesso is enum, so can't pass invalid string.
+            // If TipoProcesso is null?
+            spDest.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+            proc.setTipo(null);
+
+            subprocessoFacade.importarAtividades(dest, orig);
+            // Should remain NAO_INICIADO
+            assertThat(spDest.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
+        }
+
+        @Test
+        @DisplayName("importarAtividades com unidade origem nula")
+        void importarAtividadesUnidadeOrigemNula() {
+            Long dest = 1L;
+            Subprocesso spDest = new Subprocesso();
+            spDest.setCodigo(dest);
+            spDest.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            spDest.setMapa(new Mapa());
+            spDest.setUnidade(new Unidade());
+
+            Long orig = 2L;
+            Subprocesso spOrig = new Subprocesso();
+            spOrig.setMapa(new Mapa());
+            spOrig.setUnidade(null); // Unidade Nula
+
+            when(subprocessoRepo.findById(dest)).thenReturn(java.util.Optional.of(spDest));
+            when(subprocessoRepo.findById(orig)).thenReturn(java.util.Optional.of(spOrig));
+
+            subprocessoFacade.importarAtividades(dest, orig);
+
+            // Should pass and verify log message or something, but here just ensure no NPE
+            verify(movimentacaoRepo, org.mockito.Mockito.atLeastOnce()).save(any());
         }
     }
 }

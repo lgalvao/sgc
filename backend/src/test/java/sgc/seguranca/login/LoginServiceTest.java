@@ -80,4 +80,54 @@ class LoginServiceTest {
 
         assertThrows(ErroAccessoNegado.class, () -> loginFacade.entrar(req));
     }
+
+    @Test
+    @DisplayName("Deve autenticar em ambiente de testes sem AD")
+    void deveAutenticarEmAmbienteTestesSemAd() {
+        LoginFacade serviceSemAd = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService);
+        ReflectionTestUtils.setField(serviceSemAd, "ambienteTestes", true);
+
+        when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(new sgc.organizacao.model.Usuario());
+
+        boolean result = serviceSemAd.autenticar("123", "senha");
+
+        // Deve retornar true pois encontrou usuário
+        org.junit.jupiter.api.Assertions.assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("Deve falhar autorização sem autenticação prévia")
+    void deveFalharAutorizacaoSemAutenticacaoPrevia() {
+        assertThrows(ErroAutenticacao.class, () -> loginFacade.autorizar("user_nao_autenticado"));
+    }
+
+    @Test
+    @DisplayName("Deve falhar entrar com autenticação expirada")
+    void deveFalharEntrarComAutenticacaoExpirada() {
+        String titulo = "user_expirado";
+        // Autentica
+        when(clienteAcessoAd.autenticar(titulo, "senha")).thenReturn(true);
+        loginFacade.autenticar(titulo, "senha");
+
+        // Força expiração
+        loginFacade.expireAllAuthenticationsForTest();
+
+        EntrarRequest req = EntrarRequest.builder().tituloEleitoral(titulo).build();
+        assertThrows(ErroAutenticacao.class, () -> loginFacade.entrar(req));
+    }
+
+    @Test
+    @DisplayName("Deve limpar autenticações expiradas")
+    void deveLimparAutenticaçõesExpiradas() {
+        String titulo = "user_clean";
+        when(clienteAcessoAd.autenticar(titulo, "senha")).thenReturn(true);
+        loginFacade.autenticar(titulo, "senha");
+
+        // Força expiração
+        loginFacade.expireAllAuthenticationsForTest();
+
+        loginFacade.limparAutenticacoesExpiradas();
+
+        assertThrows(ErroAutenticacao.class, () -> loginFacade.autorizar(titulo));
+    }
 }
