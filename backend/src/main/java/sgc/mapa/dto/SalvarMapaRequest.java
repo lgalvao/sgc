@@ -1,7 +1,7 @@
 package sgc.mapa.dto;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +24,7 @@ public class SalvarMapaRequest {
     /**
      * Lista de competências do mapa.
      */
-    @NotNull(message = "Lista de competências não pode ser nula")
+    @NotEmpty(message = "Lista de competências não pode ser vazia")
     @Valid
     private final List<CompetenciaMapaDto> competencias;
 }

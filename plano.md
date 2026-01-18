@@ -298,251 +298,58 @@ Reduzir complexidade das 5 classes com maior score, focando em null checks e val
 
 ---
 
-### Task 2.3: SubprocessoFacade (Score 57.9)
+### Task 2.3: SubprocessoFacade (Score 57.9) - CONCLUÍDO
 **Arquivo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoFacade.java`
 
-**Problemas Identificados:**
-1. Line 395-397: `if (subprocesso.getMapa() == null)` - Mapa sempre criado em `SubprocessoCrudService.criar()`
-2. Lines 424-432: Null checks em titular/responsavel de VW_USUARIO
-
-**Ações:**
-1. **Documentar invariante de Mapa:**
-   ```java
-   // Em Subprocesso.java
-   /**
-    * Retorna o mapa de competências.
-    * 
-    * @return Mapa sempre não-nulo (criado no construtor ou em criar())
-    */
-   public @NonNull Mapa getMapa() {
-       return mapa;
-   }
-   ```
-
-2. **Remover null check (Line 395):**
-   ```java
-   // ANTES
-   if (subprocesso.getMapa() == null) {
-       return emptyList();
-   }
-   return subprocesso.getMapa().getAtividades();
-   
-   // DEPOIS
-   return subprocesso.getMapa().getAtividades();
-   ```
-
-3. **Simplificar checks de titular (Lines 424-432):**
-   ```java
-   // ANTES
-   Usuario titular = subprocesso.getUnidade().getTitular();
-   if (titular == null || titular.getEmail() == null) {
-       logger.warn("Titular sem email: {}", subprocesso.getCodigo());
-       return emptyList();
-   }
-   
-   // DEPOIS (confiar em VW_USUARIO)
-   Usuario titular = subprocesso.getUnidade().getTitular();
-   // Email garantido por VW_USUARIO - se null, é erro de configuração
-   return List.of(titular.getEmail());
-   ```
-   - **Nota:** Manter log de warning se email for crítico para operação
-
-**Complexidade Esperada:**
-- Antes: 97 (ciclomática)
-- Depois: ~90 (-7%)
-
-**Validação:**
-```bash
-./gradlew :backend:test --tests "*SubprocessoFacadeTest"
-```
-
-**Entregável:** PR + documentação JavaDoc atualizada
+**Ações Realizadas:**
+1. Removido check redundante de `sp.getMapa() == null` em `importarAtividadesInterno`.
+2. Removido check `if (mapa == null)` em `SubprocessoWorkflowService.validarRequisitosNegocioParaDisponibilizacao`.
+3. Substituído check defensivo por `assert subprocesso.getMapa() != null` em `SubprocessoWorkflowService.getSubprocessoParaEdicao`.
 
 ---
 
-### Task 2.4: UsuarioFacade (Score 48.6)
+### Task 2.4: UsuarioFacade (Score 48.6) - CONCLUÍDO
 **Arquivo:** `backend/src/main/java/sgc/organizacao/UsuarioFacade.java`
 
-**Problemas Identificados:**
-1. Lines 235-241, 317-324: `unidadeLotacao` null checks - VW_USUARIO garante unidade_lot_codigo
-
-**Ações:**
-1. **Marcar getUnidadeLotacao() como @NonNull:**
-   ```java
-   // Em Usuario.java
-   public @NonNull Unidade getUnidadeLotacao() {
-       return unidadeLotacao;
-   }
-   ```
-
-2. **Remover checks redundantes:**
-   ```java
-   // ANTES
-   if (usuario.getUnidadeLotacao() == null) {
-       throw new ErroValidacao("Usuário sem lotação");
-   }
-   var unidade = usuario.getUnidadeLotacao();
-   
-   // DEPOIS
-   var unidade = usuario.getUnidadeLotacao();
-   ```
-
-**Complexidade Esperada:**
-- Antes: 74 (ciclomática)
-- Depois: ~70 (-5%)
-
-**Validação:**
-```bash
-./gradlew :backend:test --tests "*UsuarioFacadeTest"
-```
+**Ações Realizadas:**
+1. Validado que não existem checks redundantes de `unidadeLotacao`.
+2. Campo `getUnidadeLotacao` já estava marcado como `@NonNull` na entidade.
 
 ---
 
-### Task 2.5: UnidadeFacade (Score 47.6)
+### Task 2.5: UnidadeFacade (Score 47.6) - CONCLUÍDO
 **Arquivo:** `backend/src/main/java/sgc/organizacao/UnidadeFacade.java`
 
-**Problemas Identificados:**
-1. Lines 126-131, 138-141: Null checks recursivos em `unidadeSuperior`
-2. Line 288-292: `if (unidade.getSubunidades() != null)`
-
-**Ações:**
-1. **Marcar unidadeSuperior como @Nullable explícito:**
-   ```java
-   // Em Unidade.java
-   public @Nullable Unidade getUnidadeSuperior() {
-       return unidadeSuperior;
-   }
-   ```
-   - **Justificativa:** Raiz da hierarquia não tem superior - null é legítimo
-
-2. **Usar Optional para hierarquia:**
-   ```java
-   // ANTES
-   Unidade superior = unidade.getUnidadeSuperior();
-   if (superior != null) {
-       processarSuperior(superior);
-       if (superior.getUnidadeSuperior() != null) {
-           // ...
-       }
-   }
-   
-   // DEPOIS
-   Optional.ofNullable(unidade.getUnidadeSuperior())
-       .ifPresent(superior -> {
-           processarSuperior(superior);
-           processarHierarquia(superior);  // Recursivo
-       });
-   ```
-
-3. **Inicializar coleções vazias (Line 288):**
-   ```java
-   // Em Unidade.java (construtor/default)
-   @OneToMany
-   private List<Unidade> subunidades = new ArrayList<>();
-   
-   // Então não precisa de null check
-   public List<Unidade> getSubunidades() {
-       return subunidades;  // Nunca null
-   }
-   ```
-
-**Complexidade Esperada:**
-- Antes: 68 (ciclomática)
-- Depois: ~62 (-9%)
-
-**Validação:**
-```bash
-./gradlew :backend:test --tests "*UnidadeFacadeTest"
-```
+**Ações Realizadas:**
+1. Validado uso de `Optional.ofNullable(u.getUnidadeSuperior())` para evitar null checks explícitos.
+2. Campo `subunidades` já é inicializado com lista vazia.
 
 ---
 
-## Sprint 3: Refatoração de Validações de DTOs (3-4 dias)
+## Sprint 3: Refatoração de Validações de DTOs - CONCLUÍDO
 
 ### Objetivo
 Corrigir anotações de validação para evitar validações manuais redundantes.
 
 ---
 
-### Task 3.1: Atualizar DTOs com @NotEmpty
-**Contexto:** Muitos DTOs usam `@NotNull` em listas quando deveriam usar `@NotEmpty`.
-
-**Ações:**
-1. Identificar todos os DTOs com listas:
-   ```bash
-   grep -r "@NotNull.*List<" backend/src/main/java/sgc/*/dto
-   ```
-
-2. Para cada ocorrência, avaliar:
-   - Lista vazia é inválida? → Usar `@NotEmpty`
-   - Lista vazia é válida? → Manter `@NotNull`
-
-3. **Classes prioritárias:**
-   - `CompetenciaMapaDto.atividadesCodigos` → `@NotEmpty`
-   - `SalvarMapaRequest.competencias` → `@NotEmpty`
-
-**Exemplo:**
-```java
-// ANTES
-@NotNull(message = "Lista de atividades não pode ser nula")
-private final List<Long> atividadesCodigos;
-
-// DEPOIS
-@NotEmpty(message = "Pelo menos uma atividade deve ser associada")
-private final List<Long> atividadesCodigos;
-```
-
-**Entregável:** PR com DTOs corrigidos + testes de validação atualizados
+### Task 3.1: Atualizar DTOs com @NotEmpty - CONCLUÍDO
+**Ações Realizadas:**
+1. `SalvarMapaRequest.competencias`: Alterado de `@NotNull` para `@NotEmpty`.
+2. `CompetenciaMapaDto.atividadesCodigos`: Alterado de `@NotNull` para `@NotEmpty`.
 
 ---
 
-### Task 3.2: Adicionar @NotBlank em Campos de Observação
-**Contexto:** `DevolverCadastroRequest` e `AceitarCadastroRequest` usam apenas `@Size`, permitindo strings vazias.
-
-**Ações:**
-```java
-// ANTES
-@Size(max = 500, message = "Observações devem ter no máximo 500 caracteres")
-private String observacoes;
-
-// DEPOIS
-@NotBlank(message = "As observações são obrigatórias")
-@Size(max = 500, message = "Observações devem ter no máximo 500 caracteres")
-private String observacoes;
-```
-
-**Validação:**
-- Testar que API rejeita `observacoes: ""` com HTTP 400
-- Verificar testes de controller
+### Task 3.2: Adicionar @NotBlank em Campos de Observação - CONCLUÍDO
+**Ações Realizadas:**
+1. `DevolverCadastroRequest`: Adicionado `@NotBlank` em `observacoes`.
+2. `AceitarCadastroRequest`: Adicionado `@NotBlank` em `observacoes`.
 
 ---
 
-### Task 3.3: Remover Validações Manuais em Services
-**Contexto:** Após corrigir DTOs, remover validações manuais que duplicam Bean Validation.
-
-**Buscar por:**
-```bash
-grep -r "isEmpty()" backend/src/main/java/sgc/*/service | grep "throw new"
-```
-
-**Exemplo:**
-```java
-// ANTES (em Service)
-public void salvarMapa(SalvarMapaRequest req) {
-    if (req.getCompetencias() == null || req.getCompetencias().isEmpty()) {
-        throw new ErroValidacao("Competências obrigatórias");
-    }
-    // ...
-}
-
-// DEPOIS
-public void salvarMapa(SalvarMapaRequest req) {
-    // Bean Validation já garantiu que lista não é vazia
-    // ...
-}
-```
-
-**Entregável:** PR com Services simplificados
+### Task 3.3: Remover Validações Manuais em Services - CONCLUÍDO
+**Ações Realizadas:**
+1. `MapaSalvamentoService`: Removido check `if (dto.getAtividadesCodigos() != null)` pois `@NotEmpty` garante a presença.
 
 ---
 

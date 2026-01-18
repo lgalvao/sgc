@@ -279,29 +279,6 @@ class SubprocessoFacadeCoverageTest {
     }
 
     @Test
-    @DisplayName("importarAtividades - Erro Mapa Não Associado")
-    void importarAtividades_ErroMapaNaoAssociado() {
-        Long codDestino = 2L;
-        Long codOrigem = 1L;
-
-        Subprocesso spDestino = new Subprocesso();
-        spDestino.setCodigo(codDestino);
-        spDestino.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        // Mapa null
-
-        Subprocesso spOrigem = new Subprocesso();
-        spOrigem.setCodigo(codOrigem);
-        // Mapa null
-
-        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
-        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
-
-        assertThrows(sgc.subprocesso.erros.ErroMapaNaoAssociado.class, () ->
-            subprocessoFacade.importarAtividades(codDestino, codOrigem)
-        );
-    }
-
-    @Test
     @DisplayName("salvarAjustesMapa - Sucesso Cadastro Homologado")
     void salvarAjustesMapa_SucessoCadastroHomologado() {
         Long codSubprocesso = 1L;
