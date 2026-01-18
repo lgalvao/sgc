@@ -28,28 +28,44 @@ class SubprocessoValidacaoControllerRestAssuredTest extends BaseRestAssuredTest 
     @Autowired
     private UnidadeRepo unidadeRepo;
 
+    @Autowired
+    private UsuarioPerfilRepo usuarioPerfilRepo;
+
     private Usuario usuarioAdmin;
     private Unidade unidade;
     private Subprocesso subprocesso;
 
     @BeforeEach
     void setupDados() {
-        subprocessoRepo.deleteAll();
-        processoRepo.deleteAll();
-        usuarioRepo.deleteAll();
-        unidadeRepo.deleteAll();
+        unidade = unidadeRepo.findBySigla("ADM_SUB_VAL").orElseGet(() -> {
+            Unidade u = new Unidade();
+            u.setSigla("ADM_SUB_VAL");
+            u.setNome("Unidade Sub Val");
+            u.setTipo(TipoUnidade.OPERACIONAL);
+            return unidadeRepo.save(u);
+        });
 
-        unidade = new Unidade();
-        unidade.setSigla("ADM_SUB_VAL");
-        unidade.setNome("Unidade Sub Val");
-        unidade.setTipo(TipoUnidade.OPERACIONAL);
-        unidade = unidadeRepo.save(unidade);
+        usuarioAdmin = usuarioRepo.findById("15151515151").orElseGet(() -> {
+            Usuario u = new Usuario();
+            u.setTituloEleitoral("15151515151");
+            u.setNome("Admin Sub Val");
+            u.setUnidadeLotacao(unidade);
+            return usuarioRepo.save(u);
+        });
 
-        usuarioAdmin = new Usuario();
-        usuarioAdmin.setTituloEleitoral("15151515151");
-        usuarioAdmin.setNome("Admin Sub Val");
-        usuarioAdmin.setUnidadeLotacao(unidade);
-        usuarioAdmin = usuarioRepo.save(usuarioAdmin);
+        UsuarioPerfilId id = new UsuarioPerfilId(usuarioAdmin.getTituloEleitoral(), unidade.getCodigo(), Perfil.ADMIN);
+        if (!usuarioPerfilRepo.existsById(id)) {
+            UsuarioPerfil up = new UsuarioPerfil();
+            up.setUsuarioTitulo(usuarioAdmin.getTituloEleitoral());
+            up.setUnidadeCodigo(unidade.getCodigo());
+            up.setPerfil(Perfil.ADMIN);
+            usuarioPerfilRepo.save(up);
+        }
+
+        // Check if Processo exists (simplified check, usually by ID or attributes, here we create new if not ensuring we don't duplicate if we can find it)
+        // Since Processo doesn't have a unique key other than ID easily accessible here without a finder, and we want a fresh one usually...
+        // But to avoid deleteAll, we just create a NEW one. The issue with deleteAll was FK constraints on Unidade/Usuario.
+        // Processo and Subprocesso usually can be created anew without clearing tables, AS LONG AS we don't try to clear Unidade/Usuario.
 
         Processo processo = new Processo();
         processo.setDescricao("Processo Sub Val");

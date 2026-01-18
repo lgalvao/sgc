@@ -23,26 +23,38 @@ class UsuarioControllerRestAssuredTest extends BaseRestAssuredTest {
     @Autowired
     private AdministradorRepo administradorRepo;
 
+    @Autowired
+    private UsuarioPerfilRepo usuarioPerfilRepo;
+
     private Usuario usuarioAdmin;
     private Unidade unidade;
 
     @BeforeEach
     void setupDados() {
-        administradorRepo.deleteAll();
-        usuarioRepo.deleteAll();
-        unidadeRepo.deleteAll();
+        unidade = unidadeRepo.findBySigla("ADM_USR").orElseGet(() -> {
+            Unidade u = new Unidade();
+            u.setSigla("ADM_USR");
+            u.setNome("Unidade Usuario");
+            u.setTipo(TipoUnidade.OPERACIONAL);
+            return unidadeRepo.save(u);
+        });
 
-        unidade = new Unidade();
-        unidade.setSigla("ADM_USR");
-        unidade.setNome("Unidade Usuario");
-        unidade.setTipo(TipoUnidade.OPERACIONAL);
-        unidade = unidadeRepo.save(unidade);
+        usuarioAdmin = usuarioRepo.findById("99999999999").orElseGet(() -> {
+            Usuario u = new Usuario();
+            u.setTituloEleitoral("99999999999");
+            u.setNome("Admin Usuario");
+            u.setUnidadeLotacao(unidade);
+            return usuarioRepo.save(u);
+        });
 
-        usuarioAdmin = new Usuario();
-        usuarioAdmin.setTituloEleitoral("99999999999");
-        usuarioAdmin.setNome("Admin Usuario");
-        usuarioAdmin.setUnidadeLotacao(unidade);
-        usuarioAdmin = usuarioRepo.save(usuarioAdmin);
+        UsuarioPerfilId id = new UsuarioPerfilId(usuarioAdmin.getTituloEleitoral(), unidade.getCodigo(), Perfil.ADMIN);
+        if (!usuarioPerfilRepo.existsById(id)) {
+            UsuarioPerfil up = new UsuarioPerfil();
+            up.setUsuarioTitulo(usuarioAdmin.getTituloEleitoral());
+            up.setUnidadeCodigo(unidade.getCodigo());
+            up.setPerfil(Perfil.ADMIN);
+            usuarioPerfilRepo.save(up);
+        }
     }
 
     @Test
