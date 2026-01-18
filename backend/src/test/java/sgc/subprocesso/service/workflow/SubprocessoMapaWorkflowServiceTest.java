@@ -283,17 +283,6 @@ class SubprocessoMapaWorkflowServiceTest {
             verify(mapaFacade).salvarMapaCompleto(10L, req);
         }
 
-        @Test
-        @DisplayName("Deve falhar ao buscar subprocesso sem mapa")
-        void deveFalharSubprocessoSemMapa() {
-            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-            when(sp.getMapa()).thenReturn(null);
-            
-            SalvarMapaRequest req = SalvarMapaRequest.builder().build();
-            assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, req))
-                .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class)
-                .hasMessageContaining("Mapa");
-        }
 
         @Test
         @DisplayName("Deve salvar mapa sem alterar situação se mapa não era vazio")

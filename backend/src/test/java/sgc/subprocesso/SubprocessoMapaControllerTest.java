@@ -98,7 +98,7 @@ class SubprocessoMapaControllerTest {
     void salvarMapa() throws Exception {
         SalvarMapaRequest req = SalvarMapaRequest.builder()
                 .observacoes("obs")
-                .competencias(List.of())
+                .competencias(List.of(sgc.mapa.dto.CompetenciaMapaDto.builder().descricao("Comp 1").atividadesCodigos(List.of(1L)).build()))
                 .build();
 
         when(subprocessoFacade.salvarMapaSubprocesso(eq(1L), any()))
@@ -158,7 +158,7 @@ class SubprocessoMapaControllerTest {
     void salvarMapaCompleto() throws Exception {
         SalvarMapaRequest req = SalvarMapaRequest.builder()
                 .observacoes("obs")
-                .competencias(List.of())
+                .competencias(List.of(sgc.mapa.dto.CompetenciaMapaDto.builder().descricao("Comp 1").atividadesCodigos(List.of(1L)).build()))
                 .build();
 
         when(subprocessoFacade.salvarMapaSubprocesso(eq(1L), any()))

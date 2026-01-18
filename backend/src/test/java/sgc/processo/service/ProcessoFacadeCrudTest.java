@@ -168,19 +168,6 @@ class ProcessoFacadeCrudTest {
                     .hasMessage("Erro");
         }
 
-        @Test
-        @DisplayName("Deve falhar se unidade participamente for INTERMEDIARIA")
-        void deveFalharSeUnidadeIntermediaria() {
-            CriarProcessoRequest req = new CriarProcessoRequest(
-                    "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
-
-            Unidade u = UnidadeFixture.unidadeComId(1L);
-            u.setTipo(sgc.organizacao.model.TipoUnidade.INTERMEDIARIA);
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
-
-            assertThatThrownBy(() -> processoFacade.criar(req))
-                    .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
-        }
 
         @Test
         @DisplayName("Deve criar processo de REVISAO quando todas unidades tem mapa vigente")

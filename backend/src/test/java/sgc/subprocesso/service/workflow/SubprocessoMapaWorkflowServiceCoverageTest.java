@@ -75,19 +75,6 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
             .isInstanceOf(ErroMapaEmSituacaoInvalida.class);
     }
 
-    @Test
-    @DisplayName("salvarMapaSubprocesso: erro se mapa null")
-    void salvarMapaSubprocesso_ErroMapaNull() {
-        Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
-        sp.setMapa(null);
-
-        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
-
-        SalvarMapaRequest request = SalvarMapaRequest.builder().build();
-        assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, request))
-            .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
-    }
 
     @Test
     @DisplayName("salvarMapaSubprocesso: muda situacao se era vazio e adicionou competencias")

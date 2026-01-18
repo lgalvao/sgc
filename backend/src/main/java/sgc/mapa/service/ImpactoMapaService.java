@@ -276,7 +276,6 @@ public class ImpactoMapaService {
             Map<Long, CompetenciaImpactoAcumulador> mapaImpactos) {
 
         removidas.stream()
-                .filter(dto -> dto.getCodigo() != null)
                 .forEach(dto -> {
                     List<Competencia> competenciasAfetadas = atividadeIdToCompetencias.getOrDefault(
                             dto.getCodigo(), List.of()
@@ -296,7 +295,6 @@ public class ImpactoMapaService {
             Map<Long, CompetenciaImpactoAcumulador> mapaImpactos) {
 
         alteradas.stream()
-                .filter(dto -> dto.getDescricao() != null)
                 .filter(dto -> descricaoToVigenteId.containsKey(dto.getDescricao()))
                 .forEach(dto -> {
                     Long idVigente = descricaoToVigenteId.get(dto.getDescricao());

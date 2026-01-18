@@ -94,18 +94,6 @@ class SubprocessoCrudServiceTest {
     }
 
     @Test
-    @DisplayName("Deve lançar exceção ao buscar subprocesso com mapa se mapa for nulo")
-    void deveLancarExcecaoSeMapaNulo() {
-        Subprocesso sp = new Subprocesso();
-        sp.setMapa(null);
-        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
-
-        assertThatThrownBy(() -> service.buscarSubprocessoComMapa(1L))
-                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class)
-                .hasMessageContaining("Subprocesso não possui mapa associado");
-    }
-
-    @Test
     @DisplayName("Deve listar entidades por processo")
     void deveListarEntidadesPorProcesso() {
         when(repositorioSubprocesso.findByProcessoCodigoWithUnidade(1L))

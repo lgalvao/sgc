@@ -154,21 +154,32 @@ public class EventoProcessoListener {
                 .toList();
 
         for (Unidade unidade : unidadesParticipantes) {
-            try {
-                ResponsavelDto responsavel = responsaveis.get(unidade.getCodigo());
-                UsuarioDto titular = usuarios.get(responsavel.getTitularTitulo());
-                String emailTitular = titular.getEmail();
+            enviarNotificacaoFinalizacao(processo, unidade, responsaveis, usuarios, todasSubordinadas);
+        }
+    }
 
-                TipoUnidade tipoUnidade = unidade.getTipo();
-                if (tipoUnidade == OPERACIONAL || tipoUnidade == INTEROPERACIONAL) {
-                    enviarEmailUnidadeFinal(processo, unidade, emailTitular);
-                } else if (tipoUnidade == INTERMEDIARIA) {
-                    enviarEmailUnidadeIntermediaria(processo, unidade, emailTitular, todasSubordinadas);
-                }
-            } catch (Exception e) {
-                log.error("Falha ao preparar notificação para unidade {} no processo {}: {}", 
-                        unidade.getSigla(), processo.getCodigo(), e.getMessage(), e);
+    private void enviarNotificacaoFinalizacao(Processo processo, Unidade unidade,
+                                              Map<Long, ResponsavelDto> responsaveis,
+                                              Map<String, UsuarioDto> usuarios,
+                                              List<Unidade> todasSubordinadas) {
+        try {
+            ResponsavelDto responsavel = responsaveis.get(unidade.getCodigo());
+            if (responsavel == null) return;
+
+            UsuarioDto titular = usuarios.get(responsavel.getTitularTitulo());
+            if (titular == null || titular.getEmail() == null) return;
+
+            String emailTitular = titular.getEmail();
+            TipoUnidade tipoUnidade = unidade.getTipo();
+
+            if (tipoUnidade == OPERACIONAL || tipoUnidade == INTEROPERACIONAL) {
+                enviarEmailUnidadeFinal(processo, unidade, emailTitular);
+            } else if (tipoUnidade == INTERMEDIARIA) {
+                enviarEmailUnidadeIntermediaria(processo, unidade, emailTitular, todasSubordinadas);
             }
+        } catch (Exception e) {
+            log.error("Falha ao preparar notificação para unidade {} no processo {}: {}",
+                    unidade.getSigla(), processo.getCodigo(), e.getMessage(), e);
         }
     }
 

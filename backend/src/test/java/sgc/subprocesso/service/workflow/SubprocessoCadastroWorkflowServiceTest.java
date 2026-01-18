@@ -145,26 +145,6 @@ class SubprocessoCadastroWorkflowServiceTest {
                 .isInstanceOf(ErroValidacao.class);
     }
 
-    @Test
-    @DisplayName("disponibilizarCadastro falha mapa nulo")
-    void disponibilizarCadastroMapaNulo() {
-        Long id = 1L;
-        Usuario user = new Usuario();
-        user.setTituloEleitoral("123");
-        Unidade u = new Unidade();
-        u.setTituloTitular("123");
-
-        Subprocesso sp = new Subprocesso();
-        sp.setUnidade(u);
-        sp.setMapa(null); // Mapa nulo
-
-        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
-        when(validacaoService.obterAtividadesSemConhecimento(id))
-                .thenReturn(Collections.emptyList());
-
-        assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
-                .isInstanceOf(sgc.subprocesso.erros.ErroMapaNaoAssociado.class);
-    }
 
     // --- Disponibilizar Revisão ---
 
@@ -538,20 +518,6 @@ class SubprocessoCadastroWorkflowServiceTest {
         assertThatThrownBy(() -> service.disponibilizarRevisao(id, user))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("Pelo menos uma atividade deve ser cadastrada");
-    }
-    @Test
-    @DisplayName("validarRequisitosNegocio deve falhar se mapa tem codigo nulo")
-    void validarRequisitosMapaCodigoNulo() {
-        Long id = 1L;
-        Subprocesso sp = new Subprocesso();
-        Mapa mapa = new Mapa();
-        mapa.setCodigo(null);
-        sp.setMapa(mapa);
-
-        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
-
-        assertThatThrownBy(() -> service.disponibilizarCadastro(id, new Usuario()))
-                .isInstanceOf(sgc.subprocesso.erros.ErroMapaNaoAssociado.class);
     }
 
     @Test

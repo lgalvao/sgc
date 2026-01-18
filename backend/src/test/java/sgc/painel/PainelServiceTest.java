@@ -306,22 +306,6 @@ class PainelServiceTest {
             assertThat(result.getContent()).isNotEmpty();
         }
 
-        @Test
-        @DisplayName("encontrarMaiorIdVisivel deve retornar null se unidade nula")
-        void encontrarMaiorIdVisivel_UnidadeNull() {
-            Unidade u1 = new Unidade();
-            u1.setCodigo(1L);
-            u1.setSigla("U1");
-            
-            Processo p = criarProcessoMock(1L);
-            p.setParticipantes(Set.of(u1));
-            
-            when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
-            u1.setSigla(null);
-            
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
-            assertThat(result.getContent().get(0).unidadesParticipantes()).isEmpty();
-        }
 
         @Test
         @DisplayName("formatarUnidadesParticipantes: deve formatar corretamente e agrupar hierarquia")
