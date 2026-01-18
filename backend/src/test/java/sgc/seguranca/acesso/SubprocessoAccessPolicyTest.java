@@ -168,6 +168,99 @@ class SubprocessoAccessPolicyTest {
         assertTrue(policy.canExecute(chefe, Acao.VERIFICAR_IMPACTOS, spChefe));
     }
 
+    @Test
+    @DisplayName("canExecute - VERIFICAR_IMPACTOS - Combinacoes e Falhas")
+    void canExecute_VerificarImpactos_Combinacoes() {
+        // 1. CHEFE (Mesma Unidade) + REVISAO_CADASTRO_EM_ANDAMENTO -> True
+        Usuario uChefe = criarUsuario(Perfil.CHEFE, 1L);
+        Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, 1L);
+        assertTrue(policy.canExecute(uChefe, Acao.VERIFICAR_IMPACTOS, sp));
+
+        // 2. CHEFE (Outra Unidade) + REVISAO_CADASTRO_EM_ANDAMENTO -> False
+        Subprocesso spOutraUnidade = criarSubprocesso(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, 2L);
+        assertFalse(policy.canExecute(uChefe, Acao.VERIFICAR_IMPACTOS, spOutraUnidade));
+
+        // 3. CHEFE (Mesma Unidade) + Situação Inválida (ex: MAPEAMENTO_CADASTRO_EM_ANDAMENTO) -> False
+        Subprocesso spSitInv = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 1L);
+        assertFalse(policy.canExecute(uChefe, Acao.VERIFICAR_IMPACTOS, spSitInv));
+
+        // 4. GESTOR + REVISAO_CADASTRO_DISPONIBILIZADA -> True
+        Usuario uGestor = criarUsuario(Perfil.GESTOR, 99L); // Unidade irrelevante
+        Subprocesso spRevDisp = criarSubprocesso(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, 1L);
+        assertTrue(policy.canExecute(uGestor, Acao.VERIFICAR_IMPACTOS, spRevDisp));
+
+        // 5. GESTOR + Situação Inválida -> False
+        assertFalse(policy.canExecute(uGestor, Acao.VERIFICAR_IMPACTOS, spSitInv));
+
+        // 6. ADMIN + REVISAO_CADASTRO_DISPONIBILIZADA -> True
+        Usuario uAdmin = criarUsuario(Perfil.ADMIN, 99L);
+        assertTrue(policy.canExecute(uAdmin, Acao.VERIFICAR_IMPACTOS, spRevDisp));
+
+        // 7. ADMIN + REVISAO_CADASTRO_HOMOLOGADA -> True
+        Subprocesso spRevHom = criarSubprocesso(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, 1L);
+        assertTrue(policy.canExecute(uAdmin, Acao.VERIFICAR_IMPACTOS, spRevHom));
+
+        // 8. ADMIN + REVISAO_MAPA_AJUSTADO -> True
+        Subprocesso spRevMapAjus = criarSubprocesso(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO, 1L);
+        assertTrue(policy.canExecute(uAdmin, Acao.VERIFICAR_IMPACTOS, spRevMapAjus));
+
+        // 9. ADMIN + Situação Inválida -> False
+        assertFalse(policy.canExecute(uAdmin, Acao.VERIFICAR_IMPACTOS, spSitInv));
+
+        // 10. SERVIDOR (Perfil Inválido) -> False
+        Usuario uServidor = criarUsuario(Perfil.SERVIDOR, 1L);
+        assertFalse(policy.canExecute(uServidor, Acao.VERIFICAR_IMPACTOS, spRevDisp));
+    }
+
+    @Test
+    @DisplayName("verificaHierarquia - Validacao Completa")
+    void verificaHierarquia_ValidacaoCompleta() {
+        Usuario u = criarUsuario(Perfil.SERVIDOR, 1L);
+        Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 1L);
+
+        // Caso Unidade Nula
+        sp.setUnidade(null);
+        // Ação EDITAR_MAPA requer MESMA_UNIDADE, então deve falhar se unidade é nula
+        assertFalse(policy.canExecute(u, Acao.EDITAR_MAPA, sp));
+
+        // Ação LISTAR_SUBPROCESSOS requer NENHUM, deve passar
+        Usuario uAdmin = criarUsuario(Perfil.ADMIN, 1L);
+        assertTrue(policy.canExecute(uAdmin, Acao.LISTAR_SUBPROCESSOS, sp));
+
+        // Re-setup unidade
+        sp.setUnidade(new Unidade());
+        sp.getUnidade().setCodigo(1L);
+        sp.getUnidade().setSigla("SIGLA");
+        sp.getUnidade().setTituloTitular("TITULAR");
+
+        // Testar mensagens de erro (indiretamente via assert false e verificação manual se necessário)
+
+        // MESMA_UNIDADE -> False
+        Usuario uOutra = criarUsuario(Perfil.SERVIDOR, 2L);
+        assertFalse(policy.canExecute(uOutra, Acao.EDITAR_MAPA, sp));
+
+        // MESMA_OU_SUBORDINADA -> False (nem mesma, nem subordinada)
+        // VISUALIZAR_SUBPROCESSO requer MESMA_OU_SUBORDINADA
+        // Configurando para retornar false para subordinação
+        when(hierarquiaService.isSubordinada(any(), any())).thenReturn(false);
+        assertFalse(policy.canExecute(uOutra, Acao.VISUALIZAR_SUBPROCESSO, sp));
+
+        // SUPERIOR_IMEDIATA -> False
+        // ACEITAR_CADASTRO requer SUPERIOR_IMEDIATA
+        Usuario uGestor = criarUsuario(Perfil.GESTOR, 2L);
+        // Atualiza status para permitir chegar na verificação de hierarquia
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        // Garante que não é superior
+        when(hierarquiaService.isSuperiorImediata(any(), any())).thenReturn(false);
+        assertFalse(policy.canExecute(uGestor, Acao.ACEITAR_CADASTRO, sp));
+
+        // TITULAR_UNIDADE -> False
+        Usuario uChefe = criarUsuario(Perfil.CHEFE, 1L);
+        uChefe.setTituloEleitoral("OUTRO");
+        // DISPONIBILIZAR_CADASTRO requer TITULAR_UNIDADE
+        assertFalse(policy.canExecute(uChefe, Acao.DISPONIBILIZAR_CADASTRO, sp));
+    }
+
     private Usuario criarUsuario(Perfil perfil, Long codUnidade) {
         Usuario u = new Usuario();
         u.setTituloEleitoral("123");
