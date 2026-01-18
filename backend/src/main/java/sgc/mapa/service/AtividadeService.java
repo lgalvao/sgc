@@ -78,6 +78,29 @@ public class AtividadeService {
         atividadeRepo.save(existente);
     }
 
+    public List<Atividade> atualizarDescricoesEmLote(java.util.Map<Long, String> descricoesPorId) {
+        List<Atividade> atividades = atividadeRepo.findAllById(descricoesPorId.keySet());
+        java.util.Set<Long> mapasAfetados = new java.util.HashSet<>();
+
+        for (Atividade atividade : atividades) {
+            String novaDescricao = descricoesPorId.get(atividade.getCodigo());
+            if (novaDescricao != null) {
+                atividade.setDescricao(novaDescricao);
+            }
+            if (atividade.getMapa() != null) {
+                mapasAfetados.add(atividade.getMapa().getCodigo());
+            }
+        }
+
+        atividadeRepo.saveAll(atividades);
+
+        for (Long codMapa : mapasAfetados) {
+            notificarAlteracaoMapa(codMapa);
+        }
+
+        return atividades;
+    }
+
     public void excluir(Long codAtividade) {
         Atividade atividade = repo.buscar(Atividade.class, codAtividade);
 

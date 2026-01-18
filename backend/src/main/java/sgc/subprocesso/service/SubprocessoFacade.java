@@ -550,25 +550,46 @@ public class SubprocessoFacade {
 
         log.info("Salvando ajustes para o mapa do subprocesso {}...", codSubprocesso);
 
+        // ⚡ Bolt: Otimização N+1 - Busca e atualização em lote
+        List<Long> competenciaIds = new ArrayList<>();
+        java.util.Map<Long, String> atividadeDescricoes = new java.util.HashMap<>();
+
         for (CompetenciaAjusteDto compDto : competencias) {
-            var competencia = competenciaService.buscarPorCodigo(compDto.getCodCompetencia());
-
-            competencia.setDescricao(compDto.getNome());
-
-            java.util.Set<Atividade> atividades = new java.util.HashSet<>();
-            for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
-                var atividade = atividadeService.obterPorCodigo(ativDto.getCodAtividade());
-
-                AtualizarAtividadeRequest request = AtualizarAtividadeRequest.builder()
-                        .descricao(ativDto.getNome())
-                        .build();
-                atividadeService.atualizar(atividade.getCodigo(), request);
-
-                atividades.add(atividadeService.obterPorCodigo(atividade.getCodigo()));
+            competenciaIds.add(compDto.getCodCompetencia());
+            if (compDto.getAtividades() != null) {
+                for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
+                    atividadeDescricoes.put(ativDto.getCodAtividade(), ativDto.getNome());
+                }
             }
-            competencia.setAtividades(atividades);
-            competenciaService.salvar(competencia);
         }
+
+        List<Atividade> atividadesAtualizadas = atividadeService.atualizarDescricoesEmLote(atividadeDescricoes);
+        java.util.Map<Long, Atividade> mapaAtividades = atividadesAtualizadas.stream()
+                .collect(java.util.stream.Collectors.toMap(Atividade::getCodigo, java.util.function.Function.identity()));
+
+        List<Competencia> entidadesCompetencias = competenciaService.buscarPorCodigos(competenciaIds);
+        java.util.Map<Long, Competencia> mapaCompetencias = entidadesCompetencias.stream()
+                .collect(java.util.stream.Collectors.toMap(Competencia::getCodigo, java.util.function.Function.identity()));
+
+        for (CompetenciaAjusteDto compDto : competencias) {
+            Competencia competencia = mapaCompetencias.get(compDto.getCodCompetencia());
+            if (competencia != null) {
+                competencia.setDescricao(compDto.getNome());
+
+                java.util.Set<Atividade> atividades = new java.util.HashSet<>();
+                if (compDto.getAtividades() != null) {
+                    for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
+                        Atividade atividade = mapaAtividades.get(ativDto.getCodAtividade());
+                        if (atividade != null) {
+                            atividades.add(atividade);
+                        }
+                    }
+                }
+                competencia.setAtividades(atividades);
+            }
+        }
+
+        competenciaService.salvarTodas(entidadesCompetencias);
 
         sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         subprocessoRepo.save(sp);
