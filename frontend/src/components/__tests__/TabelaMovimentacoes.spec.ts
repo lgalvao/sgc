@@ -66,12 +66,26 @@ describe("TabelaMovimentacoes.vue", () => {
     it("deve renderizar mensagem quando não houver movimentações", () => {
         const wrapper = mount(TabelaMovimentacoes, {
             props: {movimentacoes: []},
-            global: {stubs: {BTable: true}}
+            global: {
+                // When stubbing BTable, we need to manually render the slot content
+                // because mount won't render slots inside a stub automatically unless configured
+                stubs: {
+                    BTable: {
+                        props: ['items', 'showEmpty'],
+                        template: `
+                            <div>
+                                <slot name="empty" v-if="showEmpty === '' || showEmpty === true && (!items || items.length === 0)"></slot>
+                                <slot v-else></slot>
+                            </div>
+                        `
+                    }
+                }
+            }
         });
 
-        // Verificação ajustada para o texto diretamente, já que a classe .alert-info foi removida/alterada
-        expect(wrapper.text()).toContain("Nenhuma movimentação registrada");
-        expect(wrapper.findComponent(BTable).exists()).toBe(false);
+        expect(wrapper.text()).toContain("Nenhuma movimentação");
+        expect(wrapper.text()).toContain("O histórico de movimentações deste processo aparecerá aqui.");
+        expect(wrapper.find('[data-testid="empty-state-movimentacoes"]').exists()).toBe(true);
     });
 
     it("deve passar a função rowAttr correta", () => {
@@ -159,8 +173,6 @@ describe("TabelaMovimentacoes.vue", () => {
         });
 
         // Verifica se renderizou dois hifens (um para origem, um para destino)
-        // O text() concatena tudo, então deve ter "- -" ou algo assim.
-        // Vamos buscar especificamente o texto gerado.
         const cells = wrapper.findAll('td');
         expect(cells[0].text()).toBe("-");
         expect(cells[1].text()).toBe("-");

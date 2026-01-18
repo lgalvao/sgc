@@ -1,24 +1,24 @@
 <template>
   <div class="mt-4">
     <h4>Movimentações</h4>
-    <div
-        v-if="movimentacoes.length === 0"
-        class="text-muted small mt-2 mb-4"
-    >
-      Nenhuma movimentação registrada.
-    </div>
-
     <BTable
-        v-else
         :fields="fields"
         :items="movimentacoes"
         :tbody-tr-attr="rowAttr"
         data-testid="tbl-movimentacoes"
         primary-key="codigo"
         responsive
+        show-empty
         stacked="md"
         striped
     >
+      <template #empty>
+        <div class="text-center text-muted py-5" data-testid="empty-state-movimentacoes">
+          <i class="bi bi-arrow-left-right display-4 d-block mb-3" aria-hidden="true"></i>
+          <p class="h5">Nenhuma movimentação</p>
+          <p class="small">O histórico de movimentações deste processo aparecerá aqui.</p>
+        </div>
+      </template>
       <template #cell(dataHora)="data">
         {{ formatDateTimeBR(data.item.dataHora) }}
       </template>

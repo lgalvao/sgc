@@ -8,3 +8,7 @@
 ## 2025-02-18 - Modal Async Feedback
 **Learning:** Users lack feedback during critical async modal actions (like 'Disponibilizar'), leading to potential double-submissions.
 **Action:** Standardize passing a `loading` prop to all action modals to drive button disabled states and spinners.
+
+## 2026-01-18 - BootstrapVue Table Empty States
+**Learning:** The existing codebase consistently uses BTable's `show-empty` prop and `#empty` slot for zero-data states, avoiding manual `v-if` wrappers.
+**Action:** Always use `<BTable show-empty>` with a `#empty` slot containing a centered icon (`bi-*`) and helpful text.
