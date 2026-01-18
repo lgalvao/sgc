@@ -395,7 +395,7 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                                                 "Usuário '%s' não é o titular da unidade '%s'. Titular: %s",
                                                 usuario.getTituloEleitoral(), siglaUnidade, tituloTitular);
                         }
-                        case NENHUM -> "Erro inesperado na verificação de hierarquia";
+                        default -> "Erro inesperado na verificação de hierarquia";
                 };
         }
 

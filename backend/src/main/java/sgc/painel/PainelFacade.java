@@ -181,14 +181,6 @@ public class PainelFacade {
         for (Long unidadeId : participantesIds) {
             // ⚡ Bolt Optimization: Use the object already present in memory instead of fetching again from service/DB
             Unidade unidade = participantesPorCodigo.get(unidadeId);
-            // Fallback for safety, though it should always be in the map as the IDs come from the map keys
-            if (unidade == null) {
-                try {
-                    unidade = unidadeService.buscarEntidadePorId(unidadeId);
-                } catch (Exception e) {
-                   continue;
-                }
-            }
             Long candidato = encontrarMaiorIdVisivel(unidade, participantesIds);
             visiveis.add(candidato);
         }

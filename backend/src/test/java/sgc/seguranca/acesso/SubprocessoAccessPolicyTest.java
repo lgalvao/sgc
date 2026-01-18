@@ -395,7 +395,9 @@ class SubprocessoAccessPolicyTest {
         atribuicao.setUsuarioTitulo(usuario.getTituloEleitoral());
         atribuicao.setPerfil(perfil);
         atribuicao.setUnidade(unidade);
-        atribuicao.setUnidadeCodigo(unidade.getCodigo());
+        if (unidade != null) {
+            atribuicao.setUnidadeCodigo(unidade.getCodigo());
+        }
         usuario.getAtribuicoes().add(atribuicao);
     }
 
@@ -488,6 +490,94 @@ class SubprocessoAccessPolicyTest {
 
             policy.canExecute(usuarioChefe, VISUALIZAR_SUBPROCESSO, subprocesso);
             assertThat(policy.getMotivoNegacao()).contains("nem a uma unidade superior");
+        }
+
+        @Test
+        @DisplayName("Deve negar ADMIN realizar autoavaliação em outra unidade (cai na verificação de hierarquia)")
+        void deveNegarAdminRealizarAutoavaliacaoEmOutraUnidade() {
+            subprocesso.setSituacao(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+            // Admin está na unidadePrincipal. Subprocesso em outra unidade.
+            Unidade outra = criarUnidade(99L, "OUTRA", null, null);
+            subprocesso.setUnidade(outra);
+
+            // REALIZAR_AUTOAVALIACAO não é ação administrativa isenta de hierarquia
+            boolean resultado = policy.canExecute(usuarioAdmin, REALIZAR_AUTOAVALIACAO, subprocesso);
+
+            assertThat(resultado).isFalse();
+            assertThat(policy.getMotivoNegacao()).contains("não pertence à unidade");
+        }
+
+        @Test
+        @DisplayName("Deve permitir ADMIN realizar autoavaliação na mesma unidade")
+        void devePermitirAdminRealizarAutoavaliacaoNaMesmaUnidade() {
+            subprocesso.setSituacao(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+            // Admin está na unidadePrincipal. Subprocesso na mesma.
+
+            boolean resultado = policy.canExecute(usuarioAdmin, REALIZAR_AUTOAVALIACAO, subprocesso);
+
+            assertThat(resultado).isTrue();
+        }
+
+        @Test
+        @DisplayName("Deve ignorar atribuição com unidade nula na verificação de hierarquia")
+        void deveIgnorarAtribuicaoComUnidadeNula() {
+            Usuario usuarioSemUnidade = criarUsuario("0000", "Sem Unidade");
+            adicionarAtribuicao(usuarioSemUnidade, CHEFE, null);
+
+            // EDITAR_CADASTRO requer MESMA_UNIDADE
+            boolean resultado = policy.canExecute(usuarioSemUnidade, EDITAR_CADASTRO, subprocesso);
+
+            assertThat(resultado).isFalse();
+        }
+
+        @Test
+        @DisplayName("Deve permitir visualizar se mesma unidade (short-circuit, sem chamar hierarquia)")
+        void devePermitirVisualizarSeMesmaUnidadeSemChamarHierarquia() {
+            // VISUALIZAR_SUBPROCESSO requer MESMA_OU_SUBORDINADA
+            // Se for mesma unidade, não deve chamar hierarquiaService.isSubordinada
+
+            boolean resultado = policy.canExecute(usuarioChefe, VISUALIZAR_SUBPROCESSO, subprocesso);
+
+            assertThat(resultado).isTrue();
+            // Verify mock was not called? Mockito verify(hierarquiaService, never())...
+            org.mockito.Mockito.verify(hierarquiaService, org.mockito.Mockito.never()).isSubordinada(any(), any());
+        }
+
+        @Test
+        @DisplayName("Deve gerar mensagem de erro correta quando subprocesso não tem unidade e ação exige hierarquia")
+        void deveGerarMensagemErroQuandoUnidadeNula() {
+            subprocesso.setUnidade(null);
+
+            // EDITAR_CADASTRO exige MESMA_UNIDADE. Se subprocesso não tem unidade, deve falhar.
+            boolean resultado = policy.canExecute(usuarioChefe, EDITAR_CADASTRO, subprocesso);
+
+            assertThat(resultado).isFalse();
+            assertThat(policy.getMotivoNegacao()).contains("não definida"); // "Usuário ... não pertence à unidade 'não definida'..."
+        }
+
+        @Test
+        @DisplayName("Deve permitir ADMIN executar ação administrativa que é a última da lista (teste de cadeia OR)")
+        void devePermitirAcaoAdministrativaUltimaDaLista() {
+            subprocesso.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
+            Unidade outra = criarUnidade(99L, "OUTRA", null, null);
+            subprocesso.setUnidade(outra);
+
+            // REABRIR_REVISAO é a última na lista de isAcaoAdministrativaOuEdicaoMapa
+            // ADMIN deve poder executar mesmo em outra unidade
+            boolean resultado = policy.canExecute(usuarioAdmin, REABRIR_REVISAO, subprocesso);
+
+            assertThat(resultado).isTrue();
+        }
+
+        @Test
+        @DisplayName("Deve permitir CHEFE verificar impactos em REVISAO_CADASTRO_EM_ANDAMENTO")
+        void devePermitirChefeVerificarImpactosRevisaoCadastroEmAndamento() {
+            subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+            // Chefe na mesma unidade (unidadePrincipal)
+
+            boolean resultado = policy.canExecute(usuarioChefe, VERIFICAR_IMPACTOS, subprocesso);
+
+            assertThat(resultado).isTrue();
         }
     }
 }
