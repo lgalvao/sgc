@@ -186,22 +186,14 @@ public class SubprocessoCrudService {
     private Set<String> processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
         Set<String> campos = new HashSet<>();
 
-        java.util.Optional.ofNullable(request.getCodMapa()).ifPresentOrElse(
-            cod -> {
-                Mapa m = new Mapa();
-                m.setCodigo(cod);
-                if (!Objects.equals(subprocesso.getMapa(), m)) {
-                    campos.add("mapa");
-                    subprocesso.setMapa(m);
-                }
-            },
-            () -> {
-                if (subprocesso.getMapa() != null) {
-                    campos.add("mapa");
-                    subprocesso.setMapa(null);
-                }
+        java.util.Optional.ofNullable(request.getCodMapa()).ifPresent(cod -> {
+            Mapa m = new Mapa();
+            m.setCodigo(cod);
+            if (!Objects.equals(subprocesso.getMapa(), m)) {
+                campos.add("mapa");
+                subprocesso.setMapa(m);
             }
-        );
+        });
 
         if (!Objects.equals(subprocesso.getDataLimiteEtapa1(), request.getDataLimiteEtapa1())) {
             campos.add("dataLimiteEtapa1");

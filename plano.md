@@ -168,7 +168,7 @@ Reduzir complexidade das 5 classes com maior score, focando em null checks e val
 
 ---
 
-### Task 2.1: SubprocessoWorkflowService (Score 78.5)
+### Task 2.1: SubprocessoWorkflowService (Score 78.5) - CONCLUÍDO
 **Arquivo:** `backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowService.java`
 
 **Problemas Identificados:**
@@ -228,7 +228,7 @@ Reduzir complexidade das 5 classes com maior score, focando em null checks e val
 
 ---
 
-### Task 2.2: SubprocessoAccessPolicy (Score 74.1)
+### Task 2.2: SubprocessoAccessPolicy (Score 74.1) - CONCLUÍDO
 **Arquivo:** `backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java`
 
 **Problemas Identificados:**

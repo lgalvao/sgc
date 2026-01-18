@@ -238,7 +238,7 @@ public class UsuarioFacade {
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
                 .matricula(usuario.getMatricula())
-                .unidadeCodigo(lotacao != null ? lotacao.getCodigo() : null)
+                .unidadeCodigo(lotacao.getCodigo())
                 .build();
     }
 

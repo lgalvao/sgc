@@ -26,7 +26,8 @@ public class UnidadeDto {
     private String sigla;
     private Long codigoPai;
     private String tipo;
-    private List<UnidadeDto> subunidades; // Para árvore hierárquica
+    @Builder.Default
+    private List<UnidadeDto> subunidades = new java.util.ArrayList<>(); // Para árvore hierárquica
 
     @JsonProperty("tituloTitular")
     private String tituloTitular;

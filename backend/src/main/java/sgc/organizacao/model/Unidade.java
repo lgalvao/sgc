@@ -48,6 +48,18 @@ public class Unidade extends EntidadeBase {
     @Nullable
     private Unidade unidadeSuperior;
 
+    @OneToMany(mappedBy = "unidadeSuperior")
+    @Builder.Default
+    private java.util.List<Unidade> subunidades = new java.util.ArrayList<>();
+
+    public java.util.List<Unidade> getSubunidades() {
+        return subunidades;
+    }
+
+    public @Nullable Unidade getUnidadeSuperior() {
+        return unidadeSuperior;
+    }
+
     @ManyToMany(mappedBy = "participantes")
     @Builder.Default
     private Set<Processo> processos = new HashSet<>();

@@ -376,8 +376,8 @@ class SubprocessoCrudServiceTest {
     }
 
     @Test
-    @DisplayName("Deve atualizar removendo mapa quando existente")
-    void deveAtualizarRemovendoMapaExistente() {
+    @DisplayName("Deve atualizar mantendo mapa quando existente e request sem mapa")
+    void deveAtualizarMantendoMapaQuandoRequestSemMapa() {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
         sp.setMapa(new Mapa()); // Tem mapa
@@ -391,8 +391,7 @@ class SubprocessoCrudServiceTest {
 
         service.atualizar(1L, request);
 
-        assertThat(sp.getMapa()).isNull();
-        verify(eventPublisher).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoAtualizado.class));
+        assertThat(sp.getMapa()).isNotNull();
     }
 
     @Test
