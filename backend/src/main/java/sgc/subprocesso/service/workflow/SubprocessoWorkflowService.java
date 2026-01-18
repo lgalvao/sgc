@@ -292,11 +292,6 @@ public class SubprocessoWorkflowService {
         if (!validacaoService.obterAtividadesSemConhecimento(codSubprocesso).isEmpty()) {
             throw new ErroValidacao("Existem atividades sem conhecimentos associados.");
         }
-
-        Mapa mapa = sp.getMapa();
-        if (mapa == null || mapa.getCodigo() == null) {
-            throw new ErroMapaNaoAssociado("Subprocesso sem mapa associado");
-        }
     }
 
     @Transactional
@@ -542,11 +537,8 @@ public class SubprocessoWorkflowService {
                             .formatted(situacao));
         }
 
-        if (subprocesso.getMapa() == null) {
-            throw new ErroEstadoImpossivel(
-                    "Subprocesso %d existe mas não possui Mapa associado - violação de invariante"
-                    .formatted(subprocesso.getCodigo()));
-        }
+        assert subprocesso.getMapa() != null :
+                "Invariante violada: Subprocesso deve ter Mapa associado.";
         return subprocesso;
     }
 

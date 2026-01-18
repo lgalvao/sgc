@@ -178,11 +178,9 @@ public class MapaSalvamentoService {
             CompetenciaMapaDto dto = competenciasDto.get(i);
             Competencia competencia = competenciasSalvas.get(i);
 
-            if (dto.getAtividadesCodigos() != null) {
-                for (Long ativId : dto.getAtividadesCodigos()) {
-                    validarAtividadePertenceAoMapa(ativId, contexto.atividadesDoMapaIds, codMapa);
-                    mapAtividadeCompetencias.get(ativId).add(competencia);
-                }
+            for (Long ativId : dto.getAtividadesCodigos()) {
+                validarAtividadePertenceAoMapa(ativId, contexto.atividadesDoMapaIds, codMapa);
+                mapAtividadeCompetencias.get(ativId).add(competencia);
             }
         }
 

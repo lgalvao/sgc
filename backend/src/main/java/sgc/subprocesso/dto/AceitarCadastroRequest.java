@@ -1,5 +1,6 @@
 package sgc.subprocesso.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +16,7 @@ public class AceitarCadastroRequest {
     /**
      * Observações adicionais.
      */
+    @NotBlank(message = "As observações são obrigatórias")
     @Size(max = 500, message = "Observações devem ter no máximo 500 caracteres")
     private final String observacoes;
 }

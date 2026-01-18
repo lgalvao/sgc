@@ -126,17 +126,6 @@ class SubprocessoFacadeTest2 {
         }
 
         @Test
-        @DisplayName("listarAtividadesSubprocesso deve retornar vazio se mapa for nulo")
-        void listarAtividadesSubprocessoMapaNulo() {
-            Subprocesso sp = new Subprocesso();
-            sp.setMapa(null);
-            when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-
-            List<AtividadeVisualizacaoDto> result = subprocessoFacade.listarAtividadesSubprocesso(1L);
-            assertThat(result).isEmpty();
-        }
-
-        @Test
         @DisplayName("Deve retornar situação quando subprocesso existe")
         void deveRetornarSituacaoQuandoSubprocessoExiste() {
             when(crudService.obterStatus(1L)).thenReturn(SubprocessoSituacaoDto.builder().build());
@@ -410,6 +399,9 @@ class SubprocessoFacadeTest2 {
             Unidade unidade = new Unidade();
             unidade.setSigla("SIGLA");
             sp.setUnidade(unidade);
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(100L);
+            sp.setMapa(mapa);
 
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
             when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
@@ -645,27 +637,6 @@ class SubprocessoFacadeTest2 {
 
             org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida.class, () ->
                 subprocessoFacade.importarAtividades(dest, 2L)
-            );
-        }
-
-        @Test
-        @DisplayName("importarAtividades falha se mapa nulo")
-        void importarAtividadesMapaNulo() {
-            Long dest = 1L;
-            Subprocesso spDest = new Subprocesso();
-            spDest.setCodigo(dest);
-            spDest.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-            spDest.setMapa(null); // Null map
-
-            Long orig = 2L;
-            Subprocesso spOrig = new Subprocesso();
-            spOrig.setMapa(new Mapa());
-
-            when(subprocessoRepo.findById(dest)).thenReturn(java.util.Optional.of(spDest));
-            when(subprocessoRepo.findById(orig)).thenReturn(java.util.Optional.of(spOrig));
-
-            org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaNaoAssociado.class, () ->
-                subprocessoFacade.importarAtividades(dest, orig)
             );
         }
 

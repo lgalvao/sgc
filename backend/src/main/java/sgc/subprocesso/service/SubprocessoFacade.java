@@ -591,10 +591,6 @@ public class SubprocessoFacade {
         Subprocesso spOrigem = subprocessoRepo.findById(codSubprocessoOrigem)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso de origem não encontrado: %d".formatted(codSubprocessoOrigem)));
 
-        if (spOrigem.getMapa() == null || spDestino.getMapa() == null) {
-            throw new sgc.subprocesso.erros.ErroMapaNaoAssociado("Subprocesso de origem ou destino não possui mapa associado.");
-        }
-
         copiaMapaService.importarAtividadesDeOutroMapa(
                 spOrigem.getMapa().getCodigo(),
                 spDestino.getMapa().getCodigo()
