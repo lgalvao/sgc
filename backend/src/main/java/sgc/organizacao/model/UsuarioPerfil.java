@@ -3,6 +3,7 @@ package sgc.organizacao.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Immutable;
+import org.jspecify.annotations.NonNull;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -37,6 +38,14 @@ public class UsuarioPerfil implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "unidade_codigo", insertable = false, updatable = false)
     private Unidade unidade;
+
+    public @NonNull Perfil getPerfil() {
+        return perfil;
+    }
+
+    public @NonNull Unidade getUnidade() {
+        return unidade;
+    }
 
     @Override
     public boolean equals(Object obj) {

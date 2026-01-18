@@ -26,7 +26,7 @@ Este plano detalha a remoção sistemática de complexidade desnecessária no ba
 
 ---
 
-## Sprint 1: Análise e Preparação (3-5 dias)
+## Sprint 1: Análise e Preparação (3-5 dias) - CONCLUÍDO
 
 ### Objetivo
 Estabelecer baseline, documentar padrões problemáticos e criar ferramentas de análise automatizada.
@@ -161,7 +161,7 @@ Estabelecer baseline, documentar padrões problemáticos e criar ferramentas de 
 
 ---
 
-## Sprint 2: Refatoração das Top 5 Classes Mais Complexas (5-7 dias)
+## Sprint 2: Refatoração das Top 5 Classes Mais Complexas (5-7 dias) - EM ANDAMENTO
 
 ### Objetivo
 Reduzir complexidade das 5 classes com maior score, focando em null checks e validações redundantes.

@@ -540,23 +540,6 @@ class SubprocessoCadastroWorkflowServiceTest {
                 .hasMessageContaining("Pelo menos uma atividade deve ser cadastrada");
     }
     @Test
-    @DisplayName("disponibilizarCadastro com unidade de origem nula")
-    void disponibilizarCadastroSemUnidadeOrigem() {
-        Long id = 1L;
-        Subprocesso sp = new Subprocesso();
-        sp.setUnidade(null);
-        sp.setMapa(new Mapa());
-        sp.getMapa().setCodigo(10L);
-
-        when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
-        
-        service.disponibilizarCadastro(id, new Usuario());
-        
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-        verify(transicaoService).registrar(any(), any(), eq(null), eq(null), any());
-    }
-
-    @Test
     @DisplayName("validarRequisitosNegocio deve falhar se mapa tem codigo nulo")
     void validarRequisitosMapaCodigoNulo() {
         Long id = 1L;

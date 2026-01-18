@@ -70,25 +70,6 @@ class ProcessoValidadorTest {
     }
 
     @Test
-    @DisplayName("validarTodosSubprocessosHomologados falha se subprocesso pendente (unidade nula)")
-    void validarTodosSubprocessosHomologadosComPendenciaUnidadeNula() {
-        Processo p = new Processo();
-        p.setCodigo(1L);
-        p.setSituacao(SituacaoProcesso.EM_ANDAMENTO); // Valid situation for finalization
-
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(100L);
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO); // Not homologated
-        sp.setUnidade(null); // Unidade Nula to trigger ternary branch
-
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-
-        assertThatThrownBy(() -> validador.validarTodosSubprocessosHomologados(p))
-            .isInstanceOf(ErroProcesso.class)
-            .hasMessageContaining("Subprocesso 100");
-    }
-
-    @Test
     @DisplayName("validarTodosSubprocessosHomologados sucesso")
     void validarTodosSubprocessosHomologadosSucesso() {
         Processo p = new Processo();

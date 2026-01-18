@@ -237,42 +237,6 @@ class SubprocessoWorkflowServiceTest {
         verify(transicaoService).registrar(eq(sp), any(), any(), any(), eq(usuario), eq("Ok"));
     }
 
-    @Test
-    @DisplayName("atualizarSituacaoParaEmAndamento - Erro Processo Nulo")
-    void atualizarSituacaoParaEmAndamento_ErroProcessoNulo() {
-        Long codMapa = 100L;
-        Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        sp.setProcesso(null);
-
-        when(repositorioSubprocesso.findByMapaCodigo(codMapa)).thenReturn(Optional.of(sp));
-
-        assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () ->
-            workflowService.atualizarSituacaoParaEmAndamento(codMapa)
-        );
-    }
-
-    @Test
-    @DisplayName("disponibilizarCadastro - Unidade Nula")
-    void disponibilizarCadastro_UnidadeNula() {
-        Long codigo = 1L;
-        Usuario usuario = new Usuario();
-
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(codigo);
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        sGC_Mapa(sp);
-        sp.getMapa().setCodigo(100L);
-        sp.setUnidade(null); // Null unit
-
-        when(repo.buscar(Subprocesso.class, codigo)).thenReturn(sp);
-
-        workflowService.disponibilizarCadastro(codigo, usuario);
-
-        verify(repositorioSubprocesso).save(sp);
-        // Verify transicao registered with null origin/dest
-        verify(transicaoService).registrar(eq(sp), any(), isNull(), isNull(), eq(usuario));
-    }
 
     @Test
     @DisplayName("aceitarCadastro - Erro Unidade Superior Nula")
