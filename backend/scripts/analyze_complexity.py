@@ -2,6 +2,23 @@
 """
 Analisa complexidade do código usando dados do Jacoco e outras métricas.
 Gera um ranking detalhado das classes mais complexas do backend.
+
+USAGE:
+    1. Execute os testes com Jacoco primeiro:
+       cd /home/runner/work/sgc/sgc/backend
+       ./gradlew clean test jacocoTestReport
+    
+    2. Execute este script:
+       python3 scripts/analyze_complexity.py
+    
+    3. O relatório será gerado em: /home/runner/work/sgc/sgc/complexity-ranking.md
+
+METRICS:
+    - Cyclomatic Complexity: Número de caminhos independentes no código
+    - Branches: Pontos de decisão (if, switch, loops)
+    - Lines of Code: Total de linhas (cobertas + não cobertas)
+    - Methods: Número de métodos
+    - Complexity Score: Métrica composta ponderada
 """
 
 import csv
