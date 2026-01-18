@@ -87,17 +87,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         lastError.value = null;
         const perfilStore = usePerfilStore();
         const perfil = perfilStore.perfilSelecionado;
-        const codUnidadeSel = perfilStore.unidadeSelecionada;
-        let codUnidade: number | null = null;
-
-        if (perfil) {
-            if (perfilStore.perfisUnidades.length > 0) {
-                const perfilUnidade = perfilStore.perfisUnidades.find(
-                    (pu) => pu.perfil === perfil && (codUnidadeSel ? pu.unidade.codigo === codUnidadeSel : true)
-                );
-                if (perfilUnidade) codUnidade = perfilUnidade.unidade.codigo;
-            }
-        }
+        const codUnidade = perfilStore.unidadeAtual;
 
         // Perfis ADMIN e GESTOR são globais e podem acessar qualquer subprocesso
         // sem necessidade de codUnidade específico
@@ -114,7 +104,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
             subprocessoDetalhe.value = await serviceFetchSubprocessoDetalhe(
                 id,
                 perfil,
-                codUnidade,
+                codUnidade as number,
             );
         } catch (error) {
             lastError.value = normalizeError(error);
@@ -140,17 +130,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         lastError.value = null;
         const perfilStore = usePerfilStore();
         const perfil = perfilStore.perfilSelecionado;
-        const codUnidadeSel = perfilStore.unidadeSelecionada;
-        let codUnidade: number | null = null;
-
-        if (perfil) {
-            if (perfilStore.perfisUnidades.length > 0) {
-                const perfilUnidade = perfilStore.perfisUnidades.find(
-                    (pu) => pu.perfil === perfil && (codUnidadeSel ? pu.unidade.codigo === codUnidadeSel : true)
-                );
-                if (perfilUnidade) codUnidade = perfilUnidade.unidade.codigo;
-            }
-        }
+        const codUnidade = perfilStore.unidadeAtual;
 
         const perfilGlobal = perfil === 'ADMIN' || perfil === 'GESTOR';
 

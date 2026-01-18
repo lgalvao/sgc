@@ -89,6 +89,7 @@ describe('Subprocessos Store', () => {
         perfilSelecionado: null,
         unidadeSelecionada: null,
         perfisUnidades: [],
+        unidadeAtual: null,
     };
     const mockUnidadesStore = {
         unidade: null,
@@ -133,6 +134,7 @@ describe('Subprocessos Store', () => {
 
         it('deve buscar com sucesso para ADMIN (global)', async () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
+            mockPerfilStore.unidadeAtual = null;
             (buscarSubprocessoDetalhe as any).mockResolvedValue({ codigo: 1, situacao: 'CRIADO' });
 
             await store.buscarSubprocessoDetalhe(1);
@@ -146,6 +148,7 @@ describe('Subprocessos Store', () => {
             mockPerfilStore.perfilSelecionado = 'SERVIDOR' as any;
             mockPerfilStore.unidadeSelecionada = 10;
             mockPerfilStore.perfisUnidades = [{ perfil: 'SERVIDOR', unidade: { codigo: 10 } }] as any;
+            mockPerfilStore.unidadeAtual = 10;
 
             (buscarSubprocessoDetalhe as any).mockResolvedValue({ codigo: 1, situacao: 'CRIADO' });
 
@@ -289,6 +292,7 @@ describe('Subprocessos Store', () => {
         // --- Homologar Cadastro ---
         it('homologarCadastro deve recarregar detalhes após sucesso', async () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
+            mockPerfilStore.unidadeAtual = null;
             (homologarCadastro as any).mockResolvedValue({});
             (buscarSubprocessoDetalhe as any).mockResolvedValue({ codigo: 1, situacao: 'HOMOLOGADO' });
 
@@ -336,6 +340,7 @@ describe('Subprocessos Store', () => {
          // --- Homologar Revisão ---
          it('homologarRevisaoCadastro deve executar com sucesso e recarregar', async () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
+            mockPerfilStore.unidadeAtual = null;
             (homologarRevisaoCadastro as any).mockResolvedValue({});
             (buscarSubprocessoDetalhe as any).mockResolvedValue({ codigo: 1 });
 
@@ -355,6 +360,7 @@ describe('Subprocessos Store', () => {
     describe('alterarDataLimiteSubprocesso', () => {
         it('deve delegar para apiClient e recarregar detalhes', async () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
+            mockPerfilStore.unidadeAtual = null;
             (buscarSubprocessoDetalhe as any).mockResolvedValue({});
 
             const { apiClient } = await import('@/axios-setup');
