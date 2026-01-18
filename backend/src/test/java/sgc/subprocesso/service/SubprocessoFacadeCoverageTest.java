@@ -200,4 +200,124 @@ class SubprocessoFacadeCoverageTest {
             subprocessoFacade.importarAtividades(codDestino, 1L)
         );
     }
+
+    @Test
+    @DisplayName("importarAtividades - Sucesso Revisão")
+    void importarAtividades_SucessoRevisao() {
+        Long codDestino = 2L;
+        Long codOrigem = 1L;
+
+        Subprocesso spDestino = new Subprocesso();
+        spDestino.setCodigo(codDestino);
+        spDestino.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        Processo proc = new Processo();
+        proc.setTipo(TipoProcesso.REVISAO);
+        spDestino.setProcesso(proc);
+        Mapa mapaDestino = new Mapa();
+        mapaDestino.setCodigo(20L);
+        spDestino.setMapa(mapaDestino);
+        Unidade unidadeDestino = new Unidade();
+        unidadeDestino.setSigla("DEST");
+        spDestino.setUnidade(unidadeDestino);
+
+        Subprocesso spOrigem = new Subprocesso();
+        spOrigem.setCodigo(codOrigem);
+        Mapa mapaOrigem = new Mapa();
+        mapaOrigem.setCodigo(10L);
+        spOrigem.setMapa(mapaOrigem);
+        Unidade unidadeOrigem = new Unidade();
+        unidadeOrigem.setSigla("ORIG");
+        spOrigem.setUnidade(unidadeOrigem);
+
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+
+        subprocessoFacade.importarAtividades(codDestino, codOrigem);
+
+        verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
+        verify(subprocessoRepo).save(spDestino);
+        assertEquals(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, spDestino.getSituacao());
+    }
+
+    @Test
+    @DisplayName("importarAtividades - Sucesso Sem Atualizar Situacao")
+    void importarAtividades_SucessoSemAtualizarSituacao() {
+        Long codDestino = 2L;
+        Long codOrigem = 1L;
+
+        Subprocesso spDestino = new Subprocesso();
+        spDestino.setCodigo(codDestino);
+        spDestino.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        Processo proc = new Processo();
+        // Tipo null ou outro que não seja MAPEAMENTO ou REVISAO
+        proc.setTipo(null);
+        spDestino.setProcesso(proc);
+        Mapa mapaDestino = new Mapa();
+        mapaDestino.setCodigo(20L);
+        spDestino.setMapa(mapaDestino);
+        Unidade unidadeDestino = new Unidade();
+        unidadeDestino.setSigla("DEST");
+        spDestino.setUnidade(unidadeDestino);
+
+        Subprocesso spOrigem = new Subprocesso();
+        spOrigem.setCodigo(codOrigem);
+        Mapa mapaOrigem = new Mapa();
+        mapaOrigem.setCodigo(10L);
+        spOrigem.setMapa(mapaOrigem);
+        Unidade unidadeOrigem = new Unidade();
+        unidadeOrigem.setSigla("ORIG");
+        spOrigem.setUnidade(unidadeOrigem);
+
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+
+        subprocessoFacade.importarAtividades(codDestino, codOrigem);
+
+        verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
+        verify(subprocessoRepo).save(spDestino);
+        assertEquals(SituacaoSubprocesso.NAO_INICIADO, spDestino.getSituacao());
+    }
+
+    @Test
+    @DisplayName("importarAtividades - Erro Mapa Não Associado")
+    void importarAtividades_ErroMapaNaoAssociado() {
+        Long codDestino = 2L;
+        Long codOrigem = 1L;
+
+        Subprocesso spDestino = new Subprocesso();
+        spDestino.setCodigo(codDestino);
+        spDestino.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        // Mapa null
+
+        Subprocesso spOrigem = new Subprocesso();
+        spOrigem.setCodigo(codOrigem);
+        // Mapa null
+
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+
+        assertThrows(sgc.subprocesso.erros.ErroMapaNaoAssociado.class, () ->
+            subprocessoFacade.importarAtividades(codDestino, codOrigem)
+        );
+    }
+
+    @Test
+    @DisplayName("salvarAjustesMapa - Sucesso Cadastro Homologado")
+    void salvarAjustesMapa_SucessoCadastroHomologado() {
+        Long codSubprocesso = 1L;
+        String usuarioTitulo = "123456789012";
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codSubprocesso);
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+
+        when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+
+        List<CompetenciaAjusteDto> lista = Collections.emptyList();
+
+        subprocessoFacade.salvarAjustesMapa(codSubprocesso, lista, usuarioTitulo);
+
+        verify(subprocessoRepo).save(sp);
+        assertEquals(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO, sp.getSituacao());
+    }
 }

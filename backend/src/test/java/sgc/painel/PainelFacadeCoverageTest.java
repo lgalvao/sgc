@@ -158,4 +158,60 @@ class PainelFacadeCoverageTest {
         String unidades = result.getContent().get(0).unidadesParticipantes();
         assertTrue(unidades.contains("U1") || unidades.contains("U2"));
     }
+
+    @Test
+    @DisplayName("formatarUnidadesParticipantes - Hierarquia")
+    void formatarUnidadesParticipantes_Hierarquia() {
+        Processo proc = new Processo();
+        proc.setCodigo(1L);
+        proc.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        proc.setTipo(TipoProcesso.MAPEAMENTO);
+
+        // U1 (Top) -> U2 (Mid) -> U3 (Bottom)
+        Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setSigla("U1");
+        Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setSigla("U2"); u2.setUnidadeSuperior(u1);
+        Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setSigla("U3"); u3.setUnidadeSuperior(u2);
+
+        // Mock descendents
+        when(unidadeService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L, 3L));
+        when(unidadeService.buscarIdsDescendentes(2L)).thenReturn(List.of(3L));
+        when(unidadeService.buscarIdsDescendentes(3L)).thenReturn(List.of());
+
+        proc.setParticipantes(Set.of(u1, u2, u3));
+
+        when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(proc)));
+
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
+
+        assertEquals("U1", result.getContent().get(0).unidadesParticipantes());
+    }
+
+    @Test
+    @DisplayName("formatarUnidadesParticipantes - Hierarquia Parcial")
+    void formatarUnidadesParticipantes_HierarquiaParcial() {
+        Processo proc = new Processo();
+        proc.setCodigo(1L);
+        proc.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        proc.setTipo(TipoProcesso.MAPEAMENTO);
+
+        // U1 (Top) -> U2 (Mid) -> U3 (Bottom)
+        // Only U1 and U3 participate. U2 does NOT participate.
+        Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setSigla("U1");
+        Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setSigla("U2"); u2.setUnidadeSuperior(u1);
+        Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setSigla("U3"); u3.setUnidadeSuperior(u2);
+
+        // Mock descendents
+        when(unidadeService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L, 3L));
+        when(unidadeService.buscarIdsDescendentes(3L)).thenReturn(List.of());
+
+        proc.setParticipantes(Set.of(u1, u3));
+
+        when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(proc)));
+
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
+
+        assertTrue(result.getContent().get(0).unidadesParticipantes().contains("U1"));
+        assertTrue(result.getContent().get(0).unidadesParticipantes().contains("U3"));
+        assertFalse(result.getContent().get(0).unidadesParticipantes().contains("U2"));
+    }
 }
