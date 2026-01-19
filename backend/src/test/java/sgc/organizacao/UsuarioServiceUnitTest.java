@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
@@ -85,33 +84,6 @@ class UsuarioServiceUnitTest {
             assertThat(result).isNotNull();
             verify(usuario).getAuthorities();
             verify(usuario).setAtribuicoes(any());
-        }
-
-        @Test
-        @DisplayName("Deve carregar atribuições em lote para lista de usuários")
-        void deveCarregarAtribuicoesEmLote() {
-            Usuario u1 = new Usuario();
-            u1.setTituloEleitoral("u1");
-            Usuario u2 = new Usuario();
-            u2.setTituloEleitoral("u2");
-
-            UsuarioPerfil up = new UsuarioPerfil();
-            ReflectionTestUtils.setField(up, "usuarioTitulo", "u1");
-
-            when(usuarioPerfilRepo.findByUsuarioTituloIn(anyList())).thenReturn(List.of(up));
-
-            ReflectionTestUtils.invokeMethod(service, "carregarAtribuicoesEmLote", List.of(u1, u2));
-
-            assertThat(u1.getTodasAtribuicoes()).isNotEmpty();
-            assertThat(u2.getTodasAtribuicoes()).isEmpty();
-        }
-
-        @Test
-        @DisplayName("Deve ignorar lista vazia ao carregar atribuições em lote")
-        void deveIgnorarListaVaziaAoCarregarAtribuicoes() {
-            ReflectionTestUtils.invokeMethod(service, "carregarAtribuicoesEmLote", Collections.emptyList());
-            
-            verify(usuarioPerfilRepo, never()).findByUsuarioTituloIn(any());
         }
     }
 

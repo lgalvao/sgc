@@ -20,7 +20,7 @@ public interface SubprocessoDetalheMapper {
     @Mapping(target = "situacaoLabel", expression = "java(sp.getSituacao().getDescricao())")
     @Mapping(target = "localizacaoAtual", expression = "java(mapLocalizacaoAtual(movimentacoes))")
     @Mapping(target = "processoDescricao", source = "sp.processo.descricao")
-    @Mapping(target = "tipoProcesso", expression = "java(sp.getProcesso().getTipo().name())")
+    @Mapping(target = "tipoProcesso", expression = "java(sp.getProcesso() != null ? sp.getProcesso().getTipo().name() : null)")
     @Mapping(target = "prazoEtapaAtual", expression = "java(mapPrazoEtapaAtual(sp))")
     @Mapping(target = "isEmAndamento", expression = "java(sp.isEmAndamento())")
     @Mapping(target = "etapaAtual", source = "sp.etapaAtual")
@@ -36,7 +36,7 @@ public interface SubprocessoDetalheMapper {
     default SubprocessoDetalheDto.ResponsavelDto mapResponsavel(Subprocesso sp, Usuario responsavel) {
         if (responsavel == null) return null;
 
-        String tituloTitular = sp.getUnidade().getTituloTitular();
+        String tituloTitular = sp.getUnidade() != null ? sp.getUnidade().getTituloTitular() : "";
         String tipo = "Substituição";
         if (tituloTitular.equals(responsavel.getTituloEleitoral())) {
             tipo = "Titular";
@@ -51,6 +51,7 @@ public interface SubprocessoDetalheMapper {
     }
 
     default SubprocessoDetalheDto.ResponsavelDto mapTitular(Subprocesso sp, Usuario titular, Usuario responsavel) {
+        if (titular == null) return null;
         return SubprocessoDetalheDto.ResponsavelDto.builder()
                 .nome(titular.getNome())
                 .tipoResponsabilidade("Titular")
@@ -60,8 +61,8 @@ public interface SubprocessoDetalheMapper {
     }
 
     default String mapLocalizacaoAtual(List<Movimentacao> movimentacoes) {
-        if (!movimentacoes.isEmpty()) {
-            Movimentacao movimentacaoRecente = movimentacoes.getFirst();
+        if (!org.springframework.util.CollectionUtils.isEmpty(movimentacoes)) {
+            Movimentacao movimentacaoRecente = movimentacoes.get(0);
             if (movimentacaoRecente.getUnidadeDestino() != null) {
                 return movimentacaoRecente.getUnidadeDestino().getSigla();
             }

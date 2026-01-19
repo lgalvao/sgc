@@ -46,10 +46,8 @@ public class PainelFacade {
      * @param pageable      As informações de paginação.
      * @return Uma página {@link Page} de {@link ProcessoResumoDto}.
      */
-    public Page<ProcessoResumoDto> listarProcessos(
-            Perfil perfil, Long codigoUnidade, Pageable pageable) {
-        
-        Pageable sortedPageable = garantirOrdenacaoPadrao(pageable);
+    public Page<ProcessoResumoDto> listarProcessos(Perfil perfil, Long codigoUnidade, Pageable pageable) {
+        Pageable sortedPageable = pageable.isPaged() ? garantirOrdenacaoPadrao(pageable) : pageable;
         Page<Processo> processos;
 
         if (perfil == Perfil.ADMIN) {
@@ -64,11 +62,9 @@ public class PainelFacade {
             
             // Todos os perfis veem processos da própria unidade
             unidadeIds.add(codigoUnidade);
-
-            processos = processoFacade.listarPorParticipantesIgnorandoCriado(
-                    unidadeIds, sortedPageable);
+            processos = processoFacade.listarPorParticipantesIgnorandoCriado(unidadeIds, sortedPageable);
         }
-        return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade));
+        return processos != null ? processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade)) : Page.empty();
     }
 
     private Pageable garantirOrdenacaoPadrao(Pageable pageable) {
@@ -105,8 +101,8 @@ public class PainelFacade {
         return alertasPage.map(
                 alerta -> {
                     LocalDateTime dataHoraLeitura = alertaService
-                                    .obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo)
-                                    .orElse(null);
+                            .obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo)
+                            .orElse(null);
                     return paraAlertaDto(alerta, dataHoraLeitura);
                 });
     }
@@ -138,6 +134,7 @@ public class PainelFacade {
 
         Set<Long> participantesIds = participantesPorCodigo.keySet();
         Set<Long> unidadesVisiveis = selecionarIdsVisiveis(participantesIds, participantesPorCodigo);
+
         return unidadesVisiveis.stream()
                 .map(participantesPorCodigo::get)
                 .map(Unidade::getSigla)
@@ -150,14 +147,15 @@ public class PainelFacade {
         for (Long unidadeId : participantesIds) {
             Unidade unidade = participantesPorCodigo.get(unidadeId);
             Long candidato = encontrarMaiorIdVisivel(unidade, participantesIds);
+
             if (candidato != null) visiveis.add(candidato);
         }
         return visiveis;
     }
 
     @Nullable
-    private Long encontrarMaiorIdVisivel(Unidade unidade, Set<Long> participantesIds) {
-        if (!participantesIds.contains(unidade.getCodigo())) return null;
+    private Long encontrarMaiorIdVisivel(@org.jspecify.annotations.Nullable Unidade unidade, Set<Long> participantesIds) {
+        if (unidade == null || !participantesIds.contains(unidade.getCodigo())) return null;
         Unidade atual = unidade;
         while (true) {
             if (!todasSubordinadasParticipam(atual.getCodigo(), participantesIds)) return atual.getCodigo();
@@ -178,6 +176,7 @@ public class PainelFacade {
         if (perfil == Perfil.ADMIN && processo.getSituacao() == SituacaoProcesso.CRIADO) {
             return String.format("/processo/cadastro?codProcesso=%s", processo.getCodigo());
         }
+
         if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) {
             return "/processo/" + processo.getCodigo();
         }
@@ -193,7 +192,7 @@ public class PainelFacade {
     private AlertaDto paraAlertaDto(Alerta alerta, LocalDateTime dataHoraLeitura) {
         return AlertaDto.builder()
                 .codigo(alerta.getCodigo())
-                .codProcesso(alerta.getProcesso().getCodigo())
+                .codProcesso(alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null)
                 .descricao(alerta.getDescricao())
                 .dataHora(alerta.getDataHora())
                 .unidadeOrigem(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getSigla() : null)

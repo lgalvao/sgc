@@ -36,6 +36,7 @@ import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
+import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -617,7 +618,7 @@ public class SubprocessoWorkflowService {
 
         sp.setSituacao(SITUACAO_MAPA_COM_SUGESTOES.get(sp.getProcesso().getTipo()));
 
-        sp.setDataFimEtapa2(java.time.LocalDateTime.now());
+        sp.setDataFimEtapa2(LocalDateTime.now());
         subprocessoRepo.save(sp);
 
         analiseFacade.removerPorSubprocesso(sp.getCodigo());

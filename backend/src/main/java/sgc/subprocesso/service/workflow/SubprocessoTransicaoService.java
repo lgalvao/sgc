@@ -15,14 +15,9 @@ import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.SubprocessoFacade;
 
 /**
  * Serviço consolidado para gerenciar transições e workflows de subprocessos.
- *
- * <p><b>Arquitetura Sprint 2:</b> Este serviço foi consolidado, absorbendo as
- * responsabilidades de {@code SubprocessoWorkflowExecutor} para eliminar duplicação
- * e melhorar a coesão arquitetural.
  *
  * <p><b>Responsabilidades:</b>
  * <ol>
@@ -34,17 +29,11 @@ import sgc.subprocesso.service.SubprocessoFacade;
  *
  * <p>Este serviço <b>DEVE</b> ser chamado dentro de uma transação existente
  * ({@code @Transactional} no método chamador) para garantir atomicidade.
- *
- * <p><b>Nota arquitetural:</b> Mantido público temporariamente para compatibilidade com testes.
- * Uso deveria ser via {@link SubprocessoFacade}.
- *
- * @since 2.0.0 (consolidação arquitetural Sprint 2)
  */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class SubprocessoTransicaoService {
-
     private final MovimentacaoRepo movimentacaoRepo;
     private final ApplicationEventPublisher eventPublisher;
     private final SubprocessoRepo repositorioSubprocesso;
@@ -112,17 +101,43 @@ public class SubprocessoTransicaoService {
      */
     public record RegistrarWorkflowReq(
             Subprocesso sp,
-            SituacaoSubprocesso novaSituacao,
+            @Nullable SituacaoSubprocesso novaSituacao,
             TipoTransicao tipoTransicao,
             TipoAnalise tipoAnalise,
             TipoAcaoAnalise tipoAcaoAnalise,
-            Unidade unidadeAnalise,
+            @Nullable Unidade unidadeAnalise,
             @Nullable Unidade unidadeOrigemTransicao,
             @Nullable Unidade unidadeDestinoTransicao,
             Usuario usuario,
             @Nullable String observacoes,
             @Nullable String motivoAnalise
-    ) {}
+    ) {
+        public RegistrarWorkflowReq(
+                Subprocesso sp,
+                @Nullable SituacaoSubprocesso novaSituacao,
+                TipoTransicao tipoTransicao,
+                TipoAnalise tipoAnalise,
+                TipoAcaoAnalise tipoAcaoAnalise,
+                @Nullable Unidade unidadeAnalise,
+                @Nullable Unidade unidadeOrigemTransicao,
+                @Nullable Unidade unidadeDestinoTransicao,
+                Usuario usuario,
+                @Nullable String observacoes,
+                @Nullable String motivoAnalise
+        ) {
+            this.sp = sp;
+            this.novaSituacao = novaSituacao;
+            this.tipoTransicao = tipoTransicao;
+            this.tipoAnalise = tipoAnalise;
+            this.tipoAcaoAnalise = tipoAcaoAnalise;
+            this.unidadeAnalise = unidadeAnalise;
+            this.unidadeOrigemTransicao = unidadeOrigemTransicao;
+            this.unidadeDestinoTransicao = unidadeDestinoTransicao;
+            this.usuario = usuario;
+            this.observacoes = observacoes;
+            this.motivoAnalise = motivoAnalise;
+        }
+    }
 
     /**
      * Executa um workflow completo com análise e transição.
@@ -131,7 +146,6 @@ public class SubprocessoTransicaoService {
      * é necessário registrar análise + mudança de estado.
      *
      * @param req Objeto contendo todos os parâmetros da transição de workflow
-     * @since 2.1.0 Refatorado para usar Record (limite de parâmetros)
      */
     @Transactional
     public void registrarAnaliseETransicao(RegistrarWorkflowReq req) {

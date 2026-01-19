@@ -46,39 +46,27 @@ import java.util.Set;
  * @see EventoTransicaoSubprocesso
  */
 @Getter
-@Builder
 public class EventoSubprocessoAtualizado {
-
-    /**
-     * O subprocesso que foi atualizado (estado atual).
-     */
     private Subprocesso subprocesso;
-
-    /**
-     * Usuário que realizou a atualização.
-     */
-    private Usuario usuario;
-
-    /**
-     * Campos que foram alterados na atualização.
-     * <p>Exemplos: "observacoes", "dataLimite", "responsavel"
-     */
+    private @org.jspecify.annotations.Nullable Usuario usuario;
     private Set<String> camposAlterados;
-
-    /**
-     * Data e hora da atualização.
-     */
     private LocalDateTime dataHoraAtualizacao;
-
-    /**
-     * Situação anterior (se a situação foi alterada).
-     * <p>Pode ser null se a situação não foi alterada diretamente.
-     * <p><b>Nota:</b> Mudanças de situação via workflow devem usar {@link EventoTransicaoSubprocesso}.
-     */
     private SituacaoSubprocesso situacaoAnterior;
-
-    /**
-     * Observações opcionais sobre a atualização.
-     */
     private String observacoes;
+
+    @Builder
+    public EventoSubprocessoAtualizado(
+            Subprocesso subprocesso,
+            @org.jspecify.annotations.Nullable Usuario usuario,
+            Set<String> camposAlterados,
+            LocalDateTime dataHoraAtualizacao,
+            SituacaoSubprocesso situacaoAnterior,
+            String observacoes) {
+        this.subprocesso = subprocesso;
+        this.usuario = usuario;
+        this.camposAlterados = camposAlterados;
+        this.dataHoraAtualizacao = dataHoraAtualizacao;
+        this.situacaoAnterior = situacaoAnterior;
+        this.observacoes = observacoes;
+    }
 }

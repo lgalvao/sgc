@@ -77,7 +77,7 @@ class PainelFacadeCoverageTest {
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        assertNull(result.getContent().get(0).linkDestino());
+        assertEquals("/processo/10", result.getContent().get(0).linkDestino());
     }
 
     @Test

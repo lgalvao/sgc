@@ -51,7 +51,7 @@ public class SubprocessoCrudService {
     private final SubprocessoRepo repositorioSubprocesso;
     private final SubprocessoMapper subprocessoMapper;
     private final MapaFacade mapaFacade;
-    private final ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher publicadorEventos;
     private final UsuarioFacade usuarioService;
     private final RepositorioComum repo;
 
@@ -70,7 +70,7 @@ public class SubprocessoCrudService {
         this.repositorioSubprocesso = repositorioSubprocesso;
         this.subprocessoMapper = subprocessoMapper;
         this.mapaFacade = mapaFacade;
-        this.eventPublisher = eventPublisher;
+        this.publicadorEventos = eventPublisher;
         this.usuarioService = usuarioService;
         this.repo = repo;
     }
@@ -125,19 +125,19 @@ public class SubprocessoCrudService {
     }
 
     public SubprocessoDto criar(CriarSubprocessoRequest request, boolean criadoPorProcesso) {
-        var entity = new Subprocesso();
+        var sp = new Subprocesso();
         var processo = new sgc.processo.model.Processo();
         processo.setCodigo(request.getCodProcesso());
-        entity.setProcesso(processo);
+        sp.setProcesso(processo);
 
         var unidade = new sgc.organizacao.model.Unidade();
         unidade.setCodigo(request.getCodUnidade());
-        entity.setUnidade(unidade);
-        entity.setDataLimiteEtapa1(request.getDataLimiteEtapa1());
-        entity.setDataLimiteEtapa2(request.getDataLimiteEtapa2());
-        entity.setMapa(null);
+        sp.setUnidade(unidade);
+        sp.setDataLimiteEtapa1(request.getDataLimiteEtapa1());
+        sp.setDataLimiteEtapa2(request.getDataLimiteEtapa2());
+        sp.setMapa(null);
         
-        var subprocessoSalvo = repositorioSubprocesso.save(entity);
+        var subprocessoSalvo = repositorioSubprocesso.save(sp);
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocessoSalvo);
         Mapa mapaSalvo = mapaFacade.salvar(mapa);
@@ -150,10 +150,10 @@ public class SubprocessoCrudService {
                 .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
                 .dataHoraCriacao(LocalDateTime.now())
                 .criadoPorProcesso(criadoPorProcesso || salvo.getProcesso() != null)
-                .codProcesso(salvo.getProcesso().getCodigo())
+                .codProcesso(salvo.getProcesso() != null ? salvo.getProcesso().getCodigo() : null)
                 .codUnidade(salvo.getUnidade().getCodigo())
                 .build();
-        eventPublisher.publishEvent(evento);
+        publicadorEventos.publishEvent(evento);
 
         return subprocessoMapper.toDTO(salvo);
     }
@@ -167,14 +167,15 @@ public class SubprocessoCrudService {
 
         // Publica evento de atualização se houve mudanças
         if (!camposAlterados.isEmpty()) {
+            @org.jspecify.annotations.Nullable Usuario usuario = usuarioService.obterUsuarioAutenticadoOuNull();
             EventoSubprocessoAtualizado evento = EventoSubprocessoAtualizado.builder()
                     .subprocesso(salvo)
-                    .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
+                    .usuario(usuario)
                     .camposAlterados(camposAlterados)
                     .dataHoraAtualizacao(LocalDateTime.now())
                     .situacaoAnterior(situacaoAnterior)
                     .build();
-            eventPublisher.publishEvent(evento);
+            publicadorEventos.publishEvent(evento);
         }
 
         return subprocessoMapper.toDTO(salvo);
@@ -214,19 +215,19 @@ public class SubprocessoCrudService {
     }
 
     public void excluir(Long codigo) {
-        Subprocesso subprocesso = buscarSubprocesso(codigo);
+        Subprocesso sp = buscarSubprocesso(codigo);
 
         // Publica evento ANTES da exclusão
         EventoSubprocessoExcluido evento = EventoSubprocessoExcluido.builder()
                 .codSubprocesso(codigo)
-                .codProcesso(subprocesso.getProcesso().getCodigo())
-                .codUnidade(subprocesso.getUnidade().getCodigo())
-                .codMapa(subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null)
-                .situacao(subprocesso.getSituacao())
+                .codProcesso(sp.getProcesso() != null ? sp.getProcesso().getCodigo() : null)
+                .codUnidade(sp.getUnidade() != null ? sp.getUnidade().getCodigo() : null)
+                .codMapa(sp.getMapa() != null ? sp.getMapa().getCodigo() : null)
+                .situacao(sp.getSituacao())
                 .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
                 .dataHoraExclusao(LocalDateTime.now())
                 .build();
-        eventPublisher.publishEvent(evento);
+        publicadorEventos.publishEvent(evento);
 
         repositorioSubprocesso.deleteById(codigo);
     }
