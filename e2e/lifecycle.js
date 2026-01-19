@@ -109,7 +109,7 @@ function startBackend() {
         stdio: ['ignore', 'pipe', 'pipe']
     };
 
-    backendProcess = spawn(gradlewPath, ['bootRun', '--args=--spring.profiles.active=e2e'], spawnOptions);
+    backendProcess = spawn(gradlewPath, ['bootRun', '-PENV=e2e'], spawnOptions);
 
     backendProcess.stdout.on('data', data => log('BACKEND', data));
     backendProcess.stderr.on('data', data => log('BACKEND_ERR', data));

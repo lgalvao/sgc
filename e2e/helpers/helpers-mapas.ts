@@ -9,7 +9,14 @@ export async function navegarParaMapa(page: Page) {
 }
 
 export async function criarCompetencia(page: Page, descricao: string, atividades: string[]) {
-    await page.getByTestId('btn-abrir-criar-competencia').click();
+    // Tenta encontrar o botão de estado vazio primeiro, se visível
+    const btnEmpty = page.getByTestId('btn-abrir-criar-competencia-empty');
+    if (await btnEmpty.isVisible()) {
+        await btnEmpty.click();
+    } else {
+        await page.getByTestId('btn-abrir-criar-competencia').click();
+    }
+
     const modal = page.getByTestId('mdl-criar-competencia');
     await expect(modal).toBeVisible();
 
