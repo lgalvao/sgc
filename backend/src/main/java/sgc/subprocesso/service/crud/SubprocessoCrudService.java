@@ -9,6 +9,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
+import sgc.organizacao.model.Usuario;
 import sgc.organizacao.UsuarioFacade;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;

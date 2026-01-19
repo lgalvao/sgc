@@ -111,33 +111,7 @@ public class SubprocessoTransicaoService {
             Usuario usuario,
             @Nullable String observacoes,
             @Nullable String motivoAnalise
-    ) {
-        public RegistrarWorkflowReq(
-                Subprocesso sp,
-                @Nullable SituacaoSubprocesso novaSituacao,
-                TipoTransicao tipoTransicao,
-                TipoAnalise tipoAnalise,
-                TipoAcaoAnalise tipoAcaoAnalise,
-                @Nullable Unidade unidadeAnalise,
-                @Nullable Unidade unidadeOrigemTransicao,
-                @Nullable Unidade unidadeDestinoTransicao,
-                Usuario usuario,
-                @Nullable String observacoes,
-                @Nullable String motivoAnalise
-        ) {
-            this.sp = sp;
-            this.novaSituacao = novaSituacao;
-            this.tipoTransicao = tipoTransicao;
-            this.tipoAnalise = tipoAnalise;
-            this.tipoAcaoAnalise = tipoAcaoAnalise;
-            this.unidadeAnalise = unidadeAnalise;
-            this.unidadeOrigemTransicao = unidadeOrigemTransicao;
-            this.unidadeDestinoTransicao = unidadeDestinoTransicao;
-            this.usuario = usuario;
-            this.observacoes = observacoes;
-            this.motivoAnalise = motivoAnalise;
-        }
-    }
+    ) {}
 
     /**
      * Executa um workflow completo com análise e transição.
