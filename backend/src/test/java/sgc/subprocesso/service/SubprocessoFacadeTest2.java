@@ -37,9 +37,11 @@ import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -552,11 +554,11 @@ class SubprocessoFacadeTest2 {
 
             Competencia comp = new Competencia();
             comp.setCodigo(10L);
-            when(competenciaService.buscarPorCodigo(10L)).thenReturn(comp);
+            when(competenciaService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(comp));
 
             subprocessoFacade.salvarAjustesMapa(codigo, List.of(compDto), "user");
 
-            verify(competenciaService).salvar(comp);
+            verify(competenciaService).salvarTodas(anyList());
             verify(subprocessoRepo).save(sp);
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         }

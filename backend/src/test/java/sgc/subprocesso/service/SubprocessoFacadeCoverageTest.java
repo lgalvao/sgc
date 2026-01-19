@@ -118,16 +118,12 @@ class SubprocessoFacadeCoverageTest {
 
         Competencia competencia = new Competencia();
         competencia.setCodigo(10L);
-        when(competenciaService.buscarPorCodigo(10L)).thenReturn(competencia);
-
-        Atividade atividade = new Atividade();
-        atividade.setCodigo(100L);
-        when(atividadeService.obterPorCodigo(100L)).thenReturn(atividade);
+        when(competenciaService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(competencia));
 
         subprocessoFacade.salvarAjustesMapa(codSubprocesso, List.of(compDto), usuarioTitulo);
 
-        verify(atividadeService).atualizar(eq(100L), any(AtualizarAtividadeRequest.class));
-        verify(competenciaService).salvar(competencia);
+        verify(atividadeService).atualizarDescricoesEmLote(anyMap());
+        verify(competenciaService).salvarTodas(anyList());
         verify(subprocessoRepo).save(sp);
         assertEquals(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO, sp.getSituacao());
     }
