@@ -242,23 +242,61 @@ class EventoProcessoListenerTest {
         inter.setSigla("INTER");
         inter.setTipo(TipoUnidade.INTERMEDIARIA);
 
-        processo.setParticipantes(Set.of(inter));
+        Unidade subUnidade = new Unidade();
+        subUnidade.setCodigo(441L);
+        subUnidade.setSigla("SUB");
+        subUnidade.setTipo(TipoUnidade.OPERACIONAL);
+        subUnidade.setUnidadeSuperior(inter);
 
-        ResponsavelDto resp = ResponsavelDto.builder()
-                .unidadeCodigo(44L)
-                .titularTitulo("444")
-                .substitutoTitulo("555")
-                .build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(44L, resp));
+        processo.setParticipantes(Set.of(inter, subUnidade));
 
-        UsuarioDto userInter = UsuarioDto.builder().tituloEleitoral("444").email("inter@mail.com").build();
+        ResponsavelDto respInter = ResponsavelDto.builder().unidadeCodigo(44L).titularTitulo("444").build();
+        ResponsavelDto respSub = ResponsavelDto.builder().unidadeCodigo(441L).titularTitulo("441").build();
         
-        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("444", userInter));
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(44L, respInter, 441L, respSub));
+        
+        UsuarioDto userInter = UsuarioDto.builder().tituloEleitoral("444").email("inter@mail.com").build();
+        UsuarioDto userSub = UsuarioDto.builder().tituloEleitoral("441").email("sub@mail.com").build();
+        
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("444", userInter, "441", userSub));
         
         EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(2L).build();
         listener.aoFinalizarProcesso(evento);
         
         verify(notificacaoEmailService).enviarEmailHtml(eq("inter@mail.com"), anyString(), any());
+        verify(notificacaoEmailService).enviarEmailHtml(eq("sub@mail.com"), anyString(), any());
+    }
+
+    @Test
+    @DisplayName("Deve logar aviso se intermediária não tem subordinadas participantes")
+    void deveLogarAvisoSeIntermediariaSemSubordinadas() {
+        Processo processo = new Processo();
+        processo.setCodigo(2L);
+        when(processoFacade.buscarEntidadePorId(2L)).thenReturn(processo);
+
+        Unidade inter = new Unidade();
+        inter.setCodigo(44L);
+        inter.setTipo(TipoUnidade.INTERMEDIARIA);
+        processo.setParticipantes(Set.of(inter));
+
+        ResponsavelDto resp = ResponsavelDto.builder().unidadeCodigo(44L).titularTitulo("444").build();
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(44L, resp));
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("444", UsuarioDto.builder().email("i@i.com").build()));
+
+        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(2L).build());
+
+        verify(notificacaoEmailService, never()).enviarEmailHtml(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("Deve capturar exceção no envio de e-mail ao iniciar")
+    void deveCapturarExcecaoNoEnvioAoIniciar() {
+        lenient().when(processoFacade.buscarEntidadePorId(anyLong())).thenReturn(new Processo());
+        lenient().when(subprocessoFacade.listarEntidadesPorProcesso(anyLong())).thenReturn(List.of(new Subprocesso()));
+        lenient().doThrow(new RuntimeException("Erro de rede")).when(notificacaoEmailService).enviarEmailHtml(any(), any(), any());
+
+        assertThatCode(() -> listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build()))
+                .doesNotThrowAnyException();
     }
 
     @Test

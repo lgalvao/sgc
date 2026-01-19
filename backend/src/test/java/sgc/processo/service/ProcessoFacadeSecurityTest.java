@@ -84,55 +84,23 @@ class ProcessoFacadeSecurityTest {
             assertThat(processoFacade.checarAcesso(null, 1L)).isFalse();
         }
 
-        @Test
-        @DisplayName("Deve negar acesso quando name é null")
-        void deveNegarAcessoQuandoNameNull() {
+        @org.junit.jupiter.params.ParameterizedTest
+        @org.junit.jupiter.params.provider.ValueSource(longs = {1L, 2L})
+        @DisplayName("Deve delegar verificação de acesso para o ProcessoAcessoService")
+        void deveDelegarVerificacaoDeAcesso(Long processoCodigo) {
             Authentication auth = mock(Authentication.class);
-            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
-
-            assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
+            when(processoAcessoService.checarAcesso(auth, processoCodigo)).thenReturn(true);
+            assertThat(processoFacade.checarAcesso(auth, processoCodigo)).isTrue();
+            
+            when(processoAcessoService.checarAcesso(auth, processoCodigo)).thenReturn(false);
+            assertThat(processoFacade.checarAcesso(auth, processoCodigo)).isFalse();
         }
 
         @Test
-        @DisplayName("Deve negar acesso quando usuário sem permissão adequada")
-        void deveNegarAcessoQuandoUsuarioSemPermissao() {
-            // Arrange
-            Authentication auth = mock(Authentication.class);
-            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
-
-            // Act & Assert
-            assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
-        }
-
-        @Test
-        @DisplayName("Deve negar acesso quando usuário não possui unidade associada")
-        void deveNegarAcessoQuandoUsuarioSemUnidade() {
-            // Arrange
-            Authentication auth = mock(Authentication.class);
-            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
-
-            // Act & Assert
-            assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
-        }
-
-        @Test
-        @DisplayName("Deve negar acesso quando codUnidadeUsuario é null no perfil")
-        void deveNegarAcessoQuandoUnidadeNull() {
-            Authentication auth = mock(Authentication.class);
-            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
-
-            assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
-        }
-
-        @Test
-        @DisplayName("Deve negar acesso se hierarquia vazia")
-        void deveNegarAcessoSeHierarquiaVazia() {
-            // Arrange
-            Authentication auth = mock(Authentication.class);
-            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
-
-            // Act & Assert
-            assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
+        @DisplayName("Deve retornar false quando checarAcesso recebe null")
+        void deveRetornarFalseQuandoAuthenticationForNull() {
+            when(processoAcessoService.checarAcesso(null, 1L)).thenReturn(false);
+            assertThat(processoFacade.checarAcesso(null, 1L)).isFalse();
         }
 
         @Test
@@ -144,68 +112,6 @@ class ProcessoFacadeSecurityTest {
 
             // Act & Assert
             assertThat(processoFacade.checarAcesso(auth, 1L)).isTrue();
-        }
-
-        @Test
-        @DisplayName("Deve permitir acesso em hierarquia complexa (Neto)")
-        void devePermitirAcessoEmHierarquiaComplexa() {
-            // Arrange
-            Authentication auth = mock(Authentication.class);
-            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(true);
-
-            // Act
-            boolean acesso = processoFacade.checarAcesso(auth, 1L);
-
-            // Assert
-            assertThat(acesso).isTrue();
-        }
-
-        @Test
-        @DisplayName("Deve permitir acesso quando unidade superior é nula na construção da hierarquia")
-        void devePermitirAcessoComUnidadeSuperiorNula() {
-            // Arrange
-            Authentication auth = mock(Authentication.class);
-            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(true);
-
-            // Act
-            boolean acesso = processoFacade.checarAcesso(auth, 1L);
-
-            // Assert
-            assertThat(acesso).isTrue();
-        }
-
-        @Test
-        @DisplayName("Deve tratar ciclos na hierarquia ao checar acesso")
-        void deveTratarCiclosNaHierarquia() {
-            // Arrange
-            Authentication auth = mock(Authentication.class);
-            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(true);
-
-            // Act
-            boolean acesso = processoFacade.checarAcesso(auth, 1L);
-
-            // Assert
-            assertThat(acesso).isTrue();
-        }
-
-        @Test
-        @DisplayName("checarAcesso: retorna false se authentication for null ou não autenticado")
-        void checarAcesso_NaoAutenticado() {
-            Authentication auth = mock(Authentication.class);
-            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
-            assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
-
-            when(processoAcessoService.checarAcesso(null, 1L)).thenReturn(false);
-            assertThat(processoFacade.checarAcesso(null, 1L)).isFalse();
-        }
-
-        @Test
-        @DisplayName("checarAcesso: retorna false se usuário não tem role GESTOR ou CHEFE")
-        void checarAcesso_RoleInvalida() {
-            Authentication auth = mock(Authentication.class);
-            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
-
-            assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
         }
 
         @Test

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -13,6 +14,7 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
+import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -24,7 +26,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,12 +66,15 @@ class ProcessoFinalizadorTest {
         assertThat(p.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
         verify(unidadeService).definirMapaVigente(100L, m);
         verify(processoRepo).save(p);
-        verify(publicadorEventos).publishEvent(any());
+        
+        ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
+        verify(publicadorEventos).publishEvent(captor.capture());
+        assertThat(captor.getValue()).isInstanceOf(EventoProcessoFinalizado.class);
     }
 
     @Test
     @DisplayName("Deve falhar se processo não encontrado")
-    void deveFalharSeNaoEncontrado() {
+    void deveFailharSeNaoEncontrado() {
         when(processoRepo.findById(1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> finalizador.finalizar(1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);

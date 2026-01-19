@@ -116,9 +116,6 @@ class UnidadeFacadeCoverageTest {
     @Test
     @DisplayName("montarHierarquiaComElegibilidade - Check Filter Logic")
     void montarHierarquiaComElegibilidade_FilterCoverage() {
-        // Need to test the lambda passed to montarHierarquia
-        // Condition: u.getTipo() != INTERMEDIARIA && (!requerMapaVigente || mapExists) && !blocked
-
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
         u1.setTipo(TipoUnidade.OPERACIONAL);
@@ -137,16 +134,16 @@ class UnidadeFacadeCoverageTest {
         java.util.Set<Long> blocked = java.util.Set.of(3L);
 
         // Mock mapper to capture the boolean flag
-        when(usuarioMapper.toUnidadeDto(eq(u1), eq(true))).thenReturn(UnidadeDto.builder().codigo(1L).isElegivel(true).subunidades(Collections.emptyList()).build());
-        when(usuarioMapper.toUnidadeDto(eq(u2), eq(false))).thenReturn(UnidadeDto.builder().codigo(2L).isElegivel(false).subunidades(Collections.emptyList()).build());
-        when(usuarioMapper.toUnidadeDto(eq(u3), eq(false))).thenReturn(UnidadeDto.builder().codigo(3L).isElegivel(false).subunidades(Collections.emptyList()).build());
+        when(usuarioMapper.toUnidadeDto(u1, true)).thenReturn(UnidadeDto.builder().codigo(1L).isElegivel(true).subunidades(Collections.emptyList()).build());
+        when(usuarioMapper.toUnidadeDto(u2, false)).thenReturn(UnidadeDto.builder().codigo(2L).isElegivel(false).subunidades(Collections.emptyList()).build());
+        when(usuarioMapper.toUnidadeDto(u3, false)).thenReturn(UnidadeDto.builder().codigo(3L).isElegivel(false).subunidades(Collections.emptyList()).build());
 
         facade.buscarArvoreComElegibilidade(false, blocked);
 
         // Verify calls with expected boolean values
-        verify(usuarioMapper).toUnidadeDto(eq(u1), eq(true));
-        verify(usuarioMapper).toUnidadeDto(eq(u2), eq(false));
-        verify(usuarioMapper).toUnidadeDto(eq(u3), eq(false));
+        verify(usuarioMapper).toUnidadeDto(u1, true);
+        verify(usuarioMapper).toUnidadeDto(u2, false);
+        verify(usuarioMapper).toUnidadeDto(u3, false);
     }
 
     @Test
