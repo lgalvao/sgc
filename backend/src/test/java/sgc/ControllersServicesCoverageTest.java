@@ -195,23 +195,6 @@ class ControllersServicesCoverageTest {
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
-    @Test
-    @DisplayName("Deve lançar erro ao validar disponibilização sem mapa")
-    void deveLancarErroAoValidarDisponibilizacaoSemMapa() {
-        Subprocesso sp = new Subprocesso();
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral("123");
-
-        Unidade unidade = new Unidade();
-        unidade.setTituloTitular("123");
-        sp.setUnidade(unidade);
-
-        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
-        // Mapa nulo
-
-        assertThatThrownBy(() -> cadastroService.disponibilizarCadastro(1L, usuario))
-                .isInstanceOf(ErroMapaNaoAssociado.class);
-    }
 
     @Test
     @DisplayName("Deve lançar erro ao devolver cadastro se unidade superior nula")

@@ -207,7 +207,12 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoRepo.save(subprocesso);
 
-        var request = new SalvarMapaRequest("Obs", List.of());
+        var request =
+                new SalvarMapaRequest(
+                        "Obs",
+                        List.of(
+                                new CompetenciaMapaDto(
+                                        null, "Competência", List.of(atividade1.getCodigo()))));
 
         // When & Then
         mockMvc.perform(
