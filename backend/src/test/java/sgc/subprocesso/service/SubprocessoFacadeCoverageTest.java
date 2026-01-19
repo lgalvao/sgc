@@ -22,6 +22,7 @@ import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.seguranca.acesso.AccessControlService;
@@ -46,6 +47,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -292,5 +294,142 @@ class SubprocessoFacadeCoverageTest {
 
         verify(subprocessoRepo).save(sp);
         assertEquals(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO, sp.getSituacao());
+    }
+
+    @Test
+    @DisplayName("obterDetalhes - Sucesso")
+    void obterDetalhes_Sucesso() {
+        Long codigo = 1L;
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123");
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codigo);
+        Unidade unidade = new Unidade();
+        unidade.setSigla("SIGLA");
+        unidade.setTituloTitular("123");
+        sp.setUnidade(unidade);
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setProcesso(processo);
+
+        when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+        when(usuarioService.buscarResponsavelAtual("SIGLA")).thenReturn(usuario);
+        // titular check skips if titualr logic handled
+        when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
+        when(repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(Collections.emptyList());
+        when(accessControlService.podeExecutar(eq(usuario), any(), eq(sp))).thenReturn(true);
+
+        subprocessoFacade.obterDetalhes(codigo, null);
+
+        verify(subprocessoDetalheMapper).toDto(eq(sp), eq(usuario), eq(usuario), anyList(), any());
+    }
+
+    @Test
+    @DisplayName("obterCadastro - Sucesso")
+    void obterCadastro_Sucesso() {
+        Long codigo = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codigo);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(100L);
+        sp.setMapa(mapa);
+        Unidade unidade = new Unidade();
+        unidade.setSigla("SIGLA");
+        sp.setUnidade(unidade);
+
+        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(100L)).thenReturn(Collections.emptyList());
+
+        var result = subprocessoFacade.obterCadastro(codigo);
+
+        assertNotNull(result);
+        assertEquals(codigo, result.getSubprocessoCodigo());
+    }
+
+    @Test
+    @DisplayName("obterSugestoes - Sucesso")
+    void obterSugestoes_Sucesso() {
+        Long codigo = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codigo);
+        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+        var result = subprocessoFacade.obterSugestoes(codigo);
+        assertNotNull(result);
+    }
+
+    @Test
+    @DisplayName("obterMapaParaAjuste - Sucesso")
+    void obterMapaParaAjuste_Sucesso() {
+        Long codigo = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codigo);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(100L);
+        sp.setMapa(mapa);
+
+        when(crudService.buscarSubprocessoComMapa(codigo)).thenReturn(sp);
+        when(competenciaService.buscarPorCodMapa(100L)).thenReturn(Collections.emptyList());
+        when(atividadeService.buscarPorMapaCodigo(100L)).thenReturn(Collections.emptyList());
+        when(conhecimentoService.listarPorMapa(100L)).thenReturn(Collections.emptyList());
+
+        subprocessoFacade.obterMapaParaAjuste(codigo);
+
+        verify(mapaAjusteMapper).toDto(eq(sp), any(), anyList(), anyList(), anyList());
+    }
+
+    @Test
+    @DisplayName("obterPermissoes - Sucesso")
+    void obterPermissoes_Sucesso() {
+        Long codigo = 1L;
+        Usuario usuario = new Usuario();
+        Subprocesso sp = new Subprocesso();
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.REVISAO);
+        sp.setProcesso(processo);
+
+        when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+        when(accessControlService.podeExecutar(eq(usuario), any(), eq(sp))).thenReturn(true);
+
+        var result = subprocessoFacade.obterPermissoes(codigo);
+        assertNotNull(result);
+    }
+
+    @Test
+    @DisplayName("obterContextoEdicao - Sucesso")
+    void obterContextoEdicao_Sucesso() {
+        Long codigo = 1L;
+        Usuario usuario = new Usuario();
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codigo);
+        Unidade unidade = new Unidade();
+        unidade.setSigla("SIGLA");
+        sp.setUnidade(unidade);
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setProcesso(processo);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(100L);
+        sp.setMapa(mapa);
+
+        when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+        when(usuarioService.buscarResponsavelAtual("SIGLA")).thenReturn(usuario);
+
+        // Mock obterDetalhesInterno dependencies
+        when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(
+            sgc.subprocesso.dto.SubprocessoDetalheDto.builder()
+                .unidade(sgc.subprocesso.dto.SubprocessoDetalheDto.UnidadeDto.builder().sigla("SIGLA").build())
+                .build()
+        );
+
+        when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(new sgc.organizacao.dto.UnidadeDto());
+        when(mapaFacade.obterMapaCompleto(100L, codigo)).thenReturn(new sgc.mapa.dto.MapaCompletoDto());
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(100L)).thenReturn(Collections.emptyList());
+
+        subprocessoFacade.obterContextoEdicao(codigo, null);
+
+        verify(mapaFacade).obterMapaCompleto(100L, codigo);
     }
 }
