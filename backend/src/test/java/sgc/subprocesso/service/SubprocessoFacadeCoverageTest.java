@@ -301,4 +301,70 @@ class SubprocessoFacadeCoverageTest {
         // But movimentacao IS saved.
         verify(movimentacaoRepo).save(any(Movimentacao.class));
     }
+
+    @Test
+    @DisplayName("salvarAjustesMapa - Status Invalido")
+    void salvarAjustesMapa_StatusInvalido() {
+        Long codSubprocesso = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codSubprocesso);
+        // Set invalid status (not REVISAO_CADASTRO_HOMOLOGADA or REVISAO_MAPA_AJUSTADO)
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+
+        when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+
+        org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () -> {
+            facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList(), "user");
+        });
+    }
+
+    @Test
+    @DisplayName("importarAtividades - Status Invalido")
+    void importarAtividades_StatusInvalido() {
+        Long codDestino = 1L;
+        Long codOrigem = 2L;
+
+        Subprocesso spDestino = new Subprocesso();
+        spDestino.setCodigo(codDestino);
+        // Invalid status for import
+        spDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+
+        org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida.class, () -> {
+            facade.importarAtividades(codDestino, codOrigem);
+        });
+    }
+
+    @Test
+    @DisplayName("importarAtividades - Unidade Origem Null")
+    void importarAtividades_UnidadeOrigemNull() {
+        Long codDestino = 1L;
+        Long codOrigem = 2L;
+
+        Subprocesso spDestino = new Subprocesso();
+        spDestino.setCodigo(codDestino);
+        spDestino.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        spDestino.setMapa(new Mapa());
+        spDestino.getMapa().setCodigo(10L);
+        spDestino.setUnidade(new sgc.organizacao.model.Unidade());
+        spDestino.getUnidade().setSigla("DEST");
+        spDestino.setProcesso(new Processo());
+        spDestino.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+
+        Subprocesso spOrigem = new Subprocesso();
+        spOrigem.setCodigo(codOrigem);
+        spOrigem.setMapa(new Mapa());
+        spOrigem.getMapa().setCodigo(20L);
+        // Unit is null
+        spOrigem.setUnidade(null);
+
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+
+        facade.importarAtividades(codDestino, codOrigem);
+
+        // Verify that movimentacao was saved (no exception thrown)
+        verify(movimentacaoRepo).save(any(Movimentacao.class));
+    }
 }

@@ -376,4 +376,65 @@ class EventoProcessoListenerCoverageTest {
         verify(notificacaoEmailService, atLeastOnce()).enviarEmailHtml(eq("email@test.com"), any(), any());
         verify(notificacaoModelosService).criarEmailProcessoFinalizadoUnidadesSubordinadas(eq("U_INT"), eq("P1"), any());
     }
+
+    @Test
+    @DisplayName("aoIniciarProcesso - Exception In Loop")
+    void aoIniciarProcesso_ExceptionInLoop() {
+        Long codProcesso = 1L;
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(codProcesso).build();
+
+        Processo processo = new Processo();
+        processo.setCodigo(codProcesso);
+        processo.setDescricao("P1");
+        processo.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+
+        Subprocesso sp1 = new Subprocesso();
+        sp1.setCodigo(10L);
+        sp1.setUnidade(new Unidade());
+        sp1.getUnidade().setCodigo(100L);
+        sp1.getUnidade().setSigla("U1");
+        sp1.getUnidade().setTipo(TipoUnidade.OPERACIONAL);
+
+        Subprocesso sp2 = new Subprocesso();
+        sp2.setCodigo(20L);
+        sp2.setUnidade(new Unidade());
+        sp2.getUnidade().setCodigo(200L);
+        sp2.getUnidade().setSigla("U2");
+        sp2.getUnidade().setTipo(TipoUnidade.OPERACIONAL);
+
+        when(processoFacade.buscarEntidadePorId(codProcesso)).thenReturn(processo);
+        when(subprocessoFacade.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp1, sp2));
+
+        // Return empty map causes NPE in enviarEmailProcessoIniciado because responsavel is null
+        when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of());
+        when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of());
+
+        listener.aoIniciarProcesso(evento);
+
+        // Verify loop ran for both (implied by no crash)
+        verify(subprocessoFacade).listarEntidadesPorProcesso(codProcesso);
+    }
+
+    @Test
+    @DisplayName("aoFinalizarProcesso - Exception In Notification")
+    void aoFinalizarProcesso_ExceptionInNotification() {
+        Long codProcesso = 1L;
+        sgc.processo.eventos.EventoProcessoFinalizado evento = sgc.processo.eventos.EventoProcessoFinalizado.builder().codProcesso(codProcesso).build();
+
+        Processo processo = new Processo();
+        processo.setCodigo(codProcesso);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(100L);
+        processo.setParticipantes(Set.of(u1));
+
+        when(processoFacade.buscarEntidadePorId(codProcesso)).thenReturn(processo);
+
+        // Throw exception when getting responsaveis
+        when(usuarioService.buscarResponsaveisUnidades(any())).thenThrow(new RuntimeException("Error fetching responsaveis"));
+
+        listener.aoFinalizarProcesso(evento);
+
+        // Should catch and log
+        verify(processoFacade).buscarEntidadePorId(codProcesso);
+    }
 }
