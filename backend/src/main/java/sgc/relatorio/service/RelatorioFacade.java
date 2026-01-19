@@ -10,7 +10,7 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.service.CompetenciaService;
-import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.service.ProcessoFacade;
@@ -25,7 +25,7 @@ import java.util.List;
 public class RelatorioFacade {
     private final ProcessoFacade processoFacade;
     private final SubprocessoFacade subprocessoFacade;
-    private final UsuarioFacade usuarioService;
+    private final UnidadeFacade unidadeService;
     private final CompetenciaService competenciaService;
     private final PdfFactory pdfFactory;
 
@@ -46,7 +46,7 @@ public class RelatorioFacade {
                 String responsavel = "Não definido";
 
                 try {
-                     var respDto = usuarioService.buscarResponsavelUnidade(unidade.getCodigo());
+                     var respDto = unidadeService.buscarResponsavelUnidade(unidade.getCodigo());
                      responsavel = respDto.getTitularNome();
                 } catch (Exception e) {
                     // Ignora erro ao buscar responsável

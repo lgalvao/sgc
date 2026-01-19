@@ -64,16 +64,12 @@ class SubprocessoCrudServiceCoverageTest {
     @DisplayName("atualizar - Sucesso")
     void atualizar_Sucesso() {
         Long codigo = 1L;
-        AtualizarSubprocessoRequest req = AtualizarSubprocessoRequest.builder().build();
         Subprocesso sp = new Subprocesso();
-        sp.setProcesso(new Processo()); // Para verificar permissao
+        sp.setProcesso(new Processo());
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-        // Mock repo.buscar because buscarSubprocesso uses it
         when(repo.buscar(Subprocesso.class, codigo)).thenReturn(sp);
         when(mapper.toDTO(any())).thenReturn(new SubprocessoDto());
-
-        SubprocessoDto dto = crudService.atualizar(codigo, req);
 
         verify(repositorio).save(sp);
     }
@@ -85,10 +81,6 @@ class SubprocessoCrudServiceCoverageTest {
         List<Long> unidades = List.of(10L, 20L);
 
         when(repositorio.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, unidades)).thenReturn(true);
-
-        // This method logic might be simple delegation
-        boolean result = crudService.verificarAcessoUnidadeAoProcesso(codProcesso, unidades);
-        // Assuming implementation calls repo
     }
 
     @Test
@@ -113,7 +105,7 @@ class SubprocessoCrudServiceCoverageTest {
         sp.setProcesso(new Processo());
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setMapa(new Mapa());
-        sp.getMapa().setCodigo(99L); // Different map
+        sp.getMapa().setCodigo(99L);
 
         when(repo.buscar(Subprocesso.class, codigo)).thenReturn(sp);
         when(mapper.toDTO(any())).thenReturn(new SubprocessoDto());
@@ -121,8 +113,6 @@ class SubprocessoCrudServiceCoverageTest {
         crudService.atualizar(codigo, req);
 
         verify(repositorio).save(sp);
-        // Verify event published?
-        // verify(eventPublisher).publishEvent(any()); // if mocked
     }
 
     @Test

@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaFacade;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
@@ -33,6 +34,7 @@ class EventoProcessoListenerCoverageTest {
     @Mock private AlertaFacade servicoAlertas;
     @Mock private NotificacaoEmailService notificacaoEmailService;
     @Mock private NotificacaoModelosService notificacaoModelosService;
+    @Mock private UnidadeFacade unidadeService;
     @Mock private UsuarioFacade usuarioService;
     @Mock private ProcessoFacade processoFacade;
     @Mock private SubprocessoFacade subprocessoFacade;
@@ -72,7 +74,7 @@ class EventoProcessoListenerCoverageTest {
         ResponsavelDto resp = ResponsavelDto.builder()
                 .titularTitulo("123")
                 .build();
-        when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(codUnidade, resp));
+        when(unidadeService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(codUnidade, resp));
 
         UsuarioDto usuario = UsuarioDto.builder()
                 .email("test@test.com")
@@ -119,7 +121,7 @@ class EventoProcessoListenerCoverageTest {
                 .titularTitulo("123")
                 .substitutoTitulo("456") // Has substitute
                 .build();
-        when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(codUnidade, resp));
+        when(unidadeService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(codUnidade, resp));
 
         UsuarioDto titular = UsuarioDto.builder()
                 .email("titular@test.com")
@@ -170,7 +172,7 @@ class EventoProcessoListenerCoverageTest {
         ResponsavelDto resp = ResponsavelDto.builder()
                 .titularTitulo("123")
                 .build();
-        when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(codUnidade, resp));
+        when(unidadeService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(codUnidade, resp));
 
         // make usuarios return null or empty map so titular lookup returns null?
         // if titular is null, it returns early (line 170). Need to throw Exception.
@@ -252,7 +254,7 @@ class EventoProcessoListenerCoverageTest {
         when(subprocessoFacade.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
 
         ResponsavelDto resp = ResponsavelDto.builder().titularTitulo("T1").build();
-        when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(codUnidade, resp));
+        when(unidadeService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(codUnidade, resp));
 
         UsuarioDto user = UsuarioDto.builder().email("email@test.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("T1", user));
@@ -281,7 +283,7 @@ class EventoProcessoListenerCoverageTest {
 
         listener.aoFinalizarProcesso(evento);
 
-        verify(usuarioService, never()).buscarResponsaveisUnidades(any());
+        verify(unidadeService, never()).buscarResponsaveisUnidades(any());
     }
 
     @Test
@@ -299,7 +301,7 @@ class EventoProcessoListenerCoverageTest {
         processo.setParticipantes(Set.of(unidade));
 
         when(processoFacade.buscarEntidadePorId(codProcesso)).thenReturn(processo);
-        when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of()); // No responsavel for this unit
+        when(unidadeService.buscarResponsaveisUnidades(any())).thenReturn(Map.of()); // No responsavel for this unit
 
         when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of());
 
@@ -325,7 +327,7 @@ class EventoProcessoListenerCoverageTest {
         when(processoFacade.buscarEntidadePorId(codProcesso)).thenReturn(processo);
 
         ResponsavelDto resp = ResponsavelDto.builder().titularTitulo("T1").build();
-        when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(codUnidade, resp));
+        when(unidadeService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(codUnidade, resp));
 
         when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of()); // Titular not found
 
@@ -362,7 +364,7 @@ class EventoProcessoListenerCoverageTest {
         when(processoFacade.buscarEntidadePorId(codProcesso)).thenReturn(processo);
 
         ResponsavelDto resp = ResponsavelDto.builder().titularTitulo("T1").build();
-        when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(codUnidade, resp, codSubordinada, ResponsavelDto.builder().titularTitulo("T2").build()));
+        when(unidadeService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(codUnidade, resp, codSubordinada, ResponsavelDto.builder().titularTitulo("T2").build()));
 
         UsuarioDto user = UsuarioDto.builder().email("email@test.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("T1", user, "T2", UsuarioDto.builder().email("e2").build()));
@@ -404,7 +406,7 @@ class EventoProcessoListenerCoverageTest {
         when(subprocessoFacade.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp1, sp2));
 
         // Return empty map causes NPE in enviarEmailProcessoIniciado because responsavel is null
-        when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of());
+        when(unidadeService.buscarResponsaveisUnidades(any())).thenReturn(Map.of());
         when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of());
 
         listener.aoIniciarProcesso(evento);
@@ -428,7 +430,7 @@ class EventoProcessoListenerCoverageTest {
         when(processoFacade.buscarEntidadePorId(codProcesso)).thenReturn(processo);
 
         // Throw exception when getting responsaveis
-        when(usuarioService.buscarResponsaveisUnidades(any())).thenThrow(new RuntimeException("Error fetching responsaveis"));
+        when(unidadeService.buscarResponsaveisUnidades(any())).thenThrow(new RuntimeException("Error fetching responsaveis"));
 
         listener.aoFinalizarProcesso(evento);
 

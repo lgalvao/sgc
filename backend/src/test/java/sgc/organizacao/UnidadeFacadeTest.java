@@ -45,19 +45,11 @@ class UnidadeFacadeTest {
     private UsuarioMapper usuarioMapper;
     @Mock
     private RepositorioComum repo;
+    @Mock
+    private UsuarioPerfilRepo usuarioPerfilRepo;
 
+    @org.mockito.InjectMocks
     private UnidadeFacade service;
-
-    @org.junit.jupiter.api.BeforeEach
-    void setUp() {
-        service = new UnidadeFacade(
-                unidadeRepo,
-                unidadeMapaRepo,
-                usuarioRepo,
-                atribuicaoTemporariaRepo,
-                usuarioMapper,
-                repo);
-    }
 
     @Nested
     @DisplayName("Busca de Unidades e Hierarquia")

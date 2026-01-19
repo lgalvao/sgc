@@ -321,7 +321,7 @@ class SubprocessoFacadeTest2 {
 
             when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
-            when(usuarioService.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
+            when(unidadeFacade.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
             when(usuarioService.buscarPorLogin("TITULAR")).thenReturn(new Usuario());
             when(repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
 
@@ -349,7 +349,7 @@ class SubprocessoFacadeTest2 {
 
             when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
-            when(usuarioService.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
+            when(unidadeFacade.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
             // Titular null, should not call buscarPorLogin
             when(repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().build());
@@ -375,7 +375,7 @@ class SubprocessoFacadeTest2 {
 
             when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
-            when(usuarioService.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
+            when(unidadeFacade.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
             when(usuarioService.buscarPorLogin("TITULAR")).thenThrow(new RuntimeException("Erro"));
             when(repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().build());

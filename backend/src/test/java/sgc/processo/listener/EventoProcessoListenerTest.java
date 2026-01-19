@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaFacade;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
@@ -41,6 +42,7 @@ class EventoProcessoListenerTest {
     @Mock private AlertaFacade servicoAlertas;
     @Mock private NotificacaoEmailService notificacaoEmailService;
     @Mock private NotificacaoModelosService notificacaoModelosService;
+    @Mock private UnidadeFacade unidadeService;
     @Mock private UsuarioFacade usuarioService;
     @Mock private ProcessoFacade processoFacade;
     @Mock private SubprocessoFacade subprocessoFacade;
@@ -75,7 +77,7 @@ class EventoProcessoListenerTest {
                 .titularTitulo("123456")
                 .substitutoTitulo("654321")
                 .build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
 
         // Mock Usuarios
         UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("123456").email("titular@email.com").build();
@@ -122,7 +124,7 @@ class EventoProcessoListenerTest {
                 .titularTitulo("111")
                 .substitutoTitulo("222")
                 .build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
 
         UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("111").email("t@t.com").build();
         UsuarioDto substituto = UsuarioDto.builder().tituloEleitoral("222").email("s@s.com").build(); // Email ok
@@ -165,7 +167,7 @@ class EventoProcessoListenerTest {
                 .titularTitulo("111")
                 .substitutoTitulo("222") // Tem substituto definido na responsabilidade
                 .build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
 
         UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("111").email("t@t.com").build();
         // Substituto com email nulo
@@ -200,7 +202,7 @@ class EventoProcessoListenerTest {
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
 
         ResponsavelDto responsavel = ResponsavelDto.builder().unidadeCodigo(20L).titularTitulo("333").build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(20L, responsavel));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(20L, responsavel));
 
         UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("333").email("inter@t.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("333", titular));
@@ -235,7 +237,7 @@ class EventoProcessoListenerTest {
         // Mock responsaveis
         ResponsavelDto respInter = ResponsavelDto.builder().unidadeCodigo(30L).titularTitulo("444").build();
         ResponsavelDto respSub = ResponsavelDto.builder().unidadeCodigo(40L).titularTitulo("555").build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(30L, respInter, 40L, respSub));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(30L, respInter, 40L, respSub));
         
         UsuarioDto userInter = UsuarioDto.builder().tituloEleitoral("444").email("inter@mail.com").build();
         UsuarioDto userSub = UsuarioDto.builder().tituloEleitoral("555").email("sub@mail.com").build();
@@ -268,7 +270,7 @@ class EventoProcessoListenerTest {
         processo.setParticipantes(Set.of(intermediaria));
         
         ResponsavelDto respInter = ResponsavelDto.builder().unidadeCodigo(50L).titularTitulo("666").build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(50L, respInter));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(50L, respInter));
         
         UsuarioDto userInter = UsuarioDto.builder().tituloEleitoral("666").email("solo@mail.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("666", userInter));
@@ -299,7 +301,7 @@ class EventoProcessoListenerTest {
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
 
         ResponsavelDto responsavel = ResponsavelDto.builder().unidadeCodigo(99L).titularTitulo("999").build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(99L, responsavel));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(99L, responsavel));
 
         UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("999").email("raiz@mail.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("999", titular));
@@ -339,7 +341,7 @@ class EventoProcessoListenerTest {
                 .unidadeCodigo(100L)
                 .titularTitulo("888")
                 .build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(100L, responsavel));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(100L, responsavel));
 
         UsuarioDto titular = UsuarioDto.builder()
                 .tituloEleitoral("888")
@@ -397,7 +399,7 @@ class EventoProcessoListenerTest {
                 .unidadeCodigo(50L)
                 .titularTitulo("777")
                 .build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(50L, responsavel));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(50L, responsavel));
 
         UsuarioDto titular = UsuarioDto.builder()
                 .tituloEleitoral("777")
@@ -454,7 +456,7 @@ class EventoProcessoListenerTest {
         
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
         // Ao retornar nulo para o responsavel, causará NPE na busca do titular
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of());
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of());
 
         EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(1L).build();
         listener.aoFinalizarProcesso(evento);
@@ -489,7 +491,7 @@ class EventoProcessoListenerTest {
         processo.setParticipantes(Set.of(unidade));
 
         ResponsavelDto responsavel = ResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("123").build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
 
         UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("123").email("op@mail.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("123", titular));

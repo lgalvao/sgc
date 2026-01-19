@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static sgc.organizacao.model.Perfil.*;
 
 @Tag("integration")
 @SpringBootTest
@@ -200,7 +201,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar responsável da unidade")
         void deveBuscarResponsavelUnidade() {
             // Act
-            ResponsavelDto result = usuarioService.buscarResponsavelUnidade(2L);
+            ResponsavelDto result = unidadeService.buscarResponsavelUnidade(2L);
 
             // Assert
             assertNotNull(result);
@@ -227,7 +228,7 @@ class UsuarioServiceTest {
             List<Long> unidades = List.of(2L, 9L);
 
             // Act
-            Map<Long, ResponsavelDto> result = usuarioService.buscarResponsaveisUnidades(unidades);
+            Map<Long, ResponsavelDto> result = unidadeService.buscarResponsaveisUnidades(unidades);
 
             // Assert
             assertNotNull(result);
@@ -259,15 +260,15 @@ class UsuarioServiceTest {
         @DisplayName("Deve verificar se usuário tem perfil")
         void deveVerificarUsuarioTemPerfil() {
             // Act & Assert
-            assertTrue(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, "CHEFE", 2L));
-            assertTrue(usuarioService.usuarioTemPerfil(TITULO_ADMIN, "ADMIN", 100L));
+            assertTrue(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, CHEFE, 2L));
+            assertTrue(usuarioService.usuarioTemPerfil(TITULO_ADMIN, ADMIN, 100L));
         }
 
         @Test
         @DisplayName("Deve buscar unidades por perfil")
         void deveBuscarUnidadesPorPerfil() {
             // Act
-            List<Long> adminUnits = usuarioService.buscarUnidadesPorPerfil(TITULO_ADMIN, "ADMIN");
+            List<Long> adminUnits = usuarioService.buscarUnidadesPorPerfil(TITULO_ADMIN, ADMIN);
 
             // Assert
             assertTrue(adminUnits.contains(100L));
@@ -306,7 +307,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar responsáveis ignorando unidades sem chefe")
         void deveBuscarResponsaveisIgnorandoSemChefe() {
             // Unidade 9999 não existe ou não tem chefe
-            Map<Long, ResponsavelDto> res = usuarioService.buscarResponsaveisUnidades(List.of(9999L));
+            Map<Long, ResponsavelDto> res = unidadeService.buscarResponsaveisUnidades(List.of(9999L));
             assertTrue(res.isEmpty());
         }
 
@@ -315,10 +316,10 @@ class UsuarioServiceTest {
         void deveRetornarFalseSeNaoTiverPerfil() {
             // Usuário 777 é CHEFE na unidade 2.
             // Verifica se é CHEFE na unidade 99 (não é)
-            assertFalse(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, "CHEFE", 99L));
+            assertFalse(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, CHEFE, 99L));
 
             // Verifica se é GESTOR na unidade 2 (não é)
-            assertFalse(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, "GESTOR", 2L));
+            assertFalse(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, GESTOR, 2L));
         }
     }
 

@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Profile;
 import sgc.alerta.AlertaFacade;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.listener.EventoProcessoListener;
@@ -28,6 +29,7 @@ public class TestEventConfig {
             AlertaFacade servicoAlertas,
             NotificacaoEmailService notificacaoEmailService,
             NotificacaoModelosService notificacaoModelosService,
+            UnidadeFacade unidadeService,
             UsuarioFacade usuarioService,
             ProcessoFacade processoFacade,
             SubprocessoFacade subprocessoFacade) {
@@ -37,6 +39,7 @@ public class TestEventConfig {
                 servicoAlertas,
                 notificacaoEmailService,
                 notificacaoModelosService,
+                unidadeService,
                 usuarioService,
                 processoFacade,
                 subprocessoFacade) {
@@ -48,3 +51,4 @@ public class TestEventConfig {
         };
     }
 }
+

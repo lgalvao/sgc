@@ -80,11 +80,9 @@ public class SubprocessoFacade {
     private final MapaAjusteMapper mapaAjusteMapper;
     private final sgc.seguranca.acesso.AccessControlService accessControlService;
     
-    // Dependencies for map operations (from SubprocessoMapaService)
     private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     private final sgc.subprocesso.model.SubprocessoMovimentacaoRepo movimentacaoRepo;
     private final sgc.mapa.service.CopiaMapaService copiaMapaService;
-    private final sgc.mapa.mapper.AtividadeMapper atividadeMapper;
 
     // ===== Operações CRUD =====
 
@@ -379,7 +377,8 @@ public class SubprocessoFacade {
 
     @Transactional
     public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias, String usuarioTituloEleitoral) {
-        salvarAjustesMapaInterno(codSubprocesso, competencias, usuarioTituloEleitoral);
+        // Nota: usuarioTituloEleitoral não é mais utilizado após refatoração
+        salvarAjustesMapaInterno(codSubprocesso, competencias);
     }
 
     @Transactional
@@ -391,8 +390,6 @@ public class SubprocessoFacade {
 
     private List<AtividadeVisualizacaoDto> listarAtividadesSubprocessoInterno(Long codSubprocesso) {
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
-        // ⚡ Bolt: Usando 'buscarPorMapaCodigoComConhecimentos' para evitar N+1 queries
-        // ao carregar conhecimentos para cada atividade
         List<Atividade> todasAtividades = atividadeService.buscarPorMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
         return todasAtividades.stream().map(this::mapAtividadeToDto).toList();
     }
@@ -404,6 +401,7 @@ public class SubprocessoFacade {
                         .descricao(c.getDescricao())
                         .build())
                 .toList();
+
         return AtividadeVisualizacaoDto.builder()
                 .codigo(atividade.getCodigo())
                 .descricao(atividade.getDescricao())
@@ -413,11 +411,9 @@ public class SubprocessoFacade {
 
     private SubprocessoDetalheDto obterDetalhesInterno(Long codigo, Usuario usuarioAutenticado) {
         Subprocesso sp = crudService.buscarSubprocesso(codigo);
-        
-        // Centralized security check
         accessControlService.verificarPermissao(usuarioAutenticado, sgc.seguranca.acesso.Acao.VISUALIZAR_SUBPROCESSO, sp);
 
-        Usuario responsavel = usuarioService.buscarResponsavelAtual(sp.getUnidade().getSigla());
+        Usuario responsavel = unidadeFacade.buscarResponsavelAtual(sp.getUnidade().getSigla());
         Usuario titular = null;
         if (sp.getUnidade().getTituloTitular() != null) {
             try {
@@ -436,6 +432,7 @@ public class SubprocessoFacade {
     private SubprocessoCadastroDto obterCadastroInterno(Long codSubprocesso) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
         List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos = new ArrayList<>();
+
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
         for (Atividade a : atividades) {
             List<ConhecimentoResponse> ksDto = a.getConhecimentos().stream().map(conhecimentoMapper::toResponse).toList();
@@ -464,6 +461,7 @@ public class SubprocessoFacade {
         List<Competencia> competencias = competenciaService.buscarPorCodMapa(codMapa);
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(codMapa);
         List<Conhecimento> conhecimentos = conhecimentoService.listarPorMapa(codMapa);
+
         @Nullable Analise analiseVal = analise;
         return mapaAjusteMapper.toDto(sp, analiseVal, competencias, atividades, conhecimentos);
     }
@@ -532,35 +530,21 @@ public class SubprocessoFacade {
 
     private void salvarAjustesMapaInterno(
             Long codSubprocesso,
-            List<CompetenciaAjusteDto> competencias,
-            String usuarioTituloEleitoral) {
+            List<CompetenciaAjusteDto> competencias) {
 
         Subprocesso sp = subprocessoRepo
                 .findById(codSubprocesso)
                 .orElseThrow(() ->
                         new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
-        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
-                && sp.getSituacao() != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {
-            throw new sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida(
-                    "Ajustes no mapa só podem ser feitos em estados específicos. "
-                            + "Situação atual: %s".formatted(sp.getSituacao()));
-        }
+        validarSituacaoParaAjuste(sp);
 
         log.info("Salvando ajustes para o mapa do subprocesso {}...", codSubprocesso);
 
-        // ⚡ Bolt: Otimização N+1 - Busca e atualização em lote
-        List<Long> competenciaIds = new ArrayList<>();
-        java.util.Map<Long, String> atividadeDescricoes = new java.util.HashMap<>();
-
-        for (CompetenciaAjusteDto compDto : competencias) {
-            competenciaIds.add(compDto.getCodCompetencia());
-            if (compDto.getAtividades() != null) {
-                for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
-                    atividadeDescricoes.put(ativDto.getCodAtividade(), ativDto.getNome());
-                }
-            }
-        }
+        java.util.Map<Long, String> atividadeDescricoes = extrairDescricoesAtividades(competencias);
+        List<Long> competenciaIds = competencias.stream()
+                .map(CompetenciaAjusteDto::getCodCompetencia)
+                .toList();
 
         List<Atividade> atividadesAtualizadas = atividadeService.atualizarDescricoesEmLote(atividadeDescricoes);
         java.util.Map<Long, Atividade> mapaAtividades = atividadesAtualizadas.stream()
@@ -570,28 +554,53 @@ public class SubprocessoFacade {
         java.util.Map<Long, Competencia> mapaCompetencias = entidadesCompetencias.stream()
                 .collect(java.util.stream.Collectors.toMap(Competencia::getCodigo, java.util.function.Function.identity()));
 
-        for (CompetenciaAjusteDto compDto : competencias) {
-            Competencia competencia = mapaCompetencias.get(compDto.getCodCompetencia());
-            if (competencia != null) {
-                competencia.setDescricao(compDto.getNome());
-
-                java.util.Set<Atividade> atividades = new java.util.HashSet<>();
-                if (compDto.getAtividades() != null) {
-                    for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
-                        Atividade atividade = mapaAtividades.get(ativDto.getCodAtividade());
-                        if (atividade != null) {
-                            atividades.add(atividade);
-                        }
-                    }
-                }
-                competencia.setAtividades(atividades);
-            }
-        }
-
+        atualizarCompetencias(competencias, mapaCompetencias, mapaAtividades);
         competenciaService.salvarTodas(entidadesCompetencias);
 
         sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         subprocessoRepo.save(sp);
+    }
+
+    private void validarSituacaoParaAjuste(Subprocesso sp) {
+        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
+                && sp.getSituacao() != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {
+
+            throw new sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida(
+                    "Ajustes no mapa só podem ser feitos em estados específicos. "
+                            + "Situação atual: %s".formatted(sp.getSituacao()));
+        }
+    }
+
+    private java.util.Map<Long, String> extrairDescricoesAtividades(List<CompetenciaAjusteDto> competencias) {
+        java.util.Map<Long, String> descricoes = new java.util.HashMap<>();
+        for (CompetenciaAjusteDto compDto : competencias) {
+            var atividades = java.util.Objects.requireNonNullElse(compDto.getAtividades(), java.util.List.<AtividadeAjusteDto>of());
+            for (AtividadeAjusteDto ativDto : atividades) {
+                descricoes.put(ativDto.getCodAtividade(), ativDto.getNome());
+            }
+        }
+        return descricoes;
+    }
+
+    private void atualizarCompetencias(
+            List<CompetenciaAjusteDto> competencias,
+            java.util.Map<Long, Competencia> mapaCompetencias,
+            java.util.Map<Long, Atividade> mapaAtividades) {
+
+        for (CompetenciaAjusteDto compDto : competencias) {
+            Competencia competencia = mapaCompetencias.get(compDto.getCodCompetencia());
+            if (competencia == null) continue;
+
+            competencia.setDescricao(compDto.getNome());
+
+            var atividadesDto = java.util.Objects.requireNonNullElse(compDto.getAtividades(), java.util.List.<AtividadeAjusteDto>of());
+            java.util.Set<Atividade> atividades = new java.util.HashSet<>();
+            for (AtividadeAjusteDto ativDto : atividadesDto) {
+                Atividade atividade = mapaAtividades.get(ativDto.getCodAtividade());
+                if (atividade != null) atividades.add(atividade);
+            }
+            competencia.setAtividades(atividades);
+        }
     }
 
     private void importarAtividadesInterno(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
@@ -622,9 +631,7 @@ public class SubprocessoFacade {
             switch (tipoProcesso) {
                 case MAPEAMENTO -> spDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
                 case REVISAO -> spDestino.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-                case null, default -> {
-                    log.debug("Tipo de processo {} não requer atualização automática de situação no import.", tipoProcesso);
-                }
+                case null, default -> log.debug("Tipo de processo não requer mudança de situação");
             }
             subprocessoRepo.save(spDestino);
         }

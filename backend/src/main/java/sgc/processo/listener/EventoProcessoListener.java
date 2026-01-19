@@ -10,6 +10,7 @@ import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
@@ -41,6 +42,7 @@ public class EventoProcessoListener {
     private final AlertaFacade servicoAlertas;
     private final NotificacaoEmailService notificacaoEmailService;
     private final NotificacaoModelosService notificacaoModelosService;
+    private final UnidadeFacade unidadeService;
     private final UsuarioFacade usuarioService;
     private final ProcessoFacade processoFacade;
     private final SubprocessoFacade subprocessoFacade;
@@ -110,7 +112,7 @@ public class EventoProcessoListener {
                 .map(s -> s.getUnidade().getCodigo())
                 .toList();
 
-        Map<Long, ResponsavelDto> responsaveis = usuarioService.buscarResponsaveisUnidades(todosCodigosUnidades);
+        Map<Long, ResponsavelDto> responsaveis = unidadeService.buscarResponsaveisUnidades(todosCodigosUnidades);
 
         List<String> todosTitulos = new ArrayList<>();
         responsaveis.values().forEach(r -> {
@@ -141,7 +143,7 @@ public class EventoProcessoListener {
         }
 
         List<Long> todosCodigosUnidades = unidadesParticipantes.stream().map(Unidade::getCodigo).toList();
-        Map<Long, ResponsavelDto> responsaveis = usuarioService.buscarResponsaveisUnidades(todosCodigosUnidades);
+        Map<Long, ResponsavelDto> responsaveis = unidadeService.buscarResponsaveisUnidades(todosCodigosUnidades);
 
         Map<String, UsuarioDto> usuarios = usuarioService.buscarUsuariosPorTitulos(responsaveis.values().stream()
                 .map(ResponsavelDto::getTitularTitulo)

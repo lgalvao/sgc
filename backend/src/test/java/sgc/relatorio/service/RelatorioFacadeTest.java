@@ -14,7 +14,7 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.CompetenciaService;
-import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
@@ -41,7 +41,7 @@ class RelatorioFacadeTest {
     @Mock
     private SubprocessoFacade subprocessoFacade;
     @Mock
-    private UsuarioFacade usuarioService;
+    private UnidadeFacade unidadeService;
     @Mock
     private CompetenciaService competenciaService;
 
@@ -72,7 +72,7 @@ class RelatorioFacadeTest {
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(usuarioService.buscarResponsavelUnidade(1L)).thenReturn(ResponsavelDto.builder().titularNome("Resp").build());
+        when(unidadeService.buscarResponsavelUnidade(1L)).thenReturn(ResponsavelDto.builder().titularNome("Resp").build());
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);
@@ -97,7 +97,7 @@ class RelatorioFacadeTest {
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(usuarioService.buscarResponsavelUnidade(1L)).thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Responsável", 1L));
+        when(unidadeService.buscarResponsavelUnidade(1L)).thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Responsável", 1L));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);
@@ -237,7 +237,7 @@ class RelatorioFacadeTest {
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(usuarioService.buscarResponsavelUnidade(1L)).thenThrow(new RuntimeException("Falha simulada"));
+        when(unidadeService.buscarResponsavelUnidade(1L)).thenThrow(new RuntimeException("Falha simulada"));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);

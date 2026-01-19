@@ -13,7 +13,6 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.RepositorioComum;
-import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
 import sgc.seguranca.login.ClienteAcessoAd;
@@ -48,8 +47,6 @@ class UsuarioServiceUnitTest {
     private UsuarioFacade service;
     @Mock
     private UsuarioRepo usuarioRepo;
-    @Mock
-    private UnidadeRepo unidadeRepo;
     @Mock
     private UsuarioPerfilRepo usuarioPerfilRepo;
     @Mock
@@ -227,7 +224,7 @@ class UsuarioServiceUnitTest {
         void deveRetornarListaVaziaSeUsuarioNaoEncontradoAoBuscarUnidadesPorPerfil() {
             when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
             
-            assertThat(service.buscarUnidadesPorPerfil("user", "GESTOR")).isEmpty();
+            assertThat(service.buscarUnidadesPorPerfil("user", Perfil.GESTOR)).isEmpty();
         }
 
         @Test
@@ -235,7 +232,7 @@ class UsuarioServiceUnitTest {
         void deveRetornarFalseSeUsuarioNaoEncontradoAoVerificarPerfil() {
             when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
             
-            assertThat(service.usuarioTemPerfil("user", "GESTOR", 1L)).isFalse();
+            assertThat(service.usuarioTemPerfil("user", Perfil.GESTOR, 1L)).isFalse();
         }
 
         @Test
@@ -244,75 +241,6 @@ class UsuarioServiceUnitTest {
             when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
             
             assertThat(service.buscarPerfisUsuario("user")).isEmpty();
-        }
-    }
-
-    @Nested
-    @DisplayName("Busca de Responsáveis")
-    class BuscaResponsaveis {
-
-        @Test
-        @DisplayName("Deve lançar erro se chefe não encontrado na busca simples")
-        void deveLancarErroSeChefeNaoEncontradoNaBuscaSimples() {
-            Unidade unidade = new Unidade("Nome", "SIGLA");
-            ReflectionTestUtils.setField(unidade, "codigo", 1L);
-            when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.of(unidade));
-            when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> service.buscarResponsavelAtual("SIGLA"))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-        }
-
-        @Test
-        @DisplayName("Deve lançar erro se chefe não encontrado na busca completa")
-        void deveLancarErroSeChefeNaoEncontradoNaBuscaCompleta() {
-            Unidade unidade = new Unidade("Nome", "SIGLA");
-            ReflectionTestUtils.setField(unidade, "codigo", 1L);
-            when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.of(unidade));
-
-            Usuario chefeSimples = new Usuario();
-            chefeSimples.setTituloEleitoral("user");
-            when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.of(chefeSimples));
-            when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> service.buscarResponsavelAtual("SIGLA"))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-        }
-
-        @Test
-        @DisplayName("Deve retornar DTO com titular e substituto")
-        void deveRetornarDtoComTitularESubstituto() {
-            Usuario t = new Usuario();
-            t.setTituloEleitoral("t");
-            t.setNome("T");
-            Usuario s = new Usuario();
-            s.setTituloEleitoral("s");
-            s.setNome("S");
-
-            when(usuarioRepo.findChefesByUnidadesCodigos(anyList())).thenReturn(List.of(t, s));
-
-            ResponsavelDto res = service.buscarResponsavelUnidade(1L);
-            
-            assertThat(res).isNotNull();
-            assertThat(res.getTitularTitulo()).isEqualTo("t");
-            assertThat(res.getSubstitutoTitulo()).isEqualTo("s");
-        }
-
-        @Test
-        @DisplayName("Deve lançar erro se não houver chefe")
-        void deveLancarErroSeNaoHouverChefe() {
-            when(usuarioRepo.findChefesByUnidadesCodigos(anyList())).thenReturn(Collections.emptyList());
-            
-            assertThatThrownBy(() -> service.buscarResponsavelUnidade(1L))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-        }
-
-        @Test
-        @DisplayName("Deve retornar mapa vazio se não há chefes nas unidades")
-        void deveRetornarMapaVazioSeNaoHaChefesNasUnidades() {
-            when(usuarioRepo.findChefesByUnidadesCodigos(anyList())).thenReturn(Collections.emptyList());
-            
-            assertThat(service.buscarResponsaveisUnidades(List.of(1L))).isEmpty();
         }
     }
 
@@ -414,63 +342,6 @@ class UsuarioServiceUnitTest {
     @Nested
     @DisplayName("Gaps de Cobertura")
     class GapsCobertura {
-
-        @Test
-        @DisplayName("Deve retornar imediatamente se lista de usuários for vazia")
-        void deveRetornarSeListaVazia() {
-            Map<Long, ResponsavelDto> resultado = service.buscarResponsaveisUnidades(Collections.emptyList());
-            
-            assertTrue(resultado.isEmpty());
-            verifyNoInteractions(usuarioPerfilRepo);
-        }
-
-        @Test
-        @DisplayName("Deve lidar com chefes, substitutos e unidades sem chefes")
-        void deveLidarComChefesESubstitutos() {
-            Long unidadeCod = 1L;
-            List<Long> unidades = List.of(unidadeCod);
-            
-            Usuario u1 = new Usuario();
-            u1.setTituloEleitoral("1");
-            u1.setNome("Titular");
-            
-            Usuario u2 = new Usuario();
-            u2.setTituloEleitoral("2");
-            u2.setNome("Substituto");
-
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(unidadeCod);
-
-            UsuarioPerfil p1 = UsuarioPerfil.builder()
-                    .usuario(u1)
-                    .usuarioTitulo("1")
-                    .perfil(Perfil.CHEFE)
-                    .unidade(unidade)
-                    .unidadeCodigo(unidadeCod)
-                    .build();
-            UsuarioPerfil p2 = UsuarioPerfil.builder()
-                    .usuario(u2)
-                    .usuarioTitulo("2")
-                    .perfil(Perfil.CHEFE)
-                    .unidade(unidade)
-                    .unidadeCodigo(unidadeCod)
-                    .build();
-            
-            u1.setAtribuicoes(new HashSet<>(List.of(p1)));
-            u2.setAtribuicoes(new HashSet<>(List.of(p2)));
-
-            when(usuarioRepo.findChefesByUnidadesCodigos(unidades)).thenReturn(List.of(u1, u2));
-            when(usuarioRepo.findByIdInWithAtribuicoes(any())).thenReturn(List.of(u1, u2));
-            when(usuarioPerfilRepo.findByUsuarioTituloIn(any())).thenReturn(List.of(p1, p2));
-
-            Map<Long, ResponsavelDto> resultado = service.buscarResponsaveisUnidades(unidades);
-
-            assertFalse(resultado.isEmpty());
-            ResponsavelDto resp = resultado.get(unidadeCod);
-            assertEquals("1", resp.getTitularTitulo());
-            assertEquals("2", resp.getSubstitutoTitulo());
-        }
-
 
         @Test
         @DisplayName("Deve falhar ao obter usuário autenticado sem contexto")
