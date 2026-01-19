@@ -6,7 +6,6 @@ import {useProcessosStore} from "@/stores/processos";
 import {useFeedbackStore} from "@/stores/feedback";
 import {usePerfilStore} from "@/stores/perfil";
 import {Perfil, SituacaoSubprocesso} from "@/types/tipos";
-import * as subprocessoService from "@/services/subprocessoService";
 import {nextTick} from "vue";
 
 // Define mocks first
