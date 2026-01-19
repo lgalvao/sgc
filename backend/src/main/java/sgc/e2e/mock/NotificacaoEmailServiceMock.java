@@ -1,4 +1,4 @@
-package sgc.notificacao.mock;
+package sgc.e2e.mock;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
