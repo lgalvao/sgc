@@ -367,4 +367,123 @@ class SubprocessoFacadeCoverageTest {
         // Verify that movimentacao was saved (no exception thrown)
         verify(movimentacaoRepo).save(any(Movimentacao.class));
     }
+
+    @Test
+    @DisplayName("salvarAjustesMapa - Com Atividades")
+    void salvarAjustesMapa_ComAtividades() {
+        Long codSubprocesso = 1L;
+        Long codCompetencia = 100L;
+        Long codAtividade = 200L;
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codSubprocesso);
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+
+        when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+
+        AtividadeAjusteDto ativDto = AtividadeAjusteDto.builder()
+                .codAtividade(codAtividade)
+                .nome("Atividade Ajustada")
+                .build();
+
+        CompetenciaAjusteDto compDto = CompetenciaAjusteDto.builder()
+                .codCompetencia(codCompetencia)
+                .nome("Competencia Ajustada")
+                .atividades(java.util.List.of(ativDto))
+                .build();
+
+        // Mock Atividade Service batch update
+        sgc.mapa.model.Atividade atividade = new sgc.mapa.model.Atividade();
+        atividade.setCodigo(codAtividade);
+        atividade.setDescricao("Atividade Original");
+        when(atividadeService.atualizarDescricoesEmLote(any())).thenReturn(java.util.List.of(atividade));
+
+        // Mock Competencia Service fetch
+        sgc.mapa.model.Competencia competencia = new sgc.mapa.model.Competencia();
+        competencia.setCodigo(codCompetencia);
+        competencia.setDescricao("Competencia Original");
+        when(competenciaService.buscarPorCodigos(any())).thenReturn(java.util.List.of(competencia));
+
+        facade.salvarAjustesMapa(codSubprocesso, java.util.List.of(compDto), "user");
+
+        verify(competenciaService).salvarTodas(any());
+
+        // Assertions to ensure logic was executed
+        org.junit.jupiter.api.Assertions.assertEquals("Competencia Ajustada", competencia.getDescricao());
+        org.junit.jupiter.api.Assertions.assertNotNull(competencia.getAtividades());
+        org.junit.jupiter.api.Assertions.assertFalse(competencia.getAtividades().isEmpty());
+        org.junit.jupiter.api.Assertions.assertEquals(codAtividade, competencia.getAtividades().iterator().next().getCodigo());
+    }
+
+    @Test
+    @DisplayName("listarAtividadesSubprocesso - Com Conhecimentos")
+    void listarAtividadesSubprocesso_ComConhecimentos() {
+        Long codSubprocesso = 1L;
+        Long codMapa = 10L;
+        Long codAtividade = 100L;
+        Long codConhecimento = 200L;
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codSubprocesso);
+        sp.setMapa(new Mapa());
+        sp.getMapa().setCodigo(codMapa);
+
+        when(crudService.buscarSubprocesso(codSubprocesso)).thenReturn(sp);
+
+        sgc.mapa.model.Atividade atividade = new sgc.mapa.model.Atividade();
+        atividade.setCodigo(codAtividade);
+        atividade.setDescricao("Atividade Teste");
+
+        sgc.mapa.model.Conhecimento conhecimento = new sgc.mapa.model.Conhecimento();
+        conhecimento.setCodigo(codConhecimento);
+        conhecimento.setDescricao("Conhecimento Teste");
+
+        atividade.setConhecimentos(java.util.List.of(conhecimento));
+
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(codMapa))
+                .thenReturn(java.util.List.of(atividade));
+
+        java.util.List<sgc.subprocesso.dto.AtividadeVisualizacaoDto> result = facade.listarAtividadesSubprocesso(codSubprocesso);
+
+        org.junit.jupiter.api.Assertions.assertFalse(result.isEmpty());
+        sgc.subprocesso.dto.AtividadeVisualizacaoDto dto = result.get(0);
+        org.junit.jupiter.api.Assertions.assertFalse(dto.getConhecimentos().isEmpty());
+        org.junit.jupiter.api.Assertions.assertEquals(codConhecimento, dto.getConhecimentos().get(0).getCodigo());
+        org.junit.jupiter.api.Assertions.assertEquals("Conhecimento Teste", dto.getConhecimentos().get(0).getDescricao());
+    }
+
+    @Test
+    @DisplayName("salvarAjustesMapa - Sem Atividades")
+    void salvarAjustesMapa_SemAtividades() {
+        Long codSubprocesso = 1L;
+        Long codCompetencia = 100L;
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codSubprocesso);
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+
+        when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+
+        CompetenciaAjusteDto compDto = CompetenciaAjusteDto.builder()
+                .codCompetencia(codCompetencia)
+                .nome("Competencia Ajustada")
+                .atividades(null) // Null activities
+                .build();
+
+        // Mock Competencia Service fetch
+        sgc.mapa.model.Competencia competencia = new sgc.mapa.model.Competencia();
+        competencia.setCodigo(codCompetencia);
+        competencia.setDescricao("Competencia Original");
+        when(competenciaService.buscarPorCodigos(any())).thenReturn(java.util.List.of(competencia));
+
+        facade.salvarAjustesMapa(codSubprocesso, java.util.List.of(compDto), "user");
+
+        verify(competenciaService).salvarTodas(any());
+
+        // Assertions
+        org.junit.jupiter.api.Assertions.assertEquals("Competencia Ajustada", competencia.getDescricao());
+        // Ensure activities are reset (new HashSet is created in implementation)
+        org.junit.jupiter.api.Assertions.assertNotNull(competencia.getAtividades());
+        org.junit.jupiter.api.Assertions.assertTrue(competencia.getAtividades().isEmpty());
+    }
 }
