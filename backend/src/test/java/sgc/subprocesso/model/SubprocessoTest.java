@@ -5,6 +5,11 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.Processo;
+
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,5 +59,51 @@ class SubprocessoTest {
     void deveRetornarEtapaNullQuandoHomologado(SituacaoSubprocesso situacao) {
         Subprocesso sp = Subprocesso.builder().situacao(situacao).build();
         assertThat(sp.getEtapaAtual()).isNull();
+    }
+
+    @Test
+    @DisplayName("Deve instanciar via construtor completo")
+    void deveInstanciarViaConstrutorCompleto() {
+        Processo p = new Processo();
+        Unidade u = new Unidade();
+        Mapa m = new Mapa();
+        LocalDateTime dt = LocalDateTime.now();
+        Subprocesso sp = new Subprocesso(1L, p, u, m, SituacaoSubprocesso.NAO_INICIADO, dt);
+
+        assertThat(sp.getCodigo()).isEqualTo(1L);
+        assertThat(sp.getProcesso()).isEqualTo(p);
+        assertThat(sp.getUnidade()).isEqualTo(u);
+        assertThat(sp.getMapa()).isEqualTo(m);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
+        assertThat(sp.getDataLimiteEtapa1()).isEqualTo(dt);
+    }
+
+    @Test
+    @DisplayName("Deve instanciar via construtor de conveniência")
+    void deveInstanciarViaConstrutorConveniencia() {
+        Processo p = new Processo();
+        Unidade u = new Unidade();
+        Mapa m = new Mapa();
+        LocalDateTime dt = LocalDateTime.now();
+        Subprocesso sp = new Subprocesso(p, u, m, SituacaoSubprocesso.NAO_INICIADO, dt);
+
+        assertThat(sp.getProcesso()).isEqualTo(p);
+        assertThat(sp.getUnidade()).isEqualTo(u);
+        assertThat(sp.getMapa()).isEqualTo(m);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
+        assertThat(sp.getDataLimiteEtapa1()).isEqualTo(dt);
+    }
+
+    @Test
+    @DisplayName("Getters NonNull should return values")
+    void gettersNonNull() {
+         Processo p = new Processo();
+        Unidade u = new Unidade();
+        Mapa m = new Mapa();
+        Subprocesso sp = Subprocesso.builder().processo(p).unidade(u).mapa(m).build();
+
+        assertThat(sp.getProcesso()).isEqualTo(p);
+        assertThat(sp.getUnidade()).isEqualTo(u);
+        assertThat(sp.getMapa()).isEqualTo(m);
     }
 }

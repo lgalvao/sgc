@@ -240,4 +240,59 @@ class EventoProcessoListenerCoverageTest {
                 ErroEstadoImpossivel.class,
                 () -> listener.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, processo, s));
     }
+
+    @Test
+    @DisplayName("aoIniciarProcesso: captura erro individual ao enviar email (via mock notificacaoEmailService)")
+    void aoIniciarProcesso_ErroAoEnviarEmail() {
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+
+        Unidade u = new Unidade(); u.setTipo(TipoUnidade.OPERACIONAL); u.setCodigo(1L);
+        Subprocesso s = new Subprocesso(); s.setUnidade(u);
+
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
+
+        ResponsavelDto resp = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("t").build();
+        when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(1L, resp));
+
+        UsuarioDto userTitular = UsuarioDto.builder().tituloEleitoral("t").email("email").build();
+        when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("t", userTitular));
+
+        when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("html");
+
+        // Throw exception when sending email
+        doThrow(new RuntimeException("Mail Error")).when(notificacaoEmailService).enviarEmailHtml(any(), any(), any());
+
+        listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
+
+        // Should not throw, but log error.
+        verify(notificacaoEmailService).enviarEmailHtml(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("aoFinalizarProcesso: captura erro individual ao enviar email (via mock notificacaoEmailService)")
+    void aoFinalizarProcesso_ErroAoEnviarEmail() {
+        Unidade u = new Unidade(); u.setCodigo(1L); u.setTipo(TipoUnidade.OPERACIONAL);
+        Processo p = new Processo();
+        p.setParticipantes(Set.of(u));
+
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
+
+        ResponsavelDto resp = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("t").build();
+        when(usuarioService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(1L, resp));
+
+        UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("t").email("email").build();
+        when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("t", titular));
+
+        when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("html");
+
+        // Throw exception when sending email
+        doThrow(new RuntimeException("Mail Error")).when(notificacaoEmailService).enviarEmailHtml(any(), any(), any());
+
+        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(1L).build());
+
+        // Should not throw
+        verify(notificacaoEmailService).enviarEmailHtml(any(), any(), any());
+    }
 }
