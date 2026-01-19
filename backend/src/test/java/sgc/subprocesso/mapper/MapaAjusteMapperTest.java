@@ -52,10 +52,13 @@ class MapaAjusteMapperTest {
         con.setDescricao("Con 1");
         con.setAtividade(ativ);
 
+        // Linkar conhecimentos na atividade
+        ativ.setConhecimentos(List.of(con));
+
         // Linkar
         comp.setAtividades(new HashSet<>(List.of(ativ)));
 
-        MapaAjusteDto dto = mapper.toDto(sp, analise, List.of(comp), List.of(ativ), List.of(con));
+        MapaAjusteDto dto = mapper.toDto(sp, analise, List.of(comp), List.of(ativ));
 
         assertThat(dto).isNotNull();
         assertThat(dto.getCodMapa()).isEqualTo(1L);
@@ -66,5 +69,40 @@ class MapaAjusteMapperTest {
         assertThat(dto.getCompetencias().get(0).getAtividades()).hasSize(1);
         assertThat(dto.getCompetencias().get(0).getAtividades().get(0).getConhecimentos()).hasSize(1);
         assertThat(dto.getCompetencias().get(0).getAtividades().get(0).getConhecimentos().get(0).isIncluido()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Deve mapear atividade não vinculada")
+    void deveMapearAtividadeNaoVinculada() {
+        Subprocesso sp = new Subprocesso();
+        sp.setMapa(new Mapa());
+        sp.setUnidade(new Unidade());
+        Analise analise = new Analise();
+
+        Competencia comp = new Competencia();
+        comp.setCodigo(1L);
+        comp.setAtividades(new HashSet<>()); // Sem vínculo
+
+        Atividade ativ = new Atividade();
+        ativ.setCodigo(2L);
+        ativ.setConhecimentos(List.of());
+
+        MapaAjusteDto dto = mapper.toDto(sp, analise, List.of(comp), List.of(ativ));
+
+        assertThat(dto.getCompetencias()).hasSize(1);
+        assertThat(dto.getCompetencias().get(0).getAtividades()).hasSize(1);
+        assertThat(dto.getCompetencias().get(0).getAtividades().get(0).getConhecimentos()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve lidar com listas vazias")
+    void deveLidarComListasVazias() {
+        Subprocesso sp = new Subprocesso();
+        sp.setMapa(new Mapa());
+        sp.setUnidade(new Unidade());
+
+        MapaAjusteDto dto = mapper.toDto(sp, null, List.of(), List.of());
+
+        assertThat(dto.getCompetencias()).isEmpty();
     }
 }

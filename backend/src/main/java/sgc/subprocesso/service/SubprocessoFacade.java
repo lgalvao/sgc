@@ -20,7 +20,6 @@ import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.service.ConhecimentoService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
@@ -77,7 +76,6 @@ public class SubprocessoFacade {
     private final ConhecimentoMapper conhecimentoMapper;
     private final AnaliseFacade analiseFacade;
     private final CompetenciaService competenciaService;
-    private final ConhecimentoService conhecimentoService;
     private final MapaAjusteMapper mapaAjusteMapper;
     private final sgc.seguranca.acesso.AccessControlService accessControlService;
     
@@ -463,10 +461,10 @@ public class SubprocessoFacade {
         Long codMapa = sp.getMapa().getCodigo();
         Analise analise = analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst().orElse(null);
         List<Competencia> competencias = competenciaService.buscarPorCodMapa(codMapa);
-        List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(codMapa);
-        List<Conhecimento> conhecimentos = conhecimentoService.listarPorMapa(codMapa);
+        // ⚡ Bolt: Fetch activities WITH knowledges to avoid extra query and N+1
+        List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(codMapa);
         @Nullable Analise analiseVal = analise;
-        return mapaAjusteMapper.toDto(sp, analiseVal, competencias, atividades, conhecimentos);
+        return mapaAjusteMapper.toDto(sp, analiseVal, competencias, atividades);
     }
 
     private SubprocessoPermissoesDto obterPermissoesInterno(Long codSubprocesso, Usuario usuario) {

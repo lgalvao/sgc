@@ -74,8 +74,6 @@ class SubprocessoFacadeTest2 {
     @Mock
     private CompetenciaService competenciaService;
     @Mock
-    private ConhecimentoService conhecimentoService;
-    @Mock
     private MapaAjusteMapper mapaAjusteMapper;
     @Mock
     private sgc.seguranca.acesso.AccessControlService accessControlService;
@@ -524,9 +522,8 @@ class SubprocessoFacadeTest2 {
             when(crudService.buscarSubprocessoComMapa(codigo)).thenReturn(sp);
             when(analiseFacade.listarPorSubprocesso(codigo, sgc.analise.model.TipoAnalise.VALIDACAO)).thenReturn(List.of());
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
-            when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of());
-            when(conhecimentoService.listarPorMapa(10L)).thenReturn(List.of());
-            when(mapaAjusteMapper.toDto(any(), any(), any(), any(), any())).thenReturn(MapaAjusteDto.builder().build());
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of());
+            when(mapaAjusteMapper.toDto(any(), any(), any(), any())).thenReturn(MapaAjusteDto.builder().build());
 
             MapaAjusteDto result = subprocessoFacade.obterMapaParaAjuste(codigo);
             assertThat(result).isNotNull();
