@@ -228,7 +228,7 @@ public class EventoProcessoListener {
             String assunto = switch (unidade.getTipo()) {
                 case OPERACIONAL, INTEROPERACIONAL -> "Processo Iniciado - %s".formatted(processo.getDescricao());
                 case INTERMEDIARIA -> "Processo Iniciado em Unidades Subordinadas - %s".formatted(processo.getDescricao());
-                default -> throw new ErroEstadoImpossivel("Tipo de unidade desconhecido ao definir assunto: " + unidade.getTipo());
+                case RAIZ, SEM_EQUIPE -> throw new ErroEstadoImpossivel("Tipo de unidade não suportada para e-mail: " + unidade.getTipo());
             };
 
             notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
@@ -250,7 +250,7 @@ public class EventoProcessoListener {
                     processo.getTipo().name(),
                     subprocesso.getDataLimiteEtapa1()
             );
-            default -> throw new ErroEstadoImpossivel("Tipo de unidade não suportado para geração de e-mail: " + tipoUnidade);
+            case RAIZ, SEM_EQUIPE -> throw new ErroEstadoImpossivel("Tipo de unidade não suportado para geração de e-mail: " + tipoUnidade);
         };
     }
 

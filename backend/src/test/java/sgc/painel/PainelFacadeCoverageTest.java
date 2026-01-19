@@ -1,123 +1,103 @@
 package sgc.painel;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import sgc.alerta.AlertaFacade;
-import sgc.alerta.dto.AlertaDto;
-import sgc.alerta.model.Alerta;
+import sgc.alerta.Alerta;
+import sgc.alerta.AlertaRepo;
 import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
+import sgc.seguranca.acesso.AcessoContexto;
 
-import java.lang.reflect.Method;
-import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("unit")
+@DisplayName("Testes de Cobertura para PainelFacade")
 class PainelFacadeCoverageTest {
 
-    @Mock private ProcessoFacade processoFacade;
-    @Mock private AlertaFacade alertaService;
-    @Mock private UnidadeFacade unidadeService;
-
     @InjectMocks
-    private PainelFacade facade;
+    private PainelFacade painelFacade;
+
+    @Mock private AlertaRepo alertaRepo;
+    @Mock private ProcessoFacade processoFacade;
+    @Mock private UnidadeFacade unidadeService;
+    @Mock private UsuarioFacade usuarioFacade;
 
     @Test
-    @DisplayName("listarProcessos - Non-Admin with Null CodigoUnidade")
-    void listarProcessos_NonAdminNullCodigoUnidade() {
-        // Covers line 107
-        Page<ProcessoResumoDto> result = facade.listarProcessos(Perfil.SERVIDOR, null, org.springframework.data.domain.PageRequest.of(0, 10));
-        assertTrue(result.isEmpty());
+    @DisplayName("Deve calcular link de destino para CHEFE sem unidade informada")
+    void deveCalcularLinkChefeSemUnidade() {
+        Processo p = new Processo();
+        p.setCodigo(1L);
+        p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        
+        when(processoFacade.listarAtivos()).thenReturn(List.of(p));
+        when(usuarioFacade.obterUsuarioAutenticadoOuNull()).thenReturn(null);
+        
+        AcessoContexto ctx = AcessoContexto.builder()
+                .perfil(Perfil.CHEFE)
+                .unidadesPossiveis(Collections.emptySet())
+                .build();
+        
+        List<PainelGlobalDto.ProcessoAtivoDto> result = painelFacade.obterDadosPainelGlobal(ctx).processos();
+        
+        assertThat(result).hasSize(1);
+        // Sem unidade e perfil CHEFE -> cai na linha 231
+        assertThat(result.get(0).link()).isEqualTo("/processo/1");
     }
 
     @Test
-    @DisplayName("listarProcessos - CalcularLinkDestino Exception")
-    void listarProcessos_CalcularLinkDestinoException() {
-        // Covers line 231 (catch block)
-
-        Long codUnidade = 1L;
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(codUnidade);
-
-        Processo processo = new Processo();
-        processo.setCodigo(10L);
-        processo.setDescricao("P");
-        processo.setSituacao(SituacaoProcesso.CRIADO);
-        processo.setTipo(TipoProcesso.MAPEAMENTO);
-        processo.setParticipantes(Set.of(unidade));
-
-        // Use PageImpl instead of Page.of (Java 9+ List.of is fine, but Page.of might be newer Spring Data)
-        // Spring Data 2+ uses PageImpl
-        when(processoFacade.listarPorParticipantesIgnorandoCriado(any(), any()))
-                .thenReturn(new PageImpl<>(Collections.singletonList(processo)));
-
-        // Mock exception when fetching unit for link calculation
-        when(unidadeService.buscarPorCodigo(codUnidade)).thenThrow(new RuntimeException("Error"));
-
-        Page<ProcessoResumoDto> result = facade.listarProcessos(Perfil.SERVIDOR, codUnidade, org.springframework.data.domain.PageRequest.of(0, 10));
-
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-        assertNull(result.getContent().get(0).linkDestino());
+    @DisplayName("Deve lidar com erro ao buscar unidade no calculo do link")
+    void deveLidarComErroBuscaUnidadeNoLink() {
+       Processo p = new Processo();
+        p.setCodigo(1L);
+        p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        
+        when(processoFacade.listarAtivos()).thenReturn(List.of(p));
+        when(unidadeService.buscarPorCodigo(99L)).thenThrow(new RuntimeException("Erro"));
+        
+        AcessoContexto ctx = AcessoContexto.builder()
+                .perfil(Perfil.CHEFE)
+                .codigoUnidadeNoContexto(99L)
+                .unidadesPossiveis(Collections.singleton(99L))
+                .build();
+        
+        List<PainelGlobalDto.ProcessoAtivoDto> result = painelFacade.obterDadosPainelGlobal(ctx).processos();
+        
+        assertThat(result.get(0).link()).isNull(); // Linha 228
     }
 
     @Test
-    @DisplayName("listarAlertas - Null Units")
-    void listarAlertas_NullUnits() {
-        // Covers null checks in paraAlertaDto
+    @DisplayName("Deve cobrir nulos no mapeamento de AlertaDto")
+    void deveCobrirNulosNoAlertaDto() {
+        Alerta a = new Alerta();
+        a.setCodigo(100L);
+        a.setDescricao("D");
+        a.setUnidadeOrigem(null);
+        a.setUnidadeDestino(null);
+        a.setProcesso(null);
 
-        Alerta alerta = new Alerta();
-        alerta.setCodigo(1L);
-        alerta.setDescricao("Alerta");
-        alerta.setDataHora(LocalDateTime.now());
-        // Null origin and destination
+        when(alertaRepo.buscarAlertasNaoLidos(anyString())).thenReturn(List.of(a));
+        
+        AcessoContexto ctx = AcessoContexto.builder().tituloUsuario("T").build();
+        List<AlertaDto> result = painelFacade.obterAlertasNaoLidos(ctx);
 
-        when(alertaService.listarPorUnidade(anyLong(), any()))
-                .thenReturn(new PageImpl<>(Collections.singletonList(alerta)));
-
-        Page<AlertaDto> result = facade.listarAlertas("123", 1L, Pageable.unpaged());
-
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-        assertNull(result.getContent().get(0).getUnidadeOrigem());
-        assertNull(result.getContent().get(0).getUnidadeDestino());
-    }
-
-    @Test
-    @DisplayName("encontrarMaiorIdVisivel - Reflection Coverage")
-    void encontrarMaiorIdVisivel_Reflection() throws Exception {
-        // Covers line 191 (if reachable via reflection or logic tweak)
-
-        Method method = PainelFacade.class.getDeclaredMethod("encontrarMaiorIdVisivel", Unidade.class, Set.class);
-        method.setAccessible(true);
-
-        // Case 1: Unidade is null
-        Long result1 = (Long) method.invoke(facade, null, Set.of(1L));
-        assertNull(result1);
-
-        // Case 2: Unidade code not in set
-        Unidade u = new Unidade();
-        u.setCodigo(1L);
-        Long result2 = (Long) method.invoke(facade, u, Set.of(2L));
-        assertNull(result2);
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).unidadeOrigem()).isNull();
+        assertThat(result.get(0).unidadeDestino()).isNull();
+        assertThat(result.get(0).codProcesso()).isNull();
     }
 }
