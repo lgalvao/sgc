@@ -102,4 +102,31 @@ class SubprocessoCrudServiceCoverageTest {
         when(repositorio.findByMapaCodigo(1L)).thenReturn(Optional.empty());
         assertThrows(ErroEntidadeNaoEncontrada.class, () -> crudService.obterEntidadePorCodigoMapa(1L));
     }
+
+    @Test
+    @DisplayName("atualizar - Com Alteracoes")
+    void atualizar_ComAlteracoes() {
+        Long codigo = 1L;
+        AtualizarSubprocessoRequest req = AtualizarSubprocessoRequest.builder()
+                .codMapa(100L)
+                .dataLimiteEtapa1(java.time.LocalDateTime.now())
+                .dataFimEtapa1(java.time.LocalDateTime.now())
+                .dataFimEtapa2(java.time.LocalDateTime.now())
+                .build();
+
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(new Processo());
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setMapa(new Mapa());
+        sp.getMapa().setCodigo(99L); // Different map
+
+        when(repo.buscar(Subprocesso.class, codigo)).thenReturn(sp);
+        when(mapper.toDTO(any())).thenReturn(new SubprocessoDto());
+
+        crudService.atualizar(codigo, req);
+
+        verify(repositorio).save(sp);
+        // Verify event published?
+        // verify(eventPublisher).publishEvent(any()); // if mocked
+    }
 }

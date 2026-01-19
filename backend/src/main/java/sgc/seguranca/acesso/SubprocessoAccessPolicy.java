@@ -329,7 +329,7 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
 
                         case TITULAR_UNIDADE -> {
                                 String tituloTitular = unidadeSubprocesso.getTituloTitular();
-                                yield tituloTitular.equals(usuario.getTituloEleitoral());
+                                yield tituloTitular != null && tituloTitular.equals(usuario.getTituloEleitoral());
                         }
                 };
         }
