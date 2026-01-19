@@ -11,6 +11,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.seguranca.login.dto.PerfilUnidadeDto;
@@ -30,9 +31,30 @@ class LoginFacadeCoverageTest {
     @Mock private GerenciadorJwt gerenciadorJwt;
     @Mock private ClienteAcessoAd clienteAcessoAd;
     @Mock private UnidadeFacade unidadeService;
+    @Mock private UsuarioMapper usuarioMapper;
 
     @InjectMocks
     private LoginFacade facade;
+
+    /**
+     * Configura o mock do UsuarioMapper para retornar DTOs corretamente.
+     * Chamado apenas nos testes que usam autorizar com sucesso.
+     */
+    private void configurarMockDoMapper() {
+        when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(any(Unidade.class))).thenAnswer(inv -> {
+            Unidade u = inv.getArgument(0);
+            if (u == null) return null;
+            Unidade superior = u.getUnidadeSuperior();
+            return UnidadeDto.builder()
+                    .codigo(u.getCodigo())
+                    .nome(u.getNome())
+                    .sigla(u.getSigla())
+                    .codigoPai(superior != null ? superior.getCodigo() : null)
+                    .tipo(u.getTipo() != null ? u.getTipo().name() : null)
+                    .isElegivel(u.getTipo() != TipoUnidade.INTERMEDIARIA)
+                    .build();
+        });
+    }
 
     @Test
     @DisplayName("buscarAutorizacoesInterno - Usuario Nao Encontrado")
@@ -51,6 +73,7 @@ class LoginFacadeCoverageTest {
     @Test
     @DisplayName("toUnidadeDto - Coverage for Branches")
     void toUnidadeDto_Coverage() {
+        configurarMockDoMapper();
         String titulo = "123";
         when(clienteAcessoAd.autenticar(any(), any())).thenReturn(true);
         facade.autenticar(titulo, "pass");

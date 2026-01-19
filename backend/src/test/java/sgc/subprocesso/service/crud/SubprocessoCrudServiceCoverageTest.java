@@ -53,7 +53,7 @@ class SubprocessoCrudServiceCoverageTest {
                 .codUnidade(20L)
                 .build();
         when(repositorio.save(any())).thenAnswer(i -> i.getArgument(0));
-        when(mapper.toDTO(any())).thenReturn(new SubprocessoDto());
+        when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
         SubprocessoDto dto = crudService.criar(req);
 
@@ -73,7 +73,7 @@ class SubprocessoCrudServiceCoverageTest {
 
         // Mock repo.buscar because buscarSubprocesso uses it
         when(repo.buscar(Subprocesso.class, codigo)).thenReturn(sp);
-        when(mapper.toDTO(any())).thenReturn(new SubprocessoDto());
+        when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
         crudService.atualizar(codigo, req);
 
@@ -117,7 +117,7 @@ class SubprocessoCrudServiceCoverageTest {
         sp.getMapa().setCodigo(99L); // Different map
 
         when(repo.buscar(Subprocesso.class, codigo)).thenReturn(sp);
-        when(mapper.toDTO(any())).thenReturn(new SubprocessoDto());
+        when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
         crudService.atualizar(codigo, req);
 

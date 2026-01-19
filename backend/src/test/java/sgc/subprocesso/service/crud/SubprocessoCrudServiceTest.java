@@ -60,7 +60,7 @@ class SubprocessoCrudServiceTest {
         Subprocesso entity = new Subprocesso();
         when(repositorioSubprocesso.save(any())).thenReturn(entity);
         when(mapaFacade.salvar(any())).thenReturn(new Mapa());
-        when(subprocessoMapper.toDTO(any())).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(any())).thenReturn(responseDto);
 
         assertThat(service.criar(request)).isNotNull();
     }
@@ -156,7 +156,7 @@ class SubprocessoCrudServiceTest {
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(repositorioSubprocesso.save(sp)).thenReturn(sp);
-        when(subprocessoMapper.toDTO(sp)).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
         SubprocessoDto resultado = service.atualizar(1L, request);
         assertThat(resultado).isNotNull();
@@ -172,7 +172,7 @@ class SubprocessoCrudServiceTest {
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(repositorioSubprocesso.save(sp)).thenReturn(sp);
-        when(subprocessoMapper.toDTO(sp)).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
         SubprocessoDto resultado = service.atualizar(1L, request);
         assertThat(resultado).isNotNull();
@@ -211,7 +211,7 @@ class SubprocessoCrudServiceTest {
     @DisplayName("Deve listar todos os subprocessos")
     void deveListarTodos() {
         when(repositorioSubprocesso.findAllComFetch()).thenReturn(List.of(new Subprocesso()));
-        when(subprocessoMapper.toDTO(any())).thenReturn(SubprocessoDto.builder().build());
+        when(subprocessoMapper.toDto(any())).thenReturn(SubprocessoDto.builder().build());
 
         assertThat(service.listar()).hasSize(1);
     }
@@ -221,7 +221,7 @@ class SubprocessoCrudServiceTest {
     void deveObterPorProcessoEUnidade() {
         Subprocesso sp = new Subprocesso();
         when(repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(1L, 2L)).thenReturn(Optional.of(sp));
-        when(subprocessoMapper.toDTO(sp)).thenReturn(SubprocessoDto.builder().build());
+        when(subprocessoMapper.toDto(sp)).thenReturn(SubprocessoDto.builder().build());
 
         assertThat(service.obterPorProcessoEUnidade(1L, 2L)).isNotNull();
     }
@@ -258,7 +258,7 @@ class SubprocessoCrudServiceTest {
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(repositorioSubprocesso.save(sp)).thenReturn(sp);
-        when(subprocessoMapper.toDTO(sp)).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
         service.atualizar(1L, request);
 
@@ -276,7 +276,7 @@ class SubprocessoCrudServiceTest {
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(repositorioSubprocesso.save(sp)).thenReturn(sp);
-        when(subprocessoMapper.toDTO(sp)).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
         service.atualizar(1L, request);
 
@@ -293,7 +293,7 @@ class SubprocessoCrudServiceTest {
 
         when(repositorioSubprocesso.save(any())).thenReturn(entity);
         when(mapaFacade.salvar(any())).thenReturn(new Mapa());
-        when(subprocessoMapper.toDTO(any())).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(any())).thenReturn(responseDto);
 
         service.criar(request);
 
@@ -317,7 +317,7 @@ class SubprocessoCrudServiceTest {
 
         when(repositorioSubprocesso.save(any())).thenReturn(entity);
         when(mapaFacade.salvar(any())).thenReturn(new Mapa());
-        when(subprocessoMapper.toDTO(any())).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(any())).thenReturn(responseDto);
 
         service.criar(request);
 
@@ -375,7 +375,7 @@ class SubprocessoCrudServiceTest {
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(repositorioSubprocesso.save(sp)).thenReturn(sp);
-        when(subprocessoMapper.toDTO(sp)).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
         service.atualizar(1L, request);
 
@@ -397,7 +397,7 @@ class SubprocessoCrudServiceTest {
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(repositorioSubprocesso.save(sp)).thenReturn(sp);
-        when(subprocessoMapper.toDTO(sp)).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
         service.atualizar(1L, request);
 

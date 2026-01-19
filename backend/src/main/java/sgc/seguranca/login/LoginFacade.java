@@ -11,10 +11,7 @@ import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.seguranca.login.dto.PerfilUnidadeDto;
@@ -37,6 +34,7 @@ public class LoginFacade {
     private final GerenciadorJwt gerenciadorJwt;
     private final ClienteAcessoAd clienteAcessoAd;
     private final UnidadeFacade unidadeService;
+    private final sgc.organizacao.mapper.UsuarioMapper usuarioMapper;
 
     @Value("${aplicacao.ambiente-testes:false}")
     private boolean ambienteTestes;
@@ -46,11 +44,13 @@ public class LoginFacade {
     public LoginFacade(UsuarioFacade usuarioService,
             GerenciadorJwt gerenciadorJwt,
             @Autowired(required = false) ClienteAcessoAd clienteAcessoAd,
-            UnidadeFacade unidadeService) {
+            UnidadeFacade unidadeService,
+            sgc.organizacao.mapper.UsuarioMapper usuarioMapper) {
         this.usuarioService = usuarioService;
         this.gerenciadorJwt = gerenciadorJwt;
         this.clienteAcessoAd = clienteAcessoAd;
         this.unidadeService = unidadeService;
+        this.usuarioMapper = usuarioMapper;
     }
 
     /**
@@ -162,22 +162,8 @@ public class LoginFacade {
         return usuario.getTodasAtribuicoes().stream()
                 .map(atribuicao -> new PerfilUnidadeDto(
                         atribuicao.getPerfil(),
-                        toUnidadeDto(atribuicao.getUnidade())))
+                        usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(atribuicao.getUnidade())))
                 .toList();
-    }
-
-
-
-    private UnidadeDto toUnidadeDto(Unidade unidade) {
-        Unidade superior = unidade.getUnidadeSuperior();
-        return UnidadeDto.builder()
-                .codigo(unidade.getCodigo())
-                .nome(unidade.getNome())
-                .sigla(unidade.getSigla())
-                .codigoPai(superior != null ? superior.getCodigo() : null)
-                .tipo(unidade.getTipo().name())
-                .isElegivel(unidade.getTipo() != TipoUnidade.INTERMEDIARIA)
-                .build();
     }
 
     // Métodos para testes

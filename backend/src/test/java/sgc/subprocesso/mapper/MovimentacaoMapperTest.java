@@ -44,7 +44,7 @@ class MovimentacaoMapperTest {
         mov.setUnidadeOrigem(origem);
         mov.setUnidadeDestino(destino);
 
-        MovimentacaoDto dto = mapper.toDTO(mov);
+        MovimentacaoDto dto = mapper.toDto(mov);
 
         assertThat(dto).isNotNull();
         assertThat(dto.codigo()).isEqualTo(10L);
@@ -60,7 +60,7 @@ class MovimentacaoMapperTest {
     @Test
     @DisplayName("Deve retornar null quando entrada é null")
     void deveRetornarNullQuandoNull() {
-        assertThat(mapper.toDTO(null)).isNull();
+        assertThat(mapper.toDto(null)).isNull();
     }
 
     @Test
@@ -71,7 +71,7 @@ class MovimentacaoMapperTest {
         mov.setUnidadeOrigem(null);
         mov.setUnidadeDestino(null);
 
-        MovimentacaoDto dto = mapper.toDTO(mov);
+        MovimentacaoDto dto = mapper.toDto(mov);
 
         assertThat(dto).isNotNull();
         assertThat(dto.unidadeOrigemCodigo()).isNull();

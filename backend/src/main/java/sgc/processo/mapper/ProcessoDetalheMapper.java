@@ -1,0 +1,28 @@
+package sgc.processo.mapper;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.dto.ProcessoDetalheDto;
+
+/**
+ * Mapper MapStruct para conversão de entidades relacionadas a ProcessoDetalhe.
+ */
+@Mapper(componentModel = "spring")
+public interface ProcessoDetalheMapper {
+
+    /**
+     * Converte Unidade para UnidadeParticipanteDto.
+     * Inicializa listas vazias para filhos.
+     */
+    @Mapping(target = "codUnidade", source = "codigo")
+    @Mapping(target = "codUnidadeSuperior", source = "unidadeSuperior.codigo")
+    @Mapping(target = "filhos", expression = "java(new java.util.ArrayList<>())")
+    @Mapping(target = "situacaoSubprocesso", ignore = true)
+    @Mapping(target = "situacaoLabel", ignore = true)
+    @Mapping(target = "dataLimite", ignore = true)
+    @Mapping(target = "dataLimiteFormatada", ignore = true)
+    @Mapping(target = "codSubprocesso", ignore = true)
+    @Mapping(target = "mapaCodigo", ignore = true)
+    ProcessoDetalheDto.UnidadeParticipanteDto toUnidadeParticipanteDto(Unidade unidade);
+}

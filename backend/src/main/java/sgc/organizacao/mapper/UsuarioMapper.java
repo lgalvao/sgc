@@ -1,78 +1,75 @@
 package sgc.organizacao.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.AtribuicaoTemporaria;
+import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 
+/**
+ * Mapper MapStruct para conversão de entidades de organização para DTOs.
+ * 
+ * <p>Centraliza todos os mapeamentos de Unidade, Usuario e AtribuicaoTemporaria.
+ */
 @Mapper(componentModel = "spring")
 public interface UsuarioMapper {
-    default UnidadeDto toUnidadeDto(Unidade unidade, boolean isElegivel) {
-        if (unidade == null) {
-            return null;
-        }
 
-        Unidade unidadeSuperior = unidade.getUnidadeSuperior();
+    // ========== Mapeamentos de Unidade ==========
 
-        UnidadeDto dto = UnidadeDto.builder().build();
+    /**
+     * Converte Unidade para UnidadeDto com flag de elegibilidade customizada.
+     */
+    @Mapping(target = "codigoPai", source = "unidade.unidadeSuperior.codigo")
+    @Mapping(target = "tipo", expression = "java(unidade.getTipo().name())")
+    @Mapping(target = "subunidades", expression = "java(new java.util.ArrayList<>())")
+    @Mapping(target = "isElegivel", source = "isElegivel")
+    UnidadeDto toUnidadeDto(Unidade unidade, boolean isElegivel);
 
-        dto.setCodigo(unidade.getCodigo())
-                .setNome(unidade.getNome())
-                .setSigla(unidade.getSigla())
-                .setCodigoPai(unidadeSuperior != null ? unidadeSuperior.getCodigo() : null)
-                .setTipo(unidade.getTipo().name())
-                .setSubunidades(new java.util.ArrayList<>())
-                .setElegivel(isElegivel)
-                .setTituloTitular(unidade.getTituloTitular());
-
-        return dto;
-    }
-
+    /**
+     * Converte Unidade para UnidadeDto (elegível por padrão).
+     */
     default UnidadeDto toUnidadeDto(Unidade unidade) {
         return toUnidadeDto(unidade, true);
     }
 
     /**
-     * Converte uma entidade Usuario para UsuarioDto.
-     *
-     * @param usuario A entidade de usuário.
-     * @return O DTO de usuário.
+     * Converte Unidade para UnidadeDto calculando elegibilidade pelo tipo.
+     * Unidades INTERMEDIARIAS não são elegíveis.
      */
-    default UsuarioDto toUsuarioDto(Usuario usuario) {
-        if (usuario == null) {
-            return null;
-        }
-
-        return UsuarioDto.builder()
-                .nome(usuario.getNome())
-                .tituloEleitoral(usuario.getTituloEleitoral())
-                .email(usuario.getEmail())
-                .matricula(usuario.getMatricula())
-                .unidadeCodigo(usuario.getUnidadeLotacao().getCodigo())
-                .build();
+    @Named("toUnidadeDtoComElegibilidadeCalculada")
+    default UnidadeDto toUnidadeDtoComElegibilidadeCalculada(Unidade unidade) {
+        if (unidade == null) return null;
+        boolean elegivel = unidade.getTipo() != TipoUnidade.INTERMEDIARIA;
+        return toUnidadeDto(unidade, elegivel);
     }
 
-    /**
-     * Converte uma entidade AtribuicaoTemporaria para AtribuicaoTemporariaDto.
-     *
-     * @param atribuicao A entidade de atribuição temporária.
-     * @return O DTO de atribuição temporária.
-     */
-    default AtribuicaoTemporariaDto toAtribuicaoTemporariaDto(AtribuicaoTemporaria atribuicao) {
-        if (atribuicao == null) {
-            return null;
-        }
+    // ========== Mapeamentos de Usuario ==========
 
-        return AtribuicaoTemporariaDto.builder()
-                .codigo(atribuicao.getCodigo())
-                .unidade(toUnidadeDto(atribuicao.getUnidade()))
-                .usuario(toUsuarioDto(atribuicao.getUsuario()))
-                .dataInicio(atribuicao.getDataInicio())
-                .dataTermino(atribuicao.getDataTermino())
-                .justificativa(atribuicao.getJustificativa())
-                .build();
+    /**
+     * Converte Usuario para UsuarioDto.
+     */
+    @Mapping(target = "unidadeCodigo", source = "unidadeLotacao.codigo")
+    UsuarioDto toUsuarioDto(Usuario usuario);
+
+    // ========== Mapeamentos de AtribuicaoTemporaria ==========
+
+    /**
+     * Converte AtribuicaoTemporaria para AtribuicaoTemporariaDto.
+     */
+    @Mapping(target = "unidade", source = "unidade", qualifiedByName = "toUnidadeDtoSimples")
+    @Mapping(target = "usuario", source = "usuario")
+    AtribuicaoTemporariaDto toAtribuicaoTemporariaDto(AtribuicaoTemporaria atribuicao);
+
+    /**
+     * Mapeamento simplificado de Unidade para uso em AtribuicaoTemporariaDto.
+     */
+    @Named("toUnidadeDtoSimples")
+    default UnidadeDto toUnidadeDtoSimples(Unidade unidade) {
+        return toUnidadeDto(unidade, true);
     }
 }

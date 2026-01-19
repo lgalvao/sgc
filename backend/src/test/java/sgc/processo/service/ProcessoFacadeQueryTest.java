@@ -183,7 +183,7 @@ class ProcessoFacadeQueryTest {
         void deveListarTodosSubprocessos() {
             when(subprocessoFacade.listarEntidadesPorProcesso(100L))
                     .thenReturn(List.of(SubprocessoFixture.subprocessoPadrao(null, null)));
-            when(subprocessoMapper.toDTO(any())).thenReturn(SubprocessoDto.builder().build());
+            when(subprocessoMapper.toDto(any())).thenReturn(SubprocessoDto.builder().build());
 
             var res = processoFacade.listarTodosSubprocessos(100L);
             assertThat(res).hasSize(1);

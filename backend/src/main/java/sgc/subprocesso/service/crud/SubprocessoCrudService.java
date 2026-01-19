@@ -81,9 +81,7 @@ public class SubprocessoCrudService {
      * <p>O mapa é um invariante do subprocesso após a criação, portanto é garantido que exista.
      */
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
-        Subprocesso subprocesso = buscarSubprocesso(codigo);
-        // Mapa é invariante após criação
-        return subprocesso;
+        return buscarSubprocesso(codigo);
     }
 
     @Transactional(readOnly = true)
@@ -160,7 +158,7 @@ public class SubprocessoCrudService {
                 .build();
         eventPublisher.publishEvent(evento);
 
-        return subprocessoMapper.toDTO(salvo);
+        return subprocessoMapper.toDto(salvo);
     }
 
     public SubprocessoDto atualizar(Long codigo, AtualizarSubprocessoRequest request) {
@@ -182,7 +180,7 @@ public class SubprocessoCrudService {
             eventPublisher.publishEvent(evento);
         }
 
-        return subprocessoMapper.toDTO(salvo);
+        return subprocessoMapper.toDto(salvo);
     }
 
     private Set<String> processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
@@ -233,7 +231,7 @@ public class SubprocessoCrudService {
 
     @Transactional(readOnly = true)
     public List<SubprocessoDto> listar() {
-        return repositorioSubprocesso.findAllComFetch().stream().map(subprocessoMapper::toDTO).toList();
+        return repositorioSubprocesso.findAllComFetch().stream().map(subprocessoMapper::toDto).toList();
     }
 
     @Transactional(readOnly = true)
@@ -243,7 +241,7 @@ public class SubprocessoCrudService {
                 .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada(
                         "%s para o processo %s e unidade %s".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codProcesso,
                                 codUnidade)));
-        return subprocessoMapper.toDTO(sp);
+        return subprocessoMapper.toDto(sp);
     }
 
     @Transactional(readOnly = true)

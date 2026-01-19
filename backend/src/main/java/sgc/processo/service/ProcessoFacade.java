@@ -327,7 +327,7 @@ public class ProcessoFacade {
     @Transactional(readOnly = true)
     public List<SubprocessoDto> listarTodosSubprocessos(Long codProcesso) {
         return subprocessoFacade.listarEntidadesPorProcesso(codProcesso).stream()
-                .map(subprocessoMapper::toDTO)
+                .map(subprocessoMapper::toDto)
                 .toList();
     }
 }
