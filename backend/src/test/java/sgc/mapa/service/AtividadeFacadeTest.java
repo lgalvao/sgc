@@ -64,13 +64,11 @@ class AtividadeFacadeTest {
                 .mapaCodigo(1L)
                 .descricao("Teste")
                 .build();
-        // Facade calls: criar -> (returns dto)
         AtividadeResponse created = AtividadeResponse.builder()
                 .codigo(100L)
                 .mapaCodigo(1L)
                 .build();
 
-        // Mock usuario autenticado
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("user");
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
@@ -83,18 +81,13 @@ class AtividadeFacadeTest {
         mapa.setSubprocesso(subprocesso);
         when(mapaFacade.obterPorCodigo(1L)).thenReturn(mapa);
         
-        // Mock accessControlService to allow access
         doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());
-
         when(subprocessoFacade.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
-
         when(atividadeService.criar(request)).thenReturn(created);
 
-        // Facade gets status
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().situacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO).build();
         when(subprocessoFacade.obterSituacao(10L)).thenReturn(status);
 
-        // Facade searches for activity in list to return visualization
         AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
         vis.setCodigo(100L);
         when(subprocessoFacade.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
@@ -124,14 +117,10 @@ class AtividadeFacadeTest {
         mapa.setSubprocesso(subprocesso);
         atividadeEntity.setMapa(mapa);
 
-        // Mock usuario autenticado
         Usuario usuario = new Usuario();
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
         doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());
-
-        // Facade gets entity to find map code -> then subprocesso code
         when(atividadeService.obterPorCodigo(codigo)).thenReturn(atividadeEntity);
-
         when(subprocessoFacade.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
@@ -157,13 +146,10 @@ class AtividadeFacadeTest {
         mapa.setSubprocesso(subprocesso);
         atividadeEntity.setMapa(mapa);
 
-        // Mock usuario autenticado
         Usuario usuario = new Usuario();
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
         doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());
-
         when(atividadeService.obterPorCodigo(codigo)).thenReturn(atividadeEntity);
-
         when(subprocessoFacade.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
@@ -180,7 +166,6 @@ class AtividadeFacadeTest {
     @DisplayName("Deve propagar erro se atividade não encontrada na exclusão")
     void devePropagarErroExclusao() {
         when(atividadeService.obterPorCodigo(1L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 1L));
-
         assertThatThrownBy(() -> facade.excluirAtividade(1L))
             .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
@@ -206,14 +191,10 @@ class AtividadeFacadeTest {
         mapa.setSubprocesso(subprocesso);
         atividadeEntity.setMapa(mapa);
 
-        // Mock usuario autenticado
         Usuario usuario = new Usuario();
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
         doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());
-
         when(conhecimentoService.criar(codigoAtividade, request)).thenReturn(salvo);
-
-        // Mocks for creating response
         when(atividadeService.obterPorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
         when(subprocessoFacade.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
@@ -249,12 +230,9 @@ class AtividadeFacadeTest {
         mapa.setSubprocesso(subprocesso);
         atividadeEntity.setMapa(mapa);
 
-        // Mock usuario autenticado
         Usuario usuario = new Usuario();
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
         doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());
-
-        // Mocks for creating response
         when(atividadeService.obterPorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
         when(subprocessoFacade.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
@@ -287,12 +265,9 @@ class AtividadeFacadeTest {
         mapa.setSubprocesso(subprocesso);
         atividadeEntity.setMapa(mapa);
 
-        // Mock usuario autenticado
         Usuario usuario = new Usuario();
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
         doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());
-
-        // Mocks for creating response
         when(atividadeService.obterPorCodigo(codigoAtividade)).thenReturn(atividadeEntity);
         when(subprocessoFacade.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
 
@@ -307,5 +282,27 @@ class AtividadeFacadeTest {
 
         verify(conhecimentoService).excluir(codigoAtividade, codigoConhecimento);
         assertThat(response.getAtividade()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Deve obter atividade por ID delegando ao service")
+    void deveObterAtividadePorId() {
+        AtividadeResponse expected = AtividadeResponse.builder().codigo(1L).build();
+        when(atividadeService.obterResponse(1L)).thenReturn(expected);
+        
+        AtividadeResponse actual = facade.obterAtividadePorId(1L);
+        
+        assertThat(actual).isSameAs(expected);
+    }
+
+    @Test
+    @DisplayName("Deve listar conhecimentos por atividade delegando ao service")
+    void deveListarConhecimentos() {
+        java.util.List<ConhecimentoResponse> expected = java.util.List.of();
+        when(conhecimentoService.listarPorAtividade(100L)).thenReturn(expected);
+        
+        java.util.List<ConhecimentoResponse> actual = facade.listarConhecimentosPorAtividade(100L);
+        
+        assertThat(actual).isSameAs(expected);
     }
 }

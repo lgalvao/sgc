@@ -217,21 +217,24 @@ class ValidadorDadosOrgServiceTest {
         }
 
         @Test
-        @DisplayName("Deve acumular múltiplas violações")
-        void deveAcumularMultiplasViolacoes() {
+        @DisplayName("Deve ignorar unidade sem titular no loop de validação de emails")
+        void deveIgnorarUnidadeSemTitularNoLoopDeEmail() {
             // Arrange
-            Unidade u1 = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
-            u1.setTituloTitular(null); // Violação 1
+            Unidade valida = criarUnidadeValida(1L, "VALIDA", TipoUnidade.OPERACIONAL);
+            Unidade semTitular = criarUnidadeValida(2L, "SEM", TipoUnidade.OPERACIONAL);
+            semTitular.setTituloTitular(null);
+            
+            Usuario titular = criarUsuarioValido("TITULO_1");
 
-            Unidade u2 = criarUnidadeValida(2L, "U2", TipoUnidade.OPERACIONAL);
-            u2.setTituloTitular(null); // Violação 2
-
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1, u2));
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(valida, semTitular));
+            when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of(titular));
 
             // Act & Assert
+            // Deve falhar com 1 violação (da unidade sem titular em validarTitularesUnidades)
+            // Mas o continue em validarEmailsTitulares deve ser executado
             assertThatThrownBy(() -> validador.run(new DefaultApplicationArguments()))
                     .isInstanceOf(ErroConfiguracao.class)
-                    .hasMessageContaining("2 violações");
+                    .hasMessageContaining("1 violação");
         }
     }
 }

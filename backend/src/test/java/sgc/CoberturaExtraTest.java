@@ -7,9 +7,13 @@ import org.springframework.http.HttpStatus;
 import java.util.HashMap;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroEstadoImpossivel;
+import sgc.comum.erros.ErroNegocio;
 import sgc.comum.erros.ErroNegocioBase;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.painel.erros.ErroParametroPainelInvalido;
 
@@ -30,7 +34,15 @@ class CoberturaExtraTest {
         assertThat(erro.getMessage()).isEqualTo("msg");
         assertThat(erro.getCode()).isEqualTo("CODO");
         assertThat(erro.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-
+        
+        // Cobertura para o método default da interface ErroNegocio
+        ErroNegocio erroInterface = new ErroNegocio() {
+            @Override public String getCode() { return "X"; }
+            @Override public HttpStatus getStatus() { return HttpStatus.OK; }
+            @Override public String getMessage() { return "M"; }
+        };
+        assertThat(erroInterface.getDetails()).isNull();
+        
         new ErroNegocioBase("msg", "CODO", HttpStatus.BAD_REQUEST, new HashMap<>()) {};
         new ErroNegocioBase("msg", "CODO", HttpStatus.BAD_REQUEST, new RuntimeException()) {};
     }
@@ -38,10 +50,13 @@ class CoberturaExtraTest {
     @Test
     @DisplayName("Deve instanciar modelos para cobertura de construtores extras")
     void deveInstanciarModelos() {
-        Competencia c = new Competencia(1L, "desc", new sgc.mapa.model.Mapa());
+        Competencia c = new Competencia(1L, "desc", new Mapa());
         assertThat(c.getCodigo()).isEqualTo(1L);
         
-        Conhecimento k = new Conhecimento(1L, "desc", new sgc.mapa.model.Atividade());
+        Conhecimento k = new Conhecimento(1L, "desc", new Atividade());
         assertThat(k.getCodigo()).isEqualTo(1L);
+
+        Unidade u = new Unidade("Nome", "SIGLA");
+        assertThat(u.getSigla()).isEqualTo("SIGLA");
     }
 }
