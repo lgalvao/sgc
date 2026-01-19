@@ -10,6 +10,10 @@ export default defineConfig({
                 target: "http://localhost:10000",
                 changeOrigin: true,
             },
+            "/e2e": {
+                target: "http://localhost:10000",
+                changeOrigin: true,
+            },
         },
     },
 });

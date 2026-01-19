@@ -3,7 +3,7 @@ import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
 import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
-import {navegarParaMapa} from './helpers/helpers-mapas';
+import {abrirModalCriarCompetencia, navegarParaMapa} from './helpers/helpers-mapas';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -500,7 +500,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '05-mapa', '01-mapa-vazio', {fullPage: true});
 
             // Criar competência
-            await page.getByTestId('btn-abrir-criar-competencia').click();
+            await abrirModalCriarCompetencia(page);
             await page.waitForTimeout(100);
             await capturarTela(page, '05-mapa', '02-modal-criar-competencia');
 
