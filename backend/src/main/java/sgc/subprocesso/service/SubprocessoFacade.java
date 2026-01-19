@@ -25,6 +25,8 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
+import sgc.processo.model.TipoProcesso;
+import sgc.seguranca.acesso.Acao;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
@@ -37,7 +39,9 @@ import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Facade para orquestrar operações de Subprocesso.
@@ -375,11 +379,9 @@ public class SubprocessoFacade {
         workflowService.alterarDataLimite(codigo, novaDataLimite);
     }
 
-    // ===== Operações de Mapa =====
-
     @Transactional
-    public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias, String usuarioTituloEleitoral) {
-        salvarAjustesMapaInterno(codSubprocesso, competencias, usuarioTituloEleitoral);
+    public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias) {
+        salvarAjustesMapaInterno(codSubprocesso, competencias);
     }
 
     @Transactional
@@ -387,12 +389,129 @@ public class SubprocessoFacade {
         importarAtividadesInterno(codSubprocessoDestino, codSubprocessoOrigem);
     }
 
-    // ===== Private Helper Methods (from SubprocessoDetalheService and SubprocessoContextoService) =====
+    private void salvarAjustesMapaInterno(Long codSubprocesso, List<CompetenciaAjusteDto> competencias) {
+        Subprocesso sp = subprocessoRepo.findById(codSubprocesso)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
+
+        validarSituacaoParaAjuste(sp);
+        atualizarDescricoesAtividades(competencias);
+        atualizarCompetenciasEAssociacoes(competencias);
+
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+        subprocessoRepo.save(sp);
+    }
+
+    private void validarSituacaoParaAjuste(Subprocesso sp) {
+        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
+                && sp.getSituacao() != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {
+            throw new sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida(
+                    "Ajustes no mapa só podem ser feitos em estados específicos. "
+                            + "Situação atual: %s".formatted(sp.getSituacao()));
+        }
+    }
+
+    private void atualizarDescricoesAtividades(List<CompetenciaAjusteDto> competencias) {
+        java.util.Map<Long, String> atividadeDescricoes = new java.util.HashMap<>();
+        for (CompetenciaAjusteDto compDto : competencias) {
+            for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
+                atividadeDescricoes.put(ativDto.getCodAtividade(), ativDto.getNome());
+            }
+        }
+        if (!atividadeDescricoes.isEmpty()) {
+            atividadeService.atualizarDescricoesEmLote(atividadeDescricoes);
+        }
+    }
+
+    private void atualizarCompetenciasEAssociacoes(List<CompetenciaAjusteDto> competencias) {
+        // Carregar todas as competências envolvidas
+        List<Long> competenciaIds = competencias.stream()
+                .map(CompetenciaAjusteDto::getCodCompetencia)
+                .toList();
+        
+        java.util.Map<Long, Competencia> mapaCompetencias = competenciaService.buscarPorCodigos(competenciaIds).stream()
+                .collect(java.util.stream.Collectors.toMap(Competencia::getCodigo, java.util.function.Function.identity()));
+
+        List<Long> todasAtividadesIds = competencias.stream()
+                .flatMap(c -> c.getAtividades().stream())
+                .map(AtividadeAjusteDto::getCodAtividade)
+                .distinct()
+                .toList();
+
+        java.util.Map<Long, Atividade> mapaAtividades = atividadeService.buscarPorCodigos(todasAtividadesIds).stream()
+                .collect(java.util.stream.Collectors.toMap(Atividade::getCodigo, java.util.function.Function.identity()));
+
+        List<Competencia> competenciasParaSalvar = new ArrayList<>();
+        for (CompetenciaAjusteDto compDto : competencias) {
+            Competencia competencia = mapaCompetencias.get(compDto.getCodCompetencia());
+            if (competencia != null) {
+                competencia.setDescricao(compDto.getNome());
+                
+                Set<Atividade> atividadesSet = new HashSet<>();
+                for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
+                    Atividade ativ = mapaAtividades.get(ativDto.getCodAtividade());
+                    atividadesSet.add(ativ);
+                }
+                competencia.setAtividades(atividadesSet);
+                competenciasParaSalvar.add(competencia);
+            }
+        }
+        competenciaService.salvarTodas(competenciasParaSalvar);
+    }
+
+    private void importarAtividadesInterno(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
+        final Subprocesso spDestino = subprocessoRepo
+                .findById(codSubprocessoDestino)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso de destino não encontrado: %d".formatted(codSubprocessoDestino)));
+
+        if (spDestino.getSituacao() != SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+                && spDestino.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+                && spDestino.getSituacao() != SituacaoSubprocesso.NAO_INICIADO) {
+
+            throw new sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida("""
+                    Atividades só podem ser importadas para um subprocesso
+                    com cadastro em elaboração ou não iniciado.""");
+        }
+
+        Subprocesso spOrigem = subprocessoRepo.findById(codSubprocessoOrigem)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso de origem não encontrado: %d".formatted(codSubprocessoOrigem)));
+
+        copiaMapaService.importarAtividadesDeOutroMapa(
+                spOrigem.getMapa().getCodigo(),
+                spDestino.getMapa().getCodigo()
+        );
+
+        if (spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
+            var tipoProcesso = spDestino.getProcesso().getTipo();
+
+            switch (tipoProcesso) {
+                case MAPEAMENTO -> spDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+                case REVISAO -> spDestino.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+                default -> log.debug("Tipo de processo {} não requer atualização automática de situação no import.", tipoProcesso);
+            }
+            subprocessoRepo.save(spDestino);
+        }
+
+        final sgc.organizacao.model.Unidade unidadeOrigem = spOrigem.getUnidade();
+        String descMovimentacao = String.format("Importação de atividades do subprocesso #%d (Unidade: %s)",
+                spOrigem.getCodigo(),
+                unidadeOrigem != null ? unidadeOrigem.getSigla() : "N/A");
+
+        movimentacaoRepo.save(new Movimentacao(
+                spDestino,
+                unidadeOrigem,
+                spDestino.getUnidade(),
+                descMovimentacao,
+                null)
+        );
+
+        log.info("Atividades importadas do subprocesso {} para {}", codSubprocessoOrigem, codSubprocessoDestino);
+    }
+    private boolean podeExecutar(Usuario usuario, sgc.seguranca.acesso.Acao acao, Subprocesso subprocesso) {
+        return accessControlService.podeExecutar(usuario, acao, subprocesso);
+    }
 
     private List<AtividadeVisualizacaoDto> listarAtividadesSubprocessoInterno(Long codSubprocesso) {
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
-        // ⚡ Bolt: Usando 'buscarPorMapaCodigoComConhecimentos' para evitar N+1 queries
-        // ao carregar conhecimentos para cada atividade
         List<Atividade> todasAtividades = atividadeService.buscarPorMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
         return todasAtividades.stream().map(this::mapAtividadeToDto).toList();
     }
@@ -404,6 +523,7 @@ public class SubprocessoFacade {
                         .descricao(c.getDescricao())
                         .build())
                 .toList();
+
         return AtividadeVisualizacaoDto.builder()
                 .codigo(atividade.getCodigo())
                 .descricao(atividade.getDescricao())
@@ -413,8 +533,6 @@ public class SubprocessoFacade {
 
     private SubprocessoDetalheDto obterDetalhesInterno(Long codigo, Usuario usuarioAutenticado) {
         Subprocesso sp = crudService.buscarSubprocesso(codigo);
-        
-        // Centralized security check
         accessControlService.verificarPermissao(usuarioAutenticado, sgc.seguranca.acesso.Acao.VISUALIZAR_SUBPROCESSO, sp);
 
         Usuario responsavel = usuarioService.buscarResponsavelAtual(sp.getUnidade().getSigla());
@@ -474,174 +592,54 @@ public class SubprocessoFacade {
     }
 
     private SubprocessoPermissoesDto calcularPermissoesInterno(Subprocesso subprocesso, Usuario usuario) {
-        // Determina as ações baseado no tipo de processo
-        boolean isRevisao = subprocesso.getProcesso() != null 
-                && subprocesso.getProcesso().getTipo() == sgc.processo.model.TipoProcesso.REVISAO;
+        boolean isRevisao = subprocesso.getProcesso().getTipo() == TipoProcesso.REVISAO;
         
-        sgc.seguranca.acesso.Acao acaoDisponibilizarCadastro = isRevisao 
-                ? sgc.seguranca.acesso.Acao.DISPONIBILIZAR_REVISAO_CADASTRO 
-                : sgc.seguranca.acesso.Acao.DISPONIBILIZAR_CADASTRO;
+        Acao acaoDisponibilizarCadastro = isRevisao 
+                ? Acao.DISPONIBILIZAR_REVISAO_CADASTRO 
+                : Acao.DISPONIBILIZAR_CADASTRO;
         
-        sgc.seguranca.acesso.Acao acaoDevolverCadastro = isRevisao 
-                ? sgc.seguranca.acesso.Acao.DEVOLVER_REVISAO_CADASTRO 
-                : sgc.seguranca.acesso.Acao.DEVOLVER_CADASTRO;
+        Acao acaoDevolverCadastro = isRevisao 
+                ? Acao.DEVOLVER_REVISAO_CADASTRO 
+                : Acao.DEVOLVER_CADASTRO;
         
-        sgc.seguranca.acesso.Acao acaoAceitarCadastro = isRevisao 
-                ? sgc.seguranca.acesso.Acao.ACEITAR_REVISAO_CADASTRO 
-                : sgc.seguranca.acesso.Acao.ACEITAR_CADASTRO;
+        Acao acaoAceitarCadastro = isRevisao 
+                ? Acao.ACEITAR_REVISAO_CADASTRO 
+                : Acao.ACEITAR_CADASTRO;
         
         return SubprocessoPermissoesDto.builder()
-                .podeVerPagina(podeExecutar(usuario, sgc.seguranca.acesso.Acao.VISUALIZAR_SUBPROCESSO, subprocesso))
-                .podeEditarMapa(podeExecutar(usuario, sgc.seguranca.acesso.Acao.EDITAR_MAPA, subprocesso))
-                .podeVisualizarMapa(podeExecutar(usuario, sgc.seguranca.acesso.Acao.VISUALIZAR_MAPA, subprocesso))
-                .podeDisponibilizarMapa(podeExecutar(usuario, sgc.seguranca.acesso.Acao.DISPONIBILIZAR_MAPA, subprocesso))
+                .podeVerPagina(podeExecutar(usuario, Acao.VISUALIZAR_SUBPROCESSO, subprocesso))
+                .podeEditarMapa(podeExecutar(usuario, Acao.EDITAR_MAPA, subprocesso))
+                .podeVisualizarMapa(podeExecutar(usuario, Acao.VISUALIZAR_MAPA, subprocesso))
+                .podeDisponibilizarMapa(podeExecutar(usuario, Acao.DISPONIBILIZAR_MAPA, subprocesso))
                 .podeDisponibilizarCadastro(podeExecutar(usuario, acaoDisponibilizarCadastro, subprocesso))
                 .podeDevolverCadastro(podeExecutar(usuario, acaoDevolverCadastro, subprocesso))
                 .podeAceitarCadastro(podeExecutar(usuario, acaoAceitarCadastro, subprocesso))
-                .podeVisualizarDiagnostico(podeExecutar(usuario, sgc.seguranca.acesso.Acao.VISUALIZAR_DIAGNOSTICO, subprocesso))
-                .podeAlterarDataLimite(podeExecutar(usuario, sgc.seguranca.acesso.Acao.ALTERAR_DATA_LIMITE, subprocesso))
-                .podeVisualizarImpacto(podeExecutar(usuario, sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS, subprocesso))
-                .podeRealizarAutoavaliacao(podeExecutar(usuario, sgc.seguranca.acesso.Acao.REALIZAR_AUTOAVALIACAO, subprocesso))
-                .podeReabrirCadastro(podeExecutar(usuario, sgc.seguranca.acesso.Acao.REABRIR_CADASTRO, subprocesso))
-                .podeReabrirRevisao(podeExecutar(usuario, sgc.seguranca.acesso.Acao.REABRIR_REVISAO, subprocesso))
-                .podeEnviarLembrete(podeExecutar(usuario, sgc.seguranca.acesso.Acao.ENVIAR_LEMBRETE_PROCESSO, subprocesso))
+                .podeVisualizarDiagnostico(podeExecutar(usuario, Acao.VISUALIZAR_DIAGNOSTICO, subprocesso))
+                .podeAlterarDataLimite(podeExecutar(usuario, Acao.ALTERAR_DATA_LIMITE, subprocesso))
+                .podeVisualizarImpacto(podeExecutar(usuario, Acao.VERIFICAR_IMPACTOS, subprocesso))
+                .podeRealizarAutoavaliacao(podeExecutar(usuario, Acao.REALIZAR_AUTOAVALIACAO, subprocesso))
+                .podeReabrirCadastro(podeExecutar(usuario, Acao.REABRIR_CADASTRO, subprocesso))
+                .podeReabrirRevisao(podeExecutar(usuario, Acao.REABRIR_REVISAO, subprocesso))
+                .podeEnviarLembrete(podeExecutar(usuario, Acao.ENVIAR_LEMBRETE_PROCESSO, subprocesso))
                 .build();
-    }
-
-    private boolean podeExecutar(Usuario usuario, sgc.seguranca.acesso.Acao acao, Subprocesso subprocesso) {
-        return accessControlService.podeExecutar(usuario, acao, subprocesso);
     }
 
     private ContextoEdicaoDto obterContextoEdicaoInterno(Long codSubprocesso) {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
         SubprocessoDetalheDto subprocessoDto = obterDetalhesInterno(codSubprocesso, usuario);
-        String siglaUnidade = subprocessoDto.getUnidade().getSigla();
+
+        String sigla = subprocessoDto.getUnidade().getSigla();
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
-        UnidadeDto unidadeDto = unidadeFacade.buscarPorSigla(siglaUnidade);
+        UnidadeDto unidadeDto = unidadeFacade.buscarPorSigla(sigla);
 
         MapaCompletoDto mapaDto = mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
-
         List<AtividadeVisualizacaoDto> atividades = listarAtividadesSubprocessoInterno(codSubprocesso);
+
         return ContextoEdicaoDto.builder()
                 .unidade(unidadeDto)
                 .subprocesso(subprocessoDto)
                 .mapa(mapaDto)
                 .atividadesDisponiveis(atividades)
                 .build();
-    }
-
-    private void salvarAjustesMapaInterno(
-            Long codSubprocesso,
-            List<CompetenciaAjusteDto> competencias,
-            String usuarioTituloEleitoral) {
-
-        Subprocesso sp = subprocessoRepo
-                .findById(codSubprocesso)
-                .orElseThrow(() ->
-                        new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
-
-        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
-                && sp.getSituacao() != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {
-            throw new sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida(
-                    "Ajustes no mapa só podem ser feitos em estados específicos. "
-                            + "Situação atual: %s".formatted(sp.getSituacao()));
-        }
-
-        log.info("Salvando ajustes para o mapa do subprocesso {}...", codSubprocesso);
-
-        // ⚡ Bolt: Otimização N+1 - Busca e atualização em lote
-        List<Long> competenciaIds = new ArrayList<>();
-        java.util.Map<Long, String> atividadeDescricoes = new java.util.HashMap<>();
-
-        for (CompetenciaAjusteDto compDto : competencias) {
-            competenciaIds.add(compDto.getCodCompetencia());
-            if (compDto.getAtividades() != null) {
-                for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
-                    atividadeDescricoes.put(ativDto.getCodAtividade(), ativDto.getNome());
-                }
-            }
-        }
-
-        List<Atividade> atividadesAtualizadas = atividadeService.atualizarDescricoesEmLote(atividadeDescricoes);
-        java.util.Map<Long, Atividade> mapaAtividades = atividadesAtualizadas.stream()
-                .collect(java.util.stream.Collectors.toMap(Atividade::getCodigo, java.util.function.Function.identity()));
-
-        List<Competencia> entidadesCompetencias = competenciaService.buscarPorCodigos(competenciaIds);
-        java.util.Map<Long, Competencia> mapaCompetencias = entidadesCompetencias.stream()
-                .collect(java.util.stream.Collectors.toMap(Competencia::getCodigo, java.util.function.Function.identity()));
-
-        for (CompetenciaAjusteDto compDto : competencias) {
-            Competencia competencia = mapaCompetencias.get(compDto.getCodCompetencia());
-            if (competencia != null) {
-                competencia.setDescricao(compDto.getNome());
-
-                java.util.Set<Atividade> atividades = new java.util.HashSet<>();
-                if (compDto.getAtividades() != null) {
-                    for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
-                        Atividade atividade = mapaAtividades.get(ativDto.getCodAtividade());
-                        if (atividade != null) {
-                            atividades.add(atividade);
-                        }
-                    }
-                }
-                competencia.setAtividades(atividades);
-            }
-        }
-
-        competenciaService.salvarTodas(entidadesCompetencias);
-
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
-        subprocessoRepo.save(sp);
-    }
-
-    private void importarAtividadesInterno(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
-        final Subprocesso spDestino = subprocessoRepo
-                .findById(codSubprocessoDestino)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso de destino não encontrado: %d".formatted(codSubprocessoDestino)));
-
-        if (spDestino.getSituacao() != SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
-                && spDestino.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-                && spDestino.getSituacao() != SituacaoSubprocesso.NAO_INICIADO) {
-
-            throw new sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida("""
-                    Atividades só podem ser importadas para um subprocesso
-                    com cadastro em elaboração ou não iniciado.""");
-        }
-
-        Subprocesso spOrigem = subprocessoRepo.findById(codSubprocessoOrigem)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso de origem não encontrado: %d".formatted(codSubprocessoOrigem)));
-
-        copiaMapaService.importarAtividadesDeOutroMapa(
-                spOrigem.getMapa().getCodigo(),
-                spDestino.getMapa().getCodigo()
-        );
-
-        if (spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
-            var tipoProcesso = spDestino.getProcesso().getTipo();
-
-            switch (tipoProcesso) {
-                case MAPEAMENTO -> spDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-                case REVISAO -> spDestino.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-                case null, default -> {
-                    log.debug("Tipo de processo {} não requer atualização automática de situação no import.", tipoProcesso);
-                }
-            }
-            subprocessoRepo.save(spDestino);
-        }
-
-        final sgc.organizacao.model.Unidade unidadeOrigem = spOrigem.getUnidade();
-        String descMovimentacao = String.format("Importação de atividades do subprocesso #%d (Unidade: %s)",
-                spOrigem.getCodigo(),
-                unidadeOrigem != null ? unidadeOrigem.getSigla() : "N/A");
-
-        movimentacaoRepo.save(new Movimentacao(
-                spDestino,
-                unidadeOrigem,
-                spDestino.getUnidade(),
-                descMovimentacao,
-                null)
-        );
-
-        log.info("Atividades importadas do subprocesso {} para {}", codSubprocessoOrigem, codSubprocessoDestino);
     }
 }

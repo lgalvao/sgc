@@ -23,10 +23,11 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoCrudServiceCoverageTest {
@@ -64,16 +65,17 @@ class SubprocessoCrudServiceCoverageTest {
     @DisplayName("atualizar - Sucesso")
     void atualizar_Sucesso() {
         Long codigo = 1L;
-        AtualizarSubprocessoRequest req = AtualizarSubprocessoRequest.builder().build();
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(new Processo()); // Para verificar permissao
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+        AtualizarSubprocessoRequest req = AtualizarSubprocessoRequest.builder().build();
 
         // Mock repo.buscar because buscarSubprocesso uses it
         when(repo.buscar(Subprocesso.class, codigo)).thenReturn(sp);
         when(mapper.toDTO(any())).thenReturn(new SubprocessoDto());
 
-        SubprocessoDto dto = crudService.atualizar(codigo, req);
+        crudService.atualizar(codigo, req);
 
         verify(repositorio).save(sp);
     }
@@ -85,10 +87,9 @@ class SubprocessoCrudServiceCoverageTest {
         List<Long> unidades = List.of(10L, 20L);
 
         when(repositorio.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, unidades)).thenReturn(true);
-
-        // This method logic might be simple delegation
+        
         boolean result = crudService.verificarAcessoUnidadeAoProcesso(codProcesso, unidades);
-        // Assuming implementation calls repo
+        assertEquals(true, result);
     }
 
     @Test

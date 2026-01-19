@@ -155,7 +155,7 @@ public class SubprocessoMapaController {
             @RequestBody @Valid SalvarAjustesRequest request,
             @AuthenticationPrincipal Object principal) {
         subprocessoFacade.salvarAjustesMapa(
-                codigo, request.getCompetencias(), extractTituloUsuario(principal));
+                codigo, request.getCompetencias());
     }
 
     /**
@@ -256,9 +256,5 @@ public class SubprocessoMapaController {
                 codigo, codCompetencia);
 
         return ResponseEntity.ok(mapa);
-    }
-
-    private String extractTituloUsuario(Object principal) {
-        return usuarioService.extrairTituloUsuario(principal);
     }
 }

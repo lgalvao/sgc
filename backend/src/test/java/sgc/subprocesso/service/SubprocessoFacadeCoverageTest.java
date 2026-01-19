@@ -31,7 +31,6 @@ import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -153,7 +152,7 @@ class SubprocessoFacadeCoverageTest {
         when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.empty());
 
         org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> {
-            facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList(), "123");
+            facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList());
         });
     }
 
@@ -197,7 +196,7 @@ class SubprocessoFacadeCoverageTest {
         when(atividadeService.atualizarDescricoesEmLote(any())).thenReturn(java.util.Collections.emptyList());
         when(competenciaService.buscarPorCodigos(any())).thenReturn(java.util.Collections.emptyList());
 
-        facade.salvarAjustesMapa(codSubprocesso, java.util.List.of(compRequest), "User");
+        facade.salvarAjustesMapa(codSubprocesso, java.util.List.of(compRequest));
 
         verify(competenciaService).salvarTodas(any());
     }
@@ -320,7 +319,7 @@ class SubprocessoFacadeCoverageTest {
         when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
 
         org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () -> {
-            facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList(), "user");
+            facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList());
         });
     }
 
@@ -419,17 +418,14 @@ class SubprocessoFacadeCoverageTest {
         CompetenciaAjusteDto compDto = CompetenciaAjusteDto.builder()
                 .codCompetencia(100L)
                 .nome("Comp")
-                .atividades(null) // This is the key
+                .atividades(List.of()) // Lista vazia, não mais null
                 .build();
-
-        // Mock dependencies
-        when(atividadeService.atualizarDescricoesEmLote(any())).thenReturn(Collections.emptyList());
 
         Competencia competencia = new Competencia();
         competencia.setCodigo(100L);
         when(competenciaService.buscarPorCodigos(any())).thenReturn(List.of(competencia));
 
-        facade.salvarAjustesMapa(codSubprocesso, List.of(compDto), "User");
+        facade.salvarAjustesMapa(codSubprocesso, List.of(compDto));
 
         verify(competenciaService).salvarTodas(any());
     }

@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoFacade - Testes Complementares")
-class SubprocessoFacadeTest2 {
+class SubprocessoFacadeComplementaryTest {
     @Mock
     private UsuarioFacade usuarioService;
     @Mock
@@ -294,6 +294,9 @@ class SubprocessoFacadeTest2 {
             Long codigo = 1L;
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(codigo);
+            sgc.processo.model.Processo proc = new sgc.processo.model.Processo();
+            proc.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+            sp.setProcesso(proc);
             Usuario usuario = new Usuario();
 
             when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
@@ -310,6 +313,9 @@ class SubprocessoFacadeTest2 {
             Long codigo = 1L;
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(codigo);
+            sgc.processo.model.Processo proc = new sgc.processo.model.Processo();
+            proc.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+            sp.setProcesso(proc);
             Unidade unidade = new Unidade();
             unidade.setSigla("SIGLA");
             unidade.setTituloTitular("TITULAR");
@@ -338,6 +344,9 @@ class SubprocessoFacadeTest2 {
             Long codigo = 1L;
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(codigo);
+            sgc.processo.model.Processo proc = new sgc.processo.model.Processo();
+            proc.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+            sp.setProcesso(proc);
             Unidade unidade = new Unidade();
             unidade.setSigla("SIGLA");
             unidade.setTituloTitular(null);
@@ -353,9 +362,12 @@ class SubprocessoFacadeTest2 {
             when(repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().build());
 
-            subprocessoFacade.obterDetalhes(codigo, sgc.organizacao.model.Perfil.ADMIN);
+            SubprocessoDetalheDto result = subprocessoFacade.obterDetalhes(codigo, sgc.organizacao.model.Perfil.ADMIN);
 
-            // Should pass without error
+            // Verifica que executou sem erro e retornou resultado
+            assertThat(result).isNotNull();
+            // Verifica que não tentou buscar titular (pois é null)
+            verify(usuarioService, org.mockito.Mockito.never()).buscarPorLogin(any());
         }
 
         @Test
@@ -364,6 +376,9 @@ class SubprocessoFacadeTest2 {
             Long codigo = 1L;
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(codigo);
+            sgc.processo.model.Processo proc = new sgc.processo.model.Processo();
+            proc.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+            sp.setProcesso(proc);
             Unidade unidade = new Unidade();
             unidade.setSigla("SIGLA");
             unidade.setTituloTitular("TITULAR");
@@ -391,6 +406,9 @@ class SubprocessoFacadeTest2 {
             Usuario usuario = new Usuario();
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(codigo);
+            sgc.processo.model.Processo proc = new sgc.processo.model.Processo();
+            proc.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+            sp.setProcesso(proc);
             Unidade unidade = new Unidade();
             unidade.setSigla("SIGLA");
             sp.setUnidade(unidade);
@@ -401,11 +419,13 @@ class SubprocessoFacadeTest2 {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
             when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
             when(repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
+            when(usuarioService.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
 
             sgc.organizacao.dto.UnidadeDto unidadeDto = sgc.organizacao.dto.UnidadeDto.builder().sigla("SIGLA").build();
             SubprocessoDetalheDto.UnidadeDto subUnidadeDto = SubprocessoDetalheDto.UnidadeDto.builder().sigla("SIGLA").build();
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().unidade(subUnidadeDto).build());
             when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(unidadeDto);
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(100L)).thenReturn(java.util.Collections.emptyList());
 
             ContextoEdicaoDto result = subprocessoFacade.obterContextoEdicao(codigo, sgc.organizacao.model.Perfil.ADMIN);
             assertThat(result).isNotNull();
@@ -447,6 +467,8 @@ class SubprocessoFacadeTest2 {
 
             SubprocessoPermissoesDto result = subprocessoFacade.obterPermissoes(codigo);
             assertThat(result).isNotNull();
+            // Verifica que com MAPEAMENTO as ações são as padrões (não REVISAO)
+            verify(accessControlService).podeExecutar(usuario, sgc.seguranca.acesso.Acao.DISPONIBILIZAR_CADASTRO, sp);
         }
     }
 
@@ -528,7 +550,7 @@ class SubprocessoFacadeTest2 {
 
     @Nested
     @DisplayName("Cenários Complexos")
-    class ComplexTests {
+    class SubprocessoFacadeRefactoredTest {
         @Test
         @DisplayName("Deve salvar ajustes do mapa")
         void deveSalvarAjustesMapa() {
@@ -549,7 +571,7 @@ class SubprocessoFacadeTest2 {
             comp.setCodigo(10L);
             when(competenciaService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(comp));
 
-            subprocessoFacade.salvarAjustesMapa(codigo, List.of(compDto), "user");
+            subprocessoFacade.salvarAjustesMapa(codigo, List.of(compDto));
 
             verify(competenciaService).salvarTodas(anyList());
             verify(subprocessoRepo).save(sp);
@@ -566,7 +588,7 @@ class SubprocessoFacadeTest2 {
 
             when(subprocessoRepo.findById(codigo)).thenReturn(java.util.Optional.of(sp));
             // empty list of adjustments
-            subprocessoFacade.salvarAjustesMapa(codigo, List.of(), "user");
+            subprocessoFacade.salvarAjustesMapa(codigo, List.of());
 
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         }
@@ -582,7 +604,7 @@ class SubprocessoFacadeTest2 {
             when(subprocessoRepo.findById(codigo)).thenReturn(java.util.Optional.of(sp));
 
             org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () ->
-                subprocessoFacade.salvarAjustesMapa(codigo, List.of(), "user")
+                subprocessoFacade.salvarAjustesMapa(codigo, List.of())
             );
         }
 
@@ -660,14 +682,12 @@ class SubprocessoFacadeTest2 {
             subprocessoFacade.importarAtividades(dest, orig);
             assertThat(spDest.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
-            // Case Default/Null (using unknown type if possible or just verifying default behavior)
-            // Assuming TipoProcesso is enum, so can't pass invalid string.
-            // If TipoProcesso is null?
+            // Case Default (using DIAGNOSTICO to trigger default branch)
             spDest.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-            proc.setTipo(null);
+            proc.setTipo(sgc.processo.model.TipoProcesso.DIAGNOSTICO);
 
             subprocessoFacade.importarAtividades(dest, orig);
-            // Should remain NAO_INICIADO
+            // Default case logs debug and doesn't change status, so it remains NAO_INICIADO
             assertThat(spDest.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
         }
 
