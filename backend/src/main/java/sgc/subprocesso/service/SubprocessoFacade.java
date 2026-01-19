@@ -362,8 +362,6 @@ public class SubprocessoFacade {
         workflowService.homologarValidacaoEmBloco(codUnidades, codProcesso, usuario);
     }
 
-    // ===== Operações Administrativas =====
-
     @Transactional
     public void reabrirCadastro(Long codigo, String justificativa) {
         workflowService.reabrirCadastro(codigo, justificativa);

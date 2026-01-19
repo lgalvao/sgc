@@ -394,9 +394,12 @@ class SubprocessoFacadeComplementaryTest {
             when(repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().build());
 
-            subprocessoFacade.obterDetalhes(codigo, sgc.organizacao.model.Perfil.ADMIN);
+            SubprocessoDetalheDto result = subprocessoFacade.obterDetalhes(codigo, sgc.organizacao.model.Perfil.ADMIN);
 
-            // Should pass without error
+            // Verifica que executou sem erro mesmo com exceção ao buscar titular
+            assertThat(result).isNotNull();
+            // Confirma que tentou buscar o titular (mesmo que tenha falhado)
+            verify(usuarioService).buscarPorLogin("TITULAR");
         }
 
         @Test
