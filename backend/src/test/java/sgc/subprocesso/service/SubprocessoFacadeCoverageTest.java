@@ -432,4 +432,92 @@ class SubprocessoFacadeCoverageTest {
 
         verify(mapaFacade).obterMapaCompleto(100L, codigo);
     }
+
+    @Test
+    @DisplayName("salvarAjustesMapa - Erro Subprocesso Não Encontrado")
+    void salvarAjustesMapa_NaoEncontrado() {
+        Long codSubprocesso = 1L;
+        when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.empty());
+
+        List<CompetenciaAjusteDto> lista = Collections.emptyList();
+
+        assertThrows(ErroEntidadeNaoEncontrada.class, () ->
+            subprocessoFacade.salvarAjustesMapa(codSubprocesso, lista, "user")
+        );
+    }
+
+    @Test
+    @DisplayName("obterCadastro - Sucesso com Conhecimentos")
+    void obterCadastro_ComConhecimentos() {
+        Long codigo = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codigo);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(100L);
+        sp.setMapa(mapa);
+        Unidade unidade = new Unidade();
+        unidade.setSigla("SIGLA");
+        sp.setUnidade(unidade);
+
+        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+
+        Atividade atividade = new Atividade();
+        atividade.setCodigo(10L);
+        sgc.mapa.model.Conhecimento c = new sgc.mapa.model.Conhecimento();
+        c.setCodigo(20L);
+        c.setDescricao("Desc");
+        atividade.setConhecimentos(List.of(c));
+
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(100L)).thenReturn(List.of(atividade));
+
+        var result = subprocessoFacade.obterCadastro(codigo);
+
+        assertNotNull(result);
+        assertEquals(1, result.getAtividades().size());
+        assertEquals(1, result.getAtividades().get(0).getConhecimentos().size());
+    }
+
+    @Test
+    @DisplayName("listarPorProcessoESituacao - Sucesso")
+    void listarPorProcessoESituacao_Sucesso() {
+        Long codProcesso = 1L;
+        SituacaoSubprocesso situacao = SituacaoSubprocesso.NAO_INICIADO;
+
+        when(crudService.listarPorProcessoESituacao(codProcesso, situacao)).thenReturn(Collections.emptyList());
+
+        var result = subprocessoFacade.listarPorProcessoESituacao(codProcesso, situacao);
+
+        assertNotNull(result);
+        verify(crudService).listarPorProcessoESituacao(codProcesso, situacao);
+    }
+
+    @Test
+    @DisplayName("listarPorProcessoUnidadeESituacoes - Sucesso")
+    void listarPorProcessoUnidadeESituacoes_Sucesso() {
+        Long codProcesso = 1L;
+        Long codUnidade = 2L;
+        List<SituacaoSubprocesso> situacoes = List.of(SituacaoSubprocesso.NAO_INICIADO);
+
+        when(crudService.listarPorProcessoUnidadeESituacoes(codProcesso, codUnidade, situacoes)).thenReturn(Collections.emptyList());
+
+        var result = subprocessoFacade.listarPorProcessoUnidadeESituacoes(codProcesso, codUnidade, situacoes);
+
+        assertNotNull(result);
+        verify(crudService).listarPorProcessoUnidadeESituacoes(codProcesso, codUnidade, situacoes);
+    }
+
+    @Test
+    @DisplayName("calcularPermissoes - Sucesso")
+    void calcularPermissoes_Sucesso() {
+        Subprocesso sp = new Subprocesso();
+        Usuario u = new Usuario();
+
+        when(accessControlService.podeExecutar(any(), any(), any())).thenReturn(true);
+
+        var result = subprocessoFacade.calcularPermissoes(sp, u);
+
+        assertNotNull(result);
+        // Verify at least one call happened, e.g. EDITAR_SUBPROCESSO
+        verify(accessControlService, atLeastOnce()).podeExecutar(eq(u), any(), eq(sp));
+    }
 }

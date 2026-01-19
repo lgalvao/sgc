@@ -129,4 +129,35 @@ class SubprocessoCrudServiceCoverageTest {
         // Verify event published?
         // verify(eventPublisher).publishEvent(any()); // if mocked
     }
+
+    @Test
+    @DisplayName("listarPorProcessoESituacao - Sucesso")
+    void listarPorProcessoESituacao_Sucesso() {
+        Long codProcesso = 1L;
+        SituacaoSubprocesso situacao = SituacaoSubprocesso.NAO_INICIADO;
+
+        when(repositorio.findByProcessoCodigoAndSituacaoWithUnidade(codProcesso, situacao)).thenReturn(List.of(new Subprocesso()));
+
+        List<Subprocesso> result = crudService.listarPorProcessoESituacao(codProcesso, situacao);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(repositorio).findByProcessoCodigoAndSituacaoWithUnidade(codProcesso, situacao);
+    }
+
+    @Test
+    @DisplayName("listarPorProcessoUnidadeESituacoes - Sucesso")
+    void listarPorProcessoUnidadeESituacoes_Sucesso() {
+        Long codProcesso = 1L;
+        Long codUnidade = 2L;
+        List<SituacaoSubprocesso> situacoes = List.of(SituacaoSubprocesso.NAO_INICIADO);
+
+        when(repositorio.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso, codUnidade, situacoes)).thenReturn(List.of(new Subprocesso()));
+
+        List<Subprocesso> result = crudService.listarPorProcessoUnidadeESituacoes(codProcesso, codUnidade, situacoes);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(repositorio).findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso, codUnidade, situacoes);
+    }
 }
