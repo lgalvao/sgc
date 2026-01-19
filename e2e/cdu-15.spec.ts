@@ -129,7 +129,9 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();
 
         // Verificar botões principais
-        await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
+        await expect(
+            page.getByTestId('btn-abrir-criar-competencia').or(page.getByTestId('btn-abrir-criar-competencia-empty'))
+        ).toBeVisible();
 
         // Botão disponibilizar deve estar desabilitado se não houver competências
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();

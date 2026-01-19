@@ -49,4 +49,6 @@ backend/bin/
 test-results/
 playwright-report/
 .playwright/
+screenshots/
+e2e/server.log
 

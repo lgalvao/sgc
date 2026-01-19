@@ -2,6 +2,7 @@ import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
+import {abrirModalCriarCompetencia} from './helpers/helpers-mapas';
 import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import type {Page} from '@playwright/test';
@@ -202,14 +203,14 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         // Já está na tela de Detalhes do subprocesso
         await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first().click();
 
-        await page.getByTestId('btn-abrir-criar-competencia').click();
+        await abrirModalCriarCompetencia(page);
         await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência 1 ${timestamp}`);
         await page.getByText(atividadeA).click();
         await page.getByTestId('btn-criar-competencia-salvar').click();
         await expect(page.getByTestId('mdl-criar-competencia')).toBeHidden();
 
         // Adicionar competência para a segunda atividade (obrigatório)
-        await page.getByTestId('btn-abrir-criar-competencia').click();
+        await abrirModalCriarCompetencia(page);
         await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência 2 ${timestamp}`);
         await page.getByText(atividadeB).click();
         await page.getByTestId('btn-criar-competencia-salvar').click();
