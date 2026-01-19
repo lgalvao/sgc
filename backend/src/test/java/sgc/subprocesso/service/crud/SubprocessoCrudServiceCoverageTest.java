@@ -71,6 +71,9 @@ class SubprocessoCrudServiceCoverageTest {
         when(repo.buscar(Subprocesso.class, codigo)).thenReturn(sp);
         when(mapper.toDTO(any())).thenReturn(new SubprocessoDto());
 
+        SubprocessoDto result = crudService.atualizar(codigo, AtualizarSubprocessoRequest.builder().build());
+
+        assertNotNull(result);
         verify(repositorio).save(sp);
     }
 
@@ -81,6 +84,10 @@ class SubprocessoCrudServiceCoverageTest {
         List<Long> unidades = List.of(10L, 20L);
 
         when(repositorio.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, unidades)).thenReturn(true);
+
+        boolean result = crudService.verificarAcessoUnidadeAoProcesso(codProcesso, unidades);
+
+        assertTrue(result);
     }
 
     @Test

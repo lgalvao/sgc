@@ -110,6 +110,26 @@ public class UsuarioFacade {
         usuario.setAtribuicoes(new HashSet<>(atribuicoes));
     }
 
+    private void carregarAtribuicoesEmLote(List<Usuario> usuarios) {
+        if (usuarios == null || usuarios.isEmpty()) {
+            return;
+        }
+
+        List<String> titulos = usuarios.stream()
+                .map(Usuario::getTituloEleitoral)
+                .toList();
+
+        List<UsuarioPerfil> todasAtribuicoes = usuarioPerfilRepo.findByUsuarioTituloIn(titulos);
+
+        Map<String, List<UsuarioPerfil>> porUsuario = todasAtribuicoes.stream()
+                .collect(groupingBy(UsuarioPerfil::getUsuarioTitulo));
+
+        usuarios.forEach(u -> {
+            List<UsuarioPerfil> atribuicoes = porUsuario.getOrDefault(u.getTituloEleitoral(), Collections.emptyList());
+            u.setAtribuicoes(new HashSet<>(atribuicoes));
+        });
+    }
+
     public Optional<UsuarioDto> buscarUsuarioPorEmail(String email) {
         return usuarioRepo.findByEmail(email).map(this::toUsuarioDto);
     }

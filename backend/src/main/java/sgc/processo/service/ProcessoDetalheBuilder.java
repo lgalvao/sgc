@@ -1,6 +1,8 @@
 package sgc.processo.service;
 
 import lombok.RequiredArgsConstructor;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -138,8 +140,11 @@ public class ProcessoDetalheBuilder {
         dto.setCodUnidade(unidade.getCodigo());
         dto.setNome(unidade.getNome());
         dto.setSigla(unidade.getSigla());
-        dto.setCodUnidadeSuperior(
-                unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null);
+
+        @Nullable
+        Unidade unidadeSuperior = unidade.getUnidadeSuperior();
+        dto.setCodUnidadeSuperior(unidadeSuperior  != null ? unidadeSuperior.getCodigo() : null);
+
         return dto;
     }
 }

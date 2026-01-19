@@ -1,6 +1,8 @@
 package sgc.processo.service;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -51,16 +53,14 @@ class ProcessoAcessoService {
      * @return true se o usuário tem acesso, false caso contrário
      */
     @Transactional(readOnly = true)
-    public boolean checarAcesso(Authentication authentication, Long codProcesso) {
+    public boolean checarAcesso(@Nullable Authentication authentication, Long codProcesso) {
         if (authentication == null || !authentication.isAuthenticated() || authentication.getName() == null) {
             return false;
         }
 
         String username = authentication.getName();
         boolean isGestorOuChefe = authentication.getAuthorities().stream()
-                .anyMatch(
-                        a -> "ROLE_GESTOR".equals(a.getAuthority())
-                                || "ROLE_CHEFE".equals(a.getAuthority()));
+                .anyMatch(a -> "ROLE_GESTOR".equals(a.getAuthority()) || "ROLE_CHEFE".equals(a.getAuthority()));
 
         if (!isGestorOuChefe) {
             return false;
@@ -78,8 +78,7 @@ class ProcessoAcessoService {
 
         List<Long> codigosUnidadesHierarquia = buscarCodigosDescendentes(codUnidadeUsuario);
 
-        return subprocessoFacade.verificarAcessoUnidadeAoProcesso(
-                codProcesso, codigosUnidadesHierarquia);
+        return subprocessoFacade.verificarAcessoUnidadeAoProcesso(codProcesso, codigosUnidadesHierarquia);
     }
 
     /**
@@ -94,8 +93,10 @@ class ProcessoAcessoService {
 
         Map<Long, List<Unidade>> mapaPorPai = new HashMap<>();
         for (Unidade u : todasUnidades) {
-            if (u.getUnidadeSuperior() != null) {
-                mapaPorPai.computeIfAbsent(u.getUnidadeSuperior().getCodigo(), k -> new ArrayList<>()).add(u);
+            @Nullable
+            Unidade unidadeSuperior = u.getUnidadeSuperior();
+            if (unidadeSuperior != null) {
+                mapaPorPai.computeIfAbsent(unidadeSuperior.getCodigo(), k -> new ArrayList<>()).add(u);
             }
         }
 
@@ -113,9 +114,10 @@ class ProcessoAcessoService {
             List<Unidade> filhos = mapaPorPai.get(atual);
             if (filhos != null) {
                 for (Unidade filho : filhos) {
-                    if (!visitados.contains(filho.getCodigo())) {
-                        visitados.add(filho.getCodigo());
-                        fila.add(filho.getCodigo());
+                    Long codigo = filho.getCodigo();
+                    if (!visitados.contains(codigo)) {
+                        visitados.add(codigo);
+                        fila.add(codigo);
                     }
                 }
             }

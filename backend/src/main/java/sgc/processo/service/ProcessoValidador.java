@@ -1,6 +1,7 @@
 package sgc.processo.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,12 +52,12 @@ class ProcessoValidador {
      * @param codigosUnidades lista de códigos de unidades a validar
      * @return Optional com mensagem de erro se alguma unidade não possuir mapa vigente
      */
-    public Optional<String> getMensagemErroUnidadesSemMapa(List<Long> codigosUnidades) {
+    public Optional<String> getMensagemErroUnidadesSemMapa(@Nullable List<Long> codigosUnidades) {
         if (codigosUnidades == null || codigosUnidades.isEmpty()) {
             return Optional.empty();
         }
-        List<Unidade> unidades = unidadeService.buscarEntidadesPorIds(codigosUnidades);
 
+        List<Unidade> unidades = unidadeService.buscarEntidadesPorIds(codigosUnidades);
         List<Long> unidadesSemMapa = unidades.stream()
                 .map(Unidade::getCodigo)
                 .filter(codigo -> !unidadeService.verificarExistenciaMapaVigente(codigo))

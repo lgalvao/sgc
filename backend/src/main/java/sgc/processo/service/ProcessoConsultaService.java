@@ -34,7 +34,6 @@ import java.util.Set;
 @Service
 @Slf4j
 public class ProcessoConsultaService {
-
     private final ProcessoRepo processoRepo;
     private final SubprocessoFacade subprocessoFacade;
     private final UsuarioFacade usuarioService;

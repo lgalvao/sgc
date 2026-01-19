@@ -20,15 +20,11 @@ import java.util.function.BiFunction;
 
 /**
  * Controller REST para Processos. Implementa endpoints CRUD e ações de iniciar/finalizar processo
- * conforme CDU-03.
  */
 @RestController
 @RequestMapping("/api/processos")
 @RequiredArgsConstructor
-@Tag(
-        name = "Processos",
-        description =
-                "Endpoints para gerenciamento de processos de mapeamento, revisão e diagnóstico")
+@Tag(name = "Processos", description = "Endpoints para gerenciamento de processos de mapeamento, revisão e diagnóstico")
 public class ProcessoController {
     private final ProcessoFacade processoFacade;
 
@@ -159,15 +155,12 @@ public class ProcessoController {
     /**
      * Inicia um processo, disparando a criação dos subprocessos e notificações.
      *
-     * <p>Corresponde ao CDU-03. O comportamento varia com base no tipo de processo: 'MAPEAMENTO' ou
-     * 'REVISAO'.
-     *
      * @param codigo O código do processo a ser iniciado.
      * @return Um {@link ResponseEntity} com status 200 OK.
      */
     @PostMapping("/{codigo}/iniciar")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Inicia um processo (CDU-03)")
+    @Operation(summary = "Inicia um processo")
     public ResponseEntity<Object> iniciar(
             @PathVariable Long codigo, @Valid @RequestBody IniciarProcessoRequest req) {
 
@@ -175,8 +168,8 @@ public class ProcessoController {
         if (processador == null) {
             return ResponseEntity.badRequest().build();
         }
-        List<String> erros = processador.apply(codigo, req.unidades());
 
+        List<String> erros = processador.apply(codigo, req.unidades());
         if (!erros.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("erros", erros));
         }
@@ -191,8 +184,6 @@ public class ProcessoController {
     /**
      * Finaliza um processo, tornando os mapas de seus subprocessos homologados como os novos mapas
      * vigentes para as respectivas unidades.
-     *
-     * <p>Corresponde ao CDU-21.
      *
      * @param codigo O código do processo a ser finalizado.
      * @return Um {@link ResponseEntity} com status 200 OK.
@@ -251,7 +242,6 @@ public class ProcessoController {
 
     /**
      * Envia um lembrete de prazo para uma unidade.
-     * (CDU-34)
      */
     @PostMapping("/{codigo}/enviar-lembrete")
     @PreAuthorize("hasRole('ADMIN')")
