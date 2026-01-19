@@ -6,11 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.organizacao.service.HierarquiaService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.service.HierarquiaService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -78,9 +78,6 @@ class SubprocessoAccessPolicyTest {
         // No, let's read code:
         // isSubordinada(unidadeSubprocesso, a.getUnidade())
         // means Subprocesso (Unit 2) is subordinate to User's Unit (Unit 1).
-
-        Unidade unitSub = sp.getUnidade();
-        Unidade unitUser = u.getTodasAtribuicoes().iterator().next().getUnidade();
 
         when(hierarquiaService.isSubordinada(any(), any())).thenAnswer(inv -> {
              Unidade sub = inv.getArgument(0);
@@ -215,7 +212,6 @@ class SubprocessoAccessPolicyTest {
     @Test
     @DisplayName("verificaHierarquia - Validacao Completa")
     void verificaHierarquia_ValidacaoCompleta() {
-        Usuario u = criarUsuario(Perfil.SERVIDOR, 1L);
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 1L);
 
         // Ensure unit properties needed for tests

@@ -9,7 +9,6 @@ import sgc.analise.AnaliseFacade;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.dto.AtualizarAtividadeRequest;
 import sgc.mapa.dto.ConhecimentoResponse;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -85,7 +84,7 @@ public class SubprocessoFacade {
     private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     private final sgc.subprocesso.model.SubprocessoMovimentacaoRepo movimentacaoRepo;
     private final sgc.mapa.service.CopiaMapaService copiaMapaService;
-    private final sgc.mapa.mapper.AtividadeMapper atividadeMapper;
+    
 
     // ===== Operações CRUD =====
 

@@ -15,6 +15,7 @@ import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 /**
  * Serviço consolidado para gerenciar transições e workflows de subprocessos.

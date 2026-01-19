@@ -1,10 +1,6 @@
 package sgc.subprocesso.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 
 import java.time.LocalDateTime;

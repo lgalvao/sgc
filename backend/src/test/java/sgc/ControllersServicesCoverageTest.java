@@ -30,12 +30,11 @@ import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.subprocesso.SubprocessoMapaController;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
-import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 
 import java.util.ArrayList;
 import java.util.List;

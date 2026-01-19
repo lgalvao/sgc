@@ -12,7 +12,10 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.RepositorioComum;
-import sgc.organizacao.dto.*;
+import sgc.organizacao.dto.AdministradorDto;
+import sgc.organizacao.dto.PerfilDto;
+import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
 
 import java.util.*;

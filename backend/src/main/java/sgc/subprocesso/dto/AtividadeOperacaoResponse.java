@@ -1,10 +1,9 @@
 package sgc.subprocesso.dto;
 
-import org.jspecify.annotations.Nullable;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 
 /**
  * DTO de resposta para operações CRUD em atividades.

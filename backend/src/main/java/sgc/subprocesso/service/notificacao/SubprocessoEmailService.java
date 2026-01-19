@@ -10,6 +10,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
