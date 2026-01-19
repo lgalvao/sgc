@@ -2,6 +2,18 @@ import {config} from "@vue/test-utils";
 import {createBootstrap} from "bootstrap-vue-next";
 import {vi} from "vitest";
 
+vi.mock("@/utils/logger", () => ({
+    default: {
+        error: vi.fn(),
+        warn: vi.fn(),
+        info: vi.fn(),
+        debug: vi.fn(),
+        success: vi.fn(),
+        trace: vi.fn(),
+        log: vi.fn(),
+    }
+}));
+
 vi.mock("bootstrap", () => ({
     Tooltip: class Tooltip {
         constructor() {
