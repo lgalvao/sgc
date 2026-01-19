@@ -119,4 +119,38 @@ class GerenciadorJwtTest {
         Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken(token);
         assertThat(result).isEmpty(); // Deve falhar no null check dos claims
     }
+
+    @Test
+    @DisplayName("Deve retornar empty para token sem perfil")
+    void validateMissingPerfil() {
+        when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
+
+        String token = io.jsonwebtoken.Jwts.builder()
+                .subject("123")
+                .claim("unidade", 1L)
+                // Missing perfil
+                .signWith(io.jsonwebtoken.security.Keys
+                        .hmacShaKeyFor(SECURE_SECRET.getBytes(java.nio.charset.StandardCharsets.UTF_8)))
+                .compact();
+
+        Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken(token);
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve retornar empty para token sem unidade")
+    void validateMissingUnidade() {
+        when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
+
+        String token = io.jsonwebtoken.Jwts.builder()
+                .subject("123")
+                .claim("perfil", Perfil.ADMIN.name())
+                // Missing unidade
+                .signWith(io.jsonwebtoken.security.Keys
+                        .hmacShaKeyFor(SECURE_SECRET.getBytes(java.nio.charset.StandardCharsets.UTF_8)))
+                .compact();
+
+        Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken(token);
+        assertThat(result).isEmpty();
+    }
 }

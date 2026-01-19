@@ -183,4 +183,106 @@ class EventoProcessoListenerCoverageTest {
 
         verify(notificacaoEmailService).enviarEmailHtml(eq("t1@mail.com"), anyString(), eq("HTML"));
     }
+
+    @Test
+    void deveTratarErroEmAoIniciarProcesso() {
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
+        doThrow(new RuntimeException("Erro processando inicio")).when(processoFacade).buscarEntidadePorId(1L);
+
+        listener.aoIniciarProcesso(evento);
+        // Não deve lançar exceção
+    }
+
+    @Test
+    void deveTratarErroEmAoFinalizarProcesso() {
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(1L).build();
+        doThrow(new RuntimeException("Erro processando fim")).when(processoFacade).buscarEntidadePorId(1L);
+
+        listener.aoFinalizarProcesso(evento);
+        // Não deve lançar exceção
+    }
+
+    @Test
+    void deveTratarErroAoEnviarEmailProcessoIniciado() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
+
+        Unidade u1 = new Unidade(); u1.setCodigo(10L);
+        Subprocesso s1 = new Subprocesso(); s1.setCodigo(100L); s1.setUnidade(u1);
+
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1));
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of());
+
+        // Responsavel null vai causar NPE ao tentar acessar no metodo enviarEmailProcessoIniciado ou antes
+        // Na verdade, enviarEmailProcessoIniciado pega responsavel do map. Se null, tenta acessar getter -> NPE
+        // Isso é capturado pelo catch dentro do loop
+
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
+        listener.aoIniciarProcesso(evento);
+    }
+
+    @Test
+    void deveTratarErroAoEnviarEmailSubstituto() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setDescricao("P1");
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
+
+        Unidade u1 = new Unidade(); u1.setCodigo(10L); u1.setTipo(TipoUnidade.OPERACIONAL); u1.setNome("U1");
+        Subprocesso s1 = new Subprocesso(); s1.setCodigo(100L); s1.setUnidade(u1);
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1));
+
+        ResponsavelDto r1 = ResponsavelDto.builder()
+                .unidadeCodigo(10L)
+                .titularTitulo("T1")
+                .substitutoTitulo("S1")
+                .build();
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r1));
+
+        UsuarioDto t1 = UsuarioDto.builder().tituloEleitoral("T1").email("t1@mail.com").build();
+        UsuarioDto s1Dto = UsuarioDto.builder().tituloEleitoral("S1").email("s1@mail.com").build();
+
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", t1, "S1", s1Dto));
+        when(notificacaoModelosService.criarEmailProcessoIniciado(any(),any(),any(),any())).thenReturn("HTML");
+
+        // Usando doAnswer para garantir que apenas o segundo email lance exceção
+        doAnswer(invocation -> {
+            String email = invocation.getArgument(0);
+            if ("s1@mail.com".equals(email)) {
+                throw new RuntimeException("Erro email substituto");
+            }
+            return null;
+        }).when(notificacaoEmailService).enviarEmailHtml(any(), any(), any());
+
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
+        listener.aoIniciarProcesso(evento);
+
+        verify(notificacaoEmailService).enviarEmailHtml(eq("t1@mail.com"), any(), any());
+        verify(notificacaoEmailService).enviarEmailHtml(eq("s1@mail.com"), any(), any());
+    }
+
+    @Test
+    void deveTratarErroAoEnviarNotificacaoFinalizacao() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
+
+        Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setTipo(TipoUnidade.OPERACIONAL); u1.setSigla("U1");
+        processo.setParticipantes(Set.of(u1));
+
+        ResponsavelDto r1 = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1));
+
+        UsuarioDto t1 = UsuarioDto.builder().tituloEleitoral("T1").email("t1@mail.com").build();
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", t1));
+
+        // Forçar erro
+        doThrow(new RuntimeException("Erro envio final"))
+                .when(notificacaoModelosService).criarEmailProcessoFinalizadoPorUnidade(any(), any());
+
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(1L).build();
+        listener.aoFinalizarProcesso(evento);
+    }
 }

@@ -116,6 +116,21 @@ class ValidadorDadosOrgServiceTest {
             // Act & Assert
             assertThatCode(() -> validador.run(new DefaultApplicationArguments())).doesNotThrowAnyException();
         }
+
+        @Test
+        @DisplayName("Deve lidar com lista de unidades sem titulares (não quebra e não gera erro na busca de usuarios, mas detecta violação)")
+        void deveLidarComListaDeTitulosVazia() {
+            // Arrange
+            Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
+            u.setTituloTitular(null); // Sem titular
+
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
+
+            // Act & Assert
+            assertThatThrownBy(() -> validador.run(new DefaultApplicationArguments()))
+                    .isInstanceOf(ErroConfiguracao.class)
+                    .hasMessageContaining("1 violação");
+        }
     }
 
     @Nested
