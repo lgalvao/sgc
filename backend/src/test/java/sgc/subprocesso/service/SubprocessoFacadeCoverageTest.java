@@ -20,6 +20,8 @@ import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.dto.AtividadeAjusteDto;
+import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
@@ -147,5 +149,156 @@ class SubprocessoFacadeCoverageTest {
         org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> {
             facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList(), "123");
         });
+    }
+
+    @Test
+    @DisplayName("calcularPermissoes - Tipo Processo Revisao")
+    void calcularPermissoes_TipoProcessoRevisao() {
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(new Processo());
+        sp.getProcesso().setTipo(TipoProcesso.REVISAO);
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setUnidade(new sgc.organizacao.model.Unidade());
+
+        // Mock access control
+        when(accessControlService.podeExecutar(any(), any(), any())).thenReturn(true);
+
+        facade.calcularPermissoes(sp, new sgc.organizacao.model.Usuario());
+
+        verify(accessControlService, org.mockito.Mockito.atLeastOnce()).podeExecutar(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("salvarAjustesMapa - Competencia/Atividade nao encontrada ignorada")
+    void salvarAjustesMapa_IgnoraItensNaoEncontrados() {
+        Long codSubprocesso = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codSubprocesso);
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+
+        when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+
+        // Competencia request contains ID 100, but service returns empty map
+        CompetenciaAjusteDto compRequest = CompetenciaAjusteDto.builder()
+                .codCompetencia(100L)
+                .nome("Nova Nome")
+                .atividades(java.util.List.of(
+                        AtividadeAjusteDto.builder().codAtividade(200L).nome("Nova Ativ").build()
+                ))
+                .build();
+
+        // Mock returns empty for bulk fetch implies IDs not found
+        when(atividadeService.atualizarDescricoesEmLote(any())).thenReturn(java.util.Collections.emptyList());
+        when(competenciaService.buscarPorCodigos(any())).thenReturn(java.util.Collections.emptyList());
+
+        facade.salvarAjustesMapa(codSubprocesso, java.util.List.of(compRequest), "User");
+
+        verify(competenciaService).salvarTodas(any());
+    }
+
+    @Test
+    @DisplayName("importarAtividades - Mapeamento Nao Iniciado -> Cad Em Andamento")
+    void importarAtividades_Mapeamento() {
+        Long codDestino = 1L;
+        Long codOrigem = 2L;
+
+        Subprocesso spDestino = new Subprocesso();
+        spDestino.setCodigo(codDestino);
+        spDestino.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        spDestino.setMapa(new Mapa());
+        spDestino.getMapa().setCodigo(10L);
+        spDestino.setUnidade(new sgc.organizacao.model.Unidade());
+        spDestino.getUnidade().setSigla("DEST");
+
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        spDestino.setProcesso(processo);
+
+        Subprocesso spOrigem = new Subprocesso();
+        spOrigem.setCodigo(codOrigem);
+        spOrigem.setMapa(new Mapa());
+        spOrigem.getMapa().setCodigo(20L);
+        spOrigem.setUnidade(new sgc.organizacao.model.Unidade());
+        spOrigem.getUnidade().setSigla("ORIG");
+
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+
+        facade.importarAtividades(codDestino, codOrigem);
+
+        org.junit.jupiter.api.Assertions.assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, spDestino.getSituacao());
+        verify(subprocessoRepo).save(spDestino);
+    }
+
+    @Test
+    @DisplayName("importarAtividades - Revisao Nao Iniciado -> Revisao Cad Em Andamento")
+    void importarAtividades_Revisao() {
+        Long codDestino = 1L;
+        Long codOrigem = 2L;
+
+        Subprocesso spDestino = new Subprocesso();
+        spDestino.setCodigo(codDestino);
+        spDestino.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        spDestino.setMapa(new Mapa());
+        spDestino.getMapa().setCodigo(10L);
+        spDestino.setUnidade(new sgc.organizacao.model.Unidade());
+        spDestino.getUnidade().setSigla("DEST");
+
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.REVISAO);
+        spDestino.setProcesso(processo);
+
+        Subprocesso spOrigem = new Subprocesso();
+        spOrigem.setCodigo(codOrigem);
+        spOrigem.setMapa(new Mapa());
+        spOrigem.getMapa().setCodigo(20L);
+        spOrigem.setUnidade(new sgc.organizacao.model.Unidade());
+        spOrigem.getUnidade().setSigla("ORIG");
+
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+
+        facade.importarAtividades(codDestino, codOrigem);
+
+        org.junit.jupiter.api.Assertions.assertEquals(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, spDestino.getSituacao());
+        verify(subprocessoRepo).save(spDestino);
+    }
+
+    @Test
+    @DisplayName("importarAtividades - Status Ja Em Andamento (Mapeamento)")
+    void importarAtividades_StatusJaEmAndamento() {
+        Long codDestino = 1L;
+        Long codOrigem = 2L;
+
+        Subprocesso spDestino = new Subprocesso();
+        spDestino.setCodigo(codDestino);
+        spDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        spDestino.setMapa(new Mapa());
+        spDestino.getMapa().setCodigo(10L);
+        spDestino.setUnidade(new sgc.organizacao.model.Unidade());
+        spDestino.getUnidade().setSigla("DEST");
+
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        spDestino.setProcesso(processo);
+
+        Subprocesso spOrigem = new Subprocesso();
+        spOrigem.setCodigo(codOrigem);
+        spOrigem.setMapa(new Mapa());
+        spOrigem.getMapa().setCodigo(20L);
+        spOrigem.setUnidade(new sgc.organizacao.model.Unidade());
+        spOrigem.getUnidade().setSigla("ORIG");
+
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+
+        facade.importarAtividades(codDestino, codOrigem);
+
+        // Status must NOT change
+        org.junit.jupiter.api.Assertions.assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, spDestino.getSituacao());
+        // Verify save was NOT called
+        verify(subprocessoRepo, org.mockito.Mockito.never()).save(spDestino);
+        // But movimentacao IS saved.
+        verify(movimentacaoRepo).save(any(Movimentacao.class));
     }
 }
