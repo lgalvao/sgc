@@ -99,6 +99,7 @@
     >
       <BCol>
         <BFormInput
+            ref="inputNovaAtividadeRef"
             v-model="novaAtividade"
             aria-label="Nova atividade"
             data-testid="inp-nova-atividade"
@@ -289,6 +290,7 @@ const historicoAnalises = computed(() => {
 });
 
 const novaAtividade = ref("");
+const inputNovaAtividadeRef = ref<InstanceType<typeof BFormInput> | null>(null);
 const loadingAdicionar = ref(false);
 const loadingValidacao = ref(false);
 
@@ -319,6 +321,9 @@ async function adicionarAtividade() {
           request,
       );
       novaAtividade.value = "";
+      // UX Improvement: Refocus input to allow rapid entry of multiple activities
+      await nextTick();
+      inputNovaAtividadeRef.value?.$el?.focus();
     } finally {
       loadingAdicionar.value = false;
     }
@@ -477,6 +482,12 @@ onMounted(async () => {
   if (id) {
     codSubprocesso.value = id;
     await subprocessosStore.buscarContextoEdicao(id);
+
+    // UX Improvement: Auto-focus input if list is empty to encourage starting
+    if (atividades.value.length === 0) {
+      await nextTick();
+      inputNovaAtividadeRef.value?.$el?.focus();
+    }
   } else {
     logger.error('[CadAtividades] ERRO: Subprocesso não encontrado!');
   }
