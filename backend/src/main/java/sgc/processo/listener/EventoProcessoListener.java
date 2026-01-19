@@ -116,7 +116,7 @@ public class EventoProcessoListener {
 
         List<String> todosTitulos = new ArrayList<>();
         responsaveis.values().forEach(r -> {
-            if (r.getTitularTitulo() != null) todosTitulos.add(r.getTitularTitulo());
+            todosTitulos.add(r.getTitularTitulo());
             if (r.getSubstitutoTitulo() != null) todosTitulos.add(r.getSubstitutoTitulo());
         });
 
@@ -166,10 +166,7 @@ public class EventoProcessoListener {
                                               List<Unidade> todasSubordinadas) {
         try {
             ResponsavelDto responsavel = responsaveis.get(unidade.getCodigo());
-            if (responsavel == null) return;
-
             UsuarioDto titular = usuarios.get(responsavel.getTitularTitulo());
-            if (titular == null || titular.getEmail() == null) return;
 
             String emailTitular = titular.getEmail();
             TipoUnidade tipoUnidade = unidade.getTipo();

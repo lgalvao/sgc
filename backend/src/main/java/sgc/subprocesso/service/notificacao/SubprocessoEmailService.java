@@ -64,10 +64,8 @@ public class SubprocessoEmailService {
         Map<String, Object> variaveis = new HashMap<>();
         
         Unidade unidade = sp.getUnidade();
-        if (unidade != null) {
-            variaveis.put("siglaUnidade", unidade.getSigla());
-            variaveis.put("nomeUnidade", unidade.getNome());
-        }
+        variaveis.put("siglaUnidade", unidade.getSigla());
+        variaveis.put("nomeUnidade", unidade.getNome());
         
         variaveis.put("nomeProcesso", sp.getProcesso().getDescricao());
         variaveis.put("tipoProcesso", sp.getProcesso().getTipo().name());
@@ -89,7 +87,7 @@ public class SubprocessoEmailService {
     }
 
     private String criarAssunto(TipoTransicao tipo, Subprocesso sp) {
-        String siglaUnidade = sp.getUnidade() != null ? sp.getUnidade().getSigla() : "N/A";
+        String siglaUnidade = sp.getUnidade().getSigla();
         
         return switch (tipo) {
             case CADASTRO_DISPONIBILIZADO, REVISAO_CADASTRO_DISPONIBILIZADA ->

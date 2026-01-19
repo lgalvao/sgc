@@ -20,7 +20,7 @@ public interface SubprocessoDetalheMapper {
     @Mapping(target = "situacaoLabel", expression = "java(sp.getSituacao().getDescricao())")
     @Mapping(target = "localizacaoAtual", expression = "java(mapLocalizacaoAtual(movimentacoes))")
     @Mapping(target = "processoDescricao", source = "sp.processo.descricao")
-    @Mapping(target = "tipoProcesso", expression = "java(sp.getProcesso() != null ? sp.getProcesso().getTipo().name() : null)")
+    @Mapping(target = "tipoProcesso", expression = "java(sp.getProcesso().getTipo().name())")
     @Mapping(target = "prazoEtapaAtual", expression = "java(mapPrazoEtapaAtual(sp))")
     @Mapping(target = "isEmAndamento", expression = "java(sp.isEmAndamento())")
     @Mapping(target = "etapaAtual", source = "sp.etapaAtual")
@@ -36,10 +36,9 @@ public interface SubprocessoDetalheMapper {
     default SubprocessoDetalheDto.ResponsavelDto mapResponsavel(Subprocesso sp, Usuario responsavel) {
         if (responsavel == null) return null;
 
-        String tituloTitular = (sp.getUnidade() != null) ? sp.getUnidade().getTituloTitular() : null;
+        String tituloTitular = sp.getUnidade().getTituloTitular();
         String tipo = "Substituição";
-
-        if (tituloTitular != null && tituloTitular.equals(responsavel.getTituloEleitoral())) {
+        if (tituloTitular.equals(responsavel.getTituloEleitoral())) {
             tipo = "Titular";
         }
 
@@ -52,26 +51,22 @@ public interface SubprocessoDetalheMapper {
     }
 
     default SubprocessoDetalheDto.ResponsavelDto mapTitular(Subprocesso sp, Usuario titular, Usuario responsavel) {
-        if (titular != null) {
-            return SubprocessoDetalheDto.ResponsavelDto.builder()
-                    .codigo(null)
-                    .nome(titular.getNome())
-                    .tipoResponsabilidade("Titular")
-                    .ramal(titular.getRamal())
-                    .email(titular.getEmail())
-                    .build();
-        }
-        return null;
+        return SubprocessoDetalheDto.ResponsavelDto.builder()
+                .nome(titular.getNome())
+                .tipoResponsabilidade("Titular")
+                .ramal(titular.getRamal())
+                .email(titular.getEmail())
+                .build();
     }
 
     default String mapLocalizacaoAtual(List<Movimentacao> movimentacoes) {
-        if (movimentacoes != null && !movimentacoes.isEmpty()) {
+        if (!movimentacoes.isEmpty()) {
             Movimentacao movimentacaoRecente = movimentacoes.getFirst();
             if (movimentacaoRecente.getUnidadeDestino() != null) {
                 return movimentacaoRecente.getUnidadeDestino().getSigla();
             }
         }
-        return null;
+        return "";
     }
 
     default LocalDateTime mapPrazoEtapaAtual(Subprocesso sp) {

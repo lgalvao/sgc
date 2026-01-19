@@ -117,17 +117,7 @@ class SubprocessoCrudServiceTest {
         assertThat(status.situacaoLabel()).isEqualTo("NAO_INICIADO");
     }
 
-    @Test
-    @DisplayName("Deve obter status com label nulo se situação for nula")
-    void deveObterStatusComLabelNulo() {
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(1L);
-        sp.setSituacao(null);
-        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
-        SubprocessoSituacaoDto status = service.obterStatus(1L);
-        assertThat(status.situacaoLabel()).isNull();
-    }
 
     @Test
     @DisplayName("Deve obter entidade por código do mapa")
@@ -283,22 +273,7 @@ class SubprocessoCrudServiceTest {
         verify(eventPublisher, org.mockito.Mockito.never()).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoAtualizado.class));
     }
 
-    @Test
-    @DisplayName("Deve criar subprocesso publicando evento com relacionamentos nulos")
-    void deveCriarComRelacionamentosNulos() {
-        CriarSubprocessoRequest request = CriarSubprocessoRequest.builder().codProcesso(1L).codUnidade(1L).build();
-        SubprocessoDto responseDto = SubprocessoDto.builder().build();
-        Subprocesso entity = new Subprocesso();
-        // entity.setProcesso(null); entity.setUnidade(null); por padrão
 
-        when(repositorioSubprocesso.save(any())).thenReturn(entity);
-        when(mapaFacade.salvar(any())).thenReturn(new Mapa());
-        when(subprocessoMapper.toDTO(any())).thenReturn(responseDto);
-
-        service.criar(request);
-
-        verify(eventPublisher).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoCriado.class));
-    }
 
     @Test
     @DisplayName("Deve criar subprocesso publicando evento com relacionamentos presentes")
@@ -324,18 +299,7 @@ class SubprocessoCrudServiceTest {
         verify(eventPublisher).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoCriado.class));
     }
 
-    @Test
-    @DisplayName("Deve excluir subprocesso publicando evento com relacionamentos nulos")
-    void deveExcluirComRelacionamentosNulos() {
-        Subprocesso sp = new Subprocesso();
-        // Relacionamentos nulos por padrão
-        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
-        service.excluir(1L);
-
-        verify(eventPublisher).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoExcluido.class));
-        verify(repositorioSubprocesso).deleteById(1L);
-    }
 
     @Test
     @DisplayName("Deve excluir subprocesso publicando evento com relacionamentos presentes")

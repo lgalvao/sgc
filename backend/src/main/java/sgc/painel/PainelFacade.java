@@ -14,12 +14,11 @@ import sgc.alerta.model.Alerta;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
-import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.service.ProcessoFacade;
-
+import org.jspecify.annotations.Nullable;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,24 +45,16 @@ public class PainelFacade {
      * @param codigoUnidade O código da unidade do usuário (necessário para perfis não-ADMIN).
      * @param pageable      As informações de paginação.
      * @return Uma página {@link Page} de {@link ProcessoResumoDto}.
-     * @throws IllegalArgumentException se o perfil for nulo or em branco.
      */
     public Page<ProcessoResumoDto> listarProcessos(
             Perfil perfil, Long codigoUnidade, Pageable pageable) {
-        if (perfil == null) {
-            throw new ErroParametroPainelInvalido("O parâmetro 'perfil' é obrigatório");
-        }
-
+        
         Pageable sortedPageable = garantirOrdenacaoPadrao(pageable);
         Page<Processo> processos;
 
         if (perfil == Perfil.ADMIN) {
             processos = processoFacade.listarTodos(sortedPageable);
         } else {
-            if (codigoUnidade == null) {
-                return Page.empty(sortedPageable);
-            }
-            
             List<Long> unidadeIds = new ArrayList<>();
             
             // GESTOR vê processos da unidade e subordinadas
@@ -93,9 +84,6 @@ public class PainelFacade {
     /**
      * Lista alertas com base no usuário ou na unidade.
      *
-     * <p>A busca prioriza o título do usuário. Se não for fornecido, busca pela unidade e suas
-     * subordinadas. Se nenhum dos dois for fornecido, retorna todos os alertas.
-     *
      * @param usuarioTitulo Título de eleitor do usuário.
      * @param codigoUnidade Código da unidade.
      * @param pageable      As informações de paginação.
@@ -111,37 +99,23 @@ public class PainelFacade {
                     Sort.by(Sort.Direction.DESC, "dataHora"));
         }
 
-        Page<Alerta> alertasPage;
-
-        if (codigoUnidade != null) {
-            // Alertas são filtrados pela unidade do usuário (sem subordinadas)
-            alertasPage = alertaService.listarPorUnidade(codigoUnidade, sortedPageable);
-        } else {
-            // Sem unidade, retorna vazio
-            return Page.empty(sortedPageable);
-        }
+        // Alertas são filtrados pela unidade do usuário (sem subordinadas)
+        Page<Alerta> alertasPage = alertaService.listarPorUnidade(codigoUnidade, sortedPageable);
 
         return alertasPage.map(
                 alerta -> {
-                    LocalDateTime dataHoraLeitura = null;
-                    if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
-                        dataHoraLeitura = alertaService
-                                        .obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo)
-                                        .orElse(null);
-                    }
+                    LocalDateTime dataHoraLeitura = alertaService
+                                    .obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo)
+                                    .orElse(null);
                     return paraAlertaDto(alerta, dataHoraLeitura);
                 });
     }
 
     private ProcessoResumoDto paraProcessoResumoDto(Processo processo, Perfil perfil, Long codigoUnidade) {
         Set<Unidade> participantes = processo.getParticipantes();
-
-        Unidade participante = participantes != null && !participantes.isEmpty()
-                ? participantes.iterator().next()
-                : null;
+        Unidade participante = participantes.iterator().next();
 
         String linkDestino = calcularLinkDestinoProcesso(processo, perfil, codigoUnidade);
-
         String unidadesParticipantes = formatarUnidadesParticipantes(processo.getParticipantes());
 
         return ProcessoResumoDto.builder()
@@ -151,22 +125,18 @@ public class PainelFacade {
                 .tipo(processo.getTipo().name())
                 .dataLimite(processo.getDataLimite())
                 .dataCriacao(processo.getDataCriacao())
-                .unidadeCodigo(participante != null ? participante.getCodigo() : null)
-                .unidadeNome(participante != null ? participante.getNome() : null)
+                .unidadeCodigo(participante.getCodigo())
+                .unidadeNome(participante.getNome())
                 .unidadesParticipantes(unidadesParticipantes)
                 .linkDestino(linkDestino)
                 .build();
     }
 
     private String formatarUnidadesParticipantes(Set<Unidade> participantes) {
-        if (participantes == null || participantes.isEmpty()) return "";
-
         Map<Long, Unidade> participantesPorCodigo =
                 participantes.stream().collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
 
         Set<Long> participantesIds = participantesPorCodigo.keySet();
-
-        // ⚡ Bolt: Passando o mapa de participantes para evitar DB lookup redundante em loop
         Set<Long> unidadesVisiveis = selecionarIdsVisiveis(participantesIds, participantesPorCodigo);
         return unidadesVisiveis.stream()
                 .map(participantesPorCodigo::get)
@@ -178,29 +148,21 @@ public class PainelFacade {
     private Set<Long> selecionarIdsVisiveis(Set<Long> participantesIds, Map<Long, Unidade> participantesPorCodigo) {
         Set<Long> visiveis = new LinkedHashSet<>();
         for (Long unidadeId : participantesIds) {
-            // ⚡ Bolt Optimization: Use the object already present in memory instead of fetching again from service/DB
             Unidade unidade = participantesPorCodigo.get(unidadeId);
             Long candidato = encontrarMaiorIdVisivel(unidade, participantesIds);
-            visiveis.add(candidato);
+            if (candidato != null) visiveis.add(candidato);
         }
         return visiveis;
     }
 
+    @Nullable
     private Long encontrarMaiorIdVisivel(Unidade unidade, Set<Long> participantesIds) {
-        if (unidade == null || !participantesIds.contains(unidade.getCodigo())) {
-            return null;
-        }
+        if (!participantesIds.contains(unidade.getCodigo())) return null;
         Unidade atual = unidade;
         while (true) {
-            if (!todasSubordinadasParticipam(atual.getCodigo(), participantesIds)) {
-                return atual.getCodigo();
-            }
-
+            if (!todasSubordinadasParticipam(atual.getCodigo(), participantesIds)) return atual.getCodigo();
             Unidade superior = atual.getUnidadeSuperior();
-            if (superior == null || !participantesIds.contains(superior.getCodigo())) {
-                return atual.getCodigo();
-            }
-
+            if (superior == null || !participantesIds.contains(superior.getCodigo())) return atual.getCodigo();
             atual = superior;
         }
     }
@@ -219,22 +181,19 @@ public class PainelFacade {
         if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) {
             return "/processo/" + processo.getCodigo();
         }
-        // Para CHEFE ou SERVIDOR, precisamos da sigla da unidade
-        if (codigoUnidade != null) {
-            try {
-                var unidade = unidadeService.buscarPorCodigo(codigoUnidade);
-                return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
-            } catch (Exception e) {
-                return null;
-            }
+        
+        try {
+            var unidade = unidadeService.buscarPorCodigo(codigoUnidade);
+            return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
+        } catch (Exception e) {
+            return "/processo/" + processo.getCodigo();
         }
-        return "/processo/" + processo.getCodigo();
     }
 
     private AlertaDto paraAlertaDto(Alerta alerta, LocalDateTime dataHoraLeitura) {
         return AlertaDto.builder()
                 .codigo(alerta.getCodigo())
-                .codProcesso(alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null)
+                .codProcesso(alerta.getProcesso().getCodigo())
                 .descricao(alerta.getDescricao())
                 .dataHora(alerta.getDataHora())
                 .unidadeOrigem(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getSigla() : null)

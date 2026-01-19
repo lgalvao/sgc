@@ -4,6 +4,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
@@ -24,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -81,9 +84,7 @@ public class SubprocessoCrudService {
      * <p>O mapa é um invariante do subprocesso após a criação, portanto é garantido que exista.
      */
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
-        Subprocesso subprocesso = buscarSubprocesso(codigo);
-        // Mapa é invariante após criação
-        return subprocesso;
+        return buscarSubprocesso(codigo);
     }
 
     @Transactional(readOnly = true)
@@ -107,7 +108,7 @@ public class SubprocessoCrudService {
         return SubprocessoSituacaoDto.builder()
                 .codigo(subprocesso.getCodigo())
                 .situacao(subprocesso.getSituacao())
-                .situacaoLabel(subprocesso.getSituacao() != null ? subprocesso.getSituacao().name() : null)
+                .situacaoLabel(subprocesso.getSituacao().name())
                 .build();
     }
 
@@ -125,23 +126,18 @@ public class SubprocessoCrudService {
 
     public SubprocessoDto criar(CriarSubprocessoRequest request, boolean criadoPorProcesso) {
         var entity = new Subprocesso();
-        // Mapear manualmente do Request
-        if (request.getCodProcesso() != null) {
-            var processo = new sgc.processo.model.Processo();
-            processo.setCodigo(request.getCodProcesso());
-            entity.setProcesso(processo);
-        }
-        if (request.getCodUnidade() != null) {
-            var unidade = new sgc.organizacao.model.Unidade();
-            unidade.setCodigo(request.getCodUnidade());
-            entity.setUnidade(unidade);
-        }
+        var processo = new sgc.processo.model.Processo();
+        processo.setCodigo(request.getCodProcesso());
+        entity.setProcesso(processo);
+
+        var unidade = new sgc.organizacao.model.Unidade();
+        unidade.setCodigo(request.getCodUnidade());
+        entity.setUnidade(unidade);
         entity.setDataLimiteEtapa1(request.getDataLimiteEtapa1());
         entity.setDataLimiteEtapa2(request.getDataLimiteEtapa2());
         entity.setMapa(null);
         
         var subprocessoSalvo = repositorioSubprocesso.save(entity);
-
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocessoSalvo);
         Mapa mapaSalvo = mapaFacade.salvar(mapa);
@@ -149,14 +145,13 @@ public class SubprocessoCrudService {
         subprocessoSalvo.setMapa(mapaSalvo);
         var salvo = repositorioSubprocesso.save(subprocessoSalvo);
 
-        // Publica evento de criação
         EventoSubprocessoCriado evento = EventoSubprocessoCriado.builder()
                 .subprocesso(salvo)
                 .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
                 .dataHoraCriacao(LocalDateTime.now())
                 .criadoPorProcesso(criadoPorProcesso || salvo.getProcesso() != null)
-                .codProcesso(salvo.getProcesso() != null ? salvo.getProcesso().getCodigo() : null)
-                .codUnidade(salvo.getUnidade() != null ? salvo.getUnidade().getCodigo() : null)
+                .codProcesso(salvo.getProcesso().getCodigo())
+                .codUnidade(salvo.getUnidade().getCodigo())
                 .build();
         eventPublisher.publishEvent(evento);
 
@@ -188,7 +183,7 @@ public class SubprocessoCrudService {
     private Set<String> processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
         Set<String> campos = new HashSet<>();
 
-        java.util.Optional.ofNullable(request.getCodMapa()).ifPresent(cod -> {
+        Optional.ofNullable(request.getCodMapa()).ifPresent(cod -> {
             Mapa m = new Mapa();
             m.setCodigo(cod);
             if (!Objects.equals(subprocesso.getMapa(), m)) {
@@ -197,15 +192,20 @@ public class SubprocessoCrudService {
             }
         });
 
-        if (!Objects.equals(subprocesso.getDataLimiteEtapa1(), request.getDataLimiteEtapa1())) {
+        LocalDateTime dataLimiteEtapa1 = subprocesso.getDataLimiteEtapa1();
+        if (!Objects.equals(dataLimiteEtapa1, request.getDataLimiteEtapa1())) {
             campos.add("dataLimiteEtapa1");
             subprocesso.setDataLimiteEtapa1(request.getDataLimiteEtapa1());
         }
-        if (!Objects.equals(subprocesso.getDataFimEtapa1(), request.getDataFimEtapa1())) {
+
+        LocalDateTime dataFimEtapa1 = subprocesso.getDataFimEtapa1();
+        if (!Objects.equals(dataFimEtapa1, request.getDataFimEtapa1())) {
             campos.add("dataFimEtapa1");
             subprocesso.setDataFimEtapa1(request.getDataFimEtapa1());
         }
-        if (!Objects.equals(subprocesso.getDataFimEtapa2(), request.getDataFimEtapa2())) {
+
+        LocalDateTime dataFimEtapa2 = subprocesso.getDataFimEtapa2();
+        if (!Objects.equals(dataFimEtapa2, request.getDataFimEtapa2())) {
             campos.add("dataFimEtapa2");
             subprocesso.setDataFimEtapa2(request.getDataFimEtapa2());
         }
@@ -219,8 +219,8 @@ public class SubprocessoCrudService {
         // Publica evento ANTES da exclusão
         EventoSubprocessoExcluido evento = EventoSubprocessoExcluido.builder()
                 .codSubprocesso(codigo)
-                .codProcesso(subprocesso.getProcesso() != null ? subprocesso.getProcesso().getCodigo() : null)
-                .codUnidade(subprocesso.getUnidade() != null ? subprocesso.getUnidade().getCodigo() : null)
+                .codProcesso(subprocesso.getProcesso().getCodigo())
+                .codUnidade(subprocesso.getUnidade().getCodigo())
                 .codMapa(subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null)
                 .situacao(subprocesso.getSituacao())
                 .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
@@ -240,9 +240,8 @@ public class SubprocessoCrudService {
     public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
         Subprocesso sp = repositorioSubprocesso
                 .findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
-                .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada(
-                        "%s para o processo %s e unidade %s".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codProcesso,
-                                codUnidade)));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
+                        "%s para o processo %s e unidade %s".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codProcesso, codUnidade)));
         return subprocessoMapper.toDTO(sp);
     }
 

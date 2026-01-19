@@ -103,6 +103,7 @@ class SubprocessoEmailServiceTest {
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(new Processo());
         sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setUnidade(new Unidade());
 
         EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
             .subprocesso(sp)

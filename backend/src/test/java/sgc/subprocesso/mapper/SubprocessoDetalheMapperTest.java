@@ -63,6 +63,9 @@ class SubprocessoDetalheMapperTest {
         Unidade unidade = new Unidade();
         unidade.setTituloTitular("123");
         sp.setUnidade(unidade);
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setProcesso(processo);
 
         Usuario responsavel = new Usuario();
         responsavel.setTituloEleitoral("123");
@@ -81,6 +84,9 @@ class SubprocessoDetalheMapperTest {
         Unidade unidade = new Unidade();
         unidade.setTituloTitular("123");
         sp.setUnidade(unidade);
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setProcesso(processo);
 
         Usuario responsavel = new Usuario();
         responsavel.setTituloEleitoral("456"); // Diferente do titular
@@ -93,24 +99,12 @@ class SubprocessoDetalheMapperTest {
     }
 
     @Test
-    void deveMapearResponsavelSemUnidade() {
-        Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        sp.setUnidade(null);
-
-        Usuario responsavel = new Usuario();
-        responsavel.setTituloEleitoral("456");
-
-        SubprocessoDetalheDto dto = mapper.toDto(sp, responsavel, null, null, null);
-
-        assertThat(dto.getResponsavel()).isNotNull();
-        assertThat(dto.getResponsavel().getTipoResponsabilidade()).isEqualTo("Substituição"); // Default
-    }
-
-    @Test
     void deveMapearLocalizacaoAtual() {
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setProcesso(processo);
 
         Unidade destino = new Unidade();
         destino.setSigla("DEST");
@@ -126,6 +120,9 @@ class SubprocessoDetalheMapperTest {
     void deveMapearLocalizacaoAtualNulaSeSemDestino() {
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setProcesso(processo);
 
         Movimentacao mov = new Movimentacao();
         mov.setUnidadeDestino(null);

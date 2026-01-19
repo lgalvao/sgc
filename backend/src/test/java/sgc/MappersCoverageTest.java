@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import sgc.mapa.mapper.ConhecimentoMapper;
-import sgc.organizacao.mapper.UsuarioMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,15 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("unit")
 class MappersCoverageTest {
     private final ConhecimentoMapper conhecimentoMapper = Mappers.getMapper(ConhecimentoMapper.class);
-    private final UsuarioMapper usuarioMapper = Mappers.getMapper(UsuarioMapper.class);
 
-    @Test
-    @DisplayName("Deve cobrir nulos no UsuarioMapper")
-    void deveCobrirNulosUsuarioMapper() {
-        assertThat(usuarioMapper.toUnidadeDto(null, true)).isNull();
-        assertThat(usuarioMapper.toUsuarioDto(null)).isNull();
-        assertThat(usuarioMapper.toAtribuicaoTemporariaDto(null)).isNull();
-    }
+
 
     @Test
     @DisplayName("Deve cobrir nulos no ConhecimentoMapper")

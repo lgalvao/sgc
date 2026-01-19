@@ -27,7 +27,6 @@ public interface MapaAjusteMapper {
     MapaAjusteDto toDto(Subprocesso sp, @org.jspecify.annotations.Nullable Analise analise, List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos);
 
     default List<CompetenciaAjusteDto> mapCompetencias(List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos) {
-        // ⚡ Bolt: Agrupando conhecimentos por atividade para evitar filtragem repetida (O(N) vs O(N^2))
         Map<Long, List<Conhecimento>> conhecimentosPorAtividade = conhecimentos.stream()
                 .filter(c -> c.getAtividade() != null)
                 .collect(Collectors.groupingBy(Conhecimento::getCodigoAtividade));
@@ -51,20 +50,18 @@ public interface MapaAjusteMapper {
                                         .build())
                                 .toList();
 
-                atividadeDtos.add(
-                        AtividadeAjusteDto.builder()
-                                .codAtividade(ativ.getCodigo())
-                                .nome(ativ.getDescricao())
-                                .conhecimentos(conhecimentoDtos)
-                                .build());
+                atividadeDtos.add(AtividadeAjusteDto.builder()
+                        .codAtividade(ativ.getCodigo())
+                        .nome(ativ.getDescricao())
+                        .conhecimentos(conhecimentoDtos)
+                        .build());
             }
 
-            competenciaDtos.add(
-                    CompetenciaAjusteDto.builder()
-                            .codCompetencia(comp.getCodigo())
-                            .nome(comp.getDescricao())
-                            .atividades(atividadeDtos)
-                            .build());
+            competenciaDtos.add(CompetenciaAjusteDto.builder()
+                    .codCompetencia(comp.getCodigo())
+                    .nome(comp.getDescricao())
+                    .atividades(atividadeDtos)
+                    .build());
         }
         return competenciaDtos;
     }

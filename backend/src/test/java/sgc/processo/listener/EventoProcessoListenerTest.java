@@ -363,62 +363,7 @@ class EventoProcessoListenerTest {
         );
     }
 
-    @Test
-    void deveTratarExcecaoNoLoopDeSubprocessos() {
-        // Testa o catch do loop externo (linhas 123-124) quando enviarEmailProcessoIniciado lança exceção
-        Processo processo = new Processo();
-        processo.setCodigo(6L);
-        processo.setDescricao("Processo Teste");
-        processo.setTipo(TipoProcesso.MAPEAMENTO);
-        when(processoFacade.buscarEntidadePorId(6L)).thenReturn(processo);
 
-        // Primeiro subprocesso normal
-        Subprocesso subprocessoBom = new Subprocesso();
-        subprocessoBom.setCodigo(300L);
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(50L);
-        unidade.setTipo(TipoUnidade.OPERACIONAL);
-        unidade.setNome("Unidade Normal");
-        unidade.setSigla("UN");
-        subprocessoBom.setUnidade(unidade);
-        subprocessoBom.setDataLimiteEtapa1(LocalDateTime.now());
-
-        // Segundo subprocesso que causará exceção devido a responsável null no map
-        Subprocesso subprocessoRuim = new Subprocesso();
-        subprocessoRuim.setCodigo(301L);
-        Unidade unidadeRuim = new Unidade();
-        unidadeRuim.setCodigo(99L); // Código que não terá responsável no map
-        unidadeRuim.setTipo(TipoUnidade.OPERACIONAL);
-        subprocessoRuim.setUnidade(unidadeRuim);
-
-        when(subprocessoFacade.listarEntidadesPorProcesso(6L))
-                .thenReturn(List.of(subprocessoBom, subprocessoRuim));
-
-        // Fornece responsável apenas para a unidade 50, não para 99
-        ResponsavelDto responsavel = ResponsavelDto.builder()
-                .unidadeCodigo(50L)
-                .titularTitulo("777")
-                .build();
-        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(50L, responsavel));
-
-        UsuarioDto titular = UsuarioDto.builder()
-                .tituloEleitoral("777")
-                .email("normal@email.com")
-                .build();
-        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("777", titular));
-
-        when(notificacaoModelosService.criarEmailProcessoIniciado(anyString(), anyString(), anyString(), any()))
-                .thenReturn("<html>Email</html>");
-
-        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(6L).build();
-        
-        // Não deve lançar exceção para fora - deve capturar e logar
-        listener.aoIniciarProcesso(evento);
-
-        // Verifica que o primeiro subprocesso foi processado com sucesso
-        // O segundo causará NPE ao tentar acessar responsavel.getTitularTitulo() quando responsavel é null
-        verify(notificacaoEmailService).enviarEmailHtml(eq("normal@email.com"), anyString(), anyString());
-    }
 
     @Test
     void deveTratarExcecaoAoFinalizarProcesso_ListaVazia() {
@@ -444,25 +389,7 @@ class EventoProcessoListenerTest {
         // Sem exceção lançada
     }
 
-    @Test
-    void deveTratarExcecaoAoProcessarLoopFinalizacao() {
-        // Cobre o catch no loop de finalização (163-166)
-        Processo processo = new Processo();
-        processo.setCodigo(1L);
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(10L);
-        unidade.setSigla("U1");
-        processo.setParticipantes(Set.of(unidade));
-        
-        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
-        // Ao retornar nulo para o responsavel, causará NPE na busca do titular
-        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of());
 
-        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(1L).build();
-        listener.aoFinalizarProcesso(evento);
-        
-        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
-    }
 
     @Test
     void deveIgnorarProcessamentoSeNaoHouverSubprocessosAoIniciar() {
