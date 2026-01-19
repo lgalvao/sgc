@@ -12,13 +12,15 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.RepositorioComum;
-import sgc.organizacao.dto.*;
+import sgc.organizacao.dto.AdministradorDto;
+import sgc.organizacao.dto.PerfilDto;
+import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 
 @Service
 @Slf4j
@@ -35,7 +37,7 @@ public class UsuarioFacade {
     public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
         Usuario usuario = usuarioRepo.findByIdWithAtribuicoes(titulo).orElse(null);
         if (usuario != null) {
-            carregarAtribuicoes(usuario);
+            carregarAtribuicoesUsuario(usuario);
             usuario.getAuthorities();
         }
         return usuario;
@@ -66,7 +68,7 @@ public class UsuarioFacade {
                 .findByIdWithAtribuicoes(login)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, login));
 
-        carregarAtribuicoes(usuario);
+        carregarAtribuicoesUsuario(usuario);
         return usuario;
     }
 
@@ -92,27 +94,41 @@ public class UsuarioFacade {
                 .orElse(null);
     }
 
+    // TODO esse metodo ficaria melhor em UnidadeFacade
     @Transactional(readOnly = true)
-    public Usuario buscarResponsavelAtual(String sigla) {
-        Unidade unidade = unidadeRepo.findBySigla(sigla)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", sigla));
+    public Usuario buscarResponsavelAtual(String siglaUnidade) {
+        // TODO pesquisar pela sigla nunca deve falhar nesse nivel do sistema!
+        Unidade unidade = unidadeRepo.findBySigla(siglaUnidade)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", siglaUnidade));
 
+        // TODO é uma invariante do sistema haver um responsavel para todas as unidades
         Usuario usuarioSimples = usuarioRepo
                 .chefePorCodUnidade(unidade.getCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Responsável da unidade", sigla));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Responsável da unidade", siglaUnidade));
 
+        // TODO essa verificacao de existencia parece inutil tambem
         Usuario usuarioCompleto = usuarioRepo.findByIdWithAtribuicoes(usuarioSimples.getTituloEleitoral())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, usuarioSimples.getTituloEleitoral()));
 
-        carregarAtribuicoes(usuarioCompleto);
+        carregarAtribuicoesUsuario(usuarioCompleto);
         return usuarioCompleto;
     }
+
+    // TODO esse metodo ficaria melhor em UnidadeFacade -- e talvez esteja duplicando o método 'buscarResponsavelAtual()'
+    public ResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
+        List<Usuario> chefes = usuarioRepo.findChefesByUnidadesCodigos(List.of(unidadeCodigo));
+        if (chefes.isEmpty()) {
+            throw new ErroEntidadeNaoEncontrada("Responsável da unidade", unidadeCodigo);
+        }
+        return montarResponsavelDto(unidadeCodigo, chefes);
+    }
+
 
     @Transactional(readOnly = true)
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
         return usuarioRepo.findByIdWithAtribuicoes(titulo)
                 .map(usuario -> {
-                    carregarAtribuicoes(usuario);
+                    carregarAtribuicoesUsuario(usuario);
                     return usuario.getTodasAtribuicoes().stream()
                             .map(this::toPerfilDto)
                             .toList();
@@ -120,8 +136,8 @@ public class UsuarioFacade {
                 .orElse(Collections.emptyList());
     }
 
-    private void carregarAtribuicoes(Usuario usuario) {
-        var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral());
+    private void carregarAtribuicoesUsuario(Usuario usuario) {
+        List<UsuarioPerfil> atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral());
         usuario.setAtribuicoes(new HashSet<>(atribuicoes));
     }
 
@@ -135,11 +151,12 @@ public class UsuarioFacade {
         List<UsuarioPerfil> todasAtribuicoes = usuarioPerfilRepo.findByUsuarioTituloIn(titulos);
 
         Map<String, Set<UsuarioPerfil>> atribuicoesPorUsuario = todasAtribuicoes.stream()
-                .collect(Collectors.groupingBy(UsuarioPerfil::getUsuarioTitulo, Collectors.toSet()));
+                .collect(groupingBy(UsuarioPerfil::getUsuarioTitulo, toSet()));
 
         for (Usuario usuario : usuarios) {
-            Set<UsuarioPerfil> atribuicoes = atribuicoesPorUsuario
-                    .getOrDefault(usuario.getTituloEleitoral(), new java.util.HashSet<>());
+            Set<UsuarioPerfil> atribuicoes = atribuicoesPorUsuario.getOrDefault(
+                    usuario.getTituloEleitoral(), new HashSet<>()
+            );
             usuario.setAtribuicoes(atribuicoes);
         }
     }
@@ -152,15 +169,7 @@ public class UsuarioFacade {
         return usuarioRepo.findAll().stream().map(this::toUsuarioDto).toList();
     }
 
-
-    public ResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
-        List<Usuario> chefes = usuarioRepo.findChefesByUnidadesCodigos(List.of(unidadeCodigo));
-        if (chefes.isEmpty()) {
-             throw new ErroEntidadeNaoEncontrada("Responsável da unidade", unidadeCodigo);
-        }
-        return montarResponsavelDto(unidadeCodigo, chefes);
-    }
-
+    // TODO esse metodo ficaria melhor em UnidadeFacade?
     @Transactional(readOnly = true)
     public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         if (unidadesCodigos.isEmpty()) return Collections.emptyMap();
@@ -176,10 +185,10 @@ public class UsuarioFacade {
                 .flatMap(u -> u.getTodasAtribuicoes().stream()
                         .filter(a -> a.getPerfil() == Perfil.CHEFE && unidadesCodigos.contains(a.getUnidadeCodigo()))
                         .map(a -> new AbstractMap.SimpleEntry<>(a.getUnidadeCodigo(), u)))
-                .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+                .collect(groupingBy(Map.Entry::getKey, mapping(Map.Entry::getValue, toList())));
 
         return chefesPorUnidade.entrySet().stream()
-                .collect(Collectors.toMap(
+                .collect(toMap(
                         Map.Entry::getKey,
                         e -> montarResponsavelDto(e.getKey(), e.getValue())
                 ));
@@ -191,11 +200,11 @@ public class UsuarioFacade {
     }
 
     @Transactional(readOnly = true)
-    public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
+    public List<Long> buscarUnidadesOndeEhResponsavel(String tituloUsuario) {
         return usuarioRepo
-                .findByIdWithAtribuicoes(titulo)
+                .findByIdWithAtribuicoes(tituloUsuario)
                 .map(u -> {
-                    carregarAtribuicoes(u);
+                    carregarAtribuicoesUsuario(u);
                     return u.getTodasAtribuicoes().stream()
                             .filter(a -> a.getPerfil() == Perfil.CHEFE)
                             .map(UsuarioPerfil::getUnidadeCodigo)
@@ -204,12 +213,13 @@ public class UsuarioFacade {
                 .orElse(Collections.emptyList());
     }
 
+    // TODO por que usar string para perfil, se existe um enum?
     @Transactional(readOnly = true)
     public boolean usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo) {
         return usuarioRepo
                 .findByIdWithAtribuicoes(titulo)
                 .map(u -> {
-                    carregarAtribuicoes(u);
+                    carregarAtribuicoesUsuario(u);
                     return u.getTodasAtribuicoes().stream()
                             .anyMatch(a -> a.getPerfil().name().equals(perfil)
                                     && a.getUnidadeCodigo().equals(unidadeCodigo));
@@ -217,12 +227,13 @@ public class UsuarioFacade {
                 .orElse(false);
     }
 
+    // TODO por que usar string para perfil, se existe um enum?
     @Transactional(readOnly = true)
     public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
         return usuarioRepo
                 .findByIdWithAtribuicoes(titulo)
                 .map(u -> {
-                    carregarAtribuicoes(u);
+                    carregarAtribuicoesUsuario(u);
                     return u.getTodasAtribuicoes().stream()
                             .filter(a -> a.getPerfil().name().equals(perfil))
                             .map(a -> a.getUnidade().getCodigo())
@@ -241,7 +252,6 @@ public class UsuarioFacade {
                 .unidadeCodigo(lotacao.getCodigo())
                 .build();
     }
-
 
     private PerfilDto toPerfilDto(UsuarioPerfil atribuicao) {
         return PerfilDto.builder()

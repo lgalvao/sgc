@@ -1,11 +1,11 @@
 package sgc.mapa.model;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 import sgc.comum.model.EntidadeBase;
 import sgc.subprocesso.model.Subprocesso;
 

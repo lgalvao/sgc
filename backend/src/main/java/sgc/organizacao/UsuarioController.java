@@ -23,12 +23,6 @@ import java.util.Map;
 public class UsuarioController {
     private final UsuarioFacade usuarioService;
 
-    /**
-     * Busca um usuário pelo título de eleitor.
-     *
-     * @param titulo O título de eleitor.
-     * @return O DTO do usuário, se encontrado.
-     */
     @GetMapping("/{titulo}")
     public ResponseEntity<UsuarioDto> buscarUsuarioPorTitulo(@PathVariable String titulo) {
         return usuarioService.buscarUsuarioPorTitulo(titulo)
@@ -65,4 +59,3 @@ public class UsuarioController {
         return ResponseEntity.ok().build();
     }
 }
-

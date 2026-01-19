@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseFacade;
 import sgc.mapa.mapper.ConhecimentoMapper;
+import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.ConhecimentoService;
@@ -15,18 +16,17 @@ import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.dto.AtividadeAjusteDto;
+import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.dto.AtividadeAjusteDto;
-import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
-import sgc.mapa.model.Mapa;
 
 import java.util.Optional;
 

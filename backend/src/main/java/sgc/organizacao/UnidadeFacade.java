@@ -281,8 +281,6 @@ public class UnidadeFacade {
 
     private void coletarSiglas(UnidadeDto unidade, List<String> resultado) {
         resultado.add(unidade.getSigla());
-        for (UnidadeDto filha : unidade.getSubunidades()) {
-            coletarSiglas(filha, resultado);
-        }
+        unidade.getSubunidades().forEach(filha -> coletarSiglas(filha, resultado));
     }
 }

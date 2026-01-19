@@ -15,11 +15,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.mapa.dto.AtividadeImpactadaDto;
-import sgc.mapa.dto.AtividadeResponse;
-import sgc.mapa.dto.CriarAtividadeRequest;
-import sgc.mapa.dto.CriarConhecimentoRequest;
-import sgc.mapa.dto.ImpactoMapaDto;
+import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.ConhecimentoService;
@@ -56,18 +52,30 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @DisplayName("Fluxo de Estados: Processo e Subprocesso")
 @Import(TestSecurityConfig.class)
 class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
-    @Autowired private ProcessoFacade processoFacade;
-    @Autowired private SubprocessoWorkflowService workflowService;
-    @Autowired private AtividadeService atividadeService;
-    @Autowired private ConhecimentoService conhecimentoService;
-    @Autowired private SubprocessoRepo subprocessoRepo;
-    @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private UsuarioFacade usuarioService;
-    @Autowired private JdbcTemplate jdbcTemplate;
-    @Autowired private CompetenciaRepo competenciaRepo;
-    @Autowired private AtividadeRepo atividadeRepo;
-    @Autowired private MapaRepo mapaRepo;
-    @PersistenceContext private EntityManager em;
+    @Autowired
+    private ProcessoFacade processoFacade;
+    @Autowired
+    private SubprocessoWorkflowService workflowService;
+    @Autowired
+    private AtividadeService atividadeService;
+    @Autowired
+    private ConhecimentoService conhecimentoService;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UsuarioFacade usuarioService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
+    @PersistenceContext
+    private EntityManager em;
 
     @MockitoBean
     private ImpactoMapaService impactoMapaService;
@@ -88,8 +96,8 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
         // Ensure SEDOC exists (critical for homologation)
         if (unidadeRepo.findBySigla("SEDOC").isEmpty()) {
             jdbcTemplate.update(
-                "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                15L, "Seção de Documentação", "SEDOC", "OPERACIONAL", "ATIVA", 2L, null
+                    "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    15L, "Seção de Documentação", "SEDOC", "OPERACIONAL", "ATIVA", 2L, null
             );
         }
 
@@ -123,35 +131,34 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
         // Insert User
         jdbcTemplate.update(
-            "INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo) VALUES (?, ?, ?, ?, ?)",
-            titulo, nome, "teste@teste.com", "0000", unidadeLotacao
+                "INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo) VALUES (?, ?, ?, ?, ?)",
+                titulo, nome, "teste@teste.com", "0000", unidadeLotacao
         );
 
         // Insert Profile
         jdbcTemplate.update(
-            "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
-            titulo, perfil, unidadePerfil
+                "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
+                titulo, perfil, unidadePerfil
         );
 
         // Update Unit Titular if CHEFE
         if ("CHEFE".equals(perfil)) {
-             jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET titulo_titular = ? WHERE codigo = ?", titulo, unidadePerfil);
+            jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET titulo_titular = ? WHERE codigo = ?", titulo, unidadePerfil);
         }
     }
 
     private void autenticar(Usuario usuario, String role) {
         SecurityContextHolder.getContext().setAuthentication(
-            new UsernamePasswordAuthenticationToken(
-                String.valueOf(usuario.getTituloEleitoral()),
-                "senha",
-                List.of(new SimpleGrantedAuthority(role))
-            )
+                new UsernamePasswordAuthenticationToken(
+                        String.valueOf(usuario.getTituloEleitoral()),
+                        "senha",
+                        List.of(new SimpleGrantedAuthority(role))
+                )
         );
     }
 
     @Nested
     @DisplayName("Fluxo de Mapeamento")
-    
     class FluxoMapeamento {
 
         @Test
@@ -202,8 +209,8 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
                 // Ensure map is linked correctly (bidirectional) just in case
                 if (sp.getMapa() != null && sp.getMapa().getSubprocesso() == null) {
-                     sp.getMapa().setSubprocesso(sp);
-                     mapaRepo.save(sp.getMapa());
+                    sp.getMapa().setSubprocesso(sp);
+                    mapaRepo.save(sp.getMapa());
                 }
 
                 verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
@@ -268,10 +275,10 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 autenticar(admin, "ROLE_ADMIN");
                 processoFacade.finalizar(codProcesso);
                 assertThat(processoFacade.obterPorId(codProcesso).orElseThrow().getSituacao())
-                    .isEqualTo(sgc.processo.model.SituacaoProcesso.FINALIZADO);
+                        .isEqualTo(sgc.processo.model.SituacaoProcesso.FINALIZADO);
             } catch (Exception e) {
                 throw e;
-            } 
+            }
         }
 
         @Test
@@ -293,7 +300,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             // Adicionar dados
             autenticar(chefeMapeamento, "ROLE_CHEFE");
             AtividadeResponse ativ = atividadeService.criar(
-                CriarAtividadeRequest.builder().descricao("A").mapaCodigo(codMapa).build());
+                    CriarAtividadeRequest.builder().descricao("A").mapaCodigo(codMapa).build());
             conhecimentoService.criar(ativ.codigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.codigo()).build());
 
             em.flush();
@@ -303,8 +310,8 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
             // Ensure map is linked correctly (bidirectional) just in case
             if (sp.getMapa() != null && sp.getMapa().getSubprocesso() == null) {
-                 sp.getMapa().setSubprocesso(sp);
-                 mapaRepo.save(sp.getMapa());
+                sp.getMapa().setSubprocesso(sp);
+                mapaRepo.save(sp.getMapa());
             }
 
             // Disponibilizar
@@ -326,7 +333,6 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Fluxo de Revisão")
-    
     class FluxoRevisao {
 
         @Test
@@ -335,9 +341,9 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             try {
                 // Mock Impactos
                 when(impactoMapaService.verificarImpactos(any(), any()))
-                    .thenReturn(ImpactoMapaDto.comImpactos(
-                        List.of(AtividadeImpactadaDto.builder().descricao("Ativ 1").build()),
-                        List.of(), List.of(), List.of()));
+                        .thenReturn(ImpactoMapaDto.comImpactos(
+                                List.of(AtividadeImpactadaDto.builder().descricao("Ativ 1").build()),
+                                List.of(), List.of(), List.of()));
 
                 // 1. Criar Processo Revisão (Admin)
                 autenticar(admin, "ROLE_ADMIN");
@@ -362,7 +368,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 // 3. Chefe inicia revisão (adiciona atividade -> Em Andamento)
                 autenticar(chefeRevisao, "ROLE_CHEFE");
                 AtividadeResponse ativ = atividadeService.criar(
-                    CriarAtividadeRequest.builder().descricao("Nova Ativ Revisao").mapaCodigo(codMapa).build()
+                        CriarAtividadeRequest.builder().descricao("Nova Ativ Revisao").mapaCodigo(codMapa).build()
                 );
                 conhecimentoService.criar(ativ.codigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.codigo()).build());
 
@@ -377,13 +383,13 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 em.flush();
                 em.clear(); // Ensure clean reload for validation
 
-            // Re-fetch subprocess and map to ensure they are managed for downstream logic that might need them
-            Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
-            // Ensure map is linked correctly (bidirectional) just in case
-            if (sp.getMapa() != null && sp.getMapa().getSubprocesso() == null) {
-                 sp.getMapa().setSubprocesso(sp);
-                 mapaRepo.save(sp.getMapa());
-            }
+                // Re-fetch subprocess and map to ensure they are managed for downstream logic that might need them
+                Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
+                // Ensure map is linked correctly (bidirectional) just in case
+                if (sp.getMapa() != null && sp.getMapa().getSubprocesso() == null) {
+                    sp.getMapa().setSubprocesso(sp);
+                    mapaRepo.save(sp.getMapa());
+                }
 
                 verificarSituacao(codSubprocesso, REVISAO_CADASTRO_EM_ANDAMENTO);
 
@@ -428,9 +434,9 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Fluxo Revisão Sem Impactos")
         void fluxoRevisaoSemImpactos() {
-             // Mock Sem Impactos
+            // Mock Sem Impactos
             when(impactoMapaService.verificarImpactos(any(), any()))
-                .thenReturn(ImpactoMapaDto.semImpacto());
+                    .thenReturn(ImpactoMapaDto.semImpacto());
 
             // 1. Criar Processo
             autenticar(admin, "ROLE_ADMIN");
@@ -450,7 +456,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             // 3. Chefe faz alteração
             autenticar(chefeRevisao, "ROLE_CHEFE");
             AtividadeResponse ativ = atividadeService.criar(
-                CriarAtividadeRequest.builder().descricao("Ativ").mapaCodigo(codMapa).build()
+                    CriarAtividadeRequest.builder().descricao("Ativ").mapaCodigo(codMapa).build()
             );
             conhecimentoService.criar(ativ.codigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.codigo()).build());
 
@@ -461,8 +467,8 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
             // Ensure map is linked correctly (bidirectional) just in case
             if (sp.getMapa() != null && sp.getMapa().getSubprocesso() == null) {
-                 sp.getMapa().setSubprocesso(sp);
-                 mapaRepo.save(sp.getMapa());
+                sp.getMapa().setSubprocesso(sp);
+                mapaRepo.save(sp.getMapa());
             }
 
             // 4. Disponibilizar
@@ -481,6 +487,6 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
     private void verificarSituacao(Long codSubprocesso, SituacaoSubprocesso esperada) {
         Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
         assertThat(sp.getSituacao()).as("Situação incorreta para subprocesso " + codSubprocesso)
-            .isEqualTo(esperada);
+                .isEqualTo(esperada);
     }
 }

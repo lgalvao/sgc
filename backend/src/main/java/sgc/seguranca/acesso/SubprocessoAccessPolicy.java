@@ -2,11 +2,11 @@ package sgc.seguranca.acesso;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import sgc.organizacao.service.HierarquiaService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.service.HierarquiaService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
