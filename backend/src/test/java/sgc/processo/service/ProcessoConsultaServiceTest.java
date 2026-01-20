@@ -111,7 +111,7 @@ class ProcessoConsultaServiceTest {
     void deveListarParaAdmin() {
         mockAuth("admin", true);
 
-        Subprocesso s1 = Subprocesso.builder().situacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).unidade(new Unidade("U1", "S1")).build();
+        Subprocesso s1 = Subprocesso.builder().situacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).unidade(Unidade.builder().nome("U1").sigla("S1").build()).build();
         s1.setCodigo(1L);
 
         when(subprocessoFacade.listarPorProcessoESituacao(1L, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)).thenReturn(List.of(s1));
@@ -127,7 +127,7 @@ class ProcessoConsultaServiceTest {
     void deveListarParaUsuarioComum() {
         mockAuth("user", false);
 
-        Unidade u1 = new Unidade("U1", "S1");
+        Unidade u1 = Unidade.builder().nome("U1").sigla("S1").build();
         u1.setCodigo(100L);
 
         Subprocesso s1 = Subprocesso.builder().situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO).unidade(u1).build();

@@ -33,11 +33,21 @@ class ProcessoPerformanceTest extends BaseIntegrationTest {
         Unidade u1 = unidadeRepo.findById(2L).orElseThrow();
         Unidade u2 = unidadeRepo.findById(3L).orElseThrow();
 
-        Processo p1 = new Processo("Proc 1", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(10));
+        Processo p1 = Processo.builder()
+                .descricao("Proc 1")
+                .tipo(TipoProcesso.MAPEAMENTO)
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .dataLimite(LocalDateTime.now().plusDays(10))
+                .build();
         p1.setParticipantes(Set.of(u1, u2));
         processoRepo.save(p1);
 
-        Processo p2 = new Processo("Proc 2", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(10));
+        Processo p2 = Processo.builder()
+                .descricao("Proc 2")
+                .tipo(TipoProcesso.REVISAO)
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .dataLimite(LocalDateTime.now().plusDays(10))
+                .build();
         p2.setParticipantes(Set.of(u1));
         processoRepo.save(p2);
 

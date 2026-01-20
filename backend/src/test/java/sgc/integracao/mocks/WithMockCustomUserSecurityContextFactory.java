@@ -36,7 +36,7 @@ public class WithMockCustomUserSecurityContextFactory
         }
 
         if (unidade == null) {
-            unidade = new Unidade("Unidade Mock", "MOCK");
+            unidade = Unidade.builder().nome("Unidade Mock").sigla("MOCK").build();
             unidade.setCodigo(customUser.unidadeId());
         }
 

@@ -125,13 +125,13 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         subprocesso = subprocessoRepo.save(subprocesso);
 
         // Movimentação inicial
-        Movimentacao movimentacaoInicial =
-                new Movimentacao(
-                        subprocesso,
-                        unidade,
-                        unidadeSuperior,
-                        "Disponibilização inicial",
-                        adminUser);
+        Movimentacao movimentacaoInicial = Movimentacao.builder()
+                        .subprocesso(subprocesso)
+                        .unidadeOrigem(unidade)
+                        .unidadeDestino(unidadeSuperior)
+                        .descricao("Disponibilização inicial")
+                        .usuario(adminUser)
+                        .build();
         movimentacaoRepo.save(movimentacaoInicial);
 
         entityManager.flush();

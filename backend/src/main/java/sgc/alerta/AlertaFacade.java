@@ -168,7 +168,10 @@ public class AlertaFacade {
         LocalDateTime agora = LocalDateTime.now();
         
         for (Long codigo : alertaCodigos) {
-            AlertaUsuario.Chave chave = new AlertaUsuario.Chave(codigo, usuarioTitulo);
+            AlertaUsuario.Chave chave = AlertaUsuario.Chave.builder()
+                    .alertaCodigo(codigo)
+                    .usuarioTitulo(usuarioTitulo)
+                    .build();
             
             AlertaUsuario alertaUsuario = alertaUsuarioRepo.findById(chave)
                     .orElseGet(() -> {
@@ -236,7 +239,10 @@ public class AlertaFacade {
 
     public Optional<LocalDateTime> obterDataHoraLeitura(Long codigoAlerta, String usuarioTitulo) {
         return alertaUsuarioRepo
-                .findById(new AlertaUsuario.Chave(codigoAlerta, usuarioTitulo))
+                .findById(AlertaUsuario.Chave.builder()
+                        .alertaCodigo(codigoAlerta)
+                        .usuarioTitulo(usuarioTitulo)
+                        .build())
                 .map(AlertaUsuario::getDataHoraLeitura);
     }
 

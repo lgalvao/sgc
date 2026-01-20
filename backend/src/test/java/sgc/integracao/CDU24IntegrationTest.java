@@ -124,11 +124,11 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
         sub = subprocessoRepo.save(sub);
 
         // Criar Atividade
-        Atividade ativ = new Atividade(mapa, "Atividade Teste " + unidade.getSigla());
+        Atividade ativ = Atividade.builder().mapa(mapa).descricao("Atividade Teste " + unidade.getSigla()).build();
         atividadeRepo.save(ativ);
 
         // Criar Competência
-        Competencia comp = new Competencia("Competência Teste " + unidade.getSigla(), mapa);
+        Competencia comp = Competencia.builder().descricao("Competência Teste " + unidade.getSigla()).mapa(mapa).build();
         competenciaRepo.save(comp);
 
         // Associar (ManyToMany)

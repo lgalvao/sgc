@@ -13,8 +13,8 @@ import java.util.Objects;
 @Table(name = "VW_USUARIO_PERFIL_UNIDADE", schema = "sgc")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @IdClass(UsuarioPerfilId.class)
 public class UsuarioPerfil implements Serializable {

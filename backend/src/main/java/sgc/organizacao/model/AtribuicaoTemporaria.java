@@ -1,10 +1,10 @@
 package sgc.organizacao.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sgc.comum.model.EntidadeBase;
 
 import java.time.LocalDateTime;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
 public class AtribuicaoTemporaria extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "unidade_codigo")
@@ -44,10 +44,10 @@ public class AtribuicaoTemporaria extends EntidadeBase {
     private Usuario usuario;
 
     @Transient
-    private sgc.organizacao.model.Perfil perfil;
+    private Perfil perfil;
 
-    public sgc.organizacao.model.Perfil getPerfil() {
-        return perfil != null ? perfil : sgc.organizacao.model.Perfil.SERVIDOR;
+    public Perfil getPerfil() {
+        return perfil != null ? perfil : Perfil.SERVIDOR;
     }
 
 }

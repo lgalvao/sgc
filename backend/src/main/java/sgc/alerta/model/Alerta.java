@@ -2,6 +2,7 @@ package sgc.alerta.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import sgc.comum.model.EntidadeBase;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -19,9 +20,8 @@ import java.time.LocalDateTime;
 @Table(name = "ALERTA", schema = "sgc")
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
 public class Alerta extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "processo_codigo")

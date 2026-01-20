@@ -48,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfig.class)
 @Transactional
 @DisplayName("CDU-06: Detalhar processo")
-public class CDU06IntegrationTest extends BaseIntegrationTest {
+class CDU06IntegrationTest extends BaseIntegrationTest {
     private static final String TEST_USER_ID = "123456789";
 
     @Autowired
@@ -72,10 +72,8 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
     @BeforeEach
     void setUp() {
         // Reset sequences
-        try {
-            jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 50000");
-            jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 60000");
-        } catch (Exception ignored) {}
+        jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 50000");
+        jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 60000");
 
         // Cria unidade programaticamente
         unidade = UnidadeFixture.unidadePadrao();
@@ -126,8 +124,13 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
     void testDetalharProcesso_sucesso() throws Exception {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
-        subprocessoRepo.save(new Subprocesso(processo, unidade, null,
-                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, processo.getDataLimite()));
+        subprocessoRepo.save(Subprocesso.builder()
+                .processo(processo)
+                .unidade(unidade)
+                .mapa(null)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                .dataLimiteEtapa1(processo.getDataLimite())
+                .build());
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
@@ -148,13 +151,13 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
     void testPodeFinalizar_true_comAdmin() throws Exception {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
-        subprocessoRepo.save(
-                new Subprocesso(
-                        processo,
-                        unidade,
-                        null,
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-                        processo.getDataLimite()));
+        subprocessoRepo.save(Subprocesso.builder()
+                        .processo(processo)
+                        .unidade(unidade)
+                        .mapa(null)
+                        .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                        .dataLimiteEtapa1(processo.getDataLimite())
+                        .build());
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
@@ -167,13 +170,13 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
         org.springframework.security.core.Authentication auth = setupSecurityContext(unidade, Perfil.CHEFE);
-        subprocessoRepo.save(
-                new Subprocesso(
-                        processo,
-                        unidade,
-                        null,
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-                        processo.getDataLimite()));
+        subprocessoRepo.save(Subprocesso.builder()
+                        .processo(processo)
+                        .unidade(unidade)
+                        .mapa(null)
+                        .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                        .dataLimiteEtapa1(processo.getDataLimite())
+                        .build());
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
                 .andExpect(status().isOk())
@@ -186,8 +189,13 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
         org.springframework.security.core.Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
-        subprocessoRepo.save(new Subprocesso(processo, unidade, null,
-                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, processo.getDataLimite()));
+        subprocessoRepo.save(Subprocesso.builder()
+                .processo(processo)
+                .unidade(unidade)
+                .mapa(null)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
+                .dataLimiteEtapa1(processo.getDataLimite())
+                .build());
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
                 .andExpect(status().isOk())
@@ -200,8 +208,13 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
         org.springframework.security.core.Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
-        subprocessoRepo.save(new Subprocesso(processo, unidade, null,
-                SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO, processo.getDataLimite()));
+        subprocessoRepo.save(Subprocesso.builder()
+                .processo(processo)
+                .unidade(unidade)
+                .mapa(null)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO)
+                .dataLimiteEtapa1(processo.getDataLimite())
+                .build());
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
                 .andExpect(status().isOk())
@@ -215,8 +228,13 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
 
-        Subprocesso subprocesso = new Subprocesso(processo, unidade, null,
-                SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processo.getDataLimite());
+        Subprocesso subprocesso = Subprocesso.builder()
+                .processo(processo)
+                .unidade(unidade)
+                .mapa(null)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                .dataLimiteEtapa1(processo.getDataLimite())
+                .build();
         subprocessoRepo.save(subprocesso);
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))

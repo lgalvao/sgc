@@ -58,13 +58,13 @@ public class SubprocessoTransicaoService {
             @Nullable String observacoes) {
 
         // 1. Salvar movimentação (atômico com a transação do chamador)
-        Movimentacao movimentacao = new Movimentacao(
-                subprocesso,
-                origem,
-                destino,
-                tipo.getDescricaoMovimentacao(),
-                usuario
-        );
+        Movimentacao movimentacao = Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(origem)
+                .unidadeDestino(destino)
+                .descricao(tipo.getDescricaoMovimentacao())
+                .usuario(usuario)
+                .build();
         movimentacaoRepo.save(movimentacao);
 
         // 2. Publicar evento para comunicação (alertas/emails)

@@ -51,13 +51,15 @@ class CoberturaExtraTest {
     @Test
     @DisplayName("Deve instanciar modelos para cobertura de construtores extras")
     void deveInstanciarModelos() {
-        Competencia c = new Competencia(1L, "desc", new Mapa());
+        Competencia c = Competencia.builder().descricao("desc").mapa(new Mapa()).build();
+        c.setCodigo(1L);
         assertThat(c.getCodigo()).isEqualTo(1L);
         
-        Conhecimento k = new Conhecimento(1L, "desc", new Atividade());
+        Conhecimento k = Conhecimento.builder().descricao("desc").atividade(new Atividade()).build();
+        k.setCodigo(1L);
         assertThat(k.getCodigo()).isEqualTo(1L);
 
-        Unidade u = new Unidade("Nome", "SIGLA");
+        Unidade u = Unidade.builder().nome("Nome").sigla("SIGLA").build();
         assertThat(u.getSigla()).isEqualTo("SIGLA");
     }
 }

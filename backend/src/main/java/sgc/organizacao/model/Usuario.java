@@ -2,13 +2,16 @@ package sgc.organizacao.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.LazyInitializationException;
 import org.hibernate.annotations.Immutable;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,8 +22,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Usuario implements UserDetails {
     @Id
     @Column(name = "titulo", length = 12)
@@ -42,7 +44,7 @@ public class Usuario implements UserDetails {
     @JoinColumn(name = "unidade_lot_codigo")
     private Unidade unidadeLotacao;
 
-    public @org.jspecify.annotations.NonNull Unidade getUnidadeLotacao() {
+    public @NonNull Unidade getUnidadeLotacao() {
         return unidadeLotacao;
     }
 
@@ -52,7 +54,7 @@ public class Usuario implements UserDetails {
 
     @Builder.Default
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
-    private Set<AtribuicaoTemporaria> atribuicoesTemporarias = new java.util.HashSet<>();
+    private Set<AtribuicaoTemporaria> atribuicoesTemporarias = new HashSet<>();
 
     @Transient
     private Set<UsuarioPerfil> atribuicoesCache;
@@ -62,7 +64,7 @@ public class Usuario implements UserDetails {
     }
 
     public Set<UsuarioPerfil> getAtribuicoes() {
-        return atribuicoesCache != null ? atribuicoesCache : new java.util.HashSet<>();
+        return atribuicoesCache != null ? atribuicoesCache : new HashSet<>();
     }
 
     public Set<UsuarioPerfil> getTodasAtribuicoes() {
@@ -75,11 +77,7 @@ public class Usuario implements UserDetails {
         try {
             if (atribuicoesTemporarias != null) {
                 for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
-                    if ((temp.getDataInicio() == null || 
-                        !temp.getDataInicio().isAfter(now))
-                        && (temp.getDataTermino() == null 
-                        || !temp.getDataTermino().isBefore(now))) {
-
+                    if (!temp.getDataInicio().isAfter(now) && !temp.getDataTermino().isBefore(now)) {
                         UsuarioPerfil perfil = new UsuarioPerfil();
                         perfil.setUsuarioTitulo(this.tituloEleitoral);
                         perfil.setUsuario(this);

@@ -105,4 +105,73 @@ describe("DisponibilizarMapaModal.vue", () => {
         const btnCancelar = wrapper.find('[data-testid="btn-disponibilizar-mapa-cancelar"]');
         expect(btnCancelar.attributes("disabled")).toBeDefined();
     });
+
+    it("deve exibir erros de validação quando fornecidos", () => {
+        const wrapper = createWrapper({
+            mostrar: true,
+            fieldErrors: {
+                generic: "Erro genérico",
+                dataLimite: "Data inválida",
+                observacoes: "Observação inválida"
+            }
+        });
+
+        expect(wrapper.text()).toContain("Erro genérico");
+        expect(wrapper.text()).toContain("Data inválida");
+        expect(wrapper.text()).toContain("Observação inválida");
+    });
+
+    it("deve incluir observações no evento disponibilizar", async () => {
+        const wrapper = createWrapper({ mostrar: true });
+        const dataLimite = "2024-12-31";
+        const observacoes = "Teste observação";
+
+        const inputWrapper = wrapper.findComponent(BFormInput);
+        const nativeInput = inputWrapper.find("input");
+        await nativeInput.setValue(dataLimite);
+
+        const obsTextarea = wrapper.find('[data-testid="inp-disponibilizar-mapa-obs"]');
+        await obsTextarea.setValue(observacoes);
+
+        await wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]').trigger("click");
+
+        expect(wrapper.emitted("disponibilizar")?.[0]).toEqual([{
+            dataLimite,
+            observacoes
+        }]);
+    });
+
+    it("deve resetar campos quando mostrar mudar para true", async () => {
+        const wrapper = createWrapper({ mostrar: false });
+
+        // Set values while hidden (simulating state persistence if it wasn't reset)
+        // Note: Since we can't easily set ref values directly from wrapper without exposing them,
+        // we can test the effect by verifying they are empty after showing.
+        // But to really test the watch, we can simulate the flow:
+        // 1. Show modal
+        // 2. Set values
+        // 3. Hide modal (prop change)
+        // 4. Show modal again (prop change) -> Expect empty
+
+        await wrapper.setProps({ mostrar: true });
+        
+        const inputWrapper = wrapper.findComponent(BFormInput);
+        const nativeInput = inputWrapper.find("input");
+        await nativeInput.setValue("2024-12-31");
+        
+        const obsTextarea = wrapper.find('[data-testid="inp-disponibilizar-mapa-obs"]');
+        await obsTextarea.setValue("Obs");
+        
+        // Hide
+        await wrapper.setProps({ mostrar: false });
+        
+        // Show again
+        await wrapper.setProps({ mostrar: true });
+        
+        expect(wrapper.findComponent(BFormInput).props().modelValue).toBe("");
+        
+        // Re-find the element to ensure we have the latest state
+        const updatedObsTextarea = wrapper.find('[data-testid="inp-disponibilizar-mapa-obs"]');
+        expect(updatedObsTextarea.element.value).toBe("");
+    });
 });

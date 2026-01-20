@@ -79,7 +79,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
         usuarioRepo.save(usuario2);
 
         // Adicionar admin inicial
-        admin1 = new Administrador(usuario1.getTituloEleitoral());
+        admin1 = Administrador.builder().usuarioTitulo(usuario1.getTituloEleitoral()).build();
         administradorRepo.save(admin1);
 
         entityManager.flush();
@@ -123,7 +123,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void removerAdministrador_sucesso() throws Exception {
         // Adicionar um segundo administrador primeiro
-        Administrador admin2 = new Administrador(usuario2.getTituloEleitoral());
+        Administrador admin2 = Administrador.builder().usuarioTitulo(usuario2.getTituloEleitoral()).build();
         administradorRepo.save(admin2);
         entityManager.flush();
         entityManager.clear();

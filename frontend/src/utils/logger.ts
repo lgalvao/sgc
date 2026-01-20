@@ -4,12 +4,10 @@ import {createConsola} from "consola";
 // Desenvolvimento: INFO (4) - mostra info, warn, error
 // Produção: WARN (3) - mostra apenas warn e error
 // Teste: ERROR (1) - mostra apenas error
-const getLogLevel = () => {
-    const env = import.meta.env.MODE;
-    
-    if (env === 'test') {
+export const getLogLevel = (envMode: string = import.meta.env.MODE) => {
+    if (envMode === 'test') {
         return 1; // ERROR only
-    } else if (env === 'production') {
+    } else if (envMode === 'production') {
         return 3; // WARN and ERROR
     } else {
         return 4; // INFO, WARN, ERROR (development)

@@ -45,7 +45,7 @@ class ActuatorSecurityTest {
     @BeforeEach
     void setup() {
         Unidade unidade = unidadeRepo.findAll().stream().findFirst()
-                .orElseGet(() -> unidadeRepo.save(new Unidade("Unidade Teste", "TESTE")));
+                .orElseGet(() -> unidadeRepo.save(Unidade.builder().nome("Unidade Teste").sigla("TESTE").build()));
 
         criarUsuario("123456789", Perfil.ADMIN, unidade);
         criarUsuario("987654321", Perfil.SERVIDOR, unidade);
@@ -64,12 +64,13 @@ class ActuatorSecurityTest {
                 .build();
         usuarioRepo.save(usuario);
 
-        UsuarioPerfil usuarioPerfil = new UsuarioPerfil();
-        usuarioPerfil.setUsuarioTitulo(titulo);
-        usuarioPerfil.setUsuario(usuario);
-        usuarioPerfil.setUnidadeCodigo(unidade.getCodigo());
-        usuarioPerfil.setUnidade(unidade);
-        usuarioPerfil.setPerfil(perfil);
+        UsuarioPerfil usuarioPerfil = UsuarioPerfil.builder()
+                .usuarioTitulo(titulo)
+                .usuario(usuario)
+                .unidadeCodigo(unidade.getCodigo())
+                .unidade(unidade)
+                .perfil(perfil)
+                .build();
         usuarioPerfilRepo.save(usuarioPerfil);
     }
 

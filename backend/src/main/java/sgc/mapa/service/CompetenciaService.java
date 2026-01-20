@@ -41,7 +41,10 @@ public class CompetenciaService {
      * Creates and persists competencia with associated activities
      */
     public void criarCompetenciaComAtividades(Mapa mapa, String descricao, List<Long> codigosAtividades) {
-        Competencia competencia = new Competencia(descricao, mapa);
+        Competencia competencia = Competencia.builder()
+                .descricao(descricao)
+                .mapa(mapa)
+                .build();
         prepararCompetenciasAtividades(codigosAtividades, competencia);
         competenciaRepo.save(competencia);
 

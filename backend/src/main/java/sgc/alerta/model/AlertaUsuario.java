@@ -2,6 +2,7 @@ package sgc.alerta.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import sgc.organizacao.model.Usuario;
 
 import java.io.Serializable;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
 public class AlertaUsuario implements Serializable {
     @EmbeddedId
     private Chave id;
@@ -47,7 +48,7 @@ public class AlertaUsuario implements Serializable {
     @Getter
     @Setter
     @NoArgsConstructor
-    @AllArgsConstructor
+    @SuperBuilder
     @EqualsAndHashCode
     public static class Chave implements Serializable {
         private Long alertaCodigo;

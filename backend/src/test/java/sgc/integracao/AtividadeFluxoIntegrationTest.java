@@ -97,11 +97,12 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
         unidade.setTituloTitular("888888888888");
         unidade = unidadeRepo.save(unidade);
 
-        Usuario chefe = new Usuario();
-        chefe.setTituloEleitoral("888888888888");
-        chefe.setNome("Chefe Fluxo");
-        chefe.setEmail("chefe@fluxo.com");
-        chefe.setUnidadeLotacao(unidade);
+        Usuario chefe = Usuario.builder()
+                .tituloEleitoral("888888888888")
+                .nome("Chefe Fluxo")
+                .email("chefe@fluxo.com")
+                .unidadeLotacao(unidade)
+                .build();
         chefe = usuarioRepo.save(chefe);
 
         UsuarioPerfil perfilChefe = UsuarioPerfil.builder()
@@ -114,19 +115,21 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
         usuarioPerfilRepo.save(perfilChefe);
 
         // 2. Criar Processo
-        Processo processo = new Processo(
-                "Processo Fluxo",
-                TipoProcesso.MAPEAMENTO,
-                SituacaoProcesso.EM_ANDAMENTO,
-                LocalDateTime.now().plusDays(30));
+        Processo processo = Processo.builder()
+                .descricao("Processo Fluxo")
+                .tipo(TipoProcesso.MAPEAMENTO)
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .dataLimite(LocalDateTime.now().plusDays(30))
+                .build();
         processoRepo.save(processo);
 
         // 3. Criar Subprocesso e Mapa
-        subprocesso = new Subprocesso()
-                .setUnidade(unidade)
-                .setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
-                .setDataLimiteEtapa1(LocalDateTime.now().plusDays(10))
-                .setProcesso(processo);
+        subprocesso = Subprocesso.builder()
+                .unidade(unidade)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
+                .processo(processo)
+                .build();
         subprocesso = subprocessoRepo.save(subprocesso);
 
         mapa = new Mapa();

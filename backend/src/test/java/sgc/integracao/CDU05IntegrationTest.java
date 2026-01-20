@@ -104,17 +104,29 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         mapaOriginal = new Mapa();
         mapaRepo.save(mapaOriginal);
 
-        competenciaOriginal = new Competencia("Competencia Original", mapaOriginal);
+        competenciaOriginal = Competencia.builder()
+                .descricao("Competencia Original")
+                .mapa(mapaOriginal)
+                .build();
         competenciaRepo.save(competenciaOriginal);
 
-        atividadeOriginal = new Atividade(mapaOriginal, "Atividade Original");
+        atividadeOriginal = Atividade.builder()
+                .mapa(mapaOriginal)
+                .descricao("Atividade Original")
+                .build();
         atividadeRepo.save(atividadeOriginal);
 
-        conhecimentoOriginal = new Conhecimento("Conhecimento Original", atividadeOriginal);
+        conhecimentoOriginal = Conhecimento.builder()
+                .descricao("Conhecimento Original")
+                .atividade(atividadeOriginal)
+                .build();
         atividadeOriginal.getConhecimentos().add(conhecimentoOriginal); // Mantém consistência bidirecional
         conhecimentoRepo.save(conhecimentoOriginal);
 
-        unidadeMapaRepo.save(new UnidadeMapa(unidade.getCodigo(), mapaOriginal));
+        unidadeMapaRepo.save(UnidadeMapa.builder()
+                .unidadeCodigo(unidade.getCodigo())
+                .mapaVigente(mapaOriginal)
+                .build());
     }
 
     private CriarProcessoRequest criarCriarProcessoReq(

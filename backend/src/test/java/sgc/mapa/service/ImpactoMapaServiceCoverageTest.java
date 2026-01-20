@@ -55,7 +55,7 @@ class ImpactoMapaServiceCoverageTest {
         Atividade aVigente = new Atividade();
         aVigente.setCodigo(1L);
         aVigente.setDescricao("A");
-        aVigente.setConhecimentos(List.of(new Conhecimento("C1", aVigente)));
+        aVigente.setConhecimentos(List.of(Conhecimento.builder().descricao("C1").atividade(aVigente).build()));
 
         Atividade aAtual = new Atividade();
         aAtual.setCodigo(1L);
@@ -132,12 +132,12 @@ class ImpactoMapaServiceCoverageTest {
         Atividade aVigente = new Atividade();
         aVigente.setCodigo(1L);
         aVigente.setDescricao("A");
-        aVigente.setConhecimentos(List.of(new Conhecimento("C1", aVigente)));
+        aVigente.setConhecimentos(List.of(Conhecimento.builder().descricao("C1").atividade(aVigente).build()));
 
         Atividade aAtual = new Atividade();
         aAtual.setCodigo(1L);
         aAtual.setDescricao("A");
-        aAtual.setConhecimentos(List.of(new Conhecimento("C2", aAtual)));
+        aAtual.setConhecimentos(List.of(Conhecimento.builder().descricao("C2").atividade(aAtual).build()));
 
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(100L)).thenReturn(List.of(aVigente));
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(200L)).thenReturn(List.of(aAtual));

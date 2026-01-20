@@ -44,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-16: Ajustar mapa de competências")
 @WithMockAdmin
-public class CDU16IntegrationTest extends BaseIntegrationTest {
+class CDU16IntegrationTest extends BaseIntegrationTest {
     private static final String API_SUBPROCESSO_MAPA_AJUSTE =
             "/api/subprocessos/{codSubprocesso}/mapa-ajuste/atualizar";
 
@@ -105,11 +105,11 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
         subprocesso.setMapa(mapa);
 
         // Criar Competências e Atividades
-        var c1 = competenciaRepo.save(new Competencia("Competência 1", mapa));
+        var c1 = competenciaRepo.save(Competencia.builder().descricao("Competência 1").mapa(mapa).build());
 
         // As atividades devem ser salvas antes de serem associadas à competência
-        atividade1 = new Atividade(mapa, "Atividade 1");
-        var atividade2 = new Atividade(mapa, "Atividade 2");
+        atividade1 = Atividade.builder().mapa(mapa).descricao("Atividade 1").build();
+        var atividade2 = Atividade.builder().mapa(mapa).descricao("Atividade 2").build();
 
         List<Atividade> atividadesSalvas = atividadeRepo.saveAll(List.of(atividade1, atividade2));
         atividade1 = atividadesSalvas.get(0);

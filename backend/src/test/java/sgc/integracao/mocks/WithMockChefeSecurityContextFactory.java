@@ -48,7 +48,7 @@ public class WithMockChefeSecurityContextFactory
                 }
             }
             if (unidade == null) {
-                unidade = new Unidade("Unidade Mock", "SESEL");
+                unidade = Unidade.builder().nome("Unidade Mock").sigla("SESEL").build();
                 unidade.setCodigo(10L);
             }
 

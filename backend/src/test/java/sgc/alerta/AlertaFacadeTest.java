@@ -422,9 +422,9 @@ class AlertaFacadeTest {
             when(alertaRepo.findByUnidadeDestino_Codigo(1L)).thenReturn(List.of(a1, a2));
 
             // a1 lido, a2 nao lido
-            when(alertaUsuarioRepo.findById(eq(new AlertaUsuario.Chave(1L, titulo))))
+            when(alertaUsuarioRepo.findById(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build()))
                     .thenReturn(Optional.of(new AlertaUsuario().setDataHoraLeitura(LocalDateTime.now())));
-            when(alertaUsuarioRepo.findById(eq(new AlertaUsuario.Chave(2L, titulo))))
+            when(alertaUsuarioRepo.findById(AlertaUsuario.Chave.builder().alertaCodigo(2L).usuarioTitulo(titulo).build()))
                     .thenReturn(Optional.empty());
 
             // Mocks do mapper

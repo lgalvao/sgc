@@ -70,7 +70,6 @@ class SubprocessoAccessPolicyCoverageTest {
         Subprocesso sp = criarSubprocesso(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 1L);
 
         // Use reflection to access the private method
-        // Note: RequisitoHierarquia is a private enum inside SubprocessoAccessPolicy
         Class<?> clazz = SubprocessoAccessPolicy.class;
         Class<?>[] innerClasses = clazz.getDeclaredClasses();
         Class<?> enumClass = null;

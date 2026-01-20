@@ -104,17 +104,19 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         atividade1 = atividadeRepo.save(atividade1);
 
         Conhecimento conhecimento1 =
-                new Conhecimento(atividade1, "Interpretação de textos técnicos");
+                Conhecimento.builder().atividade(atividade1).descricao("Interpretação de textos técnicos").build();
+        // Verificando uso de builder se construtor foi removido:
+        // Conhecimento.builder().atividade(atividade1).descricao("...").build()
         conhecimentoRepo.save(conhecimento1);
 
         Atividade atividade2 = AtividadeFixture.atividadePadrao(mapa);
         atividade2.setDescricao("Elaborar relatórios");
         atividade2 = atividadeRepo.save(atividade2);
 
-        Conhecimento conhecimento2a = new Conhecimento(atividade2, "Escrita clara e concisa");
+        Conhecimento conhecimento2a = Conhecimento.builder().atividade(atividade2).descricao("Escrita clara e concisa").build();
         conhecimentoRepo.save(conhecimento2a);
 
-        Conhecimento conhecimento2b = new Conhecimento(atividade2, "Uso de planilhas");
+        Conhecimento conhecimento2b = Conhecimento.builder().atividade(atividade2).descricao("Uso de planilhas").build();
         conhecimentoRepo.save(conhecimento2b);
     }
 

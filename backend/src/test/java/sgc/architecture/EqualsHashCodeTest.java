@@ -11,8 +11,8 @@ class EqualsHashCodeTest {
 
     @Test
     void testUsuario() {
-        Unidade u1 = new Unidade("Unidade 1", "U1");
-        Unidade u2 = new Unidade("Unidade 2", "U2");
+        Unidade u1 = Unidade.builder().nome("Unidade 1").sigla("U1").build();
+        Unidade u2 = Unidade.builder().nome("Unidade 2").sigla("U2").build();
 
         AtribuicaoTemporaria at1 = new AtribuicaoTemporaria();
         at1.setJustificativa("Justificativa 1");
@@ -35,8 +35,8 @@ class EqualsHashCodeTest {
 
     @Test
     void testUsuarioPerfil() {
-        Unidade u1 = new Unidade("Unidade 1", "U1");
-        Unidade u2 = new Unidade("Unidade 2", "U2");
+        Unidade u1 = Unidade.builder().nome("Unidade 1").sigla("U1").build();
+        Unidade u2 = Unidade.builder().nome("Unidade 2").sigla("U2").build();
         Usuario user1 = Usuario.builder().tituloEleitoral("111").build();
         Usuario user2 = Usuario.builder().tituloEleitoral("222").build();
 

@@ -61,38 +61,41 @@ class SubprocessoBuscarIntegrationTest extends BaseIntegrationTest {
 
         // Processo em andamento
         processoEmAndamento =
-                new Processo(
-                        "Processo em Andamento",
-                        TipoProcesso.MAPEAMENTO,
-                        SituacaoProcesso.EM_ANDAMENTO,
-                        LocalDateTime.now().plusDays(30));
+                        Processo.builder()
+                                .descricao("Processo em Andamento")
+                                .tipo(TipoProcesso.MAPEAMENTO)
+                                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                                .dataLimite(LocalDateTime.now().plusDays(30))
+                                .build();
         processoEmAndamento.setParticipantes(Set.of(unidade));
         processoRepo.save(processoEmAndamento);
 
         var mapaEmAndamento = mapaRepo.save(new Mapa());
         subprocessoEmAndamento =
-                new Subprocesso(
-                        processoEmAndamento,
-                        unidade,
-                        mapaEmAndamento,
-                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-                        processoEmAndamento.getDataLimite());
+                Subprocesso.builder()
+                        .processo(processoEmAndamento)
+                        .unidade(unidade)
+                        .mapa(mapaEmAndamento)
+                        .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
+                        .dataLimiteEtapa1(processoEmAndamento.getDataLimite())
+                        .build();
         subprocessoRepo.save(subprocessoEmAndamento);
 
         // Processo finalizado
         processoFinalizado =
-                new Processo(
-                        "Processo Finalizado",
-                        TipoProcesso.MAPEAMENTO,
-                        SituacaoProcesso.FINALIZADO,
-                        LocalDateTime.now().plusDays(30));
+                Processo.builder()
+                        .descricao("Processo Finalizado")
+                        .tipo(TipoProcesso.MAPEAMENTO)
+                        .situacao(SituacaoProcesso.FINALIZADO)
+                        .dataLimite(LocalDateTime.now().plusDays(30))
+                        .build();
         processoFinalizado.setParticipantes(Set.of(unidade));
         processoFinalizado.setDataFinalizacao(LocalDateTime.now());
         processoRepo.save(processoFinalizado);
 
         var mapaFinalizado = mapaRepo.save(new Mapa());
-        subprocessoFinalizado = new Subprocesso(processoFinalizado, unidade, mapaFinalizado,
-                SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processoFinalizado.getDataLimite());
+        subprocessoFinalizado = Subprocesso.builder().processo(processoFinalizado).unidade(unidade).mapa(mapaFinalizado)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO).dataLimiteEtapa1(processoFinalizado.getDataLimite()).build();
         subprocessoRepo.save(subprocessoFinalizado);
     }
 

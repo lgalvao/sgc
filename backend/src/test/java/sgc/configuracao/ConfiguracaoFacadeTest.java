@@ -33,8 +33,8 @@ class ConfiguracaoFacadeTest {
     @DisplayName("Deve buscar todos os parâmetros")
     void buscarTodos_sucesso() {
         // Arrange
-        Parametro p1 = new Parametro("CHAVE_1", "VALOR_1", "Desc 1");
-        Parametro p2 = new Parametro("CHAVE_2", "VALOR_2", "Desc 2");
+        Parametro p1 = Parametro.builder().chave("CHAVE_1").valor("VALOR_1").descricao("Desc 1").build();
+        Parametro p2 = Parametro.builder().chave("CHAVE_2").valor("VALOR_2").descricao("Desc 2").build();
         when(parametroRepo.findAll()).thenReturn(List.of(p1, p2));
 
         // Act
@@ -50,7 +50,7 @@ class ConfiguracaoFacadeTest {
     void buscarPorChave_sucesso() {
         // Arrange
         String chave = "TESTE_CHAVE";
-        Parametro parametro = new Parametro(chave, "VALOR", "Desc");
+        Parametro parametro = Parametro.builder().chave(chave).valor("VALOR").descricao("Desc").build();
         when(parametroRepo.findByChave(chave)).thenReturn(Optional.of(parametro));
 
         // Act
@@ -78,7 +78,7 @@ class ConfiguracaoFacadeTest {
     @DisplayName("Deve salvar lista de parâmetros")
     void salvar_sucesso() {
         // Arrange
-        Parametro p1 = new Parametro("CHAVE_1", "VALOR_1", "Desc 1");
+        Parametro p1 = Parametro.builder().chave("CHAVE_1").valor("VALOR_1").descricao("Desc 1").build();
         List<Parametro> lista = List.of(p1);
         when(parametroRepo.saveAll(lista)).thenReturn(lista);
 
@@ -97,7 +97,7 @@ class ConfiguracaoFacadeTest {
         String chave = "CHAVE_ATUALIZAR";
         String valorAntigo = "VALOR_ANTIGO";
         String novoValor = "VALOR_NOVO";
-        Parametro parametro = new Parametro(chave, valorAntigo, "Desc");
+        Parametro parametro = Parametro.builder().chave(chave).valor(valorAntigo).descricao("Desc").build();
 
         when(parametroRepo.findByChave(chave)).thenReturn(Optional.of(parametro));
         when(parametroRepo.save(any(Parametro.class))).thenAnswer(invocation -> invocation.getArgument(0));

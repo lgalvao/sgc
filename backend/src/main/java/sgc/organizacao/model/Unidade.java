@@ -2,6 +2,7 @@ package sgc.organizacao.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Immutable;
 import org.jspecify.annotations.Nullable;
 import sgc.comum.model.EntidadeBase;
@@ -17,8 +18,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Unidade extends EntidadeBase {
     @Column(name = "nome")
     private String nome;
@@ -63,12 +63,4 @@ public class Unidade extends EntidadeBase {
     @ManyToMany(mappedBy = "participantes")
     @Builder.Default
     private Set<Processo> processos = new HashSet<>();
-
-    public Unidade(String nome, String sigla) {
-        super();
-        this.nome = nome;
-        this.sigla = sigla;
-        this.situacao = SituacaoUnidade.ATIVA;
-        this.tipo = TipoUnidade.OPERACIONAL;
-    }
 }

@@ -59,6 +59,7 @@ public class SubprocessoFactory {
                         .situacao(NAO_INICIADO)
                         .dataLimiteEtapa1(processo.getDataLimite())
                         .build())
+                .map(Subprocesso.class::cast)
                 .toList();
 
         List<Subprocesso> subprocessosSalvos = subprocessoRepo.saveAll(subprocessos);
@@ -77,7 +78,11 @@ public class SubprocessoFactory {
         
         List<Movimentacao> movimentacoes = new java.util.ArrayList<>();
         for (Subprocesso sp : subprocessosSalvos) {
-            movimentacoes.add(new Movimentacao(sp, null, sp.getUnidade(), "Processo iniciado", null));
+            movimentacoes.add(Movimentacao.builder()
+                    .subprocesso(sp)
+                    .unidadeDestino(sp.getUnidade())
+                    .descricao("Processo iniciado")
+                    .build());
         }
         movimentacaoRepo.saveAll(movimentacoes);
     }
@@ -110,7 +115,11 @@ public class SubprocessoFactory {
         Mapa mapaSalvo = mapaRepo.save(mapaCopiado);
         subprocessoSalvo.setMapa(mapaSalvo);
 
-        movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo de revisão iniciado", null));
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(subprocessoSalvo)
+                .unidadeDestino(unidade)
+                .descricao("Processo de revisão iniciado")
+                .build());
         log.info("Subprocesso para revisão criado para unidade {}", unidade.getSigla());
     }
 
@@ -139,7 +148,11 @@ public class SubprocessoFactory {
         Mapa mapaSalvo = mapaRepo.save(mapaCopiado);
         subprocessoSalvo.setMapa(mapaSalvo);
 
-        movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo de diagnóstico iniciado", null));
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(subprocessoSalvo)
+                .unidadeDestino(unidade)
+                .descricao("Processo de diagnóstico iniciado")
+                .build());
         log.info("Subprocesso {} para diagnóstico criado para unidade {}", subprocessoSalvo.getCodigo(), unidade.getSigla());
     }
 }

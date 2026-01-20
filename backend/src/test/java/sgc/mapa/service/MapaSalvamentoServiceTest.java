@@ -92,7 +92,7 @@ class MapaSalvamentoServiceTest {
                 .build();
 
         Mapa mapa = new Mapa();
-        Competencia compExistente = new Competencia("Existente", mapa);
+        Competencia compExistente = Competencia.builder().descricao("Existente").mapa(mapa).build();
         compExistente.setCodigo(100L);
         
         Atividade ativ1 = new Atividade();

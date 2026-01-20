@@ -123,10 +123,10 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         // MapaFixture.mapaPadrao(null) leaves it null, but subprocesso.setMapa sets it on subprocesso.
 
         // Setup inicial de Atividade e Competência válidas
-        Atividade atividade = new Atividade(mapa, "Atividade Valida");
+        Atividade atividade = Atividade.builder().mapa(mapa).descricao("Atividade Valida").build();
         atividade = atividadeRepo.save(atividade);
 
-        Competencia competencia = new Competencia("Competencia Valida", mapa);
+        Competencia competencia = Competencia.builder().descricao("Competencia Valida").mapa(mapa).build();
         competencia = competenciaRepo.save(competencia);
 
         // Associar (ManyToMany manually if needed or via helper methods)
@@ -240,7 +240,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         @WithMockAdmin
         void disponibilizarMapa_comAtividadeNaoAssociada_retornaBadRequest() throws Exception {
             // Cria uma nova atividade sem competências para criar o cenário de erro
-            Atividade atividadeSolta = new Atividade(mapa, "Atividade Solta");
+            Atividade atividadeSolta = Atividade.builder().mapa(mapa).descricao("Atividade Solta").build();
             atividadeRepo.save(atividadeSolta);
 
             DisponibilizarMapaRequest request =
@@ -260,7 +260,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Não deve disponibilizar mapa se houver competência sem atividade associada")
         @WithMockAdmin
         void disponibilizarMapa_comCompetenciaNaoAssociada_retornaBadRequest() throws Exception {
-            competenciaRepo.save(new Competencia("Competência Solta", mapa));
+            competenciaRepo.save(Competencia.builder().descricao("Competência Solta").mapa(mapa).build());
 
             DisponibilizarMapaRequest request =
                     new DisponibilizarMapaRequest(LocalDate.now().plusDays(10), OBS_LITERAL);

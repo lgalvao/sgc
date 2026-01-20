@@ -28,7 +28,7 @@ class ParametroValidationTest {
     @Test
     @DisplayName("Deve validar parametro válido")
     void validarParametroValido() {
-        Parametro p = new Parametro("CHAVE", "Descricao", "VALOR");
+        Parametro p = Parametro.builder().chave("CHAVE").descricao("Descricao").valor("VALOR").build();
         Set<ConstraintViolation<Parametro>> violations = validator.validate(p);
         assertTrue(violations.isEmpty());
     }
@@ -36,7 +36,7 @@ class ParametroValidationTest {
     @Test
     @DisplayName("Deve falhar quando chave é vazia")
     void validarChaveVazia() {
-        Parametro p = new Parametro("", "Descricao", "VALOR");
+        Parametro p = Parametro.builder().chave("").descricao("Descricao").valor("VALOR").build();
         Set<ConstraintViolation<Parametro>> violations = validator.validate(p);
         assertFalse(violations.isEmpty());
         assertEquals(1, violations.size());
@@ -46,7 +46,7 @@ class ParametroValidationTest {
     @Test
     @DisplayName("Deve falhar quando valor é vazio")
     void validarValorVazio() {
-        Parametro p = new Parametro("CHAVE", "Descricao", "");
+        Parametro p = Parametro.builder().chave("CHAVE").descricao("Descricao").valor("").build();
         Set<ConstraintViolation<Parametro>> violations = validator.validate(p);
         assertFalse(violations.isEmpty());
         assertEquals(1, violations.size());
@@ -57,7 +57,7 @@ class ParametroValidationTest {
     @DisplayName("Deve falhar quando chave é muito longa")
     void validarChaveLonga() {
         String chaveLonga = "A".repeat(51);
-        Parametro p = new Parametro(chaveLonga, "Descricao", "VALOR");
+        Parametro p = Parametro.builder().chave(chaveLonga).descricao("Descricao").valor("VALOR").build();
         Set<ConstraintViolation<Parametro>> violations = validator.validate(p);
         assertFalse(violations.isEmpty());
         assertEquals(1, violations.size());

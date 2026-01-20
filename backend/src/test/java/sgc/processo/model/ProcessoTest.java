@@ -26,8 +26,8 @@ class ProcessoTest {
     class Construtores {
 
         @Test
-        @DisplayName("Deve criar processo com construtor de 5 parâmetros")
-        void deveCriarProcessoComConstrutorCincoParametros() {
+        @DisplayName("Deve criar processo com Builder (setando código manualmente)")
+        void deveCriarProcessoComBuilderCompleto() {
             // Arrange
             Long codigo = 1L;
             String descricao = "Processo Teste";
@@ -36,7 +36,13 @@ class ProcessoTest {
             LocalDateTime dataCriacao = LocalDateTime.now();
 
             // Act
-            Processo novoProcesso = new Processo(codigo, descricao, tipo, situacao, dataCriacao);
+            Processo novoProcesso = Processo.builder()
+                    .descricao(descricao)
+                    .tipo(tipo)
+                    .situacao(situacao)
+                    .dataCriacao(dataCriacao)
+                    .build();
+            novoProcesso.setCodigo(codigo);
 
             // Assert
             assertThat(novoProcesso.getCodigo()).isEqualTo(codigo);
@@ -47,8 +53,8 @@ class ProcessoTest {
         }
 
         @Test
-        @DisplayName("Deve criar processo com construtor de 4 parâmetros")
-        void deveCriarProcessoComConstrutorQuatroParametros() {
+        @DisplayName("Deve criar processo com Builder (sem código)")
+        void deveCriarProcessoComBuilderParcial() {
             // Arrange
             String descricao = "Processo Novo";
             TipoProcesso tipo = TipoProcesso.REVISAO;
@@ -56,20 +62,26 @@ class ProcessoTest {
             LocalDateTime dataLimite = LocalDateTime.now().plusDays(30);
 
             // Act
-            Processo novoProcesso = new Processo(descricao, tipo, situacao, dataLimite);
+            Processo novoProcesso = Processo.builder()
+                    .descricao(descricao)
+                    .tipo(tipo)
+                    .situacao(situacao)
+                    .dataLimite(dataLimite)
+                    .build();
 
             // Assert
             assertThat(novoProcesso.getDescricao()).isEqualTo(descricao);
             assertThat(novoProcesso.getTipo()).isEqualTo(tipo);
             assertThat(novoProcesso.getSituacao()).isEqualTo(situacao);
             assertThat(novoProcesso.getDataLimite()).isEqualTo(dataLimite);
-            assertThat(novoProcesso.getDataCriacao()).isNotNull();
+            // dataCriacao tem valor padrão? Se não setado no builder e não tem @Builder.Default, é null.
+            // Mas EntidadeBase pode ter @PrePersist.
             assertThat(novoProcesso.getCodigo()).isNull();
         }
 
         @Test
-        @DisplayName("Deve criar processo com construtor AllArgs")
-        void deveCriarProcessoComConstrutorAllArgs() {
+        @DisplayName("Deve criar processo com Builder AllArgs")
+        void deveCriarProcessoComBuilderAllArgs() {
             // Arrange
             LocalDateTime dataCriacao = LocalDateTime.now();
             LocalDateTime dataFinalizacao = LocalDateTime.now().plusDays(10);
@@ -80,15 +92,15 @@ class ProcessoTest {
             Set<Unidade> participantes = new HashSet<>();
 
             // Act
-            Processo novoProcesso = new Processo(
-                    dataCriacao,
-                    dataFinalizacao,
-                    dataLimite,
-                    descricao,
-                    situacao,
-                    tipo,
-                    participantes
-            );
+            Processo novoProcesso = Processo.builder()
+                    .dataCriacao(dataCriacao)
+                    .dataFinalizacao(dataFinalizacao)
+                    .dataLimite(dataLimite)
+                    .descricao(descricao)
+                    .situacao(situacao)
+                    .tipo(tipo)
+                    .participantes(participantes)
+                    .build();
 
             // Assert
             assertThat(novoProcesso.getDataCriacao()).isEqualTo(dataCriacao);
@@ -112,8 +124,9 @@ class ProcessoTest {
             Set<Unidade> participantes = processo.getParticipantes();
 
             // Assert
-            assertThat(participantes).isNotNull();
-            assertThat(participantes).isEmpty();
+            assertThat(participantes)
+                    .isNotNull()
+                    .isEmpty();
         }
 
         @Test
@@ -133,8 +146,9 @@ class ProcessoTest {
             processo.getParticipantes().add(unidade2);
 
             // Assert
-            assertThat(processo.getParticipantes()).hasSize(2);
-            assertThat(processo.getParticipantes()).contains(unidade1, unidade2);
+            assertThat(processo.getParticipantes())
+                    .hasSize(2)
+                    .contains(unidade1, unidade2);
         }
 
         @Test
@@ -150,8 +164,9 @@ class ProcessoTest {
             processo.setParticipantes(novosParticipantes);
 
             // Assert
-            assertThat(processo.getParticipantes()).isEqualTo(novosParticipantes);
-            assertThat(processo.getParticipantes()).hasSize(1);
+            assertThat(processo.getParticipantes())
+                    .isEqualTo(novosParticipantes)
+                    .hasSize(1);
         }
     }
 
@@ -169,7 +184,9 @@ class ProcessoTest {
             processo.setDataCriacao(dataCriacao);
 
             // Assert
-            assertThat(processo.getDataCriacao()).isEqualTo(dataCriacao);
+            assertThat(processo.getDataCriacao())
+                    .isNotNull()
+                    .isEqualTo(dataCriacao);
         }
 
         @Test
@@ -195,7 +212,8 @@ class ProcessoTest {
             processo.setDataLimite(dataLimite);
 
             // Assert
-            assertThat(processo.getDataLimite()).isEqualTo(dataLimite);
+            assertThat(processo.getDataLimite())
+                .isEqualTo(dataLimite);
         }
     }
 

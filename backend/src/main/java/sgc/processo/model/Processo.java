@@ -1,10 +1,11 @@
 package sgc.processo.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.BatchSize;
 import sgc.comum.model.EntidadeBase;
 import sgc.organizacao.model.Unidade;
@@ -18,23 +19,30 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
 @AttributeOverride(name = "codigo", column = @Column(name = "codigo"))
 public class Processo extends EntidadeBase {
+    @Builder.Default
     @Column(name = "data_criacao")
-    private LocalDateTime dataCriacao;
+    private LocalDateTime dataCriacao = LocalDateTime.now();
+
     @Column(name = "data_finalizacao")
     private LocalDateTime dataFinalizacao;
+
     @Column(name = "data_limite")
     private LocalDateTime dataLimite;
+
     @Column(name = "descricao")
     private String descricao;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "situacao", length = 20)
     private SituacaoProcesso situacao;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20)
     private TipoProcesso tipo;
+
     @ManyToMany
     @JoinTable(
             name = "unidade_processo",
@@ -42,6 +50,7 @@ public class Processo extends EntidadeBase {
             joinColumns = @JoinColumn(name = "processo_codigo"),
             inverseJoinColumns = @JoinColumn(name = "unidade_codigo"))
     @BatchSize(size = 50)
+    @Builder.Default
     private Set<Unidade> participantes = new HashSet<>();
 
     public Set<Unidade> getParticipantes() {
@@ -49,31 +58,5 @@ public class Processo extends EntidadeBase {
             participantes = new HashSet<>();
         }
         return participantes;
-    }
-
-    public Processo(
-            Long codigo,
-            String descricao,
-            TipoProcesso tipo,
-            SituacaoProcesso situacao,
-            LocalDateTime dataCriacao) {
-        super(codigo);
-        this.descricao = descricao;
-        this.tipo = tipo;
-        this.situacao = situacao;
-        this.dataCriacao = dataCriacao;
-    }
-
-    public Processo(
-            String descricao,
-            TipoProcesso tipo,
-            SituacaoProcesso situacao,
-            LocalDateTime dataLimite) {
-        super();
-        this.descricao = descricao;
-        this.tipo = tipo;
-        this.situacao = situacao;
-        this.dataLimite = dataLimite;
-        this.dataCriacao = LocalDateTime.now();
     }
 }

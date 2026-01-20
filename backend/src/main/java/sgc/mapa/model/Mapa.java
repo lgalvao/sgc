@@ -1,11 +1,10 @@
 package sgc.mapa.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.jspecify.annotations.Nullable;
+import lombok.experimental.SuperBuilder;
 import sgc.comum.model.EntidadeBase;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -16,7 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
 public class Mapa extends EntidadeBase {
     @Column(name = "data_hora_disponibilizado")
     private LocalDateTime dataHoraDisponibilizado;
@@ -25,7 +24,7 @@ public class Mapa extends EntidadeBase {
     private String observacoesDisponibilizacao;
     
     @Column(name = "sugestoes", length = 1000)
-    private @Nullable String sugestoes;
+    private String sugestoes;
     
     @Column(name = "data_hora_homologado")
     private LocalDateTime dataHoraHomologado;

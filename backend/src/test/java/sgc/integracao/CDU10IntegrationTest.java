@@ -22,6 +22,7 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.ConhecimentoRepo;
 import sgc.organizacao.model.*;
 import sgc.processo.model.ProcessoRepo;
@@ -155,12 +156,13 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
                 usuario.getTituloEleitoral(), unidade.getCodigo(), perfil.name());
 
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setUsuario(usuario);
-        up.setUsuarioTitulo(usuario.getTituloEleitoral());
-        up.setUnidade(unidade);
-        up.setUnidadeCodigo(unidade.getCodigo());
-        up.setPerfil(perfil);
+        UsuarioPerfil up = UsuarioPerfil.builder()
+                .usuario(usuario)
+                .usuarioTitulo(usuario.getTituloEleitoral())
+                .unidade(unidade)
+                .unidadeCodigo(unidade.getCodigo())
+                .perfil(perfil)
+                .build();
 
         Set<UsuarioPerfil> atribuicoes = usuario.getAtribuicoes();
         if (atribuicoes == null || atribuicoes.isEmpty()) {
@@ -197,7 +199,9 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
             competencia.getAtividades().add(atividade);
             competenciaRepo.save(competencia);
 
-            conhecimentoRepo.save(new sgc.mapa.model.Conhecimento("Conhecimento de Teste", atividade));
+            Conhecimento conhecimento1 =
+                Conhecimento.builder().atividade(atividade).descricao("Interpretação de textos técnicos").build();
+            conhecimentoRepo.save(conhecimento1);
 
             entityManager.flush();
             entityManager.clear();
@@ -298,7 +302,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
             competencia.getAtividades().add(atividade);
             competenciaRepo.save(competencia);
 
-            conhecimentoRepo.save(new sgc.mapa.model.Conhecimento("Conhecimento de Teste", atividade));
+            conhecimentoRepo.save(sgc.mapa.model.Conhecimento.builder().descricao("Conhecimento de Teste").atividade(atividade).build());
 
             entityManager.flush();
             entityManager.clear();

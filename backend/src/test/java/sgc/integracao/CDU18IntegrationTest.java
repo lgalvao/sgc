@@ -90,23 +90,23 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         subprocesso = subprocessoRepo.save(subprocesso);
 
-        Atividade atividade1 = atividadeRepo.save(new Atividade(mapa, "Atividade 1"));
-        Atividade atividade2 = atividadeRepo.save(new Atividade(mapa, "Atividade 2"));
+        Atividade atividade1 = atividadeRepo.save(Atividade.builder().mapa(mapa).descricao("Atividade 1").build());
+        Atividade atividade2 = atividadeRepo.save(Atividade.builder().mapa(mapa).descricao("Atividade 2").build());
 
         Conhecimento conhecimento1 =
-                conhecimentoRepo.save(new Conhecimento("Conhecimento 1.1", atividade1));
+                conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento 1.1").atividade(atividade1).build());
         Conhecimento conhecimento2 =
-                conhecimentoRepo.save(new Conhecimento("Conhecimento 1.2", atividade1));
+                conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento 1.2").atividade(atividade1).build());
         Conhecimento conhecimento3 =
-                conhecimentoRepo.save(new Conhecimento("Conhecimento 2.1", atividade2));
+                conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento 2.1").atividade(atividade2).build());
 
         atividade1.getConhecimentos().addAll(List.of(conhecimento1, conhecimento2));
         atividade2.getConhecimentos().add(conhecimento3);
 
-        Competencia competencia1 = new Competencia("Competência 1", mapa);
+        Competencia competencia1 = Competencia.builder().descricao("Competência 1").mapa(mapa).build();
         competenciaRepo.save(competencia1);
 
-        Competencia competencia2 = new Competencia("Competência 2", mapa);
+        Competencia competencia2 = Competencia.builder().descricao("Competência 2").mapa(mapa).build();
         competenciaRepo.save(competencia2);
 
         // Configurar relacionamento bidirecional no lado owning (Atividade)

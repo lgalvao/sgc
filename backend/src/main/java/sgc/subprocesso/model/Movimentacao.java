@@ -1,9 +1,11 @@
 package sgc.subprocesso.model;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sgc.comum.model.EntidadeBase;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -15,13 +17,15 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@SuperBuilder
 public class Movimentacao extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "subprocesso_codigo")
     private Subprocesso subprocesso;
 
+    @Builder.Default
     @Column(name = "data_hora")
-    private LocalDateTime dataHora;
+    private LocalDateTime dataHora = LocalDateTime.now();
 
     @ManyToOne
     @JoinColumn(name = "unidade_origem_codigo")
@@ -37,37 +41,4 @@ public class Movimentacao extends EntidadeBase {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_titulo")
     private Usuario usuario;
-
-    public Movimentacao(
-            Long codigo,
-            Subprocesso subprocesso,
-            Usuario usuario,
-            String descricao,
-            LocalDateTime dataHora) {
-
-        super(codigo);
-        this.subprocesso = subprocesso;
-        this.usuario = usuario;
-        this.descricao = descricao;
-        this.dataHora = dataHora;
-    }
-
-    /**
-     * Construtor de conveniência para registrar uma nova movimentação. A data e hora são
-     * preenchidas automaticamente.
-     */
-    public Movimentacao(
-            Subprocesso subprocesso,
-            Unidade unidadeOrigem,
-            Unidade unidadeDestino,
-            String descricao,
-            Usuario usuario) {
-        super();
-        this.subprocesso = subprocesso;
-        this.unidadeOrigem = unidadeOrigem;
-        this.unidadeDestino = unidadeDestino;
-        this.descricao = descricao;
-        this.usuario = usuario;
-        this.dataHora = LocalDateTime.now();
-    }
 }

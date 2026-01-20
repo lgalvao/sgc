@@ -1,21 +1,19 @@
 const fs = require('fs');
 const path = require('path');
 
-// Try to find the file in root or relative to the script
-let coveragePath = 'coverage-final.json';
-if (!fs.existsSync(coveragePath)) {
-    coveragePath = path.join(__dirname, '../coverage-final.json');
-}
+// Caminho do relatório de cobertura do Frontend (Vitest/Istanbul)
+const COVERAGE_PATH = path.join(__dirname, '../../frontend/coverage/coverage-final.json');
 
-console.log(`Reading coverage from: ${coveragePath}`);
+console.log(`Lendo relatório de cobertura de: ${COVERAGE_PATH}`);
 
 try {
-    if (!fs.existsSync(coveragePath)) {
-        console.error("coverage-final.json not found!");
+    if (!fs.existsSync(COVERAGE_PATH)) {
+        console.error("Erro: coverage-final.json não encontrado.");
+        console.error("Execute 'npm run coverage:unit' no diretório frontend primeiro.");
         process.exit(1);
     }
 
-    const content = fs.readFileSync(coveragePath, 'utf8');
+    const content = fs.readFileSync(COVERAGE_PATH, 'utf8');
     const coverage = JSON.parse(content);
 
     const summary = [];
@@ -35,15 +33,15 @@ try {
 
         const percentage = totalStatements === 0 ? 100 : (coveredStatements / totalStatements) * 100;
 
-        // Normalize path to be relative to src usually or project root
-        let relativePath = filePath.replace(/\\/g, '/'); // Normalize slashes
+        // Normalize path
+        let relativePath = filePath.replace(/\\/g, '/');
         if (relativePath.includes('frontend/src')) {
             relativePath = relativePath.substring(relativePath.indexOf('frontend/src'));
         } else if (relativePath.includes('src')) {
             relativePath = relativePath.substring(relativePath.indexOf('src'));
         }
 
-        // Exclude node_modules or test files if they appear
+        // Exclude tests
         if (!relativePath.includes('node_modules') && !relativePath.includes('.spec.ts') && !relativePath.includes('.test.ts')) {
             summary.push({
                 file: relativePath,
@@ -57,19 +55,20 @@ try {
     // Sort by percentage ascending
     summary.sort((a, b) => a.pct - b.pct);
 
-    console.log('File | Coverage % | Statements (Covered/Total)');
+    console.log('\nArquivo | Cobertura % | Statements (Coberto/Total)');
     console.log('--- | --- | ---');
 
     let lowCoverageCount = 0;
     summary.forEach(item => {
-        if (item.pct < 80) { // Filter for interesting ones
+        if (item.pct < 80) {
             console.log(`${item.file} | ${item.pct}% | ${item.covered}/${item.total}`);
             lowCoverageCount++;
         }
     });
 
-    console.log(`\nFound ${lowCoverageCount} files with < 80% coverage.`);
+    console.log(`\nEncontrados ${lowCoverageCount} arquivos com < 80% de cobertura.`);
 
 } catch (err) {
-    console.error('Error reading or parsing coverage file:', err);
+    console.error('Erro ao ler ou processar arquivo de cobertura:', err);
+    process.exit(1);
 }

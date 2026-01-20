@@ -494,12 +494,12 @@ public class SubprocessoFacade {
                 spOrigem.getCodigo(),
                 unidadeOrigem != null ? unidadeOrigem.getSigla() : "N/A");
 
-        movimentacaoRepo.save(new Movimentacao(
-                spDestino,
-                unidadeOrigem,
-                spDestino.getUnidade(),
-                descMovimentacao,
-                null)
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(spDestino)
+                .unidadeOrigem(unidadeOrigem)
+                .unidadeDestino(spDestino.getUnidade())
+                .descricao(descMovimentacao)
+                .build()
         );
 
         log.info("Atividades importadas do subprocesso {} para {}", codSubprocessoOrigem, codSubprocessoDestino);

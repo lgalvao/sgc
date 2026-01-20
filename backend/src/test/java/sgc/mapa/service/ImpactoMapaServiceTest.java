@@ -12,12 +12,16 @@ import sgc.mapa.model.*;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.seguranca.acesso.Acao;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -74,13 +78,8 @@ class ImpactoMapaServiceTest {
     }
 
     private void addAtribuicao(Usuario u, Perfil p) {
-        java.util.Set<sgc.organizacao.model.UsuarioPerfil> attrs = new java.util.HashSet<>();
-        attrs.add(
-                        sgc.organizacao.model.UsuarioPerfil.builder()
-                                .usuario(u)
-                                .unidade(new Unidade())
-                                .perfil(p)
-                                .build());
+        Set<UsuarioPerfil> attrs = new HashSet<>();
+        attrs.add(UsuarioPerfil.builder().usuario(u).unidade(new Unidade()).perfil(p).build());
         u.setAtribuicoes(attrs);
     }
 
@@ -91,27 +90,16 @@ class ImpactoMapaServiceTest {
         @Test
         @DisplayName("Deve chamar AccessControlService para verificar acesso")
         void deveChamarServicoAcesso() {
-            // Após refatoração de segurança, verificação de acesso é feita via AccessControlService
-            
-            // Scenario 1: Access Granted (delegation happens)
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
             assertDoesNotThrow(() -> impactoMapaService.verificarImpactos(subprocesso, chefe));
-            verify(accessControlService).verificarPermissao(
-                eq(chefe), 
-                eq(sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS), 
-                eq(subprocesso)
-            );
+            verify(accessControlService).verificarPermissao(chefe, Acao.VERIFICAR_IMPACTOS, subprocesso);
         }
 
         @Test
         @DisplayName("Deve propagar erro se acesso negado")
         void devePropagarErroAcesso() {
             doThrow(new ErroAccessoNegado("Acesso negado"))
-                    .when(accessControlService).verificarPermissao(
-                        any(Usuario.class),
-                        any(sgc.seguranca.acesso.Acao.class),
-                        any()
-                    );
+                    .when(accessControlService).verificarPermissao(chefe, sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS, subprocesso);
 
             assertThrows(
                     ErroAccessoNegado.class, () -> impactoMapaService.verificarImpactos(subprocesso, chefe));
@@ -150,8 +138,7 @@ class ImpactoMapaServiceTest {
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
             when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSubprocesso));
 
-            // Setup atividades
-            // Vigente: A1
+            // Setup atividades - Vigente: A1
             Atividade a1Vigente = new Atividade();
             a1Vigente.setCodigo(100L);
             a1Vigente.setDescricao("Ativ 1");
@@ -161,7 +148,9 @@ class ImpactoMapaServiceTest {
             Atividade a1Atual = new Atividade();
             a1Atual.setCodigo(101L);
             a1Atual.setDescricao("Ativ 1");
-            a1Atual.setConhecimentos(List.of(new Conhecimento(1L, "C1", a1Atual)));
+            Conhecimento con1 = Conhecimento.builder().descricao("C1").atividade(a1Atual).build();
+            con1.setCodigo(1L);
+            a1Atual.setConhecimentos(List.of(con1));
 
             Atividade a2Atual = new Atividade();
             a2Atual.setCodigo(200L);

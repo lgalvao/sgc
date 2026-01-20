@@ -131,7 +131,10 @@ public class MapaSalvamentoService {
             Map<Long, Competencia> mapaCompetenciasExistentes) {
 
         if (compDto.getCodigo() == null) {
-            return new Competencia(compDto.getDescricao(), mapa);
+            return Competencia.builder()
+                    .descricao(compDto.getDescricao())
+                    .mapa(mapa)
+                    .build();
         }
 
         Competencia competencia = mapaCompetenciasExistentes.get(compDto.getCodigo());

@@ -62,13 +62,20 @@ class SubprocessoTest {
     }
 
     @Test
-    @DisplayName("Deve instanciar via construtor completo")
-    void deveInstanciarViaConstrutorCompleto() {
+    @DisplayName("Deve instanciar via Builder")
+    void deveInstanciarViaBuilder() {
         Processo p = new Processo();
         Unidade u = new Unidade();
         Mapa m = new Mapa();
         LocalDateTime dt = LocalDateTime.now();
-        Subprocesso sp = new Subprocesso(1L, p, u, m, SituacaoSubprocesso.NAO_INICIADO, dt);
+        Subprocesso sp = Subprocesso.builder()
+                .processo(p)
+                .unidade(u)
+                .mapa(m)
+                .situacao(SituacaoSubprocesso.NAO_INICIADO)
+                .dataLimiteEtapa1(dt)
+                .build();
+        sp.setCodigo(1L);
 
         assertThat(sp.getCodigo()).isEqualTo(1L);
         assertThat(sp.getProcesso()).isEqualTo(p);
@@ -78,21 +85,7 @@ class SubprocessoTest {
         assertThat(sp.getDataLimiteEtapa1()).isEqualTo(dt);
     }
 
-    @Test
-    @DisplayName("Deve instanciar via construtor de conveniência")
-    void deveInstanciarViaConstrutorConveniencia() {
-        Processo p = new Processo();
-        Unidade u = new Unidade();
-        Mapa m = new Mapa();
-        LocalDateTime dt = LocalDateTime.now();
-        Subprocesso sp = new Subprocesso(p, u, m, SituacaoSubprocesso.NAO_INICIADO, dt);
 
-        assertThat(sp.getProcesso()).isEqualTo(p);
-        assertThat(sp.getUnidade()).isEqualTo(u);
-        assertThat(sp.getMapa()).isEqualTo(m);
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
-        assertThat(sp.getDataLimiteEtapa1()).isEqualTo(dt);
-    }
 
     @Test
     @DisplayName("Getters NonNull should return values")

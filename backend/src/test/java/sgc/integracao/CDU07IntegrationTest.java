@@ -108,13 +108,13 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
         processo.setDataLimite(LocalDateTime.now().plusDays(10));
         processoRepo.save(processo);
 
-        subprocesso =
-                new Subprocesso(
-                        processo,
-                        unidade,
-                        null,
-                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                        processo.getDataLimite());
+        subprocesso = Subprocesso.builder()
+                        .processo(processo)
+                        .unidade(unidade)
+                        .mapa(null)
+                        .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                        .dataLimiteEtapa1(processo.getDataLimite())
+                        .build();
         subprocessoRepo.save(subprocesso);
 
         Usuario usuario = UsuarioFixture.usuarioPadrao();
@@ -169,8 +169,13 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
                 .build();
         usuarioPerfilRepo.save(perfilOutroChefe);
 
-        Movimentacao movimentacao =
-                new Movimentacao(subprocesso, null, unidade, "Subprocesso iniciado", usuario);
+        Movimentacao movimentacao = Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(null)
+                .unidadeDestino(unidade)
+                .descricao("Subprocesso iniciado")
+                .usuario(usuario)
+                .build();
         movimentacaoRepo.save(movimentacao);
     }
 

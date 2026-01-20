@@ -5,10 +5,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sgc.comum.model.EntidadeBase;
 
 @Entity
@@ -16,7 +16,7 @@ import sgc.comum.model.EntidadeBase;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
 public class Parametro extends EntidadeBase {
     @Column(name = "chave", length = 50)
     @NotBlank(message = "A chave não pode estar vazia")

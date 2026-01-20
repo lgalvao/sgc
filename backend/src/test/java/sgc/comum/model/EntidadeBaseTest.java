@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class EntidadeBaseTest {
     private static class EntidadeTeste extends EntidadeBase {
         public EntidadeTeste(Long codigo) {
-            super(codigo);
+            this.setCodigo(codigo);
         }
     }
 

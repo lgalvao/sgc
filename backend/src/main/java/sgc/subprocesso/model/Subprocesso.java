@@ -2,6 +2,7 @@ package sgc.subprocesso.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.jspecify.annotations.NonNull;
 import sgc.comum.model.EntidadeBase;
 import sgc.mapa.model.Mapa;
@@ -17,8 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Subprocesso extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "processo_codigo", nullable = false)
@@ -46,38 +46,6 @@ public class Subprocesso extends EntidadeBase {
     @Enumerated(EnumType.STRING)
     @Column(name = "situacao", length = 50)
     private SituacaoSubprocesso situacao;
-
-    public Subprocesso(
-            Long codigo,
-            Processo processo,
-            Unidade unidade,
-            Mapa mapa,
-            SituacaoSubprocesso situacao,
-            LocalDateTime dataLimiteEtapa1) {
-        super(codigo);
-        this.processo = processo;
-        this.unidade = unidade;
-        this.mapa = mapa;
-        this.situacao = situacao;
-        this.dataLimiteEtapa1 = dataLimiteEtapa1;
-    }
-
-    /**
-     * Construtor de conveniência para criar um novo subprocesso no início de um processo.
-     */
-    public Subprocesso(
-            Processo processo,
-            Unidade unidade,
-            Mapa mapa,
-            SituacaoSubprocesso situacao,
-            LocalDateTime dataLimiteEtapa1) {
-        super();
-        this.processo = processo;
-        this.unidade = unidade;
-        this.mapa = mapa;
-        this.situacao = situacao;
-        this.dataLimiteEtapa1 = dataLimiteEtapa1;
-    }
 
     /**
      * Retorna o mapa de competências.

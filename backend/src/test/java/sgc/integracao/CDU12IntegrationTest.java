@@ -101,7 +101,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         mapaVigente.setDataHoraHomologado(LocalDateTime.now().minusMonths(6));
         mapaVigente = mapaRepo.save(mapaVigente);
 
-        unidadeMapaRepo.save(new UnidadeMapa(unidade.getCodigo(), mapaVigente));
+        unidadeMapaRepo.save(UnidadeMapa.builder().unidadeCodigo(unidade.getCodigo()).mapaVigente(mapaVigente).build());
 
         atividadeVigente1 = AtividadeFixture.atividadePadrao(mapaVigente);
         atividadeVigente1.setDescricao("Analisar e despachar processos.");
@@ -111,7 +111,10 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         atividadeVigente2.setDescricao("Elaborar relatórios gerenciais.");
         atividadeVigente2 = atividadeRepo.save(atividadeVigente2);
 
-        Competencia competenciaVigente1 = competenciaRepo.save(new Competencia("Gerenciamento de Processos", mapaVigente));
+        Competencia competenciaVigente1 = competenciaRepo.save(Competencia.builder()
+                .descricao("Gerenciamento de Processos")
+                .mapa(mapaVigente)
+                .build());
 
         vincularAtividadeCompetencia(competenciaVigente1, atividadeVigente1);
         vincularAtividadeCompetencia(competenciaVigente1, atividadeVigente2);
@@ -156,8 +159,8 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
             // Need to setup the MockChefe properly linked to the Unidade for permission checks
             setupChefeForUnidade(CHEFE_TITULO, unidade);
 
-            atividadeRepo.save(new Atividade(mapaSubprocesso, atividadeVigente1.getDescricao()));
-            atividadeRepo.save(new Atividade(mapaSubprocesso, atividadeVigente2.getDescricao()));
+            atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao(atividadeVigente1.getDescricao()).build());
+            atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao(atividadeVigente2.getDescricao()).build());
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
                     .andExpect(status().isOk())
@@ -171,9 +174,9 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         void deveDetectarAtividadesInseridas() throws Exception {
             setupChefeForUnidade(CHEFE_TITULO, unidade);
 
-            atividadeRepo.save(new Atividade(mapaSubprocesso, atividadeVigente1.getDescricao()));
-            atividadeRepo.save(new Atividade(mapaSubprocesso, atividadeVigente2.getDescricao()));
-            atividadeRepo.save(new Atividade(mapaSubprocesso, "Realizar auditorias internas."));
+            atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao(atividadeVigente1.getDescricao()).build());
+            atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao(atividadeVigente2.getDescricao()).build());
+            atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao("Realizar auditorias internas.").build());
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
                     .andExpect(status().isOk())
@@ -188,7 +191,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         void deveDetectarAtividadesRemovidas() throws Exception {
             setupChefeForUnidade(CHEFE_TITULO, unidade);
 
-            atividadeRepo.save(new Atividade(mapaSubprocesso, atividadeVigente1.getDescricao()));
+            atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao(atividadeVigente1.getDescricao()).build());
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
                     .andExpect(status().isOk())
@@ -203,9 +206,9 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         void deveDetectarAtividadesAlteradas() throws Exception {
             setupChefeForUnidade(CHEFE_TITULO, unidade);
 
-            Atividade atividadeAlterada = new Atividade(mapaSubprocesso, "Elaborar relatórios gerenciais e estratégicos.");
+            Atividade atividadeAlterada = Atividade.builder().mapa(mapaSubprocesso).descricao("Elaborar relatórios gerenciais e estratégicos.").build();
             atividadeRepo.save(atividadeAlterada);
-            atividadeRepo.save(new Atividade(mapaSubprocesso, atividadeVigente1.getDescricao()));
+            atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao(atividadeVigente1.getDescricao()).build());
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
                     .andExpect(status().isOk())
@@ -220,7 +223,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         void deveIdentificarCompetenciasImpactadas() throws Exception {
             setupChefeForUnidade(CHEFE_TITULO, unidade);
 
-            Atividade atividadeNova = new Atividade(mapaSubprocesso, "Elaborar relatórios gerenciais e estratégicos.");
+            Atividade atividadeNova = Atividade.builder().mapa(mapaSubprocesso).descricao("Elaborar relatórios gerenciais e estratégicos.").build();
             atividadeRepo.save(atividadeNova);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))

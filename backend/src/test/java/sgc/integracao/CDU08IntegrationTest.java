@@ -124,20 +124,20 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                 .build();
         usuarioPerfilRepo.save(perfilChefe);
 
-        Processo processo =
-                new Processo(
-                        "Processo Teste",
-                        TipoProcesso.MAPEAMENTO,
-                        SituacaoProcesso.EM_ANDAMENTO,
-                        LocalDateTime.now().plusDays(30));
+        Processo processo = Processo.builder()
+                .descricao("Processo Teste")
+                .tipo(TipoProcesso.MAPEAMENTO)
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .dataLimite(LocalDateTime.now().plusDays(30))
+                .build();
         processoRepo.save(processo);
 
-        subprocessoOrigem =
-                new Subprocesso()
-                        .setUnidade(unidadeOrigem)
-                        .setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
-                        .setDataLimiteEtapa1(LocalDateTime.now().plusDays(10))
-                        .setProcesso(processo);
+        subprocessoOrigem = Subprocesso.builder()
+                        .unidade(unidadeOrigem)
+                        .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                        .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
+                        .processo(processo)
+                        .build();
         subprocessoRepo.save(subprocessoOrigem);
 
         Mapa mapaOrigem = new Mapa();
@@ -145,20 +145,21 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         mapaRepo.save(mapaOrigem);
         subprocessoOrigem.setMapa(mapaOrigem); // Manter coerência em memória
 
-        Atividade atividade1 = new Atividade(mapaOrigem, "Atividade 1");
+        Atividade atividade1 = Atividade.builder().mapa(mapaOrigem).descricao("Atividade 1").build();
         atividadeRepo.save(atividade1);
-        conhecimentoRepo.save(new Conhecimento("Conhecimento 1.1", atividade1));
+        conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento 1.1").atividade(atividade1).build());
 
-        Atividade atividade2 = new Atividade(mapaOrigem, "Atividade 2");
+        Atividade atividade2 = Atividade.builder().mapa(mapaOrigem).descricao("Atividade 2").build();
         atividadeRepo.save(atividade2);
-        conhecimentoRepo.save(new Conhecimento("Conhecimento 2.1", atividade2));
-        conhecimentoRepo.save(new Conhecimento("Conhecimento 2.2", atividade2));
+        conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento 2.1").atividade(atividade2).build());
+        conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento 2.2").atividade(atividade2).build());
 
-        subprocessoDestino = new Subprocesso();
-        subprocessoDestino.setUnidade(unidadeDestino);
-        subprocessoDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        subprocessoDestino.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
-        subprocessoDestino.setProcesso(processo);
+        subprocessoDestino = Subprocesso.builder()
+                .unidade(unidadeDestino)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
+                .processo(processo)
+                .build();
         subprocessoRepo.save(subprocessoDestino);
 
         Mapa mapa = new Mapa(); // Inicializa o mapa para os testes de CRUD
@@ -321,7 +322,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve importar apenas atividades não existentes no destino")
         void deveImportarApenasAtividadesNaoExistentesNoDestino() throws Exception {
             Atividade atividadeExistente =
-                    new Atividade(subprocessoDestino.getMapa(), "Atividade 2");
+                    Atividade.builder().mapa(subprocessoDestino.getMapa()).descricao("Atividade 2").build();
             atividadeRepo.save(atividadeExistente);
 
             ImportarAtividadesRequest request =

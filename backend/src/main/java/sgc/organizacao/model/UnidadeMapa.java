@@ -1,10 +1,8 @@
 package sgc.organizacao.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import sgc.mapa.model.Mapa;
 
 @Entity
@@ -12,7 +10,7 @@ import sgc.mapa.model.Mapa;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
 public class UnidadeMapa {
     @Id
     @Column(name = "unidade_codigo")

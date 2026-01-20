@@ -91,10 +91,10 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         subprocesso = subprocessoRepo.save(subprocesso);
 
-        atividade1 = new Atividade(mapa, "Atividade 1");
+        atividade1 = Atividade.builder().mapa(mapa).descricao("Atividade 1").build();
         atividade1 = atividadeRepo.save(atividade1);
 
-        atividade2 = new Atividade(mapa, "Atividade 2");
+        atividade2 = Atividade.builder().mapa(mapa).descricao("Atividade 2").build();
         atividade2 = atividadeRepo.save(atividade2);
     }
 

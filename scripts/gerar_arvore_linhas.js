@@ -24,6 +24,7 @@ function walkDir(dir, fileList = []) {
 }
 
 function countLines(filePath) {
+    if (!fs.existsSync(filePath)) return 0;
     const content = fs.readFileSync(filePath, 'utf-8');
     return content.split(/\r?\n/).length;
 }

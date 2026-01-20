@@ -1,10 +1,8 @@
 package sgc.organizacao.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Immutable;
 
 @Entity
@@ -13,7 +11,7 @@ import org.hibernate.annotations.Immutable;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
 @IdClass(VinculacaoUnidadeId.class)
 public class VinculacaoUnidade {
     @Id

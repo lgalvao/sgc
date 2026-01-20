@@ -225,7 +225,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             Long codMapa = subprocessoRepo.findById(codSubprocesso).orElseThrow().getMapa().getCodigo();
             Mapa mapaEntity = mapaRepo.findById(codMapa).orElseThrow();
 
-            Competencia comp = new Competencia("Competencia Mapeamento", mapaEntity);
+            Competencia comp = Competencia.builder().descricao("Competencia Mapeamento").mapa(mapaEntity).build();
             comp = competenciaRepo.save(comp);
 
             // Link using JPA properly

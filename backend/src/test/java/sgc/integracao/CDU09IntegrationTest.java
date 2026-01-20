@@ -194,14 +194,16 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         void deveDisponibilizarCadastroComSucesso() throws Exception {
             var competencia =
                     competenciaRepo.save(
-                            new Competencia(
-                                    "Competência de Teste", subprocessoMapeamento.getMapa()));
-            var atividade = new Atividade(subprocessoMapeamento.getMapa(), "Atividade de Teste");
+                            Competencia.builder()
+                                    .descricao("Competência de Teste")
+                                    .mapa(subprocessoMapeamento.getMapa())
+                                    .build());
+            var atividade = Atividade.builder().mapa(subprocessoMapeamento.getMapa()).descricao("Atividade de Teste").build();
             atividade.getCompetencias().add(competencia);
             atividadeRepo.save(atividade);
             competencia.getAtividades().add(atividade);
             competenciaRepo.save(competencia);
-            conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
+            conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento de Teste").atividade(atividade).build());
 
             entityManager.flush();
             entityManager.clear();
@@ -249,7 +251,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Não deve disponibilizar se houver atividade sem conhecimento associado")
         void naoDeveDisponibilizarComAtividadeSemConhecimento() throws Exception {
-            Atividade atividade = new Atividade(subprocessoMapeamento.getMapa(), "Atividade Vazia");
+            Atividade atividade = Atividade.builder().mapa(subprocessoMapeamento.getMapa()).descricao("Atividade Vazia").build();
             atividadeRepo.save(atividade);
 
             mockMvc.perform(

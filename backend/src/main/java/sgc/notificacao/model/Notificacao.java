@@ -1,10 +1,10 @@
 package sgc.notificacao.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sgc.comum.model.EntidadeBase;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
 public class Notificacao extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "subprocesso_codigo")

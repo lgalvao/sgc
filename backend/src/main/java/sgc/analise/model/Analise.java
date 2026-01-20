@@ -2,6 +2,7 @@ package sgc.analise.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import sgc.comum.model.EntidadeBase;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -10,17 +11,15 @@ import java.time.LocalDateTime;
 /**
  * Representa um registro de análise realizado em um subprocesso.
  *
- * <p>Esta entidade funciona como um log de auditoria para as diversas etapas de análise (e.g.,
- * análise de cadastro, análise de validação), registrando a ação, o analista, as observações e o
- * resultado.
+ * <p>Funciona como um log de auditoria para as diversas etapas de análise (e.g., análise de cadastro,
+ * análise de validação), registrando a ação, o analista, as observações e o resultado.
  */
 @Entity
 @Table(name = "ANALISE", schema = "sgc")
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
 public class Analise extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "subprocesso_codigo")

@@ -106,16 +106,16 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
         // Ensure mapa has at least one atividade with conhecimento for validation
         if (atividadeRepo.findByMapaCodigo(mapaVigente.getCodigo()).isEmpty()) {
-            Atividade atividade = new Atividade(mapaVigente, "Atividade CDU-14 Test");
+            Atividade atividade = Atividade.builder().mapa(mapaVigente).descricao("Atividade CDU-14 Test").build();
             atividade = atividadeRepo.save(atividade);
             
-            Conhecimento conhecimento = new Conhecimento("Conhecimento CDU-14 Test", atividade);
+            Conhecimento conhecimento = Conhecimento.builder().descricao("Conhecimento CDU-14 Test").atividade(atividade).build();
             conhecimento = conhecimentoRepo.save(conhecimento);
             
             atividade.getConhecimentos().add(conhecimento);
             
             // Add competência for impact testing
-            Competencia competencia = new Competencia("Competencia CDU-14 Test", mapaVigente);
+            Competencia competencia = Competencia.builder().descricao("Competencia CDU-14 Test").mapa(mapaVigente).build();
             competencia = competenciaRepo.save(competencia);
             atividade.getCompetencias().add(competencia);
             competencia.getAtividades().add(atividade);

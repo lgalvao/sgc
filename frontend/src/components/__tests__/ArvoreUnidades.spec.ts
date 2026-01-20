@@ -191,11 +191,118 @@ describe("ArvoreUnidades.vue", () => {
         expect(root.props("isHabilitado")(leafEligible)).toBe(true);
     });
 
-    it("deve atualizar local selection quando prop modelValue muda", async () => {
-        const wrapper = createWrapper({ modelValue: [] });
-        await wrapper.setProps({ modelValue: [10] });
-        // Can't easily check internal state, but we can check isChecked
+    it("deve atualizar ancestrais corretamente (selecionar pai se todos filhos selecionados)", async () => {
+        const unidadesTeste: Unidade[] = [
+            {
+                codigo: 100,
+                sigla: "PAI",
+                nome: "Pai",
+                isElegivel: true, // Pai elegível
+                filhas: [
+                    { codigo: 101, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL" },
+                    { codigo: 102, sigla: "F2", nome: "F2", isElegivel: true, filhas: [], tipo: "OPERACIONAL" }
+                ],
+                tipo: "ADMINISTRATIVA"
+            }
+        ];
+        
+        const wrapper = createWrapper({ unidades: unidadesTeste, modelValue: [101] });
         const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
-        expect(root.props("isChecked")(10)).toBe(true);
+        
+        // Select the other child
+        const child2 = unidadesTeste[0].filhas![1];
+        await root.props("onToggle")(child2, true);
+        
+        const emitted = wrapper.emitted("update:modelValue");
+        const lastEmission = emitted![emitted!.length - 1][0] as number[];
+        
+        // Should contain children and parent (since parent is eligible and all children selected)
+        expect(lastEmission).toContain(101);
+        expect(lastEmission).toContain(102);
+        expect(lastEmission).toContain(100);
+    });
+
+    it("não deve deselecionar pai INTEROPERACIONAL se filhos desmarcados", async () => {
+        // Logic: if (parent.tipo !== 'INTEROPERACIONAL') selectionSet.delete(parent.codigo);
+        // So if it IS INTEROPERACIONAL, it should NOT delete parent from selection?
+        // Wait, if allChildrenSelected is false.
+        
+        const unidadesTeste: Unidade[] = [
+            {
+                codigo: 200,
+                sigla: "INTER",
+                nome: "Inter",
+                isElegivel: true,
+                tipo: "INTEROPERACIONAL",
+                filhas: [
+                    { codigo: 201, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL" }
+                ]
+            }
+        ];
+        
+        // Start with parent selected (and child)
+        const wrapper = createWrapper({ unidades: unidadesTeste, modelValue: [200, 201] });
+        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        
+        // Deselect child
+        const child = unidadesTeste[0].filhas![0];
+        await root.props("onToggle")(child, false);
+        
+        const emitted = wrapper.emitted("update:modelValue");
+        const lastEmission = emitted![emitted!.length - 1][0] as number[];
+        
+        // Child should be gone
+        expect(lastEmission).not.toContain(201);
+        // Parent should stay because it is INTEROPERACIONAL?
+        // Code: if (parent.tipo !== 'INTEROPERACIONAL') { selectionSet.delete(parent.codigo); }
+        expect(lastEmission).toContain(200);
+    });
+    
+    it("deve atualizar ancestrais: não selecionar pai se não for elegível, mesmo se todos filhos selecionados", async () => {
+        const unidadesTeste: Unidade[] = [
+            {
+                codigo: 300,
+                sigla: "PAI_INELEGIVEL",
+                nome: "Pai Inelegivel",
+                isElegivel: false, // Inelegível
+                filhas: [
+                    { codigo: 301, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL" }
+                ],
+                tipo: "ADMINISTRATIVA"
+            }
+        ];
+        
+        const wrapper = createWrapper({ unidades: unidadesTeste, modelValue: [] });
+        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        
+        const child = unidadesTeste[0].filhas![0];
+        await root.props("onToggle")(child, true);
+        
+        const emitted = wrapper.emitted("update:modelValue");
+        const lastEmission = emitted![emitted!.length - 1][0] as number[];
+        
+        expect(lastEmission).toContain(301);
+        expect(lastEmission).not.toContain(300); // Parent should NOT be selected
+    });
+
+    it("selecionarTodas deve lidar com nós sem filhas definidas", async () => {
+        const unidadesTeste: Unidade[] = [
+            {
+                codigo: 400,
+                sigla: "SOLITARIA",
+                nome: "Solitaria",
+                isElegivel: true,
+                // filhas undefined
+                tipo: "OPERACIONAL"
+            }
+        ];
+        
+        const wrapper = createWrapper({ unidades: unidadesTeste, modelValue: [], modoSelecao: true });
+        
+        await wrapper.find('button[aria-label="Selecionar todas as unidades elegíveis"]').trigger("click");
+        
+        const emitted = wrapper.emitted("update:modelValue");
+        expect(emitted).toBeTruthy();
+        expect(emitted![0][0]).toContain(400);
     });
 });

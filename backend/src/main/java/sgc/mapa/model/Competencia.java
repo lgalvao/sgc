@@ -1,10 +1,11 @@
 package sgc.mapa.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sgc.comum.model.EntidadeBase;
 
 import java.util.HashSet;
@@ -15,7 +16,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
 public class Competencia extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "mapa_codigo")
@@ -25,17 +26,6 @@ public class Competencia extends EntidadeBase {
     private String descricao;
 
     @ManyToMany(mappedBy = "competencias")
+    @Builder.Default
     private Set<Atividade> atividades = new HashSet<>();
-
-    public Competencia(Long codigo, String descricao, Mapa mapa) {
-        super(codigo);
-        this.descricao = descricao;
-        this.mapa = mapa;
-    }
-
-    public Competencia(String descricao, Mapa mapa) {
-        super();
-        this.descricao = descricao;
-        this.mapa = mapa;
-    }
 }

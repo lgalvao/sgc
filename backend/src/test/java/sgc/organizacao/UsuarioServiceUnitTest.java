@@ -106,7 +106,7 @@ class UsuarioServiceUnitTest {
         void deveRetornarDtoQuandoEncontradoPorTitulo() {
             Usuario u = new Usuario();
             u.setTituloEleitoral("user");
-            Unidade lotacao = new Unidade();
+            Unidade lotacao = Unidade.builder().build();
             lotacao.setCodigo(1L);
             u.setUnidadeLotacao(lotacao);
             when(usuarioRepo.findById("user")).thenReturn(Optional.of(u));
@@ -230,7 +230,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve ignorar administradores inexistentes ao listar")
         void deveIgnorarAdministradoresInexistentesAoListar() {
-            Administrador admin = new Administrador("user");
+            Administrador admin = Administrador.builder().usuarioTitulo("user").build();
             when(administradorRepo.findAll()).thenReturn(List.of(admin));
             when(usuarioRepo.findById("user")).thenReturn(Optional.empty());
 
@@ -254,7 +254,7 @@ class UsuarioServiceUnitTest {
         void deveAdicionarAdministradorComSucesso() {
             Usuario u = new Usuario();
             u.setTituloEleitoral("user");
-            Unidade unidade = new Unidade("Nome", "SIGLA");
+            Unidade unidade = Unidade.builder().nome("Nome").sigla("SIGLA").build();
             unidade.setCodigo(1L);
             u.setUnidadeLotacao(unidade);
 

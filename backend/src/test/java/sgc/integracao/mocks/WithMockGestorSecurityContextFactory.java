@@ -47,7 +47,7 @@ public class WithMockGestorSecurityContextFactory
             principal.setTituloEleitoral(tituloGestor);
             principal.setNome("Gestor User");
             principal.setEmail("gestor@example.com");
-            Unidade u = new Unidade("Unidade Mock", "UO_SUP");
+            Unidade u = Unidade.builder().nome("Unidade Mock").sigla("UO_SUP").build();
             principal.setUnidadeLotacao(u);
 
             Set<sgc.organizacao.model.UsuarioPerfil> atribuicoes = new HashSet<>();
@@ -66,7 +66,7 @@ public class WithMockGestorSecurityContextFactory
                 // Usuário existe mas não tem perfil GESTOR, adicionar com sua unidade de lotação
                 Unidade unidade = principal.getUnidadeLotacao();
                 if (unidade == null) {
-                    unidade = new Unidade("Unidade Mock", "UO_SUP");
+                    unidade = Unidade.builder().nome("Unidade Mock").sigla("UO_SUP").build();
                 }
                 atribuicoes.add(
                                 sgc.organizacao.model.UsuarioPerfil.builder()

@@ -285,7 +285,9 @@ public class UsuarioFacade {
             throw new ErroValidacao("Usuário já é administrador");
         }
 
-        Administrador administrador = new Administrador(usuarioTitulo);
+        Administrador administrador = Administrador.builder()
+                .usuarioTitulo(usuarioTitulo)
+                .build();
         administradorRepo.save(administrador);
 
         log.info("Administrador {} adicionado", usuarioTitulo);

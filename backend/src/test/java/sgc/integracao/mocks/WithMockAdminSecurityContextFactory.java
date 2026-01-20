@@ -50,7 +50,7 @@ public class WithMockAdminSecurityContextFactory
             principal.setTituloEleitoral(tituloAdmin);
             principal.setNome("Admin User");
             principal.setEmail("admin@example.com");
-            Unidade u = new Unidade("Unidade Mock", "UM");
+            Unidade u = Unidade.builder().nome("Unidade Mock").sigla("UM").build();
             principal.setUnidadeLotacao(u);
 
             Set<sgc.organizacao.model.UsuarioPerfil> atribuicoes = new HashSet<>();
@@ -68,7 +68,7 @@ public class WithMockAdminSecurityContextFactory
                 // Usuário existe mas não tem perfil ADMIN, adicionar com sua unidade de lotação
                 Unidade unidade = principal.getUnidadeLotacao();
                 if (unidade == null) {
-                    unidade = new Unidade("Unidade Mock", "UM");
+                    unidade = Unidade.builder().nome("Unidade Mock").sigla("UM").build();
                 }
                 atribuicoes.add(
                                 sgc.organizacao.model.UsuarioPerfil.builder()

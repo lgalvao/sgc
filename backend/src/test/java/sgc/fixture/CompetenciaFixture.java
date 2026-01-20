@@ -6,6 +6,6 @@ import sgc.mapa.model.Mapa;
 public class CompetenciaFixture {
 
     public static Competencia competenciaPadrao(Mapa mapa) {
-        return new Competencia("Competência de Teste " + System.nanoTime(), mapa);
+        return Competencia.builder().descricao("Competência de Teste " + System.nanoTime()).mapa(mapa).build();
     }
 }

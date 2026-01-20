@@ -30,390 +30,393 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Component
 @RequiredArgsConstructor
 public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
+    private final HierarquiaService hierarquiaService;
 
-        private final HierarquiaService hierarquiaService;
+    /**
+     * Ações que ADMIN pode executar sem restrição de hierarquia.
+     */
+    private static final EnumSet<Acao> ACOES_ADMIN_GLOBAIS = EnumSet.of(
+            VISUALIZAR_SUBPROCESSO, VISUALIZAR_MAPA, VISUALIZAR_DIAGNOSTICO,
+            EDITAR_MAPA, DEVOLVER_CADASTRO, ACEITAR_CADASTRO, HOMOLOGAR_CADASTRO,
+            DEVOLVER_REVISAO_CADASTRO, ACEITAR_REVISAO_CADASTRO, HOMOLOGAR_REVISAO_CADASTRO,
+            DISPONIBILIZAR_MAPA, VALIDAR_MAPA, HOMOLOGAR_MAPA, DEVOLVER_MAPA,
+            ALTERAR_DATA_LIMITE, REABRIR_CADASTRO, REABRIR_REVISAO
+    );
 
-        /**
-         * Mapeamento de ações para regras de acesso
-         */
-        private static final Map<Acao, RegrasAcao> REGRAS = Map.ofEntries(
-                        // ========== CRUD ==========
-                        Map.entry(LISTAR_SUBPROCESSOS, new RegrasAcao(
-                                        EnumSet.of(ADMIN),
-                                        EnumSet.allOf(SituacaoSubprocesso.class),
-                                        RequisitoHierarquia.NENHUM)),
-                        Map.entry(VISUALIZAR_SUBPROCESSO, new RegrasAcao(
-                                        EnumSet.of(ADMIN, GESTOR, CHEFE, SERVIDOR),
-                                        EnumSet.allOf(SituacaoSubprocesso.class),
-                                        RequisitoHierarquia.MESMA_OU_SUBORDINADA)),
-                        Map.entry(CRIAR_SUBPROCESSO, new RegrasAcao(
-                                        EnumSet.of(ADMIN),
-                                        EnumSet.allOf(SituacaoSubprocesso.class),
-                                        RequisitoHierarquia.NENHUM)),
-                        Map.entry(EDITAR_SUBPROCESSO, new RegrasAcao(
-                                        EnumSet.of(ADMIN),
-                                        EnumSet.allOf(SituacaoSubprocesso.class),
-                                        RequisitoHierarquia.NENHUM)),
-                        Map.entry(EXCLUIR_SUBPROCESSO, new RegrasAcao(
-                                        EnumSet.of(ADMIN),
-                                        EnumSet.allOf(SituacaoSubprocesso.class),
-                                        RequisitoHierarquia.NENHUM)),
-                        Map.entry(ALTERAR_DATA_LIMITE, new RegrasAcao(
-                                        EnumSet.of(ADMIN),
-                                        EnumSet.allOf(SituacaoSubprocesso.class),
-                                        RequisitoHierarquia.NENHUM)),
-                        Map.entry(REABRIR_CADASTRO, new RegrasAcao(
-                                        EnumSet.of(ADMIN),
-                                        EnumSet.allOf(SituacaoSubprocesso.class),
-                                        RequisitoHierarquia.NENHUM)),
-                        Map.entry(REABRIR_REVISAO, new RegrasAcao(
-                                        EnumSet.of(ADMIN),
-                                        EnumSet.allOf(SituacaoSubprocesso.class),
-                                        RequisitoHierarquia.NENHUM)),
+    /**
+     * Situações permitidas para ADMIN em VERIFICAR_IMPACTOS.
+     */
+    private static final EnumSet<SituacaoSubprocesso> SITUACOES_VERIFICAR_IMPACTOS_ADMIN = EnumSet.of(
+            REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO
+    );
 
-                        // ========== CADASTRO ==========
-                        Map.entry(EDITAR_CADASTRO, new RegrasAcao(
-                                        EnumSet.of(ADMIN, GESTOR, CHEFE),
-                                        EnumSet.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO),
-                                        RequisitoHierarquia.MESMA_UNIDADE)),
-                        Map.entry(DISPONIBILIZAR_CADASTRO, new RegrasAcao(
-                                        EnumSet.of(CHEFE),
-                                        EnumSet.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO),
-                                        RequisitoHierarquia.TITULAR_UNIDADE)),
-                        Map.entry(DEVOLVER_CADASTRO, new RegrasAcao(
-                                        EnumSet.of(ADMIN, GESTOR),
-                                        EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO),
-                                        RequisitoHierarquia.SUPERIOR_IMEDIATA)),
-                        Map.entry(ACEITAR_CADASTRO, new RegrasAcao(
-                                        EnumSet.of(ADMIN, GESTOR),
-                                        EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO),
-                                        RequisitoHierarquia.SUPERIOR_IMEDIATA)),
-                        Map.entry(HOMOLOGAR_CADASTRO, new RegrasAcao(
-                                        EnumSet.of(ADMIN),
-                                        EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO),
-                                        RequisitoHierarquia.NENHUM)),
+    /**
+     * Situações permitidas para CHEFE em VERIFICAR_IMPACTOS.
+     */
+    private static final EnumSet<SituacaoSubprocesso> SITUACOES_VERIFICAR_IMPACTOS_CHEFE = EnumSet.of(
+            NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO
+    );
 
-                        // ========== REVISÃO CADASTRO ==========
-                        Map.entry(EDITAR_REVISAO_CADASTRO, new RegrasAcao(
-                                        EnumSet.of(ADMIN, GESTOR, CHEFE),
-                                        EnumSet.of(REVISAO_CADASTRO_EM_ANDAMENTO),
-                                        RequisitoHierarquia.MESMA_UNIDADE)),
-                        Map.entry(DISPONIBILIZAR_REVISAO_CADASTRO, new RegrasAcao(
-                                        EnumSet.of(CHEFE),
-                                        EnumSet.of(REVISAO_CADASTRO_EM_ANDAMENTO),
-                                        RequisitoHierarquia.TITULAR_UNIDADE)),
-                        Map.entry(DEVOLVER_REVISAO_CADASTRO, new RegrasAcao(
-                                        EnumSet.of(ADMIN, GESTOR),
-                                        EnumSet.of(REVISAO_CADASTRO_DISPONIBILIZADA),
-                                        RequisitoHierarquia.SUPERIOR_IMEDIATA)),
-                        Map.entry(ACEITAR_REVISAO_CADASTRO, new RegrasAcao(
-                                        EnumSet.of(ADMIN, GESTOR),
-                                        EnumSet.of(REVISAO_CADASTRO_DISPONIBILIZADA),
-                                        RequisitoHierarquia.SUPERIOR_IMEDIATA)),
-                        Map.entry(HOMOLOGAR_REVISAO_CADASTRO, new RegrasAcao(
-                                        EnumSet.of(ADMIN),
-                                        EnumSet.of(REVISAO_CADASTRO_DISPONIBILIZADA),
-                                        RequisitoHierarquia.NENHUM)),
+    /**
+     * Mapeamento de ações para regras de acesso
+     */
+    private static final Map<Acao, RegrasAcao> REGRAS = Map.ofEntries(
+            // ========== CRUD ==========
+            Map.entry(LISTAR_SUBPROCESSOS, new RegrasAcao(
+                    EnumSet.of(ADMIN),
+                    EnumSet.allOf(SituacaoSubprocesso.class),
+                    RequisitoHierarquia.NENHUM)),
 
-                        // ========== MAPA ==========
-                        Map.entry(VISUALIZAR_MAPA, new RegrasAcao(
-                                        EnumSet.of(ADMIN, GESTOR, CHEFE, SERVIDOR),
-                                        EnumSet.allOf(SituacaoSubprocesso.class),
-                                        RequisitoHierarquia.MESMA_OU_SUBORDINADA)),
-                        Map.entry(EDITAR_MAPA, new RegrasAcao(
-                                        EnumSet.of(ADMIN, GESTOR, CHEFE),
-                                        EnumSet.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                                                         MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO,
-                                                         MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO,
-                                                         REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO,
-                                                         REVISAO_MAPA_COM_SUGESTOES,
-                                                         DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO),
-                                        RequisitoHierarquia.MESMA_UNIDADE)),
-                        Map.entry(DISPONIBILIZAR_MAPA, new RegrasAcao(
-                                        EnumSet.of(ADMIN),
-                                        EnumSet.of(MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO,
-                                                         MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA,
-                                                         REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES),
-                                        RequisitoHierarquia.NENHUM)),
-                        Map.entry(VERIFICAR_IMPACTOS, new RegrasAcao(
-                                        EnumSet.of(ADMIN, GESTOR, CHEFE),
-                                        EnumSet.of(NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO,
-                                                         REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA,
-                                                         REVISAO_MAPA_AJUSTADO),
-                                        RequisitoHierarquia.MESMA_UNIDADE)),
-                        Map.entry(APRESENTAR_SUGESTOES, new RegrasAcao(
-                                        EnumSet.of(CHEFE),
-                                        EnumSet.of(MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO),
-                                        RequisitoHierarquia.MESMA_UNIDADE)),
-                        Map.entry(VALIDAR_MAPA, new RegrasAcao(
-                                        EnumSet.of(CHEFE),
-                                        EnumSet.of(MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO),
-                                        RequisitoHierarquia.MESMA_UNIDADE)),
-                        Map.entry(DEVOLVER_MAPA, new RegrasAcao(
-                                        EnumSet.of(ADMIN, GESTOR),
-                                        EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
-                                                         REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO),
-                                        RequisitoHierarquia.SUPERIOR_IMEDIATA)),
-                        Map.entry(ACEITAR_MAPA, new RegrasAcao(
-                                        EnumSet.of(ADMIN, GESTOR),
-                                        EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
-                                                         REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO),
-                                        RequisitoHierarquia.SUPERIOR_IMEDIATA)),
-                        Map.entry(HOMOLOGAR_MAPA, new RegrasAcao(
-                                        EnumSet.of(ADMIN),
-                                        EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
-                                                         REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO),
-                                        RequisitoHierarquia.NENHUM)),
-                        Map.entry(AJUSTAR_MAPA, new RegrasAcao(
-                                        EnumSet.of(ADMIN),
-                                        EnumSet.of(REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO),
-                                        RequisitoHierarquia.NENHUM)),
+            Map.entry(VISUALIZAR_SUBPROCESSO, new RegrasAcao(
+                    EnumSet.of(ADMIN, GESTOR, CHEFE, SERVIDOR),
+                    EnumSet.allOf(SituacaoSubprocesso.class),
+                    RequisitoHierarquia.MESMA_OU_SUBORDINADA)),
 
-                        // ========== DIAGNÓSTICO ==========
-                        Map.entry(VISUALIZAR_DIAGNOSTICO, new RegrasAcao(
-                                        EnumSet.of(ADMIN, GESTOR, CHEFE, SERVIDOR),
-                                        EnumSet.allOf(SituacaoSubprocesso.class),
-                                        RequisitoHierarquia.MESMA_OU_SUBORDINADA)),
-                        Map.entry(REALIZAR_AUTOAVALIACAO, new RegrasAcao(
-                                        EnumSet.of(ADMIN, GESTOR, CHEFE),
-                                        EnumSet.of(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO),
-                                        RequisitoHierarquia.MESMA_UNIDADE)));
+            Map.entry(CRIAR_SUBPROCESSO, new RegrasAcao(
+                    EnumSet.of(ADMIN),
+                    EnumSet.allOf(SituacaoSubprocesso.class),
+                    RequisitoHierarquia.NENHUM)),
 
-        @Override
-        public boolean canExecute(Usuario usuario, Acao acao, Subprocesso subprocesso) {
-                // Caso especial: VERIFICAR_IMPACTOS tem regras diferentes por perfil
-                if (acao == VERIFICAR_IMPACTOS) {
-                        return canExecuteVerificarImpactos(usuario, subprocesso);
-                }
+            Map.entry(EDITAR_SUBPROCESSO, new RegrasAcao(
+                    EnumSet.of(ADMIN),
+                    EnumSet.allOf(SituacaoSubprocesso.class),
+                    RequisitoHierarquia.NENHUM)),
 
-                RegrasAcao regras = REGRAS.get(acao);
-                if (regras == null) {
-                        definirMotivoNegacao("Ação não reconhecida: " + acao);
-                        return false;
-                }
+            Map.entry(EXCLUIR_SUBPROCESSO, new RegrasAcao(
+                    EnumSet.of(ADMIN),
+                    EnumSet.allOf(SituacaoSubprocesso.class),
+                    RequisitoHierarquia.NENHUM)),
 
-                // 1. Verifica perfil
-                if (!temPerfilPermitido(usuario, regras.perfisPermitidos)) {
-                        definirMotivoNegacao(usuario, regras.perfisPermitidos, acao);
-                        return false;
-                }
+            Map.entry(ALTERAR_DATA_LIMITE, new RegrasAcao(
+                    EnumSet.of(ADMIN),
+                    EnumSet.allOf(SituacaoSubprocesso.class),
+                    RequisitoHierarquia.NENHUM)),
 
-                // 2. Verifica situação do subprocesso
-                if (!regras.situacoesPermitidas.contains(subprocesso.getSituacao())) {
-                        definirMotivoNegacao(String.format(
-                                        "Ação '%s' não pode ser executada com o subprocesso na situação '%s'. Situações permitidas: %s",
-                                        acao.getDescricao(),
-                                        subprocesso.getSituacao().getDescricao(),
-                                        formatarSituacoes(regras.situacoesPermitidas)));
-                        return false;
-                }
+            Map.entry(REABRIR_CADASTRO, new RegrasAcao(
+                    EnumSet.of(ADMIN),
+                    EnumSet.allOf(SituacaoSubprocesso.class),
+                    RequisitoHierarquia.NENHUM)),
 
-                // 3. Verifica hierarquia
-                // Caso especial: ADMIN é global e não precisa verificar hierarquia para ações
-                // administrativas
-                boolean isAdmin = usuario.getTodasAtribuicoes().stream()
-                                .anyMatch(a -> a.getPerfil() == ADMIN);
+            Map.entry(REABRIR_REVISAO, new RegrasAcao(
+                    EnumSet.of(ADMIN),
+                    EnumSet.allOf(SituacaoSubprocesso.class),
+                    RequisitoHierarquia.NENHUM)),
 
-                // ADMIN pode executar ações administrativas e de edição de mapa sem restrição
-                // de hierarquia
-                if (isAdmin && isAcaoAdministrativaOuEdicaoMapa(acao)) {
-                        return true;
-                }
+            // ========== CADASTRO ==========
+            Map.entry(EDITAR_CADASTRO, new RegrasAcao(
+                    EnumSet.of(ADMIN, GESTOR, CHEFE),
+                    EnumSet.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
 
-                if (!verificaHierarquia(usuario, subprocesso, regras.requisitoHierarquia)) {
-                        definirMotivoNegacao(obterMotivoNegacaoHierarquia(
-                                        usuario, subprocesso, regras.requisitoHierarquia));
-                        return false;
-                }
+            Map.entry(DISPONIBILIZAR_CADASTRO, new RegrasAcao(
+                    EnumSet.of(CHEFE),
+                    EnumSet.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO),
+                    RequisitoHierarquia.TITULAR_UNIDADE)),
 
+            Map.entry(DEVOLVER_CADASTRO, new RegrasAcao(
+                    EnumSet.of(ADMIN, GESTOR),
+                    EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO),
+                    RequisitoHierarquia.SUPERIOR_IMEDIATA)),
+
+            Map.entry(ACEITAR_CADASTRO, new RegrasAcao(
+                    EnumSet.of(ADMIN, GESTOR),
+                    EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO),
+                    RequisitoHierarquia.SUPERIOR_IMEDIATA)),
+
+            Map.entry(HOMOLOGAR_CADASTRO, new RegrasAcao(
+                    EnumSet.of(ADMIN),
+                    EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO),
+                    RequisitoHierarquia.NENHUM)),
+
+            // ========== REVISÃO CADASTRO ==========
+            Map.entry(EDITAR_REVISAO_CADASTRO, new RegrasAcao(
+                    EnumSet.of(ADMIN, GESTOR, CHEFE),
+                    EnumSet.of(REVISAO_CADASTRO_EM_ANDAMENTO),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
+
+            Map.entry(DISPONIBILIZAR_REVISAO_CADASTRO, new RegrasAcao(
+                    EnumSet.of(CHEFE),
+                    EnumSet.of(REVISAO_CADASTRO_EM_ANDAMENTO),
+                    RequisitoHierarquia.TITULAR_UNIDADE)),
+
+            Map.entry(DEVOLVER_REVISAO_CADASTRO, new RegrasAcao(
+                    EnumSet.of(ADMIN, GESTOR),
+                    EnumSet.of(REVISAO_CADASTRO_DISPONIBILIZADA),
+                    RequisitoHierarquia.SUPERIOR_IMEDIATA)),
+
+            Map.entry(ACEITAR_REVISAO_CADASTRO, new RegrasAcao(
+                    EnumSet.of(ADMIN, GESTOR),
+                    EnumSet.of(REVISAO_CADASTRO_DISPONIBILIZADA),
+                    RequisitoHierarquia.SUPERIOR_IMEDIATA)),
+
+            Map.entry(HOMOLOGAR_REVISAO_CADASTRO, new RegrasAcao(
+                    EnumSet.of(ADMIN),
+                    EnumSet.of(REVISAO_CADASTRO_DISPONIBILIZADA),
+                    RequisitoHierarquia.NENHUM)),
+
+            // ========== MAPA ==========
+            Map.entry(VISUALIZAR_MAPA, new RegrasAcao(
+                    EnumSet.of(ADMIN, GESTOR, CHEFE, SERVIDOR),
+                    EnumSet.allOf(SituacaoSubprocesso.class),
+                    RequisitoHierarquia.MESMA_OU_SUBORDINADA)),
+
+            Map.entry(EDITAR_MAPA, new RegrasAcao(
+                    EnumSet.of(ADMIN, GESTOR, CHEFE),
+                    EnumSet.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                            MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO,
+                            MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO,
+                            REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO,
+                            REVISAO_MAPA_COM_SUGESTOES,
+                            DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
+
+            Map.entry(DISPONIBILIZAR_MAPA, new RegrasAcao(
+                    EnumSet.of(ADMIN),
+                    EnumSet.of(MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO,
+                            MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA,
+                            REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES),
+                    RequisitoHierarquia.NENHUM)),
+
+            Map.entry(VERIFICAR_IMPACTOS, new RegrasAcao(
+                    EnumSet.of(ADMIN, GESTOR, CHEFE),
+                    EnumSet.of(NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO,
+                            REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA,
+                            REVISAO_MAPA_AJUSTADO),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
+
+            Map.entry(APRESENTAR_SUGESTOES, new RegrasAcao(
+                    EnumSet.of(CHEFE),
+                    EnumSet.of(MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
+
+            Map.entry(VALIDAR_MAPA, new RegrasAcao(
+                    EnumSet.of(CHEFE),
+                    EnumSet.of(MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
+
+            Map.entry(DEVOLVER_MAPA, new RegrasAcao(
+                    EnumSet.of(ADMIN, GESTOR),
+                    EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
+                            REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO),
+                    RequisitoHierarquia.SUPERIOR_IMEDIATA)),
+
+            Map.entry(ACEITAR_MAPA, new RegrasAcao(
+                    EnumSet.of(ADMIN, GESTOR),
+                    EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
+                            REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO),
+                    RequisitoHierarquia.SUPERIOR_IMEDIATA)),
+
+            Map.entry(HOMOLOGAR_MAPA, new RegrasAcao(
+                    EnumSet.of(ADMIN),
+                    EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
+                            REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO),
+                    RequisitoHierarquia.NENHUM)),
+
+            Map.entry(AJUSTAR_MAPA, new RegrasAcao(
+                    EnumSet.of(ADMIN),
+                    EnumSet.of(REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO),
+                    RequisitoHierarquia.NENHUM)),
+
+            // ========== DIAGNÓSTICO ==========
+            Map.entry(VISUALIZAR_DIAGNOSTICO, new RegrasAcao(
+                    EnumSet.of(ADMIN, GESTOR, CHEFE, SERVIDOR),
+                    EnumSet.allOf(SituacaoSubprocesso.class),
+                    RequisitoHierarquia.MESMA_OU_SUBORDINADA)),
+
+            Map.entry(REALIZAR_AUTOAVALIACAO, new RegrasAcao(
+                    EnumSet.of(ADMIN, GESTOR, CHEFE),
+                    EnumSet.of(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO),
+                    RequisitoHierarquia.MESMA_UNIDADE)));
+
+    @Override
+    public boolean canExecute(Usuario usuario, Acao acao, Subprocesso sp) {
+        // Caso especial: VERIFICAR_IMPACTOS tem regras diferentes por perfil
+        if (acao == VERIFICAR_IMPACTOS) {
+            return canExecuteVerificarImpactos(usuario, sp);
+        }
+
+        RegrasAcao regras = REGRAS.get(acao);
+        if (regras == null) {
+            definirMotivoNegacao("Ação não reconhecida: " + acao);
+            return false;
+        }
+
+        // 1. Verifica perfil
+        if (!temPerfilPermitido(usuario, regras.perfisPermitidos)) {
+            definirMotivoNegacao(usuario, regras.perfisPermitidos, acao);
+            return false;
+        }
+
+        // 2. Verifica situação do subprocesso
+        if (!regras.situacoesPermitidas.contains(sp.getSituacao())) {
+            definirMotivoNegacao(String.format(
+                    "Ação '%s' não pode ser executada com o sp na situação '%s'. Situações permitidas: %s",
+                    acao.getDescricao(),
+                    sp.getSituacao().getDescricao(),
+                    formatarSituacoes(regras.situacoesPermitidas)));
+            return false;
+        }
+
+        // 3. Verifica hierarquia (ADMIN é global para ações administrativas)
+        if (temPerfil(usuario, ADMIN) && ACOES_ADMIN_GLOBAIS.contains(acao)) {
+            return true;
+        }
+
+        if (!verificaHierarquia(usuario, sp, regras.requisitoHierarquia)) {
+            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, sp, regras.requisitoHierarquia));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Verifica se o usuário pode executar VERIFICAR_IMPACTOS.
+     * Esta ação tem regras especiais por perfil:
+     * - ADMIN: situações de revisão (DISPONIBILIZADA, HOMOLOGADA, MAPA_AJUSTADO)
+     * - GESTOR: apenas REVISAO_CADASTRO_DISPONIBILIZADA
+     * - CHEFE: NAO_INICIADO e REVISAO_CADASTRO_EM_ANDAMENTO (mesma unidade)
+     */
+    private boolean canExecuteVerificarImpactos(Usuario usuario, Subprocesso sp) {
+        SituacaoSubprocesso situacao = sp.getSituacao();
+
+        // ADMIN: pode em revisões avançadas
+        if (temPerfil(usuario, ADMIN) && SITUACOES_VERIFICAR_IMPACTOS_ADMIN.contains(situacao)) {
+            return true;
+        }
+
+        // GESTOR: apenas quando revisão está disponibilizada
+        if (temPerfil(usuario, GESTOR) && situacao == REVISAO_CADASTRO_DISPONIBILIZADA) {
+            return true;
+        }
+
+        // CHEFE: situações iniciais, mas precisa estar na mesma unidade
+        if (temPerfil(usuario, CHEFE) && SITUACOES_VERIFICAR_IMPACTOS_CHEFE.contains(situacao)) {
+            if (verificaHierarquia(usuario, sp, RequisitoHierarquia.MESMA_UNIDADE)) {
                 return true;
+            }
+            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, sp, RequisitoHierarquia.MESMA_UNIDADE));
+            return false;
         }
 
-        /**
-         * Regras específicas para VERIFICAR_IMPACTOS baseadas na implementação original
-         * do MapaAcessoService.
-         * Cada perfil tem situações diferentes permitidas:
-         * - CHEFE: NAO_INICIADO ou REVISAO_CADASTRO_EM_ANDAMENTO (e deve estar na mesma
-         * unidade)
-         * - GESTOR: REVISAO_CADASTRO_DISPONIBILIZADA (sem verificação de unidade)
-         * - ADMIN: REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA,
-         * REVISAO_MAPA_AJUSTADO (sem verificação de unidade)
-         */
-        private boolean canExecuteVerificarImpactos(Usuario usuario, Subprocesso subprocesso) {
-                SituacaoSubprocesso situacao = subprocesso.getSituacao();
-                Set<Perfil> perfisUsuario = usuario.getTodasAtribuicoes().stream()
-                                .map(UsuarioPerfil::getPerfil)
-                                .collect(java.util.stream.Collectors.toSet());
+        definirMotivoNegacaoVerificarImpactos(usuario, sp);
+        return false;
+    }
 
-                if (isChefeVerificarImpactosPermitido(perfisUsuario, situacao, usuario, subprocesso)) {
-                        return true;
-                }
-
-                if (perfisUsuario.contains(GESTOR) && situacao == REVISAO_CADASTRO_DISPONIBILIZADA) {
-                        return true;
-                }
-
-                if (perfisUsuario.contains(ADMIN) &&
-                                (situacao == REVISAO_CADASTRO_DISPONIBILIZADA
-                                                || situacao == REVISAO_CADASTRO_HOMOLOGADA
-                                                || situacao == REVISAO_MAPA_AJUSTADO)) {
-                        return true;
-                }
-
-                if (!ultimoMotivoNegacao.isEmpty()) {
-                        return false;
-                }
-
-                definirMotivoNegacaoVerificarImpactos(perfisUsuario, subprocesso);
-                return false;
+    /**
+     * Define a mensagem de erro apropriada para VERIFICAR_IMPACTOS.
+     */
+    private void definirMotivoNegacaoVerificarImpactos(Usuario usuario, Subprocesso sp) {
+        if (!temPerfil(usuario, CHEFE) && !temPerfil(usuario, GESTOR) && !temPerfil(usuario, ADMIN)) {
+            definirMotivoNegacao("O usuário não possui um dos perfis necessários: ADMIN, GESTOR, CHEFE");
+            return;
         }
 
-        private boolean isChefeVerificarImpactosPermitido(Set<Perfil> perfis, SituacaoSubprocesso situacao,
-                        Usuario usuario, Subprocesso subprocesso) {
-                if (perfis.contains(CHEFE) && (situacao == NAO_INICIADO || situacao == REVISAO_CADASTRO_EM_ANDAMENTO)) {
-                        if (verificaHierarquia(usuario, subprocesso, RequisitoHierarquia.MESMA_UNIDADE)) {
-                                return true;
-                        }
-                        definirMotivoNegacao(obterMotivoNegacaoHierarquia(
-                                        usuario, subprocesso, RequisitoHierarquia.MESMA_UNIDADE));
-                        return false;
-                }
-                return false;
+        String situacoesPermitidas;
+        if (temPerfil(usuario, ADMIN)) {
+            situacoesPermitidas = "REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO";
+        } else if (temPerfil(usuario, GESTOR)) {
+            situacoesPermitidas = "REVISAO_CADASTRO_DISPONIBILIZADA";
+        } else {
+            situacoesPermitidas = "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO";
         }
 
-        private void definirMotivoNegacaoVerificarImpactos(Set<Perfil> perfis, Subprocesso subprocesso) {
-                if (!perfis.contains(CHEFE) && !perfis.contains(GESTOR) && !perfis.contains(ADMIN)) {
-                        definirMotivoNegacao("O usuário não possui um dos perfis necessários: ADMIN, GESTOR, CHEFE");
-                        return;
-                }
+        definirMotivoNegacao(String.format(
+                "Ação 'VERIFICAR_IMPACTOS' não pode ser executada com o sp na situação '%s'. "
+                        + "Situações permitidas para o perfil do usuário: %s",
+                sp.getSituacao().getDescricao(),
+                situacoesPermitidas));
+    }
 
-                String situacoesPermitidas;
-                if (perfis.contains(ADMIN)) {
-                        situacoesPermitidas = "REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO";
-                } else if (perfis.contains(GESTOR)) {
-                        situacoesPermitidas = "REVISAO_CADASTRO_DISPONIBILIZADA";
-                } else {
-                        situacoesPermitidas = "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO";
-                }
+    /**
+     * Verifica se o usuário possui o perfil especificado.
+     */
+    private boolean temPerfil(Usuario usuario, Perfil perfil) {
+        return usuario.getTodasAtribuicoes().stream()
+                .anyMatch(a -> a.getPerfil() == perfil);
+    }
 
-                definirMotivoNegacao(String.format(
-                                "Ação 'VERIFICAR_IMPACTOS' não pode ser executada com o subprocesso na situação '%s'. "
-                                                +
-                                                "Situações permitidas para o perfil do usuário: %s",
-                                subprocesso.getSituacao().getDescricao(),
-                                situacoesPermitidas));
+    private boolean verificaHierarquia(Usuario usuario, Subprocesso sp, RequisitoHierarquia requisito) {
+        final Unidade unidadeSp = sp.getUnidade();
+        final Set<UsuarioPerfil> todasAtribuicoes = usuario.getTodasAtribuicoes();
+        final Long codUnidade = unidadeSp.getCodigo();
+
+        return switch (requisito) {
+            case NENHUM -> true;
+            case MESMA_UNIDADE -> todasAtribuicoes.stream()
+                    .anyMatch(a -> Objects.equals(a.getUnidade().getCodigo(), codUnidade));
+
+            case MESMA_OU_SUBORDINADA -> todasAtribuicoes.stream()
+                    .anyMatch(a -> Objects.equals(a.getUnidade().getCodigo(), codUnidade)
+                            || hierarquiaService.isSubordinada(unidadeSp, a.getUnidade()));
+
+            case SUPERIOR_IMEDIATA -> todasAtribuicoes.stream()
+                    .anyMatch(a -> hierarquiaService.isSuperiorImediata(unidadeSp, a.getUnidade()));
+
+            case TITULAR_UNIDADE -> {
+                String tituloTitular = unidadeSp.getTituloTitular();
+                yield tituloTitular.equals(usuario.getTituloEleitoral());
+            }
+        };
+    }
+
+    private String obterMotivoNegacaoHierarquia(
+            Usuario usuario, Subprocesso sp, RequisitoHierarquia requisito) {
+
+        Unidade unidadeSubprocesso = sp.getUnidade();
+        String siglaUnidade = unidadeSubprocesso.getSigla();
+
+        return switch (requisito) {
+            case NENHUM -> "Erro inesperado na verificação de hierarquia";
+
+            case MESMA_UNIDADE -> String.format(
+                    "Usuário '%s' não pertence à unidade '%s' do sp",
+                    usuario.getTituloEleitoral(), siglaUnidade);
+
+            case MESMA_OU_SUBORDINADA -> String.format(
+                    "Usuário '%s' não pertence à unidade '%s' nem a uma unidade superior na hierarquia",
+                    usuario.getTituloEleitoral(), siglaUnidade);
+
+            case SUPERIOR_IMEDIATA -> String.format(
+                    "Usuário '%s' não pertence à unidade superior imediata da unidade '%s'",
+                    usuario.getTituloEleitoral(), siglaUnidade);
+
+            case TITULAR_UNIDADE -> {
+                String tituloTitular = unidadeSubprocesso.getTituloTitular();
+                yield String.format(
+                        "Usuário '%s' não é o titular da unidade '%s'. Titular: %s",
+                        usuario.getTituloEleitoral(), siglaUnidade, tituloTitular);
+            }
+        };
+    }
+
+    private String formatarSituacoes(EnumSet<SituacaoSubprocesso> situacoes) {
+        if (situacoes.size() > 5) {
+            return "%d situações".formatted(situacoes.size());
         }
+        return situacoes.stream()
+                .map(SituacaoSubprocesso::getDescricao)
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("nenhuma");
+    }
 
-        private boolean verificaHierarquia(
-                        Usuario usuario, Subprocesso subprocesso, RequisitoHierarquia requisito) {
+    /**
+     * Enum para requisitos de hierarquia de unidades
+     */
+    private enum RequisitoHierarquia {
+        NENHUM,             // Sem verificação de hierarquia
+        MESMA_UNIDADE,      // Usuário deve estar na mesma unidade
+        MESMA_OU_SUBORDINADA, // Usuário deve estar na mesma unidade ou em unidade superior
+        SUPERIOR_IMEDIATA,  // Usuário deve estar na unidade superior imediata
+        TITULAR_UNIDADE     // Usuário deve ser o titular da unidade
+    }
 
-                Unidade unidadeSubprocesso = subprocesso.getUnidade();
-
-                return switch (requisito) {
-                        case NENHUM -> true;
-
-                        case MESMA_UNIDADE -> usuario.getTodasAtribuicoes().stream()
-                                        .anyMatch(a -> Objects.equals(a.getUnidade().getCodigo(),
-                                                                         unidadeSubprocesso.getCodigo()));
-
-                        case MESMA_OU_SUBORDINADA -> usuario.getTodasAtribuicoes().stream()
-                                        .anyMatch(a -> Objects.equals(a.getUnidade().getCodigo(),
-                                                                         unidadeSubprocesso.getCodigo())
-                                                                         || hierarquiaService.isSubordinada(
-                                                                                         unidadeSubprocesso,
-                                                                                         a.getUnidade()));
-
-                        case SUPERIOR_IMEDIATA -> usuario.getTodasAtribuicoes().stream()
-                                        .anyMatch(a -> hierarquiaService.isSuperiorImediata(unidadeSubprocesso,
-                                                                         a.getUnidade()));
-
-                        case TITULAR_UNIDADE -> {
-                                String tituloTitular = unidadeSubprocesso.getTituloTitular();
-                                yield tituloTitular != null && tituloTitular.equals(usuario.getTituloEleitoral());
-                        }
-                };
-        }
-
-        /**
-         * Verifica se a ação é administrativa ou de edição de mapa.
-         * ADMIN possui privilégios globais e pode executar estas ações sem restrição de
-         * hierarquia.
-         */
-        private boolean isAcaoAdministrativaOuEdicaoMapa(Acao acao) {
-                return acao == VISUALIZAR_SUBPROCESSO
-                                || acao == VISUALIZAR_MAPA
-                                || acao == VISUALIZAR_DIAGNOSTICO
-                                || acao == EDITAR_MAPA
-                                || acao == DEVOLVER_CADASTRO
-                                || acao == ACEITAR_CADASTRO
-                                || acao == HOMOLOGAR_CADASTRO
-                                || acao == DEVOLVER_REVISAO_CADASTRO
-                                || acao == ACEITAR_REVISAO_CADASTRO
-                                || acao == HOMOLOGAR_REVISAO_CADASTRO
-                                || acao == DISPONIBILIZAR_MAPA
-                                || acao == VALIDAR_MAPA
-                                || acao == HOMOLOGAR_MAPA
-                                || acao == DEVOLVER_MAPA
-                                || acao == ALTERAR_DATA_LIMITE
-                                || acao == REABRIR_CADASTRO
-                                || acao == REABRIR_REVISAO;
-        }
-
-        private String obterMotivoNegacaoHierarquia(
-                        Usuario usuario, Subprocesso subprocesso, RequisitoHierarquia requisito) {
-
-                Unidade unidadeSubprocesso = subprocesso.getUnidade();
-                String siglaUnidade = unidadeSubprocesso != null ? unidadeSubprocesso.getSigla() : "não definida";
-
-                return switch (requisito) {
-                        case MESMA_UNIDADE -> String.format(
-                                        "Usuário '%s' não pertence à unidade '%s' do subprocesso",
-                                        usuario.getTituloEleitoral(), siglaUnidade);
-                        case MESMA_OU_SUBORDINADA -> String.format(
-                                        "Usuário '%s' não pertence à unidade '%s' nem a uma unidade superior na hierarquia",
-                                        usuario.getTituloEleitoral(), siglaUnidade);
-                        case SUPERIOR_IMEDIATA -> String.format(
-                                        "Usuário '%s' não pertence à unidade superior imediata da unidade '%s'",
-                                        usuario.getTituloEleitoral(), siglaUnidade);
-                        case TITULAR_UNIDADE -> {
-                                String tituloTitular = unidadeSubprocesso != null
-                                                ? unidadeSubprocesso.getTituloTitular()
-                                                : "não definido";
-                                yield String.format(
-                                                "Usuário '%s' não é o titular da unidade '%s'. Titular: %s",
-                                                usuario.getTituloEleitoral(), siglaUnidade, tituloTitular);
-                        }
-                        default -> "Erro inesperado na verificação de hierarquia";
-                };
-        }
-
-        private String formatarSituacoes(EnumSet<SituacaoSubprocesso> situacoes) {
-                if (situacoes.size() > 5) {
-                        return situacoes.size() + " situações";
-                }
-                return situacoes.stream()
-                                .map(SituacaoSubprocesso::getDescricao)
-                                .reduce((a, b) -> a + ", " + b)
-                                .orElse("nenhuma");
-        }
-
-        /**
-         * Enum para requisitos de hierarquia de unidades
-         */
-        private enum RequisitoHierarquia {
-                NENHUM, // Sem verificação de hierarquia
-                MESMA_UNIDADE, // Usuário deve estar na mesma unidade
-                MESMA_OU_SUBORDINADA, // Usuário deve estar na mesma unidade ou em unidade superior
-                SUPERIOR_IMEDIATA, // Usuário deve estar na unidade superior imediata
-                TITULAR_UNIDADE // Usuário deve ser o titular da unidade
-        }
-
-        /**
-         * Record para armazenar regras de uma ação
-         */
-        private record RegrasAcao(
-                        EnumSet<Perfil> perfisPermitidos,
-                        EnumSet<SituacaoSubprocesso> situacoesPermitidas,
-                        RequisitoHierarquia requisitoHierarquia) {
-        }
+    /**
+     * Record para armazenar regras de uma ação
+     */
+    private record RegrasAcao(
+            EnumSet<Perfil> perfisPermitidos,
+            EnumSet<SituacaoSubprocesso> situacoesPermitidas,
+            RequisitoHierarquia requisitoHierarquia) {
+    }
 }
