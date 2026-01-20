@@ -71,7 +71,7 @@ public class LoginFacade {
      * @return true se a autenticação for bem-sucedida
      */
     public boolean autenticar(String tituloEleitoral, String senha) {
-        boolean autenticado = false;
+        boolean autenticado;
         if (clienteAcessoAd == null) {
             if (ambienteTestes) {
                 autenticado = usuarioService.carregarUsuarioParaAutenticacao(tituloEleitoral) != null;

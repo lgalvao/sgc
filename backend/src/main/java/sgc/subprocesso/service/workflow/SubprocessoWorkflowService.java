@@ -273,7 +273,7 @@ public class SubprocessoWorkflowService {
     private void disponibilizar(Long codSubprocesso, Usuario usuario, sgc.seguranca.acesso.Acao acao, SituacaoSubprocesso novaSituacao, TipoTransicao transicao) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, acao, sp);
-        validarRequisitosNegocioParaDisponibilizacao(codSubprocesso, sp);
+        validarRequisitosNegocioParaDisponibilizacao(codSubprocesso);
         
         Unidade origem = sp.getUnidade();
         Unidade destino = origem.getUnidadeSuperior();
@@ -286,7 +286,7 @@ public class SubprocessoWorkflowService {
         transicaoService.registrar(sp, transicao, origem, destino, usuario);
     }
 
-    private void validarRequisitosNegocioParaDisponibilizacao(Long codSubprocesso, Subprocesso sp) {
+    private void validarRequisitosNegocioParaDisponibilizacao(Long codSubprocesso) {
         validacaoService.validarExistenciaAtividades(codSubprocesso);
 
         if (!validacaoService.obterAtividadesSemConhecimento(codSubprocesso).isEmpty()) {
