@@ -33,6 +33,7 @@ import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;

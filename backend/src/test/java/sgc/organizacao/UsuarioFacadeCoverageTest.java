@@ -14,7 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.comum.repo.RepositorioComum;
 import sgc.organizacao.model.*;
 
-import java.util.*;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

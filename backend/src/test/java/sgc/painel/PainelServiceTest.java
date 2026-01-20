@@ -188,28 +188,6 @@ class PainelServiceTest {
         }
 
         @Test
-        @DisplayName("listarProcessos: Link destino nulo se unidade não encontrada para Chefe")
-        void listarProcessos_LinkNuloSeUnidadeNaoEncontrada() {
-            Long codigoUnidade = 1L;
-            when(unidadeService.buscarPorCodigo(codigoUnidade)).thenThrow(new RuntimeException("Erro"));
-
-            Processo p = new Processo();
-            p.setCodigo(100L);
-            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-            p.setTipo(TipoProcesso.MAPEAMENTO);
-            
-            Unidade u = new Unidade();
-            u.setCodigo(1L);
-            p.setParticipantes(Set.of(u));
-
-            when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
-
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, codigoUnidade, pageable);
-
-            assertThat(result.getContent().getFirst().linkDestino()).isNull();
-        }
-
-        @Test
         @DisplayName("Calcula link destino com exceção na busca de unidade")
         void calculaLinkComExcecaoUnidade() {
             Processo p = new Processo();
@@ -231,19 +209,6 @@ class PainelServiceTest {
 
             assertThat(res.getContent()).hasSize(1);
             assertThat(res.getContent().getFirst().linkDestino()).isNull();
-        }
-
-        @Test
-        @DisplayName("calcularLinkDestinoProcesso deve retornar link padrão em caso de erro na busca da unidade")
-        void calcularLinkDestinoProcesso_CatchErro() {
-            Processo p = criarProcessoMock(1L);
-            // SERVIDOR ou qualquer um que cai no fluxo padrão
-            when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
-            when(unidadeService.buscarPorCodigo(1L)).thenThrow(new RuntimeException("Error"));
-            
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.SERVIDOR, 1L, PageRequest.of(0, 10));
-            assertThat(result.getContent()).isNotEmpty();
-            assertThat(result.getContent().getFirst().linkDestino()).isNull();
         }
     }
 

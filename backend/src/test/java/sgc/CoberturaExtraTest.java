@@ -4,18 +4,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import java.util.HashMap;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.comum.erros.ErroNegocio;
 import sgc.comum.erros.ErroNegocioBase;
+import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.painel.erros.ErroParametroPainelInvalido;
+import sgc.subprocesso.erros.ErroMapaNaoAssociado;
+
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -18,9 +18,9 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
-import sgc.processo.service.ProcessoFacade;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.processo.service.ProcessoFacade;
 
 import java.util.List;
 import java.util.Optional;
