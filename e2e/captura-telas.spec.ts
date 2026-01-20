@@ -44,12 +44,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
     test.beforeEach(async ({request}) => {
-        await resetDatabase(request);
         cleanup = useProcessoCleanup();
+        await resetDatabase(request);
     });
 
     test.afterEach(async ({request}) => {
-        await cleanup.limpar(request);
+        if (cleanup) {
+            await cleanup.limpar(request);
+        }
     });
 
     test.describe('01 - Autenticação', () => {

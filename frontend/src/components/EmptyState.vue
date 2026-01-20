@@ -2,6 +2,8 @@
   <div
       class="text-center py-5 border rounded bg-light mb-4 text-muted empty-state"
       data-testid="empty-state"
+      role="region"
+      aria-label="Estado vazio"
   >
     <i
         v-if="icon"

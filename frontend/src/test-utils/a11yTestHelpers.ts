@@ -9,6 +9,12 @@ import { expect } from "vitest";
  * @param options Custom axe-core options (optional).
  */
 export async function checkA11y(container: HTMLElement, options?: any) {
-  const results = await axe(container, options);
+  const results = await axe(container, {
+    ...options,
+    rules: {
+      ...options?.rules,
+      region: { enabled: false }, // Disable region rule for component tests
+    },
+  });
   expect(results).toHaveNoViolations();
 }

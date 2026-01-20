@@ -9,12 +9,16 @@ export async function navegarParaMapa(page: Page) {
 }
 
 export async function abrirModalCriarCompetencia(page: Page) {
-    // Tenta encontrar o botão de estado vazio primeiro, se visível
     const btnEmpty = page.getByTestId('btn-abrir-criar-competencia-empty');
+    const btnNormal = page.getByTestId('btn-abrir-criar-competencia');
+
+    // Wait for either button to be visible
+    await expect(btnEmpty.or(btnNormal)).toBeVisible();
+
     if (await btnEmpty.isVisible()) {
         await btnEmpty.click();
     } else {
-        await page.getByTestId('btn-abrir-criar-competencia').click();
+        await btnNormal.click();
     }
     await expect(page.getByTestId('mdl-criar-competencia')).toBeVisible();
 }
