@@ -89,7 +89,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
         }
 
         return usuarioRepo.findAllById(titulos).stream()
-                .collect(Collectors.toMap(Usuario::getTituloEleitoral, u -> u));
+                .collect(Collectors.toMap(Usuario::getTituloEleitoral, u -> u, (u1, u2) -> u1));
     }
 
     /**

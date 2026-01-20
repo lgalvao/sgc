@@ -190,7 +190,7 @@ public class UsuarioFacade {
 
     public Map<String, UsuarioDto> buscarUsuariosPorTitulos(List<String> titulos) {
         return usuarioRepo.findAllById(titulos).stream()
-                .collect(toMap(Usuario::getTituloEleitoral, this::toUsuarioDto));
+                .collect(toMap(Usuario::getTituloEleitoral, this::toUsuarioDto, (u1, u2) -> u1));
     }
 
     @Transactional(readOnly = true)

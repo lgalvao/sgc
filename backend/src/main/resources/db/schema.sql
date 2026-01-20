@@ -27,7 +27,7 @@ create table if not exists sgc.vw_unidade
     matricula_titular        varchar(8),
     titulo_titular           varchar(12),
     data_inicio_titularidade timestamp(6),
-    tipo                     varchar(20) check (tipo in ('OPERACIONAL', 'INTERMEDIARIA', 'INTEROPERACIONAL', 'SEM_EQUIPE', 'RAIZ')),
+    tipo                     varchar(20) check (tipo in ('OPERACIONAL', 'INTERMEDIARIA', 'INTEROPERACIONAL', 'SEM EQUIPE', 'RAIZ')),
     situacao                 varchar(20) check (situacao in ('ATIVA', 'INATIVA')),
     unidade_superior_codigo  bigint,
     primary key (codigo)
@@ -224,7 +224,7 @@ create table if not exists sgc.unidade_processo
     matricula_titular        varchar(8),
     titulo_titular           varchar(12),
     data_inicio_titularidade timestamp(6),
-    tipo                     varchar(20) check (tipo in ('OPERACIONAL', 'INTERMEDIARIA', 'INTEROPERACIONAL')),
+    tipo                     varchar(20) check (tipo in ('OPERACIONAL', 'INTERMEDIARIA', 'INTEROPERACIONAL', 'SEM EQUIPE')),
     situacao                 varchar(20),
     unidade_superior_codigo  bigint,
     primary key (processo_codigo, unidade_codigo)

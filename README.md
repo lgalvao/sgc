@@ -53,11 +53,11 @@ sgc/
 
 ### Desenvolvimento
 
-1. **Backend:**
+1. **Backend (Homologação):**
 
     ```bash
     cd backend
-    ./gradlew bootRun
+    ./gradlew bootRun -PENV=hom
     ```
 
     A API estará disponível em `http://localhost:10000`.

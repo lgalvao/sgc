@@ -35,7 +35,6 @@ public class Unidade extends EntidadeBase {
     @Column(name = "data_inicio_titularidade")
     private LocalDateTime dataInicioTitularidade;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20)
     private TipoUnidade tipo;
 
