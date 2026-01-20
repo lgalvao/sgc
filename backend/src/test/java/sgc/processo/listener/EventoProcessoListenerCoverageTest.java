@@ -35,7 +35,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
 class EventoProcessoListenerCoverageTest {
-
     @InjectMocks
     private EventoProcessoListener listener;
 
@@ -49,7 +48,6 @@ class EventoProcessoListenerCoverageTest {
 
     @Test
     void deveProcessarInicioComResponsavelSemTitular() {
-        // Cobre branch 117 (titular null)
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -81,14 +79,11 @@ class EventoProcessoListenerCoverageTest {
         EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
         listener.aoIniciarProcesso(evento);
 
-        // Verifica que tentou buscar (mas vai falhar no envio pois tenta pegar titular, mas isso gera exceção que é logada)
-        // O importante é cobrir o loop de titulos
         verify(usuarioService).buscarUsuariosPorTitulos(argThat(list -> list.contains("Substituto") && !list.contains(null)));
     }
 
     @Test
     void deveProcessarInicioComIntermediariaESubordinadas() {
-        // Cobre switch case INTERMEDIARIA (228 e 260)
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setDescricao("Processo P");
@@ -122,7 +117,6 @@ class EventoProcessoListenerCoverageTest {
         EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
         listener.aoIniciarProcesso(evento);
 
-        // Verifica envio de email
         verify(notificacaoEmailService).enviarEmailHtml(
                 eq("titular@email.com"),
                 contains("Processo Iniciado em Unidades Subordinadas"), // Assunto INTERMEDIARIA
@@ -132,7 +126,6 @@ class EventoProcessoListenerCoverageTest {
 
     @Test
     void deveIgnorarNotificacaoFinalizacaoSeTitularInvalido() {
-        // Cobre branch 170: titular null ou email null
         Processo processo = new Processo();
         processo.setCodigo(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
@@ -146,10 +139,7 @@ class EventoProcessoListenerCoverageTest {
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1, 2L, r2));
 
-        // T1 não existe no map de usuarios (null)
-        // T2 existe mas email é null
         UsuarioDto user2 = UsuarioDto.builder().tituloEleitoral("T2").email(null).build();
-
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T2", user2));
 
         EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(1L).build();
@@ -160,7 +150,6 @@ class EventoProcessoListenerCoverageTest {
 
     @Test
     void deveEnviarEmailFinalizacaoInteroperacional() {
-        // Cobre branch 175: INTEROPERACIONAL
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setDescricao("P1");
@@ -216,10 +205,6 @@ class EventoProcessoListenerCoverageTest {
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1));
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of());
 
-        // Responsavel null vai causar NPE ao tentar acessar no metodo enviarEmailProcessoIniciado ou antes
-        // Na verdade, enviarEmailProcessoIniciado pega responsavel do map. Se null, tenta acessar getter -> NPE
-        // Isso é capturado pelo catch dentro do loop
-
         EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
         listener.aoIniciarProcesso(evento);
     }
@@ -249,7 +234,6 @@ class EventoProcessoListenerCoverageTest {
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", t1, "S1", s1Dto));
         when(notificacaoModelosService.criarEmailProcessoIniciado(any(),any(),any(),any())).thenReturn("HTML");
 
-        // Usando doAnswer para garantir que apenas o segundo email lance exceção
         doAnswer(invocation -> {
             String email = invocation.getArgument(0);
             if ("s1@mail.com".equals(email)) {
@@ -280,7 +264,6 @@ class EventoProcessoListenerCoverageTest {
         UsuarioDto t1 = UsuarioDto.builder().tituloEleitoral("T1").email("t1@mail.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", t1));
 
-        // Forçar erro
         doThrow(new RuntimeException("Erro envio final"))
                 .when(notificacaoModelosService).criarEmailProcessoFinalizadoPorUnidade(any(), any());
 

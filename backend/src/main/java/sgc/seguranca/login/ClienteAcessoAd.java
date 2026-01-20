@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import sgc.comum.erros.ErroAutenticacao;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * Cliente para integração com o serviço AcessoAD (autenticação via Active
  * Directory).
@@ -37,7 +39,7 @@ public class ClienteAcessoAd {
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
                             (req, res) -> {
-                                String body = new String(res.getBody().readAllBytes());
+                                String body = new String(res.getBody().readAllBytes(), StandardCharsets.UTF_8);
                                 log.error("Erro HTTP {} na autenticação AD: {}", res.getStatusCode(), body);
                                 throw new ErroAutenticacao("Falha na autenticação externa.");
                             })

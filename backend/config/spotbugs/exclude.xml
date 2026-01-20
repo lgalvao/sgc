@@ -1,19 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
+    <!-- Pacotes e classes geradas -->
     <Match>
         <Package name="~.*\.generated\..*"/>
     </Match>
+
+    <!-- DTOs e Entities: getters retornam coleções mutáveis (padrão JPA/DTO) -->
     <Match>
         <Or>
             <Class name="~.*\.dto\..*"/>
             <Class name="~.*\.entity\..*"/>
+            <Class name="~.*\.model\..*"/>
         </Or>
         <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
     </Match>
+
+    <!-- Classe principal da aplicação -->
     <Match>
         <Class name="sgc.Sgc"/>
     </Match>
+
+    <!-- Classes geradas pelo MapStruct -->
     <Match>
         <Class name="~.*MapperImpl"/>
+    </Match>
+
+    <!-- 
+        Injeção de Dependências Spring: Construtores de @Service/@Component/@Facade
+        armazenam beans gerenciados pelo container. Não há risco de "exposição de 
+        representação interna" pois são singletons imutáveis após injeção.
+    -->
+    <Match>
+        <Or>
+            <Class name="sgc.mapa.service.MapaFacade"/>
+            <Class name="sgc.subprocesso.service.crud.SubprocessoCrudService"/>
+            <Class name="sgc.subprocesso.service.workflow.SubprocessoWorkflowService"/>
+            <Class name="sgc.processo.service.ProcessoConsultaService"/>
+            <Class name="sgc.seguranca.login.LoginFacade"/>
+        </Or>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- 
+        Records de Configuration Properties: Spring Boot injeta valores de configuração.
+        Os valores são efetivamente imutáveis após startup.
+    -->
+    <Match>
+        <Class name="sgc.seguranca.config.ConfigCorsProperties"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+
+    <!-- 
+        Classe de exceção que armazena causa (DocumentException).
+        O padrão de exceção com causa é intencional para stack trace.
+    -->
+    <Match>
+        <Class name="sgc.relatorio.service.ErroRelatorio"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!--
+        Setter de auto-injeção para chamadas @Transactional via proxy.
+        Padrão comum em Spring para contornar limitação de self-invocation.
+    -->
+    <Match>
+        <Class name="sgc.subprocesso.service.workflow.SubprocessoWorkflowService"/>
+        <Method name="setSelf"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
 </FindBugsFilter>

@@ -601,10 +601,9 @@ public class SubprocessoWorkflowService {
                     .map(Atividade::getDescricao)
                     .collect(Collectors.joining(", "));
 
-            throw new ErroValidacao("""
-                    Todas as atividades devem estar associadas a pelo menos uma competência.
-                    Atividades pendentes: %s""".
-                    formatted(nomesAtividades)
+            throw new ErroValidacao(
+                    "Todas as atividades devem estar associadas a pelo menos uma competência.%nAtividades pendentes: %s"
+                    .formatted(nomesAtividades)
             );
         }
     }
