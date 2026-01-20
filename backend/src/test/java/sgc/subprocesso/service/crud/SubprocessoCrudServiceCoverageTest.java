@@ -36,6 +36,12 @@ class SubprocessoCrudServiceCoverageTest {
     private SubprocessoMapper mapper;
     @Mock
     private sgc.comum.repo.RepositorioComum repo;
+    @Mock
+    private sgc.mapa.service.MapaFacade mapaFacade;
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher eventPublisher;
+    @Mock
+    private sgc.organizacao.UsuarioFacade usuarioService;
 
     @Test
     @DisplayName("criar - Sucesso")

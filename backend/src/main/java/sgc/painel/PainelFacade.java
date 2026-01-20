@@ -181,14 +181,22 @@ public class PainelFacade {
     }
 
     private String calcularLinkDestinoProcesso(Processo processo, Perfil perfil, Long codigoUnidade) {
-        if (perfil == Perfil.ADMIN && processo.getSituacao() == SituacaoProcesso.CRIADO) {
-            return String.format("/processo/cadastro?codProcesso=%s", processo.getCodigo());
+        try {
+            if (perfil == Perfil.ADMIN && processo.getSituacao() == SituacaoProcesso.CRIADO) {
+                return String.format("/processo/cadastro?codProcesso=%s", processo.getCodigo());
+            }
+            if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) {
+                return "/processo/" + processo.getCodigo();
+            }
+            if (codigoUnidade == null) {
+                return null;
+            }
+            var unidade = unidadeService.buscarPorCodigo(codigoUnidade);
+            return String.format("/processo/%s/%s", processo.getCodigo(), (unidade != null) ? unidade.getSigla() : "null");
+        } catch (Exception e) {
+            log.warn("Erro ao calcular link de destino para o processo {}: {}", processo.getCodigo(), e.getMessage());
+            return null;
         }
-        if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) {
-            return "/processo/" + processo.getCodigo();
-        }
-        var unidade = unidadeService.buscarPorCodigo(codigoUnidade);
-        return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
     }
 
     private AlertaDto paraAlertaDto(Alerta alerta, LocalDateTime dataHoraLeitura) {
