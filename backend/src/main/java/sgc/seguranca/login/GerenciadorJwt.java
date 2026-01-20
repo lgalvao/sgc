@@ -39,6 +39,7 @@ public class GerenciadorJwt {
                 log.warn("⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão.");
             } else {
                 log.error("🚨 ERRO CRÍTICO DE SEGURANÇA: Tentativa de iniciar em ambiente de produção com o segredo JWT padrão.");
+                throw new ErroConfiguracao("FALHA DE SEGURANÇA: Segredo JWT padrão não permitido em produção");
             }
         }
     }
