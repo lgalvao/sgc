@@ -4,9 +4,10 @@ const { execSync } = require('node:child_process');
 const xml2js = require('xml2js');
 
 // Configuração
-const REPORT_PATH = path.join(__dirname, '../backend/build/reports/jacoco/test/jacocoTestReport.xml');
-const GRADLE_CMD = './gradlew :backend:test :backend:jacocoTestReport';
-const GRADLE_DIR = path.join(__dirname, '..');
+const REPORT_PATH = path.join(__dirname, '../../backend/build/reports/jacoco/test/jacocoTestReport.xml');
+const GRADLE_DIR = path.join(__dirname, '../../');
+const isWindows = process.platform === 'win32';
+const GRADLE_CMD = isWindows ? 'gradlew.bat :backend:test :backend:jacocoTestReport' : './gradlew :backend:test :backend:jacocoTestReport';
 
 // Função principal
 async function main() {
@@ -159,9 +160,7 @@ function formatLineList(lines) {
     return lines.join(', ');
 }
 
-try {
-    await main();
-} catch (err) {
+main().catch(err => {
     console.error('Falha catastrófica na execução da análise:', err);
     process.exit(1);
-}
+});

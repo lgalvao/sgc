@@ -140,9 +140,7 @@ async function run() {
     }
 }
 
-try {
-    await run();
-} catch (err) {
+run().catch(err => {
     console.error('Erro inesperado no accessibility-check:', err);
     process.exit(1);
-}
+});
