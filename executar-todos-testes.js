@@ -33,6 +33,34 @@ const steps = [
 
 const reportFile = 'relatorio-testes.md';
 
+function cleanLog(output) {
+    // Remove cores ANSI
+    let text = output.replace(/\u001b\[.*?m/g, '');
+
+    // Filtros de linhas indesejadas
+    const filters = [
+        /Not implemented: HTMLCanvasElement/,
+        /^> Task :.* UP-TO-DATE/,
+        /^> Task :.* NO-SOURCE/,
+        /Downloading Chromium/,
+        /Downloading Firefox/,
+        /Downloading Webkit/,
+        /^\|.*\| \d+% of .* MiB/, // Barras de progresso
+        /^\s*$/ // Linhas vazias
+    ];
+
+    let lines = text.split('\n');
+    lines = lines.filter(line => {
+        const trimmed = line.trim();
+        if (filters.some(f => f.test(trimmed))) return false;
+        // Filtro específico para os pontos do vitest/jest
+        if (/^[\.·]+$/.test(trimmed)) return false;
+        return true;
+    });
+
+    return lines.join('\n');
+}
+
 async function runCommand(step) {
     return new Promise((resolve) => {
         console.log(`\n🚀 Iniciando: ${step.name}...`);
@@ -121,10 +149,13 @@ function generateReport(results) {
         
         md += '<details>\n<summary>Ver Logs de Saída</summary>\n\n';
         md += '```text\n';
-        // Limita o log para não quebrar o markdown se for gigante, pega os últimos 5000 chars se passar de 10k
-        let cleanOutput = r.output.replace(/\u001b\[.*?m/g, ''); // Remove cores ANSI
-        if (cleanOutput.length > 20000) {
-            cleanOutput = `... (Log truncado - mostrando últimos 20k caracteres) ...\n${cleanOutput.slice(-20000)}`;
+
+        let cleanOutput = cleanLog(r.output);
+
+        // Limita o log para não quebrar o markdown se for gigante
+        // Aumentei o limite para 50k para capturar mais contexto em erros
+        if (cleanOutput.length > 50000) {
+            cleanOutput = `... (Log truncado - mostrando últimos 50k caracteres) ...\n${cleanOutput.slice(-50000)}`;
         }
         md += cleanOutput;
         md += '\n```\n\n';

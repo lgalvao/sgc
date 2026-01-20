@@ -1,6 +1,7 @@
 package sgc.e2e;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
@@ -33,6 +34,7 @@ import java.util.List;
 @RequestMapping("/e2e")
 @Profile("e2e")
 @RequiredArgsConstructor
+@Slf4j
 public class E2eController {
     private static final String SQL_SUBPROCESSO_POR_PROCESSO = " sgc.subprocesso WHERE processo_codigo = ?)";
 
@@ -43,28 +45,33 @@ public class E2eController {
 
     @PostMapping("/reset-database")
     public void resetDatabase() throws SQLException {
-        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
-
         try {
-            List<String> tables =
-                    jdbcTemplate.queryForList(
-                            "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA ="
-                                    + " 'SGC'",
-                            String.class);
+            jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
 
-            for (String table : tables) {
-                jdbcTemplate.execute("TRUNCATE TABLE sgc." + table);
+            try {
+                List<String> tables =
+                        jdbcTemplate.queryForList(
+                                "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA ="
+                                        + " 'SGC'",
+                                String.class);
+
+                for (String table : tables) {
+                    jdbcTemplate.execute("TRUNCATE TABLE sgc." + table);
+                }
+            } finally {
+                jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
             }
-        } finally {
-            jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
-        }
 
-        File seedFile = new File("../e2e/setup/seed.sql");
-        if (!seedFile.exists()) seedFile = new File("e2e/setup/seed.sql");
-        if (!seedFile.exists()) throw new ErroConfiguracao("Arquivo seed.sql não encontrado");
+            File seedFile = new File("../e2e/setup/seed.sql");
+            if (!seedFile.exists()) seedFile = new File("e2e/setup/seed.sql");
+            if (!seedFile.exists()) throw new ErroConfiguracao("Arquivo seed.sql não encontrado");
 
-        try (Connection conn = dataSource.getConnection()) {
-            ScriptUtils.executeSqlScript(conn, new FileSystemResource(seedFile));
+            try (Connection conn = dataSource.getConnection()) {
+                ScriptUtils.executeSqlScript(conn, new FileSystemResource(seedFile));
+            }
+        } catch (Exception e) {
+            log.error("Error resetting database", e);
+            throw e;
         }
     }
 
