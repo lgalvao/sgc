@@ -151,9 +151,7 @@ class SubprocessoFacadeCoverageTest {
         Long codSubprocesso = 999L;
         when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.empty());
 
-        org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> {
-            facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList());
-        });
+        org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList()));
     }
 
     @Test
@@ -318,9 +316,7 @@ class SubprocessoFacadeCoverageTest {
 
         when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
 
-        org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () -> {
-            facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList());
-        });
+        org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () -> facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList()));
     }
 
     @Test
@@ -336,9 +332,7 @@ class SubprocessoFacadeCoverageTest {
 
         when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
 
-        org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida.class, () -> {
-            facade.importarAtividades(codDestino, codOrigem);
-        });
+        org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida.class, () -> facade.importarAtividades(codDestino, codOrigem));
     }
 
     @Test
@@ -401,7 +395,7 @@ class SubprocessoFacadeCoverageTest {
         var result = facade.listarAtividadesSubprocesso(codSubprocesso);
 
         assertFalse(result.isEmpty());
-        assertFalse(result.get(0).getConhecimentos().isEmpty());
+        assertFalse(result.getFirst().getConhecimentos().isEmpty());
     }
 
     @Test

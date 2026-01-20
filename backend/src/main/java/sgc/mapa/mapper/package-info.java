@@ -38,7 +38,6 @@
  * Mapper para atividades de um mapa de competências.
  * </p>
  * <ul>
- *   <li>{@code toDto(Atividade)} - Converte para {@link sgc.mapa.dto.AtividadeDto}</li>
  *   <li>{@code toEntity(AtividadeDto)} - Converte DTO para entidade</li>
  *   <li>Mapeamento: {@code mapa.codigo → mapaCodigo} (relacionamento com mapa)</li>
  *   <li>Ignora: {@code mapa}, {@code conhecimentos}, {@code competencias} (ao converter de DTO)</li>
@@ -50,7 +49,6 @@
  * Mapper para conhecimentos associados a atividades.
  * </p>
  * <ul>
- *   <li>{@code toDto(Conhecimento)} - Converte para {@link sgc.mapa.dto.ConhecimentoDto}</li>
  *   <li>{@code toEntity(ConhecimentoDto)} - Converte DTO para entidade</li>
  *   <li>Mapeamento: {@code atividade.codigo → atividadeCodigo} (relacionamento FK)</li>
  *   <li>Resolução de FK: {@code map(Long)} - Resolve código de atividade usando {@link sgc.mapa.model.AtividadeRepo}</li>

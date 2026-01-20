@@ -15,6 +15,8 @@ public class AlertaFixture {
         alerta.setProcesso(processo);
         alerta.setDescricao("Alerta de Teste");
         alerta.setDataHora(LocalDateTime.now());
+        alerta.setUnidadeOrigem(UnidadeFixture.unidadePadrao());
+        alerta.setUnidadeDestino(UnidadeFixture.unidadePadrao());
         return alerta;
     }
 

@@ -63,8 +63,8 @@ class MapaAjusteMapperTest {
         assertThat(dto.getJustificativaDevolucao()).isEqualTo("Justificativa");
 
         assertThat(dto.getCompetencias()).hasSize(1);
-        assertThat(dto.getCompetencias().get(0).getAtividades()).hasSize(1);
-        assertThat(dto.getCompetencias().get(0).getAtividades().get(0).getConhecimentos()).hasSize(1);
-        assertThat(dto.getCompetencias().get(0).getAtividades().get(0).getConhecimentos().get(0).isIncluido()).isTrue();
+        assertThat(dto.getCompetencias().getFirst().getAtividades()).hasSize(1);
+        assertThat(dto.getCompetencias().getFirst().getAtividades().getFirst().getConhecimentos()).hasSize(1);
+        assertThat(dto.getCompetencias().getFirst().getAtividades().getFirst().getConhecimentos().getFirst().isIncluido()).isTrue();
     }
 }

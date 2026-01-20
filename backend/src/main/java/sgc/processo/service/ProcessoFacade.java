@@ -256,7 +256,7 @@ public class ProcessoFacade {
     public org.springframework.data.domain.Page<Processo> listarPorParticipantesIgnorandoCriado(
             List<Long> unidadeIds, org.springframework.data.domain.Pageable pageable) {
         return processoRepo.findDistinctByParticipantes_CodigoInAndSituacaoNot(
-                unidadeIds, SituacaoProcesso.CRIADO, pageable);
+                unidadeIds, CRIADO, pageable);
     }
 
     // ========== MÉTODOS DE INICIALIZAÇÃO (delegam para ProcessoInicializador)

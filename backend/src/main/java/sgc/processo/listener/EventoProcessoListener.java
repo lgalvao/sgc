@@ -122,11 +122,7 @@ public class EventoProcessoListener {
 
         // 3. Enviar e-mails para cada subprocesso
         for (Subprocesso subprocesso : subprocessos) {
-            try {
-                enviarEmailProcessoIniciado(processo, subprocesso, responsaveis, usuarios);
-            } catch (Exception e) {
-                log.error("Erro ao enviar e-mail referente a subprocesso {}: {}", subprocesso.getCodigo(), e.getClass().getSimpleName(), e);
-            }
+            enviarEmailProcessoIniciado(processo, subprocesso, responsaveis, usuarios);
         }
     }
 

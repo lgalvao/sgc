@@ -30,11 +30,11 @@ import static org.mockito.Mockito.*;
 
 /**
  * Testes unitários consolidados do UsuarioFacade.
- * 
+ * <p>
  * Este arquivo consolida:
  * - UsuarioServiceCoverageTest.java (38 testes)
  * - UsuarioServiceGapsTest.java (6 testes)
- * 
+ * <p>
  * Organização:
  * - Métodos de Busca e Mapeamento
  * - Administração de Usuários

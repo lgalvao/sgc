@@ -83,7 +83,7 @@ class CopiaMapaServiceTest {
 
         List<Competencia> competenciasSalvas = captor.getValue();
         assertThat(competenciasSalvas).hasSize(1);
-        Competencia competenciaSalva = competenciasSalvas.get(0);
+        Competencia competenciaSalva = competenciasSalvas.getFirst();
         assertThat(competenciaSalva.getAtividades()).hasSize(1);
         Atividade atividadeAssociada = competenciaSalva.getAtividades().iterator().next();
         assertThat(atividadeAssociada.getCodigo()).isEqualTo(20L);

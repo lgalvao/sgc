@@ -12,7 +12,6 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UsuarioFacade;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -35,7 +34,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes para SubprocessoCrudService")
 class SubprocessoCrudServiceTest {
-
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
     @Mock
@@ -46,8 +44,6 @@ class SubprocessoCrudServiceTest {
     private MapaFacade mapaFacade;
     @Mock
     private ApplicationEventPublisher eventPublisher;
-    @Mock
-    private UsuarioFacade usuarioService;
 
     @InjectMocks
     private SubprocessoCrudService service;

@@ -226,10 +226,10 @@ class ProcessoDetalheBuilderTest {
 
         // Assert
         assertThat(dto.getUnidades()).hasSize(1); // Somente o pai na raiz
-        ProcessoDetalheDto.UnidadeParticipanteDto paiDto = dto.getUnidades().get(0);
+        ProcessoDetalheDto.UnidadeParticipanteDto paiDto = dto.getUnidades().getFirst();
         assertThat(paiDto.getMapaCodigo()).isEqualTo(100L);
         assertThat(paiDto.getFilhos()).hasSize(1);
-        assertThat(paiDto.getFilhos().get(0).getSigla()).isEqualTo("FILHO");
+        assertThat(paiDto.getFilhos().getFirst().getSigla()).isEqualTo("FILHO");
     }
 
     @Test
@@ -306,6 +306,6 @@ class ProcessoDetalheBuilderTest {
 
         // Filho deve aparecer na raiz pois pai não participa
         assertThat(dto.getUnidades()).hasSize(1);
-        assertThat(dto.getUnidades().get(0).getSigla()).isEqualTo("FILHO");
+        assertThat(dto.getUnidades().getFirst().getSigla()).isEqualTo("FILHO");
     }
 }

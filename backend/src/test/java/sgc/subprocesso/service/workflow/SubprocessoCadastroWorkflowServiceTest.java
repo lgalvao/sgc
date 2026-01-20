@@ -479,7 +479,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         // Removed unnecessary stubbing
-        org.mockito.Mockito.doThrow(
+        doThrow(
                         new ErroValidacao(
                                 "Pelo menos uma atividade deve ser cadastrada antes de"
                                         + " disponibilizar."))
@@ -508,7 +508,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
         // Removed unnecessary stubbing
-        org.mockito.Mockito.doThrow(
+        doThrow(
                         new ErroValidacao(
                                 "Pelo menos uma atividade deve ser cadastrada antes de"
                                         + " disponibilizar."))

@@ -184,15 +184,15 @@ class ImpactoMapaServiceTest {
             assertNotNull(resultado);
             // Inseriu A2
             assertEquals(1, resultado.getAtividadesInseridas().size());
-            assertEquals("Ativ 2", resultado.getAtividadesInseridas().get(0).getDescricao());
+            assertEquals("Ativ 2", resultado.getAtividadesInseridas().getFirst().getDescricao());
             
             // Alterou A1 (conhecimentos)
             assertEquals(1, resultado.getAtividadesAlteradas().size());
-            assertEquals("Ativ 1", resultado.getAtividadesAlteradas().get(0).getDescricao());
+            assertEquals("Ativ 1", resultado.getAtividadesAlteradas().getFirst().getDescricao());
 
             // Impactou C1 (pois A1 ligada a ela foi alterada)
             assertEquals(1, resultado.getCompetenciasImpactadas().size());
-            assertEquals("Comp 1", resultado.getCompetenciasImpactadas().get(0).getDescricao());
+            assertEquals("Comp 1", resultado.getCompetenciasImpactadas().getFirst().getDescricao());
         }
 
         @Test
@@ -225,7 +225,7 @@ class ImpactoMapaServiceTest {
             assertEquals(1, resultado.getAtividadesRemovidas().size());
             assertEquals(1, resultado.getCompetenciasImpactadas().size());
             assertEquals(sgc.mapa.model.TipoImpactoCompetencia.ATIVIDADE_REMOVIDA, 
-                         resultado.getCompetenciasImpactadas().get(0).getTiposImpacto().get(0));
+                         resultado.getCompetenciasImpactadas().getFirst().getTiposImpacto().getFirst());
         }
     }
 }

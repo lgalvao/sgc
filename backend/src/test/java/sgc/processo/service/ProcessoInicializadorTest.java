@@ -121,7 +121,7 @@ class ProcessoInicializadorTest {
         List<String> erros = inicializador.iniciar(1L, List.of(1L));
 
         assertThat(erros).isNotEmpty();
-        assertThat(erros.get(0)).contains("não possuem mapa vigente");
+        assertThat(erros.getFirst()).contains("não possuem mapa vigente");
     }
 
     @Test
@@ -140,7 +140,7 @@ class ProcessoInicializadorTest {
         List<String> erros = inicializador.iniciar(1L, null);
 
         assertThat(erros).isNotEmpty();
-        assertThat(erros.get(0)).contains("já participam de outro processo");
+        assertThat(erros.getFirst()).contains("já participam de outro processo");
     }
 
     @Test

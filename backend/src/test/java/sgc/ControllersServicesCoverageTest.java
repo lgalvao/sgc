@@ -26,7 +26,6 @@ import sgc.mapa.service.MapaSalvamentoService;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.painel.PainelFacade;
-import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.subprocesso.SubprocessoMapaController;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
@@ -249,13 +248,7 @@ class ControllersServicesCoverageTest {
                 .isInstanceOf(ErroInvarianteViolada.class);
     }
 
-    @Test
-    @DisplayName("Deve lançar erro se perfil for nulo")
-    void deveLancarErroSePerfilNulo() {
-        Pageable unpaged = Pageable.unpaged();
-        assertThatThrownBy(() -> painelService.listarProcessos(null, 1L, unpaged))
-                .isInstanceOf(ErroParametroPainelInvalido.class);
-    }
+
 
     @Test
     @DisplayName("Deve listar alertas com ordenação padrão se não informada")

@@ -99,7 +99,7 @@ class ProcessoMapperTest {
             ProcessoDto dto = mapper.toDto(processo);
 
             assertThat(dto).isNotNull();
-            assertThat(dto.getUnidadesParticipantes()).isNull();
+            assertThat(dto.getUnidadesParticipantes()).isEmpty();
         }
 
         @Test

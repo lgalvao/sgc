@@ -8,10 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.UnidadeFacade;
 import sgc.processo.model.Processo;
-import sgc.processo.service.ProcessoFacade;
-import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -23,27 +20,22 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoCrudServiceCoverageTest {
-
     @InjectMocks
     private SubprocessoCrudService crudService;
 
-    @Mock private SubprocessoRepo repositorio;
-    @Mock private ProcessoFacade processoFacade;
-    @Mock private UnidadeFacade unidadeFacade;
-    @Mock private SubprocessoMapper mapper;
-    @Mock private AccessControlService accessControlService;
-    @Mock private sgc.mapa.service.MapaFacade mapaFacade;
-    @Mock private sgc.comum.repo.RepositorioComum repo;
-    @Mock private sgc.organizacao.UsuarioFacade usuarioService;
-    @Mock private org.springframework.context.ApplicationEventPublisher eventPublisher;
+    @Mock
+    private SubprocessoRepo repositorio;
+    @Mock
+    private SubprocessoMapper mapper;
+    @Mock
+    private sgc.comum.repo.RepositorioComum repo;
 
     @Test
     @DisplayName("criar - Sucesso")
@@ -70,8 +62,6 @@ class SubprocessoCrudServiceCoverageTest {
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         AtualizarSubprocessoRequest req = AtualizarSubprocessoRequest.builder().build();
-
-        // Mock repo.buscar because buscarSubprocesso uses it
         when(repo.buscar(Subprocesso.class, codigo)).thenReturn(sp);
         when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
@@ -87,9 +77,9 @@ class SubprocessoCrudServiceCoverageTest {
         List<Long> unidades = List.of(10L, 20L);
 
         when(repositorio.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, unidades)).thenReturn(true);
-        
+
         boolean result = crudService.verificarAcessoUnidadeAoProcesso(codProcesso, unidades);
-        assertEquals(true, result);
+        assertTrue(result);
     }
 
     @Test
@@ -120,10 +110,7 @@ class SubprocessoCrudServiceCoverageTest {
         when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
         crudService.atualizar(codigo, req);
-
         verify(repositorio).save(sp);
-        // Verify event published?
-        // verify(eventPublisher).publishEvent(any()); // if mocked
     }
 
     @Test

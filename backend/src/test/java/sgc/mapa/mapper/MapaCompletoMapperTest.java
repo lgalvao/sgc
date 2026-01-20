@@ -40,7 +40,7 @@ class MapaCompletoMapperTest {
         assertThat(dto.getSubprocessoCodigo()).isEqualTo(100L);
         assertThat(dto.getObservacoes()).isEqualTo("Obs");
         assertThat(dto.getCompetencias()).hasSize(1);
-        assertThat(dto.getCompetencias().get(0).getCodigo()).isEqualTo(2L);
-        assertThat(dto.getCompetencias().get(0).getAtividadesCodigos()).containsExactly(10L);
+        assertThat(dto.getCompetencias().getFirst().getCodigo()).isEqualTo(2L);
+        assertThat(dto.getCompetencias().getFirst().getAtividadesCodigos()).containsExactly(10L);
     }
 }

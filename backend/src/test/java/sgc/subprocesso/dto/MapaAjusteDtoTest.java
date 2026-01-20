@@ -78,15 +78,15 @@ class MapaAjusteDtoTest {
 
             // Assert
             assertThat(dto.getCompetencias()).hasSize(1);
-            CompetenciaAjusteDto compDto = dto.getCompetencias().get(0);
+            CompetenciaAjusteDto compDto = dto.getCompetencias().getFirst();
             assertThat(compDto.getCodCompetencia()).isEqualTo(1L);
             
             assertThat(compDto.getAtividades()).hasSize(1);
-            AtividadeAjusteDto ativDto = compDto.getAtividades().get(0);
+            AtividadeAjusteDto ativDto = compDto.getAtividades().getFirst();
             assertThat(ativDto.getCodAtividade()).isEqualTo(2L);
             
             assertThat(ativDto.getConhecimentos()).hasSize(1);
-            ConhecimentoAjusteDto conDto = ativDto.getConhecimentos().get(0);
+            ConhecimentoAjusteDto conDto = ativDto.getConhecimentos().getFirst();
             assertThat(conDto.getConhecimentoCodigo()).isEqualTo(3L);
             assertThat(conDto.isIncluido()).isTrue();
         }

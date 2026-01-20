@@ -222,19 +222,49 @@ class EventoProcessoListenerTest {
     }
 
     @Test
-    @DisplayName("Deve capturar exceção no loop de e-mails de início")
-    void deveCapturarExcecaoNoLoopEmailsInicio() {
+    @DisplayName("Deve cobrir exceção para unidade SEM_EQUIPE no envio de email")
+    void deveCobrirExcecaoSemEquipe() {
         Processo processo = criarProcesso(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
-        Subprocesso s = new Subprocesso(); s.setCodigo(100L); s.setUnidade(new Unidade());
+        Subprocesso s = new Subprocesso();
+        Unidade u = new Unidade(); u.setCodigo(1L); u.setTipo(TipoUnidade.SEM_EQUIPE);
+        s.setUnidade(u);
+        
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
         
-        // Provoca exceção no enviarEmailProcessoIniciado (ex: responsaveis.get() null causando NPE em cascata)
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Collections.emptyMap());
+        ResponsavelDto r = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T").build();
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r));
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", UsuarioDto.builder().email("t@mail.com").build()));
 
-        assertThatCode(() -> listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build()))
-                .doesNotThrowAnyException();
+        listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
+
+        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Deve cobrir else implícito na finalização (tipo desconhecido)")
+    void deveCobrirElseImplicitoFinalizacao() {
+        Processo processo = criarProcesso(2L);
+        when(processoFacade.buscarEntidadePorId(2L)).thenReturn(processo);
+
+        Unidade raiz = new Unidade(); 
+        raiz.setCodigo(1L); 
+        raiz.setTipo(TipoUnidade.RAIZ); 
+        
+        processo.setParticipantes(Set.of(raiz));
+
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
+            1L, ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build()
+        ));
+
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
+            "T1", UsuarioDto.builder().email("op@mail.com").build()
+        ));
+
+        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(2L).build());
+
+        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
@@ -246,5 +276,38 @@ class EventoProcessoListenerTest {
                 .doesNotThrowAnyException();
         assertThatCode(() -> listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(1L).build()))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("Deve ignorar se participantes for vazio ao finalizar")
+    void deveLogarWarningSeParticipantesVazio() {
+        Processo p = criarProcesso(1L);
+        p.setParticipantes(Collections.emptySet());
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
+
+        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(1L).build());
+        
+        verify(usuarioService, never()).buscarResponsaveisUnidades(anyList());
+    }
+
+    @Test
+    @DisplayName("Deve capturar exceção no catch interno do loop de e-mails")
+    void deveCapturarExcecaoNoCatchInterno() {
+        Processo processo = criarProcesso(1L);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
+
+        Unidade u = new Unidade(); u.setCodigo(10L); u.setTipo(TipoUnidade.OPERACIONAL);
+        Subprocesso s = new Subprocesso(); s.setCodigo(100L); s.setUnidade(u);
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
+        
+        ResponsavelDto r = ResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").build();
+        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r));
+        
+        // Quando buscar usuário por titulo retornar null, o try interno vai estourar NPE
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Collections.emptyMap());
+
+        listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
+
+        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
 }
