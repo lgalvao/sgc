@@ -1,5 +1,6 @@
 package sgc.subprocesso.mapper;
 
+import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import sgc.organizacao.model.Usuario;
@@ -26,19 +27,19 @@ public interface SubprocessoDetalheMapper {
     @Mapping(target = "etapaAtual", source = "sp.etapaAtual")
     @Mapping(target = "movimentacoes", source = "movimentacoes")
     @Mapping(target = "permissoes", source = "permissoes")
-    SubprocessoDetalheDto toDto(Subprocesso sp, Usuario responsavel, Usuario titular, List<Movimentacao> movimentacoes, SubprocessoPermissoesDto permissoes);
+    SubprocessoDetalheDto toDto(Subprocesso sp, @Nullable Usuario responsavel, @Nullable Usuario titular, List<Movimentacao> movimentacoes, @Nullable SubprocessoPermissoesDto permissoes);
 
     @Mapping(target = "codigo", source = "codigo")
     @Mapping(target = "sigla", source = "sigla")
     @Mapping(target = "nome", source = "nome")
     SubprocessoDetalheDto.UnidadeDto toUnidadeDto(sgc.organizacao.model.Unidade unidade);
 
-    default SubprocessoDetalheDto.ResponsavelDto mapResponsavel(Subprocesso sp, Usuario responsavel) {
+    default SubprocessoDetalheDto.@Nullable ResponsavelDto mapResponsavel(Subprocesso sp, @Nullable Usuario responsavel) {
         if (responsavel == null) return null;
 
-        String tituloTitular = sp.getUnidade() != null ? sp.getUnidade().getTituloTitular() : "";
+        String tituloTitular = sp.getUnidade().getTituloTitular();
         String tipo = "Substituição";
-        if (tituloTitular.equals(responsavel.getTituloEleitoral())) {
+        if (responsavel.getTituloEleitoral().equals(tituloTitular)) {
             tipo = "Titular";
         }
 
@@ -50,7 +51,7 @@ public interface SubprocessoDetalheMapper {
                 .build();
     }
 
-    default SubprocessoDetalheDto.ResponsavelDto mapTitular(Subprocesso sp, Usuario titular, Usuario responsavel) {
+    default SubprocessoDetalheDto.@Nullable ResponsavelDto mapTitular(Subprocesso sp, @Nullable Usuario titular, @Nullable Usuario responsavel) {
         if (titular == null) return null;
         return SubprocessoDetalheDto.ResponsavelDto.builder()
                 .nome(titular.getNome())

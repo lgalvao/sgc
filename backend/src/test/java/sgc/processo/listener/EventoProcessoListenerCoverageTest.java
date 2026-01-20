@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaFacade;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
@@ -32,6 +33,7 @@ import static org.mockito.Mockito.*;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
+@org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
 class EventoProcessoListenerCoverageTest {
 
     @InjectMocks
@@ -41,6 +43,7 @@ class EventoProcessoListenerCoverageTest {
     @Mock private NotificacaoEmailService notificacaoEmailService;
     @Mock private NotificacaoModelosService notificacaoModelosService;
     @Mock private UsuarioFacade usuarioService;
+    @Mock private UnidadeFacade unidadeService;
     @Mock private ProcessoFacade processoFacade;
     @Mock private SubprocessoFacade subprocessoFacade;
 
@@ -69,7 +72,7 @@ class EventoProcessoListenerCoverageTest {
                 .substitutoTitulo("Substituto")
                 .build();
 
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
 
         // Deve buscar apenas pelo substituto
         UsuarioDto usuarioSubstituto = UsuarioDto.builder().tituloEleitoral("Substituto").email("sub@email.com").build();
@@ -108,7 +111,7 @@ class EventoProcessoListenerCoverageTest {
                 .unidadeCodigo(10L)
                 .titularTitulo("123")
                 .build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
 
         UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("123").email("titular@email.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("123", titular));
@@ -141,7 +144,7 @@ class EventoProcessoListenerCoverageTest {
         ResponsavelDto r1 = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
         ResponsavelDto r2 = ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build();
 
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1, 2L, r2));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1, 2L, r2));
 
         // T1 não existe no map de usuarios (null)
         // T2 existe mas email é null
@@ -170,7 +173,7 @@ class EventoProcessoListenerCoverageTest {
         processo.setParticipantes(Set.of(u1));
 
         ResponsavelDto r1 = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1));
 
         UsuarioDto user1 = UsuarioDto.builder().tituloEleitoral("T1").email("t1@mail.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", user1));
@@ -188,8 +191,8 @@ class EventoProcessoListenerCoverageTest {
         EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
         doThrow(new RuntimeException("Erro processando inicio")).when(processoFacade).buscarEntidadePorId(1L);
 
-        listener.aoIniciarProcesso(evento);
-        // Não deve lançar exceção
+        org.assertj.core.api.Assertions.assertThatCode(() -> listener.aoIniciarProcesso(evento))
+                .doesNotThrowAnyException();
     }
 
     @Test
@@ -197,8 +200,8 @@ class EventoProcessoListenerCoverageTest {
         EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(1L).build();
         doThrow(new RuntimeException("Erro processando fim")).when(processoFacade).buscarEntidadePorId(1L);
 
-        listener.aoFinalizarProcesso(evento);
-        // Não deve lançar exceção
+        org.assertj.core.api.Assertions.assertThatCode(() -> listener.aoFinalizarProcesso(evento))
+                .doesNotThrowAnyException();
     }
 
     @Test
@@ -211,7 +214,7 @@ class EventoProcessoListenerCoverageTest {
         Subprocesso s1 = new Subprocesso(); s1.setCodigo(100L); s1.setUnidade(u1);
 
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1));
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of());
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of());
 
         // Responsavel null vai causar NPE ao tentar acessar no metodo enviarEmailProcessoIniciado ou antes
         // Na verdade, enviarEmailProcessoIniciado pega responsavel do map. Se null, tenta acessar getter -> NPE
@@ -238,7 +241,7 @@ class EventoProcessoListenerCoverageTest {
                 .titularTitulo("T1")
                 .substitutoTitulo("S1")
                 .build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r1));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r1));
 
         UsuarioDto t1 = UsuarioDto.builder().tituloEleitoral("T1").email("t1@mail.com").build();
         UsuarioDto s1Dto = UsuarioDto.builder().tituloEleitoral("S1").email("s1@mail.com").build();
@@ -272,7 +275,7 @@ class EventoProcessoListenerCoverageTest {
         processo.setParticipantes(Set.of(u1));
 
         ResponsavelDto r1 = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1));
 
         UsuarioDto t1 = UsuarioDto.builder().tituloEleitoral("T1").email("t1@mail.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", t1));

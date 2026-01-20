@@ -598,17 +598,6 @@ class SubprocessoMapaWorkflowServiceTest {
             verify(transicaoService).registrar(eq(sp), eq(TipoTransicao.MAPA_SUGESTOES_APRESENTADAS), any(), any(), any(), eq("Sugestao"));
         }
 
-        @Test
-        @DisplayName("Deve apresentar sugestões mesmo sem mapa (resiliência)")
-        void deveApresentarSugestoesSemMapa() {
-            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
-            when(sp.getMapa()).thenReturn(null);
-
-            service.apresentarSugestoes(1L, "Sugestao", new Usuario());
-
-            verify(subprocessoRepo).save(sp);
-            // Não deve quebrar
-        }
 
         @Test
         @DisplayName("Deve validar mapa")

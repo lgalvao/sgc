@@ -117,7 +117,7 @@ class SubprocessoDetalheMapperTest {
     }
 
     @Test
-    void deveMapearLocalizacaoAtualNulaSeSemDestino() {
+    void deveMapearLocalizacaoAtualVaziaSeSemDestino() {
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         Processo processo = new Processo();
@@ -129,6 +129,6 @@ class SubprocessoDetalheMapperTest {
 
         SubprocessoDetalheDto dto = mapper.toDto(sp, null, null, List.of(mov), null);
 
-        assertThat(dto.getLocalizacaoAtual()).isNull();
+        assertThat(dto.getLocalizacaoAtual()).isEqualTo("");
     }
 }

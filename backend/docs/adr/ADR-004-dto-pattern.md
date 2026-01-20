@@ -690,8 +690,8 @@ grep -r "@Entity" backend/src/main/java/sgc/**/controller/*.java
 ## Referências
 
 ### Documentos Relacionados
-- [ADR-001: Facade Pattern](./ADR-001-facade-pattern.md) - Facades usam DTOs
-- [ADR-003: Security Architecture](./ADR-003-security-architecture.md) - Segurança com DTOs
+- [ADR-001: Facade Pattern](ADR-001-facade-pattern.md) - Facades usam DTOs
+- [ADR-003: Security Architecture](ADR-003-security-architecture.md) - Segurança com DTOs
 - `/regras/backend-padroes.md` - Padrões de DTOs
 - `/AGENTS.md` - Convenções de DTOs
 

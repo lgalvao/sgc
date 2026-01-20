@@ -9,13 +9,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.organizacao.dto.*;
+import sgc.organizacao.model.Perfil;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static sgc.organizacao.model.Perfil.*;
 
 @Tag("integration")
 @SpringBootTest
@@ -260,15 +260,15 @@ class UsuarioServiceTest {
         @DisplayName("Deve verificar se usuário tem perfil")
         void deveVerificarUsuarioTemPerfil() {
             // Act & Assert
-            assertTrue(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, CHEFE, 2L));
-            assertTrue(usuarioService.usuarioTemPerfil(TITULO_ADMIN, ADMIN, 100L));
+            assertTrue(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, String.valueOf(Perfil.CHEFE), 2L));
+            assertTrue(usuarioService.usuarioTemPerfil(TITULO_ADMIN, String.valueOf(Perfil.ADMIN), 100L));
         }
 
         @Test
         @DisplayName("Deve buscar unidades por perfil")
         void deveBuscarUnidadesPorPerfil() {
             // Act
-            List<Long> adminUnits = usuarioService.buscarUnidadesPorPerfil(TITULO_ADMIN, ADMIN);
+            List<Long> adminUnits = usuarioService.buscarUnidadesPorPerfil(TITULO_ADMIN, String.valueOf(Perfil.ADMIN));
 
             // Assert
             assertTrue(adminUnits.contains(100L));
@@ -316,10 +316,10 @@ class UsuarioServiceTest {
         void deveRetornarFalseSeNaoTiverPerfil() {
             // Usuário 777 é CHEFE na unidade 2.
             // Verifica se é CHEFE na unidade 99 (não é)
-            assertFalse(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, CHEFE, 99L));
+            assertFalse(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, String.valueOf(Perfil.CHEFE), 99L));
 
             // Verifica se é GESTOR na unidade 2 (não é)
-            assertFalse(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, GESTOR, 2L));
+            assertFalse(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, String.valueOf(Perfil.GESTOR), 2L));
         }
     }
 

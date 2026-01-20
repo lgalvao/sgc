@@ -116,7 +116,7 @@ public class EventoProcessoListener {
 
         List<String> todosTitulos = new ArrayList<>();
         responsaveis.values().forEach(r -> {
-            todosTitulos.add(r.getTitularTitulo());
+            if (r.getTitularTitulo() != null) todosTitulos.add(r.getTitularTitulo());
             if (r.getSubstitutoTitulo() != null) todosTitulos.add(r.getSubstitutoTitulo());
         });
 
@@ -143,6 +143,7 @@ public class EventoProcessoListener {
 
         Map<String, UsuarioDto> usuarios = usuarioService.buscarUsuariosPorTitulos(responsaveis.values().stream()
                 .map(ResponsavelDto::getTitularTitulo)
+                .filter(java.util.Objects::nonNull)
                 .distinct()
                 .toList());
 
@@ -162,7 +163,10 @@ public class EventoProcessoListener {
                                               List<Unidade> todasSubordinadas) {
         try {
             ResponsavelDto responsavel = responsaveis.get(unidade.getCodigo());
+            if (responsavel == null || responsavel.getTitularTitulo() == null) return;
+
             UsuarioDto titular = usuarios.get(responsavel.getTitularTitulo());
+            if (titular == null || titular.getEmail() == null || titular.getEmail().isBlank()) return;
 
             String emailTitular = titular.getEmail();
             TipoUnidade tipoUnidade = unidade.getTipo();
@@ -215,10 +219,11 @@ public class EventoProcessoListener {
 
         try {
             ResponsavelDto responsavel = responsaveis.get(codigoUnidade);
+            if (responsavel == null || responsavel.getTitularTitulo() == null) return;
+
             String nomeUnidade = unidade.getNome();
-
             UsuarioDto titular = usuarios.get(responsavel.getTitularTitulo());
-
+            
             String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
             String assunto = switch (unidade.getTipo()) {
                 case OPERACIONAL, INTEROPERACIONAL -> "Processo Iniciado - %s".formatted(processo.getDescricao());
@@ -226,8 +231,12 @@ public class EventoProcessoListener {
                 case RAIZ, SEM_EQUIPE -> throw new ErroEstadoImpossivel("Tipo de unidade não suportada para e-mail: " + unidade.getTipo());
             };
 
-            notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
-            log.info("E-mail enviado para unidade {}", unidade.getSigla());
+            if (titular != null && titular.getEmail() != null && !titular.getEmail().isBlank()) {
+                notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
+                log.info("E-mail enviado para unidade {}", unidade.getSigla());
+            } else {
+                log.warn("Titular não encontrado ou sem e-mail para unidade {}", unidade.getSigla());
+            }
 
             if (responsavel.getSubstitutoTitulo() != null) {
                 enviarEmailParaSubstituto(responsavel.getSubstitutoTitulo(), usuarios, assunto, corpoHtml, nomeUnidade);
@@ -252,7 +261,7 @@ public class EventoProcessoListener {
     private void enviarEmailParaSubstituto(String tituloSubstituto, Map<String, UsuarioDto> usuarios, String assunto, String corpoHtml, String nomeUnidade) {
         try {
             UsuarioDto substituto = usuarios.get(tituloSubstituto);
-            if (substituto != null && substituto.getEmail() != null && !substituto.getEmail().isBlank()) {
+            if (substituto != null && !substituto.getEmail().isBlank()) {
                 notificacaoEmailService.enviarEmailHtml(substituto.getEmail(), assunto, corpoHtml);
                 log.info("E-mail enviado para o substituto da unidade {}.", nomeUnidade);
             }

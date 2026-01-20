@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaFacade;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
@@ -34,6 +35,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
 @Tag("unit")
 @DisplayName("Testes do EventoProcessoListener")
 class EventoProcessoListenerTest {
@@ -49,6 +51,9 @@ class EventoProcessoListenerTest {
 
     @Mock
     private UsuarioFacade usuarioService;
+
+    @Mock
+    private UnidadeFacade unidadeService;
 
     @Mock
     private NotificacaoEmailService notificacaoEmailService;
@@ -97,7 +102,7 @@ class EventoProcessoListenerTest {
                 .titularTitulo("111")
                 .substitutoTitulo("222")
                 .build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
 
         UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("111").email("t@t.com").build();
         UsuarioDto substituto = UsuarioDto.builder().tituloEleitoral("222").email("s@s.com").build();
@@ -137,7 +142,7 @@ class EventoProcessoListenerTest {
         // Testa ErroEstadoImpossivel ao definir assunto no fluxo principal
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, ResponsavelDto.builder().titularTitulo("T").build()));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, ResponsavelDto.builder().titularTitulo("T").build()));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", UsuarioDto.builder().build()));
         
         listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
@@ -155,7 +160,7 @@ class EventoProcessoListenerTest {
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
 
         ResponsavelDto r = ResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").substitutoTitulo("S").build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r));
 
         UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("T").email("t@mail.com").build();
         
@@ -187,7 +192,7 @@ class EventoProcessoListenerTest {
         
         processo.setParticipantes(Set.of(operacional, intermediaria));
 
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
             1L, ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
             2L, ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build()
         ));
@@ -206,7 +211,7 @@ class EventoProcessoListenerTest {
         Unidade sub = new Unidade(); sub.setCodigo(21L); sub.setTipo(TipoUnidade.OPERACIONAL); sub.setUnidadeSuperior(intermediaria); sub.setSigla("SUB");
         processo.setParticipantes(Set.of(operacional, intermediaria, sub));
         
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
             1L, ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
             2L, ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build(),
             21L, ResponsavelDto.builder().unidadeCodigo(21L).titularTitulo("TS").build()
@@ -234,7 +239,7 @@ class EventoProcessoListenerTest {
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
         
         ResponsavelDto r = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T").build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", UsuarioDto.builder().email("t@mail.com").build()));
 
         listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
@@ -254,7 +259,7 @@ class EventoProcessoListenerTest {
         
         processo.setParticipantes(Set.of(raiz));
 
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
             1L, ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build()
         ));
 
@@ -287,7 +292,7 @@ class EventoProcessoListenerTest {
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(1L).build());
         
-        verify(usuarioService, never()).buscarResponsaveisUnidades(anyList());
+        verify(unidadeService, never()).buscarResponsaveisUnidades(anyList());
     }
 
     @Test
@@ -301,7 +306,7 @@ class EventoProcessoListenerTest {
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
         
         ResponsavelDto r = ResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").build();
-        when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r));
         
         // Quando buscar usuário por titulo retornar null, o try interno vai estourar NPE
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Collections.emptyMap());

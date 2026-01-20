@@ -8,7 +8,6 @@ plugins {
     id("org.springframework.boot") version "4.0.1"
     id("io.spring.dependency-management") version "1.1.7"
     id("info.solidsoft.pitest") version "1.19.0-rc.1"
-    pmd
     id("com.github.spotbugs") version "6.4.8"
 }
 
@@ -243,13 +242,13 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "BRANCH"
-                minimum = "0.90".toBigDecimal()
+                minimum = "0.92".toBigDecimal()
             }
         }
         rule {
             limit {
                 counter = "LINE"
-                minimum = "0.95".toBigDecimal()
+                minimum = "0.98".toBigDecimal()
             }
         }
         rule {
@@ -265,37 +264,26 @@ tasks.named("check") {
     dependsOn(tasks.jacocoTestCoverageVerification)
 }
 
-pmd {
-    toolVersion = "7.20.0"
-    isConsoleOutput = true
-    ruleSets = listOf()
-    ruleSetFiles = files("config/pmd/pmd-ruleset.xml")
-    isIgnoreFailures = true
-}
-
 spotbugs {
-    toolVersion = "4.9.0"
+    toolVersion = "4.9.8"
     ignoreFailures.set(true)
     excludeFilter.set(file("config/spotbugs/exclude.xml"))
 }
 
-tasks.withType<com.github.spotbugs.snom.SpotBugsTask> {
-    reports.create("html") {
-        required.set(true)
-    }
-}
-
 configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
-    junit5PluginVersion.set("1.2.1")
-    targetClasses.set(setOf("sgc.mapa.*"))
+    junit5PluginVersion.set("1.2.3")
+    targetClasses.set(setOf("sgc.*"))
     excludedClasses.set(setOf(
         "sgc.Sgc",
         "sgc.**.*Config",
         "sgc.**.*Dto",
-        "sgc.**.*Exception",
+        "sgc.**.*Request",
+        "sgc.**.*Response",
+        "sgc.**.Erro*",
+        "sgc.**.Evento*",
         "sgc.**.*Repo",
-        "sgc.**.*MapperImpl"
+        "sgc.**.*Impl"
     ))
     threads.set(8)
-    outputFormats.set(setOf("XML", "HTML"))
+    outputFormats.set(setOf("XML"))
 }

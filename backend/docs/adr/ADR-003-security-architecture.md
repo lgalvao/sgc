@@ -431,7 +431,7 @@ public RespostaDto disponibilizar(Subprocesso sp) {
 ## Referências
 
 ### Documentos Relacionados
-- [ADR-001: Facade Pattern](./ADR-001-facade-pattern.md) - Padrão de Facades (relacionado)
+- [ADR-001: Facade Pattern](ADR-001-facade-pattern.md) - Padrão de Facades (relacionado)
 - `/docs/SECURITY-REFACTORING-COMPLETE.md` - Relatório completo da refatoração
 - `/security-refactoring-plan.md` - Plano original (Sprints 1-4)
 - `/AGENTS.md` - Guia de padrões de segurança

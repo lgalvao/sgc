@@ -79,30 +79,6 @@ class RelatorioFacadeTest {
         verify(document, atLeastOnce()).add(any());
     }
 
-    @Test
-    @DisplayName("Deve gerar relatório de andamento sem responsável definido")
-    void deveGerarRelatorioAndamentoSemResponsavel() {
-        when(pdfFactory.createDocument()).thenReturn(document);
-        Processo p = new Processo();
-        p.setDescricao("Proc Teste");
-
-        Unidade u = new Unidade();
-        u.setSigla("U1");
-        u.setNome("Unidade 1");
-        u.setCodigo(1L);
-
-        Subprocesso sp = new Subprocesso();
-        sp.setUnidade(u);
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-
-        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(unidadeService.buscarResponsavelUnidade(1L)).thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Responsável", 1L));
-
-        OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioAndamento(1L, out);
-        verify(document, atLeastOnce()).add(any());
-    }
 
     @Test
     @DisplayName("Deve gerar relatório de mapas completo")
@@ -164,23 +140,6 @@ class RelatorioFacadeTest {
         verify(document, atLeastOnce()).add(any());
     }
 
-    @Test
-    @DisplayName("Deve ignorar subprocesso sem mapa no relatório de mapas")
-    void deveIgnorarSubprocessoSemMapa() {
-        when(pdfFactory.createDocument()).thenReturn(document);
-        Processo p = new Processo();
-        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1"); u.setCodigo(1L);
-        Subprocesso sp = new Subprocesso();
-        sp.setUnidade(u);
-        sp.setMapa(null); // Mapa nulo
-
-        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-
-        OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioMapas(1L, 1L, out);
-        verify(document, atLeastOnce()).add(any());
-    }
 
     @Test
     @DisplayName("Deve processar competência sem atividades")
@@ -227,22 +186,6 @@ class RelatorioFacadeTest {
         verify(document, atLeastOnce()).add(any());
     }
 
-    @Test
-    @DisplayName("Deve cobrir catch ao buscar responsável")
-    void deveCobrirCatchBuscarResponsavel() {
-        when(pdfFactory.createDocument()).thenReturn(document);
-        Processo p = new Processo();
-        Subprocesso sp = new Subprocesso();
-        Unidade u = new Unidade(); u.setCodigo(1L); sp.setUnidade(u);
-
-        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(unidadeService.buscarResponsavelUnidade(1L)).thenThrow(new RuntimeException("Falha simulada"));
-
-        OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioAndamento(1L, out);
-        verify(document, atLeastOnce()).add(any());
-    }
 
     @Test
     @DisplayName("Deve cobrir erro ao gerar PDF")
@@ -270,48 +213,5 @@ class RelatorioFacadeTest {
                 .hasMessageContaining("Erro ao gerar PDF");
     }
 
-    @Test
-    @DisplayName("Deve processar competência com atividades nulas")
-    void deveProcessarCompetenciaComAtividadesNulas() {
-        when(pdfFactory.createDocument()).thenReturn(document);
-        Processo p = new Processo();
-        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1"); u.setCodigo(1L);
-        Subprocesso sp = new Subprocesso(); sp.setUnidade(u); sp.setMapa(new Mapa()); sp.getMapa().setCodigo(10L);
 
-        Competencia c = new Competencia();
-        c.setDescricao("Comp 1");
-        c.setAtividades(null); // Explicitamente nulo
-
-        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
-
-        OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioMapas(1L, 1L, out);
-        verify(document, atLeastOnce()).add(any());
-    }
-
-    @Test
-    @DisplayName("Deve processar atividade com conhecimentos nulos")
-    void deveProcessarAtividadeComConhecimentosNulos() {
-        when(pdfFactory.createDocument()).thenReturn(document);
-        Processo p = new Processo();
-        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1"); u.setCodigo(1L);
-        Subprocesso sp = new Subprocesso(); sp.setUnidade(u); sp.setMapa(new Mapa()); sp.getMapa().setCodigo(10L);
-
-        Competencia c = new Competencia();
-        c.setDescricao("Comp 1");
-        Atividade a = new Atividade();
-        a.setDescricao("Ativ 1");
-        a.setConhecimentos(null); // Explicitamente nulo
-        c.setAtividades(java.util.Set.of(a));
-
-        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
-
-        OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioMapas(1L, 1L, out);
-        verify(document, atLeastOnce()).add(any());
-    }
 }

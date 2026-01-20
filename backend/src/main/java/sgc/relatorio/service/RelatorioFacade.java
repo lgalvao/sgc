@@ -6,11 +6,11 @@ import org.openpdf.text.DocumentException;
 import org.openpdf.text.Paragraph;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.service.CompetenciaService;
 import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.service.ProcessoFacade;
@@ -38,26 +38,22 @@ public class RelatorioFacade {
             pdfFactory.createWriter(document, outputStream);
             document.open();
 
-            document.add(new Paragraph("Relatório de Andamento - " + processo.getDescricao()));
+            document.add(new Paragraph("Relatório de Andamento - %s".formatted(processo.getDescricao())));
             document.add(new Paragraph(" ")); // Espaço
 
             for (Subprocesso sp : subprocessos) {
                 Unidade unidade = sp.getUnidade();
-                String responsavel = "Não definido";
-
-                try {
-                     var respDto = unidadeService.buscarResponsavelUnidade(unidade.getCodigo());
-                     responsavel = respDto.getTitularNome();
-                } catch (Exception e) {
-                    // Ignora erro ao buscar responsável
-                }
-
-                String texto = String.format("Unidade: %s - %s\nSituação: %s\nResponsável: %s\n---------------------------",
-                        unidade.getSigla(), unidade.getNome(), sp.getSituacao(), responsavel);
+                ResponsavelDto respDto = unidadeService.buscarResponsavelUnidade(unidade.getCodigo());
+                String responsavel = respDto.getTitularNome();
+                
+                String texto = String.format(
+                        "Unidade: %s - %s%nSituação: %s%nResponsável: %s%n---------------------------",
+                        unidade.getSigla(), unidade.getNome(), sp.getSituacao(), responsavel
+                );
                 document.add(new Paragraph(texto));
             }
         } catch (DocumentException e) {
-            throw new RuntimeException("Erro ao gerar PDF", e);
+            throw new ErroRelatorio("Erro ao gerar PDF", e);
         }
     }
 
@@ -67,43 +63,37 @@ public class RelatorioFacade {
         List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(codProcesso);
 
         subprocessos = subprocessos.stream()
-                .filter(sp -> sp.getUnidade() != null && sp.getUnidade().getCodigo() != null && sp.getUnidade().getCodigo().equals(codUnidade))
+                .filter(sp -> {
+                    Long codigoUnidade = sp.getUnidade().getCodigo();
+                    return codigoUnidade.equals(codUnidade);
+                })
                 .toList();
 
         try (Document document = pdfFactory.createDocument()) {
             pdfFactory.createWriter(document, outputStream);
             document.open();
-
-            document.add(new Paragraph("Relatório de Mapas - " + processo.getDescricao()));
+            document.add(new Paragraph("Relatório de Mapas - %s".formatted(processo.getDescricao())));
             document.add(new Paragraph(" "));
 
             for (Subprocesso sp : subprocessos) {
-                if (sp.getMapa() == null) continue;
-
                 Unidade unidade = sp.getUnidade();
-                document.add(new Paragraph("Unidade: " + unidade.getSigla() + " - " + unidade.getNome()));
+                document.add(new Paragraph("Unidade: %s - %s".formatted(unidade.getSigla(), unidade.getNome())));
                 document.add(new Paragraph(" "));
 
                 List<Competencia> competencias = competenciaService.buscarPorCodMapa(sp.getMapa().getCodigo());
-
-                for (Competencia c : competencias) {
-                    document.add(new Paragraph("Competência: " + c.getDescricao()));
-
-                    if (c.getAtividades() != null) {
-                        for (Atividade a : c.getAtividades()) {
-                            document.add(new Paragraph("  Atividade: " + a.getDescricao()));
-                            if (a.getConhecimentos() != null) {
-                                for (Conhecimento k : a.getConhecimentos()) {
-                                    document.add(new Paragraph("    Conhecimento: " + k.getDescricao()));
-                                }
-                            }
+                competencias.forEach(c -> {
+                    document.add(new Paragraph("Competência: %s".formatted(c.getDescricao())));
+                    c.getAtividades().forEach(a -> {
+                        document.add(new Paragraph("  Atividade: %s".formatted(a.getDescricao())));
+                        for (Conhecimento k : a.getConhecimentos()) {
+                            document.add(new Paragraph("    Conhecimento: %s".formatted(k.getDescricao())));
                         }
-                    }
-                }
+                    });
+                });
                 document.add(new Paragraph("---------------------------"));
             }
         } catch (DocumentException e) {
-            throw new RuntimeException("Erro ao gerar PDF", e);
+            throw new ErroRelatorio("Erro ao gerar PDF", e);
         }
     }
 }

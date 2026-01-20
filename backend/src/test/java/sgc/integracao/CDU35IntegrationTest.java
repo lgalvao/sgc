@@ -27,6 +27,9 @@ import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.time.LocalDateTime;
 
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -53,12 +56,20 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
+    @org.springframework.test.context.bean.override.mockito.MockitoBean
+    private sgc.organizacao.UnidadeFacade unidadeService;
+
     private Processo processo;
 
     @BeforeEach
     void setUp() {
         // Obter Unidade
         Unidade unidade = unidadeRepo.findById(1L).orElseThrow();
+
+        when(unidadeService.buscarResponsavelUnidade(anyLong()))
+                .thenReturn(sgc.organizacao.dto.ResponsavelDto.builder()
+                        .titularNome("Responsável Teste")
+                        .build());
 
         // Criar Processo
         processo = ProcessoFixture.processoPadrao();
