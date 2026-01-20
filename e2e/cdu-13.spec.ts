@@ -202,11 +202,12 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await navegarParaAtividades(page);
 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+        await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
         await verificarPaginaPainel(page);
     });
 
-    test('Cenario 7: GESTOR registra aceite SEM observação', async ({page}) => {
+    test('Cenario 7: GESTOR registra aceite com observação padrão', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 

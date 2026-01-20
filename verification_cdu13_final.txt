@@ -1,0 +1,133 @@
+[1A[2K[2m[WebServer] [22mWARN  s.s.login.GerenciadorJwt.verificarSegurancaChave:39 - ⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão.
+
+[1A[2K[2m[WebServer] [22mINFO  s.o.s.ValidadorDadosOrgService.run:53 - Validando integridade dos dados organizacionais...
+
+[1A[2K[2m[WebServer] [22mWARN  s.c.util.MonitoramentoAspect.monitorarExecucao:28 - EXECUCAO LENTA: sgc.organizacao.model.UnidadeRepo.findAllWithHierarquia levou 125 ms
+
+[1A[2K[2m[WebServer] [22mINFO  s.o.s.ValidadorDadosOrgService.run:70 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
+
+[1A[2K[2m[WebServer] [22mWARN  s.c.util.MonitoramentoAspect.monitorarExecucao:28 - EXECUCAO LENTA: sgc.organizacao.service.ValidadorDadosOrgService.run levou 167 ms
+
+[1A[2K[2m[WebServer] [22m  [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m385[22m[2m[0m ms[22m
+
+[1A[2K[2m[WebServer] [22m  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+
+[1A[2K[2m[WebServer] [22m[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+
+[1A[2K[2m[WebServer] [22m>>> Frontend e Backend no ar!
+
+
+Running 12 tests using 1 worker
+
+[1A[2K[1/12] [chromium] › e2e/cdu-13.spec.ts:53:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Preparacao 1: ADMIN cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mWARN  s.c.util.MonitoramentoAspect.monitorarExecucao:28 - EXECUCAO LENTA: org.springframework.data.jpa.repository.JpaRepository.saveAndFlush levou 118 ms
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoFacade.criar:101 - Processo 1 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:105 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[2m[WebServer] [22mWARN  s.p.l.EventoProcessoListener.processarInicioProcesso:100 - Nenhum subprocesso encontrado para o processo 1
+
+[1A[2K[2/12] [chromium] › e2e/cdu-13.spec.ts:78:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Preparacao 2: CHEFE preenche atividades e disponibiliza
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:20.241230196Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:20.732670917Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-20T21:43:20.793488212Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:20.882564726Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-20T21:43:20.974117543Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:21.022773689Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-20T21:43:21.180596683Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:21.230363672Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-20T21:43:21.346107103Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:21.382880290Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-20T21:43:21.541755241Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:21.586715763Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-20T21:43:21.946095751Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:21.985555304Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:1, timestamp=2026-01-20T21:43:22.567634629Z
+
+[1A[2K[3/12] [chromium] › e2e/cdu-13.spec.ts:108:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 1: GESTOR visualiza histórico de análise (vazio inicialmente)
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:51 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[2m[WebServer] [22mWARN  s.c.util.MonitoramentoAspect.monitorarExecucao:28 - EXECUCAO LENTA: sgc.subprocesso.service.notificacao.SubprocessoEmailService.enviarEmailTransicao levou 272 ms
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=131313, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:24.032986093Z
+
+[1A[2K[4/12] [chromium] › e2e/cdu-13.spec.ts:125:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 2: GESTOR devolve cadastro para ajustes COM observação
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=131313, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:26.299654962Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=131313, action=Devolver cadastro, resource=Subprocesso:1, timestamp=2026-01-20T21:43:27.021960736Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoTransicaoService.registrarAnaliseETransicao:152 - Workflow executado: Subprocesso 1 -> MAPEAMENTO_CADASTRO_EM_ANDAMENTO, Transição CADASTRO_DEVOLVIDO
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:51 - E-mail enviado para SECAO_221 - Transição: CADASTRO_DEVOLVIDO
+
+[1A[2K[5/12] [chromium] › e2e/cdu-13.spec.ts:136:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 3: CHEFE visualiza histórico após devolução e disponibiliza novamente
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:27.934974094Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:28.281654595Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:1, timestamp=2026-01-20T21:43:29.405988705Z
+[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:51 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[6/12] [chromium] › e2e/cdu-13.spec.ts:162:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 4: GESTOR cancela devolução
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=131313, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:30.526595896Z
+
+[1A[2K[7/12] [chromium] › e2e/cdu-13.spec.ts:176:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 5: GESTOR registra aceite COM observação
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=131313, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:32.478930783Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=131313, action=Aceitar cadastro, resource=Subprocesso:1, timestamp=2026-01-20T21:43:33.165095405Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoTransicaoService.registrarAnaliseETransicao:152 - Workflow executado: Subprocesso 1 -> MAPEAMENTO_CADASTRO_DISPONIBILIZADO, Transição CADASTRO_ACEITO
+[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:51 - E-mail enviado para COORD_22 - Transição: CADASTRO_ACEITO
+
+[1A[2K[8/12] [chromium] › e2e/cdu-13.spec.ts:187:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 6: ADMIN devolve para nova rodada de aceite
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:34.486152664Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Devolver cadastro, resource=Subprocesso:1, timestamp=2026-01-20T21:43:35.189155233Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoTransicaoService.registrarAnaliseETransicao:152 - Workflow executado: Subprocesso 1 -> MAPEAMENTO_CADASTRO_EM_ANDAMENTO, Transição CADASTRO_DEVOLVIDO
+[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:51 - E-mail enviado para SECAO_221 - Transição: CADASTRO_DEVOLVIDO
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:35.827115259Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:36.077758263Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:1, timestamp=2026-01-20T21:43:36.605932527Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:51 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[9/12] [chromium] › e2e/cdu-13.spec.ts:210:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 7: GESTOR registra aceite com observação padrão
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=131313, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:37.640032649Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=131313, action=Aceitar cadastro, resource=Subprocesso:1, timestamp=2026-01-20T21:43:38.371785939Z
+[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoTransicaoService.registrarAnaliseETransicao:152 - Workflow executado: Subprocesso 1 -> MAPEAMENTO_CADASTRO_DISPONIBILIZADO, Transição CADASTRO_ACEITO
+[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:51 - E-mail enviado para COORD_22 - Transição: CADASTRO_ACEITO
+
+[1A[2K[10/12] [chromium] › e2e/cdu-13.spec.ts:221:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 8: ADMIN visualiza histórico com múltiplas análises
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:39.430877428Z
+
+[1A[2K[11/12] [chromium] › e2e/cdu-13.spec.ts:250:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 9: ADMIN cancela homologação
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:41.451901966Z
+
+[1A[2K[12/12] [chromium] › e2e/cdu-13.spec.ts:264:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 10: ADMIN homologa cadastro
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:43.529608264Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:1, timestamp=2026-01-20T21:43:44.273176321Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:44.300255075Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:43:44.374778250Z
+
+[1A[2K  12 passed (46.4s)

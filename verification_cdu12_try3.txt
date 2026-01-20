@@ -1,0 +1,166 @@
+[1A[2K[2m[WebServer] [22mWARN  s.s.login.GerenciadorJwt.verificarSegurancaChave:39 - ⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão.
+
+[1A[2K[2m[WebServer] [22mINFO  s.o.s.ValidadorDadosOrgService.run:53 - Validando integridade dos dados organizacionais...
+
+[1A[2K[2m[WebServer] [22mWARN  s.c.util.MonitoramentoAspect.monitorarExecucao:28 - EXECUCAO LENTA: sgc.organizacao.model.UnidadeRepo.findAllWithHierarquia levou 143 ms
+
+[1A[2K[2m[WebServer] [22mINFO  s.o.s.ValidadorDadosOrgService.run:70 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
+[2m[WebServer] [22mWARN  s.c.util.MonitoramentoAspect.monitorarExecucao:28 - EXECUCAO LENTA: sgc.organizacao.service.ValidadorDadosOrgService.run levou 196 ms
+
+[1A[2K[2m[WebServer] [22m  [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m945[22m[2m[0m ms[22m
+
+[1A[2K[2m[WebServer] [22m  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+
+[1A[2K[2m[WebServer] [22m[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+
+
+Running 7 tests using 1 worker
+
+[1A[2K[2m[WebServer] [22m>>> Frontend e Backend no ar!
+
+[1A[2K[1/7] [chromium] › e2e/cdu-12.spec.ts:47:9 › CDU-12 - Verificar impactos no mapa de competências › Preparacao 1: Setup Mapeamento (Atividades, Competências, Homologação)
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoFacade.criar:101 - Processo 1 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:105 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[2m[WebServer] [22mWARN  s.p.l.EventoProcessoListener.processarInicioProcesso:100 - Nenhum subprocesso encontrado para o processo 1
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:45.915455781Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:46.721854212Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-20T21:37:46.787600128Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:46.885176729Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-20T21:37:46.964855741Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:47.013221614Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-20T21:37:47.232259075Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:47.322309779Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-20T21:37:47.653336599Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:47.699498207Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-20T21:37:47.863360139Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:47.907444363Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-20T21:37:48.271498382Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:48.311886546Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar cadastro, resource=Subprocesso:1, timestamp=2026-01-20T21:37:48.894182463Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:51 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[2m[WebServer] [22mWARN  s.c.util.MonitoramentoAspect.monitorarExecucao:28 - EXECUCAO LENTA: sgc.subprocesso.service.notificacao.SubprocessoEmailService.enviarEmailTransicao levou 325 ms
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:49.453122509Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar cadastro, resource=Subprocesso:1, timestamp=2026-01-20T21:37:50.147408314Z
+[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:50.182169399Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:50.250636321Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:50.573205161Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:51.207910878Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:52.115599801Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:52.952106317Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Disponibilizar mapa, resource=Subprocesso:1, timestamp=2026-01-20T21:37:53.448304689Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:51 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:53.747868960Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Validar mapa, resource=Subprocesso:1, timestamp=2026-01-20T21:37:54.168804070Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:51 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Visualizar subprocesso, resource=Subprocesso:1, timestamp=2026-01-20T21:37:54.587285836Z
+
+[1A[2K[chromium] › e2e/cdu-12.spec.ts:47:9 › CDU-12 - Verificar impactos no mapa de competências › Preparacao 1: Setup Mapeamento (Atividades, Competências, Homologação)
+[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Homologar mapa, resource=Subprocesso:1, timestamp=2026-01-20T21:37:55.054157135Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoValidador.validarTodosSubprocessosHomologados:112 - Homologados 1 subprocessos.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoFinalizador.tornarMapasVigentes:95 - Mapa vigente definido para o processo 1
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoFinalizador.tornarMapasVigentes:109 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[2m[WebServer] [22mINFO  s.p.s.ProcessoFinalizador.finalizar:85 - Processo 1 finalizado
+[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailUnidadeFinal:189 - E-mail de finalização enviado para SECAO_221
+
+[1A[2K[2/7] [chromium] › e2e/cdu-12.spec.ts:163:9 › CDU-12 - Verificar impactos no mapa de competências › Preparacao 2: Iniciar Processo de Revisão
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoFacade.criar:101 - Processo 2 criado.
+
+[1A[2K[3/7] [chromium] › e2e/cdu-12.spec.ts:189:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 1: Verificar Sem Impactos (Estado Inicial)
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.f.SubprocessoFactory.criarParaRevisao:123 - Subprocesso para revisão criado para unidade SECAO_221
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:105 - Processo de revisao 2 iniciado para 1 unidade(s).
+[2m[WebServer] [22mWARN  s.p.l.EventoProcessoListener.processarInicioProcesso:100 - Nenhum subprocesso encontrado para o processo 2
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:2, timestamp=2026-01-20T21:37:58.198503037Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:2, timestamp=2026-01-20T21:37:58.454488762Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Verificar impactos no mapa, resource=Subprocesso:2, timestamp=2026-01-20T21:37:58.606911923Z
+
+[1A[2K[4/7] [chromium] › e2e/cdu-12.spec.ts:205:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 2: Verificar Impacto de Inclusão de Atividade
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:2, timestamp=2026-01-20T21:37:59.508815011Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:2, timestamp=2026-01-20T21:37:59.766783272Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Criar atividade, resource=Atividade, timestamp=2026-01-20T21:37:59.861989569Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:2, timestamp=2026-01-20T21:37:59.898655276Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Associar conhecimentos à atividade, resource=Atividade, timestamp=2026-01-20T21:38:00.386017190Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:2, timestamp=2026-01-20T21:38:00.410846163Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Verificar impactos no mapa, resource=Subprocesso:2, timestamp=2026-01-20T21:38:00.527058674Z
+
+[1A[2K[5/7] [chromium] › e2e/cdu-12.spec.ts:228:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:2, timestamp=2026-01-20T21:38:02.645295621Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:2, timestamp=2026-01-20T21:38:03.094558360Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Editar atividade, resource=Atividade, timestamp=2026-01-20T21:38:03.406974767Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:2, timestamp=2026-01-20T21:38:03.455528119Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Verificar impactos no mapa, resource=Subprocesso:2, timestamp=2026-01-20T21:38:03.637771880Z
+
+[1A[2K[6/7] [chromium] › e2e/cdu-12.spec.ts:254:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:2, timestamp=2026-01-20T21:38:05.911398135Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:2, timestamp=2026-01-20T21:38:06.252005260Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Excluir atividade, resource=Atividade, timestamp=2026-01-20T21:38:06.418638735Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:2, timestamp=2026-01-20T21:38:06.470666689Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Verificar impactos no mapa, resource=Subprocesso:2, timestamp=2026-01-20T21:38:06.670809790Z
+
+[1A[2K[7/7] [chromium] › e2e/cdu-12.spec.ts:280:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 5: Verificar visualização pelo Admin (Somente Leitura)
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:2, timestamp=2026-01-20T21:38:08.289592724Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Visualizar subprocesso, resource=Subprocesso:2, timestamp=2026-01-20T21:38:08.551157486Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=141414, action=Disponibilizar revisão de cadastro, resource=Subprocesso:2, timestamp=2026-01-20T21:38:08.685073840Z
+[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:51 - E-mail enviado para COORD_22 - Transição: REVISAO_CADASTRO_DISPONIBILIZADA
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Visualizar subprocesso, resource=Subprocesso:2, timestamp=2026-01-20T21:38:09.500449904Z
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.acesso.AccessAuditService.logAccessGranted:29 - ACCESS_GRANTED: user=191919, action=Verificar impactos no mapa, resource=Subprocesso:2, timestamp=2026-01-20T21:38:09.718761614Z
+
+[1A[2K  7 passed (52.1s)

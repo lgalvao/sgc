@@ -189,9 +189,8 @@ async function realizarAceite(page: Page, observacao: string = '', mensagemSuces
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page.getByText(/Confirma o aceite/i)).toBeVisible();
 
-    if (observacao) {
-        await page.getByTestId('inp-aceite-cadastro-obs').fill(observacao);
-    }
+    const obsToSend = observacao || 'Aceite sem ressalvas';
+    await page.getByTestId('inp-aceite-cadastro-obs').fill(obsToSend);
 
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
     await expect(page.getByRole('heading', {name: mensagemSucesso})).toBeVisible();
@@ -226,6 +225,8 @@ export async function homologarCadastroMapeamento(page: Page) {
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page.getByText(/Confirma a homologação do cadastro de atividades e conhecimentos/i)).toBeVisible();
 
+    await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado sem ressalvas');
+
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
     await expect(page.getByText(/Cadastro homologado/i).first()).toBeVisible();
 
@@ -245,6 +246,9 @@ export async function homologarCadastroRevisaoSemImpacto(page: Page) {
     // Caminho SEM impactos (CDU-14 passo 12.2)
     await expect(page.getByText(/A revisão do cadastro não produziu nenhum impacto no mapa de competência da unidade/i)).toBeVisible();
     await expect(page.getByText(/Confirma a manutenção do mapa de competências vigente/i)).toBeVisible();
+
+    await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado sem ressalvas');
+
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
     await expect(page.getByText(/Revisão homologada/i).first()).toBeVisible();
 
@@ -264,6 +268,9 @@ export async function homologarCadastroRevisaoComImpacto(page: Page) {
 
     // Caminho COM impactos (CDU-14 passo 12.3)
     await expect(page.getByText(/Confirma a homologação do cadastro de atividades e conhecimentos/i)).toBeVisible();
+
+    await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado sem ressalvas');
+
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
     await expect(page.getByText(/Revisão homologada/i).first()).toBeVisible();
 

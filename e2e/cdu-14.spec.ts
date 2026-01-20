@@ -342,7 +342,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await verificarPaginaPainel(page);
     });
 
-    test('Cenario 8: GESTOR registra aceite SEM observação', async ({page}) => {
+    test('Cenario 8: GESTOR registra aceite com observação padrão', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 

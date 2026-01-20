@@ -45,6 +45,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     // ========================================================================
 
     test('Preparacao 1: Setup Mapeamento (Atividades, Competências, Homologação)', async ({page}) => {
+        test.slow();
         // 1. Criar Processo Mapeamento
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
@@ -97,6 +98,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
+        await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado sem ressalvas');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
         await limparNotificacoes(page);
 
@@ -147,6 +149,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('card-subprocesso-mapa').click();
         await limparNotificacoes(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await expect(page.getByTestId('btn-aceite-mapa-confirmar')).toBeVisible();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
         // Finalizar Processo
