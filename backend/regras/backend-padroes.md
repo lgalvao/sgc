@@ -132,8 +132,6 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
 }
 ```
 
-**Total de Repositórios:** 22 identificados no sistema
-
 ### 3.3. Arquitetura Orientada a Eventos (Event-Driven)
 
 **Descrição:** Para evitar acoplamento rígido em fluxos secundários (como enviar e-mail ou criar alerta), o sistema utiliza o
@@ -229,6 +227,9 @@ public class EventoProcessoListener {
 
 ### 3.4. Data Transfer Object (DTO) Pattern
 
+> [!IMPORTANT]
+> Consulte o [Guia Completo de DTOs](./guia-dtos.md) para detalhes sobre nomenclatura e boas práticas.
+
 **Descrição:** Objetos que transportam dados entre as camadas, especialmente entre Controller e Service.
 
 **Convenções de Nomenclatura:**
@@ -236,32 +237,6 @@ public class EventoProcessoListener {
 - `{Entidade}Dto`: DTO genérico (ex: `ProcessoDto`)
 - `{Acao}Req`: Request de entrada (ex: `CriarProcessoReq`, `AtualizarMapaReq`)
 - `{Entidade}Resp`: Response específica (ex: `ProcessoDetalheResp`)
-
-**Benefícios:**
-
-- Evita exposição de entidades JPA na API
-- Permite diferentes views dos mesmos dados
-- Facilita versionamento da API
-- Previne lazy loading exceptions
-
-**Exemplo:**
-
-```java
-// DTO de entrada
-public record CriarProcessoReq(
-    String descricao,
-    LocalDateTime dataLimite,
-    TipoProcesso tipo
-) {}
-
-// DTO de saída
-public record ProcessoDto(
-    Long codigo,
-    String descricao,
-    LocalDateTime dataCriacao,
-    SituacaoProcesso situacao
-) {}
-```
 
 ### 3.5. Mapper Pattern (MapStruct)
 
@@ -313,8 +288,6 @@ public abstract class SubprocessoMapper {
     }
 }
 ```
-
-**Total de Mappers:** 10 identificados no sistema
 
 **Benefícios:**
 
@@ -490,7 +463,8 @@ Isso melhora organização e coesão quando há muitas operações.
 
 ### 5.3. Tratamento de Erros
 
-**IMPORTANTE**: Consulte o [Guia Completo de Exceções](/regras/guia-excecoes.md) para orientações detalhadas sobre escolha de exceções.
+> [!IMPORTANT]
+> Consulte o [Guia Completo de Exceções](./guia-excecoes.md) para orientações detalhadas sobre escolha de exceções.
 
 **Hierarquia de Exceções:**
 
@@ -532,101 +506,10 @@ graph TD
     ESI --> EMSI
 ```
 
-**Exceções Customizadas:**
-
-| Categoria | Exceção | HTTP Status | Quando Usar |
-|-----------|---------|-------------|-------------|
-| **Erros Internos** | | | |
-| | `ErroConfiguracao` | 500 | Configuração ausente/inválida |
-| | `ErroInvarianteViolada` | 500 | Violação de integridade de dados |
-| | `ErroEstadoImpossivel` | 500 | Estado que UI impede (programação defensiva) |
-| **Erros de Negócio** | | | |
-| | `ErroEntidadeNaoEncontrada` | 404 | Recurso não existe |
-| | `ErroValidacao` | 422 | Dados de entrada inválidos |
-| | `ErroProcessoEmSituacaoInvalida` | 422 | Operação em estado incorreto |
-| | `ErroAccessoNegado` | 403 | Sem permissão |
-
-**Distinção: Erro Interno vs Erro de Negócio**
-
-**Erros Internos** (HTTP 500):
-- Indicam bugs, configuração incorreta ou dados corrompidos
-- NUNCA deveriam ocorrer se sistema funciona corretamente
-- Logados como ERROR com stack trace
-- Mensagem genérica ao usuário (não expor detalhes)
-
-```java
-// ✓ CORRETO - Erro interno
-if (secret.length() < 32) {
-    throw new ErroConfiguracao("JWT secret muito curto");
-}
-
-// ✓ CORRETO - Invariante violada
-if (unidadeSuperior == null && unidade.isOperacional()) {
-    throw new ErroInvarianteViolada("Unidade operacional sem superior");
-}
-```
-
-**Erros de Negócio** (HTTP 4xx):
-- Esperados durante uso normal
-- Podem ocorrer legitimamente (múltiplos usuários, condições de corrida)
-- Logados como WARN
-- Mensagem clara ao usuário
-
-```java
-// ✓ CORRETO - Erro de negócio
-if (processo.getSituacao() != CRIADO) {
-    throw new ErroProcessoEmSituacaoInvalida(
-        "Processo só pode ser iniciado em estado CRIADO"
-    );
-}
-
-// ✓ CORRETO - Validação
-if (atividades.isEmpty()) {
-    throw new ErroValidacao("Deve ter pelo menos uma atividade");
-}
-```
-
-**RestExceptionHandler:**
-
-O `RestExceptionHandler` (anotado com `@ControllerAdvice`) intercepta exceções e converte para JSON padronizado.
-
-**Exemplo de Resposta de Erro:**
-
-```json
-{
-  "status": 404,
-  "message": "Processo não encontrado com o código: 123",
-  "code": "ENTIDADE_NAO_ENCONTRADA",
-  "traceId": "abc123-def456",
-  "timestamp": "2025-12-14T16:30:00"
-}
-```
-
-**Exemplo de Uso:**
-
-```java
-// Busca que pode retornar 404
-public Processo buscarPorCodigo(Long codigo) {
-    return processoRepo.findById(codigo)
-        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
-}
-
-// Validação de negócio
-public void iniciar(Long codigo) {
-    Processo p = buscarPorCodigo(codigo);
-    if (p.getSituacao() != CRIADO) {
-        throw new ErroProcessoEmSituacaoInvalida(
-            "Apenas processos em estado CRIADO podem ser iniciados"
-        );
-    }
-    // ... resto da lógica
-}
-```
-
 ### 5.4. Validação de Entrada
 
 > [!IMPORTANT]
-> Consulte o [Guia Completo de Validação](/regras/guia-validacao.md) para orientações detalhadas.
+> Consulte o [Guia Completo de Validação](./guia-validacao.md) para orientações detalhadas.
 
 **Validação em Camadas:**
 
@@ -634,23 +517,6 @@ public void iniciar(Long codigo) {
 2. **DTO:** Anotações `@NotBlank`, `@NotNull`, `@Size` com mensagens em português
 3. **Service:** Apenas regras de negócio (estado, permissões)
 4. **Repository:** Constraints de banco de dados
-
-**Exemplo de DTO:**
-
-```java
-public record CriarProcessoReq(
-    @NotBlank(message = "Preencha a descrição")
-    @Size(max = 255, message = "Descrição deve ter no máximo 255 caracteres")
-    String descricao,
-    
-    @NotNull(message = "A data limite é obrigatória")
-    @Future(message = "A data limite deve ser futura")
-    LocalDateTime dataLimite,
-    
-    @NotEmpty(message = "Pelo menos uma unidade deve ser selecionada")
-    List<Long> unidades
-) {}
-```
 
 ## 6. Padrões de Persistência (JPA/Hibernate)
 
@@ -767,8 +633,6 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
 }
 ```
 
-**Total de Repositórios no Sistema:** 22
-
 ## 7. Organização de Módulos
 
 ### 7.1. Estrutura Interna de um Módulo
@@ -857,38 +721,12 @@ graph TD
 
 ## 8. Padrões de Testes
 
-### 8.1. Estrutura de Testes
+> [!IMPORTANT]
+> Consulte o [Guia Completo de Testes JUnit](./guia-testes-junit.md) para padrões detalhados de nomenclatura e implementação.
 
 **Localização:** `backend/src/test/java/sgc/{modulo}/`
 
 **Nomenclatura:** `{Classe}Test.java`
-
-**Exemplo:**
-
-```java
-@SpringBootTest
-@Transactional
-class ProcessoServiceTest {
-    @Autowired
-    private ProcessoService processoService;
-    
-    @MockBean
-    private ProcessoRepo processoRepo;
-    
-    @Test
-    void deveCriarProcessoComSucesso() {
-        // Arrange
-        CriarProcessoReq req = new CriarProcessoReq(...);
-        
-        // Act
-        ProcessoDto resultado = processoService.criar(req);
-        
-        // Assert
-        assertNotNull(resultado.codigo());
-        assertEquals(req.descricao(), resultado.descricao());
-    }
-}
-```
 
 **Convenções:**
 
@@ -897,18 +735,6 @@ class ProcessoServiceTest {
 - Use `@Transactional` para rollback automático
 - Banco H2 em memória para testes
 - Nomenclatura de métodos: `deve{Acao}Quando{Condicao}`
-
-Durante a análise, foram identificados os seguintes pontos que desviam de convenções externas comuns ou da regra estrita
-de idioma:
-
-1. **Sufixos em Inglês:** Embora a regra seja "Português Brasileiro", os sufixos das classes principais estão em
-   inglês (`Controller`, `Service`, `Repo`), provavelmente por convenção da comunidade Spring/Java. O conteúdo e lógica,
-   porém, seguem em português.
-2. **Verbos REST (POST para tudo):** A API não utiliza `PUT`, `PATCH` ou `DELETE` para operações de CRUD padrão. A opção
-   por usar `POST` com sufixos de ação (`/atualizar`, `/excluir`) é uma escolha de design explícita do projeto,
-   divergindo do estilo REST "puro".
-3. **Segurança (Em Transição):** A configuração de segurança (`SecurityConfig`) está parcialmente desabilitada ou
-   mockada nos perfis de desenvolvimento, indicando uma área que ainda não atingiu o padrão final de produção.
 
 ## 9. Tecnologias e Ferramentas
 
@@ -1101,19 +927,7 @@ public enum SituacaoProcesso {
 
 **Sempre usar `EnumType.STRING` no JPA** para legibilidade no banco.
 
-## 12. Resumo de Contadores
-
-- **Módulos:** 15
-- **Controllers:** 14
-- **Services:** 30+
-- **Repositórios:** 22
-- **Mappers (MapStruct):** 10
-- **Eventos de Domínio:** 23
-- **Exceções Customizadas:** 9+
-- **Entidades JPA:** 20+
-- **DTOs:** 50+
-
-## 13. Referências e Documentação Adicional
+## 12. Referências e Documentação Adicional
 
 - **OpenAPI/Swagger:** <http://localhost:10000/swagger-ui.html>
 - **Especificação API:** <http://localhost:10000/api-docs>
