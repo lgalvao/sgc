@@ -7,6 +7,7 @@ import {useFeedbackStore} from "@/stores/feedback";
 import {usePerfilStore} from "@/stores/perfil";
 import {Perfil, SituacaoSubprocesso} from "@/types/tipos";
 import {nextTick} from "vue";
+import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 // Define mocks first
 const mocks = vi.hoisted(() => ({
@@ -514,5 +515,14 @@ describe("ProcessoView.vue", () => {
 
         expect(processosStore.finalizarProcesso).toHaveBeenCalled();
         expect(feedbackStore.show).toHaveBeenCalledWith("Erro ao finalizar", "Erro finalização", "danger");
+    });
+
+    it("deve ser acessível", async () => {
+        wrapper = createWrapper();
+        processosStore = useProcessosStore();
+        processosStore.$patch({ processoDetalhe: mockProcesso });
+
+        await flushPromises();
+        await checkA11y(wrapper.element as HTMLElement);
     });
 });

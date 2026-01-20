@@ -3,6 +3,7 @@ import {mount} from '@vue/test-utils';
 import RelatoriosView from '@/views/RelatoriosView.vue';
 import {TipoProcesso} from '@/types/tipos';
 import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
+import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 // Mock URL.createObjectURL
 global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
@@ -157,5 +158,9 @@ describe('RelatoriosView.vue', () => {
     
     expect(setAttributeSpy).toHaveBeenCalledWith('download', 'andamento-geral.csv');
     expect(clickSpy).toHaveBeenCalled();
+  });
+
+  it('deve ser acessível', async () => {
+    await checkA11y(ctx.wrapper!.element as HTMLElement);
   });
 });

@@ -1,6 +1,7 @@
 import {describe, expect, it} from 'vitest'
 import {mount} from '@vue/test-utils'
 import ModalConfirmacao from '../ModalConfirmacao.vue'
+import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 describe('ModalConfirmacao.vue', () => {
     const defaultProps = {
@@ -139,5 +140,13 @@ describe('ModalConfirmacao.vue', () => {
 
         expect(wrapper.find('.custom-content').exists()).toBe(true)
         expect(wrapper.find('.custom-content').text()).toBe('Conteúdo Customizado')
+    })
+
+    it('deve ser acessível', async () => {
+        const wrapper = mount(ModalConfirmacao, {
+            props: defaultProps,
+            global: globalOptions
+        })
+        await checkA11y(wrapper.element as HTMLElement)
     })
 })

@@ -4,6 +4,7 @@ import {describe, expect, it} from "vitest";
 import {type ProcessoResumo, SituacaoProcesso, TipoProcesso,} from "@/types/tipos";
 import TabelaProcessos from "../TabelaProcessos.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 // Mock de dados de processo
 const mockProcessos: ProcessoResumo[] = [
@@ -313,5 +314,18 @@ describe("TabelaProcessos.vue", () => {
             expect(context.wrapper.emitted("ordenar")).toBeTruthy();
             expect(context.wrapper.emitted("ordenar")![0]).toEqual(["tipo"]);
         });
+    });
+
+    it("deve ser acessível", async () => {
+        context.wrapper = mount(TabelaProcessos, {
+            ...getCommonMountOptions(),
+            props: {
+                processos: mockProcessos,
+                criterioOrdenacao: "descricao",
+                direcaoOrdenacaoAsc: true,
+            },
+        });
+        await context.wrapper.vm.$nextTick();
+        await checkA11y(context.wrapper.element as HTMLElement);
     });
 });

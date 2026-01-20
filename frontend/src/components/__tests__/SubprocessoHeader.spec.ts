@@ -1,6 +1,7 @@
 import {describe, expect, it} from "vitest";
 import {mount} from "@vue/test-utils";
 import SubprocessoHeader from "../SubprocessoHeader.vue";
+import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 describe("SubprocessoHeader.vue", () => {
   const defaultProps = {
@@ -83,5 +84,10 @@ describe("SubprocessoHeader.vue", () => {
     expect(btn.exists()).toBe(true);
     await btn.trigger("click");
     expect(wrapper.emitted("enviarLembrete")).toBeTruthy();
+  });
+
+  it("deve ser acessível", async () => {
+    const wrapper = createWrapper();
+    await checkA11y(wrapper.element as HTMLElement);
   });
 });

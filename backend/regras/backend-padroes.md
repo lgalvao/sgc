@@ -228,7 +228,7 @@ public class EventoProcessoListener {
 ### 3.4. Data Transfer Object (DTO) Pattern
 
 > [!IMPORTANT]
-> Consulte o [Guia Completo de DTOs](./guia-dtos.md) para detalhes sobre nomenclatura e boas práticas.
+> Consulte o [Guia Completo de DTOs](../../regras/guia-dtos.md) para detalhes sobre nomenclatura e boas práticas.
 
 **Descrição:** Objetos que transportam dados entre as camadas, especialmente entre Controller e Service.
 
@@ -464,7 +464,7 @@ Isso melhora organização e coesão quando há muitas operações.
 ### 5.3. Tratamento de Erros
 
 > [!IMPORTANT]
-> Consulte o [Guia Completo de Exceções](./guia-excecoes.md) para orientações detalhadas sobre escolha de exceções.
+> Consulte o [Guia Completo de Exceções](../../regras/guia-excecoes.md) para orientações detalhadas sobre escolha de exceções.
 
 **Hierarquia de Exceções:**
 
@@ -509,7 +509,7 @@ graph TD
 ### 5.4. Validação de Entrada
 
 > [!IMPORTANT]
-> Consulte o [Guia Completo de Validação](./guia-validacao.md) para orientações detalhadas.
+> Consulte o [Guia Completo de Validação](../../regras/guia-validacao.md) para orientações detalhadas.
 
 **Validação em Camadas:**
 
@@ -722,7 +722,7 @@ graph TD
 ## 8. Padrões de Testes
 
 > [!IMPORTANT]
-> Consulte o [Guia Completo de Testes JUnit](./guia-testes-junit.md) para padrões detalhados de nomenclatura e implementação.
+> Consulte o [Guia Completo de Testes JUnit](../../regras/guia-testes-junit.md) para padrões detalhados de nomenclatura e implementação.
 
 **Localização:** `backend/src/test/java/sgc/{modulo}/`
 

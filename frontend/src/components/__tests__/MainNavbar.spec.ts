@@ -4,6 +4,7 @@ import {ref} from "vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import NavBar from "../MainNavbar.vue";
 import {usePerfil} from "@/composables/usePerfil";
+import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 // Mock usePerfil
 vi.mock("@/composables/usePerfil");
@@ -142,6 +143,18 @@ describe("MainNavbar.vue", () => {
              await logoutNavItem.trigger("click");
         }
 
+
         expect(mockPush).toHaveBeenCalledWith("/login");
+    });
+
+    it("deve ser acessível", async () => {
+        const options = getCommonMountOptions({
+            perfil: {
+                perfilSelecionado: "ADMIN",
+                unidadeSelecionada: 456
+            }
+        });
+        ctx.wrapper = mount(NavBar, options);
+        await checkA11y(ctx.wrapper.element as HTMLElement);
     });
 });

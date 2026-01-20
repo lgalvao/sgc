@@ -637,7 +637,7 @@ Ao criar um novo teste, verifique:
 ### Documentos de Arquitetura
 
 - [Padrões Backend](/regras/backend-padroes.md)
-- [Backend README](/backend/README.md)
+- [Backend README](/README.md)
 - [AGENTS.md](/AGENTS.md)
 
 ## 💡 Dicas Práticas

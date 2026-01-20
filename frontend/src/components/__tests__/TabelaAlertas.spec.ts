@@ -4,6 +4,7 @@ import TabelaAlertas from "../TabelaAlertas.vue";
 import type {Alerta} from "@/types/tipos";
 import {BTable} from "bootstrap-vue-next";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 const mockAlertas: Alerta[] = [
     {
@@ -109,5 +110,12 @@ describe("TabelaAlertas.vue", () => {
 
         await bTable.vm.$emit("sort-changed", {sortBy: "processo"});
         expect(wrapper.emitted("ordenar")?.[1]).toEqual(["processo"]);
+    });
+
+    it("deve ser acessível", async () => {
+        const wrapper = mount(TabelaAlertas, {
+            props: {alertas: mockAlertas},
+        });
+        await checkA11y(wrapper.element as HTMLElement);
     });
 });

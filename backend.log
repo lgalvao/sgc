@@ -1,0 +1,116 @@
+Starting a Gradle Daemon, 2 busy Daemons could not be reused, use --status for details
+Calculating task graph as configuration cache cannot be reused due to --refresh-dependencies
+Perfil Spring ativado: hom
+Carregando configurações de: .env.hom
+> Task :backend:processResources
+> Task :backend:compileJava
+> Task :backend:classes
+> Task :backend:resolveMainClassName
+
+> Task :backend:bootRun
+14:02:25 INFO  sgc.Sgc - Starting Sgc using Java 25.0.1 with PID 17628 (C:\sgc\backend\build\classes\java\main started by 039703250884 in C:\sgc\backend)
+14:02:25 INFO  sgc.Sgc - The following 1 profile is active: "hom"
+14:02:28 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+14:02:28 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+14:02:28 ERROR sgc.seguranca.login.GerenciadorJwt - 🚨 ERRO CRÍTICO DE SEGURANÇA: Tentativa de iniciar em ambiente produtivo com o segredo JWT padrão.
+14:02:28 ERROR o.s.b.t.s.DeferredServletContainerInitializers - Error starting Tomcat context. Exception: org.springframework.beans.factory.UnsatisfiedDependencyException. Message: Error creating bean with name 'filtroJwt' defined in file [C:\sgc\backend\build\classes\java\main\sgc\seguranca\login\FiltroJwt.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'gerenciadorJwt': Invocation of init method failed
+14:02:28 INFO  o.a.catalina.core.StandardService - Stopping service [Tomcat]
+14:02:28 WARN  o.s.b.w.s.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Unable to start web server
+14:02:28 ERROR o.s.boot.SpringApplication - Application run failed
+org.springframework.context.ApplicationContextException: Unable to start web server
+	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:167)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:614)
+	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)
+	at s14:05:10 INFO  sgc.Sgc - Starting Sgc using Java 25.0.1 with PID 16360 (C:\sgc\backend\build\classes\java\main started by 039703250884 in C:\sgc\backend)
+14:05:10 INFO  sgc.Sgc - The following 1 profile is active: "test"
+14:05:11 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+14:05:11 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+14:05:12 INFO  sgc.Sgc - Started Sgc in 2.454 seconds (process running for 996.299)
+14:05:26 INFO  sgc.Sgc - Starting Sgc using Java 25.0.1 with PID 16360 (C:\sgc\backend\build\classes\java\main started by 039703250884 in C:\sgc\backend)
+14:05:26 INFO  sgc.Sgc - The following 1 profile is active: "test"
+14:05:27 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+14:05:27 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+14:05:29 INFO  s.e.mock.NotificacaoEmailServiceMock - NotificacaoEmailServiceMock ATIVADO - E-mails serão mockados
+14:05:29 WARN  sgc.seguranca.login.GerenciadorJwt - ⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão.
+14:05:30 INFO  sgc.Sgc - Started Sgc in 3.816 seconds (process running for 1013.869)
+14:05:30 INFO  s.o.service.ValidadorDadosOrgService - Validando integridade dos dados organizacionais...
+14:05:30 INFO  s.o.service.ValidadorDadosOrgService - Dados organizacionais validados com sucesso. 0 unidades verificadas.
+14:08:27 INFO  sgc.Sgc - Starting Sgc using Java 25.0.1 with PID 16360 (C:\sgc\backend\build\classes\java\main started by 039703250884 in C:\sgc\backend)
+14:08:27 INFO  sgc.Sgc - The following 1 profile is active: "test"
+14:08:29 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+14:08:29 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+14:08:31 INFO  sgc.Sgc - Started Sgc in 4.446 seconds (process running for 1195.057)
+14:08:57 INFO  sgc.Sgc - Starting Sgc using Java 25.0.1 with PID 16360 (C:\sgc\backend\build\classes\java\main started by 039703250884 in C:\sgc\backend)
+14:08:57 INFO  sgc.Sgc - The following 1 profile is active: "test"
+14:09:00 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+14:09:00 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+14:09:03 INFO  sgc.Sgc - Started Sgc in 5.904 seconds (process running for 1226.843)
+java:333)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.getOrderedBeansOfType(ServletContextInitializerBeans.java:231)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:185)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:180)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAdaptableBeans(ServletContextInitializerBeans.java:165)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.<init>(ServletContextInitializerBeans.java:97)
+	at org.springframework.boot.web.context.servlet.WebApplicationContextInitializer.initialize(WebApplicationContextInitializer.java:53)
+	at org.springframework.boot.tomcat.servlet.DeferredServletContainerInitializers.onStartup(DeferredServletContainerInitializers.java:55)
+	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:4416)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1162)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1158)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:81)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:149)
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:714)
+	at org.apache.catalina.core.StandardHost.startInternal(StandardHost.java:780)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1162)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1158)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:81)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:149)
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:714)
+	at org.apache.catalina.core.StandardEngine.startInternal(StandardEngine.java:201)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+	at org.apache.catalina.core.StandardService.startInternal(StandardService.java:410)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+	at org.apache.catalina.core.StandardServer.startInternal(StandardServer.java:864)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+	at org.apache.catalina.startup.Tomcat.start(Tomcat.java:435)
+	at org.springframework.boot.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:131)
+	... 16 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'gerenciadorJwt': Invocation of init method failed
+	at org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor.postProcessBeforeInitialization(InitDestroyAnnotationBeanPostProcessor.java:220)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyBeanPostProcessorsBeforeInitialization(AbstractAutowireCapableBeanFactory.java:426)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1809)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:603)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveBean(DefaultListableBeanFactory.java:1225)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1704)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1651)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:912)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
+	... 56 common frames omitted
+Caused by: sgc.comum.erros.ErroConfiguracao: FALHA DE SEGURANÇA: A propriedade 'aplicacao.jwt.secret' não foi alterada do padrão inseguro. Configure a variável de ambiente JWT_SECRET com um valor seguro.
+	at sgc.seguranca.login.GerenciadorJwt.verificarSegurancaChave(GerenciadorJwt.java:43)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor$LifecycleMethod.invoke(InitDestroyAnnotationBeanPostProcessor.java:453)
+	at org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor$LifecycleMetadata.invokeInitMethods(InitDestroyAnnotationBeanPostProcessor.java:397)
+	at org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor.postProcessBeforeInitialization(InitDestroyAnnotationBeanPostProcessor.java:217)
+	... 69 common frames omitted
+
+BUILD SUCCESSFUL in 2m 29s
+4 actionable tasks: 4 executed
+Configuration cache entry stored.

@@ -3,6 +3,7 @@ import {BButton} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import ProcessoAcoes from "../ProcessoAcoes.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 describe("ProcessoAcoes.vue", () => {
     const context = setupComponentTest();
@@ -107,5 +108,17 @@ describe("ProcessoAcoes.vue", () => {
         expect(
             context.wrapper.find('[data-testid="btn-finalizar-processo"]').exists(),
         ).toBe(false);
+    });
+
+    it("deve ser acessível", async () => {
+        context.wrapper = mount(ProcessoAcoes, {
+            ...mountOptions,
+            props: {
+                mostrarBotoesBloco: true,
+                perfil: "ADMIN",
+                situacaoProcesso: "EM_ANDAMENTO",
+            },
+        });
+        await checkA11y(context.wrapper.element as HTMLElement);
     });
 });

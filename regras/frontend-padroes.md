@@ -113,13 +113,10 @@ flowchart LR
 - **Tipagem Estrita:** Evitar `any`. Usar interfaces definidas em `frontend/src/types/`.
 - **Props de Componentes:** Usar interface genérica com `defineProps<Props>()`.
 
-### 6. Testes Unitários e de Integração (Vitest)
+## 6. Testes
 
-- **Localização:** Arquivos `*.spec.ts` ou `*.test.ts` próximos ao código fonte ou em diretórios `__tests__`.
-- **Escopo:**
-  - **Unitários:** Testar funções isoladas (utils, mappers) e componentes simples.
-  - **Integração:** Testar Stores e Views (montando o componente e mockando serviços/stores).
-- **Execução:** `npm run test:unit`.
+> [!IMPORTANT]
+> Consulte o [Guia de Testes Frontend](./frontend-testes.md) para padrões detalhados de testes unitários e de integração com Vitest.
 
 ## 7. Padrões de Implementação Detalhados
 
@@ -184,8 +181,6 @@ export const useProcessosStore = defineStore('processos', () => {
 - Nomenclatura: `use{Entidade}Store` (plural)
 - ID da store: string minúscula (ex: "processos")
 
-**Total de Stores:** 12 identificadas
-
 ### 7.2. Services - Módulos de Funções Puras
 
 **Estrutura Padrão:**
@@ -227,8 +222,6 @@ export async function excluir(codigo: number): Promise<void> {
 - Importar `apiClient` de `@/axios-setup`
 - Nomenclatura de arquivo: `{entidade}Service.ts` (camelCase)
 - Funções CRUD: `listar`, `buscarPorCodigo`, `criar`, `atualizar`, `excluir`
-
-**Total de Services:** 12 identificados
 
 ### 7.3. Mappers - Funções de Transformação
 
@@ -278,8 +271,6 @@ export function mapUnidadeParticipanteDtoToFrontend(dto: UnidadeParticipanteDto)
 - **Importante:** Evite usar `any` - crie interfaces para os DTOs do backend em `@/types/`
 - Uso opcional (quando há transformação real)
 - Suporte a estruturas recursivas/aninhadas
-
-**Total de Mappers:** 7 identificados
 
 ### 7.4. Components - Componentes Apresentacionais
 
@@ -348,8 +339,6 @@ function handleIniciar() {
 - Prefira componentes BootstrapVueNext
 - Style: `scoped` quando necessário
 
-**Total de Componentes:** 24 identificados
-
 ### 7.5. Views - Páginas Inteligentes
 
 **Estrutura Padrão:**
@@ -399,8 +388,6 @@ async function handleIniciar(codigo: number) {
 - Usa `computed` para reatividade
 - Delega apresentação para componentes
 - Trata eventos de componentes filhos
-
-**Total de Views:** 18 identificadas
 
 ## 8. Axios Setup e Interceptors
 
@@ -627,56 +614,9 @@ export default [
 - Meta dados para controle de acesso
 - Rotas organizadas por domínio
 
-## 11. Testes Unitários
+## 11. TypeScript - Tipos e Interfaces
 
-### 11.1. Estrutura de Testes
-
-```typescript
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { useProcessosStore } from '@/stores/processos';
-import * as processoService from '@/services/processoService';
-
-vi.mock('@/services/processoService');
-
-describe('useProcessosStore', () => {
-    beforeEach(() => {
-        setActivePinia(createPinia());
-    });
-    
-    it('deve buscar processos com sucesso', async () => {
-        const mockProcessos = [{ codigo: 1, descricao: 'Teste' }];
-        vi.mocked(processoService.listar).mockResolvedValue(mockProcessos);
-        
-        const store = useProcessosStore();
-        await store.buscarProcessos();
-        
-        expect(store.processos).toEqual(mockProcessos);
-        expect(store.isLoading).toBe(false);
-    });
-    
-    it('deve tratar erro ao buscar processos', async () => {
-        vi.mocked(processoService.listar).mockRejectedValue(new Error('Erro'));
-        
-        const store = useProcessosStore();
-        
-        await expect(store.buscarProcessos()).rejects.toThrow();
-        expect(store.lastError).not.toBeNull();
-    });
-});
-```
-
-**Convenções:**
-
-- Use Vitest
-- Mock de services com `vi.mock`
-- Setup com Pinia em `beforeEach`
-- Teste estado, getters e actions
-- Nomenclatura: `deve{Acao}Quando{Condicao}`
-
-## 12. TypeScript - Tipos e Interfaces
-
-### 12.1. Definição de Tipos
+### 11.1. Definição de Tipos
 
 **Arquivo:** `@/types/tipos.ts`
 
@@ -714,7 +654,7 @@ export interface CriarProcessoRequest {
 - PascalCase para tipos
 - Enums como union types (não `enum`)
 
-## 14. Boas Práticas Identificadas
+## 12. Boas Práticas Identificadas
 
 1. **Separation of Concerns:** Camadas bem definidas (View → Store → Service → API)
 2. **Single Responsibility:** Cada componente tem responsabilidade única
@@ -727,7 +667,7 @@ export interface CriarProcessoRequest {
 9. **Accessibility:** Uso de componentes semânticos
 10. **Performance:** Memoization com `computed`
 
-## 15. Referências
+## 13. Referências
 
 - **Vue.js 3 Docs:** <https://vuejs.org/>
 - **Pinia Docs:** <https://pinia.vuejs.org/>

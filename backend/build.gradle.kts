@@ -91,7 +91,7 @@ tasks.withType<BootJar> {
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     // Carregar variáveis do arquivo .env apropriado baseado na variável ENV
     // Uso: ./gradlew bootRun -PENV=hom (ou test, e2e)
-    val env = project.findProperty("ENV")?.toString() ?: "test"
+    val env = (project.findProperty("ENV") ?: System.getProperty("spring.profiles.active"))?.toString() ?: "test"
     val envFile = rootProject.file(".env.$env")
     
     // Define o perfil Spring automaticamente baseado no ENV

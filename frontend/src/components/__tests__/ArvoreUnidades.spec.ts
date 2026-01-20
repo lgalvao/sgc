@@ -2,6 +2,7 @@ import {describe, expect, it} from "vitest";
 import {mount} from "@vue/test-utils";
 import ArvoreUnidades from "../ArvoreUnidades.vue";
 import type {Unidade} from "@/types/tipos";
+import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 describe("ArvoreUnidades.vue", () => {
     // Mock data
@@ -304,5 +305,10 @@ describe("ArvoreUnidades.vue", () => {
         const emitted = wrapper.emitted("update:modelValue");
         expect(emitted).toBeTruthy();
         expect(emitted![0][0]).toContain(400);
+    });
+
+    it("deve ser acessível", async () => {
+        const wrapper = createWrapper();
+        await checkA11y(wrapper.element as HTMLElement);
     });
 });

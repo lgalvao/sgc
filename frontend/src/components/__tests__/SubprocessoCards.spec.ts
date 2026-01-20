@@ -2,6 +2,7 @@ import {describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import SubprocessoCards from '@/components/SubprocessoCards.vue';
 import {TipoProcesso} from '@/types/tipos';
+import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 const pushMock = vi.fn();
 vi.mock('vue-router', () => ({
@@ -220,5 +221,21 @@ describe('SubprocessoCards.vue', () => {
 
         await card.trigger('keydown.enter');
         expect(pushMock).not.toHaveBeenCalled();
+    });
+
+    it('deve ser acessível', async () => {
+        const wrapper = mount(SubprocessoCards, {
+            props: defaultProps,
+            global: {
+                stubs: {
+                    BCard: { template: '<div class="card"><slot /></div>' },
+                    BCardTitle: { template: '<div><slot /></div>' },
+                    BCardText: { template: '<div><slot /></div>' },
+                    BRow: { template: '<div><slot /></div>' },
+                    BCol: { template: '<div><slot /></div>' }
+                }
+            }
+        });
+        await checkA11y(wrapper.element as HTMLElement);
     });
 });
