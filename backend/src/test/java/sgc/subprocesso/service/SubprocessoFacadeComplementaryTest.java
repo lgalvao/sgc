@@ -544,7 +544,7 @@ class SubprocessoFacadeComplementaryTest {
             when(crudService.buscarSubprocessoComMapa(codigo)).thenReturn(sp);
             when(analiseFacade.listarPorSubprocesso(codigo, sgc.analise.model.TipoAnalise.VALIDACAO)).thenReturn(List.of());
             when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
-            when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of());
+            when(atividadeService.buscarPorMapaCodigoSemRelacionamentos(10L)).thenReturn(List.of());
             when(conhecimentoService.listarPorMapa(10L)).thenReturn(List.of());
             when(mapaAjusteMapper.toDto(any(), any(), any(), any(), any())).thenReturn(MapaAjusteDto.builder().build());
 

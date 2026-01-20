@@ -23,6 +23,9 @@ public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
             """)
     List<Atividade> findByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
 
+    @Query("SELECT a FROM Atividade a WHERE a.mapa.codigo = :mapaCodigo")
+    List<Atividade> findByMapaCodigoSemFetch(@Param("mapaCodigo") Long mapaCodigo);
+
     @Query("""
             SELECT DISTINCT a FROM Atividade a
             LEFT JOIN FETCH a.conhecimentos
