@@ -61,9 +61,9 @@
             @keydown.enter.prevent="abrirModalMapasVigentes"
             @keydown.space.prevent="abrirModalMapasVigentes"
         >
-          <h5 class="card-title">
+          <h3 class="card-title h5">
             Mapas Vigentes
-          </h5>
+          </h3>
           <p class="card-text">
             Visualize os mapas de competências atualmente vigentes em todas as unidades.
           </p>
@@ -81,9 +81,9 @@
             @keydown.enter.prevent="abrirModalDiagnosticosGaps"
             @keydown.space.prevent="abrirModalDiagnosticosGaps"
         >
-          <h5 class="card-title">
+          <h3 class="card-title h5">
             Diagnósticos de Gaps
-          </h5>
+          </h3>
           <p class="card-text">
             Analise os gaps de competências identificados nos processos de diagnóstico.
           </p>
@@ -101,9 +101,9 @@
             @keydown.enter.prevent="abrirModalAndamentoGeral"
             @keydown.space.prevent="abrirModalAndamentoGeral"
         >
-          <h5 class="card-title">
+          <h3 class="card-title h5">
             Andamento Geral
-          </h5>
+          </h3>
           <p class="card-text">
             Acompanhe o andamento de todos os processos de mapeamento e revisão.
           </p>

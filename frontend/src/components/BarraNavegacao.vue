@@ -11,6 +11,7 @@ Responsável por: mostrar caminho atual na hierarquia, botão voltar
         class="btn-voltar"
         size="lg"
         data-testid="btn-nav-voltar"
+        aria-label="Voltar"
         @click="goBack"
     >
       <i class="bi bi-arrow-left-circle"/>
