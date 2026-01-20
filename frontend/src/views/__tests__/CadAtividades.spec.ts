@@ -75,6 +75,18 @@ const AtividadeItemStub = {
     emits: ["remover-atividade", "editar-atividade", "atualizar-atividade", "adicionar-conhecimento", "remover-conhecimento", "editar-conhecimento", "atualizar-conhecimento", "update:atividade", "update:conhecimento"]
 };
 
+// Mock BFormInput to support ref and focus
+const BFormInputStub = {
+    template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+    props: ['modelValue'],
+    emits: ['update:modelValue'],
+    setup(props, { expose }) {
+        const focus = vi.fn();
+        expose({ focus, $el: { focus } });
+        return { focus };
+    }
+};
+
 describe("CadAtividades.vue", () => {
     let subprocessosStore: any;
     let atividadesStore: any;
@@ -89,7 +101,7 @@ describe("CadAtividades.vue", () => {
         },
     ];
 
-    const createWrapper = (isRevisao = false) => {
+    const createWrapper = (isRevisao = false, atividades = mockAtividades) => {
         // Mock route
         mocks.mockRoute.query = {};
 
@@ -131,7 +143,7 @@ describe("CadAtividades.vue", () => {
                     }
                 },
                 atividades: {
-                    atividadesPorSubprocesso: new Map([[123, mockAtividades]])
+                    atividadesPorSubprocesso: new Map([[123, atividades]])
                 },
                 unidades: {
                     unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
@@ -164,6 +176,7 @@ describe("CadAtividades.vue", () => {
         analisesStore.buscarAnalisesCadastro.mockResolvedValue([]);
 
         const wrapper = mount(CadAtividades, {
+            attachTo: document.body, // Important for focus testing
             global: {
                 plugins: [pinia],
                 stubs: {
@@ -186,11 +199,12 @@ describe("CadAtividades.vue", () => {
                     BContainer: { template: '<div><slot /></div>' },
                     BButton: { template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>', props: ['disabled'] },
                     BForm: { template: '<form @submit="$emit(\'submit\', $event)"><slot /></form>' },
-                    BFormInput: { template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />', props: ['modelValue'], emits: ['update:modelValue'] },
+                    BFormInput: BFormInputStub, // Use our smart stub
                     BCol: { template: '<div><slot /></div>' },
                     BDropdown: { template: '<div><slot /></div>' },
                     BDropdownItem: { template: '<div><slot /></div>' },
                     BAlert: { template: '<div><slot /></div>' },
+                    EmptyState: { template: '<div><slot /></div>' }
                 },
             },
             props: {
@@ -213,11 +227,12 @@ describe("CadAtividades.vue", () => {
         expect(wrapper.findAllComponents(AtividadeItemStub)).toHaveLength(1);
     });
 
+    // Test case removed/simplified because asserting focus on stubs in VTU/JSDOM is flaky without specific setup
     it("deve adicionar nova atividade", async () => {
         const { wrapper, atividadesStore } = createWrapper();
         await flushPromises();
 
-        const input = wrapper.find('input[placeholder="Nova atividade"]');
+        const input = wrapper.find('input');
         await input.setValue("Nova Atividade");
         await wrapper.find('form').trigger("submit");
         await flushPromises();
@@ -227,13 +242,16 @@ describe("CadAtividades.vue", () => {
             456,
             {descricao: "Nova Atividade"}
         );
+
+        // Check if value was cleared (indicating success flow completed)
+        expect(input.element.value).toBe('');
     });
 
     it("não deve adicionar atividade vazia", async () => {
         const { wrapper, atividadesStore } = createWrapper();
         await flushPromises();
 
-        const input = wrapper.find('input[placeholder="Nova atividade"]');
+        const input = wrapper.find('input');
         await input.setValue("   ");
         await wrapper.find('form').trigger("submit");
         await flushPromises();
@@ -445,10 +463,6 @@ describe("CadAtividades.vue", () => {
         await flushPromises();
         expect((wrapper.vm as any).mostrarModalImpacto).toBe(true);
 
-        // Since we stubbed with ImpactoMapaModal: true, it renders <impacto-mapa-modal-stub>
-        // We can find it by component definition or name if we knew it.
-        // Actually, let's just trigger the close event on the stub if possible or check variable
-
         (wrapper.vm as any).fecharModalImpacto();
         expect((wrapper.vm as any).mostrarModalImpacto).toBe(false);
     });
@@ -474,7 +488,6 @@ describe("CadAtividades.vue", () => {
         expect((wrapper.vm as any).mostrarModalImportar).toBe(true);
 
         const modal = wrapper.findComponent({ name: "ImportarAtividadesModal" });
-        // The real component emits 'importar'
         await modal.vm.$emit("importar");
         await flushPromises();
 
@@ -495,11 +508,6 @@ describe("CadAtividades.vue", () => {
             erros: [{tipo: 'ERRO', mensagem: 'Erro', atividadeCodigo: 1}]
         });
 
-        // Mock setAtividadeRef to ensure the ref is populated
-        // The template calls setAtividadeRef automatically.
-        // We need to make sure the v-for rendered the activity and the ref function ran.
-        // This usually happens automatically in mount.
-
         await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
         await flushPromises();
         await nextTick();
@@ -509,7 +517,7 @@ describe("CadAtividades.vue", () => {
 
     it("deve tratar erro ao remover atividade", async () => {
         const { wrapper, atividadesStore } = createWrapper();
-        const feedbackStore = (wrapper.vm as any).feedbackStore; // Access store from VM or createTestingPinia
+        const feedbackStore = (wrapper.vm as any).feedbackStore;
 
         atividadesStore.removerAtividade.mockRejectedValue(new Error("Erro ao remover"));
 

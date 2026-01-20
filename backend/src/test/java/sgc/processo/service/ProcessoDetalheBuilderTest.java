@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.ProcessoDetalheDto;
+import sgc.processo.mapper.ProcessoDetalheMapper;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
@@ -37,13 +38,33 @@ class ProcessoDetalheBuilderTest {
     @Mock
     private SubprocessoRepo subprocessoRepo;
 
+    @Mock
+    private ProcessoDetalheMapper processoDetalheMapper;
+
     @InjectMocks
     private ProcessoDetalheBuilder builder;
+
+    /**
+     * Configura o mock do mapper para retornar DTOs corretamente mapeados.
+     * Chamado apenas nos testes que usam participantes.
+     */
+    private void configurarMockDoMapper() {
+        when(processoDetalheMapper.toUnidadeParticipanteDto(any(Unidade.class))).thenAnswer(invocation -> {
+            Unidade u = invocation.getArgument(0);
+            ProcessoDetalheDto.UnidadeParticipanteDto dto = new ProcessoDetalheDto.UnidadeParticipanteDto();
+            dto.setCodUnidade(u.getCodigo());
+            dto.setNome(u.getNome());
+            dto.setSigla(u.getSigla());
+            dto.setCodUnidadeSuperior(u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null);
+            return dto;
+        });
+    }
 
     @Test
     @DisplayName("Deve construir DTO com dados básicos e unidades quando dados válidos")
     void deveConstruirDtoQuandoDadosValidos() {
         // Arrange
+        configurarMockDoMapper();
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setDescricao("Processo Teste");
@@ -140,6 +161,7 @@ class ProcessoDetalheBuilderTest {
     @DisplayName("Deve verificar ordenação das unidades")
     void deveVerificarOrdenacaoDasUnidades() {
         // Arrange
+        configurarMockDoMapper();
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -168,6 +190,7 @@ class ProcessoDetalheBuilderTest {
     @DisplayName("Deve construir DTO com hierarquia de participantes")
     void deveConstruirDtoComHierarquiaParticipantes() {
         // Arrange
+        configurarMockDoMapper();
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -203,10 +226,10 @@ class ProcessoDetalheBuilderTest {
 
         // Assert
         assertThat(dto.getUnidades()).hasSize(1); // Somente o pai na raiz
-        ProcessoDetalheDto.UnidadeParticipanteDto paiDto = dto.getUnidades().get(0);
+        ProcessoDetalheDto.UnidadeParticipanteDto paiDto = dto.getUnidades().getFirst();
         assertThat(paiDto.getMapaCodigo()).isEqualTo(100L);
         assertThat(paiDto.getFilhos()).hasSize(1);
-        assertThat(paiDto.getFilhos().get(0).getSigla()).isEqualTo("FILHO");
+        assertThat(paiDto.getFilhos().getFirst().getSigla()).isEqualTo("FILHO");
     }
 
     @Test
@@ -237,6 +260,7 @@ class ProcessoDetalheBuilderTest {
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        configurarMockDoMapper();
         Unidade u1 = new Unidade(); u1.setCodigo(1L);
         processo.setParticipantes(Set.of(u1));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
@@ -272,6 +296,7 @@ class ProcessoDetalheBuilderTest {
         filho.setUnidadeSuperior(pai);
 
         // Apenas filho participa
+        configurarMockDoMapper();
         processo.setParticipantes(Set.of(filho));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
 
@@ -281,6 +306,6 @@ class ProcessoDetalheBuilderTest {
 
         // Filho deve aparecer na raiz pois pai não participa
         assertThat(dto.getUnidades()).hasSize(1);
-        assertThat(dto.getUnidades().get(0).getSigla()).isEqualTo("FILHO");
+        assertThat(dto.getUnidades().getFirst().getSigla()).isEqualTo("FILHO");
     }
 }

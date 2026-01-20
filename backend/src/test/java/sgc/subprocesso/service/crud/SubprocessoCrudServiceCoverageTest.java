@@ -8,10 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.UnidadeFacade;
 import sgc.processo.model.Processo;
-import sgc.processo.service.ProcessoFacade;
-import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -30,19 +27,21 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoCrudServiceCoverageTest {
-
     @InjectMocks
     private SubprocessoCrudService crudService;
 
-    @Mock private SubprocessoRepo repositorio;
-    @Mock private ProcessoFacade processoFacade;
-    @Mock private UnidadeFacade unidadeFacade;
-    @Mock private SubprocessoMapper mapper;
-    @Mock private AccessControlService accessControlService;
-    @Mock private sgc.mapa.service.MapaFacade mapaFacade;
-    @Mock private sgc.comum.repo.RepositorioComum repo;
-    @Mock private sgc.organizacao.UsuarioFacade usuarioService;
-    @Mock private org.springframework.context.ApplicationEventPublisher eventPublisher;
+    @Mock
+    private SubprocessoRepo repositorio;
+    @Mock
+    private SubprocessoMapper mapper;
+    @Mock
+    private sgc.comum.repo.RepositorioComum repo;
+    @Mock
+    private sgc.mapa.service.MapaFacade mapaFacade;
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher eventPublisher;
+    @Mock
+    private sgc.organizacao.UsuarioFacade usuarioService;
 
     @Test
     @DisplayName("criar - Sucesso")
@@ -52,7 +51,7 @@ class SubprocessoCrudServiceCoverageTest {
                 .codUnidade(20L)
                 .build();
         when(repositorio.save(any())).thenAnswer(i -> i.getArgument(0));
-        when(mapper.toDTO(any())).thenReturn(new SubprocessoDto());
+        when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
         SubprocessoDto dto = crudService.criar(req);
 
@@ -65,15 +64,15 @@ class SubprocessoCrudServiceCoverageTest {
     void atualizar_Sucesso() {
         Long codigo = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setProcesso(new Processo());
+        sp.setProcesso(new Processo()); // Para verificar permissao
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
+        AtualizarSubprocessoRequest req = AtualizarSubprocessoRequest.builder().build();
         when(repo.buscar(Subprocesso.class, codigo)).thenReturn(sp);
-        when(mapper.toDTO(any())).thenReturn(new SubprocessoDto());
+        when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
-        SubprocessoDto result = crudService.atualizar(codigo, AtualizarSubprocessoRequest.builder().build());
+        crudService.atualizar(codigo, req);
 
-        assertNotNull(result);
         verify(repositorio).save(sp);
     }
 
@@ -86,7 +85,6 @@ class SubprocessoCrudServiceCoverageTest {
         when(repositorio.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, unidades)).thenReturn(true);
 
         boolean result = crudService.verificarAcessoUnidadeAoProcesso(codProcesso, unidades);
-
         assertTrue(result);
     }
 
@@ -112,13 +110,12 @@ class SubprocessoCrudServiceCoverageTest {
         sp.setProcesso(new Processo());
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setMapa(new Mapa());
-        sp.getMapa().setCodigo(99L);
+        sp.getMapa().setCodigo(99L); // Different map
 
         when(repo.buscar(Subprocesso.class, codigo)).thenReturn(sp);
-        when(mapper.toDTO(any())).thenReturn(new SubprocessoDto());
+        when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
         crudService.atualizar(codigo, req);
-
         verify(repositorio).save(sp);
     }
 

@@ -36,7 +36,7 @@ public abstract class SubprocessoMapper {
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidade.codigo", target = "codUnidade")
     @Mapping(source = "mapa.codigo", target = "codMapa")
-    public abstract SubprocessoDto toDTO(Subprocesso subprocesso);
+    public abstract SubprocessoDto toDto(Subprocesso subprocesso);
 
     @Mapping(source = "codProcesso", target = "processo")
     @Mapping(source = "codUnidade", target = "unidade")

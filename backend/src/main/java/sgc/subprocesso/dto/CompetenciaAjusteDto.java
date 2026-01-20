@@ -20,5 +20,6 @@ import java.util.List;
 public class CompetenciaAjusteDto {
     private final Long codCompetencia;
     private final String nome;
-    private final List<AtividadeAjusteDto> atividades;
+    @Builder.Default
+    private final List<AtividadeAjusteDto> atividades = List.of();
 }

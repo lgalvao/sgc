@@ -12,6 +12,7 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.seguranca.login.dto.EntrarRequest;
 
 import java.util.Collections;
@@ -29,19 +30,20 @@ class LoginServiceTest {
     @Mock private GerenciadorJwt gerenciadorJwt;
     @Mock private ClienteAcessoAd clienteAcessoAd;
     @Mock private UnidadeFacade unidadeService;
+    @Mock private UsuarioMapper usuarioMapper;
 
     private LoginFacade loginFacade;
 
     @BeforeEach
     void setUp() {
-        loginFacade = new LoginFacade(usuarioService, gerenciadorJwt, clienteAcessoAd, unidadeService);
+        loginFacade = new LoginFacade(usuarioService, gerenciadorJwt, clienteAcessoAd, unidadeService, usuarioMapper);
         ReflectionTestUtils.setField(loginFacade, "ambienteTestes", false);
     }
 
     @Test
     @DisplayName("Linhas 86, 89: Deve falhar autenticação se AD for null e não for ambiente de testes")
     void deveFalharAutenticacaoSemAdEmProducao() {
-        LoginFacade serviceSemAd = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService);
+        LoginFacade serviceSemAd = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService, usuarioMapper);
         ReflectionTestUtils.setField(serviceSemAd, "ambienteTestes", false);
 
         boolean result = serviceSemAd.autenticar("123", "senha");
@@ -84,7 +86,7 @@ class LoginServiceTest {
     @Test
     @DisplayName("Deve autenticar em ambiente de testes sem AD")
     void deveAutenticarEmAmbienteTestesSemAd() {
-        LoginFacade serviceSemAd = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService);
+        LoginFacade serviceSemAd = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService, usuarioMapper);
         ReflectionTestUtils.setField(serviceSemAd, "ambienteTestes", true);
 
         when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(new sgc.organizacao.model.Usuario());

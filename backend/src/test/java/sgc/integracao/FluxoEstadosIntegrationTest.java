@@ -52,30 +52,18 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @DisplayName("Fluxo de Estados: Processo e Subprocesso")
 @Import(TestSecurityConfig.class)
 class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
-    @Autowired
-    private ProcessoFacade processoFacade;
-    @Autowired
-    private SubprocessoWorkflowService workflowService;
-    @Autowired
-    private AtividadeService atividadeService;
-    @Autowired
-    private ConhecimentoService conhecimentoService;
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-    @Autowired
-    private UnidadeRepo unidadeRepo;
-    @Autowired
-    private UsuarioFacade usuarioService;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private CompetenciaRepo competenciaRepo;
-    @Autowired
-    private AtividadeRepo atividadeRepo;
-    @Autowired
-    private MapaRepo mapaRepo;
-    @PersistenceContext
-    private EntityManager em;
+    @Autowired private ProcessoFacade processoFacade;
+    @Autowired private SubprocessoWorkflowService workflowService;
+    @Autowired private AtividadeService atividadeService;
+    @Autowired private ConhecimentoService conhecimentoService;
+    @Autowired private SubprocessoRepo subprocessoRepo;
+    @Autowired private UnidadeRepo unidadeRepo;
+    @Autowired private UsuarioFacade usuarioService;
+    @Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired private CompetenciaRepo competenciaRepo;
+    @Autowired private AtividadeRepo atividadeRepo;
+    @Autowired private MapaRepo mapaRepo;
+    @PersistenceContext private EntityManager em;
 
     @MockitoBean
     private ImpactoMapaService impactoMapaService;
@@ -96,8 +84,8 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
         // Ensure SEDOC exists (critical for homologation)
         if (unidadeRepo.findBySigla("SEDOC").isEmpty()) {
             jdbcTemplate.update(
-                    "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    15L, "Seção de Documentação", "SEDOC", "OPERACIONAL", "ATIVA", 2L, null
+                "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                15L, "Seção de Documentação", "SEDOC", "OPERACIONAL", "ATIVA", 2L, null
             );
         }
 
@@ -131,154 +119,151 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
         // Insert User
         jdbcTemplate.update(
-                "INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo) VALUES (?, ?, ?, ?, ?)",
-                titulo, nome, "teste@teste.com", "0000", unidadeLotacao
+            "INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo) VALUES (?, ?, ?, ?, ?)",
+            titulo, nome, "teste@teste.com", "0000", unidadeLotacao
         );
 
         // Insert Profile
         jdbcTemplate.update(
-                "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
-                titulo, perfil, unidadePerfil
+            "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
+            titulo, perfil, unidadePerfil
         );
 
         // Update Unit Titular if CHEFE
         if ("CHEFE".equals(perfil)) {
-            jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET titulo_titular = ? WHERE codigo = ?", titulo, unidadePerfil);
+             jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET titulo_titular = ? WHERE codigo = ?", titulo, unidadePerfil);
         }
     }
 
     private void autenticar(Usuario usuario, String role) {
         SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken(
-                        String.valueOf(usuario.getTituloEleitoral()),
-                        "senha",
-                        List.of(new SimpleGrantedAuthority(role))
-                )
+            new UsernamePasswordAuthenticationToken(
+                    usuario.getTituloEleitoral(),
+                "senha",
+                List.of(new SimpleGrantedAuthority(role))
+            )
         );
     }
 
     @Nested
     @DisplayName("Fluxo de Mapeamento")
+    
     class FluxoMapeamento {
 
         @Test
         @DisplayName("Fluxo Mapeamento Happy Path: Inicio -> Cadastro -> Mapa -> Finalização")
         void fluxoMapeamentoCompleto() {
-            try {
-                // 1. Criar Processo (Admin)
-                autenticar(admin, "ROLE_ADMIN");
-                CriarProcessoRequest req = CriarProcessoRequest.builder()
-                        .descricao("Processo Mapeamento Teste")
-                        .tipo(TipoProcesso.MAPEAMENTO)
-                        .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
-                        .unidades(List.of(codUnidadeMapeamento))
-                        .build();
-                var processoDto = processoFacade.criar(req);
-                Long codProcesso = processoDto.getCodigo();
+            // 1. Criar Processo (Admin)
+            autenticar(admin, "ROLE_ADMIN");
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
+                    .descricao("Processo Mapeamento Teste")
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
+                    .unidades(List.of(codUnidadeMapeamento))
+                    .build();
+            var processoDto = processoFacade.criar(req);
+            Long codProcesso = processoDto.getCodigo();
 
-                // 2. Iniciar Processo (Admin)
-                autenticar(admin, "ROLE_ADMIN");
-                processoFacade.iniciarProcessoMapeamento(codProcesso, List.of(codUnidadeMapeamento));
+            // 2. Iniciar Processo (Admin)
+            autenticar(admin, "ROLE_ADMIN");
+            processoFacade.iniciarProcessoMapeamento(codProcesso, List.of(codUnidadeMapeamento));
 
-                SubprocessoDto subprocessoDto = processoFacade.listarTodosSubprocessos(codProcesso).getFirst();
-                Long codSubprocesso = subprocessoDto.getCodigo();
+            SubprocessoDto subprocessoDto = processoFacade.listarTodosSubprocessos(codProcesso).getFirst();
+            Long codSubprocesso = subprocessoDto.getCodigo();
 
-                verificarSituacao(codSubprocesso, NAO_INICIADO);
+            verificarSituacao(codSubprocesso, NAO_INICIADO);
 
-                // 3. Adicionar Atividade/Conhecimento (Chefe)
-                // Chefe adiciona atividade
-                autenticar(chefeMapeamento, "ROLE_CHEFE");
-                CriarAtividadeRequest ativReq = CriarAtividadeRequest.builder()
-                        .descricao("Atividade Teste")
-                        .mapaCodigo(subprocessoDto.getCodMapa())
-                        .build();
-                AtividadeResponse ativCriada = atividadeService.criar(ativReq);
+            // 3. Adicionar Atividade/Conhecimento (Chefe)
+            // Chefe adiciona atividade
+            autenticar(chefeMapeamento, "ROLE_CHEFE");
+            CriarAtividadeRequest ativReq = CriarAtividadeRequest.builder()
+                    .descricao("Atividade Teste")
+                    .mapaCodigo(subprocessoDto.getCodMapa())
+                    .build();
+            AtividadeResponse ativCriada = atividadeService.criar(ativReq);
 
-                // Chefe adiciona conhecimento (necessário para validação)
-                autenticar(chefeMapeamento, "ROLE_CHEFE");
-                CriarConhecimentoRequest conReq = CriarConhecimentoRequest.builder()
-                        .descricao("Conhecimento Teste")
-                        .atividadeCodigo(ativCriada.codigo())
-                        .build();
-                conhecimentoService.criar(ativCriada.codigo(), conReq);
+            // Chefe adiciona conhecimento (necessário para validação)
+            autenticar(chefeMapeamento, "ROLE_CHEFE");
+            CriarConhecimentoRequest conReq = CriarConhecimentoRequest.builder()
+                    .descricao("Conhecimento Teste")
+                    .atividadeCodigo(ativCriada.codigo())
+                    .build();
+            conhecimentoService.criar(ativCriada.codigo(), conReq);
 
-                em.flush();
-                em.clear();
+            em.flush();
+            em.clear();
 
-                // Re-fetch subprocess and map to ensure they are managed for downstream logic that might need them
-                Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
-                // Ensure map is linked correctly (bidirectional) just in case
-                if (sp.getMapa() != null && sp.getMapa().getSubprocesso() == null) {
-                    sp.getMapa().setSubprocesso(sp);
-                    mapaRepo.save(sp.getMapa());
-                }
-
-                verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-
-                // 4. Disponibilizar Cadastro (Chefe)
-                autenticar(chefeMapeamento, "ROLE_CHEFE");
-                workflowService.disponibilizarCadastro(codSubprocesso, chefeMapeamento);
-                verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-
-                // 5. Aceitar Cadastro (Gestor)
-                autenticar(gestorMapeamento, "ROLE_GESTOR");
-                workflowService.aceitarCadastro(codSubprocesso, "Aceito pelo Gestor", gestorMapeamento);
-                verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-
-                // 6. Homologar Cadastro (Admin)
-                autenticar(admin, "ROLE_ADMIN");
-                workflowService.homologarCadastro(codSubprocesso, "Homologado pelo Admin", admin);
-                verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_HOMOLOGADO);
-
-                // 7. Disponibilizar Mapa (Admin - SEDOC cria mapa)
-                autenticar(admin, "ROLE_ADMIN");
-
-                // === CREATE COMPETENCY AND LINK (SEDOC WORK) ===
-                Long codMapa = subprocessoRepo.findById(codSubprocesso).orElseThrow().getMapa().getCodigo();
-                Mapa mapaEntity = mapaRepo.findById(codMapa).orElseThrow();
-
-                Competencia comp = new Competencia("Competencia Mapeamento", mapaEntity);
-                comp = competenciaRepo.save(comp);
-
-                // Link using JPA properly
-                Atividade ativEntity = atividadeRepo.findById(ativCriada.codigo()).orElseThrow();
-                ativEntity.setCompetencias(new HashSet<>(Collections.singletonList(comp)));
-                atividadeRepo.save(ativEntity);
-
-                em.flush(); // Ensure DB is updated
-                em.clear(); // Ensure clean state for validation query
-
-                workflowService.disponibilizarMapa(codSubprocesso,
-                        DisponibilizarMapaRequest.builder()
-                                .observacoes("Mapa Inicial")
-                                .dataLimite(LocalDate.now().plusDays(5))
-                                .build(),
-                        admin);
-                verificarSituacao(codSubprocesso, MAPEAMENTO_MAPA_DISPONIBILIZADO);
-
-                // 8. Validar Mapa (Chefe)
-                autenticar(chefeMapeamento, "ROLE_CHEFE");
-                workflowService.validarMapa(codSubprocesso, chefeMapeamento);
-                verificarSituacao(codSubprocesso, MAPEAMENTO_MAPA_VALIDADO);
-
-                // 9. Aceitar Validação (Gestor)
-                autenticar(gestorMapeamento, "ROLE_GESTOR");
-                workflowService.aceitarValidacao(codSubprocesso, gestorMapeamento);
-                verificarSituacao(codSubprocesso, MAPEAMENTO_MAPA_VALIDADO);
-
-                // 10. Homologar Validação (Admin)
-                autenticar(admin, "ROLE_ADMIN");
-                workflowService.homologarValidacao(codSubprocesso, admin);
-                verificarSituacao(codSubprocesso, MAPEAMENTO_MAPA_HOMOLOGADO);
-
-                // 11. Finalizar Processo
-                autenticar(admin, "ROLE_ADMIN");
-                processoFacade.finalizar(codProcesso);
-                assertThat(processoFacade.obterPorId(codProcesso).orElseThrow().getSituacao())
-                        .isEqualTo(sgc.processo.model.SituacaoProcesso.FINALIZADO);
-            } catch (Exception e) {
-                throw e;
+            // Re-fetch subprocess and map to ensure they are managed for downstream logic that might need them
+            Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
+            // Ensure map is linked correctly (bidirectional) just in case
+            if (sp.getMapa() != null && sp.getMapa().getSubprocesso() == null) {
+                 sp.getMapa().setSubprocesso(sp);
+                 mapaRepo.save(sp.getMapa());
             }
+
+            verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+            // 4. Disponibilizar Cadastro (Chefe)
+            autenticar(chefeMapeamento, "ROLE_CHEFE");
+            workflowService.disponibilizarCadastro(codSubprocesso, chefeMapeamento);
+            verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+
+            // 5. Aceitar Cadastro (Gestor)
+            autenticar(gestorMapeamento, "ROLE_GESTOR");
+            workflowService.aceitarCadastro(codSubprocesso, "Aceito pelo Gestor", gestorMapeamento);
+            verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+
+            // 6. Homologar Cadastro (Admin)
+            autenticar(admin, "ROLE_ADMIN");
+            workflowService.homologarCadastro(codSubprocesso, "Homologado pelo Admin", admin);
+            verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_HOMOLOGADO);
+
+            // 7. Disponibilizar Mapa (Admin - SEDOC cria mapa)
+            autenticar(admin, "ROLE_ADMIN");
+
+            // === CREATE COMPETENCY AND LINK (SEDOC WORK) ===
+            Long codMapa = subprocessoRepo.findById(codSubprocesso).orElseThrow().getMapa().getCodigo();
+            Mapa mapaEntity = mapaRepo.findById(codMapa).orElseThrow();
+
+            Competencia comp = new Competencia("Competencia Mapeamento", mapaEntity);
+            comp = competenciaRepo.save(comp);
+
+            // Link using JPA properly
+            Atividade ativEntity = atividadeRepo.findById(ativCriada.codigo()).orElseThrow();
+            ativEntity.setCompetencias(new HashSet<>(Collections.singletonList(comp)));
+            atividadeRepo.save(ativEntity);
+
+            em.flush(); // Ensure DB is updated
+            em.clear(); // Ensure clean state for validation query
+
+            workflowService.disponibilizarMapa(codSubprocesso,
+                    DisponibilizarMapaRequest.builder()
+                            .observacoes("Mapa Inicial")
+                            .dataLimite(LocalDate.now().plusDays(5))
+                            .build(),
+                    admin);
+            verificarSituacao(codSubprocesso, MAPEAMENTO_MAPA_DISPONIBILIZADO);
+
+            // 8. Validar Mapa (Chefe)
+            autenticar(chefeMapeamento, "ROLE_CHEFE");
+            workflowService.validarMapa(codSubprocesso, chefeMapeamento);
+            verificarSituacao(codSubprocesso, MAPEAMENTO_MAPA_VALIDADO);
+
+            // 9. Aceitar Validação (Gestor)
+            autenticar(gestorMapeamento, "ROLE_GESTOR");
+            workflowService.aceitarValidacao(codSubprocesso, gestorMapeamento);
+            verificarSituacao(codSubprocesso, MAPEAMENTO_MAPA_VALIDADO);
+
+            // 10. Homologar Validação (Admin)
+            autenticar(admin, "ROLE_ADMIN");
+            workflowService.homologarValidacao(codSubprocesso, admin);
+            verificarSituacao(codSubprocesso, MAPEAMENTO_MAPA_HOMOLOGADO);
+
+            // 11. Finalizar Processo
+            autenticar(admin, "ROLE_ADMIN");
+            processoFacade.finalizar(codProcesso);
+            assertThat(processoFacade.obterPorId(codProcesso).orElseThrow().getSituacao())
+                .isEqualTo(sgc.processo.model.SituacaoProcesso.FINALIZADO);
         }
 
         @Test
@@ -300,7 +285,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             // Adicionar dados
             autenticar(chefeMapeamento, "ROLE_CHEFE");
             AtividadeResponse ativ = atividadeService.criar(
-                    CriarAtividadeRequest.builder().descricao("A").mapaCodigo(codMapa).build());
+                CriarAtividadeRequest.builder().descricao("A").mapaCodigo(codMapa).build());
             conhecimentoService.criar(ativ.codigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.codigo()).build());
 
             em.flush();
@@ -310,8 +295,8 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
             // Ensure map is linked correctly (bidirectional) just in case
             if (sp.getMapa() != null && sp.getMapa().getSubprocesso() == null) {
-                sp.getMapa().setSubprocesso(sp);
-                mapaRepo.save(sp.getMapa());
+                 sp.getMapa().setSubprocesso(sp);
+                 mapaRepo.save(sp.getMapa());
             }
 
             // Disponibilizar
@@ -333,110 +318,107 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Fluxo de Revisão")
+    
     class FluxoRevisao {
 
         @Test
         @DisplayName("Fluxo Revisão Happy Path com Impactos e Ajuste de Mapa")
         void fluxoRevisaoComImpactos() {
-            try {
-                // Mock Impactos
-                when(impactoMapaService.verificarImpactos(any(), any()))
-                        .thenReturn(ImpactoMapaDto.comImpactos(
-                                List.of(AtividadeImpactadaDto.builder().descricao("Ativ 1").build()),
-                                List.of(), List.of(), List.of()));
+            // Mock Impactos
+            when(impactoMapaService.verificarImpactos(any(), any()))
+                .thenReturn(ImpactoMapaDto.comImpactos(
+                    List.of(AtividadeImpactadaDto.builder().descricao("Ativ 1").build()),
+                    List.of(), List.of(), List.of()));
 
-                // 1. Criar Processo Revisão (Admin)
-                autenticar(admin, "ROLE_ADMIN");
-                CriarProcessoRequest req = CriarProcessoRequest.builder()
-                        .descricao("Processo Revisão Teste")
-                        .tipo(TipoProcesso.REVISAO)
-                        .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
-                        .unidades(List.of(codUnidadeRevisao))
-                        .build();
-                Long codProcesso = processoFacade.criar(req).getCodigo();
+            // 1. Criar Processo Revisão (Admin)
+            autenticar(admin, "ROLE_ADMIN");
+            CriarProcessoRequest req = CriarProcessoRequest.builder()
+                    .descricao("Processo Revisão Teste")
+                    .tipo(TipoProcesso.REVISAO)
+                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
+                    .unidades(List.of(codUnidadeRevisao))
+                    .build();
+            Long codProcesso = processoFacade.criar(req).getCodigo();
 
-                // 2. Iniciar Processo
-                autenticar(admin, "ROLE_ADMIN");
-                processoFacade.iniciarProcessoRevisao(codProcesso, List.of(codUnidadeRevisao));
+            // 2. Iniciar Processo
+            autenticar(admin, "ROLE_ADMIN");
+            processoFacade.iniciarProcessoRevisao(codProcesso, List.of(codUnidadeRevisao));
 
-                SubprocessoDto subprocessoDto = processoFacade.listarTodosSubprocessos(codProcesso).getFirst();
-                Long codSubprocesso = subprocessoDto.getCodigo();
-                Long codMapa = subprocessoDto.getCodMapa();
+            SubprocessoDto subprocessoDto = processoFacade.listarTodosSubprocessos(codProcesso).getFirst();
+            Long codSubprocesso = subprocessoDto.getCodigo();
+            Long codMapa = subprocessoDto.getCodMapa();
 
-                verificarSituacao(codSubprocesso, NAO_INICIADO);
+            verificarSituacao(codSubprocesso, NAO_INICIADO);
 
-                // 3. Chefe inicia revisão (adiciona atividade -> Em Andamento)
-                autenticar(chefeRevisao, "ROLE_CHEFE");
-                AtividadeResponse ativ = atividadeService.criar(
-                        CriarAtividadeRequest.builder().descricao("Nova Ativ Revisao").mapaCodigo(codMapa).build()
-                );
-                conhecimentoService.criar(ativ.codigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.codigo()).build());
+            // 3. Chefe inicia revisão (adiciona atividade -> Em Andamento)
+            autenticar(chefeRevisao, "ROLE_CHEFE");
+            AtividadeResponse ativ = atividadeService.criar(
+                CriarAtividadeRequest.builder().descricao("Nova Ativ Revisao").mapaCodigo(codMapa).build()
+            );
+            conhecimentoService.criar(ativ.codigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.codigo()).build());
 
-                // Link activity to ALL competencies to satisfy validation
-                List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
-                if (!competencias.isEmpty()) {
-                    Atividade atividadeEntity = atividadeRepo.findById(ativ.codigo()).orElseThrow();
-                    atividadeEntity.setCompetencias(new HashSet<>(competencias));
-                    atividadeRepo.save(atividadeEntity);
-                }
-
-                em.flush();
-                em.clear(); // Ensure clean reload for validation
-
-                // Re-fetch subprocess and map to ensure they are managed for downstream logic that might need them
-                Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
-                // Ensure map is linked correctly (bidirectional) just in case
-                if (sp.getMapa() != null && sp.getMapa().getSubprocesso() == null) {
-                    sp.getMapa().setSubprocesso(sp);
-                    mapaRepo.save(sp.getMapa());
-                }
-
-                verificarSituacao(codSubprocesso, REVISAO_CADASTRO_EM_ANDAMENTO);
-
-                // 4. Disponibilizar Revisão
-                autenticar(chefeRevisao, "ROLE_CHEFE");
-                workflowService.disponibilizarRevisao(codSubprocesso, chefeRevisao);
-                verificarSituacao(codSubprocesso, REVISAO_CADASTRO_DISPONIBILIZADA);
-
-                // 5. Aceitar Revisão (Gestor)
-                autenticar(gestorRevisao, "ROLE_GESTOR");
-                workflowService.aceitarRevisaoCadastro(codSubprocesso, "Ok", gestorRevisao);
-                verificarSituacao(codSubprocesso, REVISAO_CADASTRO_DISPONIBILIZADA);
-
-                // 6. Homologar Revisão (Admin) - Com Impactos (Simulado)
-                autenticar(admin, "ROLE_ADMIN");
-                workflowService.homologarRevisaoCadastro(codSubprocesso, "Homologado", admin);
-                verificarSituacao(codSubprocesso, REVISAO_CADASTRO_HOMOLOGADA);
-
-                // 7. Submeter Mapa Ajustado (Admin)
-                autenticar(admin, "ROLE_ADMIN");
-                SubmeterMapaAjustadoRequest ajusteReq = SubmeterMapaAjustadoRequest.builder()
-                        .dataLimiteEtapa2(LocalDateTime.now().plusDays(5))
-                        .build();
-                workflowService.submeterMapaAjustado(codSubprocesso, ajusteReq, admin);
-                verificarSituacao(codSubprocesso, REVISAO_MAPA_DISPONIBILIZADO);
-
-                // 8. Validar Mapa (Chefe)
-                autenticar(chefeRevisao, "ROLE_CHEFE");
-                workflowService.validarMapa(codSubprocesso, chefeRevisao);
-                verificarSituacao(codSubprocesso, REVISAO_MAPA_VALIDADO);
-
-                // 9. Homologar Validação (Admin) (Pula gestor só pra variar, assumindo hierarquia permite ou admin força?
-                // Na verdade, homologarValidacao checa estado. Se estado é REVISAO_MAPA_VALIDADO, admin pode homologar)
-                autenticar(admin, "ROLE_ADMIN");
-                workflowService.homologarValidacao(codSubprocesso, admin);
-                verificarSituacao(codSubprocesso, REVISAO_MAPA_HOMOLOGADO);
-            } catch (Exception e) {
-                throw e;
+            // Link activity to ALL competencies to satisfy validation
+            List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
+            if (!competencias.isEmpty()) {
+                Atividade atividadeEntity = atividadeRepo.findById(ativ.codigo()).orElseThrow();
+                atividadeEntity.setCompetencias(new HashSet<>(competencias));
+                atividadeRepo.save(atividadeEntity);
             }
+
+            em.flush();
+            em.clear(); // Ensure clean reload for validation
+
+            // Re-fetch subprocess and map to ensure they are managed for downstream logic that might need them
+            Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
+            // Ensure map is linked correctly (bidirectional) just in case
+            if (sp.getMapa() != null && sp.getMapa().getSubprocesso() == null) {
+                 sp.getMapa().setSubprocesso(sp);
+                 mapaRepo.save(sp.getMapa());
+            }
+
+            verificarSituacao(codSubprocesso, REVISAO_CADASTRO_EM_ANDAMENTO);
+
+            // 4. Disponibilizar Revisão
+            autenticar(chefeRevisao, "ROLE_CHEFE");
+            workflowService.disponibilizarRevisao(codSubprocesso, chefeRevisao);
+            verificarSituacao(codSubprocesso, REVISAO_CADASTRO_DISPONIBILIZADA);
+
+            // 5. Aceitar Revisão (Gestor)
+            autenticar(gestorRevisao, "ROLE_GESTOR");
+            workflowService.aceitarRevisaoCadastro(codSubprocesso, "Ok", gestorRevisao);
+            verificarSituacao(codSubprocesso, REVISAO_CADASTRO_DISPONIBILIZADA);
+
+            // 6. Homologar Revisão (Admin) - Com Impactos (Simulado)
+            autenticar(admin, "ROLE_ADMIN");
+            workflowService.homologarRevisaoCadastro(codSubprocesso, "Homologado", admin);
+            verificarSituacao(codSubprocesso, REVISAO_CADASTRO_HOMOLOGADA);
+
+            // 7. Submeter Mapa Ajustado (Admin)
+            autenticar(admin, "ROLE_ADMIN");
+            SubmeterMapaAjustadoRequest ajusteReq = SubmeterMapaAjustadoRequest.builder()
+                    .dataLimiteEtapa2(LocalDateTime.now().plusDays(5))
+                    .build();
+            workflowService.submeterMapaAjustado(codSubprocesso, ajusteReq, admin);
+            verificarSituacao(codSubprocesso, REVISAO_MAPA_DISPONIBILIZADO);
+
+            // 8. Validar Mapa (Chefe)
+            autenticar(chefeRevisao, "ROLE_CHEFE");
+            workflowService.validarMapa(codSubprocesso, chefeRevisao);
+            verificarSituacao(codSubprocesso, REVISAO_MAPA_VALIDADO);
+
+            // 9. Homologar Validação (Admin) (Pula gestor só pra variar, assumindo hierarquia permite ou admin força?
+            // Na verdade, homologarValidacao checa estado. Se estado é REVISAO_MAPA_VALIDADO, admin pode homologar)
+            autenticar(admin, "ROLE_ADMIN");
+            workflowService.homologarValidacao(codSubprocesso, admin);
+            verificarSituacao(codSubprocesso, REVISAO_MAPA_HOMOLOGADO);
         }
 
         @Test
         @DisplayName("Fluxo Revisão Sem Impactos")
         void fluxoRevisaoSemImpactos() {
-            // Mock Sem Impactos
+             // Mock Sem Impactos
             when(impactoMapaService.verificarImpactos(any(), any()))
-                    .thenReturn(ImpactoMapaDto.semImpacto());
+                .thenReturn(ImpactoMapaDto.semImpacto());
 
             // 1. Criar Processo
             autenticar(admin, "ROLE_ADMIN");
@@ -456,7 +438,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             // 3. Chefe faz alteração
             autenticar(chefeRevisao, "ROLE_CHEFE");
             AtividadeResponse ativ = atividadeService.criar(
-                    CriarAtividadeRequest.builder().descricao("Ativ").mapaCodigo(codMapa).build()
+                CriarAtividadeRequest.builder().descricao("Ativ").mapaCodigo(codMapa).build()
             );
             conhecimentoService.criar(ativ.codigo(), CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.codigo()).build());
 
@@ -467,8 +449,8 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
             // Ensure map is linked correctly (bidirectional) just in case
             if (sp.getMapa() != null && sp.getMapa().getSubprocesso() == null) {
-                sp.getMapa().setSubprocesso(sp);
-                mapaRepo.save(sp.getMapa());
+                 sp.getMapa().setSubprocesso(sp);
+                 mapaRepo.save(sp.getMapa());
             }
 
             // 4. Disponibilizar
@@ -487,6 +469,6 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
     private void verificarSituacao(Long codSubprocesso, SituacaoSubprocesso esperada) {
         Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
         assertThat(sp.getSituacao()).as("Situação incorreta para subprocesso " + codSubprocesso)
-                .isEqualTo(esperada);
+            .isEqualTo(esperada);
     }
 }

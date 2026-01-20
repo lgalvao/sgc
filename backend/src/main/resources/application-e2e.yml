@@ -26,6 +26,9 @@ management:
       exposure:
         include: health
 
+server:
+  address: 0.0.0.0
+
 # Configuração de logging otimizada para e2e
 logging:
   pattern:

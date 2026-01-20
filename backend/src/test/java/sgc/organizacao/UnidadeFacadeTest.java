@@ -508,9 +508,9 @@ class UnidadeFacadeTest {
         
         // Assert
         assertThat(res).hasSize(1); // Somente o pai na raiz
-        UnidadeDto paiDto = res.get(0);
+        UnidadeDto paiDto = res.getFirst();
         assertThat(paiDto.getSigla()).isEqualTo("PAI");
         assertThat(paiDto.getSubunidades()).hasSize(1);
-        assertThat(paiDto.getSubunidades().get(0).getSigla()).isEqualTo("FILHO");
+        assertThat(paiDto.getSubunidades().getFirst().getSigla()).isEqualTo("FILHO");
     }
 }

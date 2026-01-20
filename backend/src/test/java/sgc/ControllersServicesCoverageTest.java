@@ -248,6 +248,8 @@ class ControllersServicesCoverageTest {
                 .isInstanceOf(ErroInvarianteViolada.class);
     }
 
+
+
     @Test
     @DisplayName("Deve listar alertas com ordenação padrão se não informada")
     void deveListarAlertasComOrdenacaoPadrao() {

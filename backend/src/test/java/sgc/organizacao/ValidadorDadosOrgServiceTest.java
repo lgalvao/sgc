@@ -32,6 +32,8 @@ class ValidadorDadosOrgServiceTest {
     @InjectMocks
     private ValidadorDadosOrgService validador;
 
+    private final DefaultApplicationArguments args = new DefaultApplicationArguments();
+
     private Unidade criarUnidadeValida(Long codigo, String sigla, TipoUnidade tipo) {
         Unidade u = new Unidade();
         u.setCodigo(codigo);
@@ -64,8 +66,7 @@ class ValidadorDadosOrgServiceTest {
             when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of(titular));
 
             // Act & Assert
-            assertThatCode(() -> validador.run(new DefaultApplicationArguments()))
-                    .doesNotThrowAnyException();
+            assertThatCode(() -> validador.run(args)).doesNotThrowAnyException();
         }
 
         @Test
@@ -79,7 +80,7 @@ class ValidadorDadosOrgServiceTest {
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(inativa));
 
             // Act & Assert
-            assertThatCode(() -> validador.run(new DefaultApplicationArguments())).doesNotThrowAnyException();
+            assertThatCode(() -> validador.run(args)).doesNotThrowAnyException();
         }
 
         @Test
@@ -94,8 +95,7 @@ class ValidadorDadosOrgServiceTest {
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(semEquipe, raiz));
 
             // Act & Assert
-            assertThatCode(() -> validador.run(new DefaultApplicationArguments()))
-                    .doesNotThrowAnyException();
+            assertThatCode(() -> validador.run(args)).doesNotThrowAnyException();
         }
 
         @Test
@@ -114,7 +114,22 @@ class ValidadorDadosOrgServiceTest {
                     .thenReturn(List.of(titularPai, titularFilha));
 
             // Act & Assert
-            assertThatCode(() -> validador.run(new DefaultApplicationArguments())).doesNotThrowAnyException();
+            assertThatCode(() -> validador.run(args)).doesNotThrowAnyException();
+        }
+
+        @Test
+        @DisplayName("Deve lidar com lista de unidades sem titulares (não quebra e não gera erro na busca de usuarios, mas detecta violação)")
+        void deveLidarComListaDeTitulosVazia() {
+            // Arrange
+            Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
+            u.setTituloTitular(null); // Sem titular
+
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
+
+            // Act & Assert
+            assertThatThrownBy(() -> validador.run(args))
+                    .isInstanceOf(ErroConfiguracao.class)
+                    .hasMessageContaining("1 violação");
         }
     }
 
@@ -132,7 +147,7 @@ class ValidadorDadosOrgServiceTest {
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
 
             // Act & Assert
-            assertThatThrownBy(() -> validador.run(new DefaultApplicationArguments()))
+            assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class)
                     .hasMessageContaining("1 violação");
         }
@@ -147,7 +162,7 @@ class ValidadorDadosOrgServiceTest {
             when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of()); // Usuário não existe
 
             // Act & Assert
-            assertThatThrownBy(() -> validador.run(new DefaultApplicationArguments()))
+            assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class)
                     .hasMessageContaining("1 violação");
         }
@@ -164,14 +179,14 @@ class ValidadorDadosOrgServiceTest {
             when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of(titular));
 
             // Act & Assert
-            assertThatThrownBy(() -> validador.run(new DefaultApplicationArguments()))
+            assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class)
                     .hasMessageContaining("1 violação");
         }
 
         @Test
         @DisplayName("Deve falhar quando titular tem email em branco")
-        void deveFalharTitularEmailEmBranco() {
+        void deveFailharTitularEmailEmBranco() {
             // Arrange
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
             Usuario titular = criarUsuarioValido("TITULO_1");
@@ -181,7 +196,7 @@ class ValidadorDadosOrgServiceTest {
             when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of(titular));
 
             // Act & Assert
-            assertThatThrownBy(() -> validador.run(new DefaultApplicationArguments()))
+            assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class);
         }
 
@@ -196,27 +211,37 @@ class ValidadorDadosOrgServiceTest {
             when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of(titular));
 
             // Act & Assert
-            assertThatThrownBy(() -> validador.run(new DefaultApplicationArguments()))
+            assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class)
                     .hasMessageContaining("1 violação");
         }
 
         @Test
-        @DisplayName("Deve acumular múltiplas violações")
-        void deveAcumularMultiplasViolacoes() {
+        @DisplayName("Deve ignorar unidade sem titular no loop de validação de emails")
+        void deveIgnorarUnidadeSemTitularNoLoopDeEmail() {
             // Arrange
-            Unidade u1 = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
-            u1.setTituloTitular(null); // Violação 1
-
-            Unidade u2 = criarUnidadeValida(2L, "U2", TipoUnidade.OPERACIONAL);
-            u2.setTituloTitular(null); // Violação 2
-
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1, u2));
+            Unidade semTitular = criarUnidadeValida(2L, "SEM", TipoUnidade.OPERACIONAL);
+            semTitular.setTituloTitular(null);
+            
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(semTitular));
 
             // Act & Assert
-            assertThatThrownBy(() -> validador.run(new DefaultApplicationArguments()))
+            assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class)
-                    .hasMessageContaining("2 violações");
+                    .hasMessageContaining("1 violação");
+        }
+
+        @Test
+        @DisplayName("Deve ignorar unidade com título em branco no loop de validação de emails")
+        void deveIgnorarUnidadeComTituloEmBrancoNoLoopDeEmail() {
+            Unidade uBranca = criarUnidadeValida(2L, "B", TipoUnidade.OPERACIONAL);
+            uBranca.setTituloTitular("   ");
+            
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(uBranca));
+
+            assertThatThrownBy(() -> validador.run(args))
+                    .isInstanceOf(ErroConfiguracao.class)
+                    .hasMessageContaining("1 violação");
         }
     }
 }

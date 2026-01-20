@@ -124,11 +124,7 @@ public class EventoProcessoListener {
 
         // 3. Enviar e-mails para cada subprocesso
         for (Subprocesso subprocesso : subprocessos) {
-            try {
-                enviarEmailProcessoIniciado(processo, subprocesso, responsaveis, usuarios);
-            } catch (Exception e) {
-                log.error("Erro ao enviar e-mail referente a subprocesso {}: {}", subprocesso.getCodigo(), e.getClass().getSimpleName(), e);
-            }
+            enviarEmailProcessoIniciado(processo, subprocesso, responsaveis, usuarios);
         }
     }
 
@@ -227,7 +223,7 @@ public class EventoProcessoListener {
             String assunto = switch (unidade.getTipo()) {
                 case OPERACIONAL, INTEROPERACIONAL -> "Processo Iniciado - %s".formatted(processo.getDescricao());
                 case INTERMEDIARIA -> "Processo Iniciado em Unidades Subordinadas - %s".formatted(processo.getDescricao());
-                default -> throw new ErroEstadoImpossivel("Tipo de unidade desconhecido ao definir assunto: " + unidade.getTipo());
+                case RAIZ, SEM_EQUIPE -> throw new ErroEstadoImpossivel("Tipo de unidade não suportada para e-mail: " + unidade.getTipo());
             };
 
             notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
@@ -249,7 +245,7 @@ public class EventoProcessoListener {
                     processo.getTipo().name(),
                     subprocesso.getDataLimiteEtapa1()
             );
-            default -> throw new ErroEstadoImpossivel("Tipo de unidade não suportado para geração de e-mail: " + tipoUnidade);
+            case RAIZ, SEM_EQUIPE -> throw new ErroEstadoImpossivel("Tipo de unidade não suportado para geração de e-mail: " + tipoUnidade);
         };
     }
 

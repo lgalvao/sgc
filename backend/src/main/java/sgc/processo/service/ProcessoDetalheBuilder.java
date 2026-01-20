@@ -1,8 +1,6 @@
 package sgc.processo.service;
 
 import lombok.RequiredArgsConstructor;
-
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -11,6 +9,7 @@ import sgc.comum.util.FormatadorData;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.ProcessoDetalheDto;
+import sgc.processo.mapper.ProcessoDetalheMapper;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -22,6 +21,7 @@ import java.util.*;
 public class ProcessoDetalheBuilder {
 
     private final SubprocessoRepo subprocessoRepo;
+    private final ProcessoDetalheMapper processoDetalheMapper;
 
     @Transactional(readOnly = true)
     public ProcessoDetalheDto build(Processo processo) {
@@ -80,11 +80,11 @@ public class ProcessoDetalheBuilder {
             ProcessoDetalheDto dto, Processo processo, List<Subprocesso> subprocessos) {
         Map<Long, ProcessoDetalheDto.UnidadeParticipanteDto> mapaUnidades = new HashMap<>();
 
-        // Mapear participantes
+        // Mapear participantes usando o mapper
         for (Unidade participante : processo.getParticipantes()) {
             mapaUnidades.put(
                     participante.getCodigo(),
-                    converterUnidadeParaDto(participante));
+                    processoDetalheMapper.toUnidadeParticipanteDto(participante));
         }
 
         // Preencher dados dos subprocessos
@@ -133,18 +133,5 @@ public class ProcessoDetalheBuilder {
         for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
             unidadeDto.getFilhos().sort(comparator);
         }
-    }
-
-    private ProcessoDetalheDto.UnidadeParticipanteDto converterUnidadeParaDto(Unidade unidade) {
-        ProcessoDetalheDto.UnidadeParticipanteDto dto = new ProcessoDetalheDto.UnidadeParticipanteDto();
-        dto.setCodUnidade(unidade.getCodigo());
-        dto.setNome(unidade.getNome());
-        dto.setSigla(unidade.getSigla());
-
-        @Nullable
-        Unidade unidadeSuperior = unidade.getUnidadeSuperior();
-        dto.setCodUnidadeSuperior(unidadeSuperior  != null ? unidadeSuperior.getCodigo() : null);
-
-        return dto;
     }
 }

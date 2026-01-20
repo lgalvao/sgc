@@ -105,7 +105,7 @@ class SubprocessoFacadeBatchUpdateTest {
         when(competenciaService.buscarPorCodigos(any())).thenReturn(List.of(c1, c2));
 
         // Act
-        facade.salvarAjustesMapa(codSubprocesso, ajustes, "user123");
+        facade.salvarAjustesMapa(codSubprocesso, ajustes);
 
         // Assert
         // Verify batch methods called ONCE

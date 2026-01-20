@@ -2,8 +2,7 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseFacade;
@@ -26,7 +25,6 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
-import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.seguranca.acesso.Acao;
 import sgc.subprocesso.dto.*;
@@ -41,12 +39,9 @@ import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Facade para orquestrar operações de Subprocesso.
@@ -89,9 +84,13 @@ public class SubprocessoFacade {
     private final MapaAjusteMapper mapaAjusteMapper;
     private final sgc.seguranca.acesso.AccessControlService accessControlService;
     
+    // Dependencies for map operations (from SubprocessoMapaService)
     private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     private final sgc.subprocesso.model.SubprocessoMovimentacaoRepo movimentacaoRepo;
     private final sgc.mapa.service.CopiaMapaService copiaMapaService;
+    
+
+    // ===== Operações CRUD =====
 
     @Transactional(readOnly = true)
     public Subprocesso buscarSubprocesso(Long codigo) {
@@ -127,6 +126,8 @@ public class SubprocessoFacade {
     public void excluir(Long codigo) {
         crudService.excluir(codigo);
     }
+
+    // ===== Consultas e Detalhes =====
 
     @Transactional(readOnly = true)
     public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil) {
@@ -237,6 +238,8 @@ public class SubprocessoFacade {
         return calcularPermissoesInterno(subprocesso, usuario);
     }
 
+    // ===== Workflow de Cadastro =====
+
     @Transactional
     public void disponibilizarCadastro(Long codigo, Usuario usuario) {
         workflowService.disponibilizarCadastro(codigo, usuario);
@@ -286,6 +289,8 @@ public class SubprocessoFacade {
     public void homologarCadastroEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
         workflowService.homologarCadastroEmBloco(codUnidades, codProcesso, usuario);
     }
+
+    // ===== Workflow de Mapa =====
 
     @Transactional
     public MapaCompletoDto salvarMapaSubprocesso(Long codigo, SalvarMapaRequest request) {
@@ -372,9 +377,8 @@ public class SubprocessoFacade {
         workflowService.alterarDataLimite(codigo, novaDataLimite);
     }
 
-
     @Transactional
-    public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias, String usuarioTituloEleitoral) {
+    public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias) {
         salvarAjustesMapaInterno(codSubprocesso, competencias);
     }
 
@@ -383,173 +387,13 @@ public class SubprocessoFacade {
         importarAtividadesInterno(codSubprocessoDestino, codSubprocessoOrigem);
     }
 
-    private List<AtividadeVisualizacaoDto> listarAtividadesSubprocessoInterno(Long codSubprocesso) {
-        Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
-        List<Atividade> todasAtividades = atividadeService.buscarPorMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
-        return todasAtividades.stream().map(this::mapAtividadeToDto).toList();
-    }
-
-    private AtividadeVisualizacaoDto mapAtividadeToDto(Atividade atividade) {
-        List<ConhecimentoVisualizacaoDto> conhecimentosDto = atividade.getConhecimentos().stream()
-                .map(c -> ConhecimentoVisualizacaoDto.builder()
-                        .codigo(c.getCodigo())
-                        .descricao(c.getDescricao())
-                        .build())
-                .toList();
-
-        return AtividadeVisualizacaoDto.builder()
-                .codigo(atividade.getCodigo())
-                .descricao(atividade.getDescricao())
-                .conhecimentos(conhecimentosDto)
-                .build();
-    }
-
-    private SubprocessoDetalheDto obterDetalhesInterno(Long codigo, Usuario usuarioAutenticado) {
-        Subprocesso sp = crudService.buscarSubprocesso(codigo);
-        accessControlService.verificarPermissao(usuarioAutenticado, sgc.seguranca.acesso.Acao.VISUALIZAR_SUBPROCESSO, sp);
-
-        Usuario responsavel = unidadeFacade.buscarResponsavelAtual(sp.getUnidade().getSigla());
-        Usuario titular = null;
-        if (sp.getUnidade().getTituloTitular() != null) {
-            try {
-                titular = usuarioService.buscarPorLogin(sp.getUnidade().getTituloTitular());
-            } catch (Exception e) {
-                log.warn("Erro ao buscar titular: {}", e.getMessage());
-            }
-        }
-
-        List<Movimentacao> movimentacoes = repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
-        SubprocessoPermissoesDto permissoes = calcularPermissoesInterno(sp, usuarioAutenticado);
-
-        return subprocessoDetalheMapper.toDto(sp, responsavel, titular, movimentacoes, permissoes);
-    }
-
-    private SubprocessoCadastroDto obterCadastroInterno(Long codSubprocesso) {
-        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos = new ArrayList<>();
-
-        List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
-        for (Atividade a : atividades) {
-            List<ConhecimentoResponse> ksDto = a.getConhecimentos().stream().map(conhecimentoMapper::toResponse).toList();
-            atividadesComConhecimentos.add(SubprocessoCadastroDto.AtividadeCadastroDto.builder()
-                    .codigo(a.getCodigo())
-                    .descricao(a.getDescricao())
-                    .conhecimentos(ksDto)
-                    .build());
-        }
-        return SubprocessoCadastroDto.builder()
-                .subprocessoCodigo(sp.getCodigo())
-                .unidadeSigla(sp.getUnidade().getSigla())
-                .atividades(atividadesComConhecimentos)
-                .build();
-    }
-
-    private SugestoesDto obterSugestoesInterno(Long codSubprocesso) {
-        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        return SugestoesDto.of(sp);
-    }
-
-    private MapaAjusteDto obterMapaParaAjusteInterno(Long codSubprocesso) {
-        Subprocesso sp = crudService.buscarSubprocessoComMapa(codSubprocesso);
-        Long codMapa = sp.getMapa().getCodigo();
-        Analise analise = analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst().orElse(null);
-        List<Competencia> competencias = competenciaService.buscarPorCodMapa(codMapa);
-        List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(codMapa);
-        List<Conhecimento> conhecimentos = conhecimentoService.listarPorMapa(codMapa);
-        Analise analiseVal = analise;
-        return mapaAjusteMapper.toDto(sp, analiseVal, competencias, atividades, conhecimentos);
-    }
-
-    private SubprocessoPermissoesDto obterPermissoesInterno(Long codSubprocesso, Usuario usuario) {
-        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        return calcularPermissoesInterno(sp, usuario);
-    }
-
-    private SubprocessoPermissoesDto calcularPermissoesInterno(Subprocesso sp, Usuario usuario) {
-        @NonNull
-        Processo processo = sp.getProcesso();
-        boolean isRevisao = processo.getTipo() == TipoProcesso.REVISAO;
-        
-        Acao acaoDisponibilizarCadastro = isRevisao 
-                ? Acao.DISPONIBILIZAR_REVISAO_CADASTRO 
-                : Acao.DISPONIBILIZAR_CADASTRO;
-        
-        Acao acaoDevolverCadastro = isRevisao 
-                ? Acao.DEVOLVER_REVISAO_CADASTRO 
-                : Acao.DEVOLVER_CADASTRO;
-        
-        Acao acaoAceitarCadastro = isRevisao 
-                ? Acao.ACEITAR_REVISAO_CADASTRO 
-                : Acao.ACEITAR_CADASTRO;
-        
-        return SubprocessoPermissoesDto.builder()
-                .podeVerPagina(podeExecutar(usuario, Acao.VISUALIZAR_SUBPROCESSO, sp))
-                .podeEditarMapa(podeExecutar(usuario, Acao.EDITAR_MAPA, sp))
-                .podeVisualizarMapa(podeExecutar(usuario, Acao.VISUALIZAR_MAPA, sp))
-                .podeDisponibilizarMapa(podeExecutar(usuario, Acao.DISPONIBILIZAR_MAPA, sp))
-                .podeDisponibilizarCadastro(podeExecutar(usuario, acaoDisponibilizarCadastro, sp))
-                .podeDevolverCadastro(podeExecutar(usuario, acaoDevolverCadastro, sp))
-                .podeAceitarCadastro(podeExecutar(usuario, acaoAceitarCadastro, sp))
-                .podeVisualizarDiagnostico(podeExecutar(usuario, Acao.VISUALIZAR_DIAGNOSTICO, sp))
-                .podeAlterarDataLimite(podeExecutar(usuario, Acao.ALTERAR_DATA_LIMITE, sp))
-                .podeVisualizarImpacto(podeExecutar(usuario, Acao.VERIFICAR_IMPACTOS, sp))
-                .podeRealizarAutoavaliacao(podeExecutar(usuario, Acao.REALIZAR_AUTOAVALIACAO, sp))
-                .podeReabrirCadastro(podeExecutar(usuario, Acao.REABRIR_CADASTRO, sp))
-                .podeReabrirRevisao(podeExecutar(usuario, Acao.REABRIR_REVISAO, sp))
-                .podeEnviarLembrete(podeExecutar(usuario, Acao.ENVIAR_LEMBRETE_PROCESSO, sp))
-                .build();
-    }
-
-    private boolean podeExecutar(Usuario usuario, Acao acao, Subprocesso subprocesso) {
-        return accessControlService.podeExecutar(usuario, acao, subprocesso);
-    }
-
-    private ContextoEdicaoDto obterContextoEdicaoInterno(Long codSubprocesso) {
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
-        SubprocessoDetalheDto subprocessoDto = obterDetalhesInterno(codSubprocesso, usuario);
-        String siglaUnidade = subprocessoDto.getUnidade().getSigla();
-        Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
-        UnidadeDto unidadeDto = unidadeFacade.buscarPorSigla(siglaUnidade);
-
-        MapaCompletoDto mapaDto = mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
-
-        List<AtividadeVisualizacaoDto> atividades = listarAtividadesSubprocessoInterno(codSubprocesso);
-        return ContextoEdicaoDto.builder()
-                .unidade(unidadeDto)
-                .subprocesso(subprocessoDto)
-                .mapa(mapaDto)
-                .atividadesDisponiveis(atividades)
-                .build();
-    }
-
-    private void salvarAjustesMapaInterno(
-            Long codSubprocesso,
-            List<CompetenciaAjusteDto> competencias) {
-
-        Subprocesso sp = subprocessoRepo
-                .findById(codSubprocesso)
-                .orElseThrow(() ->
-                        new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
+    private void salvarAjustesMapaInterno(Long codSubprocesso, List<CompetenciaAjusteDto> competencias) {
+        Subprocesso sp = subprocessoRepo.findById(codSubprocesso)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
         validarSituacaoParaAjuste(sp);
-
-        log.info("Salvando ajustes para o mapa do subprocesso {}...", codSubprocesso);
-
-        java.util.Map<Long, String> atividadeDescricoes = extrairDescricoesAtividades(competencias);
-        List<Long> competenciaIds = competencias.stream()
-                .map(CompetenciaAjusteDto::getCodCompetencia)
-                .toList();
-
-        List<Atividade> atividadesAtualizadas = atividadeService.atualizarDescricoesEmLote(atividadeDescricoes);
-        Map<Long, Atividade> mapaAtividades = atividadesAtualizadas.stream()
-                .collect(Collectors.toMap(Atividade::getCodigo, Function.identity()));
-
-        List<Competencia> entidadesCompetencias = competenciaService.buscarPorCodigos(competenciaIds);
-        Map<Long, Competencia> mapaCompetencias = entidadesCompetencias.stream()
-                .collect(Collectors.toMap(Competencia::getCodigo, Function.identity()));
-
-        atualizarCompetencias(competencias, mapaCompetencias, mapaAtividades);
-        competenciaService.salvarTodas(entidadesCompetencias);
+        atualizarDescricoesAtividades(competencias);
+        atualizarCompetenciasEAssociacoes(competencias);
 
         sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         subprocessoRepo.save(sp);
@@ -558,43 +402,58 @@ public class SubprocessoFacade {
     private void validarSituacaoParaAjuste(Subprocesso sp) {
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
                 && sp.getSituacao() != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {
-
             throw new sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida(
                     "Ajustes no mapa só podem ser feitos em estados específicos. "
                             + "Situação atual: %s".formatted(sp.getSituacao()));
         }
     }
 
-    private Map<Long, String> extrairDescricoesAtividades(List<CompetenciaAjusteDto> competencias) {
-        Map<Long, String> descricoes = new HashMap<>();
+    private void atualizarDescricoesAtividades(List<CompetenciaAjusteDto> competencias) {
+        java.util.Map<Long, String> atividadeDescricoes = new java.util.HashMap<>();
         for (CompetenciaAjusteDto compDto : competencias) {
-            var atividades = Objects.requireNonNullElse(compDto.getAtividades(), List.<AtividadeAjusteDto>of());
-            for (AtividadeAjusteDto ativDto : atividades) {
-                descricoes.put(ativDto.getCodAtividade(), ativDto.getNome());
+            for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
+                atividadeDescricoes.put(ativDto.getCodAtividade(), ativDto.getNome());
             }
         }
-        return descricoes;
+        if (!atividadeDescricoes.isEmpty()) {
+            atividadeService.atualizarDescricoesEmLote(atividadeDescricoes);
+        }
     }
 
-    private void atualizarCompetencias(
-           List<CompetenciaAjusteDto> competencias,
-            Map<Long, Competencia> mapaCompetencias,
-            Map<Long, Atividade> mapaAtividades) {
+    private void atualizarCompetenciasEAssociacoes(List<CompetenciaAjusteDto> competencias) {
+        // Carregar todas as competências envolvidas
+        List<Long> competenciaIds = competencias.stream()
+                .map(CompetenciaAjusteDto::getCodCompetencia)
+                .toList();
+        
+        java.util.Map<Long, Competencia> mapaCompetencias = competenciaService.buscarPorCodigos(competenciaIds).stream()
+                .collect(java.util.stream.Collectors.toMap(Competencia::getCodigo, java.util.function.Function.identity()));
 
+        List<Long> todasAtividadesIds = competencias.stream()
+                .flatMap(c -> c.getAtividades().stream())
+                .map(AtividadeAjusteDto::getCodAtividade)
+                .distinct()
+                .toList();
+
+        java.util.Map<Long, Atividade> mapaAtividades = atividadeService.buscarPorCodigos(todasAtividadesIds).stream()
+                .collect(java.util.stream.Collectors.toMap(Atividade::getCodigo, java.util.function.Function.identity()));
+
+        List<Competencia> competenciasParaSalvar = new ArrayList<>();
         for (CompetenciaAjusteDto compDto : competencias) {
             Competencia competencia = mapaCompetencias.get(compDto.getCodCompetencia());
-            if (competencia == null) continue;
-
-            competencia.setDescricao(compDto.getNome());
-
-            var atividadesDto = Objects.requireNonNullElse(compDto.getAtividades(), java.util.List.<AtividadeAjusteDto>of());
-            java.util.Set<Atividade> atividades = new java.util.HashSet<>();
-            for (AtividadeAjusteDto ativDto : atividadesDto) {
-                Atividade atividade = mapaAtividades.get(ativDto.getCodAtividade());
-                if (atividade != null) atividades.add(atividade);
+            if (competencia != null) {
+                competencia.setDescricao(compDto.getNome());
+                
+                Set<Atividade> atividadesSet = new HashSet<>();
+                for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
+                    Atividade ativ = mapaAtividades.get(ativDto.getCodAtividade());
+                    atividadesSet.add(ativ);
+                }
+                competencia.setAtividades(atividadesSet);
+                competenciasParaSalvar.add(competencia);
             }
-            competencia.setAtividades(atividades);
         }
+        competenciaService.salvarTodas(competenciasParaSalvar);
     }
 
     private void importarAtividadesInterno(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
@@ -625,7 +484,7 @@ public class SubprocessoFacade {
             switch (tipoProcesso) {
                 case MAPEAMENTO -> spDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
                 case REVISAO -> spDestino.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-                case null, default -> log.debug("Tipo de processo não requer mudança de situação");
+                default -> log.debug("Tipo de processo {} não requer atualização automática de situação no import.", tipoProcesso);
             }
             subprocessoRepo.save(spDestino);
         }
@@ -644,5 +503,141 @@ public class SubprocessoFacade {
         );
 
         log.info("Atividades importadas do subprocesso {} para {}", codSubprocessoOrigem, codSubprocessoDestino);
+    }
+    private boolean podeExecutar(Usuario usuario, sgc.seguranca.acesso.Acao acao, Subprocesso subprocesso) {
+        return accessControlService.podeExecutar(usuario, acao, subprocesso);
+    }
+
+    private List<AtividadeVisualizacaoDto> listarAtividadesSubprocessoInterno(Long codSubprocesso) {
+        Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
+        List<Atividade> todasAtividades = atividadeService.buscarPorMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
+        return todasAtividades.stream().map(this::mapAtividadeToDto).toList();
+    }
+
+    private AtividadeVisualizacaoDto mapAtividadeToDto(Atividade atividade) {
+        List<ConhecimentoVisualizacaoDto> conhecimentosDto = atividade.getConhecimentos().stream()
+                .map(c -> ConhecimentoVisualizacaoDto.builder()
+                        .codigo(c.getCodigo())
+                        .descricao(c.getDescricao())
+                        .build())
+                .toList();
+
+        return AtividadeVisualizacaoDto.builder()
+                .codigo(atividade.getCodigo())
+                .descricao(atividade.getDescricao())
+                .conhecimentos(conhecimentosDto)
+                .build();
+    }
+
+    private SubprocessoDetalheDto obterDetalhesInterno(Long codigo, Usuario usuarioAutenticado) {
+        Subprocesso sp = crudService.buscarSubprocesso(codigo);
+        accessControlService.verificarPermissao(usuarioAutenticado, sgc.seguranca.acesso.Acao.VISUALIZAR_SUBPROCESSO, sp);
+
+        Usuario responsavel = usuarioService.buscarResponsavelAtual(sp.getUnidade().getSigla());
+        Usuario titular = null;
+        if (sp.getUnidade().getTituloTitular() != null) {
+            try {
+                titular = usuarioService.buscarPorLogin(sp.getUnidade().getTituloTitular());
+            } catch (Exception e) {
+                log.warn("Erro ao buscar titular: {}", e.getMessage());
+            }
+        }
+
+        List<Movimentacao> movimentacoes = repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        SubprocessoPermissoesDto permissoes = calcularPermissoesInterno(sp, usuarioAutenticado);
+
+        return subprocessoDetalheMapper.toDto(sp, responsavel, titular, movimentacoes, permissoes);
+    }
+
+    private SubprocessoCadastroDto obterCadastroInterno(Long codSubprocesso) {
+        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
+        List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos = new ArrayList<>();
+        List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
+        for (Atividade a : atividades) {
+            List<ConhecimentoResponse> ksDto = a.getConhecimentos().stream().map(conhecimentoMapper::toResponse).toList();
+            atividadesComConhecimentos.add(SubprocessoCadastroDto.AtividadeCadastroDto.builder()
+                    .codigo(a.getCodigo())
+                    .descricao(a.getDescricao())
+                    .conhecimentos(ksDto)
+                    .build());
+        }
+        return SubprocessoCadastroDto.builder()
+                .subprocessoCodigo(sp.getCodigo())
+                .unidadeSigla(sp.getUnidade().getSigla())
+                .atividades(atividadesComConhecimentos)
+                .build();
+    }
+
+    private SugestoesDto obterSugestoesInterno(Long codSubprocesso) {
+        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
+        return SugestoesDto.of(sp);
+    }
+
+    private MapaAjusteDto obterMapaParaAjusteInterno(Long codSubprocesso) {
+        Subprocesso sp = crudService.buscarSubprocessoComMapa(codSubprocesso);
+        Long codMapa = sp.getMapa().getCodigo();
+        Analise analise = analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst().orElse(null);
+        List<Competencia> competencias = competenciaService.buscarPorCodMapa(codMapa);
+        List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(codMapa);
+        List<Conhecimento> conhecimentos = conhecimentoService.listarPorMapa(codMapa);
+        @Nullable Analise analiseVal = analise;
+        return mapaAjusteMapper.toDto(sp, analiseVal, competencias, atividades, conhecimentos);
+    }
+
+    private SubprocessoPermissoesDto obterPermissoesInterno(Long codSubprocesso, Usuario usuario) {
+        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
+        return calcularPermissoesInterno(sp, usuario);
+    }
+
+    private SubprocessoPermissoesDto calcularPermissoesInterno(Subprocesso subprocesso, Usuario usuario) {
+        boolean isRevisao = subprocesso.getProcesso().getTipo() == TipoProcesso.REVISAO;
+        
+        Acao acaoDisponibilizarCadastro = isRevisao 
+                ? Acao.DISPONIBILIZAR_REVISAO_CADASTRO 
+                : Acao.DISPONIBILIZAR_CADASTRO;
+        
+        Acao acaoDevolverCadastro = isRevisao 
+                ? Acao.DEVOLVER_REVISAO_CADASTRO 
+                : Acao.DEVOLVER_CADASTRO;
+        
+        Acao acaoAceitarCadastro = isRevisao 
+                ? Acao.ACEITAR_REVISAO_CADASTRO 
+                : Acao.ACEITAR_CADASTRO;
+        
+        return SubprocessoPermissoesDto.builder()
+                .podeVerPagina(podeExecutar(usuario, Acao.VISUALIZAR_SUBPROCESSO, subprocesso))
+                .podeEditarMapa(podeExecutar(usuario, Acao.EDITAR_MAPA, subprocesso))
+                .podeVisualizarMapa(podeExecutar(usuario, Acao.VISUALIZAR_MAPA, subprocesso))
+                .podeDisponibilizarMapa(podeExecutar(usuario, Acao.DISPONIBILIZAR_MAPA, subprocesso))
+                .podeDisponibilizarCadastro(podeExecutar(usuario, acaoDisponibilizarCadastro, subprocesso))
+                .podeDevolverCadastro(podeExecutar(usuario, acaoDevolverCadastro, subprocesso))
+                .podeAceitarCadastro(podeExecutar(usuario, acaoAceitarCadastro, subprocesso))
+                .podeVisualizarDiagnostico(podeExecutar(usuario, Acao.VISUALIZAR_DIAGNOSTICO, subprocesso))
+                .podeAlterarDataLimite(podeExecutar(usuario, Acao.ALTERAR_DATA_LIMITE, subprocesso))
+                .podeVisualizarImpacto(podeExecutar(usuario, Acao.VERIFICAR_IMPACTOS, subprocesso))
+                .podeRealizarAutoavaliacao(podeExecutar(usuario, Acao.REALIZAR_AUTOAVALIACAO, subprocesso))
+                .podeReabrirCadastro(podeExecutar(usuario, Acao.REABRIR_CADASTRO, subprocesso))
+                .podeReabrirRevisao(podeExecutar(usuario, Acao.REABRIR_REVISAO, subprocesso))
+                .podeEnviarLembrete(podeExecutar(usuario, Acao.ENVIAR_LEMBRETE_PROCESSO, subprocesso))
+                .build();
+    }
+
+    private ContextoEdicaoDto obterContextoEdicaoInterno(Long codSubprocesso) {
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        SubprocessoDetalheDto subprocessoDto = obterDetalhesInterno(codSubprocesso, usuario);
+
+        String sigla = subprocessoDto.getUnidade().getSigla();
+        Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
+        UnidadeDto unidadeDto = unidadeFacade.buscarPorSigla(sigla);
+
+        MapaCompletoDto mapaDto = mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
+        List<AtividadeVisualizacaoDto> atividades = listarAtividadesSubprocessoInterno(codSubprocesso);
+
+        return ContextoEdicaoDto.builder()
+                .unidade(unidadeDto)
+                .subprocesso(subprocessoDto)
+                .mapa(mapaDto)
+                .atividadesDisponiveis(atividades)
+                .build();
     }
 }

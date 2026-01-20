@@ -18,7 +18,7 @@ import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.service.ProcessoFacade;
-import org.jspecify.annotations.Nullable;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,26 +45,26 @@ public class PainelFacade {
      * @param codigoUnidade O código da unidade do usuário (necessário para perfis não-ADMIN).
      * @param pageable      As informações de paginação.
      * @return Uma página {@link Page} de {@link ProcessoResumoDto}.
+     * @throws IllegalArgumentException se o perfil for nulo or em branco.
      */
     public Page<ProcessoResumoDto> listarProcessos(Perfil perfil, Long codigoUnidade, Pageable pageable) {
-        Pageable sortedPageable = pageable.isPaged() ? garantirOrdenacaoPadrao(pageable) : pageable;
+        Pageable sortedPageable = garantirOrdenacaoPadrao(pageable);
         Page<Processo> processos;
 
         if (perfil == Perfil.ADMIN) {
             processos = processoFacade.listarTodos(sortedPageable);
         } else {
-            List<Long> unidadeIds = new ArrayList<>();
-            
+            List<Long> codigosUnidades = new ArrayList<>();
             // GESTOR vê processos da unidade e subordinadas
             if (perfil == Perfil.GESTOR) {
-                unidadeIds.addAll(unidadeService.buscarIdsDescendentes(codigoUnidade));
+                codigosUnidades.addAll(unidadeService.buscarIdsDescendentes(codigoUnidade));
             }
-            
-            // Todos os perfis veem processos da própria unidade
-            unidadeIds.add(codigoUnidade);
-            processos = processoFacade.listarPorParticipantesIgnorandoCriado(unidadeIds, sortedPageable);
+            // Os demais perfis veem apenas processos da própria unidade
+            codigosUnidades.add(codigoUnidade);
+
+            processos = processoFacade.listarPorParticipantesIgnorandoCriado(codigosUnidades, sortedPageable);
         }
-        return processos != null ? processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade)) : Page.empty();
+        return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade));
     }
 
     private Pageable garantirOrdenacaoPadrao(Pageable pageable) {
@@ -79,6 +79,9 @@ public class PainelFacade {
 
     /**
      * Lista alertas com base no usuário ou na unidade.
+     *
+     * <p>A busca prioriza o título do usuário. Se não for fornecido, busca pela unidade e suas
+     * subordinadas. Se nenhum dos dois for fornecido, retorna todos os alertas.
      *
      * @param usuarioTitulo Título de eleitor do usuário.
      * @param codigoUnidade Código da unidade.
@@ -95,8 +98,10 @@ public class PainelFacade {
                     Sort.by(Sort.Direction.DESC, "dataHora"));
         }
 
+        Page<Alerta> alertasPage;
+
         // Alertas são filtrados pela unidade do usuário (sem subordinadas)
-        Page<Alerta> alertasPage = alertaService.listarPorUnidade(codigoUnidade, sortedPageable);
+        alertasPage = alertaService.listarPorUnidade(codigoUnidade, sortedPageable);
 
         return alertasPage.map(
                 alerta -> {
@@ -129,12 +134,14 @@ public class PainelFacade {
     }
 
     private String formatarUnidadesParticipantes(Set<Unidade> participantes) {
+        if (participantes.isEmpty()) return "";
+
         Map<Long, Unidade> participantesPorCodigo =
                 participantes.stream().collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
 
         Set<Long> participantesIds = participantesPorCodigo.keySet();
-        Set<Long> unidadesVisiveis = selecionarIdsVisiveis(participantesIds, participantesPorCodigo);
 
+        Set<Long> unidadesVisiveis = selecionarIdsVisiveis(participantesIds, participantesPorCodigo);
         return unidadesVisiveis.stream()
                 .map(participantesPorCodigo::get)
                 .map(Unidade::getSigla)
@@ -147,20 +154,21 @@ public class PainelFacade {
         for (Long unidadeId : participantesIds) {
             Unidade unidade = participantesPorCodigo.get(unidadeId);
             Long candidato = encontrarMaiorIdVisivel(unidade, participantesIds);
-
-            if (candidato != null) visiveis.add(candidato);
+            visiveis.add(candidato);
         }
         return visiveis;
     }
 
-    @Nullable
-    private Long encontrarMaiorIdVisivel(@org.jspecify.annotations.Nullable Unidade unidade, Set<Long> participantesIds) {
-        if (unidade == null || !participantesIds.contains(unidade.getCodigo())) return null;
+    private Long encontrarMaiorIdVisivel(Unidade unidade, Set<Long> participantesIds) {
         Unidade atual = unidade;
         while (true) {
-            if (!todasSubordinadasParticipam(atual.getCodigo(), participantesIds)) return atual.getCodigo();
+            if (!todasSubordinadasParticipam(atual.getCodigo(), participantesIds)) {
+                return atual.getCodigo();
+            }
             Unidade superior = atual.getUnidadeSuperior();
-            if (superior == null || !participantesIds.contains(superior.getCodigo())) return atual.getCodigo();
+            if (superior == null || !participantesIds.contains(superior.getCodigo())) {
+                return atual.getCodigo();
+            }
             atual = superior;
         }
     }
@@ -173,30 +181,32 @@ public class PainelFacade {
     }
 
     private String calcularLinkDestinoProcesso(Processo processo, Perfil perfil, Long codigoUnidade) {
-        if (perfil == Perfil.ADMIN && processo.getSituacao() == SituacaoProcesso.CRIADO) {
-            return String.format("/processo/cadastro?codProcesso=%s", processo.getCodigo());
-        }
-
-        if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) {
-            return "/processo/" + processo.getCodigo();
-        }
-        
         try {
+            if (perfil == Perfil.ADMIN && processo.getSituacao() == SituacaoProcesso.CRIADO) {
+                return String.format("/processo/cadastro?codProcesso=%s", processo.getCodigo());
+            }
+            if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) {
+                return "/processo/" + processo.getCodigo();
+            }
+            if (codigoUnidade == null) {
+                return null;
+            }
             var unidade = unidadeService.buscarPorCodigo(codigoUnidade);
-            return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
+            return String.format("/processo/%s/%s", processo.getCodigo(), (unidade != null) ? unidade.getSigla() : "null");
         } catch (Exception e) {
-            return "/processo/" + processo.getCodigo();
+            log.warn("Erro ao calcular link de destino para o processo {}: {}", processo.getCodigo(), e.getMessage());
+            return null;
         }
     }
 
     private AlertaDto paraAlertaDto(Alerta alerta, LocalDateTime dataHoraLeitura) {
         return AlertaDto.builder()
                 .codigo(alerta.getCodigo())
-                .codProcesso(alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null)
+                .codProcesso(alerta.getProcesso().getCodigo())
                 .descricao(alerta.getDescricao())
                 .dataHora(alerta.getDataHora())
-                .unidadeOrigem(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getSigla() : null)
-                .unidadeDestino(alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getSigla() : null)
+                .unidadeOrigem(alerta.getUnidadeOrigem().getSigla())
+                .unidadeDestino(alerta.getUnidadeDestino().getSigla())
                 .dataHoraLeitura(dataHoraLeitura)
                 .build();
     }

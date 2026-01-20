@@ -33,7 +33,8 @@ backend/bin/
 .DS_Store
 /.vscode/
 /frontend/bin/
-
+/backend/.apt_generated/
+/backend/.apt_generated_tests
 # Privacidade/segurança 
 .env.hom
 /dados/
@@ -49,4 +50,6 @@ backend/bin/
 test-results/
 playwright-report/
 .playwright/
+screenshots/
+e2e/server.log
 

@@ -19,7 +19,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@AttributeOverrides({@AttributeOverride(name = "codigo", column = @Column(name = "codigo"))})
+@AttributeOverride(name = "codigo", column = @Column(name = "codigo"))
 public class Processo extends EntidadeBase {
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
@@ -43,6 +43,13 @@ public class Processo extends EntidadeBase {
             inverseJoinColumns = @JoinColumn(name = "unidade_codigo"))
     @BatchSize(size = 50)
     private Set<Unidade> participantes = new HashSet<>();
+
+    public Set<Unidade> getParticipantes() {
+        if (participantes == null) {
+            participantes = new HashSet<>();
+        }
+        return participantes;
+    }
 
     public Processo(
             Long codigo,

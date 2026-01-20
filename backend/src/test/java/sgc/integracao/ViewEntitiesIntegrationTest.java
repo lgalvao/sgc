@@ -116,7 +116,7 @@ class ViewEntitiesIntegrationTest extends BaseIntegrationTest {
         // Act & Assert
         List<UsuarioPerfil> perfis = usuarioPerfilRepo.findByUsuarioTitulo(uniqueId);
         assertThat(perfis).hasSize(1);
-        assertThat(perfis.get(0).getPerfil()).isEqualTo(Perfil.GESTOR);
-        assertThat(perfis.get(0).getUnidade().getCodigo()).isEqualTo(unidadeId);
+        assertThat(perfis.getFirst().getPerfil()).isEqualTo(Perfil.GESTOR);
+        assertThat(perfis.getFirst().getUnidade().getCodigo()).isEqualTo(unidadeId);
     }
 }

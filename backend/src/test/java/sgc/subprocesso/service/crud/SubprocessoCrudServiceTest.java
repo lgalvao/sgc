@@ -10,9 +10,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.RepositorioComum;
+import sgc.organizacao.UsuarioFacade;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UsuarioFacade;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -35,7 +35,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes para SubprocessoCrudService")
 class SubprocessoCrudServiceTest {
-
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
     @Mock
@@ -60,7 +59,7 @@ class SubprocessoCrudServiceTest {
         Subprocesso entity = new Subprocesso();
         when(repositorioSubprocesso.save(any())).thenReturn(entity);
         when(mapaFacade.salvar(any())).thenReturn(new Mapa());
-        when(subprocessoMapper.toDTO(any())).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(any())).thenReturn(responseDto);
 
         assertThat(service.criar(request)).isNotNull();
     }
@@ -117,7 +116,17 @@ class SubprocessoCrudServiceTest {
         assertThat(status.situacaoLabel()).isEqualTo("NAO_INICIADO");
     }
 
+    @Test
+    @DisplayName("Deve obter status com label nulo se situação for nula")
+    void deveObterStatusComLabelNulo() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        sp.setSituacao(null);
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
+        SubprocessoSituacaoDto status = service.obterStatus(1L);
+        assertThat(status.situacaoLabel()).isNull();
+    }
 
     @Test
     @DisplayName("Deve obter entidade por código do mapa")
@@ -146,7 +155,7 @@ class SubprocessoCrudServiceTest {
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(repositorioSubprocesso.save(sp)).thenReturn(sp);
-        when(subprocessoMapper.toDTO(sp)).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
         SubprocessoDto resultado = service.atualizar(1L, request);
         assertThat(resultado).isNotNull();
@@ -162,7 +171,7 @@ class SubprocessoCrudServiceTest {
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(repositorioSubprocesso.save(sp)).thenReturn(sp);
-        when(subprocessoMapper.toDTO(sp)).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
         SubprocessoDto resultado = service.atualizar(1L, request);
         assertThat(resultado).isNotNull();
@@ -201,7 +210,7 @@ class SubprocessoCrudServiceTest {
     @DisplayName("Deve listar todos os subprocessos")
     void deveListarTodos() {
         when(repositorioSubprocesso.findAllComFetch()).thenReturn(List.of(new Subprocesso()));
-        when(subprocessoMapper.toDTO(any())).thenReturn(SubprocessoDto.builder().build());
+        when(subprocessoMapper.toDto(any())).thenReturn(SubprocessoDto.builder().build());
 
         assertThat(service.listar()).hasSize(1);
     }
@@ -211,7 +220,7 @@ class SubprocessoCrudServiceTest {
     void deveObterPorProcessoEUnidade() {
         Subprocesso sp = new Subprocesso();
         when(repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(1L, 2L)).thenReturn(Optional.of(sp));
-        when(subprocessoMapper.toDTO(sp)).thenReturn(SubprocessoDto.builder().build());
+        when(subprocessoMapper.toDto(sp)).thenReturn(SubprocessoDto.builder().build());
 
         assertThat(service.obterPorProcessoEUnidade(1L, 2L)).isNotNull();
     }
@@ -248,7 +257,7 @@ class SubprocessoCrudServiceTest {
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(repositorioSubprocesso.save(sp)).thenReturn(sp);
-        when(subprocessoMapper.toDTO(sp)).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
         service.atualizar(1L, request);
 
@@ -266,14 +275,29 @@ class SubprocessoCrudServiceTest {
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(repositorioSubprocesso.save(sp)).thenReturn(sp);
-        when(subprocessoMapper.toDTO(sp)).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
         service.atualizar(1L, request);
 
         verify(eventPublisher, org.mockito.Mockito.never()).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoAtualizado.class));
     }
 
+    @Test
+    @DisplayName("Deve criar subprocesso publicando evento com relacionamentos nulos")
+    void deveCriarComRelacionamentosNulos() {
+        CriarSubprocessoRequest request = CriarSubprocessoRequest.builder().codProcesso(1L).codUnidade(1L).build();
+        SubprocessoDto responseDto = SubprocessoDto.builder().build();
+        Subprocesso entity = new Subprocesso();
+        // entity.setProcesso(null); entity.setUnidade(null); por padrão
 
+        when(repositorioSubprocesso.save(any())).thenReturn(entity);
+        when(mapaFacade.salvar(any())).thenReturn(new Mapa());
+        when(subprocessoMapper.toDto(any())).thenReturn(responseDto);
+
+        service.criar(request);
+
+        verify(eventPublisher).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoCriado.class));
+    }
 
     @Test
     @DisplayName("Deve criar subprocesso publicando evento com relacionamentos presentes")
@@ -292,14 +316,25 @@ class SubprocessoCrudServiceTest {
 
         when(repositorioSubprocesso.save(any())).thenReturn(entity);
         when(mapaFacade.salvar(any())).thenReturn(new Mapa());
-        when(subprocessoMapper.toDTO(any())).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(any())).thenReturn(responseDto);
 
         service.criar(request);
 
         verify(eventPublisher).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoCriado.class));
     }
 
+    @Test
+    @DisplayName("Deve excluir subprocesso publicando evento com relacionamentos nulos")
+    void deveExcluirComRelacionamentosNulos() {
+        Subprocesso sp = new Subprocesso();
+        // Relacionamentos nulos por padrão
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
+        service.excluir(1L);
+
+        verify(eventPublisher).publishEvent(any(sgc.subprocesso.eventos.EventoSubprocessoExcluido.class));
+        verify(repositorioSubprocesso).deleteById(1L);
+    }
 
     @Test
     @DisplayName("Deve excluir subprocesso publicando evento com relacionamentos presentes")
@@ -339,7 +374,7 @@ class SubprocessoCrudServiceTest {
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(repositorioSubprocesso.save(sp)).thenReturn(sp);
-        when(subprocessoMapper.toDTO(sp)).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
         service.atualizar(1L, request);
 
@@ -361,7 +396,7 @@ class SubprocessoCrudServiceTest {
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(repositorioSubprocesso.save(sp)).thenReturn(sp);
-        when(subprocessoMapper.toDTO(sp)).thenReturn(responseDto);
+        when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
         service.atualizar(1L, request);
 

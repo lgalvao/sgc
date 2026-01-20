@@ -40,7 +40,7 @@ export function useProcessoCleanup() {
         limpar: async (request: APIRequestContext) => {
             for (const codigo of processosParaLimpar) {
                 try {
-                    await request.post(`http://localhost:10000/e2e/processo/${codigo}/limpar`);
+                    await request.post(`/e2e/processo/${codigo}/limpar`);
                 } catch (error) {
                     console.warn(`Falha ao limpar processo ${codigo}:`, error);
                 }
@@ -67,7 +67,7 @@ export function useProcessoCleanup() {
  * ```
  */
 export async function resetDatabase(request: APIRequestContext): Promise<void> {
-    const response = await request.post('http://localhost:10000/e2e/reset-database');
+    const response = await request.post('/e2e/reset-database');
 
     if (!response.ok()) {
         throw new Error(`Falha ao resetar banco de dados: ${response.status()} ${response.statusText()}`);

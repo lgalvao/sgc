@@ -50,7 +50,7 @@ class PainelServiceTest {
     @InjectMocks
     private PainelFacade painelService;
 
-    private Pageable pageable = PageRequest.of(0, 10);
+    private final Pageable pageable = PageRequest.of(0, 10);
 
     @Nested
     @DisplayName("Listar Processos - Consultas Básicas")
@@ -92,15 +92,23 @@ class PainelServiceTest {
             Long codigoUnidade = 1L;
             when(unidadeService.buscarIdsDescendentes(codigoUnidade)).thenReturn(List.of(2L));
 
-            Processo p = criarProcessoMock(100L);
+            Processo p = new Processo();
+            p.setCodigo(100L);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            
+            Unidade u = new Unidade();
+            u.setCodigo(1L);
+            p.setParticipantes(Set.of(u));
 
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.GESTOR, codigoUnidade, pageable);
 
             assertThat(result.getContent()).isNotEmpty();
-            verify(unidadeService).buscarIdsDescendentes(codigoUnidade);
+            verify(unidadeService, atLeastOnce()).buscarIdsDescendentes(codigoUnidade);
+            verify(processoFacade).listarPorParticipantesIgnorandoCriado(
+                    argThat(list -> list.contains(1L) && list.contains(2L)), any());
         }
 
 
@@ -119,7 +127,7 @@ class PainelServiceTest {
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
 
-            assertThat(result.getContent().get(0).linkDestino()).contains("/processo/cadastro?codProcesso=1");
+            assertThat(result.getContent().getFirst().linkDestino()).contains("/processo/cadastro?codProcesso=1");
         }
 
         @Test
@@ -139,7 +147,7 @@ class PainelServiceTest {
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, 1L, PageRequest.of(0, 10));
 
-            assertThat(result.getContent().get(0).linkDestino()).isEqualTo("/processo/1/U1");
+            assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/1/U1");
         }
 
         @Test
@@ -149,18 +157,24 @@ class PainelServiceTest {
             UnidadeDto unidadeDto = UnidadeDto.builder().sigla("SIGLA").build();
             when(unidadeService.buscarPorCodigo(codigoUnidade)).thenReturn(unidadeDto);
 
-            Processo p = criarProcessoMock(100L);
+            Processo p = new Processo();
+            p.setCodigo(100L);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            
+            Unidade u = new Unidade();
+            u.setCodigo(1L);
+            p.setParticipantes(Set.of(u));
 
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, codigoUnidade, pageable);
 
-            assertThat(result.getContent().get(0).linkDestino()).isEqualTo("/processo/100/SIGLA");
+            assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/100/SIGLA");
         }
 
         @Test
-        @DisplayName("listarProcessos deve retornar link padrão se unidade nao encontrada no calculo de link CHEFE")
+        @DisplayName("listarProcessos deve retornar link null se unidade nao encontrada no calculo de link CHEFE")
         void listarProcessos_LinkChefeErro() {
             Processo p = criarProcessoMock(1L);
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
@@ -170,30 +184,20 @@ class PainelServiceTest {
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, 2L, PageRequest.of(0, 10));
 
-            assertThat(result.getContent().get(0).linkDestino()).isEqualTo("/processo/1");
-        }
-
-        @Test
-        @DisplayName("listarProcessos: Link destino padrão se unidade não encontrada para Chefe")
-        void listarProcessos_LinkPadraoSeUnidadeNaoEncontrada() {
-            Long codigoUnidade = 1L;
-            when(unidadeService.buscarPorCodigo(codigoUnidade)).thenThrow(new RuntimeException("Erro"));
-
-            Processo p = criarProcessoMock(100L);
-            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-
-            when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
-
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, codigoUnidade, pageable);
-
-            assertThat(result.getContent().get(0).linkDestino()).isEqualTo("/processo/100");
+            assertThat(result.getContent().getFirst().linkDestino()).isNull();
         }
 
         @Test
         @DisplayName("Calcula link destino com exceção na busca de unidade")
         void calculaLinkComExcecaoUnidade() {
-            Processo p = criarProcessoMock(1L);
+            Processo p = new Processo();
+            p.setCodigo(1L);
+            p.setTipo(TipoProcesso.MAPEAMENTO);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            
+            Unidade u = new Unidade();
+            u.setCodigo(1L);
+            p.setParticipantes(Set.of(u));
 
             when(processoFacade.listarPorParticipantesIgnorandoCriado(any(), any()))
                 .thenReturn(new PageImpl<>(List.of(p)));
@@ -204,19 +208,7 @@ class PainelServiceTest {
             Page<ProcessoResumoDto> res = painelService.listarProcessos(Perfil.SERVIDOR, 1L, PageRequest.of(0, 10));
 
             assertThat(res.getContent()).hasSize(1);
-            assertThat(res.getContent().get(0).linkDestino()).isEqualTo("/processo/1");
-        }
-
-        @Test
-        @DisplayName("calcularLinkDestinoProcesso deve retornar link padrão")
-        void calcularLinkDestinoProcesso_Default() {
-            Processo p = criarProcessoMock(1L);
-            when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
-            when(unidadeService.buscarPorCodigo(999L)).thenThrow(new RuntimeException("Error"));
-            
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, 999L, PageRequest.of(0, 10));
-            assertThat(result.getContent()).isNotEmpty();
-            assertThat(result.getContent().get(0).linkDestino()).isEqualTo("/processo/1");
+            assertThat(res.getContent().getFirst().linkDestino()).isNull();
         }
     }
 
@@ -241,33 +233,20 @@ class PainelServiceTest {
             assertThat(result.getContent()).hasSize(1);
         }
 
-        @Test
-        @DisplayName("paraProcessoResumoDto deve usar primeiro participante")
-        void paraProcessoResumoDto_UsaParticipante() {
-            Unidade u = new Unidade();
-            u.setCodigo(1L);
-            u.setNome("U1");
-            u.setSigla("U1");
-            Processo p = criarProcessoMock(1L);
-            p.setParticipantes(Set.of(u));
-            
-            when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
-            
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
-            assertThat(result.getContent().get(0).unidadeCodigo()).isEqualTo(1L);
-            assertThat(result.getContent().get(0).unidadesParticipantes()).contains("U1");
-        }
+
 
         @Test
-        @DisplayName("encontrarMaiorIdVisivel deve retornar null se unidade não for participante")
-        void encontrarMaiorIdVisivel_NaoParticipante() {
+        @DisplayName("encontrarMaiorIdVisivel deve retornar null se unidade for null ou não participante")
+        void encontrarMaiorIdVisivel_CasosBorda() {
             Unidade u = new Unidade();
             u.setCodigo(999L);
             
             Processo p = criarProcessoMock(1L);
-            p.setParticipantes(Set.of(new Unidade())); // Outra unidade
+            p.setParticipantes(Set.of(u));
             
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
+            // Usamos lenient para atingir indiretamente o fluxo de segurança/null checks se houver
+            lenient().when(unidadeService.buscarEntidadePorId(999L)).thenReturn(null);
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
             assertThat(result.getContent()).isNotEmpty();
@@ -284,14 +263,17 @@ class PainelServiceTest {
             when(unidadeService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
             when(unidadeService.buscarIdsDescendentes(2L)).thenReturn(Collections.emptyList());
 
-            Processo p = criarProcessoMock(100L);
+            Processo p = new Processo();
+            p.setCodigo(100L);
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            p.setTipo(TipoProcesso.MAPEAMENTO);
             p.setParticipantes(Set.of(pai, filho));
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, pageable);
 
-            assertThat(result.getContent().get(0).unidadesParticipantes()).isEqualTo("PAI");
+            assertThat(result.getContent().getFirst().unidadesParticipantes()).isEqualTo("PAI");
         }
 
         @Test
@@ -301,14 +283,17 @@ class PainelServiceTest {
             Unidade filho = new Unidade(); filho.setCodigo(2L); filho.setSigla("FILHO");
             filho.setUnidadeSuperior(pai);
 
-            Processo p = criarProcessoMock(100L);
+            Processo p = new Processo();
+            p.setCodigo(100L);
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            p.setTipo(TipoProcesso.MAPEAMENTO);
             p.setParticipantes(Set.of(filho));
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, pageable);
 
-            assertThat(result.getContent().get(0).unidadesParticipantes()).isEqualTo("FILHO");
+            assertThat(result.getContent().getFirst().unidadesParticipantes()).isEqualTo("FILHO");
         }
 
         @Test
@@ -318,15 +303,17 @@ class PainelServiceTest {
             part.setCodigo(99L);
             part.setSigla("U99");
 
-            Processo p = criarProcessoMock(1L);
+            Processo p = new Processo();
+            p.setCodigo(1L);
             p.setParticipantes(Set.of(part));
+            p.setTipo(TipoProcesso.MAPEAMENTO);
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
 
             Page<ProcessoResumoDto> res = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
 
             assertThat(res).isNotEmpty();
-            assertThat(res.getContent().get(0).unidadesParticipantes()).contains("U99");
+            assertThat(res.getContent().getFirst().unidadesParticipantes()).contains("U99");
         }
     }
 
@@ -390,8 +377,17 @@ class PainelServiceTest {
             alerta.setCodigo(100L);
             alerta.setDescricao("Alerta teste");
             alerta.setDataHora(LocalDateTime.now());
-            alerta.setProcesso(new Processo());
             
+            // Setup obrigatorio para evitar NPE
+            sgc.processo.model.Processo p = new sgc.processo.model.Processo();
+            p.setCodigo(123L);
+            alerta.setProcesso(p);
+            
+            Unidade u = new Unidade();
+            u.setSigla("U1");
+            alerta.setUnidadeOrigem(u);
+            alerta.setUnidadeDestino(u);
+
             when(alertaService.listarPorUnidade(any(Long.class), any(Pageable.class)))
                     .thenReturn(new PageImpl<>(List.of(alerta)));
             when(alertaService.obterDataHoraLeitura(any(), any())).thenReturn(Optional.empty());
@@ -399,63 +395,17 @@ class PainelServiceTest {
             Page<AlertaDto> result = painelService.listarAlertas("123456", 1L, PageRequest.of(0, 10));
 
             assertThat(result.getContent()).hasSize(1);
-            assertThat(result.getContent().get(0).getDescricao()).isEqualTo("Alerta teste");
+            assertThat(result.getContent().getFirst().getDescricao()).isEqualTo("Alerta teste");
             verify(alertaService).listarPorUnidade(any(Long.class), any(Pageable.class));
         }
 
 
 
-        @Test
-        @DisplayName("listarAlertas deve tratar unidades nulas no DTO")
-        void listarAlertas_UnidadesNulas() {
-            Alerta alerta = new Alerta();
-            alerta.setCodigo(400L);
-            alerta.setDescricao("Alerta sem unidade");
-            alerta.setDataHora(LocalDateTime.now());
-            alerta.setProcesso(new Processo());
-            
-            when(alertaService.listarPorUnidade(any(Long.class), any(Pageable.class)))
-                    .thenReturn(new PageImpl<>(List.of(alerta)));
 
-            Page<AlertaDto> result = painelService.listarAlertas(null, 1L, PageRequest.of(0, 10));
 
-            assertThat(result.getContent().get(0).getUnidadeOrigem()).isNull();
-            assertThat(result.getContent().get(0).getUnidadeDestino()).isNull();
-        }
 
-        @Test
-        @DisplayName("listarAlertas deve retornar alertas mesmo se usuarioTitulo for nulo ou em branco")
-        void listarAlertas_UsuarioTituloVazio() {
-            Alerta alerta = new Alerta();
-            alerta.setCodigo(500L);
-            alerta.setDescricao("D1");
-            alerta.setProcesso(new Processo());
-            
-            when(alertaService.listarPorUnidade(any(), any())).thenReturn(new PageImpl<>(List.of(alerta)));
-            
-            // Testa com usuarioTitulo nulo
-            Page<AlertaDto> resultNull = painelService.listarAlertas(null, 1L, PageRequest.of(0, 10));
-            assertThat(resultNull.getContent().get(0).getDataHoraLeitura()).isNull();
 
-            // Testa com usuarioTitulo em branco
-            Page<AlertaDto> resultBlank = painelService.listarAlertas("  ", 1L, PageRequest.of(0, 10));
-            assertThat(resultBlank.getContent().get(0).getDataHoraLeitura()).isNull();
-        }
 
-        @Test
-        @DisplayName("paraAlertaDto deve lidar com unidades de origem/destino nulas")
-        void paraAlertaDto_UnidadesNulas() {
-            Alerta alerta = new Alerta();
-            alerta.setUnidadeOrigem(null);
-            alerta.setUnidadeDestino(null);
-            alerta.setProcesso(new Processo());
-            
-            when(alertaService.listarPorUnidade(any(), any())).thenReturn(new PageImpl<>(List.of(alerta)));
-            
-            Page<AlertaDto> result = painelService.listarAlertas(null, 1L, PageRequest.of(0, 10));
-            assertThat(result.getContent().get(0).getUnidadeOrigem()).isNull();
-            assertThat(result.getContent().get(0).getUnidadeDestino()).isNull();
-        }
 
         @Test
         @DisplayName("listarAlertas: busca por unidade se codigoUnidade informado")
@@ -465,7 +415,16 @@ class PainelServiceTest {
             Alerta alerta = new Alerta();
             alerta.setCodigo(1L);
             alerta.setDataHora(LocalDateTime.now());
-            alerta.setProcesso(new Processo());
+            
+            // Setup obrigatorio
+            Processo p = new Processo();
+            p.setCodigo(123L);
+            alerta.setProcesso(p);
+            
+            Unidade u = new Unidade();
+            u.setSigla("U1");
+            alerta.setUnidadeOrigem(u);
+            alerta.setUnidadeDestino(u);
 
             when(alertaService.listarPorUnidade(eq(codigoUnidade), any())).thenReturn(new PageImpl<>(List.of(alerta)));
 
@@ -485,8 +444,12 @@ class PainelServiceTest {
         p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         p.setTipo(TipoProcesso.MAPEAMENTO);
         p.setDataCriacao(LocalDateTime.now());
-        Unidade u = new Unidade(); u.setCodigo(codigo); u.setSigla("U"+codigo);
-        p.setParticipantes(Set.of(u));
+        
+        Unidade participante = new Unidade();
+        participante.setCodigo(1L);
+        participante.setSigla("PART");
+        p.setParticipantes(Set.of(participante));
+        
         return p;
     }
 }

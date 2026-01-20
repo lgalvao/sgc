@@ -3,47 +3,61 @@ package sgc;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroEstadoImpossivel;
+import sgc.comum.erros.ErroNegocio;
 import sgc.comum.erros.ErroNegocioBase;
+import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.Unidade;
+import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
+
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Cobertura Extra de Erros e Modelos")
 @Tag("unit")
 class CoberturaExtraTest {
-
     @Test
     @DisplayName("Deve instanciar classes de erro para cobertura")
     void deveInstanciarErros() {
         assertThat(new ErroEstadoImpossivel("msg")).isNotNull();
         assertThat(new ErroConfiguracao("msg")).isNotNull();
         assertThat(new ErroMapaNaoAssociado("msg")).isNotNull();
-        assertThat(new sgc.painel.erros.ErroParametroPainelInvalido("msg")).isNotNull();
+        assertThat(new ErroParametroPainelInvalido("msg")).isNotNull();
         
-        // ErroNegocioBase (mais linhas)
-        ErroNegocioBase erro = new ErroNegocioBase("msg", "CODO", org.springframework.http.HttpStatus.BAD_REQUEST) {};
+        ErroNegocioBase erro = new ErroNegocioBase("msg", "CODO", HttpStatus.BAD_REQUEST) {};
         assertThat(erro.getMessage()).isEqualTo("msg");
         assertThat(erro.getCode()).isEqualTo("CODO");
-        assertThat(erro.getStatus()).isEqualTo(org.springframework.http.HttpStatus.BAD_REQUEST);
-
-        // Testar outros construtores de ErroNegocioBase
-        new ErroNegocioBase("msg", "CODO", org.springframework.http.HttpStatus.BAD_REQUEST, new java.util.HashMap<>()) {};
-        new ErroNegocioBase("msg", "CODO", org.springframework.http.HttpStatus.BAD_REQUEST, new RuntimeException()) {};
+        assertThat(erro.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        
+        // Cobertura para o método default da interface ErroNegocio
+        ErroNegocio erroInterface = new ErroNegocio() {
+            @Override public String getCode() { return "X"; }
+            @Override public HttpStatus getStatus() { return HttpStatus.OK; }
+            @Override public String getMessage() { return "M"; }
+        };
+        assertThat(erroInterface.getDetails()).isNull();
+        
+        new ErroNegocioBase("msg", "CODO", HttpStatus.BAD_REQUEST, new HashMap<>()) {};
+        new ErroNegocioBase("msg", "CODO", HttpStatus.BAD_REQUEST, new RuntimeException()) {};
     }
 
     @Test
     @DisplayName("Deve instanciar modelos para cobertura de construtores extras")
     void deveInstanciarModelos() {
-        // Competencia construtor com todos os campos
-        Competencia c = new Competencia(1L, "desc", new sgc.mapa.model.Mapa());
+        Competencia c = new Competencia(1L, "desc", new Mapa());
         assertThat(c.getCodigo()).isEqualTo(1L);
         
-        // Conhecimento construtor com todos os campos
-        Conhecimento k = new Conhecimento(1L, "desc", new sgc.mapa.model.Atividade());
+        Conhecimento k = new Conhecimento(1L, "desc", new Atividade());
         assertThat(k.getCodigo()).isEqualTo(1L);
+
+        Unidade u = new Unidade("Nome", "SIGLA");
+        assertThat(u.getSigla()).isEqualTo("SIGLA");
     }
 }

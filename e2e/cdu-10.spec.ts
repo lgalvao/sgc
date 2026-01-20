@@ -7,6 +7,7 @@ import {
     disponibilizarCadastro,
     navegarParaAtividades
 } from './helpers/helpers-atividades';
+import {abrirModalCriarCompetencia} from './helpers/helpers-mapas';
 import {abrirHistoricoAnalise, acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
 import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
@@ -129,8 +130,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first().click();
 
         // Adicionar primeira competência
-        await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
-        await page.getByTestId('btn-abrir-criar-competencia').click();
+        await abrirModalCriarCompetencia(page);
         await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência Mapeamento 1 ${timestamp}`);
         await page.getByText(`Atividade Mapeamento 1 ${timestamp}`).click();
         await page.getByTestId('btn-criar-competencia-salvar').click();
@@ -139,7 +139,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByText(`Competência Mapeamento 1 ${timestamp}`)).toBeVisible();
 
         // Adicionar segunda competência para a segunda atividade
-        await page.getByTestId('btn-abrir-criar-competencia').click();
+        await abrirModalCriarCompetencia(page);
         await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência Mapeamento 2 ${timestamp}`);
         await page.getByText(`Atividade Mapeamento 2 ${timestamp}`).click();
         await page.getByTestId('btn-criar-competencia-salvar').click();

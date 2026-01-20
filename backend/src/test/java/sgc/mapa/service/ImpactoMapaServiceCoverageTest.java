@@ -1,0 +1,152 @@
+package sgc.mapa.service;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.mapa.dto.ImpactoMapaDto;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.seguranca.acesso.AccessControlService;
+import sgc.subprocesso.model.Subprocesso;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+@Tag("unit")
+class ImpactoMapaServiceCoverageTest {
+
+    @Mock private MapaRepo mapaRepo;
+    @Mock private CompetenciaRepo competenciaRepo;
+    @Mock private AtividadeService atividadeService;
+    @Mock private AccessControlService accessControlService;
+
+    @InjectMocks
+    private ImpactoMapaService service;
+
+    @Test
+    @DisplayName("Deve detectar alteração quando conhecimentos diferem (um vazio, outro cheio)")
+    void deveDetectarAlteracaoListaVazia() {
+        // Cobre linha 209 (otimização lista vazia)
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(1L);
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        subprocesso.setUnidade(unidade);
+
+        Usuario usuario = new Usuario();
+
+        Mapa mapaVigente = new Mapa(); mapaVigente.setCodigo(100L);
+        Mapa mapaSub = new Mapa(); mapaSub.setCodigo(200L);
+
+        when(mapaRepo.findMapaVigenteByUnidade(10L)).thenReturn(Optional.of(mapaVigente));
+        when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSub));
+
+        // Atividade A: No vigente tem 1 conhecimento, no atual tem 0
+        Atividade aVigente = new Atividade();
+        aVigente.setCodigo(1L);
+        aVigente.setDescricao("A");
+        aVigente.setConhecimentos(List.of(new Conhecimento("C1", aVigente)));
+
+        Atividade aAtual = new Atividade();
+        aAtual.setCodigo(1L);
+        aAtual.setDescricao("A");
+        aAtual.setConhecimentos(Collections.emptyList());
+
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(100L)).thenReturn(List.of(aVigente));
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(200L)).thenReturn(List.of(aAtual));
+
+        when(competenciaRepo.findByMapaCodigo(100L)).thenReturn(Collections.emptyList());
+
+        ImpactoMapaDto impacto = service.verificarImpactos(subprocesso, usuario);
+
+        assertThat(impacto.isTemImpactos()).isTrue();
+        assertThat(impacto.getAtividadesAlteradas()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("Não deve detectar alteração quando ambos vazios")
+    void naoDeveDetectarAlteracaoAmbosVazios() {
+        // Cobre linha 209 (otimização lista vazia false)
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(1L);
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        subprocesso.setUnidade(unidade);
+
+        Usuario usuario = new Usuario();
+
+        Mapa mapaVigente = new Mapa(); mapaVigente.setCodigo(100L);
+        Mapa mapaSub = new Mapa(); mapaSub.setCodigo(200L);
+
+        when(mapaRepo.findMapaVigenteByUnidade(10L)).thenReturn(Optional.of(mapaVigente));
+        when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSub));
+
+        Atividade aVigente = new Atividade();
+        aVigente.setCodigo(1L);
+        aVigente.setDescricao("A");
+        aVigente.setConhecimentos(Collections.emptyList());
+
+        Atividade aAtual = new Atividade();
+        aAtual.setCodigo(1L);
+        aAtual.setDescricao("A");
+        aAtual.setConhecimentos(Collections.emptyList());
+
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(100L)).thenReturn(List.of(aVigente));
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(200L)).thenReturn(List.of(aAtual));
+
+        when(competenciaRepo.findByMapaCodigo(100L)).thenReturn(Collections.emptyList());
+
+        ImpactoMapaDto impacto = service.verificarImpactos(subprocesso, usuario);
+
+        assertThat(impacto.isTemImpactos()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve detectar alteração quando descrições diferem")
+    void deveDetectarAlteracaoDescricoesDiferentes() {
+        // Cobre branch 229 (sets diferentes)
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(1L);
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        subprocesso.setUnidade(unidade);
+
+        Usuario usuario = new Usuario();
+
+        Mapa mapaVigente = new Mapa(); mapaVigente.setCodigo(100L);
+        Mapa mapaSub = new Mapa(); mapaSub.setCodigo(200L);
+
+        when(mapaRepo.findMapaVigenteByUnidade(10L)).thenReturn(Optional.of(mapaVigente));
+        when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSub));
+
+        Atividade aVigente = new Atividade();
+        aVigente.setCodigo(1L);
+        aVigente.setDescricao("A");
+        aVigente.setConhecimentos(List.of(new Conhecimento("C1", aVigente)));
+
+        Atividade aAtual = new Atividade();
+        aAtual.setCodigo(1L);
+        aAtual.setDescricao("A");
+        aAtual.setConhecimentos(List.of(new Conhecimento("C2", aAtual)));
+
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(100L)).thenReturn(List.of(aVigente));
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(200L)).thenReturn(List.of(aAtual));
+
+        when(competenciaRepo.findByMapaCodigo(100L)).thenReturn(Collections.emptyList());
+
+        ImpactoMapaDto impacto = service.verificarImpactos(subprocesso, usuario);
+
+        assertThat(impacto.isTemImpactos()).isTrue();
+        assertThat(impacto.getAtividadesAlteradas()).hasSize(1);
+    }
+}

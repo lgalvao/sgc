@@ -43,6 +43,11 @@ public class AtividadeService {
     public Atividade obterPorCodigo(Long codAtividade) {
         return repo.buscar(Atividade.class, codAtividade);
     }
+    
+    @Transactional(readOnly = true)
+    public List<Atividade> buscarPorCodigos(List<Long> codigos) {
+        return atividadeRepo.findAllById(codigos);
+    }
 
     @Transactional(readOnly = true)
     public int contarPorMapa(Long codMapa) {

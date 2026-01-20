@@ -86,7 +86,7 @@ class MapperTest {
         entity.setDataFimEtapa2(LocalDateTime.now().plusHours(1));
         entity.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
-        SubprocessoDto dto = subprocessoMapper.toDTO(entity);
+        SubprocessoDto dto = subprocessoMapper.toDto(entity);
 
         assertNotNull(dto);
         assertEquals(1L, dto.getCodigo());
@@ -156,7 +156,7 @@ class MapperTest {
         entity.setUnidadeDestino(unidadeDestino);
         entity.setDescricao("Descrição da movimentação");
 
-        MovimentacaoDto dto = movimentacaoMapper.toDTO(entity);
+        MovimentacaoDto dto = movimentacaoMapper.toDto(entity);
 
         assertNotNull(dto);
         assertEquals(1L, dto.codigo());

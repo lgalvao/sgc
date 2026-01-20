@@ -72,6 +72,13 @@ class SubprocessoAccessPolicyTest {
         Usuario u = criarUsuario(Perfil.SERVIDOR, 1L); // Unit 1 (Superior)
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 2L); // Unit 2 (Subordinate)
 
+        // Mock hierarchy service: Unit 2 is subordinate to Unit 1?
+        // Wait, "MesmaOuSubordinada" usually means User is in Superior (Unit 1), checking Subprocess (Unit 2).
+        // The check is: hierarquiaService.isSubordinada(unidadeSubprocesso, unidadeUsuario)
+        // No, let's read code:
+        // isSubordinada(unidadeSubprocesso, a.getUnidade())
+        // means Subprocesso (Unit 2) is subordinate to User's Unit (Unit 1).
+
         when(hierarquiaService.isSubordinada(any(), any())).thenAnswer(inv -> {
              Unidade sub = inv.getArgument(0);
              Unidade sup = inv.getArgument(1);
@@ -207,8 +214,11 @@ class SubprocessoAccessPolicyTest {
     void verificaHierarquia_ValidacaoCompleta() {
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 1L);
 
+        // Ensure unit properties needed for tests
         sp.getUnidade().setSigla("SIGLA");
         sp.getUnidade().setTituloTitular("TITULAR");
+
+        // Testar mensagens de erro (indiretamente via assert false e verificação manual se necessário)
 
         // MESMA_UNIDADE -> False
         Usuario uOutra = criarUsuario(Perfil.SERVIDOR, 2L);
@@ -223,10 +233,8 @@ class SubprocessoAccessPolicyTest {
         // SUPERIOR_IMEDIATA -> False
         // ACEITAR_CADASTRO requer SUPERIOR_IMEDIATA
         Usuario uGestor = criarUsuario(Perfil.GESTOR, 2L);
-
         // Atualiza status para permitir chegar na verificação de hierarquia
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-
         // Garante que não é superior
         when(hierarquiaService.isSuperiorImediata(any(), any())).thenReturn(false);
         assertFalse(policy.canExecute(uGestor, Acao.ACEITAR_CADASTRO, sp));

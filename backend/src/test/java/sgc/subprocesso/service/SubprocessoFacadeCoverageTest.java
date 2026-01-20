@@ -8,6 +8,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseFacade;
 import sgc.mapa.mapper.ConhecimentoMapper;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
@@ -28,8 +31,10 @@ import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 
+import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -146,9 +151,7 @@ class SubprocessoFacadeCoverageTest {
         Long codSubprocesso = 999L;
         when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.empty());
 
-        org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> {
-            facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList(), "123");
-        });
+        org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList()));
     }
 
     @Test
@@ -191,7 +194,7 @@ class SubprocessoFacadeCoverageTest {
         when(atividadeService.atualizarDescricoesEmLote(any())).thenReturn(java.util.Collections.emptyList());
         when(competenciaService.buscarPorCodigos(any())).thenReturn(java.util.Collections.emptyList());
 
-        facade.salvarAjustesMapa(codSubprocesso, java.util.List.of(compRequest), "User");
+        facade.salvarAjustesMapa(codSubprocesso, java.util.List.of(compRequest));
 
         verify(competenciaService).salvarTodas(any());
     }
@@ -313,9 +316,7 @@ class SubprocessoFacadeCoverageTest {
 
         when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
 
-        org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () -> {
-            facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList(), "user");
-        });
+        org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () -> facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList()));
     }
 
     @Test
@@ -331,9 +332,7 @@ class SubprocessoFacadeCoverageTest {
 
         when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
 
-        org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida.class, () -> {
-            facade.importarAtividades(codDestino, codOrigem);
-        });
+        org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida.class, () -> facade.importarAtividades(codDestino, codOrigem));
     }
 
     @Test
@@ -366,5 +365,94 @@ class SubprocessoFacadeCoverageTest {
 
         // Verify that movimentacao was saved (no exception thrown)
         verify(movimentacaoRepo).save(any(Movimentacao.class));
+    }
+
+    @Test
+    @DisplayName("listarAtividadesSubprocesso - Com Conhecimentos (Coverage)")
+    void listarAtividadesSubprocesso_ComConhecimentos() {
+        Long codSubprocesso = 1L;
+        Long codMapa = 10L;
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codSubprocesso);
+        sp.setMapa(new Mapa());
+        sp.getMapa().setCodigo(codMapa);
+
+        when(crudService.buscarSubprocesso(codSubprocesso)).thenReturn(sp);
+
+        Atividade atividade = new Atividade();
+        atividade.setCodigo(100L);
+        atividade.setDescricao("Atividade 1");
+
+        Conhecimento conhecimento = new Conhecimento();
+        conhecimento.setCodigo(1000L);
+        conhecimento.setDescricao("Conhecimento A");
+
+        atividade.setConhecimentos(List.of(conhecimento));
+
+        when(atividadeService.buscarPorMapaCodigoComConhecimentos(codMapa)).thenReturn(List.of(atividade));
+
+        var result = facade.listarAtividadesSubprocesso(codSubprocesso);
+
+        assertFalse(result.isEmpty());
+        assertFalse(result.getFirst().getConhecimentos().isEmpty());
+    }
+
+    @Test
+    @DisplayName("salvarAjustesMapa - Atividades Null na Competencia")
+    void salvarAjustesMapa_AtividadesNull() {
+        // Covers branches 559, 580 (null check for atividades in dto)
+        Long codSubprocesso = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codSubprocesso);
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+
+        when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+
+        CompetenciaAjusteDto compDto = CompetenciaAjusteDto.builder()
+                .codCompetencia(100L)
+                .nome("Comp")
+                .atividades(List.of()) // Lista vazia, não mais null
+                .build();
+
+        Competencia competencia = new Competencia();
+        competencia.setCodigo(100L);
+        when(competenciaService.buscarPorCodigos(any())).thenReturn(List.of(competencia));
+
+        facade.salvarAjustesMapa(codSubprocesso, List.of(compDto));
+
+        verify(competenciaService).salvarTodas(any());
+    }
+
+    @Test
+    @DisplayName("importarAtividades - Destino ja em Revisao Cadastro Em Andamento")
+    void importarAtividades_RevisaoEmAndamento() {
+        // Covers branch 604
+        Long codDestino = 1L;
+        Long codOrigem = 2L;
+
+        Subprocesso spDestino = new Subprocesso();
+        spDestino.setCodigo(codDestino);
+        // Set situation to one that is VALID but not NAO_INICIADO
+        spDestino.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        spDestino.setMapa(new Mapa());
+        spDestino.getMapa().setCodigo(10L);
+        spDestino.setUnidade(new sgc.organizacao.model.Unidade());
+        spDestino.getUnidade().setSigla("DEST");
+
+        Subprocesso spOrigem = new Subprocesso();
+        spOrigem.setCodigo(codOrigem);
+        spOrigem.setMapa(new Mapa());
+        spOrigem.getMapa().setCodigo(20L);
+        spOrigem.setUnidade(new sgc.organizacao.model.Unidade());
+        spOrigem.getUnidade().setSigla("ORIG");
+
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+
+        facade.importarAtividades(codDestino, codOrigem);
+
+        // Should execute import
+        verify(copiaMapaService).importarAtividadesDeOutroMapa(20L, 10L);
     }
 }

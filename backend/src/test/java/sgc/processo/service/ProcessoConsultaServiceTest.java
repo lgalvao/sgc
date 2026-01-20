@@ -119,7 +119,7 @@ class ProcessoConsultaServiceTest {
         List<SubprocessoElegivelDto> res = processoConsultaService.listarSubprocessosElegiveis(1L);
 
         assertThat(res).hasSize(1);
-        assertThat(res.get(0).getCodSubprocesso()).isEqualTo(1L);
+        assertThat(res.getFirst().getCodSubprocesso()).isEqualTo(1L);
     }
 
     @Test

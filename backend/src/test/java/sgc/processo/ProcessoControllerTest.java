@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(RestExceptionHandler.class)
 @Tag("integration")
 @DisplayName("ProcessoController")
-public class ProcessoControllerTest {
+class ProcessoControllerTest {
     private static final String NOVO_PROCESSO = "Novo Processo";
     private static final String API_PROCESSOS = "/api/processos";
     private static final String API_PROCESSOS_1 = "/api/processos/1";
