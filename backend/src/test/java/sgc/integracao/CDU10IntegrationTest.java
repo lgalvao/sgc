@@ -238,15 +238,13 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
                     .isEqualTo(
                             "Revisão do cadastro da unidade SESEL"
                                     + " disponibilizada para análise");
-            // assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
-            // Relaxing assertion to compare IDs
             assertThat(alerta.getUnidadeDestino().getCodigo()).isEqualTo(unidadeSuperior.getCodigo());
         }
 
         @Test
         @DisplayName("Não deve disponibilizar se houver atividade sem conhecimento associado")
         void naoDeveDisponibilizarComAtividadeSemConhecimento() throws Exception {
-            AtividadeFixture.atividadePadrao(subprocessoRevisao.getMapa());
+            // Apenas salva atividade SEM conhecimento, para testar a validação
             atividadeRepo.save(AtividadeFixture.atividadePadrao(subprocessoRevisao.getMapa()));
 
             mockMvc.perform(
@@ -279,10 +277,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
             setupUsuarioPerfil(outroChefe, outraUnidade, Perfil.CHEFE);
             autenticarUsuario(outroChefe);
 
-            mockMvc.perform(
-                            post(
-                                    "/api/subprocessos/{id}/disponibilizar-revisao",
-                                    subprocessoRevisao.getCodigo()))
+            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
                     .andExpect(status().isForbidden());
         }
     }
@@ -332,7 +327,6 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
             analiseRepo.saveAndFlush(analiseDevolucao);
 
             // 4. Simular devolução
-            // We need to fetch again because entity manager was cleared
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).get();
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             sp.setDataFimEtapa1(null);
@@ -343,8 +337,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk());
 
             // 6. Verificar que histórico foi excluído
-            List<Analise> analisesDepois =
-                    analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId);
+            List<Analise> analisesDepois = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId);
             assertThat(analisesDepois).isEmpty();
         }
     }

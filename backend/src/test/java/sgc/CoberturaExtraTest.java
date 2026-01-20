@@ -44,8 +44,8 @@ class CoberturaExtraTest {
         };
         assertThat(erroInterface.getDetails()).isNull();
         
-        new ErroNegocioBase("msg", "CODO", HttpStatus.BAD_REQUEST, new HashMap<>()) {};
-        new ErroNegocioBase("msg", "CODO", HttpStatus.BAD_REQUEST, new RuntimeException()) {};
+        assertThat(new ErroNegocioBase("msg", "CODO", HttpStatus.BAD_REQUEST, new HashMap<>()) {}).isNotNull();
+        assertThat(new ErroNegocioBase("msg", "CODO", HttpStatus.BAD_REQUEST, new RuntimeException()) {}).isNotNull();
     }
 
     @Test

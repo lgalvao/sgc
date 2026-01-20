@@ -38,7 +38,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 class SubprocessoCadastroWorkflowServiceTest {
-
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
     @Mock
@@ -68,8 +67,6 @@ class SubprocessoCadastroWorkflowServiceTest {
 
     @InjectMocks
     private SubprocessoWorkflowService service;
-
-    // --- Disponibilizar Cadastro ---
 
     @Test
     @DisplayName("disponibilizarCadastro sucesso")
@@ -110,8 +107,6 @@ class SubprocessoCadastroWorkflowServiceTest {
         Long id = 1L;
         Usuario user = new Usuario();
         user.setTituloEleitoral("1");
-        Usuario titular = new Usuario();
-        titular.setTituloEleitoral("2");
         Unidade u = new Unidade();
 
         Subprocesso sp = new Subprocesso();
@@ -144,9 +139,6 @@ class SubprocessoCadastroWorkflowServiceTest {
         assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
                 .isInstanceOf(ErroValidacao.class);
     }
-
-
-    // --- Disponibilizar Revisão ---
 
     @Test
     @DisplayName("disponibilizarRevisao sucesso")
@@ -181,8 +173,6 @@ class SubprocessoCadastroWorkflowServiceTest {
                 eq(user));
     }
 
-    // --- Devolver Cadastro ---
-
     @Test
     @DisplayName("devolverCadastro sucesso")
     void devolverCadastro() {
@@ -210,8 +200,6 @@ class SubprocessoCadastroWorkflowServiceTest {
                 "obs".equals(req.observacoes())
         ));
     }
-
-    // --- Aceitar Cadastro ---
 
     @Test
     @DisplayName("aceitarCadastro sucesso")
@@ -254,8 +242,6 @@ class SubprocessoCadastroWorkflowServiceTest {
                 .isInstanceOf(ErroInvarianteViolada.class);
     }
 
-    // --- Devolver Revisão Cadastro ---
-
     @Test
     @DisplayName("devolverRevisaoCadastro falha sem unidade superior")
     void devolverRevisaoCadastroSemSuperior() {
@@ -273,8 +259,6 @@ class SubprocessoCadastroWorkflowServiceTest {
                 .isInstanceOf(ErroInvarianteViolada.class);
     }
 
-    // --- Homologar Cadastro ---
-
     @Test
     @DisplayName("homologarCadastro sucesso")
     void homologarCadastro() {
@@ -291,12 +275,12 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         verify(transicaoService).registrar(
-                eq(sp),
-                eq(TipoTransicao.CADASTRO_HOMOLOGADO),
-                eq(sedoc),
-                eq(sedoc),
-                eq(user),
-                eq("obs"));
+                sp,
+                TipoTransicao.CADASTRO_HOMOLOGADO,
+                sedoc,
+                sedoc,
+                user,
+                "obs");
     }
 
     @Test
@@ -314,9 +298,6 @@ class SubprocessoCadastroWorkflowServiceTest {
         assertThatThrownBy(() -> service.homologarCadastro(id, "obs", user))
                 .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
-
-    // --- Devolver Revisão Cadastro ---
-
     @Test
     @DisplayName("devolverRevisaoCadastro sucesso")
     void devolverRevisaoCadastro() {
@@ -326,6 +307,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         Unidade u = new Unidade();
         u.setCodigo(10L);
         u.setSigla("U1");
+
         Unidade sup = new Unidade(); // Unidade Superior
         sup.setCodigo(20L);
         sup.setSigla("SUP");
@@ -350,16 +332,16 @@ class SubprocessoCadastroWorkflowServiceTest {
         ));
     }
 
-    // --- Aceitar Revisão Cadastro ---
-
     @Test
     @DisplayName("aceitarRevisaoCadastro sucesso")
     void aceitarRevisaoCadastro() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+    
         Unidade u = new Unidade();
         u.setCodigo(10L);
+    
         Unidade sup = new Unidade();
         sup.setCodigo(20L);
         sup.setSigla("SUP");
@@ -388,9 +370,11 @@ class SubprocessoCadastroWorkflowServiceTest {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+
         Unidade u = new Unidade();
         u.setUnidadeSuperior(null);
         sp.setUnidade(u);
+
         Usuario user = new Usuario();
 
         when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
@@ -398,8 +382,6 @@ class SubprocessoCadastroWorkflowServiceTest {
         assertThatThrownBy(() -> service.aceitarRevisaoCadastro(id, "obs", user))
                 .isInstanceOf(ErroInvarianteViolada.class);
     }
-
-    // --- Homologar Revisão Cadastro ---
 
     @Test
     @DisplayName("homologarRevisaoCadastro com impactos")
@@ -436,7 +418,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         Usuario user = new Usuario();
 
         when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
-        when(impactoMapaService.verificarImpactos(any(Subprocesso.class), eq(user)))
+            when(impactoMapaService.verificarImpactos(any(Subprocesso.class), eq(user)))
                 .thenReturn(ImpactoMapaDto.semImpacto());
 
         service.homologarRevisaoCadastro(id, "obs", user);
@@ -460,16 +442,16 @@ class SubprocessoCadastroWorkflowServiceTest {
                 .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 
-    // --- Validação de Lista Vazia de Atividades (CDU-09/10) ---
-
     @Test
     @DisplayName("disponibilizarCadastro deve rejeitar quando não há atividades cadastradas")
     void disponibilizarCadastro_deveRejeitarQuandoListaVazia() {
         Long id = 1L;
         Usuario user = new Usuario();
         user.setTituloEleitoral("123");
+
         Unidade u = new Unidade();
         u.setTituloTitular("123");
+
         Mapa mapa = new Mapa(); 
         mapa.setCodigo(10L);
 
@@ -478,11 +460,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setMapa(mapa);
 
         when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
-        // Removed unnecessary stubbing
-        doThrow(
-                        new ErroValidacao(
-                                "Pelo menos uma atividade deve ser cadastrada antes de"
-                                        + " disponibilizar."))
+        doThrow(new ErroValidacao("Pelo menos uma atividade deve ser cadastrada antes de disponibilizar."))
                 .when(validacaoService)
                 .validarExistenciaAtividades(id);
 
@@ -497,8 +475,10 @@ class SubprocessoCadastroWorkflowServiceTest {
         Long id = 1L;
         Usuario user = new Usuario();
         user.setTituloEleitoral("123");
+    
         Unidade u = new Unidade();
         u.setTituloTitular("123");
+    
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
 
@@ -507,11 +487,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setMapa(mapa);
 
         when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
-        // Removed unnecessary stubbing
-        doThrow(
-                        new ErroValidacao(
-                                "Pelo menos uma atividade deve ser cadastrada antes de"
-                                        + " disponibilizar."))
+        doThrow(new ErroValidacao("Pelo menos uma atividade deve ser cadastrada antes de disponibilizar."))
                 .when(validacaoService)
                 .validarExistenciaAtividades(id);
 
@@ -525,6 +501,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void aceitarRevisaoCadastroFallbackUnidade() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
+
         Unidade u = new Unidade();
         Unidade sup = new Unidade();
         sup.setUnidadeSuperior(null); // No upper unit

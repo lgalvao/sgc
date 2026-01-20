@@ -65,10 +65,11 @@ class MapaSalvamentoServiceCoverageTest {
                 .build();
 
         // Mocks de salvamento
+        var idCounter = new java.util.concurrent.atomic.AtomicLong(100L);
         when(competenciaRepo.saveAll(any())).thenAnswer(inv -> {
             List<Competencia> list = inv.getArgument(0);
-            // Simula salvamento retornando as mesmas instancias (com IDs se necessario, mas nao critico aqui)
-            list.forEach(c -> c.setCodigo(new java.util.Random().nextLong()));
+            // Simula salvamento retornando as mesmas instancias com IDs sequenciais
+            list.forEach(c -> c.setCodigo(idCounter.incrementAndGet()));
             return list;
         });
 

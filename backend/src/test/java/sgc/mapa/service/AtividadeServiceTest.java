@@ -20,7 +20,6 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
@@ -152,9 +151,6 @@ class AtividadeServiceTest {
             Subprocesso sub = new Subprocesso();
             sub.setUnidade(unidade);
             mapa.setSubprocesso(sub);
-
-            Usuario usuario = new Usuario();
-            usuario.setTituloEleitoral(titulo);
 
             when(repo.buscar(Mapa.class, 1L)).thenReturn(mapa);
             when(atividadeMapper.toEntity(request)).thenReturn(new Atividade());

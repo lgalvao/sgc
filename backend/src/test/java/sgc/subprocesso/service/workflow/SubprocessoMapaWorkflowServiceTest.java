@@ -474,9 +474,9 @@ class SubprocessoMapaWorkflowServiceTest {
             Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
             Mapa mapa = mock(Mapa.class); when(mapa.getCodigo()).thenReturn(10L); when(sp.getMapa()).thenReturn(mapa);
             
-            when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(new Competencia() {{
-                setAtividades(new HashSet<>(List.of(new Atividade()))); 
-            }}));
+            Competencia c = new Competencia();
+            c.setAtividades(new HashSet<>(List.of(new Atividade())));
+            when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
             when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of());
 
             DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder()

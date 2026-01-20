@@ -68,4 +68,32 @@
         <Method name="setSelf"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
+
+    <!-- 
+        ===== EXCLUSÕES PARA TESTES ===== 
+    -->
+
+    <!--
+        Exceções ignoradas em métodos setUp de testes de integração.
+        Padrão comum para resetar sequências de banco em testes.
+    -->
+    <Match>
+        <Or>
+            <Class name="~sgc\.integracao\..*IntegrationTest"/>
+        </Or>
+        <Method name="~setUp|lambda\$setupSecurityContext\$.*"/>
+        <Bug pattern="DE_MIGHT_IGNORE"/>
+    </Match>
+
+    <!--
+        Variáveis não usadas em testes unitários.
+        Comum em testes de fixture onde o retorno não precisa ser verificado.
+    -->
+    <Match>
+        <Or>
+            <Class name="~sgc\..*Test\$.*"/>
+            <Class name="~sgc\..*Test"/>
+        </Or>
+        <Bug pattern="UC_USELESS_OBJECT,RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+    </Match>
 </FindBugsFilter>

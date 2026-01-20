@@ -15,6 +15,7 @@ import sgc.comum.erros.ErroAutenticacao;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -108,7 +109,7 @@ class ClienteAcessoAdTest {
         HttpRequest request = mock(HttpRequest.class);
         ClientHttpResponse response = mock(ClientHttpResponse.class);
         when(response.getStatusCode()).thenReturn(HttpStatusCode.valueOf(400));
-        when(response.getBody()).thenReturn(new ByteArrayInputStream("Erro detalhado".getBytes()));
+        when(response.getBody()).thenReturn(new ByteArrayInputStream("Erro detalhado".getBytes(StandardCharsets.UTF_8)));
 
         assertThrows(ErroAutenticacao.class, () ->
             handlerCaptor.getValue().handle(request, response)
