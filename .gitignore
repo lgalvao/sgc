@@ -16,10 +16,10 @@ frontend/build/
 frontend/coverage/
 
 # Java
-backend/src/main/resources/static/
-backend/build/
-backend/out/
-backend/bin/
+/backend/src/main/resources/static/
+/backend/build/
+/backend/out/
+/backend/bin/
 /backend/src/main/generated/
 
 # Logs
@@ -35,7 +35,8 @@ backend/bin/
 /frontend/bin/
 /backend/.apt_generated/
 /backend/.apt_generated_tests
-# Privacidade/segurança 
+
+# Privacidade/segurança
 .env.hom
 /dados/
 

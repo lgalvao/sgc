@@ -7,14 +7,14 @@
     "test:e2e:captura": "playwright test e2e/captura-telas.spec.ts",
     "test:e2e:captura:headed": "playwright test e2e/captura-telas.spec.ts --headed",
     "test:e2e:captura:ui": "playwright test e2e/captura-telas.spec.ts --ui",
-    "check:accessibility": "node scripts/accessibility-check.js",
+    "check:accessibility": "node scripts/frontend/accessibility-check.js",
     "typecheck": "npm run typecheck --prefix frontend && npm run typecheck:e2e",
     "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json",
     "lint": "npm run lint --prefix frontend"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
-    "@types/node": "^25.0.3",
+    "@types/node": "^25.0.9",
     "chrome-launcher": "^1.2.1",
     "lighthouse": "^13.0.1",
     "typescript": "^5.9.3"

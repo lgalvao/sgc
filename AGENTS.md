@@ -120,7 +120,7 @@ Para detalhes técnicos e exemplos de código, consulte:
   * [Backend Patterns](/regras/backend-padroes.md)
   * [Frontend Patterns](/regras/frontend-padroes.md)
   * [Regras de DTOs](/backend/regras-dtos.md) - Taxonomia e convenções de DTOs
-  * [Regras para execução de testes e2e e correção de bugs](/regras/e2e_regras.md)
+  * [Regras para execução de testes e2e e correção de bugs](/regras/guia-correcao-e2e.md)
 
 * **Arquitetura e Decisões:**
   * [ARCHITECTURE.md](/docs/ARCHITECTURE.md) - Visão geral da arquitetura
