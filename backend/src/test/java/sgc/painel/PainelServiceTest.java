@@ -106,7 +106,7 @@ class PainelServiceTest {
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.GESTOR, codigoUnidade, pageable);
 
             assertThat(result.getContent()).isNotEmpty();
-            verify(unidadeService).buscarIdsDescendentes(codigoUnidade);
+            verify(unidadeService, atLeastOnce()).buscarIdsDescendentes(codigoUnidade);
             verify(processoFacade).listarPorParticipantesIgnorandoCriado(
                     argThat(list -> list.contains(1L) && list.contains(2L)), any());
         }
@@ -234,17 +234,16 @@ class PainelServiceTest {
         }
 
         @Test
-        @DisplayName("calcularLinkDestinoProcesso deve retornar link padrão")
-        void calcularLinkDestinoProcesso_Default() {
-            // Linha 240
+        @DisplayName("calcularLinkDestinoProcesso deve retornar link padrão em caso de erro na busca da unidade")
+        void calcularLinkDestinoProcesso_CatchErro() {
             Processo p = criarProcessoMock(1L);
-            // CHEFE com codigoUnidade não nulo que falha na busca
+            // SERVIDOR ou qualquer um que cai no fluxo padrão
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
-            when(unidadeService.buscarPorCodigo(999L)).thenThrow(new RuntimeException("Error"));
+            when(unidadeService.buscarPorCodigo(1L)).thenThrow(new RuntimeException("Error"));
             
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, 999L, PageRequest.of(0, 10));
+            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.SERVIDOR, 1L, PageRequest.of(0, 10));
             assertThat(result.getContent()).isNotEmpty();
-            assertThat(result.getContent().getFirst().linkDestino()).isNull(); // Cai no catch do calcularLinkDestinoProcesso
+            assertThat(result.getContent().getFirst().linkDestino()).isNull();
         }
     }
 

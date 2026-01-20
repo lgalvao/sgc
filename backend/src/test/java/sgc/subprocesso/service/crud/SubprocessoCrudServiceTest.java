@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.RepositorioComum;
+import sgc.organizacao.UsuarioFacade;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
@@ -44,6 +45,8 @@ class SubprocessoCrudServiceTest {
     private MapaFacade mapaFacade;
     @Mock
     private ApplicationEventPublisher eventPublisher;
+    @Mock
+    private UsuarioFacade usuarioService;
 
     @InjectMocks
     private SubprocessoCrudService service;
