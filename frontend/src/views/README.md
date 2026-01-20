@@ -7,17 +7,38 @@ Este diretório contém os componentes de página (Views) do Vue Router. Cada ar
 As views são organizadas por domínio funcional ou fluxo de trabalho.
 
 ### Autenticação
-*   `Login.vue`: Tela de login inicial.
-*   `SelecaoPerfil.vue`: Tela intermediária para escolha de perfil/unidade (se o usuário tiver múltiplos).
+*   **LoginView.vue**: Tela de login inicial.
 
-### Processos
-*   `PainelProcessos.vue`: Dashboard principal listando processos ativos.
-*   `DetalheProcesso.vue`: Visão geral de um processo específico.
+### Painel e Processos
+*   **PainelView.vue**: Dashboard principal (Home).
+*   **ProcessoView.vue**: Detalhes e gestão de um processo específico.
+*   **CadProcesso.vue**: Formulário de criação de novos processos.
+*   **HistoricoView.vue**: Visão histórica de processos passados.
+*   **ConfiguracoesView.vue**: Configurações do sistema.
 
-### Subprocessos (Fluxo da Unidade)
-*   `WorkflowSubprocesso.vue`: Container principal para o fluxo de trabalho de uma unidade. Gerencia a navegação entre as etapas (Cadastro, Mapa, Validação).
-*   `CadAtividades.vue`: Tela de cadastro de atividades e conhecimentos.
-*   `MapaCompetencias.vue`: Tela de edição do mapa de competências.
+### Unidades
+*   **UnidadeView.vue**: Gestão e visualização de unidades.
+
+### Fluxo de Subprocesso (Workflow)
+*   **SubprocessoView.vue**: Container principal (Layout) para o fluxo de uma unidade.
+
+#### Etapa de Cadastro
+*   **CadAtividades.vue**: Cadastro de atividades.
+*   **VisAtividades.vue**: Visualização (somente leitura) de atividades.
+*   **CadAtribuicao.vue**: Cadastro de atribuições temporárias.
+
+#### Etapa de Mapa
+*   **CadMapa.vue**: Edição do mapa de competências.
+*   **VisMapa.vue**: Visualização do mapa de competências.
+
+#### Etapa de Diagnóstico
+*   **AutoavaliacaoDiagnostico.vue**: Tela de autoavaliação.
+*   **MonitoramentoDiagnostico.vue**: Acompanhamento do diagnóstico pela chefia.
+*   **ConclusaoDiagnostico.vue**: Encerramento do diagnóstico.
+*   **OcupacoesCriticasDiagnostico.vue**: Identificação de ocupações críticas.
+
+### Relatórios
+*   **RelatoriosView.vue**: Central de relatórios do sistema.
 
 ## Padrão de Implementação
 

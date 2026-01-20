@@ -77,13 +77,6 @@ Os testes estão localizados em `src/test/java/sgc/`:
 * **`[pacote]/`**: Testes unitários específicos de cada módulo.
 * **`architecture/`**: Testes ArchUnit garantindo a integridade arquitetural.
 
-### Status Atual
-
-* ✅ **1078/1078 testes passando (100%)**
-* ✅ **Cobertura de código: 95.1%**
-* ✅ **Testes de segurança: 95%+ cobertura**
-* ✅ **Testes E2E: Implementados com Playwright**
-
 ## 🏛️ Arquitetura Detalhada
 
 ### Padrões Arquiteturais
@@ -106,12 +99,6 @@ public class SubprocessoController {
     }
 }
 ```
-
-**Facades Implementadas:**
-* ✅ `ProcessoFacade` - Operações de processos
-* ✅ `SubprocessoFacade` - Operações de subprocessos  
-* ✅ `AtividadeFacade` - Operações de atividades
-* 🟡 `MapaService` - Atua como facade implícita
 
 **Services Especializados** são package-private e usados apenas pelas Facades:
 * `SubprocessoCadastroWorkflowService`
@@ -171,8 +158,6 @@ public void onProcessoIniciado(EventoProcessoIniciado evento) {
 }
 ```
 
-**Estado Atual:** 6 eventos implementados (meta: 23 completos)
-
 #### 4. Data Transfer Objects (DTOs)
 
 **Regra:** NUNCA expor entidades JPA diretamente.
@@ -210,27 +195,19 @@ User Request + DTO → Controller (@Valid) → Facade
 ### Módulos Detalhados
 
 #### `sgc.processo`
-* **Facade:** `ProcessoFacade` ✅
+* **Facade:** `ProcessoFacade`
 * **Responsabilidade:** Gerencia ciclo de vida de processos (MAPEAMENTO ou REVISÃO)
 * **Entidades:** `Processo`, `SituacaoProcesso`, `TipoProcesso`
 * **Services:** `ProcessoConsultaService`, etc.
 
 #### `sgc.subprocesso`
-* **Facade:** `SubprocessoFacade` ✅
+* **Facade:** `SubprocessoFacade`
 * **Responsabilidade:** Gerencia subprocessos vinculados a processos e unidades
 * **Entidades:** `Subprocesso`, `SituacaoSubprocesso`, `TransicaoSubprocesso`
-* **Services:** 12 services (oportunidade de consolidação para ~6)
-  * `SubprocessoCadastroWorkflowService` - Workflow de cadastro
-  * `SubprocessoMapaWorkflowService` - Workflow de mapa
-  * `SubprocessoService` - CRUD básico
-  * `SubprocessoContextoService` - Contexto de edição
-  * `SubprocessoTransicaoService` - Registro de transições
-  * `SubprocessoPermissaoCalculator` - Cálculo de permissões
-  * `SubprocessoEmailService` - Envio de emails
-  * + 4 em `decomposed/`
+* **Services:** `SubprocessoCadastroWorkflowService`, `SubprocessoMapaWorkflowService`, `SubprocessoService` (CRUD), `SubprocessoContextoService`
 
 #### `sgc.mapa`
-* **Facade:** `MapaService` (atua como facade) 🟡, `AtividadeFacade` ✅
+* **Facade:** `MapaService` (atua como facade), `AtividadeFacade`
 * **Responsabilidade:** Gerencia mapas de competências
 * **Entidades:** `Mapa`, `Competencia`, `Atividade`, `Conhecimento`
 * **Services:** `CompetenciaService`, `ConhecimentoService`, `MapaSalvamentoService`, etc.
@@ -307,45 +284,7 @@ POST /api/processos/{id}/excluir     - Excluir
 POST /api/processos/{id}/iniciar     - Workflow action
 ```
 
-**Justificativa:** Simplicidade para operações de workflow complexas.
-
-## 📊 Métricas de Qualidade
-
-* **Testes:** 1078/1078 passando (100%)
-* **Cobertura:** 95.1% (18.791/19.752 instruções)
-* **Checkstyle:** 169 violações em 81 arquivos (baseline)
-* **Services em subprocesso:** 12 (oportunidade: consolidar para ~6)
-* **Facades implementadas:** 4 (ProcessoFacade, SubprocessoFacade, AtividadeFacade, MapaService)
-* **Eventos de domínio:** 6 implementados (meta: 23)
-* **Null-safety:** @NullMarked em todos os pacotes
-
-## 🎯 Oportunidades de Melhoria
-
-### Consolidação de Services (Subprocesso)
-* **Atual:** 12 services
-* **Meta:** ~6 services (50% redução)
-* **Ações:**
-  * Consolidar `SubprocessoCadastroWorkflowService` + `SubprocessoMapaWorkflowService`
-  * Mover lógica de `SubprocessoContextoService` para `SubprocessoFacade`
-  * Tornar services especializados `package-private`
-
-### MapaFacade Explícita
-* Renomear `MapaService` → `MapaFacade` para consistência
-* Consolidar services especializados
-
-### Eventos de Domínio Completos
-* **Atual:** 6 eventos
-* **Meta:** 23 eventos completos
-* Refatorar comunicação síncrona para assíncrona
-
 ## 📚 Documentação Adicional
 
 * [Arquitetura Completa](/docs/ARCHITECTURE.md) - Visão detalhada do sistema
 * [Backend Patterns](/regras/backend-padroes.md) - Padrões e convenções
-* [Security Refactoring](/SECURITY-REFACTORING.md) - Refatoração de segurança (completa)
-* [Refactoring Plan](/refactoring-plan.md) - Plano de refatoração arquitetural
-
----
-
-**Última atualização:** 2026-01-10  
-**Versão:** 2.0 (pós-refatoração de segurança)

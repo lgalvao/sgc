@@ -30,133 +30,40 @@ Este diretório contém os componentes Vue.js reutilizáveis utilizados na aplic
 
 ## Lista de Componentes
 
-### AceitarMapaModal.vue
+### Modais
 
-Diálogo modal utilizado para aceitar (Gestor) ou homologar (Admin) um mapa de competências.
+- **AceitarMapaModal.vue**: Diálogo para aceitar (Gestor) ou homologar (Admin) um mapa.
+- **ConfirmacaoDisponibilizacaoModal.vue**: Confirmação para envio de cadastro para validação.
+- **CriarCompetenciaModal.vue**: Criação ou edição de competências e associação com atividades.
+- **DisponibilizarMapaModal.vue**: Definição de prazo e disponibilização de mapa.
+- **HistoricoAnaliseModal.vue**: Exibe histórico de auditoria/análises de um subprocesso.
+- **ImpactoMapaModal.vue**: Comparativo de mudanças (adições/remoções) em revisões de mapa.
+- **ImportarAtividadesModal.vue**: Importação de atividades de outros processos.
+- **ModalAcaoBloco.vue**: Ações em massa para unidades (aceite/homologação).
+- **ModalConfirmacao.vue**: Modal genérico de confirmação.
+- **SubprocessoModal.vue**: Alteração de data limite de subprocesso.
 
-- **Props:** `mostrarModal`, `perfil`.
-- **Eventos:** `fecharModal`, `confirmarAceitacao`.
+### Tabelas e Listas
 
-### AcoesEmBlocoModal.vue
+- **TabelaAlertas.vue**: Listagem de alertas do usuário.
+- **TabelaMovimentacoes.vue**: Histórico de movimentações recentes.
+- **TabelaProcessos.vue**: Listagem principal de processos.
+- **TreeTableView.vue**: Tabela hierárquica genérica.
+- **TreeRowItem.vue**: Linha recursiva para `TreeTableView`.
 
-Modal para realizar ações em massa (aceitar ou homologar) em registros de unidades. Exibe uma lista de seleção.
+### Árvore de Unidades
 
-- **Props:** `mostrarModal`, `titulo`, `acao`, `unidades`.
-- **Eventos:** `fechar`, `confirmar`.
+- **ArvoreUnidades.vue**: Componente principal de árvore com seleção tri-state.
+- **UnidadeTreeNode.vue**: Nó recursivo da árvore.
 
-### ArvoreUnidades.vue
+### Subprocesso e Mapa
 
-Componente de árvore hierárquica para seleção de unidades com checkboxes tri-state.
+- **AtividadeItem.vue**: Exibição e edição de itens de atividade.
+- **CompetenciaCard.vue**: Card visual para competências no mapa.
+- **SubprocessoCards.vue**: Navegação por cards para seções do subprocesso.
+- **SubprocessoHeader.vue**: Cabeçalho com detalhes do subprocesso e status.
 
-- **Props:** `unidades`, `modelValue` (v-model), `desabilitadas`.
-- **Eventos:** `update:modelValue`.
+### Utilitários
 
-### BarraNavegacao.vue
-
-(Veja seção Componentes de Navegação acima)
-
-### ConfirmacaoDisponibilizacaoModal.vue
-
-Modal de confirmação para disponibilização de cadastro.
-
-### CriarCompetenciaModal.vue
-
-Modal para criar ou editar uma competência e associá-la a atividades.
-
-- **Props:** `mostrarModal`, `competenciaParaEditar` (opcional).
-- **Eventos:** `fechar`, `salvar`.
-
-### DisponibilizarMapaModal.vue
-
-Modal para definir o prazo de validação e disponibilizar um mapa.
-
-- **Eventos:** `fechar`, `disponibilizar`.
-
-### EditarConhecimentoModal.vue
-
-Modal simples para editar a descrição de um conhecimento.
-
-### HistoricoAnaliseModal.vue
-
-Exibe o histórico de análises (auditoria) de um subprocesso em formato de tabela.
-
-- **Props:** `mostrar`, `historico`.
-- **Eventos:** `fechar`.
-
-### ImpactoMapaModal.vue
-
-Analisa e exibe os impactos (adições/remoções) de uma revisão de mapa comparando com a versão anterior.
-
-- **Props:** `mostrar`, `impacto`, `loading`.
-- **Eventos:** `fechar`.
-
-### ImportarAtividadesModal.vue
-
-Permite importar atividades de outros processos/unidades finalizados.
-
-### MainNavbar.vue
-
-(Veja seção Componentes de Navegação acima)
-
-### ModalAcaoBloco.vue
-
-Modal alternativo ou legado para realizar ações em massa (aceitar/homologar) em uma lista de unidades com seleção via
-checkbox.
-
-### ModalConfirmacao.vue
-
-Modal genérico de confirmação.
-
-- **Props:** `modelValue`, `titulo`, `mensagem` (opcional), `variant`.
-- **Slots:** default (para conteúdo customizado).
-
-### ProcessoAcoes.vue
-
-Barra de botões de ação para a tela de detalhes do processo (Aceitar em bloco, Homologar em bloco, Finalizar).
-
-### SistemaNotificacoesModal.vue
-
-Modal que lista todas as notificações do sistema, permitindo visualização de detalhes e limpeza.
-
-### SistemaNotificacoesToast.vue
-
-Container fixo para exibir notificações flutuantes (Toasts) no canto da tela. Reage à store de notificações.
-
-### SubprocessoCards.vue
-
-Exibe os cards de navegação para as diferentes seções de um subprocesso (Mapa, Atividades, Diagnóstico), adaptando-se ao
-tipo do processo.
-
-### SubprocessoHeader.vue
-
-Cabeçalho detalhado para as telas de subprocesso, mostrando unidade, responsáveis e status.
-
-### SubprocessoModal.vue
-
-Modal para alterar a data limite de um subprocesso.
-
-### TabelaAlertas.vue
-
-Tabela para listar alertas do usuário no painel principal.
-
-### TabelaMovimentacoes.vue
-
-Tabela para listar as últimas movimentações (histórico) no painel.
-
-### TabelaProcessos.vue
-
-Tabela principal para listagem de processos com suporte a ordenação e seleção.
-
-### TreeRowItem.vue
-
-Componente interno usado pelo `TreeTableView` para renderizar uma linha recursiva da árvore.
-
-### TreeTableView.vue
-
-Tabela hierárquica genérica com suporte a expansão/colapso de linhas.
-
-- **Props:** `data` (estrutura de árvore), `columns`.
-
-### UnidadeTreeNode.vue
-
-Item recursivo para a árvore de seleção de unidades (`ArvoreUnidades`).
+- **EmptyState.vue**: Feedback visual para listas ou estados vazios.
+- **ProcessoAcoes.vue**: Botões de ação para detalhes do processo.

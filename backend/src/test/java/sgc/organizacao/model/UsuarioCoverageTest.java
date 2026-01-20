@@ -30,25 +30,30 @@ class UsuarioCoverageTest {
         // Atribuição temporária futura
         AtribuicaoTemporaria tempFutura = new AtribuicaoTemporaria();
         tempFutura.setDataInicio(agora.plusDays(1));
+        tempFutura.setDataTermino(agora.plusDays(2));
         
         // Atribuição temporária passada
         AtribuicaoTemporaria tempPassada = new AtribuicaoTemporaria();
+        tempPassada.setDataInicio(agora.minusDays(5));
         tempPassada.setDataTermino(agora.minusDays(1));
         
-        // Atribuição temporária ativa (sem data fim)
+        // Atribuição temporária ativa
         AtribuicaoTemporaria tempAtiva = new AtribuicaoTemporaria();
         tempAtiva.setDataInicio(agora.minusDays(1));
+        tempAtiva.setDataTermino(agora.plusDays(1));
         Unidade un2 = new Unidade(); un2.setCodigo(2L);
         tempAtiva.setUnidade(un2);
         tempAtiva.setPerfil(Perfil.CHEFE);
         
-        // Atribuição temporária com datas null
-        AtribuicaoTemporaria tempNull = new AtribuicaoTemporaria();
+        // Atribuição temporária ativa 2
+        AtribuicaoTemporaria tempAtiva2 = new AtribuicaoTemporaria();
+        tempAtiva2.setDataInicio(agora.minusDays(1));
+        tempAtiva2.setDataTermino(agora.plusDays(1));
         Unidade un3 = new Unidade(); un3.setCodigo(3L);
-        tempNull.setUnidade(un3);
-        tempNull.setPerfil(Perfil.SERVIDOR);
+        tempAtiva2.setUnidade(un3);
+        tempAtiva2.setPerfil(Perfil.SERVIDOR);
         
-        u.setAtribuicoesTemporarias(new HashSet<>(Set.of(tempFutura, tempPassada, tempAtiva, tempNull)));
+        u.setAtribuicoesTemporarias(new HashSet<>(Set.of(tempFutura, tempPassada, tempAtiva, tempAtiva2)));
         
         Set<UsuarioPerfil> todas = u.getTodasAtribuicoes();
         

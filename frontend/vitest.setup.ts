@@ -1,6 +1,10 @@
 import {config} from "@vue/test-utils";
 import {createBootstrap} from "bootstrap-vue-next";
-import {vi} from "vitest";
+import {vi, expect} from "vitest";
+import * as matchers from "vitest-axe/matchers";
+import "vitest-axe/extend-expect";
+
+expect.extend(matchers);
 
 vi.mock("@/utils/logger", () => ({
     default: {
