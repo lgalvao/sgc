@@ -1,68 +1,68 @@
 #!/bin/bash
 
 # setup-env.sh
-# Sets up the development environment with NVM, Node.js, SDKMAN, and Java.
-# Optimized for Ubuntu/Unix-like systems (Non-interactive & SSL workarounds).
+# Configura o ambiente de desenvolvimento com NVM, Node.js, SDKMAN e Java.
+# Otimizado para sistemas Ubuntu/Unix-like (Não-interativo & Workarounds SSL).
 
-# Stop on first error
+# Parar no primeiro erro
 set -e
 
 echo "----------------------------------------------------------------"
-echo "Initializing Environment Setup"
+echo "Inicializando Configuração do Ambiente"
 echo "----------------------------------------------------------------"
 
-# Ensure common binary paths are in the PATH
+# Garantir que caminhos comuns de binários estejam no PATH
 export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-# Robust check for essential tools
-check_tool() {
-    local tool=$1
-    if ! command -v "$tool" &> /dev/null && [ ! -x "/usr/bin/$tool" ] && [ ! -x "/bin/$tool" ] && [ ! -x "/usr/local/bin/$tool" ]; then
+# Verificação robusta de ferramentas essenciais
+verificar_ferramenta() {
+    local ferramenta=$1
+    if ! command -v "$ferramenta" &> /dev/null && [ ! -x "/usr/bin/$ferramenta" ] && [ ! -x "/bin/$ferramenta" ] && [ ! -x "/usr/local/bin/$ferramenta" ]; then
         return 1
     fi
     return 0
 }
 
-for tool in curl unzip zip; do
-    if ! check_tool "$tool"; then
-        echo "[!] Error: '$tool' is not found. Please install it."
+for ferramenta in curl unzip zip; do
+    if ! verificar_ferramenta "$ferramenta"; then
+        echo "[!] Erro: '$ferramenta' não foi encontrado. Por favor, instale-o antes de continuar."
         exit 1
     fi
 done
 
-# --- SSL Workaround Setup (Curl & Wget) ---
+# --- Configuração de Workaround para SSL (Curl & Wget) ---
 CURLRC="$HOME/.curlrc"
 CURLRC_BAK="$HOME/.curlrc.bak.$(date +%s)"
 WGETRC="$HOME/.wgetrc"
 WGETRC_BAK="$HOME/.wgetrc.bak.$(date +%s)"
 
-cleanup_rc() {
+limpar_configs_ssl() {
     if [ -f "$CURLRC_BAK" ]; then mv "$CURLRC_BAK" "$CURLRC"; elif [ -f "$CURLRC" ]; then rm "$CURLRC"; fi
     if [ -f "$WGETRC_BAK" ]; then mv "$WGETRC_BAK" "$WGETRC"; elif [ -f "$WGETRC" ]; then rm "$WGETRC" ; fi
-    # echo "[*] Cleaned up temporary SSL configurations."
+    # echo "[*] Configurações temporárias de SSL limpas."
 }
 
-trap cleanup_rc EXIT
+trap limpar_configs_ssl EXIT
 
-echo "[*] Configuring temporary insecure SSL for curl and wget..."
+echo "[*] Configurando SSL inseguro temporário para curl e wget..."
 if [ -f "$CURLRC" ]; then cp "$CURLRC" "$CURLRC_BAK"; fi
 echo "insecure" >> "$CURLRC"
 if [ -f "$WGETRC" ]; then cp "$WGETRC" "$WGETRC_BAK"; fi
 echo "check_certificate = off" >> "$WGETRC"
 
 
-# --- 1. NVM Setup ---
+# --- 1. Instalação do NVM ---
 export NVM_DIR="$HOME/.nvm"
 export NVM_NODEJS_ORG_MIRROR=https://nodejs.org/dist
 
 if [ -d "$NVM_DIR" ]; then
-    echo "[✔] NVM directory exists."
+    echo "[✔] Diretório do NVM já existe."
 else
-    echo "[*] Installing NVM (v0.40.1)..."
+    echo "[*] Instalando NVM (v0.40.1)..."
     curl -k -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
 fi
 
-# Load NVM
+# Carregar NVM
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
@@ -71,54 +71,54 @@ if ! command -v nvm &> /dev/null; then
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 fi
 
-# --- 2. Node.js Setup ---
-echo "[*] Installing Node.js (LTS)..."
+# --- 2. Instalação do Node.js ---
+echo "[*] Instalando Node.js (LTS)..."
 
-# Prefer LTS (v22) over "node" (latest/v25) for stability
+# Preferir LTS (v22) ao invés do "node" (latest/v25) por estabilidade
 if ! nvm install --lts; then
-    echo "[!] 'nvm install --lts' failed. Trying explicit v22.13.0..."
+    echo "[!] 'nvm install --lts' falhou. Tentando versão explícita v22.13.0..."
     nvm install v22.13.0
 fi
 
 nvm use --lts || nvm use v22.13.0
 nvm alias default "lts/*" || nvm alias default v22.13.0
 
-# VERIFY NODE EXECUTION
-echo "[*] Verifying Node.js installation..."
+# VERIFICAR EXECUÇÃO DO NODE
+echo "[*] Verificando instalação do Node.js..."
 if ! node -e 'console.log("Node is working")' &> /dev/null; then
-    echo "[!] CRITICAL ERROR: Node.js is installed but failed to run."
-    echo "    Error detected:"
+    echo "[!] ERRO CRÍTICO: Node.js foi instalado mas falhou ao executar."
+    echo "    Erro detectado:"
     node -v 2>&1 || true
     
-    # Check specifically for libatomic error
+    # Checar especificamente pelo erro da libatomic
     if node -v 2>&1 | grep -q "libatomic"; then
         echo ""
-        echo "    [MISSING DEPENDENCY]: libatomic.so.1"
-        echo "    Your system is missing a required library."
-        echo "    Since this script cannot use sudo, please ask an admin to run:"
+        echo "    [DEPENDÊNCIA FALTANDO]: libatomic.so.1"
+        echo "    Seu sistema não possui uma biblioteca obrigatória."
+        echo "    Como este script não usa sudo, peça a um admin para rodar:"
         echo "      sudo apt-get install -y libatomic1"
-        echo "    Or if you have sudo access, run it yourself and restart this script."
+        echo "    Ou se você tiver acesso sudo, execute você mesmo e reinicie este script."
     fi
     exit 1
 fi
 
-echo "[✔] Node.js $(node -v) and npm $(npm -v) are ready."
+echo "[✔] Node.js $(node -v) e npm $(npm -v) estão prontos."
 
-# --- 3. SDKMAN Setup ---
+# --- 3. Instalação do SDKMAN ---
 export SDKMAN_DIR="$HOME/.sdkman"
 if [ -d "$SDKMAN_DIR" ]; then
-    echo "[✔] SDKMAN! is already installed."
+    echo "[✔] SDKMAN! já está instalado."
 else
-    echo "[*] Installing SDKMAN!..."
+    echo "[*] Instalando SDKMAN!..."
     curl -k -s "https://get.sdkman.io" | bash
 fi
 
-# Load SDKMAN
+# Carregar SDKMAN
 if [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]]; then
     source "$SDKMAN_DIR/bin/sdkman-init.sh"
 fi
 
-# Configure SDKMAN
+# Configurar SDKMAN
 SDKMAN_CONFIG="$SDKMAN_DIR/etc/config"
 if [ -f "$SDKMAN_CONFIG" ]; then
     set_sdkman_config() {
@@ -135,64 +135,76 @@ if [ -f "$SDKMAN_CONFIG" ]; then
 fi
 
 
-# --- 4. Java Setup ---
+# --- 4. Instalação do Java ---
 
-get_latest_java_version() {
+obter_versao_java_recente() {
     local version=$1
     local vendor=$2
-    # Check if we can list versions (ignore errors if offline/blocked)
+    # Tenta listar versões (ignora erros se estiver offline/bloqueado)
     sdk list java 2>/dev/null | grep -E " $version\.[0-9.]*-$vendor " | head -n 1 | awk '{print $NF}'
 }
 
-echo "[*] Detecting latest Java 21 (Corretto/amzn)..."
-JAVA_21_ID=$(get_latest_java_version "21" "amzn") || echo ""
+echo "[*] Detectando Java 21 mais recente (Corretto/amzn)..."
+JAVA_21_ID=$(obter_versao_java_recente "21" "amzn") || echo ""
 [ -z "$JAVA_21_ID" ] && JAVA_21_ID="21.0.9-amzn"
 
-# Check if already installed to avoid redundant output
+# Verificar se já está instalado para evitar output redundante
 if sdk list java | grep -q "installed" | grep -q "$JAVA_21_ID"; then
-    echo "[✔] Java $JAVA_21_ID is already installed."
+    echo "[✔] Java $JAVA_21_ID já está instalado."
 else
-    echo "    Installing: $JAVA_21_ID"
+    echo "    Instalando: $JAVA_21_ID"
     echo "Y" | sdk install java "$JAVA_21_ID" || true
 fi
 
-echo "[*] Detecting latest Java 25 (Corretto/amzn)..."
-JAVA_25_ID=$(get_latest_java_version "25" "amzn") || echo ""
+echo "[*] Detectando Java 25 mais recente (Corretto/amzn)..."
+JAVA_25_ID=$(obter_versao_java_recente "25" "amzn") || echo ""
 if [ -n "$JAVA_25_ID" ]; then
     if sdk list java | grep -q "installed" | grep -q "$JAVA_25_ID"; then
-        echo "[✔] Java $JAVA_25_ID is already installed."
+        echo "[✔] Java $JAVA_25_ID já está instalado."
     else
-        echo "    Installing: $JAVA_25_ID"
+        echo "    Instalando: $JAVA_25_ID"
         echo "n" | sdk install java "$JAVA_25_ID" || true
     fi
 else
-     echo "    Java 25 (amzn) not found."
+     echo "    Java 25 (amzn) não encontrado."
 fi
 
-echo "[*] Setting Java 21 ($JAVA_21_ID) as default..."
+echo "[*] Definindo Java 21 ($JAVA_21_ID) como padrão..."
 sdk default java "$JAVA_21_ID" || true
 
-# --- 5. Project Dependencies ---
+# --- 5. Dependências do Projeto ---
 echo "----------------------------------------------------------------"
-echo "Installing Project Dependencies"
+echo "Instalando Dependências do Projeto"
 echo "----------------------------------------------------------------"
 
 npm config set strict-ssl false
-echo "[*] Running 'npm install' in root..."
+echo "[*] Executando 'npm install' na raiz..."
 npm install
 
-echo "[*] Running 'npm install' in frontend..."
+echo "[*] Executando 'npm install' no frontend..."
 if [ -d "frontend" ]; then
     (cd frontend && npm install)
 else
-    echo "[!] 'frontend' directory not found."
+    echo "[!] Diretório 'frontend' não encontrado."
 fi
 
-echo "[*] Installing Playwright (Chromium only)..."
+echo "[*] Instalando Playwright (Apenas Chromium)..."
 export NODE_TLS_REJECT_UNAUTHORIZED=0
 npx playwright install chromium
 
 echo "----------------------------------------------------------------"
-echo "Setup Complete!"
-echo "Please restart your terminal or run: source ~/.bashrc"
+echo "Configuração Concluída!"
+echo "----------------------------------------------------------------"
+
+# Tentar atualizar o ambiente atual
+if [ -f "$HOME/.bashrc" ]; then
+    echo "[*] Carregando (source) ~/.bashrc..."
+    source "$HOME/.bashrc" || true
+elif [ -f "$HOME/.zshrc" ]; then
+     echo "[*] Carregando (source) ~/.zshrc..."
+     source "$HOME/.zshrc" || true
+fi
+
+echo "[✔] Ambiente atualizado. Você deve conseguir rodar 'node', 'java', etc."
+echo "    Se os comandos não forem encontrados, reinicie seu terminal manualmente."
 echo "----------------------------------------------------------------"
