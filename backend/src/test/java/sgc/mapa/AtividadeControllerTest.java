@@ -72,7 +72,7 @@ class AtividadeControllerTest {
             Mockito.when(atividadeFacade.criarAtividade(any())).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades")
-                            .with(user("123"))
+                            .with(user("123").roles("CHEFE"))
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
@@ -101,7 +101,7 @@ class AtividadeControllerTest {
             Mockito.when(atividadeFacade.atualizarAtividade(eq(1L), any())).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/atualizar")
-                            .with(user("123"))
+                            .with(user("123").roles("CHEFE"))
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
@@ -117,7 +117,7 @@ class AtividadeControllerTest {
             Mockito.when(atividadeFacade.excluirAtividade(1L)).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/excluir")
-                            .with(user("123"))
+                            .with(user("123").roles("CHEFE"))
                             .with(csrf()))
                     .andExpect(status().isOk());
 
@@ -144,7 +144,7 @@ class AtividadeControllerTest {
             Mockito.when(atividadeFacade.criarConhecimento(eq(1L), any())).thenReturn(resultado);
 
             mockMvc.perform(post("/api/atividades/1/conhecimentos")
-                            .with(user("123"))
+                            .with(user("123").roles("CHEFE"))
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"atividadeCodigo\": 1, \"descricao\": \"C1\"}"))
@@ -161,7 +161,7 @@ class AtividadeControllerTest {
             Mockito.when(atividadeFacade.atualizarConhecimento(eq(1L), eq(2L), any())).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/conhecimentos/2/atualizar")
-                            .with(user("123"))
+                            .with(user("123").roles("CHEFE"))
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"atividadeCodigo\": 1, \"descricao\": \"C1 Update\"}"))
@@ -177,7 +177,7 @@ class AtividadeControllerTest {
             Mockito.when(atividadeFacade.excluirConhecimento(1L, 2L)).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/conhecimentos/2/excluir")
-                            .with(user("123"))
+                            .with(user("123").roles("CHEFE"))
                             .with(csrf()))
                     .andExpect(status().isOk());
 

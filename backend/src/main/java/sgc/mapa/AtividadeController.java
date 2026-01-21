@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.service.AtividadeFacade;
@@ -35,6 +36,7 @@ public class AtividadeController {
      * 404 Not Found se a atividade não for encontrada.
      */
     @GetMapping("/{codAtividade}")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtém uma atividade pelo código")
     public ResponseEntity<AtividadeResponse> obterPorId(@PathVariable Long codAtividade) {
         return ResponseEntity.ok(atividadeFacade.obterAtividadePorId(codAtividade));
@@ -48,6 +50,7 @@ public class AtividadeController {
      * contendo a atividade criada e o status do subprocesso.
      */
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Cria uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> criar(@Valid @RequestBody CriarAtividadeRequest request) {
         AtividadeOperacaoResponse resp = atividadeFacade.criarAtividade(request);
@@ -64,6 +67,7 @@ public class AtividadeController {
      * a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codigo}/atualizar")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Atualiza atividade existente")
     public ResponseEntity<AtividadeOperacaoResponse> atualizar(@PathVariable Long codigo, @RequestBody @Valid AtualizarAtividadeRequest request) {
         AtividadeOperacaoResponse response = atividadeFacade.atualizarAtividade(codigo, request);
@@ -81,6 +85,7 @@ public class AtividadeController {
      * o status atualizado do subprocesso (atividade será null).
      */
     @PostMapping("/{codAtividade}/excluir")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Exclui uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> excluir(@PathVariable Long codAtividade) {
         AtividadeOperacaoResponse response = atividadeFacade.excluirAtividade(codAtividade);
@@ -94,6 +99,7 @@ public class AtividadeController {
      * @return Um {@link ResponseEntity} com status 200 OK e a lista de {@link ConhecimentoResponse}.
      */
     @GetMapping("/{codAtividade}/conhecimentos")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista todos os conhecimentos de uma atividade")
     public ResponseEntity<List<ConhecimentoResponse>> listarConhecimentos(@PathVariable Long codAtividade) {
         return ResponseEntity.ok(atividadeFacade.listarConhecimentosPorAtividade(codAtividade));
@@ -108,6 +114,7 @@ public class AtividadeController {
      * contendo a atividade atualizada com o novo conhecimento e o situação do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Cria um conhecimento para uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> criarConhecimento(
             @PathVariable Long codAtividade,
@@ -128,6 +135,7 @@ public class AtividadeController {
      * a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/atualizar")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Atualiza um conhecimento existente em uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> atualizarConhecimento(
             @PathVariable Long codAtividade,
@@ -147,6 +155,7 @@ public class AtividadeController {
      * a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/excluir")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Exclui um conhecimento de uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> excluirConhecimento(
             @PathVariable Long codAtividade,

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,6 +36,7 @@ public class PainelController {
      * ProcessoResumoDto}.
      */
     @GetMapping("/processos")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista processos para o painel com base no perfil e unidade")
     public ResponseEntity<Page<ProcessoResumoDto>> listarProcessos(
             @RequestParam(name = "perfil") Perfil perfil,
@@ -57,6 +59,7 @@ public class PainelController {
      * @return Um {@link ResponseEntity} contendo uma página {@link Page} de {@link AlertaDto}.
      */
     @GetMapping("/alertas")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista alertas para o painel com base no usuário e unidade")
     public ResponseEntity<Page<AlertaDto>> listarAlertas(
             @RequestParam(name = "usuarioTitulo", required = false) String usuarioTitulo,

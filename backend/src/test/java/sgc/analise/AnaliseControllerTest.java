@@ -154,7 +154,7 @@ class AnaliseControllerTest {
 
         @Test
         @DisplayName("Deve criar uma análise de cadastro e retornar 201 Created")
-        @WithMockUser
+        @WithMockUser(roles = "GESTOR")
         void deveCriarAnaliseCadastro() throws Exception {
             var requestDto =
                     CriarAnaliseCommand.builder().observacoes(NOVA_ANALISE_DE_CADASTRO).build();
@@ -183,7 +183,7 @@ class AnaliseControllerTest {
         @Test
         @DisplayName(
                 "Deve criar uma análise de cadastro com observações vazias e retornar 201 Created")
-        @WithMockUser
+        @WithMockUser(roles = "GESTOR")
         void deveCriarAnaliseCadastroComObservacoesVazias() throws Exception {
             var requestDto = CriarAnaliseCommand.builder().observacoes("").build();
 
@@ -207,7 +207,7 @@ class AnaliseControllerTest {
 
         @Test
         @DisplayName("Deve criar uma análise de cadastro sem payload e retornar 201 Created")
-        @WithMockUser
+        @WithMockUser(roles = "ADMIN")
         void deveCriarAnaliseCadastroSemPayload() throws Exception {
             var analise = new Analise();
             analise.setCodigo(1L);
@@ -227,7 +227,7 @@ class AnaliseControllerTest {
 
         @Test
         @DisplayName(DEVE_RETORNAR_404_NOT_FOUND)
-        @WithMockUser
+        @WithMockUser(roles = "ADMIN")
         void deveRetornarNotFoundParaSubprocessoInexistenteNaCriacao() throws Exception {
             var requestDto = CriarAnaliseCommand.builder().observacoes(ANALISE_DE_CADASTRO).build();
 
@@ -245,7 +245,7 @@ class AnaliseControllerTest {
 
         @Test
         @DisplayName("Deve retornar 400 Bad Request para parâmetro inválido")
-        @WithMockUser
+        @WithMockUser(roles = "GESTOR")
         void deveRetornarBadRequestParaParametroInvalido() throws Exception {
             var requestDto = CriarAnaliseCommand.builder().observacoes(ANALISE_INVALIDA).build();
 
@@ -268,7 +268,7 @@ class AnaliseControllerTest {
 
         @Test
         @DisplayName("Deve retornar 500 Internal Server Error para erro inesperado na criação")
-        @WithMockUser
+        @WithMockUser(roles = "ADMIN")
         void deveRetornarInternalServerErrorParaErroInesperadoNaCriacao() throws Exception {
             var requestDto = CriarAnaliseCommand.builder().observacoes(ANALISE_DE_CADASTRO).build();
 
@@ -287,7 +287,7 @@ class AnaliseControllerTest {
 
         @Test
         @DisplayName("Deve retornar 400 Bad Request para observação muito longa")
-        @WithMockUser
+        @WithMockUser(roles = "GESTOR")
         void deveRetornarBadRequestParaObservacaoMuitoLonga() throws Exception {
             var requestDto = CriarAnaliseCommand.builder()
                     .observacoes("a".repeat(501))
@@ -387,7 +387,7 @@ class AnaliseControllerTest {
 
         @Test
         @DisplayName("Deve criar uma análise de validação e retornar 201 Created")
-        @WithMockUser
+        @WithMockUser(roles = "ADMIN")
         void deveCriarAnaliseValidacao() throws Exception {
             var requestDto =
                     CriarAnaliseCommand.builder().observacoes(NOVA_ANALISE_DE_VALIDACAO).build();
@@ -416,7 +416,7 @@ class AnaliseControllerTest {
         @Test
         @DisplayName(
                 "Deve criar uma análise de validação com observações vazias e retornar 201 Created")
-        @WithMockUser
+        @WithMockUser(roles = "GESTOR")
         void deveCriarAnaliseValidacaoComObservacoesVazias() throws Exception {
             var requestDto = CriarAnaliseCommand.builder().observacoes("").build();
 
@@ -438,7 +438,7 @@ class AnaliseControllerTest {
 
         @Test
         @DisplayName(DEVE_RETORNAR_404_NOT_FOUND)
-        @WithMockUser
+        @WithMockUser(roles = "ADMIN")
         void deveRetornarNotFoundParaSubprocessoInexistenteNaCriacaoValidacao() throws Exception {
             var requestDto =
                     CriarAnaliseCommand.builder().observacoes(ANALISE_DE_VALIDACAO).build();
@@ -456,7 +456,7 @@ class AnaliseControllerTest {
 
         @Test
         @DisplayName("Deve retornar 400 Bad Request para parâmetro inválido")
-        @WithMockUser
+        @WithMockUser(roles = "GESTOR")
         void deveRetornarBadRequestParaParametroInvalidoValidacao() throws Exception {
             var requestDto = CriarAnaliseCommand.builder().observacoes(ANALISE_INVALIDA).build();
 
@@ -479,7 +479,7 @@ class AnaliseControllerTest {
 
         @Test
         @DisplayName("Deve retornar 500 Internal Server Error para erro inesperado na criação")
-        @WithMockUser
+        @WithMockUser(roles = "ADMIN")
         void deveRetornarInternalServerErrorParaErroValidacaoInesperadoNaCriacao()
                 throws Exception {
             var requestDto =

@@ -53,7 +53,7 @@ class UnidadeControllerTest {
 
     @Test
     @DisplayName("Deve retornar 201 ao criar atribuição temporária")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar201AoCriarAtribuicaoTemporaria() throws Exception {
         // Act & Assert
         mockMvc.perform(
@@ -115,7 +115,7 @@ class UnidadeControllerTest {
 
     @Test
     @DisplayName("Deve retornar lista de usuários por unidade")
-    @WithMockUser
+    @WithMockUser(roles = "CHEFE")
     void deveRetornarListaDeUsuariosPorUnidade() throws Exception {
         // Arrange
         when(unidadeService.buscarUsuariosPorUnidade(1L)).thenReturn(List.of(UsuarioDto.builder().build()));

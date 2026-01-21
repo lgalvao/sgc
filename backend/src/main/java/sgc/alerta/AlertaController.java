@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ public class AlertaController {
     private final AlertaFacade alertaService;
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista todos os alertas do usuário autenticado")
     public ResponseEntity<List<AlertaDto>> listarAlertas(@AuthenticationPrincipal Object principal) {
         String usuarioTitulo = extractTituloUsuario(principal);
@@ -30,6 +32,7 @@ public class AlertaController {
     }
 
     @GetMapping("/nao-lidos")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista alertas não lidos do usuário autenticado")
     public ResponseEntity<List<AlertaDto>> listarNaoLidos(@AuthenticationPrincipal Object principal) {
         String usuarioTitulo = extractTituloUsuario(principal);
@@ -39,6 +42,7 @@ public class AlertaController {
     }
 
     @PostMapping("/marcar-como-lidos")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Marca múltiplos alertas como lidos")
     public ResponseEntity<Map<String, String>> marcarComoLidos(
             @RequestBody List<Long> codigos,
