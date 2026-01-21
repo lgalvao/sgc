@@ -2,7 +2,8 @@
 
 # setup-env.sh
 # Configura o ambiente de desenvolvimento com NVM, Node.js, SDKMAN e Java.
-# Otimizado para sistemas Ubuntu/Unix-like (Não-interativo & Certificados Auto-assinados).
+# Otimizado para sistemas Ubuntu/Unix-like.
+# INCLUI: Importação de certificados locais para Java/Gradle.
 
 # Parar no primeiro erro
 set -e
@@ -39,17 +40,14 @@ WGETRC_BAK="$HOME/.wgetrc.bak.$(date +%s)"
 limpar_configs_ssl() {
     if [ -f "$CURLRC_BAK" ]; then mv "$CURLRC_BAK" "$CURLRC"; elif [ -f "$CURLRC" ]; then rm "$CURLRC"; fi
     if [ -f "$WGETRC_BAK" ]; then mv "$WGETRC_BAK" "$WGETRC"; elif [ -f "$WGETRC" ]; then rm "$WGETRC" ; fi
-    # echo "[*] Configurações temporárias limpas."
 }
 
 trap limpar_configs_ssl EXIT
 
 echo "[*] Configurando curl e wget para aceitar certificados auto-assinados..."
-# Curl: 'insecure' permite conexões SSL sem verificar a cadeia de certificados
 if [ -f "$CURLRC" ]; then cp "$CURLRC" "$CURLRC_BAK"; fi
 echo "insecure" >> "$CURLRC"
 
-# Wget: 'check_certificate = off' permite conexões sem verificar a cadeia
 if [ -f "$WGETRC" ]; then cp "$WGETRC" "$WGETRC_BAK"; fi
 echo "check_certificate = off" >> "$WGETRC"
 
@@ -65,10 +63,8 @@ else
     curl -k -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
 fi
 
-# Carregar NVM
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
 if ! command -v nvm &> /dev/null; then
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -77,7 +73,6 @@ fi
 # --- 2. Instalação do Node.js ---
 echo "[*] Instalando Node.js (LTS)..."
 
-# Preferir LTS (v22) ao invés do "node" (latest/v25) por estabilidade
 if ! nvm install --lts; then
     echo "[!] 'nvm install --lts' falhou. Tentando versão explícita v22.13.0..."
     nvm install v22.13.0
@@ -89,23 +84,16 @@ nvm alias default "lts/*" || nvm alias default v22.13.0
 # VERIFICAR EXECUÇÃO DO NODE
 echo "[*] Verificando instalação do Node.js..."
 if ! node -e 'console.log("Node is working")' &> /dev/null; then
-    echo "[!] ERRO CRÍTICO: Node.js foi instalado mas falhou ao executar."
-    echo "    Erro detectado:"
+    echo "[!] ERRO CRÍTICO: Node.js falhou ao executar."
     node -v 2>&1 || true
-    
-    # Checar especificamente pelo erro da libatomic
     if node -v 2>&1 | grep -q "libatomic"; then
         echo ""
         echo "    [DEPENDÊNCIA FALTANDO]: libatomic.so.1"
-        echo "    Seu sistema não possui uma biblioteca obrigatória."
-        echo "    Como este script não usa sudo, peça a um admin para rodar:"
-        echo "      sudo apt-get install -y libatomic1"
-        echo "    Ou se você tiver acesso sudo, execute você mesmo e reinicie este script."
+        echo "    Peça a um admin para rodar: sudo apt-get install -y libatomic1"
     fi
     exit 1
 fi
-
-echo "[✔] Node.js $(node -v) e npm $(npm -v) estão prontos."
+echo "[✔] Node.js $(node -v) e npm $(npm -v) prontos."
 
 # --- 3. Instalação do SDKMAN ---
 export SDKMAN_DIR="$HOME/.sdkman"
@@ -116,12 +104,10 @@ else
     curl -k -s "https://get.sdkman.io" | bash
 fi
 
-# Carregar SDKMAN
 if [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]]; then
     source "$SDKMAN_DIR/bin/sdkman-init.sh"
 fi
 
-# Configurar SDKMAN
 SDKMAN_CONFIG="$SDKMAN_DIR/etc/config"
 if [ -f "$SDKMAN_CONFIG" ]; then
     set_sdkman_config() {
@@ -133,7 +119,6 @@ if [ -f "$SDKMAN_CONFIG" ]; then
             echo "$key=$value" >> "$SDKMAN_CONFIG"
         fi
     }
-    # Permite certificados auto-assinados (não verifica a cadeia)
     set_sdkman_config "sdkman_insecure_ssl" "true"
     set_sdkman_config "sdkman_auto_answer" "true"
 fi
@@ -144,27 +129,25 @@ fi
 obter_versao_java_recente() {
     local version=$1
     local vendor=$2
-    # Tenta listar versões (ignora erros se estiver offline/bloqueado)
     sdk list java 2>/dev/null | grep -E " $version\.[0-9.]*-$vendor " | head -n 1 | awk '{print $NF}'
 }
 
-echo "[*] Detectando Java 21 mais recente (Corretto/amzn)..."
+echo "[*] Detectando Java 21 (Corretto)..."
 JAVA_21_ID=$(obter_versao_java_recente "21" "amzn") || echo ""
 [ -z "$JAVA_21_ID" ] && JAVA_21_ID="21.0.9-amzn"
 
-# Verificar se já está instalado para evitar output redundante
 if sdk list java | grep -q "installed" | grep -q "$JAVA_21_ID"; then
-    echo "[✔] Java $JAVA_21_ID já está instalado."
+    echo "[✔] Java $JAVA_21_ID já instalado."
 else
     echo "    Instalando: $JAVA_21_ID"
     echo "Y" | sdk install java "$JAVA_21_ID" || true
 fi
 
-echo "[*] Detectando Java 25 mais recente (Corretto/amzn)..."
+echo "[*] Detectando Java 25 (Corretto)..."
 JAVA_25_ID=$(obter_versao_java_recente "25" "amzn") || echo ""
 if [ -n "$JAVA_25_ID" ]; then
     if sdk list java | grep -q "installed" | grep -q "$JAVA_25_ID"; then
-        echo "[✔] Java $JAVA_25_ID já está instalado."
+        echo "[✔] Java $JAVA_25_ID já instalado."
     else
         echo "    Instalando: $JAVA_25_ID"
         echo "n" | sdk install java "$JAVA_25_ID" || true
@@ -173,15 +156,63 @@ else
      echo "    Java 25 (amzn) não encontrado."
 fi
 
-echo "[*] Definindo Java 21 ($JAVA_21_ID) como padrão..."
+echo "[*] Definindo Java 21 como padrão..."
 sdk default java "$JAVA_21_ID" || true
+
+
+# --- CORREÇÃO DE CERTIFICADOS LOCAIS PARA GRADLE/JAVA ---
+echo "----------------------------------------------------------------"
+echo "Importando Certificados Locais para o Java (Fix Gradle)"
+echo "----------------------------------------------------------------"
+
+# Encontrar o local do cacerts
+JAVA_HOME_ATUAL=$(sdk home java "$JAVA_21_ID")
+KEYSTORE="$JAVA_HOME_ATUAL/lib/security/cacerts"
+
+if [ ! -f "$KEYSTORE" ]; then
+    KEYSTORE="$JAVA_HOME_ATUAL/conf/security/cacerts"
+fi
+
+CERT_DIR="backend/etc/deploy"
+
+if [ -w "$KEYSTORE" ]; then
+    importar_cert_local() {
+        local cert_file=$1
+        local alias=$2
+        
+        if [ -f "$cert_file" ]; then
+            echo "[*] Importando $cert_file como $alias..."
+            
+            # Remove o alias se já existir para evitar erro
+            "$JAVA_HOME_ATUAL/bin/keytool" -delete -alias "$alias" -keystore "$KEYSTORE" -storepass changeit -noprompt 2>/dev/null || true
+            
+            "$JAVA_HOME_ATUAL/bin/keytool" -import -trustcacerts -alias "$alias" -file "$cert_file" -keystore "$KEYSTORE" -storepass changeit -noprompt 2>/dev/null
+            
+            if [ $? -eq 0 ]; then
+                echo "[✔] Sucesso."
+            else
+                echo "[!] Falha ao importar $alias."
+            fi
+        else
+            echo "[!] Arquivo de certificado não encontrado: $cert_file"
+        fi
+    }
+
+    # Importa os certificados fornecidos
+    importar_cert_local "$CERT_DIR/cert-for.cer" "cert-fortinet"
+    importar_cert_local "$CERT_DIR/cert-tre.cer" "cert-tre-pe"
+
+else
+    echo "[!] Não encontrei o keystore em $KEYSTORE ou sem permissão de escrita."
+    echo "    O Gradle pode falhar. Tente rodar como root se necessário, ou verifique permissões."
+fi
+
 
 # --- 5. Dependências do Projeto ---
 echo "----------------------------------------------------------------"
 echo "Instalando Dependências do Projeto"
 echo "----------------------------------------------------------------"
 
-# Permite certificados auto-assinados no npm (não desabilita SSL, apenas a validação estrita)
 npm config set strict-ssl false
 echo "[*] Executando 'npm install' na raiz..."
 npm install
@@ -194,7 +225,6 @@ else
 fi
 
 echo "[*] Instalando Playwright (Apenas Chromium)..."
-# Permite certificados auto-assinados no Node para o download do browser
 export NODE_TLS_REJECT_UNAUTHORIZED=0
 npx playwright install chromium
 
@@ -202,15 +232,11 @@ echo "----------------------------------------------------------------"
 echo "Configuração Concluída!"
 echo "----------------------------------------------------------------"
 
-# Tentar atualizar o ambiente atual
 if [ -f "$HOME/.bashrc" ]; then
-    echo "[*] Carregando (source) ~/.bashrc..."
     source "$HOME/.bashrc" || true
 elif [ -f "$HOME/.zshrc" ]; then
-     echo "[*] Carregando (source) ~/.zshrc..."
      source "$HOME/.zshrc" || true
 fi
 
-echo "[✔] Ambiente atualizado. Você deve conseguir rodar 'node', 'java', etc."
-echo "    Se os comandos não forem encontrados, reinicie seu terminal manualmente."
+echo "[✔] Ambiente atualizado."
 echo "----------------------------------------------------------------"
