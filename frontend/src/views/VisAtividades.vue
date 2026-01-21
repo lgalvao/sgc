@@ -102,7 +102,6 @@
           isHomologacao ? 'Confirma a homologação do cadastro de atividades e conhecimentos?' : (isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?')
         }}</p>
       <div
-          v-if="!isHomologacao"
           class="mb-3"
       >
         <label
