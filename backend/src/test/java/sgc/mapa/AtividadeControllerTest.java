@@ -95,6 +95,17 @@ class AtividadeControllerTest {
         }
 
         @Test
+        @DisplayName("Deve retornar 403 se usuário não tem role adequada")
+        void deveRetornar403SeUsuarioSemRole() throws Exception {
+            mockMvc.perform(post("/api/atividades")
+                            .with(user("123").roles("SERVIDOR"))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
         @DisplayName("Deve atualizar atividade")
         void deveAtualizarAtividade() throws Exception {
             AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder().build();
