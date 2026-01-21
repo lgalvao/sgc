@@ -25,7 +25,7 @@ public interface UsuarioMapper {
      * Converte Unidade para UnidadeDto com flag de elegibilidade customizada.
      */
     @Mapping(target = "codigoPai", source = "unidade.unidadeSuperior.codigo")
-    @Mapping(target = "tipo", expression = "java(unidade.getTipo().name())")
+    @Mapping(target = "tipo", expression = "java(unidade.getTipo() != null ? unidade.getTipo().name() : null)")
     @Mapping(target = "subunidades", expression = "java(new java.util.ArrayList<>())")
     @Mapping(target = "isElegivel", source = "isElegivel")
     UnidadeDto toUnidadeDto(Unidade unidade, boolean isElegivel);

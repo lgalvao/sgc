@@ -11,7 +11,7 @@ import org.springframework.util.StopWatch;
 @Component
 @Slf4j
 public class MonitoramentoAspect {
-    private static final long LIMITE_ALERTA_MS = 100;
+    private static final long LIMITE_ALERTA_MS = 500;
 
     @Around("execution(* sgc..*Service.*(..)) || execution(* sgc..*Repo.*(..))")
     public Object monitorarExecucao(ProceedingJoinPoint joinPoint) throws Throwable {

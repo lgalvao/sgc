@@ -13,19 +13,35 @@ import java.util.Optional;
  */
 @Repository
 public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
-    Optional<Unidade> findBySigla(String sigla);
+    Optional<Unidade> findBySiglaAndSituacao(String sigla, SituacaoUnidade situacao);
+
+    default Optional<Unidade> findBySigla(String sigla) {
+        return findBySiglaAndSituacao(sigla, SituacaoUnidade.ATIVA);
+    }
 
     @Query("""
-            SELECT u.sigla FROM Unidade u WHERE u.codigo IN :codigos
+            SELECT u.sigla FROM Unidade u 
+            WHERE u.codigo IN :codigos 
+            AND u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
             """)
     List<String> findSiglasByCodigos(@Param("codigos") List<Long> codigos);
 
     @Query("""
-            SELECT u FROM Unidade u LEFT JOIN FETCH u.unidadeSuperior
+            SELECT u FROM Unidade u 
+            LEFT JOIN FETCH u.unidadeSuperior 
+            WHERE u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
             """)
     List<Unidade> findAllWithHierarquia();
 
-    List<Unidade> findByUnidadeSuperiorCodigo(Long unidadeSuperiorCodigo);
+    List<Unidade> findByUnidadeSuperiorCodigoAndSituacao(Long unidadeSuperiorCodigo, SituacaoUnidade situacao);
 
-    List<Unidade> findByTituloTitular(String tituloTitular);
+    default List<Unidade> findByUnidadeSuperiorCodigo(Long unidadeSuperiorCodigo) {
+        return findByUnidadeSuperiorCodigoAndSituacao(unidadeSuperiorCodigo, SituacaoUnidade.ATIVA);
+    }
+
+    List<Unidade> findByTituloTitularAndSituacao(String tituloTitular, SituacaoUnidade situacao);
+
+    default List<Unidade> findByTituloTitular(String tituloTitular) {
+        return findByTituloTitularAndSituacao(tituloTitular, SituacaoUnidade.ATIVA);
+    }
 }

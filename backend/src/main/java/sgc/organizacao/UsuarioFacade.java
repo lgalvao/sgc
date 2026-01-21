@@ -117,6 +117,7 @@ public class UsuarioFacade {
                 .map(usuario -> {
                     carregarAtribuicoes(usuario);
                     return usuario.getTodasAtribuicoes().stream()
+                            .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                             .map(this::toPerfilDto)
                             .toList();
                 })
@@ -177,6 +178,7 @@ public class UsuarioFacade {
 
         Map<Long, List<Usuario>> chefesPorUnidade = chefesCompletos.stream()
                 .flatMap(u -> u.getTodasAtribuicoes().stream()
+                        .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                         .filter(a -> a.getPerfil() == Perfil.CHEFE && unidadesCodigos.contains(a.getUnidadeCodigo()))
                         .map(a -> new AbstractMap.SimpleEntry<>(a.getUnidadeCodigo(), u)))
                 .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
@@ -200,6 +202,7 @@ public class UsuarioFacade {
                 .map(u -> {
                     carregarAtribuicoes(u);
                     return u.getTodasAtribuicoes().stream()
+                            .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                             .filter(a -> a.getPerfil() == Perfil.CHEFE)
                             .map(UsuarioPerfil::getUnidadeCodigo)
                             .toList();
@@ -214,6 +217,7 @@ public class UsuarioFacade {
                 .map(u -> {
                     carregarAtribuicoes(u);
                     return u.getTodasAtribuicoes().stream()
+                            .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                             .anyMatch(a -> a.getPerfil().name().equals(perfil)
                                     && a.getUnidadeCodigo().equals(unidadeCodigo));
                 })
@@ -227,6 +231,7 @@ public class UsuarioFacade {
                 .map(u -> {
                     carregarAtribuicoes(u);
                     return u.getTodasAtribuicoes().stream()
+                            .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                             .filter(a -> a.getPerfil().name().equals(perfil))
                             .map(a -> a.getUnidade().getCodigo())
                             .toList();

@@ -1,10 +1,10 @@
 export interface AutenticacaoRequest {
-    tituloEleitoral: number;
+    tituloEleitoral: string;
     senha: string;
 }
 
 export interface EntrarRequest {
-    tituloEleitoral: number;
+    tituloEleitoral: string;
     perfil: string;
     unidadeCodigo: number;
 }
@@ -18,7 +18,7 @@ export interface Unidade {
 }
 
 export interface Usuario {
-    tituloEleitoral: number;
+    tituloEleitoral: string;
     nome: string;
     email: string;
     ramal: string;
@@ -62,7 +62,7 @@ export function mapUsuarioToFrontend(usuarioDto: any): Usuario {
 }
 
 export interface LoginResponse {
-    tituloEleitoral: number;
+    tituloEleitoral: string;
     nome: string;
     perfil: Perfil; // Usando o tipo Perfil já definido
     unidadeCodigo: number;

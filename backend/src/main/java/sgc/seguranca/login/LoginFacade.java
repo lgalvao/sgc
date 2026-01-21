@@ -71,11 +71,13 @@ public class LoginFacade {
      * @return true se a autenticação for bem-sucedida
      */
     public boolean autenticar(String tituloEleitoral, String senha) {
+        if (ambienteTestes) {
+            log.info("Autenticação em ambiente de testes/homologação para o usuário {}", tituloEleitoral);
+            autenticacoesRecentes.put(tituloEleitoral, LocalDateTime.now());
+            return true;
+        }
+
         if (clienteAcessoAd == null) {
-            if (ambienteTestes) {
-                autenticacoesRecentes.put(tituloEleitoral, LocalDateTime.now());
-                return true;
-            }
             log.warn("Cliente AD não configurado e ambiente não é de testes.");
             return false;
         }
@@ -158,6 +160,7 @@ public class LoginFacade {
         }
 
         return usuario.getTodasAtribuicoes().stream()
+                .filter(a -> a.getUnidade().getSituacao() == sgc.organizacao.model.SituacaoUnidade.ATIVA)
                 .map(atribuicao -> new PerfilUnidadeDto(
                         atribuicao.getPerfil(),
                         usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(atribuicao.getUnidade())))

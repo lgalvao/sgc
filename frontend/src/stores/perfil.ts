@@ -6,10 +6,8 @@ import * as usuarioService from "../services/usuarioService";
 import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
 export const usePerfilStore = defineStore("perfil", () => {
-    const usuarioCodigo = ref<number | null>(
-        localStorage.getItem("usuarioCodigo")
-            ? Number(localStorage.getItem("usuarioCodigo"))
-            : null,
+    const usuarioCodigo = ref<string | null>(
+        localStorage.getItem("usuarioCodigo") || null,
     );
     const perfilSelecionado = ref<Perfil | null>(
         (localStorage.getItem("perfilSelecionado") || null) as Perfil | null,
@@ -46,9 +44,9 @@ export const usePerfilStore = defineStore("perfil", () => {
         lastError.value = null;
     }
 
-    function definirUsuarioCodigo(novoId: string | number) {
-        usuarioCodigo.value = Number(novoId);
-        localStorage.setItem("usuarioCodigo", String(novoId));
+    function definirUsuarioCodigo(novoId: string) {
+        usuarioCodigo.value = novoId;
+        localStorage.setItem("usuarioCodigo", novoId);
     }
 
     function definirPerfilUnidade(perfil: Perfil, unidadeCodigo: number, unidadeSigla: string, nome?: string) {
@@ -76,14 +74,13 @@ export const usePerfilStore = defineStore("perfil", () => {
     async function loginCompleto(tituloEleitoral: string, senha: string) {
         lastError.value = null;
         try {
-            const tituloEleitoralNum = Number(tituloEleitoral);
             const autenticado = await usuarioService.autenticar({
-                tituloEleitoral: tituloEleitoralNum,
+                tituloEleitoral,
                 senha,
             });
             if (autenticado) {
                 const responsePerfisUnidades =
-                    await usuarioService.autorizar(tituloEleitoralNum);
+                    await usuarioService.autorizar(tituloEleitoral);
                 perfisUnidades.value = responsePerfisUnidades;
 
                 const listaPerfis = [
@@ -97,7 +94,7 @@ export const usePerfilStore = defineStore("perfil", () => {
                 if (responsePerfisUnidades.length === 1) {
                     const perfilUnidadeSelecionado = responsePerfisUnidades[0];
                     const loginResponse = await usuarioService.entrar({
-                        tituloEleitoral: tituloEleitoralNum,
+                        tituloEleitoral,
                         perfil: perfilUnidadeSelecionado.perfil,
                         unidadeCodigo: perfilUnidadeSelecionado.unidade.codigo,
                     });
@@ -123,13 +120,13 @@ export const usePerfilStore = defineStore("perfil", () => {
     }
 
     async function selecionarPerfilUnidade(
-        tituloEleitoral: number,
+        tituloEleitoral: string,
         perfilUnidade: PerfilUnidade,
     ) {
         lastError.value = null;
         try {
             const loginResponse = await usuarioService.entrar({
-                tituloEleitoral: tituloEleitoral,
+                tituloEleitoral,
                 perfil: perfilUnidade.perfil,
                 unidadeCodigo: perfilUnidade.unidade.codigo,
             });

@@ -19,16 +19,11 @@ export async function autenticar(
 }
 
 export async function autorizar(
-    tituloEleitoral: number,
+    tituloEleitoral: string,
 ): Promise<PerfilUnidade[]> {
     const response = await apiClient.post<any[]>(
         "/usuarios/autorizar",
-        tituloEleitoral,
-        {
-            headers: {
-                "Content-Type": "application/json",
-            },
-        },
+        { tituloEleitoral },
     );
     return response.data.map(mapPerfilUnidadeToFrontend);
 }

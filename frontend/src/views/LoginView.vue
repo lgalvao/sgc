@@ -259,10 +259,10 @@ const handleLogin = async () => {
     if (parSelecionado.value) {
       isLoading.value = true;
       try {
-        await perfilStore.selecionarPerfilUnidade(
-            Number(titulo.value),
-            parSelecionado.value,
-        );
+      await perfilStore.selecionarPerfilUnidade(
+          titulo.value,
+          parSelecionado.value,
+      );
         await router.push("/painel");
       } catch (error) {
         logger.error("Erro ao selecionar perfil:", error);

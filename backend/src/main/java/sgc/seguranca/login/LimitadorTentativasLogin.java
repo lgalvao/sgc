@@ -46,7 +46,7 @@ public class LimitadorTentativasLogin {
     }
 
     public void verificar(String ip) {
-        if (isPerfilTesteAtivo())
+        if (isLimiterDesabilitado())
             return;
 
         if (tentativasPorIp.size() >= maxCacheEntries) {
@@ -72,7 +72,12 @@ public class LimitadorTentativasLogin {
         tentativas.add(LocalDateTime.now(clock));
     }
 
-    private boolean isPerfilTesteAtivo() {
+    private boolean isLimiterDesabilitado() {
+        boolean ambienteTestes = environment.getProperty("aplicacao.ambiente-testes", Boolean.class, false);
+        if (ambienteTestes) {
+            return true;
+        }
+
         return Arrays.stream(environment.getActiveProfiles())
                 .anyMatch(profile -> profile.equalsIgnoreCase("test") || profile.equalsIgnoreCase("e2e"));
     }

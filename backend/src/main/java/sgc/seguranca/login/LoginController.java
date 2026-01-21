@@ -65,8 +65,8 @@ public class LoginController {
      */
     @PostMapping("/autorizar")
     @Operation(summary = "Retorna os perfis e unidades disponíveis para o usuário")
-    public ResponseEntity<List<PerfilUnidadeDto>> autorizar(@RequestBody String tituloEleitoral) {
-        List<PerfilUnidadeDto> perfis = loginFacade.autorizar(tituloEleitoral);
+    public ResponseEntity<List<PerfilUnidadeDto>> autorizar(@Valid @RequestBody sgc.seguranca.login.dto.AutorizarRequest request) {
+        List<PerfilUnidadeDto> perfis = loginFacade.autorizar(request.getTituloEleitoral());
         return ResponseEntity.ok(perfis);
     }
 

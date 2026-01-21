@@ -177,7 +177,11 @@ public class UnidadeFacade {
     }
 
     public Unidade buscarEntidadePorId(Long codigo) {
-        return repo.buscar(Unidade.class, codigo);
+        Unidade unidade = repo.buscar(Unidade.class, codigo);
+        if (unidade.getSituacao() != SituacaoUnidade.ATIVA) {
+            throw new ErroEntidadeNaoEncontrada("Unidade", codigo);
+        }
+        return unidade;
     }
 
     @Cacheable(value = "unidadeDescendentes", key = "#codigoUnidade")
