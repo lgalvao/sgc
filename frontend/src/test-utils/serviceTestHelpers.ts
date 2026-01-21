@@ -83,6 +83,6 @@ export function testErrorHandling(
 
     it(`deve lidar com erro de rede`, async () => {
         mockApi[method].mockRejectedValue(new Error("Network Error"));
-        expect(action()).rejects.toThrow("Network Error");
+        await expect(action()).rejects.toThrow("Network Error");
     });
 }
