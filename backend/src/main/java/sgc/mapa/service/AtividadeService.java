@@ -124,6 +124,11 @@ public class AtividadeService {
     }
 
     @Transactional(readOnly = true)
+    public List<Atividade> buscarPorMapaCodigoSemRelacionamentos(Long mapaCodigo) {
+        return atividadeRepo.findByMapaCodigoSemFetch(mapaCodigo);
+    }
+
+    @Transactional(readOnly = true)
     public List<Atividade> buscarPorMapaCodigoComConhecimentos(Long mapaCodigo) {
         return atividadeRepo.findByMapaCodigoWithConhecimentos(mapaCodigo);
     }

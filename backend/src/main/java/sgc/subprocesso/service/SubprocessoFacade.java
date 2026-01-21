@@ -531,6 +531,10 @@ public class SubprocessoFacade {
 
     private SubprocessoDetalheDto obterDetalhesInterno(Long codigo, Usuario usuarioAutenticado) {
         Subprocesso sp = crudService.buscarSubprocesso(codigo);
+        return obterDetalhesInterno(sp, usuarioAutenticado);
+    }
+
+    private SubprocessoDetalheDto obterDetalhesInterno(Subprocesso sp, Usuario usuarioAutenticado) {
         accessControlService.verificarPermissao(usuarioAutenticado, sgc.seguranca.acesso.Acao.VISUALIZAR_SUBPROCESSO, sp);
 
         Usuario responsavel = usuarioService.buscarResponsavelAtual(sp.getUnidade().getSigla());
@@ -578,7 +582,8 @@ public class SubprocessoFacade {
         Long codMapa = sp.getMapa().getCodigo();
         Analise analise = analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst().orElse(null);
         List<Competencia> competencias = competenciaService.buscarPorCodMapa(codMapa);
-        List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(codMapa);
+        // Optimization: Fetch activities without eager loading competencies to avoid redundant data transfer
+        List<Atividade> atividades = atividadeService.buscarPorMapaCodigoSemRelacionamentos(codMapa);
         List<Conhecimento> conhecimentos = conhecimentoService.listarPorMapa(codMapa);
         @Nullable Analise analiseVal = analise;
         return mapaAjusteMapper.toDto(sp, analiseVal, competencias, atividades, conhecimentos);
@@ -624,10 +629,10 @@ public class SubprocessoFacade {
 
     private ContextoEdicaoDto obterContextoEdicaoInterno(Long codSubprocesso) {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
-        SubprocessoDetalheDto subprocessoDto = obterDetalhesInterno(codSubprocesso, usuario);
+        Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
+        SubprocessoDetalheDto subprocessoDto = obterDetalhesInterno(subprocesso, usuario);
 
         String sigla = subprocessoDto.getUnidade().getSigla();
-        Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
         UnidadeDto unidadeDto = unidadeFacade.buscarPorSigla(sigla);
 
         MapaCompletoDto mapaDto = mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
