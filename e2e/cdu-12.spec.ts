@@ -151,6 +151,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await expect(page.getByTestId('btn-aceite-mapa-confirmar')).toBeVisible();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await expect(page.getByTestId('btn-aceite-mapa-confirmar')).toBeHidden();
 
         // Finalizar Processo
         await page.goto('/painel');
