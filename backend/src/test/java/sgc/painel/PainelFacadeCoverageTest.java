@@ -27,6 +27,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -90,5 +91,39 @@ class PainelFacadeCoverageTest {
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
         assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/cadastro?codProcesso=10");
+    }
+
+    @Test
+    @DisplayName("Deve calcular link com erro e retornar null")
+    void deveCalcularLinkErro() {
+        Processo p = new Processo();
+        p.setCodigo(10L);
+        p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+
+        sgc.organizacao.model.Unidade u = new sgc.organizacao.model.Unidade();
+        u.setCodigo(1L);
+        u.setSigla("U1");
+        p.getParticipantes().add(u);
+
+        when(processoFacade.listarPorParticipantesIgnorandoCriado(any(), any())).thenReturn(new PageImpl<>(List.of(p)));
+        // Simular erro ao buscar unidade
+        when(unidadeService.buscarPorCodigo(anyLong())).thenThrow(new RuntimeException("DB Error"));
+
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.SERVIDOR, 1L, PageRequest.of(0, 10));
+        assertThat(result.getContent().getFirst().linkDestino()).isNull();
+    }
+
+    @Test
+    @DisplayName("Deve listar alertas com pageable não ordenado")
+    void deveListarAlertasUnsorted() {
+        // Mock comportamento normal do alertaService
+        when(alertaService.listarPorUnidade(any(), any())).thenReturn(new PageImpl<>(List.of()));
+
+        // Passar pageable sem sort
+        painelFacade.listarAlertas("T", 1L, PageRequest.of(0, 10));
+
+        // Verifica se chamou alertaService com sort adicionado
+        verify(alertaService).listarPorUnidade(eq(1L), argThat(p -> ((Pageable)p).getSort().isSorted()));
     }
 }

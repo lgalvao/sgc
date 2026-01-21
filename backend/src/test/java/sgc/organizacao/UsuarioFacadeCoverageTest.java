@@ -453,4 +453,87 @@ class UsuarioFacadeCoverageTest {
         Map<String, UsuarioDto> map = usuarioFacade.buscarUsuariosPorTitulos(List.of("T"));
         assertThat(map).containsKey("T");
     }
+
+    @Test
+    @DisplayName("Deve filtrar atribuições corretamente ao buscar responsáveis de múltiplas unidades")
+    void deveFiltrarAtribuicoesBuscarResponsaveis() {
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("T");
+        u.setNome("Nome");
+
+        // Atribuição CORRETA (Chefe da unidade 1)
+        UsuarioPerfil up1 = new UsuarioPerfil();
+        up1.setUsuario(u);
+        up1.setUsuarioTitulo("T");
+        up1.setUnidadeCodigo(1L);
+        up1.setPerfil(Perfil.CHEFE);
+
+        // Atribuição ERRADA (Não é chefe)
+        UsuarioPerfil up2 = new UsuarioPerfil();
+        up2.setUsuario(u);
+        up2.setUsuarioTitulo("T");
+        up2.setUnidadeCodigo(1L);
+        up2.setPerfil(Perfil.SERVIDOR);
+
+        // Atribuição ERRADA (Unidade diferente da solicitada)
+        UsuarioPerfil up3 = new UsuarioPerfil();
+        up3.setUsuario(u);
+        up3.setUsuarioTitulo("T");
+        up3.setUnidadeCodigo(2L);
+        up3.setPerfil(Perfil.CHEFE);
+
+        u.setAtribuicoes(Set.of(up1, up2, up3));
+
+        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(u));
+        when(usuarioRepo.findByIdInWithAtribuicoes(List.of("T"))).thenReturn(List.of(u));
+        when(usuarioPerfilRepo.findByUsuarioTituloIn(List.of("T"))).thenReturn(List.of(up1, up2, up3));
+
+        Map<Long, ResponsavelDto> map = usuarioFacade.buscarResponsaveisUnidades(List.of(1L));
+
+        // Deve conter apenas a unidade 1
+        assertThat(map).containsKey(1L);
+        assertThat(map).doesNotContainKey(2L);
+
+        // O responsável deve ser o usuário T
+        assertThat(map.get(1L).getTitularTitulo()).isEqualTo("T");
+    }
+
+    @Test
+    @DisplayName("Deve montar DTO com titular e substituto")
+    void deveMontarDtoComTitularESubstituto() {
+        // Mocking repo to return 2 users for the same unit
+        Usuario titular = new Usuario();
+        titular.setTituloEleitoral("T");
+        titular.setNome("Titular");
+
+        Usuario substituto = new Usuario();
+        substituto.setTituloEleitoral("S");
+        substituto.setNome("Substituto");
+
+        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(titular, substituto));
+
+        ResponsavelDto result = usuarioFacade.buscarResponsavelUnidade(1L);
+
+        assertThat(result.getTitularTitulo()).isEqualTo("T");
+        assertThat(result.getSubstitutoTitulo()).isEqualTo("S");
+        assertThat(result.getSubstitutoNome()).isEqualTo("Substituto");
+    }
+
+    @Test
+    @DisplayName("Deve lidar com inconsistência ao buscar responsáveis (chefes encontrados mas detalhes não)")
+    void deveLidarComInconsistenciaBuscarResponsaveis() {
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("T");
+
+        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(u));
+        // Simula que o usuário não foi encontrado na busca detalhada (inconsistência)
+        when(usuarioRepo.findByIdInWithAtribuicoes(List.of("T"))).thenReturn(Collections.emptyList());
+
+        Map<Long, ResponsavelDto> map = usuarioFacade.buscarResponsaveisUnidades(List.of(1L));
+
+        // Deve retornar mapa vazio pois não conseguiu carregar detalhes
+        assertThat(map).isEmpty();
+
+        // Isso deve disparar carregarAtribuicoesEmLote(emptyList)
+    }
 }

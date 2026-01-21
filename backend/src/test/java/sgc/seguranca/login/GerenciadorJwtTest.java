@@ -153,4 +153,19 @@ class GerenciadorJwtTest {
         Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken(token);
         assertThat(result).isEmpty();
     }
+
+    @Test
+    @DisplayName("Deve capturar exceção inesperada ao validar token")
+    void validateUnexpectedException() {
+        // Simular NPE ao acessar o segredo durante a validação
+        when(jwtProperties.secret()).thenReturn(null);
+
+        // O token pode ser qualquer string, pois o erro vai ocorrer ao tentar obter a chave (antes do parse)
+        // ou durante o parse se o mock for chamado lá.
+        // O método validarToken chama getSigningKey() -> jwtProperties.secret().
+
+        Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken("any.token");
+
+        assertThat(result).isEmpty();
+    }
 }
