@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.dto.CriarAnaliseRequest;
@@ -37,6 +38,7 @@ public class AnaliseController {
      * @return Uma lista de {@link Analise} contendo o histórico de análises de cadastro.
      */
     @GetMapping("/analises-cadastro")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista o histórico de análises de cadastro")
     public List<Analise> listarAnalisesCadastro(@PathVariable("codSubprocesso") Long codigo) {
         subprocessoFacade.buscarSubprocesso(codigo); // Valida existência (lança 404 se não existir)
@@ -55,6 +57,7 @@ public class AnaliseController {
      * @return A entidade {@link Analise} recém-criada.
      */
     @PostMapping("/analises-cadastro")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de cadastro")
     public Analise criarAnaliseCadastro(@PathVariable Long codSubprocesso,
@@ -70,6 +73,7 @@ public class AnaliseController {
      * @return Uma lista de {@link Analise} contendo o histórico de análises de validação.
      */
     @GetMapping("/analises-validacao")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista o histórico de análises de validação")
     public List<Analise> listarAnalisesValidacao(@PathVariable Long codSubprocesso) {
         subprocessoFacade.buscarSubprocesso(codSubprocesso); 
@@ -88,6 +92,7 @@ public class AnaliseController {
      * @return A entidade {@link Analise} recém-criada.
      */
     @PostMapping("/analises-validacao")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de validação")
     public Analise criarAnaliseValidacao(@PathVariable Long codSubprocesso, @RequestBody @Valid CriarAnaliseRequest request) {

@@ -3,6 +3,7 @@ package sgc.organizacao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
@@ -35,6 +36,7 @@ public class UnidadeController {
      * @return Resposta vazia com status 201 (Created).
      */
     @PostMapping("/{codUnidade}/atribuicoes-temporarias")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> criarAtribuicaoTemporaria(
             @PathVariable Long codUnidade, @RequestBody CriarAtribuicaoTemporariaRequest request) {
 
@@ -48,6 +50,7 @@ public class UnidadeController {
      * @return Lista de atribuições temporárias.
      */
     @GetMapping("/atribuicoes")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AtribuicaoTemporariaDto>> buscarTodasAtribuicoes() {
         return ResponseEntity.ok(unidadeService.buscarTodasAtribuicoes());
     }
@@ -104,6 +107,7 @@ public class UnidadeController {
      * @return Lista de usuários da unidade
      */
     @GetMapping("/{codUnidade}/usuarios")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     public ResponseEntity<List<UsuarioDto>> buscarUsuariosPorUnidade(@PathVariable Long codUnidade) {
         List<UsuarioDto> usuarios = unidadeService.buscarUsuariosPorUnidade(codUnidade);
         return ResponseEntity.ok(usuarios);
