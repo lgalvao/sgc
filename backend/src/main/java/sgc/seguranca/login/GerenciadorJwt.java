@@ -1,6 +1,7 @@
 package sgc.seguranca.login;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -86,7 +87,11 @@ public class GerenciadorJwt {
             Perfil perfil = Perfil.valueOf(perfilStr);
             return Optional.of(new JwtClaims(tituloEleitoral, perfil, unidadeCodigo));
 
+        } catch (JwtException | IllegalArgumentException e) {
+            log.warn("Falha na validação do JWT: {}", e.getMessage());
+            return Optional.empty();
         } catch (Exception e) {
+            log.error("Erro inesperado ao validar JWT", e);
             return Optional.empty();
         }
     }
