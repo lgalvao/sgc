@@ -18,6 +18,7 @@ import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.ImpactoMapaService;
@@ -47,7 +48,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 /**
  * Serviço unificado responsável por todos os workflows de subprocesso.
- * 
+ *
  * <p>Consolidação dos serviços:
  * <ul>
  *   <li>SubprocessoCadastroWorkflowService - Workflow de cadastro de atividades</li>
@@ -55,7 +56,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
  *   <li>SubprocessoTransicaoService - Transições e movimentações</li>
  *   <li>SubprocessoWorkflowService (root) - Operações administrativas</li>
  * </ul>
- * 
+ *
  * <p><b>Nota sobre Injeção de Dependências:</b>
  * ImpactoMapaService e SubprocessoValidacaoService injetados com @Lazy.
  * Dependência circular verificada e tratada.
@@ -153,12 +154,12 @@ public class SubprocessoWorkflowService {
         int etapa = 1;
 
         if (s.name().contains("CADASTRO")) {
-             sp.setDataLimiteEtapa1(novaDataLimite.atStartOfDay());
+            sp.setDataLimiteEtapa1(novaDataLimite.atStartOfDay());
         } else if (s.name().contains("MAPA")) {
-             sp.setDataLimiteEtapa2(novaDataLimite.atStartOfDay());
-             etapa = 2;
+            sp.setDataLimiteEtapa2(novaDataLimite.atStartOfDay());
+            etapa = 2;
         } else {
-             sp.setDataLimiteEtapa1(novaDataLimite.atStartOfDay());
+            sp.setDataLimiteEtapa1(novaDataLimite.atStartOfDay());
         }
 
         subprocessoRepo.save(sp);
@@ -173,7 +174,7 @@ public class SubprocessoWorkflowService {
 
     public void atualizarSituacaoParaEmAndamento(Long mapaCodigo) {
         var subprocesso = subprocessoRepo.findByMapaCodigo(mapaCodigo)
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso do mapa", mapaCodigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso do mapa", mapaCodigo));
 
         if (subprocesso.getSituacao() == NAO_INICIADO) {
             var tipoProcesso = subprocesso.getProcesso().getTipo();
@@ -241,9 +242,9 @@ public class SubprocessoWorkflowService {
     private void enviarAlertasReabertura(Subprocesso sp, String justificativa, boolean isRevisao) {
         try {
             if (isRevisao) {
-                 alertaService.criarAlertaReaberturaRevisao(sp.getProcesso(), sp.getUnidade(), justificativa);
+                alertaService.criarAlertaReaberturaRevisao(sp.getProcesso(), sp.getUnidade(), justificativa);
             } else {
-                 alertaService.criarAlertaReaberturaCadastro(sp.getProcesso(), sp.getUnidade(), justificativa);
+                alertaService.criarAlertaReaberturaCadastro(sp.getProcesso(), sp.getUnidade(), justificativa);
             }
             Unidade superior = sp.getUnidade().getUnidadeSuperior();
             while (superior != null) {
@@ -275,10 +276,10 @@ public class SubprocessoWorkflowService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, acao, sp);
         validarRequisitosNegocioParaDisponibilizacao(codSubprocesso);
-        
+
         Unidade origem = sp.getUnidade();
         Unidade destino = origem.getUnidadeSuperior();
-        
+
         sp.setSituacao(novaSituacao);
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         subprocessoRepo.save(sp);
@@ -436,6 +437,8 @@ public class SubprocessoWorkflowService {
     public void aceitarCadastroEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
         unidadeCodigos.forEach(unidadeCodigo -> {
             Subprocesso base = repo.buscar(Subprocesso.class, codSubprocessoBase);
+
+            // TDDO essa pesquisa nunca deveria falhar nessa camada!
             Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_SUBPROCESSO, MSG_ERRO_SUBPROCESSO_NOT_FOUND.formatted(base.getProcesso().getCodigo(), unidadeCodigo)));
 
@@ -454,8 +457,6 @@ public class SubprocessoWorkflowService {
         });
     }
 
-    // ===== MAPA WORKFLOW =====
-
     public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         Long codMapa = subprocesso.getMapa().getCodigo();
@@ -463,11 +464,7 @@ public class SubprocessoWorkflowService {
         boolean temNovasCompetencias = !request.getCompetencias().isEmpty();
 
         MapaCompletoDto mapaDto = mapaFacade.salvarMapaCompleto(codMapa, request);
-
-        if (eraVazio
-                && temNovasCompetencias
-                && subprocesso.getSituacao()
-                == MAPEAMENTO_CADASTRO_HOMOLOGADO) {
+        if (eraVazio && temNovasCompetencias && subprocesso.getSituacao() == MAPEAMENTO_CADASTRO_HOMOLOGADO) {
             subprocesso.setSituacao(MAPEAMENTO_MAPA_CRIADO);
             subprocessoRepo.save(subprocesso);
         }
@@ -477,12 +474,13 @@ public class SubprocessoWorkflowService {
 
     public MapaCompletoDto adicionarCompetencia(Long codSubprocesso, CompetenciaRequest request) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
+        Mapa mapa = subprocesso.getMapa();
 
-        Long codMapa = subprocesso.getMapa().getCodigo();
+        Long codMapa = mapa.getCodigo();
         boolean eraVazio = competenciaService.buscarPorCodMapa(codMapa).isEmpty();
 
         competenciaService.criarCompetenciaComAtividades(
-                subprocesso.getMapa(), request.getDescricao(), request.getAtividadesIds()
+                mapa, request.getDescricao(), request.getAtividadesIds()
         );
 
         // Alterar situação para MAPA_CRIADO se era vazio e passou a ter competências
@@ -491,7 +489,7 @@ public class SubprocessoWorkflowService {
             subprocessoRepo.save(subprocesso);
         }
 
-        return mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
+        return mapaFacade.obterMapaCompleto(mapa.getCodigo(), codSubprocesso);
     }
 
     public MapaCompletoDto atualizarCompetencia(
@@ -500,15 +498,13 @@ public class SubprocessoWorkflowService {
             CompetenciaRequest request) {
 
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
-        competenciaService.atualizarCompetencia(
-                codCompetencia, request.getDescricao(), request.getAtividadesIds());
+        competenciaService.atualizarCompetencia(codCompetencia, request.getDescricao(), request.getAtividadesIds());
 
-        return mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
+        Mapa mapa = subprocesso.getMapa();
+        return mapaFacade.obterMapaCompleto(mapa.getCodigo(), codSubprocesso);
     }
 
-    public MapaCompletoDto removerCompetencia(
-            Long codSubprocesso, Long codCompetencia) {
-
+    public MapaCompletoDto removerCompetencia(Long codSubprocesso, Long codCompetencia) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
 
         Long codMapa = subprocesso.getMapa().getCodigo();
@@ -533,9 +529,8 @@ public class SubprocessoWorkflowService {
                 && situacao != MAPEAMENTO_MAPA_CRIADO
                 && situacao != REVISAO_CADASTRO_HOMOLOGADA
                 && situacao != REVISAO_MAPA_AJUSTADO) {
-            throw new ErroMapaEmSituacaoInvalida(
-                    "Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: %s"
-                            .formatted(situacao));
+
+            throw new ErroMapaEmSituacaoInvalida("Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: %s".formatted(situacao));
         }
 
         return subprocesso;
@@ -551,15 +546,15 @@ public class SubprocessoWorkflowService {
 
         sp.getMapa().setSugestoes(null);
         analiseFacade.removerPorSubprocesso(codSubprocesso);
-        
+
         if (org.springframework.util.StringUtils.hasText(request.getObservacoes())) {
             sp.getMapa().setSugestoes(request.getObservacoes());
         }
 
         sp.setSituacao(SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo()));
-        
+
         sp.setDataLimiteEtapa2(request.getDataLimite().atStartOfDay());
-        sp.setDataFimEtapa1(java.time.LocalDateTime.now());
+        sp.setDataFimEtapa1(LocalDateTime.now());
         subprocessoRepo.save(sp);
 
         Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
@@ -598,7 +593,7 @@ public class SubprocessoWorkflowService {
 
             throw new ErroValidacao(
                     "Todas as atividades devem estar associadas a pelo menos uma competência.%nAtividades pendentes: %s"
-                    .formatted(nomesAtividades)
+                            .formatted(nomesAtividades)
             );
         }
     }
@@ -676,14 +671,14 @@ public class SubprocessoWorkflowService {
             String siglaUnidade = sup != null ? sup.getSigla() : sp.getUnidade().getSigla();
 
             analiseFacade.criarAnalise(sp, CriarAnaliseCommand.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .observacoes("Aceite da validação")
-                        .tipo(TipoAnalise.VALIDACAO)
-                        .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
-                        .siglaUnidade(siglaUnidade)
-                        .tituloUsuario(usuario.getTituloEleitoral())
-                        .motivo(null)
-                        .build());
+                    .codSubprocesso(codSubprocesso)
+                    .observacoes("Aceite da validação")
+                    .tipo(TipoAnalise.VALIDACAO)
+                    .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                    .siglaUnidade(siglaUnidade)
+                    .tituloUsuario(usuario.getTituloEleitoral())
+                    .motivo(null)
+                    .build());
 
             sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
             subprocessoRepo.save(sp);
@@ -739,6 +734,7 @@ public class SubprocessoWorkflowService {
     public void disponibilizarMapaEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase, DisponibilizarMapaRequest request, Usuario usuario) {
         unidadeCodigos.forEach(unidadeCodigo -> {
             Subprocesso base = repo.buscar(Subprocesso.class, codSubprocessoBase);
+
             Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_SUBPROCESSO, MSG_ERRO_SUBPROCESSO_NOT_FOUND.formatted(base.getProcesso().getCodigo(), unidadeCodigo)));
 

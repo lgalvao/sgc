@@ -70,6 +70,7 @@ public class Subprocesso extends EntidadeBase {
                         SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
                         SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,
                         SituacaoSubprocesso.NAO_INICIADO);
+
         return !situacoesFinalizadas.contains(this.situacao);
     }
 
@@ -78,9 +79,7 @@ public class Subprocesso extends EntidadeBase {
                 Arrays.asList(
                         SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
                         SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
-        if (!situacoesFinalizadas.contains(this.situacao)) {
-            return 1;
-        }
-        return null;
+
+        return !situacoesFinalizadas.contains(this.situacao) ? 1 : null;
     }
 }

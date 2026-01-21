@@ -101,7 +101,7 @@ class E2eFixtureEndpointTest {
 
     @Test
     @DisplayName("Deve gerar descrição automática quando não fornecida")
-    void deveGerarDescricaoAutomaticaQuandoNaoFornecida() {
+    void deveGerarDescricaoAutomaticaQuandoNaoFornecida() throws Exception {
         // Preparar requisição sem descrição
         E2eController.ProcessoFixtureRequest request =
                 new E2eController.ProcessoFixtureRequest(

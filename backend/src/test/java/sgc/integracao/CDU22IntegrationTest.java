@@ -123,7 +123,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Deve aceitar cadastro de múltiplas unidades em bloco")
     @WithMockGestor("666666666666") // GESTOR of unit 6 (parent of units 8 and 9)
-    void aceitarCadastroEmBloco_deveAceitarTodasSelecionadas() {
+    void aceitarCadastroEmBloco_deveAceitarTodasSelecionadas() throws Exception {
         // Given
         Long codigoContexto = subprocesso1.getCodigo();
         List<Long> unidadesSelecionadas = List.of(unidade1.getCodigo(), unidade2.getCodigo());

@@ -46,12 +46,10 @@ public class SubprocessoEmailService {
             String assunto = criarAssunto(tipo, sp);
             String corpo = processarTemplate(tipo.getTemplateEmail(), variaveis);
 
-            if (unidadeDestino != null) {
-                notificacaoEmailService.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
-                log.info("E-mail enviado para {} - Transição: {}", unidadeDestino.getSigla(), tipo);
-            }
+            notificacaoEmailService.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
+            log.info("E-mail enviado para {} - Transição: {}", unidadeDestino.getSigla(), tipo);
 
-            if (deveNotificarHierarquia(tipo) && unidadeOrigem != null) {
+            if (deveNotificarHierarquia(tipo)) {
                 notificarHierarquia(unidadeOrigem, assunto, corpo);
             }
 
