@@ -72,22 +72,11 @@ public class LoginFacade {
      */
     public boolean autenticar(String tituloEleitoral, String senha) {
         boolean autenticado;
-        if (clienteAcessoAd == null) {
-            if (ambienteTestes) {
-                autenticado = usuarioService.carregarUsuarioParaAutenticacao(tituloEleitoral) != null;
-            } else {
-                log.error(
-                        "ERRO CRÍTICO DE SEGURANÇA: Tentativa de autenticação sem provedor configurado em ambiente produtivo. Usuário: {}",
-                        tituloEleitoral);
-                autenticado = false;
-            }
-        } else {
-            try {
-                autenticado = clienteAcessoAd.autenticar(tituloEleitoral, senha);
-            } catch (ErroAutenticacao e) {
-                log.warn("Falha na autenticação do usuário {}: {}", tituloEleitoral, e.getMessage());
-                autenticado = false;
-            }
+        try {
+            autenticado = clienteAcessoAd.autenticar(tituloEleitoral, senha);
+        } catch (ErroAutenticacao e) {
+            log.warn("Falha na autenticação do usuário {}: {}", tituloEleitoral, e.getMessage());
+            autenticado = false;
         }
 
         if (autenticado) {

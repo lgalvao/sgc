@@ -1,6 +1,7 @@
 package sgc.notificacao.mock;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -21,50 +22,45 @@ public class NotificacaoModelosServiceMock extends NotificacaoModelosService {
 
     @Override
     public String criarEmailProcessoIniciado(
-            String nomeUnidade,
-            String nomeProcesso,
-            String tipoProcesso,
-            LocalDateTime dataLimite) {
+            @NonNull String nomeUnidade,
+            @NonNull String nomeProcesso,
+            @NonNull String tipoProcesso,
+            @NonNull LocalDateTime dataLimite) {
         return "<html><body>Mock Email de Processo Iniciado</body></html>";
     }
 
     @Override
-    public String criarEmailCadastroDisponibilizado(
-            String nomeUnidade, String nomeProcesso, int quantidadeAtividades) {
-        return "<html><body>Mock Email de Cadastro Disponibilizado</body></html>";
+    public void criarEmailCadastroDisponibilizado(
+            @NonNull String nomeUnidade, @NonNull String nomeProcesso, int quantidadeAtividades) {
     }
 
     @Override
-    public String criarEmailCadastroDevolvido(
-            String nomeUnidade, String nomeProcesso, String motivo, String observacoes) {
-        return "<html><body>Mock Email de Cadastro Devolvido</body></html>";
+    public void criarEmailCadastroDevolvido(
+            @NonNull String nomeUnidade, @NonNull String nomeProcesso, @NonNull String motivo, @NonNull String observacoes) {
     }
 
     @Override
-    public String criarEmailMapaDisponibilizado(
-            String nomeUnidade, String nomeProcesso, LocalDateTime dataLimiteValidacao) {
-        return "<html><body>Mock Email de Mapa Disponibilizado</body></html>";
+    public void criarEmailMapaDisponibilizado(
+            @NonNull String nomeUnidade, @NonNull String nomeProcesso, @NonNull LocalDateTime dataLimiteValidacao) {
     }
 
     @Override
-    public String criarEmailMapaValidado(String nomeUnidade, String nomeProcesso) {
-        return "<html><body>Mock Email de Mapa Validado</body></html>";
+    public void criarEmailMapaValidado(@NonNull String nomeUnidade, @NonNull String nomeProcesso) {
     }
 
     @Override
-    public String criarEmailProcessoFinalizado(
-            String nomeProcesso, LocalDateTime dataFinalizacao, int quantidadeMapas) {
-        return "<html><body>Mock Email de Processo Finalizado</body></html>";
+    public void criarEmailProcessoFinalizado(
+            @NonNull String nomeProcesso, @NonNull LocalDateTime dataFinalizacao, int quantidadeMapas) {
     }
 
     @Override
-    public String criarEmailProcessoFinalizadoPorUnidade(String siglaUnidade, String nomeProcesso) {
+    public String criarEmailProcessoFinalizadoPorUnidade(@NonNull String siglaUnidade, @NonNull String nomeProcesso) {
         return "<html><body>Mock Email de Processo Finalizado Por Unidade</body></html>";
     }
 
     @Override
     public String criarEmailProcessoFinalizadoUnidadesSubordinadas(
-            String siglaUnidade, String nomeProcesso, List<String> siglasUnidadesSubordinadas) {
+            @NonNull String siglaUnidade, @NonNull String nomeProcesso, @NonNull List<String> siglasUnidadesSubordinadas) {
         return "<html><body>Mock Email de Processo Finalizado Unidades Subordinadas</body></html>";
     }
 }

@@ -46,7 +46,7 @@ public class LimitadorTentativasLogin {
     }
 
     public void verificar(String ip) {
-        if (ip == null || isPerfilTesteAtivo())
+        if (isPerfilTesteAtivo())
             return;
 
         if (tentativasPorIp.size() >= maxCacheEntries) {

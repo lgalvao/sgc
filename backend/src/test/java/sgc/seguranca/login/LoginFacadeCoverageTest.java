@@ -50,7 +50,7 @@ class LoginFacadeCoverageTest {
                     .nome(u.getNome())
                     .sigla(u.getSigla())
                     .codigoPai(superior != null ? superior.getCodigo() : null)
-                    .tipo(u.getTipo() != null ? u.getTipo().name() : null)
+                    .tipo(u.getTipo().name())
                     .isElegivel(u.getTipo() != TipoUnidade.INTERMEDIARIA)
                     .build();
         });

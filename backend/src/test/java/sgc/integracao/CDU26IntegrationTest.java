@@ -71,7 +71,6 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
 
     private Unidade unidade1;
     private Unidade unidade2;
-    private Processo processo;
     private Subprocesso subprocesso1;
     private Subprocesso subprocesso2;
 
@@ -93,7 +92,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
         admin.setTituloEleitoral("555555555555");
         usuarioRepo.save(admin);
 
-        processo = ProcessoFixture.processoPadrao();
+        Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -116,7 +115,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        processo = processoRepo.findById(processo.getCodigo()).orElseThrow();
+        processoRepo.findById(processo.getCodigo()).orElseThrow();
         subprocesso1 = subprocessoRepo.findById(subprocesso1.getCodigo()).orElseThrow();
         subprocesso2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
     }

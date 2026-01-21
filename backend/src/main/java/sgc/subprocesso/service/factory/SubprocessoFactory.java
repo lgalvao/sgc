@@ -9,7 +9,6 @@ import sgc.mapa.service.CopiaMapaService;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
-import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
@@ -91,9 +90,6 @@ public class SubprocessoFactory {
      * Cria subprocesso para processo de revisão e copia o mapa vigente da unidade.
      */
     public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa) {
-        if (unidadeMapa == null) {
-            throw new ErroProcesso("Unidade %s não possui mapa vigente para iniciar revisão.".formatted(unidade.getSigla()));
-        }
 
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
         
@@ -107,10 +103,7 @@ public class SubprocessoFactory {
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
         
         Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente);
-        if (mapaCopiado == null) {
-            throw new ErroProcesso("Falha ao copiar mapa vigente para unidade %s".formatted(unidade.getSigla()));
-        }
-        
+
         mapaCopiado.setSubprocesso(subprocessoSalvo);
         Mapa mapaSalvo = mapaRepo.save(mapaCopiado);
         subprocessoSalvo.setMapa(mapaSalvo);
@@ -128,9 +121,6 @@ public class SubprocessoFactory {
      * Copia o mapa vigente e inicia com autoavaliação em andamento.
      */
     public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa) {
-        if (unidadeMapa == null) {
-            throw new ErroProcesso("Unidade %s não possui mapa vigente para iniciar diagnóstico.".formatted(unidade.getSigla()));
-        }
 
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
         Subprocesso subprocesso = Subprocesso.builder()

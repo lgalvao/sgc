@@ -32,7 +32,7 @@ class DeserializadorHtmlSanitizadoTest {
 
     @Test
     @DisplayName("Deve remover script tags do conteúdo HTML")
-    void deveRemoverScriptTagsDoConteudoHtml() throws Exception {
+    void deveRemoverScriptTagsDoConteudoHtml() {
         // Arrange
         String inputMalicioso = "<script>alert('XSS')</script>Texto limpo";
         when(parser.getValueAsString()).thenReturn(inputMalicioso);
@@ -48,7 +48,7 @@ class DeserializadorHtmlSanitizadoTest {
 
     @Test
     @DisplayName("Deve remover event handlers de HTML")
-    void deveRemoverEventHandlersDeHtml() throws Exception {
+    void deveRemoverEventHandlersDeHtml() {
         // Arrange
         String inputMalicioso = "<img src='x' onerror='alert(1)'>";
         when(parser.getValueAsString()).thenReturn(inputMalicioso);
@@ -63,7 +63,7 @@ class DeserializadorHtmlSanitizadoTest {
 
     @Test
     @DisplayName("Deve permitir texto simples sem HTML")
-    void devePermitirTextoSimplesSeHtml() throws Exception {
+    void devePermitirTextoSimplesSeHtml() {
         // Arrange
         String textoSimples = "Este é um texto simples sem tags HTML";
         when(parser.getValueAsString()).thenReturn(textoSimples);
@@ -79,7 +79,7 @@ class DeserializadorHtmlSanitizadoTest {
     @NullAndEmptySource
     @ValueSource(strings = { " ", "  ", "\t", "\n" })
     @DisplayName("Deve retornar valores nulos ou vazios sem alteração")
-    void deveRetornarValoresNulosOuVaziosSemAlteracao(String input) throws Exception {
+    void deveRetornarValoresNulosOuVaziosSemAlteracao(String input) {
         // Arrange
         when(parser.getValueAsString()).thenReturn(input);
 
@@ -92,7 +92,7 @@ class DeserializadorHtmlSanitizadoTest {
 
     @Test
     @DisplayName("Deve sanitizar SQL injection em string")
-    void deveSanitizarSqlInjectionEmString() throws Exception {
+    void deveSanitizarSqlInjectionEmString() {
         // Arrange
         String inputMalicioso = "'; DROP TABLE users; --";
         when(parser.getValueAsString()).thenReturn(inputMalicioso);
@@ -108,7 +108,7 @@ class DeserializadorHtmlSanitizadoTest {
 
     @Test
     @DisplayName("Deve remover javascript: protocol de links")
-    void deveRemoverJavascriptProtocolDeLinks() throws Exception {
+    void deveRemoverJavascriptProtocolDeLinks() {
         // Arrange
         String inputMalicioso = "<a href='javascript:alert(1)'>Click me</a>";
         when(parser.getValueAsString()).thenReturn(inputMalicioso);
@@ -124,7 +124,7 @@ class DeserializadorHtmlSanitizadoTest {
     @SuppressWarnings("HttpUrlsUsage")
     @Test
     @DisplayName("Deve remover iframes maliciosos")
-    void deveRemoverIframesMaliciosos() throws Exception {
+    void deveRemoverIframesMaliciosos() {
         // Arrange
         String inputMalicioso = "<iframe src='http://malicious.com'></iframe>Texto";
         when(parser.getValueAsString()).thenReturn(inputMalicioso);

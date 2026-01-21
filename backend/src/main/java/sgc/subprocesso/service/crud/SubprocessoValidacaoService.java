@@ -51,9 +51,6 @@ public class SubprocessoValidacaoService {
     public void validarExistenciaAtividades(Long codSubprocesso) {
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
         Mapa mapa = subprocesso.getMapa();
-        if (mapa == null) {
-            throw new ErroValidacao("Mapa não encontrado para o subprocesso.");
-        }
 
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(mapa.getCodigo());
         if (atividades.isEmpty()) {
@@ -98,16 +95,6 @@ public class SubprocessoValidacaoService {
     public ValidacaoCadastroDto validarCadastro(Long codSubprocesso) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
         List<ErroValidacaoDto> erros = new ArrayList<>();
-
-        if (sp.getMapa() == null) {
-            return ValidacaoCadastroDto.builder()
-                    .valido(false)
-                    .erros(List.of(ErroValidacaoDto.builder()
-                            .tipo("MAPA_INEXISTENTE")
-                            .mensagem("O subprocesso não possui um mapa associado.")
-                            .build()))
-                    .build();
-        }
 
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
         if (atividades.isEmpty()) {

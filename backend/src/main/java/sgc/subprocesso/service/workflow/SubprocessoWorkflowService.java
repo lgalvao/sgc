@@ -154,7 +154,6 @@ public class SubprocessoWorkflowService {
 
         if (s.name().contains("CADASTRO")) {
              sp.setDataLimiteEtapa1(novaDataLimite.atStartOfDay());
-             etapa = 1;
         } else if (s.name().contains("MAPA")) {
              sp.setDataLimiteEtapa2(novaDataLimite.atStartOfDay());
              etapa = 2;
@@ -549,10 +548,6 @@ public class SubprocessoWorkflowService {
 
         validarMapaParaDisponibilizacao(sp);
         validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
-
-        if (request.getDataLimite() == null) {
-            throw new ErroValidacao("A data limite para validação é obrigatória.");
-        }
 
         sp.getMapa().setSugestoes(null);
         analiseFacade.removerPorSubprocesso(codSubprocesso);

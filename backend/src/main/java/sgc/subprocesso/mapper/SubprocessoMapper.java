@@ -45,17 +45,14 @@ public abstract class SubprocessoMapper {
     public abstract Subprocesso toEntity(SubprocessoDto dto);
 
     public Processo mapProcesso(Long value) {
-        if (value == null) return null;
         return repo.buscar(Processo.class, value);
     }
 
     public Unidade mapUnidade(Long value) {
-        if (value == null) return null;
         return repo.buscar(Unidade.class, value);
     }
 
     public Mapa mapMapa(Long value) {
-        if (value == null) return null;
         return repo.buscar(Mapa.class, value);
     }
 }

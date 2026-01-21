@@ -1,6 +1,5 @@
 package sgc.notificacao;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -40,13 +39,9 @@ class NotificacaoEmailServiceTest {
     @InjectMocks
     private NotificacaoEmailService notificacaoServico;
 
-    @BeforeEach
-    void setUp() {
-    }
-
     @Test
     @DisplayName("Deve enviar e-mail HTML")
-    void enviarEmailHtml_deveEnviarComSucesso() throws Exception {
+    void enviarEmailHtml_deveEnviarComSucesso() {
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
         when(emailExecutor.enviarEmailAssincrono(any(EmailDto.class))).thenReturn(CompletableFuture.completedFuture(true));
 
@@ -83,7 +78,7 @@ class NotificacaoEmailServiceTest {
 
     @Test
     @DisplayName("Deve enviar e-mail de texto simples")
-    void deveEnviarEmailTextoSimples() throws Exception {
+    void deveEnviarEmailTextoSimples() {
         // Arrange
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
         when(emailExecutor.enviarEmailAssincrono(any(EmailDto.class))).thenReturn(CompletableFuture.completedFuture(true));
@@ -125,24 +120,8 @@ class NotificacaoEmailServiceTest {
     }
 
     @Test
-    @DisplayName("Não deve enviar e-mail para endereço null")
-    void naoDeveEnviarEmailParaEnderecoNull() {
-        // Arrange
-        String para = null;
-        String assunto = "Test";
-        String corpo = "Body";
-
-        // Act
-        notificacaoServico.enviarEmail(para, assunto, corpo);
-
-        // Assert
-        verify(emailExecutor, never()).enviarEmailAssincrono(any());
-        verify(repositorioNotificacao, never()).save(any(Notificacao.class));
-    }
-
-    @Test
     @DisplayName("Deve truncar conteúdo longo da notificação")
-    void deveTruncarConteudoLongoDaNotificacao() throws Exception {
+    void deveTruncarConteudoLongoDaNotificacao() {
         // Arrange
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
         when(emailExecutor.enviarEmailAssincrono(any(EmailDto.class))).thenReturn(CompletableFuture.completedFuture(true));
@@ -165,7 +144,7 @@ class NotificacaoEmailServiceTest {
 
     @Test
     @DisplayName("Deve logar erro quando envio falha")
-    void deveLogarErroQuandoEnvioFalha() throws Exception {
+    void deveLogarErroQuandoEnvioFalha() {
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
         CompletableFuture<Boolean> futureFalho = CompletableFuture.completedFuture(false);
         when(emailExecutor.enviarEmailAssincrono(any(EmailDto.class))).thenReturn(futureFalho);
@@ -181,7 +160,7 @@ class NotificacaoEmailServiceTest {
 
     @Test
     @DisplayName("Deve logar erro quando exception ocorre no CompletableFuture")
-    void deveLogarErroQuandoExceptionOcorre() throws Exception {
+    void deveLogarErroQuandoExceptionOcorre() {
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
         CompletableFuture<Boolean> futureComErro = new CompletableFuture<>();
         futureComErro.completeExceptionally(new RuntimeException("Erro de teste"));
@@ -198,7 +177,7 @@ class NotificacaoEmailServiceTest {
 
     @Test
     @DisplayName("Deve capturar RuntimeException durante processamento")
-    void deveCapturaRuntimeException() throws Exception {
+    void deveCapturaRuntimeException() {
         when(repositorioNotificacao.save(any(Notificacao.class))).thenThrow(new RuntimeException("Erro de teste"));
 
         String para = "recipient@test.com";

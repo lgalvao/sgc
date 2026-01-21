@@ -85,6 +85,7 @@ class ProcessoDetalheBuilderTest {
         sp.setUnidade(u1);
         sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
         sp.setDataLimiteEtapa1(processo.getDataLimite());
+        sp.setMapa(new sgc.mapa.model.Mapa());
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
 
@@ -216,6 +217,8 @@ class ProcessoDetalheBuilderTest {
         Subprocesso spFilho = new Subprocesso();
         spFilho.setUnidade(filho);
         spFilho.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
+        spFilho.setMapa(new sgc.mapa.model.Mapa());
+        spFilho.getMapa().setCodigo(101L);
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(spPai, spFilho));
 

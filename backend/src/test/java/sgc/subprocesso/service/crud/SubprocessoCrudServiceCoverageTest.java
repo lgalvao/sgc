@@ -25,11 +25,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
+
 @ExtendWith(MockitoExtension.class)
 class SubprocessoCrudServiceCoverageTest {
     @InjectMocks
     private SubprocessoCrudService crudService;
-
     @Mock
     private SubprocessoRepo repositorio;
     @Mock
@@ -54,9 +55,7 @@ class SubprocessoCrudServiceCoverageTest {
         when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
         SubprocessoDto dto = crudService.criar(req);
-
         assertNotNull(dto);
-        // verify(accessControlService).verificarPermissao(any(), any(), any()); // Not called in service
     }
 
     @Test
@@ -64,7 +63,12 @@ class SubprocessoCrudServiceCoverageTest {
     void atualizar_Sucesso() {
         Long codigo = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setProcesso(new Processo()); // Para verificar permissao
+        Processo proc = new Processo();
+        proc.setCodigo(1L);
+        sp.setProcesso(proc);
+        sgc.organizacao.model.Unidade uni = new sgc.organizacao.model.Unidade();
+        uni.setCodigo(1L);
+        sp.setUnidade(uni);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         AtualizarSubprocessoRequest req = AtualizarSubprocessoRequest.builder().build();
@@ -101,9 +105,9 @@ class SubprocessoCrudServiceCoverageTest {
         Long codigo = 1L;
         AtualizarSubprocessoRequest req = AtualizarSubprocessoRequest.builder()
                 .codMapa(100L)
-                .dataLimiteEtapa1(java.time.LocalDateTime.now())
-                .dataFimEtapa1(java.time.LocalDateTime.now())
-                .dataFimEtapa2(java.time.LocalDateTime.now())
+                .dataLimiteEtapa1(LocalDateTime.now())
+                .dataFimEtapa1(LocalDateTime.now())
+                .dataFimEtapa2(LocalDateTime.now())
                 .build();
 
         Subprocesso sp = new Subprocesso();

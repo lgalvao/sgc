@@ -17,28 +17,12 @@ import java.util.Set;
  * {@link EventoTransicaoSubprocesso}).
 */
 @Getter
+@Builder
 public class EventoSubprocessoAtualizado {
     private Subprocesso subprocesso;
-    private @org.jspecify.annotations.Nullable Usuario usuario;
+    private Usuario usuario;
     private Set<String> camposAlterados;
     private LocalDateTime dataHoraAtualizacao;
     private SituacaoSubprocesso situacaoAnterior;
     private String observacoes;
-
-    @Builder
-    public EventoSubprocessoAtualizado(
-            Subprocesso subprocesso,
-            @org.jspecify.annotations.Nullable Usuario usuario,
-            Set<String> camposAlterados,
-            LocalDateTime dataHoraAtualizacao,
-            SituacaoSubprocesso situacaoAnterior,
-            String observacoes) {
-                
-        this.subprocesso = subprocesso;
-        this.usuario = usuario;
-        this.camposAlterados = camposAlterados != null ? Set.copyOf(camposAlterados) : Set.of();
-        this.dataHoraAtualizacao = dataHoraAtualizacao;
-        this.situacaoAnterior = situacaoAnterior;
-        this.observacoes = observacoes;
-    }
 }

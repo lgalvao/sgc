@@ -5,7 +5,6 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.LazyInitializationException;
 import org.hibernate.annotations.Immutable;
-import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -44,7 +43,7 @@ public class Usuario implements UserDetails {
     @JoinColumn(name = "unidade_lot_codigo")
     private Unidade unidadeLotacao;
 
-    public @NonNull Unidade getUnidadeLotacao() {
+    public Unidade getUnidadeLotacao() {
         return unidadeLotacao;
     }
 
@@ -64,28 +63,23 @@ public class Usuario implements UserDetails {
     }
 
     public Set<UsuarioPerfil> getAtribuicoes() {
-        return atribuicoesCache != null ? atribuicoesCache : new HashSet<>();
+        return atribuicoesCache;
     }
 
     public Set<UsuarioPerfil> getTodasAtribuicoes() {
-        Set<UsuarioPerfil> todas = new java.util.HashSet<>();
-        if (atribuicoesCache != null) {
-            todas.addAll(atribuicoesCache);
-        }
+        Set<UsuarioPerfil> todas = new HashSet<>(atribuicoesCache);
 
         LocalDateTime now = LocalDateTime.now();
         try {
-            if (atribuicoesTemporarias != null) {
-                for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
-                    if (!temp.getDataInicio().isAfter(now) && !temp.getDataTermino().isBefore(now)) {
-                        UsuarioPerfil perfil = new UsuarioPerfil();
-                        perfil.setUsuarioTitulo(this.tituloEleitoral);
-                        perfil.setUsuario(this);
-                        perfil.setUnidadeCodigo(temp.getUnidade().getCodigo());
-                        perfil.setUnidade(temp.getUnidade());
-                        perfil.setPerfil(temp.getPerfil());
-                        todas.add(perfil);
-                    }
+            for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
+                if (!temp.getDataInicio().isAfter(now) && !temp.getDataTermino().isBefore(now)) {
+                    UsuarioPerfil perfil = new UsuarioPerfil();
+                    perfil.setUsuarioTitulo(this.tituloEleitoral);
+                    perfil.setUsuario(this);
+                    perfil.setUnidadeCodigo(temp.getUnidade().getCodigo());
+                    perfil.setUnidade(temp.getUnidade());
+                    perfil.setPerfil(temp.getPerfil());
+                    todas.add(perfil);
                 }
             }
         } catch (LazyInitializationException e) {

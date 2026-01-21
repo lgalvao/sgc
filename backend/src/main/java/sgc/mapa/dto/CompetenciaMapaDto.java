@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import org.jspecify.annotations.Nullable;
 import java.util.List;
 
 /**
@@ -20,6 +21,7 @@ public class CompetenciaMapaDto {
     /**
      * O código da competência (pode ser nulo para novas competências).
      */
+    @Nullable
     private final Long codigo;
 
     /**

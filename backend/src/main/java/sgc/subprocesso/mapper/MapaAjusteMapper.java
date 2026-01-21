@@ -28,7 +28,6 @@ public interface MapaAjusteMapper {
 
     default List<CompetenciaAjusteDto> mapCompetencias(List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos) {
         Map<Long, List<Conhecimento>> conhecimentosPorAtividade = conhecimentos.stream()
-                .filter(c -> c.getAtividade() != null)
                 .collect(Collectors.groupingBy(Conhecimento::getCodigoAtividade));
 
         List<CompetenciaAjusteDto> competenciaDtos = new ArrayList<>();

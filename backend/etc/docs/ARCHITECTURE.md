@@ -169,9 +169,9 @@ POST /api/processos/{id}/iniciar     - Workflow action
 
 ## 📚 Referências
 
-- [Backend Patterns](/regras/backend-padroes.md)
-- [Frontend Patterns](/regras/frontend-padroes.md)
-- [Security Refactoring](/docs/SECURITY-REFACTORING-COMPLETE.md)
+- [Backend Patterns](/etc/regras/backend-padroes.md)
+- [Frontend Patterns](/etc/regras/frontend-padroes.md)
+- [Security Refactoring](/etc/docsdocs/SECURITY-REFACTORING-COMPLETE.md)
 - [AGENTS.md](/AGENTS.md)
 
 ---

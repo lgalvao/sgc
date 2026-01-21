@@ -188,11 +188,8 @@ public class PainelFacade {
             if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) {
                 return "/processo/" + processo.getCodigo();
             }
-            if (codigoUnidade == null) {
-                return null;
-            }
             var unidade = unidadeService.buscarPorCodigo(codigoUnidade);
-            return String.format("/processo/%s/%s", processo.getCodigo(), (unidade != null) ? unidade.getSigla() : "null");
+            return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
         } catch (Exception e) {
             log.warn("Erro ao calcular link de destino para o processo {}: {}", processo.getCodigo(), e.getMessage());
             return null;

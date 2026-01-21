@@ -7,7 +7,7 @@
     "test:e2e:captura": "playwright test e2e/captura-telas.spec.ts",
     "test:e2e:captura:headed": "playwright test e2e/captura-telas.spec.ts --headed",
     "test:e2e:captura:ui": "playwright test e2e/captura-telas.spec.ts --ui",
-    "check:accessibility": "node scripts/frontend/verificar-acessibilidade.js",
+    "check:accessibility": "node etc/scripts/frontend/verificar-acessibilidade.js",
     "typecheck": "npm run typecheck --prefix frontend && npm run typecheck:e2e",
     "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json",
     "lint": "npm run lint --prefix frontend"

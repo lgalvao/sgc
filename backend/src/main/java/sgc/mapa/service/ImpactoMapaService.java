@@ -214,7 +214,7 @@ public class ImpactoMapaService {
         if (lista1.size() != lista2.size()) return true;
 
         // Otimização: Evitar overhead de Stream/Set para listas vazias ou muito pequenas
-        if (lista1.isEmpty()) return !lista2.isEmpty();
+        if (lista1.isEmpty()) return false;
 
         Set<String> descricoes1 = new HashSet<>(lista1.size());
         for (Conhecimento c : lista1) {
@@ -275,7 +275,7 @@ public class ImpactoMapaService {
             Map<Long, List<Competencia>> atividadeIdToCompetencias,
             Map<Long, CompetenciaImpactoAcumulador> mapaImpactos) {
 
-        removidas.stream()
+        removidas
                 .forEach(dto -> {
                     List<Competencia> competenciasAfetadas = atividadeIdToCompetencias.getOrDefault(
                             dto.getCodigo(), List.of()

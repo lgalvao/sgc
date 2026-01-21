@@ -64,7 +64,7 @@ public class ArchConsistencyTest {
     static final ArchRule services_should_not_access_other_modules_repositories = classes()
             .that()
             .haveSimpleNameEndingWith("Service")
-            .should(new ArchCondition<JavaClass>("only access repositories of their own module") {
+            .should(new ArchCondition<>("only access repositories of their own module") {
                 @Override
                 public void check(JavaClass item, ConditionEvents events) {
                     String itemPackage = item.getPackageName();
@@ -108,7 +108,7 @@ public class ArchConsistencyTest {
     static final ArchRule controllers_e_services_devem_estar_em_pacotes_null_marked = classes()
             .that().haveSimpleNameEndingWith("Controller")
             .or().haveSimpleNameEndingWith("Service")
-            .should(new ArchCondition<JavaClass>("residir em pacote anotado com @NullMarked") {
+            .should(new ArchCondition<>("residir em pacote anotado com @NullMarked") {
                 @Override
                 public void check(JavaClass item, ConditionEvents events) {
                     JavaPackage javaPackage = item.getPackage();
@@ -144,22 +144,22 @@ public class ArchConsistencyTest {
     static final ArchRule controllers_should_only_use_facades_not_specialized_services = classes()
             .that()
             .haveNameMatching(".*Controller")
-            .should(new ArchCondition<JavaClass>("only depend on Facade services, not specialized services") {
+            .should(new ArchCondition<>("only depend on Facade services, not specialized services") {
                 @Override
                 public void check(JavaClass controller, ConditionEvents events) {
                     for (Dependency dependency : controller.getDirectDependenciesFromSelf()) {
                         JavaClass targetClass = dependency.getTargetClass();
-                        
+
                         // Verifica se é um @Service
                         boolean isService = targetClass.isAnnotatedWith(org.springframework.stereotype.Service.class);
-                        
+
                         // Verifica se NÃO é um Facade
                         boolean isNotFacade = !targetClass.getSimpleName().endsWith("Facade");
-                        
+
                         if (isService && isNotFacade) {
                             String message = String.format(
                                     "Controller %s depends on specialized service %s. " +
-                                    "Controllers should only use Facades (ADR-001, ADR-006 Phase 2)",
+                                            "Controllers should only use Facades (ADR-001, ADR-006 Phase 2)",
                                     controller.getSimpleName(), targetClass.getSimpleName());
                             events.add(SimpleConditionEvent.violated(dependency, message));
                         }
@@ -224,22 +224,20 @@ public class ArchConsistencyTest {
             .doNotHaveSimpleName("AccessAuditService")
             .and()
             .resideOutsideOfPackage("sgc.seguranca.acesso..")
-            .should(new ArchCondition<JavaClass>("throw ErroAccessoNegado directly - use AccessControlService instead") {
+            .should(new ArchCondition<>("throw ErroAccessoNegado directly - use AccessControlService instead") {
                 @Override
                 public void check(JavaClass item, ConditionEvents events) {
                     // Verificar se o service cria instâncias de ErroAccessoNegado
-                    item.getCodeUnits().forEach(codeUnit -> {
-                        codeUnit.getCallsFromSelf().stream()
+                    item.getCodeUnits().forEach(codeUnit -> codeUnit.getCallsFromSelf().stream()
                             .filter(call -> call.getTargetOwner().getSimpleName().equals("ErroAccessoNegado"))
                             .filter(call -> call.getName().equals("<init>"))
                             .forEach(call -> {
                                 String message = String.format(
                                         "Service %s throws ErroAccessoNegado directly in method %s. " +
-                                        "Use AccessControlService.verificarPermissao() instead.",
+                                                "Use AccessControlService.verificarPermissao() instead.",
                                         item.getSimpleName(), codeUnit.getName());
                                 events.add(SimpleConditionEvent.violated(call, message));
-                            });
-                    });
+                            }));
                 }
             })
             .because("Access control should be centralized in AccessControlService");

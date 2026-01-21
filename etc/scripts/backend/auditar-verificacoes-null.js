@@ -24,8 +24,6 @@ function getAllFiles(dirPath, arrayOfFiles) {
 }
 
 function classify(lines, index, content) {
-    // Heurística simples
-    // Verifica @Nullable na assinatura do método ou declaração de campo próxima
     const contextRange = 20;
     const start = Math.max(0, index - contextRange);
     const contextLines = lines.slice(start, index + 1).join('\n');

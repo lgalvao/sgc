@@ -52,11 +52,6 @@ class LimitadorTentativasLoginTest {
     }
 
     @Test
-    void deveIgnorarIpNulo() {
-        assertDoesNotThrow(() -> limitador.verificar(null));
-    }
-
-    @Test
     void naoDeveBloquearIpsDiferentes() {
         String ip1 = "10.0.0.1";
         String ip2 = "10.0.0.2";

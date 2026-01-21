@@ -636,7 +636,7 @@ Ao criar um novo teste, verifique:
 
 ### Documentos de Arquitetura
 
-- [Padrões Backend](/regras/backend-padroes.md)
+- [Padrões Backend](/etc/regrasgras/backend-padroes.md)
 - [Backend README](/README.md)
 - [AGENTS.md](/AGENTS.md)
 

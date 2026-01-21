@@ -60,12 +60,6 @@ class ConhecimentoMapperTest {
             assertThat(dto.descricao()).isEqualTo("Conhecimento de Teste");
             assertThat(dto.atividadeCodigo()).isEqualTo(10L);
         }
-
-        @Test
-        @DisplayName("Deve retornar null quando entidade é null")
-        void deveRetornarNullQuandoEntidadeNull() {
-            assertThat(mapper.toResponse(null)).isNull();
-        }
     }
 
     @Nested
@@ -116,13 +110,6 @@ class ConhecimentoMapperTest {
 
             assertThat(conhecimento).isNotNull();
             assertThat(conhecimento.getDescricao()).isEqualTo("Descricao Atualizada");
-        }
-
-        @Test
-        @DisplayName("Deve retornar null quando request é null")
-        void deveRetornarNullQuandoRequestNull() {
-            assertThat(mapper.toEntity((CriarConhecimentoRequest) null)).isNull();
-            assertThat(mapper.toEntity((AtualizarConhecimentoRequest) null)).isNull();
         }
     }
 }

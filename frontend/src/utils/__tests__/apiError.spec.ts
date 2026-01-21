@@ -164,7 +164,7 @@ describe("apiError.ts", () => {
       it("deve lançar erro se apiCall rejeitar com outro erro", async () => {
           const error = createAxiosError(500);
           const apiCall = vi.fn().mockRejectedValue(error);
-          await expect(existsOrFalse(apiCall)).rejects.toThrow();
+          expect(existsOrFalse(apiCall)).rejects.toThrow();
       });
   });
 
@@ -182,7 +182,7 @@ describe("apiError.ts", () => {
       it("deve lançar erro se apiCall rejeitar com outro erro", async () => {
           const error = createAxiosError(500);
           const apiCall = vi.fn().mockRejectedValue(error);
-          await expect(getOrNull(apiCall)).rejects.toThrow();
+          expect(getOrNull(apiCall)).rejects.toThrow();
       });
   });
 });

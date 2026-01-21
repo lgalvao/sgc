@@ -80,7 +80,6 @@
  * <ul>
  *   <li><strong>Unitários</strong>: JUnit 5 + Mockito</li>
  *   <li><strong>Integração</strong>: @SpringBootTest + H2</li>
- *   <li><strong>Arquiteturais</strong>: ArchUnit ({@link sgc.arquitetura.ArchConsistencyTest})</li>
  *   <li><strong>E2E</strong>: Playwright (frontend)</li>
  * </ul>
  * 

@@ -57,10 +57,6 @@ public class AtividadeService {
     public AtividadeResponse criar(CriarAtividadeRequest request) {
         Mapa mapa = repo.buscar(Mapa.class, request.mapaCodigo());
 
-        if (mapa.getSubprocesso() == null) {
-            throw new sgc.comum.erros.ErroEntidadeNaoEncontrada("Subprocesso", null);
-        }
-
         notificarAlteracaoMapa(request.mapaCodigo());
 
         Atividade entidade = atividadeMapper.toEntity(request);

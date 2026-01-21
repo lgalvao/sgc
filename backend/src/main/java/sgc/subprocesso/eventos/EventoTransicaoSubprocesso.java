@@ -16,38 +16,11 @@ import sgc.subprocesso.model.Subprocesso;
 @Getter
 @Builder
 public class EventoTransicaoSubprocesso {
-
-    /**
-     * O subprocesso que transitou.
-     */
     private Subprocesso subprocesso;
-
-    /**
-     * Tipo da transição, determinando comportamentos de comunicação.
-     */
     private TipoTransicao tipo;
-
-    /**
-     * Usuário que executou a ação que causou a transição.
-     */
     private Usuario usuario;
-
-    /**
-     * Unidade de origem da transição (de onde o subprocesso está saindo).
-     */
-    @Nullable
     private Unidade unidadeOrigem;
-
-    /**
-     * Unidade de destino da transição (para onde o subprocesso está indo).
-     */
-    @Nullable
     private Unidade unidadeDestino;
-
-    /**
-     * Observações opcionais associadas à transição.
-     */
-    @Nullable
-    private String observacoes;
+    @Nullable private String observacoes;
 }
 

@@ -179,7 +179,7 @@ describe("usePerfilStore", () => {
 
         it("deve lidar com erro em loginCompleto", async () => {
             mockUsuarioService.autenticar.mockRejectedValue(new Error("Fail"));
-            await expect(context.store.loginCompleto("123", "pass")).rejects.toThrow(
+            expect(context.store.loginCompleto("123", "pass")).rejects.toThrow(
                 "Fail",
             );
             expect(context.store.lastError).toBeTruthy();
@@ -192,7 +192,7 @@ describe("usePerfilStore", () => {
                 unidade: { codigo: 2, sigla: "XYZ", nome: "Unidade XYZ" },
                 siglaUnidade: "XYZ",
             };
-            await expect(
+            expect(
                 context.store.selecionarPerfilUnidade(123, perfilUnidade),
             ).rejects.toThrow("Fail");
             expect(context.store.lastError).toBeTruthy();

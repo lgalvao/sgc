@@ -30,10 +30,10 @@ public class SugestoesDto {
 
     public static SugestoesDto of(Subprocesso subprocesso) {
         String sugestoes =
-                subprocesso.getMapa() != null ? subprocesso.getMapa().getSugestoes() : null;
-        boolean sugestoesApresentadas = sugestoes != null && !sugestoes.isBlank();
+                subprocesso.getMapa().getSugestoes();
+        boolean sugestoesApresentadas = !sugestoes.isBlank();
         String nomeUnidade =
-                subprocesso.getUnidade() != null ? subprocesso.getUnidade().getNome() : null;
+                subprocesso.getUnidade().getNome();
 
         return SugestoesDto.builder()
                 .sugestoes(sugestoes)

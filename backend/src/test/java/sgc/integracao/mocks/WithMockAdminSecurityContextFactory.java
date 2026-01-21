@@ -67,9 +67,6 @@ public class WithMockAdminSecurityContextFactory
             if (atribuicoes.stream().noneMatch(a -> a.getPerfil() == Perfil.ADMIN)) {
                 // Usuário existe mas não tem perfil ADMIN, adicionar com sua unidade de lotação
                 Unidade unidade = principal.getUnidadeLotacao();
-                if (unidade == null) {
-                    unidade = Unidade.builder().nome("Unidade Mock").sigla("UM").build();
-                }
                 atribuicoes.add(
                                 sgc.organizacao.model.UsuarioPerfil.builder()
                                         .usuario(principal)

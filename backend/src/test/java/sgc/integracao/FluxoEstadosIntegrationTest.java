@@ -193,14 +193,6 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             em.flush();
             em.clear();
 
-            // Re-fetch subprocess and map to ensure they are managed for downstream logic that might need them
-            Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
-            // Ensure map is linked correctly (bidirectional) just in case
-            if (sp.getMapa() != null && sp.getMapa().getSubprocesso() == null) {
-                 sp.getMapa().setSubprocesso(sp);
-                 mapaRepo.save(sp.getMapa());
-            }
-
             verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
             // 4. Disponibilizar Cadastro (Chefe)
@@ -291,14 +283,6 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             em.flush();
             em.clear();
 
-            // Re-fetch subprocess and map to ensure they are managed for downstream logic that might need them
-            Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
-            // Ensure map is linked correctly (bidirectional) just in case
-            if (sp.getMapa() != null && sp.getMapa().getSubprocesso() == null) {
-                 sp.getMapa().setSubprocesso(sp);
-                 mapaRepo.save(sp.getMapa());
-            }
-
             // Disponibilizar
             autenticar(chefeMapeamento, "ROLE_CHEFE");
             workflowService.disponibilizarCadastro(codSubprocesso, chefeMapeamento);
@@ -368,14 +352,6 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             em.flush();
             em.clear(); // Ensure clean reload for validation
 
-            // Re-fetch subprocess and map to ensure they are managed for downstream logic that might need them
-            Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
-            // Ensure map is linked correctly (bidirectional) just in case
-            if (sp.getMapa() != null && sp.getMapa().getSubprocesso() == null) {
-                 sp.getMapa().setSubprocesso(sp);
-                 mapaRepo.save(sp.getMapa());
-            }
-
             verificarSituacao(codSubprocesso, REVISAO_CADASTRO_EM_ANDAMENTO);
 
             // 4. Disponibilizar Revisão
@@ -444,14 +420,6 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
             em.flush();
             em.clear();
-
-            // Re-fetch subprocess and map to ensure they are managed for downstream logic that might need them
-            Subprocesso sp = subprocessoRepo.findById(codSubprocesso).orElseThrow();
-            // Ensure map is linked correctly (bidirectional) just in case
-            if (sp.getMapa() != null && sp.getMapa().getSubprocesso() == null) {
-                 sp.getMapa().setSubprocesso(sp);
-                 mapaRepo.save(sp.getMapa());
-            }
 
             // 4. Disponibilizar
             autenticar(chefeRevisao, "ROLE_CHEFE");

@@ -1,6 +1,7 @@
 package sgc.e2e.mock;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -21,10 +22,10 @@ public class NotificacaoEmailServiceMock extends NotificacaoEmailService {
     }
 
     @Override
-    public void enviarEmail(String para, String assunto, String corpo) {
+    public void enviarEmail(@NonNull String para, @NonNull String assunto, @NonNull String corpo) {
     }
 
     @Override
-    public void enviarEmailHtml(String para, String assunto, String corpoHtml) {
+    public void enviarEmailHtml(@NonNull String para, @NonNull String assunto, @NonNull String corpoHtml) {
     }
 }

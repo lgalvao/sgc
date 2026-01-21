@@ -47,7 +47,6 @@ public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
     );
 
     @Override
-    @SuppressWarnings("squid:S2589") // Sonar FP: Atividade.mapa é @Nullable, pode ser null
     public boolean canExecute(Usuario usuario, Acao acao, Atividade atividade) {
         RegrasAcaoAtividade regras = REGRAS.get(acao);
         if (regras == null) {
@@ -64,22 +63,8 @@ public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
         // 2. Verifica se é titular da unidade (quando requerido)
         if (regras.requerTitular) {
             Mapa mapa = atividade.getMapa();
-            if (mapa == null) {
-                definirMotivoNegacao("Atividade não possui mapa associado");
-                return false;
-            }
-
             Subprocesso subprocesso = mapa.getSubprocesso();
-            if (subprocesso == null) {
-                definirMotivoNegacao("Mapa não possui subprocesso associado");
-                return false;
-            }
-
             Unidade unidade = subprocesso.getUnidade();
-            if (unidade == null) {
-                definirMotivoNegacao("Subprocesso não possui unidade associada");
-                return false;
-            }
 
             String tituloTitular = unidade.getTituloTitular();
             if (!usuario.getTituloEleitoral().equals(tituloTitular)) {

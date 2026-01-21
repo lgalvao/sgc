@@ -1,5 +1,6 @@
 package sgc.integracao.mocks;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -45,7 +46,7 @@ public class TestEventConfig {
                 subprocessoFacade) {
 
             @Override
-            public void aoIniciarProcesso(EventoProcessoIniciado evento) {
+            public void aoIniciarProcesso(@NonNull EventoProcessoIniciado evento) {
                 // No-op para testes: evita envio massivo de e-mails/alertas na inicialização de processos
             }
         };

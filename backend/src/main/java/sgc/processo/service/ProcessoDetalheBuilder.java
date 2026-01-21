@@ -95,9 +95,7 @@ public class ProcessoDetalheBuilder {
                 unidadeDto.setSituacaoSubprocesso(sp.getSituacao());
                 unidadeDto.setDataLimite(sp.getDataLimiteEtapa1());
                 unidadeDto.setCodSubprocesso(sp.getCodigo());
-                if (sp.getMapa() != null) {
-                    unidadeDto.setMapaCodigo(sp.getMapa().getCodigo());
-                }
+                unidadeDto.setMapaCodigo(sp.getMapa().getCodigo());
                 unidadeDto.setDataLimiteFormatada(
                         FormatadorData.formatarData(sp.getDataLimiteEtapa1()));
                 unidadeDto.setSituacaoLabel(sp.getSituacao().getDescricao());
@@ -106,12 +104,10 @@ public class ProcessoDetalheBuilder {
 
         // Montar a hierarquia (pai/filho)
         for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
-            if (unidadeDto.getCodUnidadeSuperior() != null) {
-                ProcessoDetalheDto.UnidadeParticipanteDto pai =
-                        mapaUnidades.get(unidadeDto.getCodUnidadeSuperior());
-                if (pai != null) {
-                    pai.getFilhos().add(unidadeDto);
-                }
+            ProcessoDetalheDto.UnidadeParticipanteDto pai =
+                    mapaUnidades.get(unidadeDto.getCodUnidadeSuperior());
+            if (pai != null) {
+                pai.getFilhos().add(unidadeDto);
             }
         }
 
@@ -119,7 +115,7 @@ public class ProcessoDetalheBuilder {
         for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
             Long codUnidadeSuperior = unidadeDto.getCodUnidadeSuperior();
             // Se não tem pai ou o pai não está participando do processo
-            if (codUnidadeSuperior == null || !mapaUnidades.containsKey(codUnidadeSuperior)) {
+            if (!mapaUnidades.containsKey(codUnidadeSuperior)) {
                 dto.getUnidades().add(unidadeDto);
             }
         }

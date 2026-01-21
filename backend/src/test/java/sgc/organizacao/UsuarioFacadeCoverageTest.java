@@ -1,7 +1,6 @@
 package sgc.organizacao;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -27,9 +26,6 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -191,7 +187,7 @@ class UsuarioFacadeCoverageTest {
 
         List<PerfilDto> perfis = usuarioFacade.buscarPerfisUsuario("T");
         assertThat(perfis).hasSize(1);
-        assertThat(perfis.get(0).getPerfil()).isEqualTo("CHEFE");
+        assertThat(perfis.getFirst().getPerfil()).isEqualTo("CHEFE");
     }
 
     @Test

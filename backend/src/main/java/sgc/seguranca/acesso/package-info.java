@@ -27,7 +27,6 @@
  * <h3>Serviços Centrais</h3>
  * <ul>
  *   <li>{@link sgc.seguranca.acesso.AccessControlService} - Ponto central de verificação de permissões</li>
- *   <li>{@link HierarchyService} - Gerencia hierarquia de unidades organizacionais</li>
  *   <li>{@link sgc.seguranca.acesso.AccessAuditService} - Auditoria de decisões de acesso</li>
  * </ul>
  * 

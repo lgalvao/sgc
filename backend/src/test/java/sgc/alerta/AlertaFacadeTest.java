@@ -29,12 +29,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
  * Testes unitários consolidados do AlertaFacade.
- * 
+ * <p>
  * Consolida testes de:
  * - AlertaServiceTest.java (15 testes)
  * - AlertaServiceUpdateTest.java (4 testes)
@@ -61,12 +60,11 @@ class AlertaFacadeTest {
     @InjectMocks
     private AlertaFacade service;
 
-    private Unidade criarSedocMock() {
+    private void criarSedocMock() {
         Unidade sedoc = new Unidade();
         sedoc.setCodigo(15L);
         sedoc.setSigla("SEDOC");
         when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(sedoc);
-        return sedoc;
     }
 
     @Nested
@@ -326,15 +324,6 @@ class AlertaFacadeTest {
             assertThat(resultado).hasSize(1);
             verify(alertaUsuarioRepo, never()).save(any());
         }
-
-        @Test
-        @DisplayName("Deve retornar vazio se usuario nao tem unidade de lotacao")
-        void deveRetornarVazioSeSemLotacao() {
-            Usuario u = new Usuario();
-            u.setUnidadeLotacao(null);
-            when(usuarioService.buscarPorId("123")).thenReturn(u);
-            assertThat(service.listarAlertasPorUsuario("123")).isEmpty();
-        }
     }
 
     @Nested
@@ -437,7 +426,7 @@ class AlertaFacadeTest {
             List<AlertaDto> result = service.listarAlertasNaoLidos(titulo);
 
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).getCodigo()).isEqualTo(2L);
+            assertThat(result.getFirst().getCodigo()).isEqualTo(2L);
         }
     }
 

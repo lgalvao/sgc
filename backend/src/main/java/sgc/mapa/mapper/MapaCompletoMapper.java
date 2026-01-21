@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
 public interface MapaCompletoMapper {
     default MapaCompletoDto toDto(Mapa mapa, Long codSubprocesso, List<Competencia> competencias) {
         return MapaCompletoDto.builder()
-                .codigo(mapa == null ? null : mapa.getCodigo())
+                .codigo(mapa.getCodigo())
                 .subprocessoCodigo(codSubprocesso)
-                .observacoes(mapa == null ? null : mapa.getObservacoesDisponibilizacao())
-                .competencias(competencias == null ? null : competencias.stream().map(this::toDto).toList())
+                .observacoes(mapa.getObservacoesDisponibilizacao())
+                .competencias(competencias.stream().map(this::toDto).toList())
                 .build();
     }
 
@@ -30,10 +30,8 @@ public interface MapaCompletoMapper {
 
     @Named("mapAtividadesCodigos")
     default List<Long> mapAtividadesCodigos(java.util.Set<sgc.mapa.model.Atividade> atividades) {
-        if (atividades == null) return null;
 
         return atividades.stream()
-                .filter(Objects::nonNull)
                 .map(sgc.mapa.model.Atividade::getCodigo)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());

@@ -100,7 +100,7 @@ describe("axios-setup", () => {
 
     it("interceptor de erro de requisição deve rejeitar a promessa", async () => {
         const error = new Error("Request error");
-        await expect(requestErrorInterceptor(error)).rejects.toThrow("Request error");
+        expect(requestErrorInterceptor(error)).rejects.toThrow("Request error");
     });
 
     it("interceptor de erro de resposta deve redirecionar para login em caso de 401", async () => {
@@ -108,7 +108,7 @@ describe("axios-setup", () => {
         vi.spyOn(feedbackStore, "show");
 
         const error = {isAxiosError: true, response: {status: 401, data: {}}};
-        await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
+        expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         expect(feedbackStore.show).toHaveBeenCalledWith(
             "Não Autorizado",
             expect.stringContaining("Sua sessão expirou"),
@@ -122,7 +122,7 @@ describe("axios-setup", () => {
         vi.spyOn(feedbackStore, "show");
 
         const error = {isAxiosError: true, response: {status: 400, data: {}}};
-        await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
+        expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         expect(feedbackStore.show).not.toHaveBeenCalled();
     });
 
@@ -134,7 +134,7 @@ describe("axios-setup", () => {
             isAxiosError: true,
             response: {status: 500, data: {message: "Server Error"}},
         };
-        await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
+        expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         // Title changed to "Erro Inesperado" in apiError.ts
         expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", "Server Error", "danger");
     });
@@ -147,7 +147,7 @@ describe("axios-setup", () => {
             isAxiosError: true,
             response: {status: 500, data: {}},
         };
-        await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
+        expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         expect(feedbackStore.show).toHaveBeenCalledWith(
             "Erro Inesperado",
             "Erro desconhecido.", // Updated expectation
@@ -161,7 +161,7 @@ describe("axios-setup", () => {
 
         // isAxiosError: true, and no response, but request exists
         const error = {isAxiosError: true, request: {}, message: "Network Error"};
-        await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
+        expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         expect(feedbackStore.show).toHaveBeenCalledWith(
             "Erro de Rede",
             expect.stringContaining("Não foi possível conectar"),
@@ -174,7 +174,7 @@ describe("axios-setup", () => {
         vi.spyOn(feedbackStore, "show");
 
         const error = new Error("Generic failure");
-        await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
+        expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", "Generic failure", "danger");
     });
 
@@ -190,7 +190,7 @@ describe("axios-setup", () => {
 
         const error = new Error("Generic failure");
 
-        await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
+        expect(responseErrorInterceptor(error)).rejects.toEqual(error);
 
         expect(logger.error).toHaveBeenCalledWith("Erro ao exibir notificação:", expect.any(Error));
     });

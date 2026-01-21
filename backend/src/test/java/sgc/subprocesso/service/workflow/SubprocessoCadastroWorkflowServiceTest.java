@@ -28,11 +28,10 @@ import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -513,9 +512,9 @@ class SubprocessoCadastroWorkflowServiceTest {
         service.aceitarRevisaoCadastro(id, "obs", new Usuario());
 
         verify(transicaoService).registrarAnaliseETransicao(argThat(req ->
-                req.unidadeAnalise().equals(sup) &&
-                req.unidadeOrigemTransicao().equals(sup) &&
-                req.unidadeDestinoTransicao().equals(sup)
+                Objects.equals(req.unidadeAnalise(), sup) &&
+                        Objects.equals(req.unidadeOrigemTransicao(), sup) &&
+                        Objects.equals(req.unidadeDestinoTransicao(), sup)
         ));
     }
 }

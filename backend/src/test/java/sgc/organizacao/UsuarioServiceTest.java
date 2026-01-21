@@ -69,9 +69,7 @@ class UsuarioServiceTest {
             // Verifica se a coleção foi inicializada (não deve lançar
             // LazyInitializationException)
             assertDoesNotThrow(() -> {
-                if (usuario.getAtribuicoesTemporarias() != null) {
-                    usuario.getAtribuicoesTemporarias().size();
-                }
+                usuario.getAtribuicoesTemporarias().size();
             });
         }
 

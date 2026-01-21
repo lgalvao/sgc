@@ -96,8 +96,7 @@ class ProcessoValidador {
         List<String> pendentes = subprocessos.stream().filter(sp -> sp.getSituacao() != MAPEAMENTO_MAPA_HOMOLOGADO
                 && sp.getSituacao() != REVISAO_MAPA_HOMOLOGADO)
                 .map(sp -> {
-                    String identificador = sp.getUnidade() != null ? sp.getUnidade().getSigla()
-                            : String.format("Subprocesso %d", sp.getCodigo());
+                    String identificador = sp.getUnidade().getSigla();
                     return String.format("%s (Situação: %s)", identificador, sp.getSituacao());
                 })
                 .toList();

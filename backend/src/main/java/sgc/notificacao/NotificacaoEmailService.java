@@ -114,6 +114,6 @@ public class NotificacaoEmailService {
     }
 
     private boolean isEmailValido(String email) {
-        return email != null && !email.isBlank() && PADRAO_EMAIL.matcher(email.trim()).matches();
+        return !email.isBlank() && PADRAO_EMAIL.matcher(email.trim()).matches();
     }
 }

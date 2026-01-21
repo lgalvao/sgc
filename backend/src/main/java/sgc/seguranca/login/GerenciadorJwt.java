@@ -79,7 +79,7 @@ public class GerenciadorJwt {
             String perfilStr = claims.get("perfil", String.class);
             Long unidadeCodigo = claims.get("unidade", Long.class);
 
-            if (tituloEleitoral == null || perfilStr == null || unidadeCodigo == null) {
+            if (tituloEleitoral == null) {
                 log.warn("JWT com claims inválidos");
                 return Optional.empty();
             }

@@ -1,6 +1,6 @@
 import { describe, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
-import { checkA11y } from "../../test-utils/a11yTestHelpers";
+import { checkA11y } from "@/test-utils/a11yTestHelpers";
 import EmptyState from "../EmptyState.vue";
 import BarraNavegacao from "../BarraNavegacao.vue";
 

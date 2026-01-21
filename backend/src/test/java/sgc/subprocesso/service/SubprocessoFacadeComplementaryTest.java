@@ -341,38 +341,6 @@ class SubprocessoFacadeComplementaryTest {
         }
 
         @Test
-        @DisplayName("obterDetalhes deve lidar com titular nulo")
-        void obterDetalhesTitularNulo() {
-            Long codigo = 1L;
-            Subprocesso sp = new Subprocesso();
-            sp.setCodigo(codigo);
-            sgc.processo.model.Processo proc = new sgc.processo.model.Processo();
-            proc.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
-            sp.setProcesso(proc);
-            Unidade unidade = new Unidade();
-            unidade.setSigla("SIGLA");
-            unidade.setTituloTitular(null);
-            sp.setUnidade(unidade);
-
-            Usuario usuario = new Usuario();
-            usuario.setTituloEleitoral("123");
-
-            when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
-            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
-            when(unidadeFacade.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
-            // Titular null, should not call buscarPorLogin
-            when(repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
-            when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().build());
-
-            SubprocessoDetalheDto result = subprocessoFacade.obterDetalhes(codigo, sgc.organizacao.model.Perfil.ADMIN);
-
-            // Verifica que executou sem erro e retornou resultado
-            assertThat(result).isNotNull();
-            // Verifica que não tentou buscar titular (pois é null)
-            verify(usuarioService, org.mockito.Mockito.never()).buscarPorLogin(any());
-        }
-
-        @Test
         @DisplayName("obterDetalhes deve lidar com exceção ao buscar titular")
         void obterDetalhesTitularException() {
             Long codigo = 1L;
@@ -486,6 +454,9 @@ class SubprocessoFacadeComplementaryTest {
         void obterSugestoes() {
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(1L);
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(10L);
+            sp.setMapa(mapa);
             when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
             
             SugestoesDto result = subprocessoFacade.obterSugestoes(1L);
@@ -694,30 +665,6 @@ class SubprocessoFacadeComplementaryTest {
             subprocessoFacade.importarAtividades(dest, orig);
             // Default case logs debug and doesn't change status, so it remains NAO_INICIADO
             assertThat(spDest.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
-        }
-
-        @Test
-        @DisplayName("importarAtividades com unidade origem nula")
-        void importarAtividadesUnidadeOrigemNula() {
-            Long dest = 1L;
-            Subprocesso spDest = new Subprocesso();
-            spDest.setCodigo(dest);
-            spDest.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            spDest.setMapa(new Mapa());
-            spDest.setUnidade(new Unidade());
-
-            Long orig = 2L;
-            Subprocesso spOrig = new Subprocesso();
-            spOrig.setMapa(new Mapa());
-            spOrig.setUnidade(null); // Unidade Nula
-
-            when(subprocessoRepo.findById(dest)).thenReturn(java.util.Optional.of(spDest));
-            when(subprocessoRepo.findById(orig)).thenReturn(java.util.Optional.of(spOrig));
-
-            subprocessoFacade.importarAtividades(dest, orig);
-
-            // Should pass and verify log message or something, but here just ensure no NPE
-            verify(movimentacaoRepo, org.mockito.Mockito.atLeastOnce()).save(any());
         }
     }
 }

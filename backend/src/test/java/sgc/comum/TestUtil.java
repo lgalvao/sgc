@@ -5,7 +5,6 @@ import org.springframework.http.MediaType;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class TestUtil {
@@ -16,7 +15,7 @@ public class TestUtil {
                     MediaType.APPLICATION_JSON.getSubtype(),
                     StandardCharsets.UTF_8);
 
-    public static byte[] convertObjectToJsonBytes(Object object) throws IOException {
+    public static byte[] convertObjectToJsonBytes(Object object) {
         ObjectMapper mapper = JsonMapper.builder().changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL)).build();
 
         return mapper.writeValueAsBytes(object);

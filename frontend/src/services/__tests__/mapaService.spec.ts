@@ -99,7 +99,7 @@ describe("mapaService", () => {
             const error = new Error("Erro genérico");
             mockApi.get.mockRejectedValue(error);
 
-            await expect(mapaService.verificarMapaVigente(1)).rejects.toThrow(
+            expect(mapaService.verificarMapaVigente(1)).rejects.toThrow(
                 "Erro genérico",
             );
         });

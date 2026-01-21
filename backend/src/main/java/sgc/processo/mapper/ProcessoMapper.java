@@ -7,7 +7,6 @@ import org.mapstruct.MappingTarget;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.Processo;
 
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -31,7 +30,6 @@ public interface ProcessoMapper {
         if (processo.getParticipantes() != null) {
             String siglas = processo.getParticipantes().stream()
                     .map(sgc.organizacao.model.Unidade::getSigla)
-                    .filter(Objects::nonNull)
                     .sorted()
                     .collect(Collectors.joining(", "));
             dto.setUnidadesParticipantes(siglas);

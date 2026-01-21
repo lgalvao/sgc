@@ -46,8 +46,6 @@ class ImpactoMapaServiceTest {
     private AccessControlService accessControlService;
 
     private Usuario chefe;
-    private Usuario gestor;
-    private Usuario admin;
     private Subprocesso subprocesso;
 
     @BeforeEach
@@ -56,11 +54,11 @@ class ImpactoMapaServiceTest {
         chefe.setTituloEleitoral("111");
         addAtribuicao(chefe, Perfil.CHEFE);
 
-        gestor = new Usuario();
+        Usuario gestor = new Usuario();
         gestor.setTituloEleitoral("222");
         addAtribuicao(gestor, Perfil.GESTOR);
 
-        admin = new Usuario();
+        Usuario admin = new Usuario();
         admin.setTituloEleitoral("333");
         addAtribuicao(admin, Perfil.ADMIN);
 

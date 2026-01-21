@@ -20,7 +20,7 @@ class ConfigCorsTest {
     void deveConfigurarOrigemCorsComOrigensPermitidas() {
         // Cria record de propriedades imutável
         ConfigCorsProperties properties = new ConfigCorsProperties(
-            List.of("http://example.com"),
+            List.of("https://example.com"),
             List.of("GET", "POST"),
             List.of("*"),
             true
@@ -36,7 +36,7 @@ class ConfigCorsTest {
         CorsConfiguration configuration = source.getCorsConfiguration(request);
 
         assertThat(configuration).isNotNull();
-        assertThat(configuration.getAllowedOrigins()).containsExactly("http://example.com");
+        assertThat(configuration.getAllowedOrigins()).containsExactly("https://example.com");
         assertThat(configuration.getAllowedMethods()).containsExactly("GET", "POST");
         assertThat(configuration.getAllowedHeaders()).containsExactly("*");
         assertThat(configuration.getAllowCredentials()).isTrue();

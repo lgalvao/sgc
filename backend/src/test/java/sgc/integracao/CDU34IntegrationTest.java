@@ -64,7 +64,6 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
 
     private Unidade unidade;
     private Processo processo;
-    private Subprocesso subprocesso;
 
     @BeforeEach
     void setUp() {
@@ -81,7 +80,7 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
         processo = processoRepo.save(processo);
 
         // Criar Subprocesso com prazo próximo
-        subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
+        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(3));
@@ -91,7 +90,7 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
         entityManager.clear();
 
         // Reload to attach
-        subprocesso = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+        subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
     }
 
     @Test

@@ -46,8 +46,4 @@ public class AtribuicaoTemporaria extends EntidadeBase {
     @Transient
     private Perfil perfil;
 
-    public Perfil getPerfil() {
-        return perfil != null ? perfil : Perfil.SERVIDOR;
-    }
-
 }

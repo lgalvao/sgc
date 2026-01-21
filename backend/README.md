@@ -286,5 +286,5 @@ POST /api/processos/{id}/iniciar     - Workflow action
 
 ## 📚 Documentação Adicional
 
-* [Arquitetura Completa](/docs/ARCHITECTURE.md) - Visão detalhada do sistema
-* [Backend Patterns](/regras/backend-padroes.md) - Padrões e convenções
+* [Arquitetura Completa](/etc/docs/ARCHITECTURE.md) - Visão detalhada do sistema
+* [Backend Patterns](/etc/regras/backend-padroes.md) - Padrões e convenções

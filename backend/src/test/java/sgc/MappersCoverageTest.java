@@ -13,14 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MappersCoverageTest {
     private final ConhecimentoMapper conhecimentoMapper = Mappers.getMapper(ConhecimentoMapper.class);
 
-
-
-    @Test
-    @DisplayName("Deve cobrir nulos no ConhecimentoMapper")
-    void deveCobrirNulosConhecimentoMapper() {
-        assertThat(conhecimentoMapper.toResponse(null)).isNull();
-    }
-
     @Test
     @DisplayName("Deve cobrir método map do ConhecimentoMapper")
     void deveCobrirMetodoMap() {
@@ -33,9 +25,6 @@ class MappersCoverageTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        // Test null
-        assertThat(conhecimentoMapper.map(null)).isNull();
 
         // Test exception
         org.mockito.Mockito.when(repo.buscar(sgc.mapa.model.Atividade.class, 1L))

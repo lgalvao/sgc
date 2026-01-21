@@ -28,7 +28,6 @@ import java.io.OutputStream;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @Tag("unit")
@@ -195,7 +194,8 @@ class RelatorioFacadeTest {
         when(pdfFactory.createDocument()).thenReturn(document);
         doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
 
-        assertThatThrownBy(() -> relatorioService.gerarRelatorioAndamento(1L, null))
+        OutputStream out = new ByteArrayOutputStream();
+        assertThatThrownBy(() -> relatorioService.gerarRelatorioAndamento(1L, out))
             .isInstanceOf(RuntimeException.class)
             .hasMessageContaining("Erro ao gerar PDF");
     }
@@ -208,7 +208,8 @@ class RelatorioFacadeTest {
         when(pdfFactory.createDocument()).thenReturn(document);
         doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
 
-        assertThatThrownBy(() -> relatorioService.gerarRelatorioMapas(1L, null, null))
+        OutputStream out = new ByteArrayOutputStream();
+        assertThatThrownBy(() -> relatorioService.gerarRelatorioMapas(1L, 1L, out))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Erro ao gerar PDF");
     }

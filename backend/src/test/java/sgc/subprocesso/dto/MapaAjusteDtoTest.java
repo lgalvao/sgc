@@ -9,7 +9,6 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -18,17 +17,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("unit")
 @DisplayName("Testes de MapaAjusteDto")
 class MapaAjusteDtoTest {
-
     private Subprocesso subprocesso;
-    private Mapa mapa;
-    private Unidade unidade;
 
     @BeforeEach
     void setUp() {
-        unidade = new Unidade();
+        Unidade unidade = new Unidade();
         unidade.setNome("Unidade Teste");
 
-        mapa = new Mapa();
+        Mapa mapa = new Mapa();
         mapa.setCodigo(100L);
 
         subprocesso = new Subprocesso();
@@ -73,8 +69,10 @@ class MapaAjusteDtoTest {
             comp.setAtividades(Set.of(ativ));
 
             // Execute
+            Analise analise = new Analise();
+            analise.setObservacoes("");
             MapaAjusteDto dto = MapaAjusteDto.of(
-                    subprocesso, null, List.of(comp), List.of(ativ), List.of(con));
+                    subprocesso, analise, List.of(comp), List.of(ativ), List.of(con));
 
             // Assert
             assertThat(dto.getCompetencias()).hasSize(1);
@@ -89,19 +87,6 @@ class MapaAjusteDtoTest {
             ConhecimentoAjusteDto conDto = ativDto.getConhecimentos().getFirst();
             assertThat(conDto.getConhecimentoCodigo()).isEqualTo(3L);
             assertThat(conDto.isIncluido()).isTrue();
-        }
-
-        @Test
-        @DisplayName("Deve lidar com valores nulos de forma segura")
-        void deveLidarComNulos() {
-            subprocesso.setUnidade(null);
-            
-            MapaAjusteDto dto = MapaAjusteDto.of(
-                    subprocesso, null, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
-
-            assertThat(dto.getUnidadeNome()).isEmpty();
-            assertThat(dto.getJustificativaDevolucao()).isNull();
-            assertThat(dto.getCompetencias()).isEmpty();
         }
     }
 

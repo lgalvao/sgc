@@ -1,5 +1,6 @@
 package sgc.subprocesso.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseFacade;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
@@ -69,7 +71,6 @@ class SubprocessoFacadeCoverageTest {
     @Test
     @DisplayName("importarAtividades - Tipo Processo Diagnostico (Default Case)")
     void importarAtividades_TipoProcessoDiagnostico() {
-        // Covers lines 404-406 (default case in switch)
         Long codDestino = 1L;
         Long codOrigem = 2L;
 
@@ -97,13 +98,9 @@ class SubprocessoFacadeCoverageTest {
 
         facade.importarAtividades(codDestino, codOrigem);
 
-        // Verify that copiaMapaService was called
         verify(copiaMapaService).importarAtividadesDeOutroMapa(20L, 10L);
-
-        // Verify that Movimentacao was saved
         verify(movimentacaoRepo).save(any(Movimentacao.class));
 
-        // Verify that situation did NOT change (default case)
         assert spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO;
     }
 
@@ -151,7 +148,7 @@ class SubprocessoFacadeCoverageTest {
         Long codSubprocesso = 999L;
         when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.empty());
 
-        org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList()));
+        Assertions.assertThrows(ErroEntidadeNaoEncontrada.class, () -> facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList()));
     }
 
     @Test
@@ -163,7 +160,6 @@ class SubprocessoFacadeCoverageTest {
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         sp.setUnidade(new sgc.organizacao.model.Unidade());
 
-        // Mock access control
         when(accessControlService.podeExecutar(any(), any(), any())).thenReturn(true);
 
         facade.calcularPermissoes(sp, new sgc.organizacao.model.Usuario());
@@ -181,7 +177,6 @@ class SubprocessoFacadeCoverageTest {
 
         when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
 
-        // Competencia request contains ID 100, but service returns empty map
         CompetenciaAjusteDto compRequest = CompetenciaAjusteDto.builder()
                 .codCompetencia(100L)
                 .nome("Nova Nome")
@@ -190,7 +185,6 @@ class SubprocessoFacadeCoverageTest {
                 ))
                 .build();
 
-        // Mock returns empty for bulk fetch implies IDs not found
         when(atividadeService.atualizarDescricoesEmLote(any())).thenReturn(java.util.Collections.emptyList());
         when(competenciaService.buscarPorCodigos(any())).thenReturn(java.util.Collections.emptyList());
 
@@ -299,8 +293,10 @@ class SubprocessoFacadeCoverageTest {
 
         // Status must NOT change
         org.junit.jupiter.api.Assertions.assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, spDestino.getSituacao());
+
         // Verify save was NOT called
         verify(subprocessoRepo, org.mockito.Mockito.never()).save(spDestino);
+
         // But movimentacao IS saved.
         verify(movimentacaoRepo).save(any(Movimentacao.class));
     }
@@ -327,44 +323,13 @@ class SubprocessoFacadeCoverageTest {
 
         Subprocesso spDestino = new Subprocesso();
         spDestino.setCodigo(codDestino);
+        
         // Invalid status for import
         spDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
         when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
 
         org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida.class, () -> facade.importarAtividades(codDestino, codOrigem));
-    }
-
-    @Test
-    @DisplayName("importarAtividades - Unidade Origem Null")
-    void importarAtividades_UnidadeOrigemNull() {
-        Long codDestino = 1L;
-        Long codOrigem = 2L;
-
-        Subprocesso spDestino = new Subprocesso();
-        spDestino.setCodigo(codDestino);
-        spDestino.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        spDestino.setMapa(new Mapa());
-        spDestino.getMapa().setCodigo(10L);
-        spDestino.setUnidade(new sgc.organizacao.model.Unidade());
-        spDestino.getUnidade().setSigla("DEST");
-        spDestino.setProcesso(new Processo());
-        spDestino.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
-
-        Subprocesso spOrigem = new Subprocesso();
-        spOrigem.setCodigo(codOrigem);
-        spOrigem.setMapa(new Mapa());
-        spOrigem.getMapa().setCodigo(20L);
-        // Unit is null
-        spOrigem.setUnidade(null);
-
-        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
-        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
-
-        facade.importarAtividades(codDestino, codOrigem);
-
-        // Verify that movimentacao was saved (no exception thrown)
-        verify(movimentacaoRepo).save(any(Movimentacao.class));
     }
 
     @Test
@@ -401,7 +366,6 @@ class SubprocessoFacadeCoverageTest {
     @Test
     @DisplayName("salvarAjustesMapa - Atividades Null na Competencia")
     void salvarAjustesMapa_AtividadesNull() {
-        // Covers branches 559, 580 (null check for atividades in dto)
         Long codSubprocesso = 1L;
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(codSubprocesso);
@@ -427,12 +391,12 @@ class SubprocessoFacadeCoverageTest {
     @Test
     @DisplayName("importarAtividades - Destino ja em Revisao Cadastro Em Andamento")
     void importarAtividades_RevisaoEmAndamento() {
-        // Covers branch 604
         Long codDestino = 1L;
         Long codOrigem = 2L;
 
         Subprocesso spDestino = new Subprocesso();
         spDestino.setCodigo(codDestino);
+
         // Set situation to one that is VALID but not NAO_INICIADO
         spDestino.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         spDestino.setMapa(new Mapa());
@@ -452,7 +416,6 @@ class SubprocessoFacadeCoverageTest {
 
         facade.importarAtividades(codDestino, codOrigem);
 
-        // Should execute import
         verify(copiaMapaService).importarAtividadesDeOutroMapa(20L, 10L);
     }
 }

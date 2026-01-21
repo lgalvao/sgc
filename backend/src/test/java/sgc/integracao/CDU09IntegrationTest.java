@@ -165,7 +165,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         up.setPerfil(perfil);
 
         Set<UsuarioPerfil> atribuicoes = usuario.getAtribuicoes();
-        if (atribuicoes == null || atribuicoes.isEmpty()) { // Handle empty set from Fixture/Immutable
+        if (atribuicoes.isEmpty()) { // Handle empty set from Fixture/Immutable
             atribuicoes = new HashSet<>();
         }
         atribuicoes.add(up);

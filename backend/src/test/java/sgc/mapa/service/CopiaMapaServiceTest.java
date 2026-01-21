@@ -11,14 +11,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -98,7 +96,7 @@ class CopiaMapaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve lidar com listas vazias ou nulas de atividades e competencias")
+    @DisplayName("Deve lidar com listas vazias de atividades e competencias")
     void deveLidarComListasVazias() {
         Long origemId = 1L;
         Mapa mapaOrigem = new Mapa();
@@ -106,8 +104,8 @@ class CopiaMapaServiceTest {
 
         when(mapaRepo.findById(origemId)).thenReturn(Optional.of(mapaOrigem));
         when(mapaRepo.save(any(Mapa.class))).thenReturn(new Mapa());
-        when(atividadeRepo.findByMapaCodigoWithConhecimentos(origemId)).thenReturn(null); // Return null
-        when(competenciaRepo.findByMapaCodigo(origemId)).thenReturn(Collections.emptyList()); // Empty list
+        when(atividadeRepo.findByMapaCodigoWithConhecimentos(origemId)).thenReturn(List.of()); // Empty list
+        when(competenciaRepo.findByMapaCodigo(origemId)).thenReturn(List.of()); // Empty list
 
         Mapa resultado = service.copiarMapaParaUnidade(origemId);
 

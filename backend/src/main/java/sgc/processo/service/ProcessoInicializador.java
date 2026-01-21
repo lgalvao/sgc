@@ -59,7 +59,7 @@ public class ProcessoInicializador {
         // Determinar unidades baseado no tipo de processo
         if (tipo == TipoProcesso.REVISAO) {
             // Revisão usa lista passada como parâmetro
-            if (codsUnidadesParam == null || codsUnidadesParam.isEmpty()) {
+            if (codsUnidadesParam.isEmpty()) {
                 throw new ErroUnidadesNaoDefinidas("A lista de unidades é obrigatória para iniciar o processo de revisão.");
             }
             codigosUnidades = codsUnidadesParam;

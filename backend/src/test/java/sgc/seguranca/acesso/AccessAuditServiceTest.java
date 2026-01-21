@@ -58,17 +58,6 @@ class AccessAuditServiceTest {
     }
 
     @Test
-    @DisplayName("Deve registrar acesso com recurso nulo")
-    void deveRegistrarAcessoComRecursoNulo() {
-        Usuario usuario = criarUsuario("123456789012");
-        Acao acao = Acao.VISUALIZAR_PAINEL_PROCESSOS;
-        
-        assertDoesNotThrow(() -> 
-            auditService.logAccessGranted(usuario, acao, null)
-        );
-    }
-
-    @Test
     @DisplayName("Deve registrar acesso com objeto genérico")
     void deveRegistrarAcessoComObjetoGenerico() {
         Usuario usuario = criarUsuario("123456789012");

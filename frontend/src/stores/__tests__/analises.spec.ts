@@ -141,7 +141,7 @@ describe("useAnalisesStore", () => {
             vi.mocked(analiseService.listarAnalisesCadastro).mockRejectedValue(
                 new Error("Fail"),
             );
-            await expect(
+            expect(
                 context.store.buscarAnalisesCadastro(codSubrocesso),
             ).rejects.toThrow("Fail");
             // Verifica se o estado permanece limpo ou inalterado em caso de erro inicial
@@ -152,7 +152,7 @@ describe("useAnalisesStore", () => {
             vi.mocked(analiseService.listarAnalisesValidacao).mockRejectedValue(
                 new Error("Fail"),
             );
-            await expect(
+            expect(
                 context.store.buscarAnalisesValidacao(codSubrocesso),
             ).rejects.toThrow("Fail");
             expect(context.store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual([]);

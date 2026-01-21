@@ -14,29 +14,29 @@ import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
 import sgc.organizacao.model.UnidadeMapaRepo;
-import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 class SubprocessoFactoryTest {
-
     @Mock
     private SubprocessoRepo subprocessoRepo;
+
     @Mock
     private MapaRepo mapaRepo;
+
     @Mock
     private SubprocessoMovimentacaoRepo movimentacaoRepo;
+
     @Mock
     private CopiaMapaService servicoDeCopiaDeMapa;
+
     @Mock
     private UnidadeMapaRepo unidadeMapaRepo;
 
@@ -103,37 +103,6 @@ class SubprocessoFactoryTest {
     }
 
     @Test
-    @DisplayName("criarParaRevisao erro se unidade nao tem mapa")
-    void criarParaRevisao_SemMapa() {
-        Processo processo = new Processo();
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(1L);
-        unidade.setSigla("U1");
-
-        assertThrows(ErroProcesso.class, () -> factory.criarParaRevisao(processo, unidade, null));
-    }
-
-    @Test
-    @DisplayName("criarParaRevisao erro se copia falha")
-    void criarParaRevisao_FalhaCopia() {
-        Processo processo = new Processo();
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(1L);
-        unidade.setSigla("U1");
-
-        Mapa mapaVigente = new Mapa();
-        mapaVigente.setCodigo(100L);
-        UnidadeMapa unidadeMapa = new UnidadeMapa();
-        unidadeMapa.setMapaVigente(mapaVigente);
-
-        when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(i -> i.getArgument(0));
-
-        when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L)).thenReturn(null);
-
-        assertThrows(ErroProcesso.class, () -> factory.criarParaRevisao(processo, unidade, unidadeMapa));
-    }
-
-    @Test
     @DisplayName("criarParaDiagnostico sucesso")
     void criarParaDiagnostico_Sucesso() {
         Processo processo = new Processo();
@@ -159,17 +128,5 @@ class SubprocessoFactoryTest {
         // Verifica situacao inicial
         verify(subprocessoRepo, atLeastOnce()).save(argThat(s -> s.getSituacao() == SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO));
         verify(movimentacaoRepo).save(any(Movimentacao.class));
-    }
-
-    @Test
-    @DisplayName("criarParaDiagnostico deve lançar exceção quando unidadeMapa é null")
-    void criarParaDiagnostico_UnidadeMapaNull() {
-        Processo processo = new Processo();
-        Unidade unidade = new Unidade();
-        unidade.setSigla("U1");
-
-        assertThatThrownBy(() -> factory.criarParaDiagnostico(processo, unidade, null))
-                .isInstanceOf(ErroProcesso.class)
-                .hasMessageContaining("não possui mapa vigente");
     }
 }

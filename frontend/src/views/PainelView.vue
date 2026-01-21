@@ -72,7 +72,7 @@ const asc = ref(true);
 async function carregarDados() {
   if (perfil.perfilSelecionado && perfil.unidadeSelecionada) {
     const promises = [
-      processosStore.buscarProcessosPainel(
+      await processosStore.buscarProcessosPainel(
           perfil.perfilSelecionado,
           Number(perfil.unidadeSelecionada),
           0,

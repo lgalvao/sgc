@@ -54,7 +54,7 @@ public class AlertaController {
             case String string -> string;
             case Usuario usuario -> usuario.getTituloEleitoral();
             case UserDetails userDetails -> userDetails.getUsername();
-            case null, default -> principal.toString();
+            default -> principal.toString();
         };
 
     }

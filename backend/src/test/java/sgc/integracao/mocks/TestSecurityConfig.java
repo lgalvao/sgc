@@ -16,7 +16,7 @@ public class TestSecurityConfig {
     @Bean
     @Primary
     @Profile({"test"})
-    public SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain testFilterChain(HttpSecurity http) {
         http.csrf(org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/usuarios/autenticar", "/api/usuarios/autorizar", "/api/usuarios/entrar").permitAll()

@@ -51,7 +51,6 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
 
     private Usuario usuario1;
     private Usuario usuario2;
-    private Administrador admin1;
 
     @BeforeEach
     void setUp() {
@@ -79,7 +78,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
         usuarioRepo.save(usuario2);
 
         // Adicionar admin inicial
-        admin1 = Administrador.builder().usuarioTitulo(usuario1.getTituloEleitoral()).build();
+        Administrador admin1 = Administrador.builder().usuarioTitulo(usuario1.getTituloEleitoral()).build();
         administradorRepo.save(admin1);
 
         entityManager.flush();

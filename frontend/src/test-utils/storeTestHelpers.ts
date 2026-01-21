@@ -43,9 +43,9 @@ export function testErrorHandling<T>(
     it("deve lançar um erro em caso de falha", async () => {
         // Se errorType for passado, verifica o tipo, senão verifica apenas se lança
         if (errorType) {
-            await expect(action()).rejects.toThrow(errorType);
+            expect(action()).rejects.toThrow(errorType);
         } else {
-            await expect(action()).rejects.toThrow();
+            expect(action()).rejects.toThrow();
         }
     });
 }

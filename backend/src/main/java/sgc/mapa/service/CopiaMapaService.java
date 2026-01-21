@@ -81,7 +81,6 @@ public class CopiaMapaService {
         Map<Long, Atividade> mapaAtividades = new HashMap<>();
 
         List<Atividade> atividadesFonte = atividadeRepo.findByMapaCodigoWithConhecimentos(codMapaFonte);
-        if (atividadesFonte == null) atividadesFonte = List.of();
 
         List<Atividade> novasAtividades = new ArrayList<>();
         // Use IdentityHashMap to map unsaved object -> source ID, to later map source ID -> saved object
@@ -111,7 +110,7 @@ public class CopiaMapaService {
         novaAtividade.setMapa(mapaDestino);
 
         List<Conhecimento> conhecimentosFonte = atividadeFonte.getConhecimentos();
-        if (conhecimentosFonte != null && !conhecimentosFonte.isEmpty()) {
+        if (!conhecimentosFonte.isEmpty()) {
             for (Conhecimento conhecimentoFonte : conhecimentosFonte) {
                 Conhecimento novoConhecimento = new Conhecimento()
                         .setAtividade(novaAtividade)
@@ -126,7 +125,7 @@ public class CopiaMapaService {
 
     private void copiarCompetencias(Long codMapaFonte, Mapa mapaSalvo, Map<Long, Atividade> mapaAtividades) {
         List<Competencia> competenciasFonte = competenciaRepo.findByMapaCodigo(codMapaFonte);
-        if (competenciasFonte == null || competenciasFonte.isEmpty()) return;
+        if (competenciasFonte.isEmpty()) return;
 
         List<Competencia> novasCompetencias = new ArrayList<>();
 

@@ -124,16 +124,12 @@ public class SubprocessoCrudService {
     public SubprocessoDto criar(CriarSubprocessoRequest request, boolean criadoPorProcesso) {
         var entity = new Subprocesso();
         // Mapear manualmente do Request
-        if (request.getCodProcesso() != null) {
-            var processo = new sgc.processo.model.Processo();
-            processo.setCodigo(request.getCodProcesso());
-            entity.setProcesso(processo);
-        }
-        if (request.getCodUnidade() != null) {
-            var unidade = new sgc.organizacao.model.Unidade();
-            unidade.setCodigo(request.getCodUnidade());
-            entity.setUnidade(unidade);
-        }
+        var processo = new sgc.processo.model.Processo();
+        processo.setCodigo(request.getCodProcesso());
+        entity.setProcesso(processo);
+        var unidade = new sgc.organizacao.model.Unidade();
+        unidade.setCodigo(request.getCodUnidade());
+        entity.setUnidade(unidade);
         entity.setDataLimiteEtapa1(request.getDataLimiteEtapa1());
         entity.setDataLimiteEtapa2(request.getDataLimiteEtapa2());
         entity.setMapa(null);
@@ -152,9 +148,9 @@ public class SubprocessoCrudService {
                 .subprocesso(salvo)
                 .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
                 .dataHoraCriacao(LocalDateTime.now())
-                .criadoPorProcesso(criadoPorProcesso || salvo.getProcesso() != null)
-                .codProcesso(salvo.getProcesso() != null ? salvo.getProcesso().getCodigo() : null)
-                .codUnidade(salvo.getUnidade() != null ? salvo.getUnidade().getCodigo() : null)
+                .criadoPorProcesso(true)
+                .codProcesso(salvo.getProcesso().getCodigo())
+                .codUnidade(salvo.getUnidade().getCodigo())
                 .build();
         eventPublisher.publishEvent(evento);
 
@@ -186,7 +182,7 @@ public class SubprocessoCrudService {
     private Set<String> processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
         Set<String> campos = new HashSet<>();
 
-        java.util.Optional.ofNullable(request.getCodMapa()).ifPresent(cod -> {
+        java.util.Optional.of(request.getCodMapa()).ifPresent(cod -> {
             Mapa m = new Mapa();
             m.setCodigo(cod);
             if (!Objects.equals(subprocesso.getMapa(), m)) {
@@ -217,9 +213,9 @@ public class SubprocessoCrudService {
         // Publica evento ANTES da exclusão
         EventoSubprocessoExcluido evento = EventoSubprocessoExcluido.builder()
                 .codSubprocesso(codigo)
-                .codProcesso(subprocesso.getProcesso() != null ? subprocesso.getProcesso().getCodigo() : null)
-                .codUnidade(subprocesso.getUnidade() != null ? subprocesso.getUnidade().getCodigo() : null)
-                .codMapa(subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null)
+                .codProcesso(subprocesso.getProcesso().getCodigo())
+                .codUnidade(subprocesso.getUnidade().getCodigo())
+                .codMapa(subprocesso.getMapa().getCodigo())
                 .situacao(subprocesso.getSituacao())
                 .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
                 .dataHoraExclusao(LocalDateTime.now())

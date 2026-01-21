@@ -69,8 +69,8 @@ function cleanLog(output) {
         const trimmed = line.trim();
         if (filters.some(f => f.test(trimmed))) return false;
         // Filtro específico para os pontos do vitest/jest
-        if (/^[\.·]+$/.test(trimmed)) return false;
-        return true;
+        return !/^[\.·]+$/.test(trimmed);
+
     });
 
     return lines.join('\n');

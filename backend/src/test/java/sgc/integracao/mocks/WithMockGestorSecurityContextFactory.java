@@ -65,9 +65,6 @@ public class WithMockGestorSecurityContextFactory
                     .noneMatch(a -> a.getPerfil() == Perfil.GESTOR)) {
                 // Usuário existe mas não tem perfil GESTOR, adicionar com sua unidade de lotação
                 Unidade unidade = principal.getUnidadeLotacao();
-                if (unidade == null) {
-                    unidade = Unidade.builder().nome("Unidade Mock").sigla("UO_SUP").build();
-                }
                 atribuicoes.add(
                                 sgc.organizacao.model.UsuarioPerfil.builder()
                                         .usuario(principal)

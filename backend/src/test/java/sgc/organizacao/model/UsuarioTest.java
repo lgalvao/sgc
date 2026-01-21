@@ -31,10 +31,10 @@ class UsuarioTest {
     @Test
     @DisplayName("Deve incluir atribuições temporárias vigentes")
     void deveIncluirAtribuicoesTemporariasVigentes() {
-        Usuario usuario = Usuario.builder()
-                .tituloEleitoral("12345")
-                .atribuicoesTemporarias(new HashSet<>())
-                .build();
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("12345");
+        usuario.setAtribuicoes(new HashSet<>());
+        usuario.setAtribuicoesTemporarias(new HashSet<>());
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
@@ -55,16 +55,15 @@ class UsuarioTest {
     @Test
     @DisplayName("Deve ignorar atribuições temporárias expiradas")
     void deveIgnorarAtribuicoesTemporariasExpiradas() {
-        Usuario usuario = Usuario.builder()
-                .tituloEleitoral("12345")
-                .atribuicoesTemporarias(new HashSet<>())
-                .build();
-
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(1L);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("12345");
+        usuario.setAtribuicoes(new HashSet<>());
+        usuario.setAtribuicoesTemporarias(new HashSet<>());
 
         AtribuicaoTemporaria temp = new AtribuicaoTemporaria();
         temp.setPerfil(Perfil.GESTOR);
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
         temp.setUnidade(unidade);
         temp.setDataInicio(LocalDateTime.now().minusDays(10));
         temp.setDataTermino(LocalDateTime.now().minusDays(1));
@@ -77,16 +76,15 @@ class UsuarioTest {
     @Test
     @DisplayName("Deve ignorar atribuições temporárias futuras")
     void deveIgnorarAtribuicoesTemporariasFuturas() {
-        Usuario usuario = Usuario.builder()
-                .tituloEleitoral("12345")
-                .atribuicoesTemporarias(new HashSet<>())
-                .build();
-
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(1L);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("12345");
+        usuario.setAtribuicoes(new HashSet<>());
+        usuario.setAtribuicoesTemporarias(new HashSet<>());
 
         AtribuicaoTemporaria temp = new AtribuicaoTemporaria();
         temp.setPerfil(Perfil.GESTOR);
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
         temp.setUnidade(unidade);
         temp.setDataInicio(LocalDateTime.now().plusDays(1));
         temp.setDataTermino(LocalDateTime.now().plusDays(10));
@@ -100,6 +98,9 @@ class UsuarioTest {
     @DisplayName("Deve funcionar quando não há atribuições")
     void deveFuncionarSemAtribuicoes() {
         Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("12345");
+        usuario.setAtribuicoes(new HashSet<>());
+        usuario.setAtribuicoesTemporarias(new HashSet<>());
         assertThat(usuario.getTodasAtribuicoes()).isEmpty();
     }
 

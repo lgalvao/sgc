@@ -40,8 +40,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -513,7 +511,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             // Verifica que sugestões não foi setado (por ser null)
             verify(mapa).setSugestoes(null);
-            verify(mapa, never()).setSugestoes(argThat(s -> s != null && !s.isBlank())); 
+            verify(mapa, never()).setSugestoes(argThat(s -> !s.isBlank()));
         }
 
         @Test

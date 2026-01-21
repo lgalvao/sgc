@@ -63,7 +63,7 @@ public interface SubprocessoDetalheMapper {
 
     default String mapLocalizacaoAtual(List<Movimentacao> movimentacoes) {
         if (!org.springframework.util.CollectionUtils.isEmpty(movimentacoes)) {
-            Movimentacao movimentacaoRecente = movimentacoes.get(0);
+            Movimentacao movimentacaoRecente = movimentacoes.getFirst();
             if (movimentacaoRecente.getUnidadeDestino() != null) {
                 return movimentacaoRecente.getUnidadeDestino().getSigla();
             }

@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,10 +38,10 @@ class CopiaMapaServiceCoverageTest {
         when(repositorioMapa.findById(codOrigem)).thenReturn(Optional.of(fonte));
         when(repositorioMapa.save(any(Mapa.class))).thenAnswer(i -> i.getArgument(0));
         
-        // Cobre line 84 (atividadesFonte == null)
-        when(atividadeRepo.findByMapaCodigoWithConhecimentos(codOrigem)).thenReturn(null);
-        // Cobre line 129 (competenciasFonte == null)
-        when(competenciaRepo.findByMapaCodigo(codOrigem)).thenReturn(null);
+        // Cobre line 84 (atividadesFonte.isEmpty())
+        when(atividadeRepo.findByMapaCodigoWithConhecimentos(codOrigem)).thenReturn(List.of());
+        // Cobre line 129 (competenciasFonte.isEmpty())
+        when(competenciaRepo.findByMapaCodigo(codOrigem)).thenReturn(List.of());
 
         Mapa novo = copiaMapaService.copiarMapaParaUnidade(codOrigem);
         
@@ -94,7 +93,7 @@ class CopiaMapaServiceCoverageTest {
         
         // Verifica que salvou a competencia mas sem atividades (pois a2 nao foi copiada)
         verify(competenciaRepo).saveAll(argThat(list -> {
-            Competencia comp = (Competencia) list.iterator().next();
+            Competencia comp = list.iterator().next();
             return comp.getAtividades().isEmpty();
         }));
     }

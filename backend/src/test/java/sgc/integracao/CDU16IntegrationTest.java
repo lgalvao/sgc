@@ -156,7 +156,7 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve salvar ajustes no mapa e alterar a situação do subprocesso")
         void deveSalvarAjustesComSucesso() throws Exception {
-            Competencia c1 = competenciaRepo.findAll().get(0);
+            Competencia c1 = competenciaRepo.findAll().getFirst();
             Atividade a1 = atividadeRepo.findAll().stream().filter(a -> a.getDescricao().equals("Atividade 1")).findFirst().orElseThrow();
 
             var request =

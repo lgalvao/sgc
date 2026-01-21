@@ -165,7 +165,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
                 .build();
 
         Set<UsuarioPerfil> atribuicoes = usuario.getAtribuicoes();
-        if (atribuicoes == null || atribuicoes.isEmpty()) {
+        if (atribuicoes.isEmpty()) {
             atribuicoes = new HashSet<>();
         }
         atribuicoes.add(up);

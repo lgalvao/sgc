@@ -27,7 +27,7 @@ public class AccessAuditService {
      */
     public void logAccessGranted(Usuario usuario, Acao acao, Object recurso) {
         log.info("ACCESS_GRANTED: user={}, action={}, resource={}, timestamp={}",
-                usuario != null ? usuario.getTituloEleitoral() : "ANONYMOUS",
+                usuario.getTituloEleitoral(),
                 acao,
                 getResourceId(recurso),
                 Instant.now()
@@ -44,7 +44,7 @@ public class AccessAuditService {
      */
     public void logAccessDenied(Usuario usuario, Acao acao, Object recurso, String motivo) {
         log.warn("ACCESS_DENIED: user={}, action={}, resource={}, reason={}, timestamp={}",
-                usuario != null ? usuario.getTituloEleitoral() : "ANONYMOUS",
+                usuario.getTituloEleitoral(),
                 acao,
                 getResourceId(recurso),
                 motivo,
@@ -63,7 +63,6 @@ public class AccessAuditService {
      */
     private String getResourceId(Object recurso) {
         return switch (recurso) {
-            case null -> "null";
             case Subprocesso sp -> "Subprocesso:" + sp.getCodigo();
             case Processo p -> "Processo:" + p.getCodigo();
             default ->

@@ -217,9 +217,9 @@ Swagger organizado por contexto (workflow phase) é mais útil para consumidores
 
 ## Referências
 
-- [ADR-001: Facade Pattern](/docs/adr/ADR-001-facade-pattern.md)
-- [ARCHITECTURE.md](/docs/ARCHITECTURE.md)
-- [Backend Patterns](/regras/backend-padroes.md)
+- [ADR-001: Facade Pattern](/etc/docsdocs/adr/ADR-001-facade-pattern.md)
+- [ARCHITECTURE.md](/etc/docsdocs/ARCHITECTURE.md)
+- [Backend Patterns](/etc/regras/backend-padroes.md)
 - [Refactoring Plan](/refactoring-plan.md) - Fase 5
 
 ---

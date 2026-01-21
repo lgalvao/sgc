@@ -34,8 +34,6 @@ public abstract class ConhecimentoMapper {
     public abstract Conhecimento toEntity(AtualizarConhecimentoRequest request);
 
     public Atividade map(Long codigo) {
-        return codigo != null
-                ? repo.buscar(Atividade.class, codigo)
-                : null;
+        return repo.buscar(Atividade.class, codigo);
     }
 }

@@ -60,12 +60,6 @@ class SubprocessoMapperTest {
     }
 
     @Test
-    @DisplayName("Deve retornar null se ID Processo for null")
-    void deveRetornarNullProcessoIdNull() {
-        assertThat(mapper.mapProcesso(null)).isNull();
-    }
-
-    @Test
     @DisplayName("Deve mapear Unidade por ID com sucesso")
     void deveMapearUnidade() {
         Unidade u = new Unidade();
@@ -85,12 +79,6 @@ class SubprocessoMapperTest {
     }
 
     @Test
-    @DisplayName("Deve retornar null se ID Unidade for null")
-    void deveRetornarNullUnidadeIdNull() {
-        assertThat(mapper.mapUnidade(null)).isNull();
-    }
-
-    @Test
     @DisplayName("Deve mapear Mapa por ID com sucesso")
     void deveMapearMapa() {
         Mapa m = new Mapa();
@@ -107,11 +95,5 @@ class SubprocessoMapperTest {
         when(repo.buscar(Mapa.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
         assertThatThrownBy(() -> mapper.mapMapa(1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
-
-    @Test
-    @DisplayName("Deve retornar null se ID Mapa for null")
-    void deveRetornarNullMapaIdNull() {
-        assertThat(mapper.mapMapa(null)).isNull();
     }
 }

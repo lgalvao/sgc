@@ -207,10 +207,6 @@ public class AlertaFacade {
         Usuario usuario = usuarioService.buscarPorId(usuarioTitulo);
         Unidade lotacao = usuario.getUnidadeLotacao();
 
-        if (lotacao == null) {
-            return java.util.Collections.emptyList();
-        }
-
         List<Alerta> alertasUnidade = alertaRepo.findByUnidadeDestino_Codigo(lotacao.getCodigo());
 
         // Maps alerts to DTOs with read timestamps

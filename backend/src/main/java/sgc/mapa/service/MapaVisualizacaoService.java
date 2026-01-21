@@ -31,11 +31,6 @@ public class MapaVisualizacaoService {
 
     public MapaVisualizacaoDto obterMapaParaVisualizacao(Subprocesso subprocesso) {
         Mapa mapa = subprocesso.getMapa();
-        if (mapa == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel(
-                    "Subprocesso %d existe mas não possui Mapa associado - violação de invariante"
-                    .formatted(subprocesso.getCodigo()));
-        }
 
         Unidade unidade = subprocesso.getUnidade();
         var unidadeDto = MapaVisualizacaoDto.UnidadeDto.builder()
@@ -69,13 +64,11 @@ public class MapaVisualizacaoService {
                     .atividades(new ArrayList<>())
                     .build());
 
-            if (ativId != null) {
-                atividadesComCompetenciaIds.add(ativId);
-                AtividadeDto ativDto = atividadeDtoMap.get(ativId);
-                // Só adiciona se a atividade existir no mapa de atividades do subprocesso
-                if (ativDto != null) {
-                    compMap.get(compId).getAtividades().add(ativDto);
-                }
+            atividadesComCompetenciaIds.add(ativId);
+            AtividadeDto ativDto = atividadeDtoMap.get(ativId);
+            // Só adiciona se a atividade existir no mapa de atividades do subprocesso
+            if (ativDto != null) {
+                compMap.get(compId).getAtividades().add(ativDto);
             }
         }
 

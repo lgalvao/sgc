@@ -2,7 +2,6 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseFacade;
@@ -234,8 +233,8 @@ public class SubprocessoFacade {
     // ===== Permissões =====
 
     @Transactional(readOnly = true)
-    public SubprocessoPermissoesDto calcularPermissoes(Subprocesso subprocesso, Usuario usuario) {
-        return calcularPermissoesInterno(subprocesso, usuario);
+    public void calcularPermissoes(Subprocesso subprocesso, Usuario usuario) {
+        calcularPermissoesInterno(subprocesso, usuario);
     }
 
     // ===== Workflow de Cadastro =====
@@ -492,7 +491,7 @@ public class SubprocessoFacade {
         final sgc.organizacao.model.Unidade unidadeOrigem = spOrigem.getUnidade();
         String descMovimentacao = String.format("Importação de atividades do subprocesso #%d (Unidade: %s)",
                 spOrigem.getCodigo(),
-                unidadeOrigem != null ? unidadeOrigem.getSigla() : "N/A");
+                unidadeOrigem.getSigla());
 
         movimentacaoRepo.save(Movimentacao.builder()
                 .subprocesso(spDestino)
@@ -539,12 +538,10 @@ public class SubprocessoFacade {
 
         Usuario responsavel = usuarioService.buscarResponsavelAtual(sp.getUnidade().getSigla());
         Usuario titular = null;
-        if (sp.getUnidade().getTituloTitular() != null) {
-            try {
-                titular = usuarioService.buscarPorLogin(sp.getUnidade().getTituloTitular());
-            } catch (Exception e) {
-                log.warn("Erro ao buscar titular: {}", e.getMessage());
-            }
+        try {
+            titular = usuarioService.buscarPorLogin(sp.getUnidade().getTituloTitular());
+        } catch (Exception e) {
+            log.warn("Erro ao buscar titular: {}", e.getMessage());
         }
 
         List<Movimentacao> movimentacoes = repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
@@ -585,8 +582,7 @@ public class SubprocessoFacade {
         // Optimization: Fetch activities without eager loading competencies to avoid redundant data transfer
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigoSemRelacionamentos(codMapa);
         List<Conhecimento> conhecimentos = conhecimentoService.listarPorMapa(codMapa);
-        @Nullable Analise analiseVal = analise;
-        return mapaAjusteMapper.toDto(sp, analiseVal, competencias, atividades, conhecimentos);
+        return mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos);
     }
 
     private SubprocessoPermissoesDto obterPermissoesInterno(Long codSubprocesso, Usuario usuario) {

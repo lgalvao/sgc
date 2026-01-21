@@ -66,14 +66,15 @@ public class AccessControlService {
             case Mapa m -> {
                 return mapaAccessPolicy.canExecute(usuario, acao, m);
             }
-            case null, default -> {
+            // Não executa nada para outros tipos ou null
+            default -> {
                 // Não executa nada para outros tipos ou null
             }
         }
 
         // Tipo de recurso não reconhecido - nega acesso por segurança
-        log.warn("Tipo de recurso não reconhecido para verificação de acesso: {}", 
-                recurso != null ? recurso.getClass().getName() : "null");
+        log.warn("Tipo de recurso não reconhecido para verificação de acesso: {}",
+                recurso.getClass().getName());
         return false;
     }
 
@@ -91,11 +92,9 @@ public class AccessControlService {
             case Processo p -> processoAccessPolicy.getMotivoNegacao();
             case Atividade a -> atividadeAccessPolicy.getMotivoNegacao();
             case Mapa m -> mapaAccessPolicy.getMotivoNegacao();
-            case null, default ->
-
-                // Mensagem genérica para outros tipos
-                    String.format("Usuário '%s' não tem permissão para executar a ação '%s'",
-                            usuario.getTituloEleitoral(), acao.getDescricao());
+            // Mensagem genérica para outros tipos
+            default -> String.format("Usuário '%s' não tem permissão para executar a ação '%s'",
+                    usuario.getTituloEleitoral(), acao.getDescricao());
         };
 
     }

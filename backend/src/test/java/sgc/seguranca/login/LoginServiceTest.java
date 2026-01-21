@@ -120,7 +120,7 @@ class LoginServiceTest {
 
     @Test
     @DisplayName("Deve limpar autenticações expiradas")
-    void deveLimparAutenticaçõesExpiradas() {
+    void deveLimparAutenticacoesExpiradas() {
         String titulo = "user_clean";
         when(clienteAcessoAd.autenticar(titulo, "senha")).thenReturn(true);
         loginFacade.autenticar(titulo, "senha");

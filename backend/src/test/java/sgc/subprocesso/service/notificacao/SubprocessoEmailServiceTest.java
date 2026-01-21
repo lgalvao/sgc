@@ -20,7 +20,6 @@ import sgc.subprocesso.model.Subprocesso;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

@@ -75,15 +75,6 @@ class SubprocessoValidacaoServiceTest {
     }
 
     @Test
-    @DisplayName("validarExistenciaAtividades: erro sem mapa")
-    void validarExistenciaAtividadesErroSemMapa() {
-        Subprocesso sp = new Subprocesso();
-        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        assertThatThrownBy(() -> service.validarExistenciaAtividades(1L))
-                .isInstanceOf(ErroValidacao.class);
-    }
-
-    @Test
     @DisplayName("validarExistenciaAtividades: erro sem atividades")
     void validarExistenciaAtividadesErroSemAtividades() {
         Subprocesso sp = new Subprocesso();
@@ -157,16 +148,6 @@ class SubprocessoValidacaoServiceTest {
 
         verify(competenciaService).buscarPorCodMapa(1L);
         verify(atividadeService).buscarPorMapaCodigo(1L);
-    }
-
-    @Test
-    @DisplayName("validarCadastro: mapa inexistente")
-    void validarCadastroMapaInexistente() {
-        Subprocesso sp = new Subprocesso();
-        when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        ValidacaoCadastroDto res = service.validarCadastro(1L);
-        assertThat(res.valido()).isFalse();
-        assertThat(res.erros().getFirst().tipo()).isEqualTo("MAPA_INEXISTENTE");
     }
 
     @Test

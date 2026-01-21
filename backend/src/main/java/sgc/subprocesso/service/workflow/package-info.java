@@ -8,13 +8,6 @@
  *   <li>Executar transições de estado entre diferentes situações do subprocesso</li>
  * </ul>
  *
- * <h2>Services Principais</h2>
- * <ul>
- *   <li>{@link sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService} - Workflow de cadastro</li>
- *   <li>{@link sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService} - Workflow de mapa</li>
- *   <li>{@link sgc.subprocesso.service.workflow.SubprocessoTransicaoService} - Transições de estado</li>
- * </ul>
- *
  * <h2>Organização Arquitetural</h2>
  * <p>
  * Estes services são especializados e devem ser acessados apenas através da

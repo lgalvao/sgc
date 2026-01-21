@@ -35,8 +35,8 @@ public class MapaAjusteDto {
                         List<Atividade> atividades,
                         List<Conhecimento> conhecimentos) {
                 Long codMapa = sp.getMapa().getCodigo();
-                String nomeUnidade = sp.getUnidade() != null ? sp.getUnidade().getNome() : "";
-                String justificativa = analise != null ? analise.getObservacoes() : null;
+                String nomeUnidade = sp.getUnidade().getNome();
+                String justificativa = analise.getObservacoes();
 
                 List<CompetenciaAjusteDto> competenciaDtos = new ArrayList<>();
 

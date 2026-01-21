@@ -74,18 +74,13 @@ public class WithMockChefeSecurityContextFactory
             if (atribuicoes.stream().noneMatch(a -> a.getPerfil() == Perfil.CHEFE)) {
                 // Se não tem perfil CHEFE, adicionar com sua unidade de lotação
                 Unidade unidadeLotacao = usuario.getUnidadeLotacao();
-                if (unidadeLotacao == null && unidadeRepo != null) {
-                    unidadeLotacao = unidadeRepo.findById(10L).orElse(null);
-                }
-                if (unidadeLotacao != null) {
-                    atribuicoes.add(
-                            UsuarioPerfil.builder()
-                                    .usuario(usuario)
-                                    .unidade(unidadeLotacao)
-                                    .perfil(Perfil.CHEFE)
-                                    .build());
-                    usuario.setAtribuicoes(atribuicoes);
-                }
+                atribuicoes.add(
+                        UsuarioPerfil.builder()
+                                .usuario(usuario)
+                                .unidade(unidadeLotacao)
+                                .perfil(Perfil.CHEFE)
+                                .build());
+                usuario.setAtribuicoes(atribuicoes);
             }
         }
 

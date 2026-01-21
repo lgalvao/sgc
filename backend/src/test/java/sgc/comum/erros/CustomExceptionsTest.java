@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 @Tag("unit")
@@ -50,6 +51,6 @@ class CustomExceptionsTest {
     void testErroNegocioGetDetailsDefault() {
         // Usando ErroValidacao que implementa ErroNegocio
         ErroValidacao exception = new ErroValidacao("Validação falhou");
-        assertEquals(null, exception.getDetails());
+        assertNull(exception.getDetails());
     }
 }

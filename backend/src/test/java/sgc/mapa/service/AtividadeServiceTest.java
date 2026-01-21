@@ -26,7 +26,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -187,23 +186,6 @@ class AtividadeServiceTest {
 
             assertThatThrownBy(() -> service.criar(request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-        }
-
-        @Test
-        @DisplayName("Deve lançar erro ao criar atividade se mapa não tem subprocesso")
-        void deveLancarErroAoCriarSemSubprocesso() {
-            CriarAtividadeRequest request = CriarAtividadeRequest.builder()
-                    .mapaCodigo(1L)
-                    .build();
-
-            Mapa mapa = new Mapa();
-            mapa.setSubprocesso(null);
-
-            when(repo.buscar(Mapa.class, 1L)).thenReturn(mapa);
-
-            assertThatThrownBy(() -> service.criar(request))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Subprocesso");
         }
     }
 

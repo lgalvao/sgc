@@ -30,7 +30,6 @@ import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

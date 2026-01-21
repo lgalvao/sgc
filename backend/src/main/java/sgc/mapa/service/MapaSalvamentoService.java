@@ -86,7 +86,6 @@ public class MapaSalvamentoService {
 
         Set<Long> codigosNovos = request.getCompetencias().stream()
                 .map(CompetenciaMapaDto::getCodigo)
-                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         return new ContextoSalvamento(
@@ -129,13 +128,6 @@ public class MapaSalvamentoService {
             CompetenciaMapaDto compDto,
             Mapa mapa,
             Map<Long, Competencia> mapaCompetenciasExistentes) {
-
-        if (compDto.getCodigo() == null) {
-            return Competencia.builder()
-                    .descricao(compDto.getDescricao())
-                    .mapa(mapa)
-                    .build();
-        }
 
         Competencia competencia = mapaCompetenciasExistentes.get(compDto.getCodigo());
         if (competencia == null) {

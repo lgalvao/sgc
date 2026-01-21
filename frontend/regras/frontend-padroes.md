@@ -116,7 +116,7 @@ flowchart LR
 ## 6. Testes
 
 > [!IMPORTANT]
-> Consulte o [Guia de Testes Frontend](./frontend-testes.md) para padrões detalhados de testes unitários e de integração com Vitest.
+> Consulte o [Guia de Testes Frontend](frontend-testes.md) para padrões detalhados de testes unitários e de integração com Vitest.
 
 ## 7. Padrões de Implementação Detalhados
 

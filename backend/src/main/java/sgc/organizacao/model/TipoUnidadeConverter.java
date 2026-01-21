@@ -10,9 +10,6 @@ public class TipoUnidadeConverter implements AttributeConverter<TipoUnidade, Str
 
     @Override
     public String convertToDatabaseColumn(TipoUnidade attribute) {
-        if (attribute == null) {
-            return null;
-        }
         if (attribute == TipoUnidade.SEM_EQUIPE) {
             return "SEM EQUIPE";
         }
@@ -21,9 +18,6 @@ public class TipoUnidadeConverter implements AttributeConverter<TipoUnidade, Str
 
     @Override
     public TipoUnidade convertToEntityAttribute(String dbData) {
-        if (dbData == null) {
-            return null;
-        }
 
         if ("SEM EQUIPE".equals(dbData)) {
             return TipoUnidade.SEM_EQUIPE;
