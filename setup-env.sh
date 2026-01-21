@@ -39,7 +39,7 @@ WGETRC_BAK="$HOME/.wgetrc.bak.$(date +%s)"
 cleanup_rc() {
     if [ -f "$CURLRC_BAK" ]; then mv "$CURLRC_BAK" "$CURLRC"; elif [ -f "$CURLRC" ]; then rm "$CURLRC"; fi
     if [ -f "$WGETRC_BAK" ]; then mv "$WGETRC_BAK" "$WGETRC"; elif [ -f "$WGETRC" ]; then rm "$WGETRC" ; fi
-    echo "[*] Cleaned up temporary SSL configurations."
+    # echo "[*] Cleaned up temporary SSL configurations."
 }
 
 trap cleanup_rc EXIT
@@ -72,19 +72,36 @@ if ! command -v nvm &> /dev/null; then
 fi
 
 # --- 2. Node.js Setup ---
-echo "[*] Installing latest Node.js..."
+echo "[*] Installing Node.js (LTS)..."
 
-# Try explicit version if alias fails
-if ! nvm install node; then
-    echo "[!] 'nvm install node' failed. Trying explicit LTS installation (v22.13.0)..."
-    if ! nvm install v22.13.0; then
-        echo "[!] Installation failed. NVM cannot reach the node mirror."
-        exit 1
-    fi
+# Prefer LTS (v22) over "node" (latest/v25) for stability
+if ! nvm install --lts; then
+    echo "[!] 'nvm install --lts' failed. Trying explicit v22.13.0..."
+    nvm install v22.13.0
 fi
 
-nvm use node || nvm use v22.13.0
-nvm alias default node || nvm alias default v22.13.0
+nvm use --lts || nvm use v22.13.0
+nvm alias default "lts/*" || nvm alias default v22.13.0
+
+# VERIFY NODE EXECUTION
+echo "[*] Verifying Node.js installation..."
+if ! node -e 'console.log("Node is working")' &> /dev/null; then
+    echo "[!] CRITICAL ERROR: Node.js is installed but failed to run."
+    echo "    Error detected:"
+    node -v 2>&1 || true
+    
+    # Check specifically for libatomic error
+    if node -v 2>&1 | grep -q "libatomic"; then
+        echo ""
+        echo "    [MISSING DEPENDENCY]: libatomic.so.1"
+        echo "    Your system is missing a required library."
+        echo "    Since this script cannot use sudo, please ask an admin to run:"
+        echo "      sudo apt-get install -y libatomic1"
+        echo "    Or if you have sudo access, run it yourself and restart this script."
+    fi
+    exit 1
+fi
+
 echo "[✔] Node.js $(node -v) and npm $(npm -v) are ready."
 
 # --- 3. SDKMAN Setup ---
@@ -101,7 +118,7 @@ if [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]]; then
     source "$SDKMAN_DIR/bin/sdkman-init.sh"
 fi
 
-# Configure SDKMAN to be non-interactive and insecure
+# Configure SDKMAN
 SDKMAN_CONFIG="$SDKMAN_DIR/etc/config"
 if [ -f "$SDKMAN_CONFIG" ]; then
     set_sdkman_config() {
@@ -115,7 +132,6 @@ if [ -f "$SDKMAN_CONFIG" ]; then
     }
     set_sdkman_config "sdkman_insecure_ssl" "true"
     set_sdkman_config "sdkman_auto_answer" "true"
-    echo "[*] Configured SDKMAN (insecure_ssl=true, auto_answer=true)."
 fi
 
 
@@ -124,32 +140,36 @@ fi
 get_latest_java_version() {
     local version=$1
     local vendor=$2
-    sdk list java | grep -E " $version\.[0-9.]*-$vendor " | head -n 1 | awk '{print $NF}'
+    # Check if we can list versions (ignore errors if offline/blocked)
+    sdk list java 2>/dev/null | grep -E " $version\.[0-9.]*-$vendor " | head -n 1 | awk '{print $NF}'
 }
 
 echo "[*] Detecting latest Java 21 (Corretto/amzn)..."
 JAVA_21_ID=$(get_latest_java_version "21" "amzn") || echo ""
+[ -z "$JAVA_21_ID" ] && JAVA_21_ID="21.0.9-amzn"
 
-if [ -z "$JAVA_21_ID" ]; then
-    echo "[!] Could not find dynamic Java 21 version. Attempting fallback..."
-    JAVA_21_ID="21.0.9-amzn"
+# Check if already installed to avoid redundant output
+if sdk list java | grep -q "installed" | grep -q "$JAVA_21_ID"; then
+    echo "[✔] Java $JAVA_21_ID is already installed."
+else
+    echo "    Installing: $JAVA_21_ID"
+    echo "Y" | sdk install java "$JAVA_21_ID" || true
 fi
-
-echo "    Installing: $JAVA_21_ID"
-# Pipe Y just in case config wasn't picked up immediately
-echo "Y" | sdk install java "$JAVA_21_ID" || true
 
 echo "[*] Detecting latest Java 25 (Corretto/amzn)..."
 JAVA_25_ID=$(get_latest_java_version "25" "amzn") || echo ""
-
 if [ -n "$JAVA_25_ID" ]; then
-    echo "    Installing: $JAVA_25_ID"
-    echo "n" | sdk install java "$JAVA_25_ID" || true
+    if sdk list java | grep -q "installed" | grep -q "$JAVA_25_ID"; then
+        echo "[✔] Java $JAVA_25_ID is already installed."
+    else
+        echo "    Installing: $JAVA_25_ID"
+        echo "n" | sdk install java "$JAVA_25_ID" || true
+    fi
 else
-    echo "    Java 25 (amzn) not found. Skipping auto-install for 25."
+     echo "    Java 25 (amzn) not found."
 fi
 
-echo "[*] Finalizing default Java to 21 ($JAVA_21_ID)..."
+echo "[*] Setting Java 21 ($JAVA_21_ID) as default..."
 sdk default java "$JAVA_21_ID" || true
 
 # --- 5. Project Dependencies ---
