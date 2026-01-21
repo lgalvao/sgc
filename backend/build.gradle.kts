@@ -290,3 +290,15 @@ configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
     threads.set(8)
     outputFormats.set(setOf("XML"))
 }
+
+tasks.register("qualityCheck") {
+    group = "quality"
+    description = "Runs all backend quality checks (tests, coverage, spotbugs)"
+    dependsOn("check", "spotbugsMain", "spotbugsTest")
+}
+
+tasks.register("qualityCheckFast") {
+    group = "quality"
+    description = "Runs fast backend quality checks (tests, coverage)"
+    dependsOn("test", "jacocoTestCoverageVerification")
+}
