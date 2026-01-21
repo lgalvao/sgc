@@ -2,7 +2,7 @@
 
 # setup-env.sh
 # Sets up the development environment with NVM, Node.js, SDKMAN, and Java.
-# Optimized for Ubuntu/Unix-like systems with SSL workarounds (curl & wget).
+# Optimized for Ubuntu/Unix-like systems (Non-interactive & SSL workarounds).
 
 # Stop on first error
 set -e
@@ -37,30 +37,16 @@ WGETRC="$HOME/.wgetrc"
 WGETRC_BAK="$HOME/.wgetrc.bak.$(date +%s)"
 
 cleanup_rc() {
-    # Restore curlrc
-    if [ -f "$CURLRC_BAK" ]; then
-        mv "$CURLRC_BAK" "$CURLRC"
-    elif [ -f "$CURLRC" ]; then
-        rm "$CURLRC"
-    fi
-    
-    # Restore wgetrc
-    if [ -f "$WGETRC_BAK" ]; then
-        mv "$WGETRC_BAK" "$WGETRC"
-    elif [ -f "$WGETRC" ]; then
-        rm "$WGETRC"
-    fi
+    if [ -f "$CURLRC_BAK" ]; then mv "$CURLRC_BAK" "$CURLRC"; elif [ -f "$CURLRC" ]; then rm "$CURLRC"; fi
+    if [ -f "$WGETRC_BAK" ]; then mv "$WGETRC_BAK" "$WGETRC"; elif [ -f "$WGETRC" ]; then rm "$WGETRC" ; fi
     echo "[*] Cleaned up temporary SSL configurations."
 }
 
 trap cleanup_rc EXIT
 
 echo "[*] Configuring temporary insecure SSL for curl and wget..."
-# Curl
 if [ -f "$CURLRC" ]; then cp "$CURLRC" "$CURLRC_BAK"; fi
 echo "insecure" >> "$CURLRC"
-
-# Wget
 if [ -f "$WGETRC" ]; then cp "$WGETRC" "$WGETRC_BAK"; fi
 echo "check_certificate = off" >> "$WGETRC"
 
@@ -86,10 +72,6 @@ if ! command -v nvm &> /dev/null; then
 fi
 
 # --- 2. Node.js Setup ---
-echo "[*] Debug: Checking NVM remote connectivity..."
-# Allow failure for this check so we don't exit script
-nvm ls-remote --lts | tail -n 3 || echo "[!] nvm ls-remote failed"
-
 echo "[*] Installing latest Node.js..."
 
 # Try explicit version if alias fails
@@ -119,18 +101,26 @@ if [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]]; then
     source "$SDKMAN_DIR/bin/sdkman-init.sh"
 fi
 
-# Permanent SDKMAN SSL workaround
+# Configure SDKMAN to be non-interactive and insecure
 SDKMAN_CONFIG="$SDKMAN_DIR/etc/config"
 if [ -f "$SDKMAN_CONFIG" ]; then
-    if grep -q "sdkman_insecure_ssl" "$SDKMAN_CONFIG"; then
-        sed -i 's/sdkman_insecure_ssl=false/sdkman_insecure_ssl=true/g' "$SDKMAN_CONFIG"
-    else
-        echo "sdkman_insecure_ssl=true" >> "$SDKMAN_CONFIG"
-    fi
-    echo "[*] Configured SDKMAN to allow insecure SSL."
+    set_sdkman_config() {
+        local key=$1
+        local value=$2
+        if grep -q "$key" "$SDKMAN_CONFIG"; then
+            sed -i "s/$key=.*/$key=$value/g" "$SDKMAN_CONFIG"
+        else
+            echo "$key=$value" >> "$SDKMAN_CONFIG"
+        fi
+    }
+    set_sdkman_config "sdkman_insecure_ssl" "true"
+    set_sdkman_config "sdkman_auto_answer" "true"
+    echo "[*] Configured SDKMAN (insecure_ssl=true, auto_answer=true)."
 fi
 
+
 # --- 4. Java Setup ---
+
 get_latest_java_version() {
     local version=$1
     local vendor=$2
@@ -139,18 +129,27 @@ get_latest_java_version() {
 
 echo "[*] Detecting latest Java 21 (Corretto/amzn)..."
 JAVA_21_ID=$(get_latest_java_version "21" "amzn") || echo ""
-[ -z "$JAVA_21_ID" ] && JAVA_21_ID="21.0.6-amzn"
+
+if [ -z "$JAVA_21_ID" ]; then
+    echo "[!] Could not find dynamic Java 21 version. Attempting fallback..."
+    JAVA_21_ID="21.0.9-amzn"
+fi
 
 echo "    Installing: $JAVA_21_ID"
-sdk install java "$JAVA_21_ID" || true
+# Pipe Y just in case config wasn't picked up immediately
+echo "Y" | sdk install java "$JAVA_21_ID" || true
 
 echo "[*] Detecting latest Java 25 (Corretto/amzn)..."
 JAVA_25_ID=$(get_latest_java_version "25" "amzn") || echo ""
+
 if [ -n "$JAVA_25_ID" ]; then
     echo "    Installing: $JAVA_25_ID"
-    sdk install java "$JAVA_25_ID" || true
+    echo "n" | sdk install java "$JAVA_25_ID" || true
+else
+    echo "    Java 25 (amzn) not found. Skipping auto-install for 25."
 fi
 
+echo "[*] Finalizing default Java to 21 ($JAVA_21_ID)..."
 sdk default java "$JAVA_21_ID" || true
 
 # --- 5. Project Dependencies ---
@@ -162,9 +161,11 @@ npm config set strict-ssl false
 echo "[*] Running 'npm install' in root..."
 npm install
 
+echo "[*] Running 'npm install' in frontend..."
 if [ -d "frontend" ]; then
-    echo "[*] Running 'npm install' in frontend..."
     (cd frontend && npm install)
+else
+    echo "[!] 'frontend' directory not found."
 fi
 
 echo "[*] Installing Playwright (Chromium only)..."
@@ -173,4 +174,5 @@ npx playwright install chromium
 
 echo "----------------------------------------------------------------"
 echo "Setup Complete!"
+echo "Please restart your terminal or run: source ~/.bashrc"
 echo "----------------------------------------------------------------"
