@@ -196,14 +196,11 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                         // Arrange
                         String tituloEleitoral = "888888888888"; // Usuário inexistente
 
-                        // Tenta autenticar, mas falhará porque o usuário não existe no banco de teste
-                        loginFacade.autenticar(tituloEleitoral, "senha-qualquer");
+                        // Não realizamos a autenticação prévia para simular um usuário não autenticado.
 
                         // Act & Assert
-                        // Como a autenticação falhou, a tentativa de autorizar deve ser rejeitada com
-                        // 401 (Unauthorized)
-                        // e não 404 (Not Found), pois a verificação de segurança ocorre antes da busca
-                        // no banco.
+                        // Sem autenticação prévia (sessão válida), a tentativa de autorizar deve ser
+                        // rejeitada com 401 (Unauthorized)
                         mockMvc.perform(post(BASE_URL + "/autorizar")
                                         .with(csrf())
                                         .contentType(MediaType.APPLICATION_JSON)
