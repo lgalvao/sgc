@@ -26,20 +26,20 @@ public class Unidade extends EntidadeBase {
     @Column(name = "sigla", length = 20, nullable = false)
     private String sigla;
 
-    @Column(name = "matricula_titular", length = 8)
+    @Column(name = "matricula_titular", length = 8, nullable = false)
     private String matriculaTitular;
 
-    @Column(name = "titulo_titular", length = 12)
+    @Column(name = "titulo_titular", length = 12 , nullable = false)
     private String tituloTitular;
 
-    @Column(name = "data_inicio_titularidade")
+    @Column(name = "data_inicio_titularidade", nullable = false)
     private LocalDateTime dataInicioTitularidade;
 
-    @Column(name = "tipo", length = 20)
+    @Column(name = "tipo", length = 20, nullable = false)
     private TipoUnidade tipo;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "situacao", length = 20)
+    @Column(name = "situacao", length = 20, nullable = false)
     private SituacaoUnidade situacao;
 
     @ManyToOne
@@ -50,10 +50,6 @@ public class Unidade extends EntidadeBase {
     @OneToMany(mappedBy = "unidadeSuperior")
     @Builder.Default
     private java.util.List<Unidade> subunidades = new java.util.ArrayList<>();
-
-    public @Nullable Unidade getUnidadeSuperior() {
-        return unidadeSuperior;
-    }
 
     @ManyToMany(mappedBy = "participantes")
     @Builder.Default

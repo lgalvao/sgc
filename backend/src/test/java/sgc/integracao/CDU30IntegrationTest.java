@@ -120,7 +120,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Deve remover um administrador")
     @WithMockAdmin
-    void removerAdministrador_sucesso() throws Exception {
+    void removerAdministrador_sucesso() {
         // Adicionar um segundo administrador primeiro
         Administrador admin2 = Administrador.builder().usuarioTitulo(usuario2.getTituloEleitoral()).build();
         administradorRepo.save(admin2);

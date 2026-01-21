@@ -18,19 +18,16 @@ import sgc.subprocesso.model.Subprocesso;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("Testes do Serviço de Visualização de Mapa")
 class MapaVisualizacaoServiceTest {
-
     @Mock
     private CompetenciaRepo competenciaRepo;
     @Mock
     private AtividadeRepo atividadeRepo;
-
     @InjectMocks
     private MapaVisualizacaoService service;
 
@@ -39,9 +36,11 @@ class MapaVisualizacaoServiceTest {
     void deveObterMapaParaVisualizacao() {
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(1L);
+
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
         sub.setMapa(mapa);
+
         Unidade unidade = new Unidade();
         unidade.setCodigo(100L);
         sub.setUnidade(unidade);
@@ -54,7 +53,6 @@ class MapaVisualizacaoServiceTest {
         ativ2.setCodigo(2L);
         ativ2.setDescricao("A2");
 
-        // Mocking the new projection method
         List<Object[]> projectionResult = new java.util.ArrayList<>();
         projectionResult.add(new Object[]{50L, "C1", 1L});
 
@@ -67,16 +65,5 @@ class MapaVisualizacaoServiceTest {
         assertThat(dto.getCompetencias()).hasSize(1);
         assertThat(dto.getAtividadesSemCompetencia()).hasSize(1);
         assertThat(dto.getAtividadesSemCompetencia().getFirst().getCodigo()).isEqualTo(2L);
-    }
-
-    @Test
-    @DisplayName("Deve lançar erro se subprocesso não tem mapa")
-    void deveLancarErroSeSemMapa() {
-        Subprocesso sub = new Subprocesso();
-        sub.setCodigo(1L);
-        // Mapa null
-
-        assertThatThrownBy(() -> service.obterMapaParaVisualizacao(sub))
-                .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
     }
 }

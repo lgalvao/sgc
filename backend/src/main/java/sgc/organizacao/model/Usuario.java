@@ -1,10 +1,14 @@
 package sgc.organizacao.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.LazyInitializationException;
 import org.hibernate.annotations.Immutable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -24,28 +28,24 @@ import java.util.stream.Collectors;
 @SuperBuilder
 public class Usuario implements UserDetails {
     @Id
-    @Column(name = "titulo", length = 12)
+    @Column(name = "titulo", length = 12, nullable = false)
     private String tituloEleitoral;
 
-    @Column(name = "matricula", length = 8)
+    @Column(name = "matricula", length = 8, nullable = false)
     private String matricula;
 
-    @Column(name = "nome")
+    @Column(name = "nome", nullable = false)
     private String nome;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "ramal", length = 20)
+    @Column(name = "ramal", length = 20, nullable = false)
     private String ramal;
 
     @ManyToOne
-    @JoinColumn(name = "unidade_lot_codigo")
+    @JoinColumn(name = "unidade_lot_codigo", nullable = false)
     private Unidade unidadeLotacao;
-
-    public Unidade getUnidadeLotacao() {
-        return unidadeLotacao;
-    }
 
     @ManyToOne
     @JoinColumn(name = "unidade_comp_codigo")
@@ -68,23 +68,22 @@ public class Usuario implements UserDetails {
 
     public Set<UsuarioPerfil> getTodasAtribuicoes() {
         Set<UsuarioPerfil> todas = new HashSet<>(atribuicoesCache);
-
         LocalDateTime now = LocalDateTime.now();
         try {
             for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
                 if (!temp.getDataInicio().isAfter(now) && !temp.getDataTermino().isBefore(now)) {
-                    UsuarioPerfil perfil = new UsuarioPerfil();
-                    perfil.setUsuarioTitulo(this.tituloEleitoral);
-                    perfil.setUsuario(this);
-                    perfil.setUnidadeCodigo(temp.getUnidade().getCodigo());
-                    perfil.setUnidade(temp.getUnidade());
-                    perfil.setPerfil(temp.getPerfil());
+                    UsuarioPerfil perfil = new UsuarioPerfil()
+                            .setUsuarioTitulo(this.tituloEleitoral)
+                            .setUsuario(this)
+                            .setUnidadeCodigo(temp.getUnidade().getCodigo())
+                            .setUnidade(temp.getUnidade())
+                            .setPerfil(temp.getPerfil());
+
                     todas.add(perfil);
                 }
             }
         } catch (LazyInitializationException e) {
             // Se não há sessão disponível, apenas retorna as atribuições do cache
-            // Isso é esperado quando o método é chamado fora de uma transação
         }
         return todas;
     }
@@ -111,6 +110,7 @@ public class Usuario implements UserDetails {
     }
 
     @Override
+    @Nullable
     public String getPassword() {
         return null;
     }

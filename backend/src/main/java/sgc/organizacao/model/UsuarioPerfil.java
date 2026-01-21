@@ -38,14 +38,6 @@ public class UsuarioPerfil implements Serializable {
     @JoinColumn(name = "unidade_codigo", insertable = false, updatable = false)
     private Unidade unidade;
 
-    public Perfil getPerfil() {
-        return perfil;
-    }
-
-    public Unidade getUnidade() {
-        return unidade;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

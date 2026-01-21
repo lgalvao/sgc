@@ -50,12 +50,9 @@ public class MapaSalvamentoService {
      * @param request A requisição contendo as competências e observações.
      * @return O DTO do mapa completo atualizado.
      * @throws ErroEntidadeNaoEncontrada se o mapa não for encontrado.
-     * @throws ErroValidacao             se houver atividades inválidas na
-     *                                   requisição.
+     * @throws ErroValidacao             se houver atividades inválidas na requisição.
      */
-    public MapaCompletoDto salvarMapaCompleto(
-            Long codMapa, SalvarMapaRequest request) {
-
+    public MapaCompletoDto salvarMapaCompleto(Long codMapa, SalvarMapaRequest request) {
         Mapa mapa = repo.buscar(Mapa.class, codMapa);
 
         atualizarObservacoes(mapa, request.getObservacoes());
@@ -129,17 +126,23 @@ public class MapaSalvamentoService {
             Mapa mapa,
             Map<Long, Competencia> mapaCompetenciasExistentes) {
 
-        Competencia competencia = mapaCompetenciasExistentes.get(compDto.getCodigo());
-        if (competencia == null) {
-            throw new sgc.comum.erros.ErroEntidadeNaoEncontrada("Competência", compDto.getCodigo());
+        Long codigo = compDto.getCodigo();
+        Competencia competencia;
+
+        if (codigo != null) {
+            competencia = mapaCompetenciasExistentes.get(codigo);
+            if (competencia == null) {
+                throw new sgc.comum.erros.ErroEntidadeNaoEncontrada("Competência", codigo);
+            }
+        } else {
+            competencia = new Competencia();
+            competencia.setMapa(mapa);
+            competencia.setAtividades(new HashSet<>());
         }
+
         competencia.setDescricao(compDto.getDescricao());
         return competencia;
     }
-
-    // ===================================================================================
-    // Métodos de associação
-    // ===================================================================================
 
     private void atualizarAssociacoesAtividades(ContextoSalvamento contexto, List<Competencia> competenciasSalvas) {
         Long codMapa = contexto.atividadesAtuais.isEmpty() ? null
@@ -194,10 +197,6 @@ public class MapaSalvamentoService {
         }
     }
 
-    // ===================================================================================
-    // Métodos de validação
-    // ===================================================================================
-
     private void validarIntegridadeMapa(Long codMapa, List<Atividade> atividades, List<Competencia> competencias) {
         for (Atividade atividade : atividades) {
             if (atividade.getCompetencias().isEmpty()) {
@@ -214,9 +213,6 @@ public class MapaSalvamentoService {
         }
     }
 
-    /**
-     * Classe auxiliar para manter o contexto durante o salvamento.
-     */
     @SuppressWarnings("ClassCanBeRecord")
     private static class ContextoSalvamento {
         final List<Competencia> competenciasAtuais;
@@ -231,6 +227,7 @@ public class MapaSalvamentoService {
                 Set<Long> atividadesDoMapaIds,
                 Set<Long> codigosNovos,
                 SalvarMapaRequest request) {
+
             this.competenciasAtuais = competenciasAtuais;
             this.atividadesAtuais = atividadesAtuais;
             this.atividadesDoMapaIds = atividadesDoMapaIds;

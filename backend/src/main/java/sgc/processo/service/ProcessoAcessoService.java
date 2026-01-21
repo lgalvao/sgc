@@ -93,7 +93,6 @@ class ProcessoAcessoService {
 
         Map<Long, List<Unidade>> mapaPorPai = new HashMap<>();
         for (Unidade u : todasUnidades) {
-            @Nullable
             Unidade unidadeSuperior = u.getUnidadeSuperior();
             if (unidadeSuperior != null) {
                 mapaPorPai.computeIfAbsent(unidadeSuperior.getCodigo(), k -> new ArrayList<>()).add(u);

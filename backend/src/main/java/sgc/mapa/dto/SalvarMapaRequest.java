@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import org.jspecify.annotations.Nullable;
 import java.util.List;
 
 /**
@@ -19,6 +20,7 @@ public class SalvarMapaRequest {
     /**
      * Observações gerais sobre o mapa.
      */
+    @Nullable
     private final String observacoes;
 
     /**

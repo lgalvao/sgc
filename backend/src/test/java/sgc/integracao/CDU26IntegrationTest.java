@@ -123,7 +123,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Deve homologar validação de mapas em bloco")
     @WithMockAdmin
-    void homologarValidacaoEmBloco_deveHomologarSucesso() throws Exception {
+    void homologarValidacaoEmBloco_deveHomologarSucesso() {
         // Given
         Long codigoContexto = subprocesso1.getCodigo();
         List<Long> unidadesSelecionadas = List.of(unidade1.getCodigo(), unidade2.getCodigo());
