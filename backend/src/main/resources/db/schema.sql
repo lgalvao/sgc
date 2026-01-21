@@ -358,3 +358,12 @@ alter table if exists sgc.ocupacao_critica
 
 alter table if exists sgc.ocupacao_critica
     add constraint fk_ocupacao_competencia foreign key (competencia_codigo) references sgc.competencia;
+
+-- Indices para otimização de performance (evitar full table scan em FKs)
+create index if not exists idx_atividade_mapa on sgc.atividade (mapa_codigo);
+create index if not exists idx_competencia_mapa on sgc.competencia (mapa_codigo);
+create index if not exists idx_conhecimento_atividade on sgc.conhecimento (atividade_codigo);
+create index if not exists idx_mapa_subprocesso on sgc.mapa (subprocesso_codigo);
+create index if not exists idx_analise_subprocesso on sgc.analise (subprocesso_codigo);
+create index if not exists idx_movimentacao_subprocesso on sgc.movimentacao (subprocesso_codigo);
+create index if not exists idx_competencia_atividade_inv on sgc.competencia_atividade (competencia_codigo);
