@@ -108,7 +108,7 @@ describe("useAtribuicaoTemporariaStore", () => {
             const error = new Error("Failed");
             (atribuicaoTemporariaService.buscarTodasAtribuicoes as any).mockRejectedValue(error);
 
-            expect(context.store.buscarAtribuicoes()).rejects.toThrow("Failed");
+            await expect(context.store.buscarAtribuicoes()).rejects.toThrow("Failed");
 
             expect(context.store.error).toBe("Failed");
             expect(context.store.lastError).toEqual(normalizeError(error));

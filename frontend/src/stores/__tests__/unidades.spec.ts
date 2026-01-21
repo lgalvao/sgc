@@ -81,7 +81,7 @@ describe("useUnidadesStore", () => {
             vi.mocked(
                 unidadesService.buscarArvoreComElegibilidade,
             ).mockRejectedValueOnce(new Error("API Error"));
-            expect(
+            await expect(
                 context.store.buscarUnidadesParaProcesso("MAPEAMENTO"),
             ).rejects.toThrow("API Error");
             expect(context.store.error).toContain("API Error");
@@ -105,7 +105,7 @@ describe("useUnidadesStore", () => {
             vi.mocked(unidadesService.buscarUnidadePorSigla).mockRejectedValue(
                 new Error("Fail"),
             );
-            expect(context.store.buscarUnidade("TEST")).rejects.toThrow(
+            await expect(context.store.buscarUnidade("TEST")).rejects.toThrow(
                 "Fail",
             );
             expect(context.store.error).toContain("Fail");
@@ -129,7 +129,7 @@ describe("useUnidadesStore", () => {
             vi.mocked(unidadesService.buscarUnidadePorCodigo).mockRejectedValue(
                 new Error("Fail"),
             );
-            expect(
+            await expect(
                 context.store.buscarUnidadePorCodigo(123),
             ).rejects.toThrow("Fail");
             expect(context.store.error).toContain("Fail");
@@ -151,7 +151,7 @@ describe("useUnidadesStore", () => {
             vi.mocked(unidadesService.buscarArvoreUnidade).mockRejectedValue(
                 new Error("Fail"),
             );
-            expect(context.store.buscarArvoreUnidade(1)).rejects.toThrow(
+            await expect(context.store.buscarArvoreUnidade(1)).rejects.toThrow(
                 "Fail",
             );
             expect(context.store.error).toContain("Fail");
@@ -175,7 +175,7 @@ describe("useUnidadesStore", () => {
             vi.mocked(unidadesService.buscarSubordinadas).mockRejectedValue(
                 new Error("Fail"),
             );
-            expect(
+            await expect(
                 context.store.obterUnidadesSubordinadas("TEST"),
             ).rejects.toThrow("Fail");
             expect(context.store.error).toContain("Fail");
@@ -197,7 +197,7 @@ describe("useUnidadesStore", () => {
             vi.mocked(unidadesService.buscarSuperior).mockRejectedValue(
                 new Error("Fail"),
             );
-            expect(
+            await expect(
                 context.store.obterUnidadeSuperior("TEST"),
             ).rejects.toThrow("Fail");
             expect(context.store.error).toContain("Fail");

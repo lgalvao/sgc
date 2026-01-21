@@ -97,7 +97,7 @@ describe("useAlertasStore", () => {
                 const error = new Error("Erro na busca");
                 painelService.listarAlertas.mockRejectedValue(error);
 
-                expect(
+                await expect(
                     context.store.buscarAlertas(123, 456, 0, 10)
                 ).rejects.toThrow("Erro na busca");
 

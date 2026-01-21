@@ -221,7 +221,7 @@ describe('Subprocessos Store', () => {
         it('deve lidar com erro do serviço', async () => {
              mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
              (buscarContextoEdicao as any).mockRejectedValue(new Error("Fail"));
-             expect(store.buscarContextoEdicao(1)).rejects.toThrow("Fail");
+             await expect(store.buscarContextoEdicao(1)).rejects.toThrow("Fail");
              expect(store.lastError).toBeTruthy();
         });
     });
@@ -378,7 +378,7 @@ describe('Subprocessos Store', () => {
             const { apiClient } = await import('@/axios-setup');
             (apiClient.post as any).mockRejectedValue(new Error("API Fail"));
 
-            expect(store.alterarDataLimiteSubprocesso(123, {novaData: '2022'}))
+            await expect(store.alterarDataLimiteSubprocesso(123, {novaData: '2022'}))
                 .rejects.toThrow("API Fail");
             expect(store.lastError).toBeTruthy();
         });

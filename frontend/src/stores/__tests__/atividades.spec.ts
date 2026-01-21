@@ -34,7 +34,7 @@ describe("useAtividadesStore", () => {
             vi.mocked(subprocessoService.listarAtividades).mockRejectedValue(
                 new Error("Erro"),
             );
-            expect(context.store.buscarAtividadesParaSubprocesso(1)).rejects.toThrow("Erro");
+            await expect(context.store.buscarAtividadesParaSubprocesso(1)).rejects.toThrow("Erro");
         });
     });
 
@@ -70,7 +70,7 @@ describe("useAtividadesStore", () => {
             vi.mocked(atividadeService.criarAtividade).mockRejectedValue(
                 new Error("Erro"),
             );
-            expect(context.store.adicionarAtividade(1, 999, {descricao: "Nova Atividade"})).rejects.toThrow("Erro");
+            await expect(context.store.adicionarAtividade(1, 999, {descricao: "Nova Atividade"})).rejects.toThrow("Erro");
         });
     });
 
@@ -101,7 +101,7 @@ describe("useAtividadesStore", () => {
             vi.mocked(atividadeService.excluirAtividade).mockRejectedValue(
                 new Error("Erro"),
             );
-            expect(context.store.removerAtividade(1, 1)).rejects.toThrow("Erro");
+            await expect(context.store.removerAtividade(1, 1)).rejects.toThrow("Erro");
         });
     });
 
@@ -141,7 +141,7 @@ describe("useAtividadesStore", () => {
             vi.mocked(atividadeService.criarConhecimento).mockRejectedValue(
                 new Error("Erro"),
             );
-            expect(
+            await expect(
                 context.store.adicionarConhecimento(1, 1, {descricao: "Novo"}),
             ).rejects.toThrow("Erro");
         });
@@ -182,7 +182,7 @@ describe("useAtividadesStore", () => {
             vi.mocked(atividadeService.excluirConhecimento).mockRejectedValue(
                 new Error("Erro"),
             );
-            expect(context.store.removerConhecimento(1, 1, 1)).rejects.toThrow("Erro");
+            await expect(context.store.removerConhecimento(1, 1, 1)).rejects.toThrow("Erro");
         });
     });
 
@@ -204,7 +204,7 @@ describe("useAtividadesStore", () => {
             vi.mocked(subprocessoService.importarAtividades).mockRejectedValue(
                 new Error("Erro"),
             );
-            expect(context.store.importarAtividades(1, 2)).rejects.toThrow("Erro");
+            await expect(context.store.importarAtividades(1, 2)).rejects.toThrow("Erro");
         });
     });
 
@@ -245,7 +245,7 @@ describe("useAtividadesStore", () => {
             vi.mocked(atividadeService.atualizarAtividade).mockRejectedValue(
                 new Error("Erro"),
             );
-            expect(
+            await expect(
                 context.store.atualizarAtividade(1, 1, {
                     codigo: 1,
                     descricao: "Teste",
@@ -302,7 +302,7 @@ describe("useAtividadesStore", () => {
             vi.mocked(atividadeService.atualizarConhecimento).mockRejectedValue(
                 new Error("Erro"),
             );
-            expect(
+            await expect(
                 context.store.atualizarConhecimento(1, 1, 1, {codigo: 1, descricao: "Teste"}),
             ).rejects.toThrow("Erro");
         });

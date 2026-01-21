@@ -126,6 +126,9 @@ public enum TipoTransicao {
      * @return Descrição formatada ou null se não gera alerta
      */
     public String formatarAlerta(String siglaUnidade) {
+        if (templateAlerta == null) {
+            return null;
+        }
         return templateAlerta.formatted(siglaUnidade);
     }
 
@@ -133,13 +136,13 @@ public enum TipoTransicao {
      * Indica se esta transição gera um alerta interno.
      */
     public boolean geraAlerta() {
-        return true;
+        return templateAlerta != null;
     }
 
     /**
      * Indica se esta transição envia e-mail de notificação.
      */
     public boolean enviaEmail() {
-        return true;
+        return templateEmail != null;
     }
 }
