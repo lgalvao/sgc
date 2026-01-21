@@ -19,6 +19,14 @@
           {{ erroAdmins }}
         </div>
 
+        <div v-else-if="administradores.length === 0">
+          <EmptyState
+            icon="bi-people"
+            title="Nenhum administrador cadastrado"
+            description="Utilize o botão 'Adicionar administrador' para cadastrar novos administradores."
+          />
+        </div>
+
         <div v-else class="table-responsive">
           <table class="table table-striped table-hover">
             <thead>
@@ -47,9 +55,6 @@
                     Remover
                   </button>
                 </td>
-              </tr>
-              <tr v-if="administradores.length === 0">
-                <td colspan="5" class="text-center text-muted">Nenhum administrador cadastrado</td>
               </tr>
             </tbody>
           </table>
@@ -176,6 +181,7 @@
 <script setup lang="ts">
 import {computed, onMounted, reactive, ref} from 'vue';
 import {BModal} from 'bootstrap-vue-next';
+import EmptyState from '@/components/EmptyState.vue';
 import {type Parametro, useConfiguracoesStore} from '@/stores/configuracoes';
 import {useNotificacoesStore} from '@/stores/feedback';
 import {usePerfilStore} from '@/stores/perfil';
