@@ -71,6 +71,15 @@ public class LoginFacade {
      * @return true se a autenticação for bem-sucedida
      */
     public boolean autenticar(String tituloEleitoral, String senha) {
+        if (clienteAcessoAd == null) {
+            if (ambienteTestes) {
+                autenticacoesRecentes.put(tituloEleitoral, LocalDateTime.now());
+                return true;
+            }
+            log.warn("Cliente AD não configurado e ambiente não é de testes.");
+            return false;
+        }
+
         boolean autenticado;
         try {
             autenticado = clienteAcessoAd.autenticar(tituloEleitoral, senha);

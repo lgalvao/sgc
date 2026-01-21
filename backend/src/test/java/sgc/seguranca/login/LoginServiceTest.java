@@ -89,8 +89,6 @@ class LoginServiceTest {
         LoginFacade serviceSemAd = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService, usuarioMapper);
         ReflectionTestUtils.setField(serviceSemAd, "ambienteTestes", true);
 
-        when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(new sgc.organizacao.model.Usuario());
-
         boolean result = serviceSemAd.autenticar("123", "senha");
 
         // Deve retornar true pois encontrou usuário

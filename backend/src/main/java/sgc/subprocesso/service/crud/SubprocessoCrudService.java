@@ -182,7 +182,7 @@ public class SubprocessoCrudService {
     private Set<String> processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
         Set<String> campos = new HashSet<>();
 
-        java.util.Optional.of(request.getCodMapa()).ifPresent(cod -> {
+        java.util.Optional.ofNullable(request.getCodMapa()).ifPresent(cod -> {
             Mapa m = new Mapa();
             m.setCodigo(cod);
             if (!Objects.equals(subprocesso.getMapa(), m)) {

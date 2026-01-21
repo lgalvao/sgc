@@ -28,10 +28,10 @@ import static sgc.organizacao.model.TipoUnidade.*;
  *
  * <p>Invariantes validadas:
  * <ul>
- *   <li>Toda unidade ativa tem titular</li>
- *   <li>Todo titular tem título eleitoral</li>
- *   <li>Todo titular tem email cadastrado</li>
- *   <li>Toda unidade INTERMEDIARIA tem pelo menos uma subordinada</li>
+ *   <li>Todas unidades ativas têm titular</li>
+ *   <li>Todos titulares têm título eleitoral</li>
+ *   <li>Todos titulares têm email cadastrado</li>
+ *   <li>Todas unidades INTERMEDIARIAS têm pelo menos uma subordinada</li>
  * </ul>
  *
  * <p>Pode ser desabilitado com a propriedade {@code sgc.validacao.startup=false}.
@@ -63,8 +63,16 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
         if (!violacoes.isEmpty()) {
             violacoes.forEach(v -> log.error("INVARIANTE VIOLADA: {}", v));
             String termo = violacoes.size() == 1 ? "violação encontrada" : "violações encontradas";
-            throw new ErroConfiguracao("Dados organizacionais inválidos. %d %s. Verifique os logs."
-                    .formatted(violacoes.size(), termo));
+            
+            String detalhes = violacoes.stream()
+                    .limit(3) // Mostra as 3 primeiras para não poluir demais
+                    .collect(Collectors.joining("; "));
+            
+            if (violacoes.size() > 3) {
+                detalhes += "; ... (+ " + (violacoes.size() - 3) + " outras)";
+            }
+
+            throw new ErroConfiguracao("Dados organizacionais inválidos. %d %s: [%s]".formatted(violacoes.size(), termo, detalhes));
         }
 
         log.info("Dados organizacionais validados com sucesso. {} unidades verificadas.", unidadesAtivas.size());
@@ -80,7 +88,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
     private Map<String, Usuario> carregarUsuariosTitulares(List<Unidade> unidades) {
         List<String> titulos = unidades.stream()
                 .map(Unidade::getTituloTitular)
-                .filter(t -> !t.isBlank())
+                .filter(t -> t != null && !t.isBlank())
                 .distinct()
                 .toList();
 
@@ -97,20 +105,20 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
      */
     private void validarTitularesUnidades(List<Unidade> unidades, List<String> violacoes) {
         for (Unidade u : unidades) {
-            if (u.getTituloTitular().isBlank()) {
+            if (u.getTituloTitular() == null || u.getTituloTitular().isBlank()) {
                 violacoes.add("Unidade %s (%s) não possui titular cadastrado".formatted(u.getSigla(), u.getTipo()));
             }
         }
     }
 
     /**
-     * Valida que todo titular de unidade tem email cadastrado.
+     * Valida que todos os titulares de unidades têm email cadastrado.
      */
     private void validarEmailsTitulares(List<Unidade> unidades, Map<String, Usuario> usuarios, List<String> violacoes) {
         for (Unidade u : unidades) {
             String tituloTitular = u.getTituloTitular();
-            if (tituloTitular.isBlank()) {
-                continue; // Já validado em validarTitularesUnidades
+            if (tituloTitular == null || tituloTitular.isBlank()) {
+                continue;
             }
 
             Usuario titular = usuarios.get(tituloTitular);
@@ -120,7 +128,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
                 continue;
             }
 
-            if (titular.getEmail().isBlank()) {
+            if (titular.getEmail() == null || titular.getEmail().isBlank()) {
                 violacoes.add("Titular %s da unidade %s não possui email cadastrado"
                         .formatted(titular.getNome(), u.getSigla()));
             }
@@ -128,7 +136,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
     }
 
     /**
-     * Valida que toda unidade INTERMEDIARIA tem pelo menos uma subordinada.
+     * Valida que todas as unidades INTERMEDIARIAS têm pelo menos uma subordinada.
      */
     private void validarUnidadesIntermediarias(List<Unidade> unidades, List<String> violacoes) {
         Set<Long> codigosComSuperior = unidades.stream()

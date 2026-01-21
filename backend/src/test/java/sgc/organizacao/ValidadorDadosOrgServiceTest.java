@@ -75,7 +75,7 @@ class ValidadorDadosOrgServiceTest {
             // Arrange
             Unidade inativa = criarUnidadeValida(1L, "INATIVA", TipoUnidade.OPERACIONAL);
             inativa.setSituacao(SituacaoUnidade.INATIVA);
-            inativa.setTituloTitular(null); // Sem titular, mas é inativa
+            inativa.setTituloTitular(""); // Sem titular, mas é inativa
 
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(inativa));
 
@@ -88,9 +88,9 @@ class ValidadorDadosOrgServiceTest {
         void deveIgnorarUnidadesNaoParticipantes() {
             // Arrange
             Unidade semEquipe = criarUnidadeValida(1L, "SEM", TipoUnidade.SEM_EQUIPE);
-            semEquipe.setTituloTitular(null);
+            semEquipe.setTituloTitular("");
             Unidade raiz = criarUnidadeValida(2L, "RAIZ", TipoUnidade.RAIZ);
-            raiz.setTituloTitular(null);
+            raiz.setTituloTitular("");
 
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(semEquipe, raiz));
 
@@ -122,7 +122,7 @@ class ValidadorDadosOrgServiceTest {
         void deveLidarComListaDeTitulosVazia() {
             // Arrange
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
-            u.setTituloTitular(null); // Sem titular
+            u.setTituloTitular(""); // Sem titular
 
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
 
@@ -142,7 +142,7 @@ class ValidadorDadosOrgServiceTest {
         void deveFalharSemTitular() {
             // Arrange
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
-            u.setTituloTitular(null);
+            u.setTituloTitular("");
 
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
 
@@ -221,7 +221,7 @@ class ValidadorDadosOrgServiceTest {
         void deveIgnorarUnidadeSemTitularNoLoopDeEmail() {
             // Arrange
             Unidade semTitular = criarUnidadeValida(2L, "SEM", TipoUnidade.OPERACIONAL);
-            semTitular.setTituloTitular(null);
+            semTitular.setTituloTitular("");
             
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(semTitular));
 

@@ -114,7 +114,7 @@ SELECT codigo, nome, sigla, matricula_titular, titulo_titular, data_inicio_titul
 FROM (
     select u.cd as codigo, u.ds as nome, u.sigla_unid_tse as sigla, c.mat_servidor as matricula_titular, c.num_tit_ele as titulo_titular, c.dt_ingresso as data_inicio_titularidade,
            case when u.sit_unid like 'E%' then ''
-                when nvl(p.qtd_unidades_filhas, 0) = 0 then case when nvl(l.qtd_servidores, 0) < 2 then 'SEM EQUIPE' else 'OPERACIONAL' end
+                when nvl(p.qtd_unidades_filhas, 0) = 0 then case when nvl(l.qtd_servidores, 0) < 2 then 'SEM_EQUIPE' else 'OPERACIONAL' end
                 when not exists (select 1 from tb_unidade uf 
                                  where uf.cod_unid_super = u.cd 
                                    and ((select count(1) from srh2.lotacao 
@@ -168,7 +168,7 @@ FROM (
 CREATE OR REPLACE VIEW VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo) AS
 select s.num_tit_ele as titulo, s.mat_servidor as matricula, s.nom as nome, s.e_mail as email,
        r.ramal_servidor as ramal, l.cod_unid_tse as unidade_lot_codigo,
-       (select decode(tipo, 'SEM EQUIPE', 
+       (select decode(tipo, 'SEM_EQUIPE', 
                             decode(unidade_superior_codigo,
                                    1, case when sigla = 'GP' then (select codigo from vw_unidade 
                                                                    where sigla = 'ASPRE'

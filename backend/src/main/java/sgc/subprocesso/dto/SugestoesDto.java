@@ -29,8 +29,7 @@ public class SugestoesDto {
     private final String unidadeNome;
 
     public static SugestoesDto of(Subprocesso subprocesso) {
-        String sugestoes =
-                subprocesso.getMapa().getSugestoes();
+        String sugestoes = subprocesso.getMapa().getSugestoes();
         boolean sugestoesApresentadas = !sugestoes.isBlank();
         String nomeUnidade =
                 subprocesso.getUnidade().getNome();

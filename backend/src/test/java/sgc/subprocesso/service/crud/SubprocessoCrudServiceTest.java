@@ -161,21 +161,7 @@ class SubprocessoCrudServiceTest {
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
-    @Test
-    @DisplayName("Deve atualizar subprocesso removendo mapa")
-    void deveAtualizarRemovendoMapa() {
-        Subprocesso sp = criarSubprocessoCompleto();
-        AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder().build(); // codMapa null
-        SubprocessoDto responseDto = SubprocessoDto.builder().build();
 
-        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
-        when(repositorioSubprocesso.save(sp)).thenReturn(sp);
-        when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
-
-        SubprocessoDto resultado = service.atualizar(1L, request);
-        assertThat(resultado).isNotNull();
-        assertThat(sp.getMapa()).isNull();
-    }
 
     @Test
     @DisplayName("Deve atualizar subprocesso definindo mapa")

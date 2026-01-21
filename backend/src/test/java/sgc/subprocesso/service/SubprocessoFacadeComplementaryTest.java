@@ -456,7 +456,12 @@ class SubprocessoFacadeComplementaryTest {
             sp.setCodigo(1L);
             Mapa mapa = new Mapa();
             mapa.setCodigo(10L);
+            mapa.setSugestoes("");
             sp.setMapa(mapa);
+            
+            sgc.organizacao.model.Unidade u = new sgc.organizacao.model.Unidade();
+            u.setNome("Unidade Teste");
+            sp.setUnidade(u);
             when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
             
             SugestoesDto result = subprocessoFacade.obterSugestoes(1L);
@@ -663,6 +668,7 @@ class SubprocessoFacadeComplementaryTest {
             proc.setTipo(sgc.processo.model.TipoProcesso.DIAGNOSTICO);
 
             subprocessoFacade.importarAtividades(dest, orig);
+
             // Default case logs debug and doesn't change status, so it remains NAO_INICIADO
             assertThat(spDest.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
         }

@@ -450,6 +450,7 @@ public class SubprocessoWorkflowService {
     public void homologarCadastroEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
         unidadeCodigos.forEach(unidadeCodigo -> {
             Subprocesso base = repo.buscar(Subprocesso.class, codSubprocessoBase);
+            // TDDO essa pesquisa nunca deveria falhar nessa camada!
             Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_SUBPROCESSO, MSG_ERRO_SUBPROCESSO_NOT_FOUND.formatted(base.getProcesso().getCodigo(), unidadeCodigo)));
 
@@ -538,6 +539,9 @@ public class SubprocessoWorkflowService {
 
     @Transactional
     public void disponibilizarMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
+        if (request.getDataLimite() == null) {
+            throw new ErroValidacao("Data limite é obrigatória.");
+        }
         Subprocesso sp = getSubprocessoParaEdicao(codSubprocesso);
         accessControlService.verificarPermissao(usuario, DISPONIBILIZAR_MAPA, sp);
 
@@ -604,7 +608,6 @@ public class SubprocessoWorkflowService {
         accessControlService.verificarPermissao(usuario, APRESENTAR_SUGESTOES, sp);
 
         sp.getMapa().setSugestoes(sugestoes);
-
         sp.setSituacao(SITUACAO_MAPA_COM_SUGESTOES.get(sp.getProcesso().getTipo()));
 
         sp.setDataFimEtapa2(LocalDateTime.now());
@@ -717,6 +720,7 @@ public class SubprocessoWorkflowService {
         Subprocesso sp = repo.buscar(Subprocesso.class, codSubprocesso);
         accessControlService.verificarPermissao(usuario, AJUSTAR_MAPA, sp);
         validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
+
         sp.setSituacao(SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo()));
         sp.setDataLimiteEtapa2(request.getDataLimiteEtapa2());
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
@@ -735,6 +739,7 @@ public class SubprocessoWorkflowService {
         unidadeCodigos.forEach(unidadeCodigo -> {
             Subprocesso base = repo.buscar(Subprocesso.class, codSubprocessoBase);
 
+            // TDDO essa pesquisa nunca deveria falhar nessa camada!
             Subprocesso target = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_SUBPROCESSO, MSG_ERRO_SUBPROCESSO_NOT_FOUND.formatted(base.getProcesso().getCodigo(), unidadeCodigo)));
 
@@ -763,8 +768,6 @@ public class SubprocessoWorkflowService {
             self.homologarValidacao(target.getCodigo(), usuario);
         });
     }
-
-    // ===== HELPER METHODS =====
 
     private Subprocesso buscarSubprocesso(Long codSubprocesso) {
         return repo.buscar(Subprocesso.class, codSubprocesso);
