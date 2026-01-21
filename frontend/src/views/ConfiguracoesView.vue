@@ -43,7 +43,7 @@
                     @click="confirmarRemocao(admin)"
                   >
                     <span v-if="removendoAdmin === admin.tituloEleitoral" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                    <i v-else class="bi bi-trash"></i>
+                    <i v-else class="bi bi-trash" aria-hidden="true"></i>
                     Remover
                   </button>
                 </td>
@@ -88,8 +88,9 @@
               class="form-control"
               min="1"
               required
+              aria-describedby="diasInativacaoHelp"
             />
-            <div class="form-text">
+            <div id="diasInativacaoHelp" class="form-text">
               Dias depois da finalização de um processo para que seja considerado inativo.
             </div>
           </div>
@@ -105,8 +106,9 @@
               class="form-control"
               min="1"
               required
+              aria-describedby="diasAlertaNovoHelp"
             />
-            <div class="form-text">
+            <div id="diasAlertaNovoHelp" class="form-text">
               Dias depois de um alerta ser enviado para que deixe de ser marcado como novo.
             </div>
           </div>
