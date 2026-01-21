@@ -63,23 +63,28 @@ public class Usuario implements UserDetails {
     }
 
     public Set<UsuarioPerfil> getAtribuicoes() {
+        if (atribuicoesCache == null) {
+            atribuicoesCache = new HashSet<>();
+        }
         return atribuicoesCache;
     }
 
     public Set<UsuarioPerfil> getTodasAtribuicoes() {
-        Set<UsuarioPerfil> todas = new HashSet<>(atribuicoesCache);
+        Set<UsuarioPerfil> todas = new HashSet<>(getAtribuicoes());
         LocalDateTime now = LocalDateTime.now();
         try {
-            for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
-                if (!temp.getDataInicio().isAfter(now) && !temp.getDataTermino().isBefore(now)) {
-                    UsuarioPerfil perfil = new UsuarioPerfil()
-                            .setUsuarioTitulo(this.tituloEleitoral)
-                            .setUsuario(this)
-                            .setUnidadeCodigo(temp.getUnidade().getCodigo())
-                            .setUnidade(temp.getUnidade())
-                            .setPerfil(temp.getPerfil());
+            if (atribuicoesTemporarias != null) {
+                for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
+                    if (!temp.getDataInicio().isAfter(now) && !temp.getDataTermino().isBefore(now)) {
+                        UsuarioPerfil perfil = new UsuarioPerfil()
+                                .setUsuarioTitulo(this.tituloEleitoral)
+                                .setUsuario(this)
+                                .setUnidadeCodigo(temp.getUnidade().getCodigo())
+                                .setUnidade(temp.getUnidade())
+                                .setPerfil(temp.getPerfil());
 
-                    todas.add(perfil);
+                        todas.add(perfil);
+                    }
                 }
             }
         } catch (LazyInitializationException e) {

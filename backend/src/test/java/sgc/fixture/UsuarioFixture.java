@@ -36,7 +36,7 @@ public class UsuarioFixture {
         up.setPerfil(perfil);
 
         Set<UsuarioPerfil> atribuicoes = usuario.getAtribuicoes();
-        if (atribuicoes.isEmpty()) {
+        if (atribuicoes == null) {
             atribuicoes = new HashSet<>();
         }
         atribuicoes.add(up);

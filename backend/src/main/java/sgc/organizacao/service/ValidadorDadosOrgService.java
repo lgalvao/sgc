@@ -65,14 +65,15 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
             String termo = violacoes.size() == 1 ? "violação encontrada" : "violações encontradas";
             
             String detalhes = violacoes.stream()
-                    .limit(3) // Mostra as 3 primeiras para não poluir demais
+                    .limit(3) // Mostra as 3 primeiras para não poluir
                     .collect(Collectors.joining("; "));
             
             if (violacoes.size() > 3) {
                 detalhes += "; ... (+ " + (violacoes.size() - 3) + " outras)";
             }
 
-            throw new ErroConfiguracao("Dados organizacionais inválidos. %d %s: [%s]".formatted(violacoes.size(), termo, detalhes));
+            String msg = "Dados organizacionais inválidos. %d %s: [%s]".formatted(violacoes.size(), termo, detalhes);
+            throw new ErroConfiguracao(msg);
         }
 
         log.info("Dados organizacionais validados com sucesso. {} unidades verificadas.", unidadesAtivas.size());

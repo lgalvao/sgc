@@ -270,7 +270,7 @@ tasks.named("check") {
 spotbugs {
     toolVersion = "4.9.8"
     ignoreFailures.set(true)
-    excludeFilter.set(file("config/spotbugs/exclude.xml"))
+    excludeFilter.set(file("etc/config/spotbugs/exclude.xml"))
 }
 
 configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {

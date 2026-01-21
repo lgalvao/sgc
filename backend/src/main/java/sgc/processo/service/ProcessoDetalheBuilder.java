@@ -95,7 +95,9 @@ public class ProcessoDetalheBuilder {
                 unidadeDto.setSituacaoSubprocesso(sp.getSituacao());
                 unidadeDto.setDataLimite(sp.getDataLimiteEtapa1());
                 unidadeDto.setCodSubprocesso(sp.getCodigo());
-                unidadeDto.setMapaCodigo(sp.getMapa().getCodigo());
+                if (sp.getMapa() != null) {
+                    unidadeDto.setMapaCodigo(sp.getMapa().getCodigo());
+                }
                 unidadeDto.setDataLimiteFormatada(
                         FormatadorData.formatarData(sp.getDataLimiteEtapa1()));
                 unidadeDto.setSituacaoLabel(sp.getSituacao().getDescricao());
