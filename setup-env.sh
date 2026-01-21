@@ -2,7 +2,7 @@
 
 # setup-env.sh
 # Configura o ambiente de desenvolvimento com NVM, Node.js, SDKMAN e Java.
-# Otimizado para sistemas Ubuntu/Unix-like (Não-interativo & Workarounds SSL).
+# Otimizado para sistemas Ubuntu/Unix-like (Não-interativo & Certificados Auto-assinados).
 
 # Parar no primeiro erro
 set -e
@@ -30,7 +30,7 @@ for ferramenta in curl unzip zip; do
     fi
 done
 
-# --- Configuração de Workaround para SSL (Curl & Wget) ---
+# --- Configuração para Aceitar Certificados Auto-assinados (Curl & Wget) ---
 CURLRC="$HOME/.curlrc"
 CURLRC_BAK="$HOME/.curlrc.bak.$(date +%s)"
 WGETRC="$HOME/.wgetrc"
@@ -39,14 +39,17 @@ WGETRC_BAK="$HOME/.wgetrc.bak.$(date +%s)"
 limpar_configs_ssl() {
     if [ -f "$CURLRC_BAK" ]; then mv "$CURLRC_BAK" "$CURLRC"; elif [ -f "$CURLRC" ]; then rm "$CURLRC"; fi
     if [ -f "$WGETRC_BAK" ]; then mv "$WGETRC_BAK" "$WGETRC"; elif [ -f "$WGETRC" ]; then rm "$WGETRC" ; fi
-    # echo "[*] Configurações temporárias de SSL limpas."
+    # echo "[*] Configurações temporárias limpas."
 }
 
 trap limpar_configs_ssl EXIT
 
-echo "[*] Configurando SSL inseguro temporário para curl e wget..."
+echo "[*] Configurando curl e wget para aceitar certificados auto-assinados..."
+# Curl: 'insecure' permite conexões SSL sem verificar a cadeia de certificados
 if [ -f "$CURLRC" ]; then cp "$CURLRC" "$CURLRC_BAK"; fi
 echo "insecure" >> "$CURLRC"
+
+# Wget: 'check_certificate = off' permite conexões sem verificar a cadeia
 if [ -f "$WGETRC" ]; then cp "$WGETRC" "$WGETRC_BAK"; fi
 echo "check_certificate = off" >> "$WGETRC"
 
@@ -130,6 +133,7 @@ if [ -f "$SDKMAN_CONFIG" ]; then
             echo "$key=$value" >> "$SDKMAN_CONFIG"
         fi
     }
+    # Permite certificados auto-assinados (não verifica a cadeia)
     set_sdkman_config "sdkman_insecure_ssl" "true"
     set_sdkman_config "sdkman_auto_answer" "true"
 fi
@@ -177,6 +181,7 @@ echo "----------------------------------------------------------------"
 echo "Instalando Dependências do Projeto"
 echo "----------------------------------------------------------------"
 
+# Permite certificados auto-assinados no npm (não desabilita SSL, apenas a validação estrita)
 npm config set strict-ssl false
 echo "[*] Executando 'npm install' na raiz..."
 npm install
@@ -189,6 +194,7 @@ else
 fi
 
 echo "[*] Instalando Playwright (Apenas Chromium)..."
+# Permite certificados auto-assinados no Node para o download do browser
 export NODE_TLS_REJECT_UNAUTHORIZED=0
 npx playwright install chromium
 
