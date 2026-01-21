@@ -26,7 +26,7 @@ public class AccessAuditService {
      * @param recurso O recurso acessado
      */
     public void logAccessGranted(Usuario usuario, Acao acao, Object recurso) {
-        log.info("ACCESS_GRANTED: user={}, action={}, resource={}, timestamp={}",
+        log.debug("ACCESS_GRANTED: user={}, action={}, resource={}, timestamp={}",
                 usuario.getTituloEleitoral(),
                 acao,
                 getResourceId(recurso),
