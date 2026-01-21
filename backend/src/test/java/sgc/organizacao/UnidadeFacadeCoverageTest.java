@@ -206,4 +206,87 @@ class UnidadeFacadeCoverageTest {
         Map<Long, ResponsavelDto> map = unidadeFacade.buscarResponsaveisUnidades(List.of(1L));
         assertThat(map).containsKey(1L);
     }
+
+    @Test
+    @DisplayName("Deve montar DTO com titular e substituto")
+    void deveMontarDtoComTitularESubstituto() {
+        // Mocking repo to return 2 users for the same unit
+        Usuario titular = new Usuario();
+        titular.setTituloEleitoral("T");
+        titular.setNome("Titular");
+
+        Usuario substituto = new Usuario();
+        substituto.setTituloEleitoral("S");
+        substituto.setNome("Substituto");
+
+        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(titular, substituto));
+
+        ResponsavelDto result = unidadeFacade.buscarResponsavelUnidade(1L);
+
+        assertThat(result.getTitularTitulo()).isEqualTo("T");
+        assertThat(result.getSubstitutoTitulo()).isEqualTo("S");
+        assertThat(result.getSubstitutoNome()).isEqualTo("Substituto");
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro ao buscar responsável unidade não encontrada")
+    void deveLancarErroBuscarResponsavelUnidadeNaoEncontrada() {
+        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(Collections.emptyList());
+        assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarResponsavelUnidade(1L));
+    }
+
+    @Test
+    @DisplayName("Deve buscar siglas subordinadas recursivamente")
+    void deveBuscarSiglasSubordinadasRecursivo() {
+        Unidade raiz = new Unidade(); raiz.setCodigo(1L); raiz.setSigla("RAIZ");
+        Unidade filho = new Unidade(); filho.setCodigo(2L); filho.setSigla("FILHO"); filho.setUnidadeSuperior(raiz);
+
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(raiz, filho));
+
+        UnidadeDto dtoRaiz = new UnidadeDto(); dtoRaiz.setCodigo(1L); dtoRaiz.setSigla("RAIZ");
+        UnidadeDto dtoFilho = new UnidadeDto(); dtoFilho.setCodigo(2L); dtoFilho.setSigla("FILHO"); dtoFilho.setSubunidades(new ArrayList<>());
+        dtoRaiz.setSubunidades(List.of(dtoFilho));
+
+        when(usuarioMapper.toUnidadeDto(any(Unidade.class), anyBoolean())).thenAnswer(inv -> {
+            Unidade u = inv.getArgument(0);
+            if (u.getCodigo().equals(1L)) return dtoRaiz;
+            if (u.getCodigo().equals(2L)) return dtoFilho;
+            return null;
+        });
+
+        // Busca pela sigla do FILHO, que está dentro da raiz
+        List<String> siglas = unidadeFacade.buscarSiglasSubordinadas("FILHO");
+        assertThat(siglas).contains("FILHO");
+    }
+
+    @Test
+    @DisplayName("Deve aplicar regras de elegibilidade corretamente (negativo)")
+    void deveAplicarRegrasElegibilidadeNegativo() {
+        // Unidade Intermediaria (deve ser false)
+        Unidade inter = new Unidade(); inter.setCodigo(1L); inter.setTipo(TipoUnidade.INTERMEDIARIA);
+
+        // Unidade Operacional sem mapa (deve ser false se required=true)
+        Unidade semMapa = new Unidade(); semMapa.setCodigo(2L); semMapa.setTipo(TipoUnidade.OPERACIONAL);
+
+        // Unidade Bloqueada (deve ser false)
+        Unidade bloq = new Unidade(); bloq.setCodigo(3L); bloq.setTipo(TipoUnidade.OPERACIONAL);
+
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(inter, semMapa, bloq));
+        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(3L)); // Bloq tem mapa, mas está bloqueada
+
+        when(usuarioMapper.toUnidadeDto(any(Unidade.class), eq(false))).thenAnswer(inv -> {
+             Unidade u = inv.getArgument(0);
+             UnidadeDto dto = new UnidadeDto();
+             dto.setCodigo(u.getCodigo());
+             dto.setSubunidades(new ArrayList<>());
+             return dto;
+        });
+
+        // Testar com requerMapaVigente=true e Bloqueios
+        List<UnidadeDto> arvore = unidadeFacade.buscarArvoreComElegibilidade(true, Set.of(3L));
+
+        // Todos devem ter isElegivel=false (que é passado para o mapper)
+        // O mapper mockado aqui deve ser chamado com isElegivel=false
+        verify(usuarioMapper, times(3)).toUnidadeDto(any(Unidade.class), eq(false));
+    }
 }
