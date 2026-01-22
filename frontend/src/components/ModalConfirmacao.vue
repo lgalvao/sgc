@@ -21,8 +21,8 @@
           ref="btnCancelar"
           :data-testid="testIdCancelar || 'btn-modal-confirmacao-cancelar'"
           variant="secondary"
-          @click="fechar"
           :disabled="loading"
+          @click="fechar"
       >
         {{ cancelTitle }}
       </BButton>

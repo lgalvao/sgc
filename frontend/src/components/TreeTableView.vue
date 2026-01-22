@@ -1,8 +1,8 @@
 <template>
   <div>
     <div
-        v-if="title"
-        class="d-flex justify-content-between align-items-center mb-3"
+      v-if="title"
+      class="d-flex justify-content-between align-items-center mb-3"
     >
       <h4 class="mb-0">
         {{ title }}
@@ -10,49 +10,45 @@
 
       <div>
         <BButton
-            class="me-2"
-            data-testid="btn-expandir-todas"
-            size="sm"
-            variant="outline-primary"
-            @click="expandAll"
+          aria-label="Expandir todas as linhas"
+          class="me-2"
+          data-testid="btn-expandir-todas"
+          size="sm"
+          variant="outline-primary"
+          @click="expandAll"
         >
-          <i class="bi bi-arrows-expand"/>
+          <i aria-hidden="true" class="bi bi-arrows-expand" />
         </BButton>
         <BButton
-            size="sm"
-            variant="outline-secondary"
-            @click="collapseAll"
+          aria-label="Recolher todas as linhas"
+          size="sm"
+          variant="outline-secondary"
+          @click="collapseAll"
         >
-          <i class="bi bi-arrows-collapse"/>
+          <i aria-hidden="true" class="bi bi-arrows-collapse" />
         </BButton>
       </div>
     </div>
 
     <div class="table-responsive w-100">
-      <table
-          class="table table-striped table-hover m-0"
-          data-testid="tbl-tree"
-      >
+      <table class="table table-striped table-hover m-0" data-testid="tbl-tree">
         <colgroup>
           <col
-              v-for="(column) in columns"
-              :key="column.key"
-              :style="{ width: column.width || (100 / columns.length) + '%' }"
-          >
+            v-for="column in columns"
+            :key="column.key"
+            :style="{ width: column.width || 100 / columns.length + '%' }"
+          />
         </colgroup>
 
         <thead v-if="!hideHeaders">
-        <tr>
-          <th
-              v-for="column in columns"
-              :key="column.key"
-          >
-            {{ column.label }}
-          </th>
-        </tr>
+          <tr>
+            <th v-for="column in columns" :key="column.key">
+              {{ column.label }}
+            </th>
+          </tr>
         </thead>
         <tbody>
-        <TreeRowItem
+          <TreeRowItem
             v-for="item in flattenedData"
             :key="item.codigo"
             :columns="columns"
@@ -60,7 +56,7 @@
             :level="item.level"
             @toggle="toggleExpand"
             @row-click="handleTreeRowClick"
-        />
+          />
         </tbody>
       </table>
     </div>
@@ -68,8 +64,8 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton} from "bootstrap-vue-next";
-import {computed, nextTick, ref, watch} from "vue";
+import { BButton } from "bootstrap-vue-next";
+import { computed, nextTick, ref, watch } from "vue";
 import TreeRowItem from "./TreeRowItem.vue";
 
 interface TreeItem {
@@ -112,20 +108,20 @@ const initializeExpanded = (items: TreeItem[]): TreeItem[] => {
 };
 
 watch(
-    () => props.data,
-    (newData) => {
-      internalData.value = initializeExpanded(
-          JSON.parse(JSON.stringify(newData)),
-      );
-    },
-    {immediate: true, deep: true},
+  () => props.data,
+  (newData) => {
+    internalData.value = initializeExpanded(
+      JSON.parse(JSON.stringify(newData)),
+    );
+  },
+  { immediate: true, deep: true },
 );
 
 const flattenedData = computed((): FlattenedTreeItem[] => {
   const flattened: FlattenedTreeItem[] = [];
   const flatten = (items: TreeItem[], level: number) => {
     for (const item of items) {
-      flattened.push({...item, level});
+      flattened.push({ ...item, level });
       if (item.expanded && item.children) {
         flatten(item.children, level + 1);
       }
@@ -136,8 +132,8 @@ const flattenedData = computed((): FlattenedTreeItem[] => {
 });
 
 const findItemByCodigo = (
-    items: TreeItem[],
-    codigo: number | string,
+  items: TreeItem[],
+  codigo: number | string,
 ): TreeItem | null => {
   for (const item of items) {
     if (item.codigo === codigo) return item;

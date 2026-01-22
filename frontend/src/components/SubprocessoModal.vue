@@ -26,8 +26,8 @@
       <BButton
           data-testid="subprocesso-modal__btn-modal-cancelar"
           variant="secondary"
-          @click="$emit('fecharModal')"
           :disabled="loading"
+          @click="$emit('fecharModal')"
       >
         <i class="bi bi-x-circle me-1" aria-hidden="true"/>
         Cancelar
