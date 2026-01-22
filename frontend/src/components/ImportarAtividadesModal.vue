@@ -108,8 +108,8 @@
           data-testid="importar-atividades-modal__btn-modal-cancelar"
           type="button"
           variant="secondary"
-          @click="fechar"
           :disabled="importando"
+          @click="fechar"
       >
         <i class="bi bi-x-circle me-1" aria-hidden="true"/>
         Cancelar
