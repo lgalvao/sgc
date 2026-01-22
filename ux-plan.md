@@ -191,7 +191,7 @@ If LoadingButton is deemed over-engineering:
 
 **CadProcesso.vue:**
 - Current: 250 lines script section
-- Extract to: `composables/useProcessoForm.ts`
+- Extract to: `composables/useProcessoForm.ts` ✅
 - Logic to extract:
   - Form field refs (descricao, tipo, dataLimite, unidadesSelecionadas)
   - Validation logic (isFormValid computed)
@@ -201,7 +201,7 @@ If LoadingButton is deemed over-engineering:
 - **Benefit:** Reusable logic, testable in isolation
 
 **CadAtividades.vue:**
-- Extract to: `composables/useAtividadeForm.ts`
+- Extract to: `composables/useAtividadeForm.ts` ✅
 - **Reduction:** ~60 lines
 
 **DisponibilizarMapaModal.vue:**
@@ -616,7 +616,7 @@ test.describe('Page Header Consistency', () => {
 **CadProcesso.vue** [PRIORITY: CRITICAL]
 - [x] Replace 2 inline modals with ModalConfirmacao
 - [ ] Replace header with PageHeader
-- [ ] Extract form logic to useProcessoForm composable
+- [x] Extract form logic to useProcessoForm composable
 - [ ] Add loading buttons (3 buttons)
 - [ ] Fix alert placement (move inside form)
 - [ ] Add focus management on validation errors
@@ -639,7 +639,7 @@ test.describe('Page Header Consistency', () => {
 
 **CadAtividades.vue** [PRIORITY: HIGH]
 - [ ] Replace header with PageHeader (fix h1 → h2)
-- [ ] Extract form logic to useAtividadeForm
+- [x] Extract form logic to useAtividadeForm
 - [ ] Standardize error display (fix mixed patterns)
 - [ ] Add loading buttons
 - **Effort:** High | **Impact:** High
@@ -773,14 +773,14 @@ test.describe('Page Header Consistency', () => {
 ### Composables
 
 **useProcessoForm.ts** [PRIORITY: HIGH]
-- [ ] Create composable
-- [ ] Extract logic from CadProcesso
+- [x] Create composable
+- [x] Extract logic from CadProcesso
 - [ ] Write comprehensive tests
 - **Effort:** Medium | **Impact:** High
 
 **useAtividadeForm.ts** [PRIORITY: MEDIUM]
-- [ ] Create composable
-- [ ] Extract logic from CadAtividades
+- [x] Create composable
+- [x] Extract logic from CadAtividades
 - [ ] Write tests
 - **Effort:** Medium | **Impact:** Medium
 

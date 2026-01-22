@@ -185,20 +185,20 @@ import {
   BFormInvalidFeedback,
   BFormSelect,
 } from "bootstrap-vue-next";
-import {computed, nextTick, onMounted, ref, watch} from "vue";
+import {nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
 import * as processoService from "@/services/processoService";
-import {useFormErrors} from '@/composables/useFormErrors';
 import {logger} from "@/utils";
+import {useProcessoForm} from "@/composables/useProcessoForm";
 
 import {useProcessosStore} from "@/stores/processos";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useFeedbackStore} from "@/stores/feedback";
-import {AtualizarProcessoRequest, CriarProcessoRequest, Processo as ProcessoModel, TipoProcesso} from "@/types/tipos";
+import {Processo as ProcessoModel, TipoProcesso} from "@/types/tipos";
 
 const tipoOptions = [
   { value: TipoProcesso.MAPEAMENTO, text: 'Mapeamento' },
@@ -206,10 +206,21 @@ const tipoOptions = [
   { value: TipoProcesso.DIAGNOSTICO, text: 'Diagnóstico' }
 ];
 
-const unidadesSelecionadas = ref<number[]>([]);
-const descricao = ref<string>("");
-const tipo = ref<string>("MAPEAMENTO");
-const dataLimite = ref<string>("");
+const {
+  descricao,
+  tipo,
+  dataLimite,
+  unidadesSelecionadas,
+  fieldErrors,
+  isFormInvalid,
+  setFromNormalizedError,
+  clearErrors,
+  hasErrors,
+  construirCriarRequest,
+  construirAtualizarRequest,
+  limpar: limparCampos
+} = useProcessoForm();
+
 const isLoading = ref(false);
 const router = useRouter();
 const route = useRoute();
@@ -217,37 +228,9 @@ const processosStore = useProcessosStore();
 const unidadesStore = useUnidadesStore();
 const feedbackStore = useFeedbackStore();
 
-const {errors: fieldErrors, setFromNormalizedError, clearErrors, hasErrors} = useFormErrors([
-  'descricao',
-  'tipo',
-  'dataLimite',
-  'unidades',
-  'dataLimiteEtapa1'
-]);
-
-watch(descricao, () => {
-  fieldErrors.value.descricao = '';
-});
-watch(tipo, () => {
-  fieldErrors.value.tipo = '';
-});
-watch(dataLimite, () => {
-  fieldErrors.value.dataLimite = '';
-});
-watch(unidadesSelecionadas, () => {
-  fieldErrors.value.unidades = '';
-});
-
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalRemocao = ref(false);
 const processoEditando = ref<ProcessoModel | null>(null);
-
-const isFormInvalid = computed(() => {
-  return !descricao.value.trim() ||
-      !tipo.value ||
-      !dataLimite.value ||
-      unidadesSelecionadas.value.length === 0;
-});
 
 interface AlertState {
   show: boolean;
@@ -293,7 +276,7 @@ onMounted(async () => {
 
         processoEditando.value = processo;
         descricao.value = processo.descricao;
-        tipo.value = processo.tipo;
+        tipo.value = processo.tipo as any;
         dataLimite.value = processo.dataLimite.split("T")[0];
         unidadesSelecionadas.value = processo.unidades.map((u) => u.codUnidade);
         await unidadesStore.buscarUnidadesParaProcesso(
@@ -317,14 +300,6 @@ watch(tipo, async (novoTipo) => {
       : undefined;
   await unidadesStore.buscarUnidadesParaProcesso(novoTipo, codProcesso);
 });
-
-function limparCampos() {
-  descricao.value = "";
-  tipo.value = "MAPEAMENTO";
-  dataLimite.value = "";
-  unidadesSelecionadas.value = [];
-  clearErrors();
-}
 
 function handleApiErrors(error: any, title: string, defaultMsg: string) {
   clearErrors();
@@ -356,25 +331,14 @@ async function salvarProcesso() {
   // Validações agora são feitas no backend via Bean Validation
   try {
     if (processoEditando.value) {
-      const request: AtualizarProcessoRequest = {
-        codigo: processoEditando.value.codigo,
-        descricao: descricao.value,
-        tipo: tipo.value as TipoProcesso,
-        dataLimiteEtapa1: dataLimite.value ? `${dataLimite.value}T00:00:00` : null,
-        unidades: unidadesSelecionadas.value, // Backend valida elegibilidade
-      };
+      const request = construirAtualizarRequest(processoEditando.value.codigo);
       await processosStore.atualizarProcesso(
           processoEditando.value.codigo,
           request,
       );
       await router.push("/painel");
     } else {
-      const request: CriarProcessoRequest = {
-        descricao: descricao.value,
-        tipo: tipo.value as TipoProcesso,
-        dataLimiteEtapa1: dataLimite.value ? `${dataLimite.value}T00:00:00` : null,
-        unidades: unidadesSelecionadas.value, // Backend valida elegibilidade
-      };
+      const request = construirCriarRequest();
       await processosStore.criarProcesso(request);
       await router.push("/painel");
     }
@@ -406,12 +370,7 @@ async function confirmarIniciarProcesso() {
     // Se não houver processo salvo, cria antes de iniciar
     // Backend valida elegibilidade das unidades
     try {
-      const request: CriarProcessoRequest = {
-        descricao: descricao.value,
-        tipo: tipo.value as TipoProcesso,
-        dataLimiteEtapa1: dataLimite.value ? `${dataLimite.value}T00:00:00` : null,
-        unidades: unidadesSelecionadas.value,
-      };
+      const request = construirCriarRequest();
       const novoProcesso = await processosStore.criarProcesso(request);
       codigoProcesso = novoProcesso.codigo;
     } catch (error) {
