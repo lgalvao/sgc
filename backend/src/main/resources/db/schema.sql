@@ -367,3 +367,5 @@ create index if not exists idx_mapa_subprocesso on sgc.mapa (subprocesso_codigo)
 create index if not exists idx_analise_subprocesso on sgc.analise (subprocesso_codigo);
 create index if not exists idx_movimentacao_subprocesso on sgc.movimentacao (subprocesso_codigo);
 create index if not exists idx_competencia_atividade_inv on sgc.competencia_atividade (competencia_codigo);
+create index if not exists idx_subprocesso_processo on sgc.subprocesso (processo_codigo);
+create index if not exists idx_subprocesso_unidade on sgc.subprocesso (unidade_codigo);
