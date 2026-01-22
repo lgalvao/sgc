@@ -49,6 +49,7 @@
   <SubprocessoModal
       :data-limite-atual="dataLimite"
       :etapa-atual="subprocesso?.etapaAtual || null"
+      :loading="isLoadingDataLimite"
       :mostrar-modal="mostrarModalAlterarDataLimite"
       @fechar-modal="fecharModalAlterarDataLimite"
       @confirmar-alteracao="confirmarAlteracaoDataLimite"
@@ -104,6 +105,7 @@ const mapaStore = useMapasStore();
 const feedbackStore = useFeedbackStore();
 
 const mostrarModalAlterarDataLimite = ref(false);
+const isLoadingDataLimite = ref(false);
 const mostrarModalReabrir = ref(false);
 const tipoReabertura = ref<'cadastro' | 'revisao'>('cadastro');
 const justificativaReabertura = ref('');
@@ -152,6 +154,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
     return;
   }
 
+  isLoadingDataLimite.value = true;
   try {
     await subprocessosStore.alterarDataLimiteSubprocesso(
         subprocesso.value.unidade.codigo,
@@ -161,6 +164,8 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
     feedbackStore.show("Data limite alterada", "A data limite foi alterada com sucesso!", "success");
   } catch {
     feedbackStore.show("Erro ao alterar data limite", "Não foi possível alterar a data limite.", "danger");
+  } finally {
+    isLoadingDataLimite.value = false;
   }
 }
 

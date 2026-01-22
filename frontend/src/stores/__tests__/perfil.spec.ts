@@ -36,7 +36,7 @@ describe("usePerfilStore", () => {
     const context = setupStoreTest(usePerfilStore);
 
     it("deve inicializar com valores padrão se o localStorage estiver vazio", () => {
-        expect(context.store.usuarioCodigo).toBe(9);
+        expect(context.store.usuarioCodigo).toBe("9");
         expect(context.store.perfilSelecionado).toBeNull();
         expect(context.store.unidadeSelecionada).toBeNull();
     });
@@ -51,7 +51,7 @@ describe("usePerfilStore", () => {
         setActivePinia(createPinia());
         const newPerfilStore = usePerfilStore();
 
-        expect(newPerfilStore.usuarioCodigo).toBe(10);
+        expect(newPerfilStore.usuarioCodigo).toBe("10");
         expect(newPerfilStore.perfilSelecionado).toBe("USER");
         expect(newPerfilStore.unidadeSelecionada).toBe(123);
         expect(newPerfilStore.unidadeSelecionadaSigla).toBe("U10");
@@ -61,8 +61,8 @@ describe("usePerfilStore", () => {
         const mockUsuarioService = vi.mocked(usuarioService);
 
         it("definirUsuarioCodigo deve atualizar usuarioCodigo e armazená-lo no localStorage", () => {
-            context.store.definirUsuarioCodigo(15);
-            expect(context.store.usuarioCodigo).toBe(15);
+            context.store.definirUsuarioCodigo("15");
+            expect(context.store.usuarioCodigo).toBe("15");
             expect(mockLocalStorage.setItem).toHaveBeenCalledWith("usuarioCodigo", "15");
         });
 
@@ -113,10 +113,10 @@ describe("usePerfilStore", () => {
             const result = await context.store.loginCompleto("123", "pass");
 
             expect(mockUsuarioService.autenticar).toHaveBeenCalledWith({
-                tituloEleitoral: 123,
+                tituloEleitoral: "123",
                 senha: "pass",
             });
-            expect(mockUsuarioService.autorizar).toHaveBeenCalledWith(123);
+            expect(mockUsuarioService.autorizar).toHaveBeenCalledWith("123");
             expect(mockUsuarioService.entrar).toHaveBeenCalled();
             expect(context.store.perfilSelecionado).toBe(Perfil.CHEFE);
             expect(context.store.unidadeSelecionada).toBe(1);

@@ -22,15 +22,23 @@
           :data-testid="testIdCancelar || 'btn-modal-confirmacao-cancelar'"
           variant="secondary"
           @click="fechar"
+          :disabled="loading"
       >
-        Cancelar
+        {{ cancelTitle }}
       </BButton>
       <BButton
-          :variant="variant || 'primary'"
+          :variant="okVariant || variant || 'primary'"
           :data-testid="testIdConfirmar || 'btn-modal-confirmacao-confirmar'"
+          :disabled="loading || okDisabled"
           @click="confirmar"
       >
-        Confirmar
+        <span
+            v-if="loading"
+            class="spinner-border spinner-border-sm me-1"
+            role="status"
+            aria-hidden="true"
+        />
+        {{ loading ? (okTitle === 'Confirmar' ? 'Processando...' : okTitle) : okTitle }}
       </BButton>
     </template>
   </BModal>
@@ -40,14 +48,27 @@
 import {BButton, BModal} from "bootstrap-vue-next";
 import {computed, ref} from "vue";
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: boolean;
   titulo: string;
   mensagem?: string;
-  variant?: any;
+  variant?: string;
   testIdConfirmar?: string;
   testIdCancelar?: string;
-}>();
+  loading?: boolean;
+  okTitle?: string;
+  cancelTitle?: string;
+  okDisabled?: boolean;
+  okVariant?: string;
+  autoClose?: boolean;
+}>(), {
+  variant: 'primary',
+  loading: false,
+  okTitle: 'Confirmar',
+  cancelTitle: 'Cancelar',
+  okDisabled: false,
+  autoClose: true,
+});
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;
@@ -67,7 +88,9 @@ function fechar() {
 
 function confirmar() {
   emit('confirmar');
-  modelValueComputed.value = false;
+  if (props.autoClose) {
+     modelValueComputed.value = false;
+  }
 }
 
 function onShown() {

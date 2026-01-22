@@ -37,7 +37,7 @@
                 variant="secondary"
                 @click="$emit('fecharModal')"
             >
-                <i class="bi bi-x-circle me-1" />
+                <i class="bi bi-x-circle me-1" aria-hidden="true" />
                 Cancelar
             </BButton>
             <BButton
@@ -45,7 +45,7 @@
                 variant="success"
                 @click="$emit('confirmarAceitacao', observacao)"
             >
-                <i class="bi bi-check-circle me-1" />
+                <i class="bi bi-check-circle me-1" aria-hidden="true" />
                 Aceitar
             </BButton>
         </template>

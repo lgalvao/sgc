@@ -27,7 +27,7 @@ describe("usuarioService", () => {
 
     describe("autorizar", () => {
         it("deve fazer POST, mapear e retornar resposta", async () => {
-            const tituloEleitoral = 123;
+            const tituloEleitoral = "123";
             const responseDto = [{ perfil: "CHEFE", unidade: "UNIT" }];
             mockApi.post.mockResolvedValue({ data: responseDto });
 
@@ -35,10 +35,7 @@ describe("usuarioService", () => {
 
             expect(mockApi.post).toHaveBeenCalledWith(
                 "/usuarios/autorizar",
-                tituloEleitoral,
-                {
-                    headers: { "Content-Type": "application/json" },
-                },
+                { tituloEleitoral },
             );
             expect(mockMappers.mapPerfilUnidadeToFrontend).toHaveBeenCalled();
             expect(mockMappers.mapPerfilUnidadeToFrontend.mock.calls[0][0]).toEqual(
@@ -47,7 +44,7 @@ describe("usuarioService", () => {
             expect(result[0]).toHaveProperty("mapped", true);
         });
 
-        testErrorHandling(() => service.autorizar(123), 'post');
+        testErrorHandling(() => service.autorizar("123"), 'post');
     });
 
     describe("entrar", () => {
