@@ -1,25 +1,25 @@
 <template>
   <div
-      class="text-center py-5 border rounded bg-light mb-4 text-muted empty-state"
+      class="text-center py-4 border rounded bg-light mb-3 text-muted empty-state"
       data-testid="empty-state"
       role="region"
       aria-label="Estado vazio"
   >
     <i
         v-if="icon"
-        :class="`bi ${icon} fs-1 d-block mb-3 text-secondary`"
+        :class="`bi ${icon} fs-3 d-block mb-2 text-secondary`"
         aria-hidden="true"
     />
     <p
         v-if="title"
-        class="h5 fw-normal mb-2"
+        class="h5 fw-normal mb-1"
         data-testid="empty-state-title"
     >
       {{ title }}
     </p>
     <p
         v-if="description"
-        class="small mb-3"
+        class="small mb-2"
         data-testid="empty-state-description"
     >
       {{ description }}

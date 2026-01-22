@@ -49,7 +49,7 @@
       <div v-if="competencias.length === 0" class="mb-4 mt-3">
         <EmptyState
             icon="bi-journal-plus"
-            title="Vamos começar?"
+            title="Mapa de competências"
             description="Nenhuma competência cadastrada para esta unidade."
         >
           <BButton

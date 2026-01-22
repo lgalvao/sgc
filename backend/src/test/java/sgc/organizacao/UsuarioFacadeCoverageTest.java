@@ -175,6 +175,7 @@ class UsuarioFacadeCoverageTest {
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         unidade.setNome("U1");
+        unidade.setSituacao(SituacaoUnidade.ATIVA);
 
         UsuarioPerfil up = new UsuarioPerfil();
         up.setUsuario(u);
@@ -277,10 +278,15 @@ class UsuarioFacadeCoverageTest {
         u.setTituloEleitoral("T");
         u.setNome("Nome");
 
+        Unidade un = new Unidade();
+        un.setCodigo(1L);
+        un.setSituacao(SituacaoUnidade.ATIVA);
+
         UsuarioPerfil up = new UsuarioPerfil();
         up.setUsuario(u);
         up.setUsuarioTitulo("T");
         up.setUnidadeCodigo(1L);
+        up.setUnidade(un);
         up.setPerfil(Perfil.CHEFE);
         u.setAtribuicoes(Set.of(up));
 
@@ -321,9 +327,15 @@ class UsuarioFacadeCoverageTest {
 
         Usuario u = new Usuario();
         u.setTituloEleitoral("T");
+
+        Unidade un = new Unidade();
+        un.setCodigo(1L);
+        un.setSituacao(SituacaoUnidade.ATIVA);
+
         UsuarioPerfil up = new UsuarioPerfil();
         up.setUsuario(u);
         up.setUnidadeCodigo(1L);
+        up.setUnidade(un);
         up.setPerfil(Perfil.CHEFE);
 
         when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.of(u));
@@ -344,6 +356,7 @@ class UsuarioFacadeCoverageTest {
         up.setUsuario(u);
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
+        unidade.setSituacao(SituacaoUnidade.ATIVA);
         up.setUnidade(unidade);
         up.setPerfil(Perfil.CHEFE);
 
@@ -458,10 +471,15 @@ class UsuarioFacadeCoverageTest {
         u.setNome("Nome");
 
         // Atribuição CORRETA (Chefe da unidade 1)
+        Unidade un1 = new Unidade();
+        un1.setCodigo(1L);
+        un1.setSituacao(SituacaoUnidade.ATIVA);
+
         UsuarioPerfil up1 = new UsuarioPerfil();
         up1.setUsuario(u);
         up1.setUsuarioTitulo("T");
         up1.setUnidadeCodigo(1L);
+        up1.setUnidade(un1);
         up1.setPerfil(Perfil.CHEFE);
 
         // Atribuição ERRADA (Não é chefe)
@@ -469,13 +487,19 @@ class UsuarioFacadeCoverageTest {
         up2.setUsuario(u);
         up2.setUsuarioTitulo("T");
         up2.setUnidadeCodigo(1L);
+        up2.setUnidade(un1);
         up2.setPerfil(Perfil.SERVIDOR);
 
         // Atribuição ERRADA (Unidade diferente da solicitada)
+        Unidade un2 = new Unidade();
+        un2.setCodigo(2L);
+        un2.setSituacao(SituacaoUnidade.ATIVA);
+
         UsuarioPerfil up3 = new UsuarioPerfil();
         up3.setUsuario(u);
         up3.setUsuarioTitulo("T");
         up3.setUnidadeCodigo(2L);
+        up3.setUnidade(un2);
         up3.setPerfil(Perfil.CHEFE);
 
         u.setAtribuicoes(Set.of(up1, up2, up3));

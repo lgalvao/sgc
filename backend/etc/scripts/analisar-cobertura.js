@@ -4,10 +4,10 @@ const { execSync } = require('node:child_process');
 const xml2js = require('xml2js');
 
 // Configuração
-const REPORT_PATH = path.join(__dirname, '../../backend/build/reports/jacoco/test/jacocoTestReport.xml');
+const REPORT_PATH = path.join(__dirname, '../../build/reports/jacoco/test/jacocoTestReport.xml');
 const GRADLE_DIR = path.join(__dirname, '../../');
 const isWindows = process.platform === 'win32';
-const GRADLE_CMD = isWindows ? 'gradlew.bat :backend:test :backend:jacocoTestReport' : './gradlew :backend:test :backend:jacocoTestReport';
+const GRADLE_CMD = isWindows ? 'gradlew.bat :backend:jacocoTestReport' : './gradlew :backend:jacocoTestReport';
 
 // Função principal
 async function main() {

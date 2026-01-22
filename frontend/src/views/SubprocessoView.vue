@@ -1,42 +1,49 @@
 <template>
   <BContainer class="mt-4">
-    <SubprocessoHeader
-        v-if="subprocesso"
-        :pode-alterar-data-limite="subprocesso.permissoes.podeAlterarDataLimite"
-        :pode-reabrir-cadastro="subprocesso.permissoes.podeReabrirCadastro"
-        :pode-reabrir-revisao="subprocesso.permissoes.podeReabrirRevisao"
-        :pode-enviar-lembrete="subprocesso.permissoes.podeEnviarLembrete"
-        :processo-descricao="subprocesso.processoDescricao || ''"
-        :responsavel-email="subprocesso.responsavel?.email || ''"
-        :responsavel-nome="subprocesso.responsavel?.nome || ''"
-        :responsavel-ramal="subprocesso.responsavel?.ramal || ''"
-        :situacao="subprocesso.situacaoLabel"
-        :titular-email="subprocesso.titular?.email || ''"
-        :titular-nome="subprocesso.titular?.nome || ''"
-        :titular-ramal="subprocesso.titular?.ramal || ''"
-        :unidade-nome="subprocesso.unidade.nome"
-        :unidade-sigla="subprocesso.unidade.sigla"
-        @alterar-data-limite="abrirModalAlterarDataLimite"
-        @reabrir-cadastro="abrirModalReabrirCadastro"
-        @reabrir-revisao="abrirModalReabrirRevisao"
-        @enviar-lembrete="confirmarEnviarLembrete"
-    />
-    <div v-else>
-      <p>Unidade não encontrada.</p>
+    <div v-if="subprocesso">
+      <SubprocessoHeader
+          :pode-alterar-data-limite="subprocesso.permissoes.podeAlterarDataLimite"
+          :pode-reabrir-cadastro="subprocesso.permissoes.podeReabrirCadastro"
+          :pode-reabrir-revisao="subprocesso.permissoes.podeReabrirRevisao"
+          :pode-enviar-lembrete="subprocesso.permissoes.podeEnviarLembrete"
+          :processo-descricao="subprocesso.processoDescricao || ''"
+          :responsavel-email="subprocesso.responsavel?.email || ''"
+          :responsavel-nome="subprocesso.responsavel?.nome || ''"
+          :responsavel-ramal="subprocesso.responsavel?.ramal || ''"
+          :situacao="subprocesso.situacaoLabel"
+          :titular-email="subprocesso.titular?.email || ''"
+          :titular-nome="subprocesso.titular?.nome || ''"
+          :titular-ramal="subprocesso.titular?.ramal || ''"
+          :unidade-nome="subprocesso.unidade.nome"
+          :unidade-sigla="subprocesso.unidade.sigla"
+          @alterar-data-limite="abrirModalAlterarDataLimite"
+          @reabrir-cadastro="abrirModalReabrirCadastro"
+          @reabrir-revisao="abrirModalReabrirRevisao"
+          @enviar-lembrete="confirmarEnviarLembrete"
+      />
+
+      <SubprocessoCards
+          v-if="codSubprocesso"
+          :cod-processo="props.codProcesso"
+          :cod-subprocesso="codSubprocesso"
+          :mapa="mapa"
+          :permissoes="subprocesso.permissoes || { podeEditarMapa: true, podeVisualizarMapa: true, podeVisualizarDiagnostico: true, podeAlterarDataLimite: false, podeDisponibilizarCadastro: false, podeDevolverCadastro: false, podeAceitarCadastro: false, podeVisualizarImpacto: false, podeVerPagina: true, podeRealizarAutoavaliacao: false, podeDisponibilizarMapa: false }"
+          :sigla-unidade="props.siglaUnidade"
+          :situacao="subprocesso.situacao"
+          :tipo-processo="subprocesso.tipoProcesso || TipoProcesso.MAPEAMENTO"
+      />
+
+      <TabelaMovimentacoes :movimentacoes="movimentacoes"/>
     </div>
-
-    <SubprocessoCards
-        v-if="subprocesso && codSubprocesso"
-        :cod-processo="props.codProcesso"
-        :cod-subprocesso="codSubprocesso"
-        :mapa="mapa"
-        :permissoes="subprocesso.permissoes || { podeEditarMapa: true, podeVisualizarMapa: true, podeVisualizarDiagnostico: true, podeAlterarDataLimite: false, podeDisponibilizarCadastro: false, podeDevolverCadastro: false, podeAceitarCadastro: false, podeVisualizarImpacto: false, podeVerPagina: true, podeRealizarAutoavaliacao: false, podeDisponibilizarMapa: false }"
-        :sigla-unidade="props.siglaUnidade"
-        :situacao="subprocesso.situacao"
-        :tipo-processo="subprocesso.tipoProcesso || TipoProcesso.MAPEAMENTO"
-    />
-
-    <TabelaMovimentacoes :movimentacoes="movimentacoes"/>
+    <div v-else-if="subprocessosStore.lastError" class="text-center py-5">
+      <BAlert :model-value="true" variant="danger">
+        {{ subprocessosStore.lastError.message || "Erro ao carregar subprocesso." }}
+      </BAlert>
+    </div>
+    <div v-else class="text-center py-5">
+      <BSpinner label="Carregando informações da unidade..." variant="primary" />
+      <p class="mt-2 text-muted">Carregando informações da unidade...</p>
+    </div>
   </BContainer>
 
   <SubprocessoModal
@@ -76,7 +83,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BContainer, BFormTextarea, BModal} from "bootstrap-vue-next";
+import {BAlert, BButton, BContainer, BFormTextarea, BModal, BSpinner} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import SubprocessoCards from "@/components/SubprocessoCards.vue";
 import SubprocessoHeader from "@/components/SubprocessoHeader.vue";
@@ -116,11 +123,6 @@ const dataLimite = computed(() =>
 );
 
 onMounted(async () => {
-  // Limpar estado anterior para evitar flicker de dados antigos
-  subprocessosStore.subprocessoDetalhe = null;
-  mapaStore.mapaCompleto = null;
-  codSubprocesso.value = null;
-
   const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
       props.codProcesso,
       props.siglaUnidade,

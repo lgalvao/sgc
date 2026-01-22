@@ -61,6 +61,10 @@
           @finalizar="finalizarProcesso"
       />
     </div>
+    <div v-else class="text-center py-5">
+      <BSpinner label="Carregando detalhes do processo..." variant="primary" />
+      <p class="mt-2 text-muted">Carregando detalhes do processo...</p>
+    </div>
 
     <!-- Modal de Ação em Bloco -->
     <ModalAcaoBloco
@@ -98,7 +102,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BBadge, BContainer} from "bootstrap-vue-next";
+import {BAlert, BBadge, BContainer, BSpinner} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";

@@ -12,6 +12,7 @@ import sgc.analise.model.TipoAnalise;
 import sgc.organizacao.UnidadeFacade;
 import sgc.subprocesso.model.Subprocesso;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -81,6 +82,25 @@ class AnaliseFacadeTest {
                     .isEqualTo(TipoAnalise.VALIDACAO);
             verify(analiseRepo).findBySubprocessoCodigoOrderByDataHoraDesc(1L);
         }
+
+        @Test
+        @DisplayName("Deve filtrar análises de outro tipo")
+        void deveFiltrarAnalisesDeOutroTipo() {
+            Analise analiseCadastro = new Analise();
+            analiseCadastro.setTipo(TipoAnalise.CADASTRO);
+            Analise analiseValidacao = new Analise();
+            analiseValidacao.setTipo(TipoAnalise.VALIDACAO);
+
+            when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L))
+                    .thenReturn(List.of(analiseCadastro, analiseValidacao));
+
+            List<Analise> resultado = service.listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
+
+            assertThat(resultado)
+                    .hasSize(1)
+                    .extracting(Analise::getTipo)
+                    .containsExactly(TipoAnalise.CADASTRO);
+        }
     }
 
     @Nested
@@ -92,17 +112,16 @@ class AnaliseFacadeTest {
         void deveCriarAnaliseCadastro() {
             when(analiseRepo.save(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
-            Analise resultado =
-                    service.criarAnalise(
-                            subprocesso,
-                            CriarAnaliseCommand.builder()
-                                    .tipo(TipoAnalise.CADASTRO)
-                                    .acao(null)
-                                    .observacoes(OBS)
-                                    .siglaUnidade(null)
-                                    .tituloUsuario(null)
-                                    .motivo(null)
-                                    .build());
+            Analise resultado = service.criarAnalise(
+                    subprocesso,
+                    CriarAnaliseCommand.builder()
+                            .tipo(TipoAnalise.CADASTRO)
+                            .acao(null)
+                            .observacoes(OBS)
+                            .siglaUnidade(null)
+                            .tituloUsuario(null)
+                            .motivo(null)
+                            .build());
 
             assertThat(resultado).isNotNull();
             assertThat(resultado.getSubprocesso()).isEqualTo(subprocesso);
@@ -116,23 +135,47 @@ class AnaliseFacadeTest {
         void deveCriarAnaliseValidacao() {
             when(analiseRepo.save(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
-            Analise resultado =
-                    service.criarAnalise(
-                            subprocesso,
-                            CriarAnaliseCommand.builder()
-                                    .tipo(TipoAnalise.VALIDACAO)
-                                    .acao(null)
-                                    .observacoes(OBS)
-                                    .siglaUnidade(null)
-                                    .tituloUsuario(null)
-                                    .motivo(null)
-                                    .build());
+            Analise resultado = service.criarAnalise(
+                    subprocesso,
+                    CriarAnaliseCommand.builder()
+                            .tipo(TipoAnalise.VALIDACAO)
+                            .acao(null)
+                            .observacoes(OBS)
+                            .siglaUnidade(null)
+                            .tituloUsuario(null)
+                            .motivo(null)
+                            .build());
 
             assertThat(resultado).isNotNull();
             assertThat(resultado.getSubprocesso()).isEqualTo(subprocesso);
             assertThat(resultado.getObservacoes()).isEqualTo(OBS);
             assertThat(resultado.getTipo()).isEqualTo(TipoAnalise.VALIDACAO);
             verify(analiseRepo).save(any(Analise.class));
+        }
+
+        @Test
+        @DisplayName("Deve criar uma análise com sigla de unidade")
+        void deveCriarAnaliseComSiglaUnidade() {
+            String sigla = "UNIDADE1";
+            sgc.organizacao.dto.UnidadeDto unidadeDto = new sgc.organizacao.dto.UnidadeDto();
+            unidadeDto.setCodigo(10L);
+            sgc.organizacao.model.Unidade unidade = new sgc.organizacao.model.Unidade();
+            unidade.setCodigo(10L);
+
+            when(unidadeService.buscarPorSigla(sigla)).thenReturn(unidadeDto);
+            when(unidadeService.buscarEntidadePorId(10L)).thenReturn(unidade);
+            when(analiseRepo.save(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
+
+            Analise resultado = service.criarAnalise(
+                    subprocesso,
+                    CriarAnaliseCommand.builder()
+                            .tipo(TipoAnalise.VALIDACAO)
+                            .siglaUnidade(sigla)
+                            .build());
+
+            assertThat(resultado.getUnidadeCodigo()).isEqualTo(10L);
+            verify(unidadeService).buscarPorSigla(sigla);
+            verify(unidadeService).buscarEntidadePorId(10L);
         }
     }
 
@@ -150,6 +193,17 @@ class AnaliseFacadeTest {
 
             verify(analiseRepo).findBySubprocessoCodigo(1L);
             verify(analiseRepo).deleteAll(analises);
+        }
+
+        @Test
+        @DisplayName("Não deve tentar remover se lista estiver vazia")
+        void naoDeveRemoverSeListaVazia() {
+            when(analiseRepo.findBySubprocessoCodigo(1L)).thenReturn(Collections.emptyList());
+
+            service.removerPorSubprocesso(1L);
+
+            verify(analiseRepo).findBySubprocessoCodigo(1L);
+            verify(analiseRepo, never()).deleteAll(any());
         }
     }
 }

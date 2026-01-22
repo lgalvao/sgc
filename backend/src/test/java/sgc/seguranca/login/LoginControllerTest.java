@@ -15,6 +15,7 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.login.dto.AutenticarRequest;
+import sgc.seguranca.login.dto.AutorizarRequest;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.seguranca.login.dto.PerfilUnidadeDto;
 import tools.jackson.databind.ObjectMapper;
@@ -101,9 +102,12 @@ class LoginControllerTest {
         PerfilUnidadeDto pu = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
         when(loginFacade.autorizar("123")).thenReturn(List.of(pu));
 
+        AutorizarRequest req = AutorizarRequest.builder().tituloEleitoral("123").build();
+
         mockMvc.perform(post("/api/usuarios/autorizar")
                 .with(csrf())
-                .content("123"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].perfil").value("ADMIN"));
     }

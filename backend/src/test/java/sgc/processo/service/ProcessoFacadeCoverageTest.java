@@ -35,20 +35,34 @@ import static org.mockito.Mockito.*;
 @DisplayName("ProcessoFacadeCoverageTest")
 class ProcessoFacadeCoverageTest {
 
-    @Mock private ProcessoRepo processoRepo;
-    @Mock private UnidadeFacade unidadeService;
-    @Mock private SubprocessoFacade subprocessoFacade;
-    @Mock private ApplicationEventPublisher publicadorEventos;
-    @Mock private sgc.processo.mapper.ProcessoMapper processoMapper;
-    @Mock private ProcessoDetalheBuilder processoDetalheBuilder;
-    @Mock private sgc.subprocesso.mapper.SubprocessoMapper subprocessoMapper;
-    @Mock private UsuarioFacade usuarioService;
-    @Mock private ProcessoInicializador processoInicializador;
-    @Mock private AlertaFacade alertaService;
-    @Mock private ProcessoAcessoService processoAcessoService;
-    @Mock private ProcessoValidador processoValidador;
-    @Mock private ProcessoFinalizador processoFinalizador;
-    @Mock private ProcessoConsultaService processoConsultaService;
+    @Mock
+    private ProcessoRepo processoRepo;
+    @Mock
+    private UnidadeFacade unidadeService;
+    @Mock
+    private SubprocessoFacade subprocessoFacade;
+    @Mock
+    private ApplicationEventPublisher publicadorEventos;
+    @Mock
+    private sgc.processo.mapper.ProcessoMapper processoMapper;
+    @Mock
+    private ProcessoDetalheBuilder processoDetalheBuilder;
+    @Mock
+    private sgc.subprocesso.mapper.SubprocessoMapper subprocessoMapper;
+    @Mock
+    private UsuarioFacade usuarioService;
+    @Mock
+    private ProcessoInicializador processoInicializador;
+    @Mock
+    private AlertaFacade alertaService;
+    @Mock
+    private ProcessoAcessoService processoAcessoService;
+    @Mock
+    private ProcessoValidador processoValidador;
+    @Mock
+    private ProcessoFinalizador processoFinalizador;
+    @Mock
+    private ProcessoConsultaService processoConsultaService;
 
     @InjectMocks
     private ProcessoFacade facade;
@@ -149,5 +163,13 @@ class ProcessoFacadeCoverageTest {
         when(unidadeService.buscarEntidadePorId(codUnidade)).thenReturn(new Unidade());
 
         assertThrows(ErroProcesso.class, () -> facade.enviarLembrete(codProcesso, codUnidade));
+    }
+
+    @Test
+    @DisplayName("buscarIdsUnidadesEmProcessosAtivos - Cobertura linha 318")
+    void buscarIdsUnidadesEmProcessosAtivos_Cobertura() {
+        Long codProcessoIgnorar = 1L;
+        facade.buscarIdsUnidadesEmProcessosAtivos(codProcessoIgnorar);
+        verify(processoConsultaService).buscarIdsUnidadesEmProcessosAtivos(codProcessoIgnorar);
     }
 }

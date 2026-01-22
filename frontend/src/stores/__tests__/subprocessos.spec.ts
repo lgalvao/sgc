@@ -1,12 +1,12 @@
-import {createPinia, setActivePinia} from 'pinia';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {useSubprocessosStore} from '../subprocessos';
-import {useProcessosStore} from '../processos';
-import {usePerfilStore} from '../perfil';
-import {useUnidadesStore} from '../unidades';
-import {useMapasStore} from '../mapas';
-import {useAtividadesStore} from '../atividades';
-import {useFeedbackStore} from '../feedback';
+import { createPinia, setActivePinia } from 'pinia';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useSubprocessosStore } from '../subprocessos';
+import { useProcessosStore } from '../processos';
+import { usePerfilStore } from '../perfil';
+import { useUnidadesStore } from '../unidades';
+import { useMapasStore } from '../mapas';
+import { useAtividadesStore } from '../atividades';
+import { useFeedbackStore } from '../feedback';
 import {
     buscarContextoEdicao,
     buscarSubprocessoDetalhe,
@@ -122,6 +122,15 @@ describe('Subprocessos Store', () => {
     });
 
     describe('buscarSubprocessoDetalhe', () => {
+        it('deve limpar o estado anterior antes de buscar novo detalhe', async () => {
+            store.subprocessoDetalhe = { codigo: 1 } as any;
+            (buscarSubprocessoDetalhe as any).mockReturnValue(new Promise(() => { }));
+
+            store.buscarSubprocessoDetalhe(2);
+
+            expect(store.subprocessoDetalhe).toBeNull();
+        });
+
         it('deve falhar se não houver perfil selecionado', async () => {
             mockPerfilStore.perfilSelecionado = null;
 
@@ -189,6 +198,15 @@ describe('Subprocessos Store', () => {
     });
 
     describe('buscarContextoEdicao', () => {
+        it('deve limpar o estado anterior antes de buscar novo contexto', async () => {
+            store.subprocessoDetalhe = { codigo: 1 } as any;
+            (buscarContextoEdicao as any).mockReturnValue(new Promise(() => { }));
+
+            store.buscarContextoEdicao(2);
+
+            expect(store.subprocessoDetalhe).toBeNull();
+        });
+
         it('deve popular stores relacionados com dados retornados', async () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
             const mockData = {
@@ -219,10 +237,10 @@ describe('Subprocessos Store', () => {
         });
 
         it('deve lidar com erro do serviço', async () => {
-             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
-             (buscarContextoEdicao as any).mockRejectedValue(new Error("Fail"));
-             await expect(store.buscarContextoEdicao(1)).rejects.toThrow("Fail");
-             expect(store.lastError).toBeTruthy();
+            mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
+            (buscarContextoEdicao as any).mockRejectedValue(new Error("Fail"));
+            await expect(store.buscarContextoEdicao(1)).rejects.toThrow("Fail");
+            expect(store.lastError).toBeTruthy();
         });
     });
 
@@ -253,10 +271,10 @@ describe('Subprocessos Store', () => {
         });
 
         it('disponibilizarRevisaoCadastro deve lidar com erro', async () => {
-             (disponibilizarRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
-             const result = await store.disponibilizarRevisaoCadastro(1);
-             expect(result).toBe(false);
-             expect(store.lastError).toBeTruthy();
+            (disponibilizarRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
+            const result = await store.disponibilizarRevisaoCadastro(1);
+            expect(result).toBe(false);
+            expect(store.lastError).toBeTruthy();
         });
 
         // --- Devolver Cadastro ---
@@ -268,11 +286,11 @@ describe('Subprocessos Store', () => {
             expect(mockFeedbackStore.show).toHaveBeenCalledWith(expect.stringContaining("Cadastro"), expect.anything(), 'success');
         });
 
-         it('devolverCadastro deve lidar com erro', async () => {
-             (devolverCadastro as any).mockRejectedValue(new Error('Falha'));
-             const result = await store.devolverCadastro(1, { observacoes: 'Erro' });
-             expect(result).toBe(false);
-             expect(store.lastError).toBeTruthy();
+        it('devolverCadastro deve lidar com erro', async () => {
+            (devolverCadastro as any).mockRejectedValue(new Error('Falha'));
+            const result = await store.devolverCadastro(1, { observacoes: 'Erro' });
+            expect(result).toBe(false);
+            expect(store.lastError).toBeTruthy();
         });
 
         // --- Aceitar Cadastro ---
@@ -309,22 +327,22 @@ describe('Subprocessos Store', () => {
             expect(store.lastError).toBeTruthy();
         });
 
-         // --- Devolver Revisão ---
-         it('devolverRevisaoCadastro deve executar com sucesso', async () => {
+        // --- Devolver Revisão ---
+        it('devolverRevisaoCadastro deve executar com sucesso', async () => {
             (devolverRevisaoCadastro as any).mockResolvedValue({});
             const result = await store.devolverRevisaoCadastro(1, { observacoes: 'Erro' });
             expect(result).toBe(true);
             expect(devolverRevisaoCadastro).toHaveBeenCalledWith(1, { observacoes: 'Erro' });
         });
 
-         it('devolverRevisaoCadastro deve lidar com erro', async () => {
-             (devolverRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
-             const result = await store.devolverRevisaoCadastro(1, { observacoes: 'Erro' });
-             expect(result).toBe(false);
+        it('devolverRevisaoCadastro deve lidar com erro', async () => {
+            (devolverRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
+            const result = await store.devolverRevisaoCadastro(1, { observacoes: 'Erro' });
+            expect(result).toBe(false);
         });
 
-         // --- Aceitar Revisão ---
-         it('aceitarRevisaoCadastro deve executar com sucesso', async () => {
+        // --- Aceitar Revisão ---
+        it('aceitarRevisaoCadastro deve executar com sucesso', async () => {
             (aceitarRevisaoCadastro as any).mockResolvedValue({});
             const result = await store.aceitarRevisaoCadastro(1, { aprovado: true } as any);
             expect(result).toBe(true);
@@ -332,13 +350,13 @@ describe('Subprocessos Store', () => {
         });
 
         it('aceitarRevisaoCadastro deve lidar com erro', async () => {
-             (aceitarRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
-             const result = await store.aceitarRevisaoCadastro(1, { aprovado: true } as any);
-             expect(result).toBe(false);
+            (aceitarRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
+            const result = await store.aceitarRevisaoCadastro(1, { aprovado: true } as any);
+            expect(result).toBe(false);
         });
 
-         // --- Homologar Revisão ---
-         it('homologarRevisaoCadastro deve executar com sucesso e recarregar', async () => {
+        // --- Homologar Revisão ---
+        it('homologarRevisaoCadastro deve executar com sucesso e recarregar', async () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
             mockPerfilStore.unidadeAtual = null;
             (homologarRevisaoCadastro as any).mockResolvedValue({});
@@ -351,9 +369,9 @@ describe('Subprocessos Store', () => {
         });
 
         it('homologarRevisaoCadastro deve lidar com erro', async () => {
-             (homologarRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
-             const result = await store.homologarRevisaoCadastro(1, { aprovado: true } as any);
-             expect(result).toBe(false);
+            (homologarRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
+            const result = await store.homologarRevisaoCadastro(1, { aprovado: true } as any);
+            expect(result).toBe(false);
         });
     });
 
@@ -369,7 +387,7 @@ describe('Subprocessos Store', () => {
             await store.alterarDataLimiteSubprocesso(123, dados);
 
             expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/123/data-limite', {
-                 novaDataLimite: dados.novaData
+                novaDataLimite: dados.novaData
             });
             expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(123, 'ADMIN', null);
         });
@@ -378,7 +396,7 @@ describe('Subprocessos Store', () => {
             const { apiClient } = await import('@/axios-setup');
             (apiClient.post as any).mockRejectedValue(new Error("API Fail"));
 
-            await expect(store.alterarDataLimiteSubprocesso(123, {novaData: '2022'}))
+            await expect(store.alterarDataLimiteSubprocesso(123, { novaData: '2022' }))
                 .rejects.toThrow("API Fail");
             expect(store.lastError).toBeTruthy();
         });

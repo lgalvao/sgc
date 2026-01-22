@@ -138,8 +138,8 @@
     <EmptyState
         v-if="atividades.length === 0"
         icon="bi-list-check"
-        title="Nenhuma atividade cadastrada"
-        :description="`Comece adicionando uma atividade no campo acima${isChefe ? ' ou importe de outro processo' : ''}.`"
+        title="Lista de atividades"
+        :description="`Não há atividades cadastradas. Utilize o campo acima para adicionar uma nova atividade${isChefe ? ' ou importe de outro processo' : ''}.`"
         data-testid="cad-atividades-empty-state"
     >
       <BButton

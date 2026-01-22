@@ -86,7 +86,9 @@ class UnidadeFacadeTest {
         @DisplayName("Deve buscar unidade por código")
         void deveBuscarPorCodigo() {
             // Arrange
-            when(repo.buscar(Unidade.class, 1L)).thenReturn(new Unidade());
+            Unidade unidade = new Unidade();
+            unidade.setSituacao(SituacaoUnidade.ATIVA);
+            when(repo.buscar(Unidade.class, 1L)).thenReturn(unidade);
             when(usuarioMapper.toUnidadeDto(any(), eq(false))).thenReturn(UnidadeDto.builder().build());
 
             // Act & Assert
