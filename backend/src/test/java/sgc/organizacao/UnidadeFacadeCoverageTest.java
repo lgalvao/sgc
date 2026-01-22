@@ -283,7 +283,7 @@ class UnidadeFacadeCoverageTest {
         });
 
         // Testar com requerMapaVigente=true e Bloqueios
-        List<UnidadeDto> arvore = unidadeFacade.buscarArvoreComElegibilidade(true, Set.of(3L));
+        unidadeFacade.buscarArvoreComElegibilidade(true, Set.of(3L));
 
         // Todos devem ter isElegivel=false (que é passado para o mapper)
         // O mapper mockado aqui deve ser chamado com isElegivel=false
