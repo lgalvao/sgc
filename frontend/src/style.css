@@ -11,6 +11,13 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+
+    /* Design Tokens - Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 3rem;
 }
 
 /* Garantir que tabelas clicáveis sempre mostrem o cursor de ponteiro */
@@ -21,6 +28,16 @@
 .table-hover tbody tr td {
     cursor: pointer;
     user-select: none;
+}
+
+/* Utility Classes */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.content-wrapper {
+    position: relative;
+    width: 100%;
 }
 
 @media (prefers-color-scheme: light) {

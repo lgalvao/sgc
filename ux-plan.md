@@ -298,14 +298,14 @@ feedbackStore.adicionarMensagem('Erro ao salvar', 'danger')
 
 #### Tasks:
 
-1. **Update `style.css` with Design Tokens**
+1. **Update `style.css` with Design Tokens** ✅
    - Add CSS variables for consistent spacing
    - Define semantic color overrides (if needed)
    - Add utility class helpers
    - **Files:** `frontend/src/style.css`
    - **Lines:** +30 lines
 
-2. **Create `PageHeader` Component**
+2. **Create `PageHeader` Component** ✅
    - **Location:** `frontend/src/components/layout/PageHeader.vue`
    - **Props:**
      - `title` (required, string)
@@ -996,7 +996,7 @@ test.describe('Page Header Consistency', () => {
 ### Views (18 files)
 
 **PainelView.vue** [PRIORITY: HIGH]
-- [ ] Replace header with PageHeader component
+- [x] Replace header with PageHeader component
 - [ ] No inline modals (✓ already clean)
 - [ ] Check button spacing (✓ uses gap-2)
 - [ ] Verify accessibility
