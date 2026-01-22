@@ -1,5 +1,5 @@
-import {defineStore} from "pinia";
-import {ref} from "vue";
+import { defineStore } from "pinia";
+import { ref } from "vue";
 import {
     aceitarCadastro,
     aceitarRevisaoCadastro,
@@ -10,27 +10,27 @@ import {
     homologarCadastro,
     homologarRevisaoCadastro,
 } from "@/services/cadastroService";
-import {apiClient} from "@/axios-setup";
+import { apiClient } from "@/axios-setup";
 import {
     buscarContextoEdicao as serviceBuscarContextoEdicao,
     buscarSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
 } from "@/services/subprocessoService";
-import {usePerfilStore} from "@/stores/perfil";
-import {useProcessosStore} from "@/stores/processos";
-import {useFeedbackStore} from "@/stores/feedback";
-import {useUnidadesStore} from "@/stores/unidades";
-import {useMapasStore} from "@/stores/mapas";
-import {useAtividadesStore} from "@/stores/atividades";
-import {mapMapaCompletoDtoToModel} from "@/mappers/mapas";
-import {mapAtividadeVisualizacaoToModel} from "@/mappers/atividades";
+import { usePerfilStore } from "@/stores/perfil";
+import { useProcessosStore } from "@/stores/processos";
+import { useFeedbackStore } from "@/stores/feedback";
+import { useUnidadesStore } from "@/stores/unidades";
+import { useMapasStore } from "@/stores/mapas";
+import { useAtividadesStore } from "@/stores/atividades";
+import { mapMapaCompletoDtoToModel } from "@/mappers/mapas";
+import { mapAtividadeVisualizacaoToModel } from "@/mappers/atividades";
 import type {
     AceitarCadastroRequest,
     DevolverCadastroRequest,
     HomologarCadastroRequest,
     SubprocessoDetalhe,
 } from "@/types/tipos";
-import {type NormalizedError, normalizeError} from "@/utils/apiError";
+import { type NormalizedError, normalizeError } from "@/utils/apiError";
 
 export const useSubprocessosStore = defineStore("subprocessos", () => {
     const subprocessoDetalhe = ref<SubprocessoDetalhe | null>(null);
@@ -72,8 +72,8 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
     ) {
         lastError.value = null;
         try {
-            await apiClient.post(`/subprocessos/${id}/data-limite`, { 
-                novaDataLimite: dados.novaData 
+            await apiClient.post(`/subprocessos/${id}/data-limite`, {
+                novaDataLimite: dados.novaData
             });
             // Recarregar os detalhes para refletir a nova data
             await buscarSubprocessoDetalhe(id);
@@ -85,6 +85,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
 
     async function buscarSubprocessoDetalhe(id: number) {
         lastError.value = null;
+        subprocessoDetalhe.value = null; // Limpa estado anterior
         const perfilStore = usePerfilStore();
         const perfil = perfilStore.perfilSelecionado;
         const codUnidade = perfilStore.unidadeAtual;
@@ -128,6 +129,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
 
     async function buscarContextoEdicao(id: number) {
         lastError.value = null;
+        subprocessoDetalhe.value = null; // Limpa estado anterior
         const perfilStore = usePerfilStore();
         const perfil = perfilStore.perfilSelecionado;
         const codUnidade = perfilStore.unidadeAtual;

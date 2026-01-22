@@ -1,6 +1,6 @@
-import {defineStore} from "pinia";
-import {computed, ref} from "vue";
-import type {Page} from "@/services/painelService";
+import { defineStore } from "pinia";
+import { computed, ref } from "vue";
+import type { Page } from "@/services/painelService";
 import type {
     AtualizarProcessoRequest,
     CriarProcessoRequest,
@@ -9,8 +9,8 @@ import type {
     SubprocessoElegivel,
     TipoProcesso,
 } from "@/types/tipos";
-import {SituacaoSubprocesso} from "@/types/tipos";
-import {type NormalizedError, normalizeError} from "@/utils/apiError";
+import { SituacaoSubprocesso } from "@/types/tipos";
+import { type NormalizedError, normalizeError } from "@/utils/apiError";
 import * as painelService from "../services/painelService";
 import * as processoService from "../services/processoService";
 import * as subprocessoService from "../services/subprocessoService";
@@ -65,6 +65,7 @@ export const useProcessosStore = defineStore("processos", () => {
 
     async function buscarContextoCompleto(idProcesso: number) {
         lastError.value = null;
+        processoDetalhe.value = null; // Limpa estado anterior
         try {
             const data = await processoService.buscarContextoCompleto(idProcesso);
             processoDetalhe.value = data.processo;
@@ -87,6 +88,7 @@ export const useProcessosStore = defineStore("processos", () => {
 
     async function buscarProcessoDetalhe(idProcesso: number) {
         lastError.value = null;
+        processoDetalhe.value = null; // Limpa estado anterior
         try {
             processoDetalhe.value = await processoService.obterDetalhesProcesso(idProcesso);
         } catch (error) {

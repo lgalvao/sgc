@@ -1,6 +1,6 @@
-import {config} from "@vue/test-utils";
-import {createBootstrap} from "bootstrap-vue-next";
-import {vi, expect} from "vitest";
+import { config } from "@vue/test-utils";
+import { createBootstrap } from "bootstrap-vue-next";
+import { vi, expect } from "vitest";
 import * as matchers from "vitest-axe/matchers";
 import "vitest-axe/extend-expect";
 

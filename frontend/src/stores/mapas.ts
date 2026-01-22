@@ -1,8 +1,8 @@
-import {defineStore} from "pinia";
-import {ref} from "vue";
+import { defineStore } from "pinia";
+import { ref } from "vue";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
-import {useFeedbackStore} from "@/stores/feedback";
+import { useFeedbackStore } from "@/stores/feedback";
 import type {
     Competencia,
     DisponibilizarMapaRequest,
@@ -13,7 +13,7 @@ import type {
     SalvarAjustesRequest,
     SalvarMapaRequest,
 } from "@/types/tipos";
-import {type NormalizedError, normalizeError} from "@/utils/apiError";
+import { type NormalizedError, normalizeError } from "@/utils/apiError";
 
 
 export const useMapasStore = defineStore("mapas", () => {
@@ -30,6 +30,7 @@ export const useMapasStore = defineStore("mapas", () => {
 
     async function buscarMapaVisualizacao(codSubrocesso: number) {
         lastError.value = null;
+        mapaVisualizacao.value = null; // Limpa estado anterior
         try {
             mapaVisualizacao.value =
                 await mapaService.obterMapaVisualizacao(codSubrocesso);
@@ -42,6 +43,7 @@ export const useMapasStore = defineStore("mapas", () => {
 
     async function buscarMapaCompleto(codSubrocesso: number) {
         lastError.value = null;
+        mapaCompleto.value = null; // Limpa estado anterior
         try {
             mapaCompleto.value = await mapaService.obterMapaCompleto(codSubrocesso);
         } catch (error) {

@@ -1,9 +1,9 @@
-import {describe, expect, it, vi} from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
-import {setupStoreTest} from "@/test-utils/storeTestHelpers";
-import type {ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao} from "@/types/tipos";
-import {useMapasStore} from "../mapas";
+import { setupStoreTest } from "@/test-utils/storeTestHelpers";
+import type { ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao } from "@/types/tipos";
+import { useMapasStore } from "../mapas";
 
 vi.mock("@/services/mapaService", () => ({
     obterMapaCompleto: vi.fn(),
@@ -32,6 +32,15 @@ describe("useMapasStore", () => {
     });
 
     describe("buscarMapaCompleto", () => {
+        it("deve limpar o estado anterior antes de buscar novo mapa completo", async () => {
+            context.store.mapaCompleto = { codigo: 1 } as any;
+            vi.mocked(mapaService.obterMapaCompleto).mockReturnValue(new Promise(() => { }));
+
+            context.store.buscarMapaCompleto(2);
+
+            expect(context.store.mapaCompleto).toBeNull();
+        });
+
         it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
             const mockMapa: MapaCompleto = {
                 codigo: 1,
@@ -314,7 +323,7 @@ describe("useMapasStore", () => {
             await expect(context.store.removerCompetencia(codSubrocesso, 0))
                 .rejects.toThrow("Código da competência inválido");
 
-             expect(subprocessoService.removerCompetencia).not.toHaveBeenCalled();
+            expect(subprocessoService.removerCompetencia).not.toHaveBeenCalled();
         });
 
         it("deve lançar erro em caso de falha", async () => {
@@ -326,6 +335,15 @@ describe("useMapasStore", () => {
     });
 
     describe("buscarMapaVisualizacao", () => {
+        it("deve limpar o estado anterior antes de buscar novo mapa visualização", async () => {
+            context.store.mapaVisualizacao = { codigo: 1 } as any;
+            vi.mocked(mapaService.obterMapaVisualizacao).mockReturnValue(new Promise(() => { }));
+
+            context.store.buscarMapaVisualizacao(2);
+
+            expect(context.store.mapaVisualizacao).toBeNull();
+        });
+
         it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
             const mockMapa: MapaVisualizacao = {
                 codigo: 1,
