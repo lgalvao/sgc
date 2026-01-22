@@ -197,6 +197,7 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
 import EmptyState from "@/components/EmptyState.vue";
 import {usePerfil} from "@/composables/usePerfil";
+import {useAtividadeForm} from "@/composables/useAtividadeForm";
 import {useAnalisesStore} from "@/stores/analises";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
@@ -209,7 +210,6 @@ import {storeToRefs} from "pinia";
 import {
   type Atividade,
   type Conhecimento,
-  type CriarAtividadeRequest,
   type CriarConhecimentoRequest,
   type ErroValidacao,
   Perfil,
@@ -265,9 +265,9 @@ const historicoAnalises = computed(() => {
   return analisesStore.obterAnalisesPorSubprocesso(codSubprocesso.value);
 });
 
-const novaAtividade = ref("");
+const { novaAtividade, loadingAdicionar, adicionarAtividade: adicionarAtividadeAction } = useAtividadeForm();
+
 const inputNovaAtividadeRef = ref<InstanceType<typeof BFormInput> | null>(null);
-const loadingAdicionar = ref(false);
 const loadingValidacao = ref(false);
 
 // Modais
@@ -283,25 +283,14 @@ const erroGlobal = ref<string | null>(null);
 const podeVerImpacto = computed(() => !!permissoes.value?.podeVisualizarImpacto);
 
 
-// CRUD Atividades (mantido local por enquanto)
+// CRUD Atividades
 async function adicionarAtividade() {
-  if (novaAtividade.value?.trim() && codMapa.value && codSubprocesso.value) {
-    loadingAdicionar.value = true;
-    try {
-      const request: CriarAtividadeRequest = {
-        descricao: novaAtividade.value.trim(),
-      };
-      await atividadesStore.adicionarAtividade(
-          codSubprocesso.value,
-          codMapa.value,
-          request,
-      );
-      novaAtividade.value = "";
+  if (codMapa.value && codSubprocesso.value) {
+    const sucesso = await adicionarAtividadeAction(codSubprocesso.value, codMapa.value);
+    if (sucesso) {
       // UX Improvement: Refocus input to allow rapid entry of multiple activities
       await nextTick();
       inputNovaAtividadeRef.value?.$el?.focus();
-    } finally {
-      loadingAdicionar.value = false;
     }
   }
 }
