@@ -1,33 +1,28 @@
 <template>
   <BContainer class="mt-4">
-    <div class="d-flex align-items-center mb-3">
-      <BButton
-          aria-label="Voltar"
-          class="p-0 me-3 text-decoration-none"
-          data-testid="btn-cad-atividades-voltar"
-          title="Voltar"
-          variant="link"
-          @click="router.back()"
-      >
-        <i aria-hidden="true" class="bi bi-arrow-left fs-4"/>
-      </BButton>
-      <div class="fs-5 d-flex align-items-center gap-2">
-        <span>{{ sigla }} - {{ nomeUnidade }}</span>
-        <span
-            v-if="subprocesso"
-            :class="badgeClass(subprocesso.situacao)"
-            class="badge fs-6"
-            data-testid="cad-atividades__txt-badge-situacao"
-        >{{ subprocesso.situacaoLabel || situacaoLabel(subprocesso.situacao) }}</span>
-      </div>
-    </div>
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h1 class="mb-0 display-6">
-        Atividades e conhecimentos
-      </h1>
-
-      <div class="d-flex gap-2">
+    <PageHeader title="Atividades e conhecimentos">
+      <template #subtitle>
+        <div class="d-flex align-items-center gap-2">
+          <BButton
+              aria-label="Voltar"
+              class="p-0 me-2 text-decoration-none text-muted"
+              data-testid="btn-cad-atividades-voltar"
+              title="Voltar"
+              variant="link"
+              @click="router.back()"
+          >
+            <i aria-hidden="true" class="bi bi-arrow-left"/>
+          </BButton>
+          <span>{{ sigla }} - {{ nomeUnidade }}</span>
+          <span
+              v-if="subprocesso"
+              :class="badgeClass(subprocesso.situacao)"
+              class="badge fs-6"
+              data-testid="cad-atividades__txt-badge-situacao"
+          >{{ subprocesso.situacaoLabel || situacaoLabel(subprocesso.situacao) }}</span>
+        </div>
+      </template>
+      <template #actions>
         <BDropdown
             v-if="codSubprocesso && (podeVerImpacto || isChefe)"
             data-testid="btn-mais-acoes"
@@ -58,28 +53,18 @@
           </BDropdownItem>
         </BDropdown>
 
-        <BButton
+        <LoadingButton
             v-if="!!permissoes?.podeDisponibilizarCadastro"
-            :disabled="loadingValidacao"
+            :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
-            title="Disponibilizar"
             variant="success"
+            icon="check-lg"
+            text="Disponibilizar"
+            loading-text="Validando..."
             @click="disponibilizarCadastro"
-        >
-          <span
-              v-if="loadingValidacao"
-              aria-hidden="true"
-              class="spinner-border spinner-border-sm me-1"
-              role="status"
-          />
-          <i
-              v-else
-              class="bi bi-check-lg me-1"
-          />
-          {{ loadingValidacao ? 'Validando...' : 'Disponibilizar' }}
-        </BButton>
-      </div>
-    </div>
+        />
+      </template>
+    </PageHeader>
 
     <BAlert
         v-if="erroGlobal"
@@ -110,27 +95,16 @@
         />
       </BCol>
       <BCol cols="auto">
-        <BButton
+        <LoadingButton
             aria-label="Adicionar atividade"
-            :disabled="!codSubprocesso || !permissoes?.podeEditarMapa || loadingAdicionar || !novaAtividade.trim()"
+            :disabled="!codSubprocesso || !permissoes?.podeEditarMapa || !novaAtividade.trim()"
+            :loading="loadingAdicionar"
             data-testid="btn-adicionar-atividade"
             size="sm"
-            title="Adicionar atividade"
             type="submit"
             variant="outline-primary"
-        >
-          <span
-              v-if="loadingAdicionar"
-              class="spinner-border spinner-border-sm"
-              role="status"
-              aria-hidden="true"
-          />
-          <i
-              v-else
-              aria-hidden="true"
-              class="bi bi-plus-lg"
-          />
-        </BButton>
+            icon="plus-lg"
+        />
       </BCol>
     </BForm>
 
@@ -219,6 +193,8 @@ import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
 import ConfirmacaoDisponibilizacaoModal from "@/components/ConfirmacaoDisponibilizacaoModal.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
+import PageHeader from "@/components/layout/PageHeader.vue";
+import LoadingButton from "@/components/ui/LoadingButton.vue";
 import EmptyState from "@/components/EmptyState.vue";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAnalisesStore} from "@/stores/analises";

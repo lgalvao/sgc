@@ -62,26 +62,22 @@
       >
         Cancelar
       </BButton>
-      <BButton
-          :disabled="!dataLimiteValidacao || loading"
+      <LoadingButton
+          :loading="loading"
+          :disabled="!dataLimiteValidacao"
           data-testid="btn-disponibilizar-mapa-confirmar"
           variant="success"
+          text="Disponibilizar"
+          loading-text="Disponibilizando..."
           @click="disponibilizar"
-      >
-        <span
-            v-if="loading"
-            aria-hidden="true"
-            class="spinner-border spinner-border-sm me-1"
-            role="status"
-        />
-        {{ loading ? 'Disponibilizando...' : 'Disponibilizar' }}
-      </BButton>
+      />
     </template>
   </BModal>
 </template>
 
 <script lang="ts" setup>
 import {BAlert, BButton, BFormInput, BFormInvalidFeedback, BFormTextarea, BModal} from "bootstrap-vue-next";
+import LoadingButton from "@/components/ui/LoadingButton.vue";
 import {ref, watch} from "vue";
 
 const props = defineProps<{

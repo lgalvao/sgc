@@ -1,13 +1,6 @@
 <template>
   <BContainer class="mt-4">
-    <BRow class="mb-4">
-      <BCol>
-        <h2 class="display-6">Histórico de Processos</h2>
-        <p class="text-muted">
-          Lista de processos finalizados.
-        </p>
-      </BCol>
-    </BRow>
+    <PageHeader title="Histórico de Processos" subtitle="Lista de processos finalizados." />
 
     <BCard no-body class="shadow-sm">
       <div class="table-responsive">
@@ -64,7 +57,8 @@
 <script setup lang="ts">
 import {onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
-import {BButton, BCard, BCol, BContainer, BRow} from 'bootstrap-vue-next';
+import {BButton, BCard, BContainer} from 'bootstrap-vue-next';
+import PageHeader from '@/components/layout/PageHeader.vue';
 import {apiClient} from '@/axios-setup';
 import {logger} from '@/utils';
 

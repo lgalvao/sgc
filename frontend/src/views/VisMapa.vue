@@ -1,10 +1,7 @@
 <template>
   <BContainer class="mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div class="display-6">
-        Mapa de competências técnicas
-      </div>
-      <div class="d-flex gap-2">
+    <PageHeader title="Mapa de competências técnicas">
+      <template #actions>
         <BButton
             v-if="podeValidar"
             data-testid="btn-mapa-sugestoes"
@@ -71,8 +68,8 @@
         >
           {{ perfilSelecionado === 'ADMIN' ? 'Homologar' : 'Registrar aceite' }}
         </BButton>
-      </div>
-    </div>
+      </template>
+    </PageHeader>
 
     <div v-if="unidade">
       <div class="mb-5 d-flex align-items-center">
@@ -142,6 +139,7 @@
     </div>
 
     <AceitarMapaModal
+        :loading="isLoading"
         :mostrar-modal="mostrarModalAceitar"
         :perfil="perfilSelecionado || undefined"
         @fechar-modal="fecharModalAceitar"
@@ -150,6 +148,7 @@
 
     <ModalConfirmacao
         v-model="mostrarModalSugestoes"
+        :loading="isLoading"
         ok-title="Confirmar"
         titulo="Apresentar Sugestões"
         test-id-confirmar="btn-sugestoes-mapa-confirmar"
@@ -204,6 +203,7 @@
 
     <ModalConfirmacao
         v-model="mostrarModalValidar"
+        :loading="isLoading"
         ok-title="Validar"
         test-id-confirmar="btn-validar-mapa-confirmar"
         test-id-cancelar="btn-validar-mapa-cancelar"
@@ -216,6 +216,7 @@
 
     <ModalConfirmacao
         v-model="mostrarModalDevolucao"
+        :loading="isLoading"
         ok-title="Confirmar"
         test-id-confirmar="btn-devolucao-mapa-confirmar"
         test-id-cancelar="btn-devolucao-mapa-cancelar"
@@ -289,6 +290,7 @@
 import {BButton, BCard, BCardBody, BContainer, BFormTextarea, BModal,} from "bootstrap-vue-next";
 import EmptyState from "@/components/EmptyState.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
+import PageHeader from "@/components/layout/PageHeader.vue";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -327,6 +329,7 @@ const mostrarModalHistorico = ref(false);
 const sugestoes = ref("");
 const sugestoesVisualizacao = ref("");
 const observacaoDevolucao = ref("");
+const isLoading = ref(false);
 
 const unidade = computed<Unidade | null>(() => unidadesStore.unidade);
 
@@ -456,6 +459,7 @@ function verHistorico() {
 
 async function confirmarSugestoes() {
   if (!codSubprocesso.value) return;
+  isLoading.value = true;
   try {
     await processosStore.apresentarSugestoes(codSubprocesso.value, {
       sugestoes: sugestoes.value,
@@ -476,11 +480,14 @@ async function confirmarSugestoes() {
         "Ocorreu um erro. Tente novamente.",
         "danger"
     );
+  } finally {
+    isLoading.value = false;
   }
 }
 
 async function confirmarValidacao() {
   if (!codSubprocesso.value) return;
+  isLoading.value = true;
   try {
     await processosStore.validarMapa(codSubprocesso.value);
 
@@ -499,44 +506,62 @@ async function confirmarValidacao() {
         "Ocorreu um erro. Tente novamente.",
         "danger"
     );
+  } finally {
+    isLoading.value = false;
   }
 }
 
 async function confirmarAceitacao(observacoes?: string) {
   if (!codSubprocesso.value) return;
 
+  isLoading.value = true;
   const perfil = perfilSelecionado.value;
   const isHomologacao = perfil === "ADMIN";
   const tipoProcesso = processo.value?.tipo;
 
-  if (isHomologacao) {
-    if (tipoProcesso === TipoProcesso.REVISAO) {
-      await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, {
+  try {
+    if (isHomologacao) {
+      if (tipoProcesso === TipoProcesso.REVISAO) {
+        await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, {
+          observacoes: observacoes || "",
+        });
+      } else {
+        await processosStore.homologarValidacao(codSubprocesso.value);
+      }
+    } else {
+      // GESTOR: aceitar validação para MAPEAMENTO ou REVISAO
+      await processosStore.aceitarValidacao(codSubprocesso.value, {
         observacoes: observacoes || "",
       });
-    } else {
-      await processosStore.homologarValidacao(codSubprocesso.value);
     }
-  } else {
-    // GESTOR: aceitar validação para MAPEAMENTO ou REVISAO
-    await processosStore.aceitarValidacao(codSubprocesso.value, {
-      observacoes: observacoes || "",
-    });
-  }
 
-  fecharModalAceitar();
-  // CDU-20 step 9.9: redireciona para Painel
-  await router.push({name: "Painel"});
+    fecharModalAceitar();
+    // CDU-20 step 9.9: redireciona para Painel
+    await router.push({name: "Painel"});
+  } catch (error) {
+    console.error(error);
+    feedbackStore.show("Erro", "Erro ao realizar a operação.", "danger");
+  } finally {
+    isLoading.value = false;
+  }
 }
 
 async function confirmarDevolucao() {
   if (!codSubprocesso.value) return;
 
-  await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, {
-    observacoes: observacaoDevolucao.value,
-  });
+  isLoading.value = true;
+  try {
+    await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, {
+      observacoes: observacaoDevolucao.value,
+    });
 
-  fecharModalDevolucao();
-  await router.push({name: "Painel"});
+    fecharModalDevolucao();
+    await router.push({name: "Painel"});
+  } catch (error) {
+    console.error(error);
+    feedbackStore.show("Erro", "Erro ao devolver.", "danger");
+  } finally {
+    isLoading.value = false;
+  }
 }
 </script>

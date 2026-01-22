@@ -11,7 +11,7 @@ export async function navegarParaAtividades(page: Page) {
     await page.getByTestId(testId).click();
     await page.waitForURL(/\/cadastro$/);
 
-    await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos', level: 1})).toBeVisible();
+    await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos', level: 2})).toBeVisible();
     await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
 }
 

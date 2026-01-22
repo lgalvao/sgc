@@ -14,25 +14,32 @@
     </BAlert>
 
     <div v-if="processo">
-      <div>
-        <BBadge
-            class="mb-2"
-            style="border-radius: 0"
-            variant="secondary"
-        >
-          Detalhes do processo
-        </BBadge>
-        <h2
-            class="display-6"
-            data-testid="processo-info"
-        >
-          {{ processo.descricao }}
-        </h2>
-        <div class="mb-4 mt-3">
-          <strong>Tipo:</strong> {{ formatarTipoProcesso(processo.tipo) }}<br>
-          <strong>Situação:</strong> {{ formatarSituacaoProcesso(processo.situacao) }}<br>
-        </div>
-      </div>
+      <PageHeader :title="processo.descricao">
+        <template #default>
+          <BBadge
+              class="mb-2"
+              style="border-radius: 0"
+              variant="secondary"
+          >
+            Detalhes do processo
+          </BBadge>
+          <div class="mb-4 mt-1">
+            <strong>Tipo:</strong> {{ formatarTipoProcesso(processo.tipo) }}<br>
+            <strong>Situação:</strong> {{ formatarSituacaoProcesso(processo.situacao) }}<br>
+          </div>
+        </template>
+        <template #actions>
+          <BButton v-if="mostrarBotoesBloco && podeAceitarBloco" variant="success" @click="abrirModalBloco('aceitar')">
+            Aceitar em Bloco
+          </BButton>
+          <BButton v-if="mostrarBotoesBloco && podeHomologarBloco" variant="warning" class="text-white" @click="abrirModalBloco('homologar')">
+            Homologar em Bloco
+          </BButton>
+          <BButton v-if="mostrarBotoesBloco && podeDisponibilizarBloco" variant="info" class="text-white" @click="abrirModalBloco('disponibilizar')">
+            Disponibilizar Mapas em Bloco
+          </BButton>
+        </template>
+      </PageHeader>
 
       <TreeTable
           :columns="colunasTabela"
@@ -40,19 +47,6 @@
           title="Unidades participantes"
           @row-click="abrirDetalhesUnidade"
       />
-
-      <!-- Botões de Ação em Bloco -->
-      <div v-if="mostrarBotoesBloco" class="mt-3 d-flex gap-2 justify-content-end">
-          <button v-if="podeAceitarBloco" class="btn btn-success" @click="abrirModalBloco('aceitar')">
-             Aceitar em Bloco
-          </button>
-          <button v-if="podeHomologarBloco" class="btn btn-warning text-white" @click="abrirModalBloco('homologar')">
-             Homologar em Bloco
-          </button>
-          <button v-if="podeDisponibilizarBloco" class="btn btn-info text-white" @click="abrirModalBloco('disponibilizar')">
-             Disponibilizar Mapas em Bloco
-          </button>
-      </div>
 
       <ProcessoAcoes
           :mostrar-botoes-bloco="false"
@@ -102,12 +96,13 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BBadge, BContainer, BSpinner} from "bootstrap-vue-next";
+import {BAlert, BBadge, BButton, BContainer, BSpinner} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ModalAcaoBloco, {type UnidadeSelecao} from "@/components/ModalAcaoBloco.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
+import PageHeader from "@/components/layout/PageHeader.vue";
 import ProcessoAcoes from "@/components/ProcessoAcoes.vue";
 import TreeTable from "@/components/TreeTableView.vue";
 

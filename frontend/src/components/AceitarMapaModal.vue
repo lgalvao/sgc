@@ -59,9 +59,12 @@ import {computed, ref} from "vue";
 interface Props {
     mostrarModal: boolean;
     perfil?: string;
+    loading?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    loading: false
+});
 
 defineEmits<{
     fecharModal: [];
