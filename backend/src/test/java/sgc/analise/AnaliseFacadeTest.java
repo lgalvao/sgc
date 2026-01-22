@@ -82,6 +82,25 @@ class AnaliseFacadeTest {
                     .isEqualTo(TipoAnalise.VALIDACAO);
             verify(analiseRepo).findBySubprocessoCodigoOrderByDataHoraDesc(1L);
         }
+
+        @Test
+        @DisplayName("Deve filtrar análises de outro tipo")
+        void deveFiltrarAnalisesDeOutroTipo() {
+            Analise analiseCadastro = new Analise();
+            analiseCadastro.setTipo(TipoAnalise.CADASTRO);
+            Analise analiseValidacao = new Analise();
+            analiseValidacao.setTipo(TipoAnalise.VALIDACAO);
+
+            when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L))
+                    .thenReturn(List.of(analiseCadastro, analiseValidacao));
+
+            List<Analise> resultado = service.listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
+
+            assertThat(resultado)
+                    .hasSize(1)
+                    .extracting(Analise::getTipo)
+                    .containsExactly(TipoAnalise.CADASTRO);
+        }
     }
 
     @Nested

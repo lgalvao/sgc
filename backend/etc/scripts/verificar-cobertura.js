@@ -11,6 +11,7 @@ const help = args.includes('--help') || args.includes('-h');
 const filterArg = args.find(a => !a.startsWith('-')) || null;
 const minCovArg = args.find(a => a.startsWith('--min='))?.split('=')[1] || '95';
 const showMissed = args.includes('--missed') || args.includes('--details');
+const simpleMode = args.includes('--simple');
 
 if (help) {
     console.log(`
@@ -22,6 +23,7 @@ Argumentos:
 Opções:
   --min=<n>      Filtrar classes com cobertura de linha menor que <n>% (Padrão: 95)
   --missed       Exibir detalhes das linhas e branches não cobertos (Ranking de perdidos)
+  --simple       Saída simplificada (apenas classe e linhas/branches perdidas)
   --help, -h     Exibir esta ajuda
 `);
     process.exit(0);
@@ -165,10 +167,14 @@ async function main() {
         console.log(`\nTOP ARQUIVOS COM LINHAS/BRANCHES PERDIDAS (Total: ${allMissed.length})\n`);
 
         allMissed.slice(0, 50).forEach(r => {
-            console.log(`📄 ${r.file}`);
-            if (r.missed.length) console.log(`   🔴 Linhas não executadas: ${r.missed.join(', ')}`);
-            if (r.partial.length) console.log(`   🟡 Branches perdidos (miss/total): ${r.partial.join(', ')}`);
-            console.log("-".repeat(50));
+            if (simpleMode) {
+                console.log(`${r.file}: MISS-L [${r.missed.join(',')}] MISS-B [${r.partial.join(',')}]`);
+            } else {
+                console.log(`📄 ${r.file}`);
+                if (r.missed.length) console.log(`   🔴 Linhas não executadas: ${r.missed.join(', ')}`);
+                if (r.partial.length) console.log(`   🟡 Branches perdidos (miss/total): ${r.partial.join(', ')}`);
+                console.log("-".repeat(50));
+            }
         });
 
     } else {
