@@ -3,7 +3,7 @@ const path = require('path');
 const xml2js = require('xml2js');
 
 // Configuração
-const REPORT_PATH = path.join(__dirname, '../../backend/build/reports/jacoco/test/jacocoTestReport.xml');
+const REPORT_PATH = path.join(__dirname, '../../build/reports/jacoco/test/jacocoTestReport.xml');
 
 // Args parsing
 const args = process.argv.slice(2);
@@ -69,16 +69,16 @@ function processPackage(pkg, filter) {
             const cMetrics = getCounters(cls);
             if (cMetrics.LINE) {
                 const l = cMetrics.LINE;
-                
+
                 // Extrair linhas perdidas se necessário
                 let missedLines = [];
                 let partialBranches = [];
-                
+
                 // Para extrair linhas, precisamos olhar o sourcefile correspondente
                 // Mas a estrutura do XML agrupa sourcefiles dentro do package, não dentro da class diretamente no formato JaCoCo padrão hierárquico
                 // O elemento 'class' tem 'sourcefilename'. Precisamos achar o 'sourcefile' no pacote com esse nome.
             }
-            
+
             classes.push({
                 name: clsName,
                 metrics: cMetrics,
@@ -102,7 +102,7 @@ function processSourceFiles(pkg, filter) {
         pkg.sourcefile.forEach(sf => {
             const fileName = sf.$.name;
             const fullPath = `${pkgName}.${fileName}`;
-            
+
             if (filter && !fullPath.includes(filter)) return;
 
             const missedLines = [];
@@ -159,11 +159,11 @@ async function main() {
                 allMissed = allMissed.concat(processSourceFiles(pkg, filterArg));
             });
         }
-        
+
         allMissed.sort((a, b) => b.weight - a.weight);
 
         console.log(`\nTOP ARQUIVOS COM LINHAS/BRANCHES PERDIDAS (Total: ${allMissed.length})\n`);
-        
+
         allMissed.slice(0, 50).forEach(r => {
             console.log(`📄 ${r.file}`);
             if (r.missed.length) console.log(`   🔴 Linhas não executadas: ${r.missed.join(', ')}`);
@@ -174,14 +174,14 @@ async function main() {
     } else {
         // Modo Tabela (substitui check_coverage.py)
         const globalCounters = getCounters(root);
-        
+
         if (globalCounters.INSTRUCTION) {
             const inst = globalCounters.INSTRUCTION;
             const line = globalCounters.LINE || { covered: 0, missed: 0 };
             const pInst = calculatePercentage(inst.covered, inst.missed);
             const pLine = calculatePercentage(line.covered, line.missed);
             const totalInst = inst.covered + inst.missed;
-            
+
             console.log(`| ${'TOTAL DO PROJETO'.padEnd(45)} | ${pInst.toFixed(2).padStart(8)}% | ${pLine.toFixed(2).padStart(8)}% | ${inst.covered.toString().padStart(10)} | ${totalInst.toString().padStart(10)} |`);
         }
         console.log("=".repeat(100) + "\n");
