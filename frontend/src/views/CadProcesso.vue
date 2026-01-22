@@ -138,73 +138,39 @@
     </BForm>
 
     <!-- Modal de confirmação CDU-05 -->
-    <BModal
+    <ModalConfirmacao
         v-model="mostrarModalConfirmacao"
-        :fade="false"
-        centered
-        hide-footer
-        title="Iniciar processo"
+        :auto-close="false"
+        :loading="isLoading"
+        cancel-title="Cancelar"
+        ok-title="Confirmar"
+        test-id-cancelar="btn-iniciar-processo-cancelar"
+        test-id-confirmar="btn-iniciar-processo-confirmar"
+        titulo="Iniciar processo"
+        @confirmar="confirmarIniciarProcesso"
     >
-      <template #default>
-        <p><strong>Descrição:</strong> {{ descricao }}</p>
-        <p><strong>Tipo:</strong> {{ tipo }}</p>
-        <p><strong>Unidades selecionadas:</strong> {{ unidadesSelecionadas.length }}</p>
-        <hr>
-        <p>
-          Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes
-          serão notificadas por e-mail.
-        </p>
-      </template>
-      <template #footer>
-        <BButton
-            :disabled="isLoading"
-            data-testid="btn-iniciar-processo-cancelar"
-            variant="secondary"
-            @click="fecharModalConfirmacao"
-        >
-          Cancelar
-        </BButton>
-        <BButton
-            :disabled="isLoading"
-            data-testid="btn-iniciar-processo-confirmar"
-            variant="primary"
-            @click="confirmarIniciarProcesso"
-        >
-          <BSpinner v-if="isLoading" small class="me-1" />
-          <span>{{ isLoading ? 'Iniciando...' : 'Confirmar' }}</span>
-        </BButton>
-      </template>
-    </BModal>
+      <p><strong>Descrição:</strong> {{ descricao }}</p>
+      <p><strong>Tipo:</strong> {{ tipo }}</p>
+      <p><strong>Unidades selecionadas:</strong> {{ unidadesSelecionadas.length }}</p>
+      <hr>
+      <p>
+        Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes
+        serão notificadas por e-mail.
+      </p>
+    </ModalConfirmacao>
 
     <!-- Modal de confirmação de remoção -->
-    <BModal
+    <ModalConfirmacao
         v-model="mostrarModalRemocao"
-        :fade="false"
-        centered
-        hide-footer
-        title="Remover processo"
+        :auto-close="false"
+        :loading="isLoading"
+        ok-title="Remover"
+        titulo="Remover processo"
+        variant="danger"
+        @confirmar="confirmarRemocao"
     >
-      <template #default>
-        <p>Remover o processo '{{ descricao }}'? Esta ação não poderá ser desfeita.</p>
-      </template>
-      <template #footer>
-        <BButton
-            :disabled="isLoading"
-            variant="secondary"
-            @click="fecharModalRemocao"
-        >
-          Cancelar
-        </BButton>
-        <BButton
-            :disabled="isLoading"
-            variant="danger"
-            @click="confirmarRemocao"
-        >
-          <BSpinner v-if="isLoading" small class="me-1" />
-          <span v-else>Remover</span>
-        </BButton>
-      </template>
-    </BModal>
+      <p>Remover o processo '{{ descricao }}'? Esta ação não poderá ser desfeita.</p>
+    </ModalConfirmacao>
   </BContainer>
 </template>
 
@@ -218,11 +184,11 @@ import {
   BFormInput,
   BFormInvalidFeedback,
   BFormSelect,
-  BModal,
   BSpinner
 } from "bootstrap-vue-next";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
+import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
 import * as processoService from "@/services/processoService";
 import {useFormErrors} from '@/composables/useFormErrors';

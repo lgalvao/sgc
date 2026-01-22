@@ -177,7 +177,7 @@ describe("LoginView.vue", () => {
         // Trigger submit novamente para confirmar seleção
         await wrapper.find('form').trigger('submit');
 
-        expect(perfilStore.selecionarPerfilUnidade).toHaveBeenCalledWith(123, mockPerfis[0]);
+        expect(perfilStore.selecionarPerfilUnidade).toHaveBeenCalledWith("123", mockPerfis[0]);
         expect(routerPushMock).toHaveBeenCalledWith("/painel");
     });
 

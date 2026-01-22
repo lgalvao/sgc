@@ -148,12 +148,13 @@
         @confirmar-aceitacao="confirmarAceitacao"
     />
 
-    <BModal
+    <ModalConfirmacao
         v-model="mostrarModalSugestoes"
-        :fade="false"
-        centered
-        hide-footer
-        title="Apresentar Sugestões"
+        ok-title="Confirmar"
+        titulo="Apresentar Sugestões"
+        test-id-confirmar="btn-sugestoes-mapa-confirmar"
+        test-id-cancelar="btn-sugestoes-mapa-cancelar"
+        @confirmar="confirmarSugestoes"
     >
       <div class="mb-3">
         <label
@@ -168,23 +169,7 @@
             rows="5"
         />
       </div>
-      <template #footer>
-        <BButton
-            data-testid="btn-sugestoes-mapa-cancelar"
-            variant="secondary"
-            @click="fecharModalSugestoes"
-        >
-          Cancelar
-        </BButton>
-        <BButton
-            data-testid="btn-sugestoes-mapa-confirmar"
-            variant="primary"
-            @click="confirmarSugestoes"
-        >
-          Confirmar
-        </BButton>
-      </template>
-    </BModal>
+    </ModalConfirmacao>
 
     <BModal
         v-model="mostrarModalVerSugestoes"
@@ -217,38 +202,26 @@
       </template>
     </BModal>
 
-    <BModal
+    <ModalConfirmacao
         v-model="mostrarModalValidar"
-        :fade="false"
-        centered
-        hide-footer
-        title="Validar Mapa de Competências"
+        ok-title="Validar"
+        test-id-confirmar="btn-validar-mapa-confirmar"
+        test-id-cancelar="btn-validar-mapa-cancelar"
+        titulo="Validar Mapa de Competências"
+        variant="success"
+        @confirmar="confirmarValidacao"
     >
       <p>Confirma a validação do mapa de competências? Essa ação habilitará a análise por unidades superiores.</p>
-      <template #footer>
-        <BButton
-            data-testid="btn-validar-mapa-cancelar"
-            variant="secondary"
-            @click="fecharModalValidar"
-        >
-          Cancelar
-        </BButton>
-        <BButton
-            data-testid="btn-validar-mapa-confirmar"
-            variant="success"
-            @click="confirmarValidacao"
-        >
-          Validar
-        </BButton>
-      </template>
-    </BModal>
+    </ModalConfirmacao>
 
-    <BModal
+    <ModalConfirmacao
         v-model="mostrarModalDevolucao"
-        :fade="false"
-        centered
-        hide-footer
-        title="Devolução"
+        ok-title="Confirmar"
+        test-id-confirmar="btn-devolucao-mapa-confirmar"
+        test-id-cancelar="btn-devolucao-mapa-cancelar"
+        titulo="Devolução"
+        variant="danger"
+        @confirmar="confirmarDevolucao"
     >
       <p>Confirma a devolução da validação do mapa para ajustes?</p>
       <div class="mb-3">
@@ -264,23 +237,7 @@
             rows="3"
         />
       </div>
-      <template #footer>
-        <BButton
-            data-testid="btn-devolucao-mapa-cancelar"
-            variant="secondary"
-            @click="fecharModalDevolucao"
-        >
-          Cancelar
-        </BButton>
-        <BButton
-            data-testid="btn-devolucao-mapa-confirmar"
-            variant="danger"
-            @click="confirmarDevolucao"
-        >
-          Confirmar
-        </BButton>
-      </template>
-    </BModal>
+    </ModalConfirmacao>
 
     <BModal
         v-model="mostrarModalHistorico"
@@ -331,6 +288,7 @@
 <script lang="ts" setup>
 import {BButton, BCard, BCardBody, BContainer, BFormTextarea, BModal,} from "bootstrap-vue-next";
 import EmptyState from "@/components/EmptyState.vue";
+import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -582,4 +540,3 @@ async function confirmarDevolucao() {
   await router.push({name: "Painel"});
 }
 </script>
-

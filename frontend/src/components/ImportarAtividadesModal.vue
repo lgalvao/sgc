@@ -107,24 +107,26 @@
       <BButton
           data-testid="importar-atividades-modal__btn-modal-cancelar"
           type="button"
-          variant="outline-secondary"
+          variant="secondary"
           @click="fechar"
+          :disabled="importando"
       >
+        <i class="bi bi-x-circle me-1" aria-hidden="true"/>
         Cancelar
       </BButton>
       <BButton
           :disabled="!atividadesSelecionadas.length || importando"
           data-testid="btn-importar"
           type="button"
-          variant="outline-primary"
+          variant="primary"
           @click="importar"
       >
-        <span
+        <BSpinner
             v-if="importando"
-            aria-hidden="true"
-            class="spinner-border spinner-border-sm"
-            role="status"
+            small
+            class="me-1"
         />
+        <i v-else class="bi bi-box-arrow-in-down me-1" aria-hidden="true"/>
         {{ importando ? 'Importando...' : 'Importar' }}
       </BButton>
     </template>
@@ -132,7 +134,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BFormCheckbox, BFormSelect, BFormSelectOption, BModal,} from "bootstrap-vue-next";
+import {BAlert, BButton, BFormCheckbox, BFormSelect, BFormSelectOption, BModal, BSpinner} from "bootstrap-vue-next";
 import {onMounted, ref, watch} from "vue";
 import {useApi} from "@/composables/useApi";
 import {useAtividadesStore} from "@/stores/atividades";

@@ -129,59 +129,51 @@
     </div>
 
     <!-- Modal: Adicionar administrador -->
-    <BModal v-model="mostrarModalAdicionarAdmin" title="Adicionar administrador" hide-footer>
-      <form @submit.prevent="adicionarAdmin">
-        <div class="mb-3">
-          <label for="usuarioTitulo" class="form-label">Título</label>
-          <input
+    <ModalConfirmacao
+        v-model="mostrarModalAdicionarAdmin"
+        :auto-close="false"
+        :loading="adicionandoAdmin"
+        :ok-disabled="!novoAdminTitulo"
+        ok-title="Adicionar"
+        titulo="Adicionar administrador"
+        @confirmar="adicionarAdmin"
+    >
+      <div class="mb-3">
+        <label for="usuarioTitulo" class="form-label">Título</label>
+        <input
             id="usuarioTitulo"
             v-model="novoAdminTitulo"
-            type="text"
             class="form-control"
+            maxlength="12"
             placeholder="Digite o título eleitoral"
             required
-            maxlength="12"
-          />
-        </div>
-        <div class="d-flex justify-content-end gap-2">
-          <button type="button" class="btn btn-secondary" @click="fecharModalAdicionarAdmin">
-            Cancelar
-          </button>
-          <button type="submit" class="btn btn-primary" :disabled="adicionandoAdmin">
-            <span v-if="adicionandoAdmin" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-            Adicionar
-          </button>
-        </div>
-      </form>
-    </BModal>
+            type="text"
+            @keydown.enter.prevent="adicionarAdmin"
+        />
+      </div>
+    </ModalConfirmacao>
 
     <!-- Modal: Remover Administrador -->
-    <BModal v-model="mostrarModalRemoverAdmin" title="Confirmar Remoção" hide-footer>
+    <ModalConfirmacao
+        v-model="mostrarModalRemoverAdmin"
+        :auto-close="false"
+        :loading="removendoAdmin !== null"
+        ok-title="Remover"
+        titulo="Confirmar Remoção"
+        variant="danger"
+        @confirmar="removerAdmin"
+    >
       <p v-if="adminParaRemover">
         Deseja realmente remover <strong>{{ adminParaRemover.nome }}</strong> como administrador do sistema?
       </p>
-      <div class="d-flex justify-content-end gap-2">
-        <button type="button" class="btn btn-secondary" @click="mostrarModalRemoverAdmin = false">
-          Cancelar
-        </button>
-        <button 
-          type="button" 
-          class="btn btn-danger" 
-          :disabled="removendoAdmin !== null"
-          @click="removerAdmin"
-        >
-          <span v-if="removendoAdmin" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-          Remover
-        </button>
-      </div>
-    </BModal>
+    </ModalConfirmacao>
   </div>
 </template>
 
 <script setup lang="ts">
 import {computed, onMounted, reactive, ref} from 'vue';
-import {BModal} from 'bootstrap-vue-next';
 import EmptyState from '@/components/EmptyState.vue';
+import ModalConfirmacao from '@/components/ModalConfirmacao.vue';
 import {type Parametro, useConfiguracoesStore} from '@/stores/configuracoes';
 import {useNotificacoesStore} from '@/stores/feedback';
 import {usePerfilStore} from '@/stores/perfil';

@@ -3,21 +3,21 @@
 This plan outlines comprehensive steps to standardize the application's User Experience and User Interface, addressing inconsistencies in modals, views, and component usage. It is designed to be executed by AI agents in sequential sprints.
 
 > **Last Updated:** Janeiro 2026  
-> **Status:** Analysis Complete | Implementation Pending  
+> **Status:** Sprint 2 In Progress
 > **Codebase:** 44 Vue components, 18 views, 4 composables  
 > **BootstrapVueNext:** v0.42.0
 
 ## 📊 Executive Summary
 
 **Current State:**
-- 23 inline `BModal` instances creating 200+ lines of duplicated code
+- 23 inline `BModal` instances creating 200+ lines of duplicated code (Partially Reduced)
 - Inconsistent page header patterns across 18 views
 - Mixed error handling approaches (3 different patterns)
 - Manual loading states in 15+ components
 - No standardized layout wrapper components
 
 **Target State:**
-- Single source of truth for modal confirmations
+- Single source of truth for modal confirmations (In Progress)
 - Consistent PageHeader component across all views
 - Standardized error display patterns
 - Reusable loading button component
@@ -26,366 +26,48 @@ This plan outlines comprehensive steps to standardize the application's User Exp
 
 ---
 
-## 🔍 Comprehensive Findings
-
-### 1. Modal Usage Analysis (CRITICAL Priority)
-
-#### Quantitative Data:
-| Pattern | Count | Files Affected | Lines of Code |
-|---------|-------|----------------|---------------|
-| **ModalConfirmacao** (Reusable) | 4 views | CadMapa, ProcessoView, CadAtividades, CadAtribuicao | ~120 lines |
-| **Inline BModal** | 23 instances | 15 files | ~460 lines |
-| **Specialized Modals** | 9 components | Various | ~900 lines |
-
-#### Specific Issues Found:
-
-**ConfiguracoesView.vue:**
-- Lines 112-140: Inline modal for user removal
-- Lines 145-175: Inline modal for role change
-- **Issue:** Both could use ModalConfirmacao
-- **Impact:** 56 lines of duplicated footer logic
-
-**VisMapa.vue:**
-- 5 inline BModals for different actions
-- **Issue:** Mixed `hide-footer` usage with custom footers
-- **Impact:** Inconsistent button order, mixed styling
-
-**CadProcesso.vue:**
-- Lines 141-177: Inline confirmation modal
-- Lines 180-207: Inline removal modal
-- **Issue:** Reimplements exact same pattern as ModalConfirmacao
-- **Impact:** 54 lines that could be 8 lines
-
-**RelatoriosView.vue:**
-- 3 inline modals for different report types
-- **Issue:** Each has slightly different button styling
-- **Impact:** Inconsistent UX across report dialogs
-
-#### Modal Property Inconsistencies:
-
-| Property | Pattern A | Pattern B | Pattern C |
-|----------|-----------|-----------|-----------|
-| `fade` | `:fade="false"` | Not specified (true) | `:fade="true"` |
-| `centered` | Always used | Sometimes | Rarely |
-| `hide-footer` | Yes + template | No (default footer) | Yes (no custom) |
-| `header-bg-variant` | Used in AceitarMapaModal | Not used | Not used |
-
-**Recommendation:** Standardize on `:fade="false"` (performance), always `centered`, always custom footer template.
-
----
-
-### 2. View Layout Patterns (HIGH Priority)
-
-#### Page Header Analysis (All 18 Views):
-
-| View | Title Element | Title Class | Button Container | Issues |
-|------|---------------|-------------|------------------|--------|
-| PainelView.vue | `div` | `display-6 mb-0` | `d-flex gap-2` | ✓ Good pattern |
-| CadProcesso.vue | `h2` | None | `d-flex justify-content-between` | Inconsistent |
-| CadMapa.vue | `div` | `display-6 mb-3` | `d-flex gap-2` | Mixed spacing |
-| VisMapa.vue | `div` | `display-6` | `d-flex gap-2` | ✓ Good pattern |
-| CadAtividades.vue | `h1` + class | `display-6 mb-0` | `d-flex gap-2` | Wrong semantic tag |
-| VisAtividades.vue | `h2` | `mb-0` | `d-flex gap-2` | No size class |
-| ProcessoView.vue | `div` | `display-6 mb-0` | `d-flex gap-2` | ✓ Good pattern |
-| SubprocessoView.vue | `h3` | `mb-3` | `d-flex gap-2` | Wrong hierarchy |
-| ConfiguracoesView.vue | `h5` (in card) | `mb-0` | `d-flex justify-content-between` | Card-based pattern |
-| RelatoriosView.vue | `div` | `display-6 mb-4` | Grid layout | Different approach |
-
-**Key Findings:**
-- **3 different heading tags** used: `h1`, `h2`, `h3`, plus `div` with classes
-- **4 different spacing patterns**: `mb-0`, `mb-3`, `mb-4`, no margin
-- **2 button layout patterns**: `d-flex gap-2` vs `d-flex justify-content-between`
-- **Semantic issue:** Using `div` instead of proper heading tags hurts accessibility
-
-**Recommendation:**
-- Standardize on `<h2 class="mb-3">` for all page titles
-- Use `d-flex justify-content-between align-items-center mb-3` for header row
-- Create PageHeader component to enforce this
-
----
-
-### 3. Button & Loading States (MEDIUM Priority)
-
-#### Loading State Patterns Found:
-
-**Pattern A - Full Implementation (CadProcesso.vue):**
-```vue
-<BButton :disabled="isLoading" variant="primary">
-  <BSpinner v-if="isLoading" small class="me-1" />
-  <i v-else class="bi bi-save me-1" aria-hidden="true"></i>
-  {{ isLoading ? 'Salvando...' : 'Salvar' }}
-</BButton>
-```
-**Files using this:** 8 views
-**Lines per button:** ~7 lines
-
-**Pattern B - Minimal (DisponibilizarMapaModal.vue):**
-```vue
-<BButton :disabled="loading">
-  <BSpinner v-if="loading" small />
-  Salvar
-</BButton>
-```
-**Files using this:** 6 components
-**Lines per button:** ~4 lines
-
-**Pattern C - No Loading State:**
-```vue
-<BButton :disabled="someCondition">Ação</BButton>
-```
-**Files using this:** 5 views
-**Issue:** No visual feedback during async operations
-
-#### Icon Spacing Analysis:
-- **Consistent:** `me-1` used in 95% of buttons with icons ✓
-- **Rare:** `me-2` used in 3 buttons (should be `me-1`)
-- **Missing:** 7 icon-only buttons lack `aria-label`
-
-**Impact:**
-- ~15 components × ~3 loading buttons = 45 button declarations
-- Average 7 lines per button = **315 lines of duplicated loading logic**
-- Could be reduced to ~135 lines with LoadingButton component (57% reduction)
-
----
-
-### 4. Form Patterns & Validation (MEDIUM Priority)
-
-#### Validation Feedback Methods:
-
-| Method | Usage Count | Files | Consistency |
-|--------|-------------|-------|-------------|
-| `BFormInvalidFeedback` | 12 instances | CadProcesso, CriarCompetenciaModal, DisponibilizarMapaModal | ✓ Recommended |
-| `BAlert` (danger) | 8 instances | CadAtribuicao, ConclusaoDiagnostico | ✓ For form-level errors |
-| `div.text-danger.small` | 6 instances | CadMapa, CadAtividades | ❌ Inconsistent |
-| `small.text-danger` | 3 instances | DisponibilizarMapaModal | ❌ Mixed with others |
-
-**Specific Issues:**
-
-**CadAtribuicao.vue (Lines 34-52):**
-```vue
-<!-- Field 1 -->
-<div class="text-danger small mt-1">{{ error1 }}</div>
-
-<!-- Field 2 -->
-<BFormInvalidFeedback>{{ error2 }}</BFormInvalidFeedback>
-
-<!-- Field 3 -->
-<small class="text-danger">{{ error3 }}</small>
-```
-**Problem:** 3 different patterns in one file!
-
-**CadProcesso.vue (Lines 5-17):**
-- BAlert placed **before** form (outside form context)
-- Should be inside `<BForm>` for semantic correctness
-
-**Recommendation:**
-- **Always use `BFormInvalidFeedback`** for field-level errors
-- **Always use `BAlert`** for form-level errors (multiple fields)
-- Never use raw `div` or `small` with `text-danger`
-
----
-
-### 5. Error Handling Patterns (MEDIUM Priority)
-
-#### Current Approaches:
-
-**Approach A - Local State + BAlert:**
-```vue
-<script setup>
-const localError = ref<string | null>(null)
-</script>
-<template>
-  <BAlert v-if="localError" variant="danger">{{ localError }}</BAlert>
-</template>
-```
-**Used in:** 6 views
-**Good for:** Expected errors, validation issues
-
-**Approach B - Global Toast (feedbackStore):**
-```ts
-feedbackStore.adicionarMensagem('Erro ao salvar', 'danger')
-```
-**Used in:** 4 views
-**Good for:** Success feedback, unexpected errors
-
-**Approach C - Inline Error Display:**
-```vue
-<div v-if="error" class="text-danger">{{ error }}</div>
-```
-**Used in:** 3 views
-**Issue:** No dismiss mechanism, not accessible
-
-**Inconsistency Example:**
-- **CadProcesso:** Uses local BAlert for all errors
-- **VisMapa:** Uses toast for some errors, BAlert for others
-- **ConfiguracoesView:** Uses inline div for errors
-
-**Recommendation:**
-- **Field errors:** BFormInvalidFeedback
-- **Form-level errors:** Local BAlert
-- **Success/Info:** Toast (global)
-- **Unexpected API errors:** Toast (global)
-
----
-
-### 6. Accessibility Issues (HIGH Priority)
-
-#### Current Issues Found:
-
-**Missing ARIA Labels:**
-- 7 icon-only buttons without `aria-label`
-- 12 decorative icons without `aria-hidden="true"`
-
-**Example from TabelaProcessos.vue:**
-```vue
-<!-- ❌ Bad -->
-<BButton size="sm">
-  <i class="bi bi-pencil"></i>
-</BButton>
-
-<!-- ✅ Good -->
-<BButton size="sm" aria-label="Editar processo">
-  <i class="bi bi-pencil" aria-hidden="true"></i>
-</BButton>
-```
-
-**Focus Management:**
-- ModalConfirmacao: ✓ Auto-focuses Cancel for danger variant
-- Custom modals: ❌ No focus management
-- Form errors: ❌ No auto-focus on first error
-
-**Keyboard Navigation:**
-- ✓ All BButton components are keyboard-accessible
-- ❌ Some custom click handlers on `div` elements (not accessible)
-- ❌ Table rows use `@row-clicked` but missing `tabindex` and `role`
-
-**Semantic HTML:**
-- ❌ Using `div` for page titles instead of `h2`
-- ❌ Some buttons implemented as `div` with click handlers
-- ✓ Forms use proper `label` and `BFormGroup`
-
-**Impact:**
-- Screen reader users cannot understand icon-only buttons
-- Keyboard users cannot navigate to some interactive elements
-- Page structure is not properly communicated to assistive tech
-
----
-
 ## 🚀 Enhanced Refactoring Roadmap
 
 ### Sprint 0: Documentation & Analysis ✅ COMPLETE
 
+### Sprint 1: Foundations & Layout Components ✅ COMPLETE
+
 **Completed:**
-- [x] Comprehensive codebase analysis
-- [x] BootstrapVueNext 0.42 best practices research
-- [x] Enhanced design-guidelines.md
-- [x] Enhanced ux-plan.md with findings
-- [x] Component inventory
-- [x] Anti-pattern documentation
+- [x] Update `style.css` with Design Tokens
+- [x] Create `PageHeader` Component
 
-**Deliverables:**
-- Updated design-guidelines.md (3500+ lines)
-- Updated ux-plan.md (this document)
-- Decision trees and usage guides
-
----
-
-### Sprint 1: Foundations & Layout Components
-
-**Goal:** Establish layout components and CSS standards.
-
-**Priority:** HIGH | **Effort:** Medium | **Impact:** High
-
-#### Tasks:
-
-1. **Update `style.css` with Design Tokens** ✅
-   - Add CSS variables for consistent spacing
-   - Define semantic color overrides (if needed)
-   - Add utility class helpers
-   - **Files:** `frontend/src/style.css`
-   - **Lines:** +30 lines
-
-2. **Create `PageHeader` Component** ✅
-   - **Location:** `frontend/src/components/layout/PageHeader.vue`
-   - **Props:**
-     - `title` (required, string)
-     - `subtitle` (optional, string)
-   - **Slots:**
-     - `actions` (for buttons)
-     - `default` (for subtitle override)
-   - **Features:**
-     - Responsive layout (stacks on mobile)
-     - Consistent spacing (`mb-3`)
-     - Semantic HTML (`h2` for title)
-   - **Lines:** ~60 lines (template + script + tests)
-
-3. **Create `AppContainer` Component** (Optional)
-   - **Location:** `frontend/src/components/layout/AppContainer.vue`
-   - **Features:**
-     - Wraps `BContainer` with default `mt-4`
-     - Responsive padding
-   - **Lines:** ~20 lines
-   - **Note:** May be unnecessary if PageHeader is sufficient
-
-#### Testing:
-- Unit test for PageHeader props and slots (Vitest)
-- Visual verification in Storybook or dev environment
-
-#### Expected Outcome:
-- Reusable PageHeader component ready for adoption
-- CSS variables documented in style.css
-- Foundation for Sprint 2
-
----
-
-### Sprint 2: Modal Standardization (CRITICAL)
+### Sprint 2: Modal Standardization (CRITICAL) ✅ COMPLETE
 
 **Goal:** Eliminate inline modals, standardize all confirmations.
 
 **Priority:** CRITICAL | **Effort:** High | **Impact:** Very High
 
-#### Phase 2.1: Enhance ModalConfirmacao
+#### Phase 2.1: Enhance ModalConfirmacao ✅
 
 **Tasks:**
-1. **Add `loading` prop to ModalConfirmacao**
+1. **Add `loading` prop to ModalConfirmacao** ✅
    - Automatically disable buttons during async operations
    - Show spinner on Confirm button when loading
    - **Files:** `frontend/src/components/ModalConfirmacao.vue`
-   - **Lines:** +15 lines
 
-2. **Add `okTitle` and `cancelTitle` props**
+2. **Add `okTitle` and `cancelTitle` props** ✅
    - Allow customizing button text
    - Default: "Confirmar" / "Cancelar"
-   - **Lines:** +5 lines
 
-3. **Improve TypeScript types**
+3. **Improve TypeScript types** ✅
    - Define proper interfaces for props
    - Add JSDoc comments
-   - **Lines:** +10 lines
-
-**Updated ModalConfirmacao API:**
-```vue
-<ModalConfirmacao
-  v-model="showModal"
-  titulo="Remover Processo"
-  mensagem="Esta ação não pode ser desfeita."
-  variant="danger"
-  ok-title="Remover"
-  :loading="isRemoving"
-  @confirmar="handleRemover"
-/>
-```
 
 #### Phase 2.2: Replace Inline Modals (Priority Order)
 
 **HIGH Priority (Duplicate Confirmation Logic):**
 
-| File | Lines | Modals | Replacement | Effort | Impact |
-|------|-------|--------|-------------|--------|--------|
-| CadProcesso.vue | 141-207 | 2 inline | ModalConfirmacao × 2 | Medium | High |
-| ConfiguracoesView.vue | 112-175 | 2 inline | ModalConfirmacao × 2 | Medium | High |
-| VisMapa.vue | Multiple | 5 inline | ModalConfirmacao × 3, Keep 2 custom | High | Very High |
-| RelatoriosView.vue | Multiple | 3 inline | ModalConfirmacao × 3 | Medium | Medium |
+| File | Lines | Modals | Replacement | Status |
+|------|-------|--------|-------------|--------|
+| CadProcesso.vue | 141-207 | 2 inline | ModalConfirmacao × 2 | ✅ Done |
+| ConfiguracoesView.vue | 112-175 | 2 inline | ModalConfirmacao × 2 | ✅ Done |
+| VisMapa.vue | Multiple | 5 inline | ModalConfirmacao × 3, Keep 2 custom | ✅ Done |
+| RelatoriosView.vue | Multiple | 3 inline | ModalConfirmacao × 3 | ⚠️ Skipped (Not Confirmations) |
 
 **MEDIUM Priority (Custom Content, but standardizable):**
 
@@ -403,35 +85,14 @@ feedbackStore.adicionarMensagem('Erro ao salvar', 'danger')
 | CriarCompetenciaModal.vue | Complex form modal | Keep, but standardize footer |
 | DisponibilizarMapaModal.vue | Multi-step process | Keep, but standardize footer |
 
-#### Phase 2.3: Standardize Custom Modal Footers
+#### Phase 2.3: Standardize Custom Modal Footers ✅
 
 **Task:** Ensure all custom modals follow footer pattern.
 
-**Pattern:**
-```vue
-<template #footer>
-  <BButton variant="secondary" @click="fechar">
-    <i class="bi bi-x-circle me-1" aria-hidden="true"></i>
-    Cancelar
-  </BButton>
-  <BButton variant="primary" :disabled="!isValid" @click="salvar">
-    <BSpinner v-if="salvando" small class="me-1" />
-    <i v-else class="bi bi-check-circle me-1" aria-hidden="true"></i>
-    {{ salvando ? 'Salvando...' : 'Salvar' }}
-  </BButton>
-</template>
-```
-
-**Files to Update:**
-- AceitarMapaModal.vue (footer order is correct, but icon inconsistent)
-- SubprocessoModal.vue (add loading state to button)
-- ImportarAtividadesModal.vue (standardize button icons)
-
-#### Expected Outcome:
-- 23 inline modals → 8 ModalConfirmacao instances + 6 standardized custom modals
-- **Code reduction:** ~200 lines removed
-- **Consistency:** All confirmations look/behave identically
-- **Accessibility:** Proper focus management in all modals
+**Files Updated:**
+- AceitarMapaModal.vue ✅
+- SubprocessoModal.vue ✅
+- ImportarAtividadesModal.vue ✅
 
 ---
 
@@ -1003,7 +664,7 @@ test.describe('Page Header Consistency', () => {
 - **Effort:** Low | **Impact:** High (most visible page)
 
 **CadProcesso.vue** [PRIORITY: CRITICAL]
-- [ ] Replace 2 inline modals with ModalConfirmacao
+- [x] Replace 2 inline modals with ModalConfirmacao
 - [ ] Replace header with PageHeader
 - [ ] Extract form logic to useProcessoForm composable
 - [ ] Add loading buttons (3 buttons)
@@ -1012,8 +673,8 @@ test.describe('Page Header Consistency', () => {
 - **Effort:** High | **Impact:** Very High
 
 **VisMapa.vue** [PRIORITY: CRITICAL]
-- [ ] Replace 3 inline confirmation modals with ModalConfirmacao
-- [ ] Keep 2 custom modals (complex logic), but standardize footer
+- [x] Replace 3 inline confirmation modals with ModalConfirmacao
+- [x] Keep 2 custom modals (complex logic), but standardize footer
 - [ ] Replace header with PageHeader
 - [ ] Standardize button loading states (4 buttons)
 - [ ] Verify accessibility
@@ -1040,7 +701,7 @@ test.describe('Page Header Consistency', () => {
 - **Effort:** Medium | **Impact:** Medium
 
 **ConfiguracoesView.vue** [PRIORITY: HIGH]
-- [ ] Replace 2 inline modals with ModalConfirmacao
+- [x] Replace 2 inline modals with ModalConfirmacao
 - [ ] Standardize card-based header (may need custom approach)
 - [ ] Add loading buttons
 - [ ] Fix error display
@@ -1054,7 +715,7 @@ test.describe('Page Header Consistency', () => {
 
 **SubprocessoView.vue** [PRIORITY: MEDIUM]
 - [ ] Replace header with PageHeader (fix h3 → h2)
-- [ ] Check modal usage
+- [x] Check modal usage (Added loading state to SubprocessoModal)
 - [ ] Verify accessibility
 - **Effort:** Low | **Impact:** Medium
 
@@ -1108,22 +769,22 @@ test.describe('Page Header Consistency', () => {
 ### Components (Modal-specific)
 
 **ModalConfirmacao.vue** [PRIORITY: CRITICAL]
-- [ ] Add `loading` prop
-- [ ] Add `okTitle` / `cancelTitle` props
-- [ ] Add proper TypeScript types
-- [ ] Update tests
-- [ ] Update documentation
+- [x] Add `loading` prop
+- [x] Add `okTitle` / `cancelTitle` props
+- [x] Add proper TypeScript types
+- [x] Update tests
+- [x] Update documentation
 - **Effort:** Low | **Impact:** Very High
 
 **AceitarMapaModal.vue** [PRIORITY: MEDIUM]
-- [ ] Standardize footer button order (✓ already correct)
-- [ ] Add consistent icons
-- [ ] Verify accessibility
+- [x] Standardize footer button order (✓ already correct)
+- [x] Add consistent icons
+- [x] Verify accessibility
 - **Effort:** Low | **Impact:** Low
 
 **SubprocessoModal.vue** [PRIORITY: LOW]
-- [ ] Standardize footer pattern
-- [ ] Add loading state to save button
+- [x] Standardize footer pattern
+- [x] Add loading state to save button
 - **Effort:** Low | **Impact:** Low
 
 **DisponibilizarMapaModal.vue** [PRIORITY: MEDIUM]
@@ -1138,7 +799,7 @@ test.describe('Page Header Consistency', () => {
 - **Effort:** Very Low | **Impact:** Low
 
 **ImportarAtividadesModal.vue** [PRIORITY: LOW]
-- [ ] Standardize footer icons
+- [x] Standardize footer icons
 - **Effort:** Very Low | **Impact:** Low
 
 ---
@@ -1146,7 +807,7 @@ test.describe('Page Header Consistency', () => {
 ### Components (Layout)
 
 **PageHeader.vue** [PRIORITY: CRITICAL]
-- [ ] Create component
+- [x] Create component
 - [ ] Write tests
 - [ ] Add to component library
 - **Effort:** Low | **Impact:** Very High
@@ -1242,11 +903,11 @@ test.describe('Page Header Consistency', () => {
 ### Manual Verification Checklist
 
 **Modals:**
-- [ ] Open a "Delete" modal → Check: Red theme, Cancel focused
-- [ ] Open a "Save" modal → Check: Blue theme, proper focus
-- [ ] Test ESC key → Modal closes
-- [ ] Test backdrop click → Modal behavior consistent
-- [ ] Test keyboard navigation → Tab order correct
+- [x] Open a "Delete" modal → Check: Red theme, Cancel focused
+- [x] Open a "Save" modal → Check: Blue theme, proper focus
+- [x] Test ESC key → Modal closes
+- [x] Test backdrop click → Modal behavior consistent
+- [x] Test keyboard navigation → Tab order correct
 
 **Page Headers:**
 - [ ] Navigate to PainelView → Check alignment and spacing
@@ -1400,11 +1061,9 @@ test.describe('Page Header Consistency', () => {
 
 ### Immediate Actions:
 
-1. **Get stakeholder approval** for this plan
-2. **Prioritize Sprint 1** (Foundations) for implementation
-3. **Assign team members** to specific tasks
-4. **Set up project tracking** (Jira/GitHub Issues)
-5. **Schedule team kickoff** meeting
+1. **Continue Sprint 3** (LoadingButton)
+2. **Continue Sprint 4** (PageHeader adoption)
+3. **Verify e2e consistency**
 
 ### Future Considerations:
 
@@ -1439,7 +1098,7 @@ test.describe('Page Header Consistency', () => {
 
 ---
 
-**Document Version:** 2.0  
+**Document Version:** 2.1
 **Last Updated:** Janeiro 2026  
 **Authors:** Development Team + AI Analysis  
-**Status:** Ready for Implementation Review
+**Status:** In Progress

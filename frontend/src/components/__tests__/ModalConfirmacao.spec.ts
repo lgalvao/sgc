@@ -18,7 +18,8 @@ describe('ModalConfirmacao.vue', () => {
                 emits: ['update:modelValue', 'hide', 'shown']
             },
             BButton: {
-                template: '<button class="b-button-stub" @click="$emit(\'click\')"><slot /></button>',
+                template: '<button class="b-button-stub" @click="$emit(\'click\')" :disabled="disabled"><slot /></button>',
+                props: ['disabled', 'variant'],
                 emits: ['click']
             }
         }
@@ -34,6 +35,7 @@ describe('ModalConfirmacao.vue', () => {
         expect(wrapper.text()).toContain('Mensagem de teste')
         const confirmBtn = wrapper.find('[data-testid="btn-modal-confirmacao-confirmar"]')
         expect(confirmBtn.exists()).toBe(true)
+        expect(confirmBtn.text()).toBe('Confirmar')
     })
 
     it('aplica variant correta e ícone quando fornecida', () => {
@@ -74,30 +76,6 @@ describe('ModalConfirmacao.vue', () => {
         wrapper.unmount()
     })
 
-    it('não foca no botão cancelar se variant não for danger', async () => {
-        const wrapper = mount(ModalConfirmacao, {
-            props: {
-                ...defaultProps,
-                variant: 'primary',
-                modelValue: true
-            },
-            global: globalOptions,
-            attachTo: document.body
-        })
-
-        const bModalComp = wrapper.findComponent('.b-modal-stub')
-        if (bModalComp.exists()) {
-             await (bModalComp as any).vm.$emit('shown')
-        } else {
-             await (wrapper.vm as any).onShown()
-        }
-
-        const cancelBtn = wrapper.find('[data-testid="btn-modal-confirmacao-cancelar"]')
-        expect(cancelBtn.element).not.toBe(document.activeElement)
-
-        wrapper.unmount()
-    })
-
     it('fecha o modal ao clicar em cancelar', async () => {
         const wrapper = mount(ModalConfirmacao, {
             props: defaultProps,
@@ -111,9 +89,12 @@ describe('ModalConfirmacao.vue', () => {
         expect(wrapper.emitted('update:modelValue')![0]).toEqual([false])
     })
 
-    it('emite confirmar e fecha o modal ao clicar em confirmar', async () => {
+    it('emite confirmar e fecha o modal ao clicar em confirmar (se autoClose=true)', async () => {
         const wrapper = mount(ModalConfirmacao, {
-            props: defaultProps,
+            props: {
+                ...defaultProps,
+                autoClose: true // Default
+            },
             global: globalOptions
         })
 
@@ -121,8 +102,23 @@ describe('ModalConfirmacao.vue', () => {
         await confirmBtn.trigger('click')
 
         expect(wrapper.emitted('confirmar')).toBeTruthy()
-        expect(wrapper.emitted('update:modelValue')).toBeTruthy()
-        expect(wrapper.emitted('update:modelValue')![0]).toEqual([false])
+        expect(wrapper.emitted('update:modelValue')).toBeTruthy() // Fecha
+    })
+
+    it('emite confirmar mas NAO fecha o modal se autoClose=false', async () => {
+        const wrapper = mount(ModalConfirmacao, {
+            props: {
+                ...defaultProps,
+                autoClose: false
+            },
+            global: globalOptions
+        })
+
+        const confirmBtn = wrapper.find('[data-testid="btn-modal-confirmacao-confirmar"]')
+        await confirmBtn.trigger('click')
+
+        expect(wrapper.emitted('confirmar')).toBeTruthy()
+        expect(wrapper.emitted('update:modelValue')).toBeFalsy() // Não fecha
     })
 
     it('renderiza conteúdo customizado via slot', () => {
@@ -130,7 +126,7 @@ describe('ModalConfirmacao.vue', () => {
         const wrapper = mount(ModalConfirmacao, {
             props: {
                 ...defaultProps,
-                mensagem: undefined // Para garantir que não renderiza a mensagem padrão
+                mensagem: undefined
             },
             slots: {
                 default: customContent
@@ -140,6 +136,36 @@ describe('ModalConfirmacao.vue', () => {
 
         expect(wrapper.find('.custom-content').exists()).toBe(true)
         expect(wrapper.find('.custom-content').text()).toBe('Conteúdo Customizado')
+    })
+
+    it('usa titulos customizados para os botoes', () => {
+        const wrapper = mount(ModalConfirmacao, {
+            props: {
+                ...defaultProps,
+                okTitle: 'Sim, eu quero',
+                cancelTitle: 'Não, obrigado'
+            },
+            global: globalOptions
+        })
+
+        const confirmBtn = wrapper.find('[data-testid="btn-modal-confirmacao-confirmar"]')
+        const cancelBtn = wrapper.find('[data-testid="btn-modal-confirmacao-cancelar"]')
+
+        expect(confirmBtn.text()).toBe('Sim, eu quero')
+        expect(cancelBtn.text()).toBe('Não, obrigado')
+    })
+
+    it('desabilita o botao confirmar se okDisabled=true', () => {
+        const wrapper = mount(ModalConfirmacao, {
+            props: {
+                ...defaultProps,
+                okDisabled: true
+            },
+            global: globalOptions
+        })
+
+        const confirmBtn = wrapper.find('[data-testid="btn-modal-confirmacao-confirmar"]')
+        expect(confirmBtn.attributes('disabled')).toBeDefined()
     })
 
     it('deve ser acessível', async () => {

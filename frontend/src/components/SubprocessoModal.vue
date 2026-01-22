@@ -27,18 +27,25 @@
           data-testid="subprocesso-modal__btn-modal-cancelar"
           variant="secondary"
           @click="$emit('fecharModal')"
+          :disabled="loading"
       >
-        <i class="bi bi-x-circle me-1"/>
+        <i class="bi bi-x-circle me-1" aria-hidden="true"/>
         Cancelar
       </BButton>
       <BButton
-          :disabled="!novaDataLimite || !isDataValida"
+          :disabled="!novaDataLimite || !isDataValida || loading"
           data-testid="btn-modal-confirmar"
           variant="primary"
           @click="$emit('confirmarAlteracao', novaDataLimite)"
       >
-        <i class="bi bi-check-circle me-1"/>
-        Confirmar
+        <span
+            v-if="loading"
+            class="spinner-border spinner-border-sm me-1"
+            role="status"
+            aria-hidden="true"
+        />
+        <i v-else class="bi bi-check-circle me-1" aria-hidden="true"/>
+        {{ loading ? 'Processando...' : 'Confirmar' }}
       </BButton>
     </template>
   </BModal>
@@ -53,9 +60,12 @@ interface Props {
   mostrarModal: boolean;
   dataLimiteAtual: Date | null;
   etapaAtual: number | null;
+  loading?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    loading: false
+});
 
 defineEmits<{
   fecharModal: [];
