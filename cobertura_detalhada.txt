@@ -1,0 +1,135 @@
+
+====================================================================================================
+                                    RELATÓRIO DE COBERTURA JACOCO
+====================================================================================================
+
+TOP ARQUIVOS COM LINHAS/BRANCHES PERDIDAS (Total: 39)
+
+📄 sgc.seguranca.login.LimitadorTentativasLogin.java
+   🔴 Linhas não executadas: 52, 53, 55, 59, 60, 61, 66, 68, 69, 70, 72, 73, 81, 82, 86, 87, 88, 90, 93, 94, 96, 97, 99, 106, 108, 109, 111, 116, 121, 122
+   🟡 Branches perdidos (miss/total): 49(1/2), 77(1/2)
+--------------------------------------------------
+📄 sgc.seguranca.login.LoginFacade.java
+   🔴 Linhas não executadas: 141, 142, 143, 150, 151, 152, 165, 166
+   🟡 Branches perdidos (miss/total): 146(1/2), 163(1/2)
+--------------------------------------------------
+📄 sgc.organizacao.service.ValidadorDadosOrgService.java
+   🔴 Linhas não executadas: 72
+   🟡 Branches perdidos (miss/total): 65(1/2), 71(1/2), 92(1/4), 109(1/4), 121(1/4)
+--------------------------------------------------
+📄 sgc.organizacao.UsuarioFacade.java
+   🔴 Linhas não executadas: 189
+   🟡 Branches perdidos (miss/total): 181(2/2), 182(4/4), 205(1/2), 206(1/2), 220(1/2)
+--------------------------------------------------
+📄 sgc.processo.listener.EventoProcessoListener.java
+   🔴 Linhas não executadas: 231
+   🟡 Branches perdidos (miss/total): 166(1/4), 169(1/6), 228(1/3), 234(2/6)
+--------------------------------------------------
+📄 sgc.organizacao.mapper.UsuarioMapper.java
+   🔴 Linhas não executadas: 46, 47, 48
+--------------------------------------------------
+📄 sgc.e2e.E2eController.java
+   🟡 Branches perdidos (miss/total): 66(1/2), 67(1/2), 100(1/2), 182(1/2), 212(1/2)
+--------------------------------------------------
+📄 sgc.seguranca.login.LoginController.java
+   🔴 Linhas não executadas: 69, 70
+   🟡 Branches perdidos (miss/total): 100(1/4)
+--------------------------------------------------
+📄 sgc.mapa.service.AtividadeService.java
+   🔴 Linhas não executadas: 124
+   🟡 Branches perdidos (miss/total): 88(1/2), 91(1/2)
+--------------------------------------------------
+📄 sgc.processo.service.ProcessoFinalizador.java
+   🔴 Linhas não executadas: 101, 105
+--------------------------------------------------
+📄 sgc.processo.ProcessoController.java
+   🔴 Linhas não executadas: 169
+   🟡 Branches perdidos (miss/total): 168(1/2)
+--------------------------------------------------
+📄 sgc.organizacao.model.Usuario.java
+   🔴 Linhas não executadas: 90
+   🟡 Branches perdidos (miss/total): 76(1/2)
+--------------------------------------------------
+📄 sgc.processo.service.ProcessoDetalheBuilder.java
+   🟡 Branches perdidos (miss/total): 55(1/4), 72(1/4), 94(1/2)
+--------------------------------------------------
+📄 sgc.subprocesso.service.notificacao.SubprocessoEmailService.java
+   🔴 Linhas não executadas: 108
+   🟡 Branches perdidos (miss/total): 90(1/9)
+--------------------------------------------------
+📄 sgc.subprocesso.eventos.TipoTransicao.java
+   🔴 Linhas não executadas: 130
+   🟡 Branches perdidos (miss/total): 129(1/2)
+--------------------------------------------------
+📄 sgc.subprocesso.SubprocessoValidacaoController.java
+   🔴 Linhas não executadas: 103
+--------------------------------------------------
+📄 sgc.organizacao.UnidadeFacade.java
+   🟡 Branches perdidos (miss/total): 334(1/4), 353(1/2)
+--------------------------------------------------
+📄 sgc.organizacao.model.UnidadeRepo.java
+   🔴 Linhas não executadas: 45
+--------------------------------------------------
+📄 sgc.processo.service.ProcessoFacade.java
+   🔴 Linhas não executadas: 318
+--------------------------------------------------
+📄 sgc.processo.service.ProcessoAcessoService.java
+   🟡 Branches perdidos (miss/total): 57(2/6), 117(1/2)
+--------------------------------------------------
+📄 sgc.painel.PainelFacade.java
+   🟡 Branches perdidos (miss/total): 94(1/4), 137(1/2)
+--------------------------------------------------
+📄 sgc.alerta.AlertaFacade.java
+   🟡 Branches perdidos (miss/total): 190(1/4)
+--------------------------------------------------
+📄 sgc.subprocesso.service.crud.SubprocessoCrudService.java
+   🟡 Branches perdidos (miss/total): 188(1/2)
+--------------------------------------------------
+📄 sgc.organizacao.service.HierarquiaService.java
+   🟡 Branches perdidos (miss/total): 56(1/2)
+--------------------------------------------------
+📄 sgc.organizacao.UnidadeController.java
+   🟡 Branches perdidos (miss/total): 82(2/4)
+--------------------------------------------------
+📄 sgc.processo.mapper.ProcessoMapper.java
+   🟡 Branches perdidos (miss/total): 30(1/2)
+--------------------------------------------------
+📄 sgc.comum.erros.RestExceptionHandler.java
+   🟡 Branches perdidos (miss/total): 63(1/4)
+--------------------------------------------------
+📄 sgc.seguranca.config.JwtProperties.java
+   🟡 Branches perdidos (miss/total): 18(1/2)
+--------------------------------------------------
+📄 sgc.mapa.service.MapaSalvamentoService.java
+   🟡 Branches perdidos (miss/total): 148(1/2)
+--------------------------------------------------
+📄 sgc.mapa.service.MapaVisualizacaoService.java
+   🟡 Branches perdidos (miss/total): 70(1/2)
+--------------------------------------------------
+📄 sgc.seguranca.login.ClienteAcessoAd.java
+   🟡 Branches perdidos (miss/total): 40(1/4)
+--------------------------------------------------
+📄 sgc.seguranca.login.GerenciadorJwt.java
+   🟡 Branches perdidos (miss/total): 83(1/6)
+--------------------------------------------------
+📄 sgc.processo.service.ProcessoInicializador.java
+   🟡 Branches perdidos (miss/total): 138(1/4)
+--------------------------------------------------
+📄 sgc.processo.service.ProcessoConsultaService.java
+   🟡 Branches perdidos (miss/total): 82(1/4)
+--------------------------------------------------
+📄 sgc.subprocesso.service.factory.SubprocessoFactory.java
+   🟡 Branches perdidos (miss/total): 48(1/4)
+--------------------------------------------------
+📄 sgc.analise.mapper.AnaliseMapper.java
+   🟡 Branches perdidos (miss/total): 40(1/2)
+--------------------------------------------------
+📄 sgc.subprocesso.service.workflow.SubprocessoWorkflowService.java
+   🟡 Branches perdidos (miss/total): 184(1/2)
+--------------------------------------------------
+📄 sgc.seguranca.acesso.AtividadeAccessPolicy.java
+   🟡 Branches perdidos (miss/total): 64(1/2)
+--------------------------------------------------
+📄 sgc.analise.AnaliseFacade.java
+   🟡 Branches perdidos (miss/total): 38(1/2)
+--------------------------------------------------
