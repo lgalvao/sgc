@@ -63,4 +63,29 @@ class UsuarioMapperTest {
         assertThat(dto.getMatricula()).isEqualTo("MAT001");
         assertThat(dto.getUnidadeCodigo()).isEqualTo(10L);
     }
+
+    @Test
+    @DisplayName("Deve mapear Unidade com elegibilidade calculada (Default Method)")
+    void deveMapearComElegibilidadeCalculada() {
+        // 1. Cenário: Unidade Nula
+        assertThat(mapper.toUnidadeDtoComElegibilidadeCalculada(null)).isNull();
+
+        // 2. Cenário: Unidade Operacional (Elegível)
+        Unidade uOp = new Unidade();
+        uOp.setCodigo(1L);
+        uOp.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+
+        UnidadeDto dtoOp = mapper.toUnidadeDtoComElegibilidadeCalculada(uOp);
+        assertThat(dtoOp).isNotNull();
+        assertThat(dtoOp.isElegivel()).isTrue();
+
+        // 3. Cenário: Unidade Intermediária (Inelegível)
+        Unidade uInt = new Unidade();
+        uInt.setCodigo(2L);
+        uInt.setTipo(sgc.organizacao.model.TipoUnidade.INTERMEDIARIA);
+
+        UnidadeDto dtoInt = mapper.toUnidadeDtoComElegibilidadeCalculada(uInt);
+        assertThat(dtoInt).isNotNull();
+        assertThat(dtoInt.isElegivel()).isFalse();
+    }
 }
