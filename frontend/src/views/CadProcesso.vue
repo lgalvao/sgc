@@ -1,6 +1,6 @@
 <template>
   <BContainer class="mt-4">
-    <h2>Cadastro de processo</h2>
+    <PageHeader title="Cadastro de processo" />
 
     <BAlert
         v-model="alertState.show"
@@ -95,36 +95,36 @@
 
       <div class="d-flex justify-content-between">
         <div>
-          <BButton
+          <LoadingButton
               :disabled="isFormInvalid || isLoading"
               data-testid="btn-processo-iniciar"
               variant="success"
+              icon="play-fill"
+              text="Iniciar processo"
               @click="abrirModalConfirmacao"
-          >
-            <i aria-hidden="true" class="bi bi-play-fill me-1"/> Iniciar processo
-          </BButton>
-          <BButton
-              :disabled="isFormInvalid || isLoading"
+          />
+          <LoadingButton
+              :loading="isLoading"
+              :disabled="isFormInvalid"
               class="ms-2"
               data-testid="btn-processo-salvar"
               type="button"
               variant="outline-primary"
+              icon="save"
+              text="Salvar"
+              loading-text="Salvando..."
               @click="salvarProcesso"
-          >
-            <BSpinner v-if="isLoading" small class="me-1" />
-            <i v-else aria-hidden="true" class="bi bi-save me-1"/>
-            {{ isLoading ? 'Salvando...' : 'Salvar' }}
-          </BButton>
-          <BButton
+          />
+          <LoadingButton
               v-if="processoEditando"
               :disabled="isLoading"
               class="ms-2"
               data-testid="btn-processo-remover"
               variant="outline-danger"
+              icon="trash"
+              text="Remover"
               @click="abrirModalRemocao"
-          >
-            <i aria-hidden="true" class="bi bi-trash me-1"/> Remover
-          </BButton>
+          />
         </div>
         <BButton
             :disabled="isLoading"
@@ -184,11 +184,12 @@ import {
   BFormInput,
   BFormInvalidFeedback,
   BFormSelect,
-  BSpinner
 } from "bootstrap-vue-next";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
+import PageHeader from "@/components/layout/PageHeader.vue";
+import LoadingButton from "@/components/ui/LoadingButton.vue";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
 import * as processoService from "@/services/processoService";
 import {useFormErrors} from '@/composables/useFormErrors';

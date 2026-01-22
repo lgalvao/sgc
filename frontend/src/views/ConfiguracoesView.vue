@@ -1,12 +1,14 @@
 <template>
   <div class="container-fluid mt-4">
+    <PageHeader title="Configurações" />
+
     <!-- Seção de Administradores -->
     <div v-if="podeGerenciarAdministradores" class="card mb-4">
       <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Administradores do Sistema</h5>
-        <button class="btn btn-light btn-sm" @click="abrirModalAdicionarAdmin">
+        <BButton variant="light" size="sm" @click="abrirModalAdicionarAdmin">
           <i class="bi bi-person-plus"></i> Adicionar administrador
-        </button>
+        </BButton>
       </div>
       <div class="card-body">
         <div v-if="carregandoAdmins" class="text-center py-4">
@@ -45,15 +47,14 @@
                 <td>{{ admin.matricula }}</td>
                 <td>{{ admin.unidadeSigla }}</td>
                 <td class="text-end">
-                  <button
-                    class="btn btn-sm btn-outline-danger"
-                    :disabled="removendoAdmin === admin.tituloEleitoral"
-                    @click="confirmarRemocao(admin)"
-                  >
-                    <span v-if="removendoAdmin === admin.tituloEleitoral" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                    <i v-else class="bi bi-trash" aria-hidden="true"></i>
-                    Remover
-                  </button>
+                  <LoadingButton
+                      :loading="removendoAdmin === admin.tituloEleitoral"
+                      variant="outline-danger"
+                      size="sm"
+                      icon="trash"
+                      text="Remover"
+                      @click="confirmarRemocao(admin)"
+                  />
                 </td>
               </tr>
             </tbody>
@@ -66,9 +67,14 @@
     <div class="card">
       <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Configurações do Sistema</h5>
-        <button class="btn btn-light btn-sm" @click="recarregar">
-          <i class="bi bi-arrow-clockwise"></i> Recarregar
-        </button>
+        <LoadingButton
+            :loading="store.loading"
+            variant="light"
+            size="sm"
+            icon="arrow-clockwise"
+            text="Recarregar"
+            @click="recarregar"
+        />
       </div>
       <div class="card-body">
         <div v-if="store.loading" class="text-center py-4">
@@ -119,10 +125,13 @@
           </div>
 
           <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-success" :disabled="salvando">
-              <span v-if="salvando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-              Salvar Configurações
-            </button>
+            <LoadingButton
+                type="submit"
+                variant="success"
+                :loading="salvando"
+                icon="check-lg"
+                text="Salvar Configurações"
+            />
           </div>
         </form>
       </div>
@@ -174,6 +183,9 @@
 import {computed, onMounted, reactive, ref} from 'vue';
 import EmptyState from '@/components/EmptyState.vue';
 import ModalConfirmacao from '@/components/ModalConfirmacao.vue';
+import PageHeader from '@/components/layout/PageHeader.vue';
+import LoadingButton from '@/components/ui/LoadingButton.vue';
+import {BButton} from 'bootstrap-vue-next';
 import {type Parametro, useConfiguracoesStore} from '@/stores/configuracoes';
 import {useNotificacoesStore} from '@/stores/feedback';
 import {usePerfilStore} from '@/stores/perfil';

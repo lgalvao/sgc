@@ -1,30 +1,15 @@
 <template>
   <BContainer class="mt-4">
-    <div class="fs-5 mb-3">
-      {{ unidade?.sigla }} - {{ unidade?.nome }}
-      <span class="ms-3" data-testid="txt-badge-situacao">{{
-          subprocessosStore.subprocessoDetalhe?.situacaoLabel || situacaoLabel(subprocessosStore.subprocessoDetalhe?.situacao)
-        }}</span>
-    </div>
-
-    <BAlert
-        v-if="mapasStore.lastError"
-        :model-value="true"
-        variant="danger"
-        dismissible
-        @dismissed="mapasStore.clearError()"
-    >
-      {{ mapasStore.lastError.message }}
-      <div v-if="mapasStore.lastError.details">
-        <small>Detalhes: {{ mapasStore.lastError.details }}</small>
-      </div>
-    </BAlert>
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div class="display-6 mb-3">
-        Mapa de competências técnicas
-      </div>
-      <div class="d-flex gap-2">
+    <PageHeader title="Mapa de competências técnicas">
+      <template #default>
+        <div class="fs-5">
+          {{ unidade?.sigla }} - {{ unidade?.nome }}
+          <span class="ms-3" data-testid="txt-badge-situacao">{{
+              subprocessosStore.subprocessoDetalhe?.situacaoLabel || situacaoLabel(subprocessosStore.subprocessoDetalhe?.situacao)
+            }}</span>
+        </div>
+      </template>
+      <template #actions>
         <BButton
             v-if="podeVerImpacto"
             data-testid="cad-mapa__btn-impactos-mapa"
@@ -42,8 +27,22 @@
         >
           Disponibilizar
         </BButton>
+      </template>
+    </PageHeader>
+
+    <BAlert
+        v-if="mapasStore.lastError"
+        :model-value="true"
+        variant="danger"
+        dismissible
+        @dismissed="mapasStore.clearError()"
+    >
+      {{ mapasStore.lastError.message }}
+      <div v-if="mapasStore.lastError.details">
+        <small>Detalhes: {{ mapasStore.lastError.details }}</small>
       </div>
-    </div>
+    </BAlert>
+
 
     <div v-if="unidade">
       <div v-if="competencias.length === 0" class="mb-4 mt-3">
@@ -110,6 +109,7 @@
 
     <ModalConfirmacao
         v-model="mostrarModalExcluirCompetencia"
+        :loading="loadingExclusao"
         data-testid="mdl-excluir-competencia"
         titulo="Exclusão de competência"
         :mensagem="`Confirma a exclusão da competência '${competenciaParaExcluir?.descricao}'?`"
@@ -131,6 +131,7 @@
 <script lang="ts" setup>
 import {BAlert, BButton, BContainer,} from "bootstrap-vue-next";
 import EmptyState from "@/components/EmptyState.vue";
+import PageHeader from "@/components/layout/PageHeader.vue";
 import {storeToRefs} from "pinia";
 import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -230,6 +231,7 @@ const mostrarModalExcluirCompetencia = ref(false);
 const competenciaParaExcluir = ref<Competencia | null>(null);
 const notificacaoDisponibilizacao = ref("");
 const loadingDisponibilizacao = ref(false);
+const loadingExclusao = ref(false);
 
 const {errors: fieldErrors, setFromNormalizedError, clearErrors} = useFormErrors([
   'descricao',
@@ -311,6 +313,7 @@ function excluirCompetencia(codigo: number) {
 
 async function confirmarExclusaoCompetencia() {
   if (competenciaParaExcluir.value) {
+    loadingExclusao.value = true;
     try {
       await mapasStore.removerCompetencia(
           codSubprocesso.value as number,
@@ -320,6 +323,8 @@ async function confirmarExclusaoCompetencia() {
       fecharModalExcluirCompetencia();
     } catch {
       handleErrors(mapasStore);
+    } finally {
+      loadingExclusao.value = false;
     }
   }
 }

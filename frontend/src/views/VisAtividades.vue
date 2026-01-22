@@ -1,11 +1,12 @@
 <template>
   <BContainer class="mt-4">
-    <div class="unidade-cabecalho w-100">
-      <span class="unidade-sigla">{{ siglaUnidade }}</span>
-      <span class="unidade-nome">{{ nomeUnidade }}</span>
-    </div>
-
     <PageHeader title="Atividades e conhecimentos">
+      <template #subtitle>
+        <div class="unidade-cabecalho mb-0">
+          <span class="unidade-sigla">{{ siglaUnidade }}</span>
+          <span class="unidade-nome">{{ nomeUnidade }}</span>
+        </div>
+      </template>
       <template #actions>
         <BButton
             v-if="podeVerImpacto"
@@ -434,9 +435,9 @@ defineExpose({
 .unidade-cabecalho {
   font-size: 1.1rem;
   font-weight: 500;
-  margin-bottom: 1.2rem;
   display: flex;
   gap: 0.5rem;
+  align-items: center;
 }
 
 .unidade-sigla {

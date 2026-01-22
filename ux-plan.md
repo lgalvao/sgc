@@ -96,73 +96,23 @@ This plan outlines comprehensive steps to standardize the application's User Exp
 
 ---
 
-### Sprint 3: Button & Loading Standardization
+### Sprint 3: Button & Loading Standardization ✅ COMPLETE
 
 **Goal:** Create reusable loading button, eliminate manual loading logic.
 
 **Priority:** MEDIUM | **Effort:** Medium | **Impact:** High
 
-#### Option A: Create LoadingButton Component (Recommended)
+#### Option A: Create LoadingButton Component (Recommended) ✅
 
 **Component:** `frontend/src/components/ui/LoadingButton.vue`
 
-```vue
-<template>
-  <BButton
-    v-bind="$attrs"
-    :disabled="loading || disabled"
-    @click="$emit('click', $event)"
-  >
-    <BSpinner v-if="loading" small class="me-1" />
-    <i v-else-if="icon" :class="`bi bi-${icon} me-1`" aria-hidden="true"></i>
-    <slot>{{ loadingText && loading ? loadingText : text }}</slot>
-  </BButton>
-</template>
-
-<script setup lang="ts">
-interface Props {
-  loading?: boolean
-  disabled?: boolean
-  icon?: string
-  text?: string
-  loadingText?: string
-}
-
-withDefaults(defineProps<Props>(), {
-  loading: false,
-  disabled: false,
-})
-
-defineEmits<{
-  click: [event: MouseEvent]
-}>()
-</script>
-```
-
-**Usage:**
-```vue
-<LoadingButton
-  variant="primary"
-  :loading="isSalvando"
-  icon="save"
-  text="Salvar"
-  loading-text="Salvando..."
-  @click="salvar"
-/>
-```
-
-**Benefits:**
-- **15 components** × **3 buttons** = 45 buttons
-- **7 lines → 3 lines** per button
-- **180 lines saved** across codebase
-
-**Files to Update (Priority Order):**
-1. CadProcesso.vue (3 loading buttons)
-2. VisMapa.vue (4 loading buttons)
-3. CadMapa.vue (2 loading buttons)
-4. ConfiguracoesView.vue (2 loading buttons)
-5. DisponibilizarMapaModal.vue (1 loading button)
-6. All other views with loading buttons (gradual adoption)
+**Files Updated:**
+1. CadProcesso.vue (3 loading buttons) ✅
+2. VisMapa.vue (via ModalConfirmacao loading prop) ✅
+3. CadMapa.vue (via ModalConfirmacao loading prop) ✅
+4. ConfiguracoesView.vue (3 loading buttons) ✅
+5. DisponibilizarMapaModal.vue (1 loading button) ✅
+6. CadAtividades.vue (2 loading buttons) ✅
 
 #### Option B: Enhance BButton Usage (Alternative)
 
@@ -189,20 +139,20 @@ If LoadingButton is deemed over-engineering:
 **Migration Order (by view complexity):**
 
 **Tier 1 - Simple Views (No complex header logic):**
-1. PainelView.vue
-2. HistoricoView.vue
-3. RelatoriosView.vue
+1. PainelView.vue ✅
+2. HistoricoView.vue ✅
+3. RelatoriosView.vue ✅
 
 **Tier 2 - Standard CRUD Views:**
-4. ProcessoView.vue
-5. UnidadeView.vue
-6. CadMapa.vue
+4. ProcessoView.vue ✅
+5. UnidadeView.vue ✅
+6. CadMapa.vue ✅
 
 **Tier 3 - Complex Views:**
-7. VisMapa.vue
-8. CadAtividades.vue
-9. VisAtividades.vue
-10. SubprocessoView.vue
+7. VisMapa.vue ✅
+8. CadAtividades.vue ✅
+9. VisAtividades.vue ✅
+10. SubprocessoView.vue (Skipped - Complex custom header)
 
 **Template Pattern:**
 

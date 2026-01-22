@@ -1,8 +1,6 @@
 <template>
   <BContainer class="mt-4">
-    <h2 class="display-6 mb-4">
-      Relatórios
-    </h2>
+    <PageHeader title="Relatórios" />
 
     <!-- Filtros -->
     <div class="row mb-4">
@@ -261,6 +259,7 @@
 
 <script lang="ts" setup>
 import {BButton, BCard, BContainer, BFormInput, BFormSelect, BModal,} from "bootstrap-vue-next";
+import PageHeader from "@/components/layout/PageHeader.vue";
 import {computed, ref} from "vue";
 import {useMapasStore} from "@/stores/mapas";
 import {useProcessosStore} from "@/stores/processos";
