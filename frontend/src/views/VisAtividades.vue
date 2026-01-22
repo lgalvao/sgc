@@ -5,11 +5,8 @@
       <span class="unidade-nome">{{ nomeUnidade }}</span>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2 class="mb-0">
-        Atividades e conhecimentos
-      </h2>
-      <div class="d-flex gap-2">
+    <PageHeader title="Atividades e conhecimentos">
+      <template #actions>
         <BButton
             v-if="podeVerImpacto"
             data-testid="cad-atividades__btn-impactos-mapa"
@@ -41,8 +38,8 @@
         >
           {{ perfilSelecionado === Perfil.ADMIN ? 'Homologar' : 'Registrar aceite' }}
         </BButton>
-      </div>
-    </div>
+      </template>
+    </PageHeader>
 
     <!-- Lista de atividades -->
     <BCard
@@ -91,95 +88,63 @@
     />
 
     <!-- Modal de Validação -->
-    <BModal
-        v-model="mostrarModalValidar"
-        :fade="false"
-        :title="isHomologacao ? 'Homologação do cadastro de atividades e conhecimentos' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro')"
-        centered
-        hide-footer
+    <ModalConfirmacao
+      v-model="mostrarModalValidar"
+      :titulo="isHomologacao ? 'Homologação do cadastro de atividades e conhecimentos' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro')"
+      ok-title="Confirmar"
+      variant="success"
+      :loading="loadingValidacao"
+      :auto-close="false"
+      test-id-confirmar="btn-aceite-cadastro-confirmar"
+      @confirmar="confirmarValidacao"
     >
       <p>{{
           isHomologacao ? 'Confirma a homologação do cadastro de atividades e conhecimentos?' : (isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?')
         }}</p>
-      <div
-          class="mb-3"
-      >
-        <label
-            class="form-label"
-            for="observacaoValidacao"
-        >Observação</label>
+      <BFormGroup label="Observação" label-for="observacaoValidacao" class="mb-3">
         <BFormTextarea
             id="observacaoValidacao"
             v-model="observacaoValidacao"
             data-testid="inp-aceite-cadastro-obs"
             rows="3"
         />
-      </div>
-      <template #footer>
-        <BButton
-            variant="secondary"
-            @click="fecharModalValidar"
-        >
-          Cancelar
-        </BButton>
-        <BButton
-            data-testid="btn-aceite-cadastro-confirmar"
-            variant="success"
-            @click="confirmarValidacao"
-        >
-          Confirmar
-        </BButton>
-      </template>
-    </BModal>
+      </BFormGroup>
+    </ModalConfirmacao>
 
     <!-- Modal de Devolução -->
-    <BModal
-        v-model="mostrarModalDevolver"
-        :fade="false"
-        :title="isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro'"
-        centered
-        hide-footer
+    <ModalConfirmacao
+      v-model="mostrarModalDevolver"
+      :titulo="isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro'"
+      ok-title="Confirmar"
+      variant="danger"
+      :loading="loadingDevolucao"
+      :auto-close="false"
+      test-id-confirmar="btn-devolucao-cadastro-confirmar"
+      @confirmar="confirmarDevolucao"
     >
       <p>{{
           isRevisao ? 'Confirma a devolução da revisão do cadastro para ajustes?' : 'Confirma a devolução do cadastro para ajustes?'
         }}</p>
-      <div class="mb-3">
-        <label
-            class="form-label"
-            for="observacaoDevolucao"
-        >Observação</label>
+      <BFormGroup label="Observação" label-for="observacaoDevolucao" class="mb-3">
         <BFormTextarea
             id="observacaoDevolucao"
             v-model="observacaoDevolucao"
             data-testid="inp-devolucao-cadastro-obs"
             rows="3"
         />
-      </div>
-      <template #footer>
-        <BButton
-            variant="secondary"
-            @click="fecharModalDevolver"
-        >
-          Cancelar
-        </BButton>
-        <BButton
-            data-testid="btn-devolucao-cadastro-confirmar"
-            variant="danger"
-            @click="confirmarDevolucao"
-        >
-          Confirmar
-        </BButton>
-      </template>
-    </BModal>
+      </BFormGroup>
+    </ModalConfirmacao>
   </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BContainer, BFormTextarea, BModal,} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BContainer, BFormGroup, BFormTextarea,} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
+import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
+import PageHeader from "@/components/layout/PageHeader.vue";
 import {useAnalisesStore} from "@/stores/analises";
 import {useAtividadesStore} from "@/stores/atividades";
 import {usePerfilStore} from "@/stores/perfil";
@@ -222,6 +187,9 @@ const mostrarModalDevolver = ref(false);
 const mostrarModalHistoricoAnalise = ref(false);
 const observacaoValidacao = ref<string>("");
 const observacaoDevolucao = ref<string>("");
+
+const loadingValidacao = ref(false);
+const loadingDevolucao = ref(false);
 
 const {impactoMapa} = storeToRefs(mapasStore);
 const loadingImpacto = ref(false);
@@ -312,67 +280,78 @@ function devolverCadastro() {
 async function confirmarValidacao() {
   if (!codSubprocesso.value || !perfilSelecionado.value) return;
 
+  loadingValidacao.value = true;
   const commonRequest = {
     observacoes: observacaoValidacao.value,
   };
 
-  let sucesso: boolean;
+  try {
+    let sucesso: boolean;
 
-  if (isHomologacao.value) {
-    const req: HomologarCadastroRequest = {
-      observacoes: observacaoValidacao.value,
-    };
-    if (isRevisao.value) {
-      sucesso = await subprocessosStore.homologarRevisaoCadastro(
-          codSubprocesso.value,
-          req,
-      );
+    if (isHomologacao.value) {
+      const req: HomologarCadastroRequest = {
+        observacoes: observacaoValidacao.value,
+      };
+      if (isRevisao.value) {
+        sucesso = await subprocessosStore.homologarRevisaoCadastro(
+            codSubprocesso.value,
+            req,
+        );
+      } else {
+        sucesso = await subprocessosStore.homologarCadastro(codSubprocesso.value, req);
+      }
+
+      if (sucesso) {
+        fecharModalValidar();
+        // Redirecionar para Detalhes do subprocesso (CDU-13 passo 11.7 e CDU-14 passo 12.4)
+        await router.push({
+          name: "Subprocesso",
+          params: {
+            codProcesso: props.codProcesso,
+            siglaUnidade: props.sigla
+          }
+        });
+      }
     } else {
-      sucesso = await subprocessosStore.homologarCadastro(codSubprocesso.value, req);
-    }
+      const req: AceitarCadastroRequest = {...commonRequest};
+      if (isRevisao.value) {
+        sucesso = await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, req);
+      } else {
+        sucesso = await subprocessosStore.aceitarCadastro(codSubprocesso.value, req);
+      }
 
-    if (sucesso) {
-      fecharModalValidar();
-      // Redirecionar para Detalhes do subprocesso (CDU-13 passo 11.7 e CDU-14 passo 12.4)
-      await router.push({
-        name: "Subprocesso",
-        params: {
-          codProcesso: props.codProcesso,
-          siglaUnidade: props.sigla
-        }
-      });
+      if (sucesso) {
+        fecharModalValidar();
+        await router.push({name: "Painel"});
+      }
     }
-  } else {
-    const req: AceitarCadastroRequest = {...commonRequest};
-    if (isRevisao.value) {
-      sucesso = await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, req);
-    } else {
-      sucesso = await subprocessosStore.aceitarCadastro(codSubprocesso.value, req);
-    }
-
-    if (sucesso) {
-      fecharModalValidar();
-      await router.push({name: "Painel"});
-    }
+  } finally {
+    loadingValidacao.value = false;
   }
 }
 
 async function confirmarDevolucao() {
   if (!codSubprocesso.value || !perfilSelecionado.value) return;
-  const req: DevolverCadastroRequest = {
-    observacoes: observacaoDevolucao.value,
-  };
+  loadingDevolucao.value = true;
 
-  let sucesso: boolean;
-  if (isRevisao.value) {
-    sucesso = await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, req);
-  } else {
-    sucesso = await subprocessosStore.devolverCadastro(codSubprocesso.value, req);
-  }
+  try {
+    const req: DevolverCadastroRequest = {
+      observacoes: observacaoDevolucao.value,
+    };
 
-  if (sucesso) {
-    fecharModalDevolver();
-    await router.push("/painel");
+    let sucesso: boolean;
+    if (isRevisao.value) {
+      sucesso = await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, req);
+    } else {
+      sucesso = await subprocessosStore.devolverCadastro(codSubprocesso.value, req);
+    }
+
+    if (sucesso) {
+      fecharModalDevolver();
+      await router.push("/painel");
+    }
+  } finally {
+    loadingDevolucao.value = false;
   }
 }
 

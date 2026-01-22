@@ -10,53 +10,52 @@
       {{ unidadesStore.lastError.message }}
     </BAlert>
 
-    <BCard
-        v-if="unidadeComResponsavelDinamico"
-        class="mb-4"
-    >
-      <BCardBody>
-        <h2 class="display-6 mb-3">
-          {{ unidadeComResponsavelDinamico.sigla }} - {{
-            unidadeComResponsavelDinamico.nome
-          }}
-        </h2>
-        <p><strong>Titular:</strong> {{ titularDetalhes?.nome }}</p>
-        <p class="ms-3">
-          <i class="bi bi-telephone-fill me-2"/>{{ titularDetalhes?.ramal }}
-          <i class="bi bi-envelope-fill ms-3 me-2"/>{{ titularDetalhes?.email }}
-        </p>
-        <template
-            v-if="unidadeComResponsavelDinamico.responsavel &&
-            unidadeComResponsavelDinamico.responsavel.codigo &&
-            unidadeComResponsavelDinamico.responsavel.codigo !== unidadeComResponsavelDinamico.usuarioCodigo"
-        >
-          <p><strong>Responsável:</strong> {{ unidadeComResponsavelDinamico.responsavel.nome }}</p>
-          <p class="ms-3">
-            <i class="bi bi-telephone-fill me-2"/>{{ unidadeComResponsavelDinamico.responsavel.ramal }}
-            <i class="bi bi-envelope-fill ms-3 me-2"/>{{ unidadeComResponsavelDinamico.responsavel.email }}
-          </p>
+    <div v-if="unidadeComResponsavelDinamico">
+      <PageHeader :title="`${unidadeComResponsavelDinamico.sigla} - ${unidadeComResponsavelDinamico.nome}`">
+        <template #actions>
+          <BButton
+              v-if="mapaVigente"
+              data-testid="btn-mapa-vigente"
+              variant="outline-success"
+              @click="visualizarMapa"
+          >
+            <i
+                class="bi bi-file-earmark-spreadsheet me-2"
+            />Mapa vigente
+          </BButton>
+          <BButton
+              v-if="perfilStore.perfilSelecionado === 'ADMIN'"
+              class="ms-2"
+              data-testid="unidade-view__btn-criar-atribuicao"
+              variant="outline-primary"
+              @click="irParaCriarAtribuicao"
+          >
+            Criar atribuição
+          </BButton>
         </template>
-        <BButton
-            v-if="mapaVigente"
-            data-testid="btn-mapa-vigente"
-            variant="outline-success"
-            @click="visualizarMapa"
-        >
-          <i
-              class="bi bi-file-earmark-spreadsheet me-2"
-          />Mapa vigente
-        </BButton>
-        <BButton
-            v-if="perfilStore.perfilSelecionado === 'ADMIN'"
-            class="ms-2"
-            data-testid="unidade-view__btn-criar-atribuicao"
-            variant="outline-primary"
-            @click="irParaCriarAtribuicao"
-        >
-          Criar atribuição
-        </BButton>
-      </BCardBody>
-    </BCard>
+      </PageHeader>
+
+      <BCard class="mb-4">
+        <BCardBody>
+          <p><strong>Titular:</strong> {{ titularDetalhes?.nome }}</p>
+          <p class="ms-3">
+            <i class="bi bi-telephone-fill me-2"/>{{ titularDetalhes?.ramal }}
+            <i class="bi bi-envelope-fill ms-3 me-2"/>{{ titularDetalhes?.email }}
+          </p>
+          <template
+              v-if="unidadeComResponsavelDinamico.responsavel &&
+              unidadeComResponsavelDinamico.responsavel.codigo &&
+              unidadeComResponsavelDinamico.responsavel.codigo !== unidadeComResponsavelDinamico.usuarioCodigo"
+          >
+            <p><strong>Responsável:</strong> {{ unidadeComResponsavelDinamico.responsavel.nome }}</p>
+            <p class="ms-3">
+              <i class="bi bi-telephone-fill me-2"/>{{ unidadeComResponsavelDinamico.responsavel.ramal }}
+              <i class="bi bi-envelope-fill ms-3 me-2"/>{{ unidadeComResponsavelDinamico.responsavel.email }}
+            </p>
+          </template>
+        </BCardBody>
+      </BCard>
+    </div>
     <div v-else>
       <p>Unidade não encontrada.</p>
     </div>
@@ -88,6 +87,7 @@ import {useUnidadesStore} from "@/stores/unidades";
 import {buscarUsuarioPorTitulo} from "@/services/usuarioService";
 import type {MapaCompleto, Responsavel, Unidade, Usuario,} from "@/types/tipos";
 import TreeTable from "../components/TreeTableView.vue";
+import PageHeader from "@/components/layout/PageHeader.vue";
 
 const props = defineProps<{ codUnidade: number }>();
 

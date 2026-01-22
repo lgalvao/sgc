@@ -1,6 +1,6 @@
 <template>
   <BContainer class="mt-4">
-    <h2>Criar atribuição temporária</h2>
+    <PageHeader title="Criar atribuição temporária" />
     <BCard class="mb-4 mt-4">
       <BCardBody>
         <h5 class="card-title mb-3">
@@ -135,6 +135,7 @@ import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService"
 import {buscarUnidadePorCodigo} from "@/services/unidadesService";
 import {buscarUsuariosPorUnidade} from "@/services/usuarioService";
 import type {Unidade, Usuario} from "@/types/tipos";
+import PageHeader from "@/components/layout/PageHeader.vue";
 
 const props = defineProps<{ codUnidade: number }>();
 
