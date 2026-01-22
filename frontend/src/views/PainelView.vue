@@ -2,22 +2,18 @@
   <BContainer class="mt-4">
     <!-- Tabela de Processos -->
     <div class="mb-5">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <div
-            class="display-6 mb-0"
-            data-testid="txt-painel-titulo-processos"
-        >
-          Processos
-        </div>
-        <BButton
-            v-if="perfil.isAdmin"
-            :to="{ name: 'CadProcesso' }"
-            data-testid="btn-painel-criar-processo"
-            variant="outline-primary"
-        >
-          <i class="bi bi-plus-lg"/> Criar processo
-        </BButton>
-      </div>
+      <PageHeader title="Processos">
+        <template #actions>
+          <BButton
+              v-if="perfil.isAdmin"
+              :to="{ name: 'CadProcesso' }"
+              data-testid="btn-painel-criar-processo"
+              variant="outline-primary"
+          >
+            <i class="bi bi-plus-lg"/> Criar processo
+          </BButton>
+        </template>
+      </PageHeader>
       <TabelaProcessos
           :compacto="true"
           :criterio-ordenacao="criterio"
@@ -29,14 +25,7 @@
     </div>
 
     <div>
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <div
-            class="mb-0 display-6"
-            data-testid="txt-painel-titulo-alertas"
-        >
-          Alertas
-        </div>
-      </div>
+      <PageHeader title="Alertas" />
       <TabelaAlertas
           :alertas="alertas"
           @ordenar="ordenarAlertasPor"
@@ -50,6 +39,7 @@ import {BButton, BContainer} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
+import PageHeader from "@/components/layout/PageHeader.vue";
 import TabelaAlertas from "@/components/TabelaAlertas.vue";
 import TabelaProcessos from "@/components/TabelaProcessos.vue";
 import {useAlertasStore} from "@/stores/alertas";

@@ -60,6 +60,11 @@ describe("PainelView.vue", () => {
             stubs: {
                 BContainer: {template: '<div><slot /></div>'},
                 BButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
+                PageHeader: {
+                    name: 'PageHeader',
+                    props: ['title'],
+                    template: '<div data-testid="page-header">{{ title }} <slot name="actions" /></div>'
+                },
                 TabelaProcessos: {
                     name: 'TabelaProcessos',
                     props: ['processos', 'criterioOrdenacao', 'direcaoOrdenacaoAsc'],
@@ -79,8 +84,11 @@ describe("PainelView.vue", () => {
     it("deve renderizar tabelas e títulos", () => {
         const wrapper = mount(PainelView, mountOptions());
 
-        expect(wrapper.find('[data-testid="txt-painel-titulo-processos"]').text()).toBe("Processos");
-        expect(wrapper.find('[data-testid="txt-painel-titulo-alertas"]').text()).toBe("Alertas");
+        const headers = wrapper.findAllComponents({ name: 'PageHeader' });
+        expect(headers).toHaveLength(2);
+        expect(headers[0].props('title')).toBe('Processos');
+        expect(headers[1].props('title')).toBe('Alertas');
+
         expect(wrapper.findComponent({name: 'TabelaProcessos'}).exists()).toBe(true);
         expect(wrapper.findComponent({name: 'TabelaAlertas'}).exists()).toBe(true);
     });
