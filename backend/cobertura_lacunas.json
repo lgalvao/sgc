@@ -1,48 +1,7 @@
 {
-  "globalLineCoverage": "98.73%",
-  "totalFilesWithGaps": 38,
+  "globalLineCoverage": "99.42%",
+  "totalFilesWithGaps": 37,
   "gaps": [
-    {
-      "class": "sgc.seguranca.login.LimitadorTentativasLogin",
-      "coverage": "40.00%",
-      "missed": [
-        52,
-        53,
-        55,
-        59,
-        60,
-        61,
-        66,
-        68,
-        69,
-        70,
-        72,
-        73,
-        81,
-        82,
-        86,
-        87,
-        88,
-        90,
-        93,
-        94,
-        96,
-        97,
-        99,
-        106,
-        108,
-        109,
-        111,
-        116,
-        121,
-        122
-      ],
-      "partial": [
-        "49(1/2)",
-        "77(1/2)"
-      ],
-      "score": 31
-    },
     {
       "class": "sgc.seguranca.login.LoginFacade",
       "coverage": "87.30%",
@@ -349,6 +308,15 @@
       "score": 0.5
     },
     {
+      "class": "sgc.seguranca.login.LimitadorTentativasLogin",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "82(1/4)"
+      ],
+      "score": 0.5
+    },
+    {
       "class": "sgc.seguranca.login.ClienteAcessoAd",
       "coverage": "100.00%",
       "missed": [],
@@ -417,15 +385,6 @@
       "missed": [],
       "partial": [
         "64(1/2)"
-      ],
-      "score": 0.5
-    },
-    {
-      "class": "sgc.analise.AnaliseFacade",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "38(1/2)"
       ],
       "score": 0.5
     }

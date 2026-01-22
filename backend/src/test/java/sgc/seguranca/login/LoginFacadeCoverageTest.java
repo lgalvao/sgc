@@ -27,32 +27,44 @@ import static org.mockito.Mockito.when;
 @DisplayName("LoginFacadeCoverageTest")
 class LoginFacadeCoverageTest {
 
-    @Mock private UsuarioFacade usuarioService;
-    @Mock private GerenciadorJwt gerenciadorJwt;
-    @Mock private ClienteAcessoAd clienteAcessoAd;
-    @Mock private UnidadeFacade unidadeService;
-    @Mock private UsuarioMapper usuarioMapper;
+    @Mock
+    private UsuarioFacade usuarioService;
+    @Mock
+    private GerenciadorJwt gerenciadorJwt;
+    @Mock
+    private ClienteAcessoAd clienteAcessoAd;
+    @Mock
+    private UnidadeFacade unidadeService;
+    @Mock
+    private UsuarioMapper usuarioMapper;
 
     @InjectMocks
     private LoginFacade facade;
 
-    /**
-     * Configura o mock do UsuarioMapper para retornar DTOs corretamente.
-     * Chamado apenas nos testes que usam autorizar com sucesso.
-     */
-    private void configurarMockDoMapper() {
-        when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(any(Unidade.class))).thenAnswer(inv -> {
-            Unidade u = inv.getArgument(0);
-            if (u == null) return null;
-            Unidade superior = u.getUnidadeSuperior();
-            return UnidadeDto.builder()
-                    .codigo(u.getCodigo())
-                    .nome(u.getNome())
-                    .sigla(u.getSigla())
-                    .codigoPai(superior != null ? superior.getCodigo() : null)
-                    .tipo(u.getTipo().name())
-                    .isElegivel(u.getTipo() != TipoUnidade.INTERMEDIARIA)
-                    .build();
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        org.mockito.Mockito.lenient().when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(any(Unidade.class)))
+                .thenAnswer(inv -> {
+                    Unidade u = inv.getArgument(0);
+                    if (u == null)
+                        return null;
+                    Unidade superior = u.getUnidadeSuperior();
+                    return UnidadeDto.builder()
+                            .codigo(u.getCodigo())
+                            .nome(u.getNome())
+                            .sigla(u.getSigla())
+                            .codigoPai(superior != null ? superior.getCodigo() : null)
+                            .tipo(u.getTipo() != null ? u.getTipo().name() : null)
+                            .isElegivel(u.getTipo() != TipoUnidade.INTERMEDIARIA)
+                            .build();
+                });
+
+        // Stubbing generico para evitar NPE se chamado
+        org.mockito.Mockito.lenient().when(unidadeService.buscarEntidadePorId(any())).thenAnswer(inv -> {
+            Unidade u = new Unidade();
+            u.setCodigo(inv.getArgument(0));
+            u.setSituacao(SituacaoUnidade.ATIVA);
+            return u;
         });
     }
 
@@ -73,7 +85,6 @@ class LoginFacadeCoverageTest {
     @Test
     @DisplayName("toUnidadeDto - Coverage for Branches")
     void toUnidadeDto_Coverage() {
-        configurarMockDoMapper();
         String titulo = "123";
         when(clienteAcessoAd.autenticar(any(), any())).thenReturn(true);
         facade.autenticar(titulo, "pass");
@@ -84,11 +95,13 @@ class LoginFacadeCoverageTest {
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
         u1.setTipo(TipoUnidade.OPERACIONAL);
+        u1.setSituacao(SituacaoUnidade.ATIVA);
 
         Unidade u2 = new Unidade();
         u2.setCodigo(2L);
         u2.setUnidadeSuperior(u1);
         u2.setTipo(TipoUnidade.INTERMEDIARIA);
+        u2.setSituacao(SituacaoUnidade.ATIVA);
 
         UsuarioPerfil p1 = new UsuarioPerfil();
         p1.setPerfil(Perfil.SERVIDOR);
@@ -108,13 +121,115 @@ class LoginFacadeCoverageTest {
 
         assertEquals(2, result.size());
 
-        UnidadeDto dto1 = result.stream().filter(r -> r.getUnidade().getCodigo().equals(1L)).findFirst().get().getUnidade();
+        UnidadeDto dto1 = result.stream().filter(r -> r.getUnidade().getCodigo().equals(1L)).findFirst().get()
+                .getUnidade();
         assertNull(dto1.getCodigoPai());
         assertTrue(dto1.isElegivel());
 
-        UnidadeDto dto2 = result.stream().filter(r -> r.getUnidade().getCodigo().equals(2L)).findFirst().get().getUnidade();
+        UnidadeDto dto2 = result.stream().filter(r -> r.getUnidade().getCodigo().equals(2L)).findFirst().get()
+                .getUnidade();
         assertEquals(1L, dto2.getCodigoPai());
         assertFalse(dto2.isElegivel());
+    }
+
+    @Test
+    @DisplayName("entrar - Sucesso")
+    void entrar_Sucesso() {
+        String titulo = "123";
+        Long codUnidade = 1L;
+        String perfilName = "SERVIDOR";
+
+        when(clienteAcessoAd.autenticar(any(), any())).thenReturn(true);
+        facade.autenticar(titulo, "pass");
+
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral(titulo);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(codUnidade);
+        u1.setSituacao(SituacaoUnidade.ATIVA);
+
+        UsuarioPerfil p1 = new UsuarioPerfil();
+        p1.setPerfil(Perfil.SERVIDOR);
+        p1.setUnidade(u1);
+        usuario.setAtribuicoes(Set.of(p1));
+
+        when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
+        when(gerenciadorJwt.gerarToken(titulo, Perfil.SERVIDOR, codUnidade)).thenReturn("jwt-token");
+
+        EntrarRequest request = EntrarRequest.builder()
+                .tituloEleitoral(titulo)
+                .perfil(perfilName)
+                .unidadeCodigo(codUnidade)
+                .build();
+
+        String token = facade.entrar(request);
+        assertEquals("jwt-token", token);
+    }
+
+    @Test
+    @DisplayName("entrar - Acesso Negado")
+    void entrar_AcessoNegado() {
+        String titulo = "123";
+        when(clienteAcessoAd.autenticar(any(), any())).thenReturn(true);
+        facade.autenticar(titulo, "pass");
+
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral(titulo);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        u1.setSituacao(SituacaoUnidade.ATIVA);
+
+        UsuarioPerfil p1 = new UsuarioPerfil();
+        p1.setPerfil(Perfil.SERVIDOR);
+        p1.setUnidade(u1);
+        usuario.setAtribuicoes(Set.of(p1));
+
+        when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
+
+        EntrarRequest request = EntrarRequest.builder()
+                .tituloEleitoral(titulo)
+                .perfil("GESTOR") // Perfil diferente
+                .unidadeCodigo(1L)
+                .build();
+
+        assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () -> facade.entrar(request));
+    }
+
+    @Test
+    @DisplayName("buscarAutorizacoesInterno - Filtra Unidades Inativas")
+    void buscarAutorizacoesInterno_FiltraInativas() {
+        String titulo = "123";
+        when(clienteAcessoAd.autenticar(any(), any())).thenReturn(true);
+        facade.autenticar(titulo, "pass");
+
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral(titulo);
+
+        Unidade uAtiva = new Unidade();
+        uAtiva.setCodigo(1L);
+        uAtiva.setSituacao(SituacaoUnidade.ATIVA);
+
+        Unidade uInativa = new Unidade();
+        uInativa.setCodigo(2L);
+        uInativa.setSituacao(SituacaoUnidade.INATIVA);
+
+        UsuarioPerfil p1 = new UsuarioPerfil();
+        p1.setPerfil(Perfil.SERVIDOR);
+        p1.setUnidade(uAtiva);
+        p1.setUsuarioTitulo(titulo);
+
+        UsuarioPerfil p2 = new UsuarioPerfil();
+        p2.setPerfil(Perfil.GESTOR);
+        p2.setUnidade(uInativa);
+        p2.setUsuarioTitulo(titulo);
+
+        usuario.setAtribuicoes(new java.util.HashSet<>(java.util.List.of(p1, p2)));
+
+        when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
+
+        List<PerfilUnidadeDto> result = facade.autorizar(titulo);
+        assertEquals(1, result.size());
+        assertEquals(1L, result.get(0).getUnidade().getCodigo());
     }
 
     @Test

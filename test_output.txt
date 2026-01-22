@@ -1,0 +1,242 @@
+Initialized native services in: C:\Users\maao1\.gradle\native
+Initialized jansi services in: C:\Users\maao1\.gradle\native
+The client will now receive all logging from the daemon (pid: 10580). The daemon log file: C:\Users\maao1\.gradle\daemon\9.3.0\daemon-10580.out.log
+Starting 13th build in daemon [uptime: 16 mins 19.309 secs, performance: 100%, GC rate: 0.00/s, heap usage: 0% of 512 MiB, non-heap usage: 25% of 384 MiB]
+Using 8 worker leases.
+Operational build model parameters: {requiresToolingModels=false, parallelProjectExecution=false, configureOnDemand=false, configurationCache=true, configurationCacheParallelStore=false, configurationCacheParallelLoad=true, isolatedProjects=false, parallelProjectConfiguration=false, intermediateModelCache=false, parallelToolingApiActions=false, invalidateCoupledProjects=false, modelAsProjectDependency=false, resilientModelBuilding=false}
+Encryption key source: default Gradle keystore (pkcs12)
+Calculating task graph as no cached configuration is available for tasks: :backend:cleanTest :backend:test --tests sgc.seguranca.login.LoginFacadeCoverageTest
+Now considering [C:\sgc] as hierarchies to watch
+Watching the file system is configured to be enabled if available
+File system watching is active
+Starting Build
+Settings evaluated using settings file 'C:\sgc\settings.gradle.kts'.
+Projects loaded. Root project using build file 'C:\sgc\build.gradle.kts'.
+Included projects: [root project 'sgc', project ':backend', project ':frontend']
+
+> Configure project :
+Evaluating root project 'sgc' using build file 'C:\sgc\build.gradle.kts'.
+Resolved plugin [id: 'org.springframework.boot', version: '4.0.1']
+Resolved plugin [id: 'io.spring.dependency-management', version: '1.1.7']
+Resolved plugin [id: 'com.github.ben-manes.versions', version: '0.52.0']
+Applying dependency management to configuration 'bootArchives' in project 'sgc'
+Applying dependency management to configuration 'archives' in project 'sgc'
+Applying dependency management to configuration 'default' in project 'sgc'
+
+> Configure project :backend
+Evaluating project ':backend' using build file 'C:\sgc\backend\build.gradle.kts'.
+Resolved plugin [id: 'org.gradle.java']
+Resolved plugin [id: 'org.gradle.jacoco']
+Resolved plugin [id: 'org.springframework.boot', version: '4.0.1']
+Resolved plugin [id: 'io.spring.dependency-management', version: '1.1.7']
+Resolved plugin [id: 'info.solidsoft.pitest', version: '1.19.0-rc.1']
+Resolved plugin [id: 'com.github.spotbugs', version: '6.4.8']
+Applying dependency management to configuration 'annotationProcessor' in project 'backend'
+Applying dependency management to configuration 'apiElements' in project 'backend'
+Applying dependency management to configuration 'archives' in project 'backend'
+Applying dependency management to configuration 'bootArchives' in project 'backend'
+Applying dependency management to configuration 'compileClasspath' in project 'backend'
+Applying dependency management to configuration 'compileOnly' in project 'backend'
+Applying dependency management to configuration 'coverageDataElementsForTest' in project 'backend'
+Applying dependency management to configuration 'default' in project 'backend'
+Applying dependency management to configuration 'developmentOnly' in project 'backend'
+Applying dependency management to configuration 'implementation' in project 'backend'
+Applying dependency management to configuration 'jacocoAgent' in project 'backend'
+Applying dependency management to configuration 'jacocoAnt' in project 'backend'
+Applying dependency management to configuration 'mainSourceElements' in project 'backend'
+Applying dependency management to configuration 'productionRuntimeClasspath' in project 'backend'
+Applying dependency management to configuration 'runtimeClasspath' in project 'backend'
+Applying dependency management to configuration 'runtimeElements' in project 'backend'
+Applying dependency management to configuration 'runtimeOnly' in project 'backend'
+Applying dependency management to configuration 'testAndDevelopmentOnly' in project 'backend'
+Applying dependency management to configuration 'testAnnotationProcessor' in project 'backend'
+Applying dependency management to configuration 'testCompileClasspath' in project 'backend'
+Applying dependency management to configuration 'testCompileOnly' in project 'backend'
+Applying dependency management to configuration 'testImplementation' in project 'backend'
+Applying dependency management to configuration 'testResultsElementsForTest' in project 'backend'
+Applying dependency management to configuration 'testRuntimeClasspath' in project 'backend'
+Applying dependency management to configuration 'testRuntimeOnly' in project 'backend'
+Applying dependency management to configuration 'pitest' in project 'backend'
+Applying dependency management to configuration 'spotbugs' in project 'backend'
+Applying dependency management to configuration 'spotbugsSlf4j' in project 'backend'
+Applying dependency management to configuration 'spotbugsPlugins' in project 'backend'
+Resolving global dependency management for project 'backend'
+Excluding [javax.validation:validation-api]
+Applying dependency management to configuration 'tmpTestImplementation' in project 'backend'
+Excluding [javax.validation:validation-api]
+org.junit.platform component (org.junit.platform:junit-platform-commons:6.0.1) found in testImplementation, adding junit-platform-launcher (org.junit.platform:junit-platform-launcher:6.0.1) to testRuntimeOnly
+Excluding []
+
+> Configure project :frontend
+Evaluating project ':frontend' using build file 'C:\sgc\frontend\build.gradle.kts'.
+All projects evaluated.
+Task path ':backend:cleanTest' matched project ':backend'
+Task name matched 'cleanTest'
+Task path ':backend:test' matched project ':backend'
+Task name matched 'test'
+Selected primary task 'cleanTest' from project :backend
+Selected primary task 'test' from project :backend
+Excluding []
+Excluding []
+Excluding []
+Excluding []
+Excluding [javax.validation:validation-api]
+Tasks to be executed: [task ':backend:cleanTest', task ':backend:compileJava', task ':backend:processResources', task ':backend:classes', task ':backend:compileTestJava', task ':backend:processTestResources', task ':backend:testClasses', task ':backend:test']
+Tasks that were excluded: []
+Ignoring listeners of task graph ready event, as this build (:) has already executed work.
+Resolve mutations for :backend:cleanTest (Thread[#849,Execution worker,5,main]) started.
+:backend:cleanTest (Thread[#849,Execution worker,5,main]) started.
+destroyer locations for task group 0 (Thread[#848,included builds,5,main]) started.
+Resolve mutations for :backend:compileJava (Thread[#848,included builds,5,main]) started.
+Resolve mutations for :backend:processResources (Thread[#853,Execution worker Thread 5,5,main]) started.
+Resolve mutations for :backend:processTestResources (Thread[#855,Execution worker Thread 7,5,main]) started.
+:backend:processTestResources (Thread[#855,Execution worker Thread 7,5,main]) started.
+:backend:processResources (Thread[#853,Execution worker Thread 5,5,main]) started.
+:backend:compileJava (Thread[#848,included builds,5,main]) started.
+
+> Task :backend:processResources UP-TO-DATE
+Caching disabled for task ':backend:processResources' because:
+  Build cache is disabled
+  Not worth caching
+Skipping task ':backend:processResources' as it is up-to-date.
+
+> Task :backend:processTestResources UP-TO-DATE
+Caching disabled for task ':backend:processTestResources' because:
+  Build cache is disabled
+  Not worth caching
+Skipping task ':backend:processTestResources' as it is up-to-date.
+
+> Task :backend:compileJava UP-TO-DATE
+Caching disabled for task ':backend:compileJava' because:
+  Build cache is disabled
+Skipping task ':backend:compileJava' as it is up-to-date.
+Resolve mutations for :backend:classes (Thread[#848,included builds,5,main]) started.
+:backend:classes (Thread[#848,included builds,5,main]) started.
+
+> Task :backend:classes UP-TO-DATE
+Skipping task ':backend:classes' as it has no actions.
+Resolve mutations for :backend:compileTestJava (Thread[#848,included builds,5,main]) started.
+:backend:compileTestJava (Thread[#848,included builds,5,main]) started.
+
+> Task :backend:compileTestJava UP-TO-DATE
+Caching disabled for task ':backend:compileTestJava' because:
+  Build cache is disabled
+Skipping task ':backend:compileTestJava' as it is up-to-date.
+Resolve mutations for :backend:testClasses (Thread[#848,included builds,5,main]) started.
+:backend:testClasses (Thread[#848,included builds,5,main]) started.
+
+> Task :backend:testClasses UP-TO-DATE
+Skipping task ':backend:testClasses' as it has no actions.
+Resolve mutations for :backend:test (Thread[#848,included builds,5,main]) started.
+
+> Task :backend:cleanTest
+Caching disabled for task ':backend:cleanTest' because:
+  Build cache is disabled
+Task ':backend:cleanTest' is not up-to-date because:
+  Task has not declared any outputs despite executing actions.
+:backend:test (Thread[#849,Execution worker,5,main]) started.
+Gradle Test Executor 9 started executing tests.
+
+> Task :backend:test
+Caching disabled for task ':backend:test' because:
+  Build cache is disabled
+Task ':backend:test' is not up-to-date because:
+  Output property 'binaryResultsDirectory' file C:\sgc\backend\build\test-results\test\binary has been removed.
+  Output property 'binaryResultsDirectory' file C:\sgc\backend\build\test-results\test\binary\output-events.bin has been removed.
+  Output property 'binaryResultsDirectory' file C:\sgc\backend\build\test-results\test\binary\results-generic.bin has been removed.
+  and more...
+Starting process 'Gradle Test Executor 9'. Working directory: C:\sgc\backend Command: C:\Program Files\OpenJDK\jdk-25\bin\java.exe -Dmockito.ext.disable=true -Dorg.gradle.internal.worker.tmpdir=C:\sgc\backend\build\tmp\test\work -Xshare:off -XX:+EnableDynamicAgentLoading --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED -javaagent:C:\Users\maao1\.gradle\caches\modules-2\files-2.1\net.bytebuddy\byte-buddy-agent\1.17.8\f09415827a71be7ed621c7bd02550678f28bc81c\byte-buddy-agent-1.17.8.jar -javaagent:C:\sgc\backend\build\tmp\.cache\expanded\zip_27729b840c216bdc69a9315e04b27ab1\jacocoagent.jar=destfile=build/jacoco/test.exec,append=true,inclnolocationclasses=false,dumponexit=true,output=file,jmx=false @C:\Users\maao1\.gradle\.tmp\gradle-worker-classpath13170500783734233214txt -Xmx512m -Dfile.encoding=UTF-8 -Duser.country=BR -Duser.language=pt -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Test Executor 9'
+Successfully started process 'Gradle Test Executor 9'
+
+LoginFacadeCoverageTest > entrar - Sessao Expirada ou Invalida STANDARD_OUT
+    2026-01-21 21:52:21,811 WARN  sgc.seguranca.login.LoginFacade - Tentativa de acesso n├úo autorizada (sem login pr├®vio) para usu├írio 123
+
+LoginFacadeCoverageTest > entrar - Sessao Expirada ou Invalida FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+    Unnecessary stubbings detected.
+    Clean & maintainable test code requires zero unnecessary code.
+    Following stubbings are unnecessary (click to navigate to relevant line of code):
+      1. -> at sgc.seguranca.login.LoginFacadeCoverageTest.setUp(LoginFacadeCoverageTest.java:46)
+      2. -> at sgc.seguranca.login.LoginFacadeCoverageTest.setUp(LoginFacadeCoverageTest.java:62)
+    Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+        at app//org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
+        at java.base@25/java.util.Optional.ifPresent(Optional.java:178)
+        at app//org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
+        at java.base@25/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base@25/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+LoginFacadeCoverageTest > toUnidadeDto - Coverage for Branches FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+    Unnecessary stubbings detected.
+    Clean & maintainable test code requires zero unnecessary code.
+    Following stubbings are unnecessary (click to navigate to relevant line of code):
+      1. -> at sgc.seguranca.login.LoginFacadeCoverageTest.setUp(LoginFacadeCoverageTest.java:62)
+    Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+        at app//org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
+        at java.base@25/java.util.Optional.ifPresent(Optional.java:178)
+        at app//org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
+        at java.base@25/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base@25/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+LoginFacadeCoverageTest > buscarAutorizacoesInterno - Usuario Nao Encontrado FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+    Unnecessary stubbings detected.
+    Clean & maintainable test code requires zero unnecessary code.
+    Following stubbings are unnecessary (click to navigate to relevant line of code):
+      1. -> at sgc.seguranca.login.LoginFacadeCoverageTest.setUp(LoginFacadeCoverageTest.java:46)
+      2. -> at sgc.seguranca.login.LoginFacadeCoverageTest.setUp(LoginFacadeCoverageTest.java:62)
+    Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+        at app//org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
+        at java.base@25/java.util.Optional.ifPresent(Optional.java:178)
+        at app//org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
+        at java.base@25/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base@25/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+LoginFacadeCoverageTest > buscarAutorizacoesInterno - Filtra Unidades Inativas FAILED
+    java.lang.IllegalArgumentException: duplicate element: sgc.organizacao.model.UsuarioPerfil@1fcee313
+        at java.base/java.util.ImmutableCollections$Set12.<init>(ImmutableCollections.java:1017)
+        at java.base/java.util.Set.of(Set.java:487)
+        at sgc.seguranca.login.LoginFacadeCoverageTest.buscarAutorizacoesInterno_FiltraInativas(LoginFacadeCoverageTest.java:222)
+
+LoginFacadeCoverageTest > autorizar - Sem Autenticacao STANDARD_OUT
+    2026-01-21 21:52:22,046 WARN  sgc.seguranca.login.LoginFacade - Tentativa de autoriza├º├úo sem autentica├º├úo pr├®via para usu├írio 123
+
+LoginFacadeCoverageTest > autorizar - Sem Autenticacao FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+    Unnecessary stubbings detected.
+    Clean & maintainable test code requires zero unnecessary code.
+    Following stubbings are unnecessary (click to navigate to relevant line of code):
+      1. -> at sgc.seguranca.login.LoginFacadeCoverageTest.setUp(LoginFacadeCoverageTest.java:46)
+      2. -> at sgc.seguranca.login.LoginFacadeCoverageTest.setUp(LoginFacadeCoverageTest.java:62)
+    Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+        at app//org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
+        at java.base@25/java.util.Optional.ifPresent(Optional.java:178)
+        at app//org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
+        at java.base@25/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base@25/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+Gradle Test Executor 9 finished executing tests.
+
+> Task :backend:test
+  Results: FAILURE
+  Total:     7 tests run
+  Ô£ô Passed:  2
+  Ô£ù Failed:  5
+  Ôùï Ignored: 0
+  Time:     7.081s
+
+Testes mais lentos (> 1s):
+  - 2966ms: sgc.seguranca.login.LoginFacadeCoverageTest > entrar_SessaoExpirada()
+
+Generating HTML test report...
+7 tests completed, 5 failed
+Finished generating test html results (0.014 secs) into: C:\sgc\backend\build\reports\tests\test
+Finished generating test XML results (0.002 secs) into: C:\sgc\backend\build\test-results\test
+There were failing tests. See the report at: file:///C:/sgc/backend/build/reports/tests/test/index.html
+
+See the complete report at file:///C:/sgc/build/reports/configuration-cache/5gsnnyx38prn8nljfco80s0mh/7z7dbgrslwd4aqgtbruc3pdik/configuration-cache-report.html
+
+BUILD SUCCESSFUL in 10s
+6 actionable tasks: 2 executed, 4 up-to-date
+Watched directory hierarchies: [C:\sgc]
+Configuration cache entry stored.
