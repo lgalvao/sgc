@@ -14,6 +14,7 @@ import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.organizacao.model.*;
 import sgc.seguranca.login.dto.AutenticarRequest;
+import sgc.seguranca.login.dto.AutorizarRequest;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.util.TestUtil;
 
@@ -131,10 +132,12 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                                         .andExpect(status().isOk())
                                         .andExpect(jsonPath("$").value(true));
 
+                        AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral).build();
+
                         mockMvc.perform(post(BASE_URL + "/autorizar")
                                         .with(csrf())
                                         .contentType(MediaType.APPLICATION_JSON)
-                                        .content(tituloEleitoral))
+                                        .content(testUtil.toJson(autorizarReq)))
                                         .andExpect(status().isOk())
                                         .andExpect(jsonPath("$[0].perfil").value("ADMIN"))
                                         .andExpect(jsonPath("$[0].unidade.sigla").value(unidadeAdmin.getSigla()));
@@ -168,10 +171,12 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                                         .andExpect(status().isOk())
                                         .andExpect(jsonPath("$").value(true));
 
+                        AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral).build();
+
                         mockMvc.perform(post(BASE_URL + "/autorizar")
                                         .with(csrf())
                                         .contentType(MediaType.APPLICATION_JSON)
-                                        .content(tituloEleitoral))
+                                        .content(testUtil.toJson(autorizarReq)))
                                         .andExpect(status().isOk())
                                         .andExpect(jsonPath("$.length()").value(2))
                                         .andExpect(jsonPath("$[*].perfil")
@@ -201,10 +206,12 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                         // Act & Assert
                         // Sem autenticação prévia (sessão válida), a tentativa de autorizar deve ser
                         // rejeitada com 401 (Unauthorized)
+                        AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral).build();
+
                         mockMvc.perform(post(BASE_URL + "/autorizar")
                                         .with(csrf())
                                         .contentType(MediaType.APPLICATION_JSON)
-                                        .content(tituloEleitoral))
+                                        .content(testUtil.toJson(autorizarReq)))
                                         .andExpect(status().isUnauthorized());
                 }
 

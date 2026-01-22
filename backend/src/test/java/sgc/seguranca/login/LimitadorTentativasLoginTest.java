@@ -28,6 +28,7 @@ class LimitadorTentativasLoginTest {
         when(clock.getZone()).thenReturn(java.time.ZoneId.systemDefault());
         when(clock.instant()).thenReturn(java.time.Instant.now());
 
+        when(environment.getProperty("aplicacao.ambiente-testes", Boolean.class, false)).thenReturn(false);
         when(environment.getActiveProfiles()).thenReturn(new String[] {});
         when(environment.getProperty("aplicacao.ambiente-testes", Boolean.class, false)).thenReturn(false);
         limitador = new LimitadorTentativasLogin(environment, clock);
