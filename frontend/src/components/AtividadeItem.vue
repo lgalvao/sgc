@@ -88,18 +88,16 @@
       </div>
 
       <!-- Mensagem de erro inline -->
-      <div
+      <BAlert
           v-if="erroValidacao"
-          class="feedback-erro-inline d-flex align-items-center mt-2 px-2 py-1"
+          :model-value="true"
+          variant="danger"
+          class="mt-2 py-2 mb-0"
           data-testid="atividade-erro-validacao"
-          role="alert"
       >
-        <i
-            aria-hidden="true"
-            class="bi bi-exclamation-circle-fill me-2"
-        />
-        <span>{{ erroValidacao }}</span>
-      </div>
+        <i aria-hidden="true" class="bi bi-exclamation-circle-fill me-2"/>
+        {{ erroValidacao }}
+      </BAlert>
 
       <div class="mt-3 ms-3">
         <!-- Label com asterisco para conhecimentos obrigatórios -->
@@ -226,7 +224,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BCol, BForm, BFormInput} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BCardBody, BCol, BForm, BFormInput} from "bootstrap-vue-next";
 import {ref} from "vue";
 import type {Atividade, Conhecimento} from "@/types/tipos";
 
@@ -398,11 +396,4 @@ function adicionarConhecimento() {
   border-top-right-radius: 0.375rem;
 }
 
-.feedback-erro-inline {
-  font-size: 0.875rem;
-  color: var(--bs-danger);
-  background-color: var(--bs-danger-bg-subtle);
-  border-radius: 4px;
-  border-left: 3px solid var(--bs-danger);
-}
 </style>

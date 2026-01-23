@@ -1,11 +1,10 @@
 <template>
   <BContainer class="mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div>
-        <h2 class="mb-0">Autoavaliação de Competências</h2>
-        <small class="text-muted">{{ siglaUnidade }} - {{ nomeUnidade }}</small>
-      </div>
-      <div class="d-flex gap-2">
+    <PageHeader
+        title="Autoavaliação de Competências"
+        :subtitle="`${siglaUnidade} - ${nomeUnidade}`"
+    >
+      <template #actions>
         <BButton
             :disabled="!podeConcluir"
             data-testid="btn-concluir-autoavaliacao"
@@ -14,8 +13,8 @@
         >
           <i aria-hidden="true" class="bi bi-check-circle me-2"/>Concluir Autoavaliação
         </BButton>
-      </div>
-    </div>
+      </template>
+    </PageHeader>
 
     <BAlert :fade="false" :model-value="true" variant="info">
       <i aria-hidden="true" class="bi bi-info-circle me-2"/>
@@ -87,6 +86,7 @@
 import {computed, onMounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {BAlert, BButton, BCard, BContainer, BFormSelect, BFormTextarea, BSpinner} from 'bootstrap-vue-next';
+import PageHeader from '@/components/layout/PageHeader.vue';
 import {logger} from '@/utils';
 import {useMapasStore} from '@/stores/mapas';
 import {useUnidadesStore} from '@/stores/unidades';

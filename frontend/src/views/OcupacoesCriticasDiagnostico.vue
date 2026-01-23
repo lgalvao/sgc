@@ -1,12 +1,13 @@
 <template>
   <BContainer class="mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div>
-        <h2 class="mb-0">Ocupações Críticas</h2>
-        <small class="text-muted">{{ unidade?.sigla }} - {{ unidade?.nome }}</small>
-      </div>
-      <BButton to="/painel" variant="primary">Voltar</BButton>
-    </div>
+    <PageHeader
+        title="Ocupações Críticas"
+        :subtitle="`${unidade?.sigla || ''} - ${unidade?.nome || ''}`"
+    >
+      <template #actions>
+        <BButton to="/painel" variant="primary">Voltar</BButton>
+      </template>
+    </PageHeader>
 
     <BAlert :fade="false" :model-value="true" variant="info">
       <i aria-hidden="true" class="bi bi-info-circle me-2"/>
@@ -68,6 +69,7 @@
 import {computed, onMounted, ref} from 'vue';
 import {useRoute} from 'vue-router';
 import {BAlert, BButton, BContainer, BFormSelect, BSpinner} from 'bootstrap-vue-next';
+import PageHeader from '@/components/layout/PageHeader.vue';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useFeedbackStore} from '@/stores/feedback';
 import {

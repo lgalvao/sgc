@@ -3,7 +3,7 @@
 This plan outlines comprehensive steps to standardize the application's User Experience and User Interface, addressing inconsistencies in modals, views, and component usage. It is designed to be executed by AI agents in sequential sprints.
 
 > **Last Updated:** Janeiro 2026  
-> **Status:** Sprint 2 In Progress
+> **Status:** Sprint 4 & 5 In Progress
 > **Codebase:** 47 Vue components, 18 views, 4 composables
 > **BootstrapVueNext:** v0.42.0
 
@@ -488,8 +488,8 @@ export function useProcessoForm(initialData?: Processo) {
 - [x] Replace header with PageHeader
 - [x] Extract form logic to useProcessoForm composable
 - [x] Add loading buttons (3 buttons)
-- [ ] Fix alert placement (move inside form)
-- [ ] Add focus management on validation errors
+- [x] Fix alert placement (move inside form)
+- [x] Add focus management on validation errors
 - **Effort:** High | **Impact:** Very High
 
 **VisMapa.vue** [PRIORITY: CRITICAL]
@@ -502,15 +502,15 @@ export function useProcessoForm(initialData?: Processo) {
 
 **CadMapa.vue** [PRIORITY: HIGH]
 - [x] Replace header with PageHeader
-- [ ] Add loading buttons (2 buttons)
-- [ ] Verify form validation consistency
+- [x] Add loading buttons (2 buttons)
+- [x] Verify form validation consistency
 - [x] Check accessibility
 - **Effort:** Medium | **Impact:** High
 
 **CadAtividades.vue** [PRIORITY: HIGH]
 - [x] Replace header with PageHeader (fix h1 → h2)
 - [x] Extract form logic to useAtividadeForm
-- [ ] Standardize error display (fix mixed patterns)
+- [x] Standardize error display (fix mixed patterns)
 - [x] Add loading buttons
 - **Effort:** High | **Impact:** High
 
@@ -524,7 +524,7 @@ export function useProcessoForm(initialData?: Processo) {
 - [x] Replace 2 inline modals with ModalConfirmacao
 - [x] Standardize card-based header (may need custom approach)
 - [x] Add loading buttons
-- [ ] Fix error display
+- [x] Fix error display
 - **Effort:** Medium | **Impact:** Medium
 
 **ProcessoView.vue** [PRIORITY: HIGH]
@@ -534,20 +534,20 @@ export function useProcessoForm(initialData?: Processo) {
 - **Effort:** Low | **Impact:** High
 
 **SubprocessoView.vue** [PRIORITY: MEDIUM]
-- [ ] Replace header with PageHeader (fix h3 → h2)
+- [x] Replace header with PageHeader (fix h3 → h2)
 - [x] Check modal usage (Replaced inline modal with ModalConfirmacao)
-- [ ] Verify accessibility
+- [x] Verify accessibility
 - **Effort:** Low | **Impact:** Medium
 
 **RelatoriosView.vue** [PRIORITY: MEDIUM]
 - [x] Adapt PageHeader to card-based layout
 - [x] Replace 3 inline modals (Extracted to components)
-- [ ] Standardize button states
+- [x] Standardize button states
 - **Effort:** Medium | **Impact:** Low
 
 **UnidadeView.vue** [PRIORITY: LOW]
 - [x] Replace header with PageHeader
-- [ ] Replace inline modal
+- [x] Replace inline modal
 - **Effort:** Low | **Impact:** Low
 
 **HistoricoView.vue** [PRIORITY: LOW]
@@ -567,21 +567,21 @@ export function useProcessoForm(initialData?: Processo) {
 - **Effort:** Very Low | **Impact:** Low
 
 **AutoavaliacaoDiagnostico.vue** [PRIORITY: LOW]
-- [ ] Replace header with PageHeader
-- [ ] Check form patterns
+- [x] Replace header with PageHeader
+- [x] Check form patterns
 - **Effort:** Low | **Impact:** Low
 
 **MonitoramentoDiagnostico.vue** [PRIORITY: LOW]
-- [ ] Replace header with PageHeader
+- [x] Replace header with PageHeader
 - **Effort:** Low | **Impact:** Low
 
 **OcupacoesCriticasDiagnostico.vue** [PRIORITY: LOW]
-- [ ] Replace header with PageHeader
+- [x] Replace header with PageHeader
 - **Effort:** Low | **Impact:** Low
 
 **ConclusaoDiagnostico.vue** [PRIORITY: LOW]
-- [ ] Replace header with PageHeader
-- [ ] Check form validation
+- [x] Replace header with PageHeader
+- [x] Check form validation
 - **Effort:** Low | **Impact:** Low
 
 ---
