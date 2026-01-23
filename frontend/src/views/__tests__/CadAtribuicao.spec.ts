@@ -7,8 +7,14 @@ import {buscarUsuariosPorUnidade} from '@/services/usuarioService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mocks
-const { mockPush } = vi.hoisted(() => {
-    return { mockPush: vi.fn() };
+const { mockPush, mockToast } = vi.hoisted(() => {
+    return {
+        mockPush: vi.fn(),
+        mockToast: {
+            success: vi.fn(),
+            danger: vi.fn(),
+        }
+    };
 });
 
 vi.mock('vue-router', () => ({
@@ -16,6 +22,14 @@ vi.mock('vue-router', () => ({
         push: mockPush,
     }),
 }));
+
+vi.mock("bootstrap-vue-next", async (importOriginal) => {
+    const actual = await importOriginal<any>();
+    return {
+        ...actual,
+        useToast: () => mockToast,
+    };
+});
 
 vi.mock('@/services/atribuicaoTemporariaService', () => ({
     criarAtribuicaoTemporaria: vi.fn(),
@@ -110,7 +124,7 @@ describe('CadAtribuicao.vue', () => {
             justificativa: 'Justificativa de teste'
         });
 
-        expect(context.wrapper!.text()).toContain('Atribuição criada!');
+        expect(mockToast.success).toHaveBeenCalledWith('Atribuição criada com sucesso!');
     });
 
     it('handles submission error', async () => {
@@ -126,7 +140,7 @@ describe('CadAtribuicao.vue', () => {
         await context.wrapper!.find('form').trigger('submit');
         await flushPromises();
 
-        expect(context.wrapper!.text()).toContain('Falha ao criar atribuição');
+        expect(mockToast.danger).toHaveBeenCalledWith('Falha ao criar atribuição. Tente novamente.');
     });
 
     it('cancels and navigates back', async () => {

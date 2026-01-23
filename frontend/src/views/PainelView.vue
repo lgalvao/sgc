@@ -10,7 +10,7 @@
               data-testid="btn-painel-criar-processo"
               variant="outline-primary"
           >
-            <i class="bi bi-plus-lg"/> Criar processo
+            <i aria-hidden="true" class="bi bi-plus-lg"/> Criar processo
           </BButton>
         </template>
       </PageHeader>

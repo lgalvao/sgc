@@ -128,7 +128,7 @@ If LoadingButton is deemed over-engineering:
 
 ---
 
-### Sprint 4: View Refactoring & PageHeader Adoption
+### Sprint 4: View Refactoring & PageHeader Adoption ✅ COMPLETE
 
 **Goal:** Apply PageHeader component, extract form logic to composables.
 
@@ -278,19 +278,12 @@ export function useProcessoForm(initialData?: Processo) {
 
 #### Tasks:
 
-1. **Add ARIA labels to icon-only buttons**
-   - **Files:** TabelaProcessos, TabelaAlertas, ProcessoView, etc.
-   - **Count:** 7 buttons need `aria-label`
-   - **Example:**
-     ```vue
-     <BButton size="sm" aria-label="Editar processo" @click="editar">
-       <i class="bi bi-pencil" aria-hidden="true"></i>
-     </BButton>
-     ```
+1. **Add ARIA labels to icon-only buttons** ✅
+   - **Files:** Checked TabelaProcessos, TabelaAlertas, ProcessoView. No missing labels found.
 
-2. **Add `aria-hidden="true"` to decorative icons**
-   - **Count:** 12 icons need attribute
-   - **Files:** All components with icons
+2. **Add `aria-hidden="true"` to decorative icons** ✅
+   - **Count:** Updated 20+ files
+   - **Files:** Views, Components, Modals
 
 3. **Improve focus management in forms**
    - Auto-focus first field on mount
@@ -608,16 +601,16 @@ test.describe('Page Header Consistency', () => {
 
 **PainelView.vue** [PRIORITY: HIGH]
 - [x] Replace header with PageHeader component
-- [ ] No inline modals (✓ already clean)
-- [ ] Check button spacing (✓ uses gap-2)
-- [ ] Verify accessibility
+- [x] No inline modals (✓ already clean)
+- [x] Check button spacing (✓ uses gap-2)
+- [x] Verify accessibility
 - **Effort:** Low | **Impact:** High (most visible page)
 
 **CadProcesso.vue** [PRIORITY: CRITICAL]
 - [x] Replace 2 inline modals with ModalConfirmacao
-- [ ] Replace header with PageHeader
+- [x] Replace header with PageHeader
 - [x] Extract form logic to useProcessoForm composable
-- [ ] Add loading buttons (3 buttons)
+- [x] Add loading buttons (3 buttons)
 - [ ] Fix alert placement (move inside form)
 - [ ] Add focus management on validation errors
 - **Effort:** High | **Impact:** Very High
@@ -625,42 +618,42 @@ test.describe('Page Header Consistency', () => {
 **VisMapa.vue** [PRIORITY: CRITICAL]
 - [x] Replace 3 inline confirmation modals with ModalConfirmacao
 - [x] Keep 2 custom modals (complex logic), but standardize footer
-- [ ] Replace header with PageHeader
-- [ ] Standardize button loading states (4 buttons)
-- [ ] Verify accessibility
+- [x] Replace header with PageHeader
+- [x] Standardize button loading states (4 buttons)
+- [x] Verify accessibility
 - **Effort:** Very High | **Impact:** Very High
 
 **CadMapa.vue** [PRIORITY: HIGH]
-- [ ] Replace header with PageHeader
+- [x] Replace header with PageHeader
 - [ ] Add loading buttons (2 buttons)
 - [ ] Verify form validation consistency
-- [ ] Check accessibility
+- [x] Check accessibility
 - **Effort:** Medium | **Impact:** High
 
 **CadAtividades.vue** [PRIORITY: HIGH]
-- [ ] Replace header with PageHeader (fix h1 → h2)
+- [x] Replace header with PageHeader (fix h1 → h2)
 - [x] Extract form logic to useAtividadeForm
 - [ ] Standardize error display (fix mixed patterns)
-- [ ] Add loading buttons
+- [x] Add loading buttons
 - **Effort:** High | **Impact:** High
 
 **VisAtividades.vue** [PRIORITY: MEDIUM]
-- [ ] Replace header with PageHeader (fix h2 sizing)
+- [x] Replace header with PageHeader (fix h2 sizing)
 - [ ] Replace 2 inline modals
-- [ ] Check accessibility
+- [x] Check accessibility
 - **Effort:** Medium | **Impact:** Medium
 
 **ConfiguracoesView.vue** [PRIORITY: HIGH]
 - [x] Replace 2 inline modals with ModalConfirmacao
-- [ ] Standardize card-based header (may need custom approach)
-- [ ] Add loading buttons
+- [x] Standardize card-based header (may need custom approach)
+- [x] Add loading buttons
 - [ ] Fix error display
 - **Effort:** Medium | **Impact:** Medium
 
 **ProcessoView.vue** [PRIORITY: HIGH]
-- [ ] Replace header with PageHeader
-- [ ] Verify ModalConfirmacao usage (✓ already uses it)
-- [ ] Check button spacing
+- [x] Replace header with PageHeader
+- [x] Verify ModalConfirmacao usage (✓ already uses it)
+- [x] Check button spacing
 - **Effort:** Low | **Impact:** High
 
 **SubprocessoView.vue** [PRIORITY: MEDIUM]
@@ -670,30 +663,30 @@ test.describe('Page Header Consistency', () => {
 - **Effort:** Low | **Impact:** Medium
 
 **RelatoriosView.vue** [PRIORITY: MEDIUM]
-- [ ] Adapt PageHeader to card-based layout
+- [x] Adapt PageHeader to card-based layout
 - [ ] Replace 3 inline modals
 - [ ] Standardize button states
 - **Effort:** Medium | **Impact:** Low
 
 **UnidadeView.vue** [PRIORITY: LOW]
-- [ ] Replace header with PageHeader
+- [x] Replace header with PageHeader
 - [ ] Replace inline modal
 - **Effort:** Low | **Impact:** Low
 
 **HistoricoView.vue** [PRIORITY: LOW]
-- [ ] Replace header with PageHeader
-- [ ] Verify consistency
+- [x] Replace header with PageHeader
+- [x] Verify consistency (Added EmptyState)
 - **Effort:** Very Low | **Impact:** Low
 
 **CadAtribuicao.vue** [PRIORITY: MEDIUM]
-- [ ] Replace header with PageHeader
-- [ ] Fix mixed error display patterns
+- [x] Replace header with PageHeader
+- [x] Fix mixed error display patterns (Adopted LoadingButton and useToast)
 - [ ] Standardize with ModalConfirmacao
 - **Effort:** Medium | **Impact:** Medium
 
 **LoginView.vue** [PRIORITY: LOW]
-- [ ] No header needed (login page)
-- [ ] Verify form validation display
+- [x] No header needed (login page)
+- [x] Verify form validation display (Adopted LoadingButton)
 - **Effort:** Very Low | **Impact:** Low
 
 **AutoavaliacaoDiagnostico.vue** [PRIORITY: LOW]

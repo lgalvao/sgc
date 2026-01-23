@@ -31,15 +31,15 @@
 
       <p><strong>Titular:</strong> {{ titularNome }}</p>
       <p class="ms-3">
-        <i class="bi bi-telephone-fill me-2"/>{{ titularRamal }}
-        <i class="bi bi-envelope-fill ms-3 me-2"/>{{ titularEmail }}
+        <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>{{ titularRamal }}
+        <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>{{ titularEmail }}
       </p>
 
       <template v-if="responsavelNome && responsavelNome !== titularNome">
         <p><strong>Responsável:</strong> {{ responsavelNome }}</p>
         <p class="ms-3">
-          <i class="bi bi-telephone-fill me-2"/>{{ responsavelRamal }}
-          <i class="bi bi-envelope-fill ms-3 me-2"/>{{ responsavelEmail }}
+          <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>{{ responsavelRamal }}
+          <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>{{ responsavelEmail }}
         </p>
       </template>
 
@@ -52,7 +52,7 @@
             variant="outline-primary"
             @click="handleAlterarDataLimite"
         >
-          <i class="bi bi-calendar me-1"/>
+          <i aria-hidden="true" class="bi bi-calendar me-1"/>
           Alterar data limite
         </BButton>
 
@@ -63,7 +63,7 @@
             variant="outline-warning"
             @click="handleReabrirCadastro"
         >
-          <i class="bi bi-arrow-counterclockwise me-1"/>
+          <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
           Reabrir cadastro
         </BButton>
 
@@ -73,7 +73,7 @@
             variant="outline-warning"
             @click="handleReabrirRevisao"
         >
-          <i class="bi bi-arrow-counterclockwise me-1"/>
+          <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
           Reabrir Revisão
         </BButton>
 
@@ -84,7 +84,7 @@
             variant="outline-info"
             @click="handleEnviarLembrete"
         >
-          <i class="bi bi-bell me-1"/>
+          <i aria-hidden="true" class="bi bi-bell me-1"/>
           Enviar lembrete
         </BButton>
       </div>

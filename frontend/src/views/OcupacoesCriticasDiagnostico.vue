@@ -9,7 +9,7 @@
     </div>
 
     <BAlert :fade="false" :model-value="true" variant="info">
-      <i class="bi bi-info-circle me-2"/>
+      <i aria-hidden="true" class="bi bi-info-circle me-2"/>
       Identifique a situação de capacitação para as competências com Gap significativo.
     </BAlert>
 
@@ -52,7 +52,7 @@
                       size="sm"
                       @change="salvar(servidor.tituloEleitoral, gap.avaliacao.competenciaCodigo, gap.ocupacao.situacao)"
                   />
-                  <small v-if="gap.salvo" class="text-success ms-2"><i class="bi bi-check"/></small>
+                  <small v-if="gap.salvo" class="text-success ms-2"><i aria-hidden="true" class="bi bi-check"/></small>
                 </td>
               </tr>
               </tbody>

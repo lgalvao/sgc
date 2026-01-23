@@ -16,7 +16,7 @@
             variant="outline-secondary"
             @click="abrirModalImpacto"
         >
-          <i class="bi bi-arrow-right-circle me-2"/>Impacto no mapa
+          <i aria-hidden="true" class="bi bi-arrow-right-circle me-2"/>Impacto no mapa
         </BButton>
         <BButton
             v-if="podeDisponibilizarMapa"
@@ -57,7 +57,7 @@
               variant="primary"
               @click="abrirModalCriarLimpo"
           >
-            <i class="bi bi-plus-lg me-2"/> Criar primeira competência
+            <i aria-hidden="true" class="bi bi-plus-lg me-2"/> Criar primeira competência
           </BButton>
         </EmptyState>
       </div>
@@ -70,7 +70,7 @@
             variant="outline-primary"
             @click="abrirModalCriarLimpo"
         >
-          <i class="bi bi-plus-lg"/> Criar competência
+          <i aria-hidden="true" class="bi bi-plus-lg"/> Criar competência
         </BButton>
 
         <CompetenciaCard

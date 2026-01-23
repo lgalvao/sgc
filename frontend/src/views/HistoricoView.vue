@@ -22,8 +22,13 @@
               </td>
             </tr>
             <tr v-else-if="processos.length === 0">
-              <td colspan="4" class="text-center py-4 text-muted">
-                Nenhum processo finalizado encontrado.
+              <td colspan="4">
+                <EmptyState
+                    icon="bi-folder2-open"
+                    title="Nenhum processo finalizado encontrado"
+                    description="Os processos finalizados aparecerão aqui."
+                    class="border-0 bg-transparent mb-0"
+                />
               </td>
             </tr>
             <tr v-for="proc in processos" v-else :key="proc.codigo">
@@ -43,7 +48,7 @@
                   variant="outline-primary"
                   @click="verDetalhes(proc.codigo)"
                 >
-                  <i class="bi bi-eye"></i> Detalhes
+                  <i aria-hidden="true" class="bi bi-eye"></i> Detalhes
                 </BButton>
               </td>
             </tr>
@@ -59,6 +64,7 @@ import {onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {BButton, BCard, BContainer} from 'bootstrap-vue-next';
 import PageHeader from '@/components/layout/PageHeader.vue';
+import EmptyState from '@/components/EmptyState.vue';
 import {apiClient} from '@/axios-setup';
 import {logger} from '@/utils';
 

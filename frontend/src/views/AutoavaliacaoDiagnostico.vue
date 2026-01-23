@@ -12,13 +12,13 @@
             variant="success"
             @click="concluirAutoavaliacao"
         >
-          <i class="bi bi-check-circle me-2"/>Concluir Autoavaliação
+          <i aria-hidden="true" class="bi bi-check-circle me-2"/>Concluir Autoavaliação
         </BButton>
       </div>
     </div>
 
     <BAlert :fade="false" :model-value="true" variant="info">
-      <i class="bi bi-info-circle me-2"/>
+      <i aria-hidden="true" class="bi bi-info-circle me-2"/>
       Avalie a importância e o seu domínio para cada competência da unidade.
       Utilize a escala de 1 a 6 ou NA (Não se aplica).
     </BAlert>
@@ -75,7 +75,7 @@
           </div>
 
           <div v-if="avaliacoes[comp.codigo].salvo" class="text-end mt-2">
-            <small class="text-success"><i class="bi bi-check"/> Salvo</small>
+            <small class="text-success"><i aria-hidden="true" class="bi bi-check"/> Salvo</small>
           </div>
         </BCard>
       </div>

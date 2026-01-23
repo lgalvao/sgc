@@ -18,11 +18,13 @@
       </template>
 
       <template #empty>
-        <div class="text-center text-muted py-5" data-testid="empty-state-alertas">
-          <i class="bi bi-bell-slash display-4 d-block mb-3" aria-hidden="true"></i>
-          <p class="h5">Tudo limpo!</p>
-          <p class="small">Você não tem novos alertas no momento.</p>
-        </div>
+        <EmptyState
+            icon="bi-bell-slash"
+            title="Tudo limpo!"
+            description="Você não tem novos alertas no momento."
+            data-testid="empty-state-alertas"
+            class="border-0 bg-transparent mb-0"
+        />
       </template>
     </BTable>
   </div>
@@ -30,6 +32,7 @@
 
 <script lang="ts" setup>
 import {BTable} from "bootstrap-vue-next";
+import EmptyState from "@/components/EmptyState.vue";
 import type {Alerta} from "@/types/tipos";
 
 defineProps<{

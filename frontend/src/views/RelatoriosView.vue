@@ -125,7 +125,7 @@
             variant="outline-primary"
             @click="exportarMapasVigentes"
         >
-          <i class="bi bi-download"/> Exportar CSV
+          <i aria-hidden="true" class="bi bi-download"/> Exportar CSV
         </BButton>
       </div>
       <div class="table-responsive">
@@ -164,7 +164,7 @@
             variant="outline-primary"
             @click="exportarDiagnosticosGaps"
         >
-          <i class="bi bi-download"/> Exportar CSV
+          <i aria-hidden="true" class="bi bi-download"/> Exportar CSV
         </BButton>
       </div>
       <div class="table-responsive">
@@ -223,7 +223,7 @@
             variant="outline-primary"
             @click="exportarAndamentoGeral"
         >
-          <i class="bi bi-download"/> Exportar CSV
+          <i aria-hidden="true" class="bi bi-download"/> Exportar CSV
         </BButton>
       </div>
       <div class="table-responsive">

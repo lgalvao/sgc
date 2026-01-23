@@ -9,16 +9,16 @@
     <BCollapse id="nav-collapse" is-nav>
       <BNavbarNav class="me-auto">
         <BNavItem to="/painel" @click="setNavbarNavigation">
-          <i class="bi bi-house-door me-1"/> Painel
+          <i aria-hidden="true" class="bi bi-house-door me-1"/> Painel
         </BNavItem>
         <BNavItem :to="`/unidade/${perfilStore.unidadeSelecionada}`" @click="setNavbarNavigation">
-          <i class="bi bi-person me-1"/> Minha unidade
+          <i aria-hidden="true" class="bi bi-person me-1"/> Minha unidade
         </BNavItem>
         <BNavItem to="/relatorios" @click="setNavbarNavigation">
-          <i class="bi bi-bar-chart-line me-1"/> Relatórios
+          <i aria-hidden="true" class="bi bi-bar-chart-line me-1"/> Relatórios
         </BNavItem>
         <BNavItem to="/historico" @click="setNavbarNavigation">
-          <i class="bi bi-clock-history me-1"/> Histórico
+          <i aria-hidden="true" class="bi bi-clock-history me-1"/> Histórico
         </BNavItem>
       </BNavbarNav>
 
@@ -32,7 +32,7 @@
           class="me-2 user-profile-item"
         >
           <div class="d-flex align-items-center">
-            <i class="bi bi-person-circle me-2"/>
+            <i aria-hidden="true" class="bi bi-person-circle me-2"/>
             <div class="user-info-text">
               <span class="d-lg-inline">{{ perfilSelecionado }} - {{ unidadeSelecionada }}</span>
             </div>
@@ -48,7 +48,7 @@
           to="/configuracoes"
           @click="setNavbarNavigation"
         >
-          <i class="bi bi-gear me-lg-0 me-1" aria-hidden="true"/>
+          <i aria-hidden="true" class="bi bi-gear me-lg-0 me-1"/>
           <span class="d-lg-none">Configurações</span>
         </BNavItem>
 
@@ -59,7 +59,7 @@
           data-testid="btn-logout"
           @click.prevent="handleLogout"
         >
-          <i class="bi bi-box-arrow-right me-lg-0 me-1" aria-hidden="true"/>
+          <i aria-hidden="true" class="bi bi-box-arrow-right me-lg-0 me-1"/>
           <span class="d-lg-none">Sair</span>
         </BNavItem>
       </BNavbarNav>

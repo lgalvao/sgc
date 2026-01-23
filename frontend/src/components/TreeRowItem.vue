@@ -23,7 +23,7 @@
           @keydown.enter.stop="toggleExpand(item.codigo)"
           @keydown.space.stop="toggleExpand(item.codigo)"
       >
-        <i :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']"/>
+        <i aria-hidden="true" :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']"/>
       </span>
       {{ item[column.key] }}
     </td>

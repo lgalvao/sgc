@@ -10,7 +10,7 @@
           variant="outline-primary"
           @click="emit('aceitarBloco')"
       >
-        <i class="bi bi-check-circle me-1"/>
+        <i aria-hidden="true" class="bi bi-check-circle me-1"/>
         Aceitar em bloco
       </BButton>
       <BButton
@@ -19,7 +19,7 @@
           variant="outline-success"
           @click="emit('homologarBloco')"
       >
-        <i class="bi bi-check-all me-1"/>
+        <i aria-hidden="true" class="bi bi-check-all me-1"/>
         Homologar em bloco
       </BButton>
     </div>
