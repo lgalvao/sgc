@@ -17,9 +17,9 @@
           </div>
         </div>
 
-        <div v-else-if="erroAdmins" class="alert alert-danger">
+        <BAlert v-else-if="erroAdmins" :model-value="true" variant="danger">
           {{ erroAdmins }}
-        </div>
+        </BAlert>
 
         <div v-else-if="administradores.length === 0">
           <EmptyState
@@ -83,9 +83,9 @@
           </div>
         </div>
 
-        <div v-else-if="store.error" class="alert alert-danger">
+        <BAlert v-else-if="store.error" :model-value="true" variant="danger">
           {{ store.error }}
-        </div>
+        </BAlert>
 
         <form v-else @submit.prevent="salvar">
           <div class="mb-3">
@@ -185,7 +185,7 @@ import EmptyState from '@/components/EmptyState.vue';
 import ModalConfirmacao from '@/components/ModalConfirmacao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import LoadingButton from '@/components/ui/LoadingButton.vue';
-import {BButton} from 'bootstrap-vue-next';
+import {BAlert, BButton} from 'bootstrap-vue-next';
 import {type Parametro, useConfiguracoesStore} from '@/stores/configuracoes';
 import {useNotificacoesStore} from '@/stores/feedback';
 import {usePerfilStore} from '@/stores/perfil';

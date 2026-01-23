@@ -2,21 +2,21 @@
   <BContainer class="mt-4">
     <PageHeader title="Cadastro de processo" />
 
-    <BAlert
-        v-model="alertState.show"
-        :fade="false"
-        :variant="alertState.variant"
-        class="mt-3"
-        dismissible
-    >
-      <h4 v-if="alertState.title" class="alert-heading">{{ alertState.title }}</h4>
-      <p class="mb-0">{{ alertState.body }}</p>
-      <ul v-if="alertState.errors && alertState.errors.length > 0" class="mb-0 mt-2">
-        <li v-for="(error, index) in alertState.errors" :key="index">{{ error }}</li>
-      </ul>
-    </BAlert>
-
     <BForm class="mt-4 col-md-6 col-sm-8 col-12">
+      <BAlert
+          v-model="alertState.show"
+          :fade="false"
+          :variant="alertState.variant"
+          class="mb-3"
+          dismissible
+      >
+        <h4 v-if="alertState.title" class="alert-heading">{{ alertState.title }}</h4>
+        <p class="mb-0">{{ alertState.body }}</p>
+        <ul v-if="alertState.errors && alertState.errors.length > 0" class="mb-0 mt-2">
+          <li v-for="(error, index) in alertState.errors" :key="index">{{ error }}</li>
+        </ul>
+      </BAlert>
+
       <BFormGroup
           class="mb-3"
           label="Descrição"
@@ -70,9 +70,9 @@
             Carregando unidades...
           </div>
         </div>
-        <div v-if="fieldErrors.unidades" class="text-danger small mt-1">
+        <BFormInvalidFeedback :state="fieldErrors.unidades ? false : null" class="d-block">
           {{ fieldErrors.unidades }}
-        </div>
+        </BFormInvalidFeedback>
       </BFormGroup>
 
       <BFormGroup
@@ -316,6 +316,14 @@ function handleApiErrors(error: any, title: string, defaultMsg: string) {
 
     if (!hasFieldErrors || genericErrors.length > 0) {
       mostrarAlerta('danger', title, lastError.message || defaultMsg, genericErrors);
+    } else if (hasFieldErrors) {
+      // Focus on first invalid field
+      nextTick(() => {
+        const firstInvalid = document.querySelector('.is-invalid') as HTMLElement;
+        if (firstInvalid) {
+          firstInvalid.focus();
+        }
+      });
     }
   } else {
     mostrarAlerta('danger', title, defaultMsg, []);

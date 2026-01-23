@@ -10,14 +10,15 @@
         </div>
       </template>
       <template #actions>
-        <BButton
+        <LoadingButton
             v-if="podeVerImpacto"
+            :loading="loadingImpacto"
             data-testid="cad-mapa__btn-impactos-mapa"
             variant="outline-secondary"
+            icon="arrow-right-circle"
+            text="Impacto no mapa"
             @click="abrirModalImpacto"
-        >
-          <i aria-hidden="true" class="bi bi-arrow-right-circle me-2"/>Impacto no mapa
-        </BButton>
+        />
         <BButton
             v-if="podeDisponibilizarMapa"
             :disabled="competencias.length === 0"
@@ -132,6 +133,7 @@
 import {BAlert, BButton, BContainer,} from "bootstrap-vue-next";
 import EmptyState from "@/components/EmptyState.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import LoadingButton from "@/components/ui/LoadingButton.vue";
 import {storeToRefs} from "pinia";
 import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";

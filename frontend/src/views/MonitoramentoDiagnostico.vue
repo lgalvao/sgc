@@ -1,11 +1,12 @@
 <template>
   <BContainer class="mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <div>
-        <h2 class="mb-0">Monitoramento do Diagnóstico</h2>
+    <PageHeader
+        title="Monitoramento do Diagnóstico"
+    >
+      <template #default>
         <span class="badge bg-secondary">{{ diagnostico?.situacaoLabel }}</span>
-      </div>
-      <div class="d-flex gap-2">
+      </template>
+      <template #actions>
         <BButton to="/painel" variant="outline-primary">Voltar</BButton>
         <BButton
             :disabled="!todosConcluiramAutoavaliacao"
@@ -22,8 +23,8 @@
         >
           Concluir Diagnóstico
         </BButton>
-      </div>
-    </div>
+      </template>
+    </PageHeader>
 
     <div v-if="loading" class="text-center py-5">
       <BSpinner label="Carregando..."/>
@@ -103,6 +104,7 @@
 import {computed, onMounted, ref} from 'vue';
 import {useRoute} from 'vue-router';
 import {BButton, BCard, BContainer, BSpinner} from 'bootstrap-vue-next';
+import PageHeader from '@/components/layout/PageHeader.vue';
 import {useFeedbackStore} from '@/stores/feedback';
 import {type DiagnosticoDto, diagnosticoService, type ServidorDiagnosticoDto} from '@/services/diagnosticoService';
 

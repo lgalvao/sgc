@@ -1,8 +1,9 @@
 <template>
   <BContainer class="mt-4">
+    <PageHeader title="Conclusão do Diagnóstico" />
     <div class="row justify-content-center">
       <div class="col-md-8">
-        <BCard class="shadow-sm" title="Conclusão do Diagnóstico">
+        <BCard class="shadow-sm">
           <div v-if="loading" class="text-center py-5">
             <BSpinner label="Carregando..."/>
           </div>
@@ -67,6 +68,7 @@ import {
   BFormTextarea,
   BSpinner
 } from 'bootstrap-vue-next';
+import PageHeader from '@/components/layout/PageHeader.vue';
 import {useFeedbackStore} from '@/stores/feedback';
 import {type DiagnosticoDto, diagnosticoService} from '@/services/diagnosticoService';
 

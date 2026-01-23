@@ -1,50 +1,10 @@
 <template>
-  <BCard
-      class="mb-4"
-      data-testid="header-subprocesso"
-      no-body
-  >
-    <BCardBody>
-      <p
-          class="text-muted small mb-1"
-          data-testid="txt-header-processo"
-      >
-        Processo: {{ processoDescricao }}
-      </p>
-      <div class="mb-3">
-        <h2
-            class="display-6 mb-0"
-            data-testid="subprocesso-header__txt-header-unidade"
-        >
-          {{ unidadeSigla }}
-        </h2>
-        <div class="text-muted">
-          {{ unidadeNome }}
-        </div>
-      </div>
-      <p>
-        <span class="fw-bold me-1">Situação:</span>
-        <span
-            data-testid="subprocesso-header__txt-situacao"
-        >{{ situacao }}</span>
-      </p>
-
-      <p><strong>Titular:</strong> {{ titularNome }}</p>
-      <p class="ms-3">
-        <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>{{ titularRamal }}
-        <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>{{ titularEmail }}
-      </p>
-
-      <template v-if="responsavelNome && responsavelNome !== titularNome">
-        <p><strong>Responsável:</strong> {{ responsavelNome }}</p>
-        <p class="ms-3">
-          <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>{{ responsavelRamal }}
-          <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>{{ responsavelEmail }}
-        </p>
-      </template>
-
-      <!-- Botões de ação -->
-      <div class="mt-3 d-flex gap-2 flex-wrap">
+  <div data-testid="header-subprocesso">
+    <PageHeader
+        :title="unidadeSigla"
+        :subtitle="unidadeNome"
+    >
+      <template #actions>
         <!-- Botão para alterar data limite -->
         <BButton
             v-if="podeAlterarDataLimite"
@@ -87,13 +47,46 @@
           <i aria-hidden="true" class="bi bi-bell me-1"/>
           Enviar lembrete
         </BButton>
-      </div>
-    </BCardBody>
-  </BCard>
+      </template>
+    </PageHeader>
+
+    <BCard class="mb-4" no-body data-testid="header-subprocesso-details">
+      <BCardBody>
+        <p
+            class="text-muted small mb-3"
+            data-testid="txt-header-processo"
+        >
+          Processo: {{ processoDescricao }}
+        </p>
+
+        <p>
+          <span class="fw-bold me-1">Situação:</span>
+          <span
+              data-testid="subprocesso-header__txt-situacao"
+          >{{ situacao }}</span>
+        </p>
+
+        <p><strong>Titular:</strong> {{ titularNome }}</p>
+        <p class="ms-3">
+          <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>{{ titularRamal }}
+          <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>{{ titularEmail }}
+        </p>
+
+        <template v-if="responsavelNome && responsavelNome !== titularNome">
+          <p><strong>Responsável:</strong> {{ responsavelNome }}</p>
+          <p class="ms-3">
+            <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>{{ responsavelRamal }}
+            <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>{{ responsavelEmail }}
+          </p>
+        </template>
+      </BCardBody>
+    </BCard>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import {BButton, BCard, BCardBody} from "bootstrap-vue-next";
+import PageHeader from "@/components/layout/PageHeader.vue";
 
 interface Props {
   processoDescricao: string;
