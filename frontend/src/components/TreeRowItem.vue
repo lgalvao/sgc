@@ -2,6 +2,7 @@
   <tr
       :class="[ item.clickable === false ? 'tree-row-disabled' : 'tree-row' ]"
       :data-testid="'tree-table-row-' + item.codigo"
+      :tabindex="item.clickable !== false ? 0 : undefined"
       @click="handleRowClick"
       @keydown.enter="handleRowClick"
       @keydown.space="handleRowClick"

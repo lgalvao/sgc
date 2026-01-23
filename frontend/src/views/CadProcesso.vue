@@ -24,6 +24,7 @@
       >
         <BFormInput
             id="descricao"
+            ref="inputDescricaoRef"
             v-model="descricao"
             :state="fieldErrors.descricao ? false : null"
             data-testid="inp-processo-descricao"
@@ -221,6 +222,8 @@ const {
   limpar: limparCampos
 } = useProcessoForm();
 
+const inputDescricaoRef = ref<InstanceType<typeof BFormInput> | null>(null);
+
 const isLoading = ref(false);
 const router = useRouter();
 const route = useRoute();
@@ -291,6 +294,13 @@ onMounted(async () => {
     }
   } else {
     await unidadesStore.buscarUnidadesParaProcesso(tipo.value);
+  }
+
+  // Auto-focus na descrição ao carregar
+  if (!processoEditando.value) {
+    nextTick(() => {
+      inputDescricaoRef.value?.$el?.focus();
+    });
   }
 });
 
