@@ -16,6 +16,7 @@
       <h5>Descrição</h5>
       <div class="mb-2">
         <BFormTextarea
+            ref="inputDescricaoRef"
             v-model="novaCompetencia.descricao"
             :state="fieldErrors?.descricao ? false : null"
             data-testid="inp-criar-competencia-descricao"
@@ -98,7 +99,7 @@ import {
   BFormTextarea,
   BModal,
 } from "bootstrap-vue-next";
-import {ref, watch} from "vue";
+import {nextTick, ref, watch} from "vue";
 import type {Atividade, Competencia} from "@/types/tipos";
 
 const props = defineProps<{
@@ -122,6 +123,7 @@ const emit = defineEmits<{
 const novaCompetencia = ref({descricao: ""});
 const atividadesSelecionadas = ref<number[]>([]);
 const competenciaSendoEditada = ref<Competencia | null>(null);
+const inputDescricaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 
 watch(
     () => props.mostrar,
@@ -138,6 +140,9 @@ watch(
           atividadesSelecionadas.value = [];
           competenciaSendoEditada.value = null;
         }
+        nextTick(() => {
+          inputDescricaoRef.value?.$el?.focus();
+        });
       }
     },
     {immediate: true},
