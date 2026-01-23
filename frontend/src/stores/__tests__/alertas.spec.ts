@@ -10,7 +10,7 @@ vi.mock("@/services/alertaService");
 
 // Mock do perfilStore para garantir que a mesma instância seja usada
 const mockPerfilStoreValues = {
-    usuarioCodigo: 123 as number | null,
+    usuarioCodigo: "123" as string | null,
     unidadeSelecionada: "456" as string | null,
 };
 vi.mock("../perfil", () => ({
@@ -38,7 +38,7 @@ describe("useAlertasStore", () => {
 
     beforeEach(async () => {
         // Resetar o estado do mock antes de cada teste
-        mockPerfilStoreValues.usuarioCodigo = 123;
+        mockPerfilStoreValues.usuarioCodigo = "123";
         mockPerfilStoreValues.unidadeSelecionada = "456";
 
         painelService = (await import("@/services/painelService")) as Mocked<
@@ -78,10 +78,10 @@ describe("useAlertasStore", () => {
                 };
                 painelService.listarAlertas.mockResolvedValue(mockPage);
 
-                await context.store.buscarAlertas(123, 456, 0, 10);
+                await context.store.buscarAlertas("123", 456, 0, 10);
 
                 expect(painelService.listarAlertas).toHaveBeenCalledWith(
-                    123,
+                    "123",
                     456,
                     0,
                     10,
@@ -98,7 +98,7 @@ describe("useAlertasStore", () => {
                 painelService.listarAlertas.mockRejectedValue(error);
 
                 await expect(
-                    context.store.buscarAlertas(123, 456, 0, 10)
+                    context.store.buscarAlertas("123", 456, 0, 10)
                 ).rejects.toThrow("Erro na busca");
 
                 expect(context.store.lastError).toEqual(normalizeError(error));

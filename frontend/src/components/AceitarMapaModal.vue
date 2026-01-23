@@ -63,7 +63,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    loading: false
+    loading: false,
+    perfil: ""
 });
 
 defineEmits<{

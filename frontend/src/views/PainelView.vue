@@ -61,8 +61,8 @@ const asc = ref(true);
 
 async function carregarDados() {
   if (perfil.perfilSelecionado && perfil.unidadeSelecionada) {
-    const promises = [
-      await processosStore.buscarProcessosPainel(
+    const promises: Promise<any>[] = [
+      processosStore.buscarProcessosPainel(
           perfil.perfilSelecionado,
           Number(perfil.unidadeSelecionada),
           0,
@@ -73,7 +73,7 @@ async function carregarDados() {
     if (perfil.usuarioCodigo) {
       promises.push(
           alertasStore.buscarAlertas(
-              Number(perfil.usuarioCodigo),
+              perfil.usuarioCodigo,
               Number(perfil.unidadeSelecionada),
               0,
               10,
@@ -131,7 +131,7 @@ function ordenarAlertasPor(campo: "data" | "processo") {
   }
   if (perfil.usuarioCodigo) {
     alertasStore.buscarAlertas(
-        Number(perfil.usuarioCodigo),
+        perfil.usuarioCodigo,
         Number(perfil.unidadeSelecionada),
         0,
         10,

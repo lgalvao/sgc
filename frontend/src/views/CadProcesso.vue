@@ -355,10 +355,6 @@ async function abrirModalConfirmacao() {
   mostrarModalConfirmacao.value = true;
 }
 
-function fecharModalConfirmacao() {
-  mostrarModalConfirmacao.value = false;
-}
-
 async function confirmarIniciarProcesso() {
   // Limpa erros
   clearErrors();

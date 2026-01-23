@@ -25,8 +25,6 @@ export function useAtividadeForm() {
       );
       novaAtividade.value = '';
       return true;
-    } catch (error) {
-      throw error;
     } finally {
       loadingAdicionar.value = false;
     }

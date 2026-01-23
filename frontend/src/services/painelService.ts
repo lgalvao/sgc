@@ -43,7 +43,7 @@ export async function listarProcessos(
 }
 
 export async function listarAlertas(
-    usuarioTitulo?: number,
+    usuarioTitulo?: string,
     codUnidade?: number,
     page: number = 0,
     size: number = 20,

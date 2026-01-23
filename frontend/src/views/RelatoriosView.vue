@@ -140,7 +140,6 @@ import {computed, ref} from "vue";
 import {useMapasStore} from "@/stores/mapas";
 import {useProcessosStore} from "@/stores/processos";
 import {TipoProcesso} from "@/types/tipos";
-import {formatDateBR} from "@/utils";
 
 const processosStore = useProcessosStore();
 const mapasStore = useMapasStore();

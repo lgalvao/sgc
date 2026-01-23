@@ -23,5 +23,8 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   loading: false,
   disabled: false,
+  icon: undefined,
+  text: undefined,
+  loadingText: undefined
 })
 </script>

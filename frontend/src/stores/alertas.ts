@@ -16,7 +16,7 @@ export const useAlertasStore = defineStore("alertas", () => {
     }
 
     async function buscarAlertas(
-        usuarioCodigo: number,
+        usuarioCodigo: string,
         unidade: number,
         page: number,
         size: number,
