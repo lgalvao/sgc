@@ -172,6 +172,6 @@ describe("DisponibilizarMapaModal.vue", () => {
         
         // Re-find the element to ensure we have the latest state
         const updatedObsTextarea = wrapper.find('[data-testid="inp-disponibilizar-mapa-obs"]');
-        expect(updatedObsTextarea.element.value).toBe("");
+        expect((updatedObsTextarea.element as HTMLTextAreaElement).value).toBe("");
     });
 });

@@ -1,7 +1,6 @@
 import {computed, ref, watch} from 'vue';
 import {useFormErrors} from '@/composables/useFormErrors';
 import {type AtualizarProcessoRequest, type CriarProcessoRequest, type Processo, TipoProcesso} from '@/types/tipos';
-import type {NormalizedError} from '@/utils/apiError';
 
 export function useProcessoForm(initialData?: Processo) {
   const descricao = ref(initialData?.descricao ?? '');

@@ -13,7 +13,7 @@ describe("usuarioService", () => {
 
     describe("autenticar", () => {
         it("deve fazer POST e retornar booleano", async () => {
-            const request = { tituloEleitoral: 123, senha: "123" };
+            const request = { tituloEleitoral: "123", senha: "123" };
             mockApi.post.mockResolvedValueOnce({ data: true });
 
             const result = await service.autenticar(request);
@@ -22,7 +22,7 @@ describe("usuarioService", () => {
             expect(result).toBe(true);
         });
 
-        testErrorHandling(() => service.autenticar({ tituloEleitoral: 123, senha: "123" }), 'post');
+        testErrorHandling(() => service.autenticar({ tituloEleitoral: "123", senha: "123" }), 'post');
     });
 
     describe("autorizar", () => {
@@ -49,7 +49,7 @@ describe("usuarioService", () => {
 
     describe("entrar", () => {
         const request = {
-            tituloEleitoral: 123,
+            tituloEleitoral: "123",
             perfil: "GESTOR",
             unidadeCodigo: 1,
         };

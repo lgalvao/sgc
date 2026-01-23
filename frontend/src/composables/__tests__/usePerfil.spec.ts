@@ -34,19 +34,19 @@ describe("usePerfil", () => {
 
     it("deve retornar o servidor logado com os dados corretos", () => {
         vi.mocked(usePerfilStore).mockReturnValue({
-            usuarioCodigo: 1,
+            usuarioCodigo: "1",
             perfilSelecionado: Perfil.GESTOR,
             unidadeSelecionada: 456,
         } as any);
 
         vi.mocked(useUsuariosStore).mockReturnValue({
-            obterUsuarioPorId: (id: number) => ({ id, nome: "Usuário Teste"}),
+            obterUsuarioPorTitulo: (titulo: string) => ({ tituloEleitoral: titulo, nome: "Usuário Teste"}),
         } as any);
 
         const {servidorLogado} = usePerfil();
 
         expect(servidorLogado.value).toEqual({
-            id: 1,
+            tituloEleitoral: "1",
             nome: "Usuário Teste",
             perfil: Perfil.GESTOR,
             unidade: 456,
@@ -55,11 +55,11 @@ describe("usePerfil", () => {
 
     it("deve retornar null se servidorLogado não encontrar usuário", () => {
         vi.mocked(usePerfilStore).mockReturnValue({
-            usuarioCodigo: 999,
+            usuarioCodigo: "999",
         } as any);
 
         vi.mocked(useUsuariosStore).mockReturnValue({
-            obterUsuarioPorId: () => null,
+            obterUsuarioPorTitulo: () => null,
         } as any);
 
         const {servidorLogado} = usePerfil();

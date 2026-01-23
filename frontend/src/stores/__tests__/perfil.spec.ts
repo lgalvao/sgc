@@ -101,7 +101,7 @@ describe("usePerfilStore", () => {
             const mockLoginResponse = {
                 perfil: Perfil.CHEFE,
                 unidadeCodigo: 1,
-                tituloEleitoral: 123,
+                tituloEleitoral: "123",
                 token: "fake-token",
                 nome: "João da Silva",
             };
@@ -158,23 +158,23 @@ describe("usePerfilStore", () => {
             const mockLoginResponse = {
                 perfil: Perfil.GESTOR,
                 unidadeCodigo: 2,
-                tituloEleitoral: 456,
+                tituloEleitoral: "456",
                 token: "fake-token",
                 nome: "Maria Oliveira",
             };
             mockUsuarioService.entrar.mockResolvedValue(mockLoginResponse);
 
-            await context.store.selecionarPerfilUnidade(456, perfilUnidade);
+            await context.store.selecionarPerfilUnidade("456", perfilUnidade);
 
             expect(mockUsuarioService.entrar).toHaveBeenCalledWith({
-                tituloEleitoral: 456,
+                tituloEleitoral: "456",
                 perfil: Perfil.GESTOR,
                 unidadeCodigo: 2,
             });
             expect(context.store.perfilSelecionado).toBe(Perfil.GESTOR);
             expect(context.store.unidadeSelecionada).toBe(2);
             expect(context.store.unidadeSelecionadaSigla).toBe("XYZ");
-            expect(context.store.usuarioCodigo).toBe(456);
+            expect(context.store.usuarioCodigo).toBe("456");
         });
 
         it("deve lidar com erro em loginCompleto", async () => {
@@ -193,7 +193,7 @@ describe("usePerfilStore", () => {
                 siglaUnidade: "XYZ",
             };
             await expect(
-                context.store.selecionarPerfilUnidade(123, perfilUnidade),
+                context.store.selecionarPerfilUnidade("123", perfilUnidade),
             ).rejects.toThrow("Fail");
             expect(context.store.lastError).toBeTruthy();
         });

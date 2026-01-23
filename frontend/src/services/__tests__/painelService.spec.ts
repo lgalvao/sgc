@@ -91,10 +91,10 @@ describe("painelService", () => {
             };
             mockApi.get.mockResolvedValueOnce({data: responseData});
 
-            const result = await service.listarAlertas(123, 1);
+            const result = await service.listarAlertas("123", 1);
 
             expect(mockApi.get).toHaveBeenCalledWith("/painel/alertas", {
-                params: {usuarioTitulo: 123, unidade: 1, page: 0, size: 20},
+                params: {usuarioTitulo: "123", unidade: 1, page: 0, size: 20},
             });
             expect(mockAlertaMappers.mapAlertaDtoToFrontend).toHaveBeenCalled();
             expect(mockAlertaMappers.mapAlertaDtoToFrontend.mock.calls[0][0]).toEqual(
@@ -106,13 +106,13 @@ describe("painelService", () => {
 
          it("deve lidar com ordenação", async () => {
              mockApi.get.mockResolvedValueOnce({data: {content: []}});
-            await service.listarAlertas(123, 1, 0, 10, "data", "asc");
+            await service.listarAlertas("123", 1, 0, 10, "data", "asc");
              expect(mockApi.get).toHaveBeenCalledWith("/painel/alertas", {
-                params: {usuarioTitulo: 123, unidade: 1, page: 0, size: 10, sort: "data,asc"},
+                params: {usuarioTitulo: "123", unidade: 1, page: 0, size: 10, sort: "data,asc"},
             });
         });
 
 
-        testErrorHandling(() => service.listarAlertas(123));
+        testErrorHandling(() => service.listarAlertas("123"));
     });
 });

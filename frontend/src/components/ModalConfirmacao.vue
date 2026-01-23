@@ -68,6 +68,10 @@ const props = withDefaults(defineProps<{
   cancelTitle: 'Cancelar',
   okDisabled: false,
   autoClose: true,
+  mensagem: '',
+  testIdConfirmar: '',
+  testIdCancelar: '',
+  okVariant: '',
 });
 
 const emit = defineEmits<{
