@@ -168,6 +168,24 @@ describe('ModalConfirmacao.vue', () => {
         expect(confirmBtn.attributes('disabled')).toBeDefined()
     })
 
+    it('exibe estado de carregamento corretamente', () => {
+        const wrapper = mount(ModalConfirmacao, {
+            props: {
+                ...defaultProps,
+                loading: true
+            },
+            global: globalOptions
+        })
+
+        const confirmBtn = wrapper.find('[data-testid="btn-modal-confirmacao-confirmar"]')
+        const cancelBtn = wrapper.find('[data-testid="btn-modal-confirmacao-cancelar"]')
+
+        expect(confirmBtn.attributes('disabled')).toBeDefined()
+        expect(cancelBtn.attributes('disabled')).toBeDefined()
+        expect(confirmBtn.find('.spinner-border').exists()).toBe(true)
+        expect(confirmBtn.text()).toContain('Processando...')
+    })
+
     it('deve ser acessível', async () => {
         const wrapper = mount(ModalConfirmacao, {
             props: defaultProps,
