@@ -3,7 +3,21 @@
     <PageHeader title="Histórico de Processos" subtitle="Lista de processos finalizados." />
 
     <BCard no-body class="shadow-sm">
-      <div class="table-responsive">
+      <div v-if="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Carregando...</span>
+        </div>
+      </div>
+
+      <EmptyState
+          v-else-if="processos.length === 0"
+          icon="bi-folder2-open"
+          title="Nenhum processo finalizado encontrado"
+          description="Os processos finalizados aparecerão aqui."
+          class="border-0 bg-transparent mb-0"
+      />
+
+      <div v-else class="table-responsive">
         <table class="table table-hover align-middle mb-0">
           <thead class="table-light">
             <tr>
@@ -14,24 +28,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-if="loading">
-              <td colspan="4" class="text-center py-4">
-                <div class="spinner-border text-primary" role="status">
-                  <span class="visually-hidden">Carregando...</span>
-                </div>
-              </td>
-            </tr>
-            <tr v-else-if="processos.length === 0">
-              <td colspan="4">
-                <EmptyState
-                    icon="bi-folder2-open"
-                    title="Nenhum processo finalizado encontrado"
-                    description="Os processos finalizados aparecerão aqui."
-                    class="border-0 bg-transparent mb-0"
-                />
-              </td>
-            </tr>
-            <tr v-for="proc in processos" v-else :key="proc.codigo">
+            <tr v-for="proc in processos" :key="proc.codigo">
               <td>
                 <div class="fw-bold">{{ proc.descricao }}</div>
                 <!-- <small class="text-muted">{{ formatarParticipantes(proc) }}</small> -->

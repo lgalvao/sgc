@@ -1,3 +1,9 @@
+# Palette's Journal
+
 ## 2024-03-24 - [Reusing EmptyState for Table Views]
 **Learning:** Tables often have awkward "No records found" rows (`<tr><td colspan="...">...</td></tr>`) that are visually distinct from other empty states in the application. Replacing these with the standardized `EmptyState` component (placed outside the table or replacing the table body) provides a much more cohesive and visually pleasing experience. It also ensures consistent iconography and messaging across the app.
 **Action:** When encountering a table that might be empty, check if `EmptyState` component can be used instead of a custom table row, potentially by conditionally rendering the table vs. the empty state container.
+
+## 2026-01-23 - [Refactoring Empty States in Tables]
+**Learning:** Moving empty states and loading indicators out of table structures (avoiding colspan hacks) improves semantic HTML and simplifies component logic, making it more accessible and maintainable.
+**Action:** When refactoring tables, ensure EmptyState and loading spinners are siblings to the table, not children, using conditional rendering.
