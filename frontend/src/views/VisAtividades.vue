@@ -14,7 +14,7 @@
             variant="outline-secondary"
             @click="abrirModalImpacto"
         >
-          <i class="bi bi-arrow-right-circle me-2"/>{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}
+          <i aria-hidden="true" class="bi bi-arrow-right-circle me-2"/>{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}
         </BButton>
         <BButton
             data-testid="btn-vis-atividades-historico"

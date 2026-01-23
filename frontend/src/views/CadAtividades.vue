@@ -35,21 +35,21 @@
               data-testid="cad-atividades__btn-impactos-mapa"
               @click="abrirModalImpacto"
           >
-            <i class="bi bi-arrow-right-circle me-2"/> Impacto no mapa
+            <i aria-hidden="true" class="bi bi-arrow-right-circle me-2"/> Impacto no mapa
           </BDropdownItem>
           <BDropdownItem
               v-if="isChefe"
               data-testid="btn-cad-atividades-historico"
               @click="abrirModalHistorico"
           >
-            <i class="bi bi-clock-history me-2"/> Histórico de análise
+            <i aria-hidden="true" class="bi bi-clock-history me-2"/> Histórico de análise
           </BDropdownItem>
           <BDropdownItem
               v-if="isChefe"
               data-testid="btn-cad-atividades-importar"
               @click="mostrarModalImportar = true"
           >
-            <i class="bi bi-upload me-2"/> Importar atividades
+            <i aria-hidden="true" class="bi bi-upload me-2"/> Importar atividades
           </BDropdownItem>
         </BDropdown>
 
@@ -123,7 +123,7 @@
           data-testid="btn-empty-state-importar"
           @click="mostrarModalImportar = true"
       >
-        <i class="bi bi-upload me-2"/> Importar atividades
+        <i aria-hidden="true" class="bi bi-upload me-2"/> Importar atividades
       </BButton>
     </EmptyState>
 

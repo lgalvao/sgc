@@ -39,8 +39,8 @@
         <BCardBody>
           <p><strong>Titular:</strong> {{ titularDetalhes?.nome }}</p>
           <p class="ms-3">
-            <i class="bi bi-telephone-fill me-2"/>{{ titularDetalhes?.ramal }}
-            <i class="bi bi-envelope-fill ms-3 me-2"/>{{ titularDetalhes?.email }}
+            <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>{{ titularDetalhes?.ramal }}
+            <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>{{ titularDetalhes?.email }}
           </p>
           <template
               v-if="unidadeComResponsavelDinamico.responsavel &&
@@ -49,8 +49,8 @@
           >
             <p><strong>Responsável:</strong> {{ unidadeComResponsavelDinamico.responsavel.nome }}</p>
             <p class="ms-3">
-              <i class="bi bi-telephone-fill me-2"/>{{ unidadeComResponsavelDinamico.responsavel.ramal }}
-              <i class="bi bi-envelope-fill ms-3 me-2"/>{{ unidadeComResponsavelDinamico.responsavel.email }}
+              <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>{{ unidadeComResponsavelDinamico.responsavel.ramal }}
+              <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>{{ unidadeComResponsavelDinamico.responsavel.email }}
             </p>
           </template>
         </BCardBody>

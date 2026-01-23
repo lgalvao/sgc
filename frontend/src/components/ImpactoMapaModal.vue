@@ -18,14 +18,14 @@
 
     <div v-else-if="impacto" data-testid="modal-impacto-body">
       <BAlert v-if="!impacto.temImpactos" :fade="false" :model-value="true" variant="success">
-        <i class="bi bi-check-circle me-2"/> Nenhum impacto detectado no mapa.
+        <i aria-hidden="true" class="bi bi-check-circle me-2"/> Nenhum impacto detectado no mapa.
       </BAlert>
 
       <div v-else class="mt-3">
         <!-- Inseridas -->
         <div v-if="impacto.atividadesInseridas.length > 0" class="mb-4">
           <h5 class="text-success mb-3">
-            <i class="bi bi-plus-circle me-2"/>Atividades Inseridas
+            <i aria-hidden="true" class="bi bi-plus-circle me-2"/>Atividades Inseridas
           </h5>
           <ul class="list-group" data-testid="lista-atividades-inseridas">
             <li
@@ -47,7 +47,7 @@
         <!-- Removidas -->
         <div v-if="impacto.atividadesRemovidas.length > 0" class="mb-4">
           <h5 class="text-danger mb-3">
-            <i class="bi bi-dash-circle me-2"/>Atividades Removidas
+            <i aria-hidden="true" class="bi bi-dash-circle me-2"/>Atividades Removidas
           </h5>
           <ul class="list-group" data-testid="lista-atividades-removidas">
             <li v-for="ativ in impacto.atividadesRemovidas" :key="ativ.codigo" class="list-group-item">
@@ -62,7 +62,7 @@
             class="mb-4"
         >
           <h5 class="text-primary mb-3">
-            <i class="bi bi-pencil me-2"/>Atividades Alteradas
+            <i aria-hidden="true" class="bi bi-pencil me-2"/>Atividades Alteradas
           </h5>
           <ul class="list-group" data-testid="lista-atividades-alteradas">
             <li
@@ -87,7 +87,7 @@
             data-testid="lista-competencias-impactadas"
         >
           <h5 class="text-warning mb-3">
-            <i class="bi bi-exclamation-triangle me-2"/>Competências Impactadas
+            <i aria-hidden="true" class="bi bi-exclamation-triangle me-2"/>Competências Impactadas
           </h5>
           <BCard
               v-for="comp in impacto.competenciasImpactadas"
@@ -104,7 +104,7 @@
                   :key="idx"
                   class="list-group-item text-muted small"
               >
-                <i class="bi bi-dot me-1"/> Impactada por: {{ ativ }}
+                <i aria-hidden="true" class="bi bi-dot me-1"/> Impactada por: {{ ativ }}
               </li>
               <li
                   v-if="comp.tiposImpacto && comp.tiposImpacto.length > 0"

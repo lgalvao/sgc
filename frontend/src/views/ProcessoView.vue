@@ -86,7 +86,7 @@
           :model-value="true"
           variant="info"
       >
-        <i class="bi bi-info-circle"/>
+        <i aria-hidden="true" class="bi bi-info-circle"/>
         Confirma a finalização do processo <strong>{{ processo?.descricao || '' }}</strong>?<br>
         Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades
         participantes do processo.

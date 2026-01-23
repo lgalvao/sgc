@@ -74,42 +74,25 @@
                 required
             />
           </div>
-          <BButton
+          <LoadingButton
               data-testid="cad-atribuicao__btn-criar-atribuicao"
               type="submit"
               variant="primary"
-          >
-            Criar
-          </BButton>
+              :loading="isLoading"
+              text="Criar"
+              loading-text="Criando..."
+          />
           <BButton
               class="ms-2"
               data-testid="btn-cancelar-atribuicao"
               type="button"
               variant="secondary"
+              :disabled="isLoading"
               @click="router.push(`/unidade/${codUnidade}`)"
           >
             Cancelar
           </BButton>
         </BForm>
-
-        <BAlert
-            v-if="sucesso"
-            :fade="false"
-            :model-value="true"
-            class="mt-3"
-            variant="success"
-        >
-          Atribuição criada!
-        </BAlert>
-        <BAlert
-            v-if="erroApi"
-            :fade="false"
-            :model-value="true"
-            class="mt-3"
-            variant="danger"
-        >
-          {{ erroApi }}
-        </BAlert>
       </BCardBody>
     </BCard>
   </BContainer>
@@ -117,7 +100,6 @@
 
 <script lang="ts" setup>
 import {
-  BAlert,
   BButton,
   BCard,
   BCardBody,
@@ -127,6 +109,7 @@ import {
   BFormSelect,
   BFormSelectOption,
   BFormTextarea,
+  useToast,
 } from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
@@ -136,10 +119,12 @@ import {buscarUnidadePorCodigo} from "@/services/unidadesService";
 import {buscarUsuariosPorUnidade} from "@/services/usuarioService";
 import type {Unidade, Usuario} from "@/types/tipos";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import LoadingButton from "@/components/ui/LoadingButton.vue";
 
 const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter();
+const toast = useToast();
 const codUnidade = computed(() => props.codUnidade);
 
 const unidade = ref<Unidade | null>(null);
@@ -148,10 +133,9 @@ const usuarioSelecionado = ref<string | null>(null);
 const dataInicio = ref("");
 const dataTermino = ref("");
 const justificativa = ref("");
+const isLoading = ref(false);
 
-const sucesso = ref(false);
 const erroUsuario = ref("");
-const erroApi = ref("");
 
 onMounted(async () => {
   try {
@@ -170,8 +154,7 @@ async function criarAtribuicao() {
     return;
   }
 
-  erroApi.value = "";
-  sucesso.value = false;
+  isLoading.value = true;
 
   try {
     await criarAtribuicaoTemporaria(unidade.value.codigo, {
@@ -180,15 +163,19 @@ async function criarAtribuicao() {
       dataTermino: dataTermino.value,
       justificativa: justificativa.value,
     });
-    sucesso.value = true;
+
+    toast.success('Atribuição criada com sucesso!');
+
     // Reset form
     usuarioSelecionado.value = null;
     dataInicio.value = "";
     dataTermino.value = "";
     justificativa.value = "";
   } catch (error) {
-    erroApi.value = "Falha ao criar atribuição. Tente novamente.";
     logger.error(error);
+    toast.danger('Falha ao criar atribuição. Tente novamente.');
+  } finally {
+    isLoading.value = false;
   }
 }
 </script>

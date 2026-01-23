@@ -1,6 +1,7 @@
 import {describe, expect, it} from "vitest";
 import {mount, VueWrapper} from "@vue/test-utils";
 import TabelaAlertas from "../TabelaAlertas.vue";
+import EmptyState from "../EmptyState.vue";
 import type {Alerta} from "@/types/tipos";
 import {BTable} from "bootstrap-vue-next";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
@@ -42,7 +43,8 @@ describe("TabelaAlertas.vue", () => {
         const wrapper = mount(TabelaAlertas, {
             props: {alertas: mockAlertas},
             global: {
-                stubs: {BTable: true}
+                stubs: {BTable: true},
+                components: { EmptyState }
             }
         });
 

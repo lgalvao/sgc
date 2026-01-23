@@ -14,7 +14,7 @@ Responsável por: mostrar caminho atual na hierarquia, botão voltar
         aria-label="Voltar"
         @click="goBack"
     >
-      <i class="bi bi-arrow-left-circle"/>
+      <i aria-hidden="true" class="bi bi-arrow-left-circle"/>
     </BButton>
 
     <BBreadcrumb

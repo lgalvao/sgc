@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {BTable} from "bootstrap-vue-next";
 import {computed} from "vue";
+import EmptyState from "@/components/EmptyState.vue";
 import type {ProcessoResumo} from "@/types/tipos";
 import {formatarSituacaoProcesso, formatarTipoProcesso} from "@/utils/formatters";
 
@@ -109,11 +110,13 @@ const rowAttr = (item: ProcessoResumo | null, type: string) => {
         @sort-changed="handleSortChange"
     >
       <template #empty>
-        <div class="text-center text-muted py-5" data-testid="empty-state-processos">
-          <i class="bi bi-folder2-open display-4 d-block mb-3" aria-hidden="true"></i>
-          <p class="h5">Nenhum processo encontrado</p>
-          <p class="small">Os processos em que sua unidade participa aparecerão aqui.</p>
-        </div>
+        <EmptyState
+            icon="bi-folder2-open"
+            title="Nenhum processo encontrado"
+            description="Os processos em que sua unidade participa aparecerão aqui."
+            data-testid="empty-state-processos"
+            class="border-0 bg-transparent mb-0"
+        />
       </template>
 
       <template #cell(situacao)="data">

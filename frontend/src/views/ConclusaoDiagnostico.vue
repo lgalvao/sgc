@@ -9,14 +9,14 @@
 
           <div v-else>
             <div v-if="!diagnostico?.podeSerConcluido" class="alert alert-danger mb-4">
-              <i class="bi bi-exclamation-triangle-fill me-2"/>
+              <i aria-hidden="true" class="bi bi-exclamation-triangle-fill me-2"/>
               {{ diagnostico?.motivoNaoPodeConcluir }}
               <hr>
               <p class="mb-0">Para concluir com pendências, é obrigatório fornecer uma justificativa abaixo.</p>
             </div>
 
             <div v-else class="alert alert-success mb-4">
-              <i class="bi bi-check-circle-fill me-2"/>
+              <i aria-hidden="true" class="bi bi-check-circle-fill me-2"/>
               O diagnóstico está completo e pronto para ser concluído.
             </div>
 

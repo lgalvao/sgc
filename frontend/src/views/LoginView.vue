@@ -139,26 +139,17 @@
               </BFormSelect>
             </div>
 
-            <BButton
+            <LoadingButton
                 aria-label="Entrar"
                 class="w-100"
                 data-testid="btn-login-entrar"
-                :disabled="isLoading"
+                :loading="isLoading"
                 type="submit"
                 variant="primary"
-            >
-              <BSpinner
-                  v-if="isLoading"
-                  class="me-2"
-                  small
-              />
-              <i
-                  v-else
-                  aria-hidden="true"
-                  class="bi bi-box-arrow-in-right me-2"
-              />
-              {{ isLoading ? 'Entrando...' : 'Entrar' }}
-            </BButton>
+                icon="box-arrow-in-right"
+                text="Entrar"
+                loading-text="Entrando..."
+            />
           </BForm>
         </BCard>
       </BCol>
@@ -178,10 +169,10 @@ import {
   BFormSelectOption,
   BInputGroup,
   BRow,
-  BSpinner
 } from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
 import {useRouter} from "vue-router";
+import LoadingButton from "@/components/ui/LoadingButton.vue";
 import type {PerfilUnidade} from "@/mappers/sgrh";
 import {logger} from "@/utils";
 

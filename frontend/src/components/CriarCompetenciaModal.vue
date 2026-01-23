@@ -82,7 +82,7 @@
           variant="primary"
           @click="salvar"
       >
-        <i class="bi bi-save"/> Salvar
+        <i aria-hidden="true" class="bi bi-save"/> Salvar
       </BButton>
     </template>
   </BModal>

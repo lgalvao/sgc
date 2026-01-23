@@ -3,6 +3,7 @@ import {BTable} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import {type ProcessoResumo, SituacaoProcesso, TipoProcesso,} from "@/types/tipos";
 import TabelaProcessos from "../TabelaProcessos.vue";
+import EmptyState from "../EmptyState.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
@@ -245,6 +246,9 @@ describe("TabelaProcessos.vue", () => {
     it("deve exibir mensagem de vazio quando não houver processos", async () => {
         context.wrapper = mount(TabelaProcessos, {
             ...getCommonMountOptions(),
+            global: {
+                components: { EmptyState }
+            },
             props: {
                 processos: [],
                 criterioOrdenacao: "descricao",

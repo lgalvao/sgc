@@ -7,7 +7,7 @@
       <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Administradores do Sistema</h5>
         <BButton variant="light" size="sm" @click="abrirModalAdicionarAdmin">
-          <i class="bi bi-person-plus"></i> Adicionar administrador
+          <i aria-hidden="true" class="bi bi-person-plus"></i> Adicionar administrador
         </BButton>
       </div>
       <div class="card-body">
