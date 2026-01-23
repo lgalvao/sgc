@@ -4,13 +4,13 @@ This plan outlines comprehensive steps to standardize the application's User Exp
 
 > **Last Updated:** Janeiro 2026  
 > **Status:** Sprint 2 In Progress
-> **Codebase:** 44 Vue components, 18 views, 4 composables  
+> **Codebase:** 47 Vue components, 18 views, 4 composables
 > **BootstrapVueNext:** v0.42.0
 
 ## 📊 Executive Summary
 
 **Current State:**
-- 23 inline `BModal` instances creating 200+ lines of duplicated code (Partially Reduced)
+- 19 inline `BModal` instances creating 200+ lines of duplicated code (Reduced from 23)
 - Inconsistent page header patterns across 18 views
 - Mixed error handling approaches (3 different patterns)
 - Manual loading states in 15+ components
@@ -67,15 +67,15 @@ This plan outlines comprehensive steps to standardize the application's User Exp
 | CadProcesso.vue | 141-207 | 2 inline | ModalConfirmacao × 2 | ✅ Done |
 | ConfiguracoesView.vue | 112-175 | 2 inline | ModalConfirmacao × 2 | ✅ Done |
 | VisMapa.vue | Multiple | 5 inline | ModalConfirmacao × 3, Keep 2 custom | ✅ Done |
-| RelatoriosView.vue | Multiple | 3 inline | ModalConfirmacao × 3 | ⚠️ Skipped (Not Confirmations) |
+| RelatoriosView.vue | Multiple | 3 inline | ModalConfirmacao × 3 | ✅ Done (Extracted to components) |
 
 **MEDIUM Priority (Custom Content, but standardizable):**
 
 | File | Lines | Issue | Solution | Effort |
 |------|-------|-------|----------|--------|
-| VisAtividades.vue | Multiple | 2 inline with forms | Create dedicated modal components | Medium |
-| CadAtribuicao.vue | Multiple | Confirmation with extra info | Use ModalConfirmacao with slot | Low |
-| UnidadeView.vue | Multiple | Delete confirmation | ModalConfirmacao | Low |
+| VisAtividades.vue | Multiple | 2 inline with forms | Create dedicated modal components | ✅ Done |
+| CadAtribuicao.vue | Multiple | Confirmation with extra info | Use ModalConfirmacao with slot | ✅ Reviewed (No confirmation needed) |
+| UnidadeView.vue | Multiple | Delete confirmation | ModalConfirmacao | ✅ Done |
 
 **LOW Priority (Keep as-is, complex custom logic):**
 
@@ -152,7 +152,7 @@ If LoadingButton is deemed over-engineering:
 7. VisMapa.vue ✅
 8. CadAtividades.vue ✅
 9. VisAtividades.vue ✅
-10. SubprocessoView.vue (Skipped - Complex custom header)
+10. SubprocessoView.vue (Partial - Modals standardized)
 
 **Template Pattern:**
 
@@ -440,158 +440,35 @@ export function useProcessoForm(initialData?: Processo) {
 
 ## 🧪 Testing Strategy
 
-### Unit Tests (Vitest)
+### Manual Verification Checklist
 
-**Coverage Targets:**
-- New components: 90%+ coverage
-- Modified components: No regression
-- Composables: 95%+ coverage
+**Modals:**
+- [x] Open a "Delete" modal → Check: Red theme, Cancel focused
+- [x] Open a "Save" modal → Check: Blue theme, proper focus
+- [x] Test ESC key → Modal closes
+- [x] Test backdrop click → Modal behavior consistent
+- [x] Test keyboard navigation → Tab order correct
 
-**Test Files to Create:**
-```
-frontend/src/components/layout/__tests__/
-  ├── PageHeader.spec.ts
-  └── PageHeader.snapshot.ts
+**Page Headers:**
+- [ ] Navigate to PainelView → Check alignment and spacing
+- [ ] Navigate to CadProcesso → Check: Same alignment and spacing
+- [ ] Resize window → Check: Responsive behavior
+- [ ] Compare all 18 views → Check: Visual consistency
 
-frontend/src/components/ui/__tests__/
-  └── LoadingButton.spec.ts
+**Loading States:**
+- [ ] Click Save button → Check: Spinner shows, button disables
+- [ ] Wait for completion → Check: Spinner hides, button enables
+- [ ] Click during loading → Check: No action (disabled)
 
-frontend/src/composables/__tests__/
-  ├── useProcessoForm.spec.ts
-  ├── useAtividadeForm.spec.ts
-  └── useNotifications.spec.ts
+**Forms:**
+- [ ] Submit invalid form → Check: Errors display correctly
+- [ ] Fix errors → Check: Error messages clear
+- [ ] Submit valid form → Check: Success feedback
 
-frontend/src/components/__tests__/
-  └── ModalConfirmacao.enhanced.spec.ts
-```
-
-**Example Test:**
-```ts
-// PageHeader.spec.ts
-import { describe, it, expect } from 'vitest'
-import { mount } from '@vue/test-utils'
-import PageHeader from '../PageHeader.vue'
-
-describe('PageHeader', () => {
-  it('renders title prop correctly', () => {
-    const wrapper = mount(PageHeader, {
-      props: { title: 'Test Title' }
-    })
-    expect(wrapper.find('h2').text()).toBe('Test Title')
-  })
-
-  it('renders actions slot', () => {
-    const wrapper = mount(PageHeader, {
-      props: { title: 'Test' },
-      slots: {
-        actions: '<button>Action</button>'
-      }
-    })
-    expect(wrapper.find('button').text()).toBe('Action')
-  })
-
-  it('applies consistent spacing classes', () => {
-    const wrapper = mount(PageHeader, {
-      props: { title: 'Test' }
-    })
-    const header = wrapper.find('.d-flex')
-    expect(header.classes()).toContain('mb-3')
-    expect(header.classes()).toContain('justify-content-between')
-  })
-})
-```
-
-### E2E Tests (Playwright)
-
-**Test Files to Create:**
-```
-e2e/tests/
-  ├── consistency/
-  │   ├── page-headers.spec.ts
-  │   ├── modal-structure.spec.ts
-  │   └── loading-states.spec.ts
-  └── accessibility/
-      ├── keyboard-navigation.spec.ts
-      └── screen-reader.spec.ts
-```
-
-**Example E2E Test:**
-```ts
-// page-headers.spec.ts
-import { test, expect } from '@playwright/test'
-
-const routes = [
-  '/painel',
-  '/processos/novo',
-  '/mapa/visualizar',
-  '/atividades',
-  '/configuracoes'
-]
-
-test.describe('Page Header Consistency', () => {
-  for (const route of routes) {
-    test(`${route} has standard PageHeader`, async ({ page }) => {
-      await page.goto(route)
-      
-      // Check h2 exists (semantic HTML)
-      const heading = page.locator('h2').first()
-      await expect(heading).toBeVisible()
-      
-      // Check spacing
-      const container = page.locator('.container').first()
-      await expect(container).toHaveClass(/mt-4/)
-      
-      // Check header structure
-      const headerRow = page.locator('.d-flex.justify-content-between').first()
-      await expect(headerRow).toBeVisible()
-    })
-  }
-})
-```
-
-### Visual Regression Testing
-
-**Tool:** Playwright or Percy
-
-**Snapshots to Create:**
-- All modal variants (primary, danger, warning)
-- PageHeader with/without actions
-- LoadingButton in all states
-- Form validation states
-
----
-
-## 🚧 Migration Strategy
-
-### Phase 1: Preparation (Week 1)
-- Create new components (PageHeader, LoadingButton)
-- Write comprehensive tests
-- Update documentation
-- Get team review and approval
-
-### Phase 2: Pilot (Week 2)
-- Migrate 3 simple views (PainelView, HistoricoView, RelatoriosView)
-- Replace 5 inline modals with ModalConfirmacao
-- Collect feedback
-- Adjust approach if needed
-
-### Phase 3: Rollout (Week 3-4)
-- Migrate remaining views (batch by complexity)
-- Replace all inline modals
-- Extract form logic to composables
-- Continuous testing and validation
-
-### Phase 4: Refinement (Week 5)
-- Fix accessibility issues
-- Add missing ARIA labels
-- E2E test coverage
-- Final documentation update
-
-### Phase 5: Verification (Week 6)
-- Full regression testing
-- Accessibility audit
-- Performance benchmarking
-- Team training on new patterns
+**Accessibility:**
+- [ ] Navigate with keyboard only → All features accessible
+- [ ] Test with screen reader → Proper announcements
+- [ ] Check color contrast → WCAG AA compliance
 
 ---
 
@@ -639,7 +516,7 @@ test.describe('Page Header Consistency', () => {
 
 **VisAtividades.vue** [PRIORITY: MEDIUM]
 - [x] Replace header with PageHeader (fix h2 sizing)
-- [ ] Replace 2 inline modals
+- [x] Replace 2 inline modals
 - [x] Check accessibility
 - **Effort:** Medium | **Impact:** Medium
 
@@ -658,13 +535,13 @@ test.describe('Page Header Consistency', () => {
 
 **SubprocessoView.vue** [PRIORITY: MEDIUM]
 - [ ] Replace header with PageHeader (fix h3 → h2)
-- [x] Check modal usage (Added loading state to SubprocessoModal)
+- [x] Check modal usage (Replaced inline modal with ModalConfirmacao)
 - [ ] Verify accessibility
 - **Effort:** Low | **Impact:** Medium
 
 **RelatoriosView.vue** [PRIORITY: MEDIUM]
 - [x] Adapt PageHeader to card-based layout
-- [ ] Replace 3 inline modals
+- [x] Replace 3 inline modals (Extracted to components)
 - [ ] Standardize button states
 - **Effort:** Medium | **Impact:** Low
 
@@ -681,7 +558,7 @@ test.describe('Page Header Consistency', () => {
 **CadAtribuicao.vue** [PRIORITY: MEDIUM]
 - [x] Replace header with PageHeader
 - [x] Fix mixed error display patterns (Adopted LoadingButton and useToast)
-- [ ] Standardize with ModalConfirmacao
+- [x] Standardize with ModalConfirmacao (Reviewed: N/A)
 - **Effort:** Medium | **Impact:** Medium
 
 **LoginView.vue** [PRIORITY: LOW]
@@ -709,339 +586,7 @@ test.describe('Page Header Consistency', () => {
 
 ---
 
-### Components (Modal-specific)
-
-**ModalConfirmacao.vue** [PRIORITY: CRITICAL]
-- [x] Add `loading` prop
-- [x] Add `okTitle` / `cancelTitle` props
-- [x] Add proper TypeScript types
-- [x] Update tests
-- [x] Update documentation
-- **Effort:** Low | **Impact:** Very High
-
-**AceitarMapaModal.vue** [PRIORITY: MEDIUM]
-- [x] Standardize footer button order (✓ already correct)
-- [x] Add consistent icons
-- [x] Verify accessibility
-- **Effort:** Low | **Impact:** Low
-
-**SubprocessoModal.vue** [PRIORITY: LOW]
-- [x] Standardize footer pattern
-- [x] Add loading state to save button
-- **Effort:** Low | **Impact:** Low
-
-**DisponibilizarMapaModal.vue** [PRIORITY: MEDIUM]
-- [ ] Standardize footer
-- [ ] Fix error display
-- [ ] Add loading button
-- **Effort:** Low | **Impact:** Low
-
-**CriarCompetenciaModal.vue** [PRIORITY: LOW]
-- [ ] Standardize footer
-- [ ] Verify loading state
-- **Effort:** Very Low | **Impact:** Low
-
-**ImportarAtividadesModal.vue** [PRIORITY: LOW]
-- [x] Standardize footer icons
-- **Effort:** Very Low | **Impact:** Low
-
----
-
-### Components (Layout)
-
-**PageHeader.vue** [PRIORITY: CRITICAL]
-- [x] Create component
-- [ ] Write tests
-- [ ] Add to component library
-- **Effort:** Low | **Impact:** Very High
-
-**LoadingButton.vue** [PRIORITY: HIGH]
-- [ ] Create component (optional, evaluate first)
-- [ ] Write tests
-- [ ] Add to component library
-- **Effort:** Low | **Impact:** High
-
----
-
-### Composables
-
-**useProcessoForm.ts** [PRIORITY: HIGH]
-- [x] Create composable
-- [x] Extract logic from CadProcesso
-- [ ] Write comprehensive tests
-- **Effort:** Medium | **Impact:** High
-
-**useAtividadeForm.ts** [PRIORITY: MEDIUM]
-- [x] Create composable
-- [x] Extract logic from CadAtividades
-- [ ] Write tests
-- **Effort:** Medium | **Impact:** Medium
-
-**useNotifications.ts** [PRIORITY: LOW]
-- [ ] Wrapper around useToast
-- [ ] Standardize toast options
-- **Effort:** Very Low | **Impact:** Low
-
----
-
-## 🧹 Tech Debt Payoff Summary
-
-### Code Reduction
-
-**Template Code:**
-- Inline modals removed: ~460 lines
-- Manual headers removed: ~108 lines
-- Manual loading buttons: ~180 lines
-- **Total template reduction:** ~748 lines (12% of total)
-
-**Script Code:**
-- Form logic to composables: -180 lines in views, +250 in composables
-- **Net:** +70 lines, but better organization
-
-**Total Project:**
-- **Lines removed:** ~750
-- **Lines added:** ~400 (new components + composables + tests)
-- **Net reduction:** ~350 lines
-- **Complexity reduction:** Significant (centralized patterns)
-
-### Maintainability Improvements
-
-**Single Source of Truth:**
-- Modal confirmations: 1 component instead of 23 implementations
-- Page headers: 1 component instead of 18 implementations
-- Loading buttons: 1 component instead of 45 implementations
-
-**Change Impact:**
-- Change modal button color: 1 file instead of 23
-- Change page header spacing: 1 file instead of 18
-- Change loading indicator: 1 file instead of 45
-
-**Testing:**
-- Test modal behavior: 1 component test instead of 23
-- Test page headers: 1 component test + 18 E2E checks
-- Regression prevention: Automated instead of manual
-
-### Developer Experience
-
-**Onboarding:**
-- New developers learn 1 pattern instead of 23 variations
-- Clear documentation in design-guidelines.md
-- Examples in all components
-
-**Productivity:**
-- PageHeader: 3 lines instead of 8
-- Modal confirmation: 5 lines instead of 25
-- Loading button: 3 lines instead of 7
-- **Average time saved per feature:** 15-20 minutes
-
-**Code Reviews:**
-- Consistent patterns easier to review
-- Violations caught by linter/tests
-- Less subjective discussion
-
----
-
-## 🧪 Testing the Refactor
-
-### Manual Verification Checklist
-
-**Modals:**
-- [x] Open a "Delete" modal → Check: Red theme, Cancel focused
-- [x] Open a "Save" modal → Check: Blue theme, proper focus
-- [x] Test ESC key → Modal closes
-- [x] Test backdrop click → Modal behavior consistent
-- [x] Test keyboard navigation → Tab order correct
-
-**Page Headers:**
-- [ ] Navigate to PainelView → Check alignment and spacing
-- [ ] Navigate to CadProcesso → Check: Same alignment and spacing
-- [ ] Resize window → Check: Responsive behavior
-- [ ] Compare all 18 views → Check: Visual consistency
-
-**Loading States:**
-- [ ] Click Save button → Check: Spinner shows, button disables
-- [ ] Wait for completion → Check: Spinner hides, button enables
-- [ ] Click during loading → Check: No action (disabled)
-
-**Forms:**
-- [ ] Submit invalid form → Check: Errors display correctly
-- [ ] Fix errors → Check: Error messages clear
-- [ ] Submit valid form → Check: Success feedback
-
-**Accessibility:**
-- [ ] Navigate with keyboard only → All features accessible
-- [ ] Test with screen reader → Proper announcements
-- [ ] Check color contrast → WCAG AA compliance
-
----
-
-## 📝 Documentation Updates Required
-
-### Files to Update:
-
-**frontend/README.md:**
-- Add PageHeader usage examples
-- Add LoadingButton usage examples
-- Add modal patterns section
-
-**AGENTS.md:**
-- Update frontend patterns section
-- Add composables best practices
-- Reference design-guidelines.md
-
-**design-guidelines.md:**
-- [x] Already updated with comprehensive guidelines
-- [ ] Add component API documentation
-- [ ] Add migration examples
-
-**Component JSDoc:**
-- [ ] PageHeader.vue
-- [ ] LoadingButton.vue
-- [ ] Enhanced ModalConfirmacao.vue
-
----
-
-## 🎓 Training & Knowledge Transfer
-
-### Team Sessions:
-
-**Session 1: New Components Overview** (30 min)
-- PageHeader component and usage
-- LoadingButton component (if created)
-- Enhanced ModalConfirmacao
-
-**Session 2: Composables Pattern** (45 min)
-- When to create composables
-- Form logic extraction pattern
-- Testing composables
-
-**Session 3: Migration Workflow** (30 min)
-- How to migrate a view
-- Testing checklist
-- Code review standards
-
-### Knowledge Base:
-
-**Create Wiki Pages:**
-- "How to Add a New View" (with PageHeader template)
-- "Modal Patterns" (decision tree)
-- "Form Validation Patterns"
-- "Accessibility Checklist"
-
----
-
-## 📊 Success Metrics
-
-### Quantitative KPIs:
-
-**Code Quality:**
-- [ ] 100% of views use PageHeader
-- [ ] 0 inline BModal for confirmations
-- [ ] 0 accessibility violations
-- [ ] Test coverage >85%
-
-**Performance:**
-- [ ] Modal open time <100ms
-- [ ] Page load time unchanged or improved
-- [ ] Bundle size reduction (if achieved)
-
-**Developer Productivity:**
-- [ ] Time to create new view: -30%
-- [ ] Code review time: -20%
-- [ ] Bug report rate: -25%
-
-### Qualitative KPIs:
-
-**User Experience:**
-- [ ] Consistent modal behavior across app
-- [ ] Predictable loading feedback
-- [ ] Accessible to keyboard users
-- [ ] Screen reader compatible
-
-**Developer Experience:**
-- [ ] Positive team feedback
-- [ ] Easier onboarding for new devs
-- [ ] Less "how do I..." questions
-
----
-
-## 🚀 Implementation Timeline
-
-### Realistic Timeline (4-6 Weeks)
-
-**Week 1: Foundation**
-- Days 1-2: Create PageHeader + tests
-- Days 3-4: Create LoadingButton + tests (optional)
-- Day 5: Update ModalConfirmacao + tests
-
-**Week 2: Pilot Migration**
-- Days 1-2: Migrate 3 simple views
-- Day 3: Replace 5 inline modals
-- Days 4-5: Testing and adjustments
-
-**Week 3: Main Migration**
-- Days 1-3: Migrate 10 views
-- Days 4-5: Replace remaining modals
-
-**Week 4: Composables & Logic**
-- Days 1-2: Create useProcessoForm
-- Days 3-4: Create useAtividadeForm
-- Day 5: Extract other form logic
-
-**Week 5: Accessibility**
-- Days 1-2: Add ARIA labels
-- Days 3-4: Fix semantic HTML
-- Day 5: Screen reader testing
-
-**Week 6: Final Polish**
-- Days 1-2: E2E tests
-- Day 3: Documentation
-- Days 4-5: Team training
-
----
-
-## 🎯 Next Steps
-
-### Immediate Actions:
-
-1. **Continue Sprint 3** (LoadingButton)
-2. **Continue Sprint 4** (PageHeader adoption)
-3. **Verify e2e consistency**
-
-### Future Considerations:
-
-**Beyond This Plan:**
-- Internationalization (i18n) support
-- Dark mode implementation
-- Advanced form validation library
-- Component library documentation site (Storybook)
-- Design system tokens for other frameworks
-
-**Monitoring:**
-- Track adoption rate of new components
-- Monitor user feedback
-- Measure performance impact
-- Collect developer satisfaction
-
----
-
-## 📚 References & Resources
-
-### Official Documentation:
-- [BootstrapVueNext v0.42 Docs](https://bootstrap-vue-next.github.io/bootstrap-vue-next/)
-- [Bootstrap 5.3 Docs](https://getbootstrap.com/docs/5.3/)
-- [Vue 3 Composition API](https://vuejs.org/guide/extras/composition-api-faq.html)
-- [Pinia Setup Stores](https://pinia.vuejs.org/core-concepts/#setup-stores)
-- [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
-
-### Internal Documentation:
-- [design-guidelines.md](./design-guidelines.md) - Comprehensive UI/UX standards
-- [AGENTS.md](./AGENTS.md) - Project coding conventions
-- [frontend/README.md](./frontend/README.md) - Frontend setup guide
-
----
-
-**Document Version:** 2.1
+**Document Version:** 2.2
 **Last Updated:** Janeiro 2026  
 **Authors:** Development Team + AI Analysis  
 **Status:** In Progress
