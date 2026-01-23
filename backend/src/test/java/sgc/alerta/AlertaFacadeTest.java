@@ -279,7 +279,7 @@ class AlertaFacadeTest {
 
             when(usuarioService.buscarPorId(usuarioTitulo)).thenReturn(usuario);
             when(alertaRepo.findByUnidadeDestino_Codigo(codUnidade)).thenReturn(List.of(alerta));
-            when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.empty());
+            when(alertaUsuarioRepo.findByUsuarioAndAlertas(eq(usuarioTitulo), anyList())).thenReturn(List.of());
             when(alertaMapper.toDto(eq(alerta), any())).thenReturn(AlertaDto.builder().codigo(100L).build());
 
             // When
@@ -309,12 +309,13 @@ class AlertaFacadeTest {
             alerta.setCodigo(100L);
 
             AlertaUsuario alertaUsuarioExistente = new AlertaUsuario();
+            alertaUsuarioExistente.setId(AlertaUsuario.Chave.builder().alertaCodigo(100L).usuarioTitulo(usuarioTitulo).build());
             alertaUsuarioExistente.setAlerta(alerta);
             alertaUsuarioExistente.setDataHoraLeitura(LocalDateTime.now());
 
             when(usuarioService.buscarPorId(usuarioTitulo)).thenReturn(usuario);
             when(alertaRepo.findByUnidadeDestino_Codigo(codUnidade)).thenReturn(List.of(alerta));
-            when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.of(alertaUsuarioExistente));
+            when(alertaUsuarioRepo.findByUsuarioAndAlertas(eq(usuarioTitulo), anyList())).thenReturn(List.of(alertaUsuarioExistente));
             when(alertaMapper.toDto(eq(alerta), any())).thenReturn(AlertaDto.builder().codigo(100L).build());
 
             // When
@@ -411,10 +412,10 @@ class AlertaFacadeTest {
             when(alertaRepo.findByUnidadeDestino_Codigo(1L)).thenReturn(List.of(a1, a2));
 
             // a1 lido, a2 nao lido
-            when(alertaUsuarioRepo.findById(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build()))
-                    .thenReturn(Optional.of(new AlertaUsuario().setDataHoraLeitura(LocalDateTime.now())));
-            when(alertaUsuarioRepo.findById(AlertaUsuario.Chave.builder().alertaCodigo(2L).usuarioTitulo(titulo).build()))
-                    .thenReturn(Optional.empty());
+            AlertaUsuario au1 = new AlertaUsuario();
+            au1.setId(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build());
+            au1.setDataHoraLeitura(LocalDateTime.now());
+            when(alertaUsuarioRepo.findByUsuarioAndAlertas(eq(titulo), anyList())).thenReturn(List.of(au1));
 
             // Mocks do mapper
             AlertaDto dto1 = AlertaDto.builder().codigo(1L).dataHoraLeitura(LocalDateTime.now()).build();
