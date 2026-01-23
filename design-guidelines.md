@@ -859,7 +859,7 @@ async function handleSubmit() {
 <BButton :disabled="loading3">Ação 3</BButton>
 ```
 
-**✅ Good (Future LoadingButton component):**
+**✅ Good (LoadingButton component):**
 ```vue
 <LoadingButton :loading="loading1" @click="action1">Ação 1</LoadingButton>
 <LoadingButton :loading="loading2" @click="action2">Ação 2</LoadingButton>
