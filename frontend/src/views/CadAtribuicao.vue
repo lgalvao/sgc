@@ -20,6 +20,7 @@
                 required
                 text-field="nome"
                 value-field="codigo"
+                :state="erroUsuario ? false : null"
             >
               <template #first>
                 <BFormSelectOption
@@ -30,12 +31,9 @@
                 </BFormSelectOption>
               </template>
             </BFormSelect>
-            <div
-                v-if="erroUsuario"
-                class="text-danger small mt-1"
-            >
+            <BFormInvalidFeedback :state="erroUsuario ? false : null">
               {{ erroUsuario }}
-            </div>
+            </BFormInvalidFeedback>
           </div>
 
           <div class="row">
@@ -106,10 +104,10 @@ import {
   BContainer,
   BForm,
   BFormInput,
+  BFormInvalidFeedback,
   BFormSelect,
   BFormSelectOption,
   BFormTextarea,
-  useToast,
 } from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
@@ -120,11 +118,12 @@ import {buscarUsuariosPorUnidade} from "@/services/usuarioService";
 import type {Unidade, Usuario} from "@/types/tipos";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
+import {useFeedbackStore} from "@/stores/feedback";
 
 const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter();
-const toast = useToast();
+const feedbackStore = useFeedbackStore();
 const codUnidade = computed(() => props.codUnidade);
 
 const unidade = ref<Unidade | null>(null);
@@ -164,7 +163,7 @@ async function criarAtribuicao() {
       justificativa: justificativa.value,
     });
 
-    toast.success('Atribuição criada com sucesso!');
+    feedbackStore.show('Sucesso', 'Atribuição criada com sucesso!', 'success');
 
     // Reset form
     usuarioSelecionado.value = null;
@@ -173,7 +172,7 @@ async function criarAtribuicao() {
     justificativa.value = "";
   } catch (error) {
     logger.error(error);
-    toast.danger('Falha ao criar atribuição. Tente novamente.');
+    feedbackStore.show('Erro', 'Falha ao criar atribuição. Tente novamente.', 'danger');
   } finally {
     isLoading.value = false;
   }

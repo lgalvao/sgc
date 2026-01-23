@@ -56,11 +56,16 @@
   />
 
   <!-- Modal para reabrir cadastro/revisão -->
-  <BModal
+  <ModalConfirmacao
       v-model="mostrarModalReabrir"
-      :title="tipoReabertura === 'cadastro' ? 'Reabrir cadastro' : 'Reabrir Revisão'"
-      centered
-      @ok="confirmarReabertura"
+      :titulo="tipoReabertura === 'cadastro' ? 'Reabrir cadastro' : 'Reabrir Revisão'"
+      variant="warning"
+      ok-title="Confirmar Reabertura"
+      :loading="loadingReabertura"
+      :ok-disabled="!justificativaReabertura.trim()"
+      :auto-close="false"
+      test-id-confirmar="btn-confirmar-reabrir"
+      @confirmar="confirmarReabertura"
   >
     <p>Informe a justificativa para reabrir o {{ tipoReabertura === 'cadastro' ? 'cadastro' : 'revisão de cadastro' }}:</p>
     <BFormTextarea
@@ -69,23 +74,13 @@
         placeholder="Justificativa obrigatória..."
         rows="3"
     />
-    <template #footer>
-      <BButton variant="secondary" @click="fecharModalReabrir">Cancelar</BButton>
-      <BButton 
-          :disabled="!justificativaReabertura.trim()"
-          data-testid="btn-confirmar-reabrir"
-          variant="warning" 
-          @click="confirmarReabertura"
-      >
-        Confirmar Reabertura
-      </BButton>
-    </template>
-  </BModal>
+  </ModalConfirmacao>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BContainer, BFormTextarea, BModal, BSpinner} from "bootstrap-vue-next";
+import {BAlert, BContainer, BFormTextarea, BSpinner} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
+import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/SubprocessoCards.vue";
 import SubprocessoHeader from "@/components/SubprocessoHeader.vue";
 import SubprocessoModal from "@/components/SubprocessoModal.vue";
@@ -107,6 +102,7 @@ const feedbackStore = useFeedbackStore();
 const mostrarModalAlterarDataLimite = ref(false);
 const isLoadingDataLimite = ref(false);
 const mostrarModalReabrir = ref(false);
+const loadingReabertura = ref(false);
 const tipoReabertura = ref<'cadastro' | 'revisao'>('cadastro');
 const justificativaReabertura = ref('');
 const codSubprocesso = ref<number | null>(null);
@@ -193,6 +189,7 @@ async function confirmarReabertura() {
     return;
   }
 
+  loadingReabertura.value = true;
   try {
     if (tipoReabertura.value === 'cadastro') {
       await reabrirCadastro(codSubprocesso.value, justificativaReabertura.value);
@@ -206,6 +203,8 @@ async function confirmarReabertura() {
     await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
   } catch {
     feedbackStore.show("Erro", "Não foi possível reabrir. Tente novamente.", "danger");
+  } finally {
+    loadingReabertura.value = false;
   }
 }
 

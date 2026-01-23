@@ -111,162 +111,36 @@
     </div>
 
     <!-- Modal Mapas Vigentes -->
-    <BModal
+    <ModalMapasVigentes
         v-model="mostrarModalMapasVigentes"
-        :fade="false"
-        hide-footer
-        size="xl"
-        title="Mapas Vigentes"
-    >
-      <div class="mb-3">
-        <BButton
-            data-testid="export-csv-mapas"
-            size="sm"
-            variant="outline-primary"
-            @click="exportarMapasVigentes"
-        >
-          <i aria-hidden="true" class="bi bi-download"/> Exportar CSV
-        </BButton>
-      </div>
-      <div class="table-responsive">
-        <table class="table table-striped">
-          <thead>
-          <tr>
-            <th>Unidade</th>
-            <th>Competências</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr
-              v-for="mapa in mapasVigentes"
-              :key="mapa.id"
-          >
-            <td>{{ mapa.unidade }}</td>
-            <td>{{ mapa.competencias?.length || 0 }}</td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-    </BModal>
+        :mapas="mapasVigentes"
+    />
 
     <!-- Modal Diagnósticos de Gaps -->
-    <BModal
+    <ModalDiagnosticosGaps
         v-model="mostrarModalDiagnosticosGaps"
-        :fade="false"
-        hide-footer
-        size="xl"
-        title="Diagnósticos de Gaps"
-    >
-      <div class="mb-3">
-        <BButton
-            data-testid="export-csv-diagnosticos"
-            size="sm"
-            variant="outline-primary"
-            @click="exportarDiagnosticosGaps"
-        >
-          <i aria-hidden="true" class="bi bi-download"/> Exportar CSV
-        </BButton>
-      </div>
-      <div class="table-responsive">
-        <table class="table table-striped">
-          <thead>
-          <tr>
-            <th>Processo</th>
-            <th>Unidade</th>
-            <th>Gaps Identificados</th>
-            <th>Importância Média</th>
-            <th>Dominio Médio</th>
-            <th>Competências Críticas</th>
-            <th>Status</th>
-            <th>Data Diagnóstico</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr
-              v-for="diagnostico in diagnosticosGapsFiltrados"
-              :key="diagnostico.id"
-          >
-            <td>{{ diagnostico.processo }}</td>
-            <td>{{ diagnostico.unidade }}</td>
-            <td>{{ diagnostico.gaps }}</td>
-            <td>{{ diagnostico.importanciaMedia }}/5</td>
-            <td>{{ diagnostico.dominioMedio }}/5</td>
-            <td>
-              <small class="text-muted">
-                {{ diagnostico.competenciasCriticas.join(', ') }}
-              </small>
-            </td>
-            <td>
-                <span :class="getClasseStatus(diagnostico.status)">
-                  {{ diagnostico.status }}
-                </span>
-            </td>
-            <td>{{ formatarData(diagnostico.data) }}</td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-    </BModal>
+        :diagnosticos="diagnosticosGapsFiltrados"
+    />
 
     <!-- Modal Andamento Geral -->
-    <BModal
+    <ModalAndamentoGeral
         v-model="mostrarModalAndamentoGeral"
-        :fade="false"
-        hide-footer
-        size="xl"
-        title="Andamento Geral dos Processos"
-    >
-      <div class="mb-3">
-        <BButton
-            data-testid="export-csv-andamento"
-            size="sm"
-            variant="outline-primary"
-            @click="exportarAndamentoGeral"
-        >
-          <i aria-hidden="true" class="bi bi-download"/> Exportar CSV
-        </BButton>
-      </div>
-      <div class="table-responsive">
-        <table class="table table-striped">
-          <thead>
-          <tr>
-            <th>Descrição</th>
-            <th>Tipo</th>
-            <th>Situação</th>
-            <th>Data Limite</th>
-            <th>Unidade</th>
-            <th>% Concluído</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr
-              v-for="processo in processosFiltrados"
-              :key="processo.codigo"
-          >
-            <td>{{ processo.descricao }}</td>
-            <td>{{ processo.tipo }}</td>
-            <td>{{ processo.situacao }}</td>
-            <td>{{ formatarData(new Date(processo.dataLimite)) }}</td>
-            <td>{{ processo.unidadeNome }}</td>
-            <td>{{ calcularPercentualConcluido }}%</td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-    </BModal>
+        :processos="processosFiltrados"
+    />
   </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BContainer, BFormInput, BFormSelect, BModal,} from "bootstrap-vue-next";
+import {BCard, BContainer, BFormInput, BFormSelect} from "bootstrap-vue-next";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import ModalMapasVigentes from "@/components/relatorios/ModalMapasVigentes.vue";
+import ModalDiagnosticosGaps from "@/components/relatorios/ModalDiagnosticosGaps.vue";
+import ModalAndamentoGeral from "@/components/relatorios/ModalAndamentoGeral.vue";
 import {computed, ref} from "vue";
 import {useMapasStore} from "@/stores/mapas";
 import {useProcessosStore} from "@/stores/processos";
 import {TipoProcesso} from "@/types/tipos";
 import {formatDateBR} from "@/utils";
-
-type CSVData = Record<string, string | number | undefined>;
 
 const processosStore = useProcessosStore();
 const mapasStore = useMapasStore();
@@ -404,29 +278,6 @@ const diagnosticosGapsFiltrados = computed(() => {
   return diagnosticos;
 });
 
-const getClasseStatus = (status: string) => {
-  switch (status) {
-    case "Finalizado":
-      return "badge bg-success";
-    case "Em análise":
-      return "badge bg-warning text-dark";
-    case "Pendente":
-      return "badge bg-danger";
-    default:
-      return "badge bg-secondary";
-  }
-};
-
-const formatarData = (data: Date) => {
-  return formatDateBR(data);
-};
-
-const calcularPercentualConcluido = () => {
-  // A lógica de percentual concluído precisa ser reavaliada com os novos DTOs.
-  // Por enquanto, retornaremos um valor fixo ou uma lógica simplificada.
-  return 0;
-};
-
 const abrirModalMapasVigentes = () => {
   mostrarModalMapasVigentes.value = true;
 };
@@ -435,72 +286,6 @@ const abrirModalDiagnosticosGaps = () => {
 };
 const abrirModalAndamentoGeral = () => {
   mostrarModalAndamentoGeral.value = true;
-};
-
-const exportarMapasVigentes = () => {
-  const dados = mapasVigentes.value.map((mapa) => ({
-    Unidade: mapa.unidade,
-    Competencias: mapa.competencias?.length || 0,
-  }));
-
-  const csv = gerarCSV(dados);
-  downloadCSV(csv, "mapas-vigentes.csv");
-};
-
-const exportarDiagnosticosGaps = () => {
-  const dados = diagnosticosGapsFiltrados.value.map((diag) => ({
-    Processo: diag.processo,
-    Unidade: diag.unidade,
-    "Gaps Identificados": diag.gaps,
-    "Importancia Media": diag.importanciaMedia,
-    "Dominio Medio": diag.dominioMedio,
-    "Competencias Criticas": diag.competenciasCriticas.join("; "),
-    Status: diag.status,
-    "Data Diagnostico": formatarData(diag.data),
-  }));
-
-  const csv = gerarCSV(dados);
-  downloadCSV(csv, "diagnosticos-gaps.csv");
-};
-
-const exportarAndamentoGeral = () => {
-  const dados = processosFiltrados.value.map((processo) => ({
-    Descricao: processo.descricao,
-    Tipo: processo.tipo,
-    Situacao: processo.situacao,
-    "Data Limite": formatarData(new Date(processo.dataLimite)),
-    Unidade: processo.unidadeNome,
-    "% Concluido": calcularPercentualConcluido(),
-  }));
-
-  const csv = gerarCSV(dados);
-  downloadCSV(csv, "andamento-geral.csv");
-};
-
-const gerarCSV = (dados: CSVData[]) => {
-  if (dados.length === 0) return "";
-
-  const headers = Object.keys(dados[0]);
-  const linhas = dados.map((item) =>
-      headers.map((header) => `"${item[header]}"`).join(","),
-  );
-
-  return [headers.join(","), ...linhas].join("\n");
-};
-
-const downloadCSV = (csv: string, nomeArquivo: string) => {
-  const blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
-  const link = document.createElement("a");
-
-  if (link.download !== undefined) {
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", nomeArquivo);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
 };
 </script>
 

@@ -27,7 +27,7 @@
         {{ cancelTitle }}
       </BButton>
       <BButton
-          :variant="okVariant || variant || 'primary'"
+          :variant="(okVariant || variant || 'primary') as any"
           :data-testid="testIdConfirmar || 'btn-modal-confirmacao-confirmar'"
           :disabled="loading || okDisabled"
           @click="confirmar"
