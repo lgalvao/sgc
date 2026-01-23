@@ -1,18 +1,31 @@
 export type CSVData = Record<string, string | number | undefined>;
 
+function sanitizeField(value: string | number | undefined): string {
+  if (value === undefined || value === null) {
+    return "";
+  }
+  let stringValue = String(value);
+
+  if (/^[=+\-@]/.test(stringValue)) {
+    stringValue = `'${stringValue}`;
+  }
+
+  return stringValue.replace(/"/g, '""');
+}
+
 export function gerarCSV(dados: CSVData[]): string {
   if (dados.length === 0) return "";
 
   const headers = Object.keys(dados[0]);
   const linhas = dados.map((item) =>
-      headers.map((header) => `"${item[header]}"`).join(","),
+    headers.map((header) => `"${sanitizeField(item[header])}"`).join(","),
   );
 
   return [headers.join(","), ...linhas].join("\n");
 }
 
 export function downloadCSV(csv: string, nomeArquivo: string) {
-  const blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const link = document.createElement("a");
 
   if (link.download !== undefined) {
