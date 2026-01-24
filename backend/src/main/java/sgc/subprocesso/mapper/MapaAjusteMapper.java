@@ -22,11 +22,11 @@ import java.util.stream.Collectors;
 public interface MapaAjusteMapper {
     @Mapping(target = "codMapa", source = "sp.mapa.codigo")
     @Mapping(target = "unidadeNome", source = "sp.unidade.nome")
-    @Mapping(target = "competencias", expression = "java(mapCompetencias(competencias, atividades, conhecimentos))")
+    @Mapping(target = "competencias", expression = "java(mapCompetencias(competencias, atividades, conhecimentos, associacoes))")
     @Mapping(target = "justificativaDevolucao", source = "analise.observacoes")
-    MapaAjusteDto toDto(Subprocesso sp, @org.jspecify.annotations.Nullable Analise analise, List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos);
+    MapaAjusteDto toDto(Subprocesso sp, @org.jspecify.annotations.Nullable Analise analise, List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, Map<Long, java.util.Set<Long>> associacoes);
 
-    default List<CompetenciaAjusteDto> mapCompetencias(List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos) {
+    default List<CompetenciaAjusteDto> mapCompetencias(List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, Map<Long, java.util.Set<Long>> associacoes) {
         Map<Long, List<Conhecimento>> conhecimentosPorAtividade = conhecimentos.stream()
                 .collect(Collectors.groupingBy(Conhecimento::getCodigoAtividade));
 
@@ -34,12 +34,13 @@ public interface MapaAjusteMapper {
 
         for (Competencia comp : competencias) {
             List<AtividadeAjusteDto> atividadeDtos = new ArrayList<>();
+            java.util.Set<Long> atividadesAssociadas = associacoes.getOrDefault(comp.getCodigo(), Collections.emptySet());
 
             for (Atividade ativ : atividades) {
                 List<Conhecimento> conhecimentosDaAtividade =
                         conhecimentosPorAtividade.getOrDefault(ativ.getCodigo(), Collections.emptyList());
 
-                boolean isLinked = comp.getAtividades().contains(ativ);
+                boolean isLinked = atividadesAssociadas.contains(ativ.getCodigo());
                 List<ConhecimentoAjusteDto> conhecimentoDtos =
                         conhecimentosDaAtividade.stream()
                                 .map(con -> ConhecimentoAjusteDto.builder()
