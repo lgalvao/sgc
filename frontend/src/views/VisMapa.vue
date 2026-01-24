@@ -154,6 +154,7 @@
         test-id-confirmar="btn-sugestoes-mapa-confirmar"
         test-id-cancelar="btn-sugestoes-mapa-cancelar"
         @confirmar="confirmarSugestoes"
+        @shown="() => sugestoesTextareaRef?.$el?.focus()"
     >
       <div class="mb-3">
         <label
@@ -162,7 +163,9 @@
         >Sugestões para o mapa de competências:</label>
         <BFormTextarea
             id="sugestoesTextarea"
+            ref="sugestoesTextareaRef"
             v-model="sugestoes"
+            autofocus
             data-testid="inp-sugestoes-mapa-texto"
             placeholder="Digite suas sugestões para o mapa de competências..."
             rows="5"
@@ -223,6 +226,7 @@
         titulo="Devolução"
         variant="danger"
         @confirmar="confirmarDevolucao"
+        @shown="() => observacaoDevolucaoRef?.$el?.focus()"
     >
       <p>Confirma a devolução da validação do mapa para ajustes?</p>
       <div class="mb-3">
@@ -232,7 +236,9 @@
         >Observação:</label>
         <BFormTextarea
             id="observacaoDevolucao"
+            ref="observacaoDevolucaoRef"
             v-model="observacaoDevolucao"
+            autofocus
             data-testid="inp-devolucao-mapa-obs"
             placeholder="Digite observações sobre a devolução..."
             rows="3"
@@ -330,6 +336,8 @@ const sugestoes = ref("");
 const sugestoesVisualizacao = ref("");
 const observacaoDevolucao = ref("");
 const isLoading = ref(false);
+const sugestoesTextareaRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
+const observacaoDevolucaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 
 const unidade = computed<Unidade | null>(() => unidadesStore.unidade);
 

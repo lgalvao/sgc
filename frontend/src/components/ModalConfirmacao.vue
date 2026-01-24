@@ -77,6 +77,8 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;
   (e: 'confirmar'): void;
+  (e: 'shown'): void;
+  (e: 'hide'): void;
 }>();
 
 const btnCancelar = ref<InstanceType<typeof BButton> | null>(null);
@@ -87,6 +89,7 @@ const modelValueComputed = computed({
 });
 
 function fechar() {
+  emit('hide');
   modelValueComputed.value = false;
 }
 
@@ -102,5 +105,6 @@ function onShown() {
   if (props.variant === 'danger' && btnCancelar.value?.$el) {
     btnCancelar.value.$el.focus();
   }
+  emit('shown');
 }
 </script>
