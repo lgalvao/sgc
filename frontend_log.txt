@@ -1,0 +1,12 @@
+
+> sgc@1.0.0 dev
+> vite --port 5173
+
+
+  VITE v7.3.1  ready in 441 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+10:41:48 PM [vite] (client) hmr update /src/views/ConfiguracoesView.vue
+10:45:24 PM [vite] (client) hmr update /src/components/ModalConfirmacao.vue
+10:45:52 PM [vite] (client) hmr update /src/views/ConfiguracoesView.vue

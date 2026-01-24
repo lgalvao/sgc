@@ -146,16 +146,19 @@
         ok-title="Adicionar"
         titulo="Adicionar administrador"
         @confirmar="adicionarAdmin"
+        @shown="() => inputTituloRef?.focus()"
     >
       <div class="mb-3">
         <label for="usuarioTitulo" class="form-label">Título</label>
         <input
             id="usuarioTitulo"
+            ref="inputTituloRef"
             v-model="novoAdminTitulo"
             class="form-control"
             maxlength="12"
             placeholder="Digite o título eleitoral"
             required
+            autofocus
             type="text"
             @keydown.enter.prevent="adicionarAdmin"
         />
@@ -212,6 +215,7 @@ const mostrarModalRemoverAdmin = ref(false);
 const adminParaRemover = ref<AdministradorDto | null>(null);
 const novoAdminTitulo = ref('');
 const adicionandoAdmin = ref(false);
+const inputTituloRef = ref<HTMLInputElement | null>(null);
 
 const podeGerenciarAdministradores = computed(() => {
   return perfilStore.isAdmin;
