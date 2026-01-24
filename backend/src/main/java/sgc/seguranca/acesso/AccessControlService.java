@@ -48,6 +48,12 @@ public class AccessControlService {
             log.warn("Tentativa de verificação de permissão com usuário nulo: acao={}, recurso={}", acao, recurso);
             return false;
         }
+
+        if (recurso == null) {
+            log.warn("Tentativa de verificação de permissão com recurso nulo: usuario={}, acao={}",
+                    usuario.getTituloEleitoral(), acao);
+            return false;
+        }
         
         log.debug("Verificando permissão: usuario={}, acao={}, recurso={}", 
                 usuario.getTituloEleitoral(), acao, recurso);
@@ -84,6 +90,10 @@ public class AccessControlService {
     private <T> String obterMotivoNegacao(@Nullable Usuario usuario, Acao acao, T recurso) {
         if (usuario == null) {
             return "Usuário não autenticado não pode executar a ação: " + acao.getDescricao();
+        }
+
+        if (recurso == null) {
+            return "Recurso não pode ser nulo para verificação de acesso.";
         }
         
         // Obtém o motivo da policy apropriada

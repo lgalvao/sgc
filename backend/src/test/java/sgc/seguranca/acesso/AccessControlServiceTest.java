@@ -226,4 +226,15 @@ class AccessControlServiceTest {
         processo.setCodigo(codigo);
         return processo;
     }
+
+    @Test
+    @DisplayName("Deve retornar false e não lançar NPE quando recurso é nulo")
+    void deveRetornarFalseQuandoRecursoEhNulo() {
+        Usuario usuario = criarUsuario("123456789012");
+        Acao acao = Acao.VISUALIZAR_PROCESSO;
+
+        boolean resultado = accessControlService.podeExecutar(usuario, acao, null);
+
+        assertThat(resultado).isFalse();
+    }
 }
