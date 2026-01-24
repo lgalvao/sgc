@@ -209,9 +209,23 @@ public class AlertaFacade {
 
         List<Alerta> alertasUnidade = alertaRepo.findByUnidadeDestino_Codigo(lotacao.getCodigo());
 
+        if (alertasUnidade.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Long> alertaCodigos = alertasUnidade.stream().map(Alerta::getCodigo).toList();
+
+        // Fetch all read statuses in a single query to avoid N+1 problem (Optimization)
+        List<AlertaUsuario> leituras = alertaUsuarioRepo.findByUsuarioAndAlertas(usuarioTitulo, alertaCodigos);
+
+        Map<Long, LocalDateTime> mapaLeitura = new HashMap<>();
+        for (AlertaUsuario au : leituras) {
+            mapaLeitura.put(au.getId().getAlertaCodigo(), au.getDataHoraLeitura());
+        }
+
         // Maps alerts to DTOs with read timestamps
         return alertasUnidade.stream().map(alerta -> {
-            LocalDateTime dataHoraLeitura = obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo).orElse(null);
+            LocalDateTime dataHoraLeitura = mapaLeitura.get(alerta.getCodigo());
             return alertaMapper.toDto(alerta, dataHoraLeitura);
         }).toList();
     }
