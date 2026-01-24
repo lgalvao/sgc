@@ -39,4 +39,16 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
             WHERE c.mapa.codigo = :mapaCodigo
             """)
     List<Object[]> findCompetenciaAndAtividadeIdsByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
+
+    /**
+     * Busca competências de um mapa sem carregar relacionamentos.
+     *
+     * @param mapaCodigo Código do mapa
+     * @return Lista de competências
+     */
+    @Query("""
+            SELECT c FROM Competencia c
+            WHERE c.mapa.codigo = :mapaCodigo
+            """)
+    List<Competencia> findByMapaCodigoSemFetch(@Param("mapaCodigo") Long mapaCodigo);
 }

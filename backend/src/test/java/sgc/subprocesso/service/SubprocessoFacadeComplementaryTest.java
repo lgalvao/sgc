@@ -519,10 +519,11 @@ class SubprocessoFacadeComplementaryTest {
 
             when(crudService.buscarSubprocessoComMapa(codigo)).thenReturn(sp);
             when(analiseFacade.listarPorSubprocesso(codigo, sgc.analise.model.TipoAnalise.VALIDACAO)).thenReturn(List.of());
-            when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
+            when(competenciaService.buscarPorCodMapaSemRelacionamentos(10L)).thenReturn(List.of());
+            when(competenciaService.buscarIdsAssociacoesCompetenciaAtividade(10L)).thenReturn(Collections.emptyMap());
             when(atividadeService.buscarPorMapaCodigoSemRelacionamentos(10L)).thenReturn(List.of());
             when(conhecimentoService.listarPorMapa(10L)).thenReturn(List.of());
-            when(mapaAjusteMapper.toDto(any(), any(), any(), any(), any())).thenReturn(MapaAjusteDto.builder().build());
+            when(mapaAjusteMapper.toDto(any(), any(), any(), any(), any(), any())).thenReturn(MapaAjusteDto.builder().build());
 
             MapaAjusteDto result = subprocessoFacade.obterMapaParaAjuste(codigo);
             assertThat(result).isNotNull();

@@ -25,6 +25,23 @@ public class CompetenciaService {
         return competenciaRepo.findByMapaCodigo(codMapa);
     }
 
+    public List<Competencia> buscarPorCodMapaSemRelacionamentos(Long codMapa) {
+        return competenciaRepo.findByMapaCodigoSemFetch(codMapa);
+    }
+
+    public java.util.Map<Long, java.util.Set<Long>> buscarIdsAssociacoesCompetenciaAtividade(Long codMapa) {
+        List<Object[]> rows = competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(codMapa);
+        java.util.Map<Long, java.util.Set<Long>> result = new java.util.HashMap<>();
+        for (Object[] row : rows) {
+            Long compId = (Long) row[0];
+            Long ativId = (Long) row[2];
+            if (ativId != null) {
+                result.computeIfAbsent(compId, k -> new java.util.HashSet<>()).add(ativId);
+            }
+        }
+        return result;
+    }
+
     public void salvar(Competencia competencia) {
         competenciaRepo.save(competencia);
     }

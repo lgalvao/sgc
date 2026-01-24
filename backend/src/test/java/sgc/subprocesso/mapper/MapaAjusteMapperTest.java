@@ -55,7 +55,10 @@ class MapaAjusteMapperTest {
         // Linkar
         comp.setAtividades(new HashSet<>(List.of(ativ)));
 
-        MapaAjusteDto dto = mapper.toDto(sp, analise, List.of(comp), List.of(ativ), List.of(con));
+        java.util.Map<Long, java.util.Set<Long>> associacoes = new java.util.HashMap<>();
+        associacoes.put(comp.getCodigo(), java.util.Set.of(ativ.getCodigo()));
+
+        MapaAjusteDto dto = mapper.toDto(sp, analise, List.of(comp), List.of(ativ), List.of(con), associacoes);
 
         assertThat(dto).isNotNull();
         assertThat(dto.getCodMapa()).isEqualTo(1L);

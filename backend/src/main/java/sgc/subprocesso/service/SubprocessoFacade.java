@@ -578,11 +578,12 @@ public class SubprocessoFacade {
         Subprocesso sp = crudService.buscarSubprocessoComMapa(codSubprocesso);
         Long codMapa = sp.getMapa().getCodigo();
         Analise analise = analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst().orElse(null);
-        List<Competencia> competencias = competenciaService.buscarPorCodMapa(codMapa);
+        List<Competencia> competencias = competenciaService.buscarPorCodMapaSemRelacionamentos(codMapa);
         // Optimization: Fetch activities without eager loading competencies to avoid redundant data transfer
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigoSemRelacionamentos(codMapa);
         List<Conhecimento> conhecimentos = conhecimentoService.listarPorMapa(codMapa);
-        return mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos);
+        java.util.Map<Long, java.util.Set<Long>> associacoes = competenciaService.buscarIdsAssociacoesCompetenciaAtividade(codMapa);
+        return mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos, associacoes);
     }
 
     private SubprocessoPermissoesDto obterPermissoesInterno(Long codSubprocesso, Usuario usuario) {
