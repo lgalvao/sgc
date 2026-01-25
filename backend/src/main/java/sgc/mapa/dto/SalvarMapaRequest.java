@@ -8,6 +8,7 @@ import lombok.Getter;
 
 import org.jspecify.annotations.Nullable;
 import java.util.List;
+import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 /**
  * Request DTO para salvar um mapa completo. Usado para criar ou atualizar o mapa com todas as suas
@@ -21,6 +22,7 @@ public class SalvarMapaRequest {
      * Observações gerais sobre o mapa.
      */
     @Nullable
+    @SanitizarHtml
     private final String observacoes;
 
     /**
