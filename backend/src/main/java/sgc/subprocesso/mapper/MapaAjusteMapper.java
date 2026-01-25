@@ -1,5 +1,6 @@
 package sgc.subprocesso.mapper;
 
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import sgc.analise.model.Analise;
@@ -24,7 +25,7 @@ public interface MapaAjusteMapper {
     @Mapping(target = "unidadeNome", source = "sp.unidade.nome")
     @Mapping(target = "competencias", expression = "java(mapCompetencias(competencias, atividades, conhecimentos, associacoes))")
     @Mapping(target = "justificativaDevolucao", source = "analise.observacoes")
-    MapaAjusteDto toDto(Subprocesso sp, @org.jspecify.annotations.Nullable Analise analise, List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, Map<Long, java.util.Set<Long>> associacoes);
+    MapaAjusteDto toDto(Subprocesso sp, @org.jspecify.annotations.Nullable Analise analise, List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, @Context Map<Long, java.util.Set<Long>> associacoes);
 
     default List<CompetenciaAjusteDto> mapCompetencias(List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, Map<Long, java.util.Set<Long>> associacoes) {
         Map<Long, List<Conhecimento>> conhecimentosPorAtividade = conhecimentos.stream()
