@@ -13,6 +13,7 @@ import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
@@ -20,6 +21,7 @@ import sgc.organizacao.model.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -514,5 +516,107 @@ class UnidadeFacadeTest {
         assertThat(paiDto.getSigla()).isEqualTo("PAI");
         assertThat(paiDto.getSubunidades()).hasSize(1);
         assertThat(paiDto.getSubunidades().getFirst().getSigla()).isEqualTo("FILHO");
+    }
+
+    @Nested
+    @DisplayName("Testes Adicionais de Cobertura")
+    class TestesAdicionaisCobertura {
+
+        @Test
+        @DisplayName("Deve ser ineligível se unidade for intermediária")
+        void deveSerIneligivelSeUnidadeIntermediaria() {
+            // Arrange
+            Unidade u1 = new Unidade();
+            u1.setCodigo(1L);
+            u1.setTipo(TipoUnidade.INTERMEDIARIA); // INTERMEDIARIA
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
+
+            // Act
+            List<UnidadeDto> result = service.buscarArvoreComElegibilidade(false, Collections.emptySet());
+
+            // Assert
+            assertThat(result).hasSize(1);
+            // Verify toUnidadeDto called with isElegivel=false
+            verify(usuarioMapper).toUnidadeDto(u1, false);
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção se unidade inativa ao buscar por ID")
+        void deveLancarExcecaoSeUnidadeInativa() {
+            // Arrange
+            Unidade u1 = new Unidade();
+            u1.setCodigo(1L);
+            u1.setSituacao(SituacaoUnidade.INATIVA); // INATIVA
+            when(repo.buscar(Unidade.class, 1L)).thenReturn(u1);
+
+            // Act & Assert
+            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(1L));
+        }
+
+        @Test
+        @DisplayName("Deve montar responsável sem substituto")
+        void deveMontarResponsavelSemSubstituto() {
+            // Arrange
+            Usuario titular = new Usuario();
+            titular.setTituloEleitoral("123");
+            titular.setNome("Titular");
+
+            when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(titular));
+
+            // Act
+            ResponsavelDto dto = service.buscarResponsavelUnidade(1L);
+
+            // Assert
+            assertThat(dto.getTitularTitulo()).isEqualTo("123");
+            assertThat(dto.getSubstitutoTitulo()).isNull();
+        }
+
+        @Test
+        @DisplayName("Deve retornar mapa vazio se lista de códigos vazia")
+        void deveRetornarMapaVazioSeListaVazia() {
+            assertThat(service.buscarResponsaveisUnidades(Collections.emptyList())).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve montar responsável com substituto")
+        void deveMontarResponsavelComSubstituto() {
+            // Arrange
+            Usuario titular = new Usuario();
+            titular.setTituloEleitoral("123");
+            titular.setNome("Titular");
+
+            Usuario substituto = new Usuario();
+            substituto.setTituloEleitoral("456");
+            substituto.setNome("Substituto");
+
+            when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(titular, substituto));
+
+            // Act
+            ResponsavelDto dto = service.buscarResponsavelUnidade(1L);
+
+            // Assert
+            assertThat(dto.getTitularTitulo()).isEqualTo("123");
+            assertThat(dto.getSubstitutoTitulo()).isEqualTo("456");
+        }
+
+        @Test
+        @DisplayName("Deve carregar atribuições em lote com lista vazia indiretamente")
+        void deveCarregarAtribuicoesEmLoteComListaVaziaIndiretamente() {
+            // Este teste visa exercitar o return se usuarios for vazio em carregarAtribuicoesEmLote
+            // Mock findChefesByUnidadesCodigos retornando algo
+            Usuario u = new Usuario();
+            u.setTituloEleitoral("123");
+            when(usuarioRepo.findChefesByUnidadesCodigos(any())).thenReturn(List.of(u));
+
+            // Mas findByIdInWithAtribuicoes retornando vazio (cenário de inconsistência possível)
+            when(usuarioRepo.findByIdInWithAtribuicoes(any())).thenReturn(Collections.emptyList());
+
+            // Act
+            Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
+
+            // Assert
+            assertThat(result).isEmpty();
+        }
     }
 }

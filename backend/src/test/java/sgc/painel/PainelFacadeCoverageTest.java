@@ -126,4 +126,73 @@ class PainelFacadeCoverageTest {
         // Verifica se chamou alertaService com sort adicionado
         verify(alertaService).listarPorUnidade(eq(1L), argThat(p -> ((Pageable)p).getSort().isSorted()));
     }
+
+    @Test
+    @DisplayName("Deve formatar unidades com hierarquia complexa (loop infinito visualização)")
+    void deveFormatarUnidadesComHierarquiaComplexa() {
+        Processo p = new Processo();
+        p.setCodigo(1L);
+        p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+
+        // A -> B -> C
+        sgc.organizacao.model.Unidade a = new sgc.organizacao.model.Unidade();
+        a.setCodigo(1L);
+        a.setSigla("A");
+
+        sgc.organizacao.model.Unidade b = new sgc.organizacao.model.Unidade();
+        b.setCodigo(2L);
+        b.setSigla("B");
+        b.setUnidadeSuperior(a);
+
+        sgc.organizacao.model.Unidade c = new sgc.organizacao.model.Unidade();
+        c.setCodigo(3L);
+        c.setSigla("C");
+        c.setUnidadeSuperior(b);
+
+        // Todos participam
+        p.getParticipantes().add(a);
+        p.getParticipantes().add(b);
+        p.getParticipantes().add(c);
+
+        when(processoFacade.listarPorParticipantesIgnorandoCriado(any(), any())).thenReturn(new PageImpl<>(List.of(p)));
+        // Mock buscarIdsDescendentes para suportar a lógica de 'todasSubordinadasParticipam'
+        // A tem B (e C via recursao, mas o metodo recebe so diretos? Nao, 'buscarIdsDescendentes' retorna todos)
+        when(unidadeService.buscarIdsDescendentes(1L)).thenReturn(List.of(1L, 2L, 3L));
+        when(unidadeService.buscarIdsDescendentes(2L)).thenReturn(List.of(2L, 3L));
+        when(unidadeService.buscarIdsDescendentes(3L)).thenReturn(List.of(3L));
+
+        sgc.organizacao.dto.UnidadeDto aDto = sgc.organizacao.dto.UnidadeDto.builder().sigla("A").build();
+        when(unidadeService.buscarPorCodigo(anyLong())).thenReturn(aDto);
+
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.SERVIDOR, 1L, PageRequest.of(0, 10));
+
+        // Se A engloba B e B engloba C, e todos participam, então deve aparecer apenas "A"
+        assertThat(result.getContent()).hasSize(1);
+        String unidadesStr = result.getContent().getFirst().unidadesParticipantes();
+        assertThat(unidadesStr).isEqualTo("A");
+    }
+
+    @Test
+    @DisplayName("Deve manter ordenação se já definida no Pageable")
+    void deveManterOrdenacaoSeJaDefinida() {
+        Processo p = new Processo();
+        p.setCodigo(1L);
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+
+        // Unidade participante para evitar NPE
+        sgc.organizacao.model.Unidade u = new sgc.organizacao.model.Unidade();
+        u.setCodigo(1L);
+        u.setSigla("U");
+        p.getParticipantes().add(u);
+
+        when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
+
+        Pageable sorted = PageRequest.of(0, 10, org.springframework.data.domain.Sort.by("codigo"));
+
+        painelFacade.listarProcessos(Perfil.ADMIN, null, sorted);
+
+        // Verifica se chamou com a ordenação original
+        verify(processoFacade).listarTodos(eq(sorted));
+    }
 }

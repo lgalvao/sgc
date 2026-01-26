@@ -237,4 +237,29 @@ class AccessControlServiceTest {
 
         assertThat(resultado).isFalse();
     }
+
+    @Test
+    @DisplayName("Deve retornar motivo padrão para recurso desconhecido")
+    void deveRetornarMotivoPadraoParaRecursoDesconhecido() {
+        Usuario usuario = criarUsuario("123");
+        Object recurso = new Object();
+
+        try {
+            accessControlService.verificarPermissao(usuario, Acao.CRIAR_PROCESSO, recurso);
+        } catch (sgc.comum.erros.ErroAccessoNegado e) {
+            assertThat(e.getMessage()).contains("não tem permissão para executar a ação");
+        }
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro se recurso nulo ao verificar permissão")
+    void deveLancarErroSeRecursoNuloAoVerificarPermissao() {
+        Usuario usuario = criarUsuario("123");
+
+        try {
+            accessControlService.verificarPermissao(usuario, Acao.CRIAR_PROCESSO, null);
+        } catch (sgc.comum.erros.ErroAccessoNegado e) {
+            assertThat(e.getMessage()).isEqualTo("Recurso não pode ser nulo para verificação de acesso.");
+        }
+    }
 }

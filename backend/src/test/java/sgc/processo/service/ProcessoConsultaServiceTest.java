@@ -169,4 +169,17 @@ class ProcessoConsultaServiceTest {
         when(context.getAuthentication()).thenReturn(auth);
         SecurityContextHolder.setContext(context);
     }
+
+    @Test
+    @DisplayName("Deve retornar vazio se nome do usuário for nulo")
+    void deveRetornarVazioSeNomeNulo() {
+        Authentication auth = mock(Authentication.class);
+        when(auth.getName()).thenReturn(null);
+        SecurityContext context = mock(SecurityContext.class);
+        when(context.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(context);
+
+        List<SubprocessoElegivelDto> res = processoConsultaService.listarSubprocessosElegiveis(1L);
+        assertThat(res).isEmpty();
+    }
 }

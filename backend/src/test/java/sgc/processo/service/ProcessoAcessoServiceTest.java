@@ -112,4 +112,56 @@ class ProcessoAcessoServiceTest {
 
         assertThat(descendentes).hasSize(4).containsExactlyInAnyOrder(1L, 2L, 3L, 4L);
     }
+
+    @Test
+    @DisplayName("Deve negar acesso se authentication não estiver autenticado")
+    void deveNegarAcessoSeAuthNaoAutenticado() {
+        Authentication auth = mock(Authentication.class);
+        when(auth.isAuthenticated()).thenReturn(false);
+
+        assertThat(processoAcessoService.checarAcesso(auth, 1L)).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve negar acesso se username for null")
+    void deveNegarAcessoSeUsernameNull() {
+        Authentication auth = mock(Authentication.class);
+        when(auth.isAuthenticated()).thenReturn(true);
+        when(auth.getName()).thenReturn(null);
+
+        assertThat(processoAcessoService.checarAcesso(auth, 1L)).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve negar acesso se unidade do usuário for nula")
+    void deveNegarAcessoSeUnidadeDoUsuarioForNula() {
+        Authentication auth = mock(Authentication.class);
+        when(auth.isAuthenticated()).thenReturn(true);
+        when(auth.getName()).thenReturn("gestor");
+        when(auth.getAuthorities()).thenAnswer(m -> List.of(new SimpleGrantedAuthority("ROLE_GESTOR")));
+
+        when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(
+                PerfilDto.builder().unidadeCodigo(null).build()
+        ));
+
+        assertThat(processoAcessoService.checarAcesso(auth, 1L)).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve lidar com ciclos na hierarquia (evitar loop infinito)")
+    void deveEvitarCicloInifinitoEmHierarquia() {
+        // U1 -> U2 -> U1
+        Unidade u1 = new Unidade(); u1.setCodigo(1L);
+        Unidade u2 = new Unidade(); u2.setCodigo(2L);
+
+        u1.setUnidadeSuperior(u2);
+        u2.setUnidadeSuperior(u1);
+
+        when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(u1, u2));
+
+        List<Long> descendentes = processoAcessoService.buscarCodigosDescendentes(1L);
+
+        // Deve retornar ambos e parar
+        assertThat(descendentes).containsExactlyInAnyOrder(1L, 2L);
+    }
 }

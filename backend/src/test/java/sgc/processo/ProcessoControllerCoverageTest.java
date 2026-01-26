@@ -40,4 +40,15 @@ class ProcessoControllerCoverageTest {
         assertThatThrownBy(() -> processoController.iniciar(cod, req))
                 .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
     }
+
+    @Test
+    @DisplayName("Deve retornar 404 se processo não encontrado")
+    void deveRetornar404SeProcessoNaoEncontrado() {
+        Long cod = 999L;
+        when(processoFacade.obterPorId(cod)).thenReturn(Optional.empty());
+
+        var response = processoController.obterPorId(cod);
+
+        org.assertj.core.api.Assertions.assertThat(response.getStatusCode().value()).isEqualTo(404);
+    }
 }
