@@ -163,4 +163,52 @@ describe('RelatoriosView.vue', () => {
   it('deve ser acessível', async () => {
     await checkA11y(ctx.wrapper!.element as HTMLElement);
   });
+
+  it('filtra processos por data fim', async () => {
+    ctx.wrapper!.vm.filtroDataInicio = '';
+    ctx.wrapper!.vm.filtroDataFim = '2023-05-01';
+    await ctx.wrapper!.vm.$nextTick();
+
+    expect(ctx.wrapper!.vm.processosFiltrados).toHaveLength(1);
+    expect(ctx.wrapper!.vm.processosFiltrados[0].codigo).toBe(1);
+  });
+
+  it('filtra diagnosticos gaps', async () => {
+    expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados).toHaveLength(4);
+
+    ctx.wrapper!.vm.filtroTipo = TipoProcesso.MAPEAMENTO;
+    await ctx.wrapper!.vm.$nextTick();
+    expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados).toHaveLength(0);
+
+    ctx.wrapper!.vm.filtroTipo = TipoProcesso.DIAGNOSTICO;
+    await ctx.wrapper!.vm.$nextTick();
+    expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados).toHaveLength(4);
+
+    ctx.wrapper!.vm.filtroTipo = '';
+    ctx.wrapper!.vm.filtroDataInicio = '2024-08-01';
+    ctx.wrapper!.vm.filtroDataFim = '2024-08-31';
+    await ctx.wrapper!.vm.$nextTick();
+
+    expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados).toHaveLength(2);
+    expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados.map((d: any) => d.id)).toContain(1);
+    expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados.map((d: any) => d.id)).toContain(2);
+  });
+
+  it('mapasVigentes retorna vazio se dados incompletos', async () => {
+    const stubsLocal = {
+      BContainer: { template: '<div><slot /></div>' },
+      BCard: { template: '<div class="card"><slot /></div>' },
+      BFormSelect: { template: '<select></select>' },
+      BFormInput: { template: '<input />' },
+    };
+
+    const mountOptions = getCommonMountOptions({
+      mapas: {
+        mapaCompleto: {},
+      },
+    }, stubsLocal);
+
+    const wrapper = mount(RelatoriosView, mountOptions);
+    expect(wrapper.vm.mapasVigentes).toHaveLength(0);
+  });
 });

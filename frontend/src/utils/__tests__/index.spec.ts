@@ -1,4 +1,4 @@
-import {describe, expect, it} from "vitest";
+import {describe, expect, it, vi} from "vitest";
 import {
     badgeClass,
     diffInDays,
@@ -10,9 +10,32 @@ import {
     isDateValidAndFuture,
     type LocalTipoNotificacao,
     parseDate,
+    situacaoLabel,
 } from "@/utils";
 
 describe("utilitários", () => {
+    describe("situacaoLabel", () => {
+        it("deve retornar o label correto para situações mapeadas do backend", () => {
+            expect(situacaoLabel("NAO_INICIADO")).toBe("Não iniciado");
+            expect(situacaoLabel("MAPEAMENTO_CADASTRO_EM_ANDAMENTO")).toBe(
+                "Cadastro em andamento",
+            );
+        });
+
+        it("deve retornar o label correto para situações legadas", () => {
+            expect(situacaoLabel("MAPA_DISPONIBILIZADO")).toBe("Mapa disponibilizado");
+        });
+
+        it("deve retornar o próprio valor se não houver mapeamento", () => {
+            expect(situacaoLabel("SITUACAO_DESCONHECIDA")).toBe("SITUACAO_DESCONHECIDA");
+        });
+
+        it('deve retornar "Não disponibilizado" para valores nulos ou indefinidos', () => {
+            expect(situacaoLabel(null)).toBe("Não disponibilizado");
+            expect(situacaoLabel(undefined)).toBe("Não disponibilizado");
+        });
+    });
+
     describe("badgeClass", () => {
         it("deve retornar a classe de badge correta para situações conhecidas", () => {
             expect(badgeClass("Finalizado")).toBe("bg-success");
@@ -197,6 +220,14 @@ describe("utilitários", () => {
             const result = formatDateBR("invalid-date-string");
             expect(result).toBe("Data inválida");
         });
+
+        it('deve retornar "Data inválida" quando toLocaleDateString lança erro', () => {
+            const date = new Date();
+            vi.spyOn(date, "toLocaleDateString").mockImplementation(() => {
+                throw new Error("Erro de formatação");
+            });
+            expect(formatDateBR(date)).toBe("Data inválida");
+        });
     });
 });
 
@@ -209,6 +240,14 @@ describe("tratamento de erro em formatDateForInput", () => {
         const result = formatDateForInput(invalidDate);
         expect(result).toBe("");
     });
+
+    it("deve retornar string vazia quando getFullYear lança erro", () => {
+        const date = new Date();
+        vi.spyOn(date, "getFullYear").mockImplementation(() => {
+            throw new Error("Erro ao obter ano");
+        });
+        expect(formatDateForInput(date)).toBe("");
+    });
 });
 
 describe("tratamento de erro em isDateValidAndFuture", () => {
@@ -219,5 +258,13 @@ describe("tratamento de erro em isDateValidAndFuture", () => {
         // Isso deve acionar o bloco catch e retornar false
         const result = isDateValidAndFuture(invalidDate);
         expect(result).toBe(false);
+    });
+
+    it("deve retornar false quando setHours lança erro", () => {
+        const date = new Date();
+        vi.spyOn(date, "setHours").mockImplementation(() => {
+            throw new Error("Erro ao definir horas");
+        });
+        expect(isDateValidAndFuture(date)).toBe(false);
     });
 });
