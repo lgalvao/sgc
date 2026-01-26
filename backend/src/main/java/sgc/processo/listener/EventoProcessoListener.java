@@ -224,12 +224,12 @@ public class EventoProcessoListener {
             String nomeUnidade = unidade.getNome();
             UsuarioDto titular = usuarios.get(responsavel.getTitularTitulo());
             
-            String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
             String assunto = switch (unidade.getTipo()) {
                 case OPERACIONAL, INTEROPERACIONAL -> "Processo Iniciado - %s".formatted(processo.getDescricao());
                 case INTERMEDIARIA -> "Processo Iniciado em Unidades Subordinadas - %s".formatted(processo.getDescricao());
                 case RAIZ, SEM_EQUIPE -> throw new ErroEstadoImpossivel("Tipo de unidade não suportada para e-mail: " + unidade.getTipo());
             };
+            String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
 
             if (titular != null && titular.getEmail() != null && !titular.getEmail().isBlank()) {
                 notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);

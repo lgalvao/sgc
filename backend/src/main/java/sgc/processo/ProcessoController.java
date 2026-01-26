@@ -29,7 +29,7 @@ public class ProcessoController {
     private final ProcessoFacade processoFacade;
 
     // Strategy Pattern: Map de handlers para inicialização de processo por tipo
-    private Map<TipoProcesso, BiFunction<Long, List<Long>, List<String>>> getProcessadoresInicio() {
+    Map<TipoProcesso, BiFunction<Long, List<Long>, List<String>>> getProcessadoresInicio() {
         return Map.of(
                 TipoProcesso.MAPEAMENTO, processoFacade::iniciarProcessoMapeamento,
                 TipoProcesso.REVISAO, processoFacade::iniciarProcessoRevisao,
@@ -163,6 +163,10 @@ public class ProcessoController {
     @Operation(summary = "Inicia um processo")
     public ResponseEntity<Object> iniciar(
             @PathVariable Long codigo, @Valid @RequestBody IniciarProcessoRequest req) {
+
+        if (req.tipo() == null) {
+            return ResponseEntity.badRequest().build();
+        }
 
         var processador = getProcessadoresInicio().get(req.tipo());
         if (processador == null) {

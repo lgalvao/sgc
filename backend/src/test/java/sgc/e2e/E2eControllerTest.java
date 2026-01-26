@@ -8,6 +8,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
@@ -52,12 +54,30 @@ class E2eControllerTest {
     @Mock
     private UnidadeFacade unidadeFacade;
 
+    @Mock
+    private ResourceLoader resourceLoader;
+
     private E2eController controller;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, dataSource, processoFacade, unidadeFacade);
+        // Default behavior for resource loader (file found in first path)
+        mockResourceLoader("file:../e2e/setup/seed.sql", true);
+        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, dataSource, processoFacade, unidadeFacade, resourceLoader);
+    }
+
+    private void mockResourceLoader(String path, boolean exists) {
+        Resource mockResource = org.mockito.Mockito.mock(Resource.class);
+        when(mockResource.exists()).thenReturn(exists);
+        if (exists) {
+            try {
+                when(mockResource.getInputStream()).thenReturn(new java.io.ByteArrayInputStream("SELECT 1;".getBytes()));
+            } catch (java.io.IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        when(resourceLoader.getResource(path)).thenReturn(mockResource);
     }
 
     @Test
@@ -141,6 +161,8 @@ class E2eControllerTest {
     @DisplayName("Deve resetar o banco de dados truncando tabelas")
     void deveResetarBancoTruncandoTabelas() throws SQLException {
         // Arrange
+        mockResourceLoader("file:../e2e/setup/seed.sql", true);
+
         jdbcTemplate.execute(
                 "INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao) VALUES (888, 'Reset"
                         + " Unit', 'RST', 'OPERACIONAL', 'ATIVA')");
@@ -161,6 +183,39 @@ class E2eControllerTest {
         // Assert
         assertCount("sgc.vw_unidade WHERE codigo=888", 0);
         assertCount("sgc.processo WHERE codigo=888", 0);
+    }
+
+    @Test
+    @DisplayName("Deve usar segundo caminho se primeiro falhar para seed.sql")
+    void deveUsarSegundoCaminhoParaSeedSql() throws SQLException {
+        // Usa mocks de DB para focar na lógica de recursos e evitar erros de SQL
+        JdbcTemplate mockJdbc = org.mockito.Mockito.mock(JdbcTemplate.class);
+        NamedParameterJdbcTemplate mockNamed = org.mockito.Mockito.mock(NamedParameterJdbcTemplate.class);
+        DataSource mockDs = org.mockito.Mockito.mock(DataSource.class);
+        java.sql.Connection mockConn = org.mockito.Mockito.mock(java.sql.Connection.class);
+        java.sql.Statement mockStmt = org.mockito.Mockito.mock(java.sql.Statement.class);
+        when(mockConn.createStatement()).thenReturn(mockStmt);
+        when(mockDs.getConnection()).thenReturn(mockConn);
+
+        E2eController localController = new E2eController(mockJdbc, mockNamed, mockDs, processoFacade, unidadeFacade, resourceLoader);
+
+        mockResourceLoader("file:../e2e/setup/seed.sql", false);
+        mockResourceLoader("file:e2e/setup/seed.sql", true);
+
+        localController.resetDatabase();
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro se seed.sql não encontrado em nenhum lugar")
+    void deveLancarErroSeSeedNaoEncontrado() {
+        // Usa mocks de DB
+        JdbcTemplate mockJdbc = org.mockito.Mockito.mock(JdbcTemplate.class);
+        E2eController localController = new E2eController(mockJdbc, namedJdbcTemplate, dataSource, processoFacade, unidadeFacade, resourceLoader);
+
+        mockResourceLoader("file:../e2e/setup/seed.sql", false);
+        mockResourceLoader("file:e2e/setup/seed.sql", false);
+
+        org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroConfiguracao.class, () -> localController.resetDatabase());
     }
 
     private void assertCount(String tableAndWhere, int expected) {
@@ -246,7 +301,7 @@ class E2eControllerTest {
         JdbcTemplate mockJdbc = org.mockito.Mockito.mock(JdbcTemplate.class);
         org.mockito.Mockito.doThrow(new RuntimeException("Error")).when(mockJdbc).execute(any(String.class));
 
-        E2eController localController = new E2eController(mockJdbc, namedJdbcTemplate, dataSource, processoFacade, unidadeFacade);
+        E2eController localController = new E2eController(mockJdbc, namedJdbcTemplate, dataSource, processoFacade, unidadeFacade, resourceLoader);
 
         org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class, () -> localController.resetDatabase());
     }
