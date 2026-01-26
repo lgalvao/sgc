@@ -117,4 +117,35 @@ class UsuarioTest {
                 .hasSameHashCodeAs(u2);
         assertThat(u1.hashCode()).isNotEqualTo(u3.hashCode());
     }
+
+    @Test
+    @DisplayName("Deve lidar com LazyInitializationException em todas atribuições")
+    void deveLidarComLazyInitExceptionEmTodasAtribuicoes() {
+        Usuario usuario = new Usuario();
+        Set<AtribuicaoTemporaria> mockSet = org.mockito.Mockito.mock(Set.class);
+
+        org.mockito.Mockito.doThrow(new org.hibernate.LazyInitializationException("Lazy")).when(mockSet).iterator();
+
+        // Injetar mock no campo privado
+        org.springframework.test.util.ReflectionTestUtils.setField(usuario, "atribuicoesTemporarias", mockSet);
+
+        // Should return empty set (or cached ones) and catch exception
+        assertThat(usuario.getTodasAtribuicoes()).isEmpty();
+        org.mockito.Mockito.verify(mockSet).iterator();
+    }
+
+    @Test
+    @DisplayName("Deve mapear perfil para authority")
+    void deveMapearPerfilParaAuthority() {
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123");
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>();
+        UsuarioPerfil up = new UsuarioPerfil();
+        up.setPerfil(Perfil.ADMIN);
+        atribuicoes.add(up);
+        usuario.setAtribuicoes(atribuicoes);
+
+        var authorities = usuario.getAuthorities();
+        assertThat(authorities).extracting("authority").containsExactly("ROLE_ADMIN");
+    }
 }

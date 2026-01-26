@@ -249,4 +249,82 @@ class SubprocessoEmailServiceTest {
         // Verifica se executou sem erro
         verify(notificacaoEmailService).enviarEmail(any(), any(), any());
     }
+
+    @Test
+    @DisplayName("Deve incluir DataLimiteEtapa2 nas variáveis")
+    void deveIncluirDataLimiteEtapa2NasVariaveis() {
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(new Processo());
+        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setUnidade(new Unidade());
+        sp.getUnidade().setSigla("U1");
+        sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(10));
+
+        EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
+                .subprocesso(sp)
+                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
+                .unidadeOrigem(new Unidade())
+                .unidadeDestino(new Unidade())
+                .build();
+
+        when(templateEngine.process(anyString(), any())).thenReturn("html");
+
+        service.enviarEmailTransicao(evento);
+
+        verify(templateEngine).process(anyString(), argThat(ctx ->
+                ctx.getVariable("dataLimiteEtapa2") != null
+        ));
+    }
+
+    @Test
+    @DisplayName("Deve incluir Observações nas variáveis")
+    void deveIncluirObservacoesNasVariaveis() {
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(new Processo());
+        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setUnidade(new Unidade());
+        sp.getUnidade().setSigla("U1");
+
+        EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
+                .subprocesso(sp)
+                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
+                .unidadeOrigem(new Unidade())
+                .unidadeDestino(new Unidade())
+                .observacoes("Minha Observação")
+                .build();
+
+        when(templateEngine.process(anyString(), any())).thenReturn("html");
+
+        service.enviarEmailTransicao(evento);
+
+        verify(templateEngine).process(anyString(), argThat(ctx ->
+                "Minha Observação".equals(ctx.getVariable("observacoes"))
+        ));
+    }
+
+    @Test
+    @DisplayName("Deve lidar com tipo processo iniciado (switch default)")
+    void deveLidarComTipoProcessoIniciado() {
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(new Processo());
+        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setUnidade(new Unidade());
+        sp.getUnidade().setSigla("U1");
+
+        EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
+                .subprocesso(sp)
+                .tipo(TipoTransicao.PROCESSO_INICIADO)
+                .unidadeOrigem(new Unidade())
+                .unidadeDestino(new Unidade())
+                .build();
+
+        when(templateEngine.process(anyString(), any())).thenReturn("html");
+
+        service.enviarEmailTransicao(evento);
+
+        // Verifica que enviou email com assunto formatado pelo default do switch
+        verify(notificacaoEmailService).enviarEmail(any(),
+                argThat(s -> s.contains("SGC: Notificação - Processo iniciado")),
+                any());
+    }
 }

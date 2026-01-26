@@ -185,7 +185,9 @@ public class SubprocessoCrudService {
         java.util.Optional.ofNullable(request.getCodMapa()).ifPresent(cod -> {
             Mapa m = new Mapa();
             m.setCodigo(cod);
-            if (!Objects.equals(subprocesso.getMapa(), m)) {
+            // Compara IDs para evitar atualização desnecessária (já que Mapa não implementa equals)
+            Long codAtual = subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null;
+            if (!Objects.equals(codAtual, cod)) {
                 campos.add("mapa");
                 subprocesso.setMapa(m);
             }

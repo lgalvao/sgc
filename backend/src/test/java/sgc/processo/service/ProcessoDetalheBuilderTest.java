@@ -377,4 +377,27 @@ class ProcessoDetalheBuilderTest {
         // Assert
         assertThat(dto.getUnidades()).isEmpty();
     }
+
+    @Test
+    @DisplayName("Deve retornar false se não autenticado")
+    void deveRetornarFalseSeNaoAutenticado() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setParticipantes(Set.of());
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
+
+        SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication auth = mock(Authentication.class);
+        when(auth.isAuthenticated()).thenReturn(false);
+        when(securityContext.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(securityContext);
+
+        ProcessoDetalheDto dto = builder.build(processo);
+
+        assertThat(dto.isPodeFinalizar()).isFalse();
+        assertThat(dto.isPodeHomologarCadastro()).isFalse();
+        assertThat(dto.isPodeHomologarMapa()).isFalse();
+    }
 }
