@@ -325,6 +325,27 @@ class AlertaFacadeTest {
             assertThat(resultado).hasSize(1);
             verify(alertaUsuarioRepo, never()).save(any());
         }
+
+        @Test
+        @DisplayName("Deve retornar vazio se sem alertas")
+        void deveRetornarVazioSeSemAlertas() {
+            String usuarioTitulo = "123";
+            Long codUnidade = 1L;
+
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(codUnidade);
+
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral(usuarioTitulo);
+            usuario.setUnidadeLotacao(unidade);
+
+            when(usuarioService.buscarPorId(usuarioTitulo)).thenReturn(usuario);
+            when(alertaRepo.findByUnidadeDestino_Codigo(codUnidade)).thenReturn(List.of());
+
+            List<AlertaDto> resultado = service.listarAlertasPorUsuario(usuarioTitulo);
+
+            assertThat(resultado).isEmpty();
+        }
     }
 
     @Nested
@@ -388,6 +409,45 @@ class AlertaFacadeTest {
             assertThat(salvo.getDataHoraLeitura()).isNotNull();
             assertThat(salvo.getUsuario()).isEqualTo(usuario);
             assertThat(salvo.getAlerta()).isEqualTo(alerta);
+        }
+
+        @Test
+        @DisplayName("Deve marcar como lido se existente e não lido")
+        void deveMarcarComoLidoSeExistenteNaoLido() {
+            String titulo = "123";
+            Long codigo = 100L;
+            Usuario usuario = new Usuario();
+
+            AlertaUsuario existente = new AlertaUsuario();
+            existente.setDataHoraLeitura(null);
+            existente.setUsuario(usuario);
+
+            when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
+            when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.of(existente));
+
+            service.marcarComoLidos(titulo, List.of(codigo));
+
+            verify(alertaUsuarioRepo).save(existente);
+            assertThat(existente.getDataHoraLeitura()).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Deve não fazer nada se já lido")
+        void deveNaoFazerNadaSeJaLido() {
+            String titulo = "123";
+            Long codigo = 100L;
+            Usuario usuario = new Usuario();
+
+            AlertaUsuario existente = new AlertaUsuario();
+            existente.setDataHoraLeitura(LocalDateTime.now());
+            existente.setUsuario(usuario);
+
+            when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
+            when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.of(existente));
+
+            service.marcarComoLidos(titulo, List.of(codigo));
+
+            verify(alertaUsuarioRepo, never()).save(any());
         }
     }
 
