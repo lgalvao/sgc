@@ -96,11 +96,11 @@ class ProcessoFinalizador {
         List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(processo.getCodigo());
 
         for (Subprocesso subprocesso : subprocessos) {
-            Unidade unidade = Optional.of(subprocesso.getUnidade())
+            Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())
                     .orElseThrow(() -> new ErroProcesso(
                             "Subprocesso %d sem unidade associada.".formatted(subprocesso.getCodigo())));
 
-            Mapa mapaDoSubprocesso = Optional.of(subprocesso.getMapa())
+            Mapa mapaDoSubprocesso = Optional.ofNullable(subprocesso.getMapa())
                     .orElseThrow(() -> new ErroProcesso(
                             "Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
 
