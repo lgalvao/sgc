@@ -5,3 +5,7 @@
 ## 2025-01-29 - [Modal Content Focus]
 **Learning:** Standard HTML `autofocus` attribute in modals is often unreliable due to the modal library's internal focus management (e.g., `bootstrap-vue-next` focuses the modal container or specific buttons).
 **Action:** To reliably focus an input field in a modal, expose the `shown` event from the modal component and use a `ref` to programmatically call `focus()` in the parent's event handler. Ensure the `shown` event is emitted *after* any internal focus logic of the modal component.
+
+## 2025-01-30 - [Empty States in Generic Components]
+**Learning:** Generic data components like `TreeTableView` often neglect empty states, forcing consumers to handle `v-if` logic repeatedly.
+**Action:** Bake `EmptyState` support directly into generic components (with customizable props) so that "no data" scenarios are handled gracefully and consistently by default without extra boilerplate in every view.

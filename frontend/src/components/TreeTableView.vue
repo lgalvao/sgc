@@ -48,15 +48,27 @@
           </tr>
         </thead>
         <tbody>
-          <TreeRowItem
-            v-for="item in flattenedData"
-            :key="item.codigo"
-            :columns="columns"
-            :item="item"
-            :level="item.level"
-            @toggle="toggleExpand"
-            @row-click="handleTreeRowClick"
-          />
+          <template v-if="flattenedData.length > 0">
+            <TreeRowItem
+              v-for="item in flattenedData"
+              :key="item.codigo"
+              :columns="columns"
+              :item="item"
+              :level="item.level"
+              @toggle="toggleExpand"
+              @row-click="handleTreeRowClick"
+            />
+          </template>
+          <tr v-else>
+            <td :colspan="columns.length" class="p-0 border-0">
+              <EmptyState
+                :title="emptyTitle"
+                :description="emptyDescription"
+                :icon="emptyIcon"
+                class="border-0 bg-transparent mb-0"
+              />
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -67,6 +79,7 @@
 import { BButton } from "bootstrap-vue-next";
 import { computed, nextTick, ref, watch } from "vue";
 import TreeRowItem from "./TreeRowItem.vue";
+import EmptyState from "@/components/EmptyState.vue";
 
 interface TreeItem {
   codigo: number | string;
@@ -92,9 +105,19 @@ interface TreeTableProps {
   columns: Column[];
   title?: string;
   hideHeaders?: boolean;
+  emptyTitle?: string;
+  emptyDescription?: string;
+  emptyIcon?: string;
 }
 
-const props = defineProps<TreeTableProps>();
+const props = withDefaults(defineProps<TreeTableProps>(), {
+  title: undefined,
+  hideHeaders: false,
+  emptyTitle: "Nenhum registro encontrado",
+  emptyDescription: "Não há dados para exibir.",
+  emptyIcon: "bi-folder2-open",
+});
+
 const emit = defineEmits<(e: "row-click", item: TreeItem) => void>();
 
 const internalData = ref<TreeItem[]>([]);

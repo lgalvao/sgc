@@ -2,6 +2,7 @@ import {mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import TreeRowItem from "../TreeRowItem.vue";
 import TreeTableView from "../TreeTableView.vue";
+import EmptyState from "@/components/EmptyState.vue";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mock do componente TreeRow
@@ -253,5 +254,39 @@ describe("TreeTable.vue", () => {
 
         // Verificar que não quebrou e manteve estado
         expect(mockData[0].expanded).toBe(false);
+    });
+
+    it("deve renderizar o estado vazio quando não houver dados", () => {
+        const wrapper = mount(TreeTableView, {
+            props: {data: [], columns: mockColumns},
+            global: {stubs: {TreeRowItem: mockTreeRow}},
+        });
+
+        // Verifica se EmptyState está presente
+        const emptyState = wrapper.findComponent(EmptyState);
+        expect(emptyState.exists()).toBe(true);
+        expect(emptyState.props('title')).toBe("Nenhum registro encontrado");
+
+        // Verifica se TreeRowItem NÃO está presente
+        expect(wrapper.findComponent(TreeRowItem).exists()).toBe(false);
+    });
+
+    it("deve renderizar o estado vazio customizado", () => {
+        const wrapper = mount(TreeTableView, {
+            props: {
+                data: [],
+                columns: mockColumns,
+                emptyTitle: "Nada aqui",
+                emptyDescription: "Vazio mesmo",
+                emptyIcon: "bi-x-circle"
+            },
+            global: {stubs: {TreeRowItem: mockTreeRow}},
+        });
+
+        const emptyState = wrapper.findComponent(EmptyState);
+        expect(emptyState.exists()).toBe(true);
+        expect(emptyState.props('title')).toBe("Nada aqui");
+        expect(emptyState.props('description')).toBe("Vazio mesmo");
+        expect(emptyState.props('icon')).toBe("bi-x-circle");
     });
 });
