@@ -116,4 +116,62 @@ class CompetenciaServiceTest {
         assertThatThrownBy(() -> service.buscarPorCodigo(1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
+
+    @Test
+    @DisplayName("Deve buscar por mapa")
+    void deveBuscarPorCodMapa() {
+        Long mapaId = 1L;
+        when(competenciaRepo.findByMapaCodigo(mapaId)).thenReturn(List.of(new Competencia()));
+        assertThat(service.buscarPorCodMapa(mapaId)).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("Deve buscar por mapa sem relacionamentos")
+    void deveBuscarPorCodMapaSemRelacionamentos() {
+        Long mapaId = 1L;
+        when(competenciaRepo.findByMapaCodigoSemFetch(mapaId)).thenReturn(List.of(new Competencia()));
+        assertThat(service.buscarPorCodMapaSemRelacionamentos(mapaId)).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("Deve buscar ids de associacoes competencia atividade")
+    void deveBuscarIdsAssociacoesCompetenciaAtividade() {
+        Long mapaId = 1L;
+        // Mocking Object[] row: [compId, compDesc, ativId]
+        Object[] row1 = new Object[]{10L, "Comp1", 100L};
+        Object[] row2 = new Object[]{10L, "Comp1", 101L};
+        Object[] row3 = new Object[]{20L, "Comp2", null};
+
+        when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(mapaId)).thenReturn(List.of(row1, row2, row3));
+
+        var result = service.buscarIdsAssociacoesCompetenciaAtividade(mapaId);
+
+        assertThat(result).hasSize(1); // Only 10L has activities
+        assertThat(result.get(10L)).containsExactlyInAnyOrder(100L, 101L);
+        assertThat(result.containsKey(20L)).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve salvar competencia")
+    void deveSalvarCompetencia() {
+        Competencia comp = new Competencia();
+        service.salvar(comp);
+        verify(competenciaRepo).save(comp);
+    }
+
+    @Test
+    @DisplayName("Deve salvar todas competencias")
+    void deveSalvarTodasCompetencias() {
+        List<Competencia> list = List.of(new Competencia());
+        service.salvarTodas(list);
+        verify(competenciaRepo).saveAll(list);
+    }
+
+    @Test
+    @DisplayName("Deve buscar por lista de codigos")
+    void deveBuscarPorCodigos() {
+        List<Long> ids = List.of(1L, 2L);
+        when(competenciaRepo.findAllById(ids)).thenReturn(List.of(new Competencia(), new Competencia()));
+        assertThat(service.buscarPorCodigos(ids)).hasSize(2);
+    }
 }
