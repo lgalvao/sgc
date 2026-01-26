@@ -1,255 +1,22 @@
 {
-  "globalLineCoverage": "99.42%",
-  "totalFilesWithGaps": 37,
+  "globalLineCoverage": "100.00%",
+  "totalFilesWithGaps": 19,
   "gaps": [
     {
-      "class": "sgc.seguranca.login.LoginFacade",
-      "coverage": "87.30%",
-      "missed": [
-        141,
-        142,
-        143,
-        150,
-        151,
-        152,
-        165,
-        166
-      ],
-      "partial": [
-        "146(1/2)",
-        "163(1/2)"
-      ],
-      "score": 9
-    },
-    {
-      "class": "sgc.organizacao.service.ValidadorDadosOrgService",
-      "coverage": "98.39%",
-      "missed": [
-        72
-      ],
-      "partial": [
-        "65(1/2)",
-        "71(1/2)",
-        "92(1/4)",
-        "109(1/4)",
-        "121(1/4)"
-      ],
-      "score": 3.5
-    },
-    {
       "class": "sgc.organizacao.UsuarioFacade",
-      "coverage": "99.42%",
-      "missed": [
-        189
-      ],
-      "partial": [
-        "181(2/2)",
-        "182(4/4)",
-        "205(1/2)",
-        "206(1/2)",
-        "220(1/2)"
-      ],
-      "score": 3.5
-    },
-    {
-      "class": "sgc.processo.listener.EventoProcessoListener",
-      "coverage": "99.19%",
-      "missed": [
-        231
-      ],
-      "partial": [
-        "166(1/4)",
-        "169(1/6)",
-        "228(1/3)",
-        "234(2/6)"
-      ],
-      "score": 3
-    },
-    {
-      "class": "sgc.organizacao.mapper.UsuarioMapper",
-      "coverage": "40.00%",
-      "missed": [
-        46,
-        47,
-        48
-      ],
-      "partial": [],
-      "score": 3
-    },
-    {
-      "class": "sgc.e2e.E2eController",
       "coverage": "100.00%",
       "missed": [],
       "partial": [
-        "66(1/2)",
-        "67(1/2)",
-        "100(1/2)",
-        "182(1/2)",
-        "212(1/2)"
+        "206(1/2)"
       ],
-      "score": 2.5
-    },
-    {
-      "class": "sgc.seguranca.login.LoginController",
-      "coverage": "90.91%",
-      "missed": [
-        69,
-        70
-      ],
-      "partial": [
-        "100(1/4)"
-      ],
-      "score": 2.5
-    },
-    {
-      "class": "sgc.mapa.service.AtividadeService",
-      "coverage": "97.78%",
-      "missed": [
-        124
-      ],
-      "partial": [
-        "88(1/2)",
-        "91(1/2)"
-      ],
-      "score": 2
-    },
-    {
-      "class": "sgc.processo.service.ProcessoFinalizador",
-      "coverage": "94.29%",
-      "missed": [
-        101,
-        105
-      ],
-      "partial": [],
-      "score": 2
-    },
-    {
-      "class": "sgc.processo.ProcessoController",
-      "coverage": "97.67%",
-      "missed": [
-        169
-      ],
-      "partial": [
-        "168(1/2)"
-      ],
-      "score": 1.5
-    },
-    {
-      "class": "sgc.organizacao.model.Usuario",
-      "coverage": "96.88%",
-      "missed": [
-        90
-      ],
-      "partial": [
-        "76(1/2)"
-      ],
-      "score": 1.5
-    },
-    {
-      "class": "sgc.processo.service.ProcessoDetalheBuilder",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "55(1/4)",
-        "72(1/4)",
-        "94(1/2)"
-      ],
-      "score": 1.5
-    },
-    {
-      "class": "sgc.subprocesso.service.notificacao.SubprocessoEmailService",
-      "coverage": "98.18%",
-      "missed": [
-        108
-      ],
-      "partial": [
-        "90(1/9)"
-      ],
-      "score": 1.5
-    },
-    {
-      "class": "sgc.subprocesso.eventos.TipoTransicao",
-      "coverage": "95.24%",
-      "missed": [
-        130
-      ],
-      "partial": [
-        "129(1/2)"
-      ],
-      "score": 1.5
-    },
-    {
-      "class": "sgc.subprocesso.SubprocessoValidacaoController",
-      "coverage": "96.15%",
-      "missed": [
-        103
-      ],
-      "partial": [],
-      "score": 1
+      "score": 0.5
     },
     {
       "class": "sgc.organizacao.UnidadeFacade",
       "coverage": "100.00%",
       "missed": [],
       "partial": [
-        "334(1/4)",
-        "353(1/2)"
-      ],
-      "score": 1
-    },
-    {
-      "class": "sgc.organizacao.model.UnidadeRepo",
-      "coverage": "66.67%",
-      "missed": [
-        45
-      ],
-      "partial": [],
-      "score": 1
-    },
-    {
-      "class": "sgc.processo.service.ProcessoAcessoService",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "57(2/6)",
-        "117(1/2)"
-      ],
-      "score": 1
-    },
-    {
-      "class": "sgc.painel.PainelFacade",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "94(1/4)",
-        "137(1/2)"
-      ],
-      "score": 1
-    },
-    {
-      "class": "sgc.alerta.AlertaFacade",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "190(1/4)"
-      ],
-      "score": 0.5
-    },
-    {
-      "class": "sgc.subprocesso.service.crud.SubprocessoCrudService",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "188(1/2)"
-      ],
-      "score": 0.5
-    },
-    {
-      "class": "sgc.organizacao.service.HierarquiaService",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "56(1/2)"
+        "334(1/4)"
       ],
       "score": 0.5
     },
@@ -259,6 +26,15 @@
       "missed": [],
       "partial": [
         "82(2/4)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.e2e.E2eController",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "215(1/2)"
       ],
       "score": 0.5
     },
@@ -308,20 +84,29 @@
       "score": 0.5
     },
     {
-      "class": "sgc.seguranca.login.LimitadorTentativasLogin",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "82(1/4)"
-      ],
-      "score": 0.5
-    },
-    {
       "class": "sgc.seguranca.login.ClienteAcessoAd",
       "coverage": "100.00%",
       "missed": [],
       "partial": [
         "40(1/4)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.seguranca.login.LoginController",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "100(1/4)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.seguranca.login.LoginFacade",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "143(1/4)"
       ],
       "score": 0.5
     },
@@ -340,15 +125,6 @@
       "missed": [],
       "partial": [
         "138(1/4)"
-      ],
-      "score": 0.5
-    },
-    {
-      "class": "sgc.processo.service.ProcessoConsultaService",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "82(1/4)"
       ],
       "score": 0.5
     },
@@ -385,6 +161,15 @@
       "missed": [],
       "partial": [
         "64(1/2)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.painel.PainelFacade",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "137(1/2)"
       ],
       "score": 0.5
     }

@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
@@ -24,7 +25,6 @@ import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 
 import javax.sql.DataSource;
-import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -45,6 +45,7 @@ public class E2eController {
     private final DataSource dataSource;
     private final ProcessoFacade processoFacade;
     private final UnidadeFacade unidadeFacade;
+    private final ResourceLoader resourceLoader;
 
     @PostMapping("/reset-database")
     public void resetDatabase() throws SQLException {
@@ -65,12 +66,16 @@ public class E2eController {
                 jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
             }
 
-            File seedFile = new File("../e2e/setup/seed.sql");
-            if (!seedFile.exists()) seedFile = new File("e2e/setup/seed.sql");
-            if (!seedFile.exists()) throw new ErroConfiguracao("Arquivo seed.sql não encontrado");
+            Resource seedResource = resourceLoader.getResource("file:../e2e/setup/seed.sql");
+            if (!seedResource.exists()) {
+                seedResource = resourceLoader.getResource("file:e2e/setup/seed.sql");
+            }
+            if (!seedResource.exists()) {
+                throw new ErroConfiguracao("Arquivo seed.sql não encontrado");
+            }
 
             try (Connection conn = dataSource.getConnection()) {
-                ScriptUtils.executeSqlScript(conn, new FileSystemResource(seedFile));
+                ScriptUtils.executeSqlScript(conn, seedResource);
             }
         } catch (Exception e) {
             log.error("Error resetting database", e);

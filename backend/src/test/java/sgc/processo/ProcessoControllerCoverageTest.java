@@ -13,9 +13,12 @@ import sgc.processo.service.ProcessoFacade;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,5 +68,33 @@ class ProcessoControllerCoverageTest {
 
         org.assertj.core.api.Assertions.assertThat(response.getStatusCode().value()).isEqualTo(400);
         org.assertj.core.api.Assertions.assertThat(response.getBody()).isInstanceOf(java.util.Map.class);
+    }
+
+    @Test
+    @DisplayName("Deve retornar Bad Request se tipo de processo for invalido (null)")
+    void deveRetornarBadRequestSeTipoInvalido() {
+        Long cod = 1L;
+        IniciarProcessoRequest req = new IniciarProcessoRequest(null, Collections.emptyList());
+
+        var response = processoController.iniciar(cod, req);
+
+        org.assertj.core.api.Assertions.assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
+    @DisplayName("Deve retornar Bad Request se processador nao encontrado (branch defensivo)")
+    void deveRetornarBadRequestSeProcessadorNaoEncontrado() {
+        // Spy
+        ProcessoController spy = org.mockito.Mockito.spy(new ProcessoController(processoFacade));
+        Map map = org.mockito.Mockito.mock(Map.class);
+        when(map.get(any())).thenReturn(null);
+        doReturn(map).when(spy).getProcessadoresInicio();
+
+        Long cod = 1L;
+        IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, Collections.emptyList());
+
+        var response = spy.iniciar(cod, req);
+
+        org.assertj.core.api.Assertions.assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
 }
