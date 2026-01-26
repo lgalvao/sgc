@@ -12,6 +12,7 @@ import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -50,5 +51,19 @@ class ProcessoControllerCoverageTest {
         var response = processoController.obterPorId(cod);
 
         org.assertj.core.api.Assertions.assertThat(response.getStatusCode().value()).isEqualTo(404);
+    }
+
+    @Test
+    @DisplayName("Deve retornar Bad Request quando houver erros ao iniciar")
+    void deveRetornarBadRequestQuandoHouverErrosAoIniciar() {
+        Long cod = 1L;
+        IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, Collections.emptyList());
+
+        when(processoFacade.iniciarProcessoMapeamento(cod, Collections.emptyList())).thenReturn(List.of("Erro 1"));
+
+        var response = processoController.iniciar(cod, req);
+
+        org.assertj.core.api.Assertions.assertThat(response.getStatusCode().value()).isEqualTo(400);
+        org.assertj.core.api.Assertions.assertThat(response.getBody()).isInstanceOf(java.util.Map.class);
     }
 }

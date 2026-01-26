@@ -398,6 +398,28 @@ class SubprocessoCrudServiceTest {
 
         service.atualizar(1L, request);
 
+        // Como o ID do mapa é igual, não deve haver alteração nem evento
+        verify(eventPublisher, org.mockito.Mockito.never()).publishEvent(any(EventoSubprocessoAtualizado.class));
+    }
+
+    @Test
+    @DisplayName("Deve atualizar definindo mapa quando subprocesso não tem mapa")
+    void deveAtualizarDefinindoMapaQuandoSemMapa() {
+        Subprocesso sp = criarSubprocessoCompleto();
+        sp.setCodigo(1L);
+        sp.setMapa(null); // Sem mapa
+
+        AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder().codMapa(5L).build();
+        SubprocessoDto responseDto = SubprocessoDto.builder().codMapa(5L).build();
+
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
+        when(repositorioSubprocesso.save(sp)).thenReturn(sp);
+        when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
+
+        service.atualizar(1L, request);
+
+        assertThat(sp.getMapa()).isNotNull();
+        assertThat(sp.getMapa().getCodigo()).isEqualTo(5L);
         verify(eventPublisher).publishEvent(any(EventoSubprocessoAtualizado.class));
     }
 }

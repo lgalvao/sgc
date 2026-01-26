@@ -239,4 +239,26 @@ class E2eControllerTest {
         assertEquals(100L, result.getCodigo());
         verify(processoFacade).iniciarProcessoMapeamento(100L, List.of(1L));
     }
+
+    @Test
+    @DisplayName("Deve lidar com erro ao resetar banco")
+    void deveLidarComErroAoResetarBanco() {
+        JdbcTemplate mockJdbc = org.mockito.Mockito.mock(JdbcTemplate.class);
+        org.mockito.Mockito.doThrow(new RuntimeException("Error")).when(mockJdbc).execute(any(String.class));
+
+        E2eController localController = new E2eController(mockJdbc, namedJdbcTemplate, dataSource, processoFacade, unidadeFacade);
+
+        org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class, () -> localController.resetDatabase());
+    }
+
+    @Test
+    @DisplayName("Deve limpar processo sem dependentes")
+    void deveLimparProcessoSemDependentes() {
+        // Create only process, no subprocess/mapa
+        jdbcTemplate.execute("INSERT INTO sgc.processo (codigo, descricao, situacao, tipo) VALUES (101, 'Proc Empty', 'CRIADO', 'MAPEAMENTO')");
+
+        controller.limparProcessoComDependentes(101L);
+
+        assertCount("sgc.processo WHERE codigo=101", 0);
+    }
 }
