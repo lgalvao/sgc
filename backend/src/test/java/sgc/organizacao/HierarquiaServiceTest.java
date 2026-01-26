@@ -101,4 +101,13 @@ class HierarquiaServiceTest {
         unidade.setUnidadeSuperior(superior);
         return unidade;
     }
+
+    @Test
+    @DisplayName("Deve retornar false se alvo não tem superior ao verificar superior imediata")
+    void deveRetornarFalsoSeAlvoNaoTemSuperiorAoVerificarImediata() {
+        Unidade alvo = criarUnidade(1L, null);
+        Unidade superior = criarUnidade(2L, null);
+
+        assertThat(hierarquiaService.isSuperiorImediata(alvo, superior)).isFalse();
+    }
 }

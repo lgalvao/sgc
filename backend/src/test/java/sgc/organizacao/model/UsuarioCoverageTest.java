@@ -60,4 +60,32 @@ class UsuarioCoverageTest {
         // Deve conter: permanente, tempAtiva e tempNull
         assertThat(todas).hasSize(3);
     }
+
+    @Test
+    @DisplayName("Deve comparar usuários corretamente")
+    void deveCompararUsuariosCorretamente() {
+        Usuario u1 = new Usuario(); u1.setTituloEleitoral("123");
+        Usuario u2 = new Usuario(); u2.setTituloEleitoral("123");
+        Usuario u3 = new Usuario(); u3.setTituloEleitoral("456");
+
+        assertThat(u1).isEqualTo(u1);
+        assertThat(u1).isEqualTo(u2);
+        assertThat(u1).isNotEqualTo(u3);
+        assertThat(u1).isNotEqualTo(null);
+        assertThat(u1).isNotEqualTo(new Object());
+
+        assertThat(u1.hashCode()).isEqualTo(u2.hashCode());
+        assertThat(u1.hashCode()).isNotEqualTo(u3.hashCode());
+    }
+
+    @Test
+    @DisplayName("Deve lidar com atribuições temporárias nulas")
+    void deveLidarComAtribuicoesTemporariasNulas() {
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("123");
+        u.setAtribuicoesTemporarias(null); // Explicitamente nulo
+
+        // Deve retornar apenas as permanentes (vazias neste caso) sem lançar NPE
+        assertThat(u.getTodasAtribuicoes()).isEmpty();
+    }
 }

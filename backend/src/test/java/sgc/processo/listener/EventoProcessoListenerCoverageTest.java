@@ -269,4 +269,98 @@ class EventoProcessoListenerCoverageTest {
         EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(1L).build();
         listener.aoFinalizarProcesso(evento);
     }
+
+    @Test
+    void deveRetornarSeSemSubprocessosAoIniciar() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
+
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
+        listener.aoIniciarProcesso(evento);
+
+        verify(servicoAlertas, never()).criarAlertasProcessoIniciado(any(), any());
+    }
+
+    @Test
+    void deveRetornarSeSemParticipantesAoFinalizar() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setParticipantes(Set.of()); // Vazio
+
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
+
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(1L).build();
+        listener.aoFinalizarProcesso(evento);
+
+        verify(unidadeService, never()).buscarResponsaveisUnidades(any());
+    }
+
+    @Test
+    void deveNaoEnviarEmailIntermediariaSemSubordinadas() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
+
+        // Unidade intermediária
+        Unidade inter = new Unidade();
+        inter.setCodigo(1L);
+        inter.setSigla("INTER");
+        inter.setTipo(TipoUnidade.INTERMEDIARIA);
+
+        // Subordinada MAS não participante (não está no set)
+        Unidade sub = new Unidade();
+        sub.setCodigo(2L);
+        sub.setUnidadeSuperior(inter);
+
+        // Set participants: Only INTER
+        processo.setParticipantes(Set.of(inter));
+
+        ResponsavelDto r1 = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1));
+
+        UsuarioDto t1 = UsuarioDto.builder().tituloEleitoral("T1").email("t1@mail.com").build();
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", t1));
+
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(1L).build();
+        listener.aoFinalizarProcesso(evento);
+
+        // Deve chamar buscarUsuariosPorTitulos mas NÃO enviar email pois não achou subordinadas participantes
+        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("t1@mail.com"), any(), any());
+    }
+
+    @Test
+    void deveFalharAoEnviarEmailParaUnidadeRaiz() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
+
+        Unidade u1 = new Unidade();
+        u1.setCodigo(10L);
+        u1.setTipo(TipoUnidade.RAIZ); // RAIZ
+        u1.setNome("U1");
+
+        Subprocesso s1 = new Subprocesso(); s1.setCodigo(100L); s1.setUnidade(u1);
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1));
+
+        ResponsavelDto r1 = ResponsavelDto.builder()
+                .unidadeCodigo(10L)
+                .titularTitulo("T1")
+                .build();
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r1));
+
+        UsuarioDto t1 = UsuarioDto.builder().tituloEleitoral("T1").email("t1@mail.com").build();
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", t1));
+
+        // Deve capturar a exceção ErroEstadoImpossivel internamente e logar, não estourar
+        org.assertj.core.api.Assertions.assertThatCode(() ->
+            listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build())
+        ).doesNotThrowAnyException();
+
+        // Verifica que NÃO enviou email
+        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+    }
 }

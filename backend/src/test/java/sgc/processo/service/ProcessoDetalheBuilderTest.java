@@ -311,4 +311,70 @@ class ProcessoDetalheBuilderTest {
         assertThat(dto.getUnidades()).hasSize(1);
         assertThat(dto.getUnidades().getFirst().getSigla()).isEqualTo("FILHO");
     }
+
+    @Test
+    @DisplayName("Deve lidar com subprocesso sem mapa")
+    void deveLidarComSubprocessoSemMapa() {
+        // Arrange
+        configurarMockDoMapper();
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setDataCriacao(LocalDateTime.now());
+        processo.setDataLimite(LocalDateTime.now().plusDays(10));
+
+        Unidade u1 = new Unidade();
+        u1.setCodigo(10L);
+        u1.setSigla("U1");
+
+        processo.setParticipantes(Set.of(u1));
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(u1);
+        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
+        sp.setDataLimiteEtapa1(processo.getDataLimite());
+        sp.setMapa(null); // Mapa nulo
+
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
+
+        SecurityContextHolder.setContext(mock(SecurityContext.class));
+
+        // Act
+        ProcessoDetalheDto dto = builder.build(processo);
+
+        // Assert
+        assertThat(dto.getUnidades()).hasSize(1);
+        assertThat(dto.getUnidades().getFirst().getMapaCodigo()).isNull();
+    }
+
+    @Test
+    @DisplayName("Deve lidar com subprocesso sem unidade correspondente nos participantes")
+    void deveLidarComSubprocessoSemUnidadeCorrespondente() {
+        // Arrange
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+
+        processo.setParticipantes(Set.of()); // Sem participantes
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        Unidade u1 = new Unidade(); u1.setCodigo(10L);
+        sp.setUnidade(u1);
+        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
+
+        // Subprocesso existe mas unidade não está em participantes
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
+
+        SecurityContextHolder.setContext(mock(SecurityContext.class));
+
+        // Act
+        ProcessoDetalheDto dto = builder.build(processo);
+
+        // Assert
+        assertThat(dto.getUnidades()).isEmpty();
+    }
 }

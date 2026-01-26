@@ -166,4 +166,24 @@ class LimitadorTentativasLoginTest {
         IntStream.range(0, 3).forEach(i -> limitadorTeste.verificar("Ip0")); // Total 5
         assertThrows(ErroMuitasTentativas.class, () -> limitadorTeste.verificar("Ip0")); // 6ª
     }
+
+    @Test
+    void devePermitirSePropriedadeAmbienteTestesTrue() {
+        when(environment.getProperty("aplicacao.ambiente-testes", Boolean.class, false)).thenReturn(true);
+        String ip = "192.168.1.15";
+
+        // Deve permitir infinitamente
+        IntStream.range(0, 10).forEach(i -> assertDoesNotThrow(() -> limitador.verificar(ip)));
+    }
+
+    @Test
+    void deveBloquearSePerfilProd() {
+        when(environment.getActiveProfiles()).thenReturn(new String[] { "prod" });
+        String ip = "192.168.1.16";
+
+        // Consome 5
+        IntStream.range(0, 5).forEach(i -> limitador.verificar(ip));
+        // 6ª falha
+        assertThrows(ErroMuitasTentativas.class, () -> limitador.verificar(ip));
+    }
 }

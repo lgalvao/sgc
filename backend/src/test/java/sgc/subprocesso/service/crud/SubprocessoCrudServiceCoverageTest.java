@@ -190,4 +190,21 @@ class SubprocessoCrudServiceCoverageTest {
 
         verify(repositorio).save(sp);
     }
+
+    @Test
+    @DisplayName("obterStatus - Situação Nula")
+    void obterStatus_SituacaoNula() {
+        Long codigo = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codigo);
+        sp.setSituacao(null); // Situação nula
+
+        when(repo.buscar(Subprocesso.class, codigo)).thenReturn(sp);
+
+        var status = crudService.obterStatus(codigo);
+
+        assertNotNull(status);
+        assertNull(status.situacaoLabel());
+        assertNull(status.situacao());
+    }
 }
