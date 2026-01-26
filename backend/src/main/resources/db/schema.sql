@@ -372,3 +372,4 @@ create index if not exists idx_subprocesso_unidade on sgc.subprocesso (unidade_c
 create index if not exists idx_alerta_unidade_destino on sgc.alerta (unidade_destino_codigo);
 create index if not exists idx_alerta_processo on sgc.alerta (processo_codigo);
 create index if not exists idx_alerta_usuario_usuario on sgc.alerta_usuario (usuario_titulo);
+create index if not exists idx_unidade_processo_unidade on sgc.unidade_processo (unidade_codigo);
