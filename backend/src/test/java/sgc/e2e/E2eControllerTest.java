@@ -18,8 +18,17 @@ import sgc.processo.service.ProcessoFacade;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import sgc.organizacao.dto.UnidadeDto;
+import sgc.processo.dto.CriarProcessoRequest;
+import sgc.processo.dto.ProcessoDto;
 
 @Tag("integration")
 @SpringBootTest
@@ -158,5 +167,76 @@ class E2eControllerTest {
         Integer count =
                 jdbcTemplate.queryForObject("SELECT count(*) FROM " + tableAndWhere, Integer.class);
         assertEquals(expected, count, "Contagem incorreta para " + tableAndWhere);
+    }
+
+    @Test
+    @DisplayName("Deve criar processo de mapeamento fixture com descrição padrão e não iniciado")
+    void deveCriarProcessoMapeamentoFixture() {
+        // Arrange
+        E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
+                null, "SIGLA", false, null);
+
+        UnidadeDto un = new UnidadeDto();
+        un.setCodigo(1L);
+        when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+
+        ProcessoDto proc = new ProcessoDto();
+        proc.setCodigo(100L);
+        when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
+
+        // Act
+        ProcessoDto result = controller.criarProcessoMapeamento(req);
+
+        // Assert
+        assertEquals(100L, result.getCodigo());
+        verify(processoFacade).criar(any(CriarProcessoRequest.class));
+    }
+
+    @Test
+    @DisplayName("Deve criar processo de revisão fixture com descrição informada e iniciado")
+    void deveCriarProcessoRevisaoFixture() {
+        // Arrange
+        E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
+                "Desc", "SIGLA", true, 10);
+
+        UnidadeDto un = new UnidadeDto();
+        un.setCodigo(1L);
+        when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+
+        ProcessoDto proc = new ProcessoDto();
+        proc.setCodigo(100L);
+        when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
+        when(processoFacade.obterPorId(100L)).thenReturn(Optional.of(proc));
+
+        // Act
+        ProcessoDto result = controller.criarProcessoRevisao(req);
+
+        // Assert
+        assertEquals(100L, result.getCodigo());
+        verify(processoFacade).iniciarProcessoRevisao(100L, List.of(1L));
+    }
+
+    @Test
+    @DisplayName("Deve criar processo de mapeamento fixture e iniciar")
+    void deveCriarProcessoMapeamentoFixtureIniciado() {
+        // Arrange
+        E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
+                "Desc", "SIGLA", true, 10);
+
+        UnidadeDto un = new UnidadeDto();
+        un.setCodigo(1L);
+        when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+
+        ProcessoDto proc = new ProcessoDto();
+        proc.setCodigo(100L);
+        when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
+        when(processoFacade.obterPorId(100L)).thenReturn(Optional.of(proc));
+
+        // Act
+        ProcessoDto result = controller.criarProcessoMapeamento(req);
+
+        // Assert
+        assertEquals(100L, result.getCodigo());
+        verify(processoFacade).iniciarProcessoMapeamento(100L, List.of(1L));
     }
 }

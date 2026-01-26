@@ -289,4 +289,16 @@ class UnidadeFacadeCoverageTest {
         // O mapper mockado aqui deve ser chamado com isElegivel=false
         verify(usuarioMapper, times(3)).toUnidadeDto(any(Unidade.class), eq(false));
     }
+
+    @Test
+    @DisplayName("Deve lançar erro ao buscar entidade por id se unidade inativa")
+    void deveLancarErroBuscarEntidadePorIdInativa() {
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
+        u.setSituacao(SituacaoUnidade.INATIVA);
+
+        when(repo.buscar(Unidade.class, 1L)).thenReturn(u);
+
+        assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarEntidadePorId(1L));
+    }
 }

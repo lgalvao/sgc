@@ -314,4 +314,105 @@ class EventoProcessoListenerTest {
 
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
+
+    @Test
+    @DisplayName("Deve ignorar participante sem responsável ou titular ao finalizar")
+    void deveIgnorarParticipanteSemResponsavelOuTitularAoFinalizar() {
+        Processo processo = criarProcesso(3L);
+        when(processoFacade.buscarEntidadePorId(3L)).thenReturn(processo);
+
+        Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setTipo(TipoUnidade.OPERACIONAL);
+
+        processo.setParticipantes(Set.of(u1, u2));
+
+        // u1 sem responsável no mapa
+        // u2 com responsável mas sem titularTitulo
+        ResponsavelDto r2 = ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo(null).build();
+
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(2L, r2));
+
+        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(3L).build());
+
+        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Deve ignorar participante com titular sem email ao finalizar")
+    void deveIgnorarParticipanteComTitularSemEmailAoFinalizar() {
+        Processo processo = criarProcesso(4L);
+        when(processoFacade.buscarEntidadePorId(4L)).thenReturn(processo);
+
+        Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setTipo(TipoUnidade.OPERACIONAL);
+
+        processo.setParticipantes(Set.of(u1, u2));
+
+        ResponsavelDto r1 = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
+        ResponsavelDto r2 = ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build();
+
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1, 2L, r2));
+
+        // T1 com email null
+        // T2 com email blank
+        UsuarioDto user1 = UsuarioDto.builder().tituloEleitoral("T1").email(null).build();
+        UsuarioDto user2 = UsuarioDto.builder().tituloEleitoral("T2").email("   ").build();
+
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", user1, "T2", user2));
+
+        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(4L).build());
+
+        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção para SEM_EQUIPE")
+    void deveLancarExcecaoParaSemEquipe() {
+        Processo processo = criarProcesso(1L);
+        Subprocesso s = new Subprocesso();
+        Unidade u = new Unidade(); u.setCodigo(1L); u.setTipo(TipoUnidade.SEM_EQUIPE);
+        s.setUnidade(u);
+
+        assertThatThrownBy(() -> listener.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, processo, s))
+                .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
+    }
+
+    @Test
+    @DisplayName("Deve ignorar e-mail se titular inválido ao iniciar")
+    void deveIgnorarEmailSeTitularInvalidoAoIniciar() {
+        Processo processo = criarProcesso(1L);
+        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
+
+        // Unidade 1: Titular null no mapa
+        Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setTipo(TipoUnidade.OPERACIONAL);
+        Subprocesso s1 = new Subprocesso(); s1.setUnidade(u1);
+
+        // Unidade 2: Titular com email null
+        Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setTipo(TipoUnidade.OPERACIONAL);
+        Subprocesso s2 = new Subprocesso(); s2.setUnidade(u2);
+
+        // Unidade 3: Titular com email blank
+        Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setTipo(TipoUnidade.OPERACIONAL);
+        Subprocesso s3 = new Subprocesso(); s3.setUnidade(u3);
+
+        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1, s2, s3));
+
+        ResponsavelDto r1 = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
+        ResponsavelDto r2 = ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build();
+        ResponsavelDto r3 = ResponsavelDto.builder().unidadeCodigo(3L).titularTitulo("T3").build();
+
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1, 2L, r2, 3L, r3));
+
+        UsuarioDto user2 = UsuarioDto.builder().tituloEleitoral("T2").email(null).build();
+        UsuarioDto user3 = UsuarioDto.builder().tituloEleitoral("T3").email(" ").build();
+
+        // T1 ausente no map
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T2", user2, "T3", user3));
+
+        listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
+
+        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+
+        // Verificar log warn (implícito via cobertura, se fosse logger mockado poderia verificar)
+    }
 }

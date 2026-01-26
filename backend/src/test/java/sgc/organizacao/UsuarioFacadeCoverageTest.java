@@ -556,4 +556,148 @@ class UsuarioFacadeCoverageTest {
 
         // Isso deve disparar carregarAtribuicoesEmLote(emptyList)
     }
+
+    @Test
+    @DisplayName("Deve filtrar perfis de unidades inativas")
+    void deveFiltrarPerfisUnidadesInativas() {
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("T");
+
+        Unidade unAtiva = new Unidade();
+        unAtiva.setCodigo(1L);
+        unAtiva.setSituacao(SituacaoUnidade.ATIVA);
+
+        Unidade unInativa = new Unidade();
+        unInativa.setCodigo(2L);
+        unInativa.setSituacao(SituacaoUnidade.INATIVA);
+
+        UsuarioPerfil up1 = new UsuarioPerfil();
+        up1.setUsuario(u);
+        up1.setUsuarioTitulo("T");
+        up1.setUnidade(unAtiva);
+        up1.setUnidadeCodigo(1L);
+        up1.setPerfil(Perfil.CHEFE);
+
+        UsuarioPerfil up2 = new UsuarioPerfil();
+        up2.setUsuario(u);
+        up2.setUsuarioTitulo("T");
+        up2.setUnidade(unInativa);
+        up2.setUnidadeCodigo(2L);
+        up2.setPerfil(Perfil.CHEFE);
+
+        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.of(u));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("T")).thenReturn(List.of(up1, up2));
+
+        List<PerfilDto> perfis = usuarioFacade.buscarPerfisUsuario("T");
+
+        assertThat(perfis).hasSize(1);
+        assertThat(perfis.getFirst().getUnidadeCodigo()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("Deve filtrar unidades inativas ao buscar unidades onde é responsável")
+    void deveFiltrarUnidadesInativasOndeEhResponsavel() {
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("T");
+
+        Unidade unAtiva = new Unidade();
+        unAtiva.setCodigo(1L);
+        unAtiva.setSituacao(SituacaoUnidade.ATIVA);
+
+        Unidade unInativa = new Unidade();
+        unInativa.setCodigo(2L);
+        unInativa.setSituacao(SituacaoUnidade.INATIVA);
+
+        UsuarioPerfil up1 = new UsuarioPerfil();
+        up1.setUsuario(u);
+        up1.setUnidade(unAtiva);
+        up1.setUnidadeCodigo(1L);
+        up1.setPerfil(Perfil.CHEFE);
+
+        UsuarioPerfil up2 = new UsuarioPerfil();
+        up2.setUsuario(u);
+        up2.setUnidade(unInativa);
+        up2.setUnidadeCodigo(2L);
+        up2.setPerfil(Perfil.CHEFE);
+
+        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.of(u));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("T")).thenReturn(List.of(up1, up2));
+
+        List<Long> unidades = usuarioFacade.buscarUnidadesOndeEhResponsavel("T");
+
+        assertThat(unidades).containsExactly(1L);
+    }
+
+    @Test
+    @DisplayName("Deve retornar false se unidade inativa ao verificar se tem perfil")
+    void deveRetornarFalseSeUnidadeInativaAoVerificarPerfil() {
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("T");
+
+        Unidade unInativa = new Unidade();
+        unInativa.setCodigo(2L);
+        unInativa.setSituacao(SituacaoUnidade.INATIVA);
+
+        UsuarioPerfil up = new UsuarioPerfil();
+        up.setUsuario(u);
+        up.setUsuarioTitulo("T");
+        up.setUnidade(unInativa);
+        up.setUnidadeCodigo(2L);
+        up.setPerfil(Perfil.CHEFE);
+
+        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.of(u));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("T")).thenReturn(List.of(up));
+
+        assertThat(usuarioFacade.usuarioTemPerfil("T", "CHEFE", 2L)).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve filtrar unidades inativas ao buscar unidades por perfil")
+    void deveFiltrarUnidadesInativasBuscarPorPerfil() {
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("T");
+
+        Unidade unInativa = new Unidade();
+        unInativa.setCodigo(2L);
+        unInativa.setSituacao(SituacaoUnidade.INATIVA);
+
+        UsuarioPerfil up = new UsuarioPerfil();
+        up.setUsuario(u);
+        up.setUsuarioTitulo("T");
+        up.setUnidade(unInativa);
+        up.setUnidadeCodigo(2L);
+        up.setPerfil(Perfil.CHEFE);
+
+        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.of(u));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("T")).thenReturn(List.of(up));
+
+        assertThat(usuarioFacade.buscarUnidadesPorPerfil("T", "CHEFE")).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve filtrar unidades inativas ao buscar responsáveis de unidades")
+    void deveFiltrarUnidadesInativasBuscarResponsaveis() {
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("T");
+
+        Unidade unInativa = new Unidade();
+        unInativa.setCodigo(2L);
+        unInativa.setSituacao(SituacaoUnidade.INATIVA);
+
+        UsuarioPerfil up = new UsuarioPerfil();
+        up.setUsuario(u);
+        up.setUsuarioTitulo("T");
+        up.setUnidade(unInativa);
+        up.setUnidadeCodigo(2L);
+        up.setPerfil(Perfil.CHEFE);
+        u.setAtribuicoes(Set.of(up));
+
+        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(2L))).thenReturn(List.of(u));
+        when(usuarioRepo.findByIdInWithAtribuicoes(List.of("T"))).thenReturn(List.of(u));
+        when(usuarioPerfilRepo.findByUsuarioTituloIn(List.of("T"))).thenReturn(List.of(up));
+
+        Map<Long, ResponsavelDto> result = usuarioFacade.buscarResponsaveisUnidades(List.of(2L));
+
+        assertThat(result).isEmpty();
+    }
 }
