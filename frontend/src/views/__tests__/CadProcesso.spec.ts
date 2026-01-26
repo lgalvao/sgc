@@ -1,6 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import {nextTick} from 'vue';
+import {createTestingPinia} from '@pinia/testing';
 import CadProcesso from '@/views/CadProcesso.vue';
 import {useProcessosStore} from '@/stores/processos';
 import {useUnidadesStore} from '@/stores/unidades';
@@ -492,4 +493,38 @@ describe('CadProcesso.vue', () => {
         // In the template: {{ isLoading ? 'Salvando...' : 'Salvar' }}
         // And BSpinner is shown.
     });
+
+    it('handles error when loading process details on mount', async () => {
+        mockRoute.query = { codProcesso: '123' };
+
+        const pinia = createTestingPinia({ stubActions: true });
+        const store = useProcessosStore(pinia);
+        (store.buscarProcessoDetalhe as any).mockRejectedValue(new Error('Load Error'));
+
+        const wrapper = mount(CadProcesso, {
+            ...getCommonMountOptions({}, {
+                BContainer: { template: '<div><slot /></div>' },
+                BAlert: { template: '<div class="alert"><slot /></div>', props: ['modelValue', 'variant'] },
+                BForm: { template: '<form @submit.prevent><slot /></form>' },
+                BFormGroup: { template: '<div><slot /></div>', props: ['label'] },
+                BFormInput: { template: '<input />', props: ['modelValue'] },
+                BFormSelect: { template: '<select></select>', props: ['modelValue'] },
+                BButton: { template: '<button></button>' },
+                BModal: { template: '<div><slot /></div>' },
+                BSpinner: { template: '<span></span>' },
+                ArvoreUnidades: { template: '<div></div>', props: ['unidades', 'modelValue'] },
+                BFormInvalidFeedback: { template: '<div></div>' },
+                LoadingButton: { template: '<button><slot /></button>' }
+            }),
+            global: {
+                plugins: [pinia]
+            }
+        });
+
+        await flushPromises();
+
+        expect(wrapper.vm.alertState.show).toBe(true);
+        expect(wrapper.vm.alertState.body).toContain('Não foi possível carregar');
+    });
+
 });

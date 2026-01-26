@@ -3,8 +3,10 @@ import {flushPromises, mount} from "@vue/test-utils";
 import VisAtividades from "@/views/VisAtividades.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useAnalisesStore} from "@/stores/analises";
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {useRouter} from "vue-router";
+import {obterDetalhesProcesso} from "@/services/processoService";
 
 // Hoist mocks to avoid ReferenceError
 const { mockApiClient } = vi.hoisted(() => {
@@ -230,5 +232,161 @@ describe("VisAtividades.vue", () => {
 
         await flushPromises();
         expect((wrapper.vm as any).mostrarModalImpacto).toBe(true);
+    });
+
+    it("deve abrir modal de histórico de análise", async () => {
+        const wrapper = mount(VisAtividades, mountOptions());
+        await flushPromises(); // Ensure initial load
+
+        const analisesStore = useAnalisesStore();
+        // Since createTestingPinia already mocks actions, we can just assert or configure the mock
+        // access the existing spy
+        (analisesStore.buscarAnalisesCadastro as any).mockResolvedValue([]);
+
+        await wrapper.find('[data-testid="btn-vis-atividades-historico"]').trigger("click");
+        await flushPromises();
+
+        expect(analisesStore.buscarAnalisesCadastro).toHaveBeenCalledWith(10);
+        expect((wrapper.vm as any).mostrarModalHistoricoAnalise).toBe(true);
+    });
+
+    describe("Fluxo Mapeamento (Não Revisão)", () => {
+        const mountOptionsMapeamento = () => mountOptions({
+            processos: {
+                processoDetalhe: {
+                    codigo: 2,
+                    tipo: 'MAPEAMENTO',
+                    unidades: [
+                        {
+                            sigla: "U1",
+                            codSubprocesso: 20,
+                            situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                        }
+                    ]
+                }
+            }
+        });
+
+        beforeEach(() => {
+            (obterDetalhesProcesso as any).mockResolvedValue({
+                codigo: 2,
+                tipo: 'MAPEAMENTO',
+                unidades: [{
+                    sigla: "U1",
+                    codSubprocesso: 20,
+                    situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO
+                }]
+            });
+        });
+
+        it("deve homologar cadastro de mapeamento", async () => {
+            const wrapper = mount(VisAtividades, mountOptionsMapeamento());
+            subprocessosStore = useSubprocessosStore();
+            vi.spyOn(subprocessosStore, "homologarCadastro").mockResolvedValue(true);
+
+            await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
+            await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
+            await flushPromises();
+
+            expect(subprocessosStore.homologarCadastro).toHaveBeenCalledWith(20, { observacoes: "" });
+            expect(pushMock).toHaveBeenCalledWith({
+                name: "Subprocesso",
+                params: { codProcesso: "1", siglaUnidade: "U1" }
+            });
+        });
+
+        it("deve aceitar cadastro de mapeamento", async () => {
+            (obterDetalhesProcesso as any).mockResolvedValue({
+                codigo: 2,
+                tipo: 'MAPEAMENTO',
+                unidades: [{
+                    sigla: "U1",
+                    codSubprocesso: 20,
+                    situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO
+                }]
+            });
+
+             const wrapper = mount(VisAtividades, mountOptions({
+                perfil: { perfilSelecionado: Perfil.GESTOR },
+                processos: {
+                    processoDetalhe: {
+                        codigo: 2,
+                        tipo: 'MAPEAMENTO',
+                        unidades: [{
+                            sigla: "U1",
+                            codSubprocesso: 20,
+                            situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                        }]
+                    }
+                }
+            }));
+            subprocessosStore = useSubprocessosStore();
+            vi.spyOn(subprocessosStore, "aceitarCadastro").mockResolvedValue(true);
+
+            await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
+            await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
+            await flushPromises();
+
+            expect(subprocessosStore.aceitarCadastro).toHaveBeenCalled();
+            expect(pushMock).toHaveBeenCalledWith({ name: "Painel" });
+        });
+
+        it("deve devolver cadastro de mapeamento", async () => {
+            const wrapper = mount(VisAtividades, mountOptionsMapeamento());
+            subprocessosStore = useSubprocessosStore();
+            vi.spyOn(subprocessosStore, "devolverCadastro").mockResolvedValue(true);
+
+            await wrapper.find('[data-testid="btn-acao-devolver"]').trigger("click");
+            await wrapper.find('[data-testid="inp-devolucao-cadastro-obs"]').setValue("Devolvendo map");
+            await wrapper.find('[data-testid="btn-devolucao-cadastro-confirmar"]').trigger("click");
+            await flushPromises();
+
+            expect(subprocessosStore.devolverCadastro).toHaveBeenCalledWith(20, { observacoes: "Devolvendo map" });
+            expect(pushMock).toHaveBeenCalledWith("/painel");
+        });
+    });
+
+    describe("Tratamento de Erros", () => {
+        beforeEach(() => {
+            (obterDetalhesProcesso as any).mockResolvedValue({
+                codigo: 1,
+                tipo: 'REVISAO',
+                unidades: [{
+                    sigla: "U1",
+                    codSubprocesso: 10,
+                    situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADO
+                }]
+            });
+        });
+
+        it("não deve redirecionar se validação falhar", async () => {
+            const wrapper = mount(VisAtividades, mountOptions());
+            subprocessosStore = useSubprocessosStore();
+            // Spy on both possible actions
+            const homologarSpy = vi.spyOn(subprocessosStore, "homologarRevisaoCadastro").mockResolvedValue(false);
+            const aceitarSpy = vi.spyOn(subprocessosStore, "aceitarRevisaoCadastro").mockResolvedValue(false);
+
+            await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
+            await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
+            await flushPromises();
+
+            // Ensure one of them was called
+            expect(homologarSpy.mock.calls.length + aceitarSpy.mock.calls.length).toBeGreaterThan(0);
+            expect(pushMock).not.toHaveBeenCalled();
+        });
+
+        it("não deve redirecionar se devolução falhar", async () => {
+             const wrapper = mount(VisAtividades, mountOptions());
+            subprocessosStore = useSubprocessosStore();
+            vi.spyOn(subprocessosStore, "devolverRevisaoCadastro").mockResolvedValue(false);
+
+            await wrapper.find('[data-testid="btn-acao-devolver"]').trigger("click");
+            await wrapper.find('[data-testid="inp-devolucao-cadastro-obs"]').setValue("Obs");
+            await wrapper.find('[data-testid="btn-devolucao-cadastro-confirmar"]').trigger("click");
+            await flushPromises();
+
+            expect(subprocessosStore.devolverRevisaoCadastro).toHaveBeenCalled();
+            expect(pushMock).not.toHaveBeenCalled();
+        });
     });
 });

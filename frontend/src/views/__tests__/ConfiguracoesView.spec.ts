@@ -214,5 +214,40 @@ describe('ConfiguracoesView', () => {
             expect(administradorService.removerAdministrador).toHaveBeenCalledWith('123');
             expect(notificacoesStore.show).toHaveBeenCalledWith(expect.anything(), expect.stringContaining('sucesso'), 'success');
         });
+
+        it('deve exibir erro ao falhar listagem de administradores', async () => {
+            const error = new Error('Erro API');
+            (administradorService.listarAdministradores as any).mockRejectedValue(error);
+
+            await wrapper.vm.carregarAdministradores();
+
+            expect(wrapper.text()).toContain('Erro API');
+        });
+
+        it('deve exibir alerta se tentar adicionar administrador com título vazio', async () => {
+            wrapper.vm.novoAdminTitulo = '   ';
+            await wrapper.vm.adicionarAdmin();
+
+            expect(notificacoesStore.show).toHaveBeenCalledWith('Erro', 'Digite um título eleitoral válido', 'warning');
+            expect(administradorService.adicionarAdministrador).not.toHaveBeenCalled();
+        });
+
+        it('deve exibir erro ao falhar adição de administrador', async () => {
+            wrapper.vm.novoAdminTitulo = '123';
+            (administradorService.adicionarAdministrador as any).mockRejectedValue(new Error('Falha ao adicionar'));
+
+            await wrapper.vm.adicionarAdmin();
+
+            expect(notificacoesStore.show).toHaveBeenCalledWith('Erro', 'Falha ao adicionar', 'danger');
+        });
+
+        it('deve exibir erro ao falhar remoção de administrador', async () => {
+            wrapper.vm.adminParaRemover = { tituloEleitoral: '123', nome: 'Admin' };
+            (administradorService.removerAdministrador as any).mockRejectedValue(new Error('Falha ao remover'));
+
+            await wrapper.vm.removerAdmin();
+
+            expect(notificacoesStore.show).toHaveBeenCalledWith('Erro', 'Falha ao remover', 'danger');
+        });
     });
 });
