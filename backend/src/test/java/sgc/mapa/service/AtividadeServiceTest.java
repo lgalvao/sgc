@@ -269,4 +269,66 @@ class AtividadeServiceTest {
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
+
+    @Nested
+    @DisplayName("Atualização em Lote")
+    class AtualizacaoLote {
+
+        @Test
+        @DisplayName("Deve atualizar descrições em lote")
+        void deveAtualizarDescricoesEmLote() {
+            Atividade atividade1 = new Atividade();
+            atividade1.setCodigo(1L);
+            atividade1.setDescricao("Antiga 1");
+            Mapa mapa1 = new Mapa();
+            mapa1.setCodigo(10L);
+            atividade1.setMapa(mapa1);
+
+            Atividade atividade2 = new Atividade();
+            atividade2.setCodigo(2L);
+            atividade2.setDescricao("Antiga 2");
+            // Sem mapa
+
+            java.util.Map<Long, String> descricoes = java.util.Map.of(
+                    1L, "Nova 1",
+                    2L, "Nova 2"
+            );
+
+            when(atividadeRepo.findAllById(descricoes.keySet())).thenReturn(List.of(atividade1, atividade2));
+
+            service.atualizarDescricoesEmLote(descricoes);
+
+            assertThat(atividade1.getDescricao()).isEqualTo("Nova 1");
+            assertThat(atividade2.getDescricao()).isEqualTo("Nova 2");
+
+            verify(atividadeRepo).saveAll(anyList());
+            verify(eventPublisher, times(1)).publishEvent(any(EventoMapaAlterado.class));
+        }
+
+        @Test
+        @DisplayName("Deve ignorar descrição nula")
+        void deveIgnorarDescricaoNula() {
+            Atividade atividade1 = new Atividade();
+            atividade1.setCodigo(1L);
+            atividade1.setDescricao("Antiga 1");
+
+            java.util.Map<Long, String> descricoes = new java.util.HashMap<>();
+            descricoes.put(1L, null);
+
+            when(atividadeRepo.findAllById(descricoes.keySet())).thenReturn(List.of(atividade1));
+
+            service.atualizarDescricoesEmLote(descricoes);
+
+            assertThat(atividade1.getDescricao()).isEqualTo("Antiga 1");
+        }
+    }
+
+    @Test
+    @DisplayName("Deve buscar por mapa sem relacionamentos")
+    void deveBuscarPorMapaSemRelacionamentos() {
+        when(atividadeRepo.findByMapaCodigoSemFetch(1L)).thenReturn(List.of(new Atividade()));
+        assertThat(service.buscarPorMapaCodigoSemRelacionamentos(1L))
+                .isNotNull()
+                .hasSize(1);
+    }
 }
