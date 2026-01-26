@@ -8,6 +8,7 @@ import lombok.Getter;
 
 import org.jspecify.annotations.Nullable;
 import java.util.List;
+import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 /**
  * DTO que representa uma competência no contexto do mapa completo. Contém os dados da competência e
@@ -28,6 +29,7 @@ public class CompetenciaMapaDto {
      * A descrição da competência.
      */
     @NotBlank(message = "Descrição da competência é obrigatória")
+    @SanitizarHtml
     private final String descricao;
 
     /**
