@@ -28,13 +28,12 @@
           class="unidade-checkbox"
           @update:model-value="(val) => onToggle(unidade, val as boolean)"
       >
-        <label
+        <span
             :class="{ 'text-muted': !isHabilitado(unidade) }"
-            :for="`chk-${unidade.sigla}`"
             class="unidade-label"
         >
           {{ unidade.sigla }}
-        </label>
+        </span>
       </BFormCheckbox>
     </div>
 
