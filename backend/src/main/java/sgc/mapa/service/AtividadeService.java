@@ -31,7 +31,7 @@ public class AtividadeService {
 
     @Transactional(readOnly = true)
     public List<AtividadeResponse> listar() {
-        return atividadeRepo.findAll().stream().map(atividadeMapper::toResponse).toList();
+        return atividadeRepo.findAllWithMapa().stream().map(atividadeMapper::toResponse).toList();
     }
 
     @Transactional(readOnly = true)

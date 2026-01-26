@@ -30,11 +30,11 @@ public class UsuarioPerfil implements Serializable {
     @Column(name = "perfil")
     private Perfil perfil;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_titulo", insertable = false, updatable = false)
     private Usuario usuario;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_codigo", insertable = false, updatable = false)
     private Unidade unidade;
 

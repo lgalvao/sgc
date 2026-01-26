@@ -11,6 +11,7 @@ import type {
 } from "@/types/tipos";
 import { SituacaoSubprocesso } from "@/types/tipos";
 import { type NormalizedError, normalizeError } from "@/utils/apiError";
+import { flattenTree } from "@/utils";
 import * as painelService from "../services/painelService";
 import * as processoService from "../services/processoService";
 import * as subprocessoService from "../services/subprocessoService";
@@ -248,15 +249,7 @@ export const useProcessosStore = defineStore("processos", () => {
             throw err;
         }
 
-        const flatten = (nodes: any[]): any[] => {
-            let res: any[] = [];
-            for (const node of nodes) {
-                res.push(node);
-                if (node.filhos) res = res.concat(flatten(node.filhos));
-            }
-            return res;
-        };
-        const all = flatten(processoDetalhe.value.unidades || []);
+        const all = flattenTree(processoDetalhe.value.unidades || [], 'filhos');
 
         const unidadeExemplo = all.find((u) => u.codUnidade === ids[0]);
 

@@ -53,7 +53,7 @@ class AtividadeServiceTest {
         @Test
         @DisplayName("Deve listar todas as atividades")
         void deveListarTodas() {
-             when(atividadeRepo.findAll()).thenReturn(List.of(new Atividade()));
+             when(atividadeRepo.findAllWithMapa()).thenReturn(List.of(new Atividade()));
              when(atividadeMapper.toResponse(any())).thenReturn(AtividadeResponse.builder().build());
              assertThat(service.listar())
                  .isNotNull()

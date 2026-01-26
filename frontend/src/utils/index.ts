@@ -9,6 +9,9 @@ import logger from "@/utils/logger";
 // ===== LOGGER =====
 export {logger};
 
+// ===== TREE UTILS =====
+export {flattenTree} from "./treeUtils";
+
 // ===== CLASSES DE BADGE =====
 export function badgeClass(situacao: string): string {
     return (

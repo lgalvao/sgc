@@ -9,12 +9,11 @@ import java.util.List;
 
 @Repository
 public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
-    @Override
     @Query("""
             SELECT a FROM Atividade a
             LEFT JOIN FETCH a.mapa
             """)
-    List<Atividade> findAll();
+    List<Atividade> findAllWithMapa();
 
     @Query("""
             SELECT DISTINCT a FROM Atividade a
@@ -35,9 +34,8 @@ public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
 
     @Query("""
             SELECT a FROM Atividade a
-            WHERE a.mapa.codigo = (
-                SELECT s.mapa.codigo FROM Subprocesso s WHERE s.codigo = :subprocessoCodigo
-            )
+            JOIN Subprocesso s ON a.mapa.codigo = s.mapa.codigo
+            WHERE s.codigo = :subprocessoCodigo
             """)
     List<Atividade> findBySubprocessoCodigo(@Param("subprocessoCodigo") Long subprocessoCodigo);
 
