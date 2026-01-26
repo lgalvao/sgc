@@ -552,6 +552,10 @@ public class SubprocessoFacade {
 
     private SubprocessoCadastroDto obterCadastroInterno(Long codSubprocesso) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
+
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        accessControlService.verificarPermissao(usuario, Acao.VISUALIZAR_SUBPROCESSO, sp);
+
         List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos = new ArrayList<>();
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
         for (Atividade a : atividades) {
