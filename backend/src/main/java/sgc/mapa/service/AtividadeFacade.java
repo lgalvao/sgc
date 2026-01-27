@@ -53,6 +53,8 @@ public class AtividadeFacade {
     private final MapaFacade mapaFacade;
     private final ApplicationEventPublisher eventPublisher;
 
+    private static final String MAPA_NAO_PODE_SER_NULO = "Mapa não pode ser nulo";
+
     // ===== Consultas =====
 
     /**
@@ -142,7 +144,7 @@ public class AtividadeFacade {
 
         // Busca estado atualizado
         Atividade atividadeAtualizada = atividadeService.obterPorCodigo(codigo);
-        Mapa mapaAtualizado = Objects.requireNonNull(atividadeAtualizada.getMapa(), "Mapa não pode ser nulo");
+        Mapa mapaAtualizado = Objects.requireNonNull(atividadeAtualizada.getMapa(), MAPA_NAO_PODE_SER_NULO);
         Long codMapa = mapaAtualizado.getCodigo();
         Subprocesso subprocesso = Objects.requireNonNull(mapaAtualizado.getSubprocesso(), "Subprocesso não pode ser nulo");
 
@@ -169,7 +171,7 @@ public class AtividadeFacade {
      */
     public AtividadeOperacaoResponse excluirAtividade(Long codigo) {
         Atividade atividade = atividadeService.obterPorCodigo(codigo);
-        Mapa mapa = Objects.requireNonNull(atividade.getMapa(), "Mapa não pode ser nulo");
+        Mapa mapa = Objects.requireNonNull(atividade.getMapa(), MAPA_NAO_PODE_SER_NULO);
         Long codMapa = mapa.getCodigo();
         
         // Busca usuário autenticado
@@ -269,7 +271,7 @@ public class AtividadeFacade {
 
     private Long obterCodigoSubprocessoPorAtividade(Long codigoAtividade) {
         Atividade atividade = atividadeService.obterPorCodigo(codigoAtividade);
-        Mapa mapa = Objects.requireNonNull(atividade.getMapa(), "Mapa não pode ser nulo");
+        Mapa mapa = Objects.requireNonNull(atividade.getMapa(), MAPA_NAO_PODE_SER_NULO);
         return obterCodigoSubprocessoPorMapa(mapa.getCodigo());
     }
 

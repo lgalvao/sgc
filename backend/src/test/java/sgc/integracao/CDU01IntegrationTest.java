@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -24,7 +25,6 @@ import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioRepo;
 import sgc.seguranca.login.dto.AutenticarRequest;
@@ -45,9 +45,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
         private TestUtil testUtil;
 
         @Autowired
-        private UnidadeRepo unidadeRepo;
-
-        @Autowired
         private UsuarioRepo usuarioRepo;
 
         @Autowired
@@ -66,11 +63,12 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
         private Usuario usuarioGestor;
 
         @BeforeEach
+        @SuppressWarnings("unused")
         void setUp() {
                 // Reset sequences to avoid conflicts
                 try {
                         jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 10000");
-                } catch (Exception ignored) {
+                } catch (DataAccessException ignored) {
                         // Nada a fazer
                 }
 
@@ -125,6 +123,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
 
         @Nested
         @DisplayName("Testes de fluxo de login completo")
+        @SuppressWarnings("unused")
         class FluxoLoginTests {
                 @Test
                 @DisplayName("Deve realizar login completo para usuário com um único perfil")

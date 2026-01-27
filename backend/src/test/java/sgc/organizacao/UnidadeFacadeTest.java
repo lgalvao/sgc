@@ -1,13 +1,28 @@
 package sgc.organizacao;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.RepositorioComum;
@@ -17,23 +32,15 @@ import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.SituacaoUnidade;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeMapaRepo;
+import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioRepo;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeMapaService;
 import sgc.organizacao.service.UnidadeResponsavelService;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -64,6 +71,7 @@ class UnidadeFacadeTest {
 
     @Nested
     @DisplayName("Busca de Unidades e Hierarquia")
+    @SuppressWarnings("unused")
     class BuscaUnidades {
 
         @Test
@@ -139,7 +147,7 @@ class UnidadeFacadeTest {
                     .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "U2"));
 
             // Act & Assert
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglasSubordinadas("U2"));
+            assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglasSubordinadas("U2")));
         }
 
         @Test
@@ -197,6 +205,7 @@ class UnidadeFacadeTest {
 
     @Nested
     @DisplayName("Elegibilidade e Mapas")
+    @SuppressWarnings("unused")
     class ElegibilidadeMapas {
         @Test
         @DisplayName("Deve buscar árvore com elegibilidade")
@@ -276,6 +285,7 @@ class UnidadeFacadeTest {
 
     @Nested
     @DisplayName("Gestão de Atribuições e Usuários")
+    @SuppressWarnings("unused")
     class GestaoAtribuicoesUsuarios {
         @Test
         @DisplayName("Deve criar atribuição temporária com sucesso")
@@ -301,7 +311,7 @@ class UnidadeFacadeTest {
                     .when(responsavelService).criarAtribuicaoTemporaria(1L, req);
 
             // Act & Assert
-            assertThrows(ErroValidacao.class, () -> service.criarAtribuicaoTemporaria(1L, req));
+            assertNotNull(assertThrows(ErroValidacao.class, () -> service.criarAtribuicaoTemporaria(1L, req)));
         }
 
         @Test
@@ -314,7 +324,7 @@ class UnidadeFacadeTest {
                     .when(responsavelService).criarAtribuicaoTemporaria(99L, req);
 
             // Act & Assert
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.criarAtribuicaoTemporaria(99L, req));
+            assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.criarAtribuicaoTemporaria(99L, req)));
         }
 
         @Test
@@ -359,6 +369,7 @@ class UnidadeFacadeTest {
 
     @Nested
     @DisplayName("Outros Metodos de Cobertura")
+    @SuppressWarnings("unused")
     class OutrosMetodos {
         @Test
         @DisplayName("Buscar IDs descendentes recursivamente")
@@ -406,21 +417,8 @@ class UnidadeFacadeTest {
         }
 
         @Test
-        @DisplayName("Definir mapa vigente (criação)")
-        void definirMapaVigenteCriacao() {
-            // Arrange
-            Mapa mapa = new Mapa();
-
-            // Act
-            service.definirMapaVigente(1L, mapa);
-
-            // Assert
-            verify(mapaService).definirMapaVigente(1L, mapa);
-        }
-
-        @Test
-        @DisplayName("Definir mapa vigente (atualização)")
-        void definirMapaVigenteAtualizacao() {
+        @DisplayName("Definir mapa vigente (criação/atualização)")
+        void definirMapaVigente() {
             // Arrange
             Mapa mapa = new Mapa();
 
@@ -435,7 +433,7 @@ class UnidadeFacadeTest {
         @DisplayName("Deve falhar ao buscar entidade por ID inexistente")
         void deveFalharAoBuscarEntidadePorIdInexistente() {
             when(repo.buscar(Unidade.class, 999L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 999L));
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(999L));
+            assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(999L)));
         }
 
         @Test
@@ -446,7 +444,7 @@ class UnidadeFacadeTest {
                     .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "INVALIDO"));
 
             // Act & Assert
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglaSuperior("INVALIDO"));
+            assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglaSuperior("INVALIDO")));
         }
 
         @Test
@@ -457,7 +455,7 @@ class UnidadeFacadeTest {
                     .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 999L));
 
             // Act & Assert
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarArvore(999L));
+            assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarArvore(999L)));
         }
 
         @Test
@@ -468,7 +466,7 @@ class UnidadeFacadeTest {
                     .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "INVALIDA"));
 
             // Act & Assert
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglasSubordinadas("INVALIDA"));
+            assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglasSubordinadas("INVALIDA")));
         }
     }
 
@@ -508,6 +506,7 @@ class UnidadeFacadeTest {
 
     @Nested
     @DisplayName("Testes Adicionais de Cobertura")
+    @SuppressWarnings("unused")
     class TestesAdicionaisCobertura {
 
         @Test
@@ -535,7 +534,7 @@ class UnidadeFacadeTest {
             when(repo.buscar(Unidade.class, 1L)).thenReturn(u1);
 
             // Act & Assert
-            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(1L));
+            assertNotNull(assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(1L)));
         }
 
         @Test

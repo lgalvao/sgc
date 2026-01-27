@@ -1,25 +1,25 @@
 package sgc.processo;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.processo.dto.IniciarProcessoRequest;
-import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoFacade;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import sgc.processo.dto.IniciarProcessoRequest;
+import sgc.processo.model.TipoProcesso;
+import sgc.processo.service.ProcessoFacade;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -88,7 +88,7 @@ class ProcessoControllerCoverageTest {
         ProcessoController spy = org.mockito.Mockito.spy(new ProcessoController(processoFacade));
         @SuppressWarnings("unchecked")
         Map<TipoProcesso, java.util.function.BiFunction<Long, List<Long>, List<String>>> map = org.mockito.Mockito.mock(Map.class);
-        when(map.get(any())).thenReturn(null);
+        when(map.get(any(TipoProcesso.class))).thenReturn(null);
         doReturn(map).when(spy).getProcessadoresInicio();
 
         Long cod = 1L;

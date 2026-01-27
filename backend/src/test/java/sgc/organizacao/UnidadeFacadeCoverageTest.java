@@ -1,12 +1,28 @@
 package sgc.organizacao;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.RepositorioComum;
@@ -14,17 +30,13 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.SituacaoUnidade;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeMapaRepo;
+import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeMapaService;
 import sgc.organizacao.service.UnidadeResponsavelService;
-
-import java.time.LocalDate;
-import java.util.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -61,7 +73,7 @@ class UnidadeFacadeCoverageTest {
         doThrow(new ErroValidacao("A data de término deve ser posterior à data de início."))
                 .when(unidadeResponsavelService).criarAtribuicaoTemporaria(1L, req);
 
-        assertThrows(ErroValidacao.class, () -> unidadeFacade.criarAtribuicaoTemporaria(1L, req));
+        assertNotNull(assertThrows(ErroValidacao.class, () -> unidadeFacade.criarAtribuicaoTemporaria(1L, req)));
         verify(unidadeResponsavelService).criarAtribuicaoTemporaria(1L, req);
     }
 
@@ -92,7 +104,7 @@ class UnidadeFacadeCoverageTest {
     void deveLancarErroBuscarSiglaSuperiorInexistente() {
         when(unidadeHierarquiaService.buscarSiglaSuperior("X"))
                 .thenThrow(new ErroEntidadeNaoEncontrada("Unidade não encontrada"));
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarSiglaSuperior("X"));
+        assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarSiglaSuperior("X")));
     }
 
     @Test
@@ -165,7 +177,7 @@ class UnidadeFacadeCoverageTest {
     void deveLancarErroResponsavelAtualUnidadeNaoEncontrada() {
         when(unidadeResponsavelService.buscarResponsavelAtual("SIGLA"))
                 .thenThrow(new ErroEntidadeNaoEncontrada("Unidade não encontrada"));
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarResponsavelAtual("SIGLA"));
+        assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarResponsavelAtual("SIGLA")));
     }
 
     @Test
@@ -200,7 +212,7 @@ class UnidadeFacadeCoverageTest {
     void deveLancarErroBuscarResponsavelUnidadeNaoEncontrada() {
         when(unidadeResponsavelService.buscarResponsavelUnidade(1L))
                 .thenThrow(new ErroEntidadeNaoEncontrada("Unidade não encontrada"));
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarResponsavelUnidade(1L));
+        assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarResponsavelUnidade(1L)));
     }
 
     @Test
@@ -241,6 +253,6 @@ class UnidadeFacadeCoverageTest {
 
         when(repo.buscar(Unidade.class, 1L)).thenReturn(u);
 
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarEntidadePorId(1L));
+        assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarEntidadePorId(1L)));
     }
 }

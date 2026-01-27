@@ -1,9 +1,6 @@
 package sgc.e2e;
 
-import java.sql.SQLException;
 import java.util.Optional;
-
-import javax.sql.DataSource;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -42,8 +39,6 @@ class E2eControllerCoverageTest {
     @Mock
     private JdbcTemplate jdbcTemplate;
     @Mock
-    private DataSource dataSource;
-    @Mock
     private ProcessoFacade processoFacade;
     @Mock
     private UnidadeFacade unidadeFacade;
@@ -57,6 +52,7 @@ class E2eControllerCoverageTest {
     private Authentication authentication;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         SecurityContextHolder.setContext(securityContext);
     }
@@ -95,7 +91,7 @@ class E2eControllerCoverageTest {
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
 
-        assertThrows(ErroValidacao.class, () -> controller.criarProcessoMapeamento(request));
+        assertNotNull(assertThrows(ErroValidacao.class, () -> controller.criarProcessoMapeamento(request)));
     }
 
     @Test
@@ -138,18 +134,9 @@ class E2eControllerCoverageTest {
 
     @Test
     @DisplayName("Reset database deve falhar se arquivo SQL não encontrado")
-    void resetDatabaseFalhaSemArquivo() throws SQLException {
-        // This is hard to test without controlling File creation.
-        // We can simulate the IOException or SQLException in other parts though.
-        // But specifically verifying the "throw new ErroConfiguracao" requires the file to be missing.
-        // Since we can't delete the file, we can't easily cover this line in unit test without powermock.
-        // However, if we assume the code is running in an environment where seed.sql might be missing, we could try.
-        // But here it exists.
-        // Let's at least test the catch block by simulating SQLException.
-
+    void resetDatabaseFalhaSemArquivo() {
         doThrow(new RuntimeException("Simulated DB Error")).when(jdbcTemplate).execute(anyString());
-
-        assertThrows(RuntimeException.class, () -> controller.resetDatabase());
+        assertNotNull(assertThrows(RuntimeException.class, () -> controller.resetDatabase()));
     }
 
     @Test
@@ -170,6 +157,6 @@ class E2eControllerCoverageTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
 
         // Deve lançar a exceção do orElseThrow
-        assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> controller.criarProcessoMapeamento(request));
+        assertNotNull(assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> controller.criarProcessoMapeamento(request)));
     }
 }

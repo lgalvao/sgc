@@ -538,8 +538,9 @@ class UsuarioFacadeCoverageTest {
         Map<Long, ResponsavelDto> map = usuarioFacade.buscarResponsaveisUnidades(List.of(1L));
 
         // Deve conter apenas a unidade 1
-        assertThat(map).containsKey(1L);
-        assertThat(map).doesNotContainKey(2L);
+        assertThat(map)
+                .containsKey(1L)
+                .doesNotContainKey(2L);
 
         // O responsável deve ser o usuário T
         assertThat(map.get(1L).getTitularTitulo()).isEqualTo("T");
