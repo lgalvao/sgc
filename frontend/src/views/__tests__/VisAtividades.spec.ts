@@ -4,6 +4,7 @@ import VisAtividades from "@/views/VisAtividades.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useAnalisesStore} from "@/stores/analises";
+import {useMapasStore} from "@/stores/mapas";
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {useRouter} from "vue-router";
 import {obterDetalhesProcesso} from "@/services/processoService";
@@ -407,6 +408,179 @@ describe("VisAtividades.vue", () => {
 
             expect(subprocessosStore.devolverRevisaoCadastro).toHaveBeenCalled();
             expect(pushMock).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("Cobertura de Casos de Borda", () => {
+        it("não deve buscar impacto se codSubprocesso não existir", async () => {
+            (obterDetalhesProcesso as any).mockResolvedValue({
+                codigo: 1,
+                tipo: TipoProcesso.REVISAO,
+                unidades: []
+            });
+             const wrapper = mount(VisAtividades, mountOptions({
+                processos: {
+                    processoDetalhe: {
+                        codigo: 1,
+                        tipo: TipoProcesso.REVISAO,
+                        unidades: [] // Sem unidade correspondente
+                    }
+                }
+            }));
+            const mapasStore = useMapasStore();
+
+            // Chama o método diretamente pois o botão estaria oculto
+            await (wrapper.vm as any).abrirModalImpacto();
+
+            expect((wrapper.vm as any).mostrarModalImpacto).toBe(true);
+            expect(mapasStore.buscarImpactoMapa).not.toHaveBeenCalled();
+        });
+
+        it("não deve confirmar validação se codSubprocesso não existir", async () => {
+            (obterDetalhesProcesso as any).mockResolvedValue({
+                codigo: 1,
+                tipo: TipoProcesso.REVISAO,
+                unidades: []
+            });
+            const wrapper = mount(VisAtividades, mountOptions({
+                processos: {
+                    processoDetalhe: {
+                        codigo: 1,
+                        tipo: TipoProcesso.REVISAO,
+                        unidades: []
+                    }
+                }
+            }));
+            subprocessosStore = useSubprocessosStore();
+            vi.spyOn(subprocessosStore, "homologarRevisaoCadastro");
+
+            // Abre modal diretamente
+            (wrapper.vm as any).mostrarModalValidar = true;
+            await wrapper.vm.$nextTick();
+
+            // Chama confirmar
+            await (wrapper.vm as any).confirmarValidacao();
+
+            expect(subprocessosStore.homologarRevisaoCadastro).not.toHaveBeenCalled();
+        });
+
+        it("não deve confirmar devolução se codSubprocesso não existir", async () => {
+            (obterDetalhesProcesso as any).mockResolvedValue({
+                codigo: 1,
+                tipo: TipoProcesso.REVISAO,
+                unidades: []
+            });
+            const wrapper = mount(VisAtividades, mountOptions({
+                processos: {
+                    processoDetalhe: {
+                        codigo: 1,
+                        tipo: TipoProcesso.REVISAO,
+                        unidades: []
+                    }
+                }
+            }));
+            subprocessosStore = useSubprocessosStore();
+            vi.spyOn(subprocessosStore, "devolverRevisaoCadastro");
+
+            (wrapper.vm as any).mostrarModalDevolver = true;
+            await wrapper.vm.$nextTick();
+
+            await (wrapper.vm as any).confirmarDevolucao();
+
+            expect(subprocessosStore.devolverRevisaoCadastro).not.toHaveBeenCalled();
+        });
+
+        it("deve cobrir branches de isHomologacao (ADMIN e Mapeamento Homologado)", async () => {
+            (obterDetalhesProcesso as any).mockResolvedValue({
+                codigo: 2,
+                tipo: TipoProcesso.MAPEAMENTO,
+                unidades: [{
+                    sigla: "U1",
+                    codSubprocesso: 20,
+                    situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
+                }]
+            });
+            const wrapper = mount(VisAtividades, mountOptions({
+                perfil: { perfilSelecionado: Perfil.ADMIN },
+                processos: {
+                    processoDetalhe: {
+                        codigo: 2,
+                        tipo: TipoProcesso.MAPEAMENTO,
+                        unidades: [{
+                            sigla: "U1",
+                            codSubprocesso: 20,
+                            situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
+                        }]
+                    }
+                }
+            }));
+            await flushPromises();
+            // isHomologacao deve ser true
+            expect((wrapper.vm as any).isHomologacao).toBe(true);
+        });
+
+         it("deve cobrir branches de isHomologacao (ADMIN e Revisao Homologada)", async () => {
+            (obterDetalhesProcesso as any).mockResolvedValue({
+                codigo: 1,
+                tipo: TipoProcesso.REVISAO,
+                unidades: [{
+                    sigla: "U1",
+                    codSubprocesso: 10,
+                    situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
+                }]
+            });
+            const wrapper = mount(VisAtividades, mountOptions({
+                perfil: { perfilSelecionado: Perfil.ADMIN },
+                processos: {
+                    processoDetalhe: {
+                        codigo: 1,
+                        tipo: TipoProcesso.REVISAO,
+                        unidades: [{
+                            sigla: "U1",
+                            codSubprocesso: 10,
+                            situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
+                        }]
+                    }
+                }
+            }));
+            await flushPromises();
+            expect((wrapper.vm as any).isHomologacao).toBe(true);
+        });
+
+        it("isHomologacao deve ser false se perfil não for ADMIN", async () => {
+            const wrapper = mount(VisAtividades, mountOptions({
+                perfil: { perfilSelecionado: Perfil.GESTOR },
+                processos: {
+                    processoDetalhe: {
+                        codigo: 1,
+                        tipo: TipoProcesso.REVISAO,
+                        unidades: [{
+                            sigla: "U1",
+                            codSubprocesso: 10,
+                            situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
+                        }]
+                    }
+                }
+            }));
+            expect((wrapper.vm as any).isHomologacao).toBe(false);
+        });
+
+        it("podeVerImpacto deve ser false se subprocesso undefined", async () => {
+            (obterDetalhesProcesso as any).mockResolvedValue({
+                codigo: 1,
+                tipo: TipoProcesso.REVISAO,
+                unidades: []
+            });
+             const wrapper = mount(VisAtividades, mountOptions({
+                processos: {
+                    processoDetalhe: {
+                        codigo: 1,
+                        tipo: TipoProcesso.REVISAO,
+                        unidades: []
+                    }
+                }
+            }));
+            expect((wrapper.vm as any).podeVerImpacto).toBe(false);
         });
     });
 });
