@@ -8,11 +8,11 @@
 
 ## 📋 Sumário de Ações
 
-| # | Ação | Prioridade | Esforço | Impacto | Arquivos |
-|---|------|------------|---------|---------|----------|
-| 2 | Criar composable `useErrorHandler` para stores | 🔴 Alta | 🟡 Médio | 🔴 Alto | 14 arquivos (~500 linhas economizadas) |
-| 4 | Consolidar queries duplicadas (AtividadeRepo, CompetenciaRepo) | 🔴 Alta | 🟡 Médio | 🟠 Médio | 2 arquivos (~20 linhas) |
-| 5 | Backend retornar dados completos (eliminar cascata de reloads) | 🔴 Alta | 🔴 Alto | 🔴 Alto | 6 controllers, 6 stores (~50 linhas) |
+| # | Ação                                                           | Prioridade | Esforço  | Impacto  | Arquivos                               |
+|---|----------------------------------------------------------------|------------|----------|----------|----------------------------------------|
+| 2 | Criar composable `useErrorHandler` para stores                 | 🔴 Alta    | 🟡 Médio | 🔴 Alto  | 14 arquivos (~500 linhas economizadas) |
+| 4 | Consolidar queries duplicadas (AtividadeRepo, CompetenciaRepo) | 🔴 Alta    | 🟡 Médio | 🟠 Médio | 2 arquivos (~20 linhas)                |
+| 5 | Backend retornar dados completos (eliminar cascata de reloads) | 🔴 Alta    | 🔴 Alto  | 🔴 Alto  | 6 controllers, 6 stores (~50 linhas)   |
 
 **Resultado Esperado:** Redução de 25-40% nas requisições HTTP, código frontend mais limpo e manutenível.
 
@@ -21,7 +21,10 @@
 ## 🎯 Ação #2: Criar Composable useErrorHandler
 
 ### Contexto
-Todos os 13 stores do frontend implementam o mesmo padrão de tratamento de erro, com código duplicado em **~104 blocos** similares. Cada método assíncrono repete a mesma lógica:
+
+Todos os 13 stores do frontend implementam o mesmo padrão de tratamento de erro, com código duplicado em **~104 blocos**
+similares. Cada método assíncrono repete a mesma lógica:
+
 1. Limpar erro anterior (`lastError.value = null`)
 2. Executar lógica em try/catch
 3. Capturar erro e normalizar (`lastError.value = normalizeError(error)`)
@@ -32,6 +35,7 @@ Isso viola o princípio DRY e dificulta manutenção.
 ### Problema Identificado
 
 **Arquivos Afetados:** 13 stores
+
 - `processos.ts`
 - `subprocessos.ts`
 - `atividades.ts`
@@ -74,6 +78,7 @@ async function buscarAtividades(codSubprocesso: number) {
 ```
 
 **Contagem:**
+
 - **13 stores** × ~8 métodos async por store = **~104 blocos idênticos**
 - Estimativa: **~500 linhas de código duplicado**
 
@@ -109,50 +114,54 @@ import { normalizeError, type NormalizedError } from '@/utils/apiError';
  *   return { lastError, clearError, buscarDados };
  * });
  * ```
- */
+
+*/
 export function useErrorHandler() {
-  const lastError = ref<NormalizedError | null>(null);
+const lastError = ref<NormalizedError | null>(null);
 
-  /**
-   * Limpa o último erro armazenado.
-   */
+/**
+
+* Limpa o último erro armazenado.
+  */
   function clearError() {
-    lastError.value = null;
+  lastError.value = null;
   }
 
-  /**
-   * Executa uma função assíncrona com tratamento automático de erros.
-   * 
-   * @param fn - Função assíncrona a ser executada
-   * @param onError - Callback opcional executado quando ocorre erro
-   * @returns Promise com resultado da função
-   * @throws Re-lança o erro após tratamento
-   */
+/**
+
+* Executa uma função assíncrona com tratamento automático de erros.
+*
+* @param fn - Função assíncrona a ser executada
+* @param onError - Callback opcional executado quando ocorre erro
+* @returns Promise com resultado da função
+* @throws Re-lança o erro após tratamento
+  */
   async function withErrorHandling<T>(
-    fn: () => Promise<T>,
-    onError?: (error: NormalizedError) => void
+  fn: () => Promise<T>,
+  onError?: (error: NormalizedError) => void
   ): Promise<T> {
-    lastError.value = null;
-    try {
-      return await fn();
-    } catch (error) {
-      const normalized = normalizeError(error);
-      lastError.value = normalized;
-      
-      if (onError) {
-        onError(normalized);
-      }
-      
-      throw error;
-    }
+  lastError.value = null;
+  try {
+  return await fn();
+  } catch (error) {
+  const normalized = normalizeError(error);
+  lastError.value = normalized;
+
+  if (onError) {
+  onError(normalized);
   }
 
-  return {
-    lastError,
-    clearError,
-    withErrorHandling
-  };
+  throw error;
+  }
+  }
+
+return {
+lastError,
+clearError,
+withErrorHandling
+};
 }
+
 ```
 
 **Uso em Store (Exemplo Simplificado):**
@@ -223,25 +232,25 @@ export const useAtividadesStore = defineStore("atividades", () => {
    ```
 
 5. **Refatorar cada store (ITERATIVO - um por vez):**
-   
+
    Para cada store:
-   
+
    a. **Ver conteúdo do store:**
    ```bash
    view /home/runner/work/sgc/sgc/frontend/src/stores/atividades.ts
    ```
-   
+
    b. **Adicionar import do useErrorHandler:**
    ```typescript
    import { useErrorHandler } from '@/composables/useErrorHandler';
    ```
-   
+
    c. **Substituir declaração de lastError:**
    ```diff
    - const lastError = ref<NormalizedError | null>(null);
    + const { lastError, clearError, withErrorHandling } = useErrorHandler();
    ```
-   
+
    d. **Refatorar cada método assíncrono:**
    ```diff
    - async function buscarAtividades(codSubprocesso: number) {
@@ -264,7 +273,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
    +   });
    + }
    ```
-   
+
    e. **Atualizar return do store para incluir clearError:**
    ```diff
    - return { atividades, lastError, buscarAtividades };
@@ -272,15 +281,15 @@ export const useAtividadesStore = defineStore("atividades", () => {
    ```
 
 6. **Stores a refatorar (ordem sugerida):**
-   - `atividades.ts` (primeiro, como exemplo)
-   - `processos.ts`
-   - `subprocessos.ts`
-   - `mapas.ts`
-   - `competencias.ts`
-   - `usuarios.ts`
-   - `unidades.ts`
-   - `perfil.ts`
-   - Outros stores restantes
+    - `atividades.ts` (primeiro, como exemplo)
+    - `processos.ts`
+    - `subprocessos.ts`
+    - `mapas.ts`
+    - `competencias.ts`
+    - `usuarios.ts`
+    - `unidades.ts`
+    - `perfil.ts`
+    - Outros stores restantes
 
 7. **Executar testes após cada store refatorado:**
    ```bash
@@ -322,17 +331,21 @@ export const useAtividadesStore = defineStore("atividades", () => {
 ## 🎯 Ação #4: Consolidar Queries Duplicadas (Backend)
 
 ### Contexto
-Os repositórios `AtividadeRepo` e `CompetenciaRepo` têm queries similares para buscar entidades por código de mapa, com pequenas variações. Essas variações poderiam ser consolidadas usando `@EntityGraph` ou métodos mais consistentes.
+
+Os repositórios `AtividadeRepo` e `CompetenciaRepo` têm queries similares para buscar entidades por código de mapa, com
+pequenas variações. Essas variações poderiam ser consolidadas usando `@EntityGraph` ou métodos mais consistentes.
 
 ### Problema Identificado
 
 **Arquivos Afetados:**
+
 - `/backend/src/main/java/sgc/mapa/model/AtividadeRepo.java`
 - `/backend/src/main/java/sgc/mapa/model/CompetenciaRepo.java`
 
 **Queries Duplicadas:**
 
 **AtividadeRepo.java:**
+
 ```java
 // Método 1 (linha ~20)
 @Query("""
@@ -354,6 +367,7 @@ List<Atividade> findByMapaCodigoWithConhecimentos(@Param("codigoMapa") Long codi
 ```
 
 **CompetenciaRepo.java:**
+
 ```java
 // Similar pattern
 @Query("""
@@ -397,6 +411,7 @@ public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
 ```
 
 **Benefícios:**
+
 - ✅ Menos código (Spring Data deriva implementação)
 - ✅ Mais flexível (@EntityGraph permite combinações)
 - ✅ Mais consistente (padrão do Spring Data)
@@ -473,16 +488,20 @@ public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
 ## 🎯 Ação #5: Backend Retornar Dados Completos (Eliminar Cascata)
 
 ### Contexto
+
 Atualmente, após ações de workflow (criar, atualizar, deletar), o frontend faz **3 requisições** em cascata:
+
 1. Ação principal (POST/PUT/DELETE)
 2. Recarregar lista afetada (GET)
 3. Recarregar detalhes relacionados (GET)
 
-Isso é **ineficiente** e causa **latência perceptível** na UI. O backend deveria retornar os dados completos na primeira resposta.
+Isso é **ineficiente** e causa **latência perceptível** na UI. O backend deveria retornar os dados completos na primeira
+resposta.
 
 ### Problema Identificado
 
 **Arquivos Afetados (Frontend):**
+
 - `/frontend/src/stores/atividades.ts` - 6 métodos com cascata
 - `/frontend/src/stores/processos.ts` - ~4 métodos com cascata
 - `/frontend/src/stores/subprocessos.ts` - ~5 métodos com cascata
@@ -517,6 +536,7 @@ async function adicionarAtividade(
 ```
 
 **Sequência Temporal (Atual):**
+
 ```
 t=0ms:   POST /api/atividades (criar atividade)
   ↓
@@ -532,6 +552,7 @@ t=380ms: CONCLUÍDO (total: 380ms, 3 requests)
 ```
 
 **Impacto:**
+
 - ❌ **3 requisições** por ação (ineficiente)
 - ❌ **Latência** de ~380ms total
 - ❌ **Código complexo** com dependências entre stores
@@ -587,6 +608,7 @@ async function adicionarAtividade(
 ```
 
 **Sequência Temporal (Nova):**
+
 ```
 t=0ms:   POST /api/atividades (criar + retornar tudo)
   ↓
@@ -615,12 +637,12 @@ Redução: 380ms → 150ms (60% mais rápido!)
    ```
 
 3. **Endpoints backend a modificar:**
-   - `POST /api/mapas/{id}/atividades` - AtividadeController
-   - `PUT /api/mapas/{id}/atividades/{idAtividade}` - AtividadeController
-   - `POST /api/atividades/{id}/excluir` - AtividadeController
-   - `POST /api/processos` - ProcessoController
-   - `POST /api/processos/{id}/iniciar` - ProcessoWorkflowController
-   - Outros identificados na análise
+    - `POST /api/mapas/{id}/atividades` - AtividadeController
+    - `PUT /api/mapas/{id}/atividades/{idAtividade}` - AtividadeController
+    - `POST /api/atividades/{id}/excluir` - AtividadeController
+    - `POST /api/processos` - ProcessoController
+    - `POST /api/processos/{id}/iniciar` - ProcessoWorkflowController
+    - Outros identificados na análise
 
 #### Fase 2: Criar DTOs de Response Completos (Backend)
 
@@ -707,10 +729,12 @@ npm run test:e2e
 ### Riscos e Mitigações
 
 **🔴 ALTO RISCO:**
+
 - Mudança em 6 controllers e 6 stores
 - Potencial para quebrar funcionalidades existentes
 
 **Mitigações:**
+
 1. **Testes E2E OBRIGATÓRIOS** antes e depois
 2. **Implementar incrementalmente** (um endpoint por vez)
 3. **Validar cada endpoint** antes de prosseguir
@@ -723,6 +747,7 @@ npm run test:e2e
 Após implementar todas as 3 ações, validar:
 
 ### Testes Automatizados
+
 - [ ] ✅ Testes unitários backend passam: `./gradlew :backend:test`
 - [ ] ✅ Testes unitários frontend passam: `npm run test:unit`
 - [ ] ✅ TypeCheck frontend passa: `npm run typecheck`
@@ -730,6 +755,7 @@ Após implementar todas as 3 ações, validar:
 - [ ] ✅ **Testes E2E passam (CRÍTICO):** `npm run test:e2e`
 
 ### Validação Manual
+
 - [ ] ✅ Aplicação inicia sem erros
 - [ ] ✅ Criar atividade não faz 3 requisições
 - [ ] ✅ Atualizar atividade não faz 3 requisições
@@ -738,6 +764,7 @@ Após implementar todas as 3 ações, validar:
 - [ ] ✅ Performance melhorada (latência reduzida)
 
 ### Qualidade de Código
+
 - [ ] ✅ Nenhuma duplicação de error handling
 - [ ] ✅ Nenhuma cascata de reloads
 - [ ] ✅ Composable `useErrorHandler` implementado
@@ -745,6 +772,7 @@ Após implementar todas as 3 ações, validar:
 - [ ] ✅ DTOs de response completos
 
 ### Métricas
+
 - [ ] ✅ Redução de **~500 linhas** (error handling)
 - [ ] ✅ Redução de **25-40%** em requisições HTTP
 - [ ] ✅ Latência reduzida em **40-60%**
@@ -754,18 +782,21 @@ Após implementar todas as 3 ações, validar:
 ## 📈 Métricas de Sucesso
 
 **Antes da Sprint 2:**
+
 - Código duplicado (error handling): ~500 linhas
 - Requisições por ação: 3 (cascata)
 - Latência por ação: ~380ms
 - Queries duplicadas: ~5 ocorrências
 
 **Após a Sprint 2:**
+
 - ✅ Código duplicado: 0 linhas (eliminado ~500 linhas)
 - ✅ Requisições por ação: 1 (redução de 66%)
 - ✅ Latência por ação: ~150ms (redução de 60%)
 - ✅ Queries consolidadas (uso de @EntityGraph)
 
 **Estimativa de Impacto:**
+
 - 🟢 Redução de **~550 linhas** de código
 - 🟢 Redução de **25-40%** em requisições HTTP
 - 🟢 Performance melhorada em **40-60%**
@@ -776,6 +807,7 @@ Após implementar todas as 3 ações, validar:
 ## 🚀 Próximos Passos
 
 Após conclusão da Sprint 2, prosseguir para:
+
 - **Sprint 3:** [backend-sprint-3.md](./backend-sprint-3.md) - Refatoração Backend (God Objects)
 - **Sprint 4:** [otimizacoes-sprint-4.md](./otimizacoes-sprint-4.md) - Otimizações Opcionais
 

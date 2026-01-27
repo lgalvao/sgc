@@ -10,12 +10,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
-
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
@@ -25,6 +21,10 @@ import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioRepo;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.util.TestUtil;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest
@@ -76,9 +76,9 @@ class SecurityAuthBypassTest extends BaseIntegrationTest {
 
         // 3. Assert that it fails with 401 Unauthorized (or similar)
         mockMvc.perform(post("/api/usuarios/entrar")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(testUtil.toJson(entrarReq)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(testUtil.toJson(entrarReq)))
                 .andExpect(status().isUnauthorized());
     }
 }

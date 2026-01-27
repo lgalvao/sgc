@@ -1,34 +1,23 @@
 package sgc.mapa.dto.visualizacao;
 
-import lombok.*;
-
 import java.util.List;
+
+import lombok.Builder;
 
 /**
  * DTO para visualização de mapa completo.
- * 
- * <p>Requer @NoArgsConstructor e @Setter para uso em testes.
  */
-@Getter
-@Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class MapaVisualizacaoDto {
+public record MapaVisualizacaoDto(
+        UnidadeDto unidade,
+        List<CompetenciaDto> competencias,
+        List<AtividadeDto> atividadesSemCompetencia,
+        String sugestoes) {
 
-    private UnidadeDto unidade;
-    private List<CompetenciaDto> competencias;
-    private List<AtividadeDto> atividadesSemCompetencia;
-    private String sugestoes;
-
-    @Getter
-    @Setter
     @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UnidadeDto {
-        private Long codigo;
-        private String sigla;
-        private String nome;
+    public record UnidadeDto(
+            Long codigo,
+            String sigla,
+            String nome) {
     }
 }

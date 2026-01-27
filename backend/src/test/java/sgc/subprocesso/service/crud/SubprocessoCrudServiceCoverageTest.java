@@ -17,6 +17,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,8 +25,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.time.LocalDateTime;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoCrudServiceCoverageTest {
@@ -37,12 +36,6 @@ class SubprocessoCrudServiceCoverageTest {
     private SubprocessoMapper mapper;
     @Mock
     private sgc.comum.repo.RepositorioComum repo;
-    @Mock
-    private sgc.mapa.service.MapaFacade mapaFacade;
-    @Mock
-    private org.springframework.context.ApplicationEventPublisher eventPublisher;
-    @Mock
-    private sgc.organizacao.UsuarioFacade usuarioService;
 
     @Test
     @DisplayName("criar - Sucesso")

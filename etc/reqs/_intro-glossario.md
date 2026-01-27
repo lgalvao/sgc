@@ -2,7 +2,8 @@
 
 ## Acesso TRE-PE
 
-O sistema de Acesso do TRE-PE, que oferece uma API REST de autenticação de usuários, usando título de eleitor e senha. O Acesso também inclui sistemas e perfis de usuários, mas esta funcionalidade não será usada no sistema, sendo os perfis
+O sistema de Acesso do TRE-PE, que oferece uma API REST de autenticação de usuários, usando título de eleitor e senha. O
+Acesso também inclui sistemas e perfis de usuários, mas esta funcionalidade não será usada no sistema, sendo os perfis
 determinados a partir do SGRH juntamente com atribuições temporárias cadastradas.
 
 ## Atribuição temporária
@@ -117,7 +118,8 @@ Unidade com mais de um servidor lotado.
 
 ## Unidade raiz
 
-Unidade que não possui unidade superior na árvore de unidades do sistema. Com relação aos processos de mapeamento, de revisão e de diagnóstico, esse papel é exercido pela SEDOC.
+Unidade que não possui unidade superior na árvore de unidades do sistema. Com relação aos processos de mapeamento, de
+revisão e de diagnóstico, esse papel é exercido pela SEDOC.
 
 ## Validação
 

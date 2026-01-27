@@ -28,10 +28,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class GerenciadorJwt {
+    private static final String DEFAULT_SECRET = "sgc-secret-key-change-this-in-production-minimum-32-chars";
     private final JwtProperties jwtProperties;
     private final Environment environment;
-
-    private static final String DEFAULT_SECRET = "sgc-secret-key-change-this-in-production-minimum-32-chars";
 
     @PostConstruct
     public void verificarSegurancaChave() {

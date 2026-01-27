@@ -51,7 +51,7 @@ public class LoginController {
         String ip = extrairIp(httpRequest);
         limitadorTentativasLogin.verificar(ip);
 
-        boolean autenticado = loginFacade.autenticar(request.getTituloEleitoral(), request.getSenha());
+        boolean autenticado = loginFacade.autenticar(request.tituloEleitoral(), request.senha());
         return ResponseEntity.ok(autenticado);
     }
 
@@ -59,14 +59,14 @@ public class LoginController {
      * Autoriza um usuário, retornando a lista de perfis e unidades a que ele tem
      * acesso.
      *
-     * @param tituloEleitoral O título de eleitor do usuário.
      * @return Um {@link ResponseEntity} contendo a lista de
      *         {@link PerfilUnidadeDto}.
      */
     @PostMapping("/autorizar")
     @Operation(summary = "Retorna os perfis e unidades disponíveis para o usuário")
-    public ResponseEntity<List<PerfilUnidadeDto>> autorizar(@Valid @RequestBody sgc.seguranca.login.dto.AutorizarRequest request) {
-        List<PerfilUnidadeDto> perfis = loginFacade.autorizar(request.getTituloEleitoral());
+    public ResponseEntity<List<PerfilUnidadeDto>> autorizar(
+            @Valid @RequestBody sgc.seguranca.login.dto.AutorizarRequest request) {
+        List<PerfilUnidadeDto> perfis = loginFacade.autorizar(request.tituloEleitoral());
         return ResponseEntity.ok(perfis);
     }
 
@@ -82,13 +82,13 @@ public class LoginController {
     @Operation(summary = "Finaliza o login e retorna o token JWT")
     public ResponseEntity<EntrarResponse> entrar(@Valid @RequestBody EntrarRequest request) {
         String token = loginFacade.entrar(request);
-        Usuario usuario = usuarioService.buscarPorLogin(request.getTituloEleitoral());
+        Usuario usuario = usuarioService.buscarPorLogin(request.tituloEleitoral());
 
         EntrarResponse response = EntrarResponse.builder()
-                .tituloEleitoral(request.getTituloEleitoral())
+                .tituloEleitoral(request.tituloEleitoral())
                 .nome(usuario.getNome())
-                .perfil(Perfil.valueOf(request.getPerfil()))
-                .unidadeCodigo(request.getUnidadeCodigo())
+                .perfil(Perfil.valueOf(request.perfil()))
+                .unidadeCodigo(request.unidadeCodigo())
                 .token(token)
                 .build();
 

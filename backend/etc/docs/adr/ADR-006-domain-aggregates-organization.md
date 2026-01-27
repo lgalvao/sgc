@@ -10,6 +10,7 @@
 ## Contexto e Problema
 
 O sistema SGC está organizado em módulos por conceitos de domínio:
+
 - `processo/` - Processos de mapeamento/revisão/diagnóstico
 - `subprocesso/` - Instâncias de processo por unidade
 - `mapa/` - Mapas de competência
@@ -19,6 +20,7 @@ O sistema SGC está organizado em módulos por conceitos de domínio:
 ### Problema Levantado
 
 Foi identificado que:
+
 1. O módulo `subprocesso/` é muito grande (76 arquivos, ~6.100 linhas)
 2. O módulo `mapa/` também é substancial (48 arquivos)
 3. Quase tudo no sistema depende de `subprocesso` (59 arquivos importam dele)
@@ -29,6 +31,7 @@ Foi identificado que:
 **"A quebra por domínio está consistente ou deveríamos reorganizar o sistema?"**
 
 Alternativas consideradas:
+
 - **A)** Reorganizar por tipo de processo (mapeamento/, revisao/, diagnostico/)
 - **B)** Reorganizar por camadas técnicas (domain/, application/, infrastructure/)
 - **C)** Manter organização atual por agregados de domínio
@@ -52,6 +55,7 @@ Alternativas consideradas:
 > **Subprocesso é central porque É o agregado raiz do sistema no sentido DDD.**
 
 Ele conecta:
+
 - Processo (contexto geral)
 - Unidade (quem executa)
 - Atividades (o que é feito)
@@ -65,6 +69,7 @@ Ele conecta:
 #### Opção A: Reorganizar por Tipo de Processo ❌
 
 **Estrutura proposta:**
+
 ```
 sgc/
 ├── mapeamento/subprocesso/
@@ -75,24 +80,24 @@ sgc/
 **Problemas Fatais:**
 
 1. **Duplicação Massiva (>80%)**
-   - Subprocesso de mapeamento e revisão compartilham:
-     - ✓ Mesmo modelo de dados (Entidade JPA)
-     - ✓ Mesma validação hierárquica
-     - ✓ Mesmo CRUD de atividades
-     - ✓ Mesmos services de transição
-   - Diferem apenas em:
-     - ✗ Alguns estados específicos (~10%)
-     - ✗ Algumas validações específicas (~5%)
+    - Subprocesso de mapeamento e revisão compartilham:
+        - ✓ Mesmo modelo de dados (Entidade JPA)
+        - ✓ Mesma validação hierárquica
+        - ✓ Mesmo CRUD de atividades
+        - ✓ Mesmos services de transição
+    - Diferem apenas em:
+        - ✗ Alguns estados específicos (~10%)
+        - ✗ Algumas validações específicas (~5%)
 
 2. **Viola DRY (Don't Repeat Yourself)**
-   - Mudança em validação = alterar 3 lugares
-   - Risco de inconsistências
-   - Bug corrigido em um, permanece nos outros
+    - Mudança em validação = alterar 3 lugares
+    - Risco de inconsistências
+    - Bug corrigido em um, permanece nos outros
 
 3. **Não Reflete o Domínio**
-   - No domínio real, existe "Subprocesso" como conceito único
-   - Não existe "Subprocesso de Mapeamento" vs "Subprocesso de Revisão"
-   - Existe "Subprocesso **em** Processo de Mapeamento"
+    - No domínio real, existe "Subprocesso" como conceito único
+    - Não existe "Subprocesso de Mapeamento" vs "Subprocesso de Revisão"
+    - Existe "Subprocesso **em** Processo de Mapeamento"
 
 **Exemplo de Duplicação:**
 
@@ -127,6 +132,7 @@ public class SubprocessoDiagnostico {
 #### Opção B: Reorganizar por Camadas Técnicas ❌
 
 **Estrutura proposta:**
+
 ```
 sgc/
 ├── domain/       (entidades)
@@ -138,21 +144,21 @@ sgc/
 **Problemas:**
 
 1. **Navegação Difícil**
-   - Para entender "Subprocesso", visitar 4 pacotes diferentes
-   - Funcionalidades relacionadas espalhadas
+    - Para entender "Subprocesso", visitar 4 pacotes diferentes
+    - Funcionalidades relacionadas espalhadas
 
 2. **Módulos Grandes Demais**
-   - `domain/` teria 100+ entidades de todos os módulos
-   - `application/` teria 50+ services de todos os módulos
-   - Perde coesão
+    - `domain/` teria 100+ entidades de todos os módulos
+    - `application/` teria 50+ services de todos os módulos
+    - Perde coesão
 
 3. **Impede Modularização Futura**
-   - Impossível extrair módulo "Processo" como microserviço
-   - Tudo está misturado por camada técnica
+    - Impossível extrair módulo "Processo" como microserviço
+    - Tudo está misturado por camada técnica
 
 4. **Não Alinha com Modelo Mental**
-   - Desenvolvedores pensam em "módulo Processo", não em "camada Application"
-   - Dificulta onboarding
+    - Desenvolvedores pensam em "módulo Processo", não em "camada Application"
+    - Dificulta onboarding
 
 **Exemplo de Problema:**
 
@@ -177,6 +183,7 @@ presentation/SubprocessoController.java // lugar 4
 #### Opção C: Manter Organização por Agregados ✅
 
 **Estrutura atual:**
+
 ```
 sgc/
 ├── processo/      - Agregado Processo
@@ -189,33 +196,33 @@ sgc/
 **Vantagens:**
 
 1. ✅ **Alinha com DDD (Domain-Driven Design)**
-   - Cada pacote = 1 agregado ou bounded context
-   - Reflete modelo de negócio
-   - Boundaries claros
+    - Cada pacote = 1 agregado ou bounded context
+    - Reflete modelo de negócio
+    - Boundaries claros
 
 2. ✅ **Coesão Máxima**
-   - Tudo sobre "Subprocesso" em um lugar
-   - Fácil navegar
-   - Mudanças localizadas
+    - Tudo sobre "Subprocesso" em um lugar
+    - Fácil navegar
+    - Mudanças localizadas
 
 3. ✅ **Permite Evolução**
-   - Módulos podem virar microserviços
-   - Dependências explícitas
-   - Testabilidade
+    - Módulos podem virar microserviços
+    - Dependências explícitas
+    - Testabilidade
 
 4. ✅ **Benchmarking Positivo**
-   - Spring Petclinic: organização por agregados
-   - eShopOnContainers: agregados dentro de bounded contexts
-   - Padrão recomendado pela indústria
+    - Spring Petclinic: organização por agregados
+    - eShopOnContainers: agregados dentro de bounded contexts
+    - Padrão recomendado pela indústria
 
 **Problemas Identificados (e soluções):**
 
-| Problema | Solução |
-|----------|---------|
-| Módulo grande (76 arquivos) | ✅ Consolidar services (12→6) |
-| Services públicos desnecessários | ✅ Tornar package-private |
-| Comunicação síncrona excessiva | ✅ Implementar eventos de domínio |
-| Falta de sub-organização | ✅ Criar sub-pacotes (workflow/, crud/) |
+| Problema                         | Solução                                |
+|----------------------------------|----------------------------------------|
+| Módulo grande (76 arquivos)      | ✅ Consolidar services (12→6)           |
+| Services públicos desnecessários | ✅ Tornar package-private               |
+| Comunicação síncrona excessiva   | ✅ Implementar eventos de domínio       |
+| Falta de sub-organização         | ✅ Criar sub-pacotes (workflow/, crud/) |
 
 **Veredito:** ✅ **ACEITO** - Arquitetura correta, requer refinamento
 
@@ -229,12 +236,12 @@ sgc/
 
 1. **Organização está CORRETA** - reflete modelo de negócio
 2. **Problemas são de REFINAMENTO, não de organização:**
-   - Consolidar services
-   - Melhorar encapsulamento
-   - Aumentar uso de eventos
+    - Consolidar services
+    - Melhorar encapsulamento
+    - Aumentar uso de eventos
 3. **Alternativas têm problemas FATAIS:**
-   - Opção A: Duplicação massiva
-   - Opção B: Navegação difícil, perde coesão
+    - Opção A: Duplicação massiva
+    - Opção B: Navegação difícil, perde coesão
 
 ### Princípio Aplicado
 
@@ -253,6 +260,7 @@ Organizar código por **funcionalidade de negócio** (agregados), não por **tip
 **Redução:** ~50%
 
 **Consolidações:**
+
 - SubprocessoCadastroWorkflowService + SubprocessoMapaWorkflowService → SubprocessoWorkflowService
 - SubprocessoDetalheService → lógica movida para Facade
 - SubprocessoContextoService → lógica movida para Facade
@@ -296,34 +304,34 @@ subprocesso/service/
 ### Positivas ✅
 
 1. **Manutenção da Coesão**
-   - Código relacionado permanece junto
-   - Mudanças localizadas
+    - Código relacionado permanece junto
+    - Mudanças localizadas
 
 2. **Evita Duplicação**
-   - Código compartilhado entre tipos de processo permanece único
-   - DRY mantido
+    - Código compartilhado entre tipos de processo permanece único
+    - DRY mantido
 
 3. **Facilita Evolução**
-   - Possível extrair módulos como microserviços no futuro
-   - Boundaries claros
+    - Possível extrair módulos como microserviços no futuro
+    - Boundaries claros
 
 4. **Melhora Qualidade Incremental**
-   - Melhorias sem big bang rewrite
-   - Baixo risco de regressões
+    - Melhorias sem big bang rewrite
+    - Baixo risco de regressões
 
 5. **Alinha com Indústria**
-   - Segue práticas recomendadas (DDD, Clean Architecture)
-   - Facilita onboarding
+    - Segue práticas recomendadas (DDD, Clean Architecture)
+    - Facilita onboarding
 
 ### Negativas ❌
 
 1. **Módulo Grande**
-   - Subprocesso continuará grande (é o agregado raiz)
-   - **Mitigação:** Consolidar services, criar sub-pacotes
+    - Subprocesso continuará grande (é o agregado raiz)
+    - **Mitigação:** Consolidar services, criar sub-pacotes
 
 2. **Dependências Cruzadas**
-   - Muitos módulos dependem de Subprocesso
-   - **Mitigação:** Usar eventos para desacoplamento
+    - Muitos módulos dependem de Subprocesso
+    - **Mitigação:** Usar eventos para desacoplamento
 
 ---
 
@@ -332,6 +340,7 @@ subprocesso/service/
 ### Complexidade Essencial (Inevitável - ~70%)
 
 Do domínio de negócio:
+
 - 9 estados de Subprocesso → workflow complexo de negócio
 - Validação hierárquica em 3 níveis → estrutura organizacional real
 - Síntese manual de competências → decisão humana, não automatizável
@@ -339,6 +348,7 @@ Do domínio de negócio:
 ### Complexidade Acidental (Evitável - ~30%)
 
 Introduzida pela implementação:
+
 - 12 services quando 6 seriam suficientes
 - Services públicos sem necessidade
 - Comunicação síncrona excessiva
@@ -352,12 +362,12 @@ Introduzida pela implementação:
 
 ## Métricas de Sucesso
 
-| Métrica | Antes | Meta |
-|---------|-------|------|
-| Services de Subprocesso | 12 | 6-7 |
-| Services públicos | 12 | 1 (Facade) |
-| Eventos implementados | 6 | 14-16 |
-| Linhas em services | ~2.500 | ~1.800 |
+| Métrica                 | Antes  | Meta       |
+|-------------------------|--------|------------|
+| Services de Subprocesso | 12     | 6-7        |
+| Services públicos       | 12     | 1 (Facade) |
+| Eventos implementados   | 6      | 14-16      |
+| Linhas em services      | ~2.500 | ~1.800     |
 
 ---
 
@@ -390,27 +400,27 @@ static final ArchRule modules_are_organized_by_domain_aggregates =
 ### Literatura
 
 1. **Domain-Driven Design** (Eric Evans, 2003)
-   - Capítulo 6: The Life Cycle of a Domain Object
-   - Capítulo 9: Modules
-   - Conceito de Agregado Raiz
+    - Capítulo 6: The Life Cycle of a Domain Object
+    - Capítulo 9: Modules
+    - Conceito de Agregado Raiz
 
 2. **Clean Architecture** (Robert C. Martin, 2017)
-   - Capítulo 20: Business Rules
-   - Capítulo 34: The Missing Chapter (Package by Feature)
+    - Capítulo 20: Business Rules
+    - Capítulo 34: The Missing Chapter (Package by Feature)
 
 3. **Implementing Domain-Driven Design** (Vaughn Vernon, 2013)
-   - Capítulo 10: Aggregates
-   - Capítulo 14: Application
+    - Capítulo 10: Aggregates
+    - Capítulo 14: Application
 
 ### Benchmarks
 
 1. **Spring Petclinic**
-   - Organização: owner/, vet/, visit/ (agregados)
-   - Não usa: domain/, application/ (camadas)
+    - Organização: owner/, vet/, visit/ (agregados)
+    - Não usa: domain/, application/ (camadas)
 
 2. **eShopOnContainers (Microsoft)**
-   - Cada microserviço: agregados dentro do domínio
-   - Não organiza por camada técnica
+    - Cada microserviço: agregados dentro do domínio
+    - Não organiza por camada técnica
 
 ### Documentação Interna
 
@@ -422,9 +432,9 @@ static final ArchRule modules_are_organized_by_domain_aggregates =
 
 ## Histórico de Revisões
 
-| Data | Versão | Mudanças |
-|------|--------|----------|
-| 2026-01-15 | 1.0 | Criação inicial - Decisão de manter organização por agregados |
+| Data       | Versão | Mudanças                                                      |
+|------------|--------|---------------------------------------------------------------|
+| 2026-01-15 | 1.0    | Criação inicial - Decisão de manter organização por agregados |
 
 ---
 

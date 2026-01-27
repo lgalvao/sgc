@@ -1,17 +1,17 @@
 package sgc.mapa.mapper;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
-import sgc.mapa.dto.MapaCompletoDto;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Mapa;
-
 import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
+
+import sgc.mapa.dto.MapaCompletoDto;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.Mapa;
 
 @Tag("unit")
 class MapaCompletoMapperTest {
@@ -36,11 +36,11 @@ class MapaCompletoMapperTest {
         MapaCompletoDto dto = mapper.toDto(mapa, 100L, competencias);
 
         assertThat(dto).isNotNull();
-        assertThat(dto.getCodigo()).isEqualTo(1L);
-        assertThat(dto.getSubprocessoCodigo()).isEqualTo(100L);
-        assertThat(dto.getObservacoes()).isEqualTo("Obs");
-        assertThat(dto.getCompetencias()).hasSize(1);
-        assertThat(dto.getCompetencias().getFirst().getCodigo()).isEqualTo(2L);
-        assertThat(dto.getCompetencias().getFirst().getAtividadesCodigos()).containsExactly(10L);
+        assertThat(dto.codigo()).isEqualTo(1L);
+        assertThat(dto.subprocessoCodigo()).isEqualTo(100L);
+        assertThat(dto.observacoes()).isEqualTo("Obs");
+        assertThat(dto.competencias()).hasSize(1);
+        assertThat(dto.competencias().getFirst().codigo()).isEqualTo(2L);
+        assertThat(dto.competencias().getFirst().atividadesCodigos()).containsExactly(10L);
     }
 }

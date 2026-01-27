@@ -11,8 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -26,8 +25,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.mail.internet.MimeMessage;
@@ -93,11 +91,11 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         try {
             jdbcTemplate.execute("ALTER SEQUENCE SGC.VW_UNIDADE_SEQ RESTART WITH 1000");
         } catch (DataAccessException e) {
-             try {
-                 jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN codigo RESTART WITH 1000");
-             } catch (DataAccessException ex) {
-                 // Ignore if fails, might depend on H2 version/mode
-             }
+            try {
+                jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN codigo RESTART WITH 1000");
+            } catch (DataAccessException ex) {
+                // Ignore if fails, might depend on H2 version/mode
+            }
         }
 
         when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));

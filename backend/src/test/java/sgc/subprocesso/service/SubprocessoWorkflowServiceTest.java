@@ -1,38 +1,35 @@
 package sgc.subprocesso.service;
 
+import java.time.LocalDate;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.RepositorioComum;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 
-import java.time.LocalDate;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("SubprocessoWorkflowService Test (Administrative Operations)")
 class SubprocessoWorkflowServiceTest {
-
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
     @Mock
@@ -41,26 +38,6 @@ class SubprocessoWorkflowServiceTest {
     private AlertaFacade alertaService;
     @Mock
     private UnidadeFacade unidadeService;
-    @Mock
-    private RepositorioComum repo;
-    @Mock
-    private MovimentacaoRepo repositorioMovimentacao;
-    @Mock
-    private sgc.subprocesso.service.workflow.SubprocessoTransicaoService transicaoService;
-    @Mock
-    private sgc.analise.AnaliseFacade analiseFacade;
-    @Mock
-    private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
-    @Mock
-    private sgc.mapa.service.ImpactoMapaService impactoMapaService;
-    @Mock
-    private sgc.seguranca.acesso.AccessControlService accessControlService;
-    @Mock
-    private sgc.mapa.service.CompetenciaService competenciaService;
-    @Mock
-    private sgc.mapa.service.AtividadeService atividadeService;
-    @Mock
-    private sgc.mapa.service.MapaFacade mapaFacade;
 
     @InjectMocks
     private SubprocessoWorkflowService service;
@@ -175,7 +152,7 @@ class SubprocessoWorkflowServiceTest {
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
         assertThatThrownBy(() -> service.reabrirCadastro(1L, "Just"))
-            .isInstanceOf(ErroValidacao.class);
+                .isInstanceOf(ErroValidacao.class);
     }
 
     @Test
@@ -189,7 +166,7 @@ class SubprocessoWorkflowServiceTest {
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
         assertThatThrownBy(() -> service.reabrirCadastro(1L, "Just"))
-            .isInstanceOf(ErroValidacao.class);
+                .isInstanceOf(ErroValidacao.class);
     }
 
     @Test
@@ -222,7 +199,7 @@ class SubprocessoWorkflowServiceTest {
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
         assertThatThrownBy(() -> service.reabrirRevisaoCadastro(1L, "Just"))
-            .isInstanceOf(ErroValidacao.class);
+                .isInstanceOf(ErroValidacao.class);
     }
 
     @Test
@@ -236,8 +213,8 @@ class SubprocessoWorkflowServiceTest {
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
         assertThatThrownBy(() -> service.reabrirRevisaoCadastro(1L, "Just"))
-            .isInstanceOf(ErroValidacao.class)
-            .hasMessageContaining("em fase de revisão");
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("em fase de revisão");
     }
 
     @Test
@@ -260,7 +237,7 @@ class SubprocessoWorkflowServiceTest {
 
         // Não deve lançar exceção
         service.alterarDataLimite(1L, LocalDate.now());
-        
+
         verify(repositorioSubprocesso).save(sp);
     }
 
@@ -278,7 +255,7 @@ class SubprocessoWorkflowServiceTest {
 
         // Não deve lançar exceção
         service.reabrirCadastro(1L, "Just");
-        
+
         verify(repositorioSubprocesso).save(sp);
     }
 }

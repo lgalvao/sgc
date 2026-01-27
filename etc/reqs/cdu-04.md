@@ -49,8 +49,8 @@ Fluxo principal:
 12. O sistema envia notificações por e-mail para todas as unidades participantes.
 
 13. 12.1. Unidades operacionais e interoperacionais deverão receber um e-mail segundo o modelo:
-        ```text
- 
+    ```text
+
         Assunto: SGC: Início de processo de mapeamento de competências
 
         Prezado(a) responsável pela [SIGLA_UNIDADE],
@@ -77,7 +77,7 @@ Fluxo principal:
         O prazo para conclusão desta etapa do processo é [DATA_LIMITE]. Acompanhe o processo no O sistema de Gestão de Competências: [URL_SISTEMA].
         ```
 
-13. O sistema cria internamente alertas para todas as unidades participantes.
+14. O sistema cria internamente alertas para todas as unidades participantes.
     13.1. Para cada unidade operacional será criado um alerta com:
 
     - `Descrição`: "Início do processo"

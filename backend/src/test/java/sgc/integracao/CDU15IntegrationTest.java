@@ -1,20 +1,9 @@
 package sgc.integracao;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import sgc.Sgc;
 import sgc.fixture.MapaFixture;
 import sgc.fixture.ProcessoFixture;
@@ -33,9 +22,18 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @org.springframework.boot.test.context.SpringBootTest(classes = Sgc.class)
 @DisplayName("CDU-15: Manter Mapa de Competências")
-@Import({ TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class })
+@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 @ActiveProfiles("test")
 @org.springframework.transaction.annotation.Transactional
 @Tag("integration")
@@ -47,6 +45,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
     private Atividade atividade2;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         // Criar Unidade via Fixture
         Unidade unidade = UnidadeFixture.unidadePadrao();
@@ -101,12 +100,12 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
 
         // When & Then
         mockMvc.perform(
-                post(
-                        "/api/subprocessos/{codSubprocesso}/mapa/atualizar",
-                        subprocesso.getCodigo())
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        post(
+                                "/api/subprocessos/{codSubprocesso}/mapa/atualizar",
+                                subprocesso.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.competencias.length()").value(2))
                 .andExpect(jsonPath("$.competencias[0].descricao").value("Nova Competência 1"))
@@ -130,12 +129,12 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
                                 "Competência Original",
                                 List.of(atividade1.getCodigo()))));
         String responseBody = mockMvc.perform(
-                post(
-                        "/api/subprocessos/{codSubprocesso}/mapa/atualizar",
-                        subprocesso.getCodigo())
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(initialRequest)))
+                        post(
+                                "/api/subprocessos/{codSubprocesso}/mapa/atualizar",
+                                subprocesso.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(initialRequest)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -158,12 +157,12 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
                                 List.of(atividade2.getCodigo()))));
 
         mockMvc.perform(
-                post(
-                        "/api/subprocessos/{codSubprocesso}/mapa/atualizar",
-                        subprocesso.getCodigo())
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateRequest)))
+                        post(
+                                "/api/subprocessos/{codSubprocesso}/mapa/atualizar",
+                                subprocesso.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.competencias.length()").value(2))
                 .andExpect(
@@ -194,12 +193,12 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
 
         // When & Then
         mockMvc.perform(
-                post(
-                        "/api/subprocessos/{codSubprocesso}/mapa/atualizar",
-                        subprocesso.getCodigo())
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        post(
+                                "/api/subprocessos/{codSubprocesso}/mapa/atualizar",
+                                subprocesso.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnprocessableContent());
     }
 
@@ -231,6 +230,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de CRUD de Competência Individual")
+    @SuppressWarnings("unused")
     class CrudCompetenciaTests {
 
         @Test
@@ -241,12 +241,12 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
                     "Nova Competência", List.of(atividade1.getCodigo()));
 
             mockMvc.perform(
-                    post(
-                            "/api/subprocessos/{codSubprocesso}/competencias",
-                            subprocesso.getCodigo())
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                            post(
+                                    "/api/subprocessos/{codSubprocesso}/competencias",
+                                    subprocesso.getCodigo())
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.competencias.length()").value(1))
                     .andExpect(jsonPath("$.competencias[0].descricao").value("Nova Competência"));
@@ -260,12 +260,12 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
             var addRequest = new sgc.subprocesso.dto.CompetenciaRequest(
                     "Competência Original", List.of(atividade1.getCodigo()));
             var result = mockMvc.perform(
-                    post(
-                            "/api/subprocessos/{codSubprocesso}/competencias",
-                            subprocesso.getCodigo())
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(addRequest)))
+                            post(
+                                    "/api/subprocessos/{codSubprocesso}/competencias",
+                                    subprocesso.getCodigo())
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(addRequest)))
                     .andReturn();
             var codCompetencia = objectMapper
                     .readTree(result.getResponse().getContentAsString())
@@ -277,13 +277,13 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
                     "Competência Atualizada",
                     List.of(atividade1.getCodigo(), atividade2.getCodigo()));
             mockMvc.perform(
-                    post(
-                            "/api/subprocessos/{codSubprocesso}/competencias/{codCompetencia}/atualizar",
-                            subprocesso.getCodigo(),
-                            codCompetencia)
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updateRequest)))
+                            post(
+                                    "/api/subprocessos/{codSubprocesso}/competencias/{codCompetencia}/atualizar",
+                                    subprocesso.getCodigo(),
+                                    codCompetencia)
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(updateRequest)))
                     .andExpect(status().isOk())
                     .andExpect(
                             jsonPath("$.competencias[0].descricao")
@@ -299,12 +299,12 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
             var addRequest = new sgc.subprocesso.dto.CompetenciaRequest(
                     "Competência a ser removida", List.of(atividade1.getCodigo()));
             var result = mockMvc.perform(
-                    post(
-                            "/api/subprocessos/{codSubprocesso}/competencias",
-                            subprocesso.getCodigo())
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(addRequest)))
+                            post(
+                                    "/api/subprocessos/{codSubprocesso}/competencias",
+                                    subprocesso.getCodigo())
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(addRequest)))
                     .andReturn();
             var codCompetencia = objectMapper
                     .readTree(result.getResponse().getContentAsString())
@@ -313,11 +313,11 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
 
             // Remover
             mockMvc.perform(
-                    post(
-                            "/api/subprocessos/{codSubprocesso}/competencias/{codCompetencia}/remover",
-                            subprocesso.getCodigo(),
-                            codCompetencia)
-                            .with(csrf()))
+                            post(
+                                    "/api/subprocessos/{codSubprocesso}/competencias/{codCompetencia}/remover",
+                                    subprocesso.getCodigo(),
+                                    codCompetencia)
+                                    .with(csrf()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.competencias.length()").value(0));
         }
@@ -333,12 +333,12 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
                     "Nova Competência", List.of(atividade1.getCodigo()));
 
             mockMvc.perform(
-                    post(
-                            "/api/subprocessos/{codSubprocesso}/competencias",
-                            subprocesso.getCodigo())
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                            post(
+                                    "/api/subprocessos/{codSubprocesso}/competencias",
+                                    subprocesso.getCodigo())
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnprocessableContent());
         }
     }

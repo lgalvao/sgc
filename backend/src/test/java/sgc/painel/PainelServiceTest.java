@@ -1,17 +1,27 @@
 package sgc.painel;
 
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
 import sgc.alerta.AlertaFacade;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.Alerta;
@@ -25,38 +35,41 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("PainelFacade - Testes Unitários")
 class PainelServiceTest {
 
+    private final Pageable pageable = PageRequest.of(0, 10);
     @Mock
     private ProcessoFacade processoFacade;
     @Mock
     private AlertaFacade alertaService;
     @Mock
     private UnidadeFacade unidadeService;
-
     @InjectMocks
     private PainelFacade painelService;
 
-    private final Pageable pageable = PageRequest.of(0, 10);
+    private Processo criarProcessoMock(Long codigo) {
+        Processo p = new Processo();
+        p.setCodigo(codigo);
+        p.setDescricao("Processo " + codigo);
+        p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        p.setDataCriacao(LocalDateTime.now());
+
+        Unidade participante = new Unidade();
+        participante.setCodigo(1L);
+        participante.setSigla("PART");
+        p.setParticipantes(Set.of(participante));
+
+        return p;
+    }
 
     @Nested
     @DisplayName("Listar Processos - Consultas Básicas")
+    @SuppressWarnings("unused")
     class ListarProcessosBasico {
-
-
-
         @Test
         @DisplayName("listarProcessos para ADMIN deve listar todos")
         void listarProcessos_Admin() {
@@ -72,7 +85,7 @@ class PainelServiceTest {
         @DisplayName("listarProcessos para GESTOR deve incluir subordinadas")
         void listarProcessos_Gestor() {
             when(unidadeService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L, 3L));
-            
+
             Processo p = criarProcessoMock(1L);
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
                     .thenReturn(new PageImpl<>(List.of(p)));
@@ -82,7 +95,6 @@ class PainelServiceTest {
             // Verifica se chamou buscando por 1L, 2L e 3L
             verify(processoFacade).listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class));
         }
-
 
 
         @Test
@@ -95,7 +107,7 @@ class PainelServiceTest {
             p.setCodigo(100L);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             p.setTipo(TipoProcesso.MAPEAMENTO);
-            
+
             Unidade u = new Unidade();
             u.setCodigo(1L);
             p.setParticipantes(Set.of(u));
@@ -115,8 +127,8 @@ class PainelServiceTest {
 
     @Nested
     @DisplayName("Listar Processos - Links de Destino")
+    @SuppressWarnings("unused")
     class ListarProcessosLinks {
-
         @Test
         @DisplayName("listarProcessos deve calcular link correto para ADMIN e processo CRIADO")
         void listarProcessos_LinkAdminCriado() {
@@ -160,7 +172,7 @@ class PainelServiceTest {
             p.setCodigo(100L);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             p.setTipo(TipoProcesso.MAPEAMENTO);
-            
+
             Unidade u = new Unidade();
             u.setCodigo(1L);
             p.setParticipantes(Set.of(u));
@@ -178,7 +190,7 @@ class PainelServiceTest {
             Processo p = criarProcessoMock(1L);
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
                     .thenReturn(new PageImpl<>(List.of(p)));
-            
+
             when(unidadeService.buscarPorCodigo(2L)).thenThrow(new RuntimeException("Unidade não achada"));
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, 2L, PageRequest.of(0, 10));
@@ -193,13 +205,13 @@ class PainelServiceTest {
             p.setCodigo(1L);
             p.setTipo(TipoProcesso.MAPEAMENTO);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-            
+
             Unidade u = new Unidade();
             u.setCodigo(1L);
             p.setParticipantes(Set.of(u));
 
             when(processoFacade.listarPorParticipantesIgnorandoCriado(any(), any()))
-                .thenReturn(new PageImpl<>(List.of(p)));
+                    .thenReturn(new PageImpl<>(List.of(p)));
 
             // Simula erro na busca da unidade para montar o link
             when(unidadeService.buscarPorCodigo(1L)).thenThrow(new RuntimeException("Erro DB"));
@@ -213,17 +225,17 @@ class PainelServiceTest {
 
     @Nested
     @DisplayName("Listar Processos - Formatação de Unidades")
+    @SuppressWarnings("unused")
     class ListarProcessosFormatacao {
-
         @Test
         @DisplayName("listarProcessos deve tratar exceção ao formatar unidades participantes")
         void listarProcessos_FormatarUnidadesException() {
             Unidade u = new Unidade();
             u.setCodigo(1L);
-            
+
             Processo p = criarProcessoMock(1L);
             p.setParticipantes(Set.of(u));
-            
+
             when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
@@ -233,16 +245,15 @@ class PainelServiceTest {
         }
 
 
-
         @Test
         @DisplayName("encontrarMaiorIdVisivel deve retornar null se unidade for null ou não participante")
         void encontrarMaiorIdVisivel_CasosBorda() {
             Unidade u = new Unidade();
             u.setCodigo(999L);
-            
+
             Processo p = criarProcessoMock(1L);
             p.setParticipantes(Set.of(u));
-            
+
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
             // Usamos lenient para atingir indiretamente o fluxo de segurança/null checks se houver
             lenient().when(unidadeService.buscarEntidadePorId(999L)).thenReturn(null);
@@ -255,8 +266,12 @@ class PainelServiceTest {
         @Test
         @DisplayName("formatarUnidadesParticipantes: deve formatar corretamente e agrupar hierarquia")
         void formatarUnidadesParticipantes_Complexa() {
-            Unidade pai = new Unidade(); pai.setCodigo(1L); pai.setSigla("PAI");
-            Unidade filho = new Unidade(); filho.setCodigo(2L); filho.setSigla("FILHO");
+            Unidade pai = new Unidade();
+            pai.setCodigo(1L);
+            pai.setSigla("PAI");
+            Unidade filho = new Unidade();
+            filho.setCodigo(2L);
+            filho.setSigla("FILHO");
             filho.setUnidadeSuperior(pai);
 
             when(unidadeService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
@@ -278,8 +293,12 @@ class PainelServiceTest {
         @Test
         @DisplayName("formatarUnidadesParticipantes: deve mostrar filho se pai não participa")
         void formatarUnidadesParticipantes_FilhoSemPai() {
-            Unidade pai = new Unidade(); pai.setCodigo(1L); pai.setSigla("PAI");
-            Unidade filho = new Unidade(); filho.setCodigo(2L); filho.setSigla("FILHO");
+            Unidade pai = new Unidade();
+            pai.setCodigo(1L);
+            pai.setSigla("PAI");
+            Unidade filho = new Unidade();
+            filho.setCodigo(2L);
+            filho.setSigla("FILHO");
             filho.setUnidadeSuperior(pai);
 
             Processo p = new Processo();
@@ -317,17 +336,17 @@ class PainelServiceTest {
     }
 
     @Nested
+    @SuppressWarnings("unused")
     @DisplayName("Listar Processos - Outros")
     class ListarProcessosOutros {
-
         @Test
         @DisplayName("garantirOrdenacaoPadrao deve retornar pageable original se já estiver ordenado")
         void garantirOrdenacaoPadrao_JaOrdenado() {
             PageRequest pageRequestWithSort = PageRequest.of(0, 10, org.springframework.data.domain.Sort.by("descricao"));
             when(processoFacade.listarTodos(pageRequestWithSort)).thenReturn(Page.empty(pageRequestWithSort));
-            
+
             painelService.listarProcessos(Perfil.ADMIN, null, pageRequestWithSort);
-            
+
             verify(processoFacade).listarTodos(pageRequestWithSort);
         }
 
@@ -336,15 +355,15 @@ class PainelServiceTest {
         void selecionarIdsVisiveis_CatchException() {
             Unidade u = new Unidade();
             u.setCodigo(999L);
-            
+
             Processo p = criarProcessoMock(1L);
             p.setParticipantes(Set.of(u));
-            
+
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
             lenient().when(unidadeService.buscarEntidadePorId(999L)).thenThrow(new RuntimeException("ERRO"));
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
-            
+
             assertThat(result.getContent()).isNotEmpty();
         }
 
@@ -367,8 +386,8 @@ class PainelServiceTest {
 
     @Nested
     @DisplayName("Listar Alertas")
+    @SuppressWarnings("unused")
     class ListarAlertas {
-
         @Test
         @DisplayName("listarAlertas por unidade deve buscar alertas da unidade")
         void listarAlertas_PorUnidade() {
@@ -376,12 +395,12 @@ class PainelServiceTest {
             alerta.setCodigo(100L);
             alerta.setDescricao("Alerta teste");
             alerta.setDataHora(LocalDateTime.now());
-            
+
             // Setup obrigatorio para evitar NPE
             sgc.processo.model.Processo p = new sgc.processo.model.Processo();
             p.setCodigo(123L);
             alerta.setProcesso(p);
-            
+
             Unidade u = new Unidade();
             u.setSigla("U1");
             alerta.setUnidadeOrigem(u);
@@ -399,13 +418,6 @@ class PainelServiceTest {
         }
 
 
-
-
-
-
-
-
-
         @Test
         @DisplayName("listarAlertas: busca por unidade se codigoUnidade informado")
         void listarAlertas_PorUnidadeCobertura() {
@@ -414,12 +426,12 @@ class PainelServiceTest {
             Alerta alerta = new Alerta();
             alerta.setCodigo(1L);
             alerta.setDataHora(LocalDateTime.now());
-            
+
             // Setup obrigatorio
             Processo p = new Processo();
             p.setCodigo(123L);
             alerta.setProcesso(p);
-            
+
             Unidade u = new Unidade();
             u.setSigla("U1");
             alerta.setUnidadeOrigem(u);
@@ -434,21 +446,5 @@ class PainelServiceTest {
         }
 
 
-    }
-
-    private Processo criarProcessoMock(Long codigo) {
-        Processo p = new Processo();
-        p.setCodigo(codigo);
-        p.setDescricao("Processo " + codigo);
-        p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        p.setTipo(TipoProcesso.MAPEAMENTO);
-        p.setDataCriacao(LocalDateTime.now());
-        
-        Unidade participante = new Unidade();
-        participante.setCodigo(1L);
-        participante.setSigla("PART");
-        p.setParticipantes(Set.of(participante));
-        
-        return p;
     }
 }

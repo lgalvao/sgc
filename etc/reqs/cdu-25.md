@@ -14,19 +14,23 @@
 
 2. O sistema mostra tela Detalhes do processo.
 
-3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para aceitação em bloco do mapa de competências (de acordo com as pré-condições).
+3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para aceitação em bloco do mapa de
+   competências (de acordo com as pré-condições).
 
-4. Na seção de unidades participantes, abaixo da árvore de unidades, sistema mostra o botão `Aceitar mapa de competências em bloco`.
+4. Na seção de unidades participantes, abaixo da árvore de unidades, sistema mostra o botão
+   `Aceitar mapa de competências em bloco`.
 
 5. O usuário clica no botão `Aceitar mapa de competências em bloco`.
 
 6. O sistema abre modal de confirmação, com os elementos a seguir:
-   - Título "Aceite de mapa em bloco";
-   - Texto "Selecione abaixo as unidades cujos mapas deverão ser aceitos:";
-   - Lista das unidades operacionais ou interoperacionais subordinadas cujos mapas poderão ser aceitos, sendo apresentados, para cada unidade, um checkbox (selecionado por padrão), a sigla e o nome; e
-   - Botão `Cancelar` e botão `Registrar aceite`.
+    - Título "Aceite de mapa em bloco";
+    - Texto "Selecione abaixo as unidades cujos mapas deverão ser aceitos:";
+    - Lista das unidades operacionais ou interoperacionais subordinadas cujos mapas poderão ser aceitos, sendo
+      apresentados, para cada unidade, um checkbox (selecionado por padrão), a sigla e o nome; e
+    - Botão `Cancelar` e botão `Registrar aceite`.
 
-7. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do processo.
+7. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do
+   processo.
 
 8. O usuário clica em `Registrar aceite`.
 

@@ -25,34 +25,34 @@ Esta abordagem, embora simples, traz **problemas graves**:
 ### Problemas de Expor Entidades JPA Diretamente
 
 1. **Lazy Loading Issues**
-   - Jackson tenta serializar relações lazy (`@OneToMany`, `@ManyToOne`)
-   - Lança `LazyInitializationException` fora da transação
-   - Solução comum: `@JsonIgnore` polui entidades com concerns de API
+    - Jackson tenta serializar relações lazy (`@OneToMany`, `@ManyToOne`)
+    - Lança `LazyInitializationException` fora da transação
+    - Solução comum: `@JsonIgnore` polui entidades com concerns de API
 
 2. **Vazamento de Dados Internos**
-   - Campos técnicos expostos (versão, timestamps internos)
-   - Relacionamentos bidirecionais causam referências cíclicas
-   - Difícil controlar o que é exposto (tudo ou nada)
+    - Campos técnicos expostos (versão, timestamps internos)
+    - Relacionamentos bidirecionais causam referências cíclicas
+    - Difícil controlar o que é exposto (tudo ou nada)
 
 3. **Acoplamento Cliente-Servidor**
-   - Mudança no modelo de dados quebra clientes
-   - Impossível ter diferentes views dos mesmos dados
-   - Evolução do schema de BD impacta APIs
+    - Mudança no modelo de dados quebra clientes
+    - Impossível ter diferentes views dos mesmos dados
+    - Evolução do schema de BD impacta APIs
 
 4. **Segurança**
-   - Risco de mass assignment (aceitar campos não desejados)
-   - Difícil ocultar dados sensíveis seletivamente
-   - Dificulta auditoria de quais dados foram acessados
+    - Risco de mass assignment (aceitar campos não desejados)
+    - Difícil ocultar dados sensíveis seletivamente
+    - Dificulta auditoria de quais dados foram acessados
 
 5. **Performance**
-   - Impossível otimizar queries (sempre carrega tudo)
-   - Difícil fazer projeções customizadas
-   - N+1 queries inevitáveis
+    - Impossível otimizar queries (sempre carrega tudo)
+    - Difícil fazer projeções customizadas
+    - N+1 queries inevitáveis
 
 6. **Validação**
-   - Validações de entrada misturadas com regras de persistência
-   - Bean Validation em entidades afeta ambos leitura e escrita
-   - Difícil ter regras diferentes para criação vs. atualização
+    - Validações de entrada misturadas com regras de persistência
+    - Bean Validation em entidades afeta ambos leitura e escrita
+    - Difícil ter regras diferentes para criação vs. atualização
 
 ## Decisão
 
@@ -88,12 +88,12 @@ Esta abordagem, embora simples, traz **problemas graves**:
    ```
 
 2. **Code Review**
-   - Checklist: "Controller retorna DTOs?"
-   - Aprovação automática bloqueada se entidades expostas
+    - Checklist: "Controller retorna DTOs?"
+    - Aprovação automática bloqueada se entidades expostas
 
 3. **Convenções de Nomenclatura**
-   - DTOs devem terminar com `Dto`, `Req`, `Request`, `Resp`, `Response`
-   - Facilita identificação visual
+    - DTOs devem terminar com `Dto`, `Req`, `Request`, `Resp`, `Response`
+    - Facilita identificação visual
 
 ## Tipos de DTOs
 
@@ -102,11 +102,13 @@ Esta abordagem, embora simples, traz **problemas graves**:
 Usados em `@RequestBody` de POST/PUT/PATCH.
 
 **Características:**
+
 - Mutáveis (setters para deserialização JSON)
 - Validados com Bean Validation
 - Específicos para cada operação (evitar DTOs genéricos)
 
 **Exemplo:**
+
 ```java
 public class AceitarCadastroReq {
     @NotBlank(message = "Parecer é obrigatório")
@@ -120,6 +122,7 @@ public class AceitarCadastroReq {
 ```
 
 **Nomenclatura:**
+
 - `Req` (curto): Para operações simples
 - `Request` (longo): Para operações complexas
 - Sufixo descritivo: `AceitarCadastroReq`, `AlterarDataLimiteRequest`
@@ -129,11 +132,13 @@ public class AceitarCadastroReq {
 Usados como retorno de `@GetMapping` ou `ResponseEntity<Dto>`.
 
 **Características:**
+
 - Imutáveis preferencialmente (usar Java Records quando possível)
 - SEM validações (dados já validados)
 - Podem ter campos calculados (permissões, flags)
 
 **Exemplo com Record:**
+
 ```java
 public record SubprocessoDto(
     Long codigo,
@@ -147,6 +152,7 @@ public record SubprocessoDto(
 ```
 
 **Exemplo com Classe (para DTOs complexos):**
+
 ```java
 public class SubprocessoDetalheDto {
     private final Long codigo;
@@ -160,6 +166,7 @@ public class SubprocessoDetalheDto {
 ```
 
 **Nomenclatura:**
+
 - `Dto` (genérico): Dados básicos
 - `DetalheDto`: Dados completos com relacionamentos
 - `VisualizacaoDto`: Dados formatados para exibição
@@ -170,11 +177,13 @@ public class SubprocessoDetalheDto {
 DTOs que servem tanto para entrada quanto saída.
 
 **Quando usar:**
+
 - ⚠️ RARAMENTE
 - Apenas para operações CRUD muito simples
 - Quando estrutura de entrada = estrutura de saída
 
 **Problema:**
+
 - Mistura validações de entrada com dados de saída
 - Dificulta evolução independente
 - Confunde responsabilidades
@@ -188,11 +197,13 @@ DTOs que servem tanto para entrada quanto saída.
 Geração de código de mapeamento em tempo de compilação.
 
 **Vantagens:**
+
 - Performance (sem reflection)
 - Segurança de tipos (erros em compile-time)
 - Geração automática de código boilerplate
 
 **Exemplo:**
+
 ```java
 @Mapper(componentModel = "spring")
 public interface SubprocessoMapper {
@@ -211,6 +222,7 @@ public interface SubprocessoMapper {
 ```
 
 **Mapeamentos Customizados:**
+
 ```java
 @Mapper(componentModel = "spring", uses = {AccessControlService.class})
 public interface SubprocessoDetalheMapper {
@@ -227,7 +239,7 @@ public interface SubprocessoDetalheMapper {
     ) {
         return new SubprocessoPermissoesDto(
             accessControl.podeExecutar(usuario, EDITAR_CADASTRO, sp),
-            accessControl.podeExecutar(usuario, VALIDAR_MAPA, sp),
+            accessControl.podeExecutar(usuario, VALIDAR_MAPA, sp)
             // ... outras permissões
         );
     }
@@ -237,11 +249,13 @@ public interface SubprocessoDetalheMapper {
 ### Mapeamento Manual (Casos Específicos)
 
 Quando MapStruct não é suficiente:
+
 - Lógica complexa de transformação
 - Agregação de múltiplas entidades
 - Cálculos pesados
 
 **Exemplo:**
+
 ```java
 @Service
 public class SubprocessoDetalheService {
@@ -373,6 +387,7 @@ public class CriarProcessoReq {
 ```
 
 **Ativação no Controller:**
+
 ```java
 @PostMapping
 public ResponseEntity<ProcessoDto> criar(@RequestBody @Valid CriarProcessoReq request) {
@@ -382,6 +397,7 @@ public ResponseEntity<ProcessoDto> criar(@RequestBody @Valid CriarProcessoReq re
 ```
 
 **Validações Customizadas:**
+
 ```java
 @Constraint(validatedBy = DataLimiteValidator.class)
 @Target({ElementType.FIELD})
@@ -430,6 +446,7 @@ public void aceitarCadastro(Subprocesso sp, String parecer) {
 ### 1. Mass Assignment Protection
 
 **Problema:**
+
 ```java
 // ❌ Vulnerável: Cliente pode enviar campos não desejados
 @PutMapping("/{id}")
@@ -441,6 +458,7 @@ public Subprocesso atualizar(@PathVariable Long id, @RequestBody Subprocesso sp)
 ```
 
 **Solução com DTOs:**
+
 ```java
 // ✅ Seguro: DTO define exatamente o que é aceito
 public class AtualizarSubprocessoReq {
@@ -459,6 +477,7 @@ public SubprocessoDto atualizar(@PathVariable Long id, @RequestBody @Valid Atual
 ### 2. Dados Sensíveis
 
 **Problema:**
+
 ```java
 @Entity
 public class Usuario {
@@ -468,6 +487,7 @@ public class Usuario {
 ```
 
 **Solução com DTOs:**
+
 ```java
 // DTO omite campos sensíveis
 public record UsuarioDto(
@@ -501,6 +521,7 @@ public record SubprocessoPermissoesDto(
 ```
 
 Frontend usa permissões para mostrar/esconder botões:
+
 ```typescript
 if (subprocesso.permissoes.podeEditar) {
     // Mostrar botão "Editar"
@@ -573,69 +594,73 @@ sgc/
 ### Vantagens ✅
 
 1. **Desacoplamento**
-   - Evolução independente de API e modelo de dados
-   - Frontend não quebra com mudanças no BD
-   - Versioning de API facilitado
+    - Evolução independente de API e modelo de dados
+    - Frontend não quebra com mudanças no BD
+    - Versioning de API facilitado
 
 2. **Segurança**
-   - Mass assignment protection automático
-   - Controle fino de dados expostos
-   - Ocultação de campos sensíveis
+    - Mass assignment protection automático
+    - Controle fino de dados expostos
+    - Ocultação de campos sensíveis
 
 3. **Performance**
-   - Queries otimizadas (apenas dados necessários)
-   - Evita lazy loading issues
-   - Projeções customizadas
+    - Queries otimizadas (apenas dados necessários)
+    - Evita lazy loading issues
+    - Projeções customizadas
 
 4. **Clareza**
-   - API autodocumentada (DTOs descrevem contratos)
-   - Separação clara entrada/saída
-   - Facilita geração de documentação (Swagger)
+    - API autodocumentada (DTOs descrevem contratos)
+    - Separação clara entrada/saída
+    - Facilita geração de documentação (Swagger)
 
 5. **Testabilidade**
-   - Fácil mockar DTOs
-   - Testes de contrato de API simplificados
-   - Validações testáveis isoladamente
+    - Fácil mockar DTOs
+    - Testes de contrato de API simplificados
+    - Validações testáveis isoladamente
 
 ### Desvantagens ⚠️
 
 1. **Duplicação de Código**
-   - DTO + Entidade + Mapper para cada recurso
-   - Mais arquivos para manter
-   - **Mitigação**: MapStruct reduz boilerplate
+    - DTO + Entidade + Mapper para cada recurso
+    - Mais arquivos para manter
+    - **Mitigação**: MapStruct reduz boilerplate
 
 2. **Overhead de Mapeamento**
-   - Conversão Entidade ↔ DTO em toda requisição
-   - **Mitigação**: MapStruct gera código eficiente (< 1ms)
+    - Conversão Entidade ↔ DTO em toda requisição
+    - **Mitigação**: MapStruct gera código eficiente (< 1ms)
 
 3. **Curva de Aprendizado**
-   - Novos desenvolvedores precisam entender padrão
-   - **Mitigação**: Documentação + exemplos + code review
+    - Novos desenvolvedores precisam entender padrão
+    - **Mitigação**: Documentação + exemplos + code review
 
 ## Alternativas Consideradas
 
 ### Alternativa 1: Expor Entidades JPA (❌ Rejeitada)
+
 - **Prós**: Simples, menos código
 - **Contras**: Todos os problemas listados no Contexto
 - **Motivo da Rejeição**: Inseguro, não escalável
 
 ### Alternativa 2: JsonView (❌ Rejeitada)
+
 - **Prós**: Controle de serialização sem DTOs
-- **Contras**: 
-  - Polui entidades com anotações de API
-  - Difícil manter múltiplas views
-  - Não resolve mass assignment
+- **Contras**:
+    - Polui entidades com anotações de API
+    - Difícil manter múltiplas views
+    - Não resolve mass assignment
 - **Motivo da Rejeição**: Acoplamento alto
 
 ### Alternativa 3: GraphQL (❌ Não Aplicável)
+
 - **Prós**: Cliente escolhe campos
-- **Contras**: 
-  - Mudança radical de arquitetura
-  - Complexidade adicional
-  - Time não familiarizado
+- **Contras**:
+    - Mudança radical de arquitetura
+    - Complexidade adicional
+    - Time não familiarizado
 - **Motivo da Rejeição**: Over-engineering para o contexto
 
 ### Alternativa 4: DTOs Obrigatórios (✅ ESCOLHIDA)
+
 - **Prós**: Seguro, flexível, testável, performático
 - **Contras**: Mais código (mitigado por MapStruct)
 - **Motivo da Escolha**: Melhor práticas da indústria
@@ -645,12 +670,14 @@ sgc/
 ### Status: ✅ 100% IMPLEMENTADO
 
 **Desde v1.0:**
+
 - ✅ 100% dos controllers usam DTOs
 - ✅ 0 entidades JPA expostas
 - ✅ Mappers implementados com MapStruct
 - ✅ Testes arquiteturais (ArchUnit) garantem aderência
 
 **Evidências:**
+
 ```bash
 # Verificar que nenhum controller expõe entidades
 grep -r "@Entity" backend/src/main/java/sgc/**/controller/*.java
@@ -660,6 +687,7 @@ grep -r "@Entity" backend/src/main/java/sgc/**/controller/*.java
 ### Arquivos Relacionados
 
 **DTOs (150+ arquivos):**
+
 - `sgc.processo.dto.*`
 - `sgc.subprocesso.dto.*`
 - `sgc.mapa.dto.*`
@@ -667,44 +695,50 @@ grep -r "@Entity" backend/src/main/java/sgc/**/controller/*.java
 - ... (outros módulos)
 
 **Mappers (30+ arquivos):**
+
 - `sgc.processo.mapper.*`
 - `sgc.subprocesso.mapper.*`
 - `sgc.mapa.mapper.*`
 - ... (outros módulos)
 
 **Testes Arquiteturais:**
+
 - `ArchConsistencyTest.controllersNaoDevemRetornarEntidades()`
 - `ArchConsistencyTest.dtosNaoDevemSerEntidades()`
 
 ## Métricas
 
-| Métrica | Valor |
-|---------|-------|
-| DTOs criados | 150+ |
-| Mappers MapStruct | 30+ |
-| Entidades JPA expostas | 0 |
-| Cobertura de mapeamento | 100% |
-| Testes de DTO | 200+ |
+| Métrica                      | Valor |
+|------------------------------|-------|
+| DTOs criados                 | 150+  |
+| Mappers MapStruct            | 30+   |
+| Entidades JPA expostas       | 0     |
+| Cobertura de mapeamento      | 100%  |
+| Testes de DTO                | 200+  |
 | Overhead médio de mapeamento | < 1ms |
 
 ## Referências
 
 ### Documentos Relacionados
+
 - [ADR-001: Facade Pattern](ADR-001-facade-pattern.md) - Facades usam DTOs
 - [ADR-003: Security Architecture](ADR-003-security-architecture.md) - Segurança com DTOs
 - `/regras/backend-padroes.md` - Padrões de DTOs
 - `/AGENTS.md` - Convenções de DTOs
 
 ### Código de Referência
+
 - `sgc.processo.dto` - Pacote completo de DTOs de processo
 - `sgc.subprocesso.mapper.SubprocessoDetalheMapper` - Mapper complexo
 - `sgc.mapa.dto.ImpactoMapaDto` - DTO de análise complexa
 
 ### Padrões Externos
+
 - Martin Fowler - DTO Pattern: https://martinfowler.com/eaaCatalog/dataTransferObject.html
 - MapStruct Documentation: https://mapstruct.org
 - Jakarta Bean Validation: https://beanvalidation.org
-- OWASP - Mass Assignment: https://owasp.org/API-Security/editions/2023/en/0xa6-unrestricted-access-to-sensitive-business-flows/
+- OWASP - Mass
+  Assignment: https://owasp.org/API-Security/editions/2023/en/0xa6-unrestricted-access-to-sensitive-business-flows/
 
 ---
 

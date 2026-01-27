@@ -29,13 +29,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("AlertaController")
 class AlertaControllerTest {
 
+    private static final String TITULO_TESTE = "12345678901"; // 11 ou 12 dígitos
     @Autowired
     private MockMvc mockMvc;
-
     @MockitoBean
     private AlertaFacade alertaService;
-
-    private static final String TITULO_TESTE = "12345678901"; // 11 ou 12 dígitos
 
     @Test
     @DisplayName("marcarComoLidos_quandoSucesso_deveRetornarOk")

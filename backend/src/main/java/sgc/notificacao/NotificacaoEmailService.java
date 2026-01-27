@@ -19,8 +19,7 @@ import java.util.regex.Pattern;
 @Slf4j
 @Profile("!test & !e2e")
 public class NotificacaoEmailService {
-    private static final Pattern PADRAO_EMAIL =
-            Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    private static final Pattern PADRAO_EMAIL = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
     private final NotificacaoRepo repositorioNotificacao;
     private final NotificacaoEmailAsyncExecutor emailExecutor;
@@ -28,7 +27,8 @@ public class NotificacaoEmailService {
     /**
      * Envia um email de texto simples.
      *
-     * <p>O processo de envio é assíncrono e inclui retentativas.
+     * <p>
+     * O processo de envio é assíncrono e inclui retentativas.
      *
      * @param para    O endereço de email do destinatário.
      * @param assunto O assunto do email.
@@ -42,7 +42,8 @@ public class NotificacaoEmailService {
     /**
      * Envia um email com conteúdo HTML.
      *
-     * <p>O processo de envio é assíncrono e inclui retentativas.
+     * <p>
+     * O processo de envio é assíncrono e inclui retentativas.
      *
      * @param para      O endereço de email do destinatário.
      * @param assunto   O assunto do email.
@@ -55,9 +56,9 @@ public class NotificacaoEmailService {
 
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private void processarEnvioDeEmail(EmailDto emailDto) {
-        if (!isEmailValido(emailDto.getDestinatario())) {
+        if (!isEmailValido(emailDto.destinatario())) {
             log.error(
-                    "Endereço de e-mail inválido, envio cancelado: {}", emailDto.getDestinatario());
+                    "Endereço de e-mail inválido, envio cancelado: {}", emailDto.destinatario());
             return;
         }
 
@@ -67,24 +68,24 @@ public class NotificacaoEmailService {
             log.info(
                     "Notificação persistida no banco - Código: {}, Destinatário: {}",
                     notificacao.getCodigo(),
-                    emailDto.getDestinatario());
+                    emailDto.destinatario());
 
             emailExecutor.enviarEmailAssincrono(emailDto)
                     .thenAccept(
                             sucesso -> {
-                                if (sucesso) {
-                                    log.info("E-mail para {} enviado.", emailDto.getDestinatario());
+                                if (Boolean.TRUE.equals(sucesso)) {
+                                    log.info("E-mail para {} enviado.", emailDto.destinatario());
                                 } else {
                                     log.error(
                                             "Falha ao enviar e-mail para {} após tentativas.",
-                                            emailDto.getDestinatario());
+                                            emailDto.destinatario());
                                 }
                             })
                     .exceptionally(
                             ex -> {
                                 log.error(
                                         "Erro inesperado ao enviar e-mail para: {}",
-                                        emailDto.getDestinatario(),
+                                        emailDto.destinatario(),
                                         ex);
                                 return null;
                             });
@@ -92,7 +93,7 @@ public class NotificacaoEmailService {
         } catch (RuntimeException e) {
             log.error(
                     "Erro ao processar notificação para {}: {}",
-                    emailDto.getDestinatario(),
+                    emailDto.destinatario(),
                     e.getMessage(),
                     e);
         }
@@ -101,10 +102,9 @@ public class NotificacaoEmailService {
     private Notificacao criarEntidadeNotificacao(EmailDto emailDto) {
         Notificacao notificacao = new Notificacao();
         notificacao.setDataHora(LocalDateTime.now());
-        String conteudo =
-                String.format(
-                        "Para: %s | Assunto: %s | Corpo: %s",
-                        emailDto.getDestinatario(), emailDto.getAssunto(), emailDto.getCorpo());
+        String conteudo = String.format(
+                "Para: %s | Assunto: %s | Corpo: %s",
+                emailDto.destinatario(), emailDto.assunto(), emailDto.corpo());
         final int limite = 500;
         if (conteudo.length() > limite) {
             conteudo = "%s...".formatted(conteudo.substring(0, limite - 3));

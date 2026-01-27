@@ -20,9 +20,9 @@ public class AccessAuditService {
 
     /**
      * Registra um acesso concedido.
-     * 
+     *
      * @param usuario O usuário que teve acesso concedido
-     * @param acao A ação que foi autorizada
+     * @param acao    A ação que foi autorizada
      * @param recurso O recurso acessado
      */
     public void logAccessGranted(Usuario usuario, Acao acao, Object recurso) {
@@ -36,11 +36,11 @@ public class AccessAuditService {
 
     /**
      * Registra um acesso negado.
-     * 
+     *
      * @param usuario O usuário que teve acesso negado
-     * @param acao A ação que foi negada
+     * @param acao    A ação que foi negada
      * @param recurso O recurso que foi tentado acessar
-     * @param motivo O motivo da negação
+     * @param motivo  O motivo da negação
      */
     public void logAccessDenied(Usuario usuario, Acao acao, Object recurso, String motivo) {
         log.warn("ACCESS_DENIED: user={}, action={}, resource={}, reason={}, timestamp={}",
@@ -50,14 +50,14 @@ public class AccessAuditService {
                 motivo,
                 Instant.now()
         );
-        
+
         // Futura implementação: persistir em tabela de auditoria
         // auditRepo.save(new AuditRecord(...));
     }
 
     /**
      * Obtém um identificador do recurso para logging.
-     * 
+     *
      * @param recurso O recurso acessado
      * @return String identificadora do recurso
      */

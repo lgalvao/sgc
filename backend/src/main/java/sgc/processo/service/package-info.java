@@ -1,13 +1,13 @@
 /**
  * Módulo de Processos - Serviços de lógica de negócio.
- * 
+ *
  * <h2>Visão Geral</h2>
  * <p>Este pacote contém os serviços que implementam a lógica de negócio do módulo de processos.
  * Processos são orquestradores de alto nível que coordenam múltiplos subprocessos em diferentes
  * unidades organizacionais.</p>
- * 
+ *
  * <h2>Arquitetura de Services</h2>
- * 
+ *
  * <h3>Facade (Public API)</h3>
  * <ul>
  *   <li>{@link sgc.processo.service.ProcessoFacade} - Ponto de entrada único para todas as operações de processo
@@ -19,7 +19,7 @@
  *       </ul>
  *   </li>
  * </ul>
- * 
+ *
  * <h3>Services Especializados</h3>
  * <ul>
  *   <li>{@code ProcessoConsultaService} - Consultas especializadas e relatórios
@@ -63,9 +63,9 @@
  *       </ul>
  *   </li>
  * </ul>
- * 
+ *
  * <h2>Fluxo de Uso</h2>
- * 
+ *
  * <h3>1. Criar Processo</h3>
  * <pre>{@code
  * // Controller
@@ -73,18 +73,18 @@
  * public ProcessoDto criar(@RequestBody ProcessoDto dto) {
  *     return facade.criar(dto);
  * }
- * 
+ *
  * // Facade
  * public ProcessoDto criar(ProcessoDto dto) {
  *     // Valida unidades
  *     processoValidador.getMensagemErroUnidadesSemMapa(...);
- *     
+ *
  *     Processo processo = mapper.toEntity(dto);
  *     Processo salvo = repo.save(processo);
  *     return mapper.toDto(salvo);
  * }
  * }</pre>
- * 
+ *
  * <h3>2. Iniciar Processo</h3>
  * <pre>{@code
  * // Controller
@@ -92,26 +92,26 @@
  * public void iniciar(@PathVariable Long id) {
  *     facade.iniciar(id, getCurrentUser());
  * }
- * 
+ *
  * // Facade
  * public void iniciar(Long id, Usuario usuario) {
  *     processoInicializador.inicializar(processo);
  *     eventPublisher.publishEvent(new EventoProcessoIniciado(id));
  * }
- * 
+ *
  * // Inicializador
  * void inicializar(Processo processo) {
  *     // Cria subprocessos para todas as unidades
  *     List<Unidade> unidades = unidadeService.listarAtivas();
- *     unidades.forEach(unidade -> 
+ *     unidades.forEach(unidade ->
  *         subprocessoService.criar(processo, unidade)
  *     );
- *     
+ *
  *     processo.setSituacao(EM_ANDAMENTO);
  *     repo.save(processo);
  * }
  * }</pre>
- * 
+ *
  * <h3>3. Finalizar Processo</h3>
  * <pre>{@code
  * facade.finalizar(id, usuario);
@@ -120,16 +120,16 @@
  * // - Publica mapas finalizados
  * // - Muda situação para FINALIZADO
  * }</pre>
- * 
+ *
  * <h2>Tipos de Processo</h2>
- * 
+ *
  * <h3>MAPEAMENTO (Inicial)</h3>
  * <ul>
  *   <li>Primeiro mapeamento de competências da organização</li>
  *   <li>Unidades criam mapas do zero</li>
  *   <li>Fluxo: Cadastro → Validação → Homologação</li>
  * </ul>
- * 
+ *
  * <h3>REVISAO (Atualização)</h3>
  * <ul>
  *   <li>Atualização de mapas existentes</li>
@@ -137,14 +137,14 @@
  *   <li>Detecta impactos de mudanças</li>
  *   <li>Fluxo: Revisão Cadastro → Validação → Homologação</li>
  * </ul>
- * 
+ *
  * <h2>Estados do Processo (SituacaoProcesso)</h2>
  * <ul>
  *   <li><strong>NAO_INICIADO:</strong> Processo criado mas não iniciado</li>
  *   <li><strong>EM_ANDAMENTO:</strong> Subprocessos sendo executados</li>
  *   <li><strong>FINALIZADO:</strong> Todos os subprocessos concluídos</li>
  * </ul>
- * 
+ *
  * <h2>Responsabilidades do ProcessoFacade</h2>
  * <ul>
  *   <li>✅ CRUD de processos (criar, atualizar, excluir)</li>
@@ -155,7 +155,7 @@
  *   <li>✅ Verificar acesso (delega para ProcessoAcessoService)</li>
  *   <li>❌ NÃO gerencia workflows de subprocessos (responsabilidade de SubprocessoFacade)</li>
  * </ul>
- * 
+ *
  * <h2>Dependências</h2>
  * <p>Services deste pacote dependem de:</p>
  * <ul>
@@ -165,14 +165,14 @@
  *   <li><strong>sgc.notificacao:</strong> NotificacaoEmailService (envio de lembretes)</li>
  *   <li><strong>sgc.mapa:</strong> MapaService (cópia de mapas de referência)</li>
  * </ul>
- * 
+ *
  * <h2>Eventos de Domínio</h2>
  * <p>Este módulo publica eventos para comunicação assíncrona:</p>
  * <ul>
  *   <li>{@link sgc.processo.eventos.EventoProcessoIniciado} - Quando processo é iniciado</li>
  *   <li>{@link sgc.processo.eventos.EventoProcessoFinalizado} - Quando processo é finalizado</li>
  * </ul>
- * 
+ *
  * <h2>Segurança</h2>
  * <p>Ações permitidas apenas para <strong>ADMIN</strong>:</p>
  * <ul>
@@ -183,7 +183,7 @@
  *   <li>Finalizar processo</li>
  *   <li>Enviar lembretes</li>
  * </ul>
- * 
+ *
  * <h2>Métricas Atuais (Pós-Refatoração P4)</h2>
  * <ul>
  *   <li><strong>Facade:</strong> ProcessoFacade (340 linhas, antes: 530)</li>
@@ -192,7 +192,7 @@
  *   <li><strong>Testes:</strong> 50+ testes (cobertura ~90%)</li>
  *   <li><strong>Visibilidade:</strong> Facade public, services package-private (ideal)</li>
  * </ul>
- * 
+ *
  * <h2>Diferenças em Relação a Subprocesso</h2>
  * <table>
  *   <tr>
@@ -226,14 +226,14 @@
  *     <td>Complexo (cadastro + validação + homologação)</td>
  *   </tr>
  * </table>
- * 
+ *
+ * @author Sistema SGC
+ * @version 2.1 - Refatoração P4 (2026-01-11)
  * @see sgc.processo.service.ProcessoFacade
  * @see sgc.subprocesso.service.SubprocessoFacade
  * @see sgc.processo.model.Processo
  * @see sgc.processo.model.TipoProcesso
  * @see sgc.processo.model.SituacaoProcesso
- * @author Sistema SGC
- * @version 2.1 - Refatoração P4 (2026-01-11)
  * @since 1.0
  */
 @NullMarked

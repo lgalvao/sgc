@@ -125,10 +125,10 @@
  * <pre>{@code
  * public SubprocessoDetalheDto buscarDetalhes(Long codigo, Usuario usuario) {
  *     Subprocesso subprocesso = subprocessoRepo.findById(codigo).orElseThrow(...);
- *     
+ *
  *     // Verifica permissões
  *     accessControlService.verificarPermissao(usuario, VISUALIZAR_SUBPROCESSO, subprocesso);
- *     
+ *
  *     // Monta DTO com mapper
  *     return subprocessoDetalheMapper.toDto(subprocesso, usuario);
  * }
@@ -150,10 +150,10 @@
  *   <li>/regras/backend-padroes.md - Convenções de DTOs</li>
  * </ul>
  *
- * @since 1.0
  * @see sgc.subprocesso.mapper
  * @see sgc.subprocesso.service.SubprocessoFacade
  * @see sgc.processo.dto
+ * @since 1.0
  */
 @NullMarked
 package sgc.subprocesso.dto;

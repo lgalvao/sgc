@@ -1,16 +1,15 @@
 package sgc.subprocesso.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
-import lombok.Getter;
-import sgc.seguranca.sanitizacao.SanitizarHtml;
 
-@Getter
+/**
+ * DTO para requisição de reabertura de processo (CDU-05 item 15).
+ */
 @Builder
-@AllArgsConstructor
-public class ReabrirProcessoRequest {
-    @NotBlank(message = "A justificativa é obrigatória")
-    @SanitizarHtml
-    private final String justificativa;
+public record ReabrirProcessoRequest(
+                /**
+                 * Justificativa para a reabertura do processo.
+                 */
+                @Size(max = 500, message = "Justificativa deve ter no máximo 500 caracteres") String justificativa) {
 }

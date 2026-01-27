@@ -24,9 +24,12 @@ class CopiaMapaServiceCoverageTest {
     @InjectMocks
     private CopiaMapaService copiaMapaService;
 
-    @Mock private MapaRepo repositorioMapa;
-    @Mock private AtividadeRepo atividadeRepo;
-    @Mock private CompetenciaRepo competenciaRepo;
+    @Mock
+    private MapaRepo repositorioMapa;
+    @Mock
+    private AtividadeRepo atividadeRepo;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
 
     @Test
     @DisplayName("Deve lidar com mapa de origem sem atividades ou competências")
@@ -34,17 +37,17 @@ class CopiaMapaServiceCoverageTest {
         Long codOrigem = 1L;
         Mapa fonte = new Mapa();
         fonte.setCodigo(codOrigem);
-        
+
         when(repositorioMapa.findById(codOrigem)).thenReturn(Optional.of(fonte));
         when(repositorioMapa.save(any(Mapa.class))).thenAnswer(i -> i.getArgument(0));
-        
+
         // Cobre line 84 (atividadesFonte.isEmpty())
         when(atividadeRepo.findWithConhecimentosByMapaCodigo(codOrigem)).thenReturn(List.of());
         // Cobre line 129 (competenciasFonte.isEmpty())
         when(competenciaRepo.findByMapaCodigo(codOrigem)).thenReturn(List.of());
 
         Mapa novo = copiaMapaService.copiarMapaParaUnidade(codOrigem);
-        
+
         assertThat(novo).isNotNull();
         verify(atividadeRepo, never()).saveAll(anyList());
         verify(competenciaRepo, never()).saveAll(anyList());
@@ -55,13 +58,13 @@ class CopiaMapaServiceCoverageTest {
     void deveImportarAtividadesApenasSeNaoVazias() {
         Long origem = 1L;
         Long destino = 2L;
-        
+
         when(atividadeRepo.findWithConhecimentosByMapaCodigo(origem)).thenReturn(List.of());
         when(atividadeRepo.findByMapaCodigo(destino)).thenReturn(List.of());
         when(repositorioMapa.findById(destino)).thenReturn(Optional.of(new Mapa()));
 
         copiaMapaService.importarAtividadesDeOutroMapa(origem, destino);
-        
+
         verify(atividadeRepo, never()).saveAll(anyList());
     }
 
@@ -71,26 +74,26 @@ class CopiaMapaServiceCoverageTest {
         Long codOrigem = 1L;
         Mapa fonte = new Mapa();
         fonte.setCodigo(codOrigem);
-        
+
         when(repositorioMapa.findById(codOrigem)).thenReturn(Optional.of(fonte));
         when(repositorioMapa.save(any(Mapa.class))).thenAnswer(i -> i.getArgument(0));
-        
+
         Atividade a1 = new Atividade();
         a1.setCodigo(10L);
         a1.setDescricao("A1");
-        
+
         when(atividadeRepo.findWithConhecimentosByMapaCodigo(codOrigem)).thenReturn(List.of(a1));
-        
+
         Competencia c1 = new Competencia();
         c1.setDescricao("C1");
         Atividade a2 = new Atividade(); // Atividade que NAO esta na lista original
         a2.setCodigo(99L);
         c1.setAtividades(Set.of(a2));
-        
+
         when(competenciaRepo.findByMapaCodigo(codOrigem)).thenReturn(List.of(c1));
 
         copiaMapaService.copiarMapaParaUnidade(codOrigem);
-        
+
         // Verifica que salvou a competencia mas sem atividades (pois a2 nao foi copiada)
         verify(competenciaRepo).saveAll(argThat(list -> {
             Competencia comp = list.iterator().next();

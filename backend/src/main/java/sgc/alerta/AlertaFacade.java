@@ -166,18 +166,18 @@ public class AlertaFacade {
     public void marcarComoLidos(String usuarioTitulo, List<Long> alertaCodigos) {
         Usuario usuario = usuarioService.buscarPorId(usuarioTitulo);
         LocalDateTime agora = LocalDateTime.now();
-        
+
         for (Long codigo : alertaCodigos) {
             AlertaUsuario.Chave chave = AlertaUsuario.Chave.builder()
                     .alertaCodigo(codigo)
                     .usuarioTitulo(usuarioTitulo)
                     .build();
-            
+
             AlertaUsuario alertaUsuario = alertaUsuarioRepo.findById(chave)
                     .orElseGet(() -> {
                         Alerta alerta = alertaRepo.findById(codigo).orElse(null);
                         if (alerta == null) {
-                            return null; 
+                            return null;
                         }
                         AlertaUsuario novo = new AlertaUsuario();
                         novo.setId(chave);
@@ -185,7 +185,7 @@ public class AlertaFacade {
                         novo.setUsuario(usuario);
                         return novo;
                     });
-            
+
             // Persists read timestamp if alert was unread
             if (alertaUsuario != null && alertaUsuario.getDataHoraLeitura() == null) {
                 alertaUsuario.setDataHoraLeitura(agora);

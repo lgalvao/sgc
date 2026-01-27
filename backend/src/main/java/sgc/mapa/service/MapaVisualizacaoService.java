@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 /**
  * Service especializado para visualização de mapas de competências.
- * 
+ *
  * <p><b>IMPORTANTE:</b> Este serviço deve ser acessado APENAS via {@link MapaFacade}.
  * Controllers não devem injetar este serviço diretamente.
  */

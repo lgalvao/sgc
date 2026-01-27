@@ -1,18 +1,24 @@
 package sgc.organizacao.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import sgc.organizacao.model.Perfil;
 
 /**
- * DTO para perfil de usuário em uma unidade.
+ * DTO para representação de perfil com dados de usuário e unidade.
  */
-@Getter
 @Builder
-@AllArgsConstructor
-public class PerfilDto {
-    private final String usuarioTitulo;
-    private final Long unidadeCodigo;
-    private final String unidadeNome;
-    private final String perfil; // ADMIN, GESTOR, CHEFE, SERVIDOR
+public record PerfilDto(
+                String usuarioTitulo,
+                Long unidadeCodigo,
+                String unidadeNome,
+                String perfil,
+                String descricao) {
+
+        /**
+         * Construtor alternativo para criar PerfilDto apenas a partir de um Perfil
+         * (enum).
+         */
+        public static PerfilDto from(Perfil perfil) {
+                return new PerfilDto(null, null, null, perfil.name(), perfil.name());
+        }
 }

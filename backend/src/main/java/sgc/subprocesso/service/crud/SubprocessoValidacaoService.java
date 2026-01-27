@@ -58,8 +58,8 @@ public class SubprocessoValidacaoService {
         }
 
         List<Atividade> atividadesSemConhecimento = atividades.stream()
-            .filter(a -> a.getConhecimentos().isEmpty())
-            .toList();
+                .filter(a -> a.getConhecimentos().isEmpty())
+                .toList();
 
         if (!atividadesSemConhecimento.isEmpty()) {
             throw new ErroValidacao("Todas as atividades devem possuir conhecimentos vinculados. Verifique as atividades pendentes.");
@@ -69,9 +69,9 @@ public class SubprocessoValidacaoService {
     public void validarAssociacoesMapa(Long mapaId) {
         List<Competencia> competencias = competenciaService.buscarPorCodMapa(mapaId);
         List<String> competenciasSemAssociacao = competencias.stream()
-            .filter(c -> c.getAtividades().isEmpty())
-            .map(Competencia::getDescricao)
-            .toList();
+                .filter(c -> c.getAtividades().isEmpty())
+                .map(Competencia::getDescricao)
+                .toList();
 
         if (!competenciasSemAssociacao.isEmpty()) {
             throw new ErroValidacao(
@@ -81,9 +81,9 @@ public class SubprocessoValidacaoService {
 
         List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(mapaId);
         List<String> atividadesSemAssociacao = atividades.stream()
-            .filter(a -> a.getCompetencias().isEmpty())
-            .map(Atividade::getDescricao)
-            .toList();
+                .filter(a -> a.getCompetencias().isEmpty())
+                .map(Atividade::getDescricao)
+                .toList();
 
         if (!atividadesSemAssociacao.isEmpty()) {
             throw new ErroValidacao(

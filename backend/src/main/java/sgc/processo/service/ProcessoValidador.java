@@ -21,10 +21,10 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
 
 /**
  * Serviço responsável pelas validações de regras de negócio de Processo.
- * 
+ *
  * <p>Centraliza todas as validações complexas relacionadas a processos,
  * incluindo validação de unidades, subprocessos e regras de finalização.</p>
- * 
+ *
  * <p><b>Nota sobre Injeção de Dependências:</b>
  * SubprocessoFacade é injetado com @Lazy para quebrar dependência circular:
  * ProcessoFacade → ProcessoValidador → SubprocessoFacade → ... → ProcessoFacade
@@ -32,7 +32,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
 @Service
 @Slf4j
 class ProcessoValidador {
-    
+
     private final UnidadeFacade unidadeService;
     private final SubprocessoFacade subprocessoFacade;
 
@@ -48,7 +48,7 @@ class ProcessoValidador {
 
     /**
      * Valida se todas as unidades especificadas possuem mapa vigente.
-     * 
+     *
      * @param codigosUnidades lista de códigos de unidades a validar
      * @return Optional com mensagem de erro se alguma unidade não possuir mapa vigente
      */
@@ -73,7 +73,7 @@ class ProcessoValidador {
 
     /**
      * Valida se o processo pode ser finalizado.
-     * 
+     *
      * @param processo processo a validar
      * @throws ErroProcesso se o processo não estiver em situação válida para finalização
      */
@@ -87,14 +87,14 @@ class ProcessoValidador {
 
     /**
      * Valida se todos os subprocessos de um processo estão homologados.
-     * 
+     *
      * @param processo processo a validar
      * @throws ErroProcesso se algum subprocesso não estiver homologado
      */
     public void validarTodosSubprocessosHomologados(Processo processo) {
         List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(processo.getCodigo());
         List<String> pendentes = subprocessos.stream().filter(sp -> sp.getSituacao() != MAPEAMENTO_MAPA_HOMOLOGADO
-                && sp.getSituacao() != REVISAO_MAPA_HOMOLOGADO)
+                        && sp.getSituacao() != REVISAO_MAPA_HOMOLOGADO)
                 .map(sp -> {
                     String identificador = sp.getUnidade().getSigla();
                     return String.format("%s (Situação: %s)", identificador, sp.getSituacao());
@@ -103,7 +103,7 @@ class ProcessoValidador {
 
         if (!pendentes.isEmpty()) {
             String mensagem = String.format("Não é possível encerrar o processo. Unidades pendentes de"
-                    + " homologação:%n- %s",
+                            + " homologação:%n- %s",
                     String.join("%n- ", pendentes));
             log.warn("Validação de finalização falhou: {} subprocessos não homologados.", pendentes.size());
             throw new ErroProcesso(mensagem);

@@ -76,7 +76,7 @@ public class AnaliseController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista o histórico de análises de validação")
     public List<Analise> listarAnalisesValidacao(@PathVariable Long codSubprocesso) {
-        subprocessoFacade.buscarSubprocesso(codSubprocesso); 
+        subprocessoFacade.buscarSubprocesso(codSubprocesso);
         return analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO);
     }
 

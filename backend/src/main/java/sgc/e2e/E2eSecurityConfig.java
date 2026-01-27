@@ -1,7 +1,6 @@
 package sgc.e2e;
 
-import java.util.List;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -16,9 +15,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
-
-import lombok.RequiredArgsConstructor;
 import sgc.seguranca.login.FiltroJwt;
+
+import java.util.List;
 
 /**
  * Configuração de segurança específica para testes E2E.
@@ -50,16 +49,16 @@ public class E2eSecurityConfig {
     @Bean
     public SecurityFilterChain e2eSecurityFilterChain(HttpSecurity http) {
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
-                "/api/usuarios/autenticar",
-                "/api/usuarios/autorizar",
-                "/api/usuarios/entrar",
-                "/actuator/**",
-                "/e2e/**")
-                .permitAll()
-                .requestMatchers("/api/**")
-                .authenticated()
-                .anyRequest()
-                .permitAll())
+                                "/api/usuarios/autenticar",
+                                "/api/usuarios/autorizar",
+                                "/api/usuarios/entrar",
+                                "/actuator/**",
+                                "/e2e/**")
+                        .permitAll()
+                        .requestMatchers("/api/**")
+                        .authenticated()
+                        .anyRequest()
+                        .permitAll())
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())

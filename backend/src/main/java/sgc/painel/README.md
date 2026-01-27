@@ -1,6 +1,5 @@
 # Módulo Painel
 
-
 ## Visão Geral
 
 O módulo `painel` é responsável por fornecer os dados agregados para o dashboard (painel de controle) da aplicação. Ele
@@ -48,10 +47,10 @@ graph TD
 4. O `PainelFacade` processa e agrega os dados, retornando uma página de DTOs (`ProcessoResumoDto`, `AlertaDto`).
 5. O `PainelController` retorna os dados como uma resposta JSON para o frontend.
 
-
 ## Como Testar
 
 Para executar apenas os testes deste módulo (a partir do diretório `backend`):
+
 ```bash
 ./gradlew test --tests "sgc.painel.*"
 ```

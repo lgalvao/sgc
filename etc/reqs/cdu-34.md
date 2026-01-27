@@ -6,7 +6,8 @@
 
 1. O usuário (Administrador) acessa a tela de Acompanhamento de Processos.
 
-2. O sistema exibe os processos e subprocessos, indicando com cores ou ícones aqueles que estão próximos do prazo ou atrasados.
+2. O sistema exibe os processos e subprocessos, indicando com cores ou ícones aqueles que estão próximos do prazo ou
+   atrasados.
 
 3. O usuário seleciona uma ou mais unidades/subprocessos que possuem pendências.
 

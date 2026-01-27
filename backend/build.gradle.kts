@@ -1,5 +1,4 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
@@ -69,7 +68,7 @@ dependencies {
     testImplementation("nl.jqno.equalsverifier:equalsverifier:3.18.1")
     testImplementation("io.rest-assured:rest-assured-all:6.0.0")
     testImplementation("org.apache.groovy:groovy-all:5.0.3")
-    
+
     // Documentação da API
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
     testImplementation("io.swagger.parser.v3:swagger-parser:2.1.37")
@@ -91,17 +90,17 @@ tasks.withType<BootJar> {
 
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     mainClass.set("sgc.Sgc")
-    
+
     // Carregar variáveis do arquivo .env apropriado baseado na variável ENV
     // Uso: ./gradlew bootRun -PENV=hom (ou test, e2e)
     // Também aceita -Dspring.profiles.active=hom
     val env = (project.findProperty("ENV") ?: System.getProperty("spring.profiles.active"))?.toString() ?: "test"
     val envFile = rootProject.file(".env.$env")
-    
+
     // Define o perfil Spring automaticamente baseado no ENV
     systemProperty("spring.profiles.active", env)
     println("Perfil Spring ativado: $env")
-    
+
     if (envFile.exists()) {
         println("Carregando configurações de: .env.$env")
         envFile.readLines()
@@ -120,7 +119,7 @@ tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
 tasks.withType<Test> {
     ignoreFailures = true
     useJUnitPlatform()
-    
+
     testLogging {
         events(TestLogEvent.SKIPPED, TestLogEvent.FAILED)
         exceptionFormat = TestExceptionFormat.SHORT
@@ -156,6 +155,7 @@ tasks.withType<Test> {
                 }
             }
         }
+
         override fun beforeTest(testDescriptor: TestDescriptor) {}
         override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {
             val duration = result.endTime - result.startTime
@@ -216,13 +216,13 @@ tasks.jacocoTestReport {
     dependsOn(tasks.named("test"))
     // Relatório consome dados de qualquer tarefa de teste que rodou
     executionData.setFrom(fileTree(layout.buildDirectory.get().asFile).include("/jacoco/*.exec"))
-    
+
     reports {
         xml.required.set(true)
         csv.required.set(true)
         html.required.set(false)
     }
-    
+
     classDirectories.setFrom(
         files(classDirectories.files.map {
             fileTree(it) {
@@ -277,17 +277,19 @@ spotbugs {
 configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
     junit5PluginVersion.set("1.2.3")
     targetClasses.set(setOf("sgc.*"))
-    excludedClasses.set(setOf(
-        "sgc.Sgc",
-        "sgc.**.*Config",
-        "sgc.**.*Dto",
-        "sgc.**.*Request",
-        "sgc.**.*Response",
-        "sgc.**.Erro*",
-        "sgc.**.Evento*",
-        "sgc.**.*Repo",
-        "sgc.**.*Impl"
-    ))
+    excludedClasses.set(
+        setOf(
+            "sgc.Sgc",
+            "sgc.**.*Config",
+            "sgc.**.*Dto",
+            "sgc.**.*Request",
+            "sgc.**.*Response",
+            "sgc.**.Erro*",
+            "sgc.**.Evento*",
+            "sgc.**.*Repo",
+            "sgc.**.*Impl"
+        )
+    )
     threads.set(8)
     outputFormats.set(setOf("XML"))
 }

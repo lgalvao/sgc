@@ -1,5 +1,8 @@
 package sgc.integracao.mocks;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -7,20 +10,18 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
+
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioRepo;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Component
 public class WithMockGestorSecurityContextFactory
         implements WithSecurityContextFactory<WithMockGestor> {
     @Autowired(required = false)
     private UsuarioRepo usuarioRepo;
-    
+
     @Autowired(required = false)
     private sgc.organizacao.model.UsuarioPerfilRepo usuarioPerfilRepo;
 
@@ -52,11 +53,11 @@ public class WithMockGestorSecurityContextFactory
 
             Set<sgc.organizacao.model.UsuarioPerfil> atribuicoes = new HashSet<>();
             atribuicoes.add(
-                            sgc.organizacao.model.UsuarioPerfil.builder()
-                                    .usuario(principal)
-                                    .unidade(u)
-                                    .perfil(Perfil.GESTOR)
-                                    .build());
+                    sgc.organizacao.model.UsuarioPerfil.builder()
+                            .usuario(principal)
+                            .unidade(u)
+                            .perfil(Perfil.GESTOR)
+                            .build());
             principal.setAtribuicoes(atribuicoes);
 
         } else {
@@ -66,11 +67,11 @@ public class WithMockGestorSecurityContextFactory
                 // Usuário existe mas não tem perfil GESTOR, adicionar com sua unidade de lotação
                 Unidade unidade = principal.getUnidadeLotacao();
                 atribuicoes.add(
-                                sgc.organizacao.model.UsuarioPerfil.builder()
-                                        .usuario(principal)
-                                        .unidade(unidade)
-                                        .perfil(Perfil.GESTOR)
-                                        .build());
+                        sgc.organizacao.model.UsuarioPerfil.builder()
+                                .usuario(principal)
+                                .unidade(unidade)
+                                .perfil(Perfil.GESTOR)
+                                .build());
                 principal.setAtribuicoes(atribuicoes);
             }
         }

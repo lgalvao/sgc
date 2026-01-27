@@ -52,6 +52,7 @@ graph TB
 ```
 
 **Legenda:**
+
 - 🔴 Vermelho: Módulo mais central (Subprocesso)
 - 🟡 Amarelo: Módulo com acoplamento significativo (Mapa)
 - 🟢 Verde: Módulo orquestrador (Processo)
@@ -121,6 +122,7 @@ graph TB
 ```
 
 **Legenda:**
+
 - ⭐ **Agregado Raiz:** Subprocesso é o agregado central que conecta todos os outros
 - Linhas pontilhadas: Relações entre agregados
 - 1:N, N:1, N:M: Cardinalidade das relações
@@ -233,6 +235,7 @@ graph LR
 ```
 
 **Problema Identificado:**
+
 - ⚠️ Todos os 12 services são PUBLIC (deveriam ser package-private)
 - ⚠️ 12 services quando 6-7 seriam suficientes
 
@@ -298,6 +301,7 @@ graph LR
 ```
 
 **Melhorias:**
+
 - ✅ 12 services → 6 services (50% redução)
 - ✅ Todos services package-private (exceto Facade)
 - ✅ Lógica consolidada, menos duplicação
@@ -334,6 +338,7 @@ sequenceDiagram
 ```
 
 **Benefícios:**
+
 - ✅ Desacoplamento entre módulos
 - ✅ Extensibilidade (novos listeners sem alterar código)
 - ✅ Processamento assíncrono
@@ -391,11 +396,13 @@ subprocesso/
 ```
 
 **Legenda:**
+
 - 📄 Arquivo público (controllers, facade)
 - 🔒 Arquivo package-private (services especializados)
 - 📁 Diretório
 
 **Benefícios:**
+
 - ✅ Navegação clara por responsabilidade
 - ✅ Separação lógica (workflow/ vs crud/ vs notificacao/)
 - ✅ Facilita identificar services relacionados
@@ -406,27 +413,27 @@ subprocesso/
 
 ### Estado Atual
 
-| Métrica | Valor |
-|---------|-------|
-| **Arquivos no módulo** | 76 |
-| **Services** | 12 |
-| **Services públicos** | 12 ⚠️ |
-| **Linhas em services** | ~2.500 |
-| **Eventos implementados** | 3 (TransicaoSubprocesso) |
-| **Arquivos importando módulo** | 59 |
-| **Comunicação** | Majoritariamente síncrona |
+| Métrica                        | Valor                     |
+|--------------------------------|---------------------------|
+| **Arquivos no módulo**         | 76                        |
+| **Services**                   | 12                        |
+| **Services públicos**          | 12 ⚠️                     |
+| **Linhas em services**         | ~2.500                    |
+| **Eventos implementados**      | 3 (TransicaoSubprocesso)  |
+| **Arquivos importando módulo** | 59                        |
+| **Comunicação**                | Majoritariamente síncrona |
 
 ### Estado Proposto
 
-| Métrica | Valor | Melhoria |
-|---------|-------|----------|
-| **Arquivos no módulo** | ~65 | ⬇️ 15% (eliminar redundantes) |
-| **Services** | 6 | ⬇️ 50% |
-| **Services públicos** | 1 (Facade) | ⬇️ 92% |
-| **Linhas em services** | ~1.800 | ⬇️ 28% |
-| **Eventos implementados** | 10+ | ⬆️ 233% |
-| **Arquivos importando módulo** | 45-50 | ⬇️ 15-24% |
-| **Comunicação** | Mix síncrona/assíncrona | ⬆️ Desacoplamento |
+| Métrica                        | Valor                   | Melhoria                      |
+|--------------------------------|-------------------------|-------------------------------|
+| **Arquivos no módulo**         | ~65                     | ⬇️ 15% (eliminar redundantes) |
+| **Services**                   | 6                       | ⬇️ 50%                        |
+| **Services públicos**          | 1 (Facade)              | ⬇️ 92%                        |
+| **Linhas em services**         | ~1.800                  | ⬇️ 28%                        |
+| **Eventos implementados**      | 10+                     | ⬆️ 233%                       |
+| **Arquivos importando módulo** | 45-50                   | ⬇️ 15-24%                     |
+| **Comunicação**                | Mix síncrona/assíncrona | ⬆️ Desacoplamento             |
 
 ---
 

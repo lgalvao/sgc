@@ -1,7 +1,6 @@
 package sgc.processo.service;
 
 import lombok.extern.slf4j.Slf4j;
-
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
@@ -17,18 +16,22 @@ import java.util.*;
 
 /**
  * Serviço responsável pelo controle de acesso a processos.
- * 
- * <p>Implementa a lógica de verificação hierárquica de acesso baseada
- * em unidades organizacionais e perfis de usuário.</p>
- * 
- * <p><b>Nota sobre Injeção de Dependências:</b>
+ *
+ * <p>
+ * Implementa a lógica de verificação hierárquica de acesso baseada
+ * em unidades organizacionais e perfis de usuário.
+ * </p>
+ *
+ * <p>
+ * <b>Nota sobre Injeção de Dependências:</b>
  * SubprocessoFacade é injetado com @Lazy para quebrar dependência circular:
- * ProcessoFacade → ProcessoAcessoService → SubprocessoFacade → ... → ProcessoFacade
+ * ProcessoFacade → ProcessoAcessoService → SubprocessoFacade → ... →
+ * ProcessoFacade
  */
 @Service
 @Slf4j
 class ProcessoAcessoService {
-    
+
     private final UnidadeFacade unidadeService;
     private final UsuarioFacade usuarioService;
     private final SubprocessoFacade subprocessoFacade;
@@ -47,9 +50,9 @@ class ProcessoAcessoService {
 
     /**
      * Verifica se o usuário autenticado tem acesso ao processo.
-     * 
+     *
      * @param authentication contexto de autenticação do usuário
-     * @param codProcesso código do processo
+     * @param codProcesso    código do processo
      * @return true se o usuário tem acesso, false caso contrário
      */
     @Transactional(readOnly = true)
@@ -69,7 +72,7 @@ class ProcessoAcessoService {
         List<PerfilDto> perfis = usuarioService.buscarPerfisUsuario(username);
         Long codUnidadeUsuario = perfis.stream()
                 .findFirst()
-                .map(PerfilDto::getUnidadeCodigo)
+                .map(PerfilDto::unidadeCodigo)
                 .orElse(null);
 
         if (codUnidadeUsuario == null) {
@@ -83,7 +86,7 @@ class ProcessoAcessoService {
 
     /**
      * Busca todos os códigos de unidades descendentes (hierarquia completa).
-     * 
+     *
      * @param codUnidade código da unidade raiz
      * @return lista de códigos incluindo a unidade raiz e todos os descendentes
      */

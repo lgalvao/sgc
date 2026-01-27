@@ -7,10 +7,10 @@ import java.time.LocalDateTime;
 
 /**
  * DTO de resposta contendo dados de um subprocesso.
- * 
+ *
  * <p>Usado exclusivamente como saída de API. Para criar ou atualizar
  * subprocessos, use {@link CriarSubprocessoRequest} ou {@link AtualizarSubprocessoRequest}.
- * 
+ *
  * <p>Requer @NoArgsConstructor e @Setter para uso em testes.
  */
 @Getter

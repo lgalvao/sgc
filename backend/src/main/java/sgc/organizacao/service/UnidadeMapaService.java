@@ -7,18 +7,17 @@ import sgc.organizacao.model.UnidadeMapaRepo;
 
 /**
  * Serviço especializado para gerenciar mapas vigentes de unidades.
- * 
+ *
  * <p>Responsabilidades:
  * <ul>
  *   <li>Verificação de existência de mapa vigente</li>
  *   <li>Definição e atualização de mapa vigente</li>
  *   <li>Consultas relacionadas a mapas de unidades</li>
  * </ul>
- * 
+ *
  * <p>Este serviço foi extraído de UnidadeFacade para respeitar o
  * Single Responsibility Principle (SRP).
- * 
- * @see UnidadeFacade
+ *
  */
 @Service
 @RequiredArgsConstructor
@@ -27,7 +26,7 @@ public class UnidadeMapaService {
 
     /**
      * Verifica se uma unidade possui mapa vigente.
-     * 
+     *
      * @param codigoUnidade código da unidade
      * @return true se a unidade possui mapa vigente
      */
@@ -37,9 +36,9 @@ public class UnidadeMapaService {
 
     /**
      * Define ou atualiza o mapa vigente de uma unidade.
-     * 
+     *
      * @param codigoUnidade código da unidade
-     * @param mapa mapa a ser definido como vigente
+     * @param mapa          mapa a ser definido como vigente
      */
     @Transactional
     public void definirMapaVigente(Long codigoUnidade, sgc.mapa.model.Mapa mapa) {

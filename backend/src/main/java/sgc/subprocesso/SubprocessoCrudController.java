@@ -52,7 +52,8 @@ public class SubprocessoCrudController {
 
     /**
      * Lista todos os subprocessos.
-     * <p>Ação restrita a usuários com perfil 'ADMIN'.
+     * <p>
+     * Ação restrita a usuários com perfil 'ADMIN'.
      *
      * @return Uma {@link List} de {@link SubprocessoDto}.
      */
@@ -91,19 +92,20 @@ public class SubprocessoCrudController {
     public ResponseEntity<SubprocessoDto> buscarPorProcessoEUnidade(
             @RequestParam Long codProcesso, @RequestParam String siglaUnidade) {
         UnidadeDto unidade = unidadeService.buscarPorSigla(siglaUnidade);
-        SubprocessoDto dto =
-                subprocessoFacade.obterPorProcessoEUnidade(codProcesso, unidade.getCodigo());
+        SubprocessoDto dto = subprocessoFacade.obterPorProcessoEUnidade(codProcesso, unidade.getCodigo());
         return ResponseEntity.ok(dto);
     }
 
     /**
      * Cria um novo subprocesso.
      *
-     * <p>Ação restrita a usuários com perfil 'ADMIN'.
+     * <p>
+     * Ação restrita a usuários com perfil 'ADMIN'.
      *
      * @param request O DTO com os dados do subprocesso a ser criado.
-     * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo subprocesso e o
-     * {@link SubprocessoDto} criado no corpo da resposta.
+     * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo
+     *         subprocesso e o
+     *         {@link SubprocessoDto} criado no corpo da resposta.
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -116,11 +118,13 @@ public class SubprocessoCrudController {
     /**
      * Atualiza um subprocesso existente.
      *
-     * <p>Ação restrita a usuários com perfil 'ADMIN'.
+     * <p>
+     * Ação restrita a usuários com perfil 'ADMIN'.
      *
-     * @param codigo O código do subprocesso a ser atualizado.
+     * @param codigo  O código do subprocesso a ser atualizado.
      * @param request O DTO com os novos dados do subprocesso.
-     * @return Um {@link ResponseEntity} com status 200 OK e o {@link SubprocessoDto} atualizado.
+     * @return Um {@link ResponseEntity} com status 200 OK e o
+     *         {@link SubprocessoDto} atualizado.
      */
     @PostMapping("/{codigo}/atualizar")
     @PreAuthorize("hasRole('ADMIN')")
@@ -133,7 +137,8 @@ public class SubprocessoCrudController {
     /**
      * Exclui um subprocesso.
      *
-     * <p>Ação restrita a usuários com perfil 'ADMIN'.
+     * <p>
+     * Ação restrita a usuários com perfil 'ADMIN'.
      *
      * @param codigo O código do subprocesso a ser excluído.
      * @return Um {@link ResponseEntity} com status 204 No Content.
@@ -154,7 +159,7 @@ public class SubprocessoCrudController {
     public ResponseEntity<Void> alterarDataLimite(
             @PathVariable Long codigo,
             @RequestBody @Valid AlterarDataLimiteRequest request) {
-        subprocessoFacade.alterarDataLimite(codigo, request.getNovaDataLimite());
+        subprocessoFacade.alterarDataLimite(codigo, request.novaDataLimite());
         return ResponseEntity.ok().build();
     }
 
@@ -168,7 +173,7 @@ public class SubprocessoCrudController {
     public ResponseEntity<Void> reabrirCadastro(
             @PathVariable Long codigo,
             @RequestBody @Valid ReabrirProcessoRequest request) {
-        subprocessoFacade.reabrirCadastro(codigo, request.getJustificativa());
+        subprocessoFacade.reabrirCadastro(codigo, request.justificativa());
         return ResponseEntity.ok().build();
     }
 
@@ -182,7 +187,7 @@ public class SubprocessoCrudController {
     public ResponseEntity<Void> reabrirRevisaoCadastro(
             @PathVariable Long codigo,
             @RequestBody @Valid ReabrirProcessoRequest request) {
-        subprocessoFacade.reabrirRevisaoCadastro(codigo, request.getJustificativa());
+        subprocessoFacade.reabrirRevisaoCadastro(codigo, request.justificativa());
         return ResponseEntity.ok().build();
     }
 }

@@ -1,22 +1,26 @@
 package sgc.mapa.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.model.*;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import static org.mockito.Mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.AtividadeRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

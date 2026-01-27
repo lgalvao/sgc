@@ -1,30 +1,51 @@
-DELETE FROM SGC.MOVIMENTACAO;
-DELETE FROM SGC.ALERTA_USUARIO;
-DELETE FROM SGC.ALERTA;
-DELETE FROM SGC.ANALISE;
-DELETE FROM SGC.NOTIFICACAO;
-DELETE FROM SGC.UNIDADE_PROCESSO;
+DELETE
+FROM SGC.MOVIMENTACAO;
+DELETE
+FROM SGC.ALERTA_USUARIO;
+DELETE
+FROM SGC.ALERTA;
+DELETE
+FROM SGC.ANALISE;
+DELETE
+FROM SGC.NOTIFICACAO;
+DELETE
+FROM SGC.UNIDADE_PROCESSO;
 
 -- Delete MAPA and its dependencies first
-DELETE FROM SGC.CONHECIMENTO;
-DELETE FROM SGC.COMPETENCIA_ATIVIDADE;
-DELETE FROM SGC.ATIVIDADE;
-DELETE FROM SGC.COMPETENCIA;
-DELETE FROM SGC.MAPA;
+DELETE
+FROM SGC.CONHECIMENTO;
+DELETE
+FROM SGC.COMPETENCIA_ATIVIDADE;
+DELETE
+FROM SGC.ATIVIDADE;
+DELETE
+FROM SGC.COMPETENCIA;
+DELETE
+FROM SGC.MAPA;
 
-DELETE FROM SGC.SUBPROCESSO;
-DELETE FROM SGC.PROCESSO;
+DELETE
+FROM SGC.SUBPROCESSO;
+DELETE
+FROM SGC.PROCESSO;
 
-DELETE FROM SGC.ATRIBUICAO_TEMPORARIA;
-DELETE FROM SGC.VW_USUARIO_PERFIL_UNIDADE;
-DELETE FROM SGC.ADMINISTRADOR;
-DELETE FROM SGC.VW_VINCULACAO_UNIDADE;
+DELETE
+FROM SGC.ATRIBUICAO_TEMPORARIA;
+DELETE
+FROM SGC.VW_USUARIO_PERFIL_UNIDADE;
+DELETE
+FROM SGC.ADMINISTRADOR;
+DELETE
+FROM SGC.VW_VINCULACAO_UNIDADE;
 
-DELETE FROM SGC.UNIDADE_MAPA;
-DELETE FROM SGC.VW_USUARIO;
-DELETE FROM SGC.VW_UNIDADE;
+DELETE
+FROM SGC.UNIDADE_MAPA;
+DELETE
+FROM SGC.VW_USUARIO;
+DELETE
+FROM SGC.VW_UNIDADE;
 
-DELETE FROM SGC.PARAMETRO;
+DELETE
+FROM SGC.PARAMETRO;
 
 -- -------------------------------------------------------------------------------------------------
 -- VW_UNIDADE - simulada como tabela no H2
@@ -91,15 +112,24 @@ VALUES ('904', 'CDU05-READONLY-UNIT', 'CDU05-READONLY-UNIT', 'OPERACIONAL', 'ATI
 -- -------------------------------------------------------------------------------------------------
 -- UNIDADE_MAPA (relaciona unidades com mapas vigentes)
 -- -------------------------------------------------------------------------------------------------
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo) VALUES ('8', 1001);
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo) VALUES ('9', 1002);
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo) VALUES ('10', 1003);
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo) VALUES ('102', 1004);
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo) VALUES ('900', 1004);
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo) VALUES ('901', 1004);
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo) VALUES ('902', 1004);
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo) VALUES ('903', 1004);
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo) VALUES ('904', 1004);
+INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
+VALUES ('8', 1001);
+INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
+VALUES ('9', 1002);
+INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
+VALUES ('10', 1003);
+INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
+VALUES ('102', 1004);
+INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
+VALUES ('900', 1004);
+INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
+VALUES ('901', 1004);
+INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
+VALUES ('902', 1004);
+INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
+VALUES ('903', 1004);
+INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
+VALUES ('904', 1004);
 
 -- -------------------------------------------------------------------------------------------------
 -- VW_USUARIO - simulada como tabela no H2
@@ -200,27 +230,44 @@ VALUES ('50006', 'Juliana Lima', 10, '');
 -- -------------------------------------------------------------------------------------------------
 -- PERFIS DE USUÁRIO (VW_USUARIO_PERFIL_UNIDADE - sem ID autoincrementado)
 -- -------------------------------------------------------------------------------------------------
-INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES ('1', 'SERVIDOR', 10);
-INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES ('2', 'CHEFE', 200);
-INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES ('3', 'CHEFE', 8);
-INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES ('6', 'ADMIN', 2);
-INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES ('8', 'GESTOR', 8);
-INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES ('777', 'CHEFE', 2);
-INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES ('111111111111', 'ADMIN', 100);
-INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES ('111111111111', 'CHEFE', 102);
-INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES ('222222222222', 'GESTOR', 101);
-INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES ('333333333333', 'CHEFE', 9);
-INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES ('121212121212', 'CHEFE', 12);
-INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES ('666666666666', 'GESTOR', 6);
-INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES ('999999999999', 'ADMIN', 2);
-INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES ('999999999999', 'GESTOR', 2);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('1', 'SERVIDOR', 10);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('2', 'CHEFE', 200);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('3', 'CHEFE', 8);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('6', 'ADMIN', 2);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('8', 'GESTOR', 8);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('777', 'CHEFE', 2);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('111111111111', 'ADMIN', 100);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('111111111111', 'CHEFE', 102);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('222222222222', 'GESTOR', 101);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('333333333333', 'CHEFE', 9);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('121212121212', 'CHEFE', 12);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('666666666666', 'GESTOR', 6);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('999999999999', 'ADMIN', 2);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('999999999999', 'GESTOR', 2);
 
 -- -------------------------------------------------------------------------------------------------
 -- ADMINISTRADORES (perfis ADMIN gerenciados pelo SGC)
 -- -------------------------------------------------------------------------------------------------
-INSERT INTO SGC.ADMINISTRADOR (usuario_titulo) VALUES ('6');
-INSERT INTO SGC.ADMINISTRADOR (usuario_titulo) VALUES ('111111111111');
-INSERT INTO SGC.ADMINISTRADOR (usuario_titulo) VALUES ('999999999999');
+INSERT INTO SGC.ADMINISTRADOR (usuario_titulo)
+VALUES ('6');
+INSERT INTO SGC.ADMINISTRADOR (usuario_titulo)
+VALUES ('111111111111');
+INSERT INTO SGC.ADMINISTRADOR (usuario_titulo)
+VALUES ('999999999999');
 
 -- -------------------------------------------------------------------------------------------------
 -- MAPAS, COMPETÊNCIAS, ATIVIDADES (DADOS BASE PARA REVISÃO)
@@ -251,7 +298,8 @@ VALUES ('70003', 50000, 6, 'Alerta para Unidade Filha 1', CURRENT_TIMESTAMP);
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
 VALUES ('60000', 50000, 8, 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO', CURRENT_TIMESTAMP);
 
-INSERT INTO SGC.MAPA (codigo, subprocesso_codigo) VALUES (1001, 60000);
+INSERT INTO SGC.MAPA (codigo, subprocesso_codigo)
+VALUES (1001, 60000);
 
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10001', 1001, 'Desenvolvimento em Java');
@@ -289,7 +337,9 @@ INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
 VALUES ('2000', 8);
 
 -- Vincula Mapa 1001 ao Subprocesso 60000 (já existente, Processo 50000 - EM ANDAMENTO)
-UPDATE SGC.MAPA SET subprocesso_codigo = 60000 WHERE codigo = 1001;
+UPDATE SGC.MAPA
+SET subprocesso_codigo = 60000
+WHERE codigo = 1001;
 
 -- Processo 50002 (FINALIZADO) para abrigar subprocessos históricos que não devem bloquear novos processos
 INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo, data_limite)
@@ -299,7 +349,8 @@ VALUES ('50002', 'Processo Histórico Finalizado', 'FINALIZADO', CURRENT_TIMESTA
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
 VALUES ('60002', 50001, 9, 'DIAGNOSTICO_CONCLUIDO', CURRENT_TIMESTAMP);
 
-INSERT INTO SGC.MAPA (codigo, subprocesso_codigo) VALUES (1002, 60002);
+INSERT INTO SGC.MAPA (codigo, subprocesso_codigo)
+VALUES (1002, 60002);
 
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10003', 1002, 'Análise de Dados');
@@ -307,11 +358,13 @@ INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10004', 1002, 'Machine Learning');
 
 -- Mapa 1003 (Unidade 10) -> Processo 50002 (FINALIZADO)
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES ('50002', 10);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
+VALUES ('50002', 10);
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
 VALUES ('60003', 50002, 10, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP);
 
-INSERT INTO SGC.MAPA (codigo, subprocesso_codigo) VALUES (1003, 60003);
+INSERT INTO SGC.MAPA (codigo, subprocesso_codigo)
+VALUES (1003, 60003);
 
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10005', 1003, 'Segurança da Informação');
@@ -319,11 +372,13 @@ INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10006', 1003, 'Gestão de Projetos');
 
 -- Mapa 1004 (Unidade 102) -> Processo 50002 (FINALIZADO)
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES ('50002', 102);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
+VALUES ('50002', 102);
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
 VALUES ('60004', 50002, 102, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP);
 
-INSERT INTO SGC.MAPA (codigo, subprocesso_codigo) VALUES (1004, 60004);
+INSERT INTO SGC.MAPA (codigo, subprocesso_codigo)
+VALUES (1004, 60004);
 
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10007', 1004, 'Gestão Administrativa');
@@ -336,11 +391,13 @@ INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo)
 VALUES ('30000', 10007);
 
 -- Mapa 201 (Unidade 201) -> Processo 50002 (FINALIZADO)
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES ('50002', 201);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
+VALUES ('50002', 201);
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
 VALUES ('60201', 50002, 201, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP);
 
-INSERT INTO SGC.MAPA (codigo, subprocesso_codigo) VALUES (201, 60201);
+INSERT INTO SGC.MAPA (codigo, subprocesso_codigo)
+VALUES (201, 60201);
 
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('20001', 201, 'Gestão Administrativa');
@@ -354,14 +411,25 @@ VALUES ('30001', 20001);
 -- -------------------------------------------------------------------------------------------------
 -- RESTART SEQUENCES para evitar conflitos de ID em testes
 -- -------------------------------------------------------------------------------------------------
-ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 1000;
-ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 60000;
-ALTER TABLE SGC.MAPA ALTER COLUMN CODIGO RESTART WITH 2000;
-ALTER TABLE SGC.SUBPROCESSO ALTER COLUMN CODIGO RESTART WITH 70000;
-ALTER TABLE SGC.COMPETENCIA ALTER COLUMN CODIGO RESTART WITH 30000;
-ALTER TABLE SGC.ATIVIDADE ALTER COLUMN CODIGO RESTART WITH 50000;
-ALTER TABLE SGC.CONHECIMENTO ALTER COLUMN CODIGO RESTART WITH 50000;
-ALTER TABLE SGC.NOTIFICACAO ALTER COLUMN CODIGO RESTART WITH 1000;
-ALTER TABLE SGC.ALERTA ALTER COLUMN CODIGO RESTART WITH 80000;
-ALTER TABLE SGC.MOVIMENTACAO ALTER COLUMN CODIGO RESTART WITH 90000;
-ALTER TABLE SGC.ANALISE ALTER COLUMN CODIGO RESTART WITH 1000;
+ALTER TABLE SGC.VW_UNIDADE
+    ALTER COLUMN CODIGO RESTART WITH 1000;
+ALTER TABLE SGC.PROCESSO
+    ALTER COLUMN CODIGO RESTART WITH 60000;
+ALTER TABLE SGC.MAPA
+    ALTER COLUMN CODIGO RESTART WITH 2000;
+ALTER TABLE SGC.SUBPROCESSO
+    ALTER COLUMN CODIGO RESTART WITH 70000;
+ALTER TABLE SGC.COMPETENCIA
+    ALTER COLUMN CODIGO RESTART WITH 30000;
+ALTER TABLE SGC.ATIVIDADE
+    ALTER COLUMN CODIGO RESTART WITH 50000;
+ALTER TABLE SGC.CONHECIMENTO
+    ALTER COLUMN CODIGO RESTART WITH 50000;
+ALTER TABLE SGC.NOTIFICACAO
+    ALTER COLUMN CODIGO RESTART WITH 1000;
+ALTER TABLE SGC.ALERTA
+    ALTER COLUMN CODIGO RESTART WITH 80000;
+ALTER TABLE SGC.MOVIMENTACAO
+    ALTER COLUMN CODIGO RESTART WITH 90000;
+ALTER TABLE SGC.ANALISE
+    ALTER COLUMN CODIGO RESTART WITH 1000;

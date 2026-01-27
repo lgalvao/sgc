@@ -7,18 +7,19 @@ import lombok.Builder;
  */
 @Builder
 public record SubprocessoPermissoesDto(
-    boolean podeVerPagina,
-    boolean podeEditarMapa,
-    boolean podeVisualizarMapa,
-    boolean podeDisponibilizarMapa,
-    boolean podeDisponibilizarCadastro,
-    boolean podeDevolverCadastro,
-    boolean podeAceitarCadastro,
-    boolean podeVisualizarDiagnostico,
-    boolean podeAlterarDataLimite,
-    boolean podeVisualizarImpacto,
-    boolean podeRealizarAutoavaliacao,
-    boolean podeReabrirCadastro,
-    boolean podeReabrirRevisao,
-    boolean podeEnviarLembrete
-) {}
+        boolean podeVerPagina,
+        boolean podeEditarMapa,
+        boolean podeVisualizarMapa,
+        boolean podeDisponibilizarMapa,
+        boolean podeDisponibilizarCadastro,
+        boolean podeDevolverCadastro,
+        boolean podeAceitarCadastro,
+        boolean podeVisualizarDiagnostico,
+        boolean podeAlterarDataLimite,
+        boolean podeVisualizarImpacto,
+        boolean podeRealizarAutoavaliacao,
+        boolean podeReabrirCadastro,
+        boolean podeReabrirRevisao,
+        boolean podeEnviarLembrete
+) {
+}

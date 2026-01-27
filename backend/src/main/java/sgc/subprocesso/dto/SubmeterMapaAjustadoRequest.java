@@ -1,27 +1,40 @@
 package sgc.subprocesso.dto;
 
-import jakarta.validation.constraints.Future;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 /**
- * DTO de requisição para submeter mapa ajustado.
+ * Request para submeter mapa ajustado (CDU-19 item 5 e CDU-16).
+ * Usado pelo RUP para submeter o mapa com ajustes após receber
+ * sugestões/devolução.
  */
-@Getter
 @Builder
-@AllArgsConstructor
-public class SubmeterMapaAjustadoRequest {
-    @NotBlank(message = "O campo 'observacoes' é obrigatório.")
-    @SanitizarHtml
-    private final String observacoes;
+public record SubmeterMapaAjustadoRequest(
+                /**
+                 * Justificativa para os ajustes realizados (obrigatória).
+                 */
+                @NotBlank(message = "A justificativa é obrigatória") @SanitizarHtml String justificativa,
 
-    @NotNull(message = "O campo 'dataLimiteEtapa2' é obrigatório.")
-    @Future(message = "A data limite da etapa 2 deve ser uma data futura.")
-    private final LocalDateTime dataLimiteEtapa2;
+                /**
+                 * Nova data limite para a próxima etapa (opcional).
+                 */
+                LocalDateTime dataLimiteEtapa2,
+
+                /**
+                 * Lista de competências com os ajustes feitos (opcional em alguns fluxos).
+                 */
+                @Valid List<CompetenciaAjusteDto> competencias) {
+
+        /**
+         * Construtor para compatibilidade com testes legados.
+         */
+        public SubmeterMapaAjustadoRequest(String justificativa, LocalDateTime dataLimiteEtapa2) {
+                this(justificativa, dataLimiteEtapa2, Collections.emptyList());
+        }
 }

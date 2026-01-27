@@ -1,9 +1,6 @@
 package sgc.integracao;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -12,13 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.persistence.EntityManager;
 import sgc.Sgc;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
@@ -37,6 +29,13 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -131,19 +130,18 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
         // Given
         Long codigoContexto = subprocesso1.getCodigo();
         List<Long> unidadesSelecionadas = List.of(unidade1.getCodigo(), unidade2.getCodigo());
-        LocalDate dataLimite = LocalDate.now().plusDays(15);
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
-                .unidadeCodigos(unidadesSelecionadas)
-                .dataLimite(dataLimite)
+                .subprocessos(unidadesSelecionadas)
+                .acao("DISPONIBILIZAR")
                 .build();
 
         // When
         mockMvc.perform(
-                post("/api/subprocessos/{id}/disponibilizar-mapa-bloco", codigoContexto)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        post("/api/subprocessos/{id}/disponibilizar-mapa-bloco", codigoContexto)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
         // Then

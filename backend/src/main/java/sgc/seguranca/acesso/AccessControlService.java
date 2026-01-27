@@ -36,7 +36,7 @@ public class AccessControlService {
             auditService.logAccessDenied(usuario, acao, recurso, motivo);
             throw new ErroAccessoNegado(motivo);
         }
-        
+
         auditService.logAccessGranted(usuario, acao, recurso);
     }
 
@@ -49,15 +49,6 @@ public class AccessControlService {
             return false;
         }
 
-        if (recurso == null) {
-            log.warn("Tentativa de verificação de permissão com recurso nulo: usuario={}, acao={}",
-                    usuario.getTituloEleitoral(), acao);
-            return false;
-        }
-        
-        log.debug("Verificando permissão: usuario={}, acao={}, recurso={}", 
-                usuario.getTituloEleitoral(), acao, recurso);
-        
         // Delega para a policy apropriada baseado no tipo do recurso
         switch (recurso) {
             case Subprocesso sp -> {
@@ -72,9 +63,9 @@ public class AccessControlService {
             case Mapa m -> {
                 return mapaAccessPolicy.canExecute(usuario, acao, m);
             }
-            // Não executa nada para outros tipos ou null
+            // Não executa nada para outros tipos
             default -> {
-                // Não executa nada para outros tipos ou null
+                // Não executa nada para outros tipos
             }
         }
 
@@ -88,24 +79,9 @@ public class AccessControlService {
      * Obtém o motivo da negação de acesso.
      */
     private <T> String obterMotivoNegacao(@Nullable Usuario usuario, Acao acao, T recurso) {
-        if (usuario == null) {
-            return "Usuário não autenticado não pode executar a ação: " + acao.getDescricao();
-        }
+        if (usuario == null) return "Usuário não autenticado não pode executar a ação: " + acao.getDescricao();
 
-        if (recurso == null) {
-            return "Recurso não pode ser nulo para verificação de acesso.";
-        }
-        
-        // Obtém o motivo da policy apropriada
-        return switch (recurso) {
-            case Subprocesso s -> subprocessoAccessPolicy.getMotivoNegacao();
-            case Processo p -> processoAccessPolicy.getMotivoNegacao();
-            case Atividade a -> atividadeAccessPolicy.getMotivoNegacao();
-            case Mapa m -> mapaAccessPolicy.getMotivoNegacao();
-            // Mensagem genérica para outros tipos
-            default -> String.format("Usuário '%s' não tem permissão para executar a ação '%s'",
-                    usuario.getTituloEleitoral(), acao.getDescricao());
-        };
-
+        return String.format("Usuário '%s' não tem permissão para executar a ação '%s'",
+                usuario.getTituloEleitoral(), acao.getDescricao());
     }
 }

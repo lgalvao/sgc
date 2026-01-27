@@ -129,8 +129,8 @@ public class MapaFacade {
     /**
      * Salva o mapa completo com competências e associações.
      *
-     * @param codMapa                O código do mapa.
-     * @param request                A requisição com os dados a salvar.
+     * @param codMapa O código do mapa.
+     * @param request A requisição com os dados a salvar.
      * @return O DTO do mapa completo atualizado.
      */
     public MapaCompletoDto salvarMapaCompleto(

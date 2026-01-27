@@ -1,6 +1,5 @@
 # Módulo de Alerta
 
-
 ## Visão Geral
 
 Este pacote é responsável por criar e gerenciar **alertas internos** do sistema, que são notificações exibidas na
@@ -82,10 +81,10 @@ graph TD
 - **`AlertaDto`**: Objeto de transferência de dados utilizado para enviar informações de alertas para o frontend.
 - **`AlertaMapper`**: Interface MapStruct para conversão entre entidade `Alerta`/`AlertaUsuario` e `AlertaDto`.
 
-
 ## Como Testar
 
 Para executar apenas os testes deste módulo (a partir do diretório `backend`):
+
 ```bash
 ./gradlew test --tests "sgc.alerta.*"
 ```

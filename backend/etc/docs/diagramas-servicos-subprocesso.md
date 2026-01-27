@@ -43,6 +43,7 @@ graph TB
 ```
 
 **Legenda:**
+
 - 🔓 `public` = Deve ser alterado para package-private (vermelho/rosa)
 - 🔒 `package-private` = Correto (verde)
 - ✅ Apenas Facade deveria ser público
@@ -87,6 +88,7 @@ graph TB
 ```
 
 **Resultado:**
+
 - ✅ 1 service público (Facade)
 - ✅ 8 services package-private
 - ✅ Encapsulamento garantido
@@ -97,25 +99,25 @@ graph TB
 
 ### Estado Atual → Estado Alvo
 
-| # | Service Atual | Visibilidade Atual | Fase 2<br/>(Package-Private) | Fase 5<br/>(Consolidação) | LoC | Destino Final |
-|---|--------------|-------------------|--------------------------|------------------------|-----|---------------|
-| 1 | **SubprocessoFacade** | 🔓 public | 🔓 public ✅ | 🔓 public ✅ | ~360 | **Mantido** (orquestração) |
-| 2 | SubprocessoMapaWorkflowService | 🔓 public | 🔒 package-private | 🔄 Consolidado | ~520 | → SubprocessoWorkflowService |
-| 3 | SubprocessoCadastroWorkflowService | 🔓 public | 🔒 package-private | 🔄 Consolidado | ~350 | → SubprocessoWorkflowService |
-| 4 | SubprocessoTransicaoService | 🔓 public | 🔒 package-private | 🔄 Consolidado | ~165 | → SubprocessoWorkflowService |
-| 5 | SubprocessoMapaService | 🔓 public | 🔒 package-private | ❌ Eliminado | ~180 | → MapaFacade (outro módulo) |
-| 6 | SubprocessoFactory | 🔓 public | 🔒 package-private | ✅ Mantido | ~160 | **Mantido** (criação) |
-| 7 | SubprocessoEmailService | 🔓 public | 🔒 package-private | 🔄 Renomeado | ~158 | → SubprocessoNotificacaoService |
-| 8 | SubprocessoContextoService | 🔓 public | 🔒 package-private | ❌ Eliminado | ~65 | → SubprocessoFacade (lógica movida) |
-| 9 | SubprocessoComunicacaoListener | 🔒 package-private | 🔒 package-private ✅ | ✅ Mantido | ~37 | **Mantido** (listener) |
+| # | Service Atual                      | Visibilidade Atual | Fase 2<br/>(Package-Private) | Fase 5<br/>(Consolidação) | LoC  | Destino Final                       |
+|---|------------------------------------|--------------------|------------------------------|---------------------------|------|-------------------------------------|
+| 1 | **SubprocessoFacade**              | 🔓 public          | 🔓 public ✅                  | 🔓 public ✅               | ~360 | **Mantido** (orquestração)          |
+| 2 | SubprocessoMapaWorkflowService     | 🔓 public          | 🔒 package-private           | 🔄 Consolidado            | ~520 | → SubprocessoWorkflowService        |
+| 3 | SubprocessoCadastroWorkflowService | 🔓 public          | 🔒 package-private           | 🔄 Consolidado            | ~350 | → SubprocessoWorkflowService        |
+| 4 | SubprocessoTransicaoService        | 🔓 public          | 🔒 package-private           | 🔄 Consolidado            | ~165 | → SubprocessoWorkflowService        |
+| 5 | SubprocessoMapaService             | 🔓 public          | 🔒 package-private           | ❌ Eliminado               | ~180 | → MapaFacade (outro módulo)         |
+| 6 | SubprocessoFactory                 | 🔓 public          | 🔒 package-private           | ✅ Mantido                 | ~160 | **Mantido** (criação)               |
+| 7 | SubprocessoEmailService            | 🔓 public          | 🔒 package-private           | 🔄 Renomeado              | ~158 | → SubprocessoNotificacaoService     |
+| 8 | SubprocessoContextoService         | 🔓 public          | 🔒 package-private           | ❌ Eliminado               | ~65  | → SubprocessoFacade (lógica movida) |
+| 9 | SubprocessoComunicacaoListener     | 🔒 package-private | 🔒 package-private ✅         | ✅ Mantido                 | ~37  | **Mantido** (listener)              |
 
 **Resumo da Evolução:**
 
-| Fase | Services Públicos | Services Package-Private | Total Services | Redução |
-|------|------------------|-------------------------|----------------|---------|
-| **Estado Atual** | 8 | 1 | 9 | - |
-| **Fase 2** (Package-Private) | 1 | 8 | 9 | 0% (preparação) |
-| **Fase 5** (Consolidação) | 1 | 5 | 6-7 | ~30% |
+| Fase                         | Services Públicos | Services Package-Private | Total Services | Redução         |
+|------------------------------|-------------------|--------------------------|----------------|-----------------|
+| **Estado Atual**             | 8                 | 1                        | 9              | -               |
+| **Fase 2** (Package-Private) | 1                 | 8                        | 9              | 0% (preparação) |
+| **Fase 5** (Consolidação)    | 1                 | 5                        | 6-7            | ~30%            |
 
 ---
 
@@ -124,11 +126,13 @@ graph TB
 ### Service 1: SubprocessoWorkflowService (Unificado)
 
 **Absorve:**
+
 - SubprocessoCadastroWorkflowService (~350 LoC)
 - SubprocessoMapaWorkflowService (~520 LoC)
 - SubprocessoTransicaoService (~165 LoC)
 
 **Responsabilidades:**
+
 ```java
 @Service
 class SubprocessoWorkflowService {
@@ -206,6 +210,7 @@ sgc/subprocesso/service/
 ```
 
 **Benefícios:**
+
 - ✅ Navegação clara por responsabilidade
 - ✅ Coesão dentro de cada sub-pacote
 - ✅ Facilita identificação de services relacionados
@@ -252,13 +257,13 @@ graph LR
 
 ### Por Fase
 
-| Métrica | Atual | Fase 2 | Fase 3 | Fase 4 | Fase 5 |
-|---------|-------|--------|--------|--------|--------|
-| **Services Públicos** | 8 | 1 ✅ | 1 | 1 | 1 |
-| **Services Total** | 9 | 9 | 9 | 9 | 6-7 |
-| **Eventos Implementados** | 6 | 6 | 14-16 ✅ | 14-16 | 14-16 |
-| **Sub-pacotes** | 0 | 0 | 0 | 4 ✅ | 4 |
-| **LoC em Services** | ~2100 | ~2100 | ~2200 | ~2200 | ~1800 ✅ |
+| Métrica                   | Atual | Fase 2 | Fase 3  | Fase 4 | Fase 5  |
+|---------------------------|-------|--------|---------|--------|---------|
+| **Services Públicos**     | 8     | 1 ✅    | 1       | 1      | 1       |
+| **Services Total**        | 9     | 9      | 9       | 9      | 6-7     |
+| **Eventos Implementados** | 6     | 6      | 14-16 ✅ | 14-16  | 14-16   |
+| **Sub-pacotes**           | 0     | 0      | 0       | 4 ✅    | 4       |
+| **LoC em Services**       | ~2100 | ~2100  | ~2200   | ~2200  | ~1800 ✅ |
 
 ---
 

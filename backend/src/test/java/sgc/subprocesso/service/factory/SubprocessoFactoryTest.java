@@ -13,7 +13,6 @@ import sgc.mapa.service.CopiaMapaService;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
-import sgc.organizacao.model.UnidadeMapaRepo;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.*;
 
@@ -36,9 +35,6 @@ class SubprocessoFactoryTest {
 
     @Mock
     private CopiaMapaService servicoDeCopiaDeMapa;
-
-    @Mock
-    private UnidadeMapaRepo unidadeMapaRepo;
 
     @InjectMocks
     private SubprocessoFactory factory;

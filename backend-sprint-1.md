@@ -8,13 +8,13 @@
 
 ## 📋 Sumário de Ações
 
-| # | Ação | Prioridade | Esforço | Impacto | Arquivos |
-|---|------|------------|---------|---------|----------|
-| 1 | Alterar `FetchType.EAGER` → `LAZY` em UsuarioPerfil | 🔴 Alta | 🟢 Baixo | 🔴 Alto | 1 arquivo (2 linhas) |
-| 3 | Remover override de `findAll()` em AtividadeRepo | 🔴 Alta | 🟢 Baixo | 🟠 Médio | 1 arquivo (6 linhas) |
-| 7 | Remover cache de unidades (CacheConfig) | 🟡 Média | 🟢 Baixo | 🟡 Baixo | 2 arquivos (~30 linhas) |
-| 11 | Converter subquery → JOIN em AtividadeRepo | 🟢 Baixa | 🟢 Baixo | 🟢 Baixo | 1 arquivo (1 query) |
-| 12 | Extrair `flattenTree` para utilitário compartilhado | 🟢 Baixa | 🟢 Baixo | 🟢 Baixo | 2 arquivos + 1 novo |
+| #  | Ação                                                | Prioridade | Esforço  | Impacto  | Arquivos                |
+|----|-----------------------------------------------------|------------|----------|----------|-------------------------|
+| 1  | Alterar `FetchType.EAGER` → `LAZY` em UsuarioPerfil | 🔴 Alta    | 🟢 Baixo | 🔴 Alto  | 1 arquivo (2 linhas)    |
+| 3  | Remover override de `findAll()` em AtividadeRepo    | 🔴 Alta    | 🟢 Baixo | 🟠 Médio | 1 arquivo (6 linhas)    |
+| 7  | Remover cache de unidades (CacheConfig)             | 🟡 Média   | 🟢 Baixo | 🟡 Baixo | 2 arquivos (~30 linhas) |
+| 11 | Converter subquery → JOIN em AtividadeRepo          | 🟢 Baixa   | 🟢 Baixo | 🟢 Baixo | 1 arquivo (1 query)     |
+| 12 | Extrair `flattenTree` para utilitário compartilhado | 🟢 Baixa   | 🟢 Baixo | 🟢 Baixo | 2 arquivos + 1 novo     |
 
 **Resultado Esperado:** Código mais limpo, sem complexidade desnecessária, base sólida para sprints futuras.
 
@@ -23,13 +23,17 @@
 ## 🎯 Ação #1: FetchType.EAGER → LAZY em UsuarioPerfil
 
 ### Contexto
-A classe `UsuarioPerfil` está usando `FetchType.EAGER` em dois relacionamentos ManyToOne (`Usuario` e `Unidade`), o que força o carregamento desses objetos em **toda** query de UsuarioPerfil, mesmo quando não são necessários. Isso degrada performance em listagens.
+
+A classe `UsuarioPerfil` está usando `FetchType.EAGER` em dois relacionamentos ManyToOne (`Usuario` e `Unidade`), o que
+força o carregamento desses objetos em **toda** query de UsuarioPerfil, mesmo quando não são necessários. Isso degrada
+performance em listagens.
 
 ### Problema Identificado
 
 **Arquivo:** `/backend/src/main/java/sgc/organizacao/model/UsuarioPerfil.java`
 
 **Código Atual (Linhas 33 e 37):**
+
 ```java
 @Entity
 @Immutable
@@ -47,6 +51,7 @@ public class UsuarioPerfil {
 ```
 
 **Impacto:**
+
 - ❌ Cada query de `UsuarioPerfil` força carregamento de `Usuario` E `Unidade`
 - ❌ Se `Usuario` tem relacionamentos LAZY, ainda pode causar N+1
 - ❌ Performance degradada em listagens (20-30% mais lento)
@@ -55,6 +60,7 @@ public class UsuarioPerfil {
 ### Solução
 
 **Alteração:**
+
 ```java
 @Entity
 @Immutable
@@ -72,6 +78,7 @@ public class UsuarioPerfil {
 ```
 
 **Para casos onde os relacionamentos SÃO necessários:**
+
 ```java
 // No UsuarioPerfilRepo.java, adicionar @EntityGraph quando precisar carregar relacionamentos:
 @EntityGraph(attributePaths = {"usuario", "unidade"})
@@ -86,7 +93,7 @@ List<UsuarioPerfil> findByUsuarioTituloWithDetails(String titulo);
    ```
 
 2. **Identificar as linhas exatas (33 e 37):**
-   - Buscar por `@ManyToOne(fetch = FetchType.EAGER)`
+    - Buscar por `@ManyToOne(fetch = FetchType.EAGER)`
 
 3. **Realizar a alteração:**
    ```bash
@@ -129,13 +136,16 @@ List<UsuarioPerfil> findByUsuarioTituloWithDetails(String titulo);
 ## 🎯 Ação #3: Remover Override de findAll() em AtividadeRepo
 
 ### Contexto
-O repositório `AtividadeRepo` sobrescreve o método `findAll()` do Spring Data JPA adicionando um `LEFT JOIN FETCH`, o que significa que **toda** chamada a `findAll()` carrega o relacionamento `mapa`, mesmo quando não é necessário.
+
+O repositório `AtividadeRepo` sobrescreve o método `findAll()` do Spring Data JPA adicionando um `LEFT JOIN FETCH`, o
+que significa que **toda** chamada a `findAll()` carrega o relacionamento `mapa`, mesmo quando não é necessário.
 
 ### Problema Identificado
 
 **Arquivo:** `/backend/src/main/java/sgc/mapa/model/AtividadeRepo.java`
 
 **Código Atual (Linhas 12-17):**
+
 ```java
 @Override
 @Query("""
@@ -146,6 +156,7 @@ List<Atividade> findAll();  // ❌ PROBLEMA - sempre faz fetch
 ```
 
 **Impacto:**
+
 - ❌ Sobrescreve comportamento padrão do Spring Data JPA
 - ❌ Força carregamento de `mapa` mesmo quando não necessário
 - ❌ Violação do princípio de menor surpresa (desenvolvedores esperam comportamento padrão)
@@ -154,6 +165,7 @@ List<Atividade> findAll();  // ❌ PROBLEMA - sempre faz fetch
 ### Solução
 
 **Remover completamente o override:**
+
 ```java
 // ❌ DELETAR estas linhas (12-17):
 @Override
@@ -165,6 +177,7 @@ List<Atividade> findAll();
 ```
 
 **Para casos onde `mapa` É necessário, criar método específico:**
+
 ```java
 // ✅ ADICIONAR método específico:
 @Query("""
@@ -223,7 +236,9 @@ List<Atividade> findAllWithMapa();  // Nome explícito
 ## 🎯 Ação #7: Remover Cache de Unidades
 
 ### Contexto
+
 O sistema implementa cache em memória (`ConcurrentMapCacheManager`) para hierarquia de unidades, mas:
+
 - **Sem invalidação:** Cache nunca é limpo, dados ficam obsoletos
 - **Benefício mínimo:** Para 20 usuários simultâneos, economia é ~40-60 queries/dia
 - **Complexidade > Benefício:** Adiciona risco de cache stale sem ganho significativo
@@ -231,12 +246,14 @@ O sistema implementa cache em memória (`ConcurrentMapCacheManager`) para hierar
 ### Problema Identificado
 
 **Arquivos Afetados:**
+
 1. `/backend/src/main/java/sgc/comum/config/CacheConfig.java` - Configuração do cache
 2. `/backend/src/main/java/sgc/organizacao/facade/UnidadeFacade.java` - Uso de @Cacheable
 
 **Código Atual:**
 
 **CacheConfig.java:**
+
 ```java
 @Configuration
 @EnableCaching
@@ -250,6 +267,7 @@ public class CacheConfig {
 ```
 
 **UnidadeFacade.java (linhas ~250 e ~280):**
+
 ```java
 @Cacheable(value = "unidadeDescendentes", key = "#codigoUnidade")
 public List<Long> buscarIdsDescendentes(Long codigoUnidade) {
@@ -263,6 +281,7 @@ public List<UnidadeDto> buscarTodasEntidadesComHierarquia() {
 ```
 
 **Impacto:**
+
 - ❌ Cache sem invalidação (dados obsoletos)
 - ❌ Complexidade desnecessária para 20 usuários simultâneos
 - ❌ Risco de bugs sutis (cache stale)
@@ -353,6 +372,7 @@ public List<UnidadeDto> buscarTodasEntidadesComHierarquia() {
 ### Justificativa da Remoção
 
 **Por que remover e não completar?**
+
 - Sistema tem apenas **20 usuários simultâneos**
 - Estrutura de unidades carregada **2-3x por sessão**
 - Economia estimada: **~40-60 queries/dia** (insignificante)
@@ -361,6 +381,7 @@ public List<UnidadeDto> buscarTodasEntidadesComHierarquia() {
 - Código mais simples e manutenível
 
 **Quando reintroduzir cache?**
+
 - Se número de usuários simultâneos > 100
 - Se performance se tornar um problema real (medido, não assumido)
 - Com implementação completa: TTL, invalidação, métricas
@@ -370,13 +391,16 @@ public List<UnidadeDto> buscarTodasEntidadesComHierarquia() {
 ## 🎯 Ação #11: Converter Subquery → JOIN em AtividadeRepo
 
 ### Contexto
-O método `findBySubprocessoCodigo()` usa uma subquery para buscar atividades por código de subprocesso, mas um JOIN seria mais eficiente.
+
+O método `findBySubprocessoCodigo()` usa uma subquery para buscar atividades por código de subprocesso, mas um JOIN
+seria mais eficiente.
 
 ### Problema Identificado
 
 **Arquivo:** `/backend/src/main/java/sgc/mapa/model/AtividadeRepo.java`
 
 **Código Atual (Linhas 36-42):**
+
 ```java
 @Query("""
     SELECT a FROM Atividade a
@@ -389,6 +413,7 @@ List<Atividade> findBySubprocessoCodigo(@Param("subprocessoCodigo") Long codigo)
 ```
 
 **Impacto:**
+
 - ❌ Subquery executa duas queries separadas
 - ❌ Menos eficiente que JOIN (especialmente com muitos dados)
 - ❌ Performance sub-ótima
@@ -396,6 +421,7 @@ List<Atividade> findBySubprocessoCodigo(@Param("subprocessoCodigo") Long codigo)
 ### Solução
 
 **Código Otimizado:**
+
 ```java
 @Query("""
     SELECT a FROM Atividade a
@@ -406,6 +432,7 @@ List<Atividade> findBySubprocessoCodigo(@Param("subprocessoCodigo") Long codigo)
 ```
 
 **Benefícios:**
+
 - ✅ Uma única query (mais eficiente)
 - ✅ Melhor performance (20-30% mais rápido)
 - ✅ Código mais idiomático
@@ -454,7 +481,10 @@ List<Atividade> findBySubprocessoCodigo(@Param("subprocessoCodigo") Long codigo)
 ## 🎯 Ação #12: Extrair flattenTree para Utilitário Compartilhado
 
 ### Contexto
-A função `flattenTree` para achatar estruturas hierárquicas está duplicada em pelo menos dois lugares do código frontend:
+
+A função `flattenTree` para achatar estruturas hierárquicas está duplicada em pelo menos dois lugares do código
+frontend:
+
 - `frontend/src/stores/unidades.ts`
 - `frontend/src/stores/perfil.ts` (ou similar)
 
@@ -463,10 +493,12 @@ Código duplicado viola o princípio DRY (Don't Repeat Yourself) e dificulta man
 ### Problema Identificado
 
 **Arquivos Afetados:**
+
 - `/frontend/src/stores/unidades.ts`
 - `/frontend/src/stores/perfil.ts` (ou outros)
 
 **Código Duplicado:**
+
 ```typescript
 // Em unidades.ts
 function flattenTree(items: UnidadeDto[]): UnidadeDto[] {
@@ -490,6 +522,7 @@ const flatten = (items: any[]): any[] => {
 **Criar utilitário compartilhado:**
 
 **Arquivo:** `/frontend/src/utils/treeUtils.ts` (NOVO)
+
 ```typescript
 /**
  * Achata uma estrutura de árvore hierárquica em uma lista plana.
@@ -514,6 +547,7 @@ export function flattenTree<T extends { subordinadas?: T[] }>(items: T[]): T[] {
 ```
 
 **Uso nos stores:**
+
 ```typescript
 // Em unidades.ts e perfil.ts
 import { flattenTree } from '@/utils/treeUtils';
@@ -582,6 +616,7 @@ const todasUnidades = flattenTree(unidades);  // ✅ Tipado e reutilizável
 Após implementar todas as 5 ações, validar:
 
 ### Testes Automatizados
+
 - [ ] ✅ Testes unitários backend passam: `./gradlew :backend:test`
 - [ ] ✅ Testes unitários frontend passam: `npm run test:unit`
 - [ ] ✅ TypeCheck frontend passa: `npm run typecheck`
@@ -589,6 +624,7 @@ Após implementar todas as 5 ações, validar:
 - [ ] ✅ Testes E2E passam: `npm run test:e2e` (crítico)
 
 ### Validação Manual
+
 - [ ] ✅ Aplicação inicia sem erros
 - [ ] ✅ Login funciona normalmente
 - [ ] ✅ Listagem de unidades funciona
@@ -596,6 +632,7 @@ Após implementar todas as 5 ações, validar:
 - [ ] ✅ Performance igual ou melhor (sem degradação perceptível)
 
 ### Qualidade de Código
+
 - [ ] ✅ Nenhum `FetchType.EAGER` desnecessário
 - [ ] ✅ Nenhum override de `findAll()` com fetch forçado
 - [ ] ✅ Nenhuma configuração de cache
@@ -603,6 +640,7 @@ Após implementar todas as 5 ações, validar:
 - [ ] ✅ Queries otimizadas (JOIN em vez de subquery)
 
 ### Documentação
+
 - [ ] ✅ Comentários de código atualizados (se aplicável)
 - [ ] ✅ Este documento marcado como CONCLUÍDO
 - [ ] ✅ `refactoring-tracker.md` atualizado
@@ -612,6 +650,7 @@ Após implementar todas as 5 ações, validar:
 ## 📈 Métricas de Sucesso
 
 **Antes da Sprint 1:**
+
 - FetchType.EAGER: 2 ocorrências
 - Overrides de findAll() com fetch: 1 ocorrência
 - Configuração de cache: 1 arquivo
@@ -619,6 +658,7 @@ Após implementar todas as 5 ações, validar:
 - Subqueries ineficientes: 1 ocorrência
 
 **Após a Sprint 1:**
+
 - ✅ FetchType.EAGER: 0 ocorrências (removidos 2)
 - ✅ Overrides de findAll() com fetch: 0 ocorrências (removido 1)
 - ✅ Configuração de cache: 0 arquivos (removido 1)
@@ -626,6 +666,7 @@ Após implementar todas as 5 ações, validar:
 - ✅ Subqueries ineficientes: 0 ocorrências (convertido para JOIN)
 
 **Estimativa de Impacto:**
+
 - 🟢 Redução de ~35-40 linhas de código
 - 🟢 Eliminação de complexidade desnecessária
 - 🟢 Performance melhorada em 10-20%
@@ -636,6 +677,7 @@ Após implementar todas as 5 ações, validar:
 ## 🚀 Próximos Passos
 
 Após conclusão da Sprint 1, prosseguir para:
+
 - **Sprint 2:** [frontend-sprint-2.md](./frontend-sprint-2.md) - Consolidação Frontend
 - **Sprint 3:** [backend-sprint-3.md](./backend-sprint-3.md) - Refatoração Backend
 - **Sprint 4:** [otimizacoes-sprint-4.md](./otimizacoes-sprint-4.md) - Otimizações Opcionais

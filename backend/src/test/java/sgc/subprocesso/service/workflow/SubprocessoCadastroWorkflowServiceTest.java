@@ -193,10 +193,10 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         verify(transicaoService).registrarAnaliseETransicao(argThat(req ->
                 req.sp().equals(sp) &&
-                req.novaSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO &&
-                req.tipoTransicao() == TipoTransicao.CADASTRO_DEVOLVIDO &&
-                req.usuario().equals(user) &&
-                "obs".equals(req.observacoes())
+                        req.novaSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO &&
+                        req.tipoTransicao() == TipoTransicao.CADASTRO_DEVOLVIDO &&
+                        req.usuario().equals(user) &&
+                        "obs".equals(req.observacoes())
         ));
     }
 
@@ -218,10 +218,10 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         verify(transicaoService).registrarAnaliseETransicao(argThat(req ->
                 req.sp().equals(sp) &&
-                req.novaSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO &&
-                req.tipoTransicao() == TipoTransicao.CADASTRO_ACEITO &&
-                req.usuario().equals(user) &&
-                "obs".equals(req.observacoes())
+                        req.novaSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO &&
+                        req.tipoTransicao() == TipoTransicao.CADASTRO_ACEITO &&
+                        req.usuario().equals(user) &&
+                        "obs".equals(req.observacoes())
         ));
     }
 
@@ -297,6 +297,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         assertThatThrownBy(() -> service.homologarCadastro(id, "obs", user))
                 .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
+
     @Test
     @DisplayName("devolverRevisaoCadastro sucesso")
     void devolverRevisaoCadastro() {
@@ -317,17 +318,17 @@ class SubprocessoCadastroWorkflowServiceTest {
         user.setUnidadeLotacao(u);
 
         when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
-        
+
         service.devolverRevisaoCadastro(id, "obs", user);
 
         assertThat(sp.getDataFimEtapa1()).isNull();
 
         verify(transicaoService).registrarAnaliseETransicao(argThat(req ->
                 req.sp().equals(sp) &&
-                req.novaSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO &&
-                req.tipoTransicao() == TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA &&
-                req.usuario().equals(user) &&
-                "obs".equals(req.observacoes())
+                        req.novaSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO &&
+                        req.tipoTransicao() == TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA &&
+                        req.usuario().equals(user) &&
+                        "obs".equals(req.observacoes())
         ));
     }
 
@@ -337,10 +338,10 @@ class SubprocessoCadastroWorkflowServiceTest {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-    
+
         Unidade u = new Unidade();
         u.setCodigo(10L);
-    
+
         Unidade sup = new Unidade();
         sup.setCodigo(20L);
         sup.setSigla("SUP");
@@ -351,15 +352,15 @@ class SubprocessoCadastroWorkflowServiceTest {
         user.setUnidadeLotacao(u);
 
         when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
-        
+
         service.aceitarRevisaoCadastro(id, "obs", user);
 
         verify(transicaoService).registrarAnaliseETransicao(argThat(req ->
                 req.sp().equals(sp) &&
-                req.novaSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA &&
-                req.tipoTransicao() == TipoTransicao.REVISAO_CADASTRO_ACEITA &&
-                req.usuario().equals(user) &&
-                "obs".equals(req.observacoes())
+                        req.novaSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA &&
+                        req.tipoTransicao() == TipoTransicao.REVISAO_CADASTRO_ACEITA &&
+                        req.usuario().equals(user) &&
+                        "obs".equals(req.observacoes())
         ));
     }
 
@@ -417,7 +418,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         Usuario user = new Usuario();
 
         when(repo.buscar(Subprocesso.class, id)).thenReturn(sp);
-            when(impactoMapaService.verificarImpactos(any(Subprocesso.class), eq(user)))
+        when(impactoMapaService.verificarImpactos(any(Subprocesso.class), eq(user)))
                 .thenReturn(ImpactoMapaDto.semImpacto());
 
         service.homologarRevisaoCadastro(id, "obs", user);
@@ -451,7 +452,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         Unidade u = new Unidade();
         u.setTituloTitular("123");
 
-        Mapa mapa = new Mapa(); 
+        Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
 
         Subprocesso sp = new Subprocesso();
@@ -474,10 +475,10 @@ class SubprocessoCadastroWorkflowServiceTest {
         Long id = 1L;
         Usuario user = new Usuario();
         user.setTituloEleitoral("123");
-    
+
         Unidade u = new Unidade();
         u.setTituloTitular("123");
-    
+
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
 

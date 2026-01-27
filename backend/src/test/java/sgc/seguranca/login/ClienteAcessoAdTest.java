@@ -112,7 +112,7 @@ class ClienteAcessoAdTest {
         when(response.getBody()).thenReturn(new ByteArrayInputStream("Erro detalhado".getBytes(StandardCharsets.UTF_8)));
 
         assertThrows(ErroAutenticacao.class, () ->
-            handlerCaptor.getValue().handle(request, response)
+                handlerCaptor.getValue().handle(request, response)
         );
     }
 }

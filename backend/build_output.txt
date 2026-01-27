@@ -1,0 +1,575 @@
+Reusing configuration cache.
+> Task :frontend:processTestResources NO-SOURCE
+> Task :frontend:processResources NO-SOURCE
+> Task :frontend:compileJava NO-SOURCE
+> Task :backend:processResources UP-TO-DATE
+> Task :frontend:classes UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :frontend:compileTestJava NO-SOURCE
+> Task :frontend:testClasses UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+
+> Task :backend:compileTestJava
+/Users/leonardo/sgc/backend/src/test/java/sgc/mapa/service/CopiaMapaServiceTest.java:87: error: cannot find symbol
+        assertThat(atividadeAssociada.codigo()).isEqualTo(20L);
+                                     ^
+  symbol:   method codigo()
+  location: variable atividadeAssociada of type Atividade
+/Users/leonardo/sgc/backend/src/test/java/sgc/organizacao/UnidadeFacadeCoverageTest.java:62: error: cannot find symbol
+        assertThat(result.codigo()).isEqualTo(3L);
+                         ^
+  symbol:   method codigo()
+  location: variable result of type UnidadeDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/organizacao/UsuarioFacadeCoverageTest.java:116: error: cannot find symbol
+        assertThat(result.tituloEleitoral()).isEqualTo("T");
+                         ^
+  symbol:   method tituloEleitoral()
+  location: variable result of type Usuario
+/Users/leonardo/sgc/backend/src/test/java/sgc/organizacao/UsuarioFacadeCoverageTest.java:123: error: cannot find symbol
+        when(u.tituloEleitoral()).thenReturn("T");
+              ^
+  symbol:   method tituloEleitoral()
+  location: variable u of type Usuario
+/Users/leonardo/sgc/backend/src/test/java/sgc/organizacao/model/UsuarioTest.java:52: error: cannot find symbol
+        assertThat(todas.iterator().next().perfil()).isEqualTo(Perfil.GESTOR);
+                                          ^
+  symbol:   method perfil()
+  location: class UsuarioPerfil
+/Users/leonardo/sgc/backend/src/test/java/sgc/organizacao/model/UnidadeTest.java:23: error: cannot find symbol
+        unidade.setMatriculaTitular(usuario.matricula());
+                                           ^
+  symbol:   method matricula()
+  location: variable usuario of type Usuario
+/Users/leonardo/sgc/backend/src/test/java/sgc/seguranca/login/dto/UsuarioAcessoAdTest.java:32: error: cannot find symbol
+        assertThat(ad.nome()).isEqualTo("nome");
+                     ^
+  symbol:   method nome()
+  location: variable ad of type UsuarioAcessoAd
+/Users/leonardo/sgc/backend/src/test/java/sgc/seguranca/login/dto/UsuarioAcessoAdTest.java:33: error: cannot find symbol
+        assertThat(ad.email()).isEqualTo("email");
+                     ^
+  symbol:   method email()
+  location: variable ad of type UsuarioAcessoAd
+/Users/leonardo/sgc/backend/src/test/java/sgc/seguranca/login/dto/UsuarioAcessoAdTest.java:39: error: cannot find symbol
+        assertThat(lot.codigo()).isEqualTo(100);
+                      ^
+  symbol:   method codigo()
+  location: variable lot of type LotacaoAd
+/Users/leonardo/sgc/backend/src/test/java/sgc/seguranca/login/dto/UsuarioAcessoAdTest.java:41: error: cannot find symbol
+        assertThat(lot.nome()).isEqualTo("Nome Lotacao");
+                      ^
+  symbol:   method nome()
+  location: variable lot of type LotacaoAd
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapaAjusteDtoTest.java:48: error: cannot find symbol
+        assertThat(dto.competencias()).isEmpty();
+                      ^
+  symbol:   method competencias()
+  location: variable dto of type MapaAjusteDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapaAjusteDtoTest.java:94: error: cannot find symbol
+            assertThat(dto.competencias()).hasSize(1);
+                          ^
+  symbol:   method competencias()
+  location: variable dto of type MapaAjusteDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapaAjusteDtoTest.java:95: error: cannot find symbol
+            CompetenciaAjusteDto compDto = dto.competencias().getFirst();
+                                              ^
+  symbol:   method competencias()
+  location: variable dto of type MapaAjusteDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapperTest.java:92: error: cannot find symbol
+        assertEquals(1L, dto.codigo());
+                            ^
+  symbol:   method codigo()
+  location: variable dto of type SubprocessoDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapperTest.java:128: error: cannot find symbol
+        assertEquals(100L, entity.getProcesso().codigo());
+                                               ^
+  symbol:   method codigo()
+  location: class Processo
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapperTest.java:129: error: cannot find symbol
+        assertNotNull(entity.unidade());
+                            ^
+  symbol:   method unidade()
+  location: variable entity of type Subprocesso
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapperTest.java:130: error: cannot find symbol
+        assertEquals(200L, entity.unidade().codigo());
+                                 ^
+  symbol:   method unidade()
+  location: variable entity of type Subprocesso
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapperTest.java:132: error: cannot find symbol
+        assertEquals(300L, entity.getMapa().codigo());
+                                           ^
+  symbol:   method codigo()
+  location: class Mapa
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/SubprocessoMapaControllerTest.java:89: error: constructor MapaVisualizacaoDto in record MapaVisualizacaoDto cannot be applied to given types;
+                                .thenReturn(new MapaVisualizacaoDto());
+                                            ^
+  required: UnidadeDto,List<CompetenciaDto>,List<AtividadeDto>,String
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/mapper/MapaAjusteMapperTest.java:59: error: cannot find symbol
+        associacoes.put(comp.codigo(), java.util.Set.of(ativ.codigo()));
+                            ^
+  symbol:   method codigo()
+  location: variable comp of type Competencia
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/mapper/MapaAjusteMapperTest.java:59: error: cannot find symbol
+        associacoes.put(comp.codigo(), java.util.Set.of(ativ.codigo()));
+                                                            ^
+  symbol:   method codigo()
+  location: variable ativ of type Atividade
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/mapper/MapaAjusteMapperTest.java:68: error: cannot find symbol
+        assertThat(dto.competencias()).hasSize(1);
+                      ^
+  symbol:   method competencias()
+  location: variable dto of type MapaAjusteDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/mapper/MapaAjusteMapperTest.java:69: error: cannot find symbol
+        assertThat(dto.competencias().getFirst().getAtividades()).hasSize(1);
+                      ^
+  symbol:   method competencias()
+  location: variable dto of type MapaAjusteDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/mapper/MapaAjusteMapperTest.java:70: error: cannot find symbol
+        assertThat(dto.competencias().getFirst().getAtividades().getFirst().conhecimentos()).hasSize(1);
+                      ^
+  symbol:   method competencias()
+  location: variable dto of type MapaAjusteDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/mapper/MapaAjusteMapperTest.java:71: error: cannot find symbol
+        assertThat(dto.competencias().getFirst().getAtividades().getFirst().conhecimentos().getFirst().incluido()).isTrue();
+                      ^
+  symbol:   method competencias()
+  location: variable dto of type MapaAjusteDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/model/MovimentacaoTest.java:31: error: cannot find symbol
+        assertThat(mov.codigo()).isEqualTo(1L);
+                      ^
+  symbol:   method codigo()
+  location: variable mov of type Movimentacao
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/model/MovimentacaoTest.java:32: error: cannot find symbol
+        assertThat(mov.subprocesso()).isEqualTo(sp);
+                      ^
+  symbol:   method subprocesso()
+  location: variable mov of type Movimentacao
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/model/MovimentacaoTest.java:34: error: cannot find symbol
+        assertThat(mov.descricao()).isEqualTo("Desc");
+                      ^
+  symbol:   method descricao()
+  location: variable mov of type Movimentacao
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/model/SubprocessoTest.java:82: error: cannot find symbol
+        assertThat(sp.unidade()).isEqualTo(u);
+                     ^
+  symbol:   method unidade()
+  location: variable sp of type Subprocesso
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/model/SubprocessoTest.java:98: error: cannot find symbol
+        assertThat(sp.unidade()).isEqualTo(u);
+                     ^
+  symbol:   method unidade()
+  location: variable sp of type Subprocesso
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowServiceTest.java:159: error: cannot find symbol
+        sp.unidade().setUnidadeSuperior(new Unidade());
+          ^
+  symbol:   method unidade()
+  location: variable sp of type Subprocesso
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowServiceTest.java:181: error: cannot find symbol
+        sp.unidade().setUnidadeSuperior(new Unidade());
+          ^
+  symbol:   method unidade()
+  location: variable sp of type Subprocesso
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowServiceTest.java:199: error: cannot find symbol
+        sp.unidade().setUnidadeSuperior(new Unidade());
+          ^
+  symbol:   method unidade()
+  location: variable sp of type Subprocesso
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowServiceTest.java:236: error: cannot find symbol
+        sp.unidade().setUnidadeSuperior(null); // Null superior
+          ^
+  symbol:   method unidade()
+  location: variable sp of type Subprocesso
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowServiceTest.java:254: error: cannot find symbol
+        sp.unidade().setUnidadeSuperior(null); // Null superior
+          ^
+  symbol:   method unidade()
+  location: variable sp of type Subprocesso
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/crud/SubprocessoCrudServiceTest.java:180: error: cannot find symbol
+        assertThat(sp.getMapa().codigo()).isEqualTo(5L);
+                               ^
+  symbol:   method codigo()
+  location: class Mapa
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/crud/SubprocessoCrudServiceTest.java:423: error: cannot find symbol
+        assertThat(sp.getMapa().codigo()).isEqualTo(5L);
+                               ^
+  symbol:   method codigo()
+  location: class Mapa
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/SubprocessoFacadeComplementaryTest.java:477: error: cannot find symbol
+            assertThat(result.codigo()).isEqualTo(1L);
+                             ^
+  symbol:   method codigo()
+  location: variable result of type SubprocessoDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/SubprocessoWorkflowServiceTest.java:133: error: cannot find symbol
+        sp.unidade().setUnidadeSuperior(new Unidade());
+          ^
+  symbol:   method unidade()
+  location: variable sp of type Subprocesso
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/SubprocessoWorkflowServiceTest.java:180: error: cannot find symbol
+        sp.unidade().setUnidadeSuperior(new Unidade());
+          ^
+  symbol:   method unidade()
+  location: variable sp of type Subprocesso
+/Users/leonardo/sgc/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:124: error: cannot find symbol
+            assertEquals(OBSERVACOES, analise.orElseThrow(() -> new AssertionError("Análise não encontrada.")).observacoes());
+                                                                                                              ^
+  symbol:   method observacoes()
+  location: class Analise
+/Users/leonardo/sgc/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:128: error: cannot find symbol
+            assertEquals("Cadastro de atividades e conhecimentos aceito", movimentacoes.getFirst().descricao());
+                                                                                                  ^
+  symbol:   method descricao()
+  location: class Movimentacao
+/Users/leonardo/sgc/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:159: error: cannot find symbol
+            assertEquals(OBSERVACOES, analise.get().observacoes());
+                                                   ^
+  symbol:   method observacoes()
+  location: class Analise
+/Users/leonardo/sgc/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:163: error: cannot find symbol
+            assertEquals("Revisão do cadastro de atividades e conhecimentos aceita", movimentacoes.getFirst().descricao());
+                                                                                                             ^
+  symbol:   method descricao()
+  location: class Movimentacao
+/Users/leonardo/sgc/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:181: error: cannot find symbol
+            assertTrue(erro.message().contains("situação"),
+                           ^
+  symbol:   method message()
+  location: variable erro of type ErroAccessoNegado
+/Users/leonardo/sgc/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:205: error: cannot find symbol
+            subprocessoWorkflowService.homologarRevisaoCadastro(subprocessoAposAceite.codigo(), OBSERVACOES, admin);
+                                                                                     ^
+  symbol:   method codigo()
+  location: variable subprocessoAposAceite of type Subprocesso
+/Users/leonardo/sgc/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:230: error: cannot find symbol
+            assertTrue(erro.message().contains("situação"),
+                           ^
+  symbol:   method message()
+  location: variable erro of type ErroAccessoNegado
+/Users/leonardo/sgc/backend/src/test/java/sgc/painel/PainelServiceIntegrationTest.java:61: error: cannot find symbol
+            Long codigoProcessoRevisao = processoRevisaoDto.codigo();
+                                                           ^
+  symbol:   method codigo()
+  location: variable processoRevisaoDto of type ProcessoDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/painel/PainelServiceIntegrationTest.java:152: error: cannot find symbol
+                    .filter(p -> p.codigo().equals(processoSeed.codigo()))
+                                                               ^
+  symbol:   method codigo()
+  location: variable processoSeed of type ProcessoDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/painel/PainelServiceIntegrationTest.java:156: error: cannot find symbol
+                    .filter(p -> p.codigo().equals(processoRevisao.codigo()))
+                                                                  ^
+  symbol:   method codigo()
+  location: variable processoRevisao of type ProcessoDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/painel/PainelServiceIntegrationTest.java:160: error: cannot find symbol
+            assertThat(dtoSeed.linkDestino()).contains(processoSeed.codigo().toString());
+                                                                   ^
+  symbol:   method codigo()
+  location: variable processoSeed of type ProcessoDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/painel/PainelServiceIntegrationTest.java:161: error: cannot find symbol
+            assertThat(dtoRevisao.linkDestino()).contains(processoRevisao.codigo().toString());
+                                                                         ^
+  symbol:   method codigo()
+  location: variable processoRevisao of type ProcessoDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/painel/PainelServiceIntegrationTest.java:164: error: cannot find symbol
+            assertThat(dtoRevisao.linkDestino()).doesNotContain(processoSeed.codigo().toString());
+                                                                            ^
+  symbol:   method codigo()
+  location: variable processoSeed of type ProcessoDto
+/Users/leonardo/sgc/backend/src/test/java/sgc/painel/PainelServiceTest.java:416: error: cannot find symbol
+            assertThat(result.getContent().getFirst().descricao()).isEqualTo("Alerta teste");
+                                                     ^
+  symbol:   method descricao()
+  location: class AlertaDto
+54 errors
+
+> Task :backend:compileTestJava FAILED
+
+[Incubating] Problems report is available at: file:///Users/leonardo/sgc/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:compileTestJava'.
+> Compilation failed; see the compiler output below.
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/SubprocessoMapaControllerTest.java:89: error: constructor MapaVisualizacaoDto in record MapaVisualizacaoDto cannot be applied to given types;
+                                  .thenReturn(new MapaVisualizacaoDto());
+                                              ^
+    required: UnidadeDto,List<CompetenciaDto>,List<AtividadeDto>,String
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  /Users/leonardo/sgc/backend/src/test/java/sgc/mapa/service/CopiaMapaServiceTest.java:87: error: cannot find symbol
+          assertThat(atividadeAssociada.codigo()).isEqualTo(20L);
+                                       ^
+    symbol:   method codigo()
+    location: variable atividadeAssociada of type Atividade
+  /Users/leonardo/sgc/backend/src/test/java/sgc/organizacao/UnidadeFacadeCoverageTest.java:62: error: cannot find symbol
+          assertThat(result.codigo()).isEqualTo(3L);
+                           ^
+    symbol:   method codigo()
+    location: variable result of type UnidadeDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/organizacao/UsuarioFacadeCoverageTest.java:116: error: cannot find symbol
+          assertThat(result.tituloEleitoral()).isEqualTo("T");
+                           ^
+    symbol:   method tituloEleitoral()
+    location: variable result of type Usuario
+  /Users/leonardo/sgc/backend/src/test/java/sgc/organizacao/UsuarioFacadeCoverageTest.java:123: error: cannot find symbol
+          when(u.tituloEleitoral()).thenReturn("T");
+                ^
+    symbol:   method tituloEleitoral()
+    location: variable u of type Usuario
+  /Users/leonardo/sgc/backend/src/test/java/sgc/organizacao/model/UsuarioTest.java:52: error: cannot find symbol
+          assertThat(todas.iterator().next().perfil()).isEqualTo(Perfil.GESTOR);
+                                            ^
+    symbol:   method perfil()
+    location: class UsuarioPerfil
+  /Users/leonardo/sgc/backend/src/test/java/sgc/organizacao/model/UnidadeTest.java:23: error: cannot find symbol
+          unidade.setMatriculaTitular(usuario.matricula());
+                                             ^
+    symbol:   method matricula()
+    location: variable usuario of type Usuario
+  /Users/leonardo/sgc/backend/src/test/java/sgc/seguranca/login/dto/UsuarioAcessoAdTest.java:32: error: cannot find symbol
+          assertThat(ad.nome()).isEqualTo("nome");
+                       ^
+    symbol:   method nome()
+    location: variable ad of type UsuarioAcessoAd
+  /Users/leonardo/sgc/backend/src/test/java/sgc/seguranca/login/dto/UsuarioAcessoAdTest.java:33: error: cannot find symbol
+          assertThat(ad.email()).isEqualTo("email");
+                       ^
+    symbol:   method email()
+    location: variable ad of type UsuarioAcessoAd
+  /Users/leonardo/sgc/backend/src/test/java/sgc/seguranca/login/dto/UsuarioAcessoAdTest.java:39: error: cannot find symbol
+          assertThat(lot.codigo()).isEqualTo(100);
+                        ^
+    symbol:   method codigo()
+    location: variable lot of type LotacaoAd
+  /Users/leonardo/sgc/backend/src/test/java/sgc/seguranca/login/dto/UsuarioAcessoAdTest.java:41: error: cannot find symbol
+          assertThat(lot.nome()).isEqualTo("Nome Lotacao");
+                        ^
+    symbol:   method nome()
+    location: variable lot of type LotacaoAd
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapaAjusteDtoTest.java:48: error: cannot find symbol
+          assertThat(dto.competencias()).isEmpty();
+                        ^
+    symbol:   method competencias()
+    location: variable dto of type MapaAjusteDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapaAjusteDtoTest.java:94: error: cannot find symbol
+              assertThat(dto.competencias()).hasSize(1);
+                            ^
+    symbol:   method competencias()
+    location: variable dto of type MapaAjusteDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapaAjusteDtoTest.java:95: error: cannot find symbol
+              CompetenciaAjusteDto compDto = dto.competencias().getFirst();
+                                                ^
+    symbol:   method competencias()
+    location: variable dto of type MapaAjusteDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapperTest.java:92: error: cannot find symbol
+          assertEquals(1L, dto.codigo());
+                              ^
+    symbol:   method codigo()
+    location: variable dto of type SubprocessoDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapperTest.java:128: error: cannot find symbol
+          assertEquals(100L, entity.getProcesso().codigo());
+                                                 ^
+    symbol:   method codigo()
+    location: class Processo
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapperTest.java:129: error: cannot find symbol
+          assertNotNull(entity.unidade());
+                              ^
+    symbol:   method unidade()
+    location: variable entity of type Subprocesso
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapperTest.java:130: error: cannot find symbol
+          assertEquals(200L, entity.unidade().codigo());
+                                   ^
+    symbol:   method unidade()
+    location: variable entity of type Subprocesso
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/dto/MapperTest.java:132: error: cannot find symbol
+          assertEquals(300L, entity.getMapa().codigo());
+                                             ^
+    symbol:   method codigo()
+    location: class Mapa
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/mapper/MapaAjusteMapperTest.java:59: error: cannot find symbol
+          associacoes.put(comp.codigo(), java.util.Set.of(ativ.codigo()));
+                              ^
+    symbol:   method codigo()
+    location: variable comp of type Competencia
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/mapper/MapaAjusteMapperTest.java:59: error: cannot find symbol
+          associacoes.put(comp.codigo(), java.util.Set.of(ativ.codigo()));
+                                                              ^
+    symbol:   method codigo()
+    location: variable ativ of type Atividade
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/mapper/MapaAjusteMapperTest.java:68: error: cannot find symbol
+          assertThat(dto.competencias()).hasSize(1);
+                        ^
+    symbol:   method competencias()
+    location: variable dto of type MapaAjusteDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/mapper/MapaAjusteMapperTest.java:69: error: cannot find symbol
+          assertThat(dto.competencias().getFirst().getAtividades()).hasSize(1);
+                        ^
+    symbol:   method competencias()
+    location: variable dto of type MapaAjusteDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/mapper/MapaAjusteMapperTest.java:70: error: cannot find symbol
+          assertThat(dto.competencias().getFirst().getAtividades().getFirst().conhecimentos()).hasSize(1);
+                        ^
+    symbol:   method competencias()
+    location: variable dto of type MapaAjusteDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/mapper/MapaAjusteMapperTest.java:71: error: cannot find symbol
+          assertThat(dto.competencias().getFirst().getAtividades().getFirst().conhecimentos().getFirst().incluido()).isTrue();
+                        ^
+    symbol:   method competencias()
+    location: variable dto of type MapaAjusteDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/model/MovimentacaoTest.java:31: error: cannot find symbol
+          assertThat(mov.codigo()).isEqualTo(1L);
+                        ^
+    symbol:   method codigo()
+    location: variable mov of type Movimentacao
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/model/MovimentacaoTest.java:32: error: cannot find symbol
+          assertThat(mov.subprocesso()).isEqualTo(sp);
+                        ^
+    symbol:   method subprocesso()
+    location: variable mov of type Movimentacao
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/model/MovimentacaoTest.java:34: error: cannot find symbol
+          assertThat(mov.descricao()).isEqualTo("Desc");
+                        ^
+    symbol:   method descricao()
+    location: variable mov of type Movimentacao
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/model/SubprocessoTest.java:82: error: cannot find symbol
+          assertThat(sp.unidade()).isEqualTo(u);
+                       ^
+    symbol:   method unidade()
+    location: variable sp of type Subprocesso
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/model/SubprocessoTest.java:98: error: cannot find symbol
+          assertThat(sp.unidade()).isEqualTo(u);
+                       ^
+    symbol:   method unidade()
+    location: variable sp of type Subprocesso
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowServiceTest.java:159: error: cannot find symbol
+          sp.unidade().setUnidadeSuperior(new Unidade());
+            ^
+    symbol:   method unidade()
+    location: variable sp of type Subprocesso
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowServiceTest.java:181: error: cannot find symbol
+          sp.unidade().setUnidadeSuperior(new Unidade());
+            ^
+    symbol:   method unidade()
+    location: variable sp of type Subprocesso
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowServiceTest.java:199: error: cannot find symbol
+          sp.unidade().setUnidadeSuperior(new Unidade());
+            ^
+    symbol:   method unidade()
+    location: variable sp of type Subprocesso
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowServiceTest.java:236: error: cannot find symbol
+          sp.unidade().setUnidadeSuperior(null); // Null superior
+            ^
+    symbol:   method unidade()
+    location: variable sp of type Subprocesso
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowServiceTest.java:254: error: cannot find symbol
+          sp.unidade().setUnidadeSuperior(null); // Null superior
+            ^
+    symbol:   method unidade()
+    location: variable sp of type Subprocesso
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/crud/SubprocessoCrudServiceTest.java:180: error: cannot find symbol
+          assertThat(sp.getMapa().codigo()).isEqualTo(5L);
+                                 ^
+    symbol:   method codigo()
+    location: class Mapa
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/crud/SubprocessoCrudServiceTest.java:423: error: cannot find symbol
+          assertThat(sp.getMapa().codigo()).isEqualTo(5L);
+                                 ^
+    symbol:   method codigo()
+    location: class Mapa
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/SubprocessoFacadeComplementaryTest.java:477: error: cannot find symbol
+              assertThat(result.codigo()).isEqualTo(1L);
+                               ^
+    symbol:   method codigo()
+    location: variable result of type SubprocessoDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/SubprocessoWorkflowServiceTest.java:133: error: cannot find symbol
+          sp.unidade().setUnidadeSuperior(new Unidade());
+            ^
+    symbol:   method unidade()
+    location: variable sp of type Subprocesso
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/SubprocessoWorkflowServiceTest.java:180: error: cannot find symbol
+          sp.unidade().setUnidadeSuperior(new Unidade());
+            ^
+    symbol:   method unidade()
+    location: variable sp of type Subprocesso
+  /Users/leonardo/sgc/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:124: error: cannot find symbol
+              assertEquals(OBSERVACOES, analise.orElseThrow(() -> new AssertionError("Análise não encontrada.")).observacoes());
+                                                                                                                ^
+    symbol:   method observacoes()
+    location: class Analise
+  /Users/leonardo/sgc/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:128: error: cannot find symbol
+              assertEquals("Cadastro de atividades e conhecimentos aceito", movimentacoes.getFirst().descricao());
+                                                                                                    ^
+    symbol:   method descricao()
+    location: class Movimentacao
+  /Users/leonardo/sgc/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:159: error: cannot find symbol
+              assertEquals(OBSERVACOES, analise.get().observacoes());
+                                                     ^
+    symbol:   method observacoes()
+    location: class Analise
+  /Users/leonardo/sgc/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:163: error: cannot find symbol
+              assertEquals("Revisão do cadastro de atividades e conhecimentos aceita", movimentacoes.getFirst().descricao());
+                                                                                                               ^
+    symbol:   method descricao()
+    location: class Movimentacao
+  /Users/leonardo/sgc/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:181: error: cannot find symbol
+              assertTrue(erro.message().contains("situação"),
+                             ^
+    symbol:   method message()
+    location: variable erro of type ErroAccessoNegado
+  /Users/leonardo/sgc/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:205: error: cannot find symbol
+              subprocessoWorkflowService.homologarRevisaoCadastro(subprocessoAposAceite.codigo(), OBSERVACOES, admin);
+                                                                                       ^
+    symbol:   method codigo()
+    location: variable subprocessoAposAceite of type Subprocesso
+  /Users/leonardo/sgc/backend/src/test/java/sgc/service/SubprocessoServiceActionsTest.java:230: error: cannot find symbol
+              assertTrue(erro.message().contains("situação"),
+                             ^
+    symbol:   method message()
+    location: variable erro of type ErroAccessoNegado
+  /Users/leonardo/sgc/backend/src/test/java/sgc/painel/PainelServiceIntegrationTest.java:61: error: cannot find symbol
+              Long codigoProcessoRevisao = processoRevisaoDto.codigo();
+                                                             ^
+    symbol:   method codigo()
+    location: variable processoRevisaoDto of type ProcessoDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/painel/PainelServiceIntegrationTest.java:152: error: cannot find symbol
+                      .filter(p -> p.codigo().equals(processoSeed.codigo()))
+                                                                 ^
+    symbol:   method codigo()
+    location: variable processoSeed of type ProcessoDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/painel/PainelServiceIntegrationTest.java:156: error: cannot find symbol
+                      .filter(p -> p.codigo().equals(processoRevisao.codigo()))
+                                                                    ^
+    symbol:   method codigo()
+    location: variable processoRevisao of type ProcessoDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/painel/PainelServiceIntegrationTest.java:160: error: cannot find symbol
+              assertThat(dtoSeed.linkDestino()).contains(processoSeed.codigo().toString());
+                                                                     ^
+    symbol:   method codigo()
+    location: variable processoSeed of type ProcessoDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/painel/PainelServiceIntegrationTest.java:161: error: cannot find symbol
+              assertThat(dtoRevisao.linkDestino()).contains(processoRevisao.codigo().toString());
+                                                                           ^
+    symbol:   method codigo()
+    location: variable processoRevisao of type ProcessoDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/painel/PainelServiceIntegrationTest.java:164: error: cannot find symbol
+              assertThat(dtoRevisao.linkDestino()).doesNotContain(processoSeed.codigo().toString());
+                                                                              ^
+    symbol:   method codigo()
+    location: variable processoSeed of type ProcessoDto
+  /Users/leonardo/sgc/backend/src/test/java/sgc/painel/PainelServiceTest.java:416: error: cannot find symbol
+              assertThat(result.getContent().getFirst().descricao()).isEqualTo("Alerta teste");
+                                                       ^
+    symbol:   method descricao()
+    location: class AlertaDto
+  54 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 4s
+4 actionable tasks: 1 executed, 3 up-to-date
+Configuration cache entry reused.

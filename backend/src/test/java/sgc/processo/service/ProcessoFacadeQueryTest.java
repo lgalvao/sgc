@@ -67,7 +67,7 @@ class ProcessoFacadeQueryTest {
     private ProcessoInicializador processoInicializador;
     @Mock
     private AlertaFacade alertaService;
-    
+
     // Specialized services
     @Mock
     private ProcessoAcessoService processoAcessoService;
@@ -325,7 +325,7 @@ class ProcessoFacadeQueryTest {
         @DisplayName("listarUnidadesBloqueadasPorTipo: chama repo")
         void listarUnidadesBloqueadasPorTipo() {
             when(processoConsultaService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO")).thenReturn(List.of(1L, 2L));
-            
+
             processoFacade.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
             verify(processoConsultaService).listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
         }
@@ -335,16 +335,16 @@ class ProcessoFacadeQueryTest {
         void getMensagemErroUnidadesSemMapa_Empty() {
             // This method is now in ProcessoValidador, not in ProcessoFacade
             // Testing through the facade by creating a process with REVISAO type
-            
+
             when(processoValidador.getMensagemErroUnidadesSemMapa(Collections.emptyList()))
                     .thenReturn(Optional.empty());
-            
+
             Optional<String> msg = processoValidador.getMensagemErroUnidadesSemMapa(Collections.emptyList());
             assertThat(msg).isEmpty();
-            
+
             when(processoValidador.getMensagemErroUnidadesSemMapa(null))
                     .thenReturn(Optional.empty());
-            
+
             Optional<String> msgNull = processoValidador.getMensagemErroUnidadesSemMapa(null);
             assertThat(msgNull).isEmpty();
         }

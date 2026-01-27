@@ -22,12 +22,10 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 @Component
 @Slf4j
 public class LimitadorTentativasLogin {
-    private final Environment environment;
-
     private static final int MAX_TENTATIVAS = 5;
     private static final int JANELA_MINUTOS = 1;
     private static final int DEFAULT_MAX_CACHE_ENTRIES = 1000;
-
+    private final Environment environment;
     private final int maxCacheEntries;
     private final Map<String, Deque<LocalDateTime>> tentativasPorIp = new ConcurrentHashMap<>();
     private final java.time.Clock clock;

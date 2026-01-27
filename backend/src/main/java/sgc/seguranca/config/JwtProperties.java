@@ -9,8 +9,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "aplicacao.jwt")
 public record JwtProperties(
-    String secret,
-    int expiracaoMinutos
+        String secret,
+        int expiracaoMinutos
 ) {
     private static final int EXPIRACAO_PADRAO = 120;
 

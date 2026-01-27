@@ -77,7 +77,7 @@ class DeserializadorHtmlSanitizadoTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings = { " ", "  ", "\t", "\n" })
+    @ValueSource(strings = {" ", "  ", "\t", "\n"})
     @DisplayName("Deve retornar valores nulos ou vazios sem alteração")
     void deveRetornarValoresNulosOuVaziosSemAlteracao(String input) {
         // Arrange

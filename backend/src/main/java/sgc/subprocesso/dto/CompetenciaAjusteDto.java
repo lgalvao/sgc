@@ -9,8 +9,8 @@ import java.util.List;
 
 /**
  * DTO para competência no contexto de ajustes do mapa.
- * 
- * <p>Usado como parte de {@link MapaAjusteDto} (Response) e 
+ *
+ * <p>Usado como parte de {@link MapaAjusteDto} (Response) e
  * {@link SalvarAjustesRequest} (Request).
  */
 @Getter

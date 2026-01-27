@@ -11,12 +11,14 @@ Este diretório armazena valores constantes reutilizáveis para evitar "magic nu
 ## Exemplos
 
 **`AppConstants.ts`**
+
 ```typescript
 export const APP_NAME = 'SGC - Sistema de Gestão de Competências';
 export const API_TIMEOUT = 30000;
 ```
 
 **`BusinessConstants.ts`**
+
 ```typescript
 export const PERFIS_ACESSO = {
   ADMIN: 'ADMIN',

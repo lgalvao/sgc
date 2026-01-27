@@ -47,264 +47,265 @@ import tools.jackson.core.type.TypeReference;
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
-@Import({ TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class })
+@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-13: Analisar cadastro de atividades e conhecimentos")
 @org.springframework.test.annotation.DirtiesContext(classMode = org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CDU13IntegrationTest extends BaseIntegrationTest {
 
-        @Autowired
-        private UsuarioRepo usuarioRepo;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
-        @Autowired
-        private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private SubprocessoMovimentacaoRepo movimentacaoRepo;
 
-        @Autowired
-        private AnaliseRepo analiseRepo;
+    @Autowired
+    private AnaliseRepo analiseRepo;
 
-        @Autowired
-        private EntityManager entityManager;
+    @Autowired
+    private EntityManager entityManager;
 
-        @Autowired
-        private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-        private Unidade unidade;
-        private Unidade unidadeSuperior;
-        private Subprocesso subprocesso;
+    private Unidade unidade;
+    private Unidade unidadeSuperior;
+    private Subprocesso subprocesso;
 
-        @BeforeEach
-        void setUp() {
-                // Criar Unidades via JDBC para contornar @Immutable
-                Long idSuperior = 3000L;
-                Long idUnidade = 3001L;
+    @BeforeEach
+    @SuppressWarnings("unused")
+    void setUp() {
+        // Criar Unidades via JDBC para contornar @Immutable
+        Long idSuperior = 3000L;
+        Long idUnidade = 3001L;
 
-                String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-                jdbcTemplate.update(sqlInsertUnidade, idSuperior, "Coordenação de Sistemas Teste", "COSIS-TEST",
-                                "INTERMEDIARIA", "ATIVA", null, null);
-                jdbcTemplate.update(sqlInsertUnidade, idUnidade, "Serviço de Desenvolvimento Teste", "SEDESENV-TEST",
-                                "OPERACIONAL", "ATIVA", idSuperior, null);
+        jdbcTemplate.update(sqlInsertUnidade, idSuperior, "Coordenação de Sistemas Teste", "COSIS-TEST",
+                "INTERMEDIARIA", "ATIVA", null, null);
+        jdbcTemplate.update(sqlInsertUnidade, idUnidade, "Serviço de Desenvolvimento Teste", "SEDESENV-TEST",
+                "OPERACIONAL", "ATIVA", idSuperior, null);
 
-                // Carregar via Repo
-                unidadeSuperior = unidadeRepo.findById(idSuperior).orElseThrow();
-                unidade = unidadeRepo.findById(idUnidade).orElseThrow();
+        // Carregar via Repo
+        unidadeSuperior = unidadeRepo.findById(idSuperior).orElseThrow();
+        unidade = unidadeRepo.findById(idUnidade).orElseThrow();
 
-                // Criar Usuários via JDBC (Usuario é @Immutable, não pode ser salvo via Repo)
-                String sqlInsertUsuario = "INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo, MATRICULA) VALUES (?, ?, ?, ?, ?, ?)";
-                jdbcTemplate.update(sqlInsertUsuario, "101010101010", "Admin Mock", "admin@test.com", "1010",
-                                idSuperior, "");
-                jdbcTemplate.update(sqlInsertUsuario, "202020202020", "Gestor Mock", "gestor@test.com", "2020",
-                                idSuperior, "");
+        // Criar Usuários via JDBC (Usuario é @Immutable, não pode ser salvo via Repo)
+        String sqlInsertUsuario = "INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo, MATRICULA) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sqlInsertUsuario, "101010101010", "Admin Mock", "admin@test.com", "1010",
+                idSuperior, "");
+        jdbcTemplate.update(sqlInsertUsuario, "202020202020", "Gestor Mock", "gestor@test.com", "2020",
+                idSuperior, "");
 
-                // Criar perfis de usuário via JDBC (VW_USUARIO_PERFIL_UNIDADE é uma view)
-                String sqlInsertPerfil = "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)";
-                jdbcTemplate.update(sqlInsertPerfil, "101010101010", "ADMIN", idSuperior);
-                jdbcTemplate.update(sqlInsertPerfil, "202020202020", "GESTOR", idSuperior);
+        // Criar perfis de usuário via JDBC (VW_USUARIO_PERFIL_UNIDADE é uma view)
+        String sqlInsertPerfil = "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sqlInsertPerfil, "101010101010", "ADMIN", idSuperior);
+        jdbcTemplate.update(sqlInsertPerfil, "202020202020", "GESTOR", idSuperior);
 
-                // Carregar usuários do banco
-                Usuario adminUser = usuarioRepo.findById("101010101010").orElseThrow();
+        // Carregar usuários do banco
+        Usuario adminUser = usuarioRepo.findById("101010101010").orElseThrow();
 
-                // Criar Processo via Fixture
-                Processo processo = ProcessoFixture.processoPadrao();
-                processo.setCodigo(null);
-                processo.setTipo(TipoProcesso.MAPEAMENTO);
-                processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-                processo.setDescricao("Processo de Teste CDU-13");
-                processo = processoRepo.save(processo);
+        // Criar Processo via Fixture
+        Processo processo = ProcessoFixture.processoPadrao();
+        processo.setCodigo(null);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setDescricao("Processo de Teste CDU-13");
+        processo = processoRepo.save(processo);
 
-                // Criar Subprocesso via Fixture
-                subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
-                subprocesso.setCodigo(null);
-                subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-                subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
-                subprocesso = subprocessoRepo.save(subprocesso);
+        // Criar Subprocesso via Fixture
+        subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
+        subprocesso.setCodigo(null);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+        subprocesso = subprocessoRepo.save(subprocesso);
 
-                // Movimentação inicial
-                Movimentacao movimentacaoInicial = Movimentacao.builder()
-                                .subprocesso(subprocesso)
-                                .unidadeOrigem(unidade)
-                                .unidadeDestino(unidadeSuperior)
-                                .descricao("Disponibilização inicial")
-                                .usuario(adminUser)
-                                .build();
-                movimentacaoRepo.save(movimentacaoInicial);
+        // Movimentação inicial
+        Movimentacao movimentacaoInicial = Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(unidade)
+                .unidadeDestino(unidadeSuperior)
+                .descricao("Disponibilização inicial")
+                .usuario(adminUser)
+                .build();
+        movimentacaoRepo.save(movimentacaoInicial);
 
-                entityManager.flush();
-                entityManager.clear();
+        entityManager.flush();
+        entityManager.clear();
 
-                // Reload entities
-                subprocesso = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-                unidade = unidadeRepo.findById(idUnidade).orElseThrow();
-                unidadeSuperior = unidadeRepo.findById(idSuperior).orElseThrow();
-        }
+        // Reload entities
+        subprocesso = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+        unidade = unidadeRepo.findById(idUnidade).orElseThrow();
+        unidadeSuperior = unidadeRepo.findById(idSuperior).orElseThrow();
+    }
 
-        @Test
-        @DisplayName("Deve devolver cadastro, registrar análise corretamente e alterar situação")
-        @WithMockGestor("202020202020")
-        void devolverCadastro_deveFuncionarCorretamente() throws Exception {
-                // Given
-                String observacoes = "Favor revisar a atividade X e Y.";
-                DevolverCadastroRequest requestBody = new DevolverCadastroRequest(observacoes);
+    @Test
+    @DisplayName("Deve devolver cadastro, registrar análise corretamente e alterar situação")
+    @WithMockGestor("202020202020")
+    void devolverCadastro_deveFuncionarCorretamente() throws Exception {
+        // Given
+        String observacoes = "Favor revisar a atividade X e Y.";
+        DevolverCadastroRequest requestBody = new DevolverCadastroRequest(observacoes);
 
-                // When
-                mockMvc.perform(
-                                post(
-                                                "/api/subprocessos/{id}/devolver-cadastro",
-                                                subprocesso.getCodigo())
-                                                .with(csrf())
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(objectMapper.writeValueAsString(requestBody)))
-                                .andExpect(status().isOk());
-
-                // Then
-                entityManager.flush();
-                entityManager.clear();
-
-                Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-                assertThat(subprocessoAtualizado.getSituacao())
-                                .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-                assertThat(subprocessoAtualizado.getDataFimEtapa1()).isNull();
-
-                List<Analise> analises = analiseRepo
-                                .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
-                assertThat(analises).hasSize(1);
-                Analise analiseRegistrada = analises.getFirst();
-                assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
-                assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
-                assertThat(analiseRegistrada.getUnidadeCodigo()).isEqualTo(unidadeSuperior.getCodigo());
-
-                List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
-                                subprocesso.getCodigo());
-                assertThat(movimentacoes).hasSize(2);
-                Movimentacao movimentacaoDevolucao = movimentacoes.getFirst();
-                assertThat(movimentacaoDevolucao.getUnidadeOrigem().getSigla())
-                                .isEqualTo(unidadeSuperior.getSigla());
-                assertThat(movimentacaoDevolucao.getUnidadeDestino().getSigla())
-                                .isEqualTo(unidade.getSigla());
-        }
-
-        @Test
-        @DisplayName("Deve aceitar cadastro, registrar análise e mover para unidade superior")
-        @WithMockGestor("202020202020")
-        void aceitarCadastro_deveFuncionarCorretamente() throws Exception {
-                String observacoes = "Cadastro parece OK.";
-                AceitarCadastroRequest requestBody = new AceitarCadastroRequest(observacoes);
-
-                mockMvc.perform(
-                                post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
-                                                .with(csrf())
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(objectMapper.writeValueAsString(requestBody)))
-                                .andExpect(status().isOk());
-
-                entityManager.flush();
-                entityManager.clear();
-
-                List<Analise> analises = analiseRepo
-                                .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
-                assertThat(analises).hasSize(1);
-                Analise analiseRegistrada = analises.getFirst();
-                assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
-                assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
-                assertThat(analiseRegistrada.getUsuarioTitulo())
-                                .isEqualTo("202020202020");
-
-                List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
-                                subprocesso.getCodigo());
-                assertThat(movimentacoes).hasSize(2);
-                Movimentacao movimentacaoAceite = movimentacoes.getFirst();
-
-                assertThat(movimentacaoAceite.getUnidadeOrigem().getSigla())
-                                .isEqualTo(unidade.getSigla());
-                assertThat(movimentacaoAceite.getUnidadeDestino().getSigla())
-                                .isEqualTo(unidadeSuperior.getSigla());
-                assertThat(movimentacaoAceite.getDescricao())
-                                .isEqualTo("Cadastro de atividades e conhecimentos aceito");
-        }
-
-        @Test
-        @DisplayName("Deve homologar cadastro, alterar situação e registrar movimentação da SEDOC")
-        @WithMockAdmin
-        void homologarCadastro_deveFuncionarCorretamente() throws Exception {
-                HomologarCadastroRequest requestBody = new HomologarCadastroRequest("Homologado via teste.");
-
-                mockMvc.perform(
-                                post(
-                                                "/api/subprocessos/{id}/homologar-cadastro",
-                                                subprocesso.getCodigo())
-                                                .with(csrf())
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(objectMapper.writeValueAsString(requestBody)))
-                                .andExpect(status().isOk());
-
-                entityManager.flush();
-                entityManager.clear();
-
-                Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-                assertThat(subprocessoAtualizado.getSituacao())
-                                .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-
-                List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
-                                subprocesso.getCodigo());
-                assertThat(movimentacoes).hasSize(2);
-                Movimentacao movimentacaoHomologacao = movimentacoes.getFirst();
-
-                // O sistema (MockAdmin) parece usar uma unidade chamada SEDOC.
-                // Para não quebrar o teste, vamos aceitar SEDOC ou COSIS-TEST
-                // (unidadeSuperior).
-                String siglaOrigem = movimentacaoHomologacao.getUnidadeOrigem().getSigla();
-                assertThat(siglaOrigem).isIn("SEDOC", unidadeSuperior.getSigla());
-        }
-
-        @Test
-        @DisplayName("Deve retornar o histórico de devoluções e aceites ordenado")
-        @WithMockGestor("202020202020")
-        void getHistorico_deveRetornarAcoesOrdenadas() throws Exception {
-                String obsDevolucao = "Falta atividade Z";
-                DevolverCadastroRequest devolverReq = new DevolverCadastroRequest(obsDevolucao);
-
-                mockMvc.perform(post("/api/subprocessos/{id}/devolver-cadastro", subprocesso.getCodigo())
+        // When
+        mockMvc.perform(
+                        post(
+                                "/api/subprocessos/{id}/devolver-cadastro",
+                                subprocesso.getCodigo())
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(devolverReq)))
-                                .andExpect(status().isOk());
+                                .content(objectMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isOk());
 
-                subprocesso = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-                subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-                subprocessoRepo.saveAndFlush(subprocesso);
+        // Then
+        entityManager.flush();
+        entityManager.clear();
 
-                String obsAceite = "Agora sim, completo.";
-                AceitarCadastroRequest aceitarReq = new AceitarCadastroRequest(obsAceite);
-                mockMvc.perform(post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
+        Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+        assertThat(subprocessoAtualizado.getSituacao())
+                .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        assertThat(subprocessoAtualizado.getDataFimEtapa1()).isNull();
+
+        List<Analise> analises = analiseRepo
+                .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+        assertThat(analises).hasSize(1);
+        Analise analiseRegistrada = analises.getFirst();
+        assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
+        assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
+        assertThat(analiseRegistrada.getUnidadeCodigo()).isEqualTo(unidadeSuperior.getCodigo());
+
+        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+                subprocesso.getCodigo());
+        assertThat(movimentacoes).hasSize(2);
+        Movimentacao movimentacaoDevolucao = movimentacoes.getFirst();
+        assertThat(movimentacaoDevolucao.getUnidadeOrigem().getSigla())
+                .isEqualTo(unidadeSuperior.getSigla());
+        assertThat(movimentacaoDevolucao.getUnidadeDestino().getSigla())
+                .isEqualTo(unidade.getSigla());
+    }
+
+    @Test
+    @DisplayName("Deve aceitar cadastro, registrar análise e mover para unidade superior")
+    @WithMockGestor("202020202020")
+    void aceitarCadastro_deveFuncionarCorretamente() throws Exception {
+        String observacoes = "Cadastro parece OK.";
+        AceitarCadastroRequest requestBody = new AceitarCadastroRequest(observacoes);
+
+        mockMvc.perform(
+                        post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(aceitarReq)))
-                                .andExpect(status().isOk());
+                                .content(objectMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isOk());
 
-                String jsonResponse = mockMvc
-                                .perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get(
-                                                "/api/subprocessos/{id}/historico-cadastro",
-                                                subprocesso.getCodigo())
-                                                .accept(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isOk())
-                                .andReturn()
-                                .getResponse()
-                                .getContentAsString();
+        entityManager.flush();
+        entityManager.clear();
 
-                List<sgc.analise.dto.AnaliseHistoricoDto> historico = objectMapper.readValue(jsonResponse,
-                                new TypeReference<>() {
-                                });
+        List<Analise> analises = analiseRepo
+                .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+        assertThat(analises).hasSize(1);
+        Analise analiseRegistrada = analises.getFirst();
+        assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
+        assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
+        assertThat(analiseRegistrada.getUsuarioTitulo())
+                .isEqualTo("202020202020");
 
-                assertThat(historico).hasSize(2);
+        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+                subprocesso.getCodigo());
+        assertThat(movimentacoes).hasSize(2);
+        Movimentacao movimentacaoAceite = movimentacoes.getFirst();
 
-                sgc.analise.dto.AnaliseHistoricoDto aceite = historico.getFirst();
-                assertThat(aceite.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
-                assertThat(aceite.getObservacoes()).isEqualTo(obsAceite);
-                assertThat(aceite.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
+        assertThat(movimentacaoAceite.getUnidadeOrigem().getSigla())
+                .isEqualTo(unidade.getSigla());
+        assertThat(movimentacaoAceite.getUnidadeDestino().getSigla())
+                .isEqualTo(unidadeSuperior.getSigla());
+        assertThat(movimentacaoAceite.getDescricao())
+                .isEqualTo("Cadastro de atividades e conhecimentos aceito");
+    }
 
-                sgc.analise.dto.AnaliseHistoricoDto devolucao = historico.get(1);
-                assertThat(devolucao.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
-                assertThat(devolucao.getObservacoes()).isEqualTo(obsDevolucao);
-                assertThat(devolucao.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
-        }
+    @Test
+    @DisplayName("Deve homologar cadastro, alterar situação e registrar movimentação da SEDOC")
+    @WithMockAdmin
+    void homologarCadastro_deveFuncionarCorretamente() throws Exception {
+        HomologarCadastroRequest requestBody = new HomologarCadastroRequest("Homologado via teste.");
+
+        mockMvc.perform(
+                        post(
+                                "/api/subprocessos/{id}/homologar-cadastro",
+                                subprocesso.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isOk());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+        assertThat(subprocessoAtualizado.getSituacao())
+                .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+
+        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+                subprocesso.getCodigo());
+        assertThat(movimentacoes).hasSize(2);
+        Movimentacao movimentacaoHomologacao = movimentacoes.getFirst();
+
+        // O sistema (MockAdmin) parece usar uma unidade chamada SEDOC.
+        // Para não quebrar o teste, vamos aceitar SEDOC ou COSIS-TEST
+        // (unidadeSuperior).
+        String siglaOrigem = movimentacaoHomologacao.getUnidadeOrigem().getSigla();
+        assertThat(siglaOrigem).isIn("SEDOC", unidadeSuperior.getSigla());
+    }
+
+    @Test
+    @DisplayName("Deve retornar o histórico de devoluções e aceites ordenado")
+    @WithMockGestor("202020202020")
+    void getHistorico_deveRetornarAcoesOrdenadas() throws Exception {
+        String obsDevolucao = "Falta atividade Z";
+        DevolverCadastroRequest devolverReq = new DevolverCadastroRequest(obsDevolucao);
+
+        mockMvc.perform(post("/api/subprocessos/{id}/devolver-cadastro", subprocesso.getCodigo())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(devolverReq)))
+                .andExpect(status().isOk());
+
+        subprocesso = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        subprocessoRepo.saveAndFlush(subprocesso);
+
+        String obsAceite = "Agora sim, completo.";
+        AceitarCadastroRequest aceitarReq = new AceitarCadastroRequest(obsAceite);
+        mockMvc.perform(post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(aceitarReq)))
+                .andExpect(status().isOk());
+
+        String jsonResponse = mockMvc
+                .perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get(
+                                "/api/subprocessos/{id}/historico-cadastro",
+                                subprocesso.getCodigo())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<sgc.analise.dto.AnaliseHistoricoDto> historico = objectMapper.readValue(jsonResponse,
+                new TypeReference<>() {
+                });
+
+        assertThat(historico).hasSize(2);
+
+        sgc.analise.dto.AnaliseHistoricoDto aceite = historico.getFirst();
+        assertThat(aceite.acao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
+        assertThat(aceite.observacoes()).isEqualTo(obsAceite);
+        assertThat(aceite.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
+
+        sgc.analise.dto.AnaliseHistoricoDto devolucao = historico.get(1);
+        assertThat(devolucao.acao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
+        assertThat(devolucao.observacoes()).isEqualTo(obsDevolucao);
+        assertThat(devolucao.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
+    }
 }

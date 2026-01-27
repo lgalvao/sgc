@@ -12,8 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import sgc.Sgc;
@@ -42,6 +41,7 @@ class SubprocessoBuscarIntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocessoFinalizado;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         unidade = unidadeRepo.findById(11L).orElseThrow(); // SENIC
 
@@ -88,8 +88,8 @@ class SubprocessoBuscarIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve retornar subprocesso para processo em andamento")
     void deveRetornarSubprocesso_QuandoProcessoEmAndamento() throws Exception {
         mockMvc.perform(get(API_SUBPROCESSOS_BUSCAR)
-                .param("codProcesso", processoEmAndamento.getCodigo().toString())
-                .param("siglaUnidade", unidade.getSigla()))
+                        .param("codProcesso", processoEmAndamento.getCodigo().toString())
+                        .param("siglaUnidade", unidade.getSigla()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo", is(subprocessoEmAndamento.getCodigo().intValue())));
     }
@@ -99,8 +99,8 @@ class SubprocessoBuscarIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve retornar subprocesso para processo FINALIZADO")
     void deveRetornarSubprocesso_QuandoProcessoFinalizado() throws Exception {
         mockMvc.perform(get(API_SUBPROCESSOS_BUSCAR)
-                .param("codProcesso", processoFinalizado.getCodigo().toString())
-                .param("siglaUnidade", unidade.getSigla()))
+                        .param("codProcesso", processoFinalizado.getCodigo().toString())
+                        .param("siglaUnidade", unidade.getSigla()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo", is(subprocessoFinalizado.getCodigo().intValue())));
     }
@@ -110,8 +110,8 @@ class SubprocessoBuscarIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve retornar 404 quando sigla de unidade não existe")
     void deveRetornar404_QuandoSiglaUnidadeNaoExiste() throws Exception {
         mockMvc.perform(get(API_SUBPROCESSOS_BUSCAR)
-                .param("codProcesso", processoEmAndamento.getCodigo().toString())
-                .param("siglaUnidade", "UNIDADE_INEXISTENTE"))
+                        .param("codProcesso", processoEmAndamento.getCodigo().toString())
+                        .param("siglaUnidade", "UNIDADE_INEXISTENTE"))
                 .andExpect(status().isNotFound());
     }
 
@@ -120,8 +120,8 @@ class SubprocessoBuscarIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve retornar 404 quando processo não existe")
     void deveRetornar404_QuandoProcessoNaoExiste() throws Exception {
         mockMvc.perform(get(API_SUBPROCESSOS_BUSCAR)
-                .param("codProcesso", "999999")
-                .param("siglaUnidade", unidade.getSigla()))
+                        .param("codProcesso", "999999")
+                        .param("siglaUnidade", unidade.getSigla()))
                 .andExpect(status().isNotFound());
     }
 
@@ -133,8 +133,8 @@ class SubprocessoBuscarIntegrationTest extends BaseIntegrationTest {
         Unidade outraUnidade = unidadeRepo.findById(1L).orElseThrow(); // SEDOC
 
         mockMvc.perform(get(API_SUBPROCESSOS_BUSCAR)
-                .param("codProcesso", processoEmAndamento.getCodigo().toString())
-                .param("siglaUnidade", outraUnidade.getSigla()))
+                        .param("codProcesso", processoEmAndamento.getCodigo().toString())
+                        .param("siglaUnidade", outraUnidade.getSigla()))
                 .andExpect(status().isNotFound());
     }
 }

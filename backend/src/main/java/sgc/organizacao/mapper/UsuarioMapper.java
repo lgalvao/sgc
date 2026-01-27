@@ -13,7 +13,7 @@ import sgc.organizacao.model.Usuario;
 
 /**
  * Mapper MapStruct para conversão de entidades de organização para DTOs.
- * 
+ *
  * <p>Centraliza todos os mapeamentos de Unidade, Usuario e AtribuicaoTemporaria.
  */
 @Mapper(componentModel = "spring")

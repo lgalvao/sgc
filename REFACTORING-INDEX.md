@@ -7,7 +7,9 @@
 
 ## 📋 Visão Geral
 
-Este índice consolida toda a documentação relacionada ao plano de refatorações do Sistema de Gestão de Competências (SGC). Os documentos foram criados a partir da análise detalhada do `optimization-report.md` e organizados em sprints executáveis.
+Este índice consolida toda a documentação relacionada ao plano de refatorações do Sistema de Gestão de Competências (
+SGC). Os documentos foram criados a partir da análise detalhada do `optimization-report.md` e organizados em sprints
+executáveis.
 
 ---
 
@@ -15,18 +17,18 @@ Este índice consolida toda a documentação relacionada ao plano de refatoraç�
 
 ### 📊 Documentos de Análise
 
-| Documento | Descrição | Tamanho | Link |
-|-----------|-----------|---------|------|
-| **optimization-report.md** | Relatório completo de análise de otimizações | 41KB | [Ver](./optimization-report.md) |
-| **refactoring-tracker.md** | Tracking consolidado de progresso | 6KB | [Ver](./refactoring-tracker.md) |
+| Documento                  | Descrição                                    | Tamanho | Link                            |
+|----------------------------|----------------------------------------------|---------|---------------------------------|
+| **optimization-report.md** | Relatório completo de análise de otimizações | 41KB    | [Ver](./optimization-report.md) |
+| **refactoring-tracker.md** | Tracking consolidado de progresso            | 6KB     | [Ver](./refactoring-tracker.md) |
 
 ### 🚀 Documentos de Sprints
 
-| Sprint | Documento | Duração | Ações | Prioridade | Link |
-|--------|-----------|---------|-------|------------|------|
-| **Sprint 1** | backend-sprint-1.md | 1-2 dias | 5 ações | 🔴 Alta | [Ver](./backend-sprint-1.md) |
-| **Sprint 2** | frontend-sprint-2.md | 3-5 dias | 3 ações | 🔴 Alta | [Ver](./frontend-sprint-2.md) |
-| **Sprint 3** | backend-sprint-3.md | 5-10 dias | 3 ações | 🟡 Média | [Ver](./backend-sprint-3.md) |
+| Sprint       | Documento               | Duração             | Ações   | Prioridade          | Link                             |
+|--------------|-------------------------|---------------------|---------|---------------------|----------------------------------|
+| **Sprint 1** | backend-sprint-1.md     | 1-2 dias            | 5 ações | 🔴 Alta             | [Ver](./backend-sprint-1.md)     |
+| **Sprint 2** | frontend-sprint-2.md    | 3-5 dias            | 3 ações | 🔴 Alta             | [Ver](./frontend-sprint-2.md)    |
+| **Sprint 3** | backend-sprint-3.md     | 5-10 dias           | 3 ações | 🟡 Média            | [Ver](./backend-sprint-3.md)     |
 | **Sprint 4** | otimizacoes-sprint-4.md | Conforme necessário | 3 ações | 🟢 Baixa (Opcional) | [Ver](./otimizacoes-sprint-4.md) |
 
 ---
@@ -219,24 +221,24 @@ graph TD
 ### Como Usar Esta Documentação
 
 1. **Ler optimization-report.md primeiro**
-   - Entender contexto completo
-   - Conhecer problemas identificados
-   - Compreender filosofia (YAGNI, KISS, DRY)
+    - Entender contexto completo
+    - Conhecer problemas identificados
+    - Compreender filosofia (YAGNI, KISS, DRY)
 
 2. **Consultar refactoring-tracker.md**
-   - Ver status atual de cada ação
-   - Entender dependências entre ações
-   - Acompanhar progresso
+    - Ver status atual de cada ação
+    - Entender dependências entre ações
+    - Acompanhar progresso
 
 3. **Executar sprints em ordem**
-   - Começar pela Sprint 1
-   - Seguir passos detalhados em cada documento
-   - Validar antes de prosseguir
+    - Começar pela Sprint 1
+    - Seguir passos detalhados em cada documento
+    - Validar antes de prosseguir
 
 4. **Documentar decisões**
-   - Atualizar tracker após cada ação
-   - Registrar problemas encontrados
-   - Documentar desvios do plano
+    - Atualizar tracker após cada ação
+    - Registrar problemas encontrados
+    - Documentar desvios do plano
 
 ### Estrutura de Cada Documento de Sprint
 
@@ -245,11 +247,11 @@ Todos os documentos de sprint seguem a mesma estrutura:
 1. **Cabeçalho** - Objetivo, duração, foco
 2. **Sumário de Ações** - Tabela consolidada
 3. **Detalhamento de Cada Ação**:
-   - Contexto
-   - Problema identificado
-   - Solução proposta
-   - Passos para execução por IA
-   - Critérios de validação
+    - Contexto
+    - Problema identificado
+    - Solução proposta
+    - Passos para execução por IA
+    - Critérios de validação
 4. **Checklist de Validação da Sprint**
 5. **Métricas de Sucesso**
 6. **Próximos Passos**
@@ -324,9 +326,9 @@ Para dúvidas sobre:
 
 ## 📝 Histórico de Versões
 
-| Versão | Data | Mudanças |
-|--------|------|----------|
-| 1.0 | 26/01/2026 | Criação inicial do índice e documentação completa |
+| Versão | Data       | Mudanças                                          |
+|--------|------------|---------------------------------------------------|
+| 1.0    | 26/01/2026 | Criação inicial do índice e documentação completa |
 
 ---
 

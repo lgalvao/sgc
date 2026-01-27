@@ -1,30 +1,34 @@
 package sgc.processo.model;
 
-import org.junit.jupiter.api.*;
-import sgc.fixture.UnidadeFixture;
-import sgc.organizacao.model.Unidade;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+
+import sgc.fixture.UnidadeFixture;
+import sgc.organizacao.model.Unidade;
 
 @Tag("unit")
 @DisplayName("Testes para Processo")
 class ProcessoTest {
-
     private Processo processo;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         processo = new Processo();
     }
 
     @Nested
     @DisplayName("Construtores")
+    @SuppressWarnings("unused")
     class Construtores {
-
         @Test
         @DisplayName("Deve criar processo com Builder (setando código manualmente)")
         void deveCriarProcessoComBuilderCompleto() {
@@ -115,6 +119,7 @@ class ProcessoTest {
 
     @Nested
     @DisplayName("Participantes")
+    @SuppressWarnings("unused")
     class Participantes {
 
         @Test
@@ -172,8 +177,8 @@ class ProcessoTest {
 
     @Nested
     @DisplayName("Datas")
+    @SuppressWarnings("unused")
     class Datas {
-
         @Test
         @DisplayName("Deve configurar data de criação")
         void deveConfigurarDataDeCriacao() {
@@ -213,14 +218,14 @@ class ProcessoTest {
 
             // Assert
             assertThat(processo.getDataLimite())
-                .isEqualTo(dataLimite);
+                    .isEqualTo(dataLimite);
         }
     }
 
     @Nested
     @DisplayName("Situação e Tipo")
+    @SuppressWarnings("unused")
     class SituacaoETipo {
-
         @Test
         @DisplayName("Deve configurar situação do processo")
         void deveConfigurarSituacaoDoProcesso() {
@@ -264,8 +269,8 @@ class ProcessoTest {
 
     @Nested
     @DisplayName("Descrição")
+    @SuppressWarnings("unused")
     class Descricao {
-
         @Test
         @DisplayName("Deve configurar descrição do processo")
         void deveConfigurarDescricaoDoProcesso() {

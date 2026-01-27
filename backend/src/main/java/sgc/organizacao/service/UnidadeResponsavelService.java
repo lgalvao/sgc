@@ -20,7 +20,7 @@ import static java.util.stream.Collectors.*;
 
 /**
  * Serviço especializado para gerenciar responsáveis e atribuições de unidades.
- * 
+ *
  * <p>Responsabilidades:
  * <ul>
  *   <li>Gestão de responsáveis (titular e substituto)</li>
@@ -28,11 +28,10 @@ import static java.util.stream.Collectors.*;
  *   <li>Carregamento de perfis e atribuições de usuários</li>
  *   <li>Consultas em lote de responsáveis</li>
  * </ul>
- * 
+ *
  * <p>Este serviço foi extraído de UnidadeFacade para respeitar o
  * Single Responsibility Principle (SRP).
- * 
- * @see UnidadeFacade
+ *
  */
 @Service
 @RequiredArgsConstructor
@@ -46,7 +45,7 @@ public class UnidadeResponsavelService {
 
     /**
      * Busca todas as atribuições temporárias cadastradas.
-     * 
+     *
      * @return lista de DTOs de atribuições temporárias
      */
     public List<AtribuicaoTemporariaDto> buscarTodasAtribuicoes() {
@@ -57,9 +56,9 @@ public class UnidadeResponsavelService {
 
     /**
      * Cria uma atribuição temporária de responsável para uma unidade.
-     * 
+     *
      * @param codUnidade código da unidade
-     * @param request dados da atribuição (usuário, datas, justificativa)
+     * @param request    dados da atribuição (usuário, datas, justificativa)
      * @throws ErroValidacao se a data de término for anterior à data de início
      */
     public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoTemporariaRequest request) {
@@ -87,7 +86,7 @@ public class UnidadeResponsavelService {
 
     /**
      * Busca o responsável atual de uma unidade (com atribuições carregadas).
-     * 
+     *
      * @param siglaUnidade sigla da unidade
      * @return usuário responsável com atribuições carregadas
      * @throws ErroEntidadeNaoEncontrada se a unidade ou responsável não for encontrado
@@ -110,7 +109,7 @@ public class UnidadeResponsavelService {
 
     /**
      * Busca o responsável (titular e substituto) de uma unidade.
-     * 
+     *
      * @param unidadeCodigo código da unidade
      * @return DTO do responsável com dados do titular e substituto
      * @throws ErroEntidadeNaoEncontrada se não houver responsável
@@ -125,7 +124,7 @@ public class UnidadeResponsavelService {
 
     /**
      * Busca responsáveis de múltiplas unidades em lote.
-     * 
+     *
      * @param unidadesCodigos lista de códigos de unidades
      * @return mapa de código de unidade para DTO de responsável
      */

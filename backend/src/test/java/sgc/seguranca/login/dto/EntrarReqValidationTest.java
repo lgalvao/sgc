@@ -44,7 +44,7 @@ class EntrarReqValidationTest {
         @DisplayName("Deve aceitar diferentes perfis válidos")
         void deveAceitarDiferentesPerfis() {
             String[] perfisValidos = {"ADMIN", "GESTOR", "CHEFE", "SERVIDOR"};
-            
+
             for (String perfil : perfisValidos) {
                 EntrarRequest req = EntrarRequest.builder()
                         .tituloEleitoral("123456789012")

@@ -28,9 +28,9 @@ class RestExceptionHandlerSecurityTest {
         String payload = "{\"dadoSensivel\": \"123\"}"; // Too short, min=5
 
         mockMvc.perform(post("/test/validacao")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(payload)
-                .with(csrf()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload)
+                        .with(csrf()))
                 .andExpect(status().isBadRequest())
                 // SENTINEL: Field 'rejectedValue' was removed to enforce security
                 .andExpect(jsonPath("$.subErrors[0].rejectedValue").doesNotExist());

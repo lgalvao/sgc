@@ -10,10 +10,11 @@ import sgc.seguranca.sanitizacao.SanitizarHtml;
  */
 @Builder
 public record CriarAtividadeRequest(
-    @NotNull(message = "Código do mapa é obrigatório")
-    Long mapaCodigo,
+        @NotNull(message = "Código do mapa é obrigatório")
+        Long mapaCodigo,
 
-    @NotBlank(message = "Descrição não pode ser vazia")
-    @SanitizarHtml
-    String descricao
-) {}
+        @NotBlank(message = "Descrição não pode ser vazia")
+        @SanitizarHtml
+        String descricao
+) {
+}

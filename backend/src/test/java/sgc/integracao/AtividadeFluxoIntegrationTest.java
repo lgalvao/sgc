@@ -3,8 +3,7 @@ package sgc.integracao;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -17,11 +16,9 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import sgc.integracao.mocks.TestSecurityConfig;
@@ -46,7 +43,7 @@ import sgc.subprocesso.model.Subprocesso;
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
-@Import({ TestSecurityConfig.class, TestThymeleafConfig.class })
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @DisplayName("Integração: Fluxo de Atividades (Criação, Exclusão, Validação)")
 class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
     @Autowired
@@ -135,9 +132,9 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
                 .build();
 
         String responseJson = mockMvc.perform(post("/api/atividades")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.atividade.descricao", is("Atividade Temporária")))
@@ -151,7 +148,7 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
 
         // Excluir Atividade
         mockMvc.perform(post("/api/atividades/{id}/excluir", codigoAtividade)
-                .with(csrf()))
+                        .with(csrf()))
                 .andExpect(status().isOk());
 
         // Verificar DB (não deve existir)
@@ -169,9 +166,9 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
                 .build();
 
         mockMvc.perform(post("/api/atividades")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
 
         // Validar Cadastro

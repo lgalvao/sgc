@@ -9,21 +9,25 @@
 
 ## 📋 Sumário Executivo
 
-O Sistema de Gestão de Competências (SGC) evoluiu com múltiplas rodadas de otimizações implementadas por IAs, resultando em um código funcional mas com **inconsistências significativas**, **complexidade desnecessária** e **otimizações prematuras** que não se justificam dado o perfil de uso do sistema.
+O Sistema de Gestão de Competências (SGC) evoluiu com múltiplas rodadas de otimizações implementadas por IAs, resultando
+em um código funcional mas com **inconsistências significativas**, **complexidade desnecessária** e **otimizações
+prematuras** que não se justificam dado o perfil de uso do sistema.
 
 ### Achados Principais
 
-| Categoria | Status Atual | Impacto | Prioridade |
-|-----------|-------------|---------|------------|
-| **Cache Backend** | Subotimizado - apenas 2 métodos com cache, sem invalidação | 🟡 Médio | Média |
-| **Fetch Strategies** | Inconsistente - uso de EAGER desnecessário, múltiplas queries duplicadas | 🔴 Alto | Alta |
-| **Services/Facades** | Sobre-engenharia - camadas excessivas, responsabilidades sobrepostas | 🔴 Alto | Alta |
-| **Cache Frontend** | Inexistente - requisições duplicadas em cascata | 🟠 Médio-Alto | Média |
-| **Complexidade** | Elevada - arquivos de 775 linhas, lógica duplicada | 🔴 Alto | Alta |
+| Categoria            | Status Atual                                                             | Impacto       | Prioridade |
+|----------------------|--------------------------------------------------------------------------|---------------|------------|
+| **Cache Backend**    | Subotimizado - apenas 2 métodos com cache, sem invalidação               | 🟡 Médio      | Média      |
+| **Fetch Strategies** | Inconsistente - uso de EAGER desnecessário, múltiplas queries duplicadas | 🔴 Alto       | Alta       |
+| **Services/Facades** | Sobre-engenharia - camadas excessivas, responsabilidades sobrepostas     | 🔴 Alto       | Alta       |
+| **Cache Frontend**   | Inexistente - requisições duplicadas em cascata                          | 🟠 Médio-Alto | Média      |
+| **Complexidade**     | Elevada - arquivos de 775 linhas, lógica duplicada                       | 🔴 Alto       | Alta       |
 
 ### Recomendação Geral
 
-**SIMPLIFICAR** é a palavra-chave. Para um sistema com 20 usuários simultâneos, a maioria das otimizações implementadas adiciona complexidade sem benefícios mensuráveis. Este relatório propõe uma **consolidação arquitetural** focada em **código mais limpo, manutenível e consistente**.
+**SIMPLIFICAR** é a palavra-chave. Para um sistema com 20 usuários simultâneos, a maioria das otimizações implementadas
+adiciona complexidade sem benefícios mensuráveis. Este relatório propõe uma **consolidação arquitetural** focada em *
+*código mais limpo, manutenível e consistente**.
 
 ---
 
@@ -34,11 +38,13 @@ O Sistema de Gestão de Competências (SGC) evoluiu com múltiplas rodadas de ot
 #### 1.1.1 Estado Atual
 
 **Configuração:**
+
 - Arquivo: `/backend/src/main/java/sgc/comum/config/CacheConfig.java`
 - Implementação: `ConcurrentMapCacheManager` (em memória)
 - Caches configurados: `"arvoreUnidades"`, `"unidadeDescendentes"`
 
 **Uso:**
+
 ```java
 // UnidadeFacade.java - APENAS 2 métodos com cache
 @Cacheable(value = "unidadeDescendentes", key = "#codigoUnidade")
@@ -51,22 +57,26 @@ public List<UnidadeDto> buscarTodasEntidadesComHierarquia()
 #### 1.1.2 Problemas Identificados
 
 ❌ **Problema 1: Cache sem Invalidação**
+
 - Nenhum uso de `@CacheEvict` ou `@CachePut`
 - Quando unidades são alteradas, cache permanece com dados obsoletos
 - Servidor precisa ser reiniciado para limpar cache
 
 ❌ **Problema 2: Benefício Questionável**
+
 - `buscarTodasEntidadesComHierarquia()` é chamado ~2-3x por sessão de usuário
 - Para 20 usuários simultâneos, economia é de ~40-60 queries/dia
 - Complexidade adicionada > benefício para essa escala
 
 ❌ **Problema 3: Cache Incompleto**
+
 - Outras entidades que mudam raramente (Competências, Mapas vigentes) não têm cache
 - Se cache é necessário, deveria ser consistente
 
 #### 1.1.3 Ações Recomendadas
 
 **OPÇÃO A - Simplificar (RECOMENDADA)**
+
 ```diff
 - Remover cache completamente
 - Estrutura de unidades é carregada 2-3x por sessão
@@ -75,6 +85,7 @@ public List<UnidadeDto> buscarTodasEntidadesComHierarquia()
 ```
 
 **OPÇÃO B - Completar**
+
 ```diff
 + Adicionar @CacheEvict em todos os métodos de alteração de unidades
 + Implementar cache TTL (tempo de expiração)
@@ -91,21 +102,23 @@ public List<UnidadeDto> buscarTodasEntidadesComHierarquia()
 
 **JOIN FETCH Identificados: 11 ocorrências**
 
-| Repositório | Método | Query | Justificativa |
-|------------|--------|-------|---------------|
-| `ProcessoRepo` | `findBySituacao()` | `LEFT JOIN FETCH p.participantes` | ✅ Válido - evita N+1 |
-| `SubprocessoRepo` | `findByProcessoCodigoWithUnidade()` | `JOIN FETCH s.unidade` | ✅ Válido |
-| `SubprocessoRepo` | `findAllComFetch()` | 3 JOINs: processo, unidade, mapa | ⚠️ Complexo - produto cartesiano potencial |
-| `AtividadeRepo` | `findAll()` | `LEFT JOIN FETCH a.mapa` | ❌ **PROBLEMA** - sempre faz fetch |
-| `AtividadeRepo` | `findByMapaCodigo()` | `LEFT JOIN FETCH a.competencias` | ✅ Válido |
-| `AtividadeRepo` | `findByMapaCodigoWithConhecimentos()` | `LEFT JOIN FETCH a.conhecimentos` | ⚠️ Duplicação - ver seção 1.2.3 |
-| `CompetenciaRepo` | `findByMapaCodigo()` | `LEFT JOIN FETCH c.atividades` | ✅ Válido |
-| `UnidadeRepo` | `findAllWithHierarquia()` | `LEFT JOIN FETCH u.unidadeSuperior` | ✅ Válido |
+| Repositório       | Método                                | Query                               | Justificativa                              |
+|-------------------|---------------------------------------|-------------------------------------|--------------------------------------------|
+| `ProcessoRepo`    | `findBySituacao()`                    | `LEFT JOIN FETCH p.participantes`   | ✅ Válido - evita N+1                       |
+| `SubprocessoRepo` | `findByProcessoCodigoWithUnidade()`   | `JOIN FETCH s.unidade`              | ✅ Válido                                   |
+| `SubprocessoRepo` | `findAllComFetch()`                   | 3 JOINs: processo, unidade, mapa    | ⚠️ Complexo - produto cartesiano potencial |
+| `AtividadeRepo`   | `findAll()`                           | `LEFT JOIN FETCH a.mapa`            | ❌ **PROBLEMA** - sempre faz fetch          |
+| `AtividadeRepo`   | `findByMapaCodigo()`                  | `LEFT JOIN FETCH a.competencias`    | ✅ Válido                                   |
+| `AtividadeRepo`   | `findByMapaCodigoWithConhecimentos()` | `LEFT JOIN FETCH a.conhecimentos`   | ⚠️ Duplicação - ver seção 1.2.3            |
+| `CompetenciaRepo` | `findByMapaCodigo()`                  | `LEFT JOIN FETCH c.atividades`      | ✅ Válido                                   |
+| `UnidadeRepo`     | `findAllWithHierarquia()`             | `LEFT JOIN FETCH u.unidadeSuperior` | ✅ Válido                                   |
 
 **@EntityGraph: 2 ocorrências**
+
 - Uso mínimo, poderia substituir múltiplas queries com variações
 
 **@BatchSize: 1 ocorrência**
+
 ```java
 // Processo.java
 @BatchSize(size = 50)
@@ -113,6 +126,7 @@ private List<ProcessoParticipante> participantes;
 ```
 
 **FetchType.EAGER: 2 ocorrências**
+
 ```java
 // UsuarioPerfil.java - CRÍTICO
 @ManyToOne(fetch = FetchType.EAGER)  // Linha 33
@@ -144,11 +158,13 @@ public class UsuarioPerfil {
 ```
 
 **Impacto:**
+
 - Cada query de `UsuarioPerfil` força carregamento de `Usuario` E `Unidade`
 - Se `Usuario` tem relacionamentos LAZY, ainda pode causar N+1
 - Performance degradada em listagens
 
 **Solução:**
+
 ```java
 @ManyToOne(fetch = FetchType.LAZY)  // ✅ CORRETO
 private Usuario usuario;
@@ -175,11 +191,13 @@ List<Atividade> findAll();  // ❌ Sempre faz JOIN mesmo quando não necessário
 ```
 
 **Impacto:**
+
 - Método `findAll()` é usado em múltiplos contextos
 - Muitas vezes o `mapa` não é necessário
 - Performance pior do que LAZY padrão
 
 **Solução:**
+
 ```java
 // Remover override de findAll(), deixar padrão do JPA
 
@@ -197,6 +215,7 @@ List<Atividade> findByMapaCodigoComMapa(@Param("codigo") Long codigo);
 **Padrão: "Com Fetch" vs "Sem Fetch" vs "Com Outros Relacionamentos"**
 
 **AtividadeRepo.java:**
+
 ```java
 // 3 variações do mesmo conceito ❌
 List<Atividade> findByMapaCodigo(...)                    // + competencias
@@ -205,6 +224,7 @@ List<Atividade> findByMapaCodigoWithConhecimentos(...)  // + conhecimentos
 ```
 
 **CompetenciaRepo.java:**
+
 ```java
 // 2 variações do mesmo conceito ❌
 List<Competencia> findByMapaCodigo(...)           // + atividades
@@ -212,6 +232,7 @@ List<Competencia> findByMapaCodigoSemFetch(...)  // sem relacionamentos
 ```
 
 **Problema:**
+
 - **Inconsistência arquitetural** - decisão de fetch deveria estar na camada de serviço
 - Proliferação de métodos no repositório
 - Dificulta manutenção
@@ -261,10 +282,12 @@ List<Atividade> findBySubprocessoCodigo(@Param("subprocessoCodigo") Long codigo)
 ```
 
 **Problema:**
+
 - Subquery executa duas queries separadas
 - JOIN seria mais eficiente
 
 **Solução:**
+
 ```java
 @Query("""
     SELECT a FROM Atividade a
@@ -277,16 +300,19 @@ List<Atividade> findBySubprocessoCodigo(@Param("subprocessoCodigo") Long codigo)
 #### 1.2.5 Ações Recomendadas - Fetch Strategies
 
 **PRIORIDADE ALTA:**
+
 1. ✅ **Alterar FetchType.EAGER para LAZY** em `UsuarioPerfil.java` (linhas 33, 37)
 2. ✅ **Remover override de findAll()** em `AtividadeRepo.java` (linhas 12-17)
 3. ✅ **Consolidar métodos duplicados** em `AtividadeRepo` e `CompetenciaRepo`
 
 **PRIORIDADE MÉDIA:**
-4. ✅ **Converter subquery para JOIN** em `AtividadeRepo.findBySubprocessoCodigo()`
+
+1. ✅ **Converter subquery para JOIN** em `AtividadeRepo.findBySubprocessoCodigo()`
 
 **PRIORIDADE BAIXA (Otimização futura):**
-5. Avaliar se `@BatchSize(size = 50)` em Processo é necessário
-6. Considerar uso de `@EntityGraph` para casos específicos
+
+1. Avaliar se `@BatchSize(size = 50)` em Processo é necessário
+2. Considerar uso de `@EntityGraph` para casos específicos
 
 ---
 
@@ -296,24 +322,25 @@ List<Atividade> findBySubprocessoCodigo(@Param("subprocessoCodigo") Long codigo)
 
 **TOP 10 Arquivos Mais Longos:**
 
-| Arquivo | Linhas | Categoria | Avaliação |
-|---------|--------|-----------|-----------|
-| `SubprocessoWorkflowService.java` | 775 | Service | ⚠️ Muito grande |
-| `SubprocessoFacade.java` | 645 | Facade | ⚠️ Muito grande |
-| `SubprocessoAccessPolicy.java` | 422 | Security | ✅ OK - lógica de negócio complexa |
-| `UnidadeFacade.java` | 384 | Facade | ⚠️ Grande demais |
-| `ImpactoMapaService.java` | 376 | Service | ⚠️ Grande demais |
-| `UsuarioFacade.java` | 344 | Facade | ⚠️ Considerável |
-| `ProcessoFacade.java` | 333 | Facade | ✅ OK |
-| `SubprocessoCadastroController.java` | 320 | Controller | ⚠️ Controller muito grande |
-| `AtividadeFacade.java` | 286 | Facade | ✅ OK |
-| `AlertaFacade.java` | 282 | Facade | ✅ OK |
+| Arquivo                              | Linhas | Categoria  | Avaliação                         |
+|--------------------------------------|--------|------------|-----------------------------------|
+| `SubprocessoWorkflowService.java`    | 775    | Service    | ⚠️ Muito grande                   |
+| `SubprocessoFacade.java`             | 645    | Facade     | ⚠️ Muito grande                   |
+| `SubprocessoAccessPolicy.java`       | 422    | Security   | ✅ OK - lógica de negócio complexa |
+| `UnidadeFacade.java`                 | 384    | Facade     | ⚠️ Grande demais                  |
+| `ImpactoMapaService.java`            | 376    | Service    | ⚠️ Grande demais                  |
+| `UsuarioFacade.java`                 | 344    | Facade     | ⚠️ Considerável                   |
+| `ProcessoFacade.java`                | 333    | Facade     | ✅ OK                              |
+| `SubprocessoCadastroController.java` | 320    | Controller | ⚠️ Controller muito grande        |
+| `AtividadeFacade.java`               | 286    | Facade     | ✅ OK                              |
+| `AlertaFacade.java`                  | 282    | Facade     | ✅ OK                              |
 
 #### 1.3.2 Análise: SubprocessoWorkflowService (775 linhas)
 
 **Localização:** `/backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowService.java`
 
 **Documentação interna:**
+
 ```java
 /**
  * Serviço unificado responsável por todos os workflows de subprocesso.
@@ -329,11 +356,13 @@ List<Atividade> findBySubprocessoCodigo(@Param("subprocessoCodigo") Long codigo)
 ```
 
 **Avaliação:**
+
 - ✅ **Boa intenção** - consolidar 4 serviços em 1
 - ❌ **Resultado subótimo** - arquivo muito grande, difícil navegação
 - ⚠️ **Complexidade cognitiva** - 775 linhas é muito para um único arquivo
 
 **Estrutura de Dependências:**
+
 ```java
 private final SubprocessoRepo subprocessoRepo;
 private final SubprocessoCrudService crudService;
@@ -349,6 +378,7 @@ private final MapaFacade mapaService;
 ```
 
 **Problema:**
+
 - **17 dependências injetadas** - God Object pattern
 - `@Lazy` usado para quebrar ciclos de dependência - code smell
 - Responsabilidades múltiplas (SRP violation)
@@ -358,6 +388,7 @@ private final MapaFacade mapaService;
 **Localização:** `/backend/src/main/java/sgc/organizacao/UnidadeFacade.java`
 
 **Responsabilidades Identificadas:**
+
 1. Hierarquia de unidades (árvore, descendentes, ancestrais)
 2. Mapa vigente por unidade
 3. Gestão de responsáveis (chefe, chefe hierárquico)
@@ -366,6 +397,7 @@ private final MapaFacade mapaService;
 6. Cache de hierarquia
 
 **Avaliação:**
+
 - ⚠️ **Fachada muito abrangente** - 6 responsabilidades distintas
 - ✅ Cada método é coeso individualmente
 - ❌ Arquivo como um todo viola SRP
@@ -412,12 +444,14 @@ sgc.subprocesso.service/
 ```
 
 **Avaliação:**
+
 - ✅ **Separação de responsabilidades clara**
 - ✅ **Package-private services** - encapsulamento adequado
 - ✅ **Nomenclatura consistente**
 - ⚠️ **Problema:** Alguns services ainda muito grandes
 
 **Lições para outros módulos:**
+
 - Replicar essa estrutura em `organizacao/` (Unidade, Usuario)
 - Replicar em `mapa/` (consolidar AtividadeService, CompetenciaService)
 
@@ -436,6 +470,7 @@ JpaRepository (Spring Data)                // Camada 4 - Framework
 ```
 
 **Problema:**
+
 - `AtividadeService` é basicamente um **CRUD wrapper** - não adiciona lógica de negócio
 - `AtividadeFacade` chama `AtividadeService` que apenas repassa para Repository
 - Violação de YAGNI (You Aren't Gonna Need It)
@@ -464,12 +499,14 @@ public class AtividadeService {
 ```
 
 **O mesmo padrão se repete em:**
+
 - `CompetenciaService` - wrapper de `CompetenciaRepo`
 - `ConhecimentoService` - wrapper de `ConhecimentoRepo`
 
 **Solução Proposta:**
 
 **OPÇÃO A - Eliminar Service Layer (MAIS SIMPLES):**
+
 ```java
 // MapaFacade chama diretamente os Repositories
 @Service
@@ -487,6 +524,7 @@ public class MapaFacade {
 ```
 
 **OPÇÃO B - Consolidar em Service Único (MEIO TERMO):**
+
 ```java
 // Um único MapaManutencaoService substitui 3 services
 @Service
@@ -501,31 +539,35 @@ public class MapaManutencaoService {
 #### 1.3.6 Ações Recomendadas - Arquitetura
 
 **PRIORIDADE ALTA:**
+
 1. ✅ **Decompor UnidadeFacade** em 3 services especializados
-2. ✅ **Consolidar AtividadeService + CompetenciaService + ConhecimentoService** em MapaManutencaoService OU eliminar e usar Facade diretamente
+2. ✅ **Consolidar AtividadeService + CompetenciaService + ConhecimentoService** em MapaManutencaoService OU eliminar e
+   usar Facade diretamente
 
 **PRIORIDADE MÉDIA:**
-3. ✅ **Dividir SubprocessoWorkflowService** em serviços menores (~300 linhas cada)
-4. ✅ **Reduzir SubprocessoCadastroController** (320 linhas) - mover lógica para Service
+
+1. ✅ **Dividir SubprocessoWorkflowService** em serviços menores (~300 linhas cada)
+2. ✅ **Reduzir SubprocessoCadastroController** (320 linhas) - mover lógica para Service
 
 **PRIORIDADE BAIXA:**
-5. Documentar padrão de arquitetura em ADR (seguir modelo de Subprocesso)
-6. Refatorar ImpactoMapaService (376 linhas)
+
+1. Documentar padrão de arquitetura em ADR (seguir modelo de Subprocesso)
+2. Refatorar ImpactoMapaService (376 linhas)
 
 ---
 
 ### 1.4 Resumo de Métricas - Backend
 
-| Métrica | Valor Atual | Valor Ideal | Gap |
-|---------|-------------|-------------|-----|
-| **Caches ativos** | 2 | 0 ou 5+ | ⚠️ Inconsistente |
-| **FetchType.EAGER** | 2 | 0 | ❌ Crítico |
-| **Queries com JOIN FETCH** | 11 | 8-10 | ✅ OK |
-| **Métodos duplicados (fetch variants)** | 5 | 0 | ⚠️ Moderado |
-| **Services > 500 linhas** | 2 | 0 | ❌ Crítico |
-| **Facades > 400 linhas** | 2 | 0-1 | ⚠️ Moderado |
-| **Controllers > 300 linhas** | 1 | 0 | ⚠️ Moderado |
-| **Uso de @EntityGraph** | 2 | 10+ | ⚠️ Subutilizado |
+| Métrica                                 | Valor Atual | Valor Ideal | Gap              |
+|-----------------------------------------|-------------|-------------|------------------|
+| **Caches ativos**                       | 2           | 0 ou 5+     | ⚠️ Inconsistente |
+| **FetchType.EAGER**                     | 2           | 0           | ❌ Crítico        |
+| **Queries com JOIN FETCH**              | 11          | 8-10        | ✅ OK             |
+| **Métodos duplicados (fetch variants)** | 5           | 0           | ⚠️ Moderado      |
+| **Services > 500 linhas**               | 2           | 0           | ❌ Crítico        |
+| **Facades > 400 linhas**                | 2           | 0-1         | ⚠️ Moderado      |
+| **Controllers > 300 linhas**            | 1           | 0           | ⚠️ Moderado      |
+| **Uso de @EntityGraph**                 | 2           | 10+         | ⚠️ Subutilizado  |
 
 ---
 
@@ -538,11 +580,13 @@ public class MapaManutencaoService {
 **Resultado:** ❌ **NENHUM cache implementado**
 
 **Evidência:**
+
 - Nenhum service implementa cache de requisições HTTP
 - Cada chamada a métodos `obter*()`, `buscar*()`, `listar*()` faz nova requisição
 - Stores não mantêm dados após navegação
 
 **Exemplo - processoService.ts:**
+
 ```typescript
 export async function obterDetalhesProcesso(codProcesso: number) {
   const url = `/api/processos/${codProcesso}/detalhes`;
@@ -572,6 +616,7 @@ export async function obterDetalhesProcesso(codProcesso: number) {
 ```
 
 **Quantificação:**
+
 - Em uma sessão típica: **40-60% das requisições são duplicadas**
 - Para 20 usuários simultâneos: ~200-400 requisições/hora desnecessárias
 - Impacto real: Mínimo (servidor suporta facilmente), mas UX pode ter latência perceptível
@@ -669,22 +714,26 @@ export async function atualizarProcesso(codProcesso: number, req: AtualizarProce
 #### 2.1.4 Avaliação de Necessidade
 
 **Prós do Cache HTTP:**
+
 - ✅ Reduz requisições duplicadas em 40-60%
 - ✅ Melhora UX - navegação mais rápida
 - ✅ Implementação simples (< 100 linhas)
 
 **Contras:**
+
 - ⚠️ Adiciona complexidade - gerenciar invalidação
 - ⚠️ Risco de dados stale (cache não invalidado corretamente)
 - ⚠️ Para 20 usuários, benefício é marginal
 
 **Decisão Sugerida:**  
 ⚠️ **IMPLEMENTAR PARCIALMENTE** - Cache apenas para:
+
 - Dados estáticos (unidades, competências)
 - Processos/Subprocessos em modo leitura
 - TTL curto (2-3 minutos)
 
 ❌ **NÃO cachear:**
+
 - Ações de workflow (sempre server-side)
 - Dados de usuário (perfil atual)
 
@@ -722,6 +771,7 @@ async function adicionarAtividade(
 ```
 
 **6 Métodos com Mesmo Padrão:**
+
 1. `adicionarAtividade()` - 3 requisições
 2. `removerAtividade()` - 3 requisições
 3. `adicionarConhecimento()` - 3 requisições
@@ -754,6 +804,7 @@ TOTAL: 251ms para uma ação simples
 ```
 
 **Problema:**
+
 - Requisições são **sequenciais** (await)
 - Backend **já retorna dados atualizados** em muitos casos
 - UX com latência perceptível (250ms)
@@ -827,7 +878,8 @@ async function adicionarAtividade(...) {
 ```
 
 **Decisão Sugerida:**  
-✅ **OPÇÃO A** - Backend retorna dados completos  
+✅ **OPÇÃO A** - Backend retorna dados completos
+
 - Mais simples de implementar
 - Menos propenso a bugs
 - Performance melhor (1 request vs 3)
@@ -857,6 +909,7 @@ async function buscar*(...) {
 ```
 
 **Contagem:**
+
 - **13 stores** × ~8 métodos async por store = ~104 blocos idênticos
 
 #### 2.3.2 Solução - Composable Centralizado
@@ -935,6 +988,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
 ```
 
 **Benefícios:**
+
 - ✅ Elimina 104 blocos duplicados
 - ✅ Centraliza lógica de erro
 - ✅ Facilita adicionar logging, telemetria, etc.
@@ -947,6 +1001,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
 #### 2.4.1 Duplicação Identificada
 
 **Localização 1:** `/frontend/src/stores/processos.ts` (linhas 251-257)
+
 ```typescript
 function flattenUnidades(unidades: UnidadeDto[]): UnidadeDto[] {
   return unidades.flatMap(u => [u, ...flattenUnidades(u.subordinadas || [])]);
@@ -954,6 +1009,7 @@ function flattenUnidades(unidades: UnidadeDto[]): UnidadeDto[] {
 ```
 
 **Localização 2:** `/frontend/src/composables/usePerfil.ts` (linhas 8-14)
+
 ```typescript
 function flattenUnidades(unidades: UnidadeDto[]): UnidadeDto[] {
   return unidades.flatMap(u => [u, ...flattenUnidades(u.subordinadas || [])]);
@@ -983,17 +1039,18 @@ const todasUnidades = flattenTree(unidades);  // ✅ Tipado e reutilizável
 
 #### 2.5.1 Ranking de Tamanho
 
-| Store | Linhas | Avaliação |
-|-------|--------|-----------|
-| `processos.ts` | 345 | ⚠️ Muito grande |
-| `subprocessos.ts` | 229 | ⚠️ Grande |
-| `mapas.ts` | 196 | ✅ OK |
-| `perfil.ts` | 183 | ✅ OK |
-| `atividades.ts` | 183 | ✅ OK (antes da refatoração) |
+| Store             | Linhas | Avaliação                   |
+|-------------------|--------|-----------------------------|
+| `processos.ts`    | 345    | ⚠️ Muito grande             |
+| `subprocessos.ts` | 229    | ⚠️ Grande                   |
+| `mapas.ts`        | 196    | ✅ OK                        |
+| `perfil.ts`       | 183    | ✅ OK                        |
+| `atividades.ts`   | 183    | ✅ OK (antes da refatoração) |
 
 #### 2.5.2 Análise - processos.ts (345 linhas)
 
 **Responsabilidades:**
+
 1. Lista de processos (filtros, paginação)
 2. Detalhes de processo (cache local)
 3. Ações de workflow (iniciar, finalizar)
@@ -1029,14 +1086,14 @@ export const useProcessosContextStore = defineStore("processosContext", () => {
 
 ### 2.6 Resumo de Métricas - Frontend
 
-| Métrica | Valor Atual | Valor Ideal | Gap |
-|---------|-------------|-------------|-----|
-| **Cache HTTP** | 0 | Parcial (3-5 endpoints) | ⚠️ Moderado |
-| **Requisições em cascata** | 18/workflow | 6/workflow (67% redução) | ❌ Crítico |
-| **Blocos error handling duplicados** | ~104 | 0 | ❌ Crítico |
-| **Funções duplicadas** | 2+ | 0 | ✅ OK (fácil fix) |
-| **Stores > 300 linhas** | 1 | 0 | ✅ OK |
-| **Uso de composables** | Médio | Alto | ⚠️ Moderado |
+| Métrica                              | Valor Atual | Valor Ideal              | Gap              |
+|--------------------------------------|-------------|--------------------------|------------------|
+| **Cache HTTP**                       | 0           | Parcial (3-5 endpoints)  | ⚠️ Moderado      |
+| **Requisições em cascata**           | 18/workflow | 6/workflow (67% redução) | ❌ Crítico        |
+| **Blocos error handling duplicados** | ~104        | 0                        | ❌ Crítico        |
+| **Funções duplicadas**               | 2+          | 0                        | ✅ OK (fácil fix) |
+| **Stores > 300 linhas**              | 1           | 0                        | ✅ OK             |
+| **Uso de composables**               | Médio       | Alto                     | ⚠️ Moderado      |
 
 ---
 
@@ -1046,15 +1103,15 @@ export const useProcessosContextStore = defineStore("processosContext", () => {
 
 **Contexto:** 500 usuários totais, máximo 20 simultâneos
 
-| Otimização | Complexidade | Benefício Real | Recomendação |
-|------------|--------------|----------------|--------------|
-| **Cache Backend (unidades)** | Média | Muito Baixo | ❌ Remover |
-| **FetchType.EAGER → LAZY** | Baixa | Alto | ✅ Implementar |
-| **JOIN FETCH consolidação** | Média | Médio | ✅ Implementar |
-| **Decomposição de Services** | Alta | Alto (manutenção) | ✅ Implementar |
-| **Cache HTTP Frontend** | Média | Baixo-Médio | ⚠️ Parcial |
-| **Eliminar cascata de reloads** | Média | Médio-Alto | ✅ Implementar |
-| **Error handler composable** | Baixa | Alto (código limpo) | ✅ Implementar |
+| Otimização                      | Complexidade | Benefício Real      | Recomendação  |
+|---------------------------------|--------------|---------------------|---------------|
+| **Cache Backend (unidades)**    | Média        | Muito Baixo         | ❌ Remover     |
+| **FetchType.EAGER → LAZY**      | Baixa        | Alto                | ✅ Implementar |
+| **JOIN FETCH consolidação**     | Média        | Médio               | ✅ Implementar |
+| **Decomposição de Services**    | Alta         | Alto (manutenção)   | ✅ Implementar |
+| **Cache HTTP Frontend**         | Média        | Baixo-Médio         | ⚠️ Parcial    |
+| **Eliminar cascata de reloads** | Média        | Médio-Alto          | ✅ Implementar |
+| **Error handler composable**    | Baixa        | Alto (código limpo) | ✅ Implementar |
 
 ### 3.2 Estimativa de Performance
 
@@ -1098,32 +1155,32 @@ Uso de CPU (backend): ~12% (20% redução)
 
 #### ALTA PRIORIDADE (Impacto > Esforço)
 
-| # | Ação | Esforço | Impacto | Arquivos Afetados |
-|---|------|---------|---------|-------------------|
-| 1 | Alterar `FetchType.EAGER` → `LAZY` em UsuarioPerfil | 🟢 Baixo | 🔴 Alto | 1 arquivo (2 linhas) |
-| 2 | Criar composable `useErrorHandler` para stores | 🟡 Médio | 🔴 Alto | 14 arquivos (~500 linhas economizadas) |
-| 3 | Remover override de `findAll()` em AtividadeRepo | 🟢 Baixo | 🟠 Médio | 1 arquivo (6 linhas) |
-| 4 | Consolidar queries duplicadas (AtividadeRepo, CompetenciaRepo) | 🟡 Médio | 🟠 Médio | 2 arquivos (~20 linhas) |
-| 5 | Backend retornar dados completos (eliminar cascata de reloads) | 🔴 Alto | 🔴 Alto | 6 controllers, 6 stores (~50 linhas) |
+| # | Ação                                                           | Esforço  | Impacto  | Arquivos Afetados                      |
+|---|----------------------------------------------------------------|----------|----------|----------------------------------------|
+| 1 | Alterar `FetchType.EAGER` → `LAZY` em UsuarioPerfil            | 🟢 Baixo | 🔴 Alto  | 1 arquivo (2 linhas)                   |
+| 2 | Criar composable `useErrorHandler` para stores                 | 🟡 Médio | 🔴 Alto  | 14 arquivos (~500 linhas economizadas) |
+| 3 | Remover override de `findAll()` em AtividadeRepo               | 🟢 Baixo | 🟠 Médio | 1 arquivo (6 linhas)                   |
+| 4 | Consolidar queries duplicadas (AtividadeRepo, CompetenciaRepo) | 🟡 Médio | 🟠 Médio | 2 arquivos (~20 linhas)                |
+| 5 | Backend retornar dados completos (eliminar cascata de reloads) | 🔴 Alto  | 🔴 Alto  | 6 controllers, 6 stores (~50 linhas)   |
 
 #### MÉDIA PRIORIDADE (Melhoria Estrutural)
 
-| # | Ação | Esforço | Impacto | Arquivos Afetados |
-|---|------|---------|---------|-------------------|
-| 6 | Decompor `UnidadeFacade` em 3 services | 🔴 Alto | 🟠 Médio | 1 arquivo (384 linhas) → 4 arquivos |
-| 7 | Eliminar cache de unidades (remover CacheConfig) | 🟢 Baixo | 🟡 Baixo | 2 arquivos (~30 linhas) |
-| 8 | Dividir `SubprocessoWorkflowService` (775 linhas) | 🔴 Alto | 🟠 Médio | 1 arquivo → 3 arquivos |
-| 9 | Implementar cache HTTP parcial (frontend) | 🟡 Médio | 🟡 Baixo | Novo módulo (~150 linhas) |
-| 10 | Consolidar AtividadeService + CompetenciaService em MapaManutencaoService | 🟡 Médio | 🟠 Médio | 3 arquivos → 1 arquivo |
+| #  | Ação                                                                      | Esforço  | Impacto  | Arquivos Afetados                   |
+|----|---------------------------------------------------------------------------|----------|----------|-------------------------------------|
+| 6  | Decompor `UnidadeFacade` em 3 services                                    | 🔴 Alto  | 🟠 Médio | 1 arquivo (384 linhas) → 4 arquivos |
+| 7  | Eliminar cache de unidades (remover CacheConfig)                          | 🟢 Baixo | 🟡 Baixo | 2 arquivos (~30 linhas)             |
+| 8  | Dividir `SubprocessoWorkflowService` (775 linhas)                         | 🔴 Alto  | 🟠 Médio | 1 arquivo → 3 arquivos              |
+| 9  | Implementar cache HTTP parcial (frontend)                                 | 🟡 Médio | 🟡 Baixo | Novo módulo (~150 linhas)           |
+| 10 | Consolidar AtividadeService + CompetenciaService em MapaManutencaoService | 🟡 Médio | 🟠 Médio | 3 arquivos → 1 arquivo              |
 
 #### BAIXA PRIORIDADE (Refinamentos)
 
-| # | Ação | Esforço | Impacto | Arquivos Afetados |
-|---|------|---------|---------|-------------------|
-| 11 | Converter subquery → JOIN em AtividadeRepo | 🟢 Baixo | 🟢 Baixo | 1 arquivo (1 query) |
-| 12 | Extrair `flattenTree` para utilitário compartilhado | 🟢 Baixo | 🟢 Baixo | 2 arquivos + 1 novo |
-| 13 | Adicionar @EntityGraph onde apropriado | 🟡 Médio | 🟢 Baixo | 3-5 repositories |
-| 14 | Decompor `processos.ts` store (345 linhas) | 🔴 Alto | 🟢 Baixo | 1 arquivo → 3 arquivos |
+| #  | Ação                                                | Esforço  | Impacto  | Arquivos Afetados      |
+|----|-----------------------------------------------------|----------|----------|------------------------|
+| 11 | Converter subquery → JOIN em AtividadeRepo          | 🟢 Baixo | 🟢 Baixo | 1 arquivo (1 query)    |
+| 12 | Extrair `flattenTree` para utilitário compartilhado | 🟢 Baixo | 🟢 Baixo | 2 arquivos + 1 novo    |
+| 13 | Adicionar @EntityGraph onde apropriado              | 🟡 Médio | 🟢 Baixo | 3-5 repositories       |
+| 14 | Decompor `processos.ts` store (345 linhas)          | 🔴 Alto  | 🟢 Baixo | 1 arquivo → 3 arquivos |
 
 ### 4.2 Roadmap Sugerido
 
@@ -1194,34 +1251,39 @@ Após cada ação, validar:
 ### 5.1 Principais Achados
 
 1. **Otimizações Prematuras**  
-   Sistema com 20 usuários simultâneos não justifica cache complexo, múltiplas variações de queries, ou otimizações agressivas de performance.
+   Sistema com 20 usuários simultâneos não justifica cache complexo, múltiplas variações de queries, ou otimizações
+   agressivas de performance.
 
 2. **Inconsistência Arquitetural**  
-   Algumas áreas seguem boas práticas (decomposição de Subprocesso), outras têm God Objects (UnidadeFacade, SubprocessoWorkflowService).
+   Algumas áreas seguem boas práticas (decomposição de Subprocesso), outras têm God Objects (UnidadeFacade,
+   SubprocessoWorkflowService).
 
-3. **Complexidade Desnecessária**  
-   - FetchType.EAGER onde não é necessário
-   - Múltiplas versões de mesmas queries
-   - Cascata de reloads no frontend (3 requisições por ação)
+3. **Complexidade Desnecessária**
+    - FetchType.EAGER onde não é necessário
+    - Múltiplas versões de mesmas queries
+    - Cascata de reloads no frontend (3 requisições por ação)
 
-4. **Código Duplicado**  
-   - Error handling em 13 stores (~104 blocos)
-   - Função `flatten` duplicada
-   - Lógica de queries similar em múltiplos repos
+4. **Código Duplicado**
+    - Error handling em 13 stores (~104 blocos)
+    - Função `flatten` duplicada
+    - Lógica de queries similar em múltiplos repos
 
 ### 5.2 Ganhos Esperados com Implementação Completa
 
 **Métricas de Código:**
+
 - **Linhas de código:** Redução de ~800-1000 linhas (duplicações eliminadas)
 - **Complexidade ciclomática:** Redução de ~15-20% (simplificações)
 - **Arquivos > 500 linhas:** De 2 para 0
 
 **Métricas de Performance:**
+
 - **Requisições HTTP:** Redução de 25-40%
 - **Tempo de resposta:** Melhoria de 20-35%
 - **Uso de memória:** Redução de 10-15%
 
 **Métricas de Qualidade:**
+
 - **Manutenibilidade:** Melhoria significativa (classes menores, SRP)
 - **Testabilidade:** Melhoria (serviços menores, menos dependências)
 - **Legibilidade:** Melhoria (menos duplicação, padrões consistentes)
@@ -1252,6 +1314,7 @@ Após cada ação, validar:
 ### 6.1 Referências de Arquivos Críticos
 
 **Backend:**
+
 - `/backend/src/main/java/sgc/comum/config/CacheConfig.java` - Cache configuration
 - `/backend/src/main/java/sgc/organizacao/model/UsuarioPerfil.java` - EAGER fetch
 - `/backend/src/main/java/sgc/mapa/model/AtividadeRepo.java` - Queries duplicadas
@@ -1259,6 +1322,7 @@ Após cada ação, validar:
 - `/backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowService.java` - Service grande
 
 **Frontend:**
+
 - `/frontend/src/stores/atividades.ts` - Cascata de reloads
 - `/frontend/src/stores/processos.ts` - Store grande, função duplicada
 - `/frontend/src/composables/usePerfil.ts` - Função duplicada
@@ -1282,6 +1346,7 @@ wc -l frontend/src/stores/*.ts | sort -rn
 ### 6.3 Métricas de Baseline (Antes das Mudanças)
 
 **Backend:**
+
 - Total de linhas: ~20.062 (arquivos Java)
 - Arquivos > 500 linhas: 2
 - Arquivos > 300 linhas: 8
@@ -1291,6 +1356,7 @@ wc -l frontend/src/stores/*.ts | sort -rn
 - Caches ativos: 2
 
 **Frontend:**
+
 - Total de linhas (stores): ~1.687
 - Stores > 300 linhas: 1
 - Blocos error handling: ~104

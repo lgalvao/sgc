@@ -11,20 +11,20 @@
 1. ADMIN clica em `Unidade` no menu (este é o comando equivalente a `Minha unidade`, visto por outros perfis).
 
 2. Sistema mostra a árvore completa de unidades.
-	
+
 3. ADMIN clica em umas das unidades.
 
-4. Sistema mostra a pagina `Detalhes da unidade` 
+4. Sistema mostra a pagina `Detalhes da unidade`
 
 5. ADMIN clica no botão `Criar atribuição`.
 
 6. Sistema apresenta um modal com estes campos:
 
-   - Dropdown pesquisável `Servidores` com os nomes dos servidores da unidade
-   - `Data de início`
-   - `Data de término`
-   - `Justificativa`
-   - Botões `Confirmar` e `Cancelar`
+    - Dropdown pesquisável `Servidores` com os nomes dos servidores da unidade
+    - `Data de início`
+    - `Data de término`
+    - `Justificativa`
+    - Botões `Confirmar` e `Cancelar`
 
 7. ADMIN seleciona o servidor, define as datas e inclui uma justificativa. Todos os campos *são obrigatórios*.
 
@@ -52,4 +52,5 @@
     - `Unidade de origem`: SEDOC
     - `Usuário destino`: [USUARIO_SERVIDOR]
 
-11. O usuário que recebe a atribuição temporária passa a ter os mesmos direitos do perfil CHEFE. A atribuição temporária terá prioridade sobre os dados de titularidade lidos do SGRH (atraves das views).
+11. O usuário que recebe a atribuição temporária passa a ter os mesmos direitos do perfil CHEFE. A atribuição temporária
+    terá prioridade sobre os dados de titularidade lidos do SGRH (atraves das views).

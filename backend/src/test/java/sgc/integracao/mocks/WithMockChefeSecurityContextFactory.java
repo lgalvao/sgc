@@ -17,7 +17,7 @@ public class WithMockChefeSecurityContextFactory
 
     @Autowired(required = false)
     private UnidadeRepo unidadeRepo;
-    
+
     @Autowired(required = false)
     private UsuarioPerfilRepo usuarioPerfilRepo;
 
@@ -62,11 +62,11 @@ public class WithMockChefeSecurityContextFactory
 
             Set<UsuarioPerfil> atribuicoes = new HashSet<>();
             atribuicoes.add(
-                            UsuarioPerfil.builder()
-                                    .usuario(usuario)
-                                    .unidade(unidade)
-                                    .perfil(Perfil.CHEFE)
-                                    .build());
+                    UsuarioPerfil.builder()
+                            .usuario(usuario)
+                            .unidade(unidade)
+                            .perfil(Perfil.CHEFE)
+                            .build());
             usuario.setAtribuicoes(atribuicoes);
         } else {
             // Usuário existe - garantir que tem pelo menos um perfil CHEFE

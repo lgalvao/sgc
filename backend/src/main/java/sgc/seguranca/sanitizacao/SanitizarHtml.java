@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * deserialização JSON.
  * Previne ataques XSS removendo HTML/JavaScript potencialmente malicioso.
  */
-@Target({ ElementType.FIELD, ElementType.PARAMETER })
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
 @JsonDeserialize(using = DeserializadorHtmlSanitizado.class)

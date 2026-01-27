@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 /**
  * DTO de resposta contendo dados de um processo.
- * 
+ *
  * <p>Requer @NoArgsConstructor e @Setter para uso em mappers.
  */
 @Getter

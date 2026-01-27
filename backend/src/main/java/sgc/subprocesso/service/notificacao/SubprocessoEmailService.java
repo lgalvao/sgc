@@ -60,14 +60,14 @@ public class SubprocessoEmailService {
 
     private Map<String, Object> criarVariaveisTemplate(Subprocesso sp, EventoTransicaoSubprocesso evento) {
         Map<String, Object> variaveis = new HashMap<>();
-        
+
         Unidade unidade = sp.getUnidade();
         variaveis.put("siglaUnidade", unidade.getSigla());
         variaveis.put("nomeUnidade", unidade.getNome());
-        
+
         variaveis.put("nomeProcesso", sp.getProcesso().getDescricao());
         variaveis.put("tipoProcesso", sp.getProcesso().getTipo().name());
-        
+
         if (sp.getDataLimiteEtapa1() != null) {
             variaveis.put("dataLimiteEtapa1", sp.getDataLimiteEtapa1().format(DATE_FORMATTER));
         }
@@ -80,32 +80,28 @@ public class SubprocessoEmailService {
             variaveis.put("observacoes", evento.getObservacoes());
             variaveis.put("motivo", evento.getObservacoes());
         }
-        
+
         return variaveis;
     }
 
     private String criarAssunto(TipoTransicao tipo, Subprocesso sp) {
         String siglaUnidade = sp.getUnidade().getSigla();
-        
+
         return switch (tipo) {
             case CADASTRO_DISPONIBILIZADO, REVISAO_CADASTRO_DISPONIBILIZADA ->
-                String.format("SGC: Cadastro de atividades da unidade %s disponibilizado", siglaUnidade);
+                    String.format("SGC: Cadastro de atividades da unidade %s disponibilizado", siglaUnidade);
             case CADASTRO_DEVOLVIDO, REVISAO_CADASTRO_DEVOLVIDA ->
-                String.format("SGC: Cadastro de atividades da unidade %s devolvido para ajustes", siglaUnidade);
+                    String.format("SGC: Cadastro de atividades da unidade %s devolvido para ajustes", siglaUnidade);
             case CADASTRO_ACEITO, REVISAO_CADASTRO_ACEITA ->
-                String.format("SGC: Cadastro de atividades da unidade %s aceito", siglaUnidade);
+                    String.format("SGC: Cadastro de atividades da unidade %s aceito", siglaUnidade);
             case MAPA_DISPONIBILIZADO ->
-                String.format("SGC: Mapa de competências da unidade %s disponibilizado", siglaUnidade);
-            case MAPA_SUGESTOES_APRESENTADAS ->
-                String.format("SGC: Sugestões para o mapa da unidade %s", siglaUnidade);
-            case MAPA_VALIDADO ->
-                String.format("SGC: Mapa de competências da unidade %s validado", siglaUnidade);
+                    String.format("SGC: Mapa de competências da unidade %s disponibilizado", siglaUnidade);
+            case MAPA_SUGESTOES_APRESENTADAS -> String.format("SGC: Sugestões para o mapa da unidade %s", siglaUnidade);
+            case MAPA_VALIDADO -> String.format("SGC: Mapa de competências da unidade %s validado", siglaUnidade);
             case MAPA_VALIDACAO_DEVOLVIDA ->
-                String.format("SGC: Validação do mapa da unidade %s devolvida", siglaUnidade);
-            case MAPA_VALIDACAO_ACEITA ->
-                String.format("SGC: Validação do mapa da unidade %s aceita", siglaUnidade);
-            default ->
-                String.format("SGC: Notificação - %s", tipo.getDescricaoMovimentacao());
+                    String.format("SGC: Validação do mapa da unidade %s devolvida", siglaUnidade);
+            case MAPA_VALIDACAO_ACEITA -> String.format("SGC: Validação do mapa da unidade %s aceita", siglaUnidade);
+            default -> String.format("SGC: Notificação - %s", tipo.getDescricaoMovimentacao());
         };
     }
 
@@ -116,9 +112,9 @@ public class SubprocessoEmailService {
     }
 
     private boolean deveNotificarHierarquia(TipoTransicao tipo) {
-        return tipo == TipoTransicao.MAPA_DISPONIBILIZADO 
-            || tipo == TipoTransicao.CADASTRO_DISPONIBILIZADO
-            || tipo == TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA;
+        return tipo == TipoTransicao.MAPA_DISPONIBILIZADO
+                || tipo == TipoTransicao.CADASTRO_DISPONIBILIZADO
+                || tipo == TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA;
     }
 
     private void notificarHierarquia(Unidade unidadeOrigem, String assunto, String corpo) {

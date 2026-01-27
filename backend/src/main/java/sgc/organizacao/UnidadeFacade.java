@@ -5,11 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.RepositorioComum;
-import sgc.organizacao.dto.AtribuicaoTemporariaDto;
-import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
-import sgc.organizacao.dto.ResponsavelDto;
-import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.dto.UsuarioDto;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.UnidadeHierarquiaService;
@@ -20,7 +16,7 @@ import java.util.*;
 
 /**
  * Facade para operações de unidades organizacionais.
- * 
+ *
  * <p>Este facade delega operações para serviços especializados seguindo o
  * Single Responsibility Principle (SRP):
  * <ul>
@@ -28,7 +24,7 @@ import java.util.*;
  *   <li>{@link UnidadeMapaService} - Mapas vigentes</li>
  *   <li>{@link UnidadeResponsavelService} - Responsáveis e atribuições</li>
  * </ul>
- * 
+ *
  * <p>A facade também mantém operações básicas de consulta e busca de entidades.
  */
 @Service
@@ -97,10 +93,10 @@ public class UnidadeFacade {
     /**
      * Método legado mantido para compatibilidade com APIs antigas.
      * Delega para {@link #verificarMapaVigente(Long)}.
-     * 
+     *
      * @deprecated Use {@link #verificarMapaVigente(Long)} em vez deste método.
      */
-    @Deprecated(since = "2026-01", forRemoval = false)
+    @Deprecated(since = "2026-01")
     public boolean verificarExistenciaMapaVigente(Long codigoUnidade) {
         return verificarMapaVigente(codigoUnidade);
     }

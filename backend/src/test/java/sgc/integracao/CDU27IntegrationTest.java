@@ -88,10 +88,10 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
 
         // When
         mockMvc.perform(
-                post("/api/subprocessos/{codigo}/data-limite", subprocesso.getCodigo())
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        post("/api/subprocessos/{codigo}/data-limite", subprocesso.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
         // Then
@@ -121,10 +121,10 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
 
         // When/Then
         mockMvc.perform(
-                post("/api/subprocessos/{codigo}/data-limite", subprocesso.getCodigo())
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        post("/api/subprocessos/{codigo}/data-limite", subprocesso.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
     }
 }

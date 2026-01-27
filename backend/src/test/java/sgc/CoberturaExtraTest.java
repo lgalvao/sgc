@@ -1,9 +1,13 @@
 package sgc;
 
+import java.util.HashMap;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.comum.erros.ErroNegocio;
@@ -16,10 +20,6 @@ import sgc.organizacao.model.Unidade;
 import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 
-import java.util.HashMap;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @DisplayName("Cobertura Extra de Erros e Modelos")
 @Tag("unit")
 class CoberturaExtraTest {
@@ -30,22 +30,36 @@ class CoberturaExtraTest {
         assertThat(new ErroConfiguracao("msg")).isNotNull();
         assertThat(new ErroMapaNaoAssociado("msg")).isNotNull();
         assertThat(new ErroParametroPainelInvalido("msg")).isNotNull();
-        
-        ErroNegocioBase erro = new ErroNegocioBase("msg", "CODO", HttpStatus.BAD_REQUEST) {};
+
+        ErroNegocioBase erro = new ErroNegocioBase("msg", "CODO", HttpStatus.BAD_REQUEST) {
+        };
         assertThat(erro.getMessage()).isEqualTo("msg");
         assertThat(erro.getCode()).isEqualTo("CODO");
         assertThat(erro.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-        
+
         // Cobertura para o método default da interface ErroNegocio
         ErroNegocio erroInterface = new ErroNegocio() {
-            @Override public String getCode() { return "X"; }
-            @Override public HttpStatus getStatus() { return HttpStatus.OK; }
-            @Override public String getMessage() { return "M"; }
+            @Override
+            public String getCode() {
+                return "X";
+            }
+
+            @Override
+            public HttpStatus getStatus() {
+                return HttpStatus.OK;
+            }
+
+            @Override
+            public String getMessage() {
+                return "M";
+            }
         };
         assertThat(erroInterface.getDetails()).isNull();
-        
-        assertThat(new ErroNegocioBase("msg", "CODO", HttpStatus.BAD_REQUEST, new HashMap<>()) {}).isNotNull();
-        assertThat(new ErroNegocioBase("msg", "CODO", HttpStatus.BAD_REQUEST, new RuntimeException()) {}).isNotNull();
+
+        assertThat(new ErroNegocioBase("msg", "CODO", HttpStatus.BAD_REQUEST, new HashMap<>()) {
+        }).isNotNull();
+        assertThat(new ErroNegocioBase("msg", "CODO", HttpStatus.BAD_REQUEST, new RuntimeException()) {
+        }).isNotNull();
     }
 
     @Test
@@ -54,7 +68,7 @@ class CoberturaExtraTest {
         Competencia c = Competencia.builder().descricao("desc").mapa(new Mapa()).build();
         c.setCodigo(1L);
         assertThat(c.getCodigo()).isEqualTo(1L);
-        
+
         Conhecimento k = Conhecimento.builder().descricao("desc").atividade(new Atividade()).build();
         k.setCodigo(1L);
         assertThat(k.getCodigo()).isEqualTo(1L);

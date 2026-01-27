@@ -30,7 +30,7 @@ class MapaMapperTest {
         MapaDto dto = mapper.toDto(mapa);
 
         assertThat(dto).isNotNull();
-        assertThat(dto.getCodigo()).isEqualTo(1L);
+        assertThat(dto.codigo()).isEqualTo(1L);
     }
 
     @Test

@@ -20,18 +20,13 @@ import sgc.fixture.SubprocessoFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
-import sgc.subprocesso.model.SubprocessoRepo;
-import tools.jackson.databind.ObjectMapper;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -47,19 +42,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-22: Aceitar cadastros em bloco")
 class CDU22IntegrationTest extends BaseIntegrationTest {
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private ProcessoRepo processoRepo;
-
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-
-    @Autowired
-    private UnidadeRepo unidadeRepo;
-
     @Autowired
     private SubprocessoMovimentacaoRepo movimentacaoRepo;
 
@@ -76,6 +58,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocesso2;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         // Use existing units from data.sql:
         // Unit 6 (COSIS - INTERMEDIARIA) is the parent
@@ -122,22 +105,24 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Deve aceitar cadastro de múltiplas unidades em bloco")
-    @WithMockGestor("666666666666") // GESTOR of unit 6 (parent of units 8 and 9)
+    @WithMockGestor("666666666666")
+        // GESTOR of unit 6 (parent of units 8 and 9)
     void aceitarCadastroEmBloco_deveAceitarTodasSelecionadas() throws Exception {
         // Given
         Long codigoContexto = subprocesso1.getCodigo();
-        List<Long> unidadesSelecionadas = List.of(unidade1.getCodigo(), unidade2.getCodigo());
+        List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
-                .unidadeCodigos(unidadesSelecionadas)
+                .acao("ACEITAR_CADASTRO")
+                .subprocessos(subprocessosSelecionados)
                 .build();
 
         // When
         mockMvc.perform(
-                post("/api/subprocessos/{id}/aceitar-cadastro-bloco", codigoContexto)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        post("/api/subprocessos/{id}/aceitar-cadastro-bloco", codigoContexto)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
         // Then

@@ -22,7 +22,7 @@ import java.io.IOException;
  * Extrai o token do header Authorization e configura o contexto de segurança.
  */
 @Component
-@Profile({ "!test", "secure-test" })
+@Profile({"!test", "secure-test"})
 @RequiredArgsConstructor
 @Slf4j
 public class FiltroJwt extends OncePerRequestFilter {

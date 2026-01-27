@@ -61,7 +61,7 @@
  * @Mapper(componentModel = "spring")
  * public interface SubprocessoMapper {
  *     SubprocessoDto toDto(Subprocesso entity);
- *     
+ *
  *     @Mapping(target = "codigo", ignore = true)
  *     @Mapping(target = "versao", ignore = true)
  *     Subprocesso toEntity(SubprocessoDto dto);
@@ -75,10 +75,10 @@
  * <pre>{@code
  * @Mapper(componentModel = "spring")
  * public interface SubprocessoDetalheMapper {
- *     
+ *
  *     @Mapping(target = "permissoes", source = ".", qualifiedByName = "calcularPermissoes")
  *     SubprocessoDetalheDto toDto(Subprocesso subprocesso, @Context Usuario usuario);
- *     
+ *
  *     @Named("calcularPermissoes")
  *     default SubprocessoPermissoesDto calcularPermissoes(Subprocesso sp, @Context Usuario usuario) {
  *         // Lógica customizada
@@ -111,16 +111,16 @@
  * <pre>{@code
  * @Service
  * public class SubprocessoFacade {
- *     
+ *
  *     private final SubprocessoRepo repo;
  *     private final SubprocessoMapper mapper;
  *     private final SubprocessoDetalheMapper detalheMapper;
- *     
+ *
  *     public SubprocessoDto buscar(Long codigo) {
  *         Subprocesso entity = repo.findById(codigo).orElseThrow(...);
  *         return mapper.toDto(entity);  // Conversão simples
  *     }
- *     
+ *
  *     public SubprocessoDetalheDto buscarDetalhes(Long codigo, Usuario usuario) {
  *         Subprocesso entity = repo.findById(codigo).orElseThrow(...);
  *         return detalheMapper.toDto(entity, usuario);  // Com contexto
@@ -175,15 +175,15 @@
  * <pre>{@code
  * @SpringBootTest
  * class SubprocessoMapperTest {
- *     
+ *
  *     @Autowired
  *     private SubprocessoMapper mapper;
- *     
+ *
  *     @Test
  *     void deveMapearSubprocessoParaDto() {
  *         Subprocesso entity = criarSubprocesso();
  *         SubprocessoDto dto = mapper.toDto(entity);
- *         
+ *
  *         assertThat(dto.codigo()).isEqualTo(entity.getCodigo());
  *         assertThat(dto.descricao()).isEqualTo(entity.getDescricao());
  *     }
@@ -200,10 +200,10 @@
  *   <li>/regras/backend-padroes.md - Convenções de mapeamento</li>
  * </ul>
  *
- * @since 1.0
  * @see sgc.subprocesso.dto
  * @see sgc.subprocesso.model
  * @see sgc.processo.mapper
+ * @since 1.0
  */
 @NullMarked
 package sgc.subprocesso.mapper;

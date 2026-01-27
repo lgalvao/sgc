@@ -1,7 +1,10 @@
 package sgc.organizacao.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Immutable;
 import org.jspecify.annotations.Nullable;
@@ -29,7 +32,7 @@ public class Unidade extends EntidadeBase {
     @Column(name = "matricula_titular", length = 8, nullable = false)
     private String matriculaTitular;
 
-    @Column(name = "titulo_titular", length = 12 , nullable = false)
+    @Column(name = "titulo_titular", length = 12, nullable = false)
     private String tituloTitular;
 
     @Column(name = "data_inicio_titularidade", nullable = false)

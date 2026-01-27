@@ -26,11 +26,16 @@ import static org.mockito.Mockito.when;
 @DisplayName("LoginFacade - Gaps de Cobertura")
 class LoginServiceTest {
 
-    @Mock private UsuarioFacade usuarioService;
-    @Mock private GerenciadorJwt gerenciadorJwt;
-    @Mock private ClienteAcessoAd clienteAcessoAd;
-    @Mock private UnidadeFacade unidadeService;
-    @Mock private UsuarioMapper usuarioMapper;
+    @Mock
+    private UsuarioFacade usuarioService;
+    @Mock
+    private GerenciadorJwt gerenciadorJwt;
+    @Mock
+    private ClienteAcessoAd clienteAcessoAd;
+    @Mock
+    private UnidadeFacade unidadeService;
+    @Mock
+    private UsuarioMapper usuarioMapper;
 
     private LoginFacade loginFacade;
 
@@ -54,7 +59,7 @@ class LoginServiceTest {
     @DisplayName("Linhas 94-97: Deve lidar com ErroAutenticacao do ClienteAcessoAd")
     void deveLidarComErroAd() {
         when(clienteAcessoAd.autenticar("123", "senha")).thenThrow(new ErroAutenticacao("Falha AD"));
-        
+
         boolean result = loginFacade.autenticar("123", "senha");
         assertFalse(result);
     }
@@ -77,7 +82,7 @@ class LoginServiceTest {
         sgc.organizacao.model.Usuario usuario = new sgc.organizacao.model.Usuario();
         usuario.setTituloEleitoral(titulo);
         usuario.setAtribuicoes(Collections.emptySet());
-        
+
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
 
         assertThrows(ErroAccessoNegado.class, () -> loginFacade.entrar(req));

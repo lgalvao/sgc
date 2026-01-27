@@ -29,7 +29,7 @@ class LimitadorTentativasLoginTest {
         when(clock.instant()).thenReturn(java.time.Instant.now());
 
         when(environment.getProperty("aplicacao.ambiente-testes", Boolean.class, false)).thenReturn(false);
-        when(environment.getActiveProfiles()).thenReturn(new String[] {});
+        when(environment.getActiveProfiles()).thenReturn(new String[]{});
         when(environment.getProperty("aplicacao.ambiente-testes", Boolean.class, false)).thenReturn(false);
         limitador = new LimitadorTentativasLogin(environment, clock);
     }
@@ -68,7 +68,7 @@ class LimitadorTentativasLoginTest {
 
     @Test
     void naoDeveBloquearSePerfilDeTesteEstiverAtivo() {
-        when(environment.getActiveProfiles()).thenReturn(new String[] { "test" });
+        when(environment.getActiveProfiles()).thenReturn(new String[]{"test"});
 
         String ip = "192.168.1.4";
 
@@ -78,7 +78,7 @@ class LimitadorTentativasLoginTest {
 
     @Test
     void naoDeveBloquearSePerfilE2eEstiverAtivo() {
-        when(environment.getActiveProfiles()).thenReturn(new String[] { "e2e" });
+        when(environment.getActiveProfiles()).thenReturn(new String[]{"e2e"});
 
         String ip = "192.168.1.5";
 
@@ -178,7 +178,7 @@ class LimitadorTentativasLoginTest {
 
     @Test
     void deveBloquearSePerfilProd() {
-        when(environment.getActiveProfiles()).thenReturn(new String[] { "prod" });
+        when(environment.getActiveProfiles()).thenReturn(new String[]{"prod"});
         String ip = "192.168.1.16";
 
         // Consome 5

@@ -1,6 +1,5 @@
 # Módulo de Análise
 
-
 ## Visão Geral
 
 Este pacote é responsável por registrar o **histórico de decisões** tomadas durante o ciclo de vida de um `Subprocesso`.
@@ -76,10 +75,10 @@ graph TD
 A principal função deste módulo é fornecer **rastreabilidade**. A abordagem de modelo genérico com um campo de "tipo"
 foi utilizada para registrar o histórico de decisões em diferentes etapas do workflow sem duplicar estruturas de dados.
 
-
 ## Como Testar
 
 Para executar apenas os testes deste módulo (a partir do diretório `backend`):
+
 ```bash
 ./gradlew test --tests "sgc.analise.*"
 ```

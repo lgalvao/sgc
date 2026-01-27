@@ -17,12 +17,14 @@ O sistema SGC precisa controlar acesso a operações baseado em múltiplos fator
 4. **Ownership**: Usuário pertence à mesma unidade do recurso
 
 Historicamente, o SGC implementava controle de acesso de forma **dispersa**:
+
 - Controllers com `@PreAuthorize`
 - Services com verificações programáticas ad-hoc
 - Lógica de permissões espalhada em 22+ arquivos
 - Padrões inconsistentes entre módulos
 
 Isso resultava em:
+
 - ❌ **Difícil auditoria**: Impossível rastrear todas as decisões de acesso
 - ❌ **Manutenção complexa**: Mudanças em regras requeriam alterações em múltiplos locais
 - ❌ **Risco de bypass**: Lógica duplicada aumentava chance de inconsistências
@@ -74,6 +76,7 @@ Implementamos uma **arquitetura de controle de acesso centralizada em 3 camadas*
 #### 1. `AccessControlService` (Orquestrador)
 
 Service centralizado que:
+
 - Recebe requisições de verificação de permissão
 - Delega para a `AccessPolicy` apropriada
 - Loga todas as decisões via `AccessAuditService`
@@ -109,6 +112,7 @@ public interface AccessPolicy<T> {
 ```
 
 **Implementações:**
+
 - `ProcessoAccessPolicy` - Regras para processos
 - `SubprocessoAccessPolicy` - Regras para subprocessos (26 ações mapeadas)
 - `AtividadeAccessPolicy` - Regras para atividades
@@ -164,6 +168,7 @@ public class AccessAuditService {
 ```
 
 Logs no formato:
+
 ```
 ACCESS_GRANTED: user=333333333333, action=VALIDAR_MAPA, resource=Subprocesso:42, timestamp=...
 ACCESS_DENIED: user=444444444444, action=HOMOLOGAR_CADASTRO, resource=Subprocesso:42, 
@@ -187,7 +192,7 @@ public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
             Set.of(ADMIN, GESTOR),
             Set.of(CADASTRO_DISPONIBILIZADO),
             RequisitoHierarquia.SUPERIOR_IMEDIATA
-        )),
+        ))
         // ... 24 outras ações
     );
     
@@ -276,90 +281,94 @@ public RespostaDto disponibilizar(Subprocesso sp) {
 ### Vantagens ✅
 
 1. **Auditabilidade Total**
-   - Todas as decisões de acesso logadas em um único ponto
-   - Fácil rastrear quem tentou acessar o quê
-   - Compliance com LGPD e requisitos de auditoria
+    - Todas as decisões de acesso logadas em um único ponto
+    - Fácil rastrear quem tentou acessar o quê
+    - Compliance com LGPD e requisitos de auditoria
 
 2. **Manutenibilidade**
-   - Mudança de regras em um único local (AccessPolicy)
-   - Fácil adicionar novas ações (enum + regras)
-   - Código de negócio limpo (sem lógica de segurança)
+    - Mudança de regras em um único local (AccessPolicy)
+    - Fácil adicionar novas ações (enum + regras)
+    - Código de negócio limpo (sem lógica de segurança)
 
 3. **Testabilidade**
-   - Testes de segurança centralizados em `AccessControlServiceTest`
-   - Testes de policies isolados
-   - Cobertura de 95%+ alcançada
+    - Testes de segurança centralizados em `AccessControlServiceTest`
+    - Testes de policies isolados
+    - Cobertura de 95%+ alcançada
 
 4. **Consistência**
-   - Padrão único para todas as verificações
-   - Impossível esquecer verificações (compilador força)
-   - Mensagens de erro padronizadas
+    - Padrão único para todas as verificações
+    - Impossível esquecer verificações (compilador força)
+    - Mensagens de erro padronizadas
 
 5. **Performance**
-   - Verificações otimizadas (cache de hierarquias)
-   - Sem duplicação de queries
-   - Decisões rápidas (mapa de regras em memória)
+    - Verificações otimizadas (cache de hierarquias)
+    - Sem duplicação de queries
+    - Decisões rápidas (mapa de regras em memória)
 
 6. **Segurança**
-   - Fail-safe defaults (padrão é negar)
-   - Impossível bypass (camada obrigatória)
-   - Auditoria automática de todas as tentativas
+    - Fail-safe defaults (padrão é negar)
+    - Impossível bypass (camada obrigatória)
+    - Auditoria automática de todas as tentativas
 
 ### Desvantagens ⚠️
 
 1. **Complexidade Inicial**
-   - Curva de aprendizado para novos desenvolvedores
-   - Mais arquivos/classes (5 novos componentes)
-   - **Mitigação**: Documentação completa + exemplos
+    - Curva de aprendizado para novos desenvolvedores
+    - Mais arquivos/classes (5 novos componentes)
+    - **Mitigação**: Documentação completa + exemplos
 
 2. **Overhead de Abstração**
-   - Chamada adicional (AccessControlService)
-   - Lookup de policy
-   - **Mitigação**: Overhead < 1ms (imperceptível)
+    - Chamada adicional (AccessControlService)
+    - Lookup de policy
+    - **Mitigação**: Overhead < 1ms (imperceptível)
 
 3. **Manutenção de Enum Acao**
-   - Precisa adicionar nova ação para cada operação
-   - **Mitigação**: Processo claro + checklist
+    - Precisa adicionar nova ação para cada operação
+    - **Mitigação**: Processo claro + checklist
 
 ### Riscos Mitigados ✅
 
-| Risco Anterior | Mitigação |
-|----------------|-----------|
-| Verificações esquecidas | Enum `Acao` força mapeamento completo |
-| Lógica inconsistente | Políticas centralizadas garantem consistência |
-| Bypass de segurança | Camada obrigatória + testes arquiteturais (ArchUnit) |
-| Falta de auditoria | `AccessAuditService` loga tudo automaticamente |
-| Difícil rastreamento | Logs estruturados + um único ponto de decisão |
+| Risco Anterior          | Mitigação                                            |
+|-------------------------|------------------------------------------------------|
+| Verificações esquecidas | Enum `Acao` força mapeamento completo                |
+| Lógica inconsistente    | Políticas centralizadas garantem consistência        |
+| Bypass de segurança     | Camada obrigatória + testes arquiteturais (ArchUnit) |
+| Falta de auditoria      | `AccessAuditService` loga tudo automaticamente       |
+| Difícil rastreamento    | Logs estruturados + um único ponto de decisão        |
 
 ## Alternativas Consideradas
 
 ### Alternativa 1: Manter Status Quo (Rejeitada)
+
 - **Prós**: Sem mudanças, sem riscos
 - **Contras**: Problemas de auditoria, manutenção e segurança permanecem
 - **Motivo da Rejeição**: Insustentável a longo prazo
 
 ### Alternativa 2: Spring Security Method Security Pura (Rejeitada)
+
 - **Prós**: Padrão do Spring, bem documentado
-- **Contras**: 
-  - Difícil centralizar lógica complexa (hierarquia + estado)
-  - Auditoria requer aspect customizado
-  - SpEL complexo e difícil de testar
+- **Contras**:
+    - Difícil centralizar lógica complexa (hierarquia + estado)
+    - Auditoria requer aspect customizado
+    - SpEL complexo e difícil de testar
 - **Motivo da Rejeição**: Não atende requisitos de auditoria e complexidade
 
 ### Alternativa 3: AOP com Aspects (Rejeitada)
+
 - **Prós**: Separação de concerns via AOP
 - **Contras**:
-  - Mágica implícita (difícil debugar)
-  - Ordem de execução de aspects pode ser problemática
-  - Mais complexo que solução explícita
+    - Mágica implícita (difícil debugar)
+    - Ordem de execução de aspects pode ser problemática
+    - Mais complexo que solução explícita
 - **Motivo da Rejeição**: Muito mágico, prefere-se explícito
 
 ### Alternativa 4: AccessControlService + Policies (✅ ESCOLHIDA)
+
 - **Prós**:
-  - Centralização explícita
-  - Fácil testar e auditar
-  - Extensível (novas policies)
-  - Performance adequada
+    - Centralização explícita
+    - Fácil testar e auditar
+    - Extensível (novas policies)
+    - Performance adequada
 - **Contras**: Overhead mínimo de abstração
 - **Motivo da Escolha**: Melhor trade-off entre clareza, testabilidade e auditoria
 
@@ -368,6 +377,7 @@ public RespostaDto disponibilizar(Subprocesso sp) {
 ### Status: ✅ 100% COMPLETO
 
 **Sprint 4 (2026-01-08 a 2026-01-09)**
+
 - ✅ AccessControlService implementado
 - ✅ 4 AccessPolicies implementadas (Processo, Subprocesso, Atividade, Mapa)
 - ✅ HierarchyService centralizado
@@ -382,6 +392,7 @@ public RespostaDto disponibilizar(Subprocesso sp) {
 ### Arquivos Criados/Modificados
 
 **Novos Componentes (8 arquivos):**
+
 - `sgc.seguranca.acesso.AccessControlService`
 - `sgc.seguranca.acesso.AccessPolicy`
 - `sgc.seguranca.acesso.Acao`
@@ -392,6 +403,7 @@ public RespostaDto disponibilizar(Subprocesso sp) {
 - `sgc.seguranca.acesso.AccessAuditService`
 
 **Services Migrados (16 arquivos):**
+
 - ProcessoFacade
 - SubprocessoFacade
 - SubprocessoCadastroWorkflowService
@@ -402,6 +414,7 @@ public RespostaDto disponibilizar(Subprocesso sp) {
 - ... (outros)
 
 **Testes (31+ arquivos de teste):**
+
 - AccessControlServiceTest (4 testes)
 - SubprocessoAccessPolicyTest (26 testes)
 - ProcessoAccessPolicyTest (8 testes)
@@ -410,15 +423,15 @@ public RespostaDto disponibilizar(Subprocesso sp) {
 
 ## Métricas de Sucesso
 
-| Métrica | Antes | Depois | Melhoria |
-|---------|-------|--------|----------|
-| Arquivos com lógica de acesso | 22 | 5 | -77% |
-| Padrões de verificação | 4+ | 1 | -75% |
-| Endpoints sem controle | 15 | 0 | -100% |
-| Cobertura de testes de segurança | ~40% | 95%+ | +137% |
-| Tempo para adicionar regra | ~2h | ~15min | -87% |
-| Linhas de código duplicado (acesso) | ~300 | ~0 | -100% |
-| Testes passando | 1122/1149 | 1149/1149 | +27 testes |
+| Métrica                             | Antes     | Depois    | Melhoria   |
+|-------------------------------------|-----------|-----------|------------|
+| Arquivos com lógica de acesso       | 22        | 5         | -77%       |
+| Padrões de verificação              | 4+        | 1         | -75%       |
+| Endpoints sem controle              | 15        | 0         | -100%      |
+| Cobertura de testes de segurança    | ~40%      | 95%+      | +137%      |
+| Tempo para adicionar regra          | ~2h       | ~15min    | -87%       |
+| Linhas de código duplicado (acesso) | ~300      | ~0        | -100%      |
+| Testes passando                     | 1122/1149 | 1149/1149 | +27 testes |
 
 ## Lições Aprendidas
 
@@ -431,6 +444,7 @@ public RespostaDto disponibilizar(Subprocesso sp) {
 ## Referências
 
 ### Documentos Relacionados
+
 - [ADR-001: Facade Pattern](ADR-001-facade-pattern.md) - Padrão de Facades (relacionado)
 - `/docs/SECURITY-REFACTORING-COMPLETE.md` - Relatório completo da refatoração
 - `/security-refactoring-plan.md` - Plano original (Sprints 1-4)
@@ -438,11 +452,13 @@ public RespostaDto disponibilizar(Subprocesso sp) {
 - `/regras/backend-padroes.md` - Seção de Controle de Acesso
 
 ### Código de Referência
+
 - `sgc.seguranca.acesso` - Pacote completo de controle de acesso
 - `sgc.seguranca.acesso.SubprocessoAccessPolicy` - Exemplo de policy completa
 - `sgc.subprocesso.service.SubprocessoFacade` - Exemplo de uso
 
 ### Padrões Externos
+
 - Spring Security: https://spring.io/projects/spring-security
 - OWASP Access Control: https://owasp.org/www-community/Access_Control
 - Domain-Driven Design: Specification Pattern (base para AccessPolicy)

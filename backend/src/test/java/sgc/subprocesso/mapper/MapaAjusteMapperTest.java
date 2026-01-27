@@ -1,10 +1,15 @@
 package sgc.subprocesso.mapper;
 
+import java.util.HashSet;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import sgc.analise.model.Analise;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
@@ -13,11 +18,6 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.model.Subprocesso;
-
-import java.util.HashSet;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -67,7 +67,7 @@ class MapaAjusteMapperTest {
 
         assertThat(dto.getCompetencias()).hasSize(1);
         assertThat(dto.getCompetencias().getFirst().getAtividades()).hasSize(1);
-        assertThat(dto.getCompetencias().getFirst().getAtividades().getFirst().getConhecimentos()).hasSize(1);
-        assertThat(dto.getCompetencias().getFirst().getAtividades().getFirst().getConhecimentos().getFirst().isIncluido()).isTrue();
+        assertThat(dto.getCompetencias().getFirst().getAtividades().getFirst().conhecimentos()).hasSize(1);
+        assertThat(dto.getCompetencias().getFirst().getAtividades().getFirst().conhecimentos().getFirst().incluido()).isTrue();
     }
 }

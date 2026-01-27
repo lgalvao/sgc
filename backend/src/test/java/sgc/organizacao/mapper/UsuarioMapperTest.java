@@ -1,15 +1,15 @@
 package sgc.organizacao.mapper;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("unit")
 @DisplayName("Testes de Mapper: UsuarioMapper")
@@ -57,11 +57,11 @@ class UsuarioMapperTest {
 
         // Assert
         assertThat(dto).isNotNull();
-        assertThat(dto.getTituloEleitoral()).isEqualTo("123");
-        assertThat(dto.getNome()).isEqualTo("Usuário Teste");
-        assertThat(dto.getEmail()).isEqualTo("teste@email.com");
-        assertThat(dto.getMatricula()).isEqualTo("MAT001");
-        assertThat(dto.getUnidadeCodigo()).isEqualTo(10L);
+        assertThat(dto.tituloEleitoral()).isEqualTo("123");
+        assertThat(dto.nome()).isEqualTo("Usuário Teste");
+        assertThat(dto.email()).isEqualTo("teste@email.com");
+        assertThat(dto.matricula()).isEqualTo("MAT001");
+        assertThat(dto.unidadeCodigo()).isEqualTo(10L);
     }
 
     @Test

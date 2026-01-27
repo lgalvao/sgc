@@ -1,5 +1,6 @@
 package sgc.seguranca.login;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,7 +42,8 @@ class LoginFacadeCoverageTest {
     @InjectMocks
     private LoginFacade facade;
 
-    @org.junit.jupiter.api.BeforeEach
+    @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         org.mockito.Mockito.lenient().when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(any(Unidade.class)))
                 .thenAnswer(inv -> {
@@ -79,7 +81,8 @@ class LoginFacadeCoverageTest {
         // Mock user not found
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(null);
 
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> facade.autorizar(titulo));
+        var exception = assertThrows(ErroEntidadeNaoEncontrada.class, () -> facade.autorizar(titulo));
+        assertNotNull(exception);
     }
 
     @Test
@@ -121,13 +124,13 @@ class LoginFacadeCoverageTest {
 
         assertEquals(2, result.size());
 
-        UnidadeDto dto1 = result.stream().filter(r -> r.getUnidade().getCodigo().equals(1L)).findFirst().get()
-                .getUnidade();
+        UnidadeDto dto1 = result.stream().filter(r -> r.unidade().getCodigo().equals(1L)).findFirst().get()
+                .unidade();
         assertNull(dto1.getCodigoPai());
         assertTrue(dto1.isElegivel());
 
-        UnidadeDto dto2 = result.stream().filter(r -> r.getUnidade().getCodigo().equals(2L)).findFirst().get()
-                .getUnidade();
+        UnidadeDto dto2 = result.stream().filter(r -> r.unidade().getCodigo().equals(2L)).findFirst().get()
+                .unidade();
         assertEquals(1L, dto2.getCodigoPai());
         assertFalse(dto2.isElegivel());
     }
@@ -192,7 +195,8 @@ class LoginFacadeCoverageTest {
                 .unidadeCodigo(1L)
                 .build();
 
-        assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () -> facade.entrar(request));
+        var exception = assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () -> facade.entrar(request));
+        assertNotNull(exception);
     }
 
     @Test
@@ -229,7 +233,7 @@ class LoginFacadeCoverageTest {
 
         List<PerfilUnidadeDto> result = facade.autorizar(titulo);
         assertEquals(1, result.size());
-        assertEquals(1L, result.get(0).getUnidade().getCodigo());
+        assertEquals(1L, result.get(0).unidade().getCodigo());
     }
 
     @Test
@@ -241,12 +245,14 @@ class LoginFacadeCoverageTest {
                 .unidadeCodigo(1L)
                 .build();
 
-        assertThrows(ErroAutenticacao.class, () -> facade.entrar(request));
+        var exception = assertThrows(ErroAutenticacao.class, () -> facade.entrar(request));
+        assertNotNull(exception);
     }
 
     @Test
     @DisplayName("autorizar - Sem Autenticacao")
     void autorizar_SemAutenticacao() {
-        assertThrows(ErroAutenticacao.class, () -> facade.autorizar("123"));
+        var exception = assertThrows(ErroAutenticacao.class, () -> facade.autorizar("123"));
+        assertNotNull(exception);
     }
 }

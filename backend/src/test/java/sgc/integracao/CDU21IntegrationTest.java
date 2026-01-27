@@ -1,6 +1,7 @@
 package sgc.integracao;
 
 import jakarta.persistence.EntityManager;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -11,34 +12,32 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
+
 import sgc.Sgc;
 import sgc.fixture.*;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioRepo;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -51,18 +50,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfig.class)
 @DisplayName("CDU-21: Finalizar Processo")
 class CDU21IntegrationTest extends BaseIntegrationTest {
-
     @Autowired
     private EntityManager entityManager;
 
-    @Autowired
-    private ProcessoRepo processoRepo;
-    @Autowired
-    private UnidadeRepo unidadeRepo;
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-    @Autowired
-    private MapaRepo mapaRepo;
     @Autowired
     private UsuarioRepo usuarioRepo;
 
@@ -79,6 +69,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
     private Unidade unidadeOperacional1;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         // Criar hierarquia de unidades via Fixture
         // Unidade intermediária

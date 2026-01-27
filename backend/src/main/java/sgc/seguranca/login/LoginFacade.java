@@ -35,11 +35,9 @@ public class LoginFacade {
     private final ClienteAcessoAd clienteAcessoAd;
     private final UnidadeFacade unidadeService;
     private final sgc.organizacao.mapper.UsuarioMapper usuarioMapper;
-
+    private final Map<String, LocalDateTime> autenticacoesRecentes = new ConcurrentHashMap<>();
     @Value("${aplicacao.ambiente-testes:false}")
     private boolean ambienteTestes;
-
-    private final Map<String, LocalDateTime> autenticacoesRecentes = new ConcurrentHashMap<>();
 
     public LoginFacade(UsuarioFacade usuarioService,
             GerenciadorJwt gerenciadorJwt,
@@ -65,7 +63,7 @@ public class LoginFacade {
 
     /**
      * Autentica um usuário com título de eleitor e senha.
-     * 
+     *
      * @param tituloEleitoral Título de eleitor do usuário
      * @param senha           Senha do usuário
      * @return true se a autenticação for bem-sucedida
@@ -99,7 +97,7 @@ public class LoginFacade {
     /**
      * Retorna os perfis e unidades que o usuário pode acessar.
      * Requer autenticação prévia.
-     * 
+     *
      * @param tituloEleitoral Título de eleitor do usuário
      * @return Lista de perfis e unidades disponíveis
      */
@@ -115,32 +113,32 @@ public class LoginFacade {
 
     /**
      * Finaliza o login gerando um token JWT para o perfil e unidade escolhidos.
-     * 
+     *
      * @param request Dados da requisição de entrada
      * @return Token JWT
      */
     @Transactional(readOnly = true)
     public String entrar(EntrarRequest request) {
-        LocalDateTime ultimoAcesso = autenticacoesRecentes.get(request.getTituloEleitoral());
+        LocalDateTime ultimoAcesso = autenticacoesRecentes.get(request.tituloEleitoral());
 
         if (ultimoAcesso == null || ultimoAcesso.isBefore(LocalDateTime.now().minusMinutes(5))) {
             log.warn("Tentativa de acesso não autorizada (sem login prévio) para usuário {}",
-                    request.getTituloEleitoral());
+                    request.tituloEleitoral());
             throw new ErroAutenticacao("Sessão de login expirada ou inválida. Por favor, autentique-se novamente.");
         }
 
-        Long codUnidade = request.getUnidadeCodigo();
+        Long codUnidade = request.unidadeCodigo();
         unidadeService.buscarEntidadePorId(codUnidade);
 
-        List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoesInterno(request.getTituloEleitoral());
+        List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoesInterno(request.tituloEleitoral());
 
-        autenticacoesRecentes.remove(request.getTituloEleitoral());
+        autenticacoesRecentes.remove(request.tituloEleitoral());
 
         boolean autorizado = autorizacoes.stream()
                 .anyMatch(pu -> {
-                    Perfil perfil = pu.getPerfil();
-                    Long codigoUnidade = pu.getUnidade().getCodigo();
-                    return perfil.name().equals(request.getPerfil()) && codigoUnidade.equals(codUnidade);
+                    Perfil perfil = pu.perfil();
+                    Long codigoUnidade = pu.unidade().getCodigo();
+                    return perfil.name().equals(request.perfil()) && codigoUnidade.equals(codUnidade);
                 });
 
         if (!autorizado) {
@@ -148,8 +146,8 @@ public class LoginFacade {
         }
 
         return gerenciadorJwt.gerarToken(
-                request.getTituloEleitoral(),
-                Perfil.valueOf(request.getPerfil()),
+                request.tituloEleitoral(),
+                Perfil.valueOf(request.perfil()),
                 codUnidade);
     }
 

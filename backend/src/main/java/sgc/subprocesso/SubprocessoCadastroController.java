@@ -153,7 +153,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody DevolverCadastroRequest request,
             @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
 
         subprocessoFacade.devolverCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -176,7 +176,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody AceitarCadastroRequest request,
             @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
 
         subprocessoFacade.aceitarCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -198,7 +198,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody HomologarCadastroRequest request,
             @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
 
         subprocessoFacade.homologarCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -219,7 +219,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody DevolverCadastroRequest request,
             @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
 
         subprocessoFacade.devolverRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -238,7 +238,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody AceitarCadastroRequest request,
             @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
 
         subprocessoFacade.aceitarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -260,7 +260,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody HomologarCadastroRequest request,
             @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.getObservacoes());
+        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
 
         subprocessoFacade.homologarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -281,7 +281,7 @@ public class SubprocessoCadastroController {
     @Operation(summary = "Importa atividades de outro subprocesso")
     public Map<String, String> importarAtividades(
             @PathVariable Long codigo, @RequestBody @Valid ImportarAtividadesRequest request) {
-        subprocessoFacade.importarAtividades(codigo, request.getCodSubprocessoOrigem());
+        subprocessoFacade.importarAtividades(codigo, request.codSubprocessoOrigem());
         return Map.of("message", "Atividades importadas.");
     }
 
@@ -296,7 +296,7 @@ public class SubprocessoCadastroController {
             @RequestBody @Valid ProcessarEmBlocoRequest request,
             @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        subprocessoFacade.aceitarCadastroEmBloco(request.getUnidadeCodigos(), codigo, usuario);
+        subprocessoFacade.aceitarCadastroEmBloco(request.subprocessos(), codigo, usuario);
     }
 
     /**
@@ -310,7 +310,7 @@ public class SubprocessoCadastroController {
             @RequestBody @Valid ProcessarEmBlocoRequest request,
             @AuthenticationPrincipal Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        subprocessoFacade.homologarCadastroEmBloco(request.getUnidadeCodigos(), codigo, usuario);
+        subprocessoFacade.homologarCadastroEmBloco(request.subprocessos(), codigo, usuario);
     }
 
     private Usuario obterUsuarioAutenticado(Object principal) {

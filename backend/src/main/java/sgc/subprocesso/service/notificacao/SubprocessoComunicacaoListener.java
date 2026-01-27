@@ -51,10 +51,10 @@ public class SubprocessoComunicacaoListener {
         String descricao = tipo.formatarAlerta(sp.getUnidade().getSigla());
 
         alertaService.criarAlertaTransicao(
-            sp.getProcesso(), 
-            descricao, 
-            evento.getUnidadeOrigem(), 
-            evento.getUnidadeDestino()
+                sp.getProcesso(),
+                descricao,
+                evento.getUnidadeOrigem(),
+                evento.getUnidadeDestino()
         );
     }
 }

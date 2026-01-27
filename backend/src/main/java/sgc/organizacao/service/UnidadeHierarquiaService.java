@@ -14,7 +14,7 @@ import java.util.function.Function;
 
 /**
  * Serviço especializado para gerenciar a hierarquia de unidades organizacionais.
- * 
+ *
  * <p>Responsabilidades:
  * <ul>
  *   <li>Montagem de árvore hierárquica de unidades</li>
@@ -22,11 +22,7 @@ import java.util.function.Function;
  *   <li>Cálculo de descendentes e subordinadas</li>
  *   <li>Algoritmos recursivos de hierarquia</li>
  * </ul>
- * 
- * <p>Este serviço foi extraído de UnidadeFacade para respeitar o
- * Single Responsibility Principle (SRP).
- * 
- * @see UnidadeFacade
+ *
  */
 @Service
 @RequiredArgsConstructor
@@ -38,7 +34,7 @@ public class UnidadeHierarquiaService {
 
     /**
      * Busca a árvore hierárquica completa de unidades.
-     * 
+     *
      * @return lista de unidades raiz com suas subunidades populadas
      */
     public List<UnidadeDto> buscarArvoreHierarquica() {
@@ -48,7 +44,7 @@ public class UnidadeHierarquiaService {
 
     /**
      * Busca a árvore hierárquica com filtro de elegibilidade.
-     * 
+     *
      * @param elegibilidadeChecker função para verificar se unidade é elegível
      * @return lista de unidades raiz com suas subunidades populadas
      */
@@ -59,7 +55,7 @@ public class UnidadeHierarquiaService {
 
     /**
      * Busca todos os IDs de unidades descendentes de uma unidade.
-     * 
+     *
      * @param codigoUnidade código da unidade raiz
      * @return lista de códigos de descendentes (filhos, netos, etc.)
      */
@@ -80,7 +76,7 @@ public class UnidadeHierarquiaService {
 
     /**
      * Busca uma unidade específica na árvore hierárquica.
-     * 
+     *
      * @param codigo código da unidade a buscar
      * @return DTO da unidade com sua subárvore
      * @throws ErroEntidadeNaoEncontrada se a unidade não for encontrada
@@ -93,7 +89,7 @@ public class UnidadeHierarquiaService {
 
     /**
      * Busca todas as siglas de unidades subordinadas a uma unidade.
-     * 
+     *
      * @param sigla sigla da unidade raiz
      * @return lista de siglas de todas as subordinadas
      * @throws ErroEntidadeNaoEncontrada se a unidade não for encontrada
@@ -111,7 +107,7 @@ public class UnidadeHierarquiaService {
 
     /**
      * Busca a sigla da unidade superior de uma unidade.
-     * 
+     *
      * @param sigla sigla da unidade
      * @return Optional com a sigla da unidade superior, ou vazio se não houver
      * @throws ErroEntidadeNaoEncontrada se a unidade não for encontrada
@@ -126,7 +122,7 @@ public class UnidadeHierarquiaService {
 
     /**
      * Busca unidades subordinadas diretas de uma unidade.
-     * 
+     *
      * @param codUnidade código da unidade pai
      * @return lista de DTOs das unidades filhas
      */

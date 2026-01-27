@@ -7,20 +7,16 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -68,6 +64,40 @@ class UnidadeFacadeTest {
 
     @InjectMocks
     private UnidadeFacade service;
+
+    @Test
+    @DisplayName("Deve testar elegibilidade com unidades que possuem pai")
+    void deveTestarElegibilidadeComPai() {
+        // Arrange
+        UnidadeDto dto = UnidadeDto.builder().codigo(2L).build();
+        when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
+
+        // Act
+        service.buscarArvoreComElegibilidade(false, Collections.emptySet());
+
+        // Assert
+        verify(hierarquiaService).buscarArvoreComElegibilidade(any());
+    }
+
+    @Test
+    @DisplayName("Deve construir unidades com hierarquia (cobertura caminhos recursivos)")
+    void deveTestarHierarquiaRecursiva() {
+        // Arrange
+        UnidadeDto filhoDto = UnidadeDto.builder().codigo(2L).sigla("FILHO").subunidades(new ArrayList<>()).build();
+        UnidadeDto paiDto = UnidadeDto.builder().codigo(1L).sigla("PAI").subunidades(List.of(filhoDto)).build();
+        when(hierarquiaService.buscarArvoreHierarquica()).thenReturn(List.of(paiDto));
+
+        // Act
+        List<UnidadeDto> res = service.buscarTodasUnidades();
+
+        // Assert
+        assertThat(res).hasSize(1);
+        UnidadeDto resultado = res.getFirst();
+        assertThat(resultado.getSigla()).isEqualTo("PAI");
+        assertThat(resultado.getSubunidades()).hasSize(1);
+        assertThat(resultado.getSubunidades().getFirst().getSigla()).isEqualTo("FILHO");
+        verify(hierarquiaService).buscarArvoreHierarquica();
+    }
 
     @Nested
     @DisplayName("Busca de Unidades e Hierarquia")
@@ -470,40 +500,6 @@ class UnidadeFacadeTest {
         }
     }
 
-    @Test
-    @DisplayName("Deve testar elegibilidade com unidades que possuem pai")
-    void deveTestarElegibilidadeComPai() {
-        // Arrange
-        UnidadeDto dto = UnidadeDto.builder().codigo(2L).build();
-        when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
-        
-        // Act
-        service.buscarArvoreComElegibilidade(false, Collections.emptySet());
-        
-        // Assert
-        verify(hierarquiaService).buscarArvoreComElegibilidade(any());
-    }
-
-    @Test
-    @DisplayName("Deve construir unidades com hierarquia (cobertura caminhos recursivos)")
-    void deveTestarHierarquiaRecursiva() {
-        // Arrange
-        UnidadeDto filhoDto = UnidadeDto.builder().codigo(2L).sigla("FILHO").subunidades(new ArrayList<>()).build();
-        UnidadeDto paiDto = UnidadeDto.builder().codigo(1L).sigla("PAI").subunidades(List.of(filhoDto)).build();
-        when(hierarquiaService.buscarArvoreHierarquica()).thenReturn(List.of(paiDto));
-        
-        // Act
-        List<UnidadeDto> res = service.buscarTodasUnidades();
-        
-        // Assert
-        assertThat(res).hasSize(1);
-        UnidadeDto resultado = res.getFirst();
-        assertThat(resultado.getSigla()).isEqualTo("PAI");
-        assertThat(resultado.getSubunidades()).hasSize(1);
-        assertThat(resultado.getSubunidades().getFirst().getSigla()).isEqualTo("FILHO");
-        verify(hierarquiaService).buscarArvoreHierarquica();
-    }
-
     @Nested
     @DisplayName("Testes Adicionais de Cobertura")
     @SuppressWarnings("unused")
@@ -551,8 +547,8 @@ class UnidadeFacadeTest {
             ResponsavelDto result = service.buscarResponsavelUnidade(1L);
 
             // Assert
-            assertThat(result.getTitularTitulo()).isEqualTo("123");
-            assertThat(result.getSubstitutoTitulo()).isNull();
+            assertThat(result.titularTitulo()).isEqualTo("123");
+            assertThat(result.substitutoTitulo()).isNull();
             verify(responsavelService).buscarResponsavelUnidade(1L);
         }
 
@@ -581,8 +577,8 @@ class UnidadeFacadeTest {
             ResponsavelDto result = service.buscarResponsavelUnidade(1L);
 
             // Assert
-            assertThat(result.getTitularTitulo()).isEqualTo("123");
-            assertThat(result.getSubstitutoTitulo()).isEqualTo("456");
+            assertThat(result.titularTitulo()).isEqualTo("123");
+            assertThat(result.substitutoTitulo()).isEqualTo("456");
             verify(responsavelService).buscarResponsavelUnidade(1L);
         }
 

@@ -1,5 +1,10 @@
 package sgc.organizacao;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
@@ -8,14 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.organizacao.dto.*;
+
+import sgc.organizacao.dto.AdministradorDto;
+import sgc.organizacao.dto.PerfilDto;
+import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.Perfil;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("integration")
 @SpringBootTest
@@ -42,8 +46,8 @@ class UsuarioServiceTest {
 
     @Nested
     @DisplayName("Consultas de Usuário")
+    @SuppressWarnings("unused")
     class ConsultasUsuario {
-
         @Test
         @DisplayName("Deve buscar usuário por título")
         void deveBuscarUsuarioPorTitulo() {
@@ -52,8 +56,8 @@ class UsuarioServiceTest {
 
             // Assert
             assertTrue(result.isPresent());
-            assertEquals(TITULO_ADMIN, result.get().getTituloEleitoral());
-            assertEquals(NOME_ADMIN, result.get().getNome());
+            assertEquals(TITULO_ADMIN, result.get().tituloEleitoral());
+            assertEquals(NOME_ADMIN, result.get().nome());
         }
 
         @Test
@@ -81,8 +85,8 @@ class UsuarioServiceTest {
 
             // Assert
             assertTrue(result.isPresent());
-            assertEquals(TITULO_ADMIN, result.get().getTituloEleitoral());
-            assertEquals(EMAIL_ADMIN, result.get().getEmail());
+            assertEquals(TITULO_ADMIN, result.get().tituloEleitoral());
+            assertEquals(EMAIL_ADMIN, result.get().email());
         }
 
         @Test
@@ -116,8 +120,8 @@ class UsuarioServiceTest {
 
     @Nested
     @DisplayName("Consultas de Unidade")
+    @SuppressWarnings("unused")
     class ConsultasUnidade {
-
         @Test
         @DisplayName("Deve buscar unidade por código")
         void deveBuscarUnidadePorCodigo() {
@@ -193,8 +197,8 @@ class UsuarioServiceTest {
 
     @Nested
     @DisplayName("Gestão de Responsáveis")
+    @SuppressWarnings("unused")
     class GestaoResponsaveis {
-
         @Test
         @DisplayName("Deve buscar responsável da unidade")
         void deveBuscarResponsavelUnidade() {
@@ -203,8 +207,8 @@ class UsuarioServiceTest {
 
             // Assert
             assertNotNull(result);
-            assertEquals(2L, result.getUnidadeCodigo());
-            assertEquals(TITULO_CHEFE_UNIT2, result.getTitularTitulo());
+            assertEquals(2L, result.unidadeCodigo());
+            assertEquals(TITULO_CHEFE_UNIT2, result.titularTitulo());
         }
 
         @Test
@@ -232,15 +236,15 @@ class UsuarioServiceTest {
             assertNotNull(result);
             assertTrue(result.containsKey(2L));
             assertTrue(result.containsKey(9L));
-            assertEquals(TITULO_CHEFE_UNIT2, result.get(2L).getTitularTitulo());
-            assertEquals("333333333333", result.get(9L).getTitularTitulo());
+            assertEquals(TITULO_CHEFE_UNIT2, result.get(2L).titularTitulo());
+            assertEquals("333333333333", result.get(9L).titularTitulo());
         }
     }
 
     @Nested
     @DisplayName("Gestão de Perfis")
+    @SuppressWarnings("unused")
     class GestaoPerfis {
-
         @Test
         @DisplayName("Deve buscar perfis do usuário")
         void deveBuscarPerfisUsuario() {
@@ -251,7 +255,7 @@ class UsuarioServiceTest {
             assertNotNull(result);
             assertFalse(result.isEmpty());
             assertTrue(result.stream()
-                    .anyMatch(p -> p.getPerfil().equals("CHEFE") && p.getUnidadeCodigo().equals(2L)));
+                    .anyMatch(p -> p.perfil().equals("CHEFE") && p.unidadeCodigo().equals(2L)));
         }
 
         @Test
@@ -275,6 +279,7 @@ class UsuarioServiceTest {
 
     @Nested
     @DisplayName("Cobertura Extra")
+    @SuppressWarnings("unused")
     class CoberturaExtra {
         @Test
         @DisplayName("Deve retornar null se não houver usuário autenticado")
@@ -323,6 +328,7 @@ class UsuarioServiceTest {
 
     @Nested
     @DisplayName("Gestão de Administradores")
+    @SuppressWarnings("unused")
     class GestaoAdministradores {
         @Test
         @DisplayName("Deve listar, adicionar e remover administradores")
@@ -336,7 +342,7 @@ class UsuarioServiceTest {
 
             // Listar
             List<AdministradorDto> admins = usuarioService.listarAdministradores();
-            assertTrue(admins.stream().anyMatch(a -> a.getTituloEleitoral().equals(tituloNovoAdmin)));
+            assertTrue(admins.stream().anyMatch(a -> a.tituloEleitoral().equals(tituloNovoAdmin)));
 
             // Falhar ao adicionar duplicado
             assertThrows(sgc.comum.erros.ErroValidacao.class,

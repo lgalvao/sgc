@@ -56,5 +56,6 @@ public class ProcessoAccessPolicy extends AbstractAccessPolicy<Processo> {
      * Record para regras de ação de processo.
      * Processos não têm verificações de situação ou hierarquia - apenas perfil.
      */
-    private record RegrasAcaoProcesso(EnumSet<Perfil> perfisPermitidos) {}
+    private record RegrasAcaoProcesso(EnumSet<Perfil> perfisPermitidos) {
+    }
 }

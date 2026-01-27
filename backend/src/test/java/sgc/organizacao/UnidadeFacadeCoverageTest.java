@@ -9,8 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -18,9 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -46,16 +43,23 @@ class UnidadeFacadeCoverageTest {
     @InjectMocks
     private UnidadeFacade unidadeFacade;
 
-    @Mock private UnidadeHierarquiaService unidadeHierarquiaService;
-    @Mock private UnidadeMapaService unidadeMapaService;
-    @Mock private UnidadeResponsavelService unidadeResponsavelService;
-    @Mock private RepositorioComum repo;
-    @Mock private UnidadeMapaRepo unidadeMapaRepo;
+    @Mock
+    private UnidadeHierarquiaService unidadeHierarquiaService;
+    @Mock
+    private UnidadeMapaService unidadeMapaService;
+    @Mock
+    private UnidadeResponsavelService unidadeResponsavelService;
+    @Mock
+    private RepositorioComum repo;
+    @Mock
+    private UnidadeMapaRepo unidadeMapaRepo;
 
     @Test
     @DisplayName("Deve buscar unidade na hierarquia recursivamente")
     void deveBuscarArvoreRecursiva() {
-        UnidadeDto dtoNeta = new UnidadeDto(); dtoNeta.setCodigo(3L); dtoNeta.setSubunidades(new ArrayList<>());
+        UnidadeDto dtoNeta = new UnidadeDto();
+        dtoNeta.setCodigo(3L);
+        dtoNeta.setSubunidades(new ArrayList<>());
 
         when(unidadeHierarquiaService.buscarArvore(3L)).thenReturn(dtoNeta);
 
@@ -148,8 +152,10 @@ class UnidadeFacadeCoverageTest {
     @Test
     @DisplayName("Deve buscar arvore com elegibilidade")
     void deveBuscarArvoreComElegibilidade() {
-        UnidadeDto dtoRaiz = new UnidadeDto(); dtoRaiz.setCodigo(1L); dtoRaiz.setSubunidades(new ArrayList<>());
-        
+        UnidadeDto dtoRaiz = new UnidadeDto();
+        dtoRaiz.setCodigo(1L);
+        dtoRaiz.setSubunidades(new ArrayList<>());
+
         when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L));
         when(unidadeHierarquiaService.buscarArvoreComElegibilidade(any()))
                 .thenReturn(List.of(dtoRaiz));
@@ -201,9 +207,9 @@ class UnidadeFacadeCoverageTest {
 
         ResponsavelDto result = unidadeFacade.buscarResponsavelUnidade(1L);
 
-        assertThat(result.getTitularTitulo()).isEqualTo("T");
-        assertThat(result.getSubstitutoTitulo()).isEqualTo("S");
-        assertThat(result.getSubstitutoNome()).isEqualTo("Substituto");
+        assertThat(result.titularTitulo()).isEqualTo("T");
+        assertThat(result.substitutoTitulo()).isEqualTo("S");
+        assertThat(result.substitutoNome()).isEqualTo("Substituto");
         verify(unidadeResponsavelService).buscarResponsavelUnidade(1L);
     }
 
@@ -229,9 +235,15 @@ class UnidadeFacadeCoverageTest {
     @Test
     @DisplayName("Deve aplicar regras de elegibilidade corretamente (negativo)")
     void deveAplicarRegrasElegibilidadeNegativo() {
-        UnidadeDto dto1 = new UnidadeDto(); dto1.setCodigo(1L); dto1.setSubunidades(new ArrayList<>());
-        UnidadeDto dto2 = new UnidadeDto(); dto2.setCodigo(2L); dto2.setSubunidades(new ArrayList<>());
-        UnidadeDto dto3 = new UnidadeDto(); dto3.setCodigo(3L); dto3.setSubunidades(new ArrayList<>());
+        UnidadeDto dto1 = new UnidadeDto();
+        dto1.setCodigo(1L);
+        dto1.setSubunidades(new ArrayList<>());
+        UnidadeDto dto2 = new UnidadeDto();
+        dto2.setCodigo(2L);
+        dto2.setSubunidades(new ArrayList<>());
+        UnidadeDto dto3 = new UnidadeDto();
+        dto3.setCodigo(3L);
+        dto3.setSubunidades(new ArrayList<>());
 
         when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(3L));
         when(unidadeHierarquiaService.buscarArvoreComElegibilidade(any()))

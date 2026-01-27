@@ -55,5 +55,6 @@ public class MapaAccessPolicy extends AbstractAccessPolicy<Mapa> {
      * Record para regras de ação de mapa.
      * Mapas têm regras simples baseadas apenas em perfil.
      */
-    private record RegrasAcaoMapa(EnumSet<Perfil> perfisPermitidos) {}
+    private record RegrasAcaoMapa(EnumSet<Perfil> perfisPermitidos) {
+    }
 }

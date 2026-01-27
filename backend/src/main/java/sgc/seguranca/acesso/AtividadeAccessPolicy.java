@@ -87,5 +87,6 @@ public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
     private record RegrasAcaoAtividade(
             EnumSet<Perfil> perfisPermitidos,
             boolean requerTitular
-    ) {}
+    ) {
+    }
 }

@@ -12,7 +12,8 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
  */
 @Builder
 public record SubprocessoSituacaoDto(
-    Long codigo,
-    SituacaoSubprocesso situacao,
-    @Nullable String situacaoLabel
-) {}
+        Long codigo,
+        SituacaoSubprocesso situacao,
+        @Nullable String situacaoLabel
+) {
+}

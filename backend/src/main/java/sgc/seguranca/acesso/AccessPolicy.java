@@ -9,5 +9,6 @@ import sgc.organizacao.model.Usuario;
  */
 public interface AccessPolicy<T> {
     boolean canExecute(Usuario usuario, Acao acao, T recurso);
+
     String getMotivoNegacao();
 }

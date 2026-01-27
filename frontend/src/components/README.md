@@ -13,14 +13,18 @@ Este diretório contém os componentes Vue.js reutilizáveis utilizados na aplic
 ## Componentes de Navegação
 
 ### MainNavbar
+
 **Responsabilidade:** Menu principal do sistema (topo da aplicação)
+
 - Links para páginas principais (Home, Alertas, Movimentações)
 - Links contextuais baseados em perfil do usuário
 - Responsivo com toggle para mobile
 - Posição: Fixa no topo
 
 ### BarraNavegacao
+
 **Responsabilidade:** Breadcrumbs contextuais e navegação hierárquica
+
 - Mostra caminho atual na hierarquia (Processo → Subprocesso → Seção)
 - Botão de voltar
 - Breadcrumbs dinâmicos baseados na rota atual

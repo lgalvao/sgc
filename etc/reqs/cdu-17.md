@@ -5,7 +5,8 @@
 ## Pré-condições
 
 - Usuário logado com perfil ADMIN.
-- Processo de mapeamento com ao menos uma unidade com subprocesso na situação 'Mapa criado' ou processo de revisão com ao menos uma unidade com subprocesso na situação 'Mapa ajustado'.
+- Processo de mapeamento com ao menos uma unidade com subprocesso na situação 'Mapa criado' ou processo de revisão com
+  ao menos uma unidade com subprocesso na situação 'Mapa ajustado'.
 - Tela `Painel` sendo exibida.
 
 ## Fluxo principal
@@ -14,7 +15,8 @@
 
 2. O sistema mostra tela `Detalhes do processo`.
 
-3. ADMIN clica em uma unidade operacional ou interoperacional com subprocesso na situação 'Mapa criado' ou 'Mapa ajustado'.
+3. ADMIN clica em uma unidade operacional ou interoperacional com subprocesso na situação 'Mapa criado' ou 'Mapa
+   ajustado'.
 
 4. O sistema mostra a tela `Detalhes de subprocesso`.
 
@@ -24,13 +26,16 @@
 
 7. ADMIN clica no botão `Disponibilizar`.
 
-8. O sistema verifica se todas as competências criadas estão associadas a pelo menos uma atividade do cadastro da unidade.
+8. O sistema verifica se todas as competências criadas estão associadas a pelo menos uma atividade do cadastro da
+   unidade.
 
-   8.1. Caso negativo, o sistema interrompe a disponibilização do mapa e informa em mensagem de erro quais competências ainda permanecem sem associação.
+   8.1. Caso negativo, o sistema interrompe a disponibilização do mapa e informa em mensagem de erro quais competências
+   ainda permanecem sem associação.
 
 9. O sistema verifica se todas as atividades foram associadas a pelo menos uma competência.
 
-   9.1. Caso negativo, o sistema interrompe a disponibilização do mapa e informa em mensagem de erro quais atividades ainda estão sem associação a competências.
+   9.1. Caso negativo, o sistema interrompe a disponibilização do mapa e informa em mensagem de erro quais atividades
+   ainda estão sem associação a competências.
 
 10. O sistema mostra um modal com as seguintes características:
 
@@ -39,11 +44,13 @@
     - `Observações`: de preenchimento opcional
     - Botões `Disponibilizar` e `Cancelar`.
 
-11. Caso ADMIN escolha `Cancelar`, o sistema interrompe a operação de disponibilização do mapa, permanecendo na tela `Edição de mapa`.
+11. Caso ADMIN escolha `Cancelar`, o sistema interrompe a operação de disponibilização do mapa, permanecendo na tela
+    `Edição de mapa`.
 
 12. ADMIN preenche as informações dos campos do modal e clica no botão `Disponibilizar`.
 
-13. O sistema registra a informação do campo `Observações` no mapa do subprocesso e a informação do campo `Data limite` para a validação do mapa na data limite da etapa 2 do subprocesso.
+13. O sistema registra a informação do campo `Observações` no mapa do subprocesso e a informação do campo `Data limite`
+    para a validação do mapa na data limite da etapa 2 do subprocesso.
 
 14. O sistema altera a situação do subprocesso da unidade para 'Mapa disponibilizado'.
 
@@ -66,7 +73,8 @@
     A validação deste mapa já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]). O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
     ```
 
-17. O sistema notifica as unidades superiores da unidade do subprocesso quanto à disponibilização, com e-mail no modelo abaixo:
+17. O sistema notifica as unidades superiores da unidade do subprocesso quanto à disponibilização, com e-mail no modelo
+    abaixo:
 
     ```text
     Assunto: SGC: Mapa de competências disponibilizado - [SIGLA_UNIDADE_SUBPROCESSO]
@@ -87,6 +95,7 @@
     - `Unidade de origem`: SEDOC
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO].
 
-19. O sistema exclui as sugestões apresentadas, assim como o histórico de análise do mapa de competência do subprocesso da unidade.
+19. O sistema exclui as sugestões apresentadas, assim como o histórico de análise do mapa de competência do subprocesso
+    da unidade.
 
 20. O sistema redireciona para o Painel e mostra confirmação: "Disponibilização do mapa de competências efetuada".

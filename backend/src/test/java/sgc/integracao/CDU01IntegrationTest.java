@@ -1,25 +1,15 @@
 package sgc.integracao;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.persistence.EntityManager;
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
@@ -32,6 +22,12 @@ import sgc.seguranca.login.dto.AutorizarRequest;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.util.TestUtil;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @Tag("integration")
 @SpringBootTest
 @ActiveProfiles("test")
@@ -39,220 +35,220 @@ import sgc.util.TestUtil;
 @Import(TestSecurityConfig.class)
 @DisplayName("CDU-01: Realizar Login")
 class CDU01IntegrationTest extends BaseIntegrationTest {
-        private static final String BASE_URL = "/api/usuarios";
+    private static final String BASE_URL = "/api/usuarios";
 
-        @Autowired
-        private TestUtil testUtil;
+    @Autowired
+    private TestUtil testUtil;
 
-        @Autowired
-        private UsuarioRepo usuarioRepo;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
-        @Autowired
-        private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-        @Autowired
-        private EntityManager entityManager;
+    @Autowired
+    private EntityManager entityManager;
 
-        private Unidade unidadeAdmin;
-        private Unidade unidadeGestor;
-        private Usuario usuarioAdmin;
-        private Usuario usuarioGestor;
+    private Unidade unidadeAdmin;
+    private Unidade unidadeGestor;
+    private Usuario usuarioAdmin;
+    private Usuario usuarioGestor;
 
-        @BeforeEach
-        @SuppressWarnings("unused")
-        void setUp() {
-                // Reset sequences to avoid conflicts
-                try {
-                        jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 10000");
-                } catch (DataAccessException ignored) {
-                        // Nada a fazer
-                }
-
-                // Setup Unidade Admin
-                unidadeAdmin = UnidadeFixture.unidadePadrao();
-                unidadeAdmin.setCodigo(null);
-                unidadeAdmin.setSigla("ADM-UNIT-TEST");
-                unidadeAdmin.setNome("Unidade Admin Teste");
-                unidadeAdmin = unidadeRepo.saveAndFlush(unidadeAdmin);
-
-                // Setup Usuario Admin
-                usuarioAdmin = UsuarioFixture.usuarioComPerfil(unidadeAdmin, Perfil.ADMIN);
-                usuarioAdmin.setTituloEleitoral("999999990001");
-                usuarioAdmin.setNome("Admin User Teste");
-                usuarioAdmin = usuarioRepo.saveAndFlush(usuarioAdmin);
-
-                // Persist Perfil via JDBC explicitly
-                jdbcTemplate.update(
-                                "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
-                                usuarioAdmin.getTituloEleitoral(), "ADMIN", unidadeAdmin.getCodigo());
-
-                // Setup Unidade Gestor
-                unidadeGestor = UnidadeFixture.unidadePadrao();
-                unidadeGestor.setCodigo(null);
-                unidadeGestor.setSigla("GES-UNIT-TEST");
-                unidadeGestor.setNome("Unidade Gestor Teste");
-                unidadeGestor = unidadeRepo.saveAndFlush(unidadeGestor);
-
-                // Setup Usuario Gestor
-                usuarioGestor = UsuarioFixture.usuarioPadrao();
-                usuarioGestor.setTituloEleitoral("999999990002");
-                usuarioGestor.setNome("Gestor User Teste");
-                usuarioGestor = usuarioRepo.saveAndFlush(usuarioGestor);
-
-                // Persist Perfis via JDBC explicitly (ADMIN na unidadeAdmin, GESTOR na
-                // unidadeGestor)
-                jdbcTemplate.update(
-                                "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
-                                usuarioGestor.getTituloEleitoral(), "ADMIN", unidadeAdmin.getCodigo());
-                jdbcTemplate.update(
-                                "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
-                                usuarioGestor.getTituloEleitoral(), "GESTOR", unidadeGestor.getCodigo());
-
-                entityManager.clear(); // Clear cache to ensure subsequent reads fetch fresh data including profiles
-
-                // Reload entities to ensure they are managed and up-to-date
-                unidadeAdmin = unidadeRepo.findById(unidadeAdmin.getCodigo()).orElseThrow();
-                unidadeGestor = unidadeRepo.findById(unidadeGestor.getCodigo()).orElseThrow();
-                usuarioAdmin = usuarioRepo.findById(usuarioAdmin.getTituloEleitoral()).orElseThrow();
-                usuarioGestor = usuarioRepo.findById(usuarioGestor.getTituloEleitoral()).orElseThrow();
+    @BeforeEach
+    @SuppressWarnings("unused")
+    void setUp() {
+        // Reset sequences to avoid conflicts
+        try {
+            jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 10000");
+        } catch (DataAccessException ignored) {
+            // Nada a fazer
         }
 
-        @Nested
-        @DisplayName("Testes de fluxo de login completo")
-        @SuppressWarnings("unused")
-        class FluxoLoginTests {
-                @Test
-                @DisplayName("Deve realizar login completo para usuário com um único perfil")
-                void testLoginCompleto_sucessoUsuarioUnicoPerfil() throws Exception {
-                        String tituloEleitoral = usuarioAdmin.getTituloEleitoral();
-                        String senha = "password";
-                        AutenticarRequest authRequest = AutenticarRequest.builder().tituloEleitoral(tituloEleitoral)
-                                        .senha(senha).build();
+        // Setup Unidade Admin
+        unidadeAdmin = UnidadeFixture.unidadePadrao();
+        unidadeAdmin.setCodigo(null);
+        unidadeAdmin.setSigla("ADM-UNIT-TEST");
+        unidadeAdmin.setNome("Unidade Admin Teste");
+        unidadeAdmin = unidadeRepo.saveAndFlush(unidadeAdmin);
 
-                        mockMvc.perform(post(BASE_URL + "/autenticar")
-                                        .with(csrf())
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(testUtil.toJson(authRequest)))
-                                        .andExpect(status().isOk())
-                                        .andExpect(jsonPath("$").value(true));
+        // Setup Usuario Admin
+        usuarioAdmin = UsuarioFixture.usuarioComPerfil(unidadeAdmin, Perfil.ADMIN);
+        usuarioAdmin.setTituloEleitoral("999999990001");
+        usuarioAdmin.setNome("Admin User Teste");
+        usuarioAdmin = usuarioRepo.saveAndFlush(usuarioAdmin);
 
-                        AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral)
-                                        .build();
+        // Persist Perfil via JDBC explicitly
+        jdbcTemplate.update(
+                "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
+                usuarioAdmin.getTituloEleitoral(), "ADMIN", unidadeAdmin.getCodigo());
 
-                        mockMvc.perform(post(BASE_URL + "/autorizar")
-                                        .with(csrf())
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(testUtil.toJson(autorizarReq)))
-                                        .andExpect(status().isOk())
-                                        .andExpect(jsonPath("$[0].perfil").value("ADMIN"))
-                                        .andExpect(jsonPath("$[0].unidade.sigla").value(unidadeAdmin.getSigla()));
+        // Setup Unidade Gestor
+        unidadeGestor = UnidadeFixture.unidadePadrao();
+        unidadeGestor.setCodigo(null);
+        unidadeGestor.setSigla("GES-UNIT-TEST");
+        unidadeGestor.setNome("Unidade Gestor Teste");
+        unidadeGestor = unidadeRepo.saveAndFlush(unidadeGestor);
 
-                        // Act & Assert: Etapa 3 - Entrar
-                        EntrarRequest entrarReq = EntrarRequest.builder()
-                                        .tituloEleitoral(tituloEleitoral)
-                                        .perfil("ADMIN")
-                                        .unidadeCodigo(unidadeAdmin.getCodigo())
-                                        .build();
+        // Setup Usuario Gestor
+        usuarioGestor = UsuarioFixture.usuarioPadrao();
+        usuarioGestor.setTituloEleitoral("999999990002");
+        usuarioGestor.setNome("Gestor User Teste");
+        usuarioGestor = usuarioRepo.saveAndFlush(usuarioGestor);
 
-                        mockMvc.perform(post(BASE_URL + "/entrar")
-                                        .with(csrf())
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(testUtil.toJson(entrarReq)))
-                                        .andExpect(status().isOk());
-                }
+        // Persist Perfis via JDBC explicitly (ADMIN na unidadeAdmin, GESTOR na
+        // unidadeGestor)
+        jdbcTemplate.update(
+                "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
+                usuarioGestor.getTituloEleitoral(), "ADMIN", unidadeAdmin.getCodigo());
+        jdbcTemplate.update(
+                "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
+                usuarioGestor.getTituloEleitoral(), "GESTOR", unidadeGestor.getCodigo());
 
-                @Test
-                @DisplayName("Deve realizar login completo para usuário com múltiplos perfis")
-                void testLoginCompleto_sucessoUsuarioMultiplosPerfis() throws Exception {
-                        String tituloEleitoral = usuarioGestor.getTituloEleitoral();
-                        String senha = "password";
-                        AutenticarRequest authRequest = AutenticarRequest.builder().tituloEleitoral(tituloEleitoral)
-                                        .senha(senha).build();
+        entityManager.clear(); // Clear cache to ensure subsequent reads fetch fresh data including profiles
 
-                        mockMvc.perform(post(BASE_URL + "/autenticar")
-                                        .with(csrf())
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(testUtil.toJson(authRequest)))
-                                        .andExpect(status().isOk())
-                                        .andExpect(jsonPath("$").value(true));
+        // Reload entities to ensure they are managed and up-to-date
+        unidadeAdmin = unidadeRepo.findById(unidadeAdmin.getCodigo()).orElseThrow();
+        unidadeGestor = unidadeRepo.findById(unidadeGestor.getCodigo()).orElseThrow();
+        usuarioAdmin = usuarioRepo.findById(usuarioAdmin.getTituloEleitoral()).orElseThrow();
+        usuarioGestor = usuarioRepo.findById(usuarioGestor.getTituloEleitoral()).orElseThrow();
+    }
 
-                        AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral)
-                                        .build();
+    @Nested
+    @DisplayName("Testes de fluxo de login completo")
+    @SuppressWarnings("unused")
+    class FluxoLoginTests {
+        @Test
+        @DisplayName("Deve realizar login completo para usuário com um único perfil")
+        void testLoginCompleto_sucessoUsuarioUnicoPerfil() throws Exception {
+            String tituloEleitoral = usuarioAdmin.getTituloEleitoral();
+            String senha = "password";
+            AutenticarRequest authRequest = AutenticarRequest.builder().tituloEleitoral(tituloEleitoral)
+                    .senha(senha).build();
 
-                        mockMvc.perform(post(BASE_URL + "/autorizar")
-                                        .with(csrf())
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(testUtil.toJson(autorizarReq)))
-                                        .andExpect(status().isOk())
-                                        .andExpect(jsonPath("$.length()").value(2))
-                                        .andExpect(jsonPath("$[*].perfil")
-                                                        .value(containsInAnyOrder("ADMIN", "GESTOR")));
+            mockMvc.perform(post(BASE_URL + "/autenticar")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(testUtil.toJson(authRequest)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").value(true));
 
-                        // Entrar como GESTOR na unidadeGestor
-                        EntrarRequest entrarReq = EntrarRequest.builder()
-                                        .tituloEleitoral(tituloEleitoral)
-                                        .perfil("GESTOR")
-                                        .unidadeCodigo(unidadeGestor.getCodigo())
-                                        .build();
-                        mockMvc.perform(post(BASE_URL + "/entrar")
-                                        .with(csrf())
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(testUtil.toJson(entrarReq)))
-                                        .andExpect(status().isOk());
-                }
+            AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral)
+                    .build();
 
-                @Test
-                @DisplayName("Deve falhar ao tentar autorizar com usuário não autenticado")
-                void testAutorizar_falhaUsuarioNaoAutenticado() throws Exception {
-                        // Arrange
-                        String tituloEleitoral = "888888888888"; // Usuário inexistente
+            mockMvc.perform(post(BASE_URL + "/autorizar")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(testUtil.toJson(autorizarReq)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].perfil").value("ADMIN"))
+                    .andExpect(jsonPath("$[0].unidade.sigla").value(unidadeAdmin.getSigla()));
 
-                        // Não realizamos a autenticação prévia para simular um usuário não autenticado.
+            // Act & Assert: Etapa 3 - Entrar
+            EntrarRequest entrarReq = EntrarRequest.builder()
+                    .tituloEleitoral(tituloEleitoral)
+                    .perfil("ADMIN")
+                    .unidadeCodigo(unidadeAdmin.getCodigo())
+                    .build();
 
-                        // Act & Assert
-                        // Sem autenticação prévia (sessão válida), a tentativa de autorizar deve ser
-                        // rejeitada com 401 (Unauthorized)
-                        AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral)
-                                        .build();
-
-                        mockMvc.perform(post(BASE_URL + "/autorizar")
-                                        .with(csrf())
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(testUtil.toJson(autorizarReq)))
-                                        .andExpect(status().isUnauthorized());
-                }
-
-                @Test
-                @DisplayName("Deve falhar ao tentar entrar com unidade inexistente")
-                void testEntrar_falhaUnidadeInexistente() throws Exception {
-                        // Arrange
-                        String tituloEleitoral = usuarioAdmin.getTituloEleitoral();
-                        long codigoUnidadeInexistente = 999999L;
-
-                        // Pre-authenticate (Required by security fix)
-                        AutenticarRequest authRequest = AutenticarRequest.builder()
-                                        .tituloEleitoral(tituloEleitoral)
-                                        .senha("any")
-                                        .build();
-                        mockMvc.perform(post(BASE_URL + "/autenticar")
-                                        .with(csrf())
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(testUtil.toJson(authRequest)));
-
-                        EntrarRequest entrarReq = EntrarRequest.builder()
-                                        .tituloEleitoral(tituloEleitoral)
-                                        .perfil("ADMIN")
-                                        .unidadeCodigo(codigoUnidadeInexistente)
-                                        .build();
-
-                        // Act & Assert
-                        // A unidade inexistente retorna 404 (NOT_FOUND) via ErroEntidadeNaoEncontrada
-                        mockMvc.perform(post(BASE_URL + "/entrar")
-                                        .with(csrf())
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(testUtil.toJson(entrarReq)))
-                                        .andExpect(status().is(404))
-                                        .andExpect(jsonPath("$.message").exists());
-                }
+            mockMvc.perform(post(BASE_URL + "/entrar")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(testUtil.toJson(entrarReq)))
+                    .andExpect(status().isOk());
         }
+
+        @Test
+        @DisplayName("Deve realizar login completo para usuário com múltiplos perfis")
+        void testLoginCompleto_sucessoUsuarioMultiplosPerfis() throws Exception {
+            String tituloEleitoral = usuarioGestor.getTituloEleitoral();
+            String senha = "password";
+            AutenticarRequest authRequest = AutenticarRequest.builder().tituloEleitoral(tituloEleitoral)
+                    .senha(senha).build();
+
+            mockMvc.perform(post(BASE_URL + "/autenticar")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(testUtil.toJson(authRequest)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").value(true));
+
+            AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral)
+                    .build();
+
+            mockMvc.perform(post(BASE_URL + "/autorizar")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(testUtil.toJson(autorizarReq)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(2))
+                    .andExpect(jsonPath("$[*].perfil")
+                            .value(containsInAnyOrder("ADMIN", "GESTOR")));
+
+            // Entrar como GESTOR na unidadeGestor
+            EntrarRequest entrarReq = EntrarRequest.builder()
+                    .tituloEleitoral(tituloEleitoral)
+                    .perfil("GESTOR")
+                    .unidadeCodigo(unidadeGestor.getCodigo())
+                    .build();
+            mockMvc.perform(post(BASE_URL + "/entrar")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(testUtil.toJson(entrarReq)))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("Deve falhar ao tentar autorizar com usuário não autenticado")
+        void testAutorizar_falhaUsuarioNaoAutenticado() throws Exception {
+            // Arrange
+            String tituloEleitoral = "888888888888"; // Usuário inexistente
+
+            // Não realizamos a autenticação prévia para simular um usuário não autenticado.
+
+            // Act & Assert
+            // Sem autenticação prévia (sessão válida), a tentativa de autorizar deve ser
+            // rejeitada com 401 (Unauthorized)
+            AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral)
+                    .build();
+
+            mockMvc.perform(post(BASE_URL + "/autorizar")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(testUtil.toJson(autorizarReq)))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        @DisplayName("Deve falhar ao tentar entrar com unidade inexistente")
+        void testEntrar_falhaUnidadeInexistente() throws Exception {
+            // Arrange
+            String tituloEleitoral = usuarioAdmin.getTituloEleitoral();
+            long codigoUnidadeInexistente = 999999L;
+
+            // Pre-authenticate (Required by security fix)
+            AutenticarRequest authRequest = AutenticarRequest.builder()
+                    .tituloEleitoral(tituloEleitoral)
+                    .senha("any")
+                    .build();
+            mockMvc.perform(post(BASE_URL + "/autenticar")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(testUtil.toJson(authRequest)));
+
+            EntrarRequest entrarReq = EntrarRequest.builder()
+                    .tituloEleitoral(tituloEleitoral)
+                    .perfil("ADMIN")
+                    .unidadeCodigo(codigoUnidadeInexistente)
+                    .build();
+
+            // Act & Assert
+            // A unidade inexistente retorna 404 (NOT_FOUND) via ErroEntidadeNaoEncontrada
+            mockMvc.perform(post(BASE_URL + "/entrar")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(testUtil.toJson(entrarReq)))
+                    .andExpect(status().is(404))
+                    .andExpect(jsonPath("$.message").exists());
+        }
+    }
 }

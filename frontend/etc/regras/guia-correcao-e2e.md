@@ -49,7 +49,8 @@ Os helpers estão organizados em arquivos especializados no diretório `e2e/help
 
 ### Extração de IDs de processos
 
-Use a função `extrairProcessoId(page)` de `helpers-processos.ts` que suporta múltiplos padrões de URL e lança erro explícito se a extração falhar.
+Use a função `extrairProcessoId(page)` de `helpers-processos.ts` que suporta múltiplos padrões de URL e lança erro
+explícito se a extração falhar.
 
 ```typescript
 import { extrairProcessoId } from './helpers/helpers-processos';

@@ -1,13 +1,10 @@
 package sgc.mapa.service;
 
-import java.util.List;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.AtualizarAtividadeRequest;
@@ -17,6 +14,8 @@ import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Mapa;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -44,7 +43,7 @@ public class AtividadeService {
     public Atividade obterPorCodigo(Long codAtividade) {
         return repo.buscar(Atividade.class, codAtividade);
     }
-    
+
     @Transactional(readOnly = true)
     public List<Atividade> buscarPorCodigos(List<Long> codigos) {
         return atividadeRepo.findAllById(codigos);

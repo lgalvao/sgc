@@ -11,7 +11,6 @@ import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.Collections;
@@ -24,11 +23,12 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 class ImpactoMapaServiceCoverageTest {
-
-    @Mock private MapaRepo mapaRepo;
-    @Mock private CompetenciaRepo competenciaRepo;
-    @Mock private AtividadeService atividadeService;
-    @Mock private AccessControlService accessControlService;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
+    @Mock
+    private AtividadeService atividadeService;
 
     @InjectMocks
     private ImpactoMapaService service;
@@ -36,7 +36,6 @@ class ImpactoMapaServiceCoverageTest {
     @Test
     @DisplayName("Deve detectar alteração quando conhecimentos diferem (um vazio, outro cheio)")
     void deveDetectarAlteracaoListaVazia() {
-        // Cobre linha 209 (otimização lista vazia)
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(1L);
         Unidade unidade = new Unidade();
@@ -45,8 +44,10 @@ class ImpactoMapaServiceCoverageTest {
 
         Usuario usuario = new Usuario();
 
-        Mapa mapaVigente = new Mapa(); mapaVigente.setCodigo(100L);
-        Mapa mapaSub = new Mapa(); mapaSub.setCodigo(200L);
+        Mapa mapaVigente = new Mapa();
+        mapaVigente.setCodigo(100L);
+        Mapa mapaSub = new Mapa();
+        mapaSub.setCodigo(200L);
 
         when(mapaRepo.findMapaVigenteByUnidade(10L)).thenReturn(Optional.of(mapaVigente));
         when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSub));
@@ -76,7 +77,6 @@ class ImpactoMapaServiceCoverageTest {
     @Test
     @DisplayName("Não deve detectar alteração quando ambos vazios")
     void naoDeveDetectarAlteracaoAmbosVazios() {
-        // Cobre linha 209 (otimização lista vazia false)
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(1L);
         Unidade unidade = new Unidade();
@@ -85,8 +85,10 @@ class ImpactoMapaServiceCoverageTest {
 
         Usuario usuario = new Usuario();
 
-        Mapa mapaVigente = new Mapa(); mapaVigente.setCodigo(100L);
-        Mapa mapaSub = new Mapa(); mapaSub.setCodigo(200L);
+        Mapa mapaVigente = new Mapa();
+        mapaVigente.setCodigo(100L);
+        Mapa mapaSub = new Mapa();
+        mapaSub.setCodigo(200L);
 
         when(mapaRepo.findMapaVigenteByUnidade(10L)).thenReturn(Optional.of(mapaVigente));
         when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSub));
@@ -123,8 +125,10 @@ class ImpactoMapaServiceCoverageTest {
 
         Usuario usuario = new Usuario();
 
-        Mapa mapaVigente = new Mapa(); mapaVigente.setCodigo(100L);
-        Mapa mapaSub = new Mapa(); mapaSub.setCodigo(200L);
+        Mapa mapaVigente = new Mapa();
+        mapaVigente.setCodigo(100L);
+        Mapa mapaSub = new Mapa();
+        mapaSub.setCodigo(200L);
 
         when(mapaRepo.findMapaVigenteByUnidade(10L)).thenReturn(Optional.of(mapaVigente));
         when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSub));

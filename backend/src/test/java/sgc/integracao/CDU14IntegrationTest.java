@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,13 +15,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import org.springframework.test.context.ActiveProfiles;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import sgc.Sgc;
 import sgc.alerta.model.AlertaRepo;
@@ -183,17 +179,15 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
         @Nested
         @DisplayName("Fluxo de Devolução")
+    @SuppressWarnings("unused")
         class Devolucao {
                 @Test
                 @DisplayName("GESTOR deve devolver, alterando status e criando registros")
                 void gestorDevolveRevisao() throws Exception {
-
                         Long subprocessoId = criarEComecarProcessoDeRevisao();
-
-                        mockMvc.perform(
-                                        post(API_SUBPROCESSOS_ID_DISPONIBILIZAR, subprocessoId)
-                                                        .with(csrf())
-                                                        .with(user(chefe)))
+                        mockMvc.perform(post(API_SUBPROCESSOS_ID_DISPONIBILIZAR, subprocessoId)
+                                        .with(csrf())
+                                        .with(user(chefe)))
                                         .andExpect(status().isOk());
 
                         mockMvc.perform(
@@ -207,10 +201,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                         .andExpect(status().isOk());
 
                         Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
-                        assertThat(sp.getSituacao())
-                                        .isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-                        assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId))
-                                        .hasSize(1);
+                        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+                        assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
                         assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(2);
                         assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
                 }
@@ -218,6 +210,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
         @Nested
         @DisplayName("Fluxo de Aceite")
+        @SuppressWarnings("unused")
         class Aceite {
                 @Test
                 @DisplayName("GESTOR deve aceitar, alterando status e criando todos os registros")
@@ -237,10 +230,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                         .andExpect(status().isOk());
 
                         Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
-                        assertThat(sp.getSituacao())
-                                        .isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-                        assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId))
-                                        .hasSize(1);
+                        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+                        assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
                         assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(2);
                         assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
                 }
@@ -248,11 +239,11 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
         @Nested
         @DisplayName("Fluxo de Homologação")
+        @SuppressWarnings("unused")
         class Homologacao {
                 private Long subprocessoId;
 
                 @BeforeEach
-                @SuppressWarnings("unused")
                 void setUpHomologacao() throws Exception {
                         subprocessoId = criarEComecarProcessoDeRevisao();
                         mockMvc.perform(
@@ -309,6 +300,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
         @Nested
         @DisplayName("Endpoints de Consulta")
+    @SuppressWarnings("unused")
         class EndpointsDeConsulta {
                 @Test
                 @DisplayName("Deve retornar histórico de análise corretamente")
@@ -367,6 +359,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
         @Nested
         @DisplayName("Falhas e Segurança")
+    @SuppressWarnings("unused")
         class FalhasESeguranca {
                 @Test
                 @DisplayName("CHEFE não pode homologar revisão")

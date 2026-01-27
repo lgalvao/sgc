@@ -45,20 +45,34 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     @InjectMocks
     private SubprocessoWorkflowService service;
 
-    @Mock private SubprocessoRepo subprocessoRepo;
-    @Mock private CompetenciaService competenciaService;
-    @Mock private AtividadeService atividadeService;
-    @Mock private MapaFacade mapaFacade;
-    @Mock private SubprocessoTransicaoService transicaoService;
-    @Mock private AnaliseFacade analiseFacade;
-    @Mock private UnidadeFacade unidadeService;
-    @Mock private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
-    @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
-    @Mock private RepositorioComum repo;
-    @Mock private sgc.alerta.AlertaFacade alertaService;
-    @Mock private sgc.subprocesso.model.MovimentacaoRepo repositorioMovimentacao;
-    @Mock private sgc.mapa.service.ImpactoMapaService impactoMapaService;
-    @Mock private sgc.subprocesso.service.crud.SubprocessoCrudService crudService;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private CompetenciaService competenciaService;
+    @Mock
+    private AtividadeService atividadeService;
+    @Mock
+    private MapaFacade mapaFacade;
+    @Mock
+    private SubprocessoTransicaoService transicaoService;
+    @Mock
+    private AnaliseFacade analiseFacade;
+    @Mock
+    private UnidadeFacade unidadeService;
+    @Mock
+    private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
+    @Mock
+    private sgc.seguranca.acesso.AccessControlService accessControlService;
+    @Mock
+    private RepositorioComum repo;
+    @Mock
+    private sgc.alerta.AlertaFacade alertaService;
+    @Mock
+    private sgc.subprocesso.model.MovimentacaoRepo repositorioMovimentacao;
+    @Mock
+    private sgc.mapa.service.ImpactoMapaService impactoMapaService;
+    @Mock
+    private sgc.subprocesso.service.crud.SubprocessoCrudService crudService;
 
     // --- SALVAR MAPA ---
 
@@ -72,7 +86,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
 
         SalvarMapaRequest request = SalvarMapaRequest.builder().build();
         assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, request))
-            .isInstanceOf(ErroMapaEmSituacaoInvalida.class);
+                .isInstanceOf(ErroMapaEmSituacaoInvalida.class);
     }
 
 
@@ -81,7 +95,8 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     void salvarMapaSubprocesso_MudaSituacao() {
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-        Mapa mapa = new Mapa(); mapa.setCodigo(10L);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
         sp.setMapa(mapa);
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
@@ -91,7 +106,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
                 .competencias(List.of(CompetenciaMapaDto.builder().build())) // Tem competencia
                 .build();
 
-        when(mapaFacade.salvarMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());
+        when(mapaFacade.salvarMapaCompleto(any(), any())).thenReturn(MapaCompletoDto.builder().build());
 
         service.salvarMapaSubprocesso(1L, req);
 
@@ -106,7 +121,8 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     void adicionarCompetencia_MudaSituacao() {
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-        Mapa mapa = new Mapa(); mapa.setCodigo(10L);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
         sp.setMapa(mapa);
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
@@ -116,7 +132,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
                 .descricao("Nova")
                 .build();
 
-        when(mapaFacade.obterMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());
+        when(mapaFacade.obterMapaCompleto(any(), any())).thenReturn(MapaCompletoDto.builder().build());
 
         service.adicionarCompetencia(1L, req);
 
@@ -131,7 +147,8 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     void removerCompetencia_VoltaSituacao() {
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
-        Mapa mapa = new Mapa(); mapa.setCodigo(10L);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
         sp.setMapa(mapa);
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
@@ -139,7 +156,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         // Simula que ficou vazio apos remover
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(Collections.emptyList());
 
-        when(mapaFacade.obterMapaCompleto(any(), any())).thenReturn(new MapaCompletoDto());
+        when(mapaFacade.obterMapaCompleto(any(), any())).thenReturn(MapaCompletoDto.builder().build());
 
         service.removerCompetencia(1L, 100L);
 
@@ -158,8 +175,8 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         Usuario user = new Usuario();
 
         assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, user))
-            .isInstanceOf(ErroValidacao.class)
-            .isInstanceOf(ErroValidacao.class);
+                .isInstanceOf(ErroValidacao.class)
+                .isInstanceOf(ErroValidacao.class);
     }
 
     @Test
@@ -167,7 +184,8 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     void validarMapa_ErroCompetenciaSemAtividade() {
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
-        Mapa mapa = new Mapa(); mapa.setCodigo(10L);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
         sp.setMapa(mapa);
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
@@ -182,8 +200,8 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
                 .build();
         Usuario user = new Usuario();
         assertThatThrownBy(() -> service.disponibilizarMapa(1L, request, user))
-            .isInstanceOf(ErroValidacao.class)
-            .hasMessageContaining("pelo menos uma atividade");
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("pelo menos uma atividade");
     }
 
     @Test
@@ -191,20 +209,24 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     void validarMapa_ErroAtividadeSemCompetencia() {
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
-        Mapa mapa = new Mapa(); mapa.setCodigo(10L);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
         sp.setMapa(mapa);
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
         // Competencia com atividade 1
         sgc.mapa.model.Competencia comp = new sgc.mapa.model.Competencia();
-        sgc.mapa.model.Atividade a1 = new sgc.mapa.model.Atividade(); a1.setCodigo(100L);
+        sgc.mapa.model.Atividade a1 = new sgc.mapa.model.Atividade();
+        a1.setCodigo(100L);
         comp.setAtividades(java.util.Set.of(a1));
 
         when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(comp));
 
         // Atividades do mapa: 1 e 2. A 2 nao esta associada
-        sgc.mapa.model.Atividade a2 = new sgc.mapa.model.Atividade(); a2.setCodigo(200L); a2.setDescricao("A2");
+        sgc.mapa.model.Atividade a2 = new sgc.mapa.model.Atividade();
+        a2.setCodigo(200L);
+        a2.setDescricao("A2");
         when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of(a1, a2));
 
         DisponibilizarMapaRequest request = DisponibilizarMapaRequest.builder()
@@ -212,8 +234,8 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
                 .build();
         Usuario user = new Usuario();
         assertThatThrownBy(() -> service.disponibilizarMapa(1L, request, user))
-            .isInstanceOf(ErroValidacao.class)
-            .hasMessageContaining("Atividades pendentes: A2");
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("Atividades pendentes: A2");
     }
 
     // --- OUTROS FLUXOS DE WORKFLOW ---
@@ -224,9 +246,11 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
         sp.setMapa(new Mapa());
-        Processo p = new Processo(); p.setTipo(TipoProcesso.MAPEAMENTO);
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.MAPEAMENTO);
         sp.setProcesso(p);
-        Unidade u = new Unidade(); u.setUnidadeSuperior(new Unidade());
+        Unidade u = new Unidade();
+        u.setUnidadeSuperior(new Unidade());
         sp.setUnidade(u);
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
@@ -241,16 +265,20 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     void aceitarValidacao_FimCadeia() {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
-        Processo p = new Processo(); p.setTipo(TipoProcesso.MAPEAMENTO);
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.MAPEAMENTO);
         sp.setProcesso(p);
 
-        Unidade pai = new Unidade(); pai.setSigla("PAI");
-        Unidade u = new Unidade(); u.setUnidadeSuperior(pai);
+        Unidade pai = new Unidade();
+        pai.setSigla("PAI");
+        Unidade u = new Unidade();
+        u.setUnidadeSuperior(pai);
         sp.setUnidade(u);
         // pai.unidadeSuperior é null -> fim da cadeia
 
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
-        Usuario user = new Usuario(); user.setTituloEleitoral("123");
+        Usuario user = new Usuario();
+        user.setTituloEleitoral("123");
 
         service.aceitarValidacao(1L, user);
 

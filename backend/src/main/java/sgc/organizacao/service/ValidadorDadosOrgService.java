@@ -63,11 +63,11 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
         if (!violacoes.isEmpty()) {
             violacoes.forEach(v -> log.error("INVARIANTE VIOLADA: {}", v));
             String termo = violacoes.size() == 1 ? "violação encontrada" : "violações encontradas";
-            
+
             String detalhes = violacoes.stream()
                     .limit(3) // Mostra as 3 primeiras para não poluir
                     .collect(Collectors.joining("; "));
-            
+
             if (violacoes.size() > 3) {
                 detalhes += "; ... (+ " + (violacoes.size() - 3) + " outras)";
             }

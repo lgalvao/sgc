@@ -21,6 +21,7 @@ public class EventoTransicaoSubprocesso {
     private Usuario usuario;
     private Unidade unidadeOrigem;
     private Unidade unidadeDestino;
-    @Nullable private String observacoes;
+    @Nullable
+    private String observacoes;
 }
 

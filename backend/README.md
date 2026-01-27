@@ -2,7 +2,8 @@
 
 ## Visão Geral
 
-Este diretório contém o código do backend do SGC. Ele fornece uma API REST para consumo pelo frontend. A arquitetura é organizada em pacotes representando domínios específicos.
+Este diretório contém o código do backend do SGC. Ele fornece uma API REST para consumo pelo frontend. A arquitetura é
+organizada em pacotes representando domínios específicos.
 
 ## 🏗️ Arquitetura e Stack
 
@@ -53,21 +54,21 @@ O sistema utiliza perfis para configurar o comportamento do ambiente:
 
 O projeto suporta a execução granular de testes através de tarefas Gradle específicas:
 
-*   **Todos os Testes** (Padrão):
-    ```bash
-    ./gradlew test
-    ```
-    Executa tanto testes unitários quanto de integração.
+* **Todos os Testes** (Padrão):
+  ```bash
+  ./gradlew test
+  ```
+  Executa tanto testes unitários quanto de integração.
 
-*   **Apenas Unitários** (Rápido, exclui tag `integration`):
-    ```bash
-    ./gradlew unitTest
-    ```
+* **Apenas Unitários** (Rápido, exclui tag `integration`):
+  ```bash
+  ./gradlew unitTest
+  ```
 
-*   **Apenas Integração** (Filtra tag `integration`):
-    ```bash
-    ./gradlew integrationTest
-    ```
+* **Apenas Integração** (Filtra tag `integration`):
+  ```bash
+  ./gradlew integrationTest
+  ```
 
 ### Estrutura de Testes
 
@@ -101,6 +102,7 @@ public class SubprocessoController {
 ```
 
 **Services Especializados** são package-private e usados apenas pelas Facades:
+
 * `SubprocessoCadastroWorkflowService`
 * `SubprocessoMapaWorkflowService`
 * `SubprocessoService` (CRUD)
@@ -138,6 +140,7 @@ CAMADA 3: LÓGICA DE NEGÓCIO (Services)
 ```
 
 **Componentes de Segurança:**
+
 * `AccessControlService` - Ponto central de autorização
 * `AccessPolicy<T>` - Políticas específicas por recurso
 * `HierarchyService` - Hierarquia de unidades
@@ -179,12 +182,14 @@ public Subprocesso obter(@PathVariable Long id) {
 ### Fluxo de Dados
 
 #### Leitura (Query)
+
 ```
 User Request → Controller → Facade → Service → Repository 
 → JPA Entity → Mapper → DTO → HTTP Response
 ```
 
 #### Escrita (Command)
+
 ```
 User Request + DTO → Controller (@Valid) → Facade
 → AccessControlService (autoriza)
@@ -195,45 +200,53 @@ User Request + DTO → Controller (@Valid) → Facade
 ### Módulos Detalhados
 
 #### `sgc.processo`
+
 * **Facade:** `ProcessoFacade`
 * **Responsabilidade:** Gerencia ciclo de vida de processos (MAPEAMENTO ou REVISÃO)
 * **Entidades:** `Processo`, `SituacaoProcesso`, `TipoProcesso`
 * **Services:** `ProcessoConsultaService`, etc.
 
 #### `sgc.subprocesso`
+
 * **Facade:** `SubprocessoFacade`
 * **Responsabilidade:** Gerencia subprocessos vinculados a processos e unidades
 * **Entidades:** `Subprocesso`, `SituacaoSubprocesso`, `TransicaoSubprocesso`
-* **Services:** `SubprocessoCadastroWorkflowService`, `SubprocessoMapaWorkflowService`, `SubprocessoService` (CRUD), `SubprocessoContextoService`
+* **Services:** `SubprocessoCadastroWorkflowService`, `SubprocessoMapaWorkflowService`, `SubprocessoService` (CRUD),
+  `SubprocessoContextoService`
 
 #### `sgc.mapa`
+
 * **Facade:** `MapaService` (atua como facade), `AtividadeFacade`
 * **Responsabilidade:** Gerencia mapas de competências
 * **Entidades:** `Mapa`, `Competencia`, `Atividade`, `Conhecimento`
 * **Services:** `CompetenciaService`, `ConhecimentoService`, `MapaSalvamentoService`, etc.
 
 #### `sgc.organizacao`
+
 * **Services:** `UsuarioFacade`, `UnidadeFacade`
 * **Responsabilidade:** Estrutura organizacional (usuários, unidades, perfis)
 * **Entidades:** `Usuario`, `Unidade`, `Perfil`
 
 #### `sgc.seguranca`
+
 * **Pacote:** `sgc.seguranca.acesso` - Controle de acesso centralizado
 * **Componentes:**
-  * `AccessControlService` - Serviço central
-  * `AccessPolicy<T>` - Interface de políticas
-  * `SubprocessoAccessPolicy`, `ProcessoAccessPolicy`, etc.
-  * `HierarchyService` - Hierarquia de unidades
-  * `AccessAuditService` - Auditoria
+    * `AccessControlService` - Serviço central
+    * `AccessPolicy<T>` - Interface de políticas
+    * `SubprocessoAccessPolicy`, `ProcessoAccessPolicy`, etc.
+    * `HierarchyService` - Hierarquia de unidades
+    * `AccessAuditService` - Auditoria
 * **Pacote:** `sgc.seguranca.login` - Autenticação
-  * `LoginFacade`, `JwtService`, `ConfigSeguranca`
+    * `LoginFacade`, `JwtService`, `ConfigSeguranca`
 
 #### `sgc.analise`
+
 * **Service:** `AnaliseService`
 * **Responsabilidade:** Auditoria de análises durante workflows
 * **Entidades:** `Analise`, `TipoAnalise`, `TipoAcaoAnalise`
 
 #### `sgc.notificacao` e `sgc.alerta`
+
 * **Services:** `NotificacaoEmailService`, `AlertaFacade`
 * **Responsabilidade:** Comunicação reativa com usuários
 * **Integração:** Reage a eventos de domínio
@@ -241,12 +254,14 @@ User Request + DTO → Controller (@Valid) → Facade
 ### Convenções de Código
 
 #### Nomenclatura
+
 * **Classes:** `PascalCase`
 * **Métodos:** `camelCase`
 * **Constantes:** `UPPER_SNAKE_CASE`
 * **Packages:** `lowercase`
 
 #### Sufixos Obrigatórios
+
 * Controllers: `{Entidade}Controller`
 * Facades: `{Entidade}Facade`
 * Services: `{Entidade}Service`
@@ -256,14 +271,18 @@ User Request + DTO → Controller (@Valid) → Facade
 * Exceções: `Erro{TipoErro}`
 
 #### Idioma
+
 **TUDO em Português Brasileiro:**
+
 * Código (variáveis, métodos, classes)
 * Comentários
 * Mensagens de erro
 * Documentação
 
 #### Identificadores
+
 **SEMPRE** use `codigo` em vez de `id`:
+
 ```java
 // ✅ BOM
 private Long codigo;
@@ -275,6 +294,7 @@ private Long id;
 ```
 
 #### REST API (Não-Padrão)
+
 ```
 GET  /api/processos           - Listar
 GET  /api/processos/{id}      - Obter

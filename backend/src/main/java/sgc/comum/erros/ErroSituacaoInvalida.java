@@ -23,7 +23,7 @@ import org.springframework.http.HttpStatus;
  * @see sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida
  */
 public abstract class ErroSituacaoInvalida extends ErroNegocioBase {
-    
+
     protected ErroSituacaoInvalida(String message, String code) {
         super(message, code, HttpStatus.UNPROCESSABLE_CONTENT);
     }

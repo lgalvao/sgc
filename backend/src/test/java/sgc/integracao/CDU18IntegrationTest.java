@@ -15,15 +15,11 @@ import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -36,24 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-18: Visualizar Mapa de Competências")
 class CDU18IntegrationTest extends BaseIntegrationTest {
-
-    @Autowired
-    private ProcessoRepo processoRepo;
-
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-
-    @Autowired
-    private UnidadeRepo unidadeRepo;
-
-    @Autowired
-    private MapaRepo mapaRepo;
-
     @Autowired
     private CompetenciaRepo competenciaRepo;
-
-    @Autowired
-    private AtividadeRepo atividadeRepo;
 
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
@@ -62,6 +42,7 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
     private Unidade unidade;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         // Criar Unidade via Fixture
         unidade = UnidadeFixture.unidadePadrao();

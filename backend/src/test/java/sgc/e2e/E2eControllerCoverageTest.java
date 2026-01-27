@@ -1,35 +1,29 @@
 package sgc.e2e;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.service.ProcessoFacade;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -97,7 +91,7 @@ class E2eControllerCoverageTest {
     @Test
     @DisplayName("Deve usar descrição padrão quando não fornecida (null)")
     void deveUsarDescricaoPadraoNull() {
-         E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
+        E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
                 null, "SIGLA", false, 10
         );
 
@@ -110,13 +104,13 @@ class E2eControllerCoverageTest {
 
         controller.criarProcessoMapeamento(request);
 
-        verify(processoFacade).criar(argThat(req -> req.getDescricao().contains("Processo Fixture E2E")));
+        verify(processoFacade).criar(argThat(req -> req.descricao().contains("Processo Fixture E2E")));
     }
 
     @Test
     @DisplayName("Deve usar descrição padrão quando vazia")
     void deveUsarDescricaoPadraoVazia() {
-         E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
+        E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
                 "", "SIGLA", false, 10
         );
 
@@ -129,7 +123,7 @@ class E2eControllerCoverageTest {
 
         controller.criarProcessoMapeamento(request);
 
-        verify(processoFacade).criar(argThat(req -> req.getDescricao().contains("Processo Fixture E2E")));
+        verify(processoFacade).criar(argThat(req -> req.descricao().contains("Processo Fixture E2E")));
     }
 
     @Test

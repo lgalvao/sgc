@@ -1,36 +1,35 @@
 package sgc.subprocesso.service.crud;
 
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.RepositorioComum;
-import sgc.organizacao.UsuarioFacade;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
-import sgc.subprocesso.eventos.*;
+import sgc.subprocesso.eventos.EventoSubprocessoAtualizado;
+import sgc.subprocesso.eventos.EventoSubprocessoCriado;
+import sgc.subprocesso.eventos.EventoSubprocessoExcluido;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
@@ -46,8 +45,6 @@ class SubprocessoCrudServiceTest {
     private MapaFacade mapaFacade;
     @Mock
     private ApplicationEventPublisher eventPublisher;
-    @Mock
-    private UsuarioFacade usuarioService;
 
     @InjectMocks
     private SubprocessoCrudService service;
@@ -160,7 +157,6 @@ class SubprocessoCrudServiceTest {
         assertThatThrownBy(() -> service.obterEntidadePorCodigoMapa(10L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
-
 
 
     @Test
@@ -288,7 +284,7 @@ class SubprocessoCrudServiceTest {
         CriarSubprocessoRequest request = CriarSubprocessoRequest.builder().codProcesso(1L).codUnidade(1L).build();
         SubprocessoDto responseDto = SubprocessoDto.builder().build();
         Subprocesso entity = criarSubprocessoCompleto();
-        
+
         when(repositorioSubprocesso.save(any())).thenReturn(entity);
         when(mapaFacade.salvar(any())).thenReturn(new Mapa());
         when(subprocessoMapper.toDto(any())).thenReturn(responseDto);

@@ -1,69 +1,52 @@
 package sgc.subprocesso.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.analise.AnaliseFacade;
+
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.service.ConhecimentoService;
-import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UsuarioFacade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
-import sgc.subprocesso.mapper.MapaAjusteMapper;
-import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
-import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoFacadeCoverageTest")
 class SubprocessoFacadeCoverageTest {
-
-    @Mock private SubprocessoCrudService crudService;
-    @Mock private SubprocessoValidacaoService validacaoService;
-    @Mock private SubprocessoWorkflowService workflowService;
-    @Mock private UsuarioFacade usuarioService;
-    @Mock private MapaFacade mapaFacade;
-    @Mock private AtividadeService atividadeService;
-    @Mock private MovimentacaoRepo repositorioMovimentacao;
-    @Mock private SubprocessoDetalheMapper subprocessoDetalheMapper;
-    @Mock private ConhecimentoMapper conhecimentoMapper;
-    @Mock private AnaliseFacade analiseFacade;
-    @Mock private CompetenciaService competenciaService;
-    @Mock private ConhecimentoService conhecimentoService;
-    @Mock private MapaAjusteMapper mapaAjusteMapper;
-    @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
-    @Mock private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
-    @Mock private sgc.subprocesso.model.SubprocessoMovimentacaoRepo movimentacaoRepo;
-    @Mock private sgc.mapa.service.CopiaMapaService copiaMapaService;
-    @Mock private sgc.mapa.mapper.AtividadeMapper atividadeMapper;
-    @Mock private sgc.organizacao.UnidadeFacade unidadeFacade;
+    @Mock
+    private SubprocessoCrudService crudService;
+    @Mock
+    private AtividadeService atividadeService;
+    @Mock
+    private CompetenciaService competenciaService;
+    @Mock
+    private sgc.seguranca.acesso.AccessControlService accessControlService;
+    @Mock
+    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    @Mock
+    private sgc.subprocesso.model.SubprocessoMovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private sgc.mapa.service.CopiaMapaService copiaMapaService;
 
     @InjectMocks
     private SubprocessoFacade facade;
@@ -148,7 +131,8 @@ class SubprocessoFacadeCoverageTest {
         Long codSubprocesso = 999L;
         when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(ErroEntidadeNaoEncontrada.class, () -> facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList()));
+        var exception = Assertions.assertThrows(ErroEntidadeNaoEncontrada.class, () -> facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList()));
+        Assertions.assertNotNull(exception);
     }
 
     @Test
@@ -312,7 +296,8 @@ class SubprocessoFacadeCoverageTest {
 
         when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
 
-        org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () -> facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList()));
+        var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () -> facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList()));
+        org.junit.jupiter.api.Assertions.assertNotNull(exception);
     }
 
     @Test
@@ -323,13 +308,14 @@ class SubprocessoFacadeCoverageTest {
 
         Subprocesso spDestino = new Subprocesso();
         spDestino.setCodigo(codDestino);
-        
+
         // Invalid status for import
         spDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
         when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
 
-        org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida.class, () -> facade.importarAtividades(codDestino, codOrigem));
+        var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida.class, () -> facade.importarAtividades(codDestino, codOrigem));
+        org.junit.jupiter.api.Assertions.assertNotNull(exception);
     }
 
     @Test
@@ -360,7 +346,7 @@ class SubprocessoFacadeCoverageTest {
         var result = facade.listarAtividadesSubprocesso(codSubprocesso);
 
         assertFalse(result.isEmpty());
-        assertFalse(result.getFirst().getConhecimentos().isEmpty());
+        assertFalse(result.getFirst().conhecimentos().isEmpty());
     }
 
     @Test

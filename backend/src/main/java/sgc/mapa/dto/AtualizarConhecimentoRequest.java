@@ -9,7 +9,8 @@ import sgc.seguranca.sanitizacao.SanitizarHtml;
  */
 @Builder
 public record AtualizarConhecimentoRequest(
-    @NotBlank(message = "Descrição não pode ser vazia")
-    @SanitizarHtml
-    String descricao
-) {}
+        @NotBlank(message = "Descrição não pode ser vazia")
+        @SanitizarHtml
+        String descricao
+) {
+}

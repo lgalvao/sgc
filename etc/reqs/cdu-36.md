@@ -3,6 +3,7 @@
 **Ator:** ADMIN
 
 ## Descrição
+
 Permite a extração consolidada dos mapas de competências (Atividades, Conhecimentos, Competências) das unidades.
 
 ## Fluxo principal
@@ -21,9 +22,9 @@ Permite a extração consolidada dos mapas de competências (Atividades, Conheci
 5. O sistema processa os dados e gera um arquivo PDF, contendo, para cada mapa, as seguintes informações:
 
     - Unidade (Sigla e Nome)
-    - Para cada competencia: 
-    	- Descricao da competência 
-     	   - Atividades da competencia
-      	      - Conhecimentos da atividade
+    - Para cada competencia:
+        - Descricao da competência
+            - Atividades da competencia
+                - Conhecimentos da atividade
 
 6. O sistema disponibiliza o arquivo para download.

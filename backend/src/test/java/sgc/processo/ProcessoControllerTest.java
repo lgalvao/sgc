@@ -101,7 +101,7 @@ class ProcessoControllerTest {
 
             verify(processoFacade).criar(criarCaptor.capture());
             CriarProcessoRequest capturado = criarCaptor.getValue();
-            assertEquals(NOVO_PROCESSO, capturado.getDescricao());
+            assertEquals(NOVO_PROCESSO, capturado.descricao());
         }
 
         @Test
@@ -310,7 +310,7 @@ class ProcessoControllerTest {
 
             verify(processoFacade).atualizar(eq(1L), atualizarCaptor.capture());
             AtualizarProcessoRequest capturado = atualizarCaptor.getValue();
-            assertEquals(PROCESSO_ATUALIZADO, capturado.getDescricao());
+            assertEquals(PROCESSO_ATUALIZADO, capturado.descricao());
         }
 
         @Test

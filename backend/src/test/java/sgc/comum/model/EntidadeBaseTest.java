@@ -10,19 +10,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DisplayName("EntidadeBase")
 @Tag("unit")
 class EntidadeBaseTest {
-    private static class EntidadeTeste extends EntidadeBase {
-        public EntidadeTeste(Long codigo) {
-            this.setCodigo(codigo);
-        }
-    }
-
     @Test
     @DisplayName("toString() deve retornar representação JSON válida")
     void testToString() {
         EntidadeTeste entidade = new EntidadeTeste(123L);
         String resultado = entidade.toString();
-        
+
         assertNotNull(resultado);
         assertTrue(resultado.contains("\"codigo\":123"), "toString deve conter o código em formato JSON");
+    }
+
+    private static class EntidadeTeste extends EntidadeBase {
+        public EntidadeTeste(Long codigo) {
+            this.setCodigo(codigo);
+        }
     }
 }

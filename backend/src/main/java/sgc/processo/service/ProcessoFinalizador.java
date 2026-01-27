@@ -23,10 +23,10 @@ import java.util.Optional;
 
 /**
  * Serviço responsável pela finalização de processos.
- * 
+ *
  * <p>Coordena todas as etapas necessárias para finalizar um processo,
  * incluindo validações, publicação de mapas vigentes e eventos.</p>
- * 
+ *
  * <p><b>Nota sobre Injeção de Dependências:</b>
  * SubprocessoFacade é injetado com @Lazy para quebrar dependência circular:
  * ProcessoFacade → ProcessoFinalizador → SubprocessoFacade → ... → ProcessoFacade
@@ -34,7 +34,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 class ProcessoFinalizador {
-    
+
     private final ProcessoRepo processoRepo;
     private final UnidadeFacade unidadeService;
     private final SubprocessoFacade subprocessoFacade;
@@ -59,10 +59,10 @@ class ProcessoFinalizador {
 
     /**
      * Finaliza um processo, validando e tornando os mapas vigentes.
-     * 
+     *
      * @param codigo código do processo a finalizar
      * @throws ErroEntidadeNaoEncontrada se o processo não for encontrado
-     * @throws ErroProcesso se o processo não puder ser finalizado
+     * @throws ErroProcesso              se o processo não puder ser finalizado
      */
     @Transactional
     public void finalizar(Long codigo) {
@@ -87,7 +87,7 @@ class ProcessoFinalizador {
 
     /**
      * Torna os mapas de todos os subprocessos do processo como vigentes.
-     * 
+     *
      * @param processo processo cujos mapas serão tornados vigentes
      * @throws ErroProcesso se algum subprocesso não tiver unidade ou mapa associado
      */
@@ -96,11 +96,11 @@ class ProcessoFinalizador {
         List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(processo.getCodigo());
 
         for (Subprocesso subprocesso : subprocessos) {
-            Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())
+            Unidade unidade = Optional.of(subprocesso.getUnidade())
                     .orElseThrow(() -> new ErroProcesso(
                             "Subprocesso %d sem unidade associada.".formatted(subprocesso.getCodigo())));
 
-            Mapa mapaDoSubprocesso = Optional.ofNullable(subprocesso.getMapa())
+            Mapa mapaDoSubprocesso = Optional.of(subprocesso.getMapa())
                     .orElseThrow(() -> new ErroProcesso(
                             "Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
 

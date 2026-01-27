@@ -11,13 +11,16 @@ Fluxo principal:
 
 1. No Painel, ADMIN clica em um processo de revisão que esteja na situação 'Criado'.
 
-2. O sistema muda para a tela `Cadastro de processo`, com os campos preenchidos com as informações do processo selecionado.
+2. O sistema muda para a tela `Cadastro de processo`, com os campos preenchidos com as informações do processo
+   selecionado.
 
 3. ADMIN clica no botão `Iniciar processo`.
 
-4. O sistema mostra diálogo de confirmação: "Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes serão notificadas por e-mail.", botões Confirmar e Cancelar.
+4. O sistema mostra diálogo de confirmação: "Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas
+   as unidades participantes serão notificadas por e-mail.", botões Confirmar e Cancelar.
 
-5. Caso o usuário escolha o botão Cancelar, o sistema interrompe a operação de iniciação do processo, permanecendo na mesma tela.
+5. Caso o usuário escolha o botão Cancelar, o sistema interrompe a operação de iniciação do processo, permanecendo na
+   mesma tela.
 
 6. ADMIN confirma.
 

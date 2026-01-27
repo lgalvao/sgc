@@ -1,8 +1,6 @@
 package sgc.integracao;
 
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -11,23 +9,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.Sgc;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockAdmin;
+import sgc.organizacao.model.*;
+
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.persistence.EntityManager;
-import sgc.Sgc;
-import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.WithMockAdmin;
-import sgc.organizacao.model.Administrador;
-import sgc.organizacao.model.AdministradorRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -159,12 +155,12 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
         long totalAdmins = administradorRepo.count();
         if (totalAdmins > 1) {
             administradorRepo.findAll().stream()
-                .filter(adm -> !adm.getUsuarioTitulo().equals(usuario1.getTituloEleitoral()))
-                .forEach(adm -> administradorRepo.deleteById(adm.getUsuarioTitulo()));
+                    .filter(adm -> !adm.getUsuarioTitulo().equals(usuario1.getTituloEleitoral()))
+                    .forEach(adm -> administradorRepo.deleteById(adm.getUsuarioTitulo()));
             entityManager.flush();
             entityManager.clear();
         }
-        
+
         mockMvc.perform(post("/api/usuarios/administradores/{usuarioTitulo}/remover", usuario1.getTituloEleitoral())
                         .with(csrf()))
                 .andExpect(status().is4xxClientError());

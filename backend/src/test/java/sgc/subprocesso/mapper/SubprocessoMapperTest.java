@@ -24,10 +24,14 @@ import static org.mockito.Mockito.when;
 @DisplayName("SubprocessoMapper")
 class SubprocessoMapperTest {
 
-    @Mock private ProcessoRepo processoRepo;
-    @Mock private UnidadeRepo unidadeRepo;
-    @Mock private MapaRepo mapaRepo;
-    @Mock private RepositorioComum repo;
+    @Mock
+    private ProcessoRepo processoRepo;
+    @Mock
+    private UnidadeRepo unidadeRepo;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private RepositorioComum repo;
 
     private SubprocessoMapper mapper;
 

@@ -1,15 +1,25 @@
 package sgc.mapa.service;
 
+import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.dto.*;
+import sgc.mapa.dto.AtividadeResponse;
+import sgc.mapa.dto.AtualizarAtividadeRequest;
+import sgc.mapa.dto.AtualizarConhecimentoRequest;
+import sgc.mapa.dto.ConhecimentoResponse;
+import sgc.mapa.dto.CriarAtividadeRequest;
+import sgc.mapa.dto.CriarConhecimentoRequest;
+import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
@@ -21,10 +31,6 @@ import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -70,15 +76,15 @@ class AtividadeFacadeTest {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("user");
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
-        
+
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(10L);
-        
+
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
         mapa.setSubprocesso(subprocesso);
         when(mapaFacade.obterPorCodigo(1L)).thenReturn(mapa);
-        
+
         doNothing().when(accessControlService).verificarPermissao(eq(usuario), any(), any());
         when(subprocessoFacade.obterEntidadePorCodigoMapa(1L)).thenReturn(subprocesso);
         when(atividadeService.criar(request)).thenReturn(created);
@@ -86,16 +92,17 @@ class AtividadeFacadeTest {
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().situacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO).build();
         when(subprocessoFacade.obterSituacao(10L)).thenReturn(status);
 
-        AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
-        vis.setCodigo(100L);
+        AtividadeVisualizacaoDto vis = AtividadeVisualizacaoDto.builder()
+                .codigo(100L)
+                .build();
         when(subprocessoFacade.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
         AtividadeOperacaoResponse response = facade.criarAtividade(request);
 
         verify(accessControlService).verificarPermissao(eq(usuario), any(), any());
-        assertThat(response.getAtividade().getCodigo()).isEqualTo(100L);
-        assertThat(response.getSubprocesso()).isNotNull();
-        assertThat(response.getSubprocesso().situacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        assertThat(response.atividade().codigo()).isEqualTo(100L);
+        assertThat(response.subprocesso()).isNotNull();
+        assertThat(response.subprocesso().situacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
     }
 
     @Test
@@ -127,7 +134,7 @@ class AtividadeFacadeTest {
         AtividadeOperacaoResponse response = facade.atualizarAtividade(codigo, request);
 
         verify(atividadeService).atualizar(codigo, request);
-        assertThat(response.getSubprocesso()).isNotNull();
+        assertThat(response.subprocesso()).isNotNull();
     }
 
     @Test
@@ -156,8 +163,8 @@ class AtividadeFacadeTest {
         AtividadeOperacaoResponse response = facade.excluirAtividade(codigo);
 
         verify(atividadeService).excluir(codigo);
-        assertThat(response.getAtividade()).isNull();
-        assertThat(response.getSubprocesso()).isNotNull();
+        assertThat(response.atividade()).isNull();
+        assertThat(response.subprocesso()).isNotNull();
     }
 
     @Test
@@ -165,7 +172,7 @@ class AtividadeFacadeTest {
     void devePropagarErroExclusao() {
         when(atividadeService.obterPorCodigo(1L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 1L));
         assertThatThrownBy(() -> facade.excluirAtividade(1L))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -199,15 +206,16 @@ class AtividadeFacadeTest {
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
         when(subprocessoFacade.obterSituacao(10L)).thenReturn(status);
 
-        AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
-        vis.setCodigo(codigoAtividade);
+        AtividadeVisualizacaoDto vis = AtividadeVisualizacaoDto.builder()
+                .codigo(codigoAtividade)
+                .build();
         when(subprocessoFacade.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
         ResultadoOperacaoConhecimento resultado = facade.criarConhecimento(codigoAtividade, request);
 
-        assertThat(resultado.getNovoConhecimentoId()).isEqualTo(200L);
-        assertThat(resultado.getResponse().getAtividade()).isNotNull();
-        assertThat(resultado.getResponse().getAtividade().getCodigo()).isEqualTo(codigoAtividade);
+        assertThat(resultado.novoConhecimentoId()).isEqualTo(200L);
+        assertThat(resultado.response().atividade()).isNotNull();
+        assertThat(resultado.response().atividade().codigo()).isEqualTo(codigoAtividade);
     }
 
     @Test
@@ -237,15 +245,16 @@ class AtividadeFacadeTest {
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
         when(subprocessoFacade.obterSituacao(10L)).thenReturn(status);
 
-        AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
-        vis.setCodigo(codigoAtividade);
+        AtividadeVisualizacaoDto vis = AtividadeVisualizacaoDto.builder()
+                .codigo(codigoAtividade)
+                .build();
         when(subprocessoFacade.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
         AtividadeOperacaoResponse response = facade.atualizarConhecimento(codigoAtividade, codigoConhecimento, request);
 
         verify(conhecimentoService).atualizar(codigoAtividade, codigoConhecimento, request);
-        assertThat(response.getAtividade()).isNotNull();
-        assertThat(response.getAtividade().getCodigo()).isEqualTo(codigoAtividade);
+        assertThat(response.atividade()).isNotNull();
+        assertThat(response.atividade().codigo()).isEqualTo(codigoAtividade);
     }
 
     @Test
@@ -272,14 +281,15 @@ class AtividadeFacadeTest {
         SubprocessoSituacaoDto status = SubprocessoSituacaoDto.builder().build();
         when(subprocessoFacade.obterSituacao(10L)).thenReturn(status);
 
-        AtividadeVisualizacaoDto vis = new AtividadeVisualizacaoDto();
-        vis.setCodigo(codigoAtividade);
+        AtividadeVisualizacaoDto vis = AtividadeVisualizacaoDto.builder()
+                .codigo(codigoAtividade)
+                .build();
         when(subprocessoFacade.listarAtividadesSubprocesso(10L)).thenReturn(java.util.List.of(vis));
 
         AtividadeOperacaoResponse response = facade.excluirConhecimento(codigoAtividade, codigoConhecimento);
 
         verify(conhecimentoService).excluir(codigoAtividade, codigoConhecimento);
-        assertThat(response.getAtividade()).isNotNull();
+        assertThat(response.atividade()).isNotNull();
     }
 
     @Test
@@ -287,9 +297,9 @@ class AtividadeFacadeTest {
     void deveObterAtividadePorId() {
         AtividadeResponse expected = AtividadeResponse.builder().codigo(1L).build();
         when(atividadeService.obterResponse(1L)).thenReturn(expected);
-        
+
         AtividadeResponse actual = facade.obterAtividadePorId(1L);
-        
+
         assertThat(actual).isSameAs(expected);
     }
 
@@ -298,9 +308,9 @@ class AtividadeFacadeTest {
     void deveListarConhecimentos() {
         java.util.List<ConhecimentoResponse> expected = java.util.List.of();
         when(conhecimentoService.listarPorAtividade(100L)).thenReturn(expected);
-        
+
         java.util.List<ConhecimentoResponse> actual = facade.listarConhecimentosPorAtividade(100L);
-        
+
         assertThat(actual).isSameAs(expected);
     }
 }

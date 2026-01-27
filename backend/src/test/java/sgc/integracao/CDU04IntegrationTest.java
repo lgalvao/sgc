@@ -1,29 +1,18 @@
 package sgc.integracao;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
-
 import sgc.Sgc;
 import sgc.alerta.model.AlertaRepo;
 import sgc.fixture.UnidadeFixture;
@@ -34,12 +23,7 @@ import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.notificacao.NotificacaoEmailService;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.model.UsuarioPerfilRepo;
-import sgc.organizacao.model.UsuarioRepo;
+import sgc.organizacao.model.*;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.IniciarProcessoRequest;
 import sgc.processo.model.Processo;
@@ -47,11 +31,22 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.Subprocesso;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
 @WithMockAdmin
-@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
+@Import({ TestSecurityConfig.class, TestThymeleafConfig.class })
 @Transactional
 @DisplayName("CDU-04: Iniciar processo de mapeamento")
 class CDU04IntegrationTest extends BaseIntegrationTest {
@@ -76,6 +71,7 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
     private Unidade unidadeLivre;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setup() {
         // Reset sequences
         try {
@@ -104,7 +100,8 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
         unidadeLivre.setMatriculaTitular(titular.getMatricula());
         unidadeRepo.save(unidadeLivre);
 
-        // Também precisamos associar o perfil CHEFE ao usuário na unidade para que ele seja encontrado pelo UsuarioFacade
+        // Também precisamos associar o perfil CHEFE ao usuário na unidade para que ele
+        // seja encontrado pelo UsuarioFacade
         UsuarioPerfil perfilChefe = UsuarioPerfil.builder()
                 .usuarioTitulo(titular.getTituloEleitoral())
                 .usuario(titular)
@@ -123,25 +120,25 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
                 "Processo Mapeamento Teste CDU-04",
                 TipoProcesso.MAPEAMENTO,
                 LocalDateTime.now().plusDays(10),
-                List.of(unidadeLivre.getCodigo())
-        );
+                List.of(unidadeLivre.getCodigo()));
 
         var result = mockMvc.perform(post("/api/processos")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(criarReq)))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(criarReq)))
                 .andExpect(status().isCreated())
                 .andReturn();
 
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // 2. Act: Iniciar Processo
-        IniciarProcessoRequest iniciarReq = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(unidadeLivre.getCodigo()));
+        IniciarProcessoRequest iniciarReq = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO,
+                List.of(unidadeLivre.getCodigo()));
 
         mockMvc.perform(post("/api/processos/{id}/iniciar", processoId)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(iniciarReq)))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
 
         // 3. Assert: Mudança de Status do Processo

@@ -33,14 +33,14 @@ public ResponseEntity<ProcessoDto> criar(@Valid @RequestBody CriarProcessoReq re
 
 **OBRIGATÓRIO** em todo DTO de entrada:
 
-| Anotação | Uso | Mensagem Obrigatória |
-|----------|-----|---------------------|
-| `@NotNull` | Campos que não podem ser nulos | Sim |
-| `@NotBlank` | Strings obrigatórias | Sim |
-| `@NotEmpty` | Listas obrigatórias | Sim |
-| `@Size` | Limites de tamanho | Sim |
-| `@Future` | Datas futuras | Opcional |
-| `@Valid` | Validação em cascata | N/A |
+| Anotação    | Uso                            | Mensagem Obrigatória |
+|-------------|--------------------------------|----------------------|
+| `@NotNull`  | Campos que não podem ser nulos | Sim                  |
+| `@NotBlank` | Strings obrigatórias           | Sim                  |
+| `@NotEmpty` | Listas obrigatórias            | Sim                  |
+| `@Size`     | Limites de tamanho             | Sim                  |
+| `@Future`   | Datas futuras                  | Opcional             |
+| `@Valid`    | Validação em cascata           | N/A                  |
 
 **Exemplo correto:**
 
@@ -63,12 +63,12 @@ public class CriarProcessoReq {
 
 Valide apenas regras que **não podem** ser expressas via anotações:
 
-| Tipo | Exceção | HTTP |
-|------|---------|------|
-| Estado inválido | `ErroProcessoEmSituacaoInvalida` | 422 |
-| Entidade não encontrada | `ErroEntidadeNaoEncontrada` | 404 |
-| Regra de negócio violada | `ErroValidacao` | 422 |
-| Acesso negado | `ErroAccessoNegado` | 403 |
+| Tipo                     | Exceção                          | HTTP |
+|--------------------------|----------------------------------|------|
+| Estado inválido          | `ErroProcessoEmSituacaoInvalida` | 422  |
+| Entidade não encontrada  | `ErroEntidadeNaoEncontrada`      | 404  |
+| Regra de negócio violada | `ErroValidacao`                  | 422  |
+| Acesso negado            | `ErroAccessoNegado`              | 403  |
 
 ```java
 public void iniciar(Long codigo) {
@@ -88,11 +88,13 @@ public void iniciar(Long codigo) {
 3. **Contexto:** Incluir nome do campo quando aplicável
 
 **Correto:**
+
 ```java
 @NotBlank(message = "A justificativa é obrigatória")
 ```
 
 **Incorreto:**
+
 ```java
 @NotBlank  // Sem mensagem - usará inglês padrão
 @NotBlank(message = "must not be blank")  // Inglês
@@ -100,13 +102,13 @@ public void iniciar(Long codigo) {
 
 ## Limites de Tamanho (Referência SQL)
 
-| Campo | Max | Uso |
-|-------|-----|-----|
-| `descricao` | 255 | Descrições gerais |
-| `observacoes` | 500 | Campos de observação |
-| `justificativa` | 500 | Campos de justificativa |
-| `motivo` | 200 | Campo motivo |
-| `sugestoes` | 1000 | Sugestões de validação |
+| Campo           | Max  | Uso                     |
+|-----------------|------|-------------------------|
+| `descricao`     | 255  | Descrições gerais       |
+| `observacoes`   | 500  | Campos de observação    |
+| `justificativa` | 500  | Campos de justificativa |
+| `motivo`        | 200  | Campo motivo            |
+| `sugestoes`     | 1000 | Sugestões de validação  |
 
 ## O Que NÃO Fazer
 

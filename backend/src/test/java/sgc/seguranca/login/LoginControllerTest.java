@@ -64,9 +64,9 @@ class LoginControllerTest {
         when(loginFacade.autenticar("123", "senha")).thenReturn(true);
 
         mockMvc.perform(post("/api/usuarios/autenticar")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"));
 
@@ -85,10 +85,10 @@ class LoginControllerTest {
         when(loginFacade.autenticar("123", "senha")).thenReturn(true);
 
         mockMvc.perform(post("/api/usuarios/autenticar")
-                .with(csrf())
-                .header("X-Forwarded-For", "10.0.0.1, 10.0.0.2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .with(csrf())
+                        .header("X-Forwarded-For", "10.0.0.1, 10.0.0.2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
         verify(limitadorTentativasLogin).verificar("10.0.0.1");
@@ -108,9 +108,9 @@ class LoginControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/usuarios/autenticar")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -125,9 +125,9 @@ class LoginControllerTest {
         AutorizarRequest req = AutorizarRequest.builder().tituloEleitoral("123").build();
 
         mockMvc.perform(post("/api/usuarios/autorizar")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].perfil").value("ADMIN"));
     }
@@ -150,9 +150,9 @@ class LoginControllerTest {
         when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
 
         mockMvc.perform(post("/api/usuarios/entrar")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value("token-jwt"))
                 .andExpect(jsonPath("$.nome").value("Admin User"));

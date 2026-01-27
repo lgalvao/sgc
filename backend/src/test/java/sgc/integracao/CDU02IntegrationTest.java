@@ -1,13 +1,7 @@
 package sgc.integracao;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -17,12 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.extern.slf4j.Slf4j;
 import sgc.Sgc;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
@@ -32,12 +21,15 @@ import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.model.UsuarioRepo;
+import sgc.organizacao.model.*;
 import sgc.processo.model.Processo;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -70,6 +62,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     private Processo processoFilha1;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setup() {
         // Ajusta sequências para evitar conflito com data.sql
         try {
@@ -169,8 +162,8 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de Visibilidade de Processos")
+    @SuppressWarnings("unused")
     class VisibilidadeProcessosTestes {
-
         @Test
         @WithMockAdmin
         @DisplayName("ADMIN deve ver todos os processos, incluindo os com status 'Criado'")
@@ -244,6 +237,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de Visibilidade de Alertas")
+    @SuppressWarnings("unused")
     class VisibilidadeAlertasTestes {
         @Test
         @DisplayName("Usuário deve ver alertas direcionados a ele")

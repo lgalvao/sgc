@@ -17,8 +17,8 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 @Tag("architecture")
-@AnalyzeClasses(packages = "sgc", importOptions = { ImportOption.DoNotIncludeTests.class,
-        ImportOption.DoNotIncludeJars.class })
+@AnalyzeClasses(packages = "sgc", importOptions = {ImportOption.DoNotIncludeTests.class,
+        ImportOption.DoNotIncludeJars.class})
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class ArchConsistencyTest {
     @ArchTest

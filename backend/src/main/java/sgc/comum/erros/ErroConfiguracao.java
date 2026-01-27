@@ -18,7 +18,7 @@ package sgc.comum.erros;
  */
 public class ErroConfiguracao extends ErroInterno {
 
-    
+
     public ErroConfiguracao(String message) {
         super(message);
     }

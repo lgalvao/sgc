@@ -1,13 +1,10 @@
 package sgc.mapa.service;
 
-import java.util.List;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtualizarConhecimentoRequest;
 import sgc.mapa.dto.ConhecimentoResponse;
@@ -18,6 +15,8 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.ConhecimentoRepo;
+
+import java.util.List;
 
 /**
  * Serviço responsável pela lógica de negócios de Conhecimentos.

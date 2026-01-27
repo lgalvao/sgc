@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TestSecurityController {
     @PostMapping("/test/validacao")
-    void teste(@Valid @RequestBody TestDto dto) {}
+    void teste(@Valid @RequestBody TestDto dto) {
+    }
 
     static class TestDto {
         @Size(min = 5)

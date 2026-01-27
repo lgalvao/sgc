@@ -33,7 +33,7 @@ package sgc.comum.erros;
  * @see ErroEstadoImpossivel
  */
 public abstract class ErroInterno extends RuntimeException {
-    
+
     /**
      * Construtor com mensagem de erro.
      * A mensagem será logada mas não exposta ao usuário final.

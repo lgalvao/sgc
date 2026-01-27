@@ -2,7 +2,8 @@
 
 ## 📋 Visão Geral
 
-Este guia fornece recomendações e boas práticas para criar novos testes unitários e de integração com JUnit no Sistema de Gestão de Competências (SGC). 
+Este guia fornece recomendações e boas práticas para criar novos testes unitários e de integração com JUnit no Sistema
+de Gestão de Competências (SGC).
 
 ## 🎯 Objetivos dos Testes
 
@@ -41,6 +42,7 @@ void deveLancarExcecaoQuandoProcessoNaoEncontrado() {
 ```
 
 **❌ Evite:**
+
 - `test{Acao}` (padrão antigo)
 - `test_cenario_especifico` (com underscore)
 - Nomes em inglês
@@ -155,6 +157,7 @@ void deveCriarProcessoComUnidadeAssociada() {
 ```
 
 **Fixtures disponíveis:**
+
 - `ProcessoFixture`
 - `SubprocessoFixture`
 - `MapaFixture`
@@ -554,6 +557,7 @@ open backend/build/reports/jacoco/test/html/index.html
 ### Quality Gates
 
 O projeto possui limites mínimos configurados:
+
 - **Branches**: 60%
 - **Linhas**: 80%
 

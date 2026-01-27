@@ -2,7 +2,9 @@
 
 ## Visão Geral
 
-O **SGC (Sistema de Gestão de Competências)** é uma aplicação corporativa para mapeamento, revisão e diagnóstico de competências organizacionais. O sistema permite que unidades mapeiem suas atividades e conhecimentos necessários, identifiquem gaps de competência e gerenciem o desenvolvimento de suas equipes.
+O **SGC (Sistema de Gestão de Competências)** é uma aplicação corporativa para mapeamento, revisão e diagnóstico de
+competências organizacionais. O sistema permite que unidades mapeiem suas atividades e conhecimentos necessários,
+identifiquem gaps de competência e gerenciem o desenvolvimento de suas equipes.
 
 ---
 
@@ -12,17 +14,19 @@ O projeto segue uma arquitetura **Modular Monolith** no backend e **Component-Ba
 
 ### Stack Principal
 
-| Camada | Tecnologias Principais                                                        |
-| --- |-------------------------------------------------------------------------------|
-| **Backend** | Java 21, Spring Boot 4, Hibernate 7, MapStruct, H2 (testes)/Oracle (produção) |
+| Camada       | Tecnologias Principais                                                        |
+|--------------|-------------------------------------------------------------------------------|
+| **Backend**  | Java 21, Spring Boot 4, Hibernate 7, MapStruct, H2 (testes)/Oracle (produção) |
 | **Frontend** | Vue.js 3.5, TypeScript, Vite, Pinia, BootstrapVueNext                         |
-| **Testes** | JUnit, Mockito, Vitest, Playwright                                            |
+| **Testes**   | JUnit, Mockito, Vitest, Playwright                                            |
 
 ### Documentação Detalhada
 
-A documentação técnica foi desacoplada deste README para facilitar a manutenção e evitar duplicação. Consulte os documentos abaixo para detalhes sobre padrões, arquitetura e regras:
+A documentação técnica foi desacoplada deste README para facilitar a manutenção e evitar duplicação. Consulte os
+documentos abaixo para detalhes sobre padrões, arquitetura e regras:
 
-* **[AGENTS.md](AGENTS.md)**: **Leitura obrigatória** para desenvolvedores e agentes de IA. Contém convenções de código, padrões de projeto e regras fundamentais.
+* **[AGENTS.md](AGENTS.md)**: **Leitura obrigatória** para desenvolvedores e agentes de IA. Contém convenções de código,
+  padrões de projeto e regras fundamentais.
 * **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos e comunicação.
 * **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
 * **[regras/](/regras)**: Diretório contendo guias específicos de padrões (backend, frontend, E2E).
@@ -60,7 +64,7 @@ sgc/
     ./gradlew bootRun -PENV=hom
     ```
 
-    A API estará disponível em `http://localhost:10000`.
+   A API estará disponível em `http://localhost:10000`.
 
 2. **Frontend:**
 
@@ -70,7 +74,7 @@ sgc/
     npm run dev
     ```
 
-    Acesse em `http://localhost:5173`.
+   Acesse em `http://localhost:5173`.
 
 ---
 
@@ -80,14 +84,14 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 
 ### Execução de Testes
 
-| Tipo | Comando                              | Descrição |
-| --- |--------------------------------------| --- |
-| **Todos Backend** | `./gradlew :backend:test`            | Executa suite completa (Unitários + Integração). |
-| **Unitários Backend** | `./gradlew :backend:unitTest`        | Executa apenas testes isolados (Rápido). |
-| **Integração Backend** | `./gradlew :backend:integrationTest` | Executa apenas fluxos completos (Mais lento). |
-| **Unitários Frontend** | `cd frontend && npm run test:unit`   | Vitest para componentes e lógica. |
-| **End-to-End (E2E)** | `npm run test:e2e`                   | Playwright simulando fluxos reais. |
-| **Type Check (Front)** | `cd frontend && npm run typecheck`   | Verificação estática de tipos TypeScript. |
+| Tipo                   | Comando                              | Descrição                                        |
+|------------------------|--------------------------------------|--------------------------------------------------|
+| **Todos Backend**      | `./gradlew :backend:test`            | Executa suite completa (Unitários + Integração). |
+| **Unitários Backend**  | `./gradlew :backend:unitTest`        | Executa apenas testes isolados (Rápido).         |
+| **Integração Backend** | `./gradlew :backend:integrationTest` | Executa apenas fluxos completos (Mais lento).    |
+| **Unitários Frontend** | `cd frontend && npm run test:unit`   | Vitest para componentes e lógica.                |
+| **End-to-End (E2E)**   | `npm run test:e2e`                   | Playwright simulando fluxos reais.               |
+| **Type Check (Front)** | `cd frontend && npm run typecheck`   | Verificação estática de tipos TypeScript.        |
 
 ### Verificação de Qualidade (Quality Gate)
 
@@ -124,4 +128,5 @@ Os requisitos do sistema estão documentados em casos de uso (CDUs) no diretóri
 
 Todo o código, comentários e documentação devem ser escritos em **Português Brasileiro**.
 
-Para detalhes completos sobre nomenclaturas (Classes, Variáveis, Banco de Dados) e padrões de projeto (Facade, DTO, Store, Service), consulte o arquivo **[AGENTS.md](AGENTS.md)**.
+Para detalhes completos sobre nomenclaturas (Classes, Variáveis, Banco de Dados) e padrões de projeto (Facade, DTO,
+Store, Service), consulte o arquivo **[AGENTS.md](AGENTS.md)**.

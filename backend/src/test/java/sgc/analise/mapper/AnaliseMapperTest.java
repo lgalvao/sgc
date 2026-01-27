@@ -54,9 +54,9 @@ class AnaliseMapperTest {
         AnaliseHistoricoDto dto = mapper.toAnaliseHistoricoDto(analise);
 
         assertThat(dto).isNotNull();
-        assertThat(dto.getUnidadeSigla()).isEqualTo("TESTE");
-        assertThat(dto.getAnalistaUsuarioTitulo()).isEqualTo("12345");
-        assertThat(dto.getObservacoes()).isEqualTo("Obs");
+        assertThat(dto.unidadeSigla()).isEqualTo("TESTE");
+        assertThat(dto.analistaUsuarioTitulo()).isEqualTo("12345");
+        assertThat(dto.observacoes()).isEqualTo("Obs");
     }
 
     @Test
@@ -77,9 +77,9 @@ class AnaliseMapperTest {
         AnaliseValidacaoHistoricoDto dto = mapper.toAnaliseValidacaoHistoricoDto(analise);
 
         assertThat(dto).isNotNull();
-        assertThat(dto.getUnidadeSigla()).isEqualTo("SIGLA");
-        assertThat(dto.getAnalistaUsuarioTitulo()).isEqualTo("67890");
-        assertThat(dto.getObservacoes()).isEqualTo("Validacao");
+        assertThat(dto.unidadeSigla()).isEqualTo("SIGLA");
+        assertThat(dto.analistaUsuarioTitulo()).isEqualTo("67890");
+        assertThat(dto.observacoes()).isEqualTo("Validacao");
     }
 
     @Test

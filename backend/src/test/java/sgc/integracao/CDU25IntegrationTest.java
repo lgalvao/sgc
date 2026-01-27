@@ -1,8 +1,6 @@
 package sgc.integracao;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -11,13 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.persistence.EntityManager;
 import sgc.Sgc;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
@@ -34,6 +27,13 @@ import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -64,11 +64,11 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         // Unit 6 (COSIS - INTERMEDIARIA) - subordinate to 2, user '666666666666' is GESTOR
         // Unit 8 (SEDESENV - OPERACIONAL) - subordinate to 6
         // Unit 9 (SEDIA - OPERACIONAL) - subordinate to 6
-        
+
         // When GESTOR of unit 6 accepts validations from units 8/9:
         // proximaUnidade = unidade8.getUnidadeSuperior().getUnidadeSuperior() = unit 2 (not null)
         // So it will create análise/movimentação for next level (unit 2)
-        
+
         unidade1 = unidadeRepo.findById(8L)
                 .orElseThrow(() -> new RuntimeException("Unit 8 not found in data.sql"));
         unidade2 = unidadeRepo.findById(9L)
@@ -103,22 +103,24 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Deve aceitar validação de mapas em bloco")
-    @WithMockGestor("666666666666") // GESTOR of unit 6 (parent of units 8 and 9)
+    @WithMockGestor("666666666666")
+        // GESTOR of unit 6 (parent of units 8 and 9)
     void aceitarValidacaoEmBloco_deveAceitarSucesso() throws Exception {
         // Given
         Long codigoContexto = subprocesso1.getCodigo();
-        List<Long> unidadesSelecionadas = List.of(unidade1.getCodigo(), unidade2.getCodigo());
+        List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
-                .unidadeCodigos(unidadesSelecionadas)
+                .acao("ACEITAR_VALIDACAO")
+                .subprocessos(subprocessosSelecionados)
                 .build();
 
         // When
         mockMvc.perform(
-                post("/api/subprocessos/{id}/aceitar-validacao-bloco", codigoContexto)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        post("/api/subprocessos/{id}/aceitar-validacao-bloco", codigoContexto)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
         // Then

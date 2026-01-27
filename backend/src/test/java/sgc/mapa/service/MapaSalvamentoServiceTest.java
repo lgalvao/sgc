@@ -27,11 +27,16 @@ import static org.mockito.Mockito.when;
 @DisplayName("MapaSalvamentoService - Gaps de Cobertura")
 class MapaSalvamentoServiceTest {
 
-    @Mock private MapaRepo mapaRepo;
-    @Mock private CompetenciaRepo competenciaRepo;
-    @Mock private AtividadeRepo atividadeRepo;
-    @Mock private RepositorioComum repo;
-    @Mock private MapaCompletoMapper mapaCompletoMapper;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
+    @Mock
+    private AtividadeRepo atividadeRepo;
+    @Mock
+    private RepositorioComum repo;
+    @Mock
+    private MapaCompletoMapper mapaCompletoMapper;
 
     @InjectMocks
     private MapaSalvamentoService mapaSalvamentoService;
@@ -53,8 +58,8 @@ class MapaSalvamentoServiceTest {
         when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(Collections.emptyList());
         when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(Collections.emptyList());
 
-        assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> 
-            mapaSalvamentoService.salvarMapaCompleto(codMapa, request));
+        assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () ->
+                mapaSalvamentoService.salvarMapaCompleto(codMapa, request));
     }
 
     @Test
@@ -79,8 +84,8 @@ class MapaSalvamentoServiceTest {
         when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of(ativ1));
         when(competenciaRepo.saveAll(any())).thenAnswer(i -> i.getArgument(0));
 
-        assertThrows(sgc.comum.erros.ErroValidacao.class, () -> 
-            mapaSalvamentoService.salvarMapaCompleto(codMapa, request));
+        assertThrows(sgc.comum.erros.ErroValidacao.class, () ->
+                mapaSalvamentoService.salvarMapaCompleto(codMapa, request));
     }
 
     @Test
@@ -94,7 +99,7 @@ class MapaSalvamentoServiceTest {
         Mapa mapa = new Mapa();
         Competencia compExistente = Competencia.builder().descricao("Existente").mapa(mapa).build();
         compExistente.setCodigo(100L);
-        
+
         Atividade ativ1 = new Atividade();
         ativ1.setCodigo(1L);
         ativ1.setMapa(mapa);

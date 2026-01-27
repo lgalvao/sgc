@@ -1,37 +1,16 @@
 package sgc.integracao;
 
-import java.time.LocalDateTime;
-
-import static org.hamcrest.Matchers.is;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
-
 import sgc.Sgc;
-import sgc.fixture.AtividadeFixture;
-import sgc.fixture.MapaFixture;
-import sgc.fixture.ProcessoFixture;
-import sgc.fixture.SubprocessoFixture;
-import sgc.fixture.UnidadeFixture;
-import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.WithMockAdmin;
-import sgc.integracao.mocks.WithMockAdminSecurityContextFactory;
-import sgc.integracao.mocks.WithMockChefe;
-import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
-import sgc.integracao.mocks.WithMockGestor;
-import sgc.integracao.mocks.WithMockGestorSecurityContextFactory;
+import sgc.fixture.*;
+import sgc.integracao.mocks.*;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
@@ -44,6 +23,13 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+
+import java.time.LocalDateTime;
+
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -71,9 +57,12 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     private static final String TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH = "$.totalAtividadesRemovidas";
 
     // Repositories
-    @Autowired private UnidadeMapaRepo unidadeMapaRepo;
-    @Autowired private CompetenciaRepo competenciaRepo;
-    @Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private UnidadeMapaRepo unidadeMapaRepo;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
 
     private Atividade atividadeVigente1;
@@ -157,6 +146,12 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         atividade.getCompetencias().add(competencia);
         competenciaRepo.save(competencia);
         atividadeRepo.save(atividade);
+    }
+
+    // Helper to insert User/Profile data for security checks that hit the DB (or View)
+    private void setupChefeForUnidade(String titulo, Unidade unidade) {
+        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
+                titulo, unidade.getCodigo(), sgc.organizacao.model.Perfil.CHEFE.name());
     }
 
     @Nested
@@ -334,11 +329,5 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
                     .andExpect(status().isForbidden());
         }
-    }
-
-    // Helper to insert User/Profile data for security checks that hit the DB (or View)
-    private void setupChefeForUnidade(String titulo, Unidade unidade) {
-         jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-                titulo, unidade.getCodigo(), sgc.organizacao.model.Perfil.CHEFE.name());
     }
 }

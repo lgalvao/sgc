@@ -1,6 +1,15 @@
 package sgc.subprocesso.dto;
 
-import org.junit.jupiter.api.*;
+import java.util.List;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+
 import sgc.analise.model.Analise;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
@@ -9,17 +18,13 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.List;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @Tag("unit")
 @DisplayName("Testes de MapaAjusteDto")
 class MapaAjusteDtoTest {
     private Subprocesso subprocesso;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         Unidade unidade = new Unidade();
         unidade.setNome("Unidade Teste");
@@ -32,11 +37,27 @@ class MapaAjusteDtoTest {
         subprocesso.setMapa(mapa);
     }
 
+    @Test
+    @DisplayName("Deve validar funcionamento do Builder")
+    void deveValidarBuilder() {
+        MapaAjusteDto dto = MapaAjusteDto.builder()
+                .codMapa(1L)
+                .unidadeNome("Unidade")
+                .justificativaDevolucao("Obs")
+                .competencias(List.of())
+                .build();
+
+        assertThat(dto.getCodMapa()).isEqualTo(1L);
+        assertThat(dto.getUnidadeNome()).isEqualTo("Unidade");
+        assertThat(dto.getJustificativaDevolucao()).isEqualTo("Obs");
+        assertThat(dto.getCompetencias()).isEmpty();
+    }
+
     @Nested
     @DisplayName("Método de criação estático of")
+    @SuppressWarnings("unused")
     class OfMethodTests {
-
-        @Test
+       @Test
         @DisplayName("Deve mapear corretamente os dados básicos")
         void deveMapearDadosBasicos() {
             Analise analise = new Analise();
@@ -78,31 +99,15 @@ class MapaAjusteDtoTest {
             assertThat(dto.getCompetencias()).hasSize(1);
             CompetenciaAjusteDto compDto = dto.getCompetencias().getFirst();
             assertThat(compDto.getCodCompetencia()).isEqualTo(1L);
-            
+
             assertThat(compDto.getAtividades()).hasSize(1);
             AtividadeAjusteDto ativDto = compDto.getAtividades().getFirst();
-            assertThat(ativDto.getCodAtividade()).isEqualTo(2L);
-            
-            assertThat(ativDto.getConhecimentos()).hasSize(1);
-            ConhecimentoAjusteDto conDto = ativDto.getConhecimentos().getFirst();
-            assertThat(conDto.getConhecimentoCodigo()).isEqualTo(3L);
-            assertThat(conDto.isIncluido()).isTrue();
+            assertThat(ativDto.codAtividade()).isEqualTo(2L);
+
+            assertThat(ativDto.conhecimentos()).hasSize(1);
+            ConhecimentoAjusteDto conDto = ativDto.conhecimentos().getFirst();
+            assertThat(conDto.conhecimentoCodigo()).isEqualTo(3L);
+            assertThat(conDto.incluido()).isTrue();
         }
-    }
-
-    @Test
-    @DisplayName("Deve validar funcionamento do Builder")
-    void deveValidarBuilder() {
-        MapaAjusteDto dto = MapaAjusteDto.builder()
-                .codMapa(1L)
-                .unidadeNome("Unidade")
-                .justificativaDevolucao("Obs")
-                .competencias(List.of())
-                .build();
-
-        assertThat(dto.getCodMapa()).isEqualTo(1L);
-        assertThat(dto.getUnidadeNome()).isEqualTo("Unidade");
-        assertThat(dto.getJustificativaDevolucao()).isEqualTo("Obs");
-        assertThat(dto.getCompetencias()).isEmpty();
     }
 }

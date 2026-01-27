@@ -8,11 +8,11 @@
 
 ## 📋 Sumário de Ações
 
-| # | Ação | Prioridade | Esforço | Impacto | Arquivos |
-|---|------|------------|---------|---------|----------|
-| 6 | Decompor `UnidadeFacade` em 3 services | 🟡 Média | 🔴 Alto | 🟠 Médio | 1 arquivo (384 linhas) → 4 arquivos |
-| 8 | Dividir `SubprocessoWorkflowService` (775 linhas) | 🟡 Média | 🔴 Alto | 🟠 Médio | 1 arquivo → 3 arquivos |
-| 10 | Consolidar AtividadeService + CompetenciaService | 🟡 Média | 🟡 Médio | 🟠 Médio | 3 arquivos → 1 arquivo |
+| #  | Ação                                              | Prioridade | Esforço  | Impacto  | Arquivos                            |
+|----|---------------------------------------------------|------------|----------|----------|-------------------------------------|
+| 6  | Decompor `UnidadeFacade` em 3 services            | 🟡 Média   | 🔴 Alto  | 🟠 Médio | 1 arquivo (384 linhas) → 4 arquivos |
+| 8  | Dividir `SubprocessoWorkflowService` (775 linhas) | 🟡 Média   | 🔴 Alto  | 🟠 Médio | 1 arquivo → 3 arquivos              |
+| 10 | Consolidar AtividadeService + CompetenciaService  | 🟡 Média   | 🟡 Médio | 🟠 Médio | 3 arquivos → 1 arquivo              |
 
 **Resultado Esperado:** Classes < 500 linhas, SRP respeitado, melhor testabilidade e manutenibilidade.
 
@@ -22,7 +22,8 @@
 
 ### Contexto
 
-`UnidadeFacade` é uma classe de **384 linhas** com **6 responsabilidades distintas**, violando o Single Responsibility Principle (SRP). Apesar de cada método ser coeso individualmente, o arquivo como um todo é difícil de navegar e manter.
+`UnidadeFacade` é uma classe de **384 linhas** com **6 responsabilidades distintas**, violando o Single Responsibility
+Principle (SRP). Apesar de cada método ser coeso individualmente, o arquivo como um todo é difícil de navegar e manter.
 
 ### Problema Identificado
 
@@ -240,9 +241,9 @@ public class UnidadeFacade {
    create /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java
    ```
 
-   - Copiar métodos relacionados a hierarquia
-   - Adicionar anotação `@Service`
-   - Injetar dependências necessárias
+    - Copiar métodos relacionados a hierarquia
+    - Adicionar anotação `@Service`
+    - Injetar dependências necessárias
 
 3. **Criar UnidadeMapaService:**
 
@@ -250,8 +251,8 @@ public class UnidadeFacade {
    create /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeMapaService.java
    ```
 
-   - Copiar métodos relacionados a mapas
-   - Adicionar anotação `@Service`
+    - Copiar métodos relacionados a mapas
+    - Adicionar anotação `@Service`
 
 4. **Criar UnidadeResponsavelService:**
 
@@ -259,8 +260,8 @@ public class UnidadeFacade {
    create /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeResponsavelService.java
    ```
 
-   - Copiar métodos relacionados a responsáveis
-   - Adicionar anotação `@Service`
+    - Copiar métodos relacionados a responsáveis
+    - Adicionar anotação `@Service`
 
 #### Fase 3: Refatorar UnidadeFacade
 
@@ -270,9 +271,9 @@ public class UnidadeFacade {
    edit /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/facade/UnidadeFacade.java
    ```
 
-   - Remover implementações
-   - Injetar os 3 novos services
-   - Delegar chamadas para services especializados
+    - Remover implementações
+    - Injetar os 3 novos services
+    - Delegar chamadas para services especializados
 
 2. **Exemplo de refatoração:**
 
@@ -355,7 +356,8 @@ public class UnidadeFacade {
 
 ### Contexto
 
-`SubprocessoWorkflowService` é o **maior arquivo** do backend com **775 linhas** e **17 dependências injetadas**. Foi criado com boa intenção (consolidar 4 serviços), mas resultou em um God Object difícil de navegar e manter.
+`SubprocessoWorkflowService` é o **maior arquivo** do backend com **775 linhas** e **17 dependências injetadas**. Foi
+criado com boa intenção (consolidar 4 serviços), mas resultou em um God Object difícil de navegar e manter.
 
 ### Problema Identificado
 
@@ -572,8 +574,8 @@ public class SubprocessoWorkflowFacade {
    ```
 
 3. **Identificar dependências de cada grupo:**
-   - Anotar quais dependências são usadas por quais métodos
-   - Identificar dependências compartilhadas
+    - Anotar quais dependências são usadas por quais métodos
+    - Identificar dependências compartilhadas
 
 #### Fase 2: Criar Services Especializados
 
@@ -583,8 +585,8 @@ public class SubprocessoWorkflowFacade {
    create backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoCadastroWorkflowService.java
    ```
 
-   - Copiar métodos relacionados a cadastro
-   - Injetar apenas dependências necessárias
+    - Copiar métodos relacionados a cadastro
+    - Injetar apenas dependências necessárias
 
 2. **Criar SubprocessoMapaWorkflowService:**
 
@@ -592,7 +594,7 @@ public class SubprocessoWorkflowFacade {
    create backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoMapaWorkflowService.java
    ```
 
-   - Copiar métodos relacionados a mapa
+    - Copiar métodos relacionados a mapa
 
 3. **Criar SubprocessoAdminWorkflowService:**
 
@@ -600,7 +602,7 @@ public class SubprocessoWorkflowFacade {
    create backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoAdminWorkflowService.java
    ```
 
-   - Copiar métodos administrativos
+    - Copiar métodos administrativos
 
 #### Fase 3: Refatorar para Facade
 
@@ -663,7 +665,9 @@ public class SubprocessoWorkflowFacade {
 
 ### Contexto
 
-`AtividadeService` e `CompetenciaService` são services separados, mas operam sobre o mesmo contexto de domínio (Mapa de Competências). Frequentemente, operações em atividades requerem operações em competências e vice-versa. Consolidar em um único service **MapaManutencaoService** reduz acoplamento e melhora coesão.
+`AtividadeService` e `CompetenciaService` são services separados, mas operam sobre o mesmo contexto de domínio (Mapa de
+Competências). Frequentemente, operações em atividades requerem operações em competências e vice-versa. Consolidar em um
+único service **MapaManutencaoService** reduz acoplamento e melhora coesão.
 
 ### Problema Identificado
 

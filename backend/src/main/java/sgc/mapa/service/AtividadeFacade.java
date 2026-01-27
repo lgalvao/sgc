@@ -20,10 +20,7 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
-import static sgc.seguranca.acesso.Acao.ASSOCIAR_CONHECIMENTOS;
-import static sgc.seguranca.acesso.Acao.CRIAR_ATIVIDADE;
-import static sgc.seguranca.acesso.Acao.EDITAR_ATIVIDADE;
-import static sgc.seguranca.acesso.Acao.EXCLUIR_ATIVIDADE;
+import static sgc.seguranca.acesso.Acao.*;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
@@ -37,7 +34,7 @@ import sgc.subprocesso.service.SubprocessoFacade;
  * Remove a lógica de negócio do AtividadeController.
  *
  * <p>Implementa o padrão Facade para simplificar a interface de uso e centralizar a coordenação de serviços.
- * 
+ *
  * <p><b>IMPORTANTE:</b> Este Facade é o ponto de entrada único para operações de atividades.
  * Controllers devem usar APENAS este Facade, nunca acessar AtividadeService ou ConhecimentoService diretamente.
  */
@@ -45,6 +42,7 @@ import sgc.subprocesso.service.SubprocessoFacade;
 @RequiredArgsConstructor
 @Transactional
 public class AtividadeFacade {
+    private static final String MAPA_NAO_PODE_SER_NULO = "Mapa não pode ser nulo";
     private final AtividadeService atividadeService;
     private final ConhecimentoService conhecimentoService;
     private final SubprocessoFacade subprocessoFacade;
@@ -52,8 +50,6 @@ public class AtividadeFacade {
     private final UsuarioFacade usuarioService;
     private final MapaFacade mapaFacade;
     private final ApplicationEventPublisher eventPublisher;
-
-    private static final String MAPA_NAO_PODE_SER_NULO = "Mapa não pode ser nulo";
 
     // ===== Consultas =====
 
@@ -86,25 +82,25 @@ public class AtividadeFacade {
      */
     public AtividadeOperacaoResponse criarAtividade(sgc.mapa.dto.CriarAtividadeRequest request) {
         Long mapaCodigo = request.mapaCodigo();
-        
+
         // Busca usuário autenticado através do contexto Spring Security
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
-        
+
         Mapa mapa = mapaFacade.obterPorCodigo(mapaCodigo);
-        
+
         // Cria atividade temporária para verificação de acesso
         Atividade atividadeTemp = new Atividade();
         atividadeTemp.setMapa(mapa);
-        
+
         // Verifica permissão usando AccessControlService
         accessControlService.verificarPermissao(usuario, CRIAR_ATIVIDADE, atividadeTemp);
-        
+
         AtividadeResponse salvo = atividadeService.criar(request);
 
         // Publica evento de criação
         Atividade atividadeCriada = atividadeService.obterPorCodigo(salvo.codigo());
         Subprocesso subprocesso = mapa.getSubprocesso();
-        
+
         EventoAtividadeCriada evento = EventoAtividadeCriada.builder()
                 .atividade(atividadeCriada)
                 .codMapa(mapaCodigo)
@@ -123,15 +119,15 @@ public class AtividadeFacade {
      */
     public AtividadeOperacaoResponse atualizarAtividade(Long codigo, sgc.mapa.dto.AtualizarAtividadeRequest request) {
         Atividade atividade = atividadeService.obterPorCodigo(codigo);
-        
+
         // Busca usuário autenticado através do contexto Spring Security
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
-        
+
         // Verifica permissão
         accessControlService.verificarPermissao(usuario, EDITAR_ATIVIDADE, atividade);
 
         // Captura estado anterior para detectar mudanças
-        
+
         Set<String> camposAlterados = new HashSet<>();
 
         if (!Objects.equals(atividade.getDescricao(), request.descricao())) {
@@ -139,7 +135,7 @@ public class AtividadeFacade {
         }
         // Nota: Competências são afetadas apenas via conhecimentos (endpoints separados)
         // Este método atualiza somente a descrição da atividade
-        
+
         atividadeService.atualizar(codigo, request);
 
         // Busca estado atualizado
@@ -173,10 +169,10 @@ public class AtividadeFacade {
         Atividade atividade = atividadeService.obterPorCodigo(codigo);
         Mapa mapa = Objects.requireNonNull(atividade.getMapa(), MAPA_NAO_PODE_SER_NULO);
         Long codMapa = mapa.getCodigo();
-        
+
         // Busca usuário autenticado
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
-        
+
         // Verifica permissão
         accessControlService.verificarPermissao(usuario, EXCLUIR_ATIVIDADE, atividade);
 
@@ -198,7 +194,7 @@ public class AtividadeFacade {
                 .totalAtividadesRestantes(totalAntes - 1)
                 .build();
         eventPublisher.publishEvent(evento);
-        
+
         atividadeService.excluir(codigo);
 
         return criarRespostaOperacaoPorMapaCodigo(codMapa, codigo, false);
@@ -209,13 +205,13 @@ public class AtividadeFacade {
      */
     public ResultadoOperacaoConhecimento criarConhecimento(Long codAtividade, sgc.mapa.dto.CriarConhecimentoRequest request) {
         Atividade atividade = atividadeService.obterPorCodigo(codAtividade);
-        
+
         // Busca usuário autenticado
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
-        
+
         // Verifica permissão usando a ação ASSOCIAR_CONHECIMENTOS
         accessControlService.verificarPermissao(usuario, ASSOCIAR_CONHECIMENTOS, atividade);
-        
+
         var salvo = conhecimentoService.criar(codAtividade, request);
         var response = criarRespostaOperacaoPorAtividade(codAtividade);
 
@@ -227,13 +223,13 @@ public class AtividadeFacade {
      */
     public AtividadeOperacaoResponse atualizarConhecimento(Long codAtividade, Long codConhecimento, sgc.mapa.dto.AtualizarConhecimentoRequest request) {
         Atividade atividade = atividadeService.obterPorCodigo(codAtividade);
-        
+
         // Busca usuário autenticado
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
-        
+
         // Verifica permissão
         accessControlService.verificarPermissao(usuario, ASSOCIAR_CONHECIMENTOS, atividade);
-        
+
         conhecimentoService.atualizar(codAtividade, codConhecimento, request);
         return criarRespostaOperacaoPorAtividade(codAtividade);
     }
@@ -243,13 +239,13 @@ public class AtividadeFacade {
      */
     public AtividadeOperacaoResponse excluirConhecimento(Long codAtividade, Long codConhecimento) {
         Atividade atividade = atividadeService.obterPorCodigo(codAtividade);
-        
+
         // Busca usuário autenticado
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
-        
+
         // Verifica permissão
         accessControlService.verificarPermissao(usuario, ASSOCIAR_CONHECIMENTOS, atividade);
-        
+
         conhecimentoService.excluir(codAtividade, codConhecimento);
         return criarRespostaOperacaoPorAtividade(codAtividade);
     }
@@ -277,14 +273,14 @@ public class AtividadeFacade {
 
     private AtividadeOperacaoResponse criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
         SubprocessoSituacaoDto situacaoDto = subprocessoFacade.obterSituacao(codSubprocesso);
-        
+
         // Buscar todas as atividades do subprocesso
         List<AtividadeVisualizacaoDto> todasAtividades = subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso);
-        
+
         AtividadeVisualizacaoDto atividadeVis = null;
         if (incluirAtividade) {
             atividadeVis = todasAtividades.stream()
-                    .filter(a -> a.getCodigo().equals(codigoAtividade))
+                    .filter(a -> a.codigo().equals(codigoAtividade))
                     .findFirst()
                     .orElse(null);
         }

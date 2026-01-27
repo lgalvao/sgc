@@ -105,31 +105,32 @@ class SubprocessoEmailServiceTest {
         sp.setUnidade(new Unidade());
 
         EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
-            .subprocesso(sp)
-            .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
-            .usuario(new Usuario())
-            .unidadeDestino(new Unidade())
-            .build();
+                .subprocesso(sp)
+                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
+                .usuario(new Usuario())
+                .unidadeDestino(new Unidade())
+                .build();
 
         when(templateEngine.process(anyString(), any())).thenThrow(new RuntimeException("Template error"));
 
         // Should not throw
         assertThatCode(() -> service.enviarEmailTransicao(evento))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
+
     @Test
     @DisplayName("Não envia email se tipo de transição não exige")
     void naoEnviaSeTipoNaoExige() {
         EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
                 .tipo(TipoTransicao.CADASTRO_HOMOLOGADO) // enviaEmail() == false
                 .build();
-        
+
         service.enviarEmailTransicao(evento);
-        
+
         verifyNoInteractions(notificacaoEmailService);
         verifyNoInteractions(templateEngine);
     }
-    
+
     @Test
     @DisplayName("Não envia email se destinatário nulo")
     void naoEnviaSeDestinoNulo() {
@@ -145,7 +146,7 @@ class SubprocessoEmailServiceTest {
                 .build();
 
         when(templateEngine.process(anyString(), any())).thenReturn("html");
-        
+
         service.enviarEmailTransicao(evento);
 
         verify(notificacaoEmailService, never()).enviarEmail(any(), any(), any());
@@ -165,15 +166,15 @@ class SubprocessoEmailServiceTest {
                 .unidadeOrigem(null) // SEM ORIGEM
                 .unidadeDestino(new Unidade()) // Com destino normal
                 .build();
-        
+
         when(templateEngine.process(anyString(), any())).thenReturn("html");
 
         service.enviarEmailTransicao(evento);
-        
+
         // Envia para destino normal
         verify(notificacaoEmailService, times(1)).enviarEmail(any(), any(), any());
     }
-    
+
     @Test
     @DisplayName("Trata exceção ao notificar hierarquia")
     void trataExcecaoHierarquia() {
@@ -182,13 +183,13 @@ class SubprocessoEmailServiceTest {
         sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
         sp.setUnidade(new Unidade());
         sp.getUnidade().setSigla("U1"); // Pra evitar null no assunto
-        
+
         Unidade origem = new Unidade();
         origem.setSigla("ORIG");
         Unidade superior = new Unidade();
         superior.setSigla("SUP");
         origem.setUnidadeSuperior(superior);
-        
+
         Unidade destino = new Unidade();
         destino.setSigla("DEST");
 
@@ -198,26 +199,22 @@ class SubprocessoEmailServiceTest {
                 .unidadeOrigem(origem)
                 .unidadeDestino(destino)
                 .build();
-        
+
         when(templateEngine.process(anyString(), any())).thenReturn("html");
-        
+
         // Configura mocks explicites para cada chamada
         doNothing().when(notificacaoEmailService).enviarEmail(eq("DEST"), anyString(), any());
         doThrow(new RuntimeException("Fail")).when(notificacaoEmailService).enviarEmail(eq("SUP"), anyString(), any());
-        
-        // Deve continuar e não lançar exceção
+
         service.enviarEmailTransicao(evento);
-        
-        // Verifica que tentou enviar (e falhou, mas capturou)
+
         verify(notificacaoEmailService).enviarEmail(eq("SUP"), anyString(), any());
-        // Verifica que enviou para destino também
         verify(notificacaoEmailService).enviarEmail(eq("DEST"), anyString(), any());
     }
 
     @Test
     @DisplayName("Cria variáveis sem datas nem observações")
     void deveCriarVariaveisSemDatasNemObservacoes() {
-        // Teste para cobrir branches 'if (sp.getDataLimiteEtapa1() != null)' e 'observacoes != null'
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(new Processo());
         sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);

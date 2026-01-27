@@ -1,8 +1,6 @@
 package sgc.integracao;
 
-import java.time.LocalDate;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -11,14 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.persistence.EntityManager;
 import sgc.Sgc;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
@@ -27,6 +19,14 @@ import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioRepo;
+
+import java.time.LocalDate;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -67,18 +67,18 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
     void criarAtribuicaoTemporaria_sucesso() throws Exception {
         // Given
         CriarAtribuicaoTemporariaRequest request = new CriarAtribuicaoTemporariaRequest(
-            usuario.getTituloEleitoral(),
-            LocalDate.now(),
-            LocalDate.now().plusDays(30),
-            "Férias do titular"
+                usuario.getTituloEleitoral(),
+                LocalDate.now(),
+                LocalDate.now().plusDays(30),
+                "Férias do titular"
         );
 
         // When
         mockMvc.perform(
-                post("/api/unidades/{codUnidade}/atribuicoes-temporarias", unidade.getCodigo())
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        post("/api/unidades/{codUnidade}/atribuicoes-temporarias", unidade.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
 
         // Then
@@ -109,18 +109,18 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
     void criarAtribuicaoTemporaria_datasInvalidas_erro() throws Exception {
         // Given: Data término antes do início
         CriarAtribuicaoTemporariaRequest request = new CriarAtribuicaoTemporariaRequest(
-            usuario.getTituloEleitoral(),
-            LocalDate.now().plusDays(10),
-            LocalDate.now(),
-            "Datas inválidas"
+                usuario.getTituloEleitoral(),
+                LocalDate.now().plusDays(10),
+                LocalDate.now(),
+                "Datas inválidas"
         );
 
         // When/Then
         mockMvc.perform(
-                post("/api/unidades/{codUnidade}/atribuicoes-temporarias", unidade.getCodigo())
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        post("/api/unidades/{codUnidade}/atribuicoes-temporarias", unidade.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is(422));
     }
 }

@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.HierarquiaService;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -25,12 +24,8 @@ import static org.mockito.Mockito.when;
 @Tag("unit")
 @DisplayName("Testes do AccessControlService")
 class AccessControlServiceTest {
-
     @Mock
     private AccessAuditService auditService;
-
-    @Mock
-    private HierarquiaService hierarquiaService;
 
     @Mock
     private SubprocessoAccessPolicy subprocessoAccessPolicy;

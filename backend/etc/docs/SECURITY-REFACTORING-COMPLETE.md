@@ -8,25 +8,30 @@
 
 ## Quick Summary
 
-The security refactoring of SGC has been **successfully completed**. All 4 sprints are done, all tests are passing, and the system now has a centralized, auditable, and maintainable access control architecture.
+The security refactoring of SGC has been **successfully completed**. All 4 sprints are done, all tests are passing, and
+the system now has a centralized, auditable, and maintainable access control architecture.
 
 ---
 
 ## What Was Accomplished
 
 ### Sprint 1: Infrastructure ✅
+
 - Created core security components
 - 22 tests created and passing
 
 ### Sprint 2: Subprocesso Migration ✅
+
 - Migrated subprocesso access control
 - 31+ access tests passing
 
 ### Sprint 3: Processo, Atividade, Mapa ✅
+
 - Completed all resource types
 - All controllers updated
 
 ### Sprint 4: Test Fixes & Finalization ✅
+
 - Fixed all 15 test failures
 - **1149/1149 tests passing (100%)**
 - Documentation complete
@@ -36,6 +41,7 @@ The security refactoring of SGC has been **successfully completed**. All 4 sprin
 ## Key Files
 
 ### Implementation
+
 - `backend/src/main/java/sgc/seguranca/acesso/AccessControlService.java` - Central hub
 - `backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java` - 26 actions
 - `backend/src/main/java/sgc/seguranca/acesso/ProcessoAccessPolicy.java` - 7 actions
@@ -46,6 +52,7 @@ The security refactoring of SGC has been **successfully completed**. All 4 sprin
 - `backend/src/main/java/sgc/seguranca/acesso/Acao.java` - 47 system actions
 
 ### Documentation
+
 - `SECURITY-REFACTORING.md` - Quick reference
 - `security-refactoring-plan.md` - Detailed plan with execution history
 - This file - Completion summary
@@ -69,6 +76,7 @@ The security refactoring of SGC has been **successfully completed**. All 4 sprin
 ## Architecture Changes
 
 ### Before
+
 - 22 files with scattered access logic
 - 6 different verification patterns
 - ~15 endpoints without control
@@ -76,6 +84,7 @@ The security refactoring of SGC has been **successfully completed**. All 4 sprin
 - Inconsistent and hard to maintain
 
 ### After
+
 - 8 centralized security files
 - 1 consistent pattern
 - 0 endpoints without control
@@ -118,6 +127,7 @@ When adding a new endpoint that requires access control:
 ### For Security Auditors
 
 All access decisions are logged by `AccessAuditService`:
+
 - User who attempted the action
 - Action attempted
 - Resource accessed
@@ -126,6 +136,7 @@ All access decisions are logged by `AccessAuditService`:
 - Timestamp
 
 Look for log entries like:
+
 ```
 ACCESS_GRANTED: user=111111111111, action=CRIAR_SUBPROCESSO, resource=Subprocesso:123
 ACCESS_DENIED: user=222222222222, action=HOMOLOGAR_CADASTRO, resource=Subprocesso:456, reason=Perfil não autorizado
@@ -137,7 +148,8 @@ ACCESS_DENIED: user=222222222222, action=HOMOLOGAR_CADASTRO, resource=Subprocess
 
 ### Deprecated Services (Still Work, Will Be Removed Later)
 
-- `MapaAcessoService.verificarAcessoImpacto()` → Use `AccessControlService.verificarPermissao(usuario, VERIFICAR_IMPACTOS, subprocesso)`
+- `MapaAcessoService.verificarAcessoImpacto()` → Use
+  `AccessControlService.verificarPermissao(usuario, VERIFICAR_IMPACTOS, subprocesso)`
 - `SubprocessoPermissoesService.validar()` → Use `AccessControlService.verificarPermissao()`
 - `SubprocessoPermissoesService.calcularPermissoes()` → Use `AccessControlService.podeExecutar()` for each action
 
@@ -148,6 +160,7 @@ These are marked with `@Deprecated(since="2026-01-08", forRemoval=true)`
 ## Testing
 
 ### Run All Tests
+
 ```bash
 cd backend
 ./gradlew test
@@ -156,15 +169,18 @@ cd backend
 Expected result: **1149 tests passed** ✅
 
 ### Run Security Tests Only
+
 ```bash
 cd backend
 ./gradlew test --tests "sgc.seguranca.acesso.*"
 ```
 
 ---
+
 ## Questions?
 
 Refer to:
+
 - `SECURITY-REFACTORING.md` for quick reference
 - `security-refactoring-plan.md` for detailed architecture and execution history
 - JavaDoc in the code for API documentation

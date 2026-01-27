@@ -67,7 +67,8 @@ flowchart LR
     - Usa a instância configurada `apiClient` (`axios-setup.ts`) que gerencia tokens JWT.
 
 4. **Mapper (`mappers/`)**:
-    - Usado dentro das Stores ou Services para transformar os dados brutos da API em objetos tipados e formatados para a UI.
+    - Usado dentro das Stores ou Services para transformar os dados brutos da API em objetos tipados e formatados para a
+      UI.
 
 ## 4. Padrões de Implementação
 
@@ -82,7 +83,7 @@ flowchart LR
 ### 4.2. Stores (Pinia)
 
 - **Estilo:** O projeto utiliza o estilo **Setup Stores** (função de setup que retorna o estado, getters e actions).
-  - *Exemplo:*
+    - *Exemplo:*
       `export const useProcessosStore = defineStore("processos", () => { const state = ref(...); function action() {...}; return { state, action }; });`
 - **Modularidade:** Uma store por domínio/entidade (ex: `useProcessosStore`, `useUnidadesStore`).
 
@@ -116,7 +117,8 @@ flowchart LR
 ## 6. Testes
 
 > [!IMPORTANT]
-> Consulte o [Guia de Testes Frontend](frontend-testes.md) para padrões detalhados de testes unitários e de integração com Vitest.
+> Consulte o [Guia de Testes Frontend](frontend-testes.md) para padrões detalhados de testes unitários e de integração
+> com Vitest.
 
 ## 7. Padrões de Implementação Detalhados
 
@@ -679,7 +681,8 @@ export interface CriarProcessoRequest {
 
 ### 9.2. Tratamento de Erros de Formulário
 
-Para simplificar o mapeamento de erros de validação (API 422) para campos de formulário, utilize o composable `useFormErrors`.
+Para simplificar o mapeamento de erros de validação (API 422) para campos de formulário, utilize o composable
+`useFormErrors`.
 
 **Arquivo:** `@/composables/useFormErrors.ts`
 

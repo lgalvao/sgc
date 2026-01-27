@@ -160,7 +160,7 @@ public class UsuarioFacade {
     public ResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
         List<Usuario> chefes = usuarioRepo.findChefesByUnidadesCodigos(List.of(unidadeCodigo));
         if (chefes.isEmpty()) {
-             throw new ErroEntidadeNaoEncontrada("Responsável da unidade", unidadeCodigo);
+            throw new ErroEntidadeNaoEncontrada("Responsável da unidade", unidadeCodigo);
         }
         return montarResponsavelDto(unidadeCodigo, chefes);
     }

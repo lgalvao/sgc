@@ -49,28 +49,50 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Cobertura Extra de Controllers e Services")
 class ControllersServicesCoverageTest {
-    @Mock private SubprocessoFacade subprocessoFacade;
-    @Mock private MapaRepo mapaRepo;
-    @Mock private CompetenciaRepo competenciaRepo;
-    @Mock private SubprocessoRepo repositorioSubprocesso;
-    @Mock private sgc.alerta.AlertaFacade alertaService;
-    @Mock private sgc.mapa.mapper.MapaCompletoMapper mapaCompletoMapper;
-    @Mock private MapaSalvamentoService mapaSalvamentoService;
-    @Mock private sgc.mapa.service.ImpactoMapaService impactoMapaService;
-    @Mock private sgc.mapa.service.MapaVisualizacaoService mapaVisualizacaoService;
-    @Mock private sgc.subprocesso.service.workflow.SubprocessoWorkflowService subprocessoWorkflowService;
-    @Mock private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
-    @Mock private sgc.organizacao.UsuarioFacade usuarioService;
-    @Mock private sgc.subprocesso.service.workflow.SubprocessoTransicaoService transicaoService;
-    @Mock private sgc.organizacao.UnidadeFacade unidadeService;
-    @Mock private sgc.analise.AnaliseFacade analiseFacade;
-    @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
-    @Mock private sgc.processo.service.ProcessoFacade processoFacade;
-    @Mock private sgc.subprocesso.service.crud.SubprocessoCrudService crudService;
-    @Mock private sgc.subprocesso.model.MovimentacaoRepo movimentacaoRepo;
-    @Mock private sgc.mapa.service.CompetenciaService competenciaService;
-    @Mock private sgc.mapa.service.AtividadeService atividadeService;
-    @Mock private sgc.comum.repo.RepositorioComum repo;
+    @Mock
+    private SubprocessoFacade subprocessoFacade;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
+    @Mock
+    private SubprocessoRepo repositorioSubprocesso;
+    @Mock
+    private sgc.alerta.AlertaFacade alertaService;
+    @Mock
+    private sgc.mapa.mapper.MapaCompletoMapper mapaCompletoMapper;
+    @Mock
+    private MapaSalvamentoService mapaSalvamentoService;
+    @Mock
+    private sgc.mapa.service.ImpactoMapaService impactoMapaService;
+    @Mock
+    private sgc.mapa.service.MapaVisualizacaoService mapaVisualizacaoService;
+    @Mock
+    private sgc.subprocesso.service.workflow.SubprocessoWorkflowService subprocessoWorkflowService;
+    @Mock
+    private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
+    @Mock
+    private sgc.organizacao.UsuarioFacade usuarioService;
+    @Mock
+    private sgc.subprocesso.service.workflow.SubprocessoTransicaoService transicaoService;
+    @Mock
+    private sgc.organizacao.UnidadeFacade unidadeService;
+    @Mock
+    private sgc.analise.AnaliseFacade analiseFacade;
+    @Mock
+    private sgc.seguranca.acesso.AccessControlService accessControlService;
+    @Mock
+    private sgc.processo.service.ProcessoFacade processoFacade;
+    @Mock
+    private sgc.subprocesso.service.crud.SubprocessoCrudService crudService;
+    @Mock
+    private sgc.subprocesso.model.MovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private sgc.mapa.service.CompetenciaService competenciaService;
+    @Mock
+    private sgc.mapa.service.AtividadeService atividadeService;
+    @Mock
+    private sgc.comum.repo.RepositorioComum repo;
 
     private SubprocessoMapaController subprocessoMapaController;
     private MapaFacade mapaFacade;
@@ -83,7 +105,7 @@ class ControllersServicesCoverageTest {
                 mapaRepo, competenciaRepo, mapaCompletoMapper, mapaSalvamentoService,
                 mapaVisualizacaoService, impactoMapaService, repo
         );
-        
+
         subprocessoMapaController = new SubprocessoMapaController(
                 subprocessoFacade,
                 mapaFacade,
@@ -132,8 +154,8 @@ class ControllersServicesCoverageTest {
     @DisplayName("Deve lançar erro de acesso negado quando usuário não autenticado em verificarImpactos")
     void deveLancarErroAcessoNegado() {
         when(usuarioService.obterUsuarioAutenticado())
-            .thenThrow(new ErroAccessoNegado("Usuário não autenticado"));
-        
+                .thenThrow(new ErroAccessoNegado("Usuário não autenticado"));
+
         assertThatThrownBy(() -> subprocessoMapaController.verificarImpactos(1L))
                 .isInstanceOf(ErroAccessoNegado.class);
     }
@@ -151,7 +173,7 @@ class ControllersServicesCoverageTest {
     void deveDelegarSalvarMapaCompletoInexistente() {
         SalvarMapaRequest req = SalvarMapaRequest.builder().build();
         when(mapaSalvamentoService.salvarMapaCompleto(99L, req))
-            .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 99L));
+                .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 99L));
         assertThatThrownBy(() -> mapaFacade.salvarMapaCompleto(99L, req))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
@@ -169,7 +191,7 @@ class ControllersServicesCoverageTest {
                 .build();
 
         when(mapaSalvamentoService.salvarMapaCompleto(1L, req))
-            .thenThrow(new ErroEntidadeNaoEncontrada("Competência não encontrada: 99"));
+                .thenThrow(new ErroEntidadeNaoEncontrada("Competência não encontrada: 99"));
 
         assertThatThrownBy(() -> mapaFacade.salvarMapaCompleto(1L, req))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -212,20 +234,20 @@ class ControllersServicesCoverageTest {
     void deveLancarErroDevolverRevisaoStatusInvalido() {
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO); // Status inválido
-        
+
         // Criar unidade com superior para evitar ErroInvarianteViolada
         Unidade unidadeSuperior = new Unidade();
         unidadeSuperior.setCodigo(100L);
-        
+
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         unidade.setUnidadeSuperior(unidadeSuperior);
         sp.setUnidade(unidade);
-        
+
         Usuario usuario = new Usuario();
-        
+
         when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
-        
+
         doThrow(new ErroAccessoNegado("Situação inválida"))
                 .when(accessControlService)
                 .verificarPermissao(any(), any(), any());
@@ -247,7 +269,6 @@ class ControllersServicesCoverageTest {
         assertThatThrownBy(() -> cadastroService.aceitarRevisaoCadastro(1L, "Obs", new Usuario()))
                 .isInstanceOf(ErroInvarianteViolada.class);
     }
-
 
 
     @Test

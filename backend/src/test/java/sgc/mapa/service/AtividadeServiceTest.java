@@ -1,14 +1,20 @@
 package sgc.mapa.service;
 
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.AtividadeResponse;
@@ -21,12 +27,6 @@ import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -47,90 +47,101 @@ class AtividadeServiceTest {
     @InjectMocks
     private AtividadeService service;
 
+    @Test
+    @DisplayName("Deve buscar por mapa sem relacionamentos")
+    void deveBuscarPorMapaSemRelacionamentos() {
+        when(atividadeRepo.findByMapaCodigoSemFetch(1L)).thenReturn(List.of(new Atividade()));
+        assertThat(service.buscarPorMapaCodigoSemRelacionamentos(1L))
+                .isNotNull()
+                .hasSize(1);
+    }
+
     @Nested
     @DisplayName("Cenários de Leitura")
+    @SuppressWarnings("unused")
     class LeituraTests {
         @Test
         @DisplayName("Deve listar todas as atividades")
         void deveListarTodas() {
-             when(atividadeRepo.findAllWithMapa()).thenReturn(List.of(new Atividade()));
-             when(atividadeMapper.toResponse(any())).thenReturn(AtividadeResponse.builder().build());
-             assertThat(service.listar())
-                 .isNotNull()
-                 .hasSize(1);
+            when(atividadeRepo.findAllWithMapa()).thenReturn(List.of(new Atividade()));
+            when(atividadeMapper.toResponse(any())).thenReturn(AtividadeResponse.builder().build());
+            assertThat(service.listar())
+                    .isNotNull()
+                    .hasSize(1);
         }
 
         @Test
         @DisplayName("Deve obter por código Response")
         void deveObterPorCodigoDto() {
-             when(repo.buscar(Atividade.class, 1L)).thenReturn(new Atividade());
-             when(atividadeMapper.toResponse(any())).thenReturn(AtividadeResponse.builder().build());
-             assertThat(service.obterResponse(1L)).isNotNull();
+            when(repo.buscar(Atividade.class, 1L)).thenReturn(new Atividade());
+            when(atividadeMapper.toResponse(any())).thenReturn(AtividadeResponse.builder().build());
+            assertThat(service.obterResponse(1L)).isNotNull();
         }
 
         @Test
         @DisplayName("Deve lançar erro se obter por código não encontrar")
         void deveLancarErroObterPorCodigo() {
-             when(repo.buscar(Atividade.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 1L));
-             assertThatThrownBy(() -> service.obterResponse(1L))
-                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+            when(repo.buscar(Atividade.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 1L));
+            assertThatThrownBy(() -> service.obterResponse(1L))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
         @DisplayName("Deve listar entidades por código")
         void deveListarEntidades() {
-             Atividade ativ = new Atividade();
-             when(repo.buscar(Atividade.class, 1L)).thenReturn(ativ);
-             assertThat(service.obterPorCodigo(1L)).isNotNull();
+            Atividade ativ = new Atividade();
+            when(repo.buscar(Atividade.class, 1L)).thenReturn(ativ);
+            assertThat(service.obterPorCodigo(1L)).isNotNull();
         }
 
         @Test
         @DisplayName("Deve lançar erro entidade não encontrada")
         void deveLancarErro() {
-             when(repo.buscar(Atividade.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 1L));
-             assertThatThrownBy(() -> service.obterPorCodigo(1L))
-                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+            when(repo.buscar(Atividade.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 1L));
+            assertThatThrownBy(() -> service.obterPorCodigo(1L))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
         @DisplayName("Deve buscar por mapa")
         void deveBuscarPorMapa() {
-             when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(List.of(new Atividade()));
-             assertThat(service.buscarPorMapaCodigo(1L))
-                 .isNotNull()
-                 .hasSize(1);
+            when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(List.of(new Atividade()));
+            assertThat(service.buscarPorMapaCodigo(1L))
+                    .isNotNull()
+                    .hasSize(1);
         }
 
         @Test
         @DisplayName("Deve retornar lista vazia quando mapa não possui atividades")
         void deveRetornarListaVaziaQuandoMapaSemAtividades() {
-             when(atividadeRepo.findByMapaCodigo(999L)).thenReturn(List.of());
-             assertThat(service.buscarPorMapaCodigo(999L))
-                 .isNotNull()
-                 .isEmpty();
+            when(atividadeRepo.findByMapaCodigo(999L)).thenReturn(List.of());
+            assertThat(service.buscarPorMapaCodigo(999L))
+                    .isNotNull()
+                    .isEmpty();
         }
 
         @Test
         @DisplayName("Deve buscar por mapa com conhecimentos")
         void deveBuscarPorMapaComConhecimentos() {
-             when(atividadeRepo.findWithConhecimentosByMapaCodigo(1L)).thenReturn(List.of(new Atividade()));
-             assertThat(service.buscarPorMapaCodigoComConhecimentos(1L))
-                 .isNotNull()
-                 .hasSize(1);
+            when(atividadeRepo.findWithConhecimentosByMapaCodigo(1L)).thenReturn(List.of(new Atividade()));
+            assertThat(service.buscarPorMapaCodigoComConhecimentos(1L))
+                    .isNotNull()
+                    .hasSize(1);
         }
 
         @Test
         @DisplayName("Deve retornar lista vazia quando mapa não possui atividades com conhecimentos")
         void deveRetornarListaVaziaQuandoMapaSemAtividadesComConhecimentos() {
-             when(atividadeRepo.findWithConhecimentosByMapaCodigo(999L)).thenReturn(List.of());
-             assertThat(service.buscarPorMapaCodigoComConhecimentos(999L))
-                 .isNotNull()
-                 .isEmpty();
+            when(atividadeRepo.findWithConhecimentosByMapaCodigo(999L)).thenReturn(List.of());
+            assertThat(service.buscarPorMapaCodigoComConhecimentos(999L))
+                    .isNotNull()
+                    .isEmpty();
         }
     }
 
     @Nested
     @DisplayName("Criação de Atividade")
+    @SuppressWarnings("unused")
     class Criacao {
         @Test
         @DisplayName("Deve criar atividade com sucesso")
@@ -191,6 +202,7 @@ class AtividadeServiceTest {
 
     @Nested
     @DisplayName("Atualização e Exclusão")
+    @SuppressWarnings("unused")
     class AtualizacaoExclusao {
         @Test
         @DisplayName("Deve atualizar atividade")
@@ -272,6 +284,7 @@ class AtividadeServiceTest {
 
     @Nested
     @DisplayName("Atualização em Lote")
+    @SuppressWarnings("unused")
     class AtualizacaoLote {
 
         @Test
@@ -321,14 +334,5 @@ class AtividadeServiceTest {
 
             assertThat(atividade1.getDescricao()).isEqualTo("Antiga 1");
         }
-    }
-
-    @Test
-    @DisplayName("Deve buscar por mapa sem relacionamentos")
-    void deveBuscarPorMapaSemRelacionamentos() {
-        when(atividadeRepo.findByMapaCodigoSemFetch(1L)).thenReturn(List.of(new Atividade()));
-        assertThat(service.buscarPorMapaCodigoSemRelacionamentos(1L))
-                .isNotNull()
-                .hasSize(1);
     }
 }

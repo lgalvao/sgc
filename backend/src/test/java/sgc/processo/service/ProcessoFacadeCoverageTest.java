@@ -7,9 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-import sgc.alerta.AlertaFacade;
 import sgc.organizacao.UnidadeFacade;
-import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.AtualizarProcessoRequest;
 import sgc.processo.erros.ErroProcesso;
@@ -34,7 +32,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoFacadeCoverageTest")
 class ProcessoFacadeCoverageTest {
-
     @Mock
     private ProcessoRepo processoRepo;
     @Mock
@@ -48,19 +45,7 @@ class ProcessoFacadeCoverageTest {
     @Mock
     private ProcessoDetalheBuilder processoDetalheBuilder;
     @Mock
-    private sgc.subprocesso.mapper.SubprocessoMapper subprocessoMapper;
-    @Mock
-    private UsuarioFacade usuarioService;
-    @Mock
-    private ProcessoInicializador processoInicializador;
-    @Mock
-    private AlertaFacade alertaService;
-    @Mock
-    private ProcessoAcessoService processoAcessoService;
-    @Mock
     private ProcessoValidador processoValidador;
-    @Mock
-    private ProcessoFinalizador processoFinalizador;
     @Mock
     private ProcessoConsultaService processoConsultaService;
 

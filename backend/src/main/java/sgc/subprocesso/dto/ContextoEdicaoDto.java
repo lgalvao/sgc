@@ -12,8 +12,9 @@ import java.util.List;
  */
 @Builder
 public record ContextoEdicaoDto(
-    UnidadeDto unidade,
-    SubprocessoDetalheDto subprocesso,
-    @Nullable MapaCompletoDto mapa,
-    List<AtividadeVisualizacaoDto> atividadesDisponiveis
-) {}
+        UnidadeDto unidade,
+        SubprocessoDetalheDto subprocesso,
+        @Nullable MapaCompletoDto mapa,
+        List<AtividadeVisualizacaoDto> atividadesDisponiveis
+) {
+}

@@ -1,16 +1,16 @@
 /**
  * Eventos de domínio do módulo de Subprocesso.
- * 
+ *
  * <p>Este pacote contém os eventos de domínio que representam transições de estado
  * e ações significativas no ciclo de vida de um {@link sgc.subprocesso.model.Subprocesso}.
- * 
+ *
  * <h2>Design Unificado ⭐</h2>
  * <p>Diferente de outros módulos que têm múltiplos eventos, o módulo de subprocesso
  * usa um <strong>evento unificado</strong>: {@link sgc.subprocesso.eventos.EventoTransicaoSubprocesso}.
- * 
+ *
  * <p>Este evento representa TODAS as transições de estado possíveis, utilizando um
  * enum {@link sgc.subprocesso.eventos.TipoTransicao} para diferenciar o tipo específico.
- * 
+ *
  * <h2>Vantagens do Design Unificado</h2>
  * <ul>
  *   <li><strong>Menos classes</strong>: 1 evento em vez de 15+ eventos separados</li>
@@ -18,7 +18,7 @@
  *   <li><strong>Simplicidade</strong>: Listeners podem filtrar por tipo se necessário</li>
  *   <li><strong>Extensibilidade</strong>: Adicionar novo tipo de transição = adicionar enum, não nova classe</li>
  * </ul>
- * 
+ *
  * <h2>Tipos de Transição Suportados</h2>
  * <p>Via {@link sgc.subprocesso.eventos.TipoTransicao}:
  * <ul>
@@ -38,15 +38,15 @@
  *   <li>{@code MAPA_HOMOLOGADO} - Mapa homologado pelo ADMIN</li>
  *   <li>{@code MAPA_AJUSTADO} - Mapa ajustado pelo ADMIN</li>
  * </ul>
- * 
+ *
  * <h2>Como Usar</h2>
- * 
+ *
  * <h3>Publicar uma Transição:</h3>
  * <pre>{@code
  * @Service
  * public class SubprocessoCadastroWorkflowService {
  *     private final ApplicationEventPublisher eventPublisher;
- *     
+ *
  *     public void disponibilizarCadastro(Long codSubprocesso, Usuario usuario) {
  *         // ... lógica de transição
  *         eventPublisher.publishEvent(new EventoTransicaoSubprocesso(
@@ -58,7 +58,7 @@
  *     }
  * }
  * }</pre>
- * 
+ *
  * <h3>Escutar Transições (Todas):</h3>
  * <pre>{@code
  * @Component
@@ -71,7 +71,7 @@
  *     }
  * }
  * }</pre>
- * 
+ *
  * <h3>Escutar Transições Específicas:</h3>
  * <pre>{@code
  * @Component
@@ -84,12 +84,12 @@
  *     }
  * }
  * }</pre>
- * 
+ *
  * <h2>Padrão Recomendado</h2>
  * <p>Este design unificado é <strong>recomendado</strong> para outros módulos que tenham
  * múltiplas transições de estado similares. Considere usar este padrão em vez de
  * criar muitos eventos separados.
- * 
+ *
  * @see sgc.processo.eventos Eventos de processo (eventos separados)
  * @see sgc.mapa.evento Eventos de mapa
  * @since 1.0

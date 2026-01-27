@@ -20,12 +20,12 @@ class ConfigCorsTest {
     void deveConfigurarOrigemCorsComOrigensPermitidas() {
         // Cria record de propriedades imutável
         ConfigCorsProperties properties = new ConfigCorsProperties(
-            List.of("https://example.com"),
-            List.of("GET", "POST"),
-            List.of("*"),
-            true
+                List.of("https://example.com"),
+                List.of("GET", "POST"),
+                List.of("*"),
+                true
         );
-        
+
         // Injeta no bean de configuração
         ConfigCors config = new ConfigCors(properties);
 
@@ -47,7 +47,7 @@ class ConfigCorsTest {
     void deveUsarValoresPadraoQuandoPropriedadesSaoNull() {
         // Compact constructor aplica valores default
         ConfigCorsProperties properties = new ConfigCorsProperties(null, null, null, false);
-        
+
         assertThat(properties.allowedOrigins()).containsExactly("http://localhost:5173");
         assertThat(properties.allowedMethods()).contains("GET", "POST", "PUT", "DELETE", "OPTIONS");
         assertThat(properties.allowedHeaders()).containsExactly("*");

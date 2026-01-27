@@ -7,7 +7,8 @@ import lombok.Builder;
  */
 @Builder
 public record ConhecimentoResponse(
-    Long codigo,
-    Long atividadeCodigo,
-    String descricao
-) {}
+        Long codigo,
+        Long atividadeCodigo,
+        String descricao
+) {
+}

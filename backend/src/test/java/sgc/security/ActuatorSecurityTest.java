@@ -87,7 +87,7 @@ class ActuatorSecurityTest {
         String token = gerenciadorJwt.gerarToken("123456789", Perfil.ADMIN, 1L);
 
         mockMvc.perform(get("/actuator/health")
-                .header("Authorization", "Bearer " + token))
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
     }
 
@@ -97,7 +97,7 @@ class ActuatorSecurityTest {
         String token = gerenciadorJwt.gerarToken("987654321", Perfil.SERVIDOR, 1L);
 
         mockMvc.perform(get("/actuator/health")
-                .header("Authorization", "Bearer " + token))
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden());
     }
 }

@@ -23,7 +23,9 @@ Ator: CHEFE
    5.1. Se CHEFE clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do
    cadastro realizadas pelas unidades superiores desde a última disponibilização.
 
-   5.1.1. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para ajustes no cadastro, antes da realização de nova disponibilização.
+   5.1.1. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('
+   Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para ajustes no cadastro,
+   antes da realização de nova disponibilização.
 
 6. CHEFE escolhe `Disponibilizar`.
 
@@ -62,7 +64,8 @@ Ator: CHEFE
 
 13. O sistema cria internamente um alerta:
 
-    - `Descrição`: "Cadastro de atividades/conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise"
+    - `Descrição`: "Cadastro de atividades/conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para
+      análise"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
     - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]

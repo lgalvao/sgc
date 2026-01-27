@@ -1,43 +1,21 @@
 package sgc.subprocesso.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import sgc.subprocesso.model.Subprocesso;
+
+import java.time.LocalDateTime;
 
 /**
- * DTO para retornar sugestões apresentadas ao mapa (CDU-20 item 5).
+ * DTO com as sugestões do CHEFE (CDU-19 item 8).
  */
-@Getter
 @Builder
-@AllArgsConstructor
-public class SugestoesDto {
+public record SugestoesDto(
+        /**
+         * As sugestões apresentadas.
+         */
+        String sugestoes,
 
-    /**
-     * O texto das sugestões.
-     */
-    private final String sugestoes;
-
-    /**
-     * Indica se foram apresentadas sugestões.
-     */
-    private final boolean sugestoesApresentadas;
-
-    /**
-     * O nome da unidade que apresentou as sugestões.
-     */
-    private final String unidadeNome;
-
-    public static SugestoesDto of(Subprocesso subprocesso) {
-        String sugestoes = subprocesso.getMapa().getSugestoes();
-        boolean sugestoesApresentadas = !sugestoes.isBlank();
-        String nomeUnidade =
-                subprocesso.getUnidade().getNome();
-
-        return SugestoesDto.builder()
-                .sugestoes(sugestoes)
-                .sugestoesApresentadas(sugestoesApresentadas)
-                .unidadeNome(nomeUnidade)
-                .build();
-    }
+        /**
+         * A data/hora em que as sugestões foram apresentadas.
+         */
+        LocalDateTime dataHora) {
 }

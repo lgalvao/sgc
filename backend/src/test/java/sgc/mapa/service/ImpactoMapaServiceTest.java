@@ -17,11 +17,7 @@ import sgc.seguranca.acesso.Acao;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -171,15 +167,15 @@ class ImpactoMapaServiceTest {
             assertNotNull(resultado);
             // Inseriu A2
             assertEquals(1, resultado.getAtividadesInseridas().size());
-            assertEquals("Ativ 2", resultado.getAtividadesInseridas().getFirst().getDescricao());
-            
+            assertEquals("Ativ 2", resultado.getAtividadesInseridas().getFirst().descricao());
+
             // Alterou A1 (conhecimentos)
             assertEquals(1, resultado.getAtividadesAlteradas().size());
-            assertEquals("Ativ 1", resultado.getAtividadesAlteradas().getFirst().getDescricao());
+            assertEquals("Ativ 1", resultado.getAtividadesAlteradas().getFirst().descricao());
 
             // Impactou C1 (pois A1 ligada a ela foi alterada)
             assertEquals(1, resultado.getCompetenciasImpactadas().size());
-            assertEquals("Comp 1", resultado.getCompetenciasImpactadas().getFirst().getDescricao());
+            assertEquals("Comp 1", resultado.getCompetenciasImpactadas().getFirst().descricao());
         }
 
         @Test
@@ -211,8 +207,8 @@ class ImpactoMapaServiceTest {
 
             assertEquals(1, resultado.getAtividadesRemovidas().size());
             assertEquals(1, resultado.getCompetenciasImpactadas().size());
-            assertEquals(sgc.mapa.model.TipoImpactoCompetencia.ATIVIDADE_REMOVIDA, 
-                         resultado.getCompetenciasImpactadas().getFirst().getTiposImpacto().getFirst());
+            assertEquals(sgc.mapa.model.TipoImpactoCompetencia.ATIVIDADE_REMOVIDA,
+                    resultado.getCompetenciasImpactadas().getFirst().tiposImpacto().getFirst());
         }
     }
 }

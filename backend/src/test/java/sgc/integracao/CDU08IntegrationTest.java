@@ -1,28 +1,14 @@
 package sgc.integracao;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
-
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
@@ -32,12 +18,7 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.ConhecimentoRepo;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.model.UsuarioPerfilRepo;
-import sgc.organizacao.model.UsuarioRepo;
+import sgc.organizacao.model.*;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
@@ -45,6 +26,16 @@ import sgc.subprocesso.dto.ImportarAtividadesRequest;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest
@@ -125,11 +116,11 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         processoRepo.save(processo);
 
         subprocessoOrigem = Subprocesso.builder()
-                        .unidade(unidadeOrigem)
-                        .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
-                        .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
-                        .processo(processo)
-                        .build();
+                .unidade(unidadeOrigem)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
+                .processo(processo)
+                .build();
         subprocessoRepo.save(subprocessoOrigem);
 
         Mapa mapaOrigem = new Mapa();

@@ -1,26 +1,44 @@
 package sgc.subprocesso.service;
 
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import sgc.analise.AnaliseFacade;
-import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.ConhecimentoService;
-import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.dto.*;
+import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
+import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
+import sgc.subprocesso.dto.CompetenciaAjusteDto;
+import sgc.subprocesso.dto.ContextoEdicaoDto;
+import sgc.subprocesso.dto.CriarSubprocessoRequest;
+import sgc.subprocesso.dto.MapaAjusteDto;
+import sgc.subprocesso.dto.SubprocessoCadastroDto;
+import sgc.subprocesso.dto.SubprocessoDetalheDto;
+import sgc.subprocesso.dto.SubprocessoDto;
+import sgc.subprocesso.dto.SubprocessoPermissoesDto;
+import sgc.subprocesso.dto.SubprocessoSituacaoDto;
+import sgc.subprocesso.dto.SugestoesDto;
+import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.MovimentacaoRepo;
@@ -29,16 +47,6 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
-
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
@@ -55,15 +63,11 @@ class SubprocessoFacadeComplementaryTest {
     @Mock
     private SubprocessoWorkflowService workflowService;
     @Mock
-    private MapaFacade mapaFacade;
-    @Mock
     private AtividadeService atividadeService;
     @Mock
     private MovimentacaoRepo repositorioMovimentacao;
     @Mock
     private SubprocessoDetalheMapper subprocessoDetalheMapper;
-    @Mock
-    private ConhecimentoMapper conhecimentoMapper;
     @Mock
     private AnaliseFacade analiseFacade;
     @Mock
@@ -80,16 +84,14 @@ class SubprocessoFacadeComplementaryTest {
     private sgc.subprocesso.model.SubprocessoMovimentacaoRepo movimentacaoRepo;
     @Mock
     private sgc.mapa.service.CopiaMapaService copiaMapaService;
-    @Mock
-    private sgc.mapa.mapper.AtividadeMapper atividadeMapper;
 
     @InjectMocks
     private SubprocessoFacade subprocessoFacade;
 
     @Nested
     @DisplayName("Cenários de Leitura")
+    @SuppressWarnings("unused")
     class LeituraTests {
-
         @Test
         @DisplayName("Deve verificar acesso da unidade ao processo")
         void deveVerificarAcessoUnidadeAoProcesso() {
@@ -113,7 +115,7 @@ class SubprocessoFacadeComplementaryTest {
             Mapa mapa = new Mapa();
             mapa.setCodigo(1L);
             sp.setMapa(mapa);
-            
+
             when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
             when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of());
 
@@ -175,6 +177,7 @@ class SubprocessoFacadeComplementaryTest {
     }
 
     @Nested
+    @SuppressWarnings("unused")
     @DisplayName("Cenários de Escrita (CRUD)")
     class CrudTests {
         @Test
@@ -205,6 +208,7 @@ class SubprocessoFacadeComplementaryTest {
 
     @Nested
     @DisplayName("Cenários de Validação")
+    @SuppressWarnings("unused")
     class ValidacaoTests {
         @Test
         @DisplayName("Deve validar existência de atividades - Sucesso")
@@ -233,6 +237,7 @@ class SubprocessoFacadeComplementaryTest {
 
     @Nested
     @DisplayName("Cenários de Transição de Estado")
+    @SuppressWarnings("unused")
     class TransicaoEstadoTests {
         @Test
         @DisplayName("Deve atualizar situação para EM ANDAMENTO")
@@ -266,17 +271,18 @@ class SubprocessoFacadeComplementaryTest {
 
     @Nested
     @DisplayName("Cenários de Permissões e Detalhes")
+    @SuppressWarnings("unused")
     class PermissaoDetalheTests {
-
         @Test
         @DisplayName("obterPermissoes lança exceção quando não autenticado")
         void obterPermissoesSemAutenticacao() {
             when(usuarioService.obterUsuarioAutenticado())
                     .thenThrow(new sgc.comum.erros.ErroAccessoNegado("Nenhum usuário autenticado"));
 
-            org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () ->
+            var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () ->
                     subprocessoFacade.obterPermissoes(1L)
             );
+            assertThat(exception).isNotNull();
         }
 
         @Test
@@ -285,9 +291,10 @@ class SubprocessoFacadeComplementaryTest {
             when(usuarioService.obterUsuarioAutenticado())
                     .thenThrow(new sgc.comum.erros.ErroAccessoNegado("Usuário sem nome"));
 
-            org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () ->
+            var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () ->
                     subprocessoFacade.obterPermissoes(1L)
             );
+            assertThat(exception).isNotNull();
         }
 
         @Test
@@ -447,8 +454,8 @@ class SubprocessoFacadeComplementaryTest {
 
     @Nested
     @DisplayName("Cenários de DTO e Mapeamento")
+    @SuppressWarnings("unused")
     class DtoMappingTests {
-
         @Test
         @DisplayName("obterSugestoes")
         void obterSugestoes() {
@@ -458,12 +465,12 @@ class SubprocessoFacadeComplementaryTest {
             mapa.setCodigo(10L);
             mapa.setSugestoes("");
             sp.setMapa(mapa);
-            
+
             sgc.organizacao.model.Unidade u = new sgc.organizacao.model.Unidade();
             u.setNome("Unidade Teste");
             sp.setUnidade(u);
             when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-            
+
             SugestoesDto result = subprocessoFacade.obterSugestoes(1L);
             assertThat(result).isNotNull();
         }
@@ -488,7 +495,7 @@ class SubprocessoFacadeComplementaryTest {
         @Test
         @DisplayName("Deve obter cadastro")
         void deveObterCadastro() {
-             Long codigo = 1L;
+            Long codigo = 1L;
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(codigo);
             sp.setUnidade(new Unidade());
@@ -532,6 +539,7 @@ class SubprocessoFacadeComplementaryTest {
 
     @Nested
     @DisplayName("Cenários Complexos")
+    @SuppressWarnings("unused")
     class SubprocessoFacadeRefactoredTest {
         @Test
         @DisplayName("Deve salvar ajustes do mapa")
@@ -585,9 +593,10 @@ class SubprocessoFacadeComplementaryTest {
 
             when(subprocessoRepo.findById(codigo)).thenReturn(java.util.Optional.of(sp));
 
-            org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () ->
-                subprocessoFacade.salvarAjustesMapa(codigo, List.of())
+            var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () ->
+                    subprocessoFacade.salvarAjustesMapa(codigo, List.of())
             );
+            assertThat(exception).isNotNull();
         }
 
         @Test
@@ -634,15 +643,16 @@ class SubprocessoFacadeComplementaryTest {
 
             when(subprocessoRepo.findById(dest)).thenReturn(java.util.Optional.of(spDest));
 
-            org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida.class, () ->
-                subprocessoFacade.importarAtividades(dest, 2L)
+            var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida.class, () ->
+                    subprocessoFacade.importarAtividades(dest, 2L)
             );
+            assertThat(exception).isNotNull();
         }
 
         @Test
         @DisplayName("importarAtividades lida com tipo processo REVISAO e Default")
         void importarAtividadesTiposProcesso() {
-             // Case REVISAO
+            // Case REVISAO
             Long dest = 1L;
             Subprocesso spDest = new Subprocesso();
             spDest.setCodigo(dest);

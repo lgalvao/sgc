@@ -16,9 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -52,11 +50,16 @@ class UsuarioFacadeCoverageTest {
     @InjectMocks
     private UsuarioFacade usuarioFacade;
 
-    @Mock private UsuarioRepo usuarioRepo;
-    @Mock private UsuarioPerfilRepo usuarioPerfilRepo;
-    @Mock private AdministradorRepo administradorRepo;
-    @Mock private RepositorioComum repo;
-    @Mock private UnidadeRepo unidadeRepo;
+    @Mock
+    private UsuarioRepo usuarioRepo;
+    @Mock
+    private UsuarioPerfilRepo usuarioPerfilRepo;
+    @Mock
+    private AdministradorRepo administradorRepo;
+    @Mock
+    private RepositorioComum repo;
+    @Mock
+    private UnidadeRepo unidadeRepo;
 
     @SuppressWarnings("unused")
     @AfterEach
@@ -122,7 +125,7 @@ class UsuarioFacadeCoverageTest {
         Usuario u = new Usuario();
         u.setTituloEleitoral("T");
         when(repo.buscar(Usuario.class, "T")).thenReturn(u);
-        
+
         Usuario result = usuarioFacade.buscarPorId("T");
         assertThat(result.getTituloEleitoral()).isEqualTo("T");
     }
@@ -160,7 +163,7 @@ class UsuarioFacadeCoverageTest {
 
         Optional<UsuarioDto> dto = usuarioFacade.buscarUsuarioPorTitulo("T");
         assertThat(dto).isPresent();
-        assertThat(dto.get().getTituloEleitoral()).isEqualTo("T");
+        assertThat(dto.get().tituloEleitoral()).isEqualTo("T");
     }
 
     @Test
@@ -207,7 +210,7 @@ class UsuarioFacadeCoverageTest {
 
         List<PerfilDto> perfis = usuarioFacade.buscarPerfisUsuario("T");
         assertThat(perfis).hasSize(1);
-        assertThat(perfis.getFirst().getPerfil()).isEqualTo("CHEFE");
+        assertThat(perfis.getFirst().perfil()).isEqualTo("CHEFE");
     }
 
     @Test
@@ -274,7 +277,7 @@ class UsuarioFacadeCoverageTest {
         when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(u));
 
         ResponsavelDto resp = usuarioFacade.buscarResponsavelUnidade(1L);
-        assertThat(resp.getTitularTitulo()).isEqualTo("T");
+        assertThat(resp.titularTitulo()).isEqualTo("T");
     }
 
     @Test
@@ -543,7 +546,7 @@ class UsuarioFacadeCoverageTest {
                 .doesNotContainKey(2L);
 
         // O responsável deve ser o usuário T
-        assertThat(map.get(1L).getTitularTitulo()).isEqualTo("T");
+        assertThat(map.get(1L).titularTitulo()).isEqualTo("T");
     }
 
     @Test
@@ -562,9 +565,9 @@ class UsuarioFacadeCoverageTest {
 
         ResponsavelDto result = usuarioFacade.buscarResponsavelUnidade(1L);
 
-        assertThat(result.getTitularTitulo()).isEqualTo("T");
-        assertThat(result.getSubstitutoTitulo()).isEqualTo("S");
-        assertThat(result.getSubstitutoNome()).isEqualTo("Substituto");
+        assertThat(result.titularTitulo()).isEqualTo("T");
+        assertThat(result.substitutoTitulo()).isEqualTo("S");
+        assertThat(result.substitutoNome()).isEqualTo("Substituto");
     }
 
     @Test
@@ -619,7 +622,7 @@ class UsuarioFacadeCoverageTest {
         List<PerfilDto> perfis = usuarioFacade.buscarPerfisUsuario("T");
 
         assertThat(perfis).hasSize(1);
-        assertThat(perfis.getFirst().getUnidadeCodigo()).isEqualTo(1L);
+        assertThat(perfis.getFirst().unidadeCodigo()).isEqualTo(1L);
     }
 
     @Test

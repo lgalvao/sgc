@@ -40,6 +40,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -72,8 +73,6 @@ class ProcessoFacadeCrudTest {
     private ProcessoInicializador processoInicializador;
     @Mock
     private AlertaFacade alertaService;
-    
-    // Specialized services
     @Mock
     private ProcessoAcessoService processoAcessoService;
     @Mock
@@ -88,6 +87,7 @@ class ProcessoFacadeCrudTest {
 
     @Nested
     @DisplayName("Criação de Processo")
+    @SuppressWarnings("unused")
     class Criacao {
         @Test
         @DisplayName("Deve criar processo quando dados válidos")
@@ -117,11 +117,6 @@ class ProcessoFacadeCrudTest {
                     p.getSituacao() == SituacaoProcesso.CRIADO));
             verify(publicadorEventos).publishEvent(any(EventoProcessoCriado.class));
         }
-
-        // NOTA: Testes de validação de descrição vazia/nula e unidades vazias
-        // foram removidos pois a validação agora é feita via Bean Validation (@Valid)
-        // no Controller, não mais no Service. Ver ProcessoControllerTest para esses
-        // cenários.
 
         @Test
         @DisplayName("Deve lançar exceção quando unidade não encontrada")
@@ -217,8 +212,8 @@ class ProcessoFacadeCrudTest {
                     .thenReturn(Optional.of("As seguintes unidades não possuem mapa vigente: SIGLA"));
 
             assertThatThrownBy(() -> processoFacade.criar(req))
-                .isInstanceOf(ErroProcesso.class)
-                .hasMessageContaining("não possuem mapa vigente");
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessageContaining("não possuem mapa vigente");
         }
 
         @Test

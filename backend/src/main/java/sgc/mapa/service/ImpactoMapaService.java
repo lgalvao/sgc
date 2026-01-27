@@ -1,46 +1,37 @@
 package sgc.mapa.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
-import sgc.mapa.model.TipoImpactoAtividade;
-import sgc.mapa.model.TipoImpactoCompetencia;
+import sgc.mapa.model.*;
 import sgc.organizacao.model.Usuario;
-import static sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS;
+
 /**
- * Serviço responsável por detectar impactos no mapa de competências causados por alterações no
+ * Serviço responsável por detectar impactos no mapa de competências causados
+ * por alterações no
  * cadastro de atividades durante processos de revisão.
  *
- * <p>Este serviço consolida toda a lógica de detecção de mudanças em atividades e análise de
- * impactos em competências. Anteriormente, essa funcionalidade estava distribuída entre três
- * services separados (ImpactoMapaService, DetectorMudancasAtividadeService e 
- * DetectorImpactoCompetenciaService), mas foram consolidados para eliminar delegação desnecessária
+ * <p>
+ * Este serviço consolida toda a lógica de detecção de mudanças em atividades e
+ * análise de
+ * impactos em competências. Anteriormente, essa funcionalidade estava
+ * distribuída entre três
+ * services separados (ImpactoMapaService, DetectorMudancasAtividadeService e
+ * DetectorImpactoCompetenciaService), mas foram consolidados para eliminar
+ * delegação desnecessária
  * e manter o pipeline de processamento coeso.
  */
 @Service
@@ -53,25 +44,35 @@ public class ImpactoMapaService {
     private final AccessControlService accessControlService;
 
     /**
-     * Realiza a verificação de impactos no mapa de competências, comparando o mapa em revisão de um
+     * Realiza a verificação de impactos no mapa de competências, comparando o mapa
+     * em revisão de um
      * subprocesso com o mapa vigente da unidade.
      *
-     * <p>Analisa as diferenças entre os dois mapas, identificando atividades inseridas,
-     * removidas ou alteradas, e as competências que são afetadas por essas mudanças.
+     * <p>
+     * Analisa as diferenças entre os dois mapas, identificando atividades
+     * inseridas,
+     * removidas ou alteradas, e as competências que são afetadas por essas
+     * mudanças.
      *
-     * <p>O acesso a esta funcionalidade é restrito por perfil e pela situação atual do subprocesso
-     * para garantir que a análise de impacto seja feita no momento correto do fluxo de trabalho.
+     * <p>
+     * O acesso a esta funcionalidade é restrito por perfil e pela situação atual do
+     * subprocesso
+     * para garantir que a análise de impacto seja feita no momento correto do fluxo
+     * de trabalho.
      *
-     * @param usuario        O usuário autenticado que realiza a operação.
-     * @return Um {@link ImpactoMapaDto} que encapsula todos os impactos encontrados. Retorna um DTO
-     * sem impactos se a unidade não possuir um mapa vigente.
-     * @throws ErroEntidadeNaoEncontrada se o subprocesso ou seu mapa não forem encontrados.
-     * @throws ErroAccessoNegado         se o usuário não tiver permissão para executar a operação na
+     * @param usuario O usuário autenticado que realiza a operação.
+     * @return Um {@link ImpactoMapaDto} que encapsula todos os impactos
+     *         encontrados. Retorna um DTO
+     *         sem impactos se a unidade não possuir um mapa vigente.
+     * @throws ErroEntidadeNaoEncontrada se o subprocesso ou seu mapa não forem
+     *                                   encontrados.
+     * @throws ErroAccessoNegado         se o usuário não tiver permissão para
+     *                                   executar a operação na
      *                                   situação atual do subprocesso.
      */
     @Transactional(readOnly = true)
     public ImpactoMapaDto verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
-        
+
         // Verificação centralizada de acesso
         accessControlService.verificarPermissao(usuario, VERIFICAR_IMPACTOS, subprocesso);
 
@@ -83,16 +84,14 @@ public class ImpactoMapaService {
 
         Mapa mapaVigente = mapaVigenteOpt.get();
         Mapa mapaSubprocesso = mapaRepo.findBySubprocessoCodigo(subprocesso.getCodigo()).orElseThrow(
-                () -> new ErroEntidadeNaoEncontrada("Mapa não encontrado para subprocesso", subprocesso.getCodigo())
-        );
+                () -> new ErroEntidadeNaoEncontrada("Mapa não encontrado para subprocesso", subprocesso.getCodigo()));
 
         List<Atividade> atividadesAtuais = obterAtividadesDoMapa(mapaSubprocesso);
         List<Atividade> atividadesVigentes = obterAtividadesDoMapa(mapaVigente);
 
         List<Competencia> competenciasMapa = competenciaRepo.findByMapaCodigo(mapaVigente.getCodigo());
 
-        Map<Long, List<Competencia>> atividadeIdToCompetencias =
-                construirMapaAtividadeCompetencias(competenciasMapa);
+        Map<Long, List<Competencia>> atividadeIdToCompetencias = construirMapaAtividadeCompetencias(competenciasMapa);
 
         // Otimização: Construir mapas auxiliares uma única vez para evitar
         // re-construção dentro de cada método do detector
@@ -100,20 +99,16 @@ public class ImpactoMapaService {
         Map<String, Atividade> mapaAtuais = atividadesPorDescricao(atividadesAtuais);
 
         List<AtividadeImpactadaDto> inseridas = detectarInseridas(
-                atividadesAtuais, mapaVigentes.keySet()
-        );
+                atividadesAtuais, mapaVigentes.keySet());
 
         List<AtividadeImpactadaDto> removidas = detectarRemovidas(
-                mapaAtuais, atividadesVigentes, atividadeIdToCompetencias
-        );
+                mapaAtuais, atividadesVigentes, atividadeIdToCompetencias);
 
         List<AtividadeImpactadaDto> alteradas = detectarAlteradas(
-                atividadesAtuais, mapaVigentes, atividadeIdToCompetencias
-        );
+                atividadesAtuais, mapaVigentes, atividadeIdToCompetencias);
 
         List<CompetenciaImpactadaDto> competenciasImpactadas = competenciasImpactadas(
-                competenciasMapa, removidas, alteradas, atividadesVigentes
-        );
+                competenciasMapa, removidas, alteradas, atividadesVigentes);
 
         return ImpactoMapaDto.comImpactos(inseridas, removidas, alteradas, competenciasImpactadas);
     }
@@ -126,7 +121,8 @@ public class ImpactoMapaService {
     }
 
     /**
-     * Detecta atividades que foram inseridas no mapa atual em comparação com o vigente.
+     * Detecta atividades que foram inseridas no mapa atual em comparação com o
+     * vigente.
      */
     private List<AtividadeImpactadaDto> detectarInseridas(List<Atividade> atuais, Set<String> descVigentes) {
         List<AtividadeImpactadaDto> inseridas = new ArrayList<>();
@@ -147,7 +143,8 @@ public class ImpactoMapaService {
     }
 
     /**
-     * Detecta atividades que foram removidas do mapa atual em comparação com o vigente.
+     * Detecta atividades que foram removidas do mapa atual em comparação com o
+     * vigente.
      */
     private List<AtividadeImpactadaDto> detectarRemovidas(
             Map<String, Atividade> atuaisMap,
@@ -174,7 +171,8 @@ public class ImpactoMapaService {
     }
 
     /**
-     * Detecta atividades que foram alteradas (em seus conhecimentos) no mapa atual em comparação com o vigente.
+     * Detecta atividades que foram alteradas (em seus conhecimentos) no mapa atual
+     * em comparação com o vigente.
      */
     private List<AtividadeImpactadaDto> detectarAlteradas(
             List<Atividade> atuais,
@@ -219,10 +217,13 @@ public class ImpactoMapaService {
     }
 
     private boolean conhecimentosDiferentes(List<Conhecimento> lista1, List<Conhecimento> lista2) {
-        if (lista1.size() != lista2.size()) return true;
+        if (lista1.size() != lista2.size())
+            return true;
 
-        // Otimização: Evitar overhead de Stream/Set para listas vazias ou muito pequenas
-        if (lista1.isEmpty()) return false;
+        // Otimização: Evitar overhead de Stream/Set para listas vazias ou muito
+        // pequenas
+        if (lista1.isEmpty())
+            return false;
 
         Set<String> descricoes1 = HashSet.newHashSet(lista1.size());
         for (Conhecimento c : lista1) {
@@ -237,7 +238,8 @@ public class ImpactoMapaService {
         return !descricoes1.equals(descricoes2);
     }
 
-    private List<String> obterNomesCompetencias(Long codigoAtividade, Map<Long, List<Competencia>> atividadeIdToCompetencias) {
+    private List<String> obterNomesCompetencias(Long codigoAtividade,
+            Map<Long, List<Competencia>> atividadeIdToCompetencias) {
         return atividadeIdToCompetencias.getOrDefault(codigoAtividade, List.of())
                 .stream()
                 .map(Competencia::getDescricao)
@@ -245,7 +247,8 @@ public class ImpactoMapaService {
     }
 
     /**
-     * Identifica quais competências foram impactadas pelas atividades removidas ou alteradas.
+     * Identifica quais competências foram impactadas pelas atividades removidas ou
+     * alteradas.
      */
     private List<CompetenciaImpactadaDto> competenciasImpactadas(
             List<Competencia> competenciasDoMapa,
@@ -259,9 +262,8 @@ public class ImpactoMapaService {
         Map<Long, List<Competencia>> atividadeIdToCompetencias = construirMapaAtividadeCompetencias(competenciasDoMapa);
 
         // Indexar IDs das atividades vigentes por descrição para lookup rápido
-        Map<String, Long> descricaoToVigenteId =
-                atividadesVigentes.stream()
-                        .collect(Collectors.toMap(Atividade::getDescricao, Atividade::getCodigo));
+        Map<String, Long> descricaoToVigenteId = atividadesVigentes.stream()
+                .collect(Collectors.toMap(Atividade::getDescricao, Atividade::getCodigo));
 
         // Processar Atividades Removidas
         processarRemovidas(removidas, atividadeIdToCompetencias, mapaImpactos);
@@ -282,13 +284,10 @@ public class ImpactoMapaService {
         removidas
                 .forEach(dto -> {
                     List<Competencia> competenciasAfetadas = atividadeIdToCompetencias.getOrDefault(
-                            dto.getCodigo(), List.of()
-                    );
-                    competenciasAfetadas.forEach(comp ->
-                            adicionarImpacto(mapaImpactos, comp,
-                                    "Atividade removida: %s".formatted(dto.getDescricao()),
-                                    TipoImpactoCompetencia.ATIVIDADE_REMOVIDA)
-                    );
+                            dto.codigo(), List.of());
+                    competenciasAfetadas.forEach(comp -> adicionarImpacto(mapaImpactos, comp,
+                            "Atividade removida: %s".formatted(dto.descricao()),
+                            TipoImpactoCompetencia.ATIVIDADE_REMOVIDA));
                 });
     }
 
@@ -299,15 +298,15 @@ public class ImpactoMapaService {
             Map<Long, CompetenciaImpactoAcumulador> mapaImpactos) {
 
         alteradas.stream()
-                .filter(dto -> descricaoToVigenteId.containsKey(dto.getDescricao()))
+                .filter(dto -> descricaoToVigenteId.containsKey(dto.descricao()))
                 .forEach(dto -> {
-                    Long idVigente = descricaoToVigenteId.get(dto.getDescricao());
-                    List<Competencia> competenciasAfetadas = atividadeIdToCompetencias.getOrDefault(idVigente, List.of());
+                    Long idVigente = descricaoToVigenteId.get(dto.descricao());
+                    List<Competencia> competenciasAfetadas = atividadeIdToCompetencias.getOrDefault(idVigente,
+                            List.of());
 
                     competenciasAfetadas.forEach(comp -> {
                         String detalhe = "Atividade alterada: '%s' → '%s'".formatted(
-                                dto.getDescricaoAnterior(), dto.getDescricao()
-                        );
+                                dto.descricaoAnterior(), dto.descricao());
                         adicionarImpacto(mapaImpactos, comp, detalhe, TipoImpactoCompetencia.ATIVIDADE_ALTERADA);
                     });
                 });
@@ -321,8 +320,7 @@ public class ImpactoMapaService {
 
         CompetenciaImpactoAcumulador acumulador = mapaImpactos.computeIfAbsent(
                 comp.getCodigo(),
-                x -> new CompetenciaImpactoAcumulador(comp.getCodigo(), comp.getDescricao())
-        );
+                x -> new CompetenciaImpactoAcumulador(comp.getCodigo(), comp.getDescricao()));
 
         acumulador.adicionarImpacto(detalhe, tipoImpacto);
     }
@@ -332,8 +330,7 @@ public class ImpactoMapaService {
                 acc.codigo,
                 acc.descricao,
                 new ArrayList<>(acc.atividadesAfetadas),
-                acc.obterTiposImpacto()
-        );
+                acc.obterTiposImpacto());
     }
 
     /**

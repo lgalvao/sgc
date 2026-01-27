@@ -29,15 +29,20 @@ import java.util.Set;
 /**
  * Serviço especializado para operações CRUD básicas de Subprocesso.
  *
- * <p>Responsável pelas operações de criação, leitura, atualização e exclusão
+ * <p>
+ * Responsável pelas operações de criação, leitura, atualização e exclusão
  * de subprocessos. Parte da decomposição arquitetural do módulo subprocesso.
  *
- * <p><b>Visibilidade:</b> Package-private - uso interno ao módulo subprocesso.
- * Acesso externo deve ser feito via {@link sgc.subprocesso.service.SubprocessoFacade}.
+ * <p>
+ * <b>Visibilidade:</b> Package-private - uso interno ao módulo subprocesso.
+ * Acesso externo deve ser feito via
+ * {@link sgc.subprocesso.service.SubprocessoFacade}.
  *
- * <p><b>Nota sobre Injeção de Dependências:</b> 
+ * <p>
+ * <b>Nota sobre Injeção de Dependências:</b>
  * MapaFacade é injetado com @Lazy para quebrar a dependência circular:
- * SubprocessoFacade → SubprocessoCrudService → MapaFacade → MapaVisualizacaoService → SubprocessoFacade
+ * SubprocessoFacade → SubprocessoCrudService → MapaFacade →
+ * MapaVisualizacaoService → SubprocessoFacade
  *
  * @since 2.0.0 - Tornado package-private na consolidação arquitetural Sprint 2
  */
@@ -54,8 +59,9 @@ public class SubprocessoCrudService {
 
     /**
      * Constructor with @Lazy injection to break circular dependency.
-     * 
-     * @param mapaFacade injetado com @Lazy para evitar BeanCurrentlyInCreationException
+     *
+     * @param mapaFacade injetado com @Lazy para evitar
+     *                   BeanCurrentlyInCreationException
      */
     public SubprocessoCrudService(
             SubprocessoRepo repositorioSubprocesso,
@@ -78,7 +84,9 @@ public class SubprocessoCrudService {
 
     /**
      * Busca subprocesso e seu mapa associado.
-     * <p>O mapa é um invariante do subprocesso após a criação, portanto é garantido que exista.
+     * <p>
+     * O mapa é um invariante do subprocesso após a criação, portanto é garantido
+     * que exista.
      */
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
         return buscarSubprocesso(codigo);
@@ -95,8 +103,10 @@ public class SubprocessoCrudService {
     }
 
     @Transactional(readOnly = true)
-    public List<Subprocesso> listarPorProcessoUnidadeESituacoes(Long codProcesso, Long codUnidade, List<SituacaoSubprocesso> situacoes) {
-        return repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso, codUnidade, situacoes);
+    public List<Subprocesso> listarPorProcessoUnidadeESituacoes(Long codProcesso, Long codUnidade,
+            List<SituacaoSubprocesso> situacoes) {
+        return repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso,
+                codUnidade, situacoes);
     }
 
     @Transactional(readOnly = true)
@@ -125,15 +135,15 @@ public class SubprocessoCrudService {
         var entity = new Subprocesso();
         // Mapear manualmente do Request
         var processo = new sgc.processo.model.Processo();
-        processo.setCodigo(request.getCodProcesso());
+        processo.setCodigo(request.codProcesso());
         entity.setProcesso(processo);
         var unidade = new sgc.organizacao.model.Unidade();
-        unidade.setCodigo(request.getCodUnidade());
+        unidade.setCodigo(request.codUnidade());
         entity.setUnidade(unidade);
-        entity.setDataLimiteEtapa1(request.getDataLimiteEtapa1());
-        entity.setDataLimiteEtapa2(request.getDataLimiteEtapa2());
+        entity.setDataLimiteEtapa1(request.dataLimiteEtapa1());
+        entity.setDataLimiteEtapa2(request.dataLimiteEtapa2());
         entity.setMapa(null);
-        
+
         var subprocessoSalvo = repositorioSubprocesso.save(entity);
 
         Mapa mapa = new Mapa();
@@ -182,10 +192,11 @@ public class SubprocessoCrudService {
     private Set<String> processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
         Set<String> campos = new HashSet<>();
 
-        java.util.Optional.ofNullable(request.getCodMapa()).ifPresent(cod -> {
+        java.util.Optional.ofNullable(request.codMapa()).ifPresent(cod -> {
             Mapa m = new Mapa();
             m.setCodigo(cod);
-            // Compara IDs para evitar atualização desnecessária (já que Mapa não implementa equals)
+            // Compara IDs para evitar atualização desnecessária (já que Mapa não implementa
+            // equals)
             Long codAtual = subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null;
             if (!Objects.equals(codAtual, cod)) {
                 campos.add("mapa");
@@ -193,17 +204,17 @@ public class SubprocessoCrudService {
             }
         });
 
-        if (!Objects.equals(subprocesso.getDataLimiteEtapa1(), request.getDataLimiteEtapa1())) {
+        if (!Objects.equals(subprocesso.getDataLimiteEtapa1(), request.dataLimiteEtapa1())) {
             campos.add("dataLimiteEtapa1");
-            subprocesso.setDataLimiteEtapa1(request.getDataLimiteEtapa1());
+            subprocesso.setDataLimiteEtapa1(request.dataLimiteEtapa1());
         }
-        if (!Objects.equals(subprocesso.getDataFimEtapa1(), request.getDataFimEtapa1())) {
+        if (!Objects.equals(subprocesso.getDataFimEtapa1(), request.dataFimEtapa1())) {
             campos.add("dataFimEtapa1");
-            subprocesso.setDataFimEtapa1(request.getDataFimEtapa1());
+            subprocesso.setDataFimEtapa1(request.dataFimEtapa1());
         }
-        if (!Objects.equals(subprocesso.getDataFimEtapa2(), request.getDataFimEtapa2())) {
+        if (!Objects.equals(subprocesso.getDataFimEtapa2(), request.dataFimEtapa2())) {
             campos.add("dataFimEtapa2");
-            subprocesso.setDataFimEtapa2(request.getDataFimEtapa2());
+            subprocesso.setDataFimEtapa2(request.dataFimEtapa2());
         }
 
         return campos;

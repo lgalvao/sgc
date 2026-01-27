@@ -9,6 +9,7 @@ import java.util.List;
  */
 @Builder
 public record ProcessoContextoDto(
-    ProcessoDetalheDto processo,
-    List<SubprocessoElegivelDto> elegiveis
-) {}
+        ProcessoDetalheDto processo,
+        List<SubprocessoElegivelDto> elegiveis
+) {
+}

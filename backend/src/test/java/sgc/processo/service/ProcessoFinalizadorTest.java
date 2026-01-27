@@ -37,11 +37,16 @@ class ProcessoFinalizadorTest {
     @InjectMocks
     private ProcessoFinalizador finalizador;
 
-    @Mock private ProcessoRepo processoRepo;
-    @Mock private UnidadeFacade unidadeService;
-    @Mock private SubprocessoFacade subprocessoFacade;
-    @Mock private ProcessoValidador processoValidador;
-    @Mock private ApplicationEventPublisher publicadorEventos;
+    @Mock
+    private ProcessoRepo processoRepo;
+    @Mock
+    private UnidadeFacade unidadeService;
+    @Mock
+    private SubprocessoFacade subprocessoFacade;
+    @Mock
+    private ProcessoValidador processoValidador;
+    @Mock
+    private ApplicationEventPublisher publicadorEventos;
 
     @Test
     @DisplayName("Deve finalizar processo com sucesso")
@@ -67,7 +72,7 @@ class ProcessoFinalizadorTest {
         assertThat(p.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
         verify(unidadeService).definirMapaVigente(100L, m);
         verify(processoRepo).save(p);
-        
+
         ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
         verify(publicadorEventos).publishEvent(captor.capture());
         assertThat(captor.getValue()).isInstanceOf(EventoProcessoFinalizado.class);

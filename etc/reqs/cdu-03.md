@@ -88,4 +88,6 @@
 ## Fluxo alternativo
 
 Caso o usuário escolha o botão `Iniciar processo` em vez do botão `Salvar`, o sistema realiza as validações dos dados
-informados, cria o processo (se ainda não tiver sido criado) e segue para o fluxo do caso de uso `Iniciar processo de mapeamento`, ou `Iniciar processo de revisão`, ou `Iniciar processo de diagnóstico`, dependendo do tipo do processo.
+informados, cria o processo (se ainda não tiver sido criado) e segue para o fluxo do caso de uso
+`Iniciar processo de mapeamento`, ou `Iniciar processo de revisão`, ou `Iniciar processo de diagnóstico`, dependendo do
+tipo do processo.

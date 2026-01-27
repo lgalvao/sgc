@@ -58,15 +58,15 @@ public class Usuario implements UserDetails {
     @Transient
     private Set<UsuarioPerfil> atribuicoesCache;
 
-    public void setAtribuicoes(Set<UsuarioPerfil> atribuicoes) {
-        this.atribuicoesCache = atribuicoes;
-    }
-
     public Set<UsuarioPerfil> getAtribuicoes() {
         if (atribuicoesCache == null) {
             atribuicoesCache = new HashSet<>();
         }
         return atribuicoesCache;
+    }
+
+    public void setAtribuicoes(Set<UsuarioPerfil> atribuicoes) {
+        this.atribuicoesCache = atribuicoes;
     }
 
     public Set<UsuarioPerfil> getTodasAtribuicoes() {

@@ -42,7 +42,8 @@ public class ProcessoInicializador {
 
     /**
      * Inicia um processo de qualquer tipo.
-     * @param codigo Código do processo
+     *
+     * @param codigo            Código do processo
      * @param codsUnidadesParam Lista de códigos de unidades (usada apenas para REVISAO)
      * @return Lista de erros (vazia se sucesso)
      */
@@ -128,16 +129,15 @@ public class ProcessoInicializador {
         return erros;
     }
 
-    private void criarSubprocessos(Processo processo, TipoProcesso tipo, 
-                                    List<Long> codigosUnidades, Set<Unidade> unidadesParaProcessar,
-                                    List<sgc.organizacao.model.UnidadeMapa> unidadesMapas) {
-        
+    private void criarSubprocessos(Processo processo, TipoProcesso tipo,
+                                   List<Long> codigosUnidades, Set<Unidade> unidadesParaProcessar,
+                                   List<sgc.organizacao.model.UnidadeMapa> unidadesMapas) {
+
         java.util.Map<Long, sgc.organizacao.model.UnidadeMapa> mapaUnidadeMapa = unidadesMapas.stream()
                 .collect(Collectors.toMap(sgc.organizacao.model.UnidadeMapa::getUnidadeCodigo, m -> m));
 
         switch (tipo) {
-            case MAPEAMENTO -> 
-                subprocessoFactory.criarParaMapeamento(processo, unidadesParaProcessar);
+            case MAPEAMENTO -> subprocessoFactory.criarParaMapeamento(processo, unidadesParaProcessar);
             case REVISAO -> {
                 // Batch fetch units to avoid N+1 queries
                 List<Unidade> unidades = unidadeRepo.findAllById(codigosUnidades);
@@ -147,7 +147,7 @@ public class ProcessoInicializador {
                 for (Long codUnidade : codigosUnidades) {
                     Unidade unidade = mapaUnidades.get(codUnidade);
                     if (unidade == null) {
-                         throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
+                        throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
                     }
                     sgc.organizacao.model.UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
                     subprocessoFactory.criarParaRevisao(processo, unidade, um);
@@ -180,7 +180,7 @@ public class ProcessoInicializador {
         List<Long> codigosComMapa = unidadeMapaRepo.findAllById(codigosUnidades).stream()
                 .map(sgc.organizacao.model.UnidadeMapa::getUnidadeCodigo)
                 .toList();
-        
+
         List<Long> unidadesSemMapa = codigosUnidades.stream()
                 .filter(codigo -> !codigosComMapa.contains(codigo))
                 .toList();

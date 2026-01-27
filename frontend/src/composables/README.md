@@ -1,6 +1,5 @@
 # Composables (Vue Composition API)
 
-
 Este diretório contém **Composables** do Vue.js. Composables são funções que encapsulam lógica de estado com a
 Composition API para ser reutilizada entre componentes.
 

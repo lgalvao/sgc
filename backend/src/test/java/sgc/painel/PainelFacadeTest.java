@@ -26,8 +26,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,11 +33,15 @@ import static org.mockito.Mockito.*;
 @DisplayName("PainelFacade Test")
 class PainelFacadeTest {
 
-    @Mock private ProcessoFacade processoFacade;
-    @Mock private AlertaFacade alertaFacade;
-    @Mock private UnidadeFacade unidadeFacade;
+    @Mock
+    private ProcessoFacade processoFacade;
+    @Mock
+    private AlertaFacade alertaFacade;
+    @Mock
+    private UnidadeFacade unidadeFacade;
 
-    @InjectMocks private PainelFacade painelFacade;
+    @InjectMocks
+    private PainelFacade painelFacade;
 
     @Test
     @DisplayName("Deve listar processos para ADMIN")
@@ -164,7 +166,7 @@ class PainelFacadeTest {
 
         // Mock deve esperar um pageable SORTED, pois o método aplica sort default
         when(alertaFacade.listarPorUnidade(eq(100L), argThat(p ->
-            p.isPaged() && p.getSort().isSorted() && p.getSort().getOrderFor("dataHora") != null
+                p.isPaged() && p.getSort().isSorted() && p.getSort().getOrderFor("dataHora") != null
         ))).thenReturn(page);
 
         when(alertaFacade.obterDataHoraLeitura(1L, "123")).thenReturn(Optional.of(LocalDateTime.now()));

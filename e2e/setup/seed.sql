@@ -59,7 +59,8 @@ INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codig
 VALUES ('333333', 'CHEFE', 6);
 
 INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
-VALUES ('444444', '00444444', 'SERVIDOR_SECAO_111_E_CHEFE_SECAO_112', 'servidor_secao_111_e_chefe_secao_112@tre-pe.jus.br', '2007', 6, 6);
+VALUES ('444444', '00444444', 'SERVIDOR_SECAO_111_E_CHEFE_SECAO_112',
+        'servidor_secao_111_e_chefe_secao_112@tre-pe.jus.br', '2007', 6, 6);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('444444', 'SERVIDOR', 6);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
@@ -232,75 +233,111 @@ VALUES (9902, 99001);
 
 -- Atualizar titulares das unidades depois da criação dos usuários (com matrícula e data inicio)
 UPDATE sgc.vw_unidade
-SET titulo_titular = '111111', matricula_titular = '00111111', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '111111',
+    matricula_titular        = '00111111',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 1;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '202020', matricula_titular = '00202020', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '202020',
+    matricula_titular        = '00202020',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 2;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '555555', matricula_titular = '00555555', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '555555',
+    matricula_titular        = '00555555',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 3;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '151515', matricula_titular = '00151515', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '151515',
+    matricula_titular        = '00151515',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 4;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '222222', matricula_titular = '00222222', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '222222',
+    matricula_titular        = '00222222',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 5;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '333333', matricula_titular = '00333333', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '333333',
+    matricula_titular        = '00333333',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 6;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '444444', matricula_titular = '00444444', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '444444',
+    matricula_titular        = '00444444',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 7;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '303030', matricula_titular = '00303030', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '303030',
+    matricula_titular        = '00303030',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 8;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '222223', matricula_titular = '00222223', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '222223',
+    matricula_titular        = '00222223',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 9;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '171717', matricula_titular = '00171717', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '171717',
+    matricula_titular        = '00171717',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 10;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '212121', matricula_titular = '00212121', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '212121',
+    matricula_titular        = '00212121',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 11;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '777777', matricula_titular = '00777777', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '777777',
+    matricula_titular        = '00777777',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 12;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '888888', matricula_titular = '00888888', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '888888',
+    matricula_titular        = '00888888',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 13;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '999999', matricula_titular = '00999999', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '999999',
+    matricula_titular        = '00999999',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 14;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '101010', matricula_titular = '00101010', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '101010',
+    matricula_titular        = '00101010',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 15;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '181818', matricula_titular = '00181818', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '181818',
+    matricula_titular        = '00181818',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 16;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '131313', matricula_titular = '00131313', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '131313',
+    matricula_titular        = '00131313',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 17;
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '141414', matricula_titular = '00141414', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '141414',
+    matricula_titular        = '00141414',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 18;
 
 -- Dados para teste de Importação (CDU-08)
@@ -353,5 +390,7 @@ INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codig
 VALUES ('123456789012', 'CHEFE', 99);
 
 UPDATE sgc.vw_unidade
-SET titulo_titular = '123456789012', matricula_titular = '56789012', data_inicio_titularidade = CURRENT_TIMESTAMP
+SET titulo_titular           = '123456789012',
+    matricula_titular        = '56789012',
+    data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 99;

@@ -8,7 +8,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mail.javamail.JavaMailSender;
 import sgc.notificacao.dto.EmailDto;
 import sgc.notificacao.model.Notificacao;
 import sgc.notificacao.model.NotificacaoRepo;
@@ -23,12 +22,8 @@ import static org.mockito.Mockito.*;
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
 class NotificacaoEmailServiceTest {
-    
     private static final int LIMITE_CONTEUDO_NOTIFICACAO = 500;
     private static final int TAMANHO_CORPO_LONGO = 600;
-    
-    @Mock
-    private JavaMailSender enviadorDeEmail;
 
     @Mock
     private NotificacaoRepo repositorioNotificacao;
@@ -55,10 +50,10 @@ class NotificacaoEmailServiceTest {
         verify(emailExecutor).enviarEmailAssincrono(captorEmailDto.capture());
 
         EmailDto emailCapturado = captorEmailDto.getValue();
-        assertEquals(para, emailCapturado.getDestinatario());
-        assertEquals(assunto, emailCapturado.getAssunto());
-        assertTrue(emailCapturado.isHtml());
-        assertEquals(corpoHtml, emailCapturado.getCorpo());
+        assertEquals(para, emailCapturado.destinatario());
+        assertEquals(assunto, emailCapturado.assunto());
+        assertTrue(emailCapturado.html());
+        assertEquals(corpoHtml, emailCapturado.corpo());
 
         verify(repositorioNotificacao, times(1)).save(any(Notificacao.class));
     }
@@ -95,10 +90,10 @@ class NotificacaoEmailServiceTest {
         verify(emailExecutor).enviarEmailAssincrono(captorEmailDto.capture());
 
         EmailDto emailCapturado = captorEmailDto.getValue();
-        assertEquals(para, emailCapturado.getDestinatario());
-        assertEquals(assunto, emailCapturado.getAssunto());
-        org.junit.jupiter.api.Assertions.assertFalse(emailCapturado.isHtml());
-        assertEquals(corpo, emailCapturado.getCorpo());
+        assertEquals(para, emailCapturado.destinatario());
+        assertEquals(assunto, emailCapturado.assunto());
+        org.junit.jupiter.api.Assertions.assertFalse(emailCapturado.html());
+        assertEquals(corpo, emailCapturado.corpo());
 
         verify(repositorioNotificacao, times(1)).save(any(Notificacao.class));
     }

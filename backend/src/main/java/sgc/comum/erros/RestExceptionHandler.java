@@ -93,7 +93,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                         error -> new ErroSubApi(error.getObjectName(),
                                 error.getField(),
                                 sanitizar(error.getDefaultMessage())))
-                        .toList()
+                .toList()
                 : null;
 
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
@@ -106,9 +106,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("[{}] Erro de constraint de banco de dados: {}", traceId, ex.getMessage(), ex);
         String message = "A requisição contém dados inválidos.";
         var subErrors = ex.getConstraintViolations().stream().map(violation -> new ErroSubApi(
-                violation.getRootBeanClass().getSimpleName(),
-                violation.getPropertyPath().toString(),
-                sanitizar(violation.getMessage())))
+                        violation.getRootBeanClass().getSimpleName(),
+                        violation.getPropertyPath().toString(),
+                        sanitizar(violation.getMessage())))
                 .collect(Collectors.toList());
 
         ErroApi erroApi = new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors);

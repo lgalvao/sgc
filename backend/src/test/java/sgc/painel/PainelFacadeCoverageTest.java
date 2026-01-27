@@ -124,7 +124,7 @@ class PainelFacadeCoverageTest {
         painelFacade.listarAlertas("T", 1L, PageRequest.of(0, 10));
 
         // Verifica se chamou alertaService com sort adicionado
-        verify(alertaService).listarPorUnidade(eq(1L), argThat(p -> ((Pageable)p).getSort().isSorted()));
+        verify(alertaService).listarPorUnidade(eq(1L), argThat(p -> p.getSort().isSorted()));
     }
 
     @Test

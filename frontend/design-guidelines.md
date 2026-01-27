@@ -1,6 +1,7 @@
 # Design Guidelines & Standards
 
-This document serves as the source of truth for UI/UX development in the frontend application. It enforces consistency across Views, Components, and Interactions using **Bootstrap 5.3** and **BootstrapVueNext 0.42**.
+This document serves as the source of truth for UI/UX development in the frontend application. It enforces consistency
+across Views, Components, and Interactions using **Bootstrap 5.3** and **BootstrapVueNext 0.42**.
 
 > **Last Updated:** Janeiro 2026  
 > **BootstrapVueNext Version:** 0.42.0  
@@ -8,6 +9,7 @@ This document serves as the source of truth for UI/UX development in the fronten
 > **Target:** Clean, minimal, accessible UI with consistent UX patterns
 
 ## 📚 Table of Contents
+
 1. [Core Principles](#-core-principles)
 2. [Layout & Typography](#-layout--typography)
 3. [Components](#-components)
@@ -22,12 +24,15 @@ This document serves as the source of truth for UI/UX development in the fronten
 
 ## 🎨 Core Principles
 
-1.  **Bootstrap First:** Use standard Bootstrap 5 utility classes (`p-3`, `d-flex`, `text-muted`) over custom CSS. Leverage Bootstrap's grid, spacing, and flexbox utilities.
-2.  **Component Reusability:** Never duplicate modal logic or complex layouts. Use shared components. If you write the same code twice, create a component.
-3.  **Feedback:** Every user action (Save, Delete, Load) must provide visual feedback (Spinners, Toasts, Alerts).
-4.  **Accessibility:** All interactive elements must be keyboard-navigable. Use semantic HTML and ARIA attributes where needed.
-5.  **Minimal Code:** Prefer built-in BootstrapVueNext features over custom implementations. Less code = fewer bugs.
-6.  **Composition API:** Use `<script setup lang="ts">` for all components. Leverage composables for reusable logic.
+1. **Bootstrap First:** Use standard Bootstrap 5 utility classes (`p-3`, `d-flex`, `text-muted`) over custom CSS.
+   Leverage Bootstrap's grid, spacing, and flexbox utilities.
+2. **Component Reusability:** Never duplicate modal logic or complex layouts. Use shared components. If you write the
+   same code twice, create a component.
+3. **Feedback:** Every user action (Save, Delete, Load) must provide visual feedback (Spinners, Toasts, Alerts).
+4. **Accessibility:** All interactive elements must be keyboard-navigable. Use semantic HTML and ARIA attributes where
+   needed.
+5. **Minimal Code:** Prefer built-in BootstrapVueNext features over custom implementations. Less code = fewer bugs.
+6. **Composition API:** Use `<script setup lang="ts">` for all components. Leverage composables for reusable logic.
 
 ---
 
@@ -90,16 +95,17 @@ This document serves as the source of truth for UI/UX development in the fronten
 
 ### Typography Hierarchy
 
-| Element | Class | Usage | Example Files |
-|---------|-------|-------|---------------|
-| **Page Title** | `h2` ou `display-6` | Título principal da página | PainelView, CadProcesso |
-| **Section Title** | `h4` ou `h5` com `mb-3` | Seções dentro da página | VisMapa, CadAtividades |
-| **Subsection** | `h6` | Sub-seções menores | Raramente usado |
-| **Body Text** | (default) | Texto padrão | Todos |
-| **Secondary Text** | `text-muted` | Informação secundária | Descrições, hints |
-| **Small Text** | `small` ou `fs-7` | Textos auxiliares | Form descriptions |
+| Element            | Class                   | Usage                      | Example Files           |
+|--------------------|-------------------------|----------------------------|-------------------------|
+| **Page Title**     | `h2` ou `display-6`     | Título principal da página | PainelView, CadProcesso |
+| **Section Title**  | `h4` ou `h5` com `mb-3` | Seções dentro da página    | VisMapa, CadAtividades  |
+| **Subsection**     | `h6`                    | Sub-seções menores         | Raramente usado         |
+| **Body Text**      | (default)               | Texto padrão               | Todos                   |
+| **Secondary Text** | `text-muted`            | Informação secundária      | Descrições, hints       |
+| **Small Text**     | `small` ou `fs-7`       | Textos auxiliares          | Form descriptions       |
 
 **⚠️ Current Inconsistency:**
+
 - Some views use `display-6`, others use `h2` for page titles
 - **Recommendation:** Standardize on `h2` for semantic HTML (better for accessibility)
 - Use `display-6` only for marketing/landing pages
@@ -167,12 +173,14 @@ This document serves as the source of truth for UI/UX development in the fronten
 ```
 
 **Icon Guidelines:**
+
 - Always use `me-1` spacing after icon (before text)
 - Add `aria-hidden="true"` to decorative icons
 - Use Bootstrap Icons (`bi-*`) library consistently
 - Icon + text is better than icon-only for clarity
 
 **Button Grouping:**
+
 ```vue
 <!-- Horizontal group with consistent spacing -->
 <div class="d-flex gap-2">
@@ -194,6 +202,7 @@ This document serves as the source of truth for UI/UX development in the fronten
 **❌ DO NOT use inline `<BModal>` for standard confirmations.**
 
 **Current Issues Found:**
+
 - 23 inline BModal instances across 15 files
 - Inconsistent `fade` prop usage
 - Duplicated footer logic
@@ -225,6 +234,7 @@ function handleConfirmar() {
 ```
 
 **Props da ModalConfirmacao:**
+
 - `titulo` (string): Título do modal
 - `mensagem` (string, optional): Mensagem de confirmação
 - `variant` (string): `danger`, `warning`, `primary` (default)
@@ -232,6 +242,7 @@ function handleConfirmar() {
 - `testIdCancelar` (string, optional): Test ID para botão cancelar
 
 **Behavior:**
+
 - Always `centered`
 - Auto-focus on **Cancel** button for `variant="danger"` (safety feature)
 - ESC key closes modal (accessible)
@@ -269,6 +280,7 @@ function handleConfirmar() {
 ```
 
 **Modal Best Practices (BootstrapVueNext 0.42):**
+
 - Use `v-model` for open/close state (reactive)
 - Use `:fade="false"` for better performance (optional, but consistent)
 - Use `hide-footer` + `<template #footer>` for custom footers
@@ -301,12 +313,14 @@ function handleConfirmar() {
 ```
 
 **Validation Patterns:**
+
 - Use `useFormErrors` composable for managing field errors
 - Set `:state="false"` to show invalid state
 - Set `:state="null"` for neutral (no validation yet)
 - Set `:state="true"` for valid state (optional, use sparingly)
 
 **Form Loading State:**
+
 ```vue
 <BForm @submit.prevent="handleSubmit">
   <BFormGroup v-for="field in fields" :key="field.name" class="mb-3">
@@ -323,11 +337,11 @@ function handleConfirmar() {
 
 **Error Display Methods:**
 
-| Method | Usage | When to Use |
-|--------|-------|-------------|
-| `BFormInvalidFeedback` | Field-level errors | Input validation errors |
-| `BAlert` (danger) | Form-level errors | Multiple errors, API errors |
-| `div.text-danger.small` | ❌ Avoid | Use BFormInvalidFeedback instead |
+| Method                  | Usage              | When to Use                      |
+|-------------------------|--------------------|----------------------------------|
+| `BFormInvalidFeedback`  | Field-level errors | Input validation errors          |
+| `BAlert` (danger)       | Form-level errors  | Multiple errors, API errors      |
+| `div.text-danger.small` | ❌ Avoid            | Use BFormInvalidFeedback instead |
 
 ---
 
@@ -361,6 +375,7 @@ function handleConfirmar() {
 ```
 
 **Table Best Practices:**
+
 - Use `:hover="true"` for clickable rows
 - Add `cursor: pointer` styling (already in style.css)
 - Always handle empty state with EmptyState component or inline template
@@ -387,6 +402,7 @@ function handleConfirmar() {
 ```
 
 **Variants:**
+
 - `success`: Operação bem-sucedida
 - `danger`: Erro crítico
 - `warning`: Aviso importante
@@ -410,6 +426,7 @@ toast.info('Processando...')
 ```
 
 **When to Use:**
+
 - **BAlert (local):** Persistent page-level messages, validation summaries
 - **Toast (global):** Transient feedback, success/error notifications
 - **BFormInvalidFeedback:** Field-level validation errors
@@ -434,6 +451,7 @@ toast.info('Processando...')
 ```
 
 **Best Practices:**
+
 - Use semantic components (`BCardHeader`, `BCardBody`, `BCardFooter`)
 - Avoid nesting cards in cards
 - Use cards for grouped content, not as generic containers
@@ -493,6 +511,7 @@ export const useExemploStore = defineStore('exemplo', () => {
 ```
 
 **Best Practices:**
+
 - Use **Setup Stores** (composition function style) instead of Options API
 - State: `ref()` for primitives and objects
 - Getters: `computed()` for derived state
@@ -589,6 +608,7 @@ try {
 ```
 
 **When to Use:**
+
 - **Local BAlert:** Expected errors, validation issues, form-level errors
 - **Global Toast:** Success feedback, unexpected errors, background operations
 - **BFormInvalidFeedback:** Field-level validation
@@ -655,14 +675,15 @@ export function useConfirmDialog() {
 
 ### Custom Composables (Existing)
 
-| Composable | Purpose | Usage |
-|------------|---------|-------|
-| `useFormErrors` | Manage form field errors | `const { fieldErrors, setFieldError, clearErrors } = useFormErrors()` |
-| `usePerfil` | Access user profile state | `const { perfil, unidade } = usePerfil()` |
-| `useBreadcrumbs` | Manage breadcrumb navigation | `const { setBreadcrumbs } = useBreadcrumbs()` |
-| `useApi` | Shared API request wrapper | Internal use in services |
+| Composable       | Purpose                      | Usage                                                                 |
+|------------------|------------------------------|-----------------------------------------------------------------------|
+| `useFormErrors`  | Manage form field errors     | `const { fieldErrors, setFieldError, clearErrors } = useFormErrors()` |
+| `usePerfil`      | Access user profile state    | `const { perfil, unidade } = usePerfil()`                             |
+| `useBreadcrumbs` | Manage breadcrumb navigation | `const { setBreadcrumbs } = useBreadcrumbs()`                         |
+| `useApi`         | Shared API request wrapper   | Internal use in services                                              |
 
 **Composable Best Practices:**
+
 - **Name with `use` prefix:** `useMyComposable`
 - **Return object with named exports:** `return { state, action }`
 - **Keep composables focused:** One responsibility per composable
@@ -716,6 +737,7 @@ export function useProcessoForm() {
 ## ♿ Accessibility
 
 ### Keyboard Navigation
+
 - **All interactive elements must be keyboard-accessible**
 - Use semantic HTML (`<button>`, `<a>`, `<input>`)
 - Test with Tab, Enter, Escape keys
@@ -747,6 +769,7 @@ export function useProcessoForm() {
 ### Focus Management
 
 **Modal Auto-Focus (Safety Pattern):**
+
 ```ts
 // ModalConfirmacao.vue already implements this
 function onShown() {
@@ -757,6 +780,7 @@ function onShown() {
 ```
 
 **Form Validation Focus:**
+
 ```ts
 async function handleSubmit() {
   if (!isFormValid.value) {
@@ -774,51 +798,57 @@ async function handleSubmit() {
 ## 📦 Component Inventory
 
 ### Layout Components
-| Component | Status | Location | Usage |
-|-----------|--------|----------|-------|
-| PageHeader | ❌ Missing | - | Standardize page headers |
-| AppContainer | ❌ Missing | - | Wrap BContainer with defaults |
-| EmptyState | ✅ Exists | `components/EmptyState.vue` | Table empty states |
+
+| Component    | Status    | Location                    | Usage                         |
+|--------------|-----------|-----------------------------|-------------------------------|
+| PageHeader   | ❌ Missing | -                           | Standardize page headers      |
+| AppContainer | ❌ Missing | -                           | Wrap BContainer with defaults |
+| EmptyState   | ✅ Exists  | `components/EmptyState.vue` | Table empty states            |
 
 ### Modal Components
-| Component | Status | Location | Usage |
-|-----------|--------|----------|-------|
-| ModalConfirmacao | ✅ Exists | `components/ModalConfirmacao.vue` | Generic confirmations |
-| SubprocessoModal | ✅ Exists | `components/SubprocessoModal.vue` | Create subprocess |
-| AceitarMapaModal | ✅ Exists | `components/AceitarMapaModal.vue` | Accept competency map |
-| DisponibilizarMapaModal | ✅ Exists | `components/DisponibilizarMapaModal.vue` | Publish map |
-| CriarCompetenciaModal | ✅ Exists | `components/CriarCompetenciaModal.vue` | Create competency |
-| ImpactoMapaModal | ✅ Exists | `components/ImpactoMapaModal.vue` | View impact report |
+
+| Component               | Status   | Location                                 | Usage                 |
+|-------------------------|----------|------------------------------------------|-----------------------|
+| ModalConfirmacao        | ✅ Exists | `components/ModalConfirmacao.vue`        | Generic confirmations |
+| SubprocessoModal        | ✅ Exists | `components/SubprocessoModal.vue`        | Create subprocess     |
+| AceitarMapaModal        | ✅ Exists | `components/AceitarMapaModal.vue`        | Accept competency map |
+| DisponibilizarMapaModal | ✅ Exists | `components/DisponibilizarMapaModal.vue` | Publish map           |
+| CriarCompetenciaModal   | ✅ Exists | `components/CriarCompetenciaModal.vue`   | Create competency     |
+| ImpactoMapaModal        | ✅ Exists | `components/ImpactoMapaModal.vue`        | View impact report    |
 
 **Issues:**
+
 - 23 inline BModal instances should use ModalConfirmacao
 - Specialized modals should extend ModalConfirmacao's footer pattern
 
 ### Form Components
-| Component | Status | Usage |
-|-----------|--------|-------|
-| BFormGroup | ✅ BootstrapVueNext | Form field wrapper |
-| BFormInput | ✅ BootstrapVueNext | Text input |
-| BFormSelect | ✅ BootstrapVueNext | Dropdown |
-| BFormTextarea | ✅ BootstrapVueNext | Multi-line text |
-| BFormInvalidFeedback | ✅ BootstrapVueNext | Validation errors |
-| FormField | ❌ Missing | Combined input + validation wrapper |
+
+| Component            | Status             | Usage                               |
+|----------------------|--------------------|-------------------------------------|
+| BFormGroup           | ✅ BootstrapVueNext | Form field wrapper                  |
+| BFormInput           | ✅ BootstrapVueNext | Text input                          |
+| BFormSelect          | ✅ BootstrapVueNext | Dropdown                            |
+| BFormTextarea        | ✅ BootstrapVueNext | Multi-line text                     |
+| BFormInvalidFeedback | ✅ BootstrapVueNext | Validation errors                   |
+| FormField            | ❌ Missing          | Combined input + validation wrapper |
 
 ### Navigation Components
-| Component | Status | Location |
-|-----------|--------|----------|
-| MainNavbar | ✅ Exists | `components/MainNavbar.vue` |
+
+| Component      | Status   | Location                        |
+|----------------|----------|---------------------------------|
+| MainNavbar     | ✅ Exists | `components/MainNavbar.vue`     |
 | BarraNavegacao | ✅ Exists | `components/BarraNavegacao.vue` |
 
 ### Data Display Components
-| Component | Status | Location |
-|-----------|--------|----------|
-| TabelaProcessos | ✅ Exists | `components/TabelaProcessos.vue` |
-| TabelaAlertas | ✅ Exists | `components/TabelaAlertas.vue` |
+
+| Component           | Status   | Location                             |
+|---------------------|----------|--------------------------------------|
+| TabelaProcessos     | ✅ Exists | `components/TabelaProcessos.vue`     |
+| TabelaAlertas       | ✅ Exists | `components/TabelaAlertas.vue`       |
 | TabelaMovimentacoes | ✅ Exists | `components/TabelaMovimentacoes.vue` |
-| TreeTableView | ✅ Exists | `components/TreeTableView.vue` |
-| ProcessoCard | ✅ Exists | `components/ProcessoCard.vue` |
-| CompetenciaCard | ✅ Exists | `components/CompetenciaCard.vue` |
+| TreeTableView       | ✅ Exists | `components/TreeTableView.vue`       |
+| ProcessoCard        | ✅ Exists | `components/ProcessoCard.vue`        |
+| CompetenciaCard     | ✅ Exists | `components/CompetenciaCard.vue`     |
 
 ---
 
@@ -827,6 +857,7 @@ async function handleSubmit() {
 ### 1. Inline Modals for Generic Confirmations
 
 **❌ Bad (23 instances found):**
+
 ```vue
 <BModal v-model="showDelete" title="Remover" hide-footer>
   <p>Confirmar remoção?</p>
@@ -838,6 +869,7 @@ async function handleSubmit() {
 ```
 
 **✅ Good:**
+
 ```vue
 <ModalConfirmacao
   v-model="showDelete"
@@ -853,6 +885,7 @@ async function handleSubmit() {
 ### 2. Manual Loading States
 
 **❌ Bad:**
+
 ```vue
 <BButton :disabled="loading1">Ação 1</BButton>
 <BButton :disabled="loading2">Ação 2</BButton>
@@ -860,6 +893,7 @@ async function handleSubmit() {
 ```
 
 **✅ Good (LoadingButton component):**
+
 ```vue
 <LoadingButton :loading="loading1" @click="action1">Ação 1</LoadingButton>
 <LoadingButton :loading="loading2" @click="action2">Ação 2</LoadingButton>
@@ -870,6 +904,7 @@ async function handleSubmit() {
 ### 3. Inconsistent Headings
 
 **❌ Bad:**
+
 ```vue
 <!-- View A -->
 <h1>Título</h1>
@@ -882,6 +917,7 @@ async function handleSubmit() {
 ```
 
 **✅ Good:**
+
 ```vue
 <!-- All views -->
 <h2 class="mb-3">Título da Página</h2>
@@ -892,12 +928,14 @@ async function handleSubmit() {
 ### 4. Hardcoded Colors
 
 **❌ Bad:**
+
 ```vue
 <div style="color: #333">Texto</div>
 <BButton style="background: #28a745">Salvar</BButton>
 ```
 
 **✅ Good:**
+
 ```vue
 <div class="text-dark">Texto</div>
 <BButton variant="success">Salvar</BButton>
@@ -908,6 +946,7 @@ async function handleSubmit() {
 ### 5. Mixed Error Display
 
 **❌ Bad:**
+
 ```vue
 <!-- File A -->
 <div class="text-danger small">{{ error }}</div>
@@ -920,6 +959,7 @@ async function handleSubmit() {
 ```
 
 **✅ Good:**
+
 ```vue
 <!-- Consistent use of BFormInvalidFeedback for field errors -->
 <BFormInvalidFeedback :state="hasError ? false : null">
@@ -932,6 +972,7 @@ async function handleSubmit() {
 ### 6. Composables with UI Side Effects
 
 **❌ Bad:**
+
 ```ts
 export function useSalvar() {
   const toast = useToast()
@@ -950,6 +991,7 @@ export function useSalvar() {
 ```
 
 **✅ Good:**
+
 ```ts
 export function useSalvar() {
   const error = ref<string | null>(null)
@@ -1040,12 +1082,14 @@ What is the action?
 ## 📚 References
 
 ### Official Documentation
+
 - [BootstrapVueNext Docs](https://bootstrap-vue-next.github.io/bootstrap-vue-next/)
 - [Bootstrap 5.3 Docs](https://getbootstrap.com/docs/5.3/getting-started/introduction/)
 - [Vue 3 Docs](https://vuejs.org/)
 - [Pinia Docs](https://pinia.vuejs.org/)
 
 ### Component Examples
+
 - See existing views in `frontend/src/views/` for implementation patterns
 - Check `frontend/src/components/` for reusable components
 - Review `frontend/src/composables/` for logic extraction patterns

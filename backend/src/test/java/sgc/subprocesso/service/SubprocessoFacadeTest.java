@@ -32,24 +32,42 @@ import static org.mockito.Mockito.verify;
 @DisplayName("SubprocessoFacadeTest")
 class SubprocessoFacadeTest {
 
-    @Mock private SubprocessoCrudService crudService;
-    @Mock private SubprocessoValidacaoService validacaoService;
-    @Mock private SubprocessoWorkflowService workflowService;
-    @Mock private UsuarioFacade usuarioService;
-    @Mock private MapaFacade mapaFacade;
-    @Mock private AtividadeService atividadeService;
-    @Mock private MovimentacaoRepo repositorioMovimentacao;
-    @Mock private SubprocessoDetalheMapper subprocessoDetalheMapper;
-    @Mock private ConhecimentoMapper conhecimentoMapper;
-    @Mock private AnaliseFacade analiseFacade;
-    @Mock private CompetenciaService competenciaService;
-    @Mock private ConhecimentoService conhecimentoService;
-    @Mock private MapaAjusteMapper mapaAjusteMapper;
-    @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
-    @Mock private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
-    @Mock private sgc.subprocesso.model.SubprocessoMovimentacaoRepo movimentacaoRepo;
-    @Mock private sgc.mapa.service.CopiaMapaService copiaMapaService;
-    @Mock private sgc.mapa.mapper.AtividadeMapper atividadeMapper;
+    @Mock
+    private SubprocessoCrudService crudService;
+    @Mock
+    private SubprocessoValidacaoService validacaoService;
+    @Mock
+    private SubprocessoWorkflowService workflowService;
+    @Mock
+    private UsuarioFacade usuarioService;
+    @Mock
+    private MapaFacade mapaFacade;
+    @Mock
+    private AtividadeService atividadeService;
+    @Mock
+    private MovimentacaoRepo repositorioMovimentacao;
+    @Mock
+    private SubprocessoDetalheMapper subprocessoDetalheMapper;
+    @Mock
+    private ConhecimentoMapper conhecimentoMapper;
+    @Mock
+    private AnaliseFacade analiseFacade;
+    @Mock
+    private CompetenciaService competenciaService;
+    @Mock
+    private ConhecimentoService conhecimentoService;
+    @Mock
+    private MapaAjusteMapper mapaAjusteMapper;
+    @Mock
+    private sgc.seguranca.acesso.AccessControlService accessControlService;
+    @Mock
+    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    @Mock
+    private sgc.subprocesso.model.SubprocessoMovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private sgc.mapa.service.CopiaMapaService copiaMapaService;
+    @Mock
+    private sgc.mapa.mapper.AtividadeMapper atividadeMapper;
 
     @InjectMocks
     private SubprocessoFacade facade;
@@ -78,43 +96,43 @@ class SubprocessoFacadeTest {
     void deveDelegarOutrosServicos() {
         facade.buscarSubprocessoComMapa(1L);
         verify(crudService).buscarSubprocessoComMapa(1L);
-        
+
         facade.obterPorProcessoEUnidade(1L, 2L);
         verify(crudService).obterPorProcessoEUnidade(1L, 2L);
-        
+
         facade.obterSituacao(1L);
         verify(crudService).obterStatus(1L);
-        
+
         facade.obterAtividadesSemConhecimento(1L);
         verify(validacaoService).obterAtividadesSemConhecimento(1L);
-        
+
         facade.obterEntidadePorCodigoMapa(1L);
         verify(crudService).obterEntidadePorCodigoMapa(1L);
-        
+
         facade.verificarAcessoUnidadeAoProcesso(1L, Collections.singletonList(2L));
         verify(crudService).verificarAcessoUnidadeAoProcesso(1L, Collections.singletonList(2L));
-        
+
         facade.validarCadastro(1L);
         verify(validacaoService).validarCadastro(1L);
-        
+
         facade.validarExistenciaAtividades(1L);
         verify(validacaoService).validarExistenciaAtividades(1L);
-        
+
         facade.validarAssociacoesMapa(1L);
         verify(validacaoService).validarAssociacoesMapa(1L);
-        
+
         facade.atualizarSituacaoParaEmAndamento(1L);
         verify(workflowService).atualizarSituacaoParaEmAndamento(1L);
-        
+
         facade.listarSubprocessosHomologados();
         verify(workflowService).listarSubprocessosHomologados();
-        
+
         facade.reabrirCadastro(1L, "j");
         verify(workflowService).reabrirCadastro(1L, "j");
-        
+
         facade.reabrirRevisaoCadastro(1L, "j");
         verify(workflowService).reabrirRevisaoCadastro(1L, "j");
-        
+
         facade.alterarDataLimite(1L, java.time.LocalDate.now());
         verify(workflowService).alterarDataLimite(1L, java.time.LocalDate.now());
     }

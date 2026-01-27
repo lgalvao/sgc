@@ -78,8 +78,8 @@ class SanitizacaoMapaTest {
         verify(subprocessoFacade).salvarMapaSubprocesso(
                 eq(1L),
                 org.mockito.ArgumentMatchers.argThat(arg ->
-                    !arg.getObservacoes().contains("<script>") &&
-                    arg.getObservacoes().contains("Observação válida")
+                        !arg.observacoes().contains("<script>") &&
+                                arg.observacoes().contains("Observação válida")
                 )
         );
     }
@@ -111,8 +111,8 @@ class SanitizacaoMapaTest {
         verify(subprocessoFacade).salvarMapaSubprocesso(
                 eq(1L),
                 org.mockito.ArgumentMatchers.argThat(arg ->
-                    !arg.getCompetencias().get(0).getDescricao().contains("<img") &&
-                    arg.getCompetencias().get(0).getDescricao().contains("Descricao")
+                        !arg.competencias().get(0).descricao().contains("<img") &&
+                                arg.competencias().get(0).descricao().contains("Descricao")
                 )
         );
     }

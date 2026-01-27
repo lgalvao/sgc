@@ -1,11 +1,8 @@
 package sgc.mapa.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
+
+import lombok.Builder;
 
 /**
  * DTO para operações CRUD simples de Mapa.
@@ -18,15 +15,11 @@ import java.time.LocalDateTime;
  * vinculadas), use {@link MapaCompletoDto}, que oferece uma estrutura hierárquica mais apropriada
  * para esse contexto.
  */
-@Getter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class MapaDto {
-
-    private Long codigo;
-    private LocalDateTime dataHoraDisponibilizado;
-    private String observacoesDisponibilizacao;
-    private LocalDateTime dataHoraHomologado;
-    private String sugestoes;
+public record MapaDto(
+        Long codigo,
+        LocalDateTime dataHoraDisponibilizado,
+        String observacoesDisponibilizacao,
+        LocalDateTime dataHoraHomologado,
+        String sugestoes) {
 }

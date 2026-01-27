@@ -43,10 +43,10 @@ public class SubprocessoTransicaoService {
      * Registra uma transição de subprocesso: salva movimentação e publica evento.
      *
      * @param subprocesso Subprocesso que está transitando
-     * @param tipo Tipo da transição (define descrição e templates de comunicação)
-     * @param origem Unidade de origem da transição
-     * @param destino Unidade de destino da transição
-     * @param usuario Usuário que executou a ação
+     * @param tipo        Tipo da transição (define descrição e templates de comunicação)
+     * @param origem      Unidade de origem da transição
+     * @param destino     Unidade de destino da transição
+     * @param usuario     Usuário que executou a ação
      * @param observacoes Observações opcionais (ex: motivo de devolução)
      */
     public void registrar(
@@ -97,23 +97,6 @@ public class SubprocessoTransicaoService {
     // ===== Execução de Workflow Completo (Consolidado de SubprocessoWorkflowExecutor) =====
 
     /**
-     * Parâmetros para registro de workflow completo.
-     */
-    public record RegistrarWorkflowReq(
-            Subprocesso sp,
-            @Nullable SituacaoSubprocesso novaSituacao,
-            TipoTransicao tipoTransicao,
-            TipoAnalise tipoAnalise,
-            TipoAcaoAnalise tipoAcaoAnalise,
-            @Nullable Unidade unidadeAnalise,
-            @Nullable Unidade unidadeOrigemTransicao,
-            @Nullable Unidade unidadeDestinoTransicao,
-            Usuario usuario,
-            @Nullable String observacoes,
-            @Nullable String motivoAnalise
-    ) {}
-
-    /**
      * Executa um workflow completo com análise e transição.
      *
      * <p>Utilizado principalmente em workflows de aprovação/devolução onde
@@ -151,5 +134,23 @@ public class SubprocessoTransicaoService {
 
         log.info("Workflow executado: Subprocesso {} -> {}, Transição {}",
                 req.sp().getCodigo(), req.novaSituacao(), req.tipoTransicao());
+    }
+
+    /**
+     * Parâmetros para registro de workflow completo.
+     */
+    public record RegistrarWorkflowReq(
+            Subprocesso sp,
+            @Nullable SituacaoSubprocesso novaSituacao,
+            TipoTransicao tipoTransicao,
+            TipoAnalise tipoAnalise,
+            TipoAcaoAnalise tipoAcaoAnalise,
+            @Nullable Unidade unidadeAnalise,
+            @Nullable Unidade unidadeOrigemTransicao,
+            @Nullable Unidade unidadeDestinoTransicao,
+            Usuario usuario,
+            @Nullable String observacoes,
+            @Nullable String motivoAnalise
+    ) {
     }
 }

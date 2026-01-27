@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
@@ -21,12 +20,11 @@ import static org.mockito.Mockito.verify;
 @Tag("unit")
 @DisplayName("Gaps de Cobertura no CompetenciaService")
 class CompetenciaServiceGapTest {
-
     @InjectMocks
     private CompetenciaService service;
 
-    @Mock private CompetenciaRepo competenciaRepo;
-    @Mock private AtividadeRepo atividadeRepo;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
 
     @Test
     @DisplayName("Deve salvar competência")

@@ -5,7 +5,7 @@ import lombok.Setter;
 
 /**
  * DTO para representar um usuário retornado pelo serviço AcessoAD.
- * 
+ *
  * <p>Usa @Setter pois é deserializado pelo Jackson via setters.
  * Caso excepcional onde mutabilidade é necessária para integração externa.
  */

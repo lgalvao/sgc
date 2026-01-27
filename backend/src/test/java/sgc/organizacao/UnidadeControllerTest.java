@@ -57,16 +57,16 @@ class UnidadeControllerTest {
     void deveRetornar201AoCriarAtribuicaoTemporaria() throws Exception {
         // Act & Assert
         mockMvc.perform(
-                post("/api/unidades/1/atribuicoes-temporarias")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "tituloEleitoralUsuario":"123",
-                                    "dataTermino":"2025-12-31",
-                                    "justificativa":"teste"
-                                }
-                                """))
+                        post("/api/unidades/1/atribuicoes-temporarias")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "tituloEleitoralUsuario":"123",
+                                            "dataTermino":"2025-12-31",
+                                            "justificativa":"teste"
+                                        }
+                                        """))
                 .andExpect(status().isCreated());
 
         verify(unidadeService)
@@ -96,7 +96,7 @@ class UnidadeControllerTest {
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/arvore-com-elegibilidade")
-                .param("tipoProcesso", "MAPEAMENTO"))
+                        .param("tipoProcesso", "MAPEAMENTO"))
                 .andExpect(status().isOk());
     }
 

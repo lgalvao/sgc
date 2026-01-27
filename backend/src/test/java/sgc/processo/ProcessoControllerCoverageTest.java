@@ -1,25 +1,25 @@
 package sgc.processo;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.processo.dto.IniciarProcessoRequest;
+import sgc.processo.model.TipoProcesso;
+import sgc.processo.service.ProcessoFacade;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import sgc.processo.dto.IniciarProcessoRequest;
-import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoFacade;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -37,7 +37,7 @@ class ProcessoControllerCoverageTest {
     void deveEstourarErroSeProcessoSumir() {
         Long cod = 1L;
         IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, Collections.emptyList());
-        
+
         when(processoFacade.iniciarProcessoMapeamento(cod, Collections.emptyList())).thenReturn(Collections.emptyList());
         when(processoFacade.obterPorId(cod)).thenReturn(Optional.empty());
 

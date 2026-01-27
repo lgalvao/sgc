@@ -17,18 +17,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("unit")
 @DisplayName("ProcessoMapper")
 class ProcessoMapperTest {
-
     private ProcessoMapper mapper;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         mapper = Mappers.getMapper(ProcessoMapper.class);
     }
 
     @Nested
     @DisplayName("toDto")
+    @SuppressWarnings("unused")
     class ToDtoTests {
-
         @Test
         @DisplayName("Deve mapear entidade para DTO com todos os campos")
         void deveMapearEntidadeParaDtoCompleto() {
@@ -137,8 +137,8 @@ class ProcessoMapperTest {
 
     @Nested
     @DisplayName("toEntity")
+    @SuppressWarnings("unused")
     class ToEntityTests {
-
         @Test
         @DisplayName("Deve mapear DTO para entidade")
         void deveMapearDtoParaEntidade() {

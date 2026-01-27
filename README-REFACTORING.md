@@ -18,21 +18,21 @@
 
 ### 🎯 Documentos Principais
 
-| Documento | Descrição | Para Quem | Tamanho |
-|-----------|-----------|-----------|---------|
-| **[REFACTORING-SUMMARY.md](./REFACTORING-SUMMARY.md)** | Resumo executivo de uma página | Todos | 7KB |
-| **[REFACTORING-INDEX.md](./REFACTORING-INDEX.md)** | Índice mestre com guias | Agentes IA / Devs | 8KB |
-| **[refactoring-tracker.md](./refactoring-tracker.md)** | Tracking de progresso | PMs / Tech Leads | 6KB |
-| **[optimization-report.md](./optimization-report.md)** | Análise detalhada original | Arquitetos / Tech Leads | 41KB |
+| Documento                                              | Descrição                      | Para Quem               | Tamanho |
+|--------------------------------------------------------|--------------------------------|-------------------------|---------|
+| **[REFACTORING-SUMMARY.md](./REFACTORING-SUMMARY.md)** | Resumo executivo de uma página | Todos                   | 7KB     |
+| **[REFACTORING-INDEX.md](./REFACTORING-INDEX.md)**     | Índice mestre com guias        | Agentes IA / Devs       | 8KB     |
+| **[refactoring-tracker.md](./refactoring-tracker.md)** | Tracking de progresso          | PMs / Tech Leads        | 6KB     |
+| **[optimization-report.md](./optimization-report.md)** | Análise detalhada original     | Arquitetos / Tech Leads | 41KB    |
 
 ### 🚀 Documentos de Sprints
 
-| Sprint | Arquivo | Duração | Ações | Prioridade |
-|--------|---------|---------|-------|------------|
-| **1** | [backend-sprint-1.md](./backend-sprint-1.md) | 1-2 dias | 5 | 🔴 Alta |
-| **2** | [frontend-sprint-2.md](./frontend-sprint-2.md) | 3-5 dias | 3 | 🔴 Alta |
-| **3** | [backend-sprint-3.md](./backend-sprint-3.md) | 5-10 dias | 3 | 🟡 Média |
-| **4** | [otimizacoes-sprint-4.md](./otimizacoes-sprint-4.md) | Conforme necessário | 3 | 🟢 Baixa |
+| Sprint | Arquivo                                              | Duração             | Ações | Prioridade |
+|--------|------------------------------------------------------|---------------------|-------|------------|
+| **1**  | [backend-sprint-1.md](./backend-sprint-1.md)         | 1-2 dias            | 5     | 🔴 Alta    |
+| **2**  | [frontend-sprint-2.md](./frontend-sprint-2.md)       | 3-5 dias            | 3     | 🔴 Alta    |
+| **3**  | [backend-sprint-3.md](./backend-sprint-3.md)         | 5-10 dias           | 3     | 🟡 Média   |
+| **4**  | [otimizacoes-sprint-4.md](./otimizacoes-sprint-4.md) | Conforme necessário | 3     | 🟢 Baixa   |
 
 ---
 
@@ -100,13 +100,13 @@ APENAS se houver necessidade demonstrada:
 
 ### Baseline → Metas
 
-| Métrica | Atual | Meta | Melhoria |
-|---------|-------|------|----------|
-| Arquivos > 500L | 2 | 0 | -2 |
-| Código duplicado | ~800L | 0 | -800L |
-| Requisições/ação | 3 | 1 | -66% |
-| FetchType.EAGER | 2 | 0 | -2 |
-| Queries N+1 | 5 | 0 | -5 |
+| Métrica          | Atual | Meta | Melhoria |
+|------------------|-------|------|----------|
+| Arquivos > 500L  | 2     | 0    | -2       |
+| Código duplicado | ~800L | 0    | -800L    |
+| Requisições/ação | 3     | 1    | -66%     |
+| FetchType.EAGER  | 2     | 0    | -2       |
+| Queries N+1      | 5     | 0    | -5       |
 
 **Performance:**
 

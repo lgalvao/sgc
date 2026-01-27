@@ -23,13 +23,17 @@ import java.util.Set;
 
 /**
  * Serviço responsável por consultas e queries relacionadas a Processos.
- * 
- * <p>Centraliza operações de leitura e consultas complexas, incluindo
- * listagens filtradas, verificações de elegibilidade e queries específicas.</p>
- * 
- * <p><b>Nota sobre Injeção de Dependências:</b>
+ *
+ * <p>
+ * Centraliza operações de leitura e consultas complexas, incluindo
+ * listagens filtradas, verificações de elegibilidade e queries específicas.
+ * </p>
+ *
+ * <p>
+ * <b>Nota sobre Injeção de Dependências:</b>
  * SubprocessoFacade é injetado com @Lazy para quebrar dependência circular:
- * ProcessoFacade → ProcessoConsultaService → SubprocessoFacade → ... → ProcessoFacade
+ * ProcessoFacade → ProcessoConsultaService → SubprocessoFacade → ... →
+ * ProcessoFacade
  */
 @Service
 @Slf4j
@@ -59,8 +63,9 @@ public class ProcessoConsultaService {
     }
 
     /**
-     * Lista unidades bloqueadas (participantes de processos ativos) por tipo de processo.
-     * 
+     * Lista unidades bloqueadas (participantes de processos ativos) por tipo de
+     * processo.
+     *
      * @param tipo tipo de processo
      * @return lista de códigos de unidades bloqueadas
      */
@@ -72,7 +77,7 @@ public class ProcessoConsultaService {
 
     /**
      * Lista subprocessos elegíveis para o usuário atual no contexto do processo.
-     * 
+     *
      * @param codProcesso código do processo
      * @return lista de subprocessos elegíveis baseado no perfil do usuário
      */
@@ -94,14 +99,15 @@ public class ProcessoConsultaService {
         }
 
         List<PerfilDto> perfis = usuarioService.buscarPerfisUsuario(username);
-        Long codUnidadeUsuario = perfis.stream().findFirst().map(PerfilDto::getUnidadeCodigo).orElse(null);
+        Long codUnidadeUsuario = perfis.stream().findFirst().map(PerfilDto::unidadeCodigo).orElse(null);
 
         if (codUnidadeUsuario == null) {
             return List.of();
         }
 
         return subprocessoFacade.listarPorProcessoUnidadeESituacoes(codProcesso, codUnidadeUsuario,
-                        List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA))
+                List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                        SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA))
                 .stream()
                 .map(this::toSubprocessoElegivelDto)
                 .toList();

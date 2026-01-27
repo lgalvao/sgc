@@ -8,7 +8,8 @@
 
 ## ⚠️ ATENÇÃO: Sprint Opcional
 
-Esta sprint contém otimizações **não críticas** que devem ser implementadas **apenas se houver necessidade demonstrada**. Não implemente por "achismo" - sempre meça antes e depois.
+Esta sprint contém otimizações **não críticas** que devem ser implementadas **apenas se houver necessidade demonstrada
+**. Não implemente por "achismo" - sempre meça antes e depois.
 
 **Princípio YAGNI:** You Aren't Gonna Need It (Você não vai precisar disso)
 
@@ -16,11 +17,11 @@ Esta sprint contém otimizações **não críticas** que devem ser implementadas
 
 ## 📋 Sumário de Ações
 
-| # | Ação | Prioridade | Esforço | Impacto | Quando Implementar |
-|---|------|------------|---------|---------|-------------------|
-| 9 | Implementar cache HTTP parcial (frontend) | 🟡 Média | 🟡 Médio | 🟡 Baixo | **SE** UX apresentar latência perceptível |
-| 13 | Adicionar @EntityGraph onde apropriado | 🟢 Baixa | 🟡 Médio | 🟢 Baixo | **SE** surgir problema N+1 medido |
-| 14 | Decompor `processos.ts` store (345 linhas) | 🟢 Baixa | 🔴 Alto | 🟢 Baixo | **SE** manutenção se tornar difícil |
+| #  | Ação                                       | Prioridade | Esforço  | Impacto  | Quando Implementar                        |
+|----|--------------------------------------------|------------|----------|----------|-------------------------------------------|
+| 9  | Implementar cache HTTP parcial (frontend)  | 🟡 Média   | 🟡 Médio | 🟡 Baixo | **SE** UX apresentar latência perceptível |
+| 13 | Adicionar @EntityGraph onde apropriado     | 🟢 Baixa   | 🟡 Médio | 🟢 Baixo | **SE** surgir problema N+1 medido         |
+| 14 | Decompor `processos.ts` store (345 linhas) | 🟢 Baixa   | 🔴 Alto  | 🟢 Baixo | **SE** manutenção se tornar difícil       |
 
 **Resultado Esperado:** Otimizações pontuais apenas quando justificadas por métricas reais.
 
@@ -31,22 +32,27 @@ Esta sprint contém otimizações **não críticas** que devem ser implementadas
 ### ⚠️ Critérios de Implementação
 
 **IMPLEMENTE APENAS SE:**
+
 - ✅ UX apresenta latência perceptível (medida > 500ms)
 - ✅ Dados são acessados múltiplas vezes na mesma sessão
 - ✅ Dados têm baixa taxa de mudança (< 1x por sessão)
 - ✅ Validação com usuários reais confirma necessidade
 
 **NÃO IMPLEMENTE SE:**
+
 - ❌ Performance atual é aceitável (< 500ms)
 - ❌ Dados mudam frequentemente
 - ❌ Apenas por "achismo" de que seria melhor
 
 ### Contexto
-Com a eliminação da cascata de reloads (Sprint 2, Ação #5), a maioria das requisições duplicadas será eliminada. Cache HTTP adicional só se justifica se houver navegação muito frequente entre as mesmas páginas.
+
+Com a eliminação da cascata de reloads (Sprint 2, Ação #5), a maioria das requisições duplicadas será eliminada. Cache
+HTTP adicional só se justifica se houver navegação muito frequente entre as mesmas páginas.
 
 ### Análise de Necessidade
 
 **Cenário Real - Navegação de Usuário:**
+
 ```
 1. Usuário acessa lista de processos
    → GET /api/processos (200ms)
@@ -62,10 +68,12 @@ Com a eliminação da cascata de reloads (Sprint 2, Ação #5), a maioria das re
 ```
 
 **Com Ação #5 (Sprint 2) implementada:**
+
 - Dados completos retornados na primeira requisição
 - Necessidade de cache reduzida em 60-70%
 
 **Benefício Potencial:**
+
 - Para 20 usuários simultâneos: ~100-200 requests/dia economizados
 - Redução de latência: ~150ms por hit de cache
 - **Benefício marginal** - complexidade adicionada pode não valer a pena
@@ -114,20 +122,22 @@ interface CachedData<T> {
  *   return data;
  * }
  * ```
- */
-class HttpCache {
-  private cache = new Map<string, CachedData<any>>();
-  private defaultTTL = 5 * 60 * 1000; // 5 minutos
 
-  /**
-   * Busca item do cache.
-   * Retorna null se não encontrado ou expirado.
-   */
+*/
+class HttpCache {
+private cache = new Map<string, CachedData<any>>();
+private defaultTTL = 5 * 60 * 1000; // 5 minutos
+
+/**
+
+* Busca item do cache.
+* Retorna null se não encontrado ou expirado.
+  */
   get<T>(key: string): T | null {
-    const cached = this.cache.get(key);
-    if (!cached) {
-      return null;
-    }
+  const cached = this.cache.get(key);
+  if (!cached) {
+  return null;
+  }
 
     const now = Date.now();
     if (now - cached.timestamp > cached.ttl) {
@@ -136,66 +146,74 @@ class HttpCache {
     }
 
     return cached.data as T;
-  }
 
-  /**
-   * Armazena item no cache.
-   * 
-   * @param key - Chave única do cache
-   * @param data - Dados a serem armazenados
-   * @param ttl - Tempo de vida em ms (opcional, padrão 5 min)
-   */
-  set<T>(key: string, data: T, ttl?: number): void {
-    this.cache.set(key, {
-      data,
-      timestamp: Date.now(),
-      ttl: ttl ?? this.defaultTTL
-    });
-  }
-
-  /**
-   * Invalida entradas do cache que correspondem ao padrão.
-   * 
-   * @example
-   * ```typescript
-   * // Invalidar todos os processos
-   * httpCache.invalidate('processo:');
-   * 
-   * // Invalidar processo específico
-   * httpCache.invalidate('processo:123');
-   * 
-   * // Usar regex
-   * httpCache.invalidate(/processo:\d+/);
-   * ```
-   */
-  invalidate(pattern: string | RegExp): void {
-    const keys = Array.from(this.cache.keys());
-    const toDelete = typeof pattern === 'string'
-      ? keys.filter(k => k.includes(pattern))
-      : keys.filter(k => pattern.test(k));
-    
-    toDelete.forEach(k => this.cache.delete(k));
-  }
-
-  /**
-   * Limpa todo o cache.
-   */
-  clear(): void {
-    this.cache.clear();
-  }
-
-  /**
-   * Retorna estatísticas do cache (para debug).
-   */
-  getStats(): { size: number; keys: string[] } {
-    return {
-      size: this.cache.size,
-      keys: Array.from(this.cache.keys())
-    };
-  }
 }
 
+/**
+
+* Armazena item no cache.
+*
+* @param key - Chave única do cache
+* @param data - Dados a serem armazenados
+* @param ttl - Tempo de vida em ms (opcional, padrão 5 min)
+  */
+  set<T>(key: string, data: T, ttl?: number): void {
+  this.cache.set(key, {
+  data,
+  timestamp: Date.now(),
+  ttl: ttl ?? this.defaultTTL
+  });
+  }
+
+/**
+
+* Invalida entradas do cache que correspondem ao padrão.
+*
+* @example
+* ```typescript
+* // Invalidar todos os processos
+* httpCache.invalidate('processo:');
+*
+* // Invalidar processo específico
+* httpCache.invalidate('processo:123');
+*
+* // Usar regex
+* httpCache.invalidate(/processo:\d+/);
+* ```
+
+*/
+invalidate(pattern: string | RegExp): void {
+const keys = Array.from(this.cache.keys());
+const toDelete = typeof pattern === 'string'
+? keys.filter(k => k.includes(pattern))
+: keys.filter(k => pattern.test(k));
+
+    toDelete.forEach(k => this.cache.delete(k));
+
+}
+
+/**
+
+* Limpa todo o cache.
+  */
+  clear(): void {
+  this.cache.clear();
+  }
+
+/**
+
+* Retorna estatísticas do cache (para debug).
+  */
+  getStats(): { size: number; keys: string[] } {
+  return {
+  size: this.cache.size,
+  keys: Array.from(this.cache.keys())
+  };
+  }
+  }
+
 export const httpCache = new HttpCache();
+
 ```
 
 **Uso em Service:**
@@ -253,32 +271,32 @@ export async function atualizarProcesso(
    ```
 
 2. **Validar necessidade:**
-   - Há navegação frequente entre mesmas páginas?
-   - Latência é perceptível (> 500ms)?
-   - Usuários reclamam de lentidão?
+    - Há navegação frequente entre mesmas páginas?
+    - Latência é perceptível (> 500ms)?
+    - Usuários reclamam de lentidão?
 
 **SE necessidade confirmada:**
 
-3. **Criar httpCache.ts:**
+1. **Criar httpCache.ts:**
    ```bash
    create /home/runner/work/sgc/sgc/frontend/src/utils/httpCache.ts
    ```
 
-4. **Adicionar export em utils/index.ts:**
+2. **Adicionar export em utils/index.ts:**
    ```typescript
    export { httpCache } from './httpCache';
    ```
 
-5. **Implementar em services seletivamente:**
-   - Começar com processoService (mais usado)
-   - Medir impacto
-   - Expandir se benefício for significativo
+3. **Implementar em services seletivamente:**
+    - Começar com processoService (mais usado)
+    - Medir impacto
+    - Expandir se benefício for significativo
 
-6. **Adicionar invalidação:**
-   - Em todos os métodos de criação/atualização/exclusão
-   - Testar que cache é invalidado corretamente
+4. **Adicionar invalidação:**
+    - Em todos os métodos de criação/atualização/exclusão
+    - Testar que cache é invalidado corretamente
 
-7. **Medir performance DEPOIS:**
+5. **Medir performance DEPOIS:**
    ```bash
    npm run test:e2e
    # Comparar com baseline
@@ -298,11 +316,13 @@ export async function atualizarProcesso(
 ### Decisão de Implementação
 
 **✅ IMPLEMENTE SE:**
+
 - Performance medida mostra latência > 500ms
 - Benefício medido > 20%
 - Usuários relatam lentidão
 
 **❌ NÃO IMPLEMENTE SE:**
+
 - Performance atual é aceitável
 - Benefício < 20%
 - Complexidade > Benefício
@@ -314,18 +334,23 @@ export async function atualizarProcesso(
 ### ⚠️ Critérios de Implementação
 
 **IMPLEMENTE APENAS SE:**
+
 - ✅ Problema N+1 **comprovado** em logs
 - ✅ Performance degradada **medida** (> 500ms)
 - ✅ Solução alternativa (JOIN FETCH) não é viável
 - ✅ Testes demonstram melhoria > 30%
 
 **NÃO IMPLEMENTE SE:**
+
 - ❌ Nenhum problema N+1 identificado
 - ❌ Performance atual é aceitável
 - ❌ JOIN FETCH resolve o problema
 
 ### Contexto
-`@EntityGraph` é uma alternativa ao `JOIN FETCH` que permite definir quais relacionamentos carregar sem escrever queries JPQL customizadas. É útil quando:
+
+`@EntityGraph` é uma alternativa ao `JOIN FETCH` que permite definir quais relacionamentos carregar sem escrever queries
+JPQL customizadas. É útil quando:
+
 - Mesma entidade precisa ser carregada de formas diferentes
 - Queries derivadas do Spring Data são preferíveis
 
@@ -345,6 +370,7 @@ SELECT * FROM participante WHERE processo_id = 10;
 ```
 
 **Como Identificar:**
+
 1. Habilitar log SQL:
    ```properties
    # application.properties
@@ -419,19 +445,19 @@ public class Processo {
 
 **SE N+1 confirmado:**
 
-3. **Adicionar @EntityGraph seletivamente:**
+1. **Adicionar @EntityGraph seletivamente:**
    ```bash
    edit backend/src/main/java/sgc/processo/model/ProcessoRepo.java
    # Adicionar método com @EntityGraph
    ```
 
-4. **Atualizar Services para usar novo método:**
+2. **Atualizar Services para usar novo método:**
    ```bash
    edit backend/src/main/java/sgc/processo/service/ProcessoService.java
    # Substituir findBySituacao() por findBySituacaoWithParticipantes()
    ```
 
-5. **Medir performance DEPOIS:**
+3. **Medir performance DEPOIS:**
    ```bash
    ./gradlew :backend:test --tests "*Processo*" > test_output_after.txt
    # Comparar número de queries
@@ -450,11 +476,13 @@ public class Processo {
 ### Decisão de Implementação
 
 **✅ IMPLEMENTE SE:**
+
 - N+1 confirmado em logs
 - Performance degradada medida
 - Melhoria > 30% demonstrada
 
 **❌ NÃO IMPLEMENTE SE:**
+
 - Nenhum N+1 identificado
 - Performance atual aceitável
 - Complexidade > Benefício
@@ -466,23 +494,28 @@ public class Processo {
 ### ⚠️ Critérios de Implementação
 
 **IMPLEMENTE APENAS SE:**
+
 - ✅ Manutenção do store se tornou **difícil**
 - ✅ Múltiplos desenvolvedores trabalhando no mesmo arquivo causam **conflitos**
 - ✅ Testes se tornaram **complexos** demais
 - ✅ Store claramente violando **SRP**
 
 **NÃO IMPLEMENTE SE:**
+
 - ❌ Store funciona bem (sem reclamações)
 - ❌ Apenas um desenvolvedor trabalhando
 - ❌ Testes são simples e claros
 - ❌ "Apenas porque tem 345 linhas" (tamanho sozinho não é problema)
 
 ### Contexto
-`processos.ts` tem **345 linhas** e **6 responsabilidades**, mas isso só é um problema se causar dificuldades práticas de manutenção. Para um sistema com 20 usuários e um ou dois desenvolvedores, pode ser perfeitamente aceitável.
+
+`processos.ts` tem **345 linhas** e **6 responsabilidades**, mas isso só é um problema se causar dificuldades práticas
+de manutenção. Para um sistema com 20 usuários e um ou dois desenvolvedores, pode ser perfeitamente aceitável.
 
 ### Análise de Necessidade
 
 **Responsabilidades Atuais:**
+
 1. Lista de processos (filtros, paginação)
 2. Detalhes de processo (cache local)
 3. Ações de workflow (iniciar, finalizar)
@@ -491,6 +524,7 @@ public class Processo {
 6. Helpers (flatten, mapeamento)
 
 **Perguntas para Decidir:**
+
 - Há conflitos frequentes em Git?
 - Testes são difíceis de escrever/manter?
 - Desenvolvedores se perdem no código?
@@ -514,6 +548,7 @@ frontend/src/stores/
 **Decomposição:**
 
 #### processosCoreStore.ts (~150 linhas)
+
 ```typescript
 /**
  * Store principal para listagem e CRUD de processos.
@@ -536,6 +571,7 @@ export const useProcessosCoreStore = defineStore('processos-core', () => {
 ```
 
 #### processosWorkflowStore.ts (~100 linhas)
+
 ```typescript
 /**
  * Store para ações de workflow de processos.
@@ -554,6 +590,7 @@ export const useProcessosWorkflowStore = defineStore('processos-workflow', () =>
 ```
 
 #### processosContextStore.ts (~100 linhas)
+
 ```typescript
 /**
  * Store para contexto completo de processos.
@@ -570,6 +607,7 @@ export const useProcessosContextStore = defineStore('processos-context', () => {
 ```
 
 #### index.ts (Re-export para compatibilidade)
+
 ```typescript
 /**
  * Re-exporta stores de processos para manter compatibilidade.
@@ -587,29 +625,29 @@ export { useProcessosCoreStore as useProcessosStore };
 **ANTES DE IMPLEMENTAR:**
 
 1. **Validar necessidade com equipe:**
-   - Há problemas práticos de manutenção?
-   - Há conflitos em Git?
-   - Vale a pena o esforço?
+    - Há problemas práticos de manutenção?
+    - Há conflitos em Git?
+    - Vale a pena o esforço?
 
 **SE necessidade confirmada:**
 
-2. **Criar pasta processos:**
+1. **Criar pasta processos:**
    ```bash
    mkdir -p /home/runner/work/sgc/sgc/frontend/src/stores/processos
    ```
 
-3. **Mover e dividir processos.ts:**
+2. **Mover e dividir processos.ts:**
    ```bash
    # Criar os 3 stores separados
    # Copiar métodos relevantes para cada um
    ```
 
-4. **Criar index.ts com re-exports:**
+3. **Criar index.ts com re-exports:**
    ```bash
    create /home/runner/work/sgc/sgc/frontend/src/stores/processos/index.ts
    ```
 
-5. **Atualizar imports em componentes:**
+4. **Atualizar imports em componentes:**
    ```bash
    # Buscar usos de useProcessosStore
    grep -r "useProcessosStore" frontend/src/ --include="*.vue" --include="*.ts"
@@ -617,7 +655,7 @@ export { useProcessosCoreStore as useProcessosStore };
    # Atualizar imports conforme necessário
    ```
 
-6. **Executar testes:**
+5. **Executar testes:**
    ```bash
    npm run typecheck
    npm run test:unit
@@ -636,11 +674,13 @@ export { useProcessosCoreStore as useProcessosStore };
 ### Decisão de Implementação
 
 **✅ IMPLEMENTE SE:**
+
 - Problemas práticos de manutenção confirmados
 - Conflitos frequentes em Git
 - Equipe concorda que vale a pena
 
 **❌ NÃO IMPLEMENTE SE:**
+
 - Store funciona bem como está
 - Nenhum problema prático
 - Esforço > Benefício
@@ -652,12 +692,14 @@ export { useProcessosCoreStore as useProcessosStore };
 **IMPORTANTE:** Validar necessidade ANTES de implementar cada ação.
 
 ### Antes de Implementar QUALQUER Ação
+
 - [ ] ✅ Problema identificado e **medido**
 - [ ] ✅ Benefício estimado > 20%
 - [ ] ✅ Equipe concorda que vale a pena
 - [ ] ✅ Alternativa mais simples não existe
 
 ### Após Implementar
+
 - [ ] ✅ Benefício **medido** (não assumido)
 - [ ] ✅ Performance melhorada conforme esperado
 - [ ] ✅ Testes passam (100%)
@@ -671,15 +713,18 @@ export { useProcessosCoreStore as useProcessosStore };
 **Esta sprint é OPCIONAL** - métricas só fazem sentido SE implementada.
 
 **SE Ação #9 implementada:**
+
 - ✅ Redução de requisições HTTP: 10-20%
 - ✅ Latência reduzida: 20-30%
 - ✅ Cache hit rate: > 40%
 
 **SE Ação #13 implementada:**
+
 - ✅ Queries N+1 eliminadas: 100%
 - ✅ Performance de listagens: +30-50%
 
 **SE Ação #14 implementada:**
+
 - ✅ Manutenibilidade melhorada (subjetivo, validar com equipe)
 - ✅ Conflitos Git reduzidos
 - ✅ Stores < 200 linhas cada
@@ -689,12 +734,14 @@ export { useProcessosCoreStore as useProcessosStore };
 ## 🚀 Conclusão da Sprint 4
 
 **Lembre-se:**
+
 - Esta sprint é **OPCIONAL**
 - Implemente apenas com **necessidade demonstrada**
 - **Meça antes e depois**
 - **Complexidade > Benefício?** Não implemente!
 
 **Princípios:**
+
 - **YAGNI:** You Aren't Gonna Need It
 - **KISS:** Keep It Simple, Stupid
 - **Measure, Don't Assume**

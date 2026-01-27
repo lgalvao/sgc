@@ -44,12 +44,11 @@ public class RelatorioFacade {
             for (Subprocesso sp : subprocessos) {
                 Unidade unidade = sp.getUnidade();
                 ResponsavelDto respDto = unidadeService.buscarResponsavelUnidade(unidade.getCodigo());
-                String responsavel = respDto.getTitularNome();
-                
+                String responsavel = respDto.titularNome();
+
                 String texto = String.format(
                         "Unidade: %s - %s%nSituação: %s%nResponsável: %s%n---------------------------",
-                        unidade.getSigla(), unidade.getNome(), sp.getSituacao(), responsavel
-                );
+                        unidade.getSigla(), unidade.getNome(), sp.getSituacao(), responsavel);
                 document.add(new Paragraph(texto));
             }
         } catch (DocumentException e) {

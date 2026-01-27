@@ -18,7 +18,7 @@ class SleeperTest {
         long inicio = System.currentTimeMillis();
         sleeper.sleep(100);
         long duracao = System.currentTimeMillis() - inicio;
-        
+
         // Verifica que dormiu pelo menos 90ms (margem para variação do sistema)
         assertTrue(duracao >= 90, "Deve ter dormido por pelo menos 90ms");
     }
@@ -27,10 +27,10 @@ class SleeperTest {
     @DisplayName("sleep() deve propagar InterruptedException")
     void testSleepInterrupted() {
         Sleeper sleeper = new Sleeper();
-        
+
         // Interrompe a thread antes de chamar sleep
         Thread.currentThread().interrupt();
-        
+
         assertThrows(InterruptedException.class, () -> sleeper.sleep(1000));
     }
 }

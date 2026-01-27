@@ -13,7 +13,10 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.mapper.MapaCompletoMapper;
-import sgc.mapa.model.*;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,21 +32,14 @@ import static org.mockito.Mockito.when;
 @Tag("unit")
 @DisplayName("Testes do MapaFacade")
 class MapaFacadeTest {
-
     @Mock
     private MapaRepo mapaRepo;
     @Mock
     private CompetenciaRepo competenciaRepo;
     @Mock
-    private AtividadeRepo atividadeRepo;
-    @Mock
     private MapaCompletoMapper mapaCompletoMapper;
     @Mock
     private MapaSalvamentoService mapaSalvamentoService;
-    @Mock
-    private MapaVisualizacaoService mapaVisualizacaoService;
-    @Mock
-    private ImpactoMapaService impactoMapaService;
     @Mock
     private sgc.comum.repo.RepositorioComum repo;
 
@@ -180,7 +176,7 @@ class MapaFacadeTest {
         void deveObterMapaCompleto() {
             when(repo.buscar(Mapa.class, 1L)).thenReturn(new Mapa());
             when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(new Competencia()));
-            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(new MapaCompletoDto());
+            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(MapaCompletoDto.builder().build());
 
             var resultado = service.obterMapaCompleto(1L, 10L);
             assertThat(resultado).isNotNull();
@@ -191,7 +187,7 @@ class MapaFacadeTest {
         void deveObterMapaCompletoSemCompetencias() {
             when(repo.buscar(Mapa.class, 1L)).thenReturn(new Mapa());
             when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of());
-            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(new MapaCompletoDto());
+            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(MapaCompletoDto.builder().build());
 
             var resultado = service.obterMapaCompleto(1L, 10L);
             assertThat(resultado).isNotNull();
@@ -209,7 +205,7 @@ class MapaFacadeTest {
             SalvarMapaRequest req = SalvarMapaRequest.builder()
                     .observacoes("Obs")
                     .build();
-            MapaCompletoDto expectedDto = new MapaCompletoDto();
+            MapaCompletoDto expectedDto = MapaCompletoDto.builder().build();
 
             when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req)).thenReturn(expectedDto);
 
@@ -226,7 +222,7 @@ class MapaFacadeTest {
             SalvarMapaRequest req = SalvarMapaRequest.builder().build();
 
             when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req))
-                .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", mapaId));
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", mapaId));
 
             assertThatThrownBy(() -> service.salvarMapaCompleto(mapaId, req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -239,7 +235,7 @@ class MapaFacadeTest {
             SalvarMapaRequest req = SalvarMapaRequest.builder().build();
 
             when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req))
-                .thenThrow(new ErroValidacao("Atividade 99 não pertence ao mapa"));
+                    .thenThrow(new ErroValidacao("Atividade 99 não pertence ao mapa"));
 
             assertThatThrownBy(() -> service.salvarMapaCompleto(mapaId, req))
                     .isInstanceOf(ErroValidacao.class)

@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +37,7 @@ class AnaliseFacadeTest {
     private Subprocesso subprocesso;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         subprocesso = new Subprocesso();
         subprocesso.setCodigo(1L);
@@ -43,8 +45,8 @@ class AnaliseFacadeTest {
 
     @Nested
     @DisplayName("Testes para listarPorSubprocesso")
+    @SuppressWarnings("unused")
     class ListarPorSubprocesso {
-
         @Test
         @DisplayName("Deve retornar lista de análises de cadastro")
         void deveRetornarListaDeAnalisesCadastro() {
@@ -105,8 +107,8 @@ class AnaliseFacadeTest {
 
     @Nested
     @DisplayName("Testes para criarAnalise")
+    @SuppressWarnings("unused")
     class CriarAnalise {
-
         @Test
         @DisplayName("Deve criar uma análise de cadastro")
         void deveCriarAnaliseCadastro() {
@@ -181,6 +183,7 @@ class AnaliseFacadeTest {
 
     @Nested
     @DisplayName("Testes para removerPorSubprocesso")
+    @SuppressWarnings("unused")
     class RemoverPorSubprocesso {
         @Test
         @DisplayName("Deve remover análises por subprocesso")

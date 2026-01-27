@@ -21,7 +21,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -51,7 +52,7 @@ class SubprocessoValidacaoControllerTest {
 
         verify(subprocessoFacade).disponibilizarMapa(eq(codigo), any(DisponibilizarMapaRequest.class), eq(usuario));
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getMessage()).isEqualTo("Mapa de competências disponibilizado.");
+        assertThat(response.getBody().mensagem()).isEqualTo("Mapa de competências disponibilizado.");
     }
 
     @Test
@@ -81,7 +82,10 @@ class SubprocessoValidacaoControllerTest {
     @DisplayName("Deve obter sugestões")
     void deveObterSugestoes() {
         Long codigo = 1L;
-        SugestoesDto dto = new SugestoesDto("Texto", true, "Unidade");
+        SugestoesDto dto = SugestoesDto.builder()
+                .sugestoes("Texto")
+                .dataHora(java.time.LocalDateTime.now())
+                .build();
         when(subprocessoFacade.obterSugestoes(codigo)).thenReturn(dto);
 
         SugestoesDto result = controller.obterSugestoes(codigo);
@@ -143,7 +147,9 @@ class SubprocessoValidacaoControllerTest {
     @DisplayName("Deve submeter mapa ajustado")
     void deveSubmeterMapaAjustado() {
         Long codigo = 1L;
-        SubmeterMapaAjustadoRequest req = new SubmeterMapaAjustadoRequest("Obs", null);
+        SubmeterMapaAjustadoRequest req = SubmeterMapaAjustadoRequest.builder()
+                .justificativa("Obs")
+                .build();
         Usuario usuario = new Usuario();
 
         controller.submeterMapaAjustado(codigo, req, usuario);
@@ -155,7 +161,10 @@ class SubprocessoValidacaoControllerTest {
     @DisplayName("Deve aceitar validação em bloco")
     void deveAceitarValidacaoEmBloco() {
         Long codigo = 1L;
-        ProcessarEmBlocoRequest req = new ProcessarEmBlocoRequest(List.of(10L, 20L), null);
+        ProcessarEmBlocoRequest req = ProcessarEmBlocoRequest.builder()
+                .subprocessos(List.of(10L, 20L))
+                .acao("ACEITAR")
+                .build();
         Usuario usuario = new Usuario();
 
         controller.aceitarValidacaoEmBloco(codigo, req, usuario);
@@ -167,7 +176,10 @@ class SubprocessoValidacaoControllerTest {
     @DisplayName("Deve homologar validação em bloco")
     void deveHomologarValidacaoEmBloco() {
         Long codigo = 1L;
-        ProcessarEmBlocoRequest req = new ProcessarEmBlocoRequest(List.of(10L, 20L), null);
+        ProcessarEmBlocoRequest req = ProcessarEmBlocoRequest.builder()
+                .subprocessos(List.of(10L, 20L))
+                .acao("HOMOLOGAR")
+                .build();
         Usuario usuario = new Usuario();
 
         controller.homologarValidacaoEmBloco(codigo, req, usuario);

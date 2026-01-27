@@ -47,7 +47,7 @@ public class SubprocessoFactory {
         List<Unidade> unidadesElegiveis = unidades.stream()
                 .filter(u -> TipoUnidade.OPERACIONAL == u.getTipo() || TipoUnidade.INTEROPERACIONAL == u.getTipo())
                 .toList();
-        
+
         if (unidadesElegiveis.isEmpty()) return;
 
         List<Subprocesso> subprocessos = unidadesElegiveis.stream()
@@ -74,7 +74,7 @@ public class SubprocessoFactory {
         for (int i = 0; i < subprocessosSalvos.size(); i++) {
             subprocessosSalvos.get(i).setMapa(mapasSalvos.get(i));
         }
-        
+
         List<Movimentacao> movimentacoes = new java.util.ArrayList<>();
         for (Subprocesso sp : subprocessosSalvos) {
             movimentacoes.add(Movimentacao.builder()
@@ -92,7 +92,7 @@ public class SubprocessoFactory {
     public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa) {
 
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
-        
+
         Subprocesso subprocesso = Subprocesso.builder()
                 .processo(processo)
                 .unidade(unidade)
@@ -101,7 +101,7 @@ public class SubprocessoFactory {
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build();
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
-        
+
         Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente);
 
         mapaCopiado.setSubprocesso(subprocessoSalvo);

@@ -123,11 +123,21 @@ class RelatorioFacadeTest {
         Processo p = new Processo();
         p.setDescricao("Proc Teste");
 
-        Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setSigla("U1");
-        Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setSigla("U2");
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        u1.setSigla("U1");
+        Unidade u2 = new Unidade();
+        u2.setCodigo(2L);
+        u2.setSigla("U2");
 
-        Subprocesso sp1 = new Subprocesso(); sp1.setUnidade(u1); sp1.setMapa(new Mapa()); sp1.getMapa().setCodigo(10L);
-        Subprocesso sp2 = new Subprocesso(); sp2.setUnidade(u2); sp2.setMapa(new Mapa()); sp2.getMapa().setCodigo(20L);
+        Subprocesso sp1 = new Subprocesso();
+        sp1.setUnidade(u1);
+        sp1.setMapa(new Mapa());
+        sp1.getMapa().setCodigo(10L);
+        Subprocesso sp2 = new Subprocesso();
+        sp2.setUnidade(u2);
+        sp2.setMapa(new Mapa());
+        sp2.getMapa().setCodigo(20L);
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
@@ -145,8 +155,14 @@ class RelatorioFacadeTest {
     void deveProcessarCompetenciaSemAtividades() {
         when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
-        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1"); u.setCodigo(1L);
-        Subprocesso sp = new Subprocesso(); sp.setUnidade(u); sp.setMapa(new Mapa()); sp.getMapa().setCodigo(10L);
+        Unidade u = new Unidade();
+        u.setSigla("U1");
+        u.setNome("U1");
+        u.setCodigo(1L);
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(u);
+        sp.setMapa(new Mapa());
+        sp.getMapa().setCodigo(10L);
 
         Competencia c = new Competencia();
         c.setDescricao("Comp 1");
@@ -166,8 +182,14 @@ class RelatorioFacadeTest {
     void deveProcessarAtividadeSemConhecimentos() {
         when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
-        Unidade u = new Unidade(); u.setSigla("U1"); u.setNome("U1"); u.setCodigo(1L);
-        Subprocesso sp = new Subprocesso(); sp.setUnidade(u); sp.setMapa(new Mapa()); sp.getMapa().setCodigo(10L);
+        Unidade u = new Unidade();
+        u.setSigla("U1");
+        u.setNome("U1");
+        u.setCodigo(1L);
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(u);
+        sp.setMapa(new Mapa());
+        sp.getMapa().setCodigo(10L);
 
         Competencia c = new Competencia();
         c.setDescricao("Comp 1");
@@ -196,8 +218,8 @@ class RelatorioFacadeTest {
 
         OutputStream out = new ByteArrayOutputStream();
         assertThatThrownBy(() -> relatorioService.gerarRelatorioAndamento(1L, out))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("Erro ao gerar PDF");
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Erro ao gerar PDF");
     }
 
     @Test

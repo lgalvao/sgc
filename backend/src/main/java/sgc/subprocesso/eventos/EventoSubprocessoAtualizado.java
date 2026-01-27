@@ -15,7 +15,7 @@ import java.util.Set;
  * <p>Este evento é disparado após a atualização bem-sucedida de campos básicos
  * de um subprocesso (não relacionados a transições de workflow, que usam
  * {@link EventoTransicaoSubprocesso}).
-*/
+ */
 @Getter
 @Builder
 public class EventoSubprocessoAtualizado {

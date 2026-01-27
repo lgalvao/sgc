@@ -34,8 +34,8 @@ public class SubprocessoMapaController {
     /**
      * Obtém o contexto completo para edição de mapa (BFF).
      *
-     * @param codigo         O código do subprocesso.
-     * @param perfil         O perfil do usuário (opcional).
+     * @param codigo O código do subprocesso.
+     * @param perfil O perfil do usuário (opcional).
      * @return O {@link ContextoEdicaoDto} com todos os dados necessários.
      */
     @GetMapping("/{codigo}/contexto-edicao")
@@ -50,7 +50,9 @@ public class SubprocessoMapaController {
     /**
      * Analisa e retorna os impactos de uma revisão de mapa de competências.
      *
-     * <p>Compara o mapa em elaboração no subprocesso com o mapa vigente da unidade para identificar
+     * <p>
+     * Compara o mapa em elaboração no subprocesso com o mapa vigente da unidade
+     * para identificar
      * atividades inseridas, removidas ou alteradas, e as competências afetadas.
      *
      * @param codigo O código do subprocesso em revisão.
@@ -79,11 +81,13 @@ public class SubprocessoMapaController {
     }
 
     /**
-     * Obtém uma representação aninhada e formatada do mapa de um subprocesso, ideal para telas de
+     * Obtém uma representação aninhada e formatada do mapa de um subprocesso, ideal
+     * para telas de
      * visualização.
      *
      * @param codSubprocesso O código do subprocesso.
-     * @return Um {@link MapaVisualizacaoDto} com a estrutura hierárquica completa do mapa.
+     * @return Um {@link MapaVisualizacaoDto} com a estrutura hierárquica completa
+     *         do mapa.
      */
     @GetMapping("/{codigo}/mapa-visualizacao")
     @PreAuthorize("isAuthenticated()")
@@ -95,19 +99,21 @@ public class SubprocessoMapaController {
     /**
      * Lista todas as atividades de um subprocesso com seus conhecimentos.
      *
-     * <p>Retorna uma lista plana de atividades (sem agrupamento por competências),
-     * ideal para uso em stores e componentes que precisam apenas da lista de atividades.
+     * <p>
+     * Retorna uma lista plana de atividades (sem agrupamento por competências),
+     * ideal para uso em stores e componentes que precisam apenas da lista de
+     * atividades.
      *
      * @param codSubprocesso O código do subprocesso.
-     * @return Uma lista de {@link AtividadeVisualizacaoDto} com as atividades e conhecimentos.
+     * @return Uma lista de {@link AtividadeVisualizacaoDto} com as atividades e
+     *         conhecimentos.
      */
     @GetMapping("/{codSubprocesso}/atividades")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista todas as atividades de um subprocesso")
     public ResponseEntity<List<AtividadeVisualizacaoDto>> listarAtividades(
             @PathVariable Long codSubprocesso) {
-        List<AtividadeVisualizacaoDto> atividades =
-                subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso);
+        List<AtividadeVisualizacaoDto> atividades = subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso);
         return ResponseEntity.ok(atividades);
     }
 
@@ -155,11 +161,12 @@ public class SubprocessoMapaController {
             @RequestBody @Valid SalvarAjustesRequest request,
             @AuthenticationPrincipal Object principal) {
         subprocessoFacade.salvarAjustesMapa(
-                codigo, request.getCompetencias());
+                codigo, request.competencias());
     }
 
     /**
-     * Obtém a estrutura completa de um mapa, incluindo competências e as atividades associadas a
+     * Obtém a estrutura completa de um mapa, incluindo competências e as atividades
+     * associadas a
      * cada uma.
      *
      * @param codigo código do subprocesso.
@@ -170,13 +177,13 @@ public class SubprocessoMapaController {
     @Operation(summary = "Obtém um mapa completo com competências e atividades (CDU-15)")
     public ResponseEntity<MapaCompletoDto> obterMapaCompleto(@PathVariable Long codigo) {
         Subprocesso subprocesso = subprocessoFacade.buscarSubprocessoComMapa(codigo);
-        MapaCompletoDto mapa =
-                mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
+        MapaCompletoDto mapa = mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
         return ResponseEntity.ok(mapa);
     }
 
     /**
-     * Salva a estrutura completa de um mapa, incluindo a criação/edição de competências e a
+     * Salva a estrutura completa de um mapa, incluindo a criação/edição de
+     * competências e a
      * atualização de seus vínculos com atividades.
      *
      * @param codigo  O código do subprocesso.
@@ -206,12 +213,11 @@ public class SubprocessoMapaController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Disponibiliza mapas em bloco")
     public void disponibilizarMapaEmBloco(@PathVariable Long codigo,
-                                          @RequestBody @Valid ProcessarEmBlocoRequest request,
-                                          @AuthenticationPrincipal Usuario usuario) {
+            @RequestBody @Valid ProcessarEmBlocoRequest request,
+            @AuthenticationPrincipal Usuario usuario) {
         DisponibilizarMapaRequest serviceRequest = DisponibilizarMapaRequest.builder()
-                .dataLimite(request.getDataLimite())
                 .build();
-        subprocessoFacade.disponibilizarMapaEmBloco(request.getUnidadeCodigos(), codigo, serviceRequest, usuario);
+        subprocessoFacade.disponibilizarMapaEmBloco(request.subprocessos(), codigo, serviceRequest, usuario);
     }
 
     @PostMapping("/{codigo}/competencias")
@@ -222,9 +228,8 @@ public class SubprocessoMapaController {
             @PathVariable Long codigo,
             @RequestBody @Valid CompetenciaRequest request,
             @AuthenticationPrincipal Object principal) {
-        MapaCompletoDto mapa =
-                subprocessoFacade.adicionarCompetencia(
-                        codigo, request);
+        MapaCompletoDto mapa = subprocessoFacade.adicionarCompetencia(
+                codigo, request);
         return ResponseEntity.ok(mapa);
     }
 

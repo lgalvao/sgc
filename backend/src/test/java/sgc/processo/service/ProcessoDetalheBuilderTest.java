@@ -168,8 +168,14 @@ class ProcessoDetalheBuilderTest {
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.CRIADO);
 
-        Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setSigla("B"); u1.setNome("Unidade B");
-        Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setSigla("A"); u2.setNome("Unidade A");
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        u1.setSigla("B");
+        u1.setNome("Unidade B");
+        Unidade u2 = new Unidade();
+        u2.setCodigo(2L);
+        u2.setSigla("A");
+        u2.setNome("Unidade A");
 
         processo.setParticipantes(Set.of(u1, u2));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
@@ -264,7 +270,8 @@ class ProcessoDetalheBuilderTest {
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         configurarMockDoMapper();
-        Unidade u1 = new Unidade(); u1.setCodigo(1L);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
         processo.setParticipantes(Set.of(u1));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
 
@@ -274,7 +281,8 @@ class ProcessoDetalheBuilderTest {
 
         sgc.organizacao.model.Usuario usuario = new sgc.organizacao.model.Usuario();
         sgc.organizacao.model.UsuarioPerfil atribuicao = new sgc.organizacao.model.UsuarioPerfil();
-        Unidade u2 = new Unidade(); u2.setCodigo(2L); // Different unit
+        Unidade u2 = new Unidade();
+        u2.setCodigo(2L); // Different unit
         atribuicao.setUnidade(u2);
         usuario.setAtribuicoes(Set.of(atribuicao));
 
@@ -294,8 +302,12 @@ class ProcessoDetalheBuilderTest {
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-        Unidade pai = new Unidade(); pai.setCodigo(1L); pai.setSigla("PAI");
-        Unidade filho = new Unidade(); filho.setCodigo(2L); filho.setSigla("FILHO");
+        Unidade pai = new Unidade();
+        pai.setCodigo(1L);
+        pai.setSigla("PAI");
+        Unidade filho = new Unidade();
+        filho.setCodigo(2L);
+        filho.setSigla("FILHO");
         filho.setUnidadeSuperior(pai);
 
         // Apenas filho participa
@@ -362,7 +374,8 @@ class ProcessoDetalheBuilderTest {
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
-        Unidade u1 = new Unidade(); u1.setCodigo(10L);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(10L);
         sp.setUnidade(u1);
         sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
 

@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "aplicacao.acesso-ad")
 public record PropriedadesAcessoAd(
-    String baseUrl,
-    String codigoSistema
-) {}
+        String baseUrl,
+        String codigoSistema
+) {
+}

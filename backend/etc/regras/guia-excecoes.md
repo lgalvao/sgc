@@ -88,6 +88,7 @@ Este documento orienta desenvolvedores na escolha da exceção apropriada para c
 ### 2.1. Erros Internos (ErroInterno e subclasses)
 
 **Características**:
+
 - Indicam bugs, configuração incorreta ou violação de invariantes
 - NUNCA deveriam ocorrer se sistema está funcionando corretamente
 - Retornam HTTP 500 (Internal Server Error)
@@ -95,6 +96,7 @@ Este documento orienta desenvolvedores na escolha da exceção apropriada para c
 - Mensagem genérica ao usuário (não expor detalhes internos)
 
 **Quando usar**:
+
 ```java
 ✓ Configuração ausente ou inválida
 ✓ Dados corrompidos (FK inválida, entidade obrigatória ausente)
@@ -104,6 +106,7 @@ Este documento orienta desenvolvedores na escolha da exceção apropriada para c
 ```
 
 **Quando NÃO usar**:
+
 ```java
 ✗ Validação de entrada do usuário
 ✗ Recurso não encontrado
@@ -113,13 +116,14 @@ Este documento orienta desenvolvedores na escolha da exceção apropriada para c
 
 **Subclasses**:
 
-| Classe | Quando Usar | Exemplo |
-|--------|-------------|---------|
-| `ErroConfiguracao` | Problemas de configuração | JWT secret ausente ou muito curto |
-| `ErroInvarianteViolada` | Violação de invariante do sistema | FK obrigatória não encontrada |
-| `ErroEstadoImpossivel` | Estado que UI impede mas backend valida | Tipo de enum desconhecido |
+| Classe                  | Quando Usar                             | Exemplo                           |
+|-------------------------|-----------------------------------------|-----------------------------------|
+| `ErroConfiguracao`      | Problemas de configuração               | JWT secret ausente ou muito curto |
+| `ErroInvarianteViolada` | Violação de invariante do sistema       | FK obrigatória não encontrada     |
+| `ErroEstadoImpossivel`  | Estado que UI impede mas backend valida | Tipo de enum desconhecido         |
 
 **Exemplo**:
+
 ```java
 // ✓ CORRETO - Erro interno
 if (secret.length() < 32) {
@@ -145,6 +149,7 @@ if (processo.getSituacao() != CRIADO) {
 ### 2.2. Erros de Negócio
 
 **Características**:
+
 - São esperados durante uso normal do sistema
 - Podem ocorrer legitimamente (múltiplos usuários, condições de corrida)
 - Retornam status HTTP 4xx apropriado
@@ -158,6 +163,7 @@ if (processo.getSituacao() != CRIADO) {
 **Quando usar**: Recurso solicitado não existe no sistema
 
 **Exemplos**:
+
 ```java
 // ✓ CORRETO
 Processo processo = processoRepo.findById(codigo)
@@ -175,11 +181,13 @@ Unidade unidade = unidadeRepo.findBySigla(sigla)
 **Quando usar**: Validação de dados de entrada ou regras de negócio
 
 **Características**:
+
 - Requisição sintaticamente correta mas semanticamente inválida
 - Pode incluir detalhes sobre campos específicos
 - Usuário pode corrigir e reenviar
 
 **Exemplos**:
+
 ```java
 // ✓ CORRETO - Validação simples
 if (atividades.isEmpty()) {
@@ -200,6 +208,7 @@ throw new ErroValidacao("Dados de entrada inválidos", detalhes);
 **Quando usar**: Usuário autenticado mas sem permissão para a ação
 
 **Exemplo**:
+
 ```java
 // ✓ CORRETO
 if (!usuario.getTituloEleitoral().equals(tituloTitular)) {
@@ -216,11 +225,13 @@ if (!usuario.getTituloEleitoral().equals(tituloTitular)) {
 **Importante**: Este é um erro de negócio ESPERADO (pode ocorrer com múltiplos usuários ou condições de corrida)
 
 **Classes disponíveis**:
+
 - `ErroProcessoEmSituacaoInvalida`
 - `ErroMapaEmSituacaoInvalida`
 - `ErroAtividadesEmSituacaoInvalida`
 
 **Exemplos**:
+
 ```java
 // ✓ CORRETO
 if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
@@ -242,6 +253,7 @@ if (subprocesso.getSituacao() != REVISAO_CADASTRO_DISPONIBILIZADA) {
 **Quando usar**: Violação de regras de negócio não cobertas acima
 
 **Exemplos**:
+
 - `ErroProcesso` - regras gerais de processo
 - `ErroUnidadesNaoDefinidas` - processo sem unidades
 - `ErroMapaNaoAssociado` - mapa não vinculado
@@ -254,6 +266,7 @@ if (subprocesso.getSituacao() != REVISAO_CADASTRO_DISPONIBILIZADA) {
 **Cenário**: Código busca `unidade.getUnidadeSuperior()` e retorna `null`
 
 **Decisão**:
+
 ```java
 // Se superior é OBRIGATÓRIO pela estrutura do sistema:
 if (unidadeSuperior == null) {
@@ -270,9 +283,11 @@ if (unidadeSuperior == null) {
 
 ### 4.2. Múltiplos Usuários e Condições de Corrida
 
-**Cenário**: Usuário A inicia ação quando processo está em estado X. Antes de completar, usuário B muda para estado Y. Ação de A falha.
+**Cenário**: Usuário A inicia ação quando processo está em estado X. Antes de completar, usuário B muda para estado Y.
+Ação de A falha.
 
 **Decisão**:
+
 ```java
 // ✓ CORRETO - Erro de negócio
 if (processo.getSituacao() != estadoEsperado) {
@@ -292,20 +307,20 @@ if (processo.getSituacao() != estadoEsperado) {
 Antes de lançar uma exceção, pergunte-se:
 
 1. **Este erro pode ocorrer durante uso normal do sistema?**
-   - SIM → Erro de Negócio
-   - NÃO → Erro Interno
+    - SIM → Erro de Negócio
+    - NÃO → Erro Interno
 
 2. **O usuário pode fazer algo para corrigir?**
-   - SIM → Erro de Negócio (validação, permissão, estado)
-   - NÃO → Provavelmente Erro Interno
+    - SIM → Erro de Negócio (validação, permissão, estado)
+    - NÃO → Provavelmente Erro Interno
 
 3. **Outro usuário ou processo poderia causar este erro?**
-   - SIM → Erro de Negócio
-   - NÃO → Considere Erro Interno
+    - SIM → Erro de Negócio
+    - NÃO → Considere Erro Interno
 
 4. **Este erro indica um bug no código?**
-   - SIM → Erro Interno
-   - NÃO → Erro de Negócio
+    - SIM → Erro Interno
+    - NÃO → Erro de Negócio
 
 ## 6. Migração de Código Legado
 

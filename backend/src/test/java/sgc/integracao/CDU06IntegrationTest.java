@@ -22,8 +22,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import sgc.Sgc;
@@ -107,7 +106,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         context.setAuthentication(auth);
 
         when(usuarioService.buscarPerfisUsuario(anyString())).thenReturn(List.of(
-                new PerfilDto(TEST_USER_ID, unidade.getCodigo(), unidade.getNome(), perfil.name())));
+                new PerfilDto(TEST_USER_ID, unidade.getCodigo(), unidade.getNome(), perfil.name(), perfil.name())));
         return auth;
     }
 
@@ -145,12 +144,12 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
         subprocessoRepo.save(Subprocesso.builder()
-                        .processo(processo)
-                        .unidade(unidade)
-                        .mapa(null)
-                        .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
-                        .dataLimiteEtapa1(processo.getDataLimite())
-                        .build());
+                .processo(processo)
+                .unidade(unidade)
+                .mapa(null)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                .dataLimiteEtapa1(processo.getDataLimite())
+                .build());
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
@@ -164,12 +163,12 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         processoRepo.save(processo);
         org.springframework.security.core.Authentication auth = setupSecurityContext(unidade, Perfil.CHEFE);
         subprocessoRepo.save(Subprocesso.builder()
-                        .processo(processo)
-                        .unidade(unidade)
-                        .mapa(null)
-                        .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
-                        .dataLimiteEtapa1(processo.getDataLimite())
-                        .build());
+                .processo(processo)
+                .unidade(unidade)
+                .mapa(null)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                .dataLimiteEtapa1(processo.getDataLimite())
+                .build());
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
                 .andExpect(status().isOk())

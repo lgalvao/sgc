@@ -19,8 +19,10 @@ import java.util.stream.Collectors;
 
 /**
  * Serviço especializado para salvar o mapa completo de competências.
- * 
- * <p><b>IMPORTANTE:</b> Este serviço deve ser acessado APENAS via {@link MapaFacade}.
+ *
+ * <p>
+ * <b>IMPORTANTE:</b> Este serviço deve ser acessado APENAS via
+ * {@link MapaFacade}.
  * Controllers não devem injetar este serviço diretamente.
  *
  * <p>
@@ -50,12 +52,13 @@ public class MapaSalvamentoService {
      * @param request A requisição contendo as competências e observações.
      * @return O DTO do mapa completo atualizado.
      * @throws ErroEntidadeNaoEncontrada se o mapa não for encontrado.
-     * @throws ErroValidacao             se houver atividades inválidas na requisição.
+     * @throws ErroValidacao             se houver atividades inválidas na
+     *                                   requisição.
      */
     public MapaCompletoDto salvarMapaCompleto(Long codMapa, SalvarMapaRequest request) {
         Mapa mapa = repo.buscar(Mapa.class, codMapa);
 
-        atualizarObservacoes(mapa, request.getObservacoes());
+        atualizarObservacoes(mapa, request.observacoes());
 
         ContextoSalvamento contexto = prepararContexto(codMapa, request);
         removerCompetenciasObsoletas(contexto);
@@ -81,8 +84,8 @@ public class MapaSalvamentoService {
                 .map(Atividade::getCodigo)
                 .collect(Collectors.toSet());
 
-        Set<Long> codigosNovos = request.getCompetencias().stream()
-                .map(CompetenciaMapaDto::getCodigo)
+        Set<Long> codigosNovos = request.competencias().stream()
+                .map(CompetenciaMapaDto::codigo)
                 .collect(Collectors.toSet());
 
         return new ContextoSalvamento(
@@ -113,7 +116,7 @@ public class MapaSalvamentoService {
 
         List<Competencia> competenciasParaSalvar = new ArrayList<>();
 
-        for (CompetenciaMapaDto compDto : contexto.request.getCompetencias()) {
+        for (CompetenciaMapaDto compDto : contexto.request.competencias()) {
             Competencia competencia = processarCompetenciaDto(compDto, mapa, mapaCompetenciasExistentes);
             competenciasParaSalvar.add(competencia);
         }
@@ -126,7 +129,7 @@ public class MapaSalvamentoService {
             Mapa mapa,
             Map<Long, Competencia> mapaCompetenciasExistentes) {
 
-        Long codigo = compDto.getCodigo();
+        Long codigo = compDto.codigo();
         Competencia competencia;
 
         if (codigo != null) {
@@ -140,7 +143,7 @@ public class MapaSalvamentoService {
             competencia.setAtividades(new HashSet<>());
         }
 
-        competencia.setDescricao(compDto.getDescricao());
+        competencia.setDescricao(compDto.descricao());
         return competencia;
     }
 
@@ -167,12 +170,12 @@ public class MapaSalvamentoService {
             mapAtividadeCompetencias.put(ativId, new HashSet<>());
         }
 
-        List<CompetenciaMapaDto> competenciasDto = contexto.request.getCompetencias();
+        List<CompetenciaMapaDto> competenciasDto = contexto.request.competencias();
         for (int i = 0; i < competenciasDto.size(); i++) {
             CompetenciaMapaDto dto = competenciasDto.get(i);
             Competencia competencia = competenciasSalvas.get(i);
 
-            for (Long ativId : dto.getAtividadesCodigos()) {
+            for (Long ativId : dto.atividadesCodigos()) {
                 validarAtividadePertenceAoMapa(ativId, contexto.atividadesDoMapaIds, codMapa);
                 mapAtividadeCompetencias.get(ativId).add(competencia);
             }

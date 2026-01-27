@@ -11,9 +11,13 @@ import java.util.Map;
  */
 public interface ErroNegocio {
     String getCode();
+
     HttpStatus getStatus();
+
     @SuppressWarnings("SameReturnValue")
-    default Map<String, ?> getDetails() { return null; }
+    default Map<String, ?> getDetails() {
+        return null;
+    }
 
     String getMessage();
 }

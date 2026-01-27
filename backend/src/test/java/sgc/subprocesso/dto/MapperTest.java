@@ -1,12 +1,17 @@
 package sgc.subprocesso.dto;
 
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
@@ -19,12 +24,6 @@ import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-
-import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -42,6 +41,7 @@ class MapperTest {
     private RepositorioComum repo;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() throws NoSuchFieldException, IllegalAccessException {
         java.lang.reflect.Field processoRepoField =
                 SubprocessoMapper.class.getDeclaredField("processoRepo");

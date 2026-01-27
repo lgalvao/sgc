@@ -30,8 +30,6 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Component
 @RequiredArgsConstructor
 public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
-    private final HierarquiaService hierarquiaService;
-
     /**
      * Ações que ADMIN pode executar sem restrição de hierarquia.
      */
@@ -42,21 +40,18 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
             DISPONIBILIZAR_MAPA, VALIDAR_MAPA, HOMOLOGAR_MAPA, DEVOLVER_MAPA,
             ALTERAR_DATA_LIMITE, REABRIR_CADASTRO, REABRIR_REVISAO
     );
-
     /**
      * Situações permitidas para ADMIN em VERIFICAR_IMPACTOS.
      */
     private static final EnumSet<SituacaoSubprocesso> SITUACOES_VERIFICAR_IMPACTOS_ADMIN = EnumSet.of(
             REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO
     );
-
     /**
      * Situações permitidas para CHEFE em VERIFICAR_IMPACTOS.
      */
     private static final EnumSet<SituacaoSubprocesso> SITUACOES_VERIFICAR_IMPACTOS_CHEFE = EnumSet.of(
             NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO
     );
-
     /**
      * Mapeamento de ações para regras de acesso
      */
@@ -227,6 +222,7 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                     EnumSet.of(ADMIN, GESTOR, CHEFE),
                     EnumSet.of(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO),
                     RequisitoHierarquia.MESMA_UNIDADE)));
+    private final HierarquiaService hierarquiaService;
 
     @Override
     public boolean canExecute(Usuario usuario, Acao acao, Subprocesso sp) {

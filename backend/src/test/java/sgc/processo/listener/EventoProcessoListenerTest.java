@@ -131,9 +131,11 @@ class EventoProcessoListenerTest {
     void deveCobrirExcecaoTipoUnidadeRaizEInvalido() {
         Processo processo = criarProcesso(1L);
         Subprocesso s = new Subprocesso();
-        Unidade u = new Unidade(); u.setCodigo(1L); u.setTipo(TipoUnidade.RAIZ);
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
+        u.setTipo(TipoUnidade.RAIZ);
         s.setUnidade(u);
-        
+
         // Testa ErroEstadoImpossivel ao criar corpo
         assertThatThrownBy(() -> listener.criarCorpoEmailPorTipo(TipoUnidade.RAIZ, processo, s))
                 .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
@@ -143,7 +145,7 @@ class EventoProcessoListenerTest {
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, ResponsavelDto.builder().titularTitulo("T").build()));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", UsuarioDto.builder().build()));
-        
+
         listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
@@ -154,15 +156,18 @@ class EventoProcessoListenerTest {
         Processo processo = criarProcesso(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
-        Unidade u = new Unidade(); u.setCodigo(10L); u.setTipo(TipoUnidade.OPERACIONAL);
-        Subprocesso s = new Subprocesso(); s.setUnidade(u);
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        u.setTipo(TipoUnidade.OPERACIONAL);
+        Subprocesso s = new Subprocesso();
+        s.setUnidade(u);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
 
         ResponsavelDto r = ResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").substitutoTitulo("S").build();
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r));
 
         UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("T").email("t@mail.com").build();
-        
+
         // 1. Substituto null no mapa de usuários
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", titular));
         listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
@@ -186,19 +191,25 @@ class EventoProcessoListenerTest {
         Processo processo = criarProcesso(2L);
         when(processoFacade.buscarEntidadePorId(2L)).thenReturn(processo);
 
-        Unidade operacional = new Unidade(); operacional.setCodigo(1L); operacional.setTipo(TipoUnidade.OPERACIONAL); operacional.setSigla("OP");
-        Unidade intermediaria = new Unidade(); intermediaria.setCodigo(2L); intermediaria.setTipo(TipoUnidade.INTERMEDIARIA); intermediaria.setSigla("INT");
-        
+        Unidade operacional = new Unidade();
+        operacional.setCodigo(1L);
+        operacional.setTipo(TipoUnidade.OPERACIONAL);
+        operacional.setSigla("OP");
+        Unidade intermediaria = new Unidade();
+        intermediaria.setCodigo(2L);
+        intermediaria.setTipo(TipoUnidade.INTERMEDIARIA);
+        intermediaria.setSigla("INT");
+
         processo.setParticipantes(Set.of(operacional, intermediaria));
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
-            1L, ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
-            2L, ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build()
+                1L, ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
+                2L, ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build()
         ));
 
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
-            "T1", UsuarioDto.builder().email("op@mail.com").build(),
-            "T2", UsuarioDto.builder().email("int@mail.com").build()
+                "T1", UsuarioDto.builder().email("op@mail.com").build(),
+                "T2", UsuarioDto.builder().email("int@mail.com").build()
         ));
 
         // 1. Intermediária sem subordinadas (log.warn)
@@ -207,18 +218,22 @@ class EventoProcessoListenerTest {
         verify(notificacaoEmailService, never()).enviarEmailHtml(eq("int@mail.com"), anyString(), any());
 
         // 2. Intermediária com subordinadas (sucesso)
-        Unidade sub = new Unidade(); sub.setCodigo(21L); sub.setTipo(TipoUnidade.OPERACIONAL); sub.setUnidadeSuperior(intermediaria); sub.setSigla("SUB");
+        Unidade sub = new Unidade();
+        sub.setCodigo(21L);
+        sub.setTipo(TipoUnidade.OPERACIONAL);
+        sub.setUnidadeSuperior(intermediaria);
+        sub.setSigla("SUB");
         processo.setParticipantes(Set.of(operacional, intermediaria, sub));
-        
+
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
-            1L, ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
-            2L, ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build(),
-            21L, ResponsavelDto.builder().unidadeCodigo(21L).titularTitulo("TS").build()
+                1L, ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
+                2L, ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build(),
+                21L, ResponsavelDto.builder().unidadeCodigo(21L).titularTitulo("TS").build()
         ));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
-            "T1", UsuarioDto.builder().email("op@mail.com").build(),
-            "T2", UsuarioDto.builder().email("int@mail.com").build(),
-            "TS", UsuarioDto.builder().email("sub@mail.com").build()
+                "T1", UsuarioDto.builder().email("op@mail.com").build(),
+                "T2", UsuarioDto.builder().email("int@mail.com").build(),
+                "TS", UsuarioDto.builder().email("sub@mail.com").build()
         ));
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(2L).build());
@@ -232,11 +247,13 @@ class EventoProcessoListenerTest {
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
         Subprocesso s = new Subprocesso();
-        Unidade u = new Unidade(); u.setCodigo(1L); u.setTipo(TipoUnidade.SEM_EQUIPE);
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
+        u.setTipo(TipoUnidade.SEM_EQUIPE);
         s.setUnidade(u);
-        
+
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
-        
+
         ResponsavelDto r = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T").build();
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", UsuarioDto.builder().email("t@mail.com").build()));
@@ -252,18 +269,18 @@ class EventoProcessoListenerTest {
         Processo processo = criarProcesso(2L);
         when(processoFacade.buscarEntidadePorId(2L)).thenReturn(processo);
 
-        Unidade raiz = new Unidade(); 
-        raiz.setCodigo(1L); 
-        raiz.setTipo(TipoUnidade.RAIZ); 
-        
+        Unidade raiz = new Unidade();
+        raiz.setCodigo(1L);
+        raiz.setTipo(TipoUnidade.RAIZ);
+
         processo.setParticipantes(Set.of(raiz));
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
-            1L, ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build()
+                1L, ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build()
         ));
 
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
-            "T1", UsuarioDto.builder().email("op@mail.com").build()
+                "T1", UsuarioDto.builder().email("op@mail.com").build()
         ));
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(2L).build());
@@ -275,7 +292,7 @@ class EventoProcessoListenerTest {
     @DisplayName("Deve capturar exceção no processamento assíncrono geral")
     void deveCapturarExcecaoAsyncGeral() {
         when(processoFacade.buscarEntidadePorId(anyLong())).thenThrow(new RuntimeException("Crash"));
-        
+
         assertThatCode(() -> listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build()))
                 .doesNotThrowAnyException();
         assertThatCode(() -> listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(1L).build()))
@@ -290,7 +307,7 @@ class EventoProcessoListenerTest {
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(1L).build());
-        
+
         verify(unidadeService, never()).buscarResponsaveisUnidades(anyList());
     }
 
@@ -300,13 +317,17 @@ class EventoProcessoListenerTest {
         Processo processo = criarProcesso(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
-        Unidade u = new Unidade(); u.setCodigo(10L); u.setTipo(TipoUnidade.OPERACIONAL);
-        Subprocesso s = new Subprocesso(); s.setCodigo(100L); s.setUnidade(u);
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        u.setTipo(TipoUnidade.OPERACIONAL);
+        Subprocesso s = new Subprocesso();
+        s.setCodigo(100L);
+        s.setUnidade(u);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
-        
+
         ResponsavelDto r = ResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").build();
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r));
-        
+
         // Quando buscar usuário por titulo retornar null, o try interno vai estourar NPE
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Collections.emptyMap());
 
@@ -321,8 +342,12 @@ class EventoProcessoListenerTest {
         Processo processo = criarProcesso(3L);
         when(processoFacade.buscarEntidadePorId(3L)).thenReturn(processo);
 
-        Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setTipo(TipoUnidade.OPERACIONAL);
-        Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        u1.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade u2 = new Unidade();
+        u2.setCodigo(2L);
+        u2.setTipo(TipoUnidade.OPERACIONAL);
 
         processo.setParticipantes(Set.of(u1, u2));
 
@@ -343,8 +368,12 @@ class EventoProcessoListenerTest {
         Processo processo = criarProcesso(4L);
         when(processoFacade.buscarEntidadePorId(4L)).thenReturn(processo);
 
-        Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setTipo(TipoUnidade.OPERACIONAL);
-        Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        u1.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade u2 = new Unidade();
+        u2.setCodigo(2L);
+        u2.setTipo(TipoUnidade.OPERACIONAL);
 
         processo.setParticipantes(Set.of(u1, u2));
 
@@ -370,7 +399,9 @@ class EventoProcessoListenerTest {
     void deveLancarExcecaoParaSemEquipe() {
         Processo processo = criarProcesso(1L);
         Subprocesso s = new Subprocesso();
-        Unidade u = new Unidade(); u.setCodigo(1L); u.setTipo(TipoUnidade.SEM_EQUIPE);
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
+        u.setTipo(TipoUnidade.SEM_EQUIPE);
         s.setUnidade(u);
 
         assertThatThrownBy(() -> listener.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, processo, s))
@@ -384,16 +415,25 @@ class EventoProcessoListenerTest {
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
         // Unidade 1: Titular null no mapa
-        Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setTipo(TipoUnidade.OPERACIONAL);
-        Subprocesso s1 = new Subprocesso(); s1.setUnidade(u1);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        u1.setTipo(TipoUnidade.OPERACIONAL);
+        Subprocesso s1 = new Subprocesso();
+        s1.setUnidade(u1);
 
         // Unidade 2: Titular com email null
-        Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setTipo(TipoUnidade.OPERACIONAL);
-        Subprocesso s2 = new Subprocesso(); s2.setUnidade(u2);
+        Unidade u2 = new Unidade();
+        u2.setCodigo(2L);
+        u2.setTipo(TipoUnidade.OPERACIONAL);
+        Subprocesso s2 = new Subprocesso();
+        s2.setUnidade(u2);
 
         // Unidade 3: Titular com email blank
-        Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setTipo(TipoUnidade.OPERACIONAL);
-        Subprocesso s3 = new Subprocesso(); s3.setUnidade(u3);
+        Unidade u3 = new Unidade();
+        u3.setCodigo(3L);
+        u3.setTipo(TipoUnidade.OPERACIONAL);
+        Subprocesso s3 = new Subprocesso();
+        s3.setUnidade(u3);
 
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1, s2, s3));
 

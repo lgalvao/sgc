@@ -16,9 +16,7 @@ import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
@@ -27,9 +25,6 @@ import sgc.subprocesso.dto.SalvarAjustesRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-import tools.jackson.databind.ObjectMapper;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -49,30 +44,13 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
             "/api/subprocessos/{codSubprocesso}/mapa-ajuste/atualizar";
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private ProcessoRepo processoRepo;
-
-    @Autowired
-    private UnidadeRepo unidadeRepo;
-
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-
-    @Autowired
-    private MapaRepo mapaRepo;
-
-    @Autowired
-    private AtividadeRepo atividadeRepo;
-
-    @Autowired
     private CompetenciaRepo competenciaRepo;
 
     private Subprocesso subprocesso;
     private Atividade atividade1;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         // Criar Unidade via Fixture
         Unidade unidade = UnidadeFixture.unidadePadrao();
@@ -151,8 +129,8 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de ajuste do mapa")
+    @SuppressWarnings("unused")
     class AjusteDoMapa {
-
         @Test
         @DisplayName("Deve salvar ajustes no mapa e alterar a situação do subprocesso")
         void deveSalvarAjustesComSucesso() throws Exception {

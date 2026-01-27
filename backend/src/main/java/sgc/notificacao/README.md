@@ -4,7 +4,7 @@
 
 Este pacote é responsável pelo envio de **notificações por e-mail** para os usuários de forma robusta e desacoplada.
 
-## Arquitetura 
+## Arquitetura
 
 O módulo de notificação é consumido por listeners de eventos que orquestram a criação de alertas e o envio de e-mails.
 Os listeners ficam nos respectivos módulos de domínio (ex: `sgc.processo.listener.EventoProcessoListener`).
@@ -55,6 +55,7 @@ graph TD
 ## Mocks para Testes
 
 Os mocks deste módulo estão em `src/test/java/sgc/notificacao/mock/`:
+
 - `NotificacaoEmailServiceMock` - Mock para perfis `test` e `e2e`
 - `NotificacaoModelosServiceMock` - Mock para perfil `test`
 
@@ -68,6 +69,7 @@ Os mocks deste módulo estão em `src/test/java/sgc/notificacao/mock/`:
 ## Como Testar
 
 Para executar apenas os testes deste módulo (a partir do diretório `backend`):
+
 ```bash
 ./gradlew test --tests "sgc.notificacao.*"
 ```

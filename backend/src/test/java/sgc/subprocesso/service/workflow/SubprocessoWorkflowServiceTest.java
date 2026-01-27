@@ -1,18 +1,21 @@
 package sgc.subprocesso.service.workflow;
 
+import java.time.LocalDate;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import sgc.alerta.AlertaFacade;
 import sgc.analise.AnaliseFacade;
 import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.service.AtividadeService;
-import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.service.ImpactoMapaService;
-import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -26,16 +29,8 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
-import java.time.LocalDate;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class SubprocessoWorkflowServiceTest {
-
     @InjectMocks
     private SubprocessoWorkflowService workflowService;
 
@@ -56,15 +51,7 @@ class SubprocessoWorkflowServiceTest {
     @Mock
     private SubprocessoValidacaoService validacaoService;
     @Mock
-    private ImpactoMapaService impactoMapaService;
-    @Mock
     private AccessControlService accessControlService;
-    @Mock
-    private CompetenciaService competenciaService;
-    @Mock
-    private AtividadeService atividadeService;
-    @Mock
-    private MapaFacade mapaFacade;
     @Mock
     private sgc.comum.repo.RepositorioComum repo;
 
@@ -154,7 +141,8 @@ class SubprocessoWorkflowServiceTest {
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
 
-        assertThrows(ErroValidacao.class, () -> workflowService.reabrirCadastro(codigo, "J"));
+        var exception = assertThrows(ErroValidacao.class, () -> workflowService.reabrirCadastro(codigo, "J"));
+        assertNotNull(exception);
     }
 
     @Test
@@ -250,9 +238,10 @@ class SubprocessoWorkflowServiceTest {
 
         when(repo.buscar(Subprocesso.class, codigo)).thenReturn(sp);
 
-        assertThrows(sgc.comum.erros.ErroInvarianteViolada.class, () ->
-            workflowService.aceitarCadastro(codigo, "Ok", usuario)
+        var exception = assertThrows(sgc.comum.erros.ErroInvarianteViolada.class, () ->
+                workflowService.aceitarCadastro(codigo, "Ok", usuario)
         );
+        assertNotNull(exception);
     }
 
     @Test
@@ -268,9 +257,10 @@ class SubprocessoWorkflowServiceTest {
 
         when(repo.buscar(Subprocesso.class, codigo)).thenReturn(sp);
 
-        assertThrows(sgc.comum.erros.ErroInvarianteViolada.class, () ->
-            workflowService.devolverRevisaoCadastro(codigo, "Obs", usuario)
+        var exception = assertThrows(sgc.comum.erros.ErroInvarianteViolada.class, () ->
+                workflowService.devolverRevisaoCadastro(codigo, "Obs", usuario)
         );
+        assertNotNull(exception);
     }
 
     private void sGC_Mapa(Subprocesso sp) {

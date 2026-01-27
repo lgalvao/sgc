@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Atividade;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.organizacao.model.Unidade;
@@ -35,10 +34,12 @@ class ImpactoMapaGapTest {
     @InjectMocks
     private ImpactoMapaService service;
 
-    @Mock private MapaRepo mapaRepo;
-    @Mock private CompetenciaRepo competenciaRepo;
-    @Mock private AtividadeService atividadeService;
-    @Mock private AccessControlService accessControlService;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private AtividadeService atividadeService;
+    @Mock
+    private AccessControlService accessControlService;
 
     @Test
     @DisplayName("Deve falhar se mapa do subprocesso não for encontrado")
@@ -77,8 +78,12 @@ class ImpactoMapaGapTest {
         when(mapaRepo.findMapaVigenteByUnidade(10L)).thenReturn(Optional.of(vig));
         when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(atual));
 
-        Atividade a1 = new Atividade(); a1.setCodigo(1L); a1.setDescricao("DUP");
-        Atividade a2 = new Atividade(); a2.setCodigo(2L); a2.setDescricao("DUP");
+        Atividade a1 = new Atividade();
+        a1.setCodigo(1L);
+        a1.setDescricao("DUP");
+        Atividade a2 = new Atividade();
+        a2.setCodigo(2L);
+        a2.setDescricao("DUP");
 
         // mock obterAtividadesDoMapa
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(200L)).thenReturn(List.of(a1, a2));
@@ -86,7 +91,7 @@ class ImpactoMapaGapTest {
 
         // Call method. Line 88 calls atividadesPorDescricao, which triggers the merge function.
         var impactos = service.verificarImpactos(s, user);
-        
+
         // Atualmente verificarImpactos usa a lista raw para detectarInseridas, por isso o tamanho é 2
         assertThat(impactos.getAtividadesInseridas()).hasSize(2);
     }

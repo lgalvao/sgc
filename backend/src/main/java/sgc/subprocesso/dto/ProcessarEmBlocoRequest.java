@@ -1,19 +1,17 @@
 package sgc.subprocesso.dto;
 
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
-import lombok.Getter;
 
-import java.time.LocalDate;
 import java.util.List;
 
 /**
- * DTO de requisição para processar subprocessos em bloco.
+ * DTO para requisição de processamento de subprocessos em lote.
  */
-@Getter
 @Builder
-@AllArgsConstructor
-public class ProcessarEmBlocoRequest {
-    private final List<Long> unidadeCodigos;
-    private final LocalDate dataLimite;
+public record ProcessarEmBlocoRequest(
+                @NotBlank(message = "A ação é obrigatória") String acao,
+
+                @NotEmpty(message = "Pelo menos um subprocesso deve ser selecionado") List<Long> subprocessos) {
 }

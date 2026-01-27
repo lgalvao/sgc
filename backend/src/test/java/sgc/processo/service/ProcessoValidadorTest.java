@@ -1,20 +1,12 @@
 package sgc.processo.service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
@@ -23,6 +15,14 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -48,7 +48,8 @@ class ProcessoValidadorTest {
     @Test
     @DisplayName("getMensagemErroUnidadesSemMapa deve retornar erro se unidade sem mapa")
     void getMensagemErroUnidadesSemMapaComErro() {
-        Unidade u = new Unidade(); u.setCodigo(1L);
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
         when(unidadeService.buscarEntidadesPorIds(List.of(1L))).thenReturn(List.of(u));
         when(unidadeService.verificarMapaVigente(1L)).thenReturn(false);
         when(unidadeService.buscarSiglasPorIds(List.of(1L))).thenReturn(List.of("SIGLA"));
@@ -65,8 +66,8 @@ class ProcessoValidadorTest {
         p.setSituacao(SituacaoProcesso.CRIADO);
 
         assertThatThrownBy(() -> validador.validarFinalizacaoProcesso(p))
-            .isInstanceOf(ErroProcesso.class)
-            .hasMessageContaining("EM ANDAMENTO");
+                .isInstanceOf(ErroProcesso.class)
+                .hasMessageContaining("EM ANDAMENTO");
     }
 
     @Test

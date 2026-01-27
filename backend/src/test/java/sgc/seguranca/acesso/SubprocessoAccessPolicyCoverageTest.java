@@ -4,13 +4,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.service.HierarquiaService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -28,9 +26,6 @@ class SubprocessoAccessPolicyCoverageTest {
 
     @InjectMocks
     private SubprocessoAccessPolicy policy;
-
-    @Mock
-    private HierarquiaService hierarquiaService;
 
     @Test
     @DisplayName("canExecute - VERIFICAR_IMPACTOS - Admin com Situação Inválida")

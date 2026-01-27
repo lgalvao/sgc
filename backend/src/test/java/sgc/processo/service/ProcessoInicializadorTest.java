@@ -92,7 +92,8 @@ class ProcessoInicializadorTest {
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.MAPEAMENTO);
-        Unidade u = new Unidade(); u.setCodigo(1L);
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
         p.setParticipantes(Set.of(u));
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
@@ -130,7 +131,8 @@ class ProcessoInicializadorTest {
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.MAPEAMENTO);
-        Unidade u = new Unidade(); u.setCodigo(1L);
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
         p.setParticipantes(Set.of(u));
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
@@ -151,12 +153,13 @@ class ProcessoInicializadorTest {
         p.setTipo(TipoProcesso.REVISAO);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
-        
+
         UnidadeMapa um = new UnidadeMapa();
         um.setUnidadeCodigo(1L);
         when(unidadeMapaRepo.findAllById(anyList())).thenReturn(List.of(um));
 
-        Unidade u = new Unidade(); u.setCodigo(1L);
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
         when(unidadeRepo.findAllById(anyList())).thenReturn(List.of(u));
 
         List<String> erros = inicializador.iniciar(1L, List.of(1L));
@@ -171,7 +174,8 @@ class ProcessoInicializadorTest {
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.DIAGNOSTICO);
-        Unidade u = new Unidade(); u.setCodigo(1L);
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
         p.setParticipantes(Set.of(u));
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));

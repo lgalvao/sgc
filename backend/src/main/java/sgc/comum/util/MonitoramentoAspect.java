@@ -26,9 +26,9 @@ public class MonitoramentoAspect {
 
             if (tempoTotal > LIMITE_ALERTA_MS) {
                 log.warn("EXECUCAO LENTA: {}.{} levou {} ms",
-                    joinPoint.getSignature().getDeclaringTypeName(),
-                    joinPoint.getSignature().getName(),
-                    tempoTotal);
+                        joinPoint.getSignature().getDeclaringTypeName(),
+                        joinPoint.getSignature().getName(),
+                        tempoTotal);
             }
         }
     }

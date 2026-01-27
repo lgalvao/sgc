@@ -12,10 +12,11 @@
 
 2. Sistema apresenta uma tabela com todos os processos com situação 'Finalizado', com:
 
-   - `Processo`: Descrição do processo.
-   - `Tipo`: Tipo do processo.
-   - `Finalizado em`: Data de finalização do processo
-   - `Unidades participantes`: Lista de unidades participantes, agregando pelas unidades que tiverem todas as subunidades participando (da mesma forma usada no Painel)
+    - `Processo`: Descrição do processo.
+    - `Tipo`: Tipo do processo.
+    - `Finalizado em`: Data de finalização do processo
+    - `Unidades participantes`: Lista de unidades participantes, agregando pelas unidades que tiverem todas as
+      subunidades participando (da mesma forma usada no Painel)
 
 3. Usuário clica em um processo para detalhamento.
 

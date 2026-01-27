@@ -9,13 +9,14 @@ import java.time.LocalDateTime;
  */
 @Builder
 public record MovimentacaoDto(
-    Long codigo,
-    LocalDateTime dataHora,
-    Long unidadeOrigemCodigo,
-    String unidadeOrigemSigla,
-    String unidadeOrigemNome,
-    Long unidadeDestinoCodigo,
-    String unidadeDestinoSigla,
-    String unidadeDestinoNome,
-    String descricao
-) {}
+        Long codigo,
+        LocalDateTime dataHora,
+        Long unidadeOrigemCodigo,
+        String unidadeOrigemSigla,
+        String unidadeOrigemNome,
+        Long unidadeDestinoCodigo,
+        String unidadeDestinoSigla,
+        String unidadeDestinoNome,
+        String descricao
+) {
+}

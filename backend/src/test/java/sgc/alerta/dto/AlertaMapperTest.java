@@ -1,13 +1,13 @@
 package sgc.alerta.dto;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import sgc.alerta.mapper.AlertaMapper;
-import sgc.alerta.model.Alerta;
-
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import sgc.alerta.mapper.AlertaMapper;
+import sgc.alerta.model.Alerta;
 
 @DisplayName("AlertaMapper")
 class AlertaMapperTest {
@@ -35,9 +35,9 @@ class AlertaMapperTest {
         Alerta alerta = new Alerta();
         alerta.setCodigo(1L);
         LocalDateTime dataLeitura = LocalDateTime.of(2023, 10, 25, 15, 0, 0);
-        
+
         AlertaDto dto = mapper.toDto(alerta, dataLeitura);
-        
+
         assertThat(dto.getDataHoraLeitura()).isEqualTo(dataLeitura);
     }
 
@@ -49,7 +49,7 @@ class AlertaMapperTest {
                     .codigo(alerta.getCodigo())
                     .build();
         }
-        
+
         // Expõe o método protegido para testes
         public String publicFormatDataHora(LocalDateTime dataHora) {
             return formatDataHora(dataHora);

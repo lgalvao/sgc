@@ -1,13 +1,5 @@
 package sgc.integracao;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -18,13 +10,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MvcResult;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.transaction.annotation.Transactional;
-
 import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
@@ -32,6 +20,20 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.AtualizarProcessoRequest;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.model.TipoProcesso;
+
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest
@@ -51,12 +53,14 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
         private Unidade unidade2;
 
         @BeforeEach
+        @SuppressWarnings("unused")
         void setup() {
                 // Reset sequences to avoid conflicts
                 try {
                         jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 20000");
                         jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 80000");
                 } catch (DataAccessException ignored) {
+                        // ignore
                 }
 
                 // Create fixtures using saveAndFlush to ensure visibility
@@ -103,7 +107,7 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
                                 .andExpect(
                                                 jsonPath("$.situacao")
                                                                 .value("CRIADO")); // Verifica se a situação inicial é
-                                                                                   // 'Criado'
+                // 'Criado'
         }
 
         @Test
@@ -123,7 +127,7 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
                                 .andExpect(
                                                 jsonPath("$.subErrors[0].message")
                                                                 .value("Preencha a descrição")); // Mensagem de
-                                                                                                 // validação
+                // validação
         }
 
         @Test

@@ -27,10 +27,10 @@ navegação do sistema. Inclui também um botão de voltar para facilitar a nave
 **Rota**: `/processo/:codProcesso`  
 **Nome**: `Processo`
 
-| Perfil            | Breadcrumbs                          |
-|-------------------|--------------------------------------|
-| ADMIN / GESTOR    | 🏠 > Detalhes do processo            |
-| CHEFE / SERVIDOR  | 🏠                                   |
+| Perfil           | Breadcrumbs               |
+|------------------|---------------------------|
+| ADMIN / GESTOR   | 🏠 > Detalhes do processo |
+| CHEFE / SERVIDOR | 🏠                        |
 
 **Regra**: Para CHEFE e SERVIDOR, o breadcrumb "Detalhes do processo" é omitido pois eles só veem processos da própria
 unidade.

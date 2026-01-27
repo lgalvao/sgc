@@ -76,13 +76,13 @@ class SubprocessoAccessPolicyTest {
         // Wait, "MesmaOuSubordinada" usually means User is in Superior (Unit 1), checking Subprocess (Unit 2).
         // The check is: hierarquiaService.isSubordinada(unidadeSubprocesso, unidadeUsuario)
         // No, let's read code:
-        // isSubordinada(unidadeSubprocesso, a.getUnidade())
+        // isSubordinada(unidadeSubprocesso, a.unidade())
         // means Subprocesso (Unit 2) is subordinate to User's Unit (Unit 1).
 
         when(hierarquiaService.isSubordinada(any(), any())).thenAnswer(inv -> {
-             Unidade sub = inv.getArgument(0);
-             Unidade sup = inv.getArgument(1);
-             return sub.getCodigo().equals(2L) && sup.getCodigo().equals(1L);
+            Unidade sub = inv.getArgument(0);
+            Unidade sup = inv.getArgument(1);
+            return sub.getCodigo().equals(2L) && sup.getCodigo().equals(1L);
         });
 
         assertTrue(policy.canExecute(u, Acao.VISUALIZAR_SUBPROCESSO, sp));
@@ -95,7 +95,7 @@ class SubprocessoAccessPolicyTest {
         u.setTituloEleitoral("123");
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 1L);
         sp.getUnidade().setTituloTitular("123");
-
+ 
         assertTrue(policy.canExecute(u, Acao.DISPONIBILIZAR_CADASTRO, sp));
     }
 
@@ -105,10 +105,10 @@ class SubprocessoAccessPolicyTest {
         // Use GESTOR because ADMIN skips hierarchy checks for this action
         Usuario u = criarUsuario(Perfil.GESTOR, 1L);
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, 2L);
-
+ 
         Unidade sub = sp.getUnidade();
         Unidade sup = u.getTodasAtribuicoes().iterator().next().getUnidade();
-        
+ 
         when(hierarquiaService.isSuperiorImediata(sub, sup)).thenReturn(true);
 
         assertTrue(policy.canExecute(u, Acao.ACEITAR_CADASTRO, sp));

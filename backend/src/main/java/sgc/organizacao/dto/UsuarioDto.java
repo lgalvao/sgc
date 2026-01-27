@@ -1,25 +1,16 @@
 package sgc.organizacao.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 
 /**
- * DTO para dados de usuário do SGRH.
- *
- * <p>Usado nos endpoints que retornam dados de usuários,
- * incluindo GET /api/unidades/{codigoUnidade}/usuarios.
+ * DTO para representação de usuário.
  */
-@Getter
 @Builder
-@AllArgsConstructor
-public class UsuarioDto {
-
-    private final String nome;
-    private final String tituloEleitoral;
-    private final String email;
-    private final String matricula;
-
-    /** Código da unidade de lotação do usuário. */
-    private final Long unidadeCodigo;
+public record UsuarioDto(
+        String tituloEleitoral,
+        String nome,
+        @Nullable String email,
+        @Nullable String matricula,
+        @Nullable Long unidadeCodigo) {
 }

@@ -14,20 +14,24 @@
 
 2. O sistema mostra tela `Detalhes do processo`.
 
-3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para homologação em bloco do mapa de competências (de acordo com as pré-condições do caso de uso).
+3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para homologação em bloco do mapa
+   de competências (de acordo com as pré-condições do caso de uso).
 
-4. Na seção de unidades participantes, abaixo da árvore de unidades, sistema mostra o botão `Homologar mapa de competências em bloco`.
+4. Na seção de unidades participantes, abaixo da árvore de unidades, sistema mostra o botão
+   `Homologar mapa de competências em bloco`.
 
 5. O usuário clica no botão `Homologar mapa de competências em bloco`.
 
 6. O sistema abre modal de confirmação, com os elementos a seguir:
 
-   - Título "Homologação de mapa em bloco";
-   - Texto "Selecione abaixo as unidades cujos mapas deverão ser homologados:";
-   - Lista das unidades operacionais ou interoperacionais subordinadas cujos mapas poderão ser homologados, sendo apresentados, para cada unidade, um checkbox (selecionado por padrão), a sigla e o nome; 
-   - Botão `Cancelar` e botão `Homologar`.
+    - Título "Homologação de mapa em bloco";
+    - Texto "Selecione abaixo as unidades cujos mapas deverão ser homologados:";
+    - Lista das unidades operacionais ou interoperacionais subordinadas cujos mapas poderão ser homologados, sendo
+      apresentados, para cada unidade, um checkbox (selecionado por padrão), a sigla e o nome;
+    - Botão `Cancelar` e botão `Homologar`.
 
-7. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do processo.
+7. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do
+   processo.
 
 8. O usuário clica em `Homologar`.
 
@@ -35,20 +39,20 @@
 
    9.1. O sistema registra uma movimentação para o subprocesso:
 
-     - `Data/hora`: [Data/hora atual]
-     - `Unidade origem`: "SEDOC"
-     - `Unidade destino`: "SEDOC"
-     - `Descrição`: "Mapa de competências homologado"
+    - `Data/hora`: [Data/hora atual]
+    - `Unidade origem`: "SEDOC"
+    - `Unidade destino`: "SEDOC"
+    - `Descrição`: "Mapa de competências homologado"
 
    9.2. O sistema altera a situação do subprocesso da unidade para 'Mapa homologado'.
 
    9.3. O sistema cria internamente um alerta:
 
-     - `Descrição`: "Mapa de competências da unidade [SIGLA_UNIDADE_SUBPROCESSO] homologado"
-     - `Processo`: [DESCRIÇÃO_PROCESSO]
-     - `Data/hora`: [Data/hora atual]
-     - `Unidade de origem`: SEDOC
-     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+    - `Descrição`: "Mapa de competências da unidade [SIGLA_UNIDADE_SUBPROCESSO] homologado"
+    - `Processo`: [DESCRIÇÃO_PROCESSO]
+    - `Data/hora`: [Data/hora atual]
+    - `Unidade de origem`: SEDOC
+    - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 
    9.4. O sistema envia notificação por e-mail para a unidade do subprocesso:
 

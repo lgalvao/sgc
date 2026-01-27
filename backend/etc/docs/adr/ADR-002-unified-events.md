@@ -11,6 +11,7 @@
 Subprocessos têm múltiplas transições de estado (~15 transições diferentes entre situações).
 
 **Abordagem Tradicional:** Um evento por transição
+
 - EventoCadastroDisponibilizado
 - EventoCadastroDevolvido
 - EventoCadastroAceito
@@ -19,6 +20,7 @@ Subprocessos têm múltiplas transições de estado (~15 transições diferentes
 - ... (15+ eventos)
 
 **Problemas:**
+
 1. Proliferação de classes (15+ arquivos)
 2. Código duplicado entre eventos
 3. Difícil adicionar novos tipos
@@ -31,6 +33,7 @@ Subprocessos têm múltiplas transições de estado (~15 transições diferentes
 Usar **Evento Unificado** com enum de tipos para transições similares.
 
 **EventoTransicaoSubprocesso:**
+
 ```java
 public record EventoTransicaoSubprocesso(
     Long codigoSubprocesso,
@@ -68,11 +71,13 @@ public enum TipoTransicao {
 ## Quando Usar
 
 ✅ **Use evento unificado quando:**
+
 - Múltiplas transições similares (>5)
 - Mesma estrutura de dados
 - Ações subsequentes similares
 
 ❌ **Use eventos separados quando:**
+
 - Eventos conceitualmente diferentes
 - Estruturas de dados diferentes
 - Processamento completamente distinto

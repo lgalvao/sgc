@@ -10,7 +10,8 @@ Ator: GESTOR e ADMIN
 
 ## Fluxo principal
 
-1. No Painel, usuário escolhe um processo e na tela Detalhes do processo clica em uma unidade com situação 'Mapa validado' ou 'Mapa com sugestões'.
+1. No Painel, usuário escolhe um processo e na tela Detalhes do processo clica em uma unidade com situação 'Mapa
+   validado' ou 'Mapa com sugestões'.
 
 2. O sistema mostra a tela `Detalhes do subprocesso`.
 
@@ -22,9 +23,14 @@ Ator: GESTOR e ADMIN
     - `Devolver para ajustes`;
     - `Registrar aceite`, caso o perfil seja GESTOR ou `Homologar`, caso o perfil seja ADMIN.
 
-5. Caso a situação do subprocesso seja 'Mapa com sugestões', a tela Visualização de mapa incluirá ainda, antes do botão `Histórico de análise`, o botão `Ver sugestões`, a partir do qual será possível visualizar, em uma tela modal, as sugestões registradas para o mapa no subprocesso da unidade.
+5. Caso a situação do subprocesso seja 'Mapa com sugestões', a tela Visualização de mapa incluirá ainda, antes do botão
+   `Histórico de análise`, o botão `Ver sugestões`, a partir do qual será possível visualizar, em uma tela modal, as
+   sugestões registradas para o mapa no subprocesso da unidade.
 
-6. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises prévias registradas para a validação do mapa. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para a realização da análise pela unidade atual.
+6. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises prévias
+   registradas para a validação do mapa. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla
+   da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio
+   para a realização da análise pela unidade atual.
 
 7. O usuário analisa as informações e opta por aceitar/homologar ou devolver a validação para ajustes.
 
@@ -32,9 +38,11 @@ Ator: GESTOR e ADMIN
 
    8.1. Usuário clica em `Devolver para ajustes`.
 
-   8.2. O sistema abre um modal (título "Devolução") com a pergunta "Confirma a devolução da validação do mapa para ajustes", um campo para preenchimento de uma observação (opcional) e os botões `Confirmar` ou `Cancelar`.
+   8.2. O sistema abre um modal (título "Devolução") com a pergunta "Confirma a devolução da validação do mapa para
+   ajustes", um campo para preenchimento de uma observação (opcional) e os botões `Confirmar` ou `Cancelar`.
 
-   8.3. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de devolução, permanecendo na tela `Visualização de mapa`.
+   8.3. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de devolução, permanecendo na tela
+   `Visualização de mapa`.
 
    8.4. O usuário opcionalmente informa a observação e escolhe `Confirmar`.
 
@@ -45,7 +53,8 @@ Ator: GESTOR e ADMIN
     - `Resultado`: 'Devolução'
     - `Observação`: A observação da janela modal, caso tenha sido fornecida.
 
-   8.6. O sistema identifica a unidade de devolução como sendo a unidade de origem da última movimentação do subprocesso.
+   8.6. O sistema identifica a unidade de devolução como sendo a unidade de origem da última movimentação do
+   subprocesso.
 
    8.7. O sistema registra uma movimentação para o subprocesso com:
 
@@ -54,7 +63,8 @@ Ator: GESTOR e ADMIN
     - `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
     - `Unidade destino`: [SIGLA_UNIDADE_DEVOLUCAO]
 
-   8.8. Se a unidade de devolução for a própria unidade do subprocesso, o sistema altera a situação do subprocesso para 'Mapa disponibilizado' e apaga a data/hora de conclusão da etapa 2 do subprocesso da unidade.
+   8.8. Se a unidade de devolução for a própria unidade do subprocesso, o sistema altera a situação do subprocesso
+   para 'Mapa disponibilizado' e apaga a data/hora de conclusão da etapa 2 do subprocesso da unidade.
 
    8.9. O sistema envia notificação por e-mail para a unidade de devolução:
 
@@ -82,9 +92,11 @@ Ator: GESTOR e ADMIN
 
    9.1. Usuário clica em `Registrar aceite`.
 
-   9.2. O sistema abre um diálogo modal (título "Aceite") com a pergunta "Confirma o aceite da validação do mapa de competências?", um campo para preenchimento de uma observação opcional e os botões `Confirmar` ou `Cancelar`.
+   9.2. O sistema abre um diálogo modal (título "Aceite") com a pergunta "Confirma o aceite da validação do mapa de
+   competências?", um campo para preenchimento de uma observação opcional e os botões `Confirmar` ou `Cancelar`.
 
-   9.3. Caso o usuário escolha o botão Cancelar, o sistema interrompe a operação de aceite, permanecendo na tela `Visualização de mapa`.
+   9.3. Caso o usuário escolha o botão Cancelar, o sistema interrompe a operação de aceite, permanecendo na tela
+   `Visualização de mapa`.
 
    9.4. O usuário opcionalmente informa a observação e escolhe `Confirmar`.
 
@@ -128,9 +140,11 @@ Ator: GESTOR e ADMIN
 
     10.1. Usuário escolhe `Homologar`.
 
-    10.2. O sistema abre um diálogo de confirmação (título 'Homologação') com a pergunta 'Confirma a homologação do mapa de competências?' e os botões `Confirmar` ou `Cancelar`.
+    10.2. O sistema abre um diálogo de confirmação (título 'Homologação') com a pergunta 'Confirma a homologação do mapa
+    de competências?' e os botões `Confirmar` ou `Cancelar`.
 
-    10.3. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação, permanecendo na mesma tela.
+    10.3. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação, permanecendo na
+    mesma tela.
 
     10.4. Usuário escolhe `Confirmar`.
 

@@ -131,7 +131,7 @@
  * <pre>{@code
  * // Frontend solicita mapa para validação
  * MapaCompletoDto mapa = mapaService.buscarMapaCompleto(codSubprocesso);
- * 
+ *
  * // CHEFE valida e pode apresentar sugestões
  * ApresentarSugestoesRequest sugestoes = ...;
  * mapaService.apresentarSugestoes(codSubprocesso, sugestoes);
@@ -141,7 +141,7 @@
  * <pre>{@code
  * // Comparar mapa atual vs. mapa de revisão
  * ImpactoMapaDto impactos = mapaService.analisarImpactos(codSubprocesso);
- * 
+ *
  * // impactos contém:
  * // - atividadesNovas, atividadesRemovidas, atividadesAlteradas
  * // - competenciasNovas, competenciasRemovidas, competenciasAlteradas
@@ -154,7 +154,7 @@
  * SalvarMapaRequest ajustes = new SalvarMapaRequest();
  * ajustes.setAtividades(...);
  * ajustes.setCompetencias(...);
- * 
+ *
  * mapaService.salvarAjustes(codSubprocesso, ajustes);
  * }</pre>
  *
@@ -208,10 +208,10 @@
  *   <li>/reqs/cdu-16.md - Ajustar mapa</li>
  * </ul>
  *
- * @since 1.0
  * @see sgc.mapa.mapper
  * @see sgc.mapa.service
  * @see sgc.mapa.dto.visualizacao
+ * @since 1.0
  */
 @NullMarked
 package sgc.mapa.dto;

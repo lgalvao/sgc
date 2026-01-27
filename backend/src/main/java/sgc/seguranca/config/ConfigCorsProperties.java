@@ -11,10 +11,10 @@ import java.util.List;
  */
 @ConfigurationProperties(prefix = "aplicacao.cors")
 public record ConfigCorsProperties(
-    List<String> allowedOrigins,
-    List<String> allowedMethods,
-    List<String> allowedHeaders,
-    boolean allowCredentials
+        List<String> allowedOrigins,
+        List<String> allowedMethods,
+        List<String> allowedHeaders,
+        boolean allowCredentials
 ) {
     private static final List<String> DEFAULT_ORIGINS = List.of("http://localhost:5173");
     private static final List<String> DEFAULT_METHODS = List.of("GET", "POST", "PUT", "DELETE", "OPTIONS");

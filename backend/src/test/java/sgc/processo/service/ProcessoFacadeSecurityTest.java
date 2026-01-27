@@ -54,7 +54,7 @@ class ProcessoFacadeSecurityTest {
     private ProcessoInicializador processoInicializador;
     @Mock
     private AlertaFacade alertaService;
-    
+
     // Specialized services
     @Mock
     private ProcessoAcessoService processoAcessoService;
@@ -91,7 +91,7 @@ class ProcessoFacadeSecurityTest {
             Authentication auth = mock(Authentication.class);
             when(processoAcessoService.checarAcesso(auth, processoCodigo)).thenReturn(true);
             assertThat(processoFacade.checarAcesso(auth, processoCodigo)).isTrue();
-            
+
             when(processoAcessoService.checarAcesso(auth, processoCodigo)).thenReturn(false);
             assertThat(processoFacade.checarAcesso(auth, processoCodigo)).isFalse();
         }
@@ -119,10 +119,10 @@ class ProcessoFacadeSecurityTest {
         void buscarCodigosDescendentes_Arvore() {
             // Este é um método privado do ProcessoAcessoService.
             // Vamos testar através do checarAcesso que o utiliza.
-            
+
             Authentication auth = mock(Authentication.class);
             when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(true);
-            
+
             assertThat(processoFacade.checarAcesso(auth, 1L)).isTrue();
             verify(processoAcessoService).checarAcesso(auth, 1L);
         }

@@ -31,11 +31,15 @@ import static org.mockito.Mockito.when;
 @DisplayName("SubprocessoValidacaoService")
 class SubprocessoValidacaoServiceTest {
 
-    @Mock private AtividadeService atividadeService;
-    @Mock private CompetenciaService competenciaService;
-    @Mock private SubprocessoCrudService crudService;
+    @Mock
+    private AtividadeService atividadeService;
+    @Mock
+    private CompetenciaService competenciaService;
+    @Mock
+    private SubprocessoCrudService crudService;
 
-    @InjectMocks private SubprocessoValidacaoService service;
+    @InjectMocks
+    private SubprocessoValidacaoService service;
 
     @Test
     @DisplayName("obterAtividadesSemConhecimento: retorna lista vazia se mapa null")
@@ -67,8 +71,10 @@ class SubprocessoValidacaoServiceTest {
     void obterAtividadesSemConhecimentoRetornaLista() {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
-        Atividade a1 = new Atividade(); a1.setConhecimentos(List.of(new Conhecimento()));
-        Atividade a2 = new Atividade(); a2.setConhecimentos(List.of()); // Sem
+        Atividade a1 = new Atividade();
+        a1.setConhecimentos(List.of(new Conhecimento()));
+        Atividade a2 = new Atividade();
+        a2.setConhecimentos(List.of()); // Sem
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1, a2));
 
         assertThat(service.obterAtividadesSemConhecimento(mapa)).containsExactly(a2);
@@ -78,7 +84,8 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarExistenciaAtividades: erro sem atividades")
     void validarExistenciaAtividadesErroSemAtividades() {
         Subprocesso sp = new Subprocesso();
-        Mapa m = new Mapa(); m.setCodigo(1L);
+        Mapa m = new Mapa();
+        m.setCodigo(1L);
         sp.setMapa(m);
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of());
@@ -92,7 +99,8 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarExistenciaAtividades: erro atividade sem conhecimento")
     void validarExistenciaAtividadesErroSemConhecimento() {
         Subprocesso sp = new Subprocesso();
-        Mapa m = new Mapa(); m.setCodigo(1L);
+        Mapa m = new Mapa();
+        m.setCodigo(1L);
         sp.setMapa(m);
         Atividade a = new Atividade();
         a.setConhecimentos(List.of());
@@ -154,7 +162,9 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarCadastro: sem atividades")
     void validarCadastroSemAtividades() {
         Subprocesso sp = new Subprocesso();
-        Mapa m = new Mapa(); m.setCodigo(1L); sp.setMapa(m);
+        Mapa m = new Mapa();
+        m.setCodigo(1L);
+        sp.setMapa(m);
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of());
 
@@ -167,8 +177,12 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarCadastro: atividade sem conhecimento")
     void validarCadastroAtividadeSemConhecimento() {
         Subprocesso sp = new Subprocesso();
-        Mapa m = new Mapa(); m.setCodigo(1L); sp.setMapa(m);
-        Atividade a = new Atividade(); a.setCodigo(10L); a.setConhecimentos(List.of());
+        Mapa m = new Mapa();
+        m.setCodigo(1L);
+        sp.setMapa(m);
+        Atividade a = new Atividade();
+        a.setCodigo(10L);
+        a.setConhecimentos(List.of());
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
@@ -182,8 +196,11 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarCadastro: sucesso")
     void validarCadastroSucesso() {
         Subprocesso sp = new Subprocesso();
-        Mapa m = new Mapa(); m.setCodigo(1L); sp.setMapa(m);
-        Atividade a = new Atividade(); a.setConhecimentos(List.of(new Conhecimento()));
+        Mapa m = new Mapa();
+        m.setCodigo(1L);
+        sp.setMapa(m);
+        Atividade a = new Atividade();
+        a.setConhecimentos(List.of(new Conhecimento()));
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));

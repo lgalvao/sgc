@@ -1,24 +1,39 @@
 package sgc.mapa;
 
+import java.net.URI;
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-import sgc.mapa.dto.*;
+import sgc.mapa.dto.AtividadeResponse;
+import sgc.mapa.dto.AtualizarAtividadeRequest;
+import sgc.mapa.dto.AtualizarConhecimentoRequest;
+import sgc.mapa.dto.ConhecimentoResponse;
+import sgc.mapa.dto.CriarAtividadeRequest;
+import sgc.mapa.dto.CriarConhecimentoRequest;
+import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.service.AtividadeFacade;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 
-import java.net.URI;
-import java.util.List;
-
 /**
  * Controlador REST para gerenciar Atividades e seus Conhecimentos associados.
- * 
- * <p><b>Padrão Arquitetural:</b> Este controller usa APENAS {@link AtividadeFacade}.
- * Nunca acessa AtividadeService ou ConhecimentoService diretamente, seguindo o padrão Facade
+ *
+ * <p>
+ * <b>Padrão Arquitetural:</b> Este controller usa APENAS
+ * {@link AtividadeFacade}.
+ * Nunca acessa AtividadeService ou ConhecimentoService diretamente, seguindo o
+ * padrão Facade
  * para manter a separação de responsabilidades e encapsulamento.
  */
 @RestController
@@ -32,8 +47,9 @@ public class AtividadeController {
      * Busca e retorna uma atividade específica pelo seu código.
      *
      * @param codAtividade O código da atividade a ser buscada.
-     * @return Um {@link ResponseEntity} contendo a {@link AtividadeResponse} correspondente ou um status
-     * 404 Not Found se a atividade não for encontrada.
+     * @return Um {@link ResponseEntity} contendo a {@link AtividadeResponse}
+     *         correspondente ou um status
+     *         404 Not Found se a atividade não for encontrada.
      */
     @GetMapping("/{codAtividade}")
     @PreAuthorize("isAuthenticated()")
@@ -46,8 +62,9 @@ public class AtividadeController {
      * Cria uma nova atividade no sistema.
      *
      * @param request O Request contendo os dados da atividade a ser criada.
-     * @return Um {@link ResponseEntity} com status 201 Created e {@link AtividadeOperacaoResponse}
-     * contendo a atividade criada e o status do subprocesso.
+     * @return Um {@link ResponseEntity} com status 201 Created e
+     *         {@link AtividadeOperacaoResponse}
+     *         contendo a atividade criada e o status do subprocesso.
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
@@ -55,21 +72,24 @@ public class AtividadeController {
     public ResponseEntity<AtividadeOperacaoResponse> criar(@Valid @RequestBody CriarAtividadeRequest request) {
         AtividadeOperacaoResponse resp = atividadeFacade.criarAtividade(request);
 
-        URI uri = URI.create("/api/atividades/%d".formatted(resp.getAtividade().getCodigo()));
+        URI uri = URI.create("/api/atividades/%d".formatted(resp.atividade().codigo()));
         return ResponseEntity.created(uri).body(resp);
     }
 
     /**
      * Atualiza os dados de uma atividade existente.
      *
-     * @param request O Request com os novos dados da atividade. A descrição será sanitizada.
-     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse} contendo
-     * a atividade atualizada e o status do subprocesso.
+     * @param request O Request com os novos dados da atividade. A descrição será
+     *                sanitizada.
+     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse}
+     *         contendo
+     *         a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codigo}/atualizar")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Atualiza atividade existente")
-    public ResponseEntity<AtividadeOperacaoResponse> atualizar(@PathVariable Long codigo, @RequestBody @Valid AtualizarAtividadeRequest request) {
+    public ResponseEntity<AtividadeOperacaoResponse> atualizar(@PathVariable Long codigo,
+            @RequestBody @Valid AtualizarAtividadeRequest request) {
         AtividadeOperacaoResponse response = atividadeFacade.atualizarAtividade(codigo, request);
         return ResponseEntity.ok(response);
     }
@@ -77,12 +97,15 @@ public class AtividadeController {
     /**
      * Exclui uma atividade do sistema.
      *
-     * <p>Se a atividade não for encontrada, o serviço lançará uma exceção que resultará em uma
+     * <p>
+     * Se a atividade não for encontrada, o serviço lançará uma exceção que
+     * resultará em uma
      * resposta 404 Not Found. Retorna o status atualizado do subprocesso.
      *
      * @param codAtividade O código da atividade a ser excluída.
-     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse} contendo
-     * o status atualizado do subprocesso (atividade será null).
+     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse}
+     *         contendo
+     *         o status atualizado do subprocesso (atividade será null).
      */
     @PostMapping("/{codAtividade}/excluir")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
@@ -96,7 +119,8 @@ public class AtividadeController {
      * Lista todos os conhecimentos associados a uma atividade específica.
      *
      * @param codAtividade O código da atividade pai.
-     * @return Um {@link ResponseEntity} com status 200 OK e a lista de {@link ConhecimentoResponse}.
+     * @return Um {@link ResponseEntity} com status 200 OK e a lista de
+     *         {@link ConhecimentoResponse}.
      */
     @GetMapping("/{codAtividade}/conhecimentos")
     @PreAuthorize("isAuthenticated()")
@@ -108,10 +132,13 @@ public class AtividadeController {
     /**
      * Adiciona um novo conhecimento a uma atividade existente.
      *
-     * @param codAtividade O código da atividade à qual o conhecimento será associado.
+     * @param codAtividade O código da atividade à qual o conhecimento será
+     *                     associado.
      * @param request      O Request com os dados do conhecimento a ser criado.
-     * @return Um {@link ResponseEntity} com status 201 Created e {@link AtividadeOperacaoResponse}
-     * contendo a atividade atualizada com o novo conhecimento e o situação do subprocesso.
+     * @return Um {@link ResponseEntity} com status 201 Created e
+     *         {@link AtividadeOperacaoResponse}
+     *         contendo a atividade atualizada com o novo conhecimento e o situação
+     *         do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
@@ -121,8 +148,9 @@ public class AtividadeController {
             @Valid @RequestBody CriarConhecimentoRequest request) {
 
         ResultadoOperacaoConhecimento resultado = atividadeFacade.criarConhecimento(codAtividade, request);
-        URI uri = URI.create("/api/atividades/%d/conhecimentos/%d".formatted(codAtividade, resultado.getNovoConhecimentoId()));
-        return ResponseEntity.created(uri).body(resultado.getResponse());
+        URI uri = URI
+                .create("/api/atividades/%d/conhecimentos/%d".formatted(codAtividade, resultado.novoConhecimentoId()));
+        return ResponseEntity.created(uri).body(resultado.response());
     }
 
     /**
@@ -131,8 +159,9 @@ public class AtividadeController {
      * @param codAtividade    O código da atividade pai.
      * @param codConhecimento O código do conhecimento a ser atualizado.
      * @param request         O Request com os novos dados do conhecimento.
-     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse} contendo
-     * a atividade atualizada e o status do subprocesso.
+     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse}
+     *         contendo
+     *         a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/atualizar")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
@@ -142,7 +171,8 @@ public class AtividadeController {
             @PathVariable Long codConhecimento,
             @Valid @RequestBody AtualizarConhecimentoRequest request) {
 
-        AtividadeOperacaoResponse response = atividadeFacade.atualizarConhecimento(codAtividade, codConhecimento, request);
+        AtividadeOperacaoResponse response = atividadeFacade.atualizarConhecimento(codAtividade, codConhecimento,
+                request);
         return ResponseEntity.ok(response);
     }
 
@@ -151,8 +181,9 @@ public class AtividadeController {
      *
      * @param codAtividade    O código da atividade pai.
      * @param codConhecimento O código do conhecimento a ser excluído.
-     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse} contendo
-     * a atividade atualizada e o status do subprocesso.
+     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse}
+     *         contendo
+     *         a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/excluir")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")

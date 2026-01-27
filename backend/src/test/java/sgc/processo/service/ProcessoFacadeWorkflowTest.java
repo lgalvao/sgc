@@ -62,7 +62,7 @@ class ProcessoFacadeWorkflowTest {
     private ProcessoInicializador processoInicializador;
     @Mock
     private AlertaFacade alertaService;
-    
+
     // Specialized services
     @Mock
     private ProcessoAcessoService processoAcessoService;
@@ -249,8 +249,8 @@ class ProcessoFacadeWorkflowTest {
                     .when(processoFinalizador).finalizar(1L);
 
             assertThatThrownBy(() -> processoFacade.finalizar(1L))
-                .isInstanceOf(ErroProcesso.class)
-                .hasMessageContaining("Apenas processos 'EM ANDAMENTO' podem ser finalizados");
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessageContaining("Apenas processos 'EM ANDAMENTO' podem ser finalizados");
         }
 
         @Test
@@ -258,21 +258,21 @@ class ProcessoFacadeWorkflowTest {
         void finalizar_SubprocessoSemUnidade() {
             doThrow(new ErroProcesso("Subprocesso 1 sem unidade associada."))
                     .when(processoFinalizador).finalizar(1L);
-            
+
             assertThatThrownBy(() -> processoFacade.finalizar(1L))
-                .isInstanceOf(ErroProcesso.class)
-                .hasMessageContaining("sem unidade associada");
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessageContaining("sem unidade associada");
         }
 
-         @Test
+        @Test
         @DisplayName("finalizar: erro se subprocesso sem mapa")
         void finalizar_SubprocessoSemMapa() {
             doThrow(new ErroProcesso("Subprocesso 1 sem mapa associado."))
                     .when(processoFinalizador).finalizar(1L);
 
             assertThatThrownBy(() -> processoFacade.finalizar(1L))
-                .isInstanceOf(ErroProcesso.class)
-                .hasMessageContaining("sem mapa associado");
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessageContaining("sem mapa associado");
         }
 
         @Test
@@ -331,14 +331,15 @@ class ProcessoFacadeWorkflowTest {
             when(unidadeService.buscarEntidadePorId(2L)).thenReturn(new Unidade());
 
             assertThatThrownBy(() -> processoFacade.enviarLembrete(1L, 2L))
-                .isInstanceOf(ErroProcesso.class)
-                .hasMessage("Unidade não participa deste processo.");
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessage("Unidade não participa deste processo.");
         }
 
         @Test
         @DisplayName("enviarLembrete: sucesso")
         void enviarLembrete_Sucesso() {
-            Unidade u = new Unidade(); u.setCodigo(2L);
+            Unidade u = new Unidade();
+            u.setCodigo(2L);
             Processo p = new Processo();
             p.setDescricao("P1");
             p.setDataLimite(java.time.LocalDateTime.now());

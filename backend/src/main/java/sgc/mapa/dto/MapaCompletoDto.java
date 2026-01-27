@@ -1,8 +1,8 @@
 package sgc.mapa.dto;
 
-import lombok.*;
-
 import java.util.List;
+
+import lombok.Builder;
 
 /**
  * DTO que representa um mapa completo com todas as suas competências e os vínculos com atividades
@@ -14,18 +14,11 @@ import java.util.List;
  * inclui metadados como datas de disponibilização e homologação. Este DTO se foca na estrutura
  * hierárquica mapa → competências → atividades, sendo mais adequado para operações que manipulam a
  * composição completa do mapa.
- * 
- * <p>Requer @NoArgsConstructor e @Setter para uso em testes.
  */
-@Getter
-@Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class MapaCompletoDto {
-
-    private Long codigo;
-    private Long subprocessoCodigo;
-    private String observacoes;
-    private List<CompetenciaMapaDto> competencias;
+public record MapaCompletoDto(
+        Long codigo,
+        Long subprocessoCodigo,
+        String observacoes,
+        List<CompetenciaMapaDto> competencias) {
 }

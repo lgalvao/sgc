@@ -30,13 +30,20 @@ class AtividadeFacadeCoverageTest {
     @InjectMocks
     private AtividadeFacade facade;
 
-    @Mock private AtividadeService atividadeService;
-    @Mock private ConhecimentoService conhecimentoService;
-    @Mock private SubprocessoFacade subprocessoFacade;
-    @Mock private AccessControlService accessControlService;
-    @Mock private UsuarioFacade usuarioService;
-    @Mock private MapaFacade mapaFacade;
-    @Mock private ApplicationEventPublisher eventPublisher;
+    @Mock
+    private AtividadeService atividadeService;
+    @Mock
+    private ConhecimentoService conhecimentoService;
+    @Mock
+    private SubprocessoFacade subprocessoFacade;
+    @Mock
+    private AccessControlService accessControlService;
+    @Mock
+    private UsuarioFacade usuarioService;
+    @Mock
+    private MapaFacade mapaFacade;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @Test
     void devePublicarEventoAoCriarAtividade() {

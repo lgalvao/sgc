@@ -83,12 +83,17 @@ class ProcessoAcessoServiceTest {
         ));
 
         // Mock hierarquia: 100 -> 101 -> 102
-        Unidade u100 = new Unidade(); u100.setCodigo(100L);
-        Unidade u101 = new Unidade(); u101.setCodigo(101L); u101.setUnidadeSuperior(u100);
-        Unidade u102 = new Unidade(); u102.setCodigo(102L); u102.setUnidadeSuperior(u101);
+        Unidade u100 = new Unidade();
+        u100.setCodigo(100L);
+        Unidade u101 = new Unidade();
+        u101.setCodigo(101L);
+        u101.setUnidadeSuperior(u100);
+        Unidade u102 = new Unidade();
+        u102.setCodigo(102L);
+        u102.setUnidadeSuperior(u101);
 
         when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(u100, u101, u102));
-        
+
         when(subprocessoFacade.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenAnswer(invocation -> {
             List<Long> ids = invocation.getArgument(1);
             return ids.contains(100L) && ids.contains(101L) && ids.contains(102L);
@@ -100,11 +105,19 @@ class ProcessoAcessoServiceTest {
     @Test
     @DisplayName("Deve encontrar corretamente todos os descendentes")
     void deveBuscarCodigosDescendentes() {
-        Unidade u1 = new Unidade(); u1.setCodigo(1L);
-        Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setUnidadeSuperior(u1);
-        Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setUnidadeSuperior(u1);
-        Unidade u4 = new Unidade(); u4.setCodigo(4L); u4.setUnidadeSuperior(u2);
-        Unidade u5 = new Unidade(); u5.setCodigo(5L); // Independente
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        Unidade u2 = new Unidade();
+        u2.setCodigo(2L);
+        u2.setUnidadeSuperior(u1);
+        Unidade u3 = new Unidade();
+        u3.setCodigo(3L);
+        u3.setUnidadeSuperior(u1);
+        Unidade u4 = new Unidade();
+        u4.setCodigo(4L);
+        u4.setUnidadeSuperior(u2);
+        Unidade u5 = new Unidade();
+        u5.setCodigo(5L); // Independente
 
         when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(u1, u2, u3, u4, u5));
 
@@ -151,8 +164,10 @@ class ProcessoAcessoServiceTest {
     @DisplayName("Deve lidar com ciclos na hierarquia (evitar loop infinito)")
     void deveEvitarCicloInifinitoEmHierarquia() {
         // U1 -> U2 -> U1
-        Unidade u1 = new Unidade(); u1.setCodigo(1L);
-        Unidade u2 = new Unidade(); u2.setCodigo(2L);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        Unidade u2 = new Unidade();
+        u2.setCodigo(2L);
 
         u1.setUnidadeSuperior(u2);
         u2.setUnidadeSuperior(u1);

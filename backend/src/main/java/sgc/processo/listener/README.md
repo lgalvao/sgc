@@ -12,10 +12,12 @@ Os listeners são responsáveis por orquestrar ações assíncronas como criaç�
 Listener assíncrono principal que processa eventos de processo iniciado e finalizado.
 
 **Eventos processados:**
+
 - `EventoProcessoIniciado` - Quando um novo processo de mapeamento ou revisão é iniciado
 - `EventoProcessoFinalizado` - Quando um processo é concluído
 
 **Responsabilidades:**
+
 1. Criação de alertas diferenciados por tipo de unidade
 2. Envio de e-mails para titulares e substitutos das unidades participantes
 3. Tratamento diferenciado para unidades operacionais, interoperacionais e intermediárias

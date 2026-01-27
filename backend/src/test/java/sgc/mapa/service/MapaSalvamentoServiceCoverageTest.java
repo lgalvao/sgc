@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.mapper.MapaCompletoMapper;
 import sgc.mapa.model.*;
 
 import java.util.ArrayList;
@@ -24,12 +23,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 class MapaSalvamentoServiceCoverageTest {
-
-    @Mock private MapaRepo mapaRepo;
-    @Mock private CompetenciaRepo competenciaRepo;
-    @Mock private AtividadeRepo atividadeRepo;
-    @Mock private RepositorioComum repo;
-    @Mock private MapaCompletoMapper mapaCompletoMapper;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
+    @Mock
+    private AtividadeRepo atividadeRepo;
+    @Mock
+    private RepositorioComum repo;
 
     @InjectMocks
     private MapaSalvamentoService service;
@@ -76,11 +77,6 @@ class MapaSalvamentoServiceCoverageTest {
         // Executa
         service.salvarMapaCompleto(codMapa, request);
 
-        // Verifica fluxo completo
-        // O código vai passar por validarIntegridadeMapa:
-        // 1. Atividade 10L tem competencias vazio -> Log WARN
-        // 2. Nova Competencia tem atividades vazio -> Log WARN
-        // Como é log, não verificamos side effect exceto que não explode.
         verify(mapaRepo).save(mapa);
     }
 }

@@ -5,9 +5,9 @@ Este arquivo contém as diretrizes operacionais para assistentes de IA no projet
 1. **Leia o [AGENTS.md](./AGENTS.md)**: Contém as regras de codificação, idioma e arquitetura.
 
 2. **Explore os READMEs**:
-   - Raiz: Visão geral.
-   - `backend/` e `frontend/`: Visão dos módulos.
-   - READMEs internos: Detalhes de pacotes e componentes.
+    - Raiz: Visão geral.
+    - `backend/` e `frontend/`: Visão dos módulos.
+    - READMEs internos: Detalhes de pacotes e componentes.
 
 3. Idioma português brasileiro
 

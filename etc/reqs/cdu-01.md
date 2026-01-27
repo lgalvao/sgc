@@ -22,7 +22,9 @@ Fluxo principal:
 5. Caso o usuário não seja autenticado com as credenciais fornecidas, sistema mostra a mensagem
    `Título ou senha inválidos.`
 
-6. Caso o usuário seja autenticado, o sistema consulta os perfis e as unidades do usuário nas views do banco de dados. Importante: Um usuário pode estar em várias unidades (ex. substituição, atribuição temporária) e também ter mais de um perfil.
+6. Caso o usuário seja autenticado, o sistema consulta os perfis e as unidades do usuário nas views do banco de dados.
+   Importante: Um usuário pode estar em várias unidades (ex. substituição, atribuição temporária) e também ter mais de
+   um perfil.
 
 7. O sistema determina os perfis disponíveis para o usuário, seguindo estas regras, não exclusivas:
     - ADMIN: Se usuário estiver cadastrado como administrador do sistema.
@@ -45,30 +47,31 @@ Fluxo principal:
    8.4. O sistema guarda o perfil e a unidade definidos
 
 9. O sistema exibe a estrutura de telas da aplicação, composta pelas seções: `Barra de navegação`, `Conteúdo` e
-    `Rodapé`.
+   `Rodapé`.
 
-    9.1. `A Barra de navegação` é sempre mostrada no topo das telas (exceto para tela de login) e tem as seguintes
-    regras de exibição:
+   9.1. `A Barra de navegação` é sempre mostrada no topo das telas (exceto para tela de login) e tem as seguintes
+   regras de exibição:
 
-    9.1.1. Itens principais de navegação:
+   9.1.1. Itens principais de navegação:
     - Ícone/logotipo do sistema (abre a tela `Painel`)
     - Link `Painel`, para tela `Painel`
     - Menu das unidades, de acordo com essas regras:
         - Se ADMIN: Link `Unidades`, para tela `Unidades`, que apresenta a hierarquia de unidades do TRE-PE
-        - Se GESTOR: CHEFE, ou SERVIDOR**: Link `Minha unidade`, para tela `Detalhe da unidade`, que apresenta os dados da unidade do usuário logado
+        - Se GESTOR: CHEFE, ou SERVIDOR**: Link `Minha unidade`, para tela `Detalhe da unidade`, que apresenta os dados
+          da unidade do usuário logado
     - Link `Relatórios`, para tela `Relatórios`
     - Link `Histórico`, para tela `Histórico de processos`
 
-    9.1.2. Itens adicionais, alinhados à direita:
+   9.1.2. Itens adicionais, alinhados à direita:
     - Para todos os perfis:
         - `[Perfil] - [Sigla da unidade]` - Texto fixo, sem interatividade (ex. `CHEFE - SESEL`).
         - `Ícone de logout` - faz logout e mostra tela `Login`
     - Se perfil ADMIN:
         - Mostrar adicionalmente o `ícone de engrenagem` para acesso à tela `Configurações`
 
-    9.2. O `Conteúdo` compõe a parte central onde serão 'encaixadas' todas as telas.
+   9.2. O `Conteúdo` compõe a parte central onde serão 'encaixadas' todas as telas.
 
-    9.3. O `Rodapé` é a seção localizada na parte inferior das telas (exceto na tela de login), em que aparecerá a
-    informação da versão do sistema assim como a informação `Desenvolvido por SESEL/COSIS/TRE-PE`.
+   9.3. O `Rodapé` é a seção localizada na parte inferior das telas (exceto na tela de login), em que aparecerá a
+   informação da versão do sistema assim como a informação `Desenvolvido por SESEL/COSIS/TRE-PE`.
 
 10. O sistema mostra inicialmente a tela `Painel`.

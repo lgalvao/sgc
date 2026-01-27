@@ -40,9 +40,11 @@ import static sgc.processo.model.TipoProcesso.REVISAO;
  * <p>
  * Implementa o padrão Facade para simplificar a interface de uso e centralizar
  * a coordenação entre múltiplos serviços relacionados a processos.
- * 
- * <p><b>Nota sobre Injeção de Dependências:</b>
- * SubprocessoFacade é injetado normalmente. Dependência circular verificada e refutada.
+ *
+ * <p>
+ * <b>Nota sobre Injeção de Dependências:</b>
+ * SubprocessoFacade é injetado normalmente. Dependência circular verificada e
+ * refutada.
  */
 @Service
 @Slf4j
@@ -58,7 +60,7 @@ public class ProcessoFacade {
     private final UsuarioFacade usuarioService;
     private final ProcessoInicializador processoInicializador;
     private final sgc.alerta.AlertaFacade alertaService;
-    
+
     // Services especializados
     private final ProcessoAcessoService processoAcessoService;
     private final ProcessoValidador processoValidador;
@@ -73,24 +75,24 @@ public class ProcessoFacade {
     @PreAuthorize("hasRole('ADMIN')")
     public ProcessoDto criar(CriarProcessoRequest req) {
         Set<Unidade> participantes = new HashSet<>();
-        for (Long codigoUnidade : req.getUnidades()) {
+        for (Long codigoUnidade : req.unidades()) {
             Unidade unidade = unidadeService.buscarEntidadePorId(codigoUnidade);
             participantes.add(unidade);
         }
 
-        TipoProcesso tipoProcesso = req.getTipo();
+        TipoProcesso tipoProcesso = req.tipo();
 
         if (tipoProcesso == REVISAO || tipoProcesso == DIAGNOSTICO) {
-            processoValidador.getMensagemErroUnidadesSemMapa(new ArrayList<>(req.getUnidades()))
+            processoValidador.getMensagemErroUnidadesSemMapa(new ArrayList<>(req.unidades()))
                     .ifPresent(msg -> {
                         throw new ErroProcesso(msg);
                     });
         }
 
         Processo processo = new Processo()
-                .setDescricao(req.getDescricao())
+                .setDescricao(req.descricao())
                 .setTipo(tipoProcesso)
-                .setDataLimite(req.getDataLimiteEtapa1())
+                .setDataLimite(req.dataLimiteEtapa1())
                 .setSituacao(CRIADO)
                 .setDataCriacao(LocalDateTime.now())
                 .setParticipantes(participantes);
@@ -117,22 +119,22 @@ public class ProcessoFacade {
         TipoProcesso tipoAnterior = processo.getTipo();
         Set<String> camposAlterados = new HashSet<>();
 
-        if (!processo.getDescricao().equals(requisicao.getDescricao())) {
+        if (!processo.getDescricao().equals(requisicao.descricao())) {
             camposAlterados.add("descricao");
         }
-        if (processo.getTipo() != requisicao.getTipo()) {
+        if (processo.getTipo() != requisicao.tipo()) {
             camposAlterados.add("tipo");
         }
-        if (!Objects.equals(processo.getDataLimite(), requisicao.getDataLimiteEtapa1())) {
+        if (!Objects.equals(processo.getDataLimite(), requisicao.dataLimiteEtapa1())) {
             camposAlterados.add("dataLimite");
         }
 
-        processo.setDescricao(requisicao.getDescricao());
-        processo.setTipo(requisicao.getTipo());
-        processo.setDataLimite(requisicao.getDataLimiteEtapa1());
+        processo.setDescricao(requisicao.descricao());
+        processo.setTipo(requisicao.tipo());
+        processo.setDataLimite(requisicao.dataLimiteEtapa1());
 
-        if (requisicao.getTipo() == REVISAO || requisicao.getTipo() == DIAGNOSTICO) {
-            processoValidador.getMensagemErroUnidadesSemMapa(new ArrayList<>(requisicao.getUnidades()))
+        if (requisicao.tipo() == REVISAO || requisicao.tipo() == DIAGNOSTICO) {
+            processoValidador.getMensagemErroUnidadesSemMapa(new ArrayList<>(requisicao.unidades()))
                     .ifPresent(msg -> {
                         throw new ErroProcesso(msg);
                     });
@@ -140,7 +142,7 @@ public class ProcessoFacade {
 
         Set<Unidade> participantesAtuais = new HashSet<>(processo.getParticipantes());
         Set<Unidade> participantes = new HashSet<>();
-        for (Long codigoUnidade : requisicao.getUnidades()) {
+        for (Long codigoUnidade : requisicao.unidades()) {
             participantes.add(unidadeService.buscarEntidadePorId(codigoUnidade));
         }
 
@@ -160,7 +162,7 @@ public class ProcessoFacade {
                     .usuario(usuarioService.obterUsuarioAutenticado())
                     .camposAlterados(camposAlterados)
                     .dataHoraAtualizacao(LocalDateTime.now())
-                    .tipoAnterior(tipoAnterior != requisicao.getTipo() ? tipoAnterior : null)
+                    .tipoAnterior(tipoAnterior != requisicao.tipo() ? tipoAnterior : null)
                     .build();
             publicadorEventos.publishEvent(evento);
             log.debug("Evento EventoProcessoAtualizado publicado para processo {}", codigo);
@@ -179,7 +181,8 @@ public class ProcessoFacade {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser removidos.");
         }
 
-        // Publica evento ANTES da exclusão para permitir listeners acessarem dados relacionados
+        // Publica evento ANTES da exclusão para permitir listeners acessarem dados
+        // relacionados
         EventoProcessoExcluido evento = EventoProcessoExcluido.builder()
                 .codProcesso(codigo)
                 .descricao(processo.getDescricao())

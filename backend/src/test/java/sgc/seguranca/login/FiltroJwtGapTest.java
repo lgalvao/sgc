@@ -26,11 +26,16 @@ class FiltroJwtGapTest {
     @InjectMocks
     private FiltroJwt filtro;
 
-    @Mock private GerenciadorJwt jwtService;
-    @Mock private UsuarioFacade usuarioService;
-    @Mock private HttpServletRequest request;
-    @Mock private HttpServletResponse response;
-    @Mock private FilterChain filterChain;
+    @Mock
+    private GerenciadorJwt jwtService;
+    @Mock
+    private UsuarioFacade usuarioService;
+    @Mock
+    private HttpServletRequest request;
+    @Mock
+    private HttpServletResponse response;
+    @Mock
+    private FilterChain filterChain;
 
     @Test
     @DisplayName("Deve ignorar requisição sem cabeçalho Authorization")
@@ -55,14 +60,14 @@ class FiltroJwtGapTest {
     void deveLogarAvisoUsuarioNaoEncontrado() throws ServletException, IOException {
         String token = "valid-token";
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
-        
+
         GerenciadorJwt.JwtClaims claims = new GerenciadorJwt.JwtClaims("123", null, null);
         when(jwtService.validarToken(token)).thenReturn(Optional.of(claims));
-        
+
         when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(null);
-        
+
         filtro.doFilterInternal(request, response, filterChain);
-        
+
         verify(filterChain).doFilter(request, response);
     }
 }

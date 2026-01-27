@@ -43,6 +43,7 @@ public abstract class BaseIntegrationTest {
     private WebApplicationContext context;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setupMockMvc() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
     }

@@ -23,16 +23,13 @@ import static org.mockito.Mockito.when;
 @Tag("unit")
 @DisplayName("Testes do ValidadorDadosOrgService")
 class ValidadorDadosOrgServiceTest {
+    private final DefaultApplicationArguments args = new DefaultApplicationArguments();
     @Mock
     private UnidadeRepo unidadeRepo;
-
     @Mock
     private UsuarioRepo usuarioRepo;
-
     @InjectMocks
     private ValidadorDadosOrgService validador;
-
-    private final DefaultApplicationArguments args = new DefaultApplicationArguments();
 
     private Unidade criarUnidadeValida(Long codigo, String sigla, TipoUnidade tipo) {
         Unidade u = new Unidade();

@@ -4,7 +4,8 @@ Este diretório contém utilitários específicos para facilitar a escrita de te
 
 ## Conteúdo Típico
 
-- **`renderUtils.ts`**: Wrappers customizados para o `mount` do Vue Test Utils que já injetam plugins comuns (Pinia, Router, BootstrapVueNext) para evitar repetição em cada teste.
+- **`renderUtils.ts`**: Wrappers customizados para o `mount` do Vue Test Utils que já injetam plugins comuns (Pinia,
+  Router, BootstrapVueNext) para evitar repetição em cada teste.
 - **`mockFactories.ts`**: Funções geradoras de dados fake (fixtures) para testes. Ex: `criarProcessoMock()`.
 
 ## Exemplo de Factory

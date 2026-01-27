@@ -1,11 +1,22 @@
 package sgc.service;
 
-import org.junit.jupiter.api.*;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
+
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.comum.erros.ErroAccessoNegado;
@@ -14,7 +25,6 @@ import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.ImpactoMapaService;
-import sgc.notificacao.NotificacaoEmailService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
@@ -22,15 +32,12 @@ import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.*;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.when;
 
 @Tag("integration")
 @SpringBootTest
@@ -64,8 +71,6 @@ class SubprocessoServiceActionsTest {
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
 
-    @MockitoBean
-    private NotificacaoEmailService notificacaoEmailService;
 
     @MockitoBean
     private ImpactoMapaService impactoMapaService;
@@ -75,6 +80,7 @@ class SubprocessoServiceActionsTest {
     private Usuario gestor;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         unidade = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
         admin = carregarUsuarioComPerfis("6"); // Ricardo Alves - ADMIN
@@ -111,6 +117,7 @@ class SubprocessoServiceActionsTest {
 
     @Nested
     @DisplayName("Testes para aceitarCadastro")
+    @SuppressWarnings("unused")
     class AceitarCadastroTest {
         @Test
         @Transactional
@@ -131,6 +138,7 @@ class SubprocessoServiceActionsTest {
 
     @Nested
     @DisplayName("Testes para homologarCadastro")
+    @SuppressWarnings("unused")
     class HomologarCadastroTest {
         @Test
         @Transactional
@@ -146,6 +154,7 @@ class SubprocessoServiceActionsTest {
 
     @Nested
     @DisplayName("Testes para aceitarRevisaoCadastro")
+    @SuppressWarnings("unused")
     class AceitarRevisaoCadastroTest {
         @Test
         @Transactional
@@ -165,7 +174,8 @@ class SubprocessoServiceActionsTest {
 
         @Test
         void deveLancarExcecaoSeSubprocessoNaoEncontrado() {
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoWorkflowService.aceitarRevisaoCadastro(999L, OBSERVACOES, gestor));
+            var exception = assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoWorkflowService.aceitarRevisaoCadastro(999L, OBSERVACOES, gestor));
+            assertNotNull(exception);
         }
 
         @Test
@@ -173,18 +183,18 @@ class SubprocessoServiceActionsTest {
         void deveLancarExcecaoSeSituacaoIncorreta() {
             Processo processo = criarProcesso(TipoProcesso.REVISAO);
             Subprocesso sp = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            // Após refatoração de segurança, verificações de situação são feitas pelo AccessControlService
-            // que sempre lança ErroAccessoNegado (com mensagem descritiva sobre a situação incorreta)
+
             Long spCodigo = sp.getCodigo();
-            ErroAccessoNegado erro = assertThrows(ErroAccessoNegado.class, 
-                () -> subprocessoWorkflowService.aceitarRevisaoCadastro(spCodigo, OBSERVACOES, gestor));
-            assertTrue(erro.getMessage().contains("situação"), 
-                "Mensagem de erro deve mencionar a situação incorreta");
+            ErroAccessoNegado erro = assertThrows(ErroAccessoNegado.class,
+                    () -> subprocessoWorkflowService.aceitarRevisaoCadastro(spCodigo, OBSERVACOES, gestor));
+            assertTrue(erro.getMessage().contains("situação"),
+                    "Mensagem de erro deve mencionar a situação incorreta");
         }
     }
 
     @Nested
     @DisplayName("Testes para homologarRevisaoCadastro")
+    @SuppressWarnings("unused")
     class HomologarRevisaoCadastroTest {
         @Test
         @Transactional
@@ -197,7 +207,7 @@ class SubprocessoServiceActionsTest {
 
             // Recarregar o subprocesso do repositório para garantir que o estado esteja atualizado
             Subprocesso subprocessoAposAceite = subprocessoRepo.findById(subprocesso.getCodigo())
-                            .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após aceite da revisão."));
+                    .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após aceite da revisão."));
 
             when(impactoMapaService.verificarImpactos(any(Subprocesso.class), any(Usuario.class))).thenReturn(ImpactoMapaDto.semImpacto());
 
@@ -205,14 +215,15 @@ class SubprocessoServiceActionsTest {
             subprocessoWorkflowService.homologarRevisaoCadastro(subprocessoAposAceite.getCodigo(), OBSERVACOES, admin);
 
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo())
-                            .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após homologação da revisão."));
+                    .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após homologação da revisão."));
 
             assertEquals(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO, spAtualizado.getSituacao());
         }
 
         @Test
         void deveLancarExcecaoSeSubprocessoNaoEncontrado_homologar() {
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoWorkflowService.homologarRevisaoCadastro(999L, OBSERVACOES, admin));
+            var exception = assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoWorkflowService.homologarRevisaoCadastro(999L, OBSERVACOES, admin));
+            assertNotNull(exception);
         }
 
         @Test
@@ -221,19 +232,18 @@ class SubprocessoServiceActionsTest {
             Processo processo = criarProcesso(TipoProcesso.REVISAO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-            // Após refatoração de segurança, verificações de situação são feitas pelo AccessControlService
-            // que sempre lança ErroAccessoNegado (com mensagem descritiva sobre a situação incorreta)
-            // Usa admin pois HOMOLOGAR_REVISAO_CADASTRO requer perfil ADMIN
             Long spCodigo = subprocesso.getCodigo();
-            ErroAccessoNegado erro = assertThrows(ErroAccessoNegado.class, 
-                () -> subprocessoWorkflowService.homologarRevisaoCadastro(spCodigo, OBSERVACOES, admin));
-            assertTrue(erro.getMessage().contains("situação"), 
-                "Mensagem de erro deve mencionar a situação incorreta");
+            ErroAccessoNegado erro = assertThrows(ErroAccessoNegado.class,
+                    () -> subprocessoWorkflowService.homologarRevisaoCadastro(spCodigo, OBSERVACOES, admin));
+
+            assertTrue(erro.getMessage().contains("situação"),
+                    "Mensagem de erro deve mencionar a situação incorreta");
         }
     }
 
     @Nested
     @DisplayName("Testes para devolverCadastro")
+    @SuppressWarnings("unused")
     class DevolverCadastroTest {
         @Test
         @Transactional
@@ -243,7 +253,7 @@ class SubprocessoServiceActionsTest {
             subprocessoWorkflowService.devolverCadastro(subprocesso.getCodigo(), OBSERVACOES, gestor);
 
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo())
-                .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após devolução."));
+                    .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após devolução."));
 
             assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, spAtualizado.getSituacao());
             assertNull(spAtualizado.getDataFimEtapa1());

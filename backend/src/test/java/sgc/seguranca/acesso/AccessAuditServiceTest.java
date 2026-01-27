@@ -26,9 +26,9 @@ class AccessAuditServiceTest {
         Usuario usuario = criarUsuario("123456789012");
         Acao acao = Acao.VISUALIZAR_PROCESSO;
         Processo processo = criarProcesso(1L);
-        
-        assertDoesNotThrow(() -> 
-            auditService.logAccessGranted(usuario, acao, processo)
+
+        assertDoesNotThrow(() ->
+                auditService.logAccessGranted(usuario, acao, processo)
         );
     }
 
@@ -39,9 +39,9 @@ class AccessAuditServiceTest {
         Acao acao = Acao.EDITAR_PROCESSO;
         Processo processo = criarProcesso(1L);
         String motivo = "Usuário não tem permissão ADMIN";
-        
-        assertDoesNotThrow(() -> 
-            auditService.logAccessDenied(usuario, acao, processo, motivo)
+
+        assertDoesNotThrow(() ->
+                auditService.logAccessDenied(usuario, acao, processo, motivo)
         );
     }
 
@@ -51,9 +51,9 @@ class AccessAuditServiceTest {
         Usuario usuario = criarUsuario("123456789012");
         Acao acao = Acao.VISUALIZAR_SUBPROCESSO;
         Subprocesso subprocesso = criarSubprocesso(10L);
-        
-        assertDoesNotThrow(() -> 
-            auditService.logAccessGranted(usuario, acao, subprocesso)
+
+        assertDoesNotThrow(() ->
+                auditService.logAccessGranted(usuario, acao, subprocesso)
         );
     }
 
@@ -63,9 +63,9 @@ class AccessAuditServiceTest {
         Usuario usuario = criarUsuario("123456789012");
         Acao acao = Acao.EDITAR_CONFIGURACOES;
         String recurso = "ConfiguracaoGenerica";
-        
-        assertDoesNotThrow(() -> 
-            auditService.logAccessGranted(usuario, acao, recurso)
+
+        assertDoesNotThrow(() ->
+                auditService.logAccessGranted(usuario, acao, recurso)
         );
     }
 

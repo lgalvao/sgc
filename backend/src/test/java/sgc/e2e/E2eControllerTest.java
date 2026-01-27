@@ -1,10 +1,19 @@
 package sgc.e2e;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.sql.DataSource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,22 +24,12 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+
 import sgc.organizacao.UnidadeFacade;
-import sgc.processo.service.ProcessoFacade;
-
-import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
+import sgc.processo.service.ProcessoFacade;
 
 @Tag("integration")
 @SpringBootTest
@@ -60,6 +59,7 @@ class E2eControllerTest {
     private E2eController controller;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         MockitoAnnotations.openMocks(this);
         // Default behavior for resource loader (file found in first path)
@@ -202,7 +202,8 @@ class E2eControllerTest {
         mockResourceLoader("file:../e2e/setup/seed.sql", false);
         mockResourceLoader("file:e2e/setup/seed.sql", true);
 
-        org.junit.jupiter.api.Assertions.assertThrows(SQLException.class, () -> localController.resetDatabase());
+        var exception = org.junit.jupiter.api.Assertions.assertThrows(SQLException.class, localController::resetDatabase);
+        org.junit.jupiter.api.Assertions.assertNotNull(exception);
 
         // Verifica se tentou carregar o segundo caminho
         verify(resourceLoader).getResource("file:e2e/setup/seed.sql");
@@ -218,7 +219,8 @@ class E2eControllerTest {
         mockResourceLoader("file:../e2e/setup/seed.sql", false);
         mockResourceLoader("file:e2e/setup/seed.sql", false);
 
-        org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroConfiguracao.class, () -> localController.resetDatabase());
+        var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroConfiguracao.class, localController::resetDatabase);
+        org.junit.jupiter.api.Assertions.assertNotNull(exception);
     }
 
     private void assertCount(String tableAndWhere, int expected) {
@@ -306,7 +308,8 @@ class E2eControllerTest {
 
         E2eController localController = new E2eController(mockJdbc, namedJdbcTemplate, dataSource, processoFacade, unidadeFacade, resourceLoader);
 
-        org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class, () -> localController.resetDatabase());
+        var exception = org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class, localController::resetDatabase);
+        org.junit.jupiter.api.Assertions.assertNotNull(exception);
     }
 
     @Test

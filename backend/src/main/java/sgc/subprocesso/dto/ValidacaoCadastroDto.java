@@ -9,6 +9,7 @@ import java.util.List;
  */
 @Builder
 public record ValidacaoCadastroDto(
-    Boolean valido,
-    List<ErroValidacaoDto> erros
-) {}
+        Boolean valido,
+        List<ErroValidacaoDto> erros
+) {
+}

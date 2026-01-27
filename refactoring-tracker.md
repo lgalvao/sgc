@@ -7,12 +7,12 @@
 
 ## 📈 Progresso Geral
 
-| Fase | Status | Progresso | Ações Concluídas | Total |
-|------|--------|-----------|------------------|-------|
-| **Sprint 1** - Quick Wins | 🟢 Concluída | 100% | 5/5 | [Ver detalhes](#sprint-1) |
-| **Sprint 2** - Frontend | 🟢 Concluída | 100% | 3/3 | [Ver detalhes](#sprint-2) |
-| **Sprint 3** - Backend | 🔵 Planejada | 0% | 0/3 | [Ver detalhes](#sprint-3) |
-| **Sprint 4** - Opcionais | 🔵 Planejada | 0% | 0/3 | [Ver detalhes](#sprint-4) |
+| Fase                      | Status       | Progresso | Ações Concluídas | Total                     |
+|---------------------------|--------------|-----------|------------------|---------------------------|
+| **Sprint 1** - Quick Wins | 🟢 Concluída | 100%      | 5/5              | [Ver detalhes](#sprint-1) |
+| **Sprint 2** - Frontend   | 🟢 Concluída | 100%      | 3/3              | [Ver detalhes](#sprint-2) |
+| **Sprint 3** - Backend    | 🔵 Planejada | 0%        | 0/3              | [Ver detalhes](#sprint-3) |
+| **Sprint 4** - Opcionais  | 🔵 Planejada | 0%        | 0/3              | [Ver detalhes](#sprint-4) |
 
 **Total Geral:** 8/14 ações (57%)
 
@@ -25,13 +25,13 @@
 **Objetivo:** Remover complexidade desnecessária, ganhos rápidos  
 **Status:** 🟢 Concluída
 
-| # | Ação | Prioridade | Status | Esforço | Impacto |
-|---|------|------------|--------|---------|---------|
-| 1 | Alterar `FetchType.EAGER` → `LAZY` em UsuarioPerfil | 🔴 Alta | 🟢 Concluída | 🟢 Baixo | 🔴 Alto |
-| 3 | Remover override de `findAll()` em AtividadeRepo | 🔴 Alta | 🟢 Concluída | 🟢 Baixo | 🟠 Médio |
-| 7 | Remover cache de unidades (CacheConfig) | 🟡 Média | 🟢 Concluída | 🟢 Baixo | 🟡 Baixo |
-| 11 | Converter subquery → JOIN em AtividadeRepo | 🟢 Baixa | 🟢 Concluída | 🟢 Baixo | 🟢 Baixo |
-| 12 | Extrair `flattenTree` para utilitário compartilhado | 🟢 Baixa | 🟢 Concluída | 🟢 Baixo | 🟢 Baixo |
+| #  | Ação                                                | Prioridade | Status       | Esforço  | Impacto  |
+|----|-----------------------------------------------------|------------|--------------|----------|----------|
+| 1  | Alterar `FetchType.EAGER` → `LAZY` em UsuarioPerfil | 🔴 Alta    | 🟢 Concluída | 🟢 Baixo | 🔴 Alto  |
+| 3  | Remover override de `findAll()` em AtividadeRepo    | 🔴 Alta    | 🟢 Concluída | 🟢 Baixo | 🟠 Médio |
+| 7  | Remover cache de unidades (CacheConfig)             | 🟡 Média   | 🟢 Concluída | 🟢 Baixo | 🟡 Baixo |
+| 11 | Converter subquery → JOIN em AtividadeRepo          | 🟢 Baixa   | 🟢 Concluída | 🟢 Baixo | 🟢 Baixo |
+| 12 | Extrair `flattenTree` para utilitário compartilhado | 🟢 Baixa   | 🟢 Concluída | 🟢 Baixo | 🟢 Baixo |
 
 **Documentação:** [backend-sprint-1.md](./backend-sprint-1.md)
 
@@ -51,11 +51,11 @@
 **Objetivo:** Frontend mais consistente, menos requisições HTTP  
 **Status:** 🟢 Concluída (100%)
 
-| # | Ação | Prioridade | Status | Esforço | Impacto |
-|---|------|------------|--------|---------|---------|
-| 2 | Criar composable `useErrorHandler` para stores | 🔴 Alta | 🟢 Concluída | 🟡 Médio | 🔴 Alto |
-| 4 | Consolidar queries duplicadas (AtividadeRepo, CompetenciaRepo) | 🔴 Alta | 🟢 Concluída | 🟡 Médio | 🟠 Médio |
-| 5 | Backend retornar dados completos (eliminar cascata de reloads) | 🔴 Alta | 🟢 Concluída | 🔴 Alto | 🔴 Alto |
+| # | Ação                                                           | Prioridade | Status       | Esforço  | Impacto  |
+|---|----------------------------------------------------------------|------------|--------------|----------|----------|
+| 2 | Criar composable `useErrorHandler` para stores                 | 🔴 Alta    | 🟢 Concluída | 🟡 Médio | 🔴 Alto  |
+| 4 | Consolidar queries duplicadas (AtividadeRepo, CompetenciaRepo) | 🔴 Alta    | 🟢 Concluída | 🟡 Médio | 🟠 Médio |
+| 5 | Backend retornar dados completos (eliminar cascata de reloads) | 🔴 Alta    | 🟢 Concluída | 🔴 Alto  | 🔴 Alto  |
 
 **Documentação:** [frontend-sprint-2.md](./frontend-sprint-2.md)
 
@@ -80,11 +80,11 @@
 **Objetivo:** Arquitetura mais clara, SRP respeitado  
 **Status:** 🔵 Planejada
 
-| # | Ação | Prioridade | Status | Esforço | Impacto |
-|---|------|------------|--------|---------|---------|
-| 6 | Decompor `UnidadeFacade` em 3 services | 🟡 Média | ⚪ Pendente | 🔴 Alto | 🟠 Médio |
-| 8 | Dividir `SubprocessoWorkflowService` (775 linhas) | 🟡 Média | ⚪ Pendente | 🔴 Alto | 🟠 Médio |
-| 10 | Consolidar AtividadeService + CompetenciaService em MapaManutencaoService | 🟡 Média | ⚪ Pendente | 🟡 Médio | 🟠 Médio |
+| #  | Ação                                                                      | Prioridade | Status     | Esforço  | Impacto  |
+|----|---------------------------------------------------------------------------|------------|------------|----------|----------|
+| 6  | Decompor `UnidadeFacade` em 3 services                                    | 🟡 Média   | ⚪ Pendente | 🔴 Alto  | 🟠 Médio |
+| 8  | Dividir `SubprocessoWorkflowService` (775 linhas)                         | 🟡 Média   | ⚪ Pendente | 🔴 Alto  | 🟠 Médio |
+| 10 | Consolidar AtividadeService + CompetenciaService em MapaManutencaoService | 🟡 Média   | ⚪ Pendente | 🟡 Médio | 🟠 Médio |
 
 **Documentação:** [backend-sprint-3.md](./backend-sprint-3.md)
 
@@ -95,11 +95,11 @@
 **Objetivo:** Refinamentos, não críticos  
 **Status:** 🔵 Planejada
 
-| # | Ação | Prioridade | Status | Esforço | Impacto |
-|---|------|------------|--------|---------|---------|
-| 9 | Implementar cache HTTP parcial (frontend) | 🟡 Média | ⚪ Pendente | 🟡 Médio | 🟡 Baixo |
-| 13 | Adicionar @EntityGraph onde apropriado | 🟢 Baixa | ⚪ Pendente | 🟡 Médio | 🟢 Baixo |
-| 14 | Decompor `processos.ts` store (345 linhas) | 🟢 Baixa | ⚪ Pendente | 🔴 Alto | 🟢 Baixo |
+| #  | Ação                                       | Prioridade | Status     | Esforço  | Impacto  |
+|----|--------------------------------------------|------------|------------|----------|----------|
+| 9  | Implementar cache HTTP parcial (frontend)  | 🟡 Média   | ⚪ Pendente | 🟡 Médio | 🟡 Baixo |
+| 13 | Adicionar @EntityGraph onde apropriado     | 🟢 Baixa   | ⚪ Pendente | 🟡 Médio | 🟢 Baixo |
+| 14 | Decompor `processos.ts` store (345 linhas) | 🟢 Baixa   | ⚪ Pendente | 🔴 Alto  | 🟢 Baixo |
 
 **Documentação:** [otimizacoes-sprint-4.md](./otimizacoes-sprint-4.md)
 
@@ -144,14 +144,14 @@
 
 ## 🔄 Status Legenda
 
-| Ícone | Status | Descrição |
-|-------|--------|-----------|
-| ⚪ | Pendente | Ainda não iniciado |
-| 🔵 | Planejada | Sprint planejada, aguardando início |
-| 🟡 | Em Progresso | Sprint/ação em andamento |
-| 🟢 | Concluída | Sprint/ação finalizada e validada |
-| 🔴 | Bloqueada | Sprint/ação com impedimento |
-| ⚠️ | Atenção | Sprint/ação necessita revisão |
+| Ícone | Status       | Descrição                           |
+|-------|--------------|-------------------------------------|
+| ⚪     | Pendente     | Ainda não iniciado                  |
+| 🔵    | Planejada    | Sprint planejada, aguardando início |
+| 🟡    | Em Progresso | Sprint/ação em andamento            |
+| 🟢    | Concluída    | Sprint/ação finalizada e validada   |
+| 🔴    | Bloqueada    | Sprint/ação com impedimento         |
+| ⚠️    | Atenção      | Sprint/ação necessita revisão       |
 
 ---
 
@@ -160,26 +160,26 @@
 ### Decisões Arquiteturais
 
 1. **Cache de Unidades** - Decisão: REMOVER
-   - Justificativa: Complexidade > Benefício para 20 usuários simultâneos
-   - Data: Planejado na Sprint 1
+    - Justificativa: Complexidade > Benefício para 20 usuários simultâneos
+    - Data: Planejado na Sprint 1
 
 2. **Cascata de Reloads** - Decisão: ELIMINAR
-   - Justificativa: Backend deve retornar dados completos
-   - Data: Planejado na Sprint 2
+    - Justificativa: Backend deve retornar dados completos
+    - Data: Planejado na Sprint 2
 
 3. **God Objects** - Decisão: DECOMPOR
-   - Justificativa: Respeitar SRP, melhorar testabilidade
-   - Data: Planejado na Sprint 3
+    - Justificativa: Respeitar SRP, melhorar testabilidade
+    - Data: Planejado na Sprint 3
 
 ### Riscos Identificados
 
 1. **Ação #5 (Cascata de Reloads)** - 🔴 Alto risco
-   - Impacto: 6 controllers, 6 stores
-   - Mitigação: Testes E2E extensivos antes e depois
+    - Impacto: 6 controllers, 6 stores
+    - Mitigação: Testes E2E extensivos antes e depois
 
 2. **Ação #6 e #8 (Decomposição)** - 🟡 Médio risco
-   - Impacto: Mudança arquitetural significativa
-   - Mitigação: Refatoração incremental, testes unitários
+    - Impacto: Mudança arquitetural significativa
+    - Mitigação: Refatoração incremental, testes unitários
 
 ---
 

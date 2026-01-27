@@ -6,26 +6,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.analise.AnaliseFacade;
-import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.service.ConhecimentoService;
-import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UsuarioFacade;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
-import sgc.subprocesso.mapper.MapaAjusteMapper;
-import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
-import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.crud.SubprocessoCrudService;
-import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,26 +24,12 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoFacade Batch Update Test")
 class SubprocessoFacadeBatchUpdateTest {
-
-    // Mocks required for SubprocessoFacade constructor
-    @Mock private SubprocessoCrudService crudService;
-    @Mock private SubprocessoValidacaoService validacaoService;
-    @Mock private SubprocessoWorkflowService workflowService;
-    @Mock private UsuarioFacade usuarioService;
-    @Mock private MapaFacade mapaFacade;
-    @Mock private AtividadeService atividadeService;
-    @Mock private MovimentacaoRepo repositorioMovimentacao;
-    @Mock private SubprocessoDetalheMapper subprocessoDetalheMapper;
-    @Mock private ConhecimentoMapper conhecimentoMapper;
-    @Mock private AnaliseFacade analiseFacade;
-    @Mock private CompetenciaService competenciaService;
-    @Mock private ConhecimentoService conhecimentoService;
-    @Mock private MapaAjusteMapper mapaAjusteMapper;
-    @Mock private sgc.seguranca.acesso.AccessControlService accessControlService;
-    @Mock private SubprocessoRepo subprocessoRepo;
-    @Mock private sgc.subprocesso.model.SubprocessoMovimentacaoRepo movimentacaoRepo;
-    @Mock private sgc.mapa.service.CopiaMapaService copiaMapaService;
-    @Mock private sgc.mapa.mapper.AtividadeMapper atividadeMapper;
+    @Mock
+    private AtividadeService atividadeService;
+    @Mock
+    private CompetenciaService competenciaService;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
 
     @InjectMocks
     private SubprocessoFacade facade;

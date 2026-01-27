@@ -22,12 +22,6 @@ public class UnidadeFixture {
         return unidade;
     }
 
-    public static Unidade novaUnidade(Long codigo) {
-        Unidade unidade = unidadePadrao();
-        unidade.setCodigo(codigo);
-        return unidade;
-    }
-
     public static Unidade unidadeComId(Long id) {
         Unidade unidade = unidadePadrao();
         unidade.setCodigo(id);

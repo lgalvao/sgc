@@ -77,11 +77,11 @@
  * <pre>{@code
  * @Mapper(componentModel = "spring")
  * public abstract class AtividadeMapper {
- *     
+ *
  *     // Entidade → DTO: mapa.codigo vira mapaCodigo
  *     @Mapping(source = "mapa.codigo", target = "mapaCodigo")
  *     public abstract AtividadeDto toDto(Atividade atividade);
- *     
+ *
  *     // DTO → Entidade: mapaCodigo é ignorado (relacionamento gerenciado no service)
  *     @Mapping(target = "mapa", ignore = true)
  *     @Mapping(target = "conhecimentos", ignore = true)
@@ -98,13 +98,13 @@
  * @Component
  * @Mapper(componentModel = "spring")
  * public abstract class ConhecimentoMapper {
- *     
+ *
  *     @Autowired
  *     protected RepositorioComum repo;
- *     
+ *
  *     @Mapping(source = "atividadeCodigo", target = "atividade")
  *     public abstract Conhecimento toEntity(ConhecimentoDto dto);
- *     
+ *
  *     // Método de resolução de FK
  *     public Atividade map(Long codigo) {
  *         return codigo != null
@@ -121,23 +121,23 @@
  * <pre>{@code
  * @Mapper(componentModel = "spring")
  * public interface MapaCompletoMapper {
- *     
+ *
  *     // Método default para lógica complexa
- *     default MapaCompletoDto toDto(Mapa mapa, Long codSubprocesso, 
+ *     default MapaCompletoDto toDto(Mapa mapa, Long codSubprocesso,
  *                                    List<Competencia> competencias) {
  *         return MapaCompletoDto.builder()
  *             .codigo(mapa == null ? null : mapa.getCodigo())
  *             .subprocessoCodigo(codSubprocesso)
  *             .observacoes(mapa == null ? null : mapa.getObservacoesDisponibilizacao())
- *             .competencias(competencias == null ? null : 
+ *             .competencias(competencias == null ? null :
  *                 competencias.stream().map(this::toDto).toList())
  *             .build();
  *     }
- *     
- *     @Mapping(target = "atividadesCodigos", source = "atividades", 
+ *
+ *     @Mapping(target = "atividadesCodigos", source = "atividades",
  *              qualifiedByName = "mapAtividadesCodigos")
  *     CompetenciaMapaDto toDto(Competencia competencia);
- *     
+ *
  *     @Named("mapAtividadesCodigos")
  *     default List<Long> mapAtividadesCodigos(Set<Atividade> atividades) {
  *         if (atividades == null) return null;
@@ -156,13 +156,13 @@
  * Adicione {@code @Component} além de {@code @Mapper}.
  * </p>
  * <pre>{@code
- * @Component  // Necessário para autowiring
+ * @Component // Necessário para autowiring
  * @Mapper(componentModel = "spring")
  * public abstract class ConhecimentoMapper {
- *     
- *     @Autowired  // Injeta o repositório comum centralizado
+ *
+ *     @Autowired // Injeta o repositório comum centralizado
  *     protected RepositorioComum repo;
- *     
+ *
  *     // ... métodos de mapeamento
  * }
  * }</pre>

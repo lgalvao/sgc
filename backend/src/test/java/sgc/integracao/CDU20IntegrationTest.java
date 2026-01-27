@@ -1,5 +1,8 @@
 package sgc.integracao;
 
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -7,8 +10,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import org.springframework.test.context.ActiveProfiles;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
+
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.TipoAcaoAnalise;
@@ -18,25 +25,16 @@ import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.DevolverValidacaoRequest;
-import sgc.subprocesso.model.*;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest
@@ -44,19 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-20: Analisar validação de mapa de competências")
 @Import(TestThymeleafConfig.class)
-public class CDU20IntegrationTest extends BaseIntegrationTest {
-    @Autowired
-    ProcessoRepo processoRepo;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-
-    @Autowired
-    private UnidadeRepo unidadeRepo;
-
+class CDU20IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UsuarioFacade usuarioService;
 
@@ -74,6 +60,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
     private Usuario usuarioChefe;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         // Use existing 3-level hierarchy from data.sql:
         // Unit 2 (STIC - INTEROPERACIONAL) - top level
@@ -83,10 +70,10 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         // User '333333333333' is CHEFE of unit 9
         unidadeSuperiorSuperior = unidadeRepo.findById(2L)
                 .orElseThrow(() -> new RuntimeException("Unit 2 not found in data.sql"));
-        
+
         unidadeSuperior = unidadeRepo.findById(6L)
                 .orElseThrow(() -> new RuntimeException("Unit 6 not found in data.sql"));
-        
+
         unidade = unidadeRepo.findById(9L)
                 .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
 
@@ -116,17 +103,17 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         // Devolução do mapa (GESTOR of unit 6 devolves to subordinate unit 9)
         DevolverValidacaoRequest devolverReq = new DevolverValidacaoRequest("Justificativa da devolução");
         mockMvc.perform(post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
-                                .with(user(usuarioGestor))
-                                .with(csrf())
-                                .contentType("application/json")
-                                .content(objectMapper.writeValueAsString(devolverReq)))
+                        .with(user(usuarioGestor))
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(devolverReq)))
                 .andExpect(status().isOk());
 
         // Verificação do histórico após devolução
         String responseDevolucao =
                 mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
-                        .with(user(usuarioGestor))
-                        .with(csrf()))
+                                .with(user(usuarioGestor))
+                                .with(csrf()))
                         .andExpect(status().isOk())
                         .andReturn()
                         .getResponse()
@@ -136,10 +123,10 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
                 });
 
         assertThat(historicoDevolucao).hasSize(1);
-        assertThat(historicoDevolucao.getFirst().getAcao())
+        assertThat(historicoDevolucao.getFirst().acao())
                 .isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
-        assertThat(historicoDevolucao.getFirst().getUnidadeSigla()).isNotNull();
-        assertThat(historicoDevolucao.getFirst().getObservacoes())
+        assertThat(historicoDevolucao.getFirst().unidadeSigla()).isNotNull();
+        assertThat(historicoDevolucao.getFirst().observacoes())
                 .isEqualTo("Justificativa da devolução");
 
         // Adicionar verificação de Movimentacao e Alerta após devolução
@@ -166,21 +153,21 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
 
         // Unidade inferior valida o mapa novamente (CHEFE of unit 9)
         mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
-                                .with(user(usuarioChefe))
-                                .with(csrf()))
+                        .with(user(usuarioChefe))
+                        .with(csrf()))
                 .andExpect(status().isOk());
 
         // GESTOR da unidade superior aceita a validação
         mockMvc.perform(post("/api/subprocessos/{id}/aceitar-validacao", subprocesso.getCodigo())
-                                .with(user(usuarioGestor))
-                                .with(csrf()))
+                        .with(user(usuarioGestor))
+                        .with(csrf()))
                 .andExpect(status().isOk());
 
         // Verificação do histórico após aceite
         String responseAceite =
                 mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
-                                        .with(user(usuarioGestor))
-                                        .with(csrf()))
+                                .with(user(usuarioGestor))
+                                .with(csrf()))
                         .andExpect(status().isOk())
                         .andReturn()
                         .getResponse()
@@ -190,9 +177,9 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
                 });
 
         assertThat(historicoAceite).hasSize(2);
-        assertThat(historicoAceite.getFirst().getAcao())
+        assertThat(historicoAceite.getFirst().acao())
                 .isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
-        assertThat(historicoAceite.getFirst().getUnidadeSigla()).isNotNull();
+        assertThat(historicoAceite.getFirst().unidadeSigla()).isNotNull();
 
         // Adicionar verificação de Movimentacao e Alerta após aceite
         List<Movimentacao> movimentacoesAceite =

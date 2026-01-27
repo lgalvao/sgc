@@ -24,17 +24,15 @@ import static org.mockito.Mockito.when;
 @DisplayName("GerenciadorJwt - Testes Unitários")
 class GerenciadorJwtTest {
 
+    private static final String DEFAULT_SECRET = "sgc-secret-key-change-this-in-production-minimum-32-chars";
+    private static final String DEFAULT_SECRET_SHORT = "short";
+    private static final String SECURE_SECRET = "secure-secret-key-minimum-32-chars-length-xyz-123";
     @Mock
     private JwtProperties jwtProperties;
     @Mock
     private Environment environment;
-
     @InjectMocks
     private GerenciadorJwt gerenciador;
-
-    private static final String DEFAULT_SECRET = "sgc-secret-key-change-this-in-production-minimum-32-chars";
-    private static final String DEFAULT_SECRET_SHORT = "short";
-    private static final String SECURE_SECRET = "secure-secret-key-minimum-32-chars-length-xyz-123";
 
     @Test
     @DisplayName("Deve inicializar com sucesso se segredo seguro em produção")

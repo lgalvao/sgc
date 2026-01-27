@@ -7,25 +7,25 @@
 1. O usuário acessa o Painel.
 
 2. O usuário localiza o subprocesso de uma unidade.
-   
+
 3. O usuário clica no botão `Reabrir cadastro`.
- 
-5. O sistema solicita uma justificativa para a reabertura.
 
-6. O usuário informa a justificativa e confirma.
+4. O sistema solicita uma justificativa para a reabertura.
 
-7. O sistema altera a situação do subprocesso para `MAPEAMENTO_CADASTRO_EM_ANDAMENTO`.
+5. O usuário informa a justificativa e confirma.
+
+6. O sistema altera a situação do subprocesso para `MAPEAMENTO_CADASTRO_EM_ANDAMENTO`.
 
 8 sistema registra uma movimentação para o subprocesso com os campos:
 
- - `Data/hora`: Data/hora atual
- - `Unidade origem`: SEDOC
- - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
- - `Descrição`: 'Reabertura de cadastro'
- - `Observação`: [JUSTIFICATIVA]
+- `Data/hora`: Data/hora atual
+- `Unidade origem`: SEDOC
+- `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+- `Descrição`: 'Reabertura de cadastro'
+- `Observação`: [JUSTIFICATIVA]
 
-8. O sistema envia notificações por e-mail para a unidade solicitante e unidades superiores.
-   
+1. O sistema envia notificações por e-mail para a unidade solicitante e unidades superiores.
+
    8.1. Para a unidade solicitante (operacional/interoperacional):
 
     ```text
@@ -52,7 +52,7 @@
     Após a conclusão dos ajustes, o cadastro será submetido novamente para sua análise.
     ```
 
-9. O sistema cria internamente alertas:
+2. O sistema cria internamente alertas:
 
    9.1. Para a unidade solicitante:
     - `Descrição`: "Cadastro de atividades reaberto pela SEDOC"
@@ -68,4 +68,4 @@
     - `Unidade de origem`: SEDOC
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
-10. O sistema exibe mensagem de sucesso "Cadastro reaberto com sucesso".
+3. O sistema exibe mensagem de sucesso "Cadastro reaberto com sucesso".

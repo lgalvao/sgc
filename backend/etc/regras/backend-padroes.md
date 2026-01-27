@@ -53,17 +53,18 @@ O idioma oficial do projeto é o **Português Brasileiro**.
 - **Pacotes:** minúsculo, sem separadores, representando o domínio (ex: `sgc.processo`, `sgc.mapa`).
 - **Exceções:** Prefixo `Erro` (ex: `ErroEntidadeNaoEncontrada`).
 - **Sufixos Padronizados:**
-  - Controladores: `Controller` (ex: `ProcessoController`).
-  - Serviços: `Service` (ex: `MapaService`).
-  - Repositórios: `Repo` (ex: `SubprocessoRepo`).
-  - Testes: `Test` (ex: `MapaServiceTest`).
-  - DTOs: `Dto`, `Req` (Request), `Resp` (Response).
+    - Controladores: `Controller` (ex: `ProcessoController`).
+    - Serviços: `Service` (ex: `MapaService`).
+    - Repositórios: `Repo` (ex: `SubprocessoRepo`).
+    - Testes: `Test` (ex: `MapaServiceTest`).
+    - DTOs: `Dto`, `Req` (Request), `Resp` (Response).
 
 ## 3. Padrões de Projeto (Design Patterns)
 
 ### 3.1. Service Facade (Fachada de Serviço)
 
-**Descrição:** Cada módulo possui um serviço principal que atua como ponto de entrada único para operações de negócio. Este serviço
+**Descrição:** Cada módulo possui um serviço principal que atua como ponto de entrada único para operações de negócio.
+Este serviço
 orquestra serviços especializados internos e delega tarefas.
 
 **Responsabilidades da Fachada:**
@@ -134,7 +135,8 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
 
 ### 3.3. Arquitetura Orientada a Eventos (Event-Driven)
 
-**Descrição:** Para evitar acoplamento rígido em fluxos secundários (como enviar e-mail ou criar alerta), o sistema utiliza o
+**Descrição:** Para evitar acoplamento rígido em fluxos secundários (como enviar e-mail ou criar alerta), o sistema
+utiliza o
 `ApplicationEventPublisher` do Spring.
 
 **Eventos de Domínio Identificados (23 eventos):**
@@ -204,7 +206,7 @@ public class ProcessoService {
 }
 ```
 
-2. Listener reage ao evento:
+1. Listener reage ao evento:
 
 ```java
 @Component
@@ -464,7 +466,8 @@ Isso melhora organização e coesão quando há muitas operações.
 ### 5.3. Tratamento de Erros
 
 > [!IMPORTANT]
-> Consulte o [Guia Completo de Exceções](../../regras/guia-excecoes.md) para orientações detalhadas sobre escolha de exceções.
+> Consulte o [Guia Completo de Exceções](../../regras/guia-excecoes.md) para orientações detalhadas sobre escolha de
+> exceções.
 
 **Hierarquia de Exceções:**
 
@@ -673,19 +676,22 @@ sgc/{modulo}/
 4. **atividade**: CRUD de atividades e conhecimentos
 
 **Módulos de Suporte:**
-6. **analise**: Trilha de auditoria
-7. **notificacao**: E-mails assíncronos
-8. **alerta**: Alertas na interface
-9. **painel**: Dashboards e visões agregadas
+
+1. **analise**: Trilha de auditoria
+2. **notificacao**: E-mails assíncronos
+3. **alerta**: Alertas na interface
+4. **painel**: Dashboards e visões agregadas
 
 **Módulos de Integração e Estrutura:**
-10. **sgrh**: Integração com sistema de RH
-11. **unidade**: Estrutura organizacional
+
+1. **sgrh**: Integração com sistema de RH
+2. **unidade**: Estrutura organizacional
 
 **Módulos de Infraestrutura:**
-12. **comum**: Componentes compartilhados (erros, base entities, config)
-13. **config**: Configurações específicas (OpenAPI)
-14. **e2e**: Suporte para testes end-to-end
+
+1. **comum**: Componentes compartilhados (erros, base entities, config)
+2. **config**: Configurações específicas (OpenAPI)
+3. **e2e**: Suporte para testes end-to-end
 
 ### 7.3. Dependências Entre Módulos
 
@@ -722,7 +728,8 @@ graph TD
 ## 8. Padrões de Testes
 
 > [!IMPORTANT]
-> Consulte o [Guia Completo de Testes JUnit](../../regras/guia-testes-junit.md) para padrões detalhados de nomenclatura e implementação.
+> Consulte o [Guia Completo de Testes JUnit](../../regras/guia-testes-junit.md) para padrões detalhados de nomenclatura
+> e implementação.
 
 **Localização:** `backend/src/test/java/sgc/{modulo}/`
 

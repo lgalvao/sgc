@@ -1,7 +1,9 @@
 package sgc.analise.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import sgc.comum.model.EntidadeBase;
 import sgc.subprocesso.model.Subprocesso;

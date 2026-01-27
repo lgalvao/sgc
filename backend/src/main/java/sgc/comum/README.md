@@ -1,6 +1,5 @@
 # Pacote Comum
 
-
 ## Visão Geral
 
 O pacote `comum` é uma das fundações da aplicação SGC. Ele contém código transversal, essencial para o funcionamento de
@@ -91,10 +90,10 @@ public Recurso buscar(Long codigo) {
 }
 ```
 
-
 ## Como Testar
 
 Para executar apenas os testes deste módulo (a partir do diretório `backend`):
+
 ```bash
 ./gradlew test --tests "sgc.comum.*"
 ```

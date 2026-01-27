@@ -1,14 +1,7 @@
 package sgc.e2e;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
@@ -20,14 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
@@ -37,6 +23,14 @@ import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/e2e")
@@ -114,7 +108,6 @@ public class E2eController {
                 codigo);
 
 
-
         if (!mapaIds.isEmpty()) {
             Map<String, Object> params = Map.of("ids", mapaIds);
 
@@ -169,7 +162,7 @@ public class E2eController {
                 "e2e-admin",
                 null,
                 List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
-        
+
         var previousAuth = SecurityContextHolder.getContext().getAuthentication();
         try {
             SecurityContextHolder.getContext().setAuthentication(auth);

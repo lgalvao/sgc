@@ -37,13 +37,20 @@ class EventoProcessoListenerCoverageTest {
     @InjectMocks
     private EventoProcessoListener listener;
 
-    @Mock private AlertaFacade servicoAlertas;
-    @Mock private NotificacaoEmailService notificacaoEmailService;
-    @Mock private NotificacaoModelosService notificacaoModelosService;
-    @Mock private UsuarioFacade usuarioService;
-    @Mock private UnidadeFacade unidadeService;
-    @Mock private ProcessoFacade processoFacade;
-    @Mock private SubprocessoFacade subprocessoFacade;
+    @Mock
+    private AlertaFacade servicoAlertas;
+    @Mock
+    private NotificacaoEmailService notificacaoEmailService;
+    @Mock
+    private NotificacaoModelosService notificacaoModelosService;
+    @Mock
+    private UsuarioFacade usuarioService;
+    @Mock
+    private UnidadeFacade unidadeService;
+    @Mock
+    private ProcessoFacade processoFacade;
+    @Mock
+    private SubprocessoFacade subprocessoFacade;
 
     @Test
     void deveProcessarInicioComResponsavelSemTitular() {
@@ -129,8 +136,12 @@ class EventoProcessoListenerCoverageTest {
         processo.setCodigo(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
-        Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setTipo(TipoUnidade.OPERACIONAL);
-        Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        u1.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade u2 = new Unidade();
+        u2.setCodigo(2L);
+        u2.setTipo(TipoUnidade.OPERACIONAL);
         processo.setParticipantes(Set.of(u1, u2));
 
         ResponsavelDto r1 = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
@@ -198,8 +209,11 @@ class EventoProcessoListenerCoverageTest {
         processo.setCodigo(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
-        Unidade u1 = new Unidade(); u1.setCodigo(10L);
-        Subprocesso s1 = new Subprocesso(); s1.setCodigo(100L); s1.setUnidade(u1);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(10L);
+        Subprocesso s1 = new Subprocesso();
+        s1.setCodigo(100L);
+        s1.setUnidade(u1);
 
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1));
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of());
@@ -216,8 +230,13 @@ class EventoProcessoListenerCoverageTest {
         processo.setDescricao("P1");
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
-        Unidade u1 = new Unidade(); u1.setCodigo(10L); u1.setTipo(TipoUnidade.OPERACIONAL); u1.setNome("U1");
-        Subprocesso s1 = new Subprocesso(); s1.setCodigo(100L); s1.setUnidade(u1);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(10L);
+        u1.setTipo(TipoUnidade.OPERACIONAL);
+        u1.setNome("U1");
+        Subprocesso s1 = new Subprocesso();
+        s1.setCodigo(100L);
+        s1.setUnidade(u1);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1));
 
         ResponsavelDto r1 = ResponsavelDto.builder()
@@ -231,7 +250,7 @@ class EventoProcessoListenerCoverageTest {
         UsuarioDto s1Dto = UsuarioDto.builder().tituloEleitoral("S1").email("s1@mail.com").build();
 
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", t1, "S1", s1Dto));
-        when(notificacaoModelosService.criarEmailProcessoIniciado(any(),any(),any(),any())).thenReturn("HTML");
+        when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("HTML");
 
         doAnswer(invocation -> {
             String email = invocation.getArgument(0);
@@ -254,7 +273,10 @@ class EventoProcessoListenerCoverageTest {
         processo.setCodigo(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
-        Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setTipo(TipoUnidade.OPERACIONAL); u1.setSigla("U1");
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        u1.setTipo(TipoUnidade.OPERACIONAL);
+        u1.setSigla("U1");
         processo.setParticipantes(Set.of(u1));
 
         ResponsavelDto r1 = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
@@ -343,7 +365,9 @@ class EventoProcessoListenerCoverageTest {
         u1.setTipo(TipoUnidade.RAIZ); // RAIZ
         u1.setNome("U1");
 
-        Subprocesso s1 = new Subprocesso(); s1.setCodigo(100L); s1.setUnidade(u1);
+        Subprocesso s1 = new Subprocesso();
+        s1.setCodigo(100L);
+        s1.setUnidade(u1);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1));
 
         ResponsavelDto r1 = ResponsavelDto.builder()
@@ -357,7 +381,7 @@ class EventoProcessoListenerCoverageTest {
 
         // Deve capturar a exceção ErroEstadoImpossivel internamente e logar, não estourar
         org.assertj.core.api.Assertions.assertThatCode(() ->
-            listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build())
+                listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build())
         ).doesNotThrowAnyException();
 
         // Verifica que NÃO enviou email

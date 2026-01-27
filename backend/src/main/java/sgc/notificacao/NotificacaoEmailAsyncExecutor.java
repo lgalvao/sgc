@@ -19,7 +19,8 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Executor responsável pelo envio assíncrono de e-mails.
- * Extraído de NotificacaoEmailService para resolver problemas de auto-invocação com @Async.
+ * Extraído de NotificacaoEmailService para resolver problemas de auto-invocação
+ * com @Async.
  */
 @Service
 @RequiredArgsConstructor
@@ -44,12 +45,15 @@ public class NotificacaoEmailAsyncExecutor {
     /**
      * Tenta enviar um email de forma assíncrona, com uma política de retentativas.
      *
-     * <p>Este método é executado em uma thread separada. Ele tentará enviar o email até {@code
+     * <p>
+     * Este método é executado em uma thread separada. Ele tentará enviar o email
+     * até {@code
      * MAX_TENTATIVAS} vezes, com um tempo de espera crescente entre as tentativas.
      *
      * @param emailDto O DTO contendo os detalhes do email a ser enviado.
-     * @return Um {@link CompletableFuture} que será concluído com {@code true} se o email for
-     * enviado, ou {@code false} caso contrário.
+     * @return Um {@link CompletableFuture} que será concluído com {@code true} se o
+     *         email for
+     *         enviado, ou {@code false} caso contrário.
      */
     @Async
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
@@ -58,7 +62,7 @@ public class NotificacaoEmailAsyncExecutor {
         for (int tentativa = 1; tentativa <= MAX_TENTATIVAS; tentativa++) {
             try {
                 enviarEmailSmtp(emailDto);
-                log.info("E-mail enviado para: {}", emailDto.getDestinatario());
+                log.info("E-mail enviado para: {}", emailDto.destinatario());
                 return CompletableFuture.completedFuture(true);
             } catch (MessagingException | UnsupportedEncodingException | RuntimeException e) {
                 excecaoFinal = e;
@@ -66,7 +70,7 @@ public class NotificacaoEmailAsyncExecutor {
                         "Falha na tentativa {} de {} ao enviar e-mail para {}: {}",
                         tentativa,
                         MAX_TENTATIVAS,
-                        emailDto.getDestinatario(),
+                        emailDto.destinatario(),
                         e.getMessage());
                 if (tentativa < MAX_TENTATIVAS) {
                     try {
@@ -85,7 +89,7 @@ public class NotificacaoEmailAsyncExecutor {
         log.error(
                 "Não foi possível enviar o e-mail para {} após {} tentativas.",
                 MAX_TENTATIVAS,
-                emailDto.getDestinatario(),
+                emailDto.destinatario(),
                 excecaoFinal);
         return CompletableFuture.completedFuture(false);
     }
@@ -96,10 +100,10 @@ public class NotificacaoEmailAsyncExecutor {
         MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
 
         helper.setFrom(new InternetAddress(remetente, nomeRemetente));
-        helper.setTo(emailDto.getDestinatario());
-        String assuntoCompleto = "%s %s".formatted(prefixoAssunto, emailDto.getAssunto());
+        helper.setTo(emailDto.destinatario());
+        String assuntoCompleto = "%s %s".formatted(prefixoAssunto, emailDto.assunto());
         helper.setSubject(assuntoCompleto);
-        helper.setText(emailDto.getCorpo(), emailDto.isHtml());
+        helper.setText(emailDto.corpo(), emailDto.html());
 
         enviadorDeEmail.send(mensagem);
     }

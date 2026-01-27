@@ -20,9 +20,10 @@ Este documento define os padrões e melhores práticas para testes no frontend d
 ### 3.1. Testando Stores (Pinia)
 
 Testes de store devem validar:
-1.  Estado inicial
-2.  Actions (mudança de estado)
-3.  Tratamento de erros (mock de serviços)
+
+1. Estado inicial
+2. Actions (mudança de estado)
+3. Tratamento de erros (mock de serviços)
 
 **Exemplo:**
 
