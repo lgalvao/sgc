@@ -60,7 +60,7 @@ class ProcessoValidador {
         List<Unidade> unidades = unidadeService.buscarEntidadesPorIds(codigosUnidades);
         List<Long> unidadesSemMapa = unidades.stream()
                 .map(Unidade::getCodigo)
-                .filter(codigo -> !unidadeService.verificarExistenciaMapaVigente(codigo))
+                .filter(codigo -> !unidadeService.verificarMapaVigente(codigo))
                 .toList();
 
         if (!unidadesSemMapa.isEmpty()) {

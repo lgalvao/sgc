@@ -399,7 +399,7 @@ class UnidadeFacadeTest {
         @DisplayName("Verificar existencia mapa vigente")
         void verificarExistenciaMapaVigente() {
             // Act
-            service.verificarExistenciaMapaVigente(1L);
+            service.verificarMapaVigente(1L);
 
             // Assert
             verify(mapaService).verificarMapaVigente(1L);

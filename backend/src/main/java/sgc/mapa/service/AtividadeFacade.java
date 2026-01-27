@@ -142,8 +142,9 @@ public class AtividadeFacade {
 
         // Busca estado atualizado
         Atividade atividadeAtualizada = atividadeService.obterPorCodigo(codigo);
-        Long codMapa = atividadeAtualizada.getMapa().getCodigo();
-        Subprocesso subprocesso = atividadeAtualizada.getMapa().getSubprocesso();
+        Mapa mapaAtualizado = Objects.requireNonNull(atividadeAtualizada.getMapa(), "Mapa não pode ser nulo");
+        Long codMapa = mapaAtualizado.getCodigo();
+        Subprocesso subprocesso = Objects.requireNonNull(mapaAtualizado.getSubprocesso(), "Subprocesso não pode ser nulo");
 
         // Publica evento de atualização se houve mudanças
         if (!camposAlterados.isEmpty()) {
@@ -168,7 +169,8 @@ public class AtividadeFacade {
      */
     public AtividadeOperacaoResponse excluirAtividade(Long codigo) {
         Atividade atividade = atividadeService.obterPorCodigo(codigo);
-        Long codMapa = atividade.getMapa().getCodigo();
+        Mapa mapa = Objects.requireNonNull(atividade.getMapa(), "Mapa não pode ser nulo");
+        Long codMapa = mapa.getCodigo();
         
         // Busca usuário autenticado
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
@@ -178,7 +180,7 @@ public class AtividadeFacade {
 
         // Captura dados para o evento ANTES da exclusão
         String descricao = atividade.getDescricao();
-        Subprocesso subprocesso = atividade.getMapa().getSubprocesso();
+        Subprocesso subprocesso = Objects.requireNonNull(mapa.getSubprocesso(), "Subprocesso não pode ser nulo");
         int quantidadeConhecimentos = atividade.getConhecimentos().size();
         int totalAntes = atividadeService.contarPorMapa(codMapa);
 
@@ -267,7 +269,8 @@ public class AtividadeFacade {
 
     private Long obterCodigoSubprocessoPorAtividade(Long codigoAtividade) {
         Atividade atividade = atividadeService.obterPorCodigo(codigoAtividade);
-        return obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
+        Mapa mapa = Objects.requireNonNull(atividade.getMapa(), "Mapa não pode ser nulo");
+        return obterCodigoSubprocessoPorMapa(mapa.getCodigo());
     }
 
     private AtividadeOperacaoResponse criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
