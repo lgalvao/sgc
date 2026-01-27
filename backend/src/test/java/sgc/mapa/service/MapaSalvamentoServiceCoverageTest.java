@@ -1,24 +1,28 @@
 package sgc.mapa.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.repo.RepositorioComum;
-import sgc.mapa.dto.CompetenciaMapaDto;
-import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.model.*;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import sgc.comum.repo.RepositorioComum;
+import sgc.mapa.dto.CompetenciaMapaDto;
+import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.AtividadeRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -31,6 +35,8 @@ class MapaSalvamentoServiceCoverageTest {
     private AtividadeRepo atividadeRepo;
     @Mock
     private RepositorioComum repo;
+    @Mock
+    private sgc.mapa.mapper.MapaCompletoMapper mapaCompletoMapper;
 
     @InjectMocks
     private MapaSalvamentoService service;

@@ -1,20 +1,20 @@
 package sgc.mapa.service;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
-
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -25,6 +25,9 @@ class CompetenciaServiceGapTest {
 
     @Mock
     private CompetenciaRepo competenciaRepo;
+
+    @Mock
+    private sgc.mapa.model.AtividadeRepo atividadeRepo;
 
     @Test
     @DisplayName("Deve salvar competência")
