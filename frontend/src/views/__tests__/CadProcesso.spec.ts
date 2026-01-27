@@ -69,9 +69,13 @@ describe('CadProcesso.vue', () => {
                         props: ['modelValue']
                     },
                     BFormSelect: {
-                        template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><option value="MAPEAMENTO">MAPEAMENTO</option></select>',
+                        template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><slot name="first" /><option value="MAPEAMENTO">MAPEAMENTO</option></select>',
                         props: ['modelValue', 'options'],
                         inheritAttrs: false
+                    },
+                    BFormSelectOption: {
+                        template: '<option :value="value" :disabled="disabled"><slot /></option>',
+                        props: ['value', 'disabled']
                     },
                     BButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
                     BModal: {
@@ -105,7 +109,7 @@ describe('CadProcesso.vue', () => {
     it('renders correctly in creation mode', async () => {
         const { wrapper } = createWrapper();
         expect(wrapper.find('h2').text()).toBe('Cadastro de processo');
-        expect(unidadesStore.buscarUnidadesParaProcesso).toHaveBeenCalledWith('MAPEAMENTO');
+        expect(unidadesStore.buscarUnidadesParaProcesso).not.toHaveBeenCalled();
         expect(wrapper.find('[data-testid="btn-processo-salvar"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-remover"]').exists()).toBe(false);
     });
@@ -131,7 +135,14 @@ describe('CadProcesso.vue', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        // Now it should be enabled (tipo has default 'MAPEAMENTO')
+        // Still disabled because tipo is null
+        expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(true);
+
+        // Select type
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        await nextTick();
+
+        // Now it should be enabled
         expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(false);
         expect((iniciarBtn.element as HTMLButtonElement).disabled).toBe(false);
 
@@ -164,6 +175,9 @@ describe('CadProcesso.vue', () => {
 
         const descricaoInput = wrapper.find('[data-testid="inp-processo-descricao"]');
         await descricaoInput.setValue('Novo Processo');
+
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        await nextTick();
 
         const dataInput = wrapper.find('[data-testid="inp-processo-data-limite"]');
         await dataInput.setValue('2023-12-31');

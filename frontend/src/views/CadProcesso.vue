@@ -47,7 +47,11 @@
             :options="tipoOptions"
             :state="fieldErrors.tipo ? false : null"
             data-testid="sel-processo-tipo"
-        />
+        >
+          <template #first>
+            <BFormSelectOption :value="null" disabled>-- Selecione o tipo --</BFormSelectOption>
+          </template>
+        </BFormSelect>
         <BFormInvalidFeedback :state="fieldErrors.tipo ? false : null">
           {{ fieldErrors.tipo }}
         </BFormInvalidFeedback>
@@ -185,6 +189,7 @@ import {
   BFormInput,
   BFormInvalidFeedback,
   BFormSelect,
+  BFormSelectOption,
 } from "bootstrap-vue-next";
 import {nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -292,7 +297,7 @@ onMounted(async () => {
       mostrarAlerta('danger', "Erro ao carregar processo", "Não foi possível carregar os detalhes do processo.");
       logger.error("Erro ao carregar processo:", error);
     }
-  } else {
+  } else if (tipo.value) {
     await unidadesStore.buscarUnidadesParaProcesso(tipo.value);
   }
 
@@ -308,7 +313,9 @@ watch(tipo, async (novoTipo) => {
   const codProcesso = processoEditando.value
       ? processoEditando.value.codigo
       : undefined;
-  await unidadesStore.buscarUnidadesParaProcesso(novoTipo, codProcesso);
+  if (novoTipo) {
+    await unidadesStore.buscarUnidadesParaProcesso(novoTipo, codProcesso);
+  }
 });
 
 function handleApiErrors(error: any, title: string, defaultMsg: string) {
