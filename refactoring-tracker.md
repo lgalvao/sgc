@@ -10,17 +10,18 @@
 | Fase | Status | Progresso | Ações Concluídas | Total |
 |------|--------|-----------|------------------|-------|
 | **Sprint 1** - Quick Wins | 🟢 Concluída | 100% | 5/5 | [Ver detalhes](#sprint-1) |
-| **Sprint 2** - Frontend | 🟡 Em Progresso | 67% | 2/3 | [Ver detalhes](#sprint-2) |
+| **Sprint 2** - Frontend | 🟢 Concluída | 100% | 3/3 | [Ver detalhes](#sprint-2) |
 | **Sprint 3** - Backend | 🔵 Planejada | 0% | 0/3 | [Ver detalhes](#sprint-3) |
 | **Sprint 4** - Opcionais | 🔵 Planejada | 0% | 0/3 | [Ver detalhes](#sprint-4) |
 
-**Total Geral:** 7/14 ações (50%)
+**Total Geral:** 8/14 ações (57%)
 
 ---
 
 ## 🎯 Sprints e Ações
 
 ### Sprint 1 - Quick Wins (1-2 dias)
+
 **Objetivo:** Remover complexidade desnecessária, ganhos rápidos  
 **Status:** 🟢 Concluída
 
@@ -35,6 +36,7 @@
 **Documentação:** [backend-sprint-1.md](./backend-sprint-1.md)
 
 **Resultados Alcançados:**
+
 - ✅ 130 testes backend passando
 - ✅ ~40 linhas de código removidas
 - ✅ FetchType.EAGER eliminado (2 → 0)
@@ -45,18 +47,20 @@
 ---
 
 ### Sprint 2 - Consolidação Frontend (3-5 dias)
+
 **Objetivo:** Frontend mais consistente, menos requisições HTTP  
-**Status:** 🟡 Em Progresso (67% concluída)
+**Status:** 🟢 Concluída (100%)
 
 | # | Ação | Prioridade | Status | Esforço | Impacto |
 |---|------|------------|--------|---------|---------|
 | 2 | Criar composable `useErrorHandler` para stores | 🔴 Alta | 🟢 Concluída | 🟡 Médio | 🔴 Alto |
 | 4 | Consolidar queries duplicadas (AtividadeRepo, CompetenciaRepo) | 🔴 Alta | 🟢 Concluída | 🟡 Médio | 🟠 Médio |
-| 5 | Backend retornar dados completos (eliminar cascata de reloads) | 🔴 Alta | ⚪ Pendente | 🔴 Alto | 🔴 Alto |
+| 5 | Backend retornar dados completos (eliminar cascata de reloads) | 🔴 Alta | 🟢 Concluída | 🔴 Alto | 🔴 Alto |
 
 **Documentação:** [frontend-sprint-2.md](./frontend-sprint-2.md)
 
 **Resultados Alcançados:**
+
 - ✅ useErrorHandler criado e testado (8/8 testes passando)
 - ✅ 11 stores refatorados (100%)
 - ✅ ~200 linhas de código duplicado eliminadas (frontend)
@@ -67,11 +71,12 @@
 - ✅ 27/27 testes backend relacionados passando
 - ✅ Código mais idiomático usando padrões do Spring Data
 - ✅ 0 vulnerabilidades de segurança (verificado com CodeQL)
-- ⚠️ Ação #5 pendente (recomendada para PR separada devido à complexidade)
+- ✅ Ação #5 concluída - backend retorna `atividadesAtualizadas` e frontend usa dados diretamente
 
 ---
 
 ### Sprint 3 - Refatoração Backend (5-10 dias)
+
 **Objetivo:** Arquitetura mais clara, SRP respeitado  
 **Status:** 🔵 Planejada
 
@@ -86,6 +91,7 @@
 ---
 
 ### Sprint 4 - Otimizações Opcionais (conforme necessário)
+
 **Objetivo:** Refinamentos, não críticos  
 **Status:** 🔵 Planejada
 
@@ -104,11 +110,13 @@
 ### Baseline (Antes das Refatorações)
 
 **Backend:**
+
 - Classes > 500 linhas: 2 arquivos
 - Código duplicado: ~800-1000 linhas
 - Queries N+1: ~5 problemas identificados
 
 **Frontend:**
+
 - Stores > 300 linhas: 1 arquivo (processos.ts - 345 linhas)
 - Código duplicado: ~104 blocos de error handling
 - Requisições em cascata: ~3 requisições por ação
@@ -116,16 +124,19 @@
 ### Metas (Após Refatorações)
 
 **Backend:**
+
 - ✅ Classes > 500 linhas: 0 arquivos
 - ✅ Redução de código: 800-1000 linhas
 - ✅ Queries otimizadas: 100% dos problemas N+1 resolvidos
 
 **Frontend:**
+
 - ✅ Redução de requisições HTTP: 25-40%
 - ✅ Código duplicado: ~500 linhas economizadas
 - ✅ Cascata de reloads: Eliminada
 
 **Performance:**
+
 - ✅ Tempo de resposta: Melhoria de 20-35%
 - ✅ Uso de memória: Redução de 10-15%
 

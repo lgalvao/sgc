@@ -39,9 +39,11 @@
 ## 🗺️ Visão Geral das Sprints
 
 ### Sprint 1 - Quick Wins (Backend) 🔴
+
 **1-2 dias | 5 ações | Alta Prioridade**
 
 Remover complexidade desnecessária:
+
 - ✅ EAGER → LAZY em UsuarioPerfil
 - ✅ Remover override findAll()
 - ✅ Remover cache de unidades
@@ -53,9 +55,11 @@ Remover complexidade desnecessária:
 ---
 
 ### Sprint 2 - Consolidação Frontend 🔴
+
 **3-5 dias | 3 ações | Alta Prioridade**
 
 Frontend consistente e eficiente:
+
 - ✅ Criar composable useErrorHandler
 - ✅ Consolidar queries duplicadas
 - ✅ Eliminar cascata de reloads
@@ -65,9 +69,11 @@ Frontend consistente e eficiente:
 ---
 
 ### Sprint 3 - Refatoração Backend 🟡
+
 **5-10 dias | 3 ações | Média Prioridade**
 
 Arquitetura clara, SRP respeitado:
+
 - ✅ Decompor UnidadeFacade
 - ✅ Dividir SubprocessoWorkflowService
 - ✅ Consolidar Services de Mapa
@@ -77,9 +83,11 @@ Arquitetura clara, SRP respeitado:
 ---
 
 ### Sprint 4 - Otimizações Opcionais 🟢
+
 **Conforme necessário | 3 ações | Baixa Prioridade**
 
 APENAS se houver necessidade demonstrada:
+
 - ⚠️ Cache HTTP (SE latência > 500ms)
 - ⚠️ @EntityGraph (SE surgir N+1)
 - ⚠️ Decompor stores (SE manutenção dificultar)
@@ -101,6 +109,7 @@ APENAS se houver necessidade demonstrada:
 | Queries N+1 | 5 | 0 | -5 |
 
 **Performance:**
+
 - Tempo de resposta: +20-35%
 - Latência em ações: -40-60%
 - Uso de memória: -10-15%
@@ -141,6 +150,7 @@ npm run test:e2e
 ## ✅ Checklist Rápido
 
 ### Sprint 1 (1-2 dias)
+
 - [ ] Alterar EAGER → LAZY
 - [ ] Remover override findAll()
 - [ ] Remover cache
@@ -148,16 +158,19 @@ npm run test:e2e
 - [ ] Extrair flattenTree
 
 ### Sprint 2 (3-5 dias)
+
 - [ ] Criar useErrorHandler
 - [ ] Consolidar queries
 - [ ] Eliminar cascata de reloads
 
 ### Sprint 3 (5-10 dias)
+
 - [ ] Decompor UnidadeFacade
 - [ ] Dividir SubprocessoWorkflowService
 - [ ] Consolidar Services de Mapa
 
 ### Sprint 4 (opcional)
+
 - [ ] Cache HTTP? (se necessário)
 - [ ] @EntityGraph? (se N+1)
 - [ ] Decompor stores? (se dificultar)

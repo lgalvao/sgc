@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * DTO de resposta para operações CRUD em atividades.
  *
@@ -28,4 +30,10 @@ public class AtividadeOperacaoResponse {
      * Inclui situação, label e timestamp.
      */
     private final SubprocessoSituacaoDto subprocesso;
+
+    /**
+     * Lista completa de atividades do subprocesso após a operação.
+     * Permite que o frontend atualize o cache local sem chamadas adicionais.
+     */
+    private final List<AtividadeVisualizacaoDto> atividadesAtualizadas;
 }

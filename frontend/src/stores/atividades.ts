@@ -2,9 +2,10 @@ import {defineStore} from "pinia";
 import {computed, ref} from "vue";
 import * as atividadeService from "@/services/atividadeService";
 import * as subprocessoService from "@/services/subprocessoService";
-import type {Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest,} from "@/types/tipos";
+import type {Atividade, AtividadeOperacaoResponse, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest,} from "@/types/tipos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
+import {mapAtividadeVisualizacaoToModel} from "@/mappers/atividades";
 
 export const useAtividadesStore = defineStore("atividades", () => {
     const atividadesPorSubprocesso = ref(new Map<number, Atividade[]>());
@@ -19,6 +20,22 @@ export const useAtividadesStore = defineStore("atividades", () => {
 
     function setAtividadesParaSubprocesso(codSubprocesso: number, atividades: Atividade[]) {
         atividadesPorSubprocesso.value.set(codSubprocesso, atividades);
+    }
+
+    /**
+     * Atualiza o estado local com dados retornados pela operação CRUD.
+     * Elimina a necessidade de chamadas extras ao backend.
+     */
+    function atualizarDadosLocais(codSubprocesso: number, response: AtividadeOperacaoResponse) {
+        // Atualizar lista de atividades no cache local
+        if (response.atividadesAtualizadas) {
+            const atividades = response.atividadesAtualizadas.map(mapAtividadeVisualizacaoToModel);
+            atividadesPorSubprocesso.value.set(codSubprocesso, atividades);
+        }
+        
+        // Atualizar status do subprocesso
+        const subprocessosStore = useSubprocessosStore();
+        subprocessosStore.atualizarStatusLocal(response.subprocesso);
     }
 
     async function buscarAtividadesParaSubprocesso(codSubrocesso: number) {
@@ -37,22 +54,18 @@ export const useAtividadesStore = defineStore("atividades", () => {
     ) {
         return withErrorHandling(async () => {
             const response = await atividadeService.criarAtividade(request, codMapa);
-            await buscarAtividadesParaSubprocesso(codSubprocesso);
-            // Atualiza o detalhe do subprocesso para refletir mudanças de estado
-            const subprocessosStore = useSubprocessosStore();
-            await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso);
-            return response.subprocesso; // Retorna status do subprocesso
+            // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
+            atualizarDadosLocais(codSubprocesso, response);
+            return response.subprocesso;
         });
     }
 
     async function removerAtividade(codSubrocesso: number, atividadeId: number) {
         return withErrorHandling(async () => {
             const response = await atividadeService.excluirAtividade(atividadeId);
-            await buscarAtividadesParaSubprocesso(codSubrocesso);
-            // Atualiza o detalhe do subprocesso para refletir mudanças de estado
-            const subprocessosStore = useSubprocessosStore();
-            await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso);
-            return response.subprocesso; // Retorna status do subprocesso
+            // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
+            atualizarDadosLocais(codSubrocesso, response);
+            return response.subprocesso;
         });
     }
 
@@ -63,11 +76,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
     ) {
         return withErrorHandling(async () => {
             const response = await atividadeService.criarConhecimento(atividadeId, request);
-            await buscarAtividadesParaSubprocesso(codSubrocesso);
-            // Atualiza o detalhe do subprocesso para refletir mudanças de estado
-            const subprocessosStore = useSubprocessosStore();
-            await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso);
-            return response.subprocesso; // Retorna status do subprocesso
+            // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
+            atualizarDadosLocais(codSubrocesso, response);
+            return response.subprocesso;
         });
     }
 
@@ -78,11 +89,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
     ) {
         return withErrorHandling(async () => {
             const response = await atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
-            await buscarAtividadesParaSubprocesso(codSubrocesso);
-            // Atualiza o detalhe do subprocesso para refletir mudanças de estado
-            const subprocessosStore = useSubprocessosStore();
-            await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso);
-            return response.subprocesso; // Retorna status do subprocesso
+            // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
+            atualizarDadosLocais(codSubrocesso, response);
+            return response.subprocesso;
         });
     }
 
@@ -91,9 +100,10 @@ export const useAtividadesStore = defineStore("atividades", () => {
         codSubrocessoOrigem: number,
     ) {
         return withErrorHandling(async () => {
+            // Nota: importarAtividades não retorna AtividadeOperacaoResponse,
+            // então mantemos as chamadas de reload aqui
             await subprocessoService.importarAtividades(codSubrocessoDestino, codSubrocessoOrigem);
             await buscarAtividadesParaSubprocesso(codSubrocessoDestino);
-            // Atualiza o detalhe do subprocesso para refletir mudanças de estado
             const subprocessosStore = useSubprocessosStore();
             await subprocessosStore.buscarSubprocessoDetalhe(codSubrocessoDestino);
         });
@@ -106,11 +116,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
     ) {
         return withErrorHandling(async () => {
             const response = await atividadeService.atualizarAtividade(atividadeId, data);
-            await buscarAtividadesParaSubprocesso(codSubrocesso);
-            // Atualiza o detalhe do subprocesso para refletir mudanças de estado
-            const subprocessosStore = useSubprocessosStore();
-            await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso);
-            return response.subprocesso; // Retorna status do subprocesso
+            // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
+            atualizarDadosLocais(codSubrocesso, response);
+            return response.subprocesso;
         });
     }
 
@@ -122,11 +130,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
     ) {
         return withErrorHandling(async () => {
             const response = await atividadeService.atualizarConhecimento(atividadeId, conhecimentoId, data);
-            await buscarAtividadesParaSubprocesso(codSubrocesso);
-            // Atualiza o detalhe do subprocesso para refletir mudanças de estado
-            const subprocessosStore = useSubprocessosStore();
-            await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso);
-            return response.subprocesso; // Retorna status do subprocesso
+            // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
+            atualizarDadosLocais(codSubrocesso, response);
+            return response.subprocesso;
         });
     }
 

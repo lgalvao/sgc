@@ -1,9 +1,16 @@
 package sgc.mapa.service;
 
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.evento.EventoAtividadeAtualizada;
@@ -13,20 +20,16 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
+import static sgc.seguranca.acesso.Acao.ASSOCIAR_CONHECIMENTOS;
+import static sgc.seguranca.acesso.Acao.CRIAR_ATIVIDADE;
+import static sgc.seguranca.acesso.Acao.EDITAR_ATIVIDADE;
+import static sgc.seguranca.acesso.Acao.EXCLUIR_ATIVIDADE;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
-
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-import static sgc.seguranca.acesso.Acao.*;
 
 /**
  * Facade para orquestrar operações de atividades e conhecimentos,
@@ -269,10 +272,13 @@ public class AtividadeFacade {
 
     private AtividadeOperacaoResponse criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
         SubprocessoSituacaoDto situacaoDto = subprocessoFacade.obterSituacao(codSubprocesso);
+        
+        // Buscar todas as atividades do subprocesso
+        List<AtividadeVisualizacaoDto> todasAtividades = subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso);
+        
         AtividadeVisualizacaoDto atividadeVis = null;
         if (incluirAtividade) {
-            atividadeVis = subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso)
-                    .stream()
+            atividadeVis = todasAtividades.stream()
                     .filter(a -> a.getCodigo().equals(codigoAtividade))
                     .findFirst()
                     .orElse(null);
@@ -281,6 +287,7 @@ public class AtividadeFacade {
         return AtividadeOperacaoResponse.builder()
                 .atividade(atividadeVis)
                 .subprocesso(situacaoDto)
+                .atividadesAtualizadas(todasAtividades)
                 .build();
     }
 }

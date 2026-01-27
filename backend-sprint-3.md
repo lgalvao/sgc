@@ -21,6 +21,7 @@
 ## 🎯 Ação #6: Decompor UnidadeFacade em 3 Services
 
 ### Contexto
+
 `UnidadeFacade` é uma classe de **384 linhas** com **6 responsabilidades distintas**, violando o Single Responsibility Principle (SRP). Apesar de cada método ser coeso individualmente, o arquivo como um todo é difícil de navegar e manter.
 
 ### Problema Identificado
@@ -28,6 +29,7 @@
 **Arquivo:** `/backend/src/main/java/sgc/organizacao/facade/UnidadeFacade.java`
 
 **Responsabilidades Atuais (Misturadas):**
+
 1. 🌳 **Hierarquia de unidades** - Árvore, descendentes, ancestrais (cache incluído)
 2. 🗺️ **Mapa vigente** - Verificação e busca de unidades com mapa vigente
 3. 👤 **Gestão de responsáveis** - Chefe, chefe hierárquico, gestores
@@ -36,6 +38,7 @@
 6. 💾 **Cache** - Sistema de cache para hierarquia (já removido na Sprint 1)
 
 **Indicadores de Problema:**
+
 - ❌ Arquivo muito grande (384 linhas)
 - ❌ Múltiplas responsabilidades (SRP violation)
 - ❌ Difícil navegação e compreensão
@@ -58,6 +61,7 @@ sgc.organizacao/
 **Decomposição Detalhada:**
 
 #### UnidadeHierarquiaService (~150 linhas)
+
 ```java
 @Service
 class UnidadeHierarquiaService {
@@ -96,6 +100,7 @@ class UnidadeHierarquiaService {
 ```
 
 #### UnidadeMapaService (~100 linhas)
+
 ```java
 @Service
 class UnidadeMapaService {
@@ -127,6 +132,7 @@ class UnidadeMapaService {
 ```
 
 #### UnidadeResponsavelService (~100 linhas)
+
 ```java
 @Service
 class UnidadeResponsavelService {
@@ -171,6 +177,7 @@ class UnidadeResponsavelService {
 ```
 
 #### UnidadeFacade (~60 linhas - Orquestrador)
+
 ```java
 @Service
 public class UnidadeFacade {
@@ -202,16 +209,19 @@ public class UnidadeFacade {
 #### Fase 1: Análise e Planejamento
 
 1. **Ler o arquivo completo:**
+
    ```bash
    view /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/facade/UnidadeFacade.java
    ```
 
 2. **Identificar métodos por responsabilidade:**
+
    ```bash
    grep -n "public.*buscar\|public.*verificar\|public.*criar" /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/facade/UnidadeFacade.java
    ```
 
 3. **Mapear dependências:**
+
    ```bash
    grep -n "private final\|@Autowired" /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/facade/UnidadeFacade.java
    ```
@@ -219,43 +229,53 @@ public class UnidadeFacade {
 #### Fase 2: Criar Services Especializados
 
 1. **Criar pasta service (se não existir):**
+
    ```bash
    mkdir -p /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/service
    ```
 
 2. **Criar UnidadeHierarquiaService:**
+
    ```bash
    create /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java
    ```
+
    - Copiar métodos relacionados a hierarquia
    - Adicionar anotação `@Service`
    - Injetar dependências necessárias
 
 3. **Criar UnidadeMapaService:**
+
    ```bash
    create /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeMapaService.java
    ```
+
    - Copiar métodos relacionados a mapas
    - Adicionar anotação `@Service`
 
 4. **Criar UnidadeResponsavelService:**
+
    ```bash
    create /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeResponsavelService.java
    ```
+
    - Copiar métodos relacionados a responsáveis
    - Adicionar anotação `@Service`
 
 #### Fase 3: Refatorar UnidadeFacade
 
 1. **Simplificar UnidadeFacade:**
+
    ```bash
    edit /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/facade/UnidadeFacade.java
    ```
+
    - Remover implementações
    - Injetar os 3 novos services
    - Delegar chamadas para services especializados
 
 2. **Exemplo de refatoração:**
+
    ```diff
    - public List<UnidadeDto> buscarTodasEntidadesComHierarquia() {
    -     List<Unidade> unidades = unidadeRepo.findAll();
@@ -270,11 +290,13 @@ public class UnidadeFacade {
 #### Fase 4: Atualizar Testes
 
 1. **Verificar testes existentes:**
+
    ```bash
    find backend/src/test -name "*UnidadeFacade*" -type f
    ```
 
 2. **Criar testes para novos services:**
+
    ```bash
    create backend/src/test/java/sgc/organizacao/service/UnidadeHierarquiaServiceTest.java
    create backend/src/test/java/sgc/organizacao/service/UnidadeMapaServiceTest.java
@@ -282,6 +304,7 @@ public class UnidadeFacade {
    ```
 
 3. **Atualizar testes de UnidadeFacade:**
+
    ```bash
    edit backend/src/test/java/sgc/organizacao/facade/UnidadeFacadeTest.java
    # Simplificar testes - agora apenas mocks dos 3 services
@@ -290,17 +313,20 @@ public class UnidadeFacade {
 #### Fase 5: Validação
 
 1. **Executar testes:**
+
    ```bash
    cd /home/runner/work/sgc/sgc
    ./gradlew :backend:test --tests "*Unidade*"
    ```
 
 2. **Verificar compilação:**
+
    ```bash
    ./gradlew :backend:build
    ```
 
 3. **Executar testes E2E (se houver):**
+
    ```bash
    npm run test:e2e
    ```
@@ -328,6 +354,7 @@ public class UnidadeFacade {
 ## 🎯 Ação #8: Dividir SubprocessoWorkflowService (775 linhas)
 
 ### Contexto
+
 `SubprocessoWorkflowService` é o **maior arquivo** do backend com **775 linhas** e **17 dependências injetadas**. Foi criado com boa intenção (consolidar 4 serviços), mas resultou em um God Object difícil de navegar e manter.
 
 ### Problema Identificado
@@ -335,6 +362,7 @@ public class UnidadeFacade {
 **Arquivo:** `/backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowService.java`
 
 **Documentação Interna:**
+
 ```java
 /**
  * Serviço unificado responsável por todos os workflows de subprocesso.
@@ -350,6 +378,7 @@ public class UnidadeFacade {
 ```
 
 **Dependências (17 injetadas!):**
+
 ```java
 private final SubprocessoRepo subprocessoRepo;
 private final SubprocessoCrudService crudService;
@@ -365,6 +394,7 @@ private final MapaFacade mapaService;
 ```
 
 **Indicadores de Problema:**
+
 - ❌ 775 linhas (arquivo muito grande)
 - ❌ 17 dependências (God Object)
 - ❌ `@Lazy` para quebrar ciclos (code smell)
@@ -385,6 +415,7 @@ sgc.subprocesso.service.workflow/
 **Decomposição por Responsabilidade:**
 
 #### SubprocessoCadastroWorkflowService (~250 linhas)
+
 **Responsabilidade:** Workflow de cadastro de atividades
 
 ```java
@@ -420,6 +451,7 @@ class SubprocessoCadastroWorkflowService {
 ```
 
 #### SubprocessoMapaWorkflowService (~250 linhas)
+
 **Responsabilidade:** Workflow de mapa de competências
 
 ```java
@@ -456,6 +488,7 @@ class SubprocessoMapaWorkflowService {
 ```
 
 #### SubprocessoAdminWorkflowService (~200 linhas)
+
 **Responsabilidade:** Operações administrativas (transições, movimentações)
 
 ```java
@@ -495,6 +528,7 @@ class SubprocessoAdminWorkflowService {
 ```
 
 #### SubprocessoWorkflowFacade (~100 linhas - Orquestrador)
+
 ```java
 @Service
 public class SubprocessoWorkflowFacade {
@@ -526,11 +560,13 @@ public class SubprocessoWorkflowFacade {
 #### Fase 1: Análise
 
 1. **Ler arquivo completo:**
+
    ```bash
    view /home/runner/work/sgc/sgc/backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowService.java
    ```
 
 2. **Mapear métodos por workflow:**
+
    ```bash
    grep -n "public void\|public.*Dto" backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowService.java
    ```
@@ -542,27 +578,34 @@ public class SubprocessoWorkflowFacade {
 #### Fase 2: Criar Services Especializados
 
 1. **Criar SubprocessoCadastroWorkflowService:**
+
    ```bash
    create backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoCadastroWorkflowService.java
    ```
+
    - Copiar métodos relacionados a cadastro
    - Injetar apenas dependências necessárias
 
 2. **Criar SubprocessoMapaWorkflowService:**
+
    ```bash
    create backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoMapaWorkflowService.java
    ```
+
    - Copiar métodos relacionados a mapa
 
 3. **Criar SubprocessoAdminWorkflowService:**
+
    ```bash
    create backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoAdminWorkflowService.java
    ```
+
    - Copiar métodos administrativos
 
 #### Fase 3: Refatorar para Facade
 
 1. **Renomear arquivo original:**
+
    ```bash
    # Backup do original
    mv backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowService.java \
@@ -570,6 +613,7 @@ public class SubprocessoWorkflowFacade {
    ```
 
 2. **Simplificar Facade:**
+
    ```bash
    edit backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoWorkflowFacade.java
    # Remover implementações, apenas delegação
@@ -578,11 +622,13 @@ public class SubprocessoWorkflowFacade {
 #### Fase 4: Atualizar Referências
 
 1. **Buscar usos de SubprocessoWorkflowService:**
+
    ```bash
    grep -r "SubprocessoWorkflowService" backend/src/main/java/sgc/ --include="*.java"
    ```
 
 2. **Atualizar imports e referências:**
+
    ```bash
    # Substituir SubprocessoWorkflowService por SubprocessoWorkflowFacade
    ```
@@ -590,11 +636,13 @@ public class SubprocessoWorkflowFacade {
 #### Fase 5: Validação
 
 1. **Compilar:**
+
    ```bash
    ./gradlew :backend:build
    ```
 
 2. **Executar testes:**
+
    ```bash
    ./gradlew :backend:test --tests "*Subprocesso*"
    ```
@@ -614,16 +662,19 @@ public class SubprocessoWorkflowFacade {
 ## 🎯 Ação #10: Consolidar AtividadeService + CompetenciaService
 
 ### Contexto
+
 `AtividadeService` e `CompetenciaService` são services separados, mas operam sobre o mesmo contexto de domínio (Mapa de Competências). Frequentemente, operações em atividades requerem operações em competências e vice-versa. Consolidar em um único service **MapaManutencaoService** reduz acoplamento e melhora coesão.
 
 ### Problema Identificado
 
 **Arquivos Atuais:**
+
 - `/backend/src/main/java/sgc/mapa/service/AtividadeService.java` (~200 linhas)
 - `/backend/src/main/java/sgc/mapa/service/CompetenciaService.java` (~150 linhas)
 - Ambos chamam um ao outro (acoplamento circular)
 
 **Acoplamento Circular:**
+
 ```java
 // AtividadeService.java
 private final CompetenciaService competenciaService;  // ❌ Depende de Competencia
@@ -701,29 +752,34 @@ public class MapaManutencaoService {
 ### Passos para Execução por IA
 
 1. **Criar MapaManutencaoService:**
+
    ```bash
    create backend/src/main/java/sgc/mapa/service/MapaManutencaoService.java
    ```
 
 2. **Migrar métodos de AtividadeService:**
+
    ```bash
    view backend/src/main/java/sgc/mapa/service/AtividadeService.java
    # Copiar métodos para MapaManutencaoService
    ```
 
 3. **Migrar métodos de CompetenciaService:**
+
    ```bash
    view backend/src/main/java/sgc/mapa/service/CompetenciaService.java
    # Copiar métodos para MapaManutencaoService
    ```
 
 4. **Eliminar chamadas cruzadas:**
+
    ```bash
    # Refatorar métodos que antes chamavam o outro service
    # Agora estão no mesmo service!
    ```
 
 5. **Atualizar Facades:**
+
    ```bash
    edit backend/src/main/java/sgc/mapa/facade/AtividadeFacade.java
    # Injetar MapaManutencaoService em vez de AtividadeService
@@ -733,12 +789,14 @@ public class MapaManutencaoService {
    ```
 
 6. **Deletar services antigos:**
+
    ```bash
    rm backend/src/main/java/sgc/mapa/service/AtividadeService.java
    rm backend/src/main/java/sgc/mapa/service/CompetenciaService.java
    ```
 
 7. **Executar testes:**
+
    ```bash
    ./gradlew :backend:test --tests "*Atividade*"
    ./gradlew :backend:test --tests "*Competencia*"
@@ -760,11 +818,13 @@ public class MapaManutencaoService {
 Após implementar todas as 3 ações, validar:
 
 ### Testes Automatizados
+
 - [ ] ✅ Testes unitários backend passam: `./gradlew :backend:test`
 - [ ] ✅ Compilação sem erros: `./gradlew :backend:build`
 - [ ] ✅ Testes E2E passam: `npm run test:e2e` (crítico)
 
 ### Validação Manual
+
 - [ ] ✅ Aplicação inicia sem erros
 - [ ] ✅ Funcionalidades de unidade funcionam
 - [ ] ✅ Workflows de subprocesso funcionam
@@ -772,6 +832,7 @@ Após implementar todas as 3 ações, validar:
 - [ ] ✅ Nenhuma regressão de funcionalidade
 
 ### Qualidade de Código
+
 - [ ] ✅ Nenhum arquivo > 500 linhas
 - [ ] ✅ SRP respeitado em todos os services
 - [ ] ✅ Nenhuma dependência circular (`@Lazy` removido)
@@ -779,6 +840,7 @@ Após implementar todas as 3 ações, validar:
 - [ ] ✅ JavaDoc completo em services públicos
 
 ### Métricas
+
 - [ ] ✅ Redução de classes > 500 linhas: 2 → 0
 - [ ] ✅ Aumento de arquivos menores e coesos
 - [ ] ✅ Redução de dependências por classe
@@ -788,18 +850,21 @@ Após implementar todas as 3 ações, validar:
 ## 📈 Métricas de Sucesso
 
 **Antes da Sprint 3:**
+
 - Arquivos > 500 linhas: 2 (SubprocessoWorkflowService 775L, UnidadeFacade 384L)
 - God Objects: 2
 - Dependências circulares: 1 (Atividade ↔ Competência)
 - Uso de @Lazy: 2 ocorrências
 
 **Após a Sprint 3:**
+
 - ✅ Arquivos > 500 linhas: 0
 - ✅ God Objects: 0
 - ✅ Dependências circulares: 0
 - ✅ Uso de @Lazy: 0 ocorrências
 
 **Estimativa de Impacto:**
+
 - 🟢 **Manutenibilidade:** Melhoria significativa (arquivos menores)
 - 🟢 **Testabilidade:** Melhoria (services isolados, menos mocks)
 - 🟢 **Legibilidade:** Melhoria (estrutura clara, SRP)
@@ -810,6 +875,7 @@ Após implementar todas as 3 ações, validar:
 ## 🚀 Próximos Passos
 
 Após conclusão da Sprint 3, considerar:
+
 - **Sprint 4:** [otimizacoes-sprint-4.md](./otimizacoes-sprint-4.md) - Otimizações Opcionais
 - **Documentação:** Atualizar ADRs com decisões arquiteturais
 - **Code Review:** Revisar estrutura com equipe

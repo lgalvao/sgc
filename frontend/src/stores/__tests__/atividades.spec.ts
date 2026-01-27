@@ -51,11 +51,9 @@ describe("useAtividadesStore", () => {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
                     situacaoLabel: "CADASTRO_EM_ANDAMENTO"
-                }
+                },
+                atividadesAtualizadas: [novaAtividade]
             });
-            vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([
-                novaAtividade
-            ] as any);
 
             await context.store.adicionarAtividade(1, 999, {descricao: "Nova Atividade"});
 
@@ -85,11 +83,9 @@ describe("useAtividadesStore", () => {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
                     situacaoLabel: "CADASTRO_EM_ANDAMENTO"
-                }
+                },
+                atividadesAtualizadas: []
             });
-            vi.mocked(subprocessoService.listarAtividades).mockResolvedValue(
-                [] as any
-            );
 
             await context.store.removerAtividade(1, 1);
 
@@ -111,19 +107,20 @@ describe("useAtividadesStore", () => {
                 {codigo: 1, descricao: "Atividade Teste", conhecimentos: []},
             ]);
             const novoConhecimento = {codigo: 1, descricao: "Novo Conhecimento"};
+            const atividadeComConhecimento = {
+                codigo: 1, 
+                descricao: "Atividade Teste", 
+                conhecimentos: [novoConhecimento]
+            };
             vi.mocked(atividadeService.criarConhecimento).mockResolvedValue({
-                atividade: {codigo: 1, descricao: "Atividade Teste", conhecimentos: [novoConhecimento]},
+                atividade: atividadeComConhecimento,
                 subprocesso: {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
                     situacaoLabel: "CADASTRO_EM_ANDAMENTO"
-                }
+                },
+                atividadesAtualizadas: [atividadeComConhecimento]
             });
-            vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([{
-                codigo: 1,
-                descricao: "Atividade Teste",
-                conhecimentos: [novoConhecimento]
-            }] as any);
 
             await context.store.adicionarConhecimento(1, 1, {
                 descricao: "Novo Conhecimento",
@@ -156,19 +153,20 @@ describe("useAtividadesStore", () => {
                     conhecimentos: [{codigo: 1, descricao: "Conhecimento Teste"}],
                 },
             ]);
+            const atividadeSemConhecimento = {
+                codigo: 1, 
+                descricao: "Atividade Teste", 
+                conhecimentos: []
+            };
             vi.mocked(atividadeService.excluirConhecimento).mockResolvedValue({
-                atividade: {codigo: 1, descricao: "Atividade Teste", conhecimentos: []},
+                atividade: atividadeSemConhecimento,
                 subprocesso: {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
                     situacaoLabel: "CADASTRO_EM_ANDAMENTO"
-                }
+                },
+                atividadesAtualizadas: [atividadeSemConhecimento]
             });
-            vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([{
-                codigo: 1,
-                descricao: "Atividade Teste",
-                conhecimentos: []
-            }] as any);
 
             await context.store.removerConhecimento(1, 1, 1);
 
@@ -224,11 +222,9 @@ describe("useAtividadesStore", () => {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
                     situacaoLabel: "CADASTRO_EM_ANDAMENTO"
-                }
+                },
+                atividadesAtualizadas: [atividadeAtualizada]
             });
-            vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([
-                atividadeAtualizada
-            ] as any);
 
             await context.store.atualizarAtividade(1, 1, atividadeAtualizada);
 
@@ -280,11 +276,9 @@ describe("useAtividadesStore", () => {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
                     situacaoLabel: "CADASTRO_EM_ANDAMENTO"
-                }
+                },
+                atividadesAtualizadas: [atividadeComConhecimentoAtualizado]
             });
-            vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([
-                atividadeComConhecimentoAtualizado
-            ] as any);
 
             await context.store.atualizarConhecimento(1, 1, 1, conhecimentoAtualizado);
 

@@ -28,6 +28,7 @@ import type {
     AceitarCadastroRequest,
     DevolverCadastroRequest,
     HomologarCadastroRequest,
+    SituacaoSubprocesso,
     SubprocessoDetalhe,
 } from "@/types/tipos";
 import { useErrorHandler } from "@/composables/useErrorHandler";
@@ -49,14 +50,6 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
             }
             return true;
         }).catch(() => {
-            // Propagating error is important if the component relies on it,
-            // but the original code was catching it and returning false.
-            // The plan says: "Deixar componente/view decidir UX"
-            // However, _executarAcao is a helper. Let's populate lastError and return false,
-            // but we might want to throw if components need to handle it.
-            // The original code was returning false, so let's stick to that for now
-            // but ensure lastError is set so components CAN display it if they want.
-            // AND we remove the feedbackStore.show call for errors.
             return false;
         });
     }
@@ -152,6 +145,17 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         });
     }
 
+    /**
+     * Atualiza o status do subprocesso localmente, sem fazer chamada HTTP.
+     * Usado após operações CRUD que retornam o status atualizado.
+     */
+    function atualizarStatusLocal(status: { codigo: number; situacao: SituacaoSubprocesso; situacaoLabel: string }) {
+        if (subprocessoDetalhe.value) {
+            subprocessoDetalhe.value.situacao = status.situacao;
+            subprocessoDetalhe.value.situacaoLabel = status.situacaoLabel;
+        }
+    }
+
     return {
         subprocessoDetalhe,
         lastError,
@@ -160,6 +164,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         buscarSubprocessoDetalhe,
         buscarContextoEdicao,
         buscarSubprocessoPorProcessoEUnidade,
+        atualizarStatusLocal,
         disponibilizarCadastro: (codSubrocesso: number) =>
             _executarAcao(
                 () => disponibilizarCadastro(codSubrocesso),

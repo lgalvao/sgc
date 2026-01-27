@@ -422,11 +422,12 @@ export interface SubprocessoStatus {
 
 /**
  * Resposta enriquecida das operações CRUD em atividades/conhecimentos.
- * Inclui a atividade afetada e o status atualizado do subprocesso.
+ * Inclui a atividade afetada, o status atualizado do subprocesso e a lista completa de atividades.
  */
 export interface AtividadeOperacaoResponse {
     atividade: Atividade | null;
     subprocesso: SubprocessoStatus;
+    atividadesAtualizadas: Atividade[];
 }
 
 /**

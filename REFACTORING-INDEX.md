@@ -34,11 +34,13 @@ Este índice consolida toda a documentação relacionada ao plano de refatoraç�
 ## 🎯 Resumo por Sprint
 
 ### Sprint 1 - Quick Wins (Backend)
+
 **Objetivo:** Remover complexidade desnecessária, ganhos rápidos  
 **Duração:** 1-2 dias  
 **Prioridade:** 🔴 Alta
 
 **Ações:**
+
 1. ✅ Alterar `FetchType.EAGER` → `LAZY` em UsuarioPerfil
 2. ✅ Remover override de `findAll()` em AtividadeRepo
 3. ✅ Remover cache de unidades (CacheConfig)
@@ -46,6 +48,7 @@ Este índice consolida toda a documentação relacionada ao plano de refatoraç�
 5. ✅ Extrair `flattenTree` para utilitário compartilhado
 
 **Resultado Esperado:**
+
 - Código mais limpo
 - ~35-40 linhas removidas
 - Performance 10-20% melhor
@@ -54,16 +57,19 @@ Este índice consolida toda a documentação relacionada ao plano de refatoraç�
 ---
 
 ### Sprint 2 - Consolidação Frontend
+
 **Objetivo:** Frontend mais consistente, menos requisições HTTP  
 **Duração:** 3-5 dias  
 **Prioridade:** 🔴 Alta
 
 **Ações:**
+
 1. ✅ Criar composable `useErrorHandler` para stores
 2. ✅ Consolidar queries duplicadas (AtividadeRepo, CompetenciaRepo)
 3. ✅ Backend retornar dados completos (eliminar cascata de reloads)
 
 **Resultado Esperado:**
+
 - ~550 linhas de código eliminadas
 - 25-40% menos requisições HTTP
 - 40-60% latência reduzida
@@ -72,16 +78,19 @@ Este índice consolida toda a documentação relacionada ao plano de refatoraç�
 ---
 
 ### Sprint 3 - Refatoração Backend
+
 **Objetivo:** Arquitetura mais clara, SRP respeitado  
 **Duração:** 5-10 dias  
 **Prioridade:** 🟡 Média
 
 **Ações:**
+
 1. ✅ Decompor `UnidadeFacade` em 3 services
 2. ✅ Dividir `SubprocessoWorkflowService` (775 linhas)
 3. ✅ Consolidar AtividadeService + CompetenciaService
 
 **Resultado Esperado:**
+
 - Arquivos > 500 linhas: 2 → 0
 - SRP respeitado
 - Melhor testabilidade
@@ -90,16 +99,19 @@ Este índice consolida toda a documentação relacionada ao plano de refatoraç�
 ---
 
 ### Sprint 4 - Otimizações Opcionais
+
 **Objetivo:** Refinamentos apenas se necessário  
 **Duração:** Conforme necessidade  
 **Prioridade:** 🟢 Baixa (Opcional)
 
 **Ações:**
+
 1. ⚠️ Implementar cache HTTP parcial (SE UX exigir)
 2. ⚠️ Adicionar @EntityGraph (SE surgir N+1)
 3. ⚠️ Decompor stores grandes (SE manutenção dificultar)
 
 **Resultado Esperado:**
+
 - Implementar APENAS com necessidade demonstrada
 - Princípio YAGNI aplicado
 - Medir antes e depois
@@ -111,6 +123,7 @@ Este índice consolida toda a documentação relacionada ao plano de refatoraç�
 ### Baseline (Antes das Refatorações)
 
 **Backend:**
+
 - Classes > 500 linhas: 2 arquivos
 - FetchType.EAGER: 2 ocorrências
 - Código duplicado: ~800-1000 linhas
@@ -118,6 +131,7 @@ Este índice consolida toda a documentação relacionada ao plano de refatoraç�
 - Configuração de cache: 1 arquivo
 
 **Frontend:**
+
 - Stores > 300 linhas: 1 arquivo
 - Código duplicado (error handling): ~500 linhas
 - Requisições em cascata: ~3 por ação
@@ -126,6 +140,7 @@ Este índice consolida toda a documentação relacionada ao plano de refatoraç�
 ### Metas (Após Todas as Sprints)
 
 **Backend:**
+
 - ✅ Classes > 500 linhas: 0 arquivos
 - ✅ FetchType.EAGER: 0 ocorrências
 - ✅ Redução de código: 800-1000 linhas
@@ -133,12 +148,14 @@ Este índice consolida toda a documentação relacionada ao plano de refatoraç�
 - ✅ Configuração de cache: 0 arquivos
 
 **Frontend:**
+
 - ✅ Redução de requisições HTTP: 25-40%
 - ✅ Código duplicado: ~500 linhas economizadas
 - ✅ Cascata de reloads: Eliminada
 - ✅ Error handling: Centralizado
 
 **Performance:**
+
 - ✅ Tempo de resposta: Melhoria de 20-35%
 - ✅ Uso de memória: Redução de 10-15%
 
@@ -164,6 +181,7 @@ graph TD
 ```
 
 **Ordem de Execução:**
+
 1. **Sprint 1** (obrigatória) - Fundação limpa
 2. **Sprint 2** (obrigatória) - Frontend otimizado
 3. **Sprint 3** (recomendada) - Backend estruturado
@@ -174,6 +192,7 @@ graph TD
 ## ✅ Checklist Geral de Validação
 
 ### Por Sprint
+
 - [ ] Todas as ações da sprint implementadas
 - [ ] Testes unitários passam (100%)
 - [ ] Testes E2E passam (100%)
@@ -184,6 +203,7 @@ graph TD
 - [ ] Code review aprovado
 
 ### Geral (Após Todas as Sprints)
+
 - [ ] Todas as métricas de baseline atingidas
 - [ ] Redução de código confirmada
 - [ ] Performance melhorada (medida)
@@ -237,6 +257,7 @@ Todos os documentos de sprint seguem a mesma estrutura:
 ### Comandos Importantes
 
 **Backend:**
+
 ```bash
 # Executar testes
 ./gradlew :backend:test
@@ -249,6 +270,7 @@ Todos os documentos de sprint seguem a mesma estrutura:
 ```
 
 **Frontend:**
+
 ```bash
 # TypeCheck
 npm run typecheck
@@ -268,18 +290,23 @@ npm run test:e2e
 ## 🎯 Princípios e Filosofia
 
 ### YAGNI (You Aren't Gonna Need It)
+
 Não otimizar até que problema seja demonstrado com dados reais.
 
 ### KISS (Keep It Simple, Stupid)
+
 Código simples > código "inteligente".
 
 ### DRY (Don't Repeat Yourself)
+
 Duplicação é pior que abstração moderada.
 
 ### SRP (Single Responsibility Principle)
+
 Classes/Serviços com responsabilidade única.
 
 ### Measure, Don't Assume
+
 Medir performance antes e depois. Não otimizar por "achismo".
 
 ---
@@ -287,6 +314,7 @@ Medir performance antes e depois. Não otimizar por "achismo".
 ## 📞 Suporte e Dúvidas
 
 Para dúvidas sobre:
+
 - **Arquitetura:** Consultar `backend/etc/docs/ARCHITECTURE.md`
 - **ADRs:** Consultar `backend/etc/docs/adr/`
 - **Padrões:** Consultar `AGENTS.md` e `GEMINI.md`

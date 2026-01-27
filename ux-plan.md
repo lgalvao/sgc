@@ -10,6 +10,7 @@ This plan outlines comprehensive steps to standardize the application's User Exp
 ## 📊 Executive Summary
 
 **Current State:**
+
 - 19 inline `BModal` instances creating 200+ lines of duplicated code (Reduced from 23)
 - Inconsistent page header patterns across 18 views
 - Mixed error handling approaches (3 different patterns)
@@ -17,6 +18,7 @@ This plan outlines comprehensive steps to standardize the application's User Exp
 - No standardized layout wrapper components
 
 **Target State:**
+
 - Single source of truth for modal confirmations (In Progress)
 - Consistent PageHeader component across all views
 - Standardized error display patterns
@@ -33,6 +35,7 @@ This plan outlines comprehensive steps to standardize the application's User Exp
 ### Sprint 1: Foundations & Layout Components ✅ COMPLETE
 
 **Completed:**
+
 - [x] Update `style.css` with Design Tokens
 - [x] Create `PageHeader` Component
 
@@ -45,6 +48,7 @@ This plan outlines comprehensive steps to standardize the application's User Exp
 #### Phase 2.1: Enhance ModalConfirmacao ✅
 
 **Tasks:**
+
 1. **Add `loading` prop to ModalConfirmacao** ✅
    - Automatically disable buttons during async operations
    - Show spinner on Confirm button when loading
@@ -90,6 +94,7 @@ This plan outlines comprehensive steps to standardize the application's User Exp
 **Task:** Ensure all custom modals follow footer pattern.
 
 **Files Updated:**
+
 - AceitarMapaModal.vue ✅
 - SubprocessoModal.vue ✅
 - ImportarAtividadesModal.vue ✅
@@ -107,6 +112,7 @@ This plan outlines comprehensive steps to standardize the application's User Exp
 **Component:** `frontend/src/components/ui/LoadingButton.vue`
 
 **Files Updated:**
+
 1. CadProcesso.vue (3 loading buttons) ✅
 2. VisMapa.vue (via ModalConfirmacao loading prop) ✅
 3. CadMapa.vue (via ModalConfirmacao loading prop) ✅
@@ -117,11 +123,13 @@ This plan outlines comprehensive steps to standardize the application's User Exp
 #### Option B: Enhance BButton Usage (Alternative)
 
 If LoadingButton is deemed over-engineering:
+
 - Create composable `useLoadingButton`
 - Standardize template pattern across all files
 - Less code reduction, but simpler approach
 
-#### Expected Outcome:
+#### Expected Outcome
+
 - Consistent loading button behavior
 - Reduced template code
 - Easier to maintain loading states
@@ -139,6 +147,7 @@ If LoadingButton is deemed over-engineering:
 **Migration Order (by view complexity):**
 
 **Tier 1 - Simple Views (No complex header logic):**
+
 1. PainelView.vue ✅
 2. HistoricoView.vue ✅
 3. RelatoriosView.vue ✅
@@ -157,6 +166,7 @@ If LoadingButton is deemed over-engineering:
 **Template Pattern:**
 
 **Before:**
+
 ```vue
 <BContainer class="mt-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
@@ -170,6 +180,7 @@ If LoadingButton is deemed over-engineering:
 ```
 
 **After:**
+
 ```vue
 <BContainer class="mt-4">
   <PageHeader title="Título">
@@ -182,6 +193,7 @@ If LoadingButton is deemed over-engineering:
 ```
 
 **Impact per view:**
+
 - **Lines removed:** 5-8 lines
 - **Total:** 18 views × 6 lines average = **~108 lines removed**
 
@@ -190,6 +202,7 @@ If LoadingButton is deemed over-engineering:
 **Target Views with Heavy Form Logic:**
 
 **CadProcesso.vue:**
+
 - Current: 250 lines script section
 - Extract to: `composables/useProcessoForm.ts` ✅
 - Logic to extract:
@@ -201,14 +214,17 @@ If LoadingButton is deemed over-engineering:
 - **Benefit:** Reusable logic, testable in isolation
 
 **CadAtividades.vue:**
+
 - Extract to: `composables/useAtividadeForm.ts` ✅
 - **Reduction:** ~60 lines
 
 **DisponibilizarMapaModal.vue:**
+
 - Extract to: `composables/useDisponibilizacaoForm.ts`
 - **Reduction:** ~40 lines
 
 **Composable Pattern:**
+
 ```ts
 // composables/useProcessoForm.ts
 export function useProcessoForm(initialData?: Processo) {
@@ -261,7 +277,8 @@ export function useProcessoForm(initialData?: Processo) {
 }
 ```
 
-#### Expected Outcome:
+#### Expected Outcome
+
 - All views use PageHeader (consistent structure)
 - Heavy form logic extracted to composables
 - Views are more declarative, less imperative
@@ -276,7 +293,7 @@ export function useProcessoForm(initialData?: Processo) {
 
 **Priority:** HIGH | **Effort:** Medium | **Impact:** Very High
 
-#### Tasks:
+#### Tasks
 
 1. **Add ARIA labels to icon-only buttons** ✅
    - **Files:** Checked TabelaProcessos, TabelaAlertas, ProcessoView. No missing labels found.
@@ -307,7 +324,8 @@ export function useProcessoForm(initialData?: Processo) {
    - Ensure all interactions are accessible
    - Document any remaining issues
 
-#### Expected Outcome:
+#### Expected Outcome
+
 - WCAG 2.1 Level AA compliance
 - All interactive elements keyboard-accessible
 - Proper ARIA labels and semantic HTML
@@ -321,9 +339,10 @@ export function useProcessoForm(initialData?: Processo) {
 
 **Priority:** MEDIUM | **Effort:** Medium | **Impact:** Medium
 
-#### Unit Tests (Vitest):
+#### Unit Tests (Vitest)
 
 **New Components to Test:**
+
 - PageHeader.vue ✅
   - Props rendering
   - Slots rendering
@@ -334,20 +353,24 @@ export function useProcessoForm(initialData?: Processo) {
   - Event emission
 
 **Enhanced Tests:**
+
 - ModalConfirmacao.vue ✅
   - New `loading` prop
   - New `okTitle`/`cancelTitle` props
   - Focus management
 
 **Snapshot Tests:**
+
 - PageHeader with different props ✅
 - ModalConfirmacao with different variants ✅
 - LoadingButton states ✅
 
-#### E2E Tests (Playwright):
+#### E2E Tests (Playwright)
 
 **Consistency Checks:**
+
 1. **Page Header Test:** ✅
+
    ```ts
    test('all views have consistent page headers', async ({ page }) => {
      const views = ['/painel', '/processos/novo', '/mapa/123']
@@ -360,11 +383,13 @@ export function useProcessoForm(initialData?: Processo) {
    ```
 
 2. **Modal Consistency Test:** (Covered by Unit Tests)
+
    ```ts
    // Modal structure consistency is primarily verified via ModalConfirmacao unit tests
    ```
 
 3. **Accessibility Test:** ✅
+
    ```ts
    test('interactive elements are keyboard accessible', async ({ page }) => {
      await page.goto('/painel')
@@ -373,15 +398,17 @@ export function useProcessoForm(initialData?: Processo) {
    })
    ```
 
-#### Documentation Updates:
+#### Documentation Updates
 
 **Files to Update:**
+
 - README.md (usage examples for new components)
 - AGENTS.md (frontend patterns section)
 - design-guidelines.md (add new components) ✅
 - Component JSDoc comments
 
-#### Expected Outcome:
+#### Expected Outcome
+
 - Comprehensive test coverage for new components ✅
 - E2E tests prevent regression ✅
 - Updated documentation for maintainability ✅
@@ -395,6 +422,7 @@ export function useProcessoForm(initialData?: Processo) {
 ### Code Quality Metrics
 
 **Before Refactoring:**
+
 | Metric | Value |
 |--------|-------|
 | Inline BModal instances | 23 |
@@ -406,6 +434,7 @@ export function useProcessoForm(initialData?: Processo) {
 | Total template lines | ~6,200 |
 
 **After Refactoring (Target):**
+
 | Metric | Target | Improvement |
 |--------|--------|-------------|
 | Inline BModal instances | 0 | -23 (100%) |
@@ -419,17 +448,20 @@ export function useProcessoForm(initialData?: Processo) {
 ### User Experience Metrics
 
 **Consistency:**
+
 - Modal dialog UX: 100% consistent
 - Page header structure: 100% consistent
 - Loading feedback: 100% consistent
 - Error messaging: 100% consistent
 
 **Accessibility:**
+
 - WCAG 2.1 Level AA compliance: 100%
 - Keyboard navigation: 100% functional
 - Screen reader compatibility: Excellent
 
 **Performance:**
+
 - Modal fade disabled: Faster perception
 - Reduced template complexity: Easier Vue compilation
 - Better code splitting: Smaller bundle sizes
@@ -441,6 +473,7 @@ export function useProcessoForm(initialData?: Processo) {
 ### Manual Verification Checklist
 
 **Modals:**
+
 - [x] Open a "Delete" modal → Check: Red theme, Cancel focused
 - [x] Open a "Save" modal → Check: Blue theme, proper focus
 - [x] Test ESC key → Modal closes
@@ -448,22 +481,26 @@ export function useProcessoForm(initialData?: Processo) {
 - [x] Test keyboard navigation → Tab order correct
 
 **Page Headers:**
+
 - [x] Navigate to PainelView → Check alignment and spacing
 - [x] Navigate to CadProcesso → Check: Same alignment and spacing
 - [x] Resize window → Check: Responsive behavior
 - [x] Compare all 18 views → Check: Visual consistency
 
 **Loading States:**
+
 - [x] Click Save button → Check: Spinner shows, button disables
 - [x] Wait for completion → Check: Spinner hides, button enables
 - [x] Click during loading → Check: No action (disabled)
 
 **Forms:**
+
 - [x] Submit invalid form → Check: Errors display correctly
 - [x] Fix errors → Check: Error messages clear
 - [x] Submit valid form → Check: Success feedback
 
 **Accessibility:**
+
 - [x] Navigate with keyboard only → All features accessible
 - [x] Test with screen reader → Proper announcements
 - [x] Check color contrast → WCAG AA compliance
@@ -475,6 +512,7 @@ export function useProcessoForm(initialData?: Processo) {
 ### Views (18 files)
 
 **PainelView.vue** [PRIORITY: HIGH]
+
 - [x] Replace header with PageHeader component
 - [x] No inline modals (✓ already clean)
 - [x] Check button spacing (✓ uses gap-2)
@@ -482,6 +520,7 @@ export function useProcessoForm(initialData?: Processo) {
 - **Effort:** Low | **Impact:** High (most visible page)
 
 **CadProcesso.vue** [PRIORITY: CRITICAL]
+
 - [x] Replace 2 inline modals with ModalConfirmacao
 - [x] Replace header with PageHeader
 - [x] Extract form logic to useProcessoForm composable
@@ -491,6 +530,7 @@ export function useProcessoForm(initialData?: Processo) {
 - **Effort:** High | **Impact:** Very High
 
 **VisMapa.vue** [PRIORITY: CRITICAL]
+
 - [x] Replace 3 inline confirmation modals with ModalConfirmacao
 - [x] Keep 2 custom modals (complex logic), but standardize footer
 - [x] Replace header with PageHeader
@@ -499,6 +539,7 @@ export function useProcessoForm(initialData?: Processo) {
 - **Effort:** Very High | **Impact:** Very High
 
 **CadMapa.vue** [PRIORITY: HIGH]
+
 - [x] Replace header with PageHeader
 - [x] Add loading buttons (2 buttons)
 - [x] Verify form validation consistency
@@ -506,6 +547,7 @@ export function useProcessoForm(initialData?: Processo) {
 - **Effort:** Medium | **Impact:** High
 
 **CadAtividades.vue** [PRIORITY: HIGH]
+
 - [x] Replace header with PageHeader (fix h1 → h2)
 - [x] Extract form logic to useAtividadeForm
 - [x] Standardize error display (fix mixed patterns)
@@ -513,12 +555,14 @@ export function useProcessoForm(initialData?: Processo) {
 - **Effort:** High | **Impact:** High
 
 **VisAtividades.vue** [PRIORITY: MEDIUM]
+
 - [x] Replace header with PageHeader (fix h2 sizing)
 - [x] Replace 2 inline modals
 - [x] Check accessibility
 - **Effort:** Medium | **Impact:** Medium
 
 **ConfiguracoesView.vue** [PRIORITY: HIGH]
+
 - [x] Replace 2 inline modals with ModalConfirmacao
 - [x] Standardize card-based header (may need custom approach)
 - [x] Add loading buttons
@@ -526,58 +570,69 @@ export function useProcessoForm(initialData?: Processo) {
 - **Effort:** Medium | **Impact:** Medium
 
 **ProcessoView.vue** [PRIORITY: HIGH]
+
 - [x] Replace header with PageHeader
 - [x] Verify ModalConfirmacao usage (✓ already uses it)
 - [x] Check button spacing
 - **Effort:** Low | **Impact:** High
 
 **SubprocessoView.vue** [PRIORITY: MEDIUM]
+
 - [x] Replace header with PageHeader (fix h3 → h2)
 - [x] Check modal usage (Replaced inline modal with ModalConfirmacao)
 - [x] Verify accessibility
 - **Effort:** Low | **Impact:** Medium
 
 **RelatoriosView.vue** [PRIORITY: MEDIUM]
+
 - [x] Adapt PageHeader to card-based layout
 - [x] Replace 3 inline modals (Extracted to components)
 - [x] Standardize button states
 - **Effort:** Medium | **Impact:** Low
 
 **UnidadeView.vue** [PRIORITY: LOW]
+
 - [x] Replace header with PageHeader
 - [x] Replace inline modal
 - **Effort:** Low | **Impact:** Low
 
 **HistoricoView.vue** [PRIORITY: LOW]
+
 - [x] Replace header with PageHeader
 - [x] Verify consistency (Added EmptyState)
 - **Effort:** Very Low | **Impact:** Low
 
 **CadAtribuicao.vue** [PRIORITY: MEDIUM]
+
 - [x] Replace header with PageHeader
 - [x] Fix mixed error display patterns (Adopted LoadingButton and useToast)
 - [x] Standardize with ModalConfirmacao (Reviewed: N/A)
 - **Effort:** Medium | **Impact:** Medium
 
 **LoginView.vue** [PRIORITY: LOW]
+
 - [x] No header needed (login page)
 - [x] Verify form validation display (Adopted LoadingButton)
 - **Effort:** Very Low | **Impact:** Low
 
 **AutoavaliacaoDiagnostico.vue** [PRIORITY: LOW]
+
 - [x] Replace header with PageHeader
 - [x] Check form patterns
 - **Effort:** Low | **Impact:** Low
 
 **MonitoramentoDiagnostico.vue** [PRIORITY: LOW]
+
 - [x] Replace header with PageHeader
 - **Effort:** Low | **Impact:** Low
 
 **OcupacoesCriticasDiagnostico.vue** [PRIORITY: LOW]
+
 - [x] Replace header with PageHeader
 - **Effort:** Low | **Impact:** Low
 
 **ConclusaoDiagnostico.vue** [PRIORITY: LOW]
+
 - [x] Replace header with PageHeader
 - [x] Check form validation
 - **Effort:** Low | **Impact:** Low
