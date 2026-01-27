@@ -124,6 +124,23 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     expect(diagnosticoService.salvarAvaliacao).toHaveBeenCalledWith(10, 2, 'N4', 'N2', '');
   });
 
+  it('salva avaliação ao sair do campo de observação (blur)', async () => {
+    await ctx.wrapper!.vm.$nextTick();
+    await new Promise(resolve => setTimeout(resolve, 10));
+    await ctx.wrapper!.vm.$nextTick();
+
+    const textarea = ctx.wrapper!.find('[data-testid="txt-obs-1"]');
+
+    // Set value triggers input -> v-model update
+    await textarea.setValue('Nova observação');
+
+    // Trigger blur
+    await textarea.trigger('blur');
+
+    // Expect salvarAvaliacao to be called with existing importance/domain (N5, N3) and new observation
+    expect(diagnosticoService.salvarAvaliacao).toHaveBeenCalledWith(10, 1, 'N5', 'N3', 'Nova observação');
+  });
+
   it('habilita botão de concluir apenas quando todas as competências estão avaliadas', async () => {
     await ctx.wrapper!.vm.$nextTick();
     await new Promise(resolve => setTimeout(resolve, 10));

@@ -3,6 +3,7 @@ import {flushPromises, mount} from '@vue/test-utils';
 import OcupacoesCriticasDiagnostico from '@/views/OcupacoesCriticasDiagnostico.vue';
 import {diagnosticoService} from '@/services/diagnosticoService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {useFeedbackStore} from '@/stores/feedback';
 
 // Mocks
 const { mockRouteParams } = vi.hoisted(() => {
@@ -13,6 +14,9 @@ vi.mock('vue-router', async (importOriginal) => {
     const actual: any = await importOriginal();
     return {
         ...actual,
+        useRouter: () => ({
+            push: vi.fn(),
+        }),
         useRoute: () => ({
             params: mockRouteParams.value,
         }),
@@ -131,5 +135,32 @@ describe('OcupacoesCriticasDiagnostico.vue', () => {
         await flushPromises();
 
         expect(context.wrapper.text()).toContain('Nenhuma ocupação crítica identificada');
+    });
+
+    it('shows error when loading fails', async () => {
+        (diagnosticoService.buscarDiagnostico as any).mockRejectedValue(new Error('Load Error'));
+
+        context.wrapper = createWrapper();
+        const feedbackStore = useFeedbackStore();
+        await flushPromises();
+        await context.wrapper.vm.$nextTick();
+
+        expect(diagnosticoService.buscarDiagnostico).toHaveBeenCalled();
+        expect(feedbackStore.show).toHaveBeenCalledWith('Erro', expect.stringContaining('Load Error'), 'danger');
+    });
+
+    it('shows error when saving fails', async () => {
+        context.wrapper = createWrapper();
+        const feedbackStore = useFeedbackStore();
+        await flushPromises();
+
+        (diagnosticoService.salvarOcupacao as any).mockRejectedValue(new Error('Save Error'));
+
+        const select = context.wrapper.find('select');
+        await select.setValue('AC');
+        await flushPromises();
+        await context.wrapper.vm.$nextTick();
+
+        expect(feedbackStore.show).toHaveBeenCalledWith('Erro', expect.stringContaining('Save Error'), 'danger');
     });
 });

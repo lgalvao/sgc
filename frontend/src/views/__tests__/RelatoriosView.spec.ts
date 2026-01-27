@@ -198,7 +198,7 @@ describe('RelatoriosView.vue', () => {
     const stubsLocal = {
       BContainer: { template: '<div><slot /></div>' },
       BCard: { template: '<div class="card"><slot /></div>' },
-      BFormSelect: { template: '<select></select>' },
+      BFormSelect: { template: '<select></select>', props: ['options'] },
       BFormInput: { template: '<input />' },
     };
 

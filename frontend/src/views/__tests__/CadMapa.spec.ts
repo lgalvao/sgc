@@ -167,7 +167,7 @@ const CompetenciaCardStub = {
        <span class="descricao">{{ competencia.descricao }}</span>
        <button data-testid="btn-editar-competencia" @click="$emit('editar', competencia)">Editar</button>
        <button data-testid="btn-excluir-competencia" @click="$emit('excluir', competencia.codigo)">Excluir</button>
-       <button class="botao-acao-inline" @click="$emit('remover-atividade', competencia.codigo, 999)">Remover Atv</button>
+       <button class="botao-acao-inline" @click="$emit('remover-atividade', competencia.codigo, 101)">Remover Atv</button>
     </div>
     `,
     emits: ['editar', 'excluir', 'remover-atividade']

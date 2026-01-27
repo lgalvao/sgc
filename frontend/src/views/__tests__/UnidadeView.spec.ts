@@ -8,11 +8,18 @@ import {useUsuariosStore} from '@/stores/usuarios';
 import {useMapasStore} from '@/stores/mapas';
 import {buscarUsuarioPorTitulo} from '@/services/usuarioService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {logger} from "@/utils";
 
 // Mocks
 const { mockPush } = vi.hoisted(() => {
     return { mockPush: vi.fn() };
 });
+
+vi.mock("@/utils", () => ({
+    logger: {
+        error: vi.fn(),
+    }
+}));
 
 vi.mock('vue-router', async (importOriginal) => {
     const actual: any = await importOriginal();
@@ -249,5 +256,27 @@ describe('UnidadeView.vue', () => {
             name: 'SubprocessoVisMapa',
             params: { codProcesso: 99, siglaUnidade: 'TEST' }
         });
+    });
+
+    it('displays error alert when unidadesStore has error', async () => {
+        const { wrapper, unidadesStore } = createWrapper();
+        // Since createTestingPinia is used, we can directly modify state or use patch
+        unidadesStore.lastError = { message: 'Erro ao carregar unidade' };
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find('.alert').text()).toContain('Erro ao carregar unidade');
+    });
+
+    it('logs error when fetching titular fails', async () => {
+        (buscarUsuarioPorTitulo as any).mockRejectedValue(new Error('Fetch error'));
+
+        const { wrapper } = createWrapper({
+            unidades: {
+                unidade: { ...mockUnidade, tituloTitular: '123' }
+            }
+        });
+        await flushPromises();
+
+        expect(logger.error).toHaveBeenCalledWith('Erro ao buscar titular:', expect.any(Error));
     });
 });
