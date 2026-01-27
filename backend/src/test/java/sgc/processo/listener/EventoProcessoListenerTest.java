@@ -64,6 +64,7 @@ class EventoProcessoListenerTest {
     private AlertaFacade servicoAlertas;
 
     @org.junit.jupiter.api.BeforeEach
+    @SuppressWarnings("unused")
     void setup() {
         lenient().when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         lenient().when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");

@@ -75,9 +75,6 @@ class ProcessoFacadeSecurityTest {
         @Test
         @DisplayName("buscarCodigosDescendentes: via checarAcesso - teste de logica de arvore")
         void buscarCodigosDescendentes_Arvore() {
-            // Este é um método privado do ProcessoAcessoService.
-            // Vamos testar através do checarAcesso que o utiliza.
-
             Authentication auth = mock(Authentication.class);
             when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(true);
 
