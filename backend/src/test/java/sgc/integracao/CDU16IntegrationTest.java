@@ -1,11 +1,23 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.*;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
+
 import sgc.Sgc;
 import sgc.fixture.MapaFixture;
 import sgc.fixture.ProcessoFixture;
@@ -14,7 +26,10 @@ import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.mapa.model.*;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
@@ -25,13 +40,6 @@ import sgc.subprocesso.dto.SalvarAjustesRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest(classes = {Sgc.class, TestSecurityConfig.class, TestThymeleafConfig.class})
@@ -176,7 +184,13 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
             subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
             subprocessoRepo.save(subprocesso);
 
-            var request = new SalvarAjustesRequest(List.of());
+            var request = new SalvarAjustesRequest(
+                    List.of(
+                            CompetenciaAjusteDto.builder()
+                                    .codCompetencia(1L)
+                                    .nome("Competência Dummy")
+                                    .atividades(List.of())
+                                    .build()));
 
             mockMvc.perform(
                             post(API_SUBPROCESSO_MAPA_AJUSTE, subprocesso.getCodigo())

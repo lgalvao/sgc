@@ -120,21 +120,27 @@ class SubprocessoMapaControllerTest {
                 mockMvc.perform(get("/api/subprocessos/1/mapa-ajuste")).andExpect(status().isOk());
         }
 
-        @Test
-        @DisplayName("salvarAjustesMapa")
-        @WithMockUser
-        void salvarAjustesMapa() throws Exception {
-                SalvarAjustesRequest req = SalvarAjustesRequest.builder()
-                                .competencias(List.of())
-                                .build();
+    @Test
+    @DisplayName("salvarAjustesMapa")
+    @WithMockUser
+    void salvarAjustesMapa() throws Exception {
+        sgc.subprocesso.dto.CompetenciaAjusteDto comp = sgc.subprocesso.dto.CompetenciaAjusteDto.builder()
+                .codCompetencia(1L)
+                .nome("Competencia Teste")
+                .atividades(List.of())
+                .build();
 
-                mockMvc.perform(
-                                post("/api/subprocessos/1/mapa-ajuste/atualizar")
-                                                .with(csrf())
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(objectMapper.writeValueAsString(req)))
-                                .andExpect(status().isOk());
-        }
+        SalvarAjustesRequest req = SalvarAjustesRequest.builder()
+                .competencias(List.of(comp))
+                .build();
+
+        mockMvc.perform(
+                        post("/api/subprocessos/1/mapa-ajuste/atualizar")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk());
+    }
 
         @Test
         @DisplayName("obterMapaCompleto")

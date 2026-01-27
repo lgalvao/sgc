@@ -1,0 +1,61 @@
+Reusing configuration cache.
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava
+> Task :backend:testClasses
+
+> Task :backend:test
+
+SubprocessoMapaControllerTest STANDARD_OUT
+    2026-01-27 20:09:22,304 INFO  s.s.SubprocessoMapaControllerTest - Starting SubprocessoMapaControllerTest using Java 25.0.1 with PID 91829 (started by leonardo in /Users/leonardo/sgc/backend)
+    2026-01-27 20:09:22,307 INFO  s.s.SubprocessoMapaControllerTest - The following 1 profile is active: "test"
+    2026-01-27 20:09:24,088 INFO  s.s.SubprocessoMapaControllerTest - Started SubprocessoMapaControllerTest in 2.026 seconds (process running for 3.255)
+
+SubprocessoMapaControllerTest > salvarAjustesMapa PASSED
+
+SubprocessoMapaControllerTest > obterMapa PASSED
+
+SubprocessoMapaControllerTest > adicionarCompetencia - deve retornar 400 quando lista de atividades é null STANDARD_OUT
+    2026-01-27 20:09:24,397 INFO  s.comum.erros.RestExceptionHandler - Erro de validação de argumento
+
+SubprocessoMapaControllerTest > adicionarCompetencia - deve retornar 400 quando lista de atividades é null PASSED
+
+SubprocessoMapaControllerTest > salvarMapa PASSED
+
+SubprocessoMapaControllerTest > salvarMapaCompleto PASSED
+
+SubprocessoMapaControllerTest > atualizarCompetencia PASSED
+
+SubprocessoMapaControllerTest > obterMapaCompleto PASSED
+
+SubprocessoMapaControllerTest > verificarImpactos PASSED
+
+SubprocessoMapaControllerTest > removerCompetencia PASSED
+
+SubprocessoMapaControllerTest > adicionarCompetencia - deve retornar 400 quando lista de atividades está vazia STANDARD_OUT
+    2026-01-27 20:09:24,541 INFO  s.comum.erros.RestExceptionHandler - Erro de validação de argumento
+
+SubprocessoMapaControllerTest > adicionarCompetencia - deve retornar 400 quando lista de atividades está vazia PASSED
+
+SubprocessoMapaControllerTest > obterMapaParaAjuste PASSED
+
+SubprocessoMapaControllerTest > adicionarCompetencia PASSED
+
+SubprocessoMapaControllerTest > adicionarCompetencia - deve retornar 400 quando descrição está vazia STANDARD_OUT
+    2026-01-27 20:09:24,574 INFO  s.comum.erros.RestExceptionHandler - Erro de validação de argumento
+
+SubprocessoMapaControllerTest > adicionarCompetencia - deve retornar 400 quando descrição está vazia PASSED
+
+SubprocessoMapaControllerTest > obterMapaVisualizacao PASSED
+  Results: SUCCESS
+  Total:     14 tests run
+  ✓ Passed:  14
+  ✗ Failed:  0
+  ○ Ignored: 0
+  Time:     3.877s
+
+BUILD SUCCESSFUL in 5s
+5 actionable tasks: 2 executed, 3 up-to-date
+Configuration cache entry reused.

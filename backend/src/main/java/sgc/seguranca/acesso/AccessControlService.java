@@ -1,9 +1,10 @@
 package sgc.seguranca.acesso;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
@@ -80,6 +81,19 @@ public class AccessControlService {
      */
     private <T> String obterMotivoNegacao(@Nullable Usuario usuario, Acao acao, T recurso) {
         if (usuario == null) return "Usuário não autenticado não pode executar a ação: " + acao.getDescricao();
+
+        String motivoPolicy = null;
+        switch (recurso) {
+            case Subprocesso sp -> motivoPolicy = subprocessoAccessPolicy.getMotivoNegacao();
+            case Processo p -> motivoPolicy = processoAccessPolicy.getMotivoNegacao();
+            case Atividade a -> motivoPolicy = atividadeAccessPolicy.getMotivoNegacao();
+            case Mapa m -> motivoPolicy = mapaAccessPolicy.getMotivoNegacao();
+            default -> {}
+        }
+
+        if (motivoPolicy != null && !motivoPolicy.isBlank()) {
+            return motivoPolicy;
+        }
 
         return String.format("Usuário '%s' não tem permissão para executar a ação '%s'",
                 usuario.getTituloEleitoral(), acao.getDescricao());

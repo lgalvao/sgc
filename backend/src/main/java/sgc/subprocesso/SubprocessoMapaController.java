@@ -1,14 +1,23 @@
 package sgc.subprocesso;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -16,11 +25,15 @@ import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.dto.*;
+import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
+import sgc.subprocesso.dto.CompetenciaRequest;
+import sgc.subprocesso.dto.ContextoEdicaoDto;
+import sgc.subprocesso.dto.DisponibilizarMapaRequest;
+import sgc.subprocesso.dto.MapaAjusteDto;
+import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
+import sgc.subprocesso.dto.SalvarAjustesRequest;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/subprocessos")
@@ -216,6 +229,7 @@ public class SubprocessoMapaController {
             @RequestBody @Valid ProcessarEmBlocoRequest request,
             @AuthenticationPrincipal Usuario usuario) {
         DisponibilizarMapaRequest serviceRequest = DisponibilizarMapaRequest.builder()
+                .dataLimite(request.dataLimite() != null ? request.dataLimite() : java.time.LocalDate.now().plusDays(15))
                 .build();
         subprocessoFacade.disponibilizarMapaEmBloco(request.subprocessos(), codigo, serviceRequest, usuario);
     }

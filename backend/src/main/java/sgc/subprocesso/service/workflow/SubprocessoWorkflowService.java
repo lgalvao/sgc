@@ -1,11 +1,18 @@
 package sgc.subprocesso.service.workflow;
 
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.extern.slf4j.Slf4j;
 import sgc.alerta.AlertaFacade;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.CriarAnaliseCommand;
@@ -27,24 +34,21 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
+import static sgc.seguranca.acesso.Acao.*;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.CompetenciaRequest;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.eventos.TipoTransicao;
-import sgc.subprocesso.model.*;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-
-import java.time.LocalDateTime;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static sgc.seguranca.acesso.Acao.*;
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 /**
  * Serviço unificado responsável por todos os workflows de subprocesso.
@@ -434,32 +438,17 @@ public class SubprocessoWorkflowService {
     }
 
     @Transactional
-    public void aceitarCadastroEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
-        unidadeCodigos.forEach(unidadeCodigo -> {
-            Subprocesso base = repo.buscar(Subprocesso.class, codSubprocessoBase);
-
-            // TDDO essa pesquisa nunca deveria falhar nessa camada!
-            Subprocesso target = subprocessoRepo
-                    .findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_SUBPROCESSO,
-                            MSG_ERRO_SUBPROCESSO_NOT_FOUND.formatted(base.getProcesso().getCodigo(), unidadeCodigo)));
-
-            self.aceitarCadastro(target.getCodigo(), "De acordo com o cadastro de atividades da unidade (Em Bloco)",
+    public void aceitarCadastroEmBloco(List<Long> subprocessoCodigos, Long codSubprocessoBase, Usuario usuario) {
+        subprocessoCodigos.forEach(codSubprocesso -> {
+            self.aceitarCadastro(codSubprocesso, "De acordo com o cadastro de atividades da unidade (Em Bloco)",
                     usuario);
         });
     }
 
     @Transactional
-    public void homologarCadastroEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
-        unidadeCodigos.forEach(unidadeCodigo -> {
-            Subprocesso base = repo.buscar(Subprocesso.class, codSubprocessoBase);
-            // TDDO essa pesquisa nunca deveria falhar nessa camada!
-            Subprocesso target = subprocessoRepo
-                    .findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_SUBPROCESSO,
-                            MSG_ERRO_SUBPROCESSO_NOT_FOUND.formatted(base.getProcesso().getCodigo(), unidadeCodigo)));
-
-            self.homologarCadastro(target.getCodigo(), "Homologação em bloco", usuario);
+    public void homologarCadastroEmBloco(List<Long> subprocessoCodigos, Long codSubprocessoBase, Usuario usuario) {
+        subprocessoCodigos.forEach(codSubprocesso -> {
+            self.homologarCadastro(codSubprocesso, "Homologação em bloco", usuario);
         });
     }
 
@@ -739,44 +728,24 @@ public class SubprocessoWorkflowService {
     }
 
     @Transactional
-    public void disponibilizarMapaEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase,
+    public void disponibilizarMapaEmBloco(List<Long> subprocessoCodigos, Long codSubprocessoBase,
             DisponibilizarMapaRequest request, Usuario usuario) {
-        unidadeCodigos.forEach(unidadeCodigo -> {
-            Subprocesso base = repo.buscar(Subprocesso.class, codSubprocessoBase);
-
-            // TDDO essa pesquisa nunca deveria falhar nessa camada!
-            Subprocesso target = subprocessoRepo
-                    .findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_SUBPROCESSO,
-                            MSG_ERRO_SUBPROCESSO_NOT_FOUND.formatted(base.getProcesso().getCodigo(), unidadeCodigo)));
-
-            self.disponibilizarMapa(target.getCodigo(), request, usuario);
+        subprocessoCodigos.forEach(codSubprocesso -> {
+            self.disponibilizarMapa(codSubprocesso, request, usuario);
         });
     }
 
     @Transactional
-    public void aceitarValidacaoEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
-        unidadeCodigos.forEach(unidadeCodigo -> {
-            Subprocesso base = repo.buscar(Subprocesso.class, codSubprocessoBase);
-            Subprocesso target = subprocessoRepo
-                    .findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_SUBPROCESSO,
-                            MSG_ERRO_SUBPROCESSO_NOT_FOUND.formatted(base.getProcesso().getCodigo(), unidadeCodigo)));
-
-            self.aceitarValidacao(target.getCodigo(), usuario);
+    public void aceitarValidacaoEmBloco(List<Long> subprocessoCodigos, Long codSubprocessoBase, Usuario usuario) {
+        subprocessoCodigos.forEach(codSubprocesso -> {
+            self.aceitarValidacao(codSubprocesso, usuario);
         });
     }
 
     @Transactional
-    public void homologarValidacaoEmBloco(List<Long> unidadeCodigos, Long codSubprocessoBase, Usuario usuario) {
-        unidadeCodigos.forEach(unidadeCodigo -> {
-            Subprocesso base = repo.buscar(Subprocesso.class, codSubprocessoBase);
-            Subprocesso target = subprocessoRepo
-                    .findByProcessoCodigoAndUnidadeCodigo(base.getProcesso().getCodigo(), unidadeCodigo)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_SUBPROCESSO,
-                            MSG_ERRO_SUBPROCESSO_NOT_FOUND.formatted(base.getProcesso().getCodigo(), unidadeCodigo)));
-
-            self.homologarValidacao(target.getCodigo(), usuario);
+    public void homologarValidacaoEmBloco(List<Long> subprocessoCodigos, Long codSubprocessoBase, Usuario usuario) {
+        subprocessoCodigos.forEach(codSubprocesso -> {
+            self.homologarValidacao(codSubprocesso, usuario);
         });
     }
 

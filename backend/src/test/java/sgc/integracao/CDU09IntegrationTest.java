@@ -203,7 +203,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", subprocessoMapeamento.getCodigo()).with(csrf()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message", is("Cadastro de atividades disponibilizado")));
+                    .andExpect(jsonPath("$.mensagem", is("Cadastro de atividades disponibilizado")));
 
             Subprocesso subprocessoAtualizado =
                     subprocessoRepo.findById(subprocessoMapeamento.getCodigo()).orElseThrow();
