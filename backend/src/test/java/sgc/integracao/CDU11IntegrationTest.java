@@ -14,8 +14,7 @@ import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.mapa.model.*;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.*;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -53,6 +52,8 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
     @Autowired private MapaRepo mapaRepo;
     @Autowired private AtividadeRepo atividadeRepo;
     @Autowired private ConhecimentoRepo conhecimentoRepo;
+    @Autowired private UsuarioRepo usuarioRepo;
+    @Autowired private UsuarioPerfilRepo usuarioPerfilRepo;
 
 
     // Test data
@@ -79,6 +80,11 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         unidade = UnidadeFixture.unidadeComSigla("SENIC");
         unidade.setCodigo(null);
         unidade = unidadeRepo.save(unidade);
+
+        // Setup users for mocks
+        criarUsuario("111122223333", Perfil.CHEFE, unidade); // For @WithMockChefe
+        criarUsuario("222222222222", Perfil.GESTOR, unidade); // For @WithMockGestor
+        criarUsuario("user", Perfil.SERVIDOR, unidade); // For @WithMockUser (default username)
 
         // Processo
         processo = ProcessoFixture.processoPadrao();
@@ -118,6 +124,20 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
 
         Conhecimento conhecimento2b = Conhecimento.builder().atividade(atividade2).descricao("Uso de planilhas").build();
         conhecimentoRepo.save(conhecimento2b);
+    }
+
+    private void criarUsuario(String titulo, Perfil perfil, Unidade unidade) {
+        Usuario usuario = UsuarioFixture.usuarioComTitulo(titulo);
+        usuario.setUnidadeLotacao(unidade);
+        usuario = usuarioRepo.save(usuario);
+
+        UsuarioPerfil up = new UsuarioPerfil();
+        up.setUsuario(usuario);
+        up.setUsuarioTitulo(titulo);
+        up.setUnidade(unidade);
+        up.setUnidadeCodigo(unidade.getCodigo());
+        up.setPerfil(perfil);
+        usuarioPerfilRepo.save(up);
     }
 
     @Nested
