@@ -56,7 +56,7 @@ class MapaVisualizacaoServiceTest {
         List<Object[]> projectionResult = new java.util.ArrayList<>();
         projectionResult.add(new Object[]{50L, "C1", 1L});
 
-        when(atividadeRepo.findByMapaCodigoWithConhecimentos(10L)).thenReturn(List.of(ativ1, ativ2));
+        when(atividadeRepo.findWithConhecimentosByMapaCodigo(10L)).thenReturn(List.of(ativ1, ativ2));
         when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(10L)).thenReturn(projectionResult);
 
         MapaVisualizacaoDto dto = service.obterMapaParaVisualizacao(sub);

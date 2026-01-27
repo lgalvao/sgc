@@ -10,7 +10,7 @@ import type {
     TipoProcesso,
 } from "@/types/tipos";
 import { SituacaoSubprocesso } from "@/types/tipos";
-import { type NormalizedError, normalizeError } from "@/utils/apiError";
+import { useErrorHandler } from "@/composables/useErrorHandler";
 import { flattenTree } from "@/utils";
 import * as painelService from "../services/painelService";
 import * as processoService from "../services/processoService";
@@ -22,7 +22,7 @@ export const useProcessosStore = defineStore("processos", () => {
     const processoDetalhe = ref<Processo | null>(null);
     const subprocessosElegiveis = ref<SubprocessoElegivel[]>([]);
     const processosFinalizados = ref<ProcessoResumo[]>([]);
-    const lastError = ref<NormalizedError | null>(null);
+    const { lastError, clearError, withErrorHandling } = useErrorHandler();
 
     const obterUnidadesProcesso = computed(
         () =>
@@ -34,10 +34,6 @@ export const useProcessosStore = defineStore("processos", () => {
             },
     );
 
-    function clearError() {
-        lastError.value = null;
-    }
-
     async function buscarProcessosPainel(
         perfil: string,
         unidade: number,
@@ -46,8 +42,7 @@ export const useProcessosStore = defineStore("processos", () => {
         sort?: keyof ProcessoResumo,
         order?: "asc" | "desc",
     ) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             const response = await painelService.listarProcessos(
                 perfil,
                 unidade,
@@ -58,107 +53,69 @@ export const useProcessosStore = defineStore("processos", () => {
             );
             processosPainel.value = response.content;
             processosPainelPage.value = response;
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function buscarContextoCompleto(idProcesso: number) {
-        lastError.value = null;
-        processoDetalhe.value = null; // Limpa estado anterior
-        try {
+        return withErrorHandling(async () => {
+            processoDetalhe.value = null; // Limpa estado anterior
             const data = await processoService.buscarContextoCompleto(idProcesso);
             processoDetalhe.value = data.processo;
             subprocessosElegiveis.value = data.elegiveis;
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function buscarProcessosFinalizados() {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             processosFinalizados.value = await processoService.buscarProcessosFinalizados();
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function buscarProcessoDetalhe(idProcesso: number) {
-        lastError.value = null;
-        processoDetalhe.value = null; // Limpa estado anterior
-        try {
+        return withErrorHandling(async () => {
+            processoDetalhe.value = null; // Limpa estado anterior
             processoDetalhe.value = await processoService.obterDetalhesProcesso(idProcesso);
-        } catch (error) {
-            lastError.value = normalizeError(error);
+        }, () => {
             processoDetalhe.value = null;
-            throw error;
-        }
+        });
     }
 
     async function buscarSubprocessosElegiveis(idProcesso: number) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             subprocessosElegiveis.value =
                 await processoService.buscarSubprocessosElegiveis(idProcesso);
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function criarProcesso(payload: CriarProcessoRequest) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             return await processoService.criarProcesso(payload);
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function atualizarProcesso(idProcesso: number, payload: AtualizarProcessoRequest) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             await processoService.atualizarProcesso(idProcesso, payload);
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function removerProcesso(idProcesso: number) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             await processoService.excluirProcesso(idProcesso);
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function iniciarProcesso(idProcesso: number, tipo: TipoProcesso, unidadesIds: number[]) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             await processoService.iniciarProcesso(idProcesso, tipo, unidadesIds);
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function finalizarProcesso(idProcesso: number) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             await processoService.finalizarProcesso(idProcesso);
             await buscarProcessoDetalhe(idProcesso);
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function processarCadastroBloco(payload: {
@@ -167,74 +124,50 @@ export const useProcessosStore = defineStore("processos", () => {
         tipoAcao: "aceitar" | "homologar";
         unidadeUsuario: string;
     }) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             await processoService.processarAcaoEmBloco(payload);
             // Após a ação em bloco, recarregar os detalhes do processo para refletir as mudanças
             await buscarProcessoDetalhe(payload.codProcesso);
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function alterarDataLimiteSubprocesso(id: number, dados: { novaData: string }) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             await processoService.alterarDataLimiteSubprocesso(id, dados);
             if (processoDetalhe.value) {
                 await buscarProcessoDetalhe(processoDetalhe.value.codigo);
             }
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function apresentarSugestoes(id: number, dados: { sugestoes: string }) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             await processoService.apresentarSugestoes(id, dados);
             if (processoDetalhe.value) {
                 await buscarProcessoDetalhe(processoDetalhe.value.codigo);
             }
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function validarMapa(id: number) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             await processoService.validarMapa(id);
             if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function homologarValidacao(id: number) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             await processoService.homologarValidacao(id);
             if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function aceitarValidacao(id: number, dados?: { observacoes?: string }) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             await processoService.aceitarValidacao(id, dados);
             if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function executarAcaoBloco(
@@ -242,32 +175,27 @@ export const useProcessosStore = defineStore("processos", () => {
         ids: number[],
         dataLimite?: string
     ) {
-        lastError.value = null;
-        if (!processoDetalhe.value) {
-            const err = new Error("Detalhes do processo não carregados.");
-            lastError.value = normalizeError(err);
-            throw err;
-        }
+        return withErrorHandling(async () => {
+            if (!processoDetalhe.value) {
+                throw new Error("Detalhes do processo não carregados.");
+            }
 
-        const all = flattenTree(processoDetalhe.value.unidades || [], 'filhos');
+            const all = flattenTree(processoDetalhe.value.unidades || [], 'filhos');
 
-        const unidadeExemplo = all.find((u) => u.codUnidade === ids[0]);
+            const unidadeExemplo = all.find((u) => u.codUnidade === ids[0]);
 
-        if (!unidadeExemplo) {
-            const err = new Error("Unidade selecionada não encontrada no contexto do processo.");
-            lastError.value = normalizeError(err);
-            throw err;
-        }
+            if (!unidadeExemplo) {
+                throw new Error("Unidade selecionada não encontrada no contexto do processo.");
+            }
 
-        const codSubprocessoBase = unidadeExemplo.codSubprocesso;
-        const situacao = unidadeExemplo.situacaoSubprocesso;
+            const codSubprocessoBase = unidadeExemplo.codSubprocesso;
+            const situacao = unidadeExemplo.situacaoSubprocesso;
 
-        const payload = {
-            unidadeCodigos: ids,
-            dataLimite: dataLimite,
-        };
+            const payload = {
+                unidadeCodigos: ids,
+                dataLimite: dataLimite,
+            };
 
-        try {
             if (acao === 'aceitar') {
                 if (
                     situacao === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
@@ -302,10 +230,7 @@ export const useProcessosStore = defineStore("processos", () => {
 
             // Reload details
             await buscarProcessoDetalhe(processoDetalhe.value.codigo);
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     return {

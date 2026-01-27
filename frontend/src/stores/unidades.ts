@@ -10,17 +10,17 @@ import {
     buscarUnidadePorSigla,
 } from "@/services/unidadesService";
 import type {Unidade} from "@/types/tipos";
-import {type NormalizedError, normalizeError} from "@/utils/apiError";
+import {useErrorHandler} from "@/composables/useErrorHandler";
 
 export const useUnidadesStore = defineStore("unidades", () => {
     const unidades = ref<Unidade[]>([]);
     const unidade = ref<Unidade | null>(null);
     const isLoading = ref(false);
     const error = ref<string | null>(null);
-    const lastError = ref<NormalizedError | null>(null);
+    const { lastError, clearError: clearNormalizedError, withErrorHandling } = useErrorHandler();
 
     function clearError() {
-        lastError.value = null;
+        clearNormalizedError();
         error.value = null;
     }
 
@@ -30,96 +30,84 @@ export const useUnidadesStore = defineStore("unidades", () => {
     ) {
         isLoading.value = true;
         error.value = null;
-        lastError.value = null;
-        try {
+        await withErrorHandling(async () => {
             const response = await buscarArvoreComElegibilidade(
                 tipoProcesso,
                 codProcesso,
             );
             unidades.value = mapUnidadesArray(response as any) as Unidade[];
-        } catch (err: any) {
-            lastError.value = normalizeError(err);
-            error.value = lastError.value.message;
+        }).catch((err: any) => {
+            error.value = lastError.value?.message || "Erro ao buscar unidades";
             throw err;
-        } finally {
+        }).finally(() => {
             isLoading.value = false;
-        }
+        });
     }
 
     async function buscarUnidade(sigla: string) {
         isLoading.value = true;
         error.value = null;
-        lastError.value = null;
-        try {
+        await withErrorHandling(async () => {
             const response = await buscarUnidadePorSigla(sigla);
             unidade.value = response as unknown as Unidade;
-        } catch (err: any) {
-            lastError.value = normalizeError(err);
-            error.value = lastError.value.message;
+        }).catch((err: any) => {
+            error.value = lastError.value?.message || "Erro ao buscar unidade";
             throw err;
-        } finally {
+        }).finally(() => {
             isLoading.value = false;
-        }
+        });
     }
 
     async function buscarUnidadePorCodigo(codigo: number) {
         isLoading.value = true;
         error.value = null;
-        lastError.value = null;
-        try {
+        await withErrorHandling(async () => {
             const response = await serviceBuscarUnidadePorCodigo(codigo);
             unidade.value = response as unknown as Unidade;
-        } catch (err: any) {
-            lastError.value = normalizeError(err);
-            error.value = lastError.value.message;
+        }).catch((err: any) => {
+            error.value = lastError.value?.message || "Erro ao buscar unidade";
             throw err;
-        } finally {
+        }).finally(() => {
             isLoading.value = false;
-        }
+        });
     }
 
     async function buscarArvoreUnidade(codigo: number) {
         isLoading.value = true;
         error.value = null;
-        lastError.value = null;
-        try {
+        await withErrorHandling(async () => {
             const response = await serviceBuscarArvoreUnidade(codigo);
             unidade.value = response as unknown as Unidade;
-        } catch (err: any) {
-            lastError.value = normalizeError(err);
-            error.value = lastError.value.message;
+        }).catch((err: any) => {
+            error.value = lastError.value?.message || "Erro ao buscar árvore";
             throw err;
-        } finally {
+        }).finally(() => {
             isLoading.value = false;
-        }
+        });
     }
 
     async function obterUnidadesSubordinadas(siglaUnidade: string): Promise<string[]> {
         isLoading.value = true;
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             return await serviceBuscarSubordinadas(siglaUnidade);
-        } catch (err: any) {
-            lastError.value = normalizeError(err);
-            error.value = lastError.value.message;
+        }).catch((err: any) => {
+            error.value = lastError.value?.message || "Erro ao buscar subordinadas";
             throw err;
-        } finally {
+        }).finally(() => {
             isLoading.value = false;
-        }
+        });
     }
 
     async function obterUnidadeSuperior(siglaUnidade: string): Promise<string | null> {
         isLoading.value = true;
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             return await serviceBuscarSuperior(siglaUnidade);
-        } catch (err: any) {
-            lastError.value = normalizeError(err);
-            error.value = lastError.value.message;
+        }).catch((err: any) => {
+            error.value = lastError.value?.message || "Erro ao buscar superior";
             throw err;
-        } finally {
+        }).finally(() => {
             isLoading.value = false;
-        }
+        });
     }
 
     return {

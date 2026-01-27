@@ -126,7 +126,7 @@ public class AtividadeService {
 
     @Transactional(readOnly = true)
     public List<Atividade> buscarPorMapaCodigoComConhecimentos(Long mapaCodigo) {
-        return atividadeRepo.findByMapaCodigoWithConhecimentos(mapaCodigo);
+        return atividadeRepo.findWithConhecimentosByMapaCodigo(mapaCodigo);
     }
 
     private void notificarAlteracaoMapa(Long mapaCodigo) {

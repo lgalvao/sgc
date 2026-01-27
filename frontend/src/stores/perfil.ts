@@ -3,7 +3,7 @@ import {computed, ref} from "vue";
 import type {PerfilUnidade} from "@/mappers/sgrh";
 import type {Perfil} from "@/types/tipos";
 import * as usuarioService from "../services/usuarioService";
-import {type NormalizedError, normalizeError} from "@/utils/apiError";
+import {useErrorHandler} from "@/composables/useErrorHandler";
 
 export const usePerfilStore = defineStore("perfil", () => {
     const usuarioCodigo = ref<string | null>(
@@ -27,7 +27,7 @@ export const usePerfilStore = defineStore("perfil", () => {
     const perfis = ref<Perfil[]>(
         (JSON.parse(localStorage.getItem("perfis") || "[]")) as Perfil[],
     );
-    const lastError = ref<NormalizedError | null>(null);
+    const { lastError, clearError, withErrorHandling } = useErrorHandler();
 
     const isAdmin = computed(() => perfis.value.includes("ADMIN" as Perfil));
     const isGestor = computed(() => perfis.value.includes("GESTOR" as Perfil));
@@ -39,10 +39,6 @@ export const usePerfilStore = defineStore("perfil", () => {
         const pu = perfisUnidades.value.find((p) => p.perfil === perfilSelecionado.value);
         return pu ? pu.unidade.codigo : null;
     });
-
-    function clearError() {
-        lastError.value = null;
-    }
 
     function definirUsuarioCodigo(novoId: string) {
         usuarioCodigo.value = novoId;
@@ -72,8 +68,7 @@ export const usePerfilStore = defineStore("perfil", () => {
     }
 
     async function loginCompleto(tituloEleitoral: string, senha: string) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             const autenticado = await usuarioService.autenticar({
                 tituloEleitoral,
                 senha,
@@ -110,21 +105,19 @@ export const usePerfilStore = defineStore("perfil", () => {
                 return true;
             }
             return false;
-        } catch (error: any) {
-            lastError.value = normalizeError(error);
+        }).catch((error: any) => {
             if (error?.response?.status === 404 || error?.response?.status === 401) {
                 return false;
             }
             throw error;
-        }
+        });
     }
 
     async function selecionarPerfilUnidade(
         tituloEleitoral: string,
         perfilUnidade: PerfilUnidade,
     ) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             const loginResponse = await usuarioService.entrar({
                 tituloEleitoral,
                 perfil: perfilUnidade.perfil,
@@ -138,10 +131,7 @@ export const usePerfilStore = defineStore("perfil", () => {
             );
             definirUsuarioCodigo(loginResponse.tituloEleitoral);
             definirToken(loginResponse.token);
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     function logout() {

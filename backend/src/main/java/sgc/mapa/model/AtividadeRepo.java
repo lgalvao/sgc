@@ -1,5 +1,6 @@
 package sgc.mapa.model;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,22 +16,22 @@ public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
             """)
     List<Atividade> findAllWithMapa();
 
-    @Query("""
-            SELECT DISTINCT a FROM Atividade a
-            LEFT JOIN FETCH a.competencias
-            WHERE a.mapa.codigo = :mapaCodigo
-            """)
+    /**
+     * Busca atividades por código de mapa com competências carregadas.
+     */
+    @EntityGraph(attributePaths = {"competencias"})
     List<Atividade> findByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
 
-    @Query("SELECT a FROM Atividade a WHERE a.mapa.codigo = :mapaCodigo")
+    /**
+     * Busca atividades por código de mapa sem carregar relacionamentos.
+     */
     List<Atividade> findByMapaCodigoSemFetch(@Param("mapaCodigo") Long mapaCodigo);
 
-    @Query("""
-            SELECT DISTINCT a FROM Atividade a
-            LEFT JOIN FETCH a.conhecimentos
-            WHERE a.mapa.codigo = :mapaCodigo
-            """)
-    List<Atividade> findByMapaCodigoWithConhecimentos(@Param("mapaCodigo") Long mapaCodigo);
+    /**
+     * Busca atividades por código de mapa com conhecimentos carregados.
+     */
+    @EntityGraph(attributePaths = {"conhecimentos"})
+    List<Atividade> findWithConhecimentosByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
 
     @Query("""
             SELECT a FROM Atividade a

@@ -2,7 +2,7 @@ import {defineStore} from "pinia";
 import {computed, ref} from "vue";
 import {buscarTodasAtribuicoes} from "@/services/atribuicaoTemporariaService";
 import type {AtribuicaoTemporaria} from "@/types/tipos";
-import {type NormalizedError, normalizeError} from "@/utils/apiError";
+import {useErrorHandler} from "@/composables/useErrorHandler";
 import {logger} from "@/utils";
 
 export const useAtribuicaoTemporariaStore = defineStore(
@@ -11,10 +11,10 @@ export const useAtribuicaoTemporariaStore = defineStore(
         const atribuicoes = ref<AtribuicaoTemporaria[]>([]);
         const isLoading = ref(false);
         const error = ref<string | null>(null); // Keeping for backward compatibility
-        const lastError = ref<NormalizedError | null>(null);
+        const { lastError, clearError: clearNormalizedError, withErrorHandling } = useErrorHandler();
 
         function clearError() {
-            lastError.value = null;
+            clearNormalizedError();
             error.value = null;
         }
 
@@ -39,8 +39,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
         async function buscarAtribuicoes() {
             isLoading.value = true;
             error.value = null;
-            lastError.value = null;
-            try {
+            await withErrorHandling(async () => {
                 const response = await buscarTodasAtribuicoes();
                 // response is the array directly from the service
                 const data = Array.isArray(response) ? response : (response as any).data;
@@ -59,13 +58,12 @@ export const useAtribuicaoTemporariaStore = defineStore(
                     logger.error("Expected array but got:", data);
                     atribuicoes.value = [];
                 }
-            } catch (err: any) {
-                lastError.value = normalizeError(err);
-                error.value = lastError.value.message;
+            }).catch((err: any) => {
+                error.value = lastError.value?.message || "Erro ao buscar atribuições";
                 throw err;
-            } finally {
+            }).finally(() => {
                 isLoading.value = false;
-            }
+            });
         }
 
         return {
