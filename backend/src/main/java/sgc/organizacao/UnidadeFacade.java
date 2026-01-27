@@ -2,7 +2,6 @@ package sgc.organizacao;
 
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -184,7 +183,6 @@ public class UnidadeFacade {
         return unidade;
     }
 
-    @Cacheable(value = "unidadeDescendentes", key = "#codigoUnidade")
     public List<Long> buscarIdsDescendentes(Long codigoUnidade) {
         List<Unidade> todas = buscarTodasEntidadesComHierarquia();
 
@@ -214,7 +212,6 @@ public class UnidadeFacade {
         return unidadeRepo.findAllById(codigos);
     }
 
-    @Cacheable(value = "arvoreUnidades", unless = "#result == null || #result.isEmpty()")
     public List<Unidade> buscarTodasEntidadesComHierarquia() {
         return unidadeRepo.findAllWithHierarquia();
     }

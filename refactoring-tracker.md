@@ -1,7 +1,7 @@
 # 📊 Tracking de Refatorações - SGC
 
 **Última Atualização:** 26 de Janeiro de 2026  
-**Status Geral:** 🟡 Em Planejamento
+**Status Geral:** 🟡 Em Andamento
 
 ---
 
@@ -9,12 +9,12 @@
 
 | Fase | Status | Progresso | Ações Concluídas | Total |
 |------|--------|-----------|------------------|-------|
-| **Sprint 1** - Quick Wins | 🔵 Planejada | 0% | 0/5 | [Ver detalhes](#sprint-1) |
+| **Sprint 1** - Quick Wins | 🟢 Concluída | 100% | 5/5 | [Ver detalhes](#sprint-1) |
 | **Sprint 2** - Frontend | 🔵 Planejada | 0% | 0/3 | [Ver detalhes](#sprint-2) |
 | **Sprint 3** - Backend | 🔵 Planejada | 0% | 0/3 | [Ver detalhes](#sprint-3) |
 | **Sprint 4** - Opcionais | 🔵 Planejada | 0% | 0/3 | [Ver detalhes](#sprint-4) |
 
-**Total Geral:** 0/14 ações (0%)
+**Total Geral:** 5/14 ações (36%)
 
 ---
 
@@ -22,17 +22,25 @@
 
 ### Sprint 1 - Quick Wins (1-2 dias)
 **Objetivo:** Remover complexidade desnecessária, ganhos rápidos  
-**Status:** 🔵 Planejada
+**Status:** 🟢 Concluída
 
 | # | Ação | Prioridade | Status | Esforço | Impacto |
 |---|------|------------|--------|---------|---------|
-| 1 | Alterar `FetchType.EAGER` → `LAZY` em UsuarioPerfil | 🔴 Alta | ⚪ Pendente | 🟢 Baixo | 🔴 Alto |
-| 3 | Remover override de `findAll()` em AtividadeRepo | 🔴 Alta | ⚪ Pendente | 🟢 Baixo | 🟠 Médio |
-| 7 | Remover cache de unidades (CacheConfig) | 🟡 Média | ⚪ Pendente | 🟢 Baixo | 🟡 Baixo |
-| 11 | Converter subquery → JOIN em AtividadeRepo | 🟢 Baixa | ⚪ Pendente | 🟢 Baixo | 🟢 Baixo |
-| 12 | Extrair `flattenTree` para utilitário compartilhado | 🟢 Baixa | ⚪ Pendente | 🟢 Baixo | 🟢 Baixo |
+| 1 | Alterar `FetchType.EAGER` → `LAZY` em UsuarioPerfil | 🔴 Alta | 🟢 Concluída | 🟢 Baixo | 🔴 Alto |
+| 3 | Remover override de `findAll()` em AtividadeRepo | 🔴 Alta | 🟢 Concluída | 🟢 Baixo | 🟠 Médio |
+| 7 | Remover cache de unidades (CacheConfig) | 🟡 Média | 🟢 Concluída | 🟢 Baixo | 🟡 Baixo |
+| 11 | Converter subquery → JOIN em AtividadeRepo | 🟢 Baixa | 🟢 Concluída | 🟢 Baixo | 🟢 Baixo |
+| 12 | Extrair `flattenTree` para utilitário compartilhado | 🟢 Baixa | 🟢 Concluída | 🟢 Baixo | 🟢 Baixo |
 
 **Documentação:** [backend-sprint-1.md](./backend-sprint-1.md)
+
+**Resultados Alcançados:**
+- ✅ 130 testes backend passando
+- ✅ ~40 linhas de código removidas
+- ✅ FetchType.EAGER eliminado (2 → 0)
+- ✅ Cache desnecessário removido
+- ✅ Queries otimizadas (JOIN em vez de subquery)
+- ✅ flattenTree centralizado em utilitário compartilhado
 
 ---
 
