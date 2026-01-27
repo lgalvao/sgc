@@ -84,6 +84,8 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         // sem necessidade de codUnidade específico
         const perfilGlobal = perfil === 'ADMIN' || perfil === 'GESTOR';
 
+        // Validação pré-condição: não lança exceção, apenas popula lastError
+        // Mantido padrão original para compatibilidade com testes
         if (!perfil || (!perfilGlobal && codUnidade === null)) {
             const err = new Error("Informações de perfil ou unidade não disponíveis.");
             lastError.value = normalizeError(err);
@@ -125,6 +127,8 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
 
         const perfilGlobal = perfil === 'ADMIN' || perfil === 'GESTOR';
 
+        // Validação pré-condição: não lança exceção, apenas popula lastError
+        // Mantido padrão original para compatibilidade com testes
         if (!perfil || (!perfilGlobal && codUnidade === null)) {
             const err = new Error("Informações de perfil ou unidade não disponíveis.");
             lastError.value = normalizeError(err);
