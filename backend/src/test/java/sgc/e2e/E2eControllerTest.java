@@ -72,7 +72,7 @@ class E2eControllerTest {
         when(mockResource.exists()).thenReturn(exists);
         if (exists) {
             try {
-                when(mockResource.getInputStream()).thenReturn(new java.io.ByteArrayInputStream("SELECT 1;".getBytes()));
+                when(mockResource.getInputStream()).thenReturn(new java.io.ByteArrayInputStream("SELECT 1;".getBytes(java.nio.charset.StandardCharsets.UTF_8)));
             } catch (java.io.IOException e) {
                 throw new RuntimeException(e);
             }
@@ -192,17 +192,20 @@ class E2eControllerTest {
         JdbcTemplate mockJdbc = org.mockito.Mockito.mock(JdbcTemplate.class);
         NamedParameterJdbcTemplate mockNamed = org.mockito.Mockito.mock(NamedParameterJdbcTemplate.class);
         DataSource mockDs = org.mockito.Mockito.mock(DataSource.class);
-        java.sql.Connection mockConn = org.mockito.Mockito.mock(java.sql.Connection.class);
-        java.sql.Statement mockStmt = org.mockito.Mockito.mock(java.sql.Statement.class);
-        when(mockConn.createStatement()).thenReturn(mockStmt);
-        when(mockDs.getConnection()).thenReturn(mockConn);
+
+        // Simula erro ao conectar para evitar execução do script (que trava com mocks)
+        // O teste foca apenas na lógica de seleção do recurso (mockResourceLoader)
+        when(mockDs.getConnection()).thenThrow(new SQLException("Stop here"));
 
         E2eController localController = new E2eController(mockJdbc, mockNamed, mockDs, processoFacade, unidadeFacade, resourceLoader);
 
         mockResourceLoader("file:../e2e/setup/seed.sql", false);
         mockResourceLoader("file:e2e/setup/seed.sql", true);
 
-        localController.resetDatabase();
+        org.junit.jupiter.api.Assertions.assertThrows(SQLException.class, () -> localController.resetDatabase());
+
+        // Verifica se tentou carregar o segundo caminho
+        verify(resourceLoader).getResource("file:e2e/setup/seed.sql");
     }
 
     @Test
