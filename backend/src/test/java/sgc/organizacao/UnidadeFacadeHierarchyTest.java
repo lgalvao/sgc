@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.service.UnidadeHierarquiaService;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ import static org.mockito.Mockito.when;
 class UnidadeFacadeHierarchyTest {
 
     @Mock
-    private UnidadeRepo unidadeRepo;
+    private UnidadeHierarquiaService unidadeHierarquiaService;
 
     @InjectMocks
     private UnidadeFacade unidadeService;
@@ -30,10 +31,8 @@ class UnidadeFacadeHierarchyTest {
     @DisplayName("buscarIdsDescendentes: deve retornar lista vazia se não houver descendentes")
     void buscarIdsDescendentes_SemFilhos() {
         Long raizId = 1L;
-        Unidade raiz = new Unidade(); raiz.setCodigo(raizId);
 
-        // Simulando que só existe a raiz no banco (cache)
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(raiz));
+        when(unidadeHierarquiaService.buscarIdsDescendentes(raizId)).thenReturn(List.of());
 
         List<Long> ids = unidadeService.buscarIdsDescendentes(raizId);
 
@@ -49,14 +48,12 @@ class UnidadeFacadeHierarchyTest {
         //      -> Neto 1 (3)
         //   -> Filho 2 (4)
 
-        Unidade raiz = new Unidade(); raiz.setCodigo(1L);
-        Unidade filho1 = new Unidade(); filho1.setCodigo(2L); filho1.setUnidadeSuperior(raiz);
-        Unidade neto1 = new Unidade(); neto1.setCodigo(3L); neto1.setUnidadeSuperior(filho1);
-        Unidade filho2 = new Unidade(); filho2.setCodigo(4L); filho2.setUnidadeSuperior(raiz);
-
-        List<Unidade> todas = List.of(raiz, filho1, neto1, filho2);
-
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(todas);
+        when(unidadeHierarquiaService.buscarIdsDescendentes(1L))
+                .thenReturn(List.of(2L, 3L, 4L));
+        when(unidadeHierarquiaService.buscarIdsDescendentes(2L))
+                .thenReturn(List.of(3L));
+        when(unidadeHierarquiaService.buscarIdsDescendentes(3L))
+                .thenReturn(List.of());
 
         // Teste: Descendentes da Raiz (1) devem ser 2, 3 e 4
         List<Long> idsRaiz = unidadeService.buscarIdsDescendentes(1L);
@@ -77,13 +74,8 @@ class UnidadeFacadeHierarchyTest {
         // Arvore A: 1 -> 2
         // Arvore B: 10 -> 11
 
-        Unidade a1 = new Unidade(); a1.setCodigo(1L);
-        Unidade a2 = new Unidade(); a2.setCodigo(2L); a2.setUnidadeSuperior(a1);
-
-        Unidade b1 = new Unidade(); b1.setCodigo(10L);
-        Unidade b2 = new Unidade(); b2.setCodigo(11L); b2.setUnidadeSuperior(b1);
-
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(a1, a2, b1, b2));
+        when(unidadeHierarquiaService.buscarIdsDescendentes(1L))
+                .thenReturn(List.of(2L));
 
         List<Long> idsA1 = unidadeService.buscarIdsDescendentes(1L);
         assertThat(idsA1).containsExactly(2L);

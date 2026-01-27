@@ -16,6 +16,9 @@ import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.UnidadeHierarquiaService;
+import sgc.organizacao.service.UnidadeMapaService;
+import sgc.organizacao.service.UnidadeResponsavelService;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -32,37 +35,22 @@ class UnidadeFacadeCoverageTest {
     @InjectMocks
     private UnidadeFacade unidadeFacade;
 
-    @Mock private UnidadeRepo unidadeRepo;
-    @Mock private UsuarioMapper usuarioMapper;
+    @Mock private UnidadeHierarquiaService unidadeHierarquiaService;
+    @Mock private UnidadeMapaService unidadeMapaService;
+    @Mock private UnidadeResponsavelService unidadeResponsavelService;
     @Mock private RepositorioComum repo;
     @Mock private UnidadeMapaRepo unidadeMapaRepo;
-    @Mock private UsuarioRepo usuarioRepo;
-    @Mock private AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
-    @Mock private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Test
     @DisplayName("Deve buscar unidade na hierarquia recursivamente")
     void deveBuscarArvoreRecursiva() {
-        Unidade raiz = new Unidade(); raiz.setCodigo(1L); raiz.setSigla("RAIZ");
-        Unidade filha = new Unidade(); filha.setCodigo(2L); filha.setSigla("FILHA"); filha.setUnidadeSuperior(raiz);
-        Unidade neta = new Unidade(); neta.setCodigo(3L); neta.setSigla("NETA"); neta.setUnidadeSuperior(filha);
-
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(raiz, filha, neta));
-
-        UnidadeDto dtoRaiz = new UnidadeDto(); dtoRaiz.setCodigo(1L); dtoRaiz.setSubunidades(new ArrayList<>());
-        UnidadeDto dtoFilha = new UnidadeDto(); dtoFilha.setCodigo(2L); dtoFilha.setSubunidades(new ArrayList<>());
         UnidadeDto dtoNeta = new UnidadeDto(); dtoNeta.setCodigo(3L); dtoNeta.setSubunidades(new ArrayList<>());
 
-        when(usuarioMapper.toUnidadeDto(any(Unidade.class), anyBoolean())).thenAnswer(inv -> {
-           Unidade u = inv.getArgument(0);
-           if (u.getCodigo() == 1L) return dtoRaiz;
-           if (u.getCodigo() == 2L) return dtoFilha;
-           if (u.getCodigo() == 3L) return dtoNeta;
-           return null;
-        });
+        when(unidadeHierarquiaService.buscarArvore(3L)).thenReturn(dtoNeta);
 
         UnidadeDto result = unidadeFacade.buscarArvore(3L);
         assertThat(result.getCodigo()).isEqualTo(3L);
+        verify(unidadeHierarquiaService).buscarArvore(3L);
     }
 
     @Test
@@ -71,223 +59,178 @@ class UnidadeFacadeCoverageTest {
         CriarAtribuicaoTemporariaRequest req = new CriarAtribuicaoTemporariaRequest(
                 "T", LocalDate.now(), LocalDate.now().minusDays(1), "Justificativa");
 
-        when(repo.buscar(Unidade.class, 1L)).thenReturn(new Unidade());
-        when(repo.buscar(Usuario.class, "T")).thenReturn(new Usuario());
+        doThrow(new ErroValidacao("A data de término deve ser posterior à data de início."))
+                .when(unidadeResponsavelService).criarAtribuicaoTemporaria(1L, req);
 
         assertThrows(ErroValidacao.class, () -> unidadeFacade.criarAtribuicaoTemporaria(1L, req));
+        verify(unidadeResponsavelService).criarAtribuicaoTemporaria(1L, req);
     }
 
     @Test
     @DisplayName("Deve retornar mapa vazio ao buscar responsáveis de lista vazia")
     void deveRetornarMapaVazioResponsaveis() {
+        when(unidadeResponsavelService.buscarResponsaveisUnidades(Collections.emptyList()))
+                .thenReturn(Collections.emptyMap());
         assertThat(unidadeFacade.buscarResponsaveisUnidades(Collections.emptyList())).isEmpty();
 
-        when(usuarioRepo.findChefesByUnidadesCodigos(anyList())).thenReturn(Collections.emptyList());
+        when(unidadeResponsavelService.buscarResponsaveisUnidades(List.of(1L)))
+                .thenReturn(Collections.emptyMap());
         assertThat(unidadeFacade.buscarResponsaveisUnidades(List.of(1L))).isEmpty();
     }
 
     @Test
     @DisplayName("Deve buscar sigla superior")
     void deveBuscarSiglaSuperior() {
-        Unidade pai = new Unidade(); pai.setSigla("PAI");
-        Unidade filho = new Unidade(); filho.setSigla("FILHO"); filho.setUnidadeSuperior(pai);
-
-        when(unidadeRepo.findBySigla("FILHO")).thenReturn(Optional.of(filho));
+        when(unidadeHierarquiaService.buscarSiglaSuperior("FILHO"))
+                .thenReturn(Optional.of("PAI"));
 
         assertThat(unidadeFacade.buscarSiglaSuperior("FILHO")).isPresent().contains("PAI");
+        verify(unidadeHierarquiaService).buscarSiglaSuperior("FILHO");
     }
 
     @Test
     @DisplayName("Deve lançar erro ao buscar sigla superior de unidade inexistente")
     void deveLancarErroBuscarSiglaSuperiorInexistente() {
-        when(unidadeRepo.findBySigla("X")).thenReturn(Optional.empty());
+        when(unidadeHierarquiaService.buscarSiglaSuperior("X"))
+                .thenThrow(new ErroEntidadeNaoEncontrada("Unidade não encontrada"));
         assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarSiglaSuperior("X"));
     }
 
     @Test
     @DisplayName("Deve buscar siglas subordinadas")
     void deveBuscarSiglasSubordinadas() {
-        Unidade raiz = new Unidade(); raiz.setCodigo(1L); raiz.setSigla("RAIZ");
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(raiz));
-
-        UnidadeDto dtoRaiz = new UnidadeDto(); dtoRaiz.setCodigo(1L); dtoRaiz.setSigla("RAIZ"); dtoRaiz.setSubunidades(new ArrayList<>());
-        when(usuarioMapper.toUnidadeDto(any(Unidade.class), anyBoolean())).thenReturn(dtoRaiz);
+        when(unidadeHierarquiaService.buscarSiglasSubordinadas("RAIZ"))
+                .thenReturn(List.of("RAIZ"));
 
         List<String> siglas = unidadeFacade.buscarSiglasSubordinadas("RAIZ");
         assertThat(siglas).contains("RAIZ");
+        verify(unidadeHierarquiaService).buscarSiglasSubordinadas("RAIZ");
     }
 
     @Test
     @DisplayName("Deve definir mapa vigente")
     void deveDefinirMapaVigente() {
-        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.empty());
-        unidadeFacade.definirMapaVigente(1L, new Mapa());
-        verify(unidadeMapaRepo).save(any(UnidadeMapa.class));
+        Mapa mapa = new Mapa();
+        unidadeFacade.definirMapaVigente(1L, mapa);
+        verify(unidadeMapaService).definirMapaVigente(1L, mapa);
     }
 
     @Test
     @DisplayName("Deve buscar ids descendentes")
     void deveBuscarIdsDescendentes() {
-        Unidade raiz = new Unidade(); raiz.setCodigo(1L);
-        Unidade filho = new Unidade(); filho.setCodigo(2L); filho.setUnidadeSuperior(raiz);
-
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(raiz, filho));
+        when(unidadeHierarquiaService.buscarIdsDescendentes(1L))
+                .thenReturn(List.of(2L));
 
         List<Long> ids = unidadeFacade.buscarIdsDescendentes(1L);
         assertThat(ids).contains(2L);
+        verify(unidadeHierarquiaService).buscarIdsDescendentes(1L);
     }
 
     @Test
     @DisplayName("Deve verificar mapa vigente")
     void deveVerificarMapaVigente() {
-        when(unidadeMapaRepo.existsById(1L)).thenReturn(true);
+        when(unidadeMapaService.verificarMapaVigente(1L)).thenReturn(true);
         assertThat(unidadeFacade.verificarMapaVigente(1L)).isTrue();
+        verify(unidadeMapaService).verificarMapaVigente(1L);
     }
 
     @Test
     @DisplayName("Deve buscar arvore com elegibilidade")
     void deveBuscarArvoreComElegibilidade() {
-        Unidade raiz = new Unidade(); raiz.setCodigo(1L); raiz.setTipo(TipoUnidade.OPERACIONAL);
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(raiz));
-
-        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L));
-
         UnidadeDto dtoRaiz = new UnidadeDto(); dtoRaiz.setCodigo(1L); dtoRaiz.setSubunidades(new ArrayList<>());
-        when(usuarioMapper.toUnidadeDto(eq(raiz), anyBoolean())).thenReturn(dtoRaiz);
+        
+        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L));
+        when(unidadeHierarquiaService.buscarArvoreComElegibilidade(any()))
+                .thenReturn(List.of(dtoRaiz));
 
         List<UnidadeDto> arvore = unidadeFacade.buscarArvoreComElegibilidade(true, Collections.emptySet());
         assertThat(arvore).hasSize(1);
+        verify(unidadeHierarquiaService).buscarArvoreComElegibilidade(any());
     }
 
     @Test
     @DisplayName("Deve buscar responsável atual")
     void deveBuscarResponsavelAtual() {
-        Unidade un = new Unidade();
-        un.setCodigo(1L);
-        when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.of(un));
-
-        Usuario chefeSimples = new Usuario();
-        chefeSimples.setTituloEleitoral("C");
-        when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.of(chefeSimples));
-
         Usuario chefeCompleto = new Usuario();
         chefeCompleto.setTituloEleitoral("C");
-        when(usuarioRepo.findByIdWithAtribuicoes("C")).thenReturn(Optional.of(chefeCompleto));
+        when(unidadeResponsavelService.buscarResponsavelAtual("SIGLA"))
+                .thenReturn(chefeCompleto);
 
         Usuario res = unidadeFacade.buscarResponsavelAtual("SIGLA");
         assertThat(res).isNotNull();
+        verify(unidadeResponsavelService).buscarResponsavelAtual("SIGLA");
     }
 
     @Test
     @DisplayName("Deve lançar erro ao buscar responsável atual se unidade não encontrada")
     void deveLancarErroResponsavelAtualUnidadeNaoEncontrada() {
-        when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.empty());
+        when(unidadeResponsavelService.buscarResponsavelAtual("SIGLA"))
+                .thenThrow(new ErroEntidadeNaoEncontrada("Unidade não encontrada"));
         assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarResponsavelAtual("SIGLA"));
     }
 
     @Test
     @DisplayName("Deve buscar responsáveis de múltiplas unidades")
     void deveBuscarResponsaveisMultiplasUnidades() {
-        Usuario u = new Usuario();
-        u.setTituloEleitoral("T");
-        u.setNome("Nome");
-
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setUsuario(u);
-        up.setUsuarioTitulo("T");
-        up.setUnidadeCodigo(1L);
-        up.setPerfil(Perfil.CHEFE);
-        u.setAtribuicoes(Set.of(up));
-
-        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(u));
-        when(usuarioRepo.findByIdInWithAtribuicoes(List.of("T"))).thenReturn(List.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTituloIn(List.of("T"))).thenReturn(List.of(up));
+        ResponsavelDto dto = new ResponsavelDto(1L, "T", "Nome", null, null);
+        when(unidadeResponsavelService.buscarResponsaveisUnidades(List.of(1L)))
+                .thenReturn(Map.of(1L, dto));
 
         Map<Long, ResponsavelDto> map = unidadeFacade.buscarResponsaveisUnidades(List.of(1L));
         assertThat(map).containsKey(1L);
+        verify(unidadeResponsavelService).buscarResponsaveisUnidades(List.of(1L));
     }
 
     @Test
     @DisplayName("Deve montar DTO com titular e substituto")
     void deveMontarDtoComTitularESubstituto() {
-        // Mocking repo to return 2 users for the same unit
-        Usuario titular = new Usuario();
-        titular.setTituloEleitoral("T");
-        titular.setNome("Titular");
-
-        Usuario substituto = new Usuario();
-        substituto.setTituloEleitoral("S");
-        substituto.setNome("Substituto");
-
-        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(titular, substituto));
+        ResponsavelDto dto = new ResponsavelDto(1L, "T", "Titular", "S", "Substituto");
+        when(unidadeResponsavelService.buscarResponsavelUnidade(1L))
+                .thenReturn(dto);
 
         ResponsavelDto result = unidadeFacade.buscarResponsavelUnidade(1L);
 
         assertThat(result.getTitularTitulo()).isEqualTo("T");
         assertThat(result.getSubstitutoTitulo()).isEqualTo("S");
         assertThat(result.getSubstitutoNome()).isEqualTo("Substituto");
+        verify(unidadeResponsavelService).buscarResponsavelUnidade(1L);
     }
 
     @Test
     @DisplayName("Deve lançar erro ao buscar responsável unidade não encontrada")
     void deveLancarErroBuscarResponsavelUnidadeNaoEncontrada() {
-        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(Collections.emptyList());
+        when(unidadeResponsavelService.buscarResponsavelUnidade(1L))
+                .thenThrow(new ErroEntidadeNaoEncontrada("Unidade não encontrada"));
         assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarResponsavelUnidade(1L));
     }
 
     @Test
     @DisplayName("Deve buscar siglas subordinadas recursivamente")
     void deveBuscarSiglasSubordinadasRecursivo() {
-        Unidade raiz = new Unidade(); raiz.setCodigo(1L); raiz.setSigla("RAIZ");
-        Unidade filho = new Unidade(); filho.setCodigo(2L); filho.setSigla("FILHO"); filho.setUnidadeSuperior(raiz);
+        when(unidadeHierarquiaService.buscarSiglasSubordinadas("FILHO"))
+                .thenReturn(List.of("FILHO"));
 
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(raiz, filho));
-
-        UnidadeDto dtoRaiz = new UnidadeDto(); dtoRaiz.setCodigo(1L); dtoRaiz.setSigla("RAIZ");
-        UnidadeDto dtoFilho = new UnidadeDto(); dtoFilho.setCodigo(2L); dtoFilho.setSigla("FILHO"); dtoFilho.setSubunidades(new ArrayList<>());
-        dtoRaiz.setSubunidades(List.of(dtoFilho));
-
-        when(usuarioMapper.toUnidadeDto(any(Unidade.class), anyBoolean())).thenAnswer(inv -> {
-            Unidade u = inv.getArgument(0);
-            if (u.getCodigo().equals(1L)) return dtoRaiz;
-            if (u.getCodigo().equals(2L)) return dtoFilho;
-            return null;
-        });
-
-        // Busca pela sigla do FILHO, que está dentro da raiz
         List<String> siglas = unidadeFacade.buscarSiglasSubordinadas("FILHO");
         assertThat(siglas).contains("FILHO");
+        verify(unidadeHierarquiaService).buscarSiglasSubordinadas("FILHO");
     }
 
     @Test
     @DisplayName("Deve aplicar regras de elegibilidade corretamente (negativo)")
     void deveAplicarRegrasElegibilidadeNegativo() {
-        // Unidade Intermediaria (deve ser false)
-        Unidade inter = new Unidade(); inter.setCodigo(1L); inter.setTipo(TipoUnidade.INTERMEDIARIA);
+        UnidadeDto dto1 = new UnidadeDto(); dto1.setCodigo(1L); dto1.setSubunidades(new ArrayList<>());
+        UnidadeDto dto2 = new UnidadeDto(); dto2.setCodigo(2L); dto2.setSubunidades(new ArrayList<>());
+        UnidadeDto dto3 = new UnidadeDto(); dto3.setCodigo(3L); dto3.setSubunidades(new ArrayList<>());
 
-        // Unidade Operacional sem mapa (deve ser false se required=true)
-        Unidade semMapa = new Unidade(); semMapa.setCodigo(2L); semMapa.setTipo(TipoUnidade.OPERACIONAL);
-
-        // Unidade Bloqueada (deve ser false)
-        Unidade bloq = new Unidade(); bloq.setCodigo(3L); bloq.setTipo(TipoUnidade.OPERACIONAL);
-
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(inter, semMapa, bloq));
-        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(3L)); // Bloq tem mapa, mas está bloqueada
-
-        when(usuarioMapper.toUnidadeDto(any(Unidade.class), eq(false))).thenAnswer(inv -> {
-             Unidade u = inv.getArgument(0);
-             UnidadeDto dto = new UnidadeDto();
-             dto.setCodigo(u.getCodigo());
-             dto.setSubunidades(new ArrayList<>());
-             return dto;
-        });
+        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(3L));
+        when(unidadeHierarquiaService.buscarArvoreComElegibilidade(any()))
+                .thenReturn(List.of(dto1, dto2, dto3));
 
         // Testar com requerMapaVigente=true e Bloqueios
-        unidadeFacade.buscarArvoreComElegibilidade(true, Set.of(3L));
+        List<UnidadeDto> result = unidadeFacade.buscarArvoreComElegibilidade(true, Set.of(3L));
 
-        // Todos devem ter isElegivel=false (que é passado para o mapper)
-        // O mapper mockado aqui deve ser chamado com isElegivel=false
-        verify(usuarioMapper, times(3)).toUnidadeDto(any(Unidade.class), eq(false));
+        assertThat(result).hasSize(3);
+        verify(unidadeHierarquiaService).buscarArvoreComElegibilidade(any());
     }
 
     @Test
