@@ -12,3 +12,8 @@ Competence-Activity associations because `Competencia.getAtividades()` was acces
 scans for common dashboard queries. `sgc.alerta_usuario` was missing an index on `usuario_titulo`.
 **Action:** Always verify `schema.sql` against `JpaRepository` queries (especially `findBy...`) to ensure foreign keys
 and filter columns are indexed.
+
+## 2025-02-18 - N+1 on Movimentacao
+
+**Learning:** `MovimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc` was a derived query causing N+1 selects for `Unidade` (origin and destination) because they are EAGER by default.
+**Action:** Replaced with `@Query` using `LEFT JOIN FETCH`. Always check derived queries involving entities with EAGER relationships.
