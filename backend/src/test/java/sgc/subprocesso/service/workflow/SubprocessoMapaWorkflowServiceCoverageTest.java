@@ -17,7 +17,6 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
@@ -54,25 +53,9 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     @Mock
     private MapaFacade mapaFacade;
     @Mock
-    private SubprocessoTransicaoService transicaoService;
-    @Mock
     private AnaliseFacade analiseFacade;
     @Mock
-    private UnidadeFacade unidadeService;
-    @Mock
-    private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
-    @Mock
-    private sgc.seguranca.acesso.AccessControlService accessControlService;
-    @Mock
     private RepositorioComum repo;
-    @Mock
-    private sgc.alerta.AlertaFacade alertaService;
-    @Mock
-    private sgc.subprocesso.model.MovimentacaoRepo repositorioMovimentacao;
-    @Mock
-    private sgc.mapa.service.ImpactoMapaService impactoMapaService;
-    @Mock
-    private sgc.subprocesso.service.crud.SubprocessoCrudService crudService;
 
     // --- SALVAR MAPA ---
 
