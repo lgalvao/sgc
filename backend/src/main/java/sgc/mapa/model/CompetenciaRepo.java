@@ -1,5 +1,6 @@
 package sgc.mapa.model;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,11 +19,7 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
      * @param mapaCodigo Código do mapa
      * @return Lista de competências do mapa
      */
-    @Query("""
-            SELECT DISTINCT c FROM Competencia c
-            LEFT JOIN FETCH c.atividades
-            WHERE c.mapa.codigo = :mapaCodigo
-            """)
+    @EntityGraph(attributePaths = {"atividades"})
     List<Competencia> findByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
 
     /**
@@ -46,9 +43,5 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
      * @param mapaCodigo Código do mapa
      * @return Lista de competências
      */
-    @Query("""
-            SELECT c FROM Competencia c
-            WHERE c.mapa.codigo = :mapaCodigo
-            """)
     List<Competencia> findByMapaCodigoSemFetch(@Param("mapaCodigo") Long mapaCodigo);
 }

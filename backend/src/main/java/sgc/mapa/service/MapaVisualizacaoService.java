@@ -40,7 +40,7 @@ public class MapaVisualizacaoService {
                 .build();
 
         List<Atividade> atividadesComConhecimentos =
-                atividadeRepo.findByMapaCodigoWithConhecimentos(mapa.getCodigo());
+                atividadeRepo.findWithConhecimentosByMapaCodigo(mapa.getCodigo());
 
         Map<Long, AtividadeDto> atividadeDtoMap = atividadesComConhecimentos.stream()
                 .collect(Collectors.toMap(Atividade::getCodigo, this::mapAtividadeToDto));

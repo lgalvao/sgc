@@ -113,7 +113,7 @@ class AtividadeServiceTest {
         @Test
         @DisplayName("Deve buscar por mapa com conhecimentos")
         void deveBuscarPorMapaComConhecimentos() {
-             when(atividadeRepo.findByMapaCodigoWithConhecimentos(1L)).thenReturn(List.of(new Atividade()));
+             when(atividadeRepo.findWithConhecimentosByMapaCodigo(1L)).thenReturn(List.of(new Atividade()));
              assertThat(service.buscarPorMapaCodigoComConhecimentos(1L))
                  .isNotNull()
                  .hasSize(1);
@@ -122,7 +122,7 @@ class AtividadeServiceTest {
         @Test
         @DisplayName("Deve retornar lista vazia quando mapa não possui atividades com conhecimentos")
         void deveRetornarListaVaziaQuandoMapaSemAtividadesComConhecimentos() {
-             when(atividadeRepo.findByMapaCodigoWithConhecimentos(999L)).thenReturn(List.of());
+             when(atividadeRepo.findWithConhecimentosByMapaCodigo(999L)).thenReturn(List.of());
              assertThat(service.buscarPorMapaCodigoComConhecimentos(999L))
                  .isNotNull()
                  .isEmpty();

@@ -60,7 +60,7 @@ class CopiaMapaServiceTest {
 
         when(mapaRepo.findById(origemId)).thenReturn(Optional.of(mapaOrigem));
         when(mapaRepo.save(any(Mapa.class))).thenReturn(mapaSalvo);
-        when(atividadeRepo.findByMapaCodigoWithConhecimentos(origemId)).thenReturn(List.of(atividadeOrigem));
+        when(atividadeRepo.findWithConhecimentosByMapaCodigo(origemId)).thenReturn(List.of(atividadeOrigem));
 
         when(atividadeRepo.saveAll(anyList())).thenAnswer(i -> {
             List<Atividade> list = i.getArgument(0);
@@ -104,7 +104,7 @@ class CopiaMapaServiceTest {
 
         when(mapaRepo.findById(origemId)).thenReturn(Optional.of(mapaOrigem));
         when(mapaRepo.save(any(Mapa.class))).thenReturn(new Mapa());
-        when(atividadeRepo.findByMapaCodigoWithConhecimentos(origemId)).thenReturn(List.of()); // Empty list
+        when(atividadeRepo.findWithConhecimentosByMapaCodigo(origemId)).thenReturn(List.of()); // Empty list
         when(competenciaRepo.findByMapaCodigo(origemId)).thenReturn(List.of()); // Empty list
 
         Mapa resultado = service.copiarMapaParaUnidade(origemId);

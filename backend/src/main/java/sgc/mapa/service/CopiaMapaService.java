@@ -48,7 +48,7 @@ public class CopiaMapaService {
      */
     @Transactional
     public void importarAtividadesDeOutroMapa(Long mapaOrigemId, Long mapaDestinoId) {
-        List<Atividade> atividadesOrigem = atividadeRepo.findByMapaCodigoWithConhecimentos(mapaOrigemId);
+        List<Atividade> atividadesOrigem = atividadeRepo.findWithConhecimentosByMapaCodigo(mapaOrigemId);
         Set<String> descricoesExistentes = obterDescricoesExistentes(mapaDestinoId);
 
         Mapa mapaDestino = repositorioMapa.findById(mapaDestinoId)
@@ -80,7 +80,7 @@ public class CopiaMapaService {
     private Map<Long, Atividade> copiarAtividades(Long codMapaFonte, Mapa mapaSalvo) {
         Map<Long, Atividade> mapaAtividades = new HashMap<>();
 
-        List<Atividade> atividadesFonte = atividadeRepo.findByMapaCodigoWithConhecimentos(codMapaFonte);
+        List<Atividade> atividadesFonte = atividadeRepo.findWithConhecimentosByMapaCodigo(codMapaFonte);
 
         List<Atividade> novasAtividades = new ArrayList<>();
         // Use IdentityHashMap to map unsaved object -> source ID, to later map source ID -> saved object

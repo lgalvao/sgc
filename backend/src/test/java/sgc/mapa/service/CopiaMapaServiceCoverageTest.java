@@ -39,7 +39,7 @@ class CopiaMapaServiceCoverageTest {
         when(repositorioMapa.save(any(Mapa.class))).thenAnswer(i -> i.getArgument(0));
         
         // Cobre line 84 (atividadesFonte.isEmpty())
-        when(atividadeRepo.findByMapaCodigoWithConhecimentos(codOrigem)).thenReturn(List.of());
+        when(atividadeRepo.findWithConhecimentosByMapaCodigo(codOrigem)).thenReturn(List.of());
         // Cobre line 129 (competenciasFonte.isEmpty())
         when(competenciaRepo.findByMapaCodigo(codOrigem)).thenReturn(List.of());
 
@@ -56,7 +56,7 @@ class CopiaMapaServiceCoverageTest {
         Long origem = 1L;
         Long destino = 2L;
         
-        when(atividadeRepo.findByMapaCodigoWithConhecimentos(origem)).thenReturn(List.of());
+        when(atividadeRepo.findWithConhecimentosByMapaCodigo(origem)).thenReturn(List.of());
         when(atividadeRepo.findByMapaCodigo(destino)).thenReturn(List.of());
         when(repositorioMapa.findById(destino)).thenReturn(Optional.of(new Mapa()));
 
@@ -79,7 +79,7 @@ class CopiaMapaServiceCoverageTest {
         a1.setCodigo(10L);
         a1.setDescricao("A1");
         
-        when(atividadeRepo.findByMapaCodigoWithConhecimentos(codOrigem)).thenReturn(List.of(a1));
+        when(atividadeRepo.findWithConhecimentosByMapaCodigo(codOrigem)).thenReturn(List.of(a1));
         
         Competencia c1 = new Competencia();
         c1.setDescricao("C1");
