@@ -1,13 +1,22 @@
 package sgc.subprocesso.service.workflow;
 
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import sgc.analise.AnaliseFacade;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.comum.erros.ErroValidacao;
@@ -33,15 +42,6 @@ import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -733,8 +733,7 @@ class SubprocessoMapaWorkflowServiceTest {
             Subprocesso base = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
             base.getProcesso().setCodigo(100L);
 
-            Subprocesso target = mockSubprocesso(2L, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
-            when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(100L, 10L)).thenReturn(Optional.of(target));
+            Subprocesso target = mockSubprocesso(10L, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
 
             // Mock validations for target
             Mapa mapa = mock(Mapa.class);
@@ -761,8 +760,7 @@ class SubprocessoMapaWorkflowServiceTest {
             Subprocesso base = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
             base.getProcesso().setCodigo(100L);
 
-            Subprocesso target = mockSubprocesso(2L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
-            when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(100L, 10L)).thenReturn(Optional.of(target));
+            Subprocesso target = mockSubprocesso(10L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
             when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
 
@@ -804,8 +802,7 @@ class SubprocessoMapaWorkflowServiceTest {
             Subprocesso base = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
             base.getProcesso().setCodigo(100L);
 
-            Subprocesso target = mockSubprocesso(2L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
-            when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(100L, 10L)).thenReturn(Optional.of(target));
+            Subprocesso target = mockSubprocesso(10L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
             // Topo da cadeia para simplificar
             Unidade u = target.getUnidade();

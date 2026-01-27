@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -52,6 +53,7 @@ class E2eFixtureEndpointTest {
         // Executar e Validar
         mockMvc.perform(
                         post("/e2e/fixtures/processo-mapeamento")
+                                .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -74,6 +76,7 @@ class E2eFixtureEndpointTest {
         // Executar e Validar
         mockMvc.perform(
                         post("/e2e/fixtures/processo-mapeamento")
+                                .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -94,6 +97,7 @@ class E2eFixtureEndpointTest {
         // Executar e Validar
         mockMvc.perform(
                         post("/e2e/fixtures/processo-mapeamento")
+                                .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is4xxClientError());
@@ -113,6 +117,7 @@ class E2eFixtureEndpointTest {
         // Executar e Validar
         mockMvc.perform(
                         post("/e2e/fixtures/processo-mapeamento")
+                                .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
