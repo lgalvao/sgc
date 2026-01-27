@@ -38,6 +38,26 @@ class SubprocessoWorkflowServiceTest {
     private AlertaFacade alertaService;
     @Mock
     private UnidadeFacade unidadeService;
+    @Mock
+    private sgc.subprocesso.model.MovimentacaoRepo repositorioMovimentacao;
+    @Mock
+    private sgc.subprocesso.service.workflow.SubprocessoTransicaoService transicaoService;
+    @Mock
+    private sgc.analise.AnaliseFacade analiseFacade;
+    @Mock
+    private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
+    @Mock
+    private sgc.mapa.service.ImpactoMapaService impactoMapaService;
+    @Mock
+    private sgc.seguranca.acesso.AccessControlService accessControlService;
+    @Mock
+    private sgc.mapa.service.CompetenciaService competenciaService;
+    @Mock
+    private sgc.mapa.service.AtividadeService atividadeService;
+    @Mock
+    private sgc.mapa.service.MapaFacade mapaFacade;
+    @Mock
+    private sgc.comum.repo.RepositorioComum repo;
 
     @InjectMocks
     private SubprocessoWorkflowService service;

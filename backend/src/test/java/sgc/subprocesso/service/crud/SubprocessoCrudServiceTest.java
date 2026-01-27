@@ -45,6 +45,8 @@ class SubprocessoCrudServiceTest {
     private MapaFacade mapaFacade;
     @Mock
     private ApplicationEventPublisher eventPublisher;
+    @Mock
+    private sgc.organizacao.UsuarioFacade usuarioService;
 
     @InjectMocks
     private SubprocessoCrudService service;

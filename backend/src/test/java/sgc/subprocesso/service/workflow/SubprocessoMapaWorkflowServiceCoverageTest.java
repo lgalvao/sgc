@@ -39,11 +39,10 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
+@SuppressWarnings("unused")
 class SubprocessoMapaWorkflowServiceCoverageTest {
-
     @InjectMocks
     private SubprocessoWorkflowService service;
-
     @Mock
     private SubprocessoRepo subprocessoRepo;
     @Mock
