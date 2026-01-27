@@ -1,0 +1,35 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:test --tests sgc.subprocesso.SubprocessoMapaControllerTest
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+
+> Task :backend:compileTestJava FAILED
+/Users/leonardo/sgc/backend/src/test/java/sgc/seguranca/SanitizacaoMapaTest.java:53: error: cannot find symbol
+    @Disabled("Sanitização não está ocorrendo automaticamente no WebMvcTest - investigar configuração de segurança")
+     ^
+  symbol:   class Disabled
+  location: class SanitizacaoMapaTest
+1 error
+
+[Incubating] Problems report is available at: file:///Users/leonardo/sgc/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:compileTestJava'.
+> Compilation failed; see the compiler output below.
+  /Users/leonardo/sgc/backend/src/test/java/sgc/seguranca/SanitizacaoMapaTest.java:53: error: cannot find symbol
+      @Disabled("Sanitização não está ocorrendo automaticamente no WebMvcTest - investigar configuração de segurança")
+       ^
+    symbol:   class Disabled
+    location: class SanitizacaoMapaTest
+  1 error
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 1s
+4 actionable tasks: 1 executed, 3 up-to-date
+Configuration cache entry stored.
