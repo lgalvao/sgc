@@ -42,6 +42,12 @@ class SanitizacaoMapaTest {
     @MockitoBean
     private SubprocessoFacade subprocessoFacade;
 
+    @MockitoBean
+    private sgc.mapa.service.MapaFacade mapaFacade;
+
+    @MockitoBean
+    private sgc.organizacao.UsuarioFacade usuarioFacade;
+
 
     @Test
     @WithMockUser(roles = "ADMIN")

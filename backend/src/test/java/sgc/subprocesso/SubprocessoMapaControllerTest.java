@@ -40,6 +40,9 @@ class SubprocessoMapaControllerTest {
         @MockitoBean
         private MapaFacade mapaFacade;
 
+        @MockitoBean
+        private sgc.organizacao.UsuarioFacade usuarioFacade;
+
         @Autowired
         private MockMvc mockMvc;
         private ObjectMapper objectMapper;

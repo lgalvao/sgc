@@ -1,14 +1,22 @@
 package sgc.processo.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.UnidadeFixture;
@@ -27,15 +35,6 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("ProcessoFacade - CRUD Operations")
@@ -50,6 +49,24 @@ class ProcessoFacadeCrudTest {
     private ProcessoMapper processoMapper;
     @Mock
     private ProcessoValidador processoValidador;
+    @Mock
+    private sgc.subprocesso.service.SubprocessoFacade subprocessoFacade;
+    @Mock
+    private ProcessoDetalheBuilder processoDetalheBuilder;
+    @Mock
+    private sgc.subprocesso.mapper.SubprocessoMapper subprocessoMapper;
+    @Mock
+    private sgc.organizacao.UsuarioFacade usuarioService;
+    @Mock
+    private ProcessoInicializador processoInicializador;
+    @Mock
+    private sgc.alerta.AlertaFacade alertaService;
+    @Mock
+    private ProcessoAcessoService processoAcessoService;
+    @Mock
+    private ProcessoFinalizador processoFinalizador;
+    @Mock
+    private ProcessoConsultaService processoConsultaService;
 
     @InjectMocks
     private ProcessoFacade processoFacade;
