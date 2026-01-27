@@ -14,7 +14,6 @@ import type {
     SalvarMapaRequest,
 } from "@/types/tipos";
 import { useErrorHandler } from "@/composables/useErrorHandler";
-import { normalizeError } from "@/utils/apiError";
 
 
 export const useMapasStore = defineStore("mapas", () => {
@@ -71,9 +70,7 @@ export const useMapasStore = defineStore("mapas", () => {
     ) {
         if (!competencia || !competencia.codigo) {
             // Evitar chamada ao backend com id inválido
-            const err = new Error("Código da competência inválido");
-            lastError.value = normalizeError(err);
-            throw err;
+            throw new Error("Código da competência inválido");
         }
 
         return withErrorHandling(async () => {
@@ -86,9 +83,7 @@ export const useMapasStore = defineStore("mapas", () => {
 
     async function removerCompetencia(codSubrocesso: number, idCompetencia: number) {
         if (!idCompetencia || idCompetencia === 0) {
-            const err = new Error("Código da competência inválido");
-            lastError.value = normalizeError(err);
-            throw err;
+            throw new Error("Código da competência inválido");
         }
 
         return withErrorHandling(async () => {
