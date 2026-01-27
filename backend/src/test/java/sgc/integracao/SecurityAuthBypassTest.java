@@ -7,20 +7,24 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
+
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioRepo;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.util.TestUtil;
-
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest
@@ -28,14 +32,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @Import(TestSecurityConfig.class)
 @DisplayName("Security Auth Bypass Test")
-public class SecurityAuthBypassTest extends BaseIntegrationTest {
-
+class SecurityAuthBypassTest extends BaseIntegrationTest {
     @Autowired
     private TestUtil testUtil;
-    @Autowired
-    private UnidadeRepo unidadeRepo;
+
     @Autowired
     private UsuarioRepo usuarioRepo;
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -43,7 +46,7 @@ public class SecurityAuthBypassTest extends BaseIntegrationTest {
     void setUp() {
         try {
             jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 20000");
-        } catch (Exception ignored) {
+        } catch (DataAccessException ignored) {
         }
     }
 

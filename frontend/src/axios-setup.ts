@@ -6,6 +6,9 @@ import {logger} from "@/utils";
 
 export const apiClient = axios.create({
     baseURL: "http://localhost:10000/api",
+    withCredentials: true,
+    xsrfCookieName: 'XSRF-TOKEN',
+    xsrfHeaderName: 'X-XSRF-TOKEN',
     headers: {
         "Content-type": "application/json",
     },

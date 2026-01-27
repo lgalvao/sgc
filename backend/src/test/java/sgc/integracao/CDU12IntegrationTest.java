@@ -1,34 +1,49 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.*;
+import java.time.LocalDateTime;
+
+import static org.hamcrest.Matchers.is;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
+
 import sgc.Sgc;
-import sgc.fixture.*;
-import sgc.integracao.mocks.*;
-import sgc.mapa.model.*;
+import sgc.fixture.AtividadeFixture;
+import sgc.fixture.MapaFixture;
+import sgc.fixture.ProcessoFixture;
+import sgc.fixture.SubprocessoFixture;
+import sgc.fixture.UnidadeFixture;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockAdmin;
+import sgc.integracao.mocks.WithMockAdminSecurityContextFactory;
+import sgc.integracao.mocks.WithMockChefe;
+import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
+import sgc.integracao.mocks.WithMockGestor;
+import sgc.integracao.mocks.WithMockGestorSecurityContextFactory;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
 import sgc.organizacao.model.UnidadeMapaRepo;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-
-import java.time.LocalDateTime;
-
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -56,12 +71,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     private static final String TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH = "$.totalAtividadesRemovidas";
 
     // Repositories
-    @Autowired private ProcessoRepo processoRepo;
-    @Autowired private UnidadeRepo unidadeRepo;
     @Autowired private UnidadeMapaRepo unidadeMapaRepo;
-    @Autowired private SubprocessoRepo subprocessoRepo;
-    @Autowired private MapaRepo mapaRepo;
-    @Autowired private AtividadeRepo atividadeRepo;
     @Autowired private CompetenciaRepo competenciaRepo;
     @Autowired private JdbcTemplate jdbcTemplate;
 
@@ -73,14 +83,15 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     private Unidade unidade;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         // Reset sequence
         try {
             jdbcTemplate.execute("ALTER SEQUENCE SGC.VW_UNIDADE_SEQ RESTART WITH 1000");
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             try {
                 jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN codigo RESTART WITH 1000");
-            } catch (Exception ex) {
+            } catch (DataAccessException ex) {
                 // Ignore
             }
         }
@@ -150,6 +161,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Cenários de Sucesso")
+    @SuppressWarnings("unused")
     class Sucesso {
 
         @Test
@@ -234,6 +246,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Cenários de Borda e Falhas")
+    @SuppressWarnings("unused")
     class BordaEfalhas {
 
         @Test
@@ -260,6 +273,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de Controle de Acesso por Perfil e Situação")
+    @SuppressWarnings("unused")
     class Acesso {
 
         @Test

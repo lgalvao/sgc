@@ -5,9 +5,9 @@ process.on('warning', (warning) => {
     console.warn(warning.name, warning.message);
 });
 
-const {spawn} = require('child_process');
-const path = require('path');
-const fs = require('fs');
+const {spawn} = require('node:child_process');
+const path = require('node:path');
+const fs = require('node:fs');
 
 const BACKEND_DIR = path.resolve(__dirname, '../backend');
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
@@ -50,8 +50,8 @@ const LOG_FILTERS = [
     /^> sgc@.*dev$/,
     /^> vite$/,
     /VITE v.* ready in/,
-    /➜  Local:/,
-    /➜  Network:/,
+    /➜ {2}Local:/,
+    /➜ {2}Network:/,
     /use --host to expose/,
     /\[vite\] connecting/,
     /\[vite\] connected/,
@@ -80,10 +80,7 @@ function log(prefix, data) {
         const trimmed = line.trim();
         if (trimmed && !shouldFilterLog(line)) {
             console.log(line);
-            try {
-                fs.appendFileSync(LOG_FILE, `[${prefix}] ${line}\n`);
-            } catch (e) { /* ignore */
-            }
+            fs.appendFileSync(LOG_FILE, `[${prefix}] ${line}\n`);
         }
     });
 }
@@ -93,11 +90,7 @@ const isWindows = process.platform === 'win32';
 function startBackend() {
     // Ensure gradlew is executable (Unix only)
     if (!isWindows) {
-        try {
-            fs.chmodSync(path.join(BACKEND_DIR, 'gradlew'), '755');
-        } catch (e) {
-            // Ignorar se falhar
-        }
+        fs.chmodSync(path.join(BACKEND_DIR, 'gradlew'), '755');
     }
 
     const gradlewExecutable = isWindows ? 'gradlew.bat' : './gradlew';
@@ -144,39 +137,23 @@ function startFrontend() {
     });
 }
 
+function stopProcess(proc, isWindows) {
+    if (!proc) return;
+    try {
+        if (isWindows) {
+            require('node:child_process').execSync(`taskkill /pid ${proc.pid} /T /F`, {stdio: 'ignore'});
+        } else {
+            process.kill(-proc.pid);
+        }
+    } catch {
+        proc.kill();
+    }
+}
+
 function cleanup() {
     // Matar apenas processos iniciados, preservando Gradle Daemons
-    if (backendProcess) {
-        try {
-            if (isWindows) {
-                // /T mata a árvore de processos (Spring Boot), mas não afeta Daemons
-                require('child_process').execSync(`taskkill /pid ${backendProcess.pid} /T /F`, {stdio: 'ignore'});
-            } else {
-                process.kill(-backendProcess.pid);
-            }
-        } catch (e) {
-            try {
-                backendProcess.kill();
-            } catch (e2) { /* ignore */
-            }
-        }
-    }
-
-    if (frontendProcess) {
-        try {
-            if (isWindows) {
-                require('child_process').execSync(`taskkill /pid ${frontendProcess.pid} /T /F`, {stdio: 'ignore'});
-            } else {
-                process.kill(-frontendProcess.pid);
-            }
-        } catch (e) {
-            try {
-                frontendProcess.kill();
-            } catch (e2) { /* ignore */
-            }
-        }
-    }
-
+    stopProcess(backendProcess, isWindows);
+    stopProcess(frontendProcess, isWindows);
 }
 
 // Handle exit signals
@@ -197,7 +174,9 @@ process.on('exit', () => {
 function checkBackendHealth() {
     return new Promise((resolve) => {
         const check = () => {
-            const req = require('http').get(`http://localhost:${BACKEND_PORT}/`, (res) => {
+            // Uso de http intencional para health check local (localhost).
+            // O ambiente de desenvolvimento local não utiliza HTTPS por padrão.
+            const req = require('node:http').get(`http://localhost:${BACKEND_PORT}/`, (res) => {
                 if (res.statusCode >= 200 && res.statusCode < 500) resolve(); else setTimeout(check, 1000);
             });
             req.on('error', () => setTimeout(check, 1000));
@@ -210,7 +189,8 @@ function checkBackendHealth() {
 function checkFrontendHealth() {
     return new Promise((resolve) => {
         const check = () => {
-            const req = require('http').get(`http://localhost:${FRONTEND_PORT}`, (res) => {
+            // Uso de http intencional para health check local (localhost).
+            const req = require('node:http').get(`http://localhost:${FRONTEND_PORT}`, (res) => {
                 if (res.statusCode >= 200 && res.statusCode < 400) resolve(); else setTimeout(check, 1000);
             });
             req.on('error', () => setTimeout(check, 1000));
@@ -221,12 +201,15 @@ function checkFrontendHealth() {
 }
 
 startBackend();
-checkBackendHealth()
-    .then(() => {
-        startFrontend();
-        return checkFrontendHealth();
-    })
-    .then(() => console.log('>>> Frontend e Backend no ar!'));
+try {
+    await checkBackendHealth();
+    startFrontend();
+    await checkFrontendHealth();
+    console.log('>>> Frontend e Backend no ar!');
+} catch (error) {
+    console.error('Erro ao iniciar infraestrutura de testes:', error.message);
+    process.exit(1);
+}
 
 // Keep alive
 setInterval(() => {

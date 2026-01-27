@@ -53,10 +53,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
         @Autowired
         private EntityManager entityManager;
 
-        @SuppressWarnings("unused")
-        @Autowired
-        private sgc.seguranca.login.LoginFacade loginFacade;
-
         private Unidade unidadeAdmin;
         private Unidade unidadeGestor;
         private Usuario usuarioAdmin;
@@ -140,7 +136,8 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                                         .andExpect(status().isOk())
                                         .andExpect(jsonPath("$").value(true));
 
-                        AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral).build();
+                        AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral)
+                                        .build();
 
                         mockMvc.perform(post(BASE_URL + "/autorizar")
                                         .with(csrf())
@@ -179,7 +176,8 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                                         .andExpect(status().isOk())
                                         .andExpect(jsonPath("$").value(true));
 
-                        AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral).build();
+                        AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral)
+                                        .build();
 
                         mockMvc.perform(post(BASE_URL + "/autorizar")
                                         .with(csrf())
@@ -214,7 +212,8 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                         // Act & Assert
                         // Sem autenticação prévia (sessão válida), a tentativa de autorizar deve ser
                         // rejeitada com 401 (Unauthorized)
-                        AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral).build();
+                        AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral)
+                                        .build();
 
                         mockMvc.perform(post(BASE_URL + "/autorizar")
                                         .with(csrf())

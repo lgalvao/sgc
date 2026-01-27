@@ -1,32 +1,50 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
+
 import sgc.Sgc;
-import sgc.fixture.*;
+import sgc.fixture.AtividadeFixture;
+import sgc.fixture.MapaFixture;
+import sgc.fixture.ProcessoFixture;
+import sgc.fixture.SubprocessoFixture;
+import sgc.fixture.UnidadeFixture;
+import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockGestor;
-import sgc.mapa.model.*;
-import sgc.organizacao.model.*;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.ConhecimentoRepo;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.organizacao.model.UsuarioRepo;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -42,36 +60,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         AtividadeFixture.class
 })
 class CDU11IntegrationTest extends BaseIntegrationTest {
-    private static final String API_SUBPROCESSOS_ID_CADASTRO =
-            "/api/subprocessos/{codigo}/cadastro";
+    private static final String API_SUBPROCESSOS_ID_CADASTRO = "/api/subprocessos/{codigo}/cadastro";
     private static final String UNIDADE_SIGLA_JSON_PATH = "$.unidadeSigla";
 
-    @Autowired private ProcessoRepo processoRepo;
-    @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private SubprocessoRepo subprocessoRepo;
-    @Autowired private MapaRepo mapaRepo;
-    @Autowired private AtividadeRepo atividadeRepo;
-    @Autowired private ConhecimentoRepo conhecimentoRepo;
-    @Autowired private UsuarioRepo usuarioRepo;
-    @Autowired private UsuarioPerfilRepo usuarioPerfilRepo;
+    @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
+    @Autowired
+    private UsuarioPerfilRepo usuarioPerfilRepo;
 
-
-    // Test data
     private Unidade unidade;
     private Processo processo;
     private Subprocesso subprocesso;
 
-    @Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
     void setUp() {
         // Reset sequence
         try {
             jdbcTemplate.execute("ALTER SEQUENCE SGC.VW_UNIDADE_SEQ RESTART WITH 1000");
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             try {
                 jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN codigo RESTART WITH 1000");
-            } catch (Exception ex) {
+            } catch (DataAccessException ex) {
                 // Ignore
             }
         }
@@ -109,8 +123,8 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         atividade1.setDescricao("Analisar documentação");
         atividade1 = atividadeRepo.save(atividade1);
 
-        Conhecimento conhecimento1 =
-                Conhecimento.builder().atividade(atividade1).descricao("Interpretação de textos técnicos").build();
+        Conhecimento conhecimento1 = Conhecimento.builder().atividade(atividade1)
+                .descricao("Interpretação de textos técnicos").build();
         // Verificando uso de builder se construtor foi removido:
         // Conhecimento.builder().atividade(atividade1).descricao("...").build()
         conhecimentoRepo.save(conhecimento1);
@@ -119,10 +133,12 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         atividade2.setDescricao("Elaborar relatórios");
         atividade2 = atividadeRepo.save(atividade2);
 
-        Conhecimento conhecimento2a = Conhecimento.builder().atividade(atividade2).descricao("Escrita clara e concisa").build();
+        Conhecimento conhecimento2a = Conhecimento.builder().atividade(atividade2).descricao("Escrita clara e concisa")
+                .build();
         conhecimentoRepo.save(conhecimento2a);
 
-        Conhecimento conhecimento2b = Conhecimento.builder().atividade(atividade2).descricao("Uso de planilhas").build();
+        Conhecimento conhecimento2b = Conhecimento.builder().atividade(atividade2).descricao("Uso de planilhas")
+                .build();
         conhecimentoRepo.save(conhecimento2b);
     }
 
@@ -146,9 +162,8 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
 
         @Test
         @WithMockChefe("111122223333")
-        @DisplayName(
-                "Deve retornar o cadastro completo de atividades e conhecimentos para o Chefe da"
-                        + " unidade")
+        @DisplayName("Deve retornar o cadastro completo de atividades e conhecimentos para o Chefe da"
+                + " unidade")
         void deveRetornarCadastroCompleto_QuandoChefeDaUnidade() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
                     .andExpect(status().isOk())
@@ -157,9 +172,11 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath("$.atividades", hasSize(2)))
                     // Valida a primeira atividade e seu conhecimento
                     // Nota: a ordem não é garantida, então usamos filtro ou assumptions.
-                    // Mas como inserimos sequencialmente, pode vir sequencial. Vamos ajustar se falhar.
+                    // Mas como inserimos sequencialmente, pode vir sequencial. Vamos ajustar se
+                    // falhar.
                     // Melhor usar containsInAnyOrder para robustez
-                    .andExpect(jsonPath("$.atividades[*].descricao", containsInAnyOrder("Analisar documentação", "Elaborar relatórios")));
+                    .andExpect(jsonPath("$.atividades[*].descricao",
+                            containsInAnyOrder("Analisar documentação", "Elaborar relatórios")));
         }
 
         @Test
@@ -236,14 +253,11 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
             atividadeRepo.save(atividadeSemConhecimento);
 
             mockMvc.perform(
-                            get(
-                                    API_SUBPROCESSOS_ID_CADASTRO,
-                                    subprocessoAtividadeSemConhecimento.getCodigo()))
+                    get(API_SUBPROCESSOS_ID_CADASTRO, subprocessoAtividadeSemConhecimento.getCodigo()))
                     .andExpect(status().isOk())
-                    .andExpect(
-                            jsonPath(
-                                    "$.subprocessoCodigo",
-                                    is(subprocessoAtividadeSemConhecimento.getCodigo().intValue())))
+                    .andExpect(jsonPath(
+                            "$.subprocessoCodigo",
+                            is(subprocessoAtividadeSemConhecimento.getCodigo().intValue())))
                     .andExpect(jsonPath("$.atividades", hasSize(1)))
                     .andExpect(
                             jsonPath("$.atividades[0].descricao", is("Atividade sem conhecimento")))

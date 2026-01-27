@@ -1,32 +1,30 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
-import sgc.integracao.mocks.WithMockAdmin;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-
 import java.time.LocalDateTime;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.is;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.transaction.annotation.Transactional;
+
+import sgc.Sgc;
+import sgc.integracao.mocks.WithMockAdmin;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
 
 /**
  * Testes de integração focados no endpoint /api/processos/{id}. Este endpoint é
@@ -42,26 +40,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
         private static final String API_PROCESSO_DETALHES = "/api/processos/{codProcesso}";
 
-        @Autowired
-        private ProcessoRepo processoRepo;
-
-        @Autowired
-        private UnidadeRepo unidadeRepo;
-
-        @Autowired
-        private SubprocessoRepo subprocessoRepo;
-
-        @Autowired
-        private MapaRepo mapaRepo;
-
-    private Processo processoEmAndamento;
+        private Processo processoEmAndamento;
         private Processo processoFinalizado;
 
         @BeforeEach
         void setUp() {
-            Unidade unidade = unidadeRepo.findById(11L).orElseThrow(); // SENIC
+                Unidade unidade = unidadeRepo.findById(11L).orElseThrow(); // SENIC
 
-            // Processo em andamento
+                // Processo em andamento
                 processoEmAndamento = Processo.builder()
                                 .descricao("Processo em Andamento")
                                 .tipo(TipoProcesso.MAPEAMENTO)
@@ -74,7 +60,7 @@ class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
                 var mapaEmAndamento = mapaRepo.save(new Mapa());
                 var subprocessoEmAndamento = Subprocesso.builder()
                                 .processo(processoEmAndamento)
-                        .unidade(unidade)
+                                .unidade(unidade)
                                 .mapa(mapaEmAndamento)
                                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                                 .dataLimiteEtapa1(processoEmAndamento.getDataLimite())
@@ -95,7 +81,7 @@ class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
                 var mapaFinalizado = mapaRepo.save(new Mapa());
                 var subprocessoFinalizado = Subprocesso.builder()
                                 .processo(processoFinalizado)
-                        .unidade(unidade)
+                                .unidade(unidade)
                                 .mapa(mapaFinalizado)
                                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
                                 .dataLimiteEtapa1(processoFinalizado.getDataLimite())
@@ -103,34 +89,30 @@ class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
                 subprocessoRepo.save(subprocessoFinalizado);
         }
 
-        @Nested
-        @DisplayName("Detalhes do processo com unidades participantes")
-        class DetalhesProcesso {
-                @Test
-                @WithMockAdmin
-                @DisplayName("Deve retornar detalhes com unidades para processo em andamento")
-                void deveRetornarDetalhesComUnidades_QuandoProcessoEmAndamento() throws Exception {
-                        mockMvc.perform(get(API_PROCESSO_DETALHES, processoEmAndamento.getCodigo()))
-                                        .andExpect(status().isOk())
-                                        .andExpect(jsonPath("$.codigo", is(processoEmAndamento.getCodigo().intValue())))
-                                        .andExpect(jsonPath("$.situacao", is("EM_ANDAMENTO")));
-                }
+        @Test
+        @WithMockAdmin
+        @DisplayName("Deve retornar detalhes com unidades para processo em andamento")
+        void deveRetornarDetalhesComUnidades_QuandoProcessoEmAndamento() throws Exception {
+                mockMvc.perform(get(API_PROCESSO_DETALHES, processoEmAndamento.getCodigo()))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.codigo", is(processoEmAndamento.getCodigo().intValue())))
+                                .andExpect(jsonPath("$.situacao", is("EM_ANDAMENTO")));
+        }
 
-                @Test
-                @WithMockAdmin
-                @DisplayName("Deve retornar detalhes com unidades para processo FINALIZADO")
-                void deveRetornarDetalhesComUnidades_QuandoProcessoFinalizado() throws Exception {
-                        mockMvc.perform(get(API_PROCESSO_DETALHES, processoFinalizado.getCodigo()))
-                                        .andExpect(status().isOk())
-                                        .andExpect(jsonPath("$.codigo", is(processoFinalizado.getCodigo().intValue())))
-                                        .andExpect(jsonPath("$.situacao", is("FINALIZADO")));
-                }
+        @Test
+        @WithMockAdmin
+        @DisplayName("Deve retornar detalhes com unidades para processo FINALIZADO")
+        void deveRetornarDetalhesComUnidades_QuandoProcessoFinalizado() throws Exception {
+                mockMvc.perform(get(API_PROCESSO_DETALHES, processoFinalizado.getCodigo()))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.codigo", is(processoFinalizado.getCodigo().intValue())))
+                                .andExpect(jsonPath("$.situacao", is("FINALIZADO")));
+        }
 
-                @Test
-                @WithMockAdmin
-                @DisplayName("Deve retornar 404 quando processo não existe")
-                void deveRetornar404_QuandoProcessoNaoExiste() throws Exception {
-                        mockMvc.perform(get(API_PROCESSO_DETALHES, 999999L)).andExpect(status().isNotFound());
-                }
+        @Test
+        @WithMockAdmin
+        @DisplayName("Deve retornar 404 quando processo não existe")
+        void deveRetornar404_QuandoProcessoNaoExiste() throws Exception {
+                mockMvc.perform(get(API_PROCESSO_DETALHES, 999999L)).andExpect(status().isNotFound());
         }
 }

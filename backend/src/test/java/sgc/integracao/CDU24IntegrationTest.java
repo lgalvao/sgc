@@ -1,6 +1,9 @@
 package sgc.integracao;
 
-import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -9,31 +12,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.persistence.EntityManager;
 import sgc.Sgc;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.mapa.model.*;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
-import sgc.subprocesso.model.*;
-import tools.jackson.databind.ObjectMapper;
-
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -44,28 +47,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CDU24IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private ProcessoRepo processoRepo;
-
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-
-    @Autowired
-    private UnidadeRepo unidadeRepo;
-
-    @Autowired
     private SubprocessoMovimentacaoRepo movimentacaoRepo;
 
     @Autowired
-    private AtividadeRepo atividadeRepo;
-
-    @Autowired
     private CompetenciaRepo competenciaRepo;
-
-    @Autowired
-    private MapaRepo mapaRepo;
 
     @Autowired
     private EntityManager entityManager;
@@ -77,6 +62,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocesso2;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         // Use existing units from data.sql:
         // Unit 8 (SEDESENV - OPERACIONAL) subordinate to 6

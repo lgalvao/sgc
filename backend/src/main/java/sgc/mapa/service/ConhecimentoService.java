@@ -1,10 +1,13 @@
 package sgc.mapa.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtualizarConhecimentoRequest;
 import sgc.mapa.dto.ConhecimentoResponse;
@@ -15,8 +18,6 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.ConhecimentoRepo;
-
-import java.util.List;
 
 /**
  * Serviço responsável pela lógica de negócios de Conhecimentos.
@@ -70,7 +71,10 @@ public class ConhecimentoService {
     public ConhecimentoResponse criar(Long codAtividade, CriarConhecimentoRequest request) {
         return atividadeRepo.findById(codAtividade)
                 .map(atividade -> {
-                    notificarAlteracaoMapa(atividade.getMapa().getCodigo());
+                    var mapa = atividade.getMapa();
+                    if (mapa != null) {
+                        notificarAlteracaoMapa(mapa.getCodigo());
+                    }
                     var conhecimento = conhecimentoMapper.toEntity(request);
                     conhecimento.setAtividade(atividade);
                     var salvo = conhecimentoRepo.save(conhecimento);
@@ -84,7 +88,10 @@ public class ConhecimentoService {
                 .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
                 .ifPresentOrElse(
                         existente -> {
-                            notificarAlteracaoMapa(existente.getAtividade().getMapa().getCodigo());
+                            var mapa = existente.getAtividade().getMapa();
+                            if (mapa != null) {
+                                notificarAlteracaoMapa(mapa.getCodigo());
+                            }
                             var paraAtualizar = conhecimentoMapper.toEntity(request);
                             existente.setDescricao(paraAtualizar.getDescricao());
                             conhecimentoRepo.save(existente);
@@ -123,7 +130,10 @@ public class ConhecimentoService {
     }
 
     private void executarExclusao(Conhecimento conhecimento) {
-        notificarAlteracaoMapa(conhecimento.getAtividade().getMapa().getCodigo());
+        var mapa = conhecimento.getAtividade().getMapa();
+        if (mapa != null) {
+            notificarAlteracaoMapa(mapa.getCodigo());
+        }
         conhecimentoRepo.delete(conhecimento);
     }
 

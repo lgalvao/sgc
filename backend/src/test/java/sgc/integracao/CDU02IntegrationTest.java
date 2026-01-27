@@ -1,16 +1,28 @@
 package sgc.integracao;
 
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.*;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.extern.slf4j.Slf4j;
 import sgc.Sgc;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
@@ -20,16 +32,12 @@ import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioRepo;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -49,11 +57,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     private static final String PROCESSO_FILHA_1_JSON_PATH = "$.content[?(@.descricao == 'Processo Filha 1')]";
 
     @Autowired
-    private UnidadeRepo unidadeRepo;
-    @Autowired
     private UsuarioRepo usuarioRepo;
-    @Autowired
-    private ProcessoRepo processoRepo;
     @Autowired
     private AlertaRepo alertaRepo;
     @Autowired
@@ -72,7 +76,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 20000");
             jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 80000");
             jdbcTemplate.execute("ALTER TABLE SGC.ALERTA ALTER COLUMN CODIGO RESTART WITH 90000");
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             // Ignora se o DB não suportar (H2 suporta)
             log.warn("Aviso: Não foi possível reiniciar sequências: {}", e.getMessage());
         }
@@ -132,12 +136,12 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             newUser.setUnidadeLotacao(unidade);
             newUser = usuarioRepo.save(newUser);
             // Insere na tabela de join simulada se necessário (H2 specific for View)
-             for (String perfilStr : perfis) {
+            for (String perfilStr : perfis) {
                 try {
                     jdbcTemplate.update(
                             "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
                             newUser.getTituloEleitoral(), unidade.getCodigo(), perfilStr);
-                } catch (Exception ignored) {
+                } catch (DataAccessException ignored) {
                     // Ignora se já existe
                 }
             }
@@ -253,8 +257,8 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             alertaRepo.save(alerta);
 
             mockMvc.perform(get(API_PAINEL_ALERTAS)
-                            .param("usuarioTitulo", usuario.getTituloEleitoral())
-                            .param(UNIDADE, unidadeRaiz.getCodigo().toString()))
+                    .param("usuarioTitulo", usuario.getTituloEleitoral())
+                    .param(UNIDADE, unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta Pessoal Teste')]").exists());
         }

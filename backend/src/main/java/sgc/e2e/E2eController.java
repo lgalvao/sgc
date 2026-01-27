@@ -1,7 +1,14 @@
 package sgc.e2e;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
@@ -13,7 +20,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
@@ -23,14 +37,6 @@ import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/e2e")
@@ -60,7 +66,11 @@ public class E2eController {
                                 String.class);
 
                 for (String table : tables) {
-                    jdbcTemplate.execute("TRUNCATE TABLE sgc." + table);
+                    if (table.matches("^\\w+$")) {
+                        jdbcTemplate.execute("TRUNCATE TABLE sgc." + table);
+                    } else {
+                        log.warn("Nome de tabela suspeito ignorado no reset: {}", table);
+                    }
                 }
             } finally {
                 jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
@@ -77,7 +87,7 @@ public class E2eController {
             try (Connection conn = dataSource.getConnection()) {
                 ScriptUtils.executeSqlScript(conn, seedResource);
             }
-        } catch (Exception e) {
+        } catch (RuntimeException | SQLException e) {
             log.error("Error resetting database", e);
             throw e;
         }
@@ -182,7 +192,7 @@ public class E2eController {
         UnidadeDto unidade = unidadeFacade.buscarPorSigla(request.unidadeSigla());
 
         // Calcular data limite
-        int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
+        int diasLimite = java.util.Objects.requireNonNullElse(request.diasLimite(), 30);
         LocalDateTime dataLimite = LocalDate.now().plusDays(diasLimite).atStartOfDay();
 
         // Criar requisição de processo

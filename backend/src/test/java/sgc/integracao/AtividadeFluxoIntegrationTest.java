@@ -1,5 +1,10 @@
 package sgc.integracao;
 
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -7,65 +12,43 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.TestThymeleafConfig;
-import sgc.integracao.mocks.WithMockChefe;
-import sgc.mapa.dto.CriarAtividadeRequest;
-import sgc.mapa.model.AtividadeRepo;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
-import sgc.organizacao.model.*;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-import tools.jackson.databind.ObjectMapper;
-
-import java.time.LocalDateTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import org.springframework.test.context.ActiveProfiles;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.transaction.annotation.Transactional;
+
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.TestThymeleafConfig;
+import sgc.integracao.mocks.WithMockChefe;
+import sgc.mapa.dto.CriarAtividadeRequest;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.TipoUnidade;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.organizacao.model.UsuarioRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
 
 @Tag("integration")
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
+@Import({ TestSecurityConfig.class, TestThymeleafConfig.class })
 @DisplayName("Integração: Fluxo de Atividades (Criação, Exclusão, Validação)")
 class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private UnidadeRepo unidadeRepo;
-
-    @Autowired
-    private MapaRepo mapaRepo;
-
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-
-    @Autowired
-    private AtividadeRepo atividadeRepo;
-
-    @Autowired
-    private ProcessoRepo processoRepo;
-
     @Autowired
     private UsuarioRepo usuarioRepo;
 
@@ -79,13 +62,14 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
     private Mapa mapa;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
-         try {
+        try {
             jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 75000");
             jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 85000");
             jdbcTemplate.execute("ALTER TABLE SGC.SUBPROCESSO ALTER COLUMN CODIGO RESTART WITH 95000");
             jdbcTemplate.execute("ALTER TABLE SGC.MAPA ALTER COLUMN CODIGO RESTART WITH 95000");
-        } catch (Exception ignored) {
+        } catch (DataAccessException ignored) {
             // Ignorado: falha ao resetar sequências no H2 não deve impedir o teste
         }
 
@@ -151,9 +135,9 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
                 .build();
 
         String responseJson = mockMvc.perform(post("/api/atividades")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.atividade.descricao", is("Atividade Temporária")))
@@ -167,7 +151,7 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
 
         // Excluir Atividade
         mockMvc.perform(post("/api/atividades/{id}/excluir", codigoAtividade)
-                        .with(csrf()))
+                .with(csrf()))
                 .andExpect(status().isOk());
 
         // Verificar DB (não deve existir)
@@ -185,9 +169,9 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
                 .build();
 
         mockMvc.perform(post("/api/atividades")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
 
         // Validar Cadastro

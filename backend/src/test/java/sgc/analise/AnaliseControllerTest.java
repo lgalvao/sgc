@@ -1,13 +1,34 @@
 package sgc.analise;
 
-import org.junit.jupiter.api.*;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
@@ -16,17 +37,6 @@ import sgc.comum.erros.RestExceptionHandler;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 import tools.jackson.databind.ObjectMapper;
-
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AnaliseController.class)
 @Import(RestExceptionHandler.class)
@@ -64,6 +74,7 @@ class AnaliseControllerTest {
     private Subprocesso subprocesso;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setup() {
         objectMapper = new ObjectMapper();
         subprocesso = new Subprocesso();
@@ -72,6 +83,7 @@ class AnaliseControllerTest {
 
     @Nested
     @DisplayName("Testes para listar análises de cadastro")
+    @SuppressWarnings("unused")
     class ListarAnalisesCadastro {
         @Test
         @DisplayName("Deve retornar lista de análises de cadastro com status 200 OK")
@@ -150,6 +162,7 @@ class AnaliseControllerTest {
 
     @Nested
     @DisplayName("Testes para criar análise de cadastro")
+    @SuppressWarnings("unused")
     class CriarAnaliseCadastro {
 
         @Test
@@ -307,6 +320,7 @@ class AnaliseControllerTest {
 
     @Nested
     @DisplayName("Testes para listar análises de validação")
+    @SuppressWarnings("unused")
     class ListarAnalisesValidacao {
 
         @Test
@@ -383,6 +397,7 @@ class AnaliseControllerTest {
 
     @Nested
     @DisplayName("Testes para criar análise de validação")
+    @SuppressWarnings("unused")
     class CriarAnaliseValidacao {
 
         @Test

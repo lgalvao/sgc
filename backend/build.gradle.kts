@@ -78,8 +78,9 @@ dependencies {
 
     // Dependências básicas com versões mais recentes que as definidas pelo Spring (reduz CVEs)
     implementation("org.apache.commons:commons-lang3:3.20.0")
-    implementation("ch.qos.logback:logback-classic:1.5.23")
-    implementation("ch.qos.logback:logback-core:1.5.23")
+    implementation("ch.qos.logback:logback-classic:1.5.25")
+    implementation("ch.qos.logback:logback-core:1.5.25")
+    testImplementation("org.assertj:assertj-core:3.27.7")
 }
 
 

@@ -1,13 +1,26 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.*;
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
+
 import sgc.Sgc;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
@@ -20,24 +33,18 @@ import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
-import sgc.mapa.model.*;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
-import sgc.subprocesso.model.*;
-import tools.jackson.databind.ObjectMapper;
-
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -51,17 +58,6 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
     private static final String SEDOC_LITERAL = "SEDOC";
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-    @Autowired
-    private UnidadeRepo unidadeRepo;
-    @Autowired
-    private MapaRepo mapaRepo;
-    @Autowired
-    private AtividadeRepo atividadeRepo;
-    @Autowired
     private CompetenciaRepo competenciaRepo;
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
@@ -70,8 +66,6 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private AnaliseRepo analiseRepo;
     @Autowired
-    private ProcessoRepo processoRepo;
-    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     private Unidade unidade;
@@ -79,6 +73,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
     private Mapa mapa;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         // Use existing SEDOC from data.sql (ID 15) instead of creating a duplicate with ID 100.
         // Creating a duplicate 'SEDOC' causes NonUniqueResultException in services looking up by sigla.
@@ -139,6 +134,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de Sucesso")
+    @SuppressWarnings("unused")
     class Sucesso {
 
         @Test
@@ -201,6 +197,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de Falha")
+    @SuppressWarnings("unused")
     class Falha {
         @Test
         @DisplayName("Não deve disponibilizar mapa com usuário sem permissão (não ADMIN)")

@@ -1,6 +1,8 @@
 package sgc.integracao;
 
-import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -9,26 +11,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.persistence.EntityManager;
 import sgc.Sgc;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioRepo;
-import tools.jackson.databind.ObjectMapper;
-
-import java.time.LocalDate;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -37,12 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-28: Manter atribuição temporária")
 class CDU28IntegrationTest extends BaseIntegrationTest {
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private UnidadeRepo unidadeRepo;
 
     @Autowired
     private UsuarioRepo usuarioRepo;
@@ -54,6 +46,7 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
     private Usuario usuario;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         unidade = unidadeRepo.findById(1L).orElseThrow();
 

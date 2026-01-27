@@ -1,11 +1,11 @@
 package sgc.mapa.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import sgc.mapa.model.TipoImpactoAtividade;
-
-import java.util.List;
 
 /**
  * DTO que representa uma atividade que sofreu alteração durante a revisão do cadastro.
@@ -33,7 +33,7 @@ public class AtividadeImpactadaDto {
     private final TipoImpactoAtividade tipoImpacto;
 
     /**
-     * A descrição anterior da atividade (apenas para tipo ALTERADA).
+     * A descrição anterior da atividade.
      */
     private final String descricaoAnterior;
 

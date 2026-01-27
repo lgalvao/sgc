@@ -1,10 +1,13 @@
 package sgc.mapa.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.AtualizarAtividadeRequest;
@@ -14,8 +17,6 @@ import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Mapa;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -70,7 +71,10 @@ public class AtividadeService {
         Atividade existente = repo.buscar(Atividade.class, codigo);
 
         if (existente.getMapa() != null) {
-            notificarAlteracaoMapa(existente.getMapa().getCodigo());
+            var mapa = existente.getMapa();
+            if (mapa != null) {
+                notificarAlteracaoMapa(mapa.getCodigo());
+            }
         }
 
         var entidadeParaAtualizar = atividadeMapper.toEntity(request);
@@ -88,8 +92,9 @@ public class AtividadeService {
             if (novaDescricao != null) {
                 atividade.setDescricao(novaDescricao);
             }
-            if (atividade.getMapa() != null) {
-                mapasAfetados.add(atividade.getMapa().getCodigo());
+            var mapa = atividade.getMapa();
+            if (mapa != null) {
+                mapasAfetados.add(mapa.getCodigo());
             }
         }
 
@@ -109,7 +114,10 @@ public class AtividadeService {
     }
 
     private void excluirAtividadeEConhecimentos(Atividade atividade) {
-        notificarAlteracaoMapa(atividade.getMapa().getCodigo());
+        var mapa = atividade.getMapa();
+        if (mapa != null) {
+            notificarAlteracaoMapa(mapa.getCodigo());
+        }
         conhecimentoService.excluirTodosDaAtividade(atividade);
         atividadeRepo.delete(atividade);
     }

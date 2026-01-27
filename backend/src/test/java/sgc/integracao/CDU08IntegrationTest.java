@@ -1,40 +1,50 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.*;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.ActiveProfiles;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
+
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
-import sgc.mapa.model.*;
-import sgc.organizacao.model.*;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.ConhecimentoRepo;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.organizacao.model.UsuarioRepo;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.ImportarAtividadesRequest;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-import tools.jackson.databind.ObjectMapper;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @SpringBootTest
@@ -43,30 +53,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @DisplayName("CDU-08: Manter cadastro de atividades e conhecimentos")
 class CDU08IntegrationTest extends BaseIntegrationTest {
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private UnidadeRepo unidadeRepo;
-
-    @Autowired
-    private MapaRepo mapaRepo;
-
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-
-    @Autowired
-    private AtividadeRepo atividadeRepo;
-
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
 
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
-
-    @Autowired
-    private ProcessoRepo processoRepo;
 
     @Autowired
     private UsuarioRepo usuarioRepo;
@@ -84,6 +75,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocessoDestino;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         // Reset sequences
         try {
@@ -91,7 +83,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 80000");
             jdbcTemplate.execute("ALTER TABLE SGC.SUBPROCESSO ALTER COLUMN CODIGO RESTART WITH 90000");
             jdbcTemplate.execute("ALTER TABLE SGC.MAPA ALTER COLUMN CODIGO RESTART WITH 90000");
-        } catch (Exception ignored) {
+        } catch (DataAccessException e) {
             // Ignorado: falha ao resetar sequências no H2 não deve impedir o teste
         }
 
@@ -178,6 +170,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
     @Nested
     @DisplayName("Testes de importação de atividades")
     @WithMockChefe("888888888888")
+    @SuppressWarnings("unused")
     class ImportacaoAtividades {
         @Test
         @DisplayName("Deve importar atividades e conhecimentos")
@@ -185,13 +178,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             ImportarAtividadesRequest request =
                     new ImportarAtividadesRequest(subprocessoOrigem.getCodigo());
 
-            mockMvc.perform(
-                            post(
-                                    "/api/subprocessos/{id}/importar-atividades",
-                                    subprocessoDestino.getCodigo())
-                                    .with(csrf())
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message", is("Atividades importadas.")));
 
@@ -210,6 +197,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             assertThat(atividade1Importada).isNotNull();
             List<Conhecimento> conhecimentos1 =
                     conhecimentoRepo.findByAtividadeCodigo(atividade1Importada.getCodigo());
+
             assertThat(conhecimentos1).hasSize(1);
             assertThat(conhecimentos1.getFirst().getDescricao()).isEqualTo("Conhecimento 1.1");
 
@@ -229,10 +217,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                     movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
                             subprocessoDestino.getCodigo());
             assertThat(movimentacoes).hasSize(1);
-            assertThat(movimentacoes.getFirst().getDescricao())
-                    .contains(
-                            "Importação de atividades do subprocesso #"
-                                    + subprocessoOrigem.getCodigo());
+            assertThat(movimentacoes.getFirst().getDescricao()).contains("Importação de atividades do subprocesso #" + subprocessoOrigem.getCodigo());
         }
 
         @Test

@@ -1,6 +1,5 @@
 package sgc.seguranca.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -13,6 +12,10 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+
+import lombok.RequiredArgsConstructor;
 import sgc.seguranca.login.FiltroJwt;
 
 @Configuration
@@ -60,9 +63,11 @@ public class ConfigSeguranca {
                                 .permitAll())
                                 .exceptionHandling(e -> e.authenticationEntryPoint(
                                                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-                                // Desabilita CSRF pois a API é stateless e usa JWTs via header, sem cookies de
-                                // sessão
-                                .csrf(AbstractHttpConfigurer::disable)
+                                // Habilita CSRF usando cookies (padrão para SPAs como Vue/React)
+                                // O cliente deve ler o cookie XSRF-TOKEN e enviar no header X-XSRF-TOKEN
+                                .csrf(csrf -> csrf
+                                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                                                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
                                 .httpBasic(AbstractHttpConfigurer::disable)
                                 .formLogin(AbstractHttpConfigurer::disable)
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource))

@@ -1,20 +1,29 @@
 package sgc.organizacao;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.HtmlUtils;
+
+import jakarta.validation.constraints.Pattern;
+import lombok.RequiredArgsConstructor;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.processo.model.TipoProcesso;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
 import static sgc.processo.model.TipoProcesso.REVISAO;
 
@@ -24,6 +33,7 @@ import static sgc.processo.model.TipoProcesso.REVISAO;
 @RestController
 @RequestMapping("/api/unidades")
 @RequiredArgsConstructor
+@Validated
 public class UnidadeController {
     private final UnidadeFacade unidadeService;
     private final sgc.processo.service.ProcessoFacade processoFacade;
@@ -120,7 +130,8 @@ public class UnidadeController {
      * @return Os dados da unidade.
      */
     @GetMapping("/sigla/{siglaUnidade}")
-    public ResponseEntity<UnidadeDto> buscarUnidadePorSigla(@PathVariable String siglaUnidade) {
+    public ResponseEntity<UnidadeDto> buscarUnidadePorSigla(
+            @PathVariable @Pattern(regexp = "^[a-zA-Z0-9_.-]+$") String siglaUnidade) {
         UnidadeDto unidade = unidadeService.buscarPorSigla(siglaUnidade);
         return ResponseEntity.ok(unidade);
     }
@@ -155,7 +166,8 @@ public class UnidadeController {
      * @return Lista de siglas.
      */
     @GetMapping("/sigla/{sigla}/subordinadas")
-    public ResponseEntity<List<String>> buscarSiglasSubordinadas(@PathVariable String sigla) {
+    public ResponseEntity<List<String>> buscarSiglasSubordinadas(
+            @PathVariable @Pattern(regexp = "^[a-zA-Z0-9_.-]+$") String sigla) {
         List<String> siglas = unidadeService.buscarSiglasSubordinadas(sigla);
         return ResponseEntity.ok(siglas);
     }
@@ -167,10 +179,10 @@ public class UnidadeController {
      * @return A sigla da unidade superior ou 204 se não houver.
      */
     @GetMapping("/sigla/{sigla}/superior")
-    public ResponseEntity<String> buscarSiglaSuperior(@PathVariable String sigla) {
+    public ResponseEntity<String> buscarSiglaSuperior(@PathVariable @Pattern(regexp = "^[a-zA-Z0-9_.-]+$") String sigla) {
         return unidadeService
                 .buscarSiglaSuperior(sigla)
-                .map(ResponseEntity::ok)
+                .map(res -> ResponseEntity.ok(HtmlUtils.htmlEscape(res)))
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }
 }

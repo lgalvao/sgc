@@ -1,30 +1,42 @@
 package sgc.mapa.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.model.*;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.TipoImpactoAtividade;
+import sgc.mapa.model.TipoImpactoCompetencia;
 import sgc.organizacao.model.Usuario;
+import static sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS;
 
 /**
  * Serviço responsável por detectar impactos no mapa de competências causados por alterações no
  * cadastro de atividades durante processos de revisão.
  *
- * <p>CDU-12 - Verificar impactos no mapa de competências
- * 
  * <p>Este serviço consolida toda a lógica de detecção de mudanças em atividades e análise de
  * impactos em competências. Anteriormente, essa funcionalidade estava distribuída entre três
  * services separados (ImpactoMapaService, DetectorMudancasAtividadeService e 
@@ -113,10 +125,6 @@ public class ImpactoMapaService {
         return atividadeService.buscarPorMapaCodigoComConhecimentos(mapa.getCodigo());
     }
 
-    // ===================================================================================
-    // Detecção de Mudanças em Atividades
-    // ===================================================================================
-
     /**
      * Detecta atividades que foram inseridas no mapa atual em comparação com o vigente.
      */
@@ -128,7 +136,7 @@ public class ImpactoMapaService {
                         .codigo(atual.getCodigo())
                         .descricao(atual.getDescricao())
                         .tipoImpacto(TipoImpactoAtividade.INSERIDA)
-                        .descricaoAnterior(null)
+                        .descricaoAnterior(atual.getDescricao())
                         .competenciasVinculadas(List.of())
                         .build();
 
@@ -155,7 +163,7 @@ public class ImpactoMapaService {
                         .codigo(vigenteCodigo)
                         .descricao(vigente.getDescricao())
                         .tipoImpacto(TipoImpactoAtividade.REMOVIDA)
-                        .descricaoAnterior(null)
+                        .descricaoAnterior(vigente.getDescricao())
                         .competenciasVinculadas(obterNomesCompetencias(vigenteCodigo, competenciasVinculadas))
                         .build();
 
@@ -188,7 +196,7 @@ public class ImpactoMapaService {
                                     .codigo(atual.getCodigo())
                                     .descricao(atual.getDescricao())
                                     .tipoImpacto(TipoImpactoAtividade.ALTERADA)
-                                    .descricaoAnterior("Descrição ou conhecimentos associados alterados.")
+                                    .descricaoAnterior(vigente.getDescricao())
                                     .competenciasVinculadas(
                                             obterNomesCompetencias(vigente.getCodigo(), atividadeIdToCompetencias))
                                     .build());
@@ -216,12 +224,12 @@ public class ImpactoMapaService {
         // Otimização: Evitar overhead de Stream/Set para listas vazias ou muito pequenas
         if (lista1.isEmpty()) return false;
 
-        Set<String> descricoes1 = new HashSet<>(lista1.size());
+        Set<String> descricoes1 = HashSet.newHashSet(lista1.size());
         for (Conhecimento c : lista1) {
             descricoes1.add(c.getDescricao());
         }
 
-        Set<String> descricoes2 = new HashSet<>(lista2.size());
+        Set<String> descricoes2 = HashSet.newHashSet(lista2.size());
         for (Conhecimento c : lista2) {
             descricoes2.add(c.getDescricao());
         }
@@ -235,10 +243,6 @@ public class ImpactoMapaService {
                 .map(Competencia::getDescricao)
                 .toList();
     }
-
-    // ===================================================================================
-    // Análise de Impactos em Competências
-    // ===================================================================================
 
     /**
      * Identifica quais competências foram impactadas pelas atividades removidas ou alteradas.
@@ -346,13 +350,6 @@ public class ImpactoMapaService {
         return mapa;
     }
 
-    // ===================================================================================
-    // Classe Auxiliar Interna
-    // ===================================================================================
-
-    /**
-     * Classe auxiliar interna para acumular impactos antes de converter para DTO.
-     */
     private static class CompetenciaImpactoAcumulador {
         private final Long codigo;
         private final String descricao;

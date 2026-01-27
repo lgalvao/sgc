@@ -1,22 +1,34 @@
 package sgc.subprocesso;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.TipoAnalise;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.dto.*;
+import sgc.subprocesso.dto.ApresentarSugestoesRequest;
+import sgc.subprocesso.dto.DevolverValidacaoRequest;
+import sgc.subprocesso.dto.DisponibilizarMapaRequest;
+import sgc.subprocesso.dto.MensagemResponse;
+import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
+import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
+import sgc.subprocesso.dto.SugestoesDto;
 import sgc.subprocesso.service.SubprocessoFacade;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/subprocessos")
@@ -211,3 +223,4 @@ public class SubprocessoValidacaoController {
         subprocessoFacade.homologarValidacaoEmBloco(request.getUnidadeCodigos(), codigo, usuario);
     }
 }
+        
