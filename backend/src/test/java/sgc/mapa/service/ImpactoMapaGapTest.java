@@ -1,12 +1,19 @@
 package sgc.mapa.service;
 
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
@@ -15,16 +22,6 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -40,6 +37,8 @@ class ImpactoMapaGapTest {
     private AtividadeService atividadeService;
     @Mock
     private AccessControlService accessControlService;
+    @Mock
+    private sgc.mapa.model.CompetenciaRepo competenciaRepo;
 
     @Test
     @DisplayName("Deve falhar se mapa do subprocesso não for encontrado")

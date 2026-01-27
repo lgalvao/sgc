@@ -1,12 +1,23 @@
 package sgc.processo.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.AtualizarProcessoRequest;
@@ -17,17 +28,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoFacadeCoverageTest")
@@ -42,6 +42,24 @@ class ProcessoFacadeCoverageTest {
     private ProcessoValidador processoValidador;
     @Mock
     private ProcessoConsultaService processoConsultaService;
+    @Mock
+    private sgc.subprocesso.service.SubprocessoFacade subprocessoFacade;
+    @Mock
+    private ProcessoDetalheBuilder processoDetalheBuilder;
+    @Mock
+    private sgc.subprocesso.mapper.SubprocessoMapper subprocessoMapper;
+    @Mock
+    private sgc.organizacao.UsuarioFacade usuarioService;
+    @Mock
+    private ProcessoInicializador processoInicializador;
+    @Mock
+    private sgc.alerta.AlertaFacade alertaService;
+    @Mock
+    private ProcessoAcessoService processoAcessoService;
+    @Mock
+    private ProcessoFinalizador processoFinalizador;
+    @Mock
+    private sgc.processo.mapper.ProcessoMapper processoMapper;
 
     @InjectMocks
     private ProcessoFacade facade;

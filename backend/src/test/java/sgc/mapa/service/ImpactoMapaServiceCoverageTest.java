@@ -1,24 +1,28 @@
 package sgc.mapa.service;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.model.*;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -29,6 +33,8 @@ class ImpactoMapaServiceCoverageTest {
     private CompetenciaRepo competenciaRepo;
     @Mock
     private AtividadeService atividadeService;
+    @Mock
+    private sgc.seguranca.acesso.AccessControlService accessControlService;
 
     @InjectMocks
     private ImpactoMapaService service;
