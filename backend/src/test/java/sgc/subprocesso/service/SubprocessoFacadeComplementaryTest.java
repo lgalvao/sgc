@@ -84,6 +84,10 @@ class SubprocessoFacadeComplementaryTest {
     private sgc.subprocesso.model.SubprocessoMovimentacaoRepo movimentacaoRepo;
     @Mock
     private sgc.mapa.service.CopiaMapaService copiaMapaService;
+    @Mock
+    private sgc.mapa.service.MapaFacade mapaFacade;
+    @Mock
+    private sgc.mapa.mapper.ConhecimentoMapper conhecimentoMapper;
 
     @InjectMocks
     private SubprocessoFacade subprocessoFacade;

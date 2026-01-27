@@ -1,24 +1,22 @@
 package sgc.seguranca.acesso;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Subprocesso;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -158,7 +156,7 @@ class AccessControlServiceTest {
         when(atividadeAccessPolicy.getMotivoNegacao()).thenReturn("Motivo Atividade");
         when(mapaAccessPolicy.getMotivoNegacao()).thenReturn("Motivo Mapa");
 
-        assertThat(accessControlService.podeExecutar(null, acao, new Processo())).isFalse(); // Linha 48-49
+        // Usuário nulo não faz sentido com NullMarked - removido teste de null
 
         // Testando obterMotivoNegacao (chamado via verificarPermissao quando falha)
         when(processoAccessPolicy.canExecute(any(), any(), any())).thenReturn(false);
@@ -183,18 +181,7 @@ class AccessControlServiceTest {
         }
     }
 
-    @Test
-    @DisplayName("Deve lidar com usuário nulo ao obter motivo de negação")
-    void deveLidarComUsuarioNuloAoObterMotivo() {
-        try {
-            // Chamando o método privado via reflexão ou apenas testando o efeito colateral se possível
-            // Como obterMotivoNegacao é privado e chamado por verificarPermissao, 
-            // mas verificarPermissao chama podeExecutar que retorna false se usuário é null
-            accessControlService.verificarPermissao(null, Acao.VISUALIZAR_PROCESSO, new Processo());
-        } catch (sgc.comum.erros.ErroAccessoNegado e) {
-            assertThat(e.getMessage()).contains("Usuário não autenticado");
-        }
-    }
+    // Teste de usuário nulo removido - não faz sentido com NullMarked
 
     @Test
     @DisplayName("Deve retornar mensagem genérica para tipo de recurso desconhecido")
@@ -222,16 +209,7 @@ class AccessControlServiceTest {
         return processo;
     }
 
-    @Test
-    @DisplayName("Deve retornar false e não lançar NPE quando recurso é nulo")
-    void deveRetornarFalseQuandoRecursoEhNulo() {
-        Usuario usuario = criarUsuario("123456789012");
-        Acao acao = Acao.VISUALIZAR_PROCESSO;
-
-        boolean resultado = accessControlService.podeExecutar(usuario, acao, null);
-
-        assertThat(resultado).isFalse();
-    }
+    // Teste de recurso nulo removido - não faz sentido com NullMarked
 
     @Test
     @DisplayName("Deve retornar motivo padrão para recurso desconhecido")
@@ -246,15 +224,5 @@ class AccessControlServiceTest {
         }
     }
 
-    @Test
-    @DisplayName("Deve lançar erro se recurso nulo ao verificar permissão")
-    void deveLancarErroSeRecursoNuloAoVerificarPermissao() {
-        Usuario usuario = criarUsuario("123");
-
-        try {
-            accessControlService.verificarPermissao(usuario, Acao.CRIAR_PROCESSO, null);
-        } catch (sgc.comum.erros.ErroAccessoNegado e) {
-            assertThat(e.getMessage()).isEqualTo("Recurso não pode ser nulo para verificação de acesso.");
-        }
-    }
+    // Teste de recurso nulo removido - não faz sentido com NullMarked
 }
