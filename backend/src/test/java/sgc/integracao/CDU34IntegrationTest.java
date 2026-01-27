@@ -49,6 +49,7 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
     private Processo processo;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         // Obter Unidade
         unidade = unidadeRepo.findById(1L).orElseThrow();

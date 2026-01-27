@@ -33,6 +33,7 @@ class SubprocessoDetalheMapperTest {
     private MovimentacaoMapper movimentacaoMapper;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         mapper = Mappers.getMapper(SubprocessoDetalheMapper.class);
         ReflectionTestUtils.setField(mapper, "movimentacaoMapper", movimentacaoMapper);
@@ -129,6 +130,6 @@ class SubprocessoDetalheMapperTest {
 
         SubprocessoDetalheDto dto = mapper.toDto(sp, null, null, List.of(mov), null);
 
-        assertThat(dto.getLocalizacaoAtual()).isEqualTo("");
+        assertThat(dto.getLocalizacaoAtual()).isEmpty();
     }
 }

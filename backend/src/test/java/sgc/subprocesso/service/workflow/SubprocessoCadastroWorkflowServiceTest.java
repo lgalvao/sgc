@@ -23,7 +23,6 @@ import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
 import java.util.Collections;
@@ -38,8 +37,6 @@ import static org.mockito.Mockito.*;
 @Tag("unit")
 class SubprocessoCadastroWorkflowServiceTest {
     @Mock
-    private SubprocessoRepo repositorioSubprocesso;
-    @Mock
     private SubprocessoTransicaoService transicaoService;
     @Mock
     private UnidadeFacade unidadeService;
@@ -53,16 +50,6 @@ class SubprocessoCadastroWorkflowServiceTest {
     private sgc.seguranca.acesso.AccessControlService accessControlService;
     @Mock
     private RepositorioComum repo;
-    @Mock
-    private sgc.mapa.service.CompetenciaService competenciaService;
-    @Mock
-    private sgc.mapa.service.AtividadeService atividadeService;
-    @Mock
-    private sgc.mapa.service.MapaFacade mapaFacade;
-    @Mock
-    private sgc.subprocesso.model.MovimentacaoRepo repositorioMovimentacao;
-    @Mock
-    private sgc.subprocesso.service.crud.SubprocessoCrudService crudService;
 
     @InjectMocks
     private SubprocessoWorkflowService service;

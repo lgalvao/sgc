@@ -232,18 +232,9 @@ class SubprocessoEmailServiceTest {
                 .observacoes(null) // Sem observações
                 .build();
 
-        // Configura mock para capturar variáveis passadas ao contexto (mas aqui o templateEngine.process recebe o Context direto?
-        // Não, a classe SubprocessoEmailService cria um Context e passa.
-        // O método processarTemplate é privado.
-        // O método enviarEmailTransicao chama processarTemplate.
-        // processarTemplate chama templateEngine.process(templateName, context).
-        // Então eu posso verificar o argumento do templateEngine.process.
 
         when(templateEngine.process(anyString(), any())).thenReturn("html");
-
         service.enviarEmailTransicao(evento);
-
-        // Verifica se executou sem erro
         verify(notificacaoEmailService).enviarEmail(any(), any(), any());
     }
 

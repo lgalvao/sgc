@@ -593,8 +593,9 @@ class SubprocessoFacadeComplementaryTest {
 
             when(subprocessoRepo.findById(codigo)).thenReturn(java.util.Optional.of(sp));
 
+            List<CompetenciaAjusteDto> ajustes = List.of();
             var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () ->
-                    subprocessoFacade.salvarAjustesMapa(codigo, List.of())
+                    subprocessoFacade.salvarAjustesMapa(codigo, ajustes)
             );
             assertThat(exception).isNotNull();
         }

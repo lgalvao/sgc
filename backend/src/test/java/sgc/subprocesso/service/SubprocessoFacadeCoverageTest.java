@@ -131,7 +131,8 @@ class SubprocessoFacadeCoverageTest {
         Long codSubprocesso = 999L;
         when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.empty());
 
-        var exception = Assertions.assertThrows(ErroEntidadeNaoEncontrada.class, () -> facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList()));
+        List<CompetenciaAjusteDto> ajustes = java.util.Collections.emptyList();
+        var exception = Assertions.assertThrows(ErroEntidadeNaoEncontrada.class, () -> facade.salvarAjustesMapa(codSubprocesso, ajustes));
         Assertions.assertNotNull(exception);
     }
 
@@ -296,7 +297,8 @@ class SubprocessoFacadeCoverageTest {
 
         when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
 
-        var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () -> facade.salvarAjustesMapa(codSubprocesso, java.util.Collections.emptyList()));
+        List<CompetenciaAjusteDto> ajustes = java.util.Collections.emptyList();
+        var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () -> facade.salvarAjustesMapa(codSubprocesso, ajustes));
         org.junit.jupiter.api.Assertions.assertNotNull(exception);
     }
 

@@ -89,7 +89,8 @@ class SubprocessoCrudServiceCoverageTest {
     @DisplayName("obterEntidadePorCodigoMapa - Erro")
     void obterEntidadePorCodigoMapa_Erro() {
         when(repositorio.findByMapaCodigo(1L)).thenReturn(Optional.empty());
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> crudService.obterEntidadePorCodigoMapa(1L));
+        var exception = assertThrows(ErroEntidadeNaoEncontrada.class, () -> crudService.obterEntidadePorCodigoMapa(1L));
+        assertNotNull(exception);
     }
 
     @Test
