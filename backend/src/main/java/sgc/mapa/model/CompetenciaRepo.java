@@ -1,12 +1,12 @@
 package sgc.mapa.model;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 /**
  * Repositório JPA para a entidade Competencia.
@@ -43,5 +43,6 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
      * @param mapaCodigo Código do mapa
      * @return Lista de competências
      */
+    @Query("SELECT c FROM Competencia c WHERE c.mapa.codigo = :mapaCodigo")
     List<Competencia> findByMapaCodigoSemFetch(@Param("mapaCodigo") Long mapaCodigo);
 }
