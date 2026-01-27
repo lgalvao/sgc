@@ -3,16 +3,12 @@ import {computed, ref} from "vue";
 import * as atividadeService from "@/services/atividadeService";
 import * as subprocessoService from "@/services/subprocessoService";
 import type {Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest,} from "@/types/tipos";
-import {type NormalizedError, normalizeError} from "@/utils/apiError";
 import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useErrorHandler} from "@/composables/useErrorHandler";
 
 export const useAtividadesStore = defineStore("atividades", () => {
     const atividadesPorSubprocesso = ref(new Map<number, Atividade[]>());
-    const lastError = ref<NormalizedError | null>(null);
-
-    function clearError() {
-        lastError.value = null;
-    }
+    const { lastError, clearError, withErrorHandling } = useErrorHandler();
 
     const obterAtividadesPorSubprocesso = computed(
         () =>
@@ -26,15 +22,12 @@ export const useAtividadesStore = defineStore("atividades", () => {
     }
 
     async function buscarAtividadesParaSubprocesso(codSubrocesso: number) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             const atividades = await subprocessoService.listarAtividades(codSubrocesso);
             atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
-        } catch (error) {
-            lastError.value = normalizeError(error);
+        }, () => {
             atividadesPorSubprocesso.value.set(codSubrocesso, []);
-            throw error;
-        }
+        });
     }
 
     async function adicionarAtividade(
@@ -42,33 +35,25 @@ export const useAtividadesStore = defineStore("atividades", () => {
         codMapa: number,
         request: CriarAtividadeRequest,
     ) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             const response = await atividadeService.criarAtividade(request, codMapa);
             await buscarAtividadesParaSubprocesso(codSubprocesso);
             // Atualiza o detalhe do subprocesso para refletir mudanças de estado
             const subprocessosStore = useSubprocessosStore();
             await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso);
             return response.subprocesso; // Retorna status do subprocesso
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function removerAtividade(codSubrocesso: number, atividadeId: number) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             const response = await atividadeService.excluirAtividade(atividadeId);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
             // Atualiza o detalhe do subprocesso para refletir mudanças de estado
             const subprocessosStore = useSubprocessosStore();
             await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso);
             return response.subprocesso; // Retorna status do subprocesso
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function adicionarConhecimento(
@@ -76,18 +61,14 @@ export const useAtividadesStore = defineStore("atividades", () => {
         atividadeId: number,
         request: CriarConhecimentoRequest,
     ) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             const response = await atividadeService.criarConhecimento(atividadeId, request);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
             // Atualiza o detalhe do subprocesso para refletir mudanças de estado
             const subprocessosStore = useSubprocessosStore();
             await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso);
             return response.subprocesso; // Retorna status do subprocesso
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function removerConhecimento(
@@ -95,35 +76,27 @@ export const useAtividadesStore = defineStore("atividades", () => {
         atividadeId: number,
         conhecimentoId: number,
     ) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             const response = await atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
             // Atualiza o detalhe do subprocesso para refletir mudanças de estado
             const subprocessosStore = useSubprocessosStore();
             await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso);
             return response.subprocesso; // Retorna status do subprocesso
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function importarAtividades(
         codSubrocessoDestino: number,
         codSubrocessoOrigem: number,
     ) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             await subprocessoService.importarAtividades(codSubrocessoDestino, codSubrocessoOrigem);
             await buscarAtividadesParaSubprocesso(codSubrocessoDestino);
             // Atualiza o detalhe do subprocesso para refletir mudanças de estado
             const subprocessosStore = useSubprocessosStore();
             await subprocessosStore.buscarSubprocessoDetalhe(codSubrocessoDestino);
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function atualizarAtividade(
@@ -131,18 +104,14 @@ export const useAtividadesStore = defineStore("atividades", () => {
         atividadeId: number,
         data: Atividade,
     ) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             const response = await atividadeService.atualizarAtividade(atividadeId, data);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
             // Atualiza o detalhe do subprocesso para refletir mudanças de estado
             const subprocessosStore = useSubprocessosStore();
             await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso);
             return response.subprocesso; // Retorna status do subprocesso
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function atualizarConhecimento(
@@ -151,18 +120,14 @@ export const useAtividadesStore = defineStore("atividades", () => {
         conhecimentoId: number,
         data: Conhecimento,
     ) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             const response = await atividadeService.atualizarConhecimento(atividadeId, conhecimentoId, data);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
             // Atualiza o detalhe do subprocesso para refletir mudanças de estado
             const subprocessosStore = useSubprocessosStore();
             await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso);
             return response.subprocesso; // Retorna status do subprocesso
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     return {
