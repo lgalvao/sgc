@@ -13,7 +13,8 @@ import type {
     SalvarAjustesRequest,
     SalvarMapaRequest,
 } from "@/types/tipos";
-import { type NormalizedError, normalizeError } from "@/utils/apiError";
+import { useErrorHandler } from "@/composables/useErrorHandler";
+import { normalizeError } from "@/utils/apiError";
 
 
 export const useMapasStore = defineStore("mapas", () => {
@@ -21,72 +22,53 @@ export const useMapasStore = defineStore("mapas", () => {
     const mapaAjuste = ref<MapaAjuste | null>(null);
     const impactoMapa = ref<ImpactoMapa | null>(null);
     const mapaVisualizacao = ref<MapaVisualizacao | null>(null);
-    const lastError = ref<NormalizedError | null>(null);
+    const { lastError, clearError, withErrorHandling } = useErrorHandler();
     const feedbackStore = useFeedbackStore();
 
-    function clearError() {
-        lastError.value = null;
-    }
-
     async function buscarMapaVisualizacao(codSubrocesso: number) {
-        lastError.value = null;
-        mapaVisualizacao.value = null; // Limpa estado anterior
-        try {
+        return withErrorHandling(async () => {
+            mapaVisualizacao.value = null; // Limpa estado anterior
             mapaVisualizacao.value =
                 await mapaService.obterMapaVisualizacao(codSubrocesso);
-        } catch (error) {
-            lastError.value = normalizeError(error);
+        }, () => {
             mapaVisualizacao.value = null;
-            throw error;
-        }
+        });
     }
 
     async function buscarMapaCompleto(codSubrocesso: number) {
-        lastError.value = null;
-        mapaCompleto.value = null; // Limpa estado anterior
-        try {
+        return withErrorHandling(async () => {
+            mapaCompleto.value = null; // Limpa estado anterior
             mapaCompleto.value = await mapaService.obterMapaCompleto(codSubrocesso);
-        } catch (error) {
-            lastError.value = normalizeError(error);
+        }, () => {
             mapaCompleto.value = null;
-            throw error;
-        }
+        });
     }
 
     async function salvarMapa(codSubrocesso: number, request: SalvarMapaRequest) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             mapaCompleto.value = await mapaService.salvarMapaCompleto(
                 codSubrocesso,
                 request,
             );
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function adicionarCompetencia(
         codSubrocesso: number,
         competencia: Competencia,
     ) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             mapaCompleto.value = await subprocessoService.adicionarCompetencia(
                 codSubrocesso,
                 competencia,
             );
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function atualizarCompetencia(
         codSubrocesso: number,
         competencia: Competencia,
     ) {
-        lastError.value = null;
         if (!competencia || !competencia.codigo) {
             // Evitar chamada ao backend com id inválido
             const err = new Error("Código da competência inválido");
@@ -94,85 +76,64 @@ export const useMapasStore = defineStore("mapas", () => {
             throw err;
         }
 
-        try {
+        return withErrorHandling(async () => {
             mapaCompleto.value = await subprocessoService.atualizarCompetencia(
                 codSubrocesso,
                 competencia,
             );
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function removerCompetencia(codSubrocesso: number, idCompetencia: number) {
-        lastError.value = null;
         if (!idCompetencia || idCompetencia === 0) {
             const err = new Error("Código da competência inválido");
             lastError.value = normalizeError(err);
             throw err;
         }
 
-        try {
+        return withErrorHandling(async () => {
             mapaCompleto.value = await subprocessoService.removerCompetencia(
                 codSubrocesso,
                 idCompetencia,
             );
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function buscarMapaAjuste(codSubrocesso: number) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             mapaAjuste.value = await mapaService.obterMapaAjuste(codSubrocesso);
-        } catch (error) {
-            lastError.value = normalizeError(error);
+        }, () => {
             mapaAjuste.value = null;
-            throw error;
-        }
+        });
     }
 
     async function salvarAjustes(codSubrocesso: number, request: SalvarAjustesRequest) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             await mapaService.salvarMapaAjuste(codSubrocesso, request);
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function buscarImpactoMapa(codSubrocesso: number) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             impactoMapa.value =
                 await mapaService.verificarImpactosMapa(codSubrocesso);
-        } catch (error) {
-            lastError.value = normalizeError(error);
+        }, () => {
             impactoMapa.value = null;
-            throw error;
-        }
+        });
     }
 
     async function disponibilizarMapa(
         codSubrocesso: number,
         request: DisponibilizarMapaRequest,
     ) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             await mapaService.disponibilizarMapa(codSubrocesso, request);
             feedbackStore.show(
                 "Mapa disponibilizado",
                 "O mapa de competências foi disponibilizado com sucesso.",
                 "success"
             );
-        } catch (error: any) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     return {

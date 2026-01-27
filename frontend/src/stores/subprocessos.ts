@@ -30,20 +30,16 @@ import type {
     HomologarCadastroRequest,
     SubprocessoDetalhe,
 } from "@/types/tipos";
-import { type NormalizedError, normalizeError } from "@/utils/apiError";
+import { useErrorHandler } from "@/composables/useErrorHandler";
+import { normalizeError } from "@/utils/apiError";
 
 export const useSubprocessosStore = defineStore("subprocessos", () => {
     const subprocessoDetalhe = ref<SubprocessoDetalhe | null>(null);
-    const lastError = ref<NormalizedError | null>(null);
+    const { lastError, clearError, withErrorHandling } = useErrorHandler();
     const feedbackStore = useFeedbackStore();
 
-    function clearError() {
-        lastError.value = null;
-    }
-
     async function _executarAcao(acao: () => Promise<any>, sucessoMsg: string, _: string): Promise<boolean> {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             await acao();
             feedbackStore.show(sucessoMsg, `${sucessoMsg}.`, 'success');
 
@@ -52,8 +48,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
                 await processosStore.buscarProcessoDetalhe(processosStore.processoDetalhe.codigo);
             }
             return true;
-        } catch (error) {
-            lastError.value = normalizeError(error);
+        }).catch(() => {
             // Propagating error is important if the component relies on it,
             // but the original code was catching it and returning false.
             // The plan says: "Deixar componente/view decidir UX"
@@ -63,28 +58,23 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
             // but ensure lastError is set so components CAN display it if they want.
             // AND we remove the feedbackStore.show call for errors.
             return false;
-        }
+        });
     }
 
     async function alterarDataLimiteSubprocesso(
         id: number,
         dados: { novaData: string },
     ) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             await apiClient.post(`/subprocessos/${id}/data-limite`, {
                 novaDataLimite: dados.novaData
             });
             // Recarregar os detalhes para refletir a nova data
             await buscarSubprocessoDetalhe(id);
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function buscarSubprocessoDetalhe(id: number) {
-        lastError.value = null;
         subprocessoDetalhe.value = null; // Limpa estado anterior
         const perfilStore = usePerfilStore();
         const perfil = perfilStore.perfilSelecionado;
@@ -101,34 +91,33 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
             return;
         }
 
-        try {
+        await withErrorHandling(async () => {
             subprocessoDetalhe.value = await serviceFetchSubprocessoDetalhe(
                 id,
                 perfil,
                 codUnidade as number,
             );
-        } catch (error) {
-            lastError.value = normalizeError(error);
+        }, () => {
             subprocessoDetalhe.value = null;
-        }
+        }).catch(() => {
+            // Silenciar erro - lastError já foi populado pelo withErrorHandling
+            subprocessoDetalhe.value = null;
+        });
     }
 
     async function buscarSubprocessoPorProcessoEUnidade(
         codProcesso: number,
         siglaUnidade: string,
     ): Promise<number | null> {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             const dto = await serviceBuscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
             return dto.codigo;
-        } catch (error) {
-            lastError.value = normalizeError(error);
+        }).catch(() => {
             return null;
-        }
+        });
     }
 
     async function buscarContextoEdicao(id: number) {
-        lastError.value = null;
         subprocessoDetalhe.value = null; // Limpa estado anterior
         const perfilStore = usePerfilStore();
         const perfil = perfilStore.perfilSelecionado;
@@ -142,7 +131,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
             return;
         }
 
-        try {
+        return withErrorHandling(async () => {
             const data = await serviceBuscarContextoEdicao(id, perfil, codUnidade as number);
 
             subprocessoDetalhe.value = data.subprocesso;
@@ -156,11 +145,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
             const atividadesStore = useAtividadesStore();
             const atividadesMapped = (data.atividadesDisponiveis || []).map(mapAtividadeVisualizacaoToModel);
             atividadesStore.setAtividadesParaSubprocesso(id, atividadesMapped);
-
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     return {

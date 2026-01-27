@@ -4,16 +4,12 @@ import type {Page} from "@/services/painelService";
 import type {Alerta} from "@/types/tipos";
 import * as alertaService from "../services/alertaService";
 import * as painelService from "../services/painelService";
-import {type NormalizedError, normalizeError} from "@/utils/apiError";
+import {useErrorHandler} from "@/composables/useErrorHandler";
 
 export const useAlertasStore = defineStore("alertas", () => {
     const alertas = ref<Alerta[]>([]);
     const alertasPage = ref<Page<Alerta>>({} as Page<Alerta>);
-    const lastError = ref<NormalizedError | null>(null);
-
-    function clearError() {
-        lastError.value = null;
-    }
+    const { lastError, clearError, withErrorHandling } = useErrorHandler();
 
     async function buscarAlertas(
         usuarioCodigo: string,
@@ -23,8 +19,7 @@ export const useAlertasStore = defineStore("alertas", () => {
         sort?: "data" | "processo",
         order?: "asc" | "desc",
     ) {
-        lastError.value = null;
-        try {
+        return withErrorHandling(async () => {
             const response = await painelService.listarAlertas(
                 usuarioCodigo,
                 unidade,
@@ -35,15 +30,10 @@ export const useAlertasStore = defineStore("alertas", () => {
             );
             alertas.value = response.content;
             alertasPage.value = response;
-        } catch (error) {
-            lastError.value = normalizeError(error);
-            throw error;
-        }
+        });
     }
 
     async function marcarAlertaComoLido(idAlerta: number): Promise<boolean> {
-        lastError.value = null;
-
         // 1. Snapshot state for revert
         const originalAlertas = JSON.parse(JSON.stringify(alertas.value));
 
@@ -54,19 +44,18 @@ export const useAlertasStore = defineStore("alertas", () => {
             alertas.value[index].dataHoraLeitura = new Date().toISOString();
         }
 
-        try {
+        return withErrorHandling(async () => {
             // 3. Call API
             await alertaService.marcarComoLido(idAlerta);
 
             // 4. Success: We do NOT re-fetch to preserve current pagination and provide instant feedback.
             // If strict consistency is needed, we could fetch in background, but it might disrupt UX if list shifts.
             return true;
-        } catch (error) {
+        }).catch(() => {
             // 5. Error: Revert state
             alertas.value = originalAlertas;
-            lastError.value = normalizeError(error);
             return false;
-        }
+        });
     }
 
     return {
