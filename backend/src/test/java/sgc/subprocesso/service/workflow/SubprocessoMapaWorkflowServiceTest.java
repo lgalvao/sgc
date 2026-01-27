@@ -734,7 +734,6 @@ class SubprocessoMapaWorkflowServiceTest {
             base.getProcesso().setCodigo(100L);
 
             Subprocesso target = mockSubprocesso(2L, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
-            when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(100L, 10L)).thenReturn(Optional.of(target));
 
             // Mock validations for target
             Mapa mapa = mock(Mapa.class);
@@ -750,7 +749,7 @@ class SubprocessoMapaWorkflowServiceTest {
                     .dataLimite(LocalDate.now())
                     .build();
 
-            service.disponibilizarMapaEmBloco(List.of(10L), 1L, req, new Usuario());
+            service.disponibilizarMapaEmBloco(List.of(2L), 1L, req, new Usuario());
 
             verify(transicaoService).registrar(eq(target), eq(TipoTransicao.MAPA_DISPONIBILIZADO), any(), any(), any(),
                     any());
@@ -762,11 +761,10 @@ class SubprocessoMapaWorkflowServiceTest {
             base.getProcesso().setCodigo(100L);
 
             Subprocesso target = mockSubprocesso(2L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
-            when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(100L, 10L)).thenReturn(Optional.of(target));
 
             when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
 
-            service.homologarValidacaoEmBloco(List.of(10L), 1L, new Usuario());
+            service.homologarValidacaoEmBloco(List.of(2L), 1L, new Usuario());
 
             verify(subprocessoRepo).save(target);
             verify(transicaoService).registrar(eq(target), eq(TipoTransicao.MAPA_HOMOLOGADO), any(), any(), any());
@@ -805,7 +803,6 @@ class SubprocessoMapaWorkflowServiceTest {
             base.getProcesso().setCodigo(100L);
 
             Subprocesso target = mockSubprocesso(2L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
-            when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(100L, 10L)).thenReturn(Optional.of(target));
 
             // Topo da cadeia para simplificar
             Unidade u = target.getUnidade();
@@ -813,7 +810,7 @@ class SubprocessoMapaWorkflowServiceTest {
             when(u.getUnidadeSuperior()).thenReturn(superior);
             when(superior.getUnidadeSuperior()).thenReturn(null);
 
-            service.aceitarValidacaoEmBloco(List.of(10L), 1L, new Usuario());
+            service.aceitarValidacaoEmBloco(List.of(2L), 1L, new Usuario());
 
             verify(subprocessoRepo).save(target);
             verify(analiseFacade).criarAnalise(eq(target), any());
