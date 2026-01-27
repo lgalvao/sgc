@@ -37,6 +37,8 @@ import static org.mockito.Mockito.*;
 @Tag("unit")
 class SubprocessoCadastroWorkflowServiceTest {
     @Mock
+    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    @Mock
     private SubprocessoTransicaoService transicaoService;
     @Mock
     private UnidadeFacade unidadeService;
@@ -50,6 +52,18 @@ class SubprocessoCadastroWorkflowServiceTest {
     private sgc.seguranca.acesso.AccessControlService accessControlService;
     @Mock
     private RepositorioComum repo;
+    @Mock
+    private sgc.subprocesso.service.crud.SubprocessoCrudService crudService;
+    @Mock
+    private sgc.alerta.AlertaFacade alertaService;
+    @Mock
+    private sgc.subprocesso.model.MovimentacaoRepo repositorioMovimentacao;
+    @Mock
+    private sgc.mapa.service.CompetenciaService competenciaService;
+    @Mock
+    private sgc.mapa.service.AtividadeService atividadeService;
+    @Mock
+    private sgc.mapa.service.MapaFacade mapaFacade;
 
     @InjectMocks
     private SubprocessoWorkflowService service;

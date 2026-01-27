@@ -54,6 +54,14 @@ class SubprocessoWorkflowServiceTest {
     private AccessControlService accessControlService;
     @Mock
     private sgc.comum.repo.RepositorioComum repo;
+    @Mock
+    private sgc.mapa.service.ImpactoMapaService impactoMapaService;
+    @Mock
+    private sgc.mapa.service.CompetenciaService competenciaService;
+    @Mock
+    private sgc.mapa.service.AtividadeService atividadeService;
+    @Mock
+    private sgc.mapa.service.MapaFacade mapaFacade;
 
     @Test
     @DisplayName("alterarDataLimite - Etapa 1")

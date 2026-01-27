@@ -56,6 +56,22 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     private AnaliseFacade analiseFacade;
     @Mock
     private RepositorioComum repo;
+    @Mock
+    private sgc.seguranca.acesso.AccessControlService accessControlService;
+    @Mock
+    private sgc.subprocesso.service.crud.SubprocessoCrudService crudService;
+    @Mock
+    private sgc.alerta.AlertaFacade alertaService;
+    @Mock
+    private sgc.organizacao.UnidadeFacade unidadeService;
+    @Mock
+    private sgc.subprocesso.model.MovimentacaoRepo repositorioMovimentacao;
+    @Mock
+    private SubprocessoTransicaoService transicaoService;
+    @Mock
+    private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
+    @Mock
+    private sgc.mapa.service.ImpactoMapaService impactoMapaService;
 
     // --- SALVAR MAPA ---
 

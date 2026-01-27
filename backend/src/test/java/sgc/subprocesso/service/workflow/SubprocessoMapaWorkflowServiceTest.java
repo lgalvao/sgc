@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.comum.erros.ErroValidacao;
+import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Atividade;
@@ -62,6 +63,18 @@ class SubprocessoMapaWorkflowServiceTest {
     private UnidadeFacade unidadeService;
     @Mock
     private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
+    @Mock
+    private RepositorioComum repo;
+    @Mock
+    private sgc.seguranca.acesso.AccessControlService accessControlService;
+    @Mock
+    private sgc.subprocesso.service.crud.SubprocessoCrudService crudService;
+    @Mock
+    private sgc.alerta.AlertaFacade alertaService;
+    @Mock
+    private sgc.subprocesso.model.MovimentacaoRepo repositorioMovimentacao;
+    @Mock
+    private sgc.mapa.service.ImpactoMapaService impactoMapaService;
 
     @InjectMocks
     private SubprocessoWorkflowService service;
@@ -69,7 +82,8 @@ class SubprocessoMapaWorkflowServiceTest {
     @Test
     @DisplayName("Deve falhar ao buscar subprocesso inexistente")
     void deveFalharSubprocessoInexistente() {
-        when(subprocessoRepo.findById(999L)).thenReturn(Optional.empty());
+        when(repo.buscar(eq(Subprocesso.class), eq(999L)))
+                .thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Subprocesso", 999L));
         assertThatThrownBy(() -> service.adicionarCompetencia(999L, CompetenciaRequest.builder().build()))
                 .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
     }
@@ -79,6 +93,7 @@ class SubprocessoMapaWorkflowServiceTest {
         lenient().when(sp.getCodigo()).thenReturn(codigo);
         // Suporte para ambos os padrões enquanto migramos os testes
         lenient().when(subprocessoRepo.findById(codigo)).thenReturn(Optional.of(sp));
+        lenient().when(repo.buscar(eq(Subprocesso.class), eq(codigo))).thenReturn(sp);
  
         Processo p = new Processo();
         p.setTipo(TipoProcesso.MAPEAMENTO);
@@ -93,6 +108,7 @@ class SubprocessoMapaWorkflowServiceTest {
  
         return sp;
     }
+
 
     @Nested
     @DisplayName("Edição de Mapa")
