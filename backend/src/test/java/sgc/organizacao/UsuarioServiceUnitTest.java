@@ -65,6 +65,7 @@ class UsuarioServiceUnitTest {
 
     // ========== MÉTODOS DE BUSCA E MAPEAMENTO ==========
 
+    @SuppressWarnings("unused")
     @Nested
     @DisplayName("Autenticação e Carregamento de Usuário")
     class AutenticacaoCarregamento {
@@ -93,6 +94,7 @@ class UsuarioServiceUnitTest {
         }
     }
 
+    @SuppressWarnings("unused")
     @Nested
     @DisplayName("Busca de Usuários")
     class BuscaUsuarios {
@@ -227,6 +229,7 @@ class UsuarioServiceUnitTest {
 
     // ========== ADMINISTRAÇÃO DE USUÁRIOS ==========
 
+    @SuppressWarnings("unused")
     @Nested
     @DisplayName("Administração")
     class Administracao {
@@ -318,6 +321,7 @@ class UsuarioServiceUnitTest {
 
     // ========== GAPS DE COBERTURA ==========
 
+    @SuppressWarnings("unused")
     @Nested
     @DisplayName("Gaps de Cobertura")
     class GapsCobertura {

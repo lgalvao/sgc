@@ -14,7 +14,6 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeMapaService;

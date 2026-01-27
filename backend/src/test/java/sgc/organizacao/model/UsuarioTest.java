@@ -1,14 +1,13 @@
 package sgc.organizacao.model;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 @Tag("unit")
 @DisplayName("Entidade: Usuario")
@@ -122,6 +121,7 @@ class UsuarioTest {
     @DisplayName("Deve lidar com LazyInitializationException em todas atribuições")
     void deveLidarComLazyInitExceptionEmTodasAtribuicoes() {
         Usuario usuario = new Usuario();
+        @SuppressWarnings("unchecked")
         Set<AtribuicaoTemporaria> mockSet = org.mockito.Mockito.mock(Set.class);
 
         org.mockito.Mockito.doThrow(new org.hibernate.LazyInitializationException("Lazy")).when(mockSet).iterator();

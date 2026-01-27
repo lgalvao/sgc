@@ -86,7 +86,8 @@ class ProcessoControllerCoverageTest {
     void deveRetornarBadRequestSeProcessadorNaoEncontrado() {
         // Spy
         ProcessoController spy = org.mockito.Mockito.spy(new ProcessoController(processoFacade));
-        Map map = org.mockito.Mockito.mock(Map.class);
+        @SuppressWarnings("unchecked")
+        Map<TipoProcesso, java.util.function.BiFunction<Long, List<Long>, List<String>>> map = org.mockito.Mockito.mock(Map.class);
         when(map.get(any())).thenReturn(null);
         doReturn(map).when(spy).getProcessadoresInicio();
 
