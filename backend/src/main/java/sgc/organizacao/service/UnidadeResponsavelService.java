@@ -37,6 +37,7 @@ import static java.util.stream.Collectors.*;
 @Service
 @RequiredArgsConstructor
 public class UnidadeResponsavelService {
+    private final UnidadeRepo unidadeRepo;
     private final UsuarioRepo usuarioRepo;
     private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
@@ -93,7 +94,8 @@ public class UnidadeResponsavelService {
      */
     @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String siglaUnidade) {
-        Unidade unidade = repo.buscar(Unidade.class, siglaUnidade);
+        Unidade unidade = unidadeRepo.findBySigla(siglaUnidade)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", siglaUnidade));
 
         Usuario usuarioSimples = usuarioRepo
                 .chefePorCodUnidade(unidade.getCodigo())

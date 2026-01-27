@@ -34,8 +34,6 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class UnidadeFacade {
-    private static final String MSG_NAO_ENCONTRADA = " não encontrada";
-
     private final UnidadeRepo unidadeRepo;
     private final sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo;
     private final UsuarioRepo usuarioRepo;
@@ -96,8 +94,15 @@ public class UnidadeFacade {
         return mapaService.verificarMapaVigente(codigoUnidade);
     }
 
+    /**
+     * Método legado mantido para compatibilidade com APIs antigas.
+     * Delega para {@link #verificarMapaVigente(Long)}.
+     * 
+     * @deprecated Use {@link #verificarMapaVigente(Long)} em vez deste método.
+     */
+    @Deprecated(since = "2026-01", forRemoval = false)
     public boolean verificarExistenciaMapaVigente(Long codigoUnidade) {
-        return mapaService.verificarMapaVigente(codigoUnidade);
+        return verificarMapaVigente(codigoUnidade);
     }
 
     @Transactional
@@ -139,7 +144,7 @@ public class UnidadeFacade {
     public Unidade buscarEntidadePorSigla(String sigla) {
         return unidadeRepo
                 .findBySigla(sigla)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com sigla %s%s".formatted(sigla, MSG_NAO_ENCONTRADA)));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com sigla " + sigla + " não encontrada"));
     }
 
     public UnidadeDto buscarPorCodigo(Long codigo) {
