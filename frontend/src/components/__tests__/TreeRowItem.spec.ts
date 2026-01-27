@@ -134,4 +134,70 @@ describe("TreeRowItem.vue", () => {
         expect(wrapper.find(".bi-chevron-down").exists()).toBe(true);
         expect(wrapper.find(".bi-chevron-right").exists()).toBe(false);
     });
+
+    it("deve emitir o evento toggle ao pressionar Enter no toggle-icon", async () => {
+        const item = {
+            codigo: 1,
+            nome: "Item 1",
+            children: [{ codigo: 2, nome: "Child 1" }],
+        };
+        const columns = [{ key: "nome", label: "Nome" }];
+        const wrapper = mount(TreeRowItem, {
+            props: { item, columns, level: 0 },
+        });
+
+        const toggleIcon = wrapper.find(".toggle-icon");
+        expect(toggleIcon.exists()).toBe(true);
+
+        await toggleIcon.trigger("keydown.enter");
+
+        expect(wrapper.emitted("toggle")).toHaveLength(1);
+        expect(wrapper.emitted("toggle")![0]).toEqual([1]);
+    });
+
+    it("deve emitir o evento toggle ao pressionar Space no toggle-icon", async () => {
+        const item = {
+            codigo: 1,
+            nome: "Item 1",
+            children: [{ codigo: 2, nome: "Child 1" }],
+        };
+        const columns = [{ key: "nome", label: "Nome" }];
+        const wrapper = mount(TreeRowItem, {
+            props: { item, columns, level: 0 },
+        });
+
+        const toggleIcon = wrapper.find(".toggle-icon");
+        expect(toggleIcon.exists()).toBe(true);
+
+        await toggleIcon.trigger("keydown.space");
+
+        expect(wrapper.emitted("toggle")).toHaveLength(1);
+        expect(wrapper.emitted("toggle")![0]).toEqual([1]);
+    });
+
+    it("deve emitir o evento row-click ao pressionar Enter na linha", async () => {
+        const item = { codigo: 1, nome: "Item 1", clickable: true };
+        const columns = [{ key: "nome", label: "Nome" }];
+        const wrapper = mount(TreeRowItem, {
+            props: { item, columns, level: 0 },
+        });
+
+        await wrapper.find("tr").trigger("keydown.enter");
+
+        expect(wrapper.emitted("row-click")).toHaveLength(1);
+        expect(wrapper.emitted("row-click")![0]).toEqual([item]);
+    });
+
+    it("deve emitir o evento row-click ao pressionar Space na linha", async () => {
+        const item = { codigo: 1, nome: "Item 1", clickable: true };
+        const columns = [{ key: "nome", label: "Nome" }];
+        const wrapper = mount(TreeRowItem, {
+            props: { item, columns, level: 0 },
+        });
+
+        await wrapper.find("tr").trigger("keydown.space");
+
+        expect(wrapper.emitted("row-click")).toHaveLength(1);
+        expect(wrapper.emitted("row-click")![0]).toEqual([item]);
+    });
 });

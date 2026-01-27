@@ -332,4 +332,26 @@ describe("LoginView.vue", () => {
 
         expect(wrapper.find('[data-testid="alert-caps-lock"]').exists()).toBe(false);
     });
+
+    it("deve alternar visibilidade da senha", async () => {
+        const wrapper = mount(LoginView, mountOptions());
+
+        const inputSenha = wrapper.find('[data-testid="inp-login-senha"]');
+        expect(inputSenha.attributes("type")).toBe("password"); // Default
+
+        // Encontra o botão de toggle. Como está dentro de um slot e BInputGroup não está stubbed,
+        // precisamos garantir que conseguimos encontrá-lo.
+        // O botão tem aria-label 'Mostrar senha' inicialmente.
+        const toggleBtn = wrapper.find('[aria-label="Mostrar senha"]');
+        expect(toggleBtn.exists()).toBe(true);
+
+        await toggleBtn.trigger("click");
+
+        // Verifica se mudou o tipo do input
+        expect(wrapper.find('[data-testid="inp-login-senha"]').attributes("type")).toBe("text");
+        expect(wrapper.find('[aria-label="Ocultar senha"]').exists()).toBe(true);
+
+        await toggleBtn.trigger("click");
+        expect(wrapper.find('[data-testid="inp-login-senha"]').attributes("type")).toBe("password");
+    });
 });
