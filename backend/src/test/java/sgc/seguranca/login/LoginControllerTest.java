@@ -22,6 +22,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -47,6 +48,7 @@ class LoginControllerTest {
     private LimitadorTentativasLogin limitadorTentativasLogin;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         objectMapper = new ObjectMapper();
     }

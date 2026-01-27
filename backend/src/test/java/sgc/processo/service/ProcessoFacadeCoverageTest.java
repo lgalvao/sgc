@@ -17,7 +17,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -37,13 +37,7 @@ class ProcessoFacadeCoverageTest {
     @Mock
     private UnidadeFacade unidadeService;
     @Mock
-    private SubprocessoFacade subprocessoFacade;
-    @Mock
     private ApplicationEventPublisher publicadorEventos;
-    @Mock
-    private sgc.processo.mapper.ProcessoMapper processoMapper;
-    @Mock
-    private ProcessoDetalheBuilder processoDetalheBuilder;
     @Mock
     private ProcessoValidador processoValidador;
     @Mock
@@ -70,7 +64,8 @@ class ProcessoFacadeCoverageTest {
                 .unidades(List.of(1L))
                 .build();
 
-        assertThrows(ErroProcessoEmSituacaoInvalida.class, () -> facade.atualizar(codigo, req));
+        var exception = assertThrows(ErroProcessoEmSituacaoInvalida.class, () -> facade.atualizar(codigo, req));
+        assertNotNull(exception);
     }
 
     @Test
@@ -95,7 +90,8 @@ class ProcessoFacadeCoverageTest {
 
         when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.of("Erro Validacao"));
 
-        assertThrows(ErroProcesso.class, () -> facade.atualizar(codigo, req));
+        var exception = assertThrows(ErroProcesso.class, () -> facade.atualizar(codigo, req));
+        assertNotNull(exception);
     }
 
     @Test
@@ -147,7 +143,8 @@ class ProcessoFacadeCoverageTest {
         when(processoRepo.findById(codProcesso)).thenReturn(Optional.of(processo));
         when(unidadeService.buscarEntidadePorId(codUnidade)).thenReturn(new Unidade());
 
-        assertThrows(ErroProcesso.class, () -> facade.enviarLembrete(codProcesso, codUnidade));
+        var exception = assertThrows(ErroProcesso.class, () -> facade.enviarLembrete(codProcesso, codUnidade));
+        assertNotNull(exception);
     }
 
     @Test

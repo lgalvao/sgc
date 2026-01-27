@@ -18,6 +18,7 @@ import sgc.seguranca.login.dto.EntrarRequest;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -40,6 +41,7 @@ class LoginServiceTest {
     private LoginFacade loginFacade;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         loginFacade = new LoginFacade(usuarioService, gerenciadorJwt, clienteAcessoAd, unidadeService, usuarioMapper);
         ReflectionTestUtils.setField(loginFacade, "ambienteTestes", false);
@@ -85,7 +87,8 @@ class LoginServiceTest {
 
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
 
-        assertThrows(ErroAccessoNegado.class, () -> loginFacade.entrar(req));
+        var exception = assertThrows(ErroAccessoNegado.class, () -> loginFacade.entrar(req));
+        assertNotNull(exception);
     }
 
     @Test
@@ -103,7 +106,8 @@ class LoginServiceTest {
     @Test
     @DisplayName("Deve falhar autorização sem autenticação prévia")
     void deveFalharAutorizacaoSemAutenticacaoPrevia() {
-        assertThrows(ErroAutenticacao.class, () -> loginFacade.autorizar("user_nao_autenticado"));
+        var exception = assertThrows(ErroAutenticacao.class, () -> loginFacade.autorizar("user_nao_autenticado"));
+        assertNotNull(exception);
     }
 
     @Test
@@ -118,7 +122,8 @@ class LoginServiceTest {
         loginFacade.expireAllAuthenticationsForTest();
 
         EntrarRequest req = EntrarRequest.builder().tituloEleitoral(titulo).build();
-        assertThrows(ErroAutenticacao.class, () -> loginFacade.entrar(req));
+        var exception = assertThrows(ErroAutenticacao.class, () -> loginFacade.entrar(req));
+        assertNotNull(exception);
     }
 
     @Test
@@ -133,6 +138,7 @@ class LoginServiceTest {
 
         loginFacade.limparAutenticacoesExpiradas();
 
-        assertThrows(ErroAutenticacao.class, () -> loginFacade.autorizar(titulo));
+        var exception = assertThrows(ErroAutenticacao.class, () -> loginFacade.autorizar(titulo));
+        assertNotNull(exception);
     }
 }

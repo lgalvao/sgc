@@ -13,8 +13,6 @@ import sgc.comum.erros.RestExceptionHandler;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UsuarioFacade;
 import sgc.subprocesso.SubprocessoMapaController;
 import sgc.subprocesso.service.SubprocessoFacade;
 import tools.jackson.databind.ObjectMapper;
@@ -44,11 +42,6 @@ class SanitizacaoMapaTest {
     @MockitoBean
     private SubprocessoFacade subprocessoFacade;
 
-    @MockitoBean
-    private MapaFacade mapaFacade;
-
-    @MockitoBean
-    private UsuarioFacade usuarioFacade;
 
     @Test
     @WithMockUser(roles = "ADMIN")

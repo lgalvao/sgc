@@ -8,18 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
-import sgc.alerta.AlertaFacade;
-import sgc.mapa.model.MapaRepo;
-import sgc.mapa.service.CopiaMapaService;
-import sgc.organizacao.UnidadeFacade;
-import sgc.organizacao.UsuarioFacade;
-import sgc.processo.mapper.ProcessoMapper;
-import sgc.processo.model.ProcessoRepo;
-import sgc.subprocesso.mapper.SubprocessoMapper;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
-import sgc.subprocesso.service.SubprocessoFacade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -28,48 +17,17 @@ import static org.mockito.Mockito.*;
 @Tag("unit")
 @DisplayName("ProcessoFacade - Segurança e Controle de Acesso")
 class ProcessoFacadeSecurityTest {
-    @Mock
-    private ProcessoRepo processoRepo;
-    @Mock
-    private UnidadeFacade unidadeService;
-    @Mock
-    private SubprocessoFacade subprocessoFacade;
-    @Mock
-    private ApplicationEventPublisher publicadorEventos;
-    @Mock
-    private ProcessoMapper processoMapper;
-    @Mock
-    private ProcessoDetalheBuilder processoDetalheBuilder;
-    @Mock
-    private MapaRepo mapaRepo;
-    @Mock
-    private SubprocessoMovimentacaoRepo movimentacaoRepo;
-    @Mock
-    private SubprocessoMapper subprocessoMapper;
-    @Mock
-    private CopiaMapaService servicoDeCopiaDeMapa;
-    @Mock
-    private UsuarioFacade usuarioService;
-    @Mock
-    private ProcessoInicializador processoInicializador;
-    @Mock
-    private AlertaFacade alertaService;
 
     // Specialized services
     @Mock
     private ProcessoAcessoService processoAcessoService;
-    @Mock
-    private ProcessoValidador processoValidador;
-    @Mock
-    private ProcessoFinalizador processoFinalizador;
-    @Mock
-    private ProcessoConsultaService processoConsultaService;
 
     @InjectMocks
     private ProcessoFacade processoFacade;
 
     @Nested
     @DisplayName("Segurança e Controle de Acesso")
+    @SuppressWarnings("unused")
     class Seguranca {
         @Test
         @DisplayName("Deve negar acesso quando usuário não autenticado")

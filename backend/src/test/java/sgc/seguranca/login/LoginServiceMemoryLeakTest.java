@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ActiveProfiles("test")
 @DisplayName("Verificação de Correção de Vulnerabilidade de Memória - LoginFacade")
 class LoginServiceMemoryLeakTest {
-
     @Autowired
     private LoginFacade loginFacade;
 

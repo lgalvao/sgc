@@ -36,6 +36,7 @@ class NotificacaoModelosServiceTest {
     private ArgumentCaptor<String> templateNameCaptor;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         when(templateEngine.process(templateNameCaptor.capture(), contextCaptor.capture()))
                 .thenReturn("<html></html>");
@@ -43,6 +44,7 @@ class NotificacaoModelosServiceTest {
 
     @Nested
     @DisplayName("Geração de E-mails de Processo Iniciado")
+    @SuppressWarnings("unused")
     class ProcessoIniciado {
         @Test
         @DisplayName("Deve criar email de processo iniciado com os dados corretos")
@@ -70,6 +72,7 @@ class NotificacaoModelosServiceTest {
 
     @Nested
     @DisplayName("Geração de E-mails de Cadastro")
+    @SuppressWarnings("unused")
     class Cadastro {
         @Test
         @DisplayName("Deve criar email de cadastro disponibilizado com os dados corretos")
@@ -118,6 +121,7 @@ class NotificacaoModelosServiceTest {
 
     @Nested
     @DisplayName("Geração de E-mails de Mapa")
+    @SuppressWarnings("unused")
     class Mapa {
         @Test
         @DisplayName("Deve criar email de mapa disponibilizado com os dados corretos")
@@ -161,6 +165,7 @@ class NotificacaoModelosServiceTest {
 
     @Nested
     @DisplayName("Geração de E-mails de Finalização")
+    @SuppressWarnings("unused")
     class Finalizacao {
         @Test
         @DisplayName("Deve criar email de processo finalizado com os dados corretos")

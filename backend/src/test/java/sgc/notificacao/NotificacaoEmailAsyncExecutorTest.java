@@ -20,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @Tag("unit")
@@ -41,6 +42,7 @@ class NotificacaoEmailAsyncExecutorTest {
     private MimeMessage mimeMessage;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         ReflectionTestUtils.setField(executor, "remetente", "teste@sgc.com.br");
         ReflectionTestUtils.setField(executor, "nomeRemetente", "SGC Teste");

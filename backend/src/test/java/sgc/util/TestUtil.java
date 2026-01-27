@@ -1,6 +1,8 @@
 package sgc.util;
 
 import org.springframework.stereotype.Component;
+
+import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
 @Component
@@ -10,7 +12,7 @@ public class TestUtil {
     public String toJson(Object obj) {
         try {
             return objectMapper.writeValueAsString(obj);
-        } catch (Exception e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }

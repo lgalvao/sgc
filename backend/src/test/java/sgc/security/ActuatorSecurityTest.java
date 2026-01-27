@@ -43,6 +43,7 @@ class ActuatorSecurityTest {
     private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setup() {
         Unidade unidade = unidadeRepo.findAll().stream().findFirst()
                 .orElseGet(() -> unidadeRepo.save(Unidade.builder().nome("Unidade Teste").sigla("TESTE").build()));

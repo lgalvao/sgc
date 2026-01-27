@@ -37,6 +37,7 @@ class AtividadeAccessPolicyTest {
     private Unidade unidade;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         unidade = new Unidade();
         unidade.setCodigo(1L);

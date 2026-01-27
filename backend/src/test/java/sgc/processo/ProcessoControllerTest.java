@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -58,6 +59,7 @@ class ProcessoControllerTest {
     private org.mockito.ArgumentCaptor<AtualizarProcessoRequest> atualizarCaptor;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         org.mockito.MockitoAnnotations.openMocks(this);
         objectMapper = new ObjectMapper();
@@ -65,6 +67,7 @@ class ProcessoControllerTest {
 
     @Nested
     @DisplayName("Criação de Processo")
+    @SuppressWarnings("unused")
     class Criacao {
         @Test
         @WithMockUser
@@ -183,6 +186,7 @@ class ProcessoControllerTest {
 
     @Nested
     @DisplayName("Consulta de Processo")
+    @SuppressWarnings("unused")
     class Consulta {
         @Test
         @WithMockUser
@@ -236,7 +240,7 @@ class ProcessoControllerTest {
                             .dataCriacao(LocalDateTime.now())
                             .build();
 
-            when(processoFacade.obterDetalhes(eq(1L))).thenReturn(dto);
+            when(processoFacade.obterDetalhes(1L)).thenReturn(dto);
 
             // Act & Assert
             mockMvc.perform(get("/api/processos/1/detalhes"))
@@ -244,7 +248,7 @@ class ProcessoControllerTest {
                     .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
                     .andExpect(jsonPath("$.descricao").value("Processo Detalhado"));
 
-            verify(processoFacade).obterDetalhes(eq(1L));
+            verify(processoFacade).obterDetalhes(1L);
         }
 
         @Test
@@ -254,7 +258,7 @@ class ProcessoControllerTest {
             // Arrange
             doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
                     .when(processoFacade)
-                    .obterDetalhes(eq(999L));
+                    .obterDetalhes(999L);
 
             // Act & Assert
             mockMvc.perform(get("/api/processos/999/detalhes")).andExpect(status().isNotFound());
@@ -265,7 +269,7 @@ class ProcessoControllerTest {
         @DisplayName("Deve retornar 403 Forbidden ao obter detalhes se acesso negado")
         void deveRetornarForbiddenAoObterDetalhesQuandoAcessoNegado() throws Exception {
             // Arrange
-            doThrow(new ErroAccessoNegado("Acesso negado")).when(processoFacade).obterDetalhes(eq(1L));
+            doThrow(new ErroAccessoNegado("Acesso negado")).when(processoFacade).obterDetalhes(1L);
 
             // Act & Assert
             mockMvc.perform(get("/api/processos/1/detalhes")).andExpect(status().isForbidden());
@@ -274,6 +278,7 @@ class ProcessoControllerTest {
 
     @Nested
     @DisplayName("Atualização de Processo")
+    @SuppressWarnings("unused")
     class Atualizacao {
         @Test
         @WithMockUser
@@ -368,6 +373,7 @@ class ProcessoControllerTest {
 
     @Nested
     @DisplayName("Exclusão de Processo")
+    @SuppressWarnings("unused")
     class Exclusao {
         @Test
         @WithMockUser
@@ -399,7 +405,7 @@ class ProcessoControllerTest {
         @DisplayName("Deve retornar 409 Conflict ao excluir se estado inválido")
         void deveRetornarConflictAoExcluirQuandoEstadoInvalido() throws Exception {
             // Arrange
-            doThrow(new IllegalStateException()).when(processoFacade).apagar(eq(1L));
+            doThrow(new IllegalStateException()).when(processoFacade).apagar(1L);
 
             // Act & Assert
             mockMvc.perform(post(API_PROCESSOS + "/1/excluir").with(csrf()))
@@ -409,6 +415,7 @@ class ProcessoControllerTest {
 
     @Nested
     @DisplayName("Workflow e Operações")
+    @SuppressWarnings("unused")
     class Workflow {
         @Test
         @WithMockUser
@@ -431,7 +438,7 @@ class ProcessoControllerTest {
                     .andExpect(jsonPath("$.codigo").value(1L))
                     .andExpect(jsonPath("$.descricao").value("Processo Teste"));
 
-            verify(processoFacade).iniciarProcessoMapeamento(eq(1L), eq(List.of(1L)));
+            verify(processoFacade).iniciarProcessoMapeamento(1L, List.of(1L));
         }
 
         @Test
@@ -455,7 +462,7 @@ class ProcessoControllerTest {
                     .andExpect(jsonPath("$.codigo").value(1L))
                     .andExpect(jsonPath("$.descricao").value("Processo Teste"));
 
-            verify(processoFacade).iniciarProcessoRevisao(eq(1L), eq(List.of(1L)));
+            verify(processoFacade).iniciarProcessoRevisao(1L, List.of(1L));
         }
 
         @Test
@@ -537,6 +544,7 @@ class ProcessoControllerTest {
     }
 
     @Nested
+    @SuppressWarnings("unused")
     @DisplayName("Listagens")
     class Listagens {
         @Test
@@ -637,6 +645,7 @@ class ProcessoControllerTest {
 
     @Nested
     @DisplayName("Cobertura de Branches Adicionais")
+    @SuppressWarnings("unused")
     class CoberturaBranches {
 
         @Test
@@ -660,7 +669,7 @@ class ProcessoControllerTest {
                     .andExpect(jsonPath("$.codigo").value(1L))
                     .andExpect(jsonPath("$.descricao").value("Processo Diagnóstico"));
 
-            verify(processoFacade).iniciarProcessoDiagnostico(eq(1L), eq(List.of(1L)));
+            verify(processoFacade).iniciarProcessoDiagnostico(1L, List.of(1L));
         }
 
         @Test

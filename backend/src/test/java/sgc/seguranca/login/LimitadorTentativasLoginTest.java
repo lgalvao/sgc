@@ -16,12 +16,12 @@ import static org.mockito.Mockito.when;
 @Tag("unit")
 @DisplayName("LimitadorTentativasLogin - Testes Unitários")
 class LimitadorTentativasLoginTest {
-
     private LimitadorTentativasLogin limitador;
     private Environment environment;
     private java.time.Clock clock;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         environment = mock(Environment.class);
         clock = mock(java.time.Clock.class);
@@ -50,7 +50,8 @@ class LimitadorTentativasLoginTest {
         IntStream.range(0, 5).forEach(i -> limitador.verificar(ip));
 
         // 6ª tentativa deve falhar
-        assertThrows(ErroMuitasTentativas.class, () -> limitador.verificar(ip));
+        var exception = assertThrows(ErroMuitasTentativas.class, () -> limitador.verificar(ip));
+        assertNotNull(exception);
     }
 
     @Test
@@ -60,7 +61,8 @@ class LimitadorTentativasLoginTest {
 
         // Bloqueia ip1
         IntStream.range(0, 5).forEach(i -> limitador.verificar(ip1));
-        assertThrows(ErroMuitasTentativas.class, () -> limitador.verificar(ip1));
+        var exception = assertThrows(ErroMuitasTentativas.class, () -> limitador.verificar(ip1));
+        assertNotNull(exception);
 
         // ip2 deve continuar livre
         assertDoesNotThrow(() -> limitador.verificar(ip2));
@@ -141,7 +143,8 @@ class LimitadorTentativasLoginTest {
 
         // Tenta adicionar mais um, SEM avançar o tempo
         // Deve lançar erro indicando sobrecarga
-        assertThrows(ErroMuitasTentativas.class, () -> limitadorTeste.verificar("IpNovo"));
+        var exception = assertThrows(ErroMuitasTentativas.class, () -> limitadorTeste.verificar("IpNovo"));
+        assertNotNull(exception);
 
         // O cache NÃO deve ter sido limpo. Size = limiteTeste.
         assertEquals(limiteTeste, limitadorTeste.getCacheSize());
@@ -164,7 +167,8 @@ class LimitadorTentativasLoginTest {
         // Verifica se contou a tentativa (Ip0 agora deve ter 2 tentativas)
         // Se eu chamar mais 3 vezes (total 5), deve bloquear na 6ª.
         IntStream.range(0, 3).forEach(i -> limitadorTeste.verificar("Ip0")); // Total 5
-        assertThrows(ErroMuitasTentativas.class, () -> limitadorTeste.verificar("Ip0")); // 6ª
+        var exception = assertThrows(ErroMuitasTentativas.class, () -> limitadorTeste.verificar("Ip0")); // 6ª
+        assertNotNull(exception);
     }
 
     @Test
@@ -184,6 +188,7 @@ class LimitadorTentativasLoginTest {
         // Consome 5
         IntStream.range(0, 5).forEach(i -> limitador.verificar(ip));
         // 6ª falha
-        assertThrows(ErroMuitasTentativas.class, () -> limitador.verificar(ip));
+        var exception = assertThrows(ErroMuitasTentativas.class, () -> limitador.verificar(ip));
+        assertNotNull(exception);
     }
 }

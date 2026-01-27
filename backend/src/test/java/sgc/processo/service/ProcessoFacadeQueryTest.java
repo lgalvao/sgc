@@ -8,15 +8,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
-import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
-import sgc.mapa.model.MapaRepo;
-import sgc.mapa.service.CopiaMapaService;
-import sgc.organizacao.UnidadeFacade;
-import sgc.organizacao.UsuarioFacade;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.dto.SubprocessoElegivelDto;
@@ -26,7 +20,6 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.Collections;
@@ -35,6 +28,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,45 +38,24 @@ class ProcessoFacadeQueryTest {
     @Mock
     private ProcessoRepo processoRepo;
     @Mock
-    private UnidadeFacade unidadeService;
-    @Mock
     private SubprocessoFacade subprocessoFacade;
-    @Mock
-    private ApplicationEventPublisher publicadorEventos;
     @Mock
     private ProcessoMapper processoMapper;
     @Mock
     private ProcessoDetalheBuilder processoDetalheBuilder;
     @Mock
-    private MapaRepo mapaRepo;
-    @Mock
-    private SubprocessoMovimentacaoRepo movimentacaoRepo;
-    @Mock
     private SubprocessoMapper subprocessoMapper;
     @Mock
-    private CopiaMapaService servicoDeCopiaDeMapa;
-    @Mock
-    private UsuarioFacade usuarioService;
-    @Mock
-    private ProcessoInicializador processoInicializador;
-    @Mock
-    private AlertaFacade alertaService;
-
-    // Specialized services
-    @Mock
-    private ProcessoAcessoService processoAcessoService;
+    private ProcessoConsultaService processoConsultaService;
     @Mock
     private ProcessoValidador processoValidador;
-    @Mock
-    private ProcessoFinalizador processoFinalizador;
-    @Mock
-    private ProcessoConsultaService processoConsultaService;
 
     @InjectMocks
     private ProcessoFacade processoFacade;
 
     @Nested
     @DisplayName("Consultas e Detalhes")
+    @SuppressWarnings("unused")
     class Consultas {
         @Test
         @DisplayName("Deve retornar detalhes do processo (DTO)")
@@ -260,33 +233,6 @@ class ProcessoFacadeQueryTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @Test
-        @DisplayName("Deve retornar vazio ao listar subprocessos se authentication for null")
-        void deveRetornarVazioSeAuthenticationNull() {
-            // Arrange
-            when(processoConsultaService.listarSubprocessosElegiveis(100L))
-                    .thenReturn(List.of());
-
-            // Act
-            List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
-
-            // Assert
-            assertThat(res).isEmpty();
-        }
-
-        @Test
-        @DisplayName("Deve retornar vazio ao listar subprocessos se name for null")
-        void deveRetornarVazioSeNameNull() {
-            // Arrange
-            when(processoConsultaService.listarSubprocessosElegiveis(100L))
-                    .thenReturn(List.of());
-
-            // Act
-            List<SubprocessoElegivelDto> res = processoFacade.listarSubprocessosElegiveis(100L);
-
-            // Assert
-            assertThat(res).isEmpty();
-        }
 
         @Test
         @DisplayName("Deve retornar contexto completo do processo")

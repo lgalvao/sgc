@@ -16,10 +16,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("unit")
 @DisplayName("Testes de Validação: CriarProcessoRequest")
 class CriarProcessoRequestValidationTest {
-
     private Validator validator;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
@@ -27,8 +27,8 @@ class CriarProcessoRequestValidationTest {
 
     @Nested
     @DisplayName("Requisições válidas")
+    @SuppressWarnings("unused")
     class RequisicoesValidas {
-
         @Test
         @DisplayName("Deve aceitar requisição com todos os campos preenchidos corretamente")
         void deveAceitarRequisicaoCompleta() {
@@ -62,8 +62,8 @@ class CriarProcessoRequestValidationTest {
 
     @Nested
     @DisplayName("Validação de descrição")
+    @SuppressWarnings("unused")
     class ValidacaoDescricao {
-
         @Test
         @DisplayName("Deve rejeitar descrição nula")
         void deveRejeitarDescricaoNula() {
@@ -84,6 +84,7 @@ class CriarProcessoRequestValidationTest {
 
         @Test
         @DisplayName("Deve rejeitar descrição em branco")
+    @SuppressWarnings("unused")
         void deveRejeitarDescricaoEmBranco() {
             CriarProcessoRequest req = CriarProcessoRequest.builder()
                     .descricao("   ")
@@ -120,6 +121,7 @@ class CriarProcessoRequestValidationTest {
 
     @Nested
     @DisplayName("Validação de tipo")
+    @SuppressWarnings("unused")
     class ValidacaoTipo {
 
         @Test
@@ -143,6 +145,7 @@ class CriarProcessoRequestValidationTest {
 
     @Nested
     @DisplayName("Validação de data limite")
+    @SuppressWarnings("unused")
     class ValidacaoDataLimite {
 
         @Test
@@ -201,6 +204,7 @@ class CriarProcessoRequestValidationTest {
 
     @Nested
     @DisplayName("Validação de unidades")
+    @SuppressWarnings("unused")
     class ValidacaoUnidades {
 
         @Test
@@ -242,6 +246,7 @@ class CriarProcessoRequestValidationTest {
 
     @Nested
     @DisplayName("Validação de múltiplos campos inválidos")
+    @SuppressWarnings("unused")
     class ValidacaoMultipla {
 
         @Test

@@ -9,14 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.UnidadeFixture;
-import sgc.mapa.model.MapaRepo;
-import sgc.mapa.service.CopiaMapaService;
 import sgc.organizacao.UnidadeFacade;
-import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.AtualizarProcessoRequest;
 import sgc.processo.dto.CriarProcessoRequest;
@@ -30,9 +26,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.mapper.SubprocessoMapper;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
-import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -52,35 +45,11 @@ class ProcessoFacadeCrudTest {
     @Mock
     private UnidadeFacade unidadeService;
     @Mock
-    private SubprocessoFacade subprocessoFacade;
-    @Mock
     private ApplicationEventPublisher publicadorEventos;
     @Mock
     private ProcessoMapper processoMapper;
     @Mock
-    private ProcessoDetalheBuilder processoDetalheBuilder;
-    @Mock
-    private MapaRepo mapaRepo;
-    @Mock
-    private SubprocessoMovimentacaoRepo movimentacaoRepo;
-    @Mock
-    private SubprocessoMapper subprocessoMapper;
-    @Mock
-    private CopiaMapaService servicoDeCopiaDeMapa;
-    @Mock
-    private UsuarioFacade usuarioService;
-    @Mock
-    private ProcessoInicializador processoInicializador;
-    @Mock
-    private AlertaFacade alertaService;
-    @Mock
-    private ProcessoAcessoService processoAcessoService;
-    @Mock
     private ProcessoValidador processoValidador;
-    @Mock
-    private ProcessoFinalizador processoFinalizador;
-    @Mock
-    private ProcessoConsultaService processoConsultaService;
 
     @InjectMocks
     private ProcessoFacade processoFacade;
@@ -241,6 +210,7 @@ class ProcessoFacadeCrudTest {
 
     @Nested
     @DisplayName("Atualização de Processo")
+    @SuppressWarnings("unused")
     class Atualizacao {
         @Test
         @DisplayName("Deve atualizar processo quando está em situação CRIADO")
@@ -496,6 +466,7 @@ class ProcessoFacadeCrudTest {
 
     @Nested
     @DisplayName("Exclusão de Processo")
+    @SuppressWarnings("unused")
     class Exclusao {
         @Test
         @DisplayName("Deve apagar processo quando está em situação CRIADO")

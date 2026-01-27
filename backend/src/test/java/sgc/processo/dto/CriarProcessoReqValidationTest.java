@@ -16,10 +16,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("unit")
 @DisplayName("Testes de Validação: CriarProcessoRequest")
 class CriarProcessoReqValidationTest {
-
     private Validator validator;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
@@ -27,6 +27,7 @@ class CriarProcessoReqValidationTest {
 
     @Nested
     @DisplayName("Requisições válidas")
+    @SuppressWarnings("unused")
     class RequisicoesValidas {
 
         @Test
@@ -62,8 +63,8 @@ class CriarProcessoReqValidationTest {
 
     @Nested
     @DisplayName("Validação de descrição")
+    @SuppressWarnings("unused")
     class ValidacaoDescricao {
-
         @Test
         @DisplayName("Deve rejeitar descrição nula")
         void deveRejeitarDescricaoNula() {
@@ -119,6 +120,7 @@ class CriarProcessoReqValidationTest {
     }
 
     @Nested
+    @SuppressWarnings("unused")
     @DisplayName("Validação de tipo")
     class ValidacaoTipo {
 
@@ -143,6 +145,7 @@ class CriarProcessoReqValidationTest {
 
     @Nested
     @DisplayName("Validação de data limite")
+    @SuppressWarnings("unused")
     class ValidacaoDataLimite {
 
         @Test
@@ -201,6 +204,7 @@ class CriarProcessoReqValidationTest {
 
     @Nested
     @DisplayName("Validação de unidades")
+    @SuppressWarnings("unused")
     class ValidacaoUnidades {
 
         @Test
@@ -242,7 +246,8 @@ class CriarProcessoReqValidationTest {
 
     @Nested
     @DisplayName("Validação de múltiplos campos inválidos")
-    class ValidacaoMultipla {
+        @SuppressWarnings("unused")
+class ValidacaoMultipla {
 
         @Test
         @DisplayName("Deve reportar todas as violações quando múltiplos campos são inválidos")

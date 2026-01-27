@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Predicate;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,7 +68,8 @@ class ClienteAcessoAdTest {
         when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
         when(responseSpec.body(String.class)).thenThrow(new RuntimeException("Erro inesperado"));
 
-        assertThrows(ErroAutenticacao.class, () -> clienteAcessoAd.autenticar("123", "senha"));
+        var exception = assertThrows(ErroAutenticacao.class, () -> clienteAcessoAd.autenticar("123", "senha"));
+        assertNotNull(exception);
     }
 
     @Test
@@ -81,7 +83,8 @@ class ClienteAcessoAdTest {
 
         when(responseSpec.body(String.class)).thenThrow(new ErroAutenticacao("Falha simulada"));
 
-        assertThrows(ErroAutenticacao.class, () -> clienteAcessoAd.autenticar("123", "senha"));
+        var exception = assertThrows(ErroAutenticacao.class, () -> clienteAcessoAd.autenticar("123", "senha"));
+        assertNotNull(exception);
     }
 
     @SuppressWarnings("unchecked")
@@ -111,8 +114,10 @@ class ClienteAcessoAdTest {
         when(response.getStatusCode()).thenReturn(HttpStatusCode.valueOf(400));
         when(response.getBody()).thenReturn(new ByteArrayInputStream("Erro detalhado".getBytes(StandardCharsets.UTF_8)));
 
-        assertThrows(ErroAutenticacao.class, () ->
-                handlerCaptor.getValue().handle(request, response)
+        var errorHandler = handlerCaptor.getValue();
+        var exception = assertThrows(ErroAutenticacao.class, () ->
+            errorHandler.handle(request, response)
         );
+        assertNotNull(exception);
     }
 }
