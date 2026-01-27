@@ -1,17 +1,30 @@
 package sgc.organizacao;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
@@ -20,13 +33,16 @@ import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
-import sgc.organizacao.model.*;
-
-import java.util.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import sgc.organizacao.model.Administrador;
+import sgc.organizacao.model.AdministradorRepo;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.SituacaoUnidade;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.organizacao.model.UsuarioRepo;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -77,7 +93,8 @@ class UsuarioFacadeCoverageTest {
         SecurityContextHolder.setContext(ctx);
         when(ctx.getAuthentication()).thenReturn(null);
 
-        assertThrows(ErroAccessoNegado.class, () -> usuarioFacade.obterUsuarioAutenticado());
+        var erro = assertThrows(ErroAccessoNegado.class, () -> usuarioFacade.obterUsuarioAutenticado());
+        assertThat(erro).isNotNull();
     }
 
     @Test
@@ -126,7 +143,8 @@ class UsuarioFacadeCoverageTest {
     @DisplayName("Deve lançar erro se usuário não encontrado por login")
     void deveLancarErroSeUsuarioNaoEncontradoPorLogin() {
         when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.empty());
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarPorLogin("T"));
+        var erro = assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarPorLogin("T"));
+        assertThat(erro).isNotNull();
     }
 
     @Test
@@ -214,7 +232,8 @@ class UsuarioFacadeCoverageTest {
     @DisplayName("Deve lançar erro ao buscar responsável de unidade inexistente")
     void deveLancarErroResponsavelUnidadeInexistente() {
         when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.empty());
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarResponsavelAtual("SIGLA"));
+        var erro = assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarResponsavelAtual("SIGLA"));
+        assertThat(erro).isNotNull();
     }
 
     @Test
@@ -225,7 +244,8 @@ class UsuarioFacadeCoverageTest {
         when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.of(un));
         when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarResponsavelAtual("SIGLA"));
+        var erro = assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarResponsavelAtual("SIGLA"));
+        assertThat(erro).isNotNull();
     }
 
     @Test
@@ -240,7 +260,8 @@ class UsuarioFacadeCoverageTest {
         when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.of(chefeSimples));
         when(usuarioRepo.findByIdWithAtribuicoes("C")).thenReturn(Optional.empty());
 
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarResponsavelAtual("SIGLA"));
+        var erro = assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarResponsavelAtual("SIGLA"));
+        assertThat(erro).isNotNull();
     }
 
     @Test
@@ -259,7 +280,8 @@ class UsuarioFacadeCoverageTest {
     @DisplayName("Deve lançar erro se responsável por código não encontrado")
     void deveLancarErroResponsavelPorCodigoNaoEncontrado() {
         when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(Collections.emptyList());
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarResponsavelUnidade(1L));
+        var erro = assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarResponsavelUnidade(1L));
+        assertThat(erro).isNotNull();
     }
 
     @Test
@@ -407,7 +429,8 @@ class UsuarioFacadeCoverageTest {
         when(repo.buscar(Usuario.class, "T")).thenReturn(new Usuario());
         when(administradorRepo.existsById("T")).thenReturn(true);
 
-        assertThrows(ErroValidacao.class, () -> usuarioFacade.adicionarAdministrador("T"));
+        var erro = assertThrows(ErroValidacao.class, () -> usuarioFacade.adicionarAdministrador("T"));
+        assertThat(erro).isNotNull();
     }
 
     @Test
@@ -424,14 +447,16 @@ class UsuarioFacadeCoverageTest {
     @Test
     @DisplayName("Deve lançar erro ao remover a si mesmo")
     void deveLancarErroRemoverSiMesmo() {
-        assertThrows(ErroValidacao.class, () -> usuarioFacade.removerAdministrador("Eu", "Eu"));
+        var erro = assertThrows(ErroValidacao.class, () -> usuarioFacade.removerAdministrador("Eu", "Eu"));
+        assertThat(erro).isNotNull();
     }
 
     @Test
     @DisplayName("Deve lançar erro ao remover não admin")
     void deveLancarErroRemoverNaoAdmin() {
         when(administradorRepo.existsById("Outro")).thenReturn(false);
-        assertThrows(ErroValidacao.class, () -> usuarioFacade.removerAdministrador("Outro", "Eu"));
+        var erro = assertThrows(ErroValidacao.class, () -> usuarioFacade.removerAdministrador("Outro", "Eu"));
+        assertThat(erro).isNotNull();
     }
 
     @Test
@@ -439,7 +464,8 @@ class UsuarioFacadeCoverageTest {
     void deveLancarErroRemoverUnicoAdmin() {
         when(administradorRepo.existsById("Outro")).thenReturn(true);
         when(administradorRepo.count()).thenReturn(1L);
-        assertThrows(ErroValidacao.class, () -> usuarioFacade.removerAdministrador("Outro", "Eu"));
+        var erro = assertThrows(ErroValidacao.class, () -> usuarioFacade.removerAdministrador("Outro", "Eu"));
+        assertThat(erro).isNotNull();
     }
 
     @Test
