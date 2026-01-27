@@ -131,6 +131,32 @@ describe('MonitoramentoDiagnostico.vue', () => {
     expect(btnConcluir.attributes('disabled')).toBeUndefined();
   });
 
+  it('exibe badges de status corretamente para diferentes situações', async () => {
+    const mockServidoresVariados = [
+      { situacao: 'CONSENSO_CRIADO', situacaoLabel: 'Consenso Criado', totalCompetencias: 10, competenciasAvaliadas: 5, tituloEleitoral: '1' },
+      { situacao: 'CONSENSO_APROVADO', situacaoLabel: 'Consenso Aprovado', totalCompetencias: 10, competenciasAvaliadas: 10, tituloEleitoral: '2' },
+      { situacao: 'AVALIACAO_IMPOSSIBILITADA', situacaoLabel: 'Impossibilitada', totalCompetencias: 0, competenciasAvaliadas: 0, tituloEleitoral: '3' },
+      { situacao: 'OUTRA', situacaoLabel: 'Outra', totalCompetencias: 10, competenciasAvaliadas: 0, tituloEleitoral: '4' }
+    ];
+
+    (diagnosticoService.buscarDiagnostico as any).mockResolvedValue({
+        ...mockDiagnostico,
+        servidores: mockServidoresVariados
+    });
+
+    const mountOptions = getCommonMountOptions({}, stubs);
+    ctx.wrapper = mount(MonitoramentoDiagnostico, mountOptions);
+
+    await ctx.wrapper!.vm.$nextTick();
+    await new Promise(resolve => setTimeout(resolve, 10));
+    await ctx.wrapper!.vm.$nextTick();
+
+    expect(ctx.wrapper!.text()).toContain('Consenso Criado');
+    expect(ctx.wrapper!.text()).toContain('Consenso Aprovado');
+    expect(ctx.wrapper!.text()).toContain('Impossibilitada');
+    expect(ctx.wrapper!.text()).toContain('Outra');
+  });
+
   it('trata erro ao buscar diagnóstico', async () => {
     (diagnosticoService.buscarDiagnostico as any).mockRejectedValue(new Error('Falha'));
     

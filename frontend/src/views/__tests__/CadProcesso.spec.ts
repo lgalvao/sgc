@@ -527,4 +527,42 @@ describe('CadProcesso.vue', () => {
         expect(wrapper.vm.alertState.body).toContain('Não foi possível carregar');
     });
 
+    it('focuses on the first invalid field when validation errors occur', async () => {
+        const { wrapper, processosStore } = createWrapper();
+
+        // Mock document.querySelector to return a mock element with focus method
+        const focusMock = vi.fn();
+        const mockElement = { focus: focusMock } as unknown as HTMLElement;
+        const querySelectorSpy = vi.spyOn(document, 'querySelector').mockReturnValue(mockElement);
+
+        processosStore.criarProcesso.mockImplementation(async () => {
+            processosStore.lastError = {
+                message: 'Erro de validação',
+                subErrors: [
+                    { field: 'descricao', message: 'Descrição é obrigatória' }
+                ]
+            };
+            throw new Error('Validation Error');
+        });
+
+        wrapper.vm.descricao = 'Teste';
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.unidadesSelecionadas = [1];
+        await nextTick();
+
+        await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
+
+        // Wait for async operations and nextTick inside handleApiErrors
+        await flushPromises();
+        // The focus logic is inside a nextTick, so we need to wait for it
+        await nextTick();
+        await nextTick();
+
+        expect(querySelectorSpy).toHaveBeenCalledWith('.is-invalid');
+        expect(focusMock).toHaveBeenCalled();
+
+        querySelectorSpy.mockRestore();
+    });
+
 });

@@ -446,4 +446,123 @@ describe("VisMapa.vue", () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.text()).toContain("Nenhuma competência cadastrada");
     });
+
+    it("confirms homologacao (ADMIN) for Mapeamento", async () => {
+        const { wrapper } = mountComponent({
+            perfil: { perfilSelecionado: "ADMIN" },
+            processos: {
+                processoDetalhe: {
+                    tipo: TipoProcesso.MAPEAMENTO,
+                    unidades: [
+                        {
+                            sigla: "TEST",
+                            codUnidade: 10,
+                            codSubprocesso: 10,
+                            situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
+                        },
+                    ],
+                },
+            },
+        });
+        const store = useProcessosStore();
+
+        await wrapper
+            .find('[data-testid="btn-mapa-homologar-aceite"]')
+            .trigger("click");
+        await wrapper.vm.$nextTick();
+
+        const modal = wrapper.findComponent(AceitarMapaModal);
+        await modal.vm.$emit("confirmar-aceitacao", "Obs homolog");
+
+        expect(store.homologarValidacao).toHaveBeenCalledWith(10);
+    });
+
+    it("handles error in confirmarAceitacao", async () => {
+        const { wrapper, feedbackStore } = mountComponent({
+            perfil: { perfilSelecionado: "GESTOR" },
+            processos: {
+                processoDetalhe: {
+                    unidades: [
+                        {
+                            sigla: "TEST",
+                            codUnidade: 10,
+                            codSubprocesso: 10,
+                            situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
+                        },
+                    ],
+                },
+            },
+        });
+        const store = useProcessosStore();
+        store.aceitarValidacao.mockRejectedValue(new Error("Fail"));
+        vi.spyOn(feedbackStore, "show");
+
+        await wrapper
+            .find('[data-testid="btn-mapa-homologar-aceite"]')
+            .trigger("click");
+        await wrapper.vm.$nextTick();
+
+        const modal = wrapper.findComponent(AceitarMapaModal);
+        await modal.vm.$emit("confirmar-aceitacao", "Obs");
+        await flushPromises();
+
+        expect(feedbackStore.show).toHaveBeenCalledWith("Erro", "Erro ao realizar a operação.", "danger");
+    });
+
+    it("handles error in confirmarDevolucao", async () => {
+        const { wrapper, feedbackStore } = mountComponent({
+            perfil: { perfilSelecionado: "GESTOR" },
+            processos: {
+                processoDetalhe: {
+                    unidades: [
+                        {
+                            sigla: "TEST",
+                            codUnidade: 10,
+                            codSubprocesso: 10,
+                            situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
+                        },
+                    ],
+                },
+            },
+        });
+        const store = useSubprocessosStore();
+        store.devolverRevisaoCadastro.mockRejectedValue(new Error("Fail"));
+        vi.spyOn(feedbackStore, "show");
+
+        await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
+        await wrapper.vm.$nextTick();
+
+        await wrapper.find('[data-testid="btn-devolucao-mapa-confirmar"]').trigger("click");
+        await flushPromises();
+
+        expect(feedbackStore.show).toHaveBeenCalledWith("Erro", "Erro ao devolver.", "danger");
+    });
+
+    it("handles error in confirmarValidacao", async () => {
+        const { wrapper, feedbackStore } = mountComponent();
+        const store = useProcessosStore();
+        store.validarMapa.mockRejectedValue(new Error("Fail"));
+        vi.spyOn(feedbackStore, "show");
+
+        await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
+        await wrapper.vm.$nextTick();
+        await wrapper.find('[data-testid="btn-validar-mapa-confirmar"]').trigger("click");
+        await flushPromises();
+
+        expect(feedbackStore.show).toHaveBeenCalledWith("Erro ao validar mapa", expect.any(String), "danger");
+    });
+
+    it("handles error in confirmarSugestoes", async () => {
+        const { wrapper, feedbackStore } = mountComponent();
+        const store = useProcessosStore();
+        store.apresentarSugestoes.mockRejectedValue(new Error("Fail"));
+        vi.spyOn(feedbackStore, "show");
+
+        await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
+        await wrapper.vm.$nextTick();
+        await wrapper.find('[data-testid="btn-sugestoes-mapa-confirmar"]').trigger("click");
+        await flushPromises();
+
+        expect(feedbackStore.show).toHaveBeenCalledWith("Erro ao apresentar sugestões", expect.any(String), "danger");
+    });
 });

@@ -344,6 +344,26 @@ describe("VisAtividades.vue", () => {
             expect(subprocessosStore.devolverCadastro).toHaveBeenCalledWith(20, { observacoes: "Devolvendo map" });
             expect(pushMock).toHaveBeenCalledWith("/painel");
         });
+
+        it("deve mostrar texto correto no botão de impacto", async () => {
+            const wrapper = mount(VisAtividades, mountOptionsMapeamento());
+            const btn = wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]');
+            expect(btn.text()).toContain("Impacto no mapa");
+        });
+
+        it("não deve redirecionar se devolução de mapeamento falhar", async () => {
+            const wrapper = mount(VisAtividades, mountOptionsMapeamento());
+            subprocessosStore = useSubprocessosStore();
+            vi.spyOn(subprocessosStore, "devolverCadastro").mockResolvedValue(false);
+
+            await wrapper.find('[data-testid="btn-acao-devolver"]').trigger("click");
+            await wrapper.find('[data-testid="inp-devolucao-cadastro-obs"]').setValue("Obs");
+            await wrapper.find('[data-testid="btn-devolucao-cadastro-confirmar"]').trigger("click");
+            await flushPromises();
+
+            expect(subprocessosStore.devolverCadastro).toHaveBeenCalled();
+            expect(pushMock).not.toHaveBeenCalled();
+        });
     });
 
     describe("Tratamento de Erros", () => {
