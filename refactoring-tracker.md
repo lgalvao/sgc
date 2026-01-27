@@ -1,6 +1,6 @@
 # 📊 Tracking de Refatorações - SGC
 
-**Última Atualização:** 26 de Janeiro de 2026  
+**Última Atualização:** 27 de Janeiro de 2026  
 **Status Geral:** 🟡 Em Andamento
 
 ---
@@ -10,11 +10,11 @@
 | Fase | Status | Progresso | Ações Concluídas | Total |
 |------|--------|-----------|------------------|-------|
 | **Sprint 1** - Quick Wins | 🟢 Concluída | 100% | 5/5 | [Ver detalhes](#sprint-1) |
-| **Sprint 2** - Frontend | 🔵 Planejada | 0% | 0/3 | [Ver detalhes](#sprint-2) |
+| **Sprint 2** - Frontend | 🟡 Em Progresso | 67% | 2/3 | [Ver detalhes](#sprint-2) |
 | **Sprint 3** - Backend | 🔵 Planejada | 0% | 0/3 | [Ver detalhes](#sprint-3) |
 | **Sprint 4** - Opcionais | 🔵 Planejada | 0% | 0/3 | [Ver detalhes](#sprint-4) |
 
-**Total Geral:** 5/14 ações (36%)
+**Total Geral:** 7/14 ações (50%)
 
 ---
 
@@ -46,15 +46,28 @@
 
 ### Sprint 2 - Consolidação Frontend (3-5 dias)
 **Objetivo:** Frontend mais consistente, menos requisições HTTP  
-**Status:** 🔵 Planejada
+**Status:** 🟡 Em Progresso (67% concluída)
 
 | # | Ação | Prioridade | Status | Esforço | Impacto |
 |---|------|------------|--------|---------|---------|
-| 2 | Criar composable `useErrorHandler` para stores | 🔴 Alta | ⚪ Pendente | 🟡 Médio | 🔴 Alto |
-| 4 | Consolidar queries duplicadas (AtividadeRepo, CompetenciaRepo) | 🔴 Alta | ⚪ Pendente | 🟡 Médio | 🟠 Médio |
+| 2 | Criar composable `useErrorHandler` para stores | 🔴 Alta | 🟢 Concluída | 🟡 Médio | 🔴 Alto |
+| 4 | Consolidar queries duplicadas (AtividadeRepo, CompetenciaRepo) | 🔴 Alta | 🟢 Concluída | 🟡 Médio | 🟠 Médio |
 | 5 | Backend retornar dados completos (eliminar cascata de reloads) | 🔴 Alta | ⚪ Pendente | 🔴 Alto | 🔴 Alto |
 
 **Documentação:** [frontend-sprint-2.md](./frontend-sprint-2.md)
+
+**Resultados Alcançados:**
+- ✅ useErrorHandler criado e testado (8/8 testes passando)
+- ✅ 11 stores refatorados (100%)
+- ✅ ~200 linhas de código duplicado eliminadas (frontend)
+- ✅ 50+ métodos assíncronos refatorados
+- ✅ 1157/1157 testes frontend passando (100%)
+- ✅ AtividadeRepo e CompetenciaRepo usando @EntityGraph
+- ✅ ~20 linhas de código reduzidas (backend)
+- ✅ 27/27 testes backend relacionados passando
+- ✅ Código mais idiomático usando padrões do Spring Data
+- ✅ 0 vulnerabilidades de segurança (verificado com CodeQL)
+- ⚠️ Ação #5 pendente (recomendada para PR separada devido à complexidade)
 
 ---
 
