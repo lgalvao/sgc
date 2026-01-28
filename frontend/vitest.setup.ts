@@ -24,12 +24,11 @@ vi.mock("@/utils/logger", () => ({
 
 vi.mock("bootstrap", () => ({
     Tooltip: class Tooltip {
-        constructor() {
-        }
-
         dispose() {
+            // Mock dispose method
         }
     },
+
 }));
 
 config.global.stubs["b-modal"] = {
@@ -67,9 +66,10 @@ const localStorageMock = (function () {
     };
 })();
 
-Object.defineProperty(window, "localStorage", {
+Object.defineProperty(globalThis, "localStorage", {
     value: localStorageMock,
 });
+
 
 // Mock window.location
 const locationMock = {
@@ -79,8 +79,9 @@ const locationMock = {
     reload: vi.fn(),
 };
 
-Object.defineProperty(window, "location", {
+Object.defineProperty(globalThis, "location", {
     value: locationMock,
 });
+
 
 

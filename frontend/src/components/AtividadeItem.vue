@@ -6,85 +6,40 @@
   >
     <BCardBody class="py-2 position-relative">
       <div
-          class="card-title d-flex align-items-center atividade-edicao-row atividade-titulo-card"
+          class="card-title d-flex align-items-center atividade-titulo-card"
           :class="{'atividade-hover-row': !emEdicao}"
       >
-        <template v-if="emEdicao">
-          <BFormInput
-              v-model="atividadeEditada"
-              aria-label="Editar atividade"
-              class="me-2 atividade-edicao-input"
-              data-testid="inp-editar-atividade"
-          />
-          <BButton
-              class="me-1 botao-acao"
-              data-testid="btn-salvar-edicao-atividade"
-              size="sm"
-              title="Salvar"
-              aria-label="Salvar edição da atividade"
-              variant="outline-success"
-              @click="salvarEdicaoAtividade"
-          >
-            <i
-                aria-hidden="true"
-                class="bi bi-save"
-            />
-          </BButton>
-          <BButton
-              class="botao-acao"
-              data-testid="btn-cancelar-edicao-atividade"
-              size="sm"
-              title="Cancelar"
-              aria-label="Cancelar edição"
-              variant="outline-secondary"
-              @click="cancelarEdicaoAtividade"
-          >
-            <i
-                aria-hidden="true"
-                class="bi bi-x"
-            />
-          </BButton>
-        </template>
-
-        <template v-else>
+        <InlineEditor
+          :model-value="atividade.descricao"
+          :can-edit="podeEditar"
+          aria-label="Editar atividade"
+          test-id-input="inp-editar-atividade"
+          test-id-save="btn-salvar-edicao-atividade"
+          test-id-cancel="btn-cancelar-edicao-atividade"
+          test-id-edit="btn-editar-atividade"
+          @update:model-value="(val) => $emit('atualizar-atividade', val)"
+          @edit-start="emEdicao = true"
+          @edit-end="emEdicao = false"
+        >
           <strong
               class="atividade-descricao"
               data-testid="cad-atividades__txt-atividade-descricao"
           >{{ atividade?.descricao }}</strong>
-        </template>
-      </div>
-      <div
-          v-if="podeEditar && !emEdicao"
-          class="botoes-acao-atividade position-absolute d-flex"
-      >
-        <BButton
-            class="botao-acao"
-            data-testid="btn-editar-atividade"
-            size="sm"
-            title="Editar"
-            :aria-label="'Editar atividade: ' + atividade.descricao"
-            variant="outline-primary"
-            @click="iniciarEdicaoAtividade"
-        >
-          <i
-              aria-hidden="true"
-              class="bi bi-pencil"
-          />
-        </BButton>
-        <BButton
-            class="botao-acao ms-1"
-            data-testid="btn-remover-atividade"
-            size="sm"
-            title="Remover"
-            :aria-label="'Remover atividade: ' + atividade.descricao"
-            variant="outline-danger"
-            @click="$emit('remover-atividade')"
-        >
-          <i
-              aria-hidden="true"
-              class="bi bi-trash"
-          />
-        </BButton>
+
+          <template #extra-actions>
+            <BButton
+                class="ms-1"
+                data-testid="btn-remover-atividade"
+                size="sm"
+                title="Remover"
+                :aria-label="'Remover atividade: ' + atividade.descricao"
+                variant="outline-danger"
+                @click="$emit('remover-atividade')"
+            >
+              <i aria-hidden="true" class="bi bi-trash" />
+            </BButton>
+          </template>
+        </InlineEditor>
       </div>
 
       <!-- Mensagem de erro inline -->
@@ -111,65 +66,22 @@
             :key="conhecimento.codigo"
             class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
         >
-          <template v-if="conhecimentoEmEdicao === conhecimento.codigo">
-            <BFormInput
-                v-model="conhecimentoEditadoDescricao"
-                aria-label="Editar conhecimento"
-                class="me-2"
-                data-testid="inp-editar-conhecimento"
-                size="sm"
-            />
-            <BButton
-                class="me-1 botao-acao"
-                data-testid="btn-salvar-edicao-conhecimento"
-                size="sm"
-                title="Salvar"
-                aria-label="Salvar edição do conhecimento"
-                variant="outline-success"
-                @click="salvarEdicaoConhecimento(conhecimento.codigo)"
-            >
-              <i
-                  aria-hidden="true"
-                  class="bi bi-save"
-              />
-            </BButton>
-            <BButton
-                class="botao-acao"
-                data-testid="btn-cancelar-edicao-conhecimento"
-                size="sm"
-                title="Cancelar"
-                aria-label="Cancelar edição"
-                variant="outline-secondary"
-                @click="cancelarEdicaoConhecimento"
-            >
-              <i
-                  aria-hidden="true"
-                  class="bi bi-x"
-              />
-            </BButton>
-          </template>
-          <template v-else>
+          <InlineEditor
+            :model-value="conhecimento.descricao"
+            :can-edit="podeEditar"
+            size="sm"
+            aria-label="Editar conhecimento"
+            test-id-input="inp-editar-conhecimento"
+            test-id-save="btn-salvar-edicao-conhecimento"
+            test-id-cancel="btn-cancelar-edicao-conhecimento"
+            test-id-edit="btn-editar-conhecimento"
+            @update:model-value="(val) => $emit('atualizar-conhecimento', conhecimento.codigo, val)"
+          >
             <span data-testid="cad-atividades__txt-conhecimento-descricao">{{ conhecimento?.descricao }}</span>
-            <div
-                v-if="podeEditar"
-                class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group"
-            >
+
+            <template #extra-actions>
               <BButton
-                  class="botao-acao"
-                  data-testid="btn-editar-conhecimento"
-                  size="sm"
-                  title="Editar"
-                  :aria-label="'Editar conhecimento: ' + conhecimento.descricao"
-                  variant="outline-primary"
-                  @click="iniciarEdicaoConhecimento(conhecimento)"
-              >
-                <i
-                    aria-hidden="true"
-                    class="bi bi-pencil"
-                />
-              </BButton>
-              <BButton
-                  class="botao-acao"
+                  class="ms-1"
                   data-testid="btn-remover-conhecimento"
                   size="sm"
                   title="Remover"
@@ -177,13 +89,10 @@
                   variant="outline-danger"
                   @click="$emit('remover-conhecimento', conhecimento.codigo)"
               >
-                <i
-                    aria-hidden="true"
-                    class="bi bi-trash"
-                />
+                <i aria-hidden="true" class="bi bi-trash" />
               </BButton>
-            </div>
-          </template>
+            </template>
+          </InlineEditor>
         </div>
         <BForm
             v-if="podeEditar"
@@ -226,7 +135,8 @@
 <script lang="ts" setup>
 import {BAlert, BButton, BCard, BCardBody, BCol, BForm, BFormInput} from "bootstrap-vue-next";
 import {ref} from "vue";
-import type {Atividade, Conhecimento} from "@/types/tipos";
+import type {Atividade} from "@/types/tipos";
+import InlineEditor from "@/components/common/InlineEditor.vue";
 
 interface Props {
   atividade: Atividade;
@@ -234,7 +144,7 @@ interface Props {
   erroValidacao?: string;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 const emit = defineEmits<{
   (e: "atualizar-atividade", novaDescricao: string): void;
@@ -246,47 +156,6 @@ const emit = defineEmits<{
 
 // Estado de Edição da Atividade
 const emEdicao = ref(false);
-const atividadeEditada = ref("");
-
-function iniciarEdicaoAtividade() {
-  atividadeEditada.value = props.atividade.descricao;
-  emEdicao.value = true;
-}
-
-function cancelarEdicaoAtividade() {
-  emEdicao.value = false;
-  atividadeEditada.value = "";
-}
-
-function salvarEdicaoAtividade() {
-  const descricao = atividadeEditada.value.trim();
-  if (descricao && descricao !== props.atividade.descricao) {
-    emit("atualizar-atividade", descricao);
-  }
-  cancelarEdicaoAtividade();
-}
-
-// Estado de Edição de Conhecimento
-const conhecimentoEmEdicao = ref<number | null>(null);
-const conhecimentoEditadoDescricao = ref("");
-
-function iniciarEdicaoConhecimento(conhecimento: Conhecimento) {
-  conhecimentoEmEdicao.value = conhecimento.codigo;
-  conhecimentoEditadoDescricao.value = conhecimento.descricao;
-}
-
-function cancelarEdicaoConhecimento() {
-  conhecimentoEmEdicao.value = null;
-  conhecimentoEditadoDescricao.value = "";
-}
-
-function salvarEdicaoConhecimento(codigo: number) {
-  const descricao = conhecimentoEditadoDescricao.value.trim();
-  if (descricao) {
-    emit("atualizar-conhecimento", codigo, descricao);
-  }
-  cancelarEdicaoConhecimento();
-}
 
 // Novo Conhecimento
 const novoConhecimento = ref("");

@@ -134,7 +134,7 @@
     >
       <AtividadeItem
           :atividade="atividade"
-          :pode-editar="!!permissoes?.podeEditarMapa"
+          :pode-editar="!!permissoes?.podeEditarCadastro"
           :erro-validacao="obterErroParaAtividade(atividade.codigo)"
           @atualizar-atividade="(desc) => salvarEdicaoAtividade(atividade.codigo, desc)"
           @remover-atividade="() => removerAtividade(idx)"

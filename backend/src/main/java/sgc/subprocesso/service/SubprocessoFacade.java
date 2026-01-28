@@ -650,6 +650,7 @@ public class SubprocessoFacade {
         return SubprocessoPermissoesDto.builder()
                 .podeVerPagina(podeExecutar(usuario, Acao.VISUALIZAR_SUBPROCESSO, subprocesso))
                 .podeEditarMapa(podeExecutar(usuario, Acao.EDITAR_MAPA, subprocesso))
+                .podeEditarCadastro(podeExecutar(usuario, Acao.EDITAR_CADASTRO, subprocesso))
                 .podeVisualizarMapa(podeExecutar(usuario, Acao.VISUALIZAR_MAPA, subprocesso))
                 .podeDisponibilizarMapa(podeExecutar(usuario, Acao.DISPONIBILIZAR_MAPA, subprocesso))
                 .podeDisponibilizarCadastro(podeExecutar(usuario, acaoDisponibilizarCadastro, subprocesso))
@@ -662,6 +663,11 @@ public class SubprocessoFacade {
                 .podeReabrirCadastro(podeExecutar(usuario, Acao.REABRIR_CADASTRO, subprocesso))
                 .podeReabrirRevisao(podeExecutar(usuario, Acao.REABRIR_REVISAO, subprocesso))
                 .podeEnviarLembrete(podeExecutar(usuario, Acao.ENVIAR_LEMBRETE_PROCESSO, subprocesso))
+                .podeApresentarSugestoes(podeExecutar(usuario, Acao.APRESENTAR_SUGESTOES, subprocesso))
+                .podeValidarMapa(podeExecutar(usuario, Acao.VALIDAR_MAPA, subprocesso))
+                .podeAceitarMapa(podeExecutar(usuario, Acao.ACEITAR_MAPA, subprocesso))
+                .podeDevolverMapa(podeExecutar(usuario, Acao.DEVOLVER_MAPA, subprocesso))
+                .podeHomologarMapa(podeExecutar(usuario, Acao.HOMOLOGAR_MAPA, subprocesso))
                 .build();
     }
 

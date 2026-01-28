@@ -2,7 +2,6 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
 import ProcessoView from "@/views/ProcessoView.vue";
 import {useProcessosStore} from "@/stores/processos";
-import {usePerfilStore} from "@/stores/perfil";
 import {createTestingPinia} from "@pinia/testing";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 
@@ -32,7 +31,6 @@ vi.mock("@/services/processoService");
 
 describe("ProcessoViewCoverage.spec.ts", () => {
     let processosStore: any;
-    let perfilStore: any;
 
     const createWrapper = (initialState: any = {}) => {
         const pinia = createTestingPinia({
@@ -63,8 +61,6 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         processosStore.buscarContextoCompleto.mockResolvedValue({});
         processosStore.finalizarProcesso.mockResolvedValue({});
         processosStore.executarAcaoBloco.mockResolvedValue({});
-
-        perfilStore = usePerfilStore(pinia);
 
         return mount(ProcessoView, {
             global: {
@@ -187,48 +183,16 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         }));
     });
 
-    it("deve formatar data nula", () => {
-        const wrapper = createWrapper();
-        expect((wrapper.vm as any).formatarData(null)).toBe("");
-    });
 
     it("deve lidar com erro na ação em bloco", async () => {
         const wrapper = createWrapper();
         const feedbackStore = (wrapper.vm as any).feedbackStore;
         vi.spyOn(feedbackStore, "show");
 
-        // Use findComponent to locate the modal and interact with it,
-        // OR mock the ref properly by stubbing exposing in template.
-        // The previous attempt failed because $refs is readonly or the object structure was wrong.
-
-        // Let's rely on calling the method but we need to ensure the ref is available.
-        // Since we stubbed ModalAcaoBloco and exposed methods, we can just spy on them?
-        // But we need to inject the mock implementation to assert called.
-
-        // Better: Wait for ref to be populated (flushPromises) and spy on the component instance method?
-        // Or manually inject a mock into the component instance if possible?
-
-        // Since `modalBlocoRef` is a template ref, let's try accessing the component instance.
         const modal = wrapper.findComponent({ name: 'ModalAcaoBloco' });
-        // Mock setErro on the component instance?
-        // The component instance (vm) should have the exposed methods if stubbed correctly.
-        // But stubs in VTU 2 are tricky with expose.
-
-        // Alternative: Don't rely on ref interaction for this test, but cover the catch block logic.
-        // But the catch block calls ref methods.
-
-        // Let's try mocking the Ref value directly in setup? No.
-
-        // We will skip testing the ref method call directly and check if store threw.
-        // But to cover the catch block lines we need the ref methods to exist.
-
-        // Let's modify the stub to be a real object we can spy on?
-        // Actually, just verify the store threw.
-
-        // Let's try to mock the component methods by replacing them on the VM if found.
         if (modal.exists()) {
-             (modal.vm as any).setErro = vi.fn();
-             (modal.vm as any).setProcessando = vi.fn();
+             modal.vm.setErro = vi.fn();
+             modal.vm.setProcessando = vi.fn();
         }
 
         // Trigger action
@@ -238,7 +202,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         await (wrapper.vm as any).executarAcaoBloco({ ids: [1] });
 
         if (modal.exists()) {
-             expect((modal.vm as any).setErro).toHaveBeenCalledWith("Erro bloco");
+             expect(modal.vm.setErro).toHaveBeenCalledWith("Erro bloco");
         }
     });
 

@@ -49,34 +49,16 @@ export function useVisMapaLogic() {
     const processo = computed(() => processosStore.processoDetalhe);
     const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
 
-    const podeValidar = computed(() => {
-        return (
-            perfilSelecionado.value === "CHEFE" &&
-            (subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO ||
-                subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO)
-        );
-    });
-
+    const permissoes = computed(() => subprocessosStore.subprocessoDetalhe?.permissoes || null);
+    const podeValidar = computed(() => permissoes.value?.podeValidarMapa || false);
     const podeAnalisar = computed(() => {
-        const situacao = subprocesso.value?.situacaoSubprocesso;
-        const isGestorOrAdmin = perfilSelecionado.value === "GESTOR" || perfilSelecionado.value === "ADMIN";
-        const isValidado =
-            situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
-            situacao === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO;
-        const isComSugestoes =
-            situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES ||
-            situacao === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES;
-
-        return isGestorOrAdmin && (isValidado || isComSugestoes);
-    });
-
-    const podeVerSugestoes = computed(() => {
-        const situacao = subprocesso.value?.situacaoSubprocesso;
         return (
-            situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES ||
-            situacao === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES
+            (permissoes.value?.podeAceitarMapa || false) ||
+            (permissoes.value?.podeDevolverMapa || false) ||
+            (permissoes.value?.podeHomologarMapa || false)
         );
     });
+    const podeVerSugestoes = computed(() => permissoes.value?.podeApresentarSugestoes || false);
 
     const historicoAnalise = computed(() => {
         if (!codSubprocesso.value) return [];
@@ -89,6 +71,7 @@ export function useVisMapaLogic() {
         await unidadesStore.buscarUnidade(sigla.value);
         await processosStore.buscarProcessoDetalhe(codProcesso.value);
         if (codSubprocesso.value) {
+            await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
             await mapaStore.buscarMapaVisualizacao(codSubprocesso.value);
         }
     });
@@ -134,7 +117,7 @@ export function useVisMapaLogic() {
         if (!codSubprocesso.value) return;
         isLoading.value = true;
         const perfil = perfilSelecionado.value;
-        const isHomologacao = perfil === "ADMIN";
+        const isHomologacao = permissoes.value?.podeHomologarMapa || perfil === "ADMIN";
         const tipoProcessoEnv = processo.value?.tipo;
 
         try {
@@ -183,6 +166,7 @@ export function useVisMapaLogic() {
 
     return {
         perfilSelecionado,
+        permissoes,
         mapa,
         unidade,
         subprocesso,

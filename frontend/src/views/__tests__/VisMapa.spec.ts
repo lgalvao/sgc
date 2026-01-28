@@ -100,6 +100,22 @@ describe("VisMapa.vue", () => {
                                 analisesPorSubprocesso: new Map(),
                                 ...initialState["analises"],
                             },
+                            subprocessos: {
+                                subprocessoDetalhe: {
+                                    codigo: 10,
+                                    codSubprocesso: 10,
+                                    permissoes: {
+                                        podeValidarMapa: true,
+                                        podeApresentarSugestoes: true,
+                                        podeAceitarMapa: true,
+                                        podeDevolverMapa: true,
+                                        podeHomologarMapa: false,
+                                        podeVerPagina: true,
+                                        podeVisualizarMapa: true,
+                                    }
+                                },
+                                ...initialState["subprocessos"],
+                            },
                         },
                     }),
                     router,
@@ -330,7 +346,7 @@ describe("VisMapa.vue", () => {
         const modal = wrapper.findComponent(AceitarMapaModal);
         expect(modal.props("mostrarModal")).toBe(true);
 
-        await modal.vm.$emit("confirmar-aceitacao", "Obs aceite");
+        modal.vm.$emit("confirmar-aceitacao", "Obs aceite");
 
         expect(store.aceitarValidacao).toHaveBeenCalledWith(10, {
             observacoes: "Obs aceite",
@@ -362,7 +378,7 @@ describe("VisMapa.vue", () => {
         await wrapper.vm.$nextTick();
 
         const modal = wrapper.findComponent(AceitarMapaModal);
-        await modal.vm.$emit("confirmar-aceitacao", "Obs homolog");
+        modal.vm.$emit("confirmar-aceitacao", "Obs homolog");
 
         expect(store.homologarRevisaoCadastro).toHaveBeenCalledWith(10, {
             observacoes: "Obs homolog",
@@ -472,7 +488,7 @@ describe("VisMapa.vue", () => {
         await wrapper.vm.$nextTick();
 
         const modal = wrapper.findComponent(AceitarMapaModal);
-        await modal.vm.$emit("confirmar-aceitacao", "Obs homolog");
+        modal.vm.$emit("confirmar-aceitacao", "Obs homolog");
 
         expect(store.homologarValidacao).toHaveBeenCalledWith(10);
     });
@@ -494,7 +510,7 @@ describe("VisMapa.vue", () => {
             },
         });
         const store = useProcessosStore();
-        store.aceitarValidacao.mockRejectedValue(new Error("Fail"));
+        (store.aceitarValidacao as any).mockRejectedValue(new Error("Fail"));
         vi.spyOn(feedbackStore, "show");
 
         await wrapper
@@ -503,7 +519,7 @@ describe("VisMapa.vue", () => {
         await wrapper.vm.$nextTick();
 
         const modal = wrapper.findComponent(AceitarMapaModal);
-        await modal.vm.$emit("confirmar-aceitacao", "Obs");
+        modal.vm.$emit("confirmar-aceitacao", "Obs");
         await flushPromises();
 
         expect(feedbackStore.show).toHaveBeenCalledWith("Erro", "Erro ao realizar a operação.", "danger");
@@ -526,7 +542,7 @@ describe("VisMapa.vue", () => {
             },
         });
         const store = useSubprocessosStore();
-        store.devolverRevisaoCadastro.mockRejectedValue(new Error("Fail"));
+        (store.devolverRevisaoCadastro as any).mockRejectedValue(new Error("Fail"));
         vi.spyOn(feedbackStore, "show");
 
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
@@ -541,7 +557,7 @@ describe("VisMapa.vue", () => {
     it("handles error in confirmarValidacao", async () => {
         const { wrapper, feedbackStore } = mountComponent();
         const store = useProcessosStore();
-        store.validarMapa.mockRejectedValue(new Error("Fail"));
+        (store.validarMapa as any).mockRejectedValue(new Error("Fail"));
         vi.spyOn(feedbackStore, "show");
 
         await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
@@ -555,7 +571,7 @@ describe("VisMapa.vue", () => {
     it("handles error in confirmarSugestoes", async () => {
         const { wrapper, feedbackStore } = mountComponent();
         const store = useProcessosStore();
-        store.apresentarSugestoes.mockRejectedValue(new Error("Fail"));
+        (store.apresentarSugestoes as any).mockRejectedValue(new Error("Fail"));
         vi.spyOn(feedbackStore, "show");
 
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");

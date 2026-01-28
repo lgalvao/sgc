@@ -112,6 +112,7 @@ import {useProcessosStore} from "@/stores/processos";
 import {useFeedbackStore} from "@/stores/feedback";
 import type {Processo, UnidadeParticipante} from "@/types/tipos";
 import {SituacaoSubprocesso} from "@/types/tipos";
+import {flattenTree} from "@/utils/treeUtils";
 
 interface TreeTableItem {
   codigo: number | string;
@@ -156,22 +157,13 @@ const colunasTabela = [
 
 const dadosFormatados = computed<TreeTableItem[]>(() => formatarDadosParaArvore(participantesHierarquia.value));
 
-function formatarData(data: string | null): string {
-  if (!data) return "";
-  const date = new Date(data);
-  const dia = String(date.getDate()).padStart(2, "0");
-  const mes = String(date.getMonth() + 1).padStart(2, "0");
-  const ano = date.getFullYear();
-  return `${dia}/${mes}/${ano}`;
-}
-
 function formatarDadosParaArvore(dados: UnidadeParticipante[]): TreeTableItem[] {
   if (!dados) return [];
   return dados.map((item) => ({
     codigo: item.codUnidade,
     nome: item.sigla,
-    situacao: item.situacaoSubprocesso || "Não iniciado",
-    dataLimite: formatarData(item.dataLimite || null),
+    situacao: item.situacaoLabel || item.situacaoSubprocesso || "Não iniciado",
+    dataLimite: item.dataLimiteFormatada || "",
     unidadeAtual: item.sigla,
     clickable: true,
     expanded: true,
@@ -237,16 +229,7 @@ function toSituacao(s: string): SituacaoSubprocesso | string {
 }
 
 const unidadesElegiveis = computed<UnidadeSelecao[]>(() => {
-    const flatten = (nodes: UnidadeParticipante[]): UnidadeParticipante[] => {
-        let res: UnidadeParticipante[] = [];
-        for (const node of nodes) {
-            res.push(node);
-            if (node.filhos) res = res.concat(flatten(node.filhos));
-        }
-        return res;
-    };
-
-    const all = flatten(participantesHierarquia.value);
+    const all = flattenTree(participantesHierarquia.value, 'filhos');
 
     if (acaoBlocoAtual.value === 'aceitar') {
         return all.filter(u =>
@@ -272,15 +255,7 @@ const unidadesElegiveis = computed<UnidadeSelecao[]>(() => {
 const idsElegiveis = computed(() => unidadesElegiveis.value.map(u => u.codigo));
 
 const mostrarBotoesBloco = computed(() => {
-    const flatten = (nodes: UnidadeParticipante[]): UnidadeParticipante[] => {
-        let res: UnidadeParticipante[] = [];
-        for (const node of nodes) {
-            res.push(node);
-            if (node.filhos) res = res.concat(flatten(node.filhos));
-        }
-        return res;
-    };
-    const all = flatten(participantesHierarquia.value);
+    const all = flattenTree(participantesHierarquia.value, 'filhos');
 
     const temDisponivelAceite = all.some(u =>
         toSituacao(u.situacaoSubprocesso) === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
@@ -298,8 +273,8 @@ const mostrarBotoesBloco = computed(() => {
     return (temDisponivelAceite || temDisponivelHomolog || temDisponivelMapa);
 });
 
-const podeAceitarBloco = computed(() => perfilStore.isGestor || perfilStore.isAdmin);
-const podeHomologarBloco = computed(() => perfilStore.isAdmin);
+const podeAceitarBloco = computed(() => perfilStore.isAdmin || perfilStore.isGestor);
+const podeHomologarBloco = computed(() => processo.value?.podeHomologarCadastro || false);
 const podeDisponibilizarBloco = computed(() => perfilStore.isAdmin);
 
 const tituloModalBloco = computed(() => {

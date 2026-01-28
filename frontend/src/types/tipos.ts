@@ -131,6 +131,9 @@ export interface Processo {
     dataLimite: string;
     dataCriacao: string;
     dataFinalizacao?: string;
+    podeFinalizar?: boolean;
+    podeHomologarCadastro?: boolean;
+    podeHomologarMapa?: boolean;
     unidades: UnidadeParticipante[];
     resumoSubprocessos: ProcessoResumo[];
     // Campos formatados do backend
@@ -280,6 +283,7 @@ export interface UnidadeParticipante {
 export interface SubprocessoPermissoes {
     podeVerPagina: boolean;
     podeEditarMapa: boolean;
+    podeEditarCadastro?: boolean;
     podeVisualizarMapa: boolean;
     podeDisponibilizarMapa: boolean;
     podeDisponibilizarCadastro: boolean;
@@ -292,6 +296,11 @@ export interface SubprocessoPermissoes {
     podeReabrirCadastro?: boolean;
     podeReabrirRevisao?: boolean;
     podeEnviarLembrete?: boolean;
+    podeApresentarSugestoes?: boolean;
+    podeValidarMapa?: boolean;
+    podeAceitarMapa?: boolean;
+    podeDevolverMapa?: boolean;
+    podeHomologarMapa?: boolean;
 }
 
 export interface SubprocessoDetalhe {

@@ -25,27 +25,10 @@ describe("AtividadeItem.vue", () => {
            template: '<input class="form-control" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
            props: ['modelValue', 'size']
        },
-       // Simplified BForm stub to avoid preventDefault issues with manual triggers
        BForm: { template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' },
        BCol: { template: '<div class="col"><slot /></div>' },
   };
 
-  it("deve renderizar os botões de ação com a classe d-flex para ficarem lado a lado", async () => {
-    const mountOptions = getCommonMountOptions({}, commonStubs);
-
-    context.wrapper = mount(AtividadeItem, {
-      ...mountOptions,
-      props: {
-        atividade: atividadeMock,
-        podeEditar: true,
-      },
-    });
-
-    // Hover simulation logic in CSS is not testable here easily, but we check existence
-    const botoesContainer = context.wrapper.find(".botoes-acao-atividade");
-    expect(botoesContainer.exists()).toBe(true);
-    expect(botoesContainer.classes()).toContain("d-flex");
-  });
 
   it("deve entrar em modo de edição de atividade e salvar", async () => {
     const mountOptions = getCommonMountOptions({}, commonStubs);
@@ -62,13 +45,12 @@ describe("AtividadeItem.vue", () => {
 
     await input.setValue('Atividade Editada');
 
-    // Find save button specifically
     const saveButton = context.wrapper.find('[data-testid="btn-salvar-edicao-atividade"]');
     expect(saveButton.exists()).toBe(true);
     await saveButton.trigger('click');
 
     expect(context.wrapper.emitted('atualizar-atividade')).toBeTruthy();
-    expect(context.wrapper.emitted('atualizar-atividade')![0]).toEqual(['Atividade Editada']);
+    expect(context.wrapper.emitted('atualizar-atividade')[0]).toEqual(['Atividade Editada']);
   });
 
   it("deve adicionar novo conhecimento", async () => {
@@ -86,7 +68,7 @@ describe("AtividadeItem.vue", () => {
     await context.wrapper.find('[data-testid="form-novo-conhecimento"]').trigger('submit');
 
     expect(context.wrapper.emitted('adicionar-conhecimento')).toBeTruthy();
-    expect(context.wrapper.emitted('adicionar-conhecimento')![0]).toEqual(['Novo Conhecimento']);
+    expect(context.wrapper.emitted('adicionar-conhecimento')[0]).toEqual(['Novo Conhecimento']);
   });
 
   it("não deve salvar edição de atividade se descrição vazia", async () => {
@@ -153,7 +135,7 @@ describe("AtividadeItem.vue", () => {
 
       await context.wrapper.find('[data-testid="btn-remover-conhecimento"]').trigger('click');
       expect(context.wrapper.emitted('remover-conhecimento')).toBeTruthy();
-      expect(context.wrapper.emitted('remover-conhecimento')![0]).toEqual([10]);
+      expect(context.wrapper.emitted('remover-conhecimento')[0]).toEqual([10]);
   });
 
   it("deve salvar edição de conhecimento", async () => {
@@ -169,7 +151,7 @@ describe("AtividadeItem.vue", () => {
       await context.wrapper.find('[data-testid="btn-salvar-edicao-conhecimento"]').trigger('click');
 
       expect(context.wrapper.emitted('atualizar-conhecimento')).toBeTruthy();
-      expect(context.wrapper.emitted('atualizar-conhecimento')![0]).toEqual([10, 'Conhecimento Editado']);
+      expect(context.wrapper.emitted('atualizar-conhecimento')[0]).toEqual([10, 'Conhecimento Editado']);
   });
 
   it("não deve salvar edição de conhecimento vazio", async () => {

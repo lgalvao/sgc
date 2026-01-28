@@ -107,6 +107,7 @@ describe("ProcessoView.vue", () => {
         descricao: "Processo de Teste",
         tipo: "REVISAO",
         situacao: "EM_ANDAMENTO",
+        podeHomologarCadastro: true,
         unidades: [
             {
                 codUnidade: 101,
