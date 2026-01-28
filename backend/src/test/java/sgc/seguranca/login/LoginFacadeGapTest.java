@@ -76,6 +76,7 @@ class LoginFacadeGapTest {
                 .isInstanceOf(ErroAccessoNegado.class);
     }
 
+    @SuppressWarnings("unchecked")
     private void injectAutenticacaoRecente(String titulo) throws Exception {
         java.lang.reflect.Field field = LoginFacade.class.getDeclaredField("autenticacoesRecentes");
         field.setAccessible(true);

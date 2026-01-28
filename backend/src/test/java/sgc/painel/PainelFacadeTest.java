@@ -179,7 +179,8 @@ class PainelFacadeTest {
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
 
-        assertThat(result.getContent().get(0).unidadeCodigo()).isNull();
+        assertThat(result.getContent().get(0).unidadeCodigo()).isEqualTo(100L);
+        assertThat(result.getContent().get(0).unidadeNome()).isEqualTo("Unidade 100");
         assertThat(result.getContent().get(0).unidadesParticipantes()).isEmpty();
     }
 

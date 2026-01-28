@@ -33,6 +33,7 @@ class PainelFacadeGapTest {
         var resultado = facade.listarProcessos(Perfil.ADMIN, 1L, Pageable.unpaged());
         
         assertThat(resultado.getContent()).hasSize(1);
+        assertThat(resultado.getContent().get(0).unidadeCodigo()).isEqualTo(1L);
         assertThat(resultado.getContent().get(0).unidadesParticipantes()).isNullOrEmpty();
     }
 }

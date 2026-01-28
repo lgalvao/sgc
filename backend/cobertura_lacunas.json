@@ -9,10 +9,9 @@
         121
       ],
       "partial": [
-        "120(1/2)",
-        "148(1/4)"
+        "120(1/2)"
       ],
-      "score": 2
+      "score": 1.5
     },
     {
       "class": "sgc.seguranca.login.ClienteAcessoAd",
