@@ -21,3 +21,7 @@ internal focus logic of the modal component.
 `v-if` logic repeatedly.
 **Action:** Bake `EmptyState` support directly into generic components (with customizable props) so that "no data"
 scenarios are handled gracefully and consistently by default without extra boilerplate in every view.
+
+## 2026-01-27 - [Explicit Choice vs Smart Default]
+**Learning:** For critical classifications like "Process Type", defaulting to the first option (e.g., "Mapeamento") prone to user error, as users often skip fields with pre-filled values.
+**Action:** Initialize such fields as null/empty and force an explicit user selection using a disabled placeholder option (e.g., "-- Selecione --"), ensuring the user makes a conscious decision.

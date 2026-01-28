@@ -4,7 +4,7 @@ import {type AtualizarProcessoRequest, type CriarProcessoRequest, type Processo,
 
 export function useProcessoForm(initialData?: Processo) {
   const descricao = ref(initialData?.descricao ?? '');
-  const tipo = ref(initialData?.tipo ?? TipoProcesso.MAPEAMENTO);
+  const tipo = ref<TipoProcesso | null>(initialData?.tipo ?? null);
 
   // Handling date format for input type="date"
   const initialDate = initialData?.dataLimite ? initialData.dataLimite.split('T')[0] : '';
@@ -63,7 +63,7 @@ export function useProcessoForm(initialData?: Processo) {
 
   function limpar() {
     descricao.value = '';
-    tipo.value = TipoProcesso.MAPEAMENTO;
+    tipo.value = null;
     dataLimite.value = '';
     unidadesSelecionadas.value = [];
     clearErrors();
