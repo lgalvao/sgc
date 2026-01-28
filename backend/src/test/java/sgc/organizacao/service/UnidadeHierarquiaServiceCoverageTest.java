@@ -181,4 +181,20 @@ class UnidadeHierarquiaServiceCoverageTest {
         assertThat(arvore).hasSize(1);
         assertThat(arvore.get(0).getSubunidades()).isEmpty();
     }
+
+    @Test
+    @DisplayName("Deve lidar com órfão na montagem da hierarquia (pai não está na lista)")
+    void deveLidarComOrfaoEmMontarHierarquia() {
+        // Pai existe no objeto filho, mas não está na lista retornada pelo repo
+        Unidade pai = Unidade.builder().codigo(999L).build();
+        Unidade filho = Unidade.builder().codigo(2L).unidadeSuperior(pai).build();
+        UnidadeDto filhoDto = UnidadeDto.builder().codigo(2L).subunidades(new ArrayList<>()).build();
+
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(filho));
+        when(usuarioMapper.toUnidadeDto(filho, true)).thenReturn(filhoDto);
+
+        List<UnidadeDto> arvore = service.buscarArvoreHierarquica();
+
+        assertThat(arvore).isEmpty();
+    }
 }

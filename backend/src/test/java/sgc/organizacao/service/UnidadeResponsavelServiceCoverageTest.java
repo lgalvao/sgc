@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.RepositorioComum;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -238,5 +240,98 @@ class UnidadeResponsavelServiceCoverageTest {
         ResponsavelDto resp = result.get(1L);
         assertThat(resp.titularTitulo()).isEqualTo("TITULAR");
         assertThat(resp.substitutoTitulo()).isEqualTo("SUBSTITUTO");
+    }
+
+    @Test
+    @DisplayName("Deve buscar responsável atual com sucesso")
+    void deveBuscarResponsavelAtualComSucesso() {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+        unidade.setSigla("SIGLA");
+
+        Usuario chefe = new Usuario();
+        chefe.setTituloEleitoral("123");
+
+        Usuario chefeCompleto = new Usuario();
+        chefeCompleto.setTituloEleitoral("123");
+        chefeCompleto.setAtribuicoes(Collections.emptySet());
+
+        UsuarioPerfil perfil = new UsuarioPerfil();
+        perfil.setUsuarioTitulo("123");
+
+        when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.of(unidade));
+        when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.of(chefe));
+        when(usuarioRepo.findByIdWithAtribuicoes("123")).thenReturn(Optional.of(chefeCompleto));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(List.of(perfil));
+
+        Usuario result = service.buscarResponsavelAtual("SIGLA");
+
+        assertThat(result).isEqualTo(chefeCompleto);
+        assertThat(result.getAtribuicoes()).contains(perfil);
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando unidade não encontrada em buscarResponsavelAtual")
+    void deveLancarErroQuandoUnidadeNaoEncontrada() {
+        when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.empty());
+
+        assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarResponsavelAtual("SIGLA"));
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando responsável não encontrado em buscarResponsavelAtual")
+    void deveLancarErroQuandoResponsavelNaoEncontrado() {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+
+        when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.of(unidade));
+        when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarResponsavelAtual("SIGLA"));
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando usuário completo não encontrado em buscarResponsavelAtual")
+    void deveLancarErroQuandoUsuarioNaoEncontrado() {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+
+        Usuario chefe = new Usuario();
+        chefe.setTituloEleitoral("123");
+
+        when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.of(unidade));
+        when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.of(chefe));
+        when(usuarioRepo.findByIdWithAtribuicoes("123")).thenReturn(Optional.empty());
+
+        assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarResponsavelAtual("SIGLA"));
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando não encontrar responsável da unidade")
+    void deveLancarErroQuandoNaoEncontrarResponsavelUnidade() {
+        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(Collections.emptyList());
+
+        assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarResponsavelUnidade(1L));
+    }
+
+    @Test
+    @DisplayName("Deve ignorar atribuições de outras unidades em buscarResponsaveisUnidades")
+    void deveIgnorarAtribuicoesDeOutrasUnidades() {
+        Usuario chefe = new Usuario();
+        chefe.setTituloEleitoral("123");
+
+        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(chefe));
+        when(usuarioRepo.findByIdInWithAtribuicoes(List.of("123"))).thenReturn(List.of(chefe));
+
+        UsuarioPerfil perfilOutraUnidade = new UsuarioPerfil();
+        perfilOutraUnidade.setUsuarioTitulo("123");
+        perfilOutraUnidade.setUnidadeCodigo(2L); // Outra unidade
+        perfilOutraUnidade.setPerfil(Perfil.CHEFE);
+
+        when(usuarioPerfilRepo.findByUsuarioTituloIn(List.of("123"))).thenReturn(List.of(perfilOutraUnidade));
+
+        Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
+
+        assertThat(result).isEmpty();
     }
 }

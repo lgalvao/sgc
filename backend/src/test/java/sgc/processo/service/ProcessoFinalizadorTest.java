@@ -19,6 +19,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
+import sgc.processo.erros.ErroProcesso;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
@@ -83,5 +84,43 @@ class ProcessoFinalizadorTest {
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
-    // Testes de subprocesso sem unidade/mapa removidos - não fazem sentido com NullMarked e garantias de integridade
+    @Test
+    @DisplayName("Deve falhar se subprocesso sem unidade")
+    void deveFalharSeSubprocessoSemUnidade() {
+        Long codigo = 1L;
+        Processo p = new Processo();
+        p.setCodigo(codigo);
+        when(processoRepo.findById(codigo)).thenReturn(Optional.of(p));
+
+        Subprocesso s = new Subprocesso();
+        s.setCodigo(10L);
+        s.setUnidade(null); // Sem unidade
+        s.setMapa(new Mapa());
+
+        when(subprocessoFacade.listarEntidadesPorProcesso(codigo)).thenReturn(List.of(s));
+
+        assertThatThrownBy(() -> finalizador.finalizar(codigo))
+                .isInstanceOf(ErroProcesso.class)
+                .hasMessageContaining("Subprocesso 10 sem unidade associada");
+    }
+
+    @Test
+    @DisplayName("Deve falhar se subprocesso sem mapa")
+    void deveFalharSeSubprocessoSemMapa() {
+        Long codigo = 1L;
+        Processo p = new Processo();
+        p.setCodigo(codigo);
+        when(processoRepo.findById(codigo)).thenReturn(Optional.of(p));
+
+        Subprocesso s = new Subprocesso();
+        s.setCodigo(10L);
+        s.setUnidade(new Unidade());
+        s.setMapa(null); // Sem mapa
+
+        when(subprocessoFacade.listarEntidadesPorProcesso(codigo)).thenReturn(List.of(s));
+
+        assertThatThrownBy(() -> finalizador.finalizar(codigo))
+                .isInstanceOf(ErroProcesso.class)
+                .hasMessageContaining("Subprocesso 10 sem mapa associado");
+    }
 }

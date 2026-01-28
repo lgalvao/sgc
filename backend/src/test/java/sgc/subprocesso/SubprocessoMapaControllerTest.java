@@ -27,6 +27,7 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
 import sgc.subprocesso.dto.CompetenciaRequest;
 import sgc.subprocesso.dto.MapaAjusteDto;
+import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
 import sgc.subprocesso.dto.SalvarAjustesRequest;
 import sgc.subprocesso.model.Subprocesso;
 import tools.jackson.databind.ObjectMapper;
@@ -279,4 +280,32 @@ class SubprocessoMapaControllerTest {
                                 .andExpect(status().isOk());
         }
 
+    @Test
+    @DisplayName("disponibilizarMapaEmBloco - Com Data Limite")
+    @WithMockUser
+    void disponibilizarMapaEmBloco_ComDataLimite() throws Exception {
+        java.time.LocalDate data = java.time.LocalDate.now().plusDays(20);
+        ProcessarEmBlocoRequest req = new ProcessarEmBlocoRequest("ACAO", List.of(1L, 2L), data);
+
+        mockMvc.perform(
+                        post("/api/subprocessos/1/disponibilizar-mapa-bloco")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("disponibilizarMapaEmBloco - Sem Data Limite")
+    @WithMockUser
+    void disponibilizarMapaEmBloco_SemDataLimite() throws Exception {
+        ProcessarEmBlocoRequest req = new ProcessarEmBlocoRequest("ACAO", List.of(1L, 2L), null);
+
+        mockMvc.perform(
+                        post("/api/subprocessos/1/disponibilizar-mapa-bloco")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk());
+    }
 }

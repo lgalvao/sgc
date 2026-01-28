@@ -1,6 +1,8 @@
 package sgc.comum.erros;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -215,5 +217,29 @@ class RestExceptionHandlerTest {
 
         ResponseEntity<Object> r2 = restExceptionHandler.handleMethodArgumentNotValid(null, new HttpHeaders(), HttpStatus.BAD_REQUEST, null);
         assertEquals(HttpStatus.BAD_REQUEST, r2.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Deve incluir detalhes no ErroApi")
+    void deveIncluirDetalhesNoErroApi() {
+        Map<String, String> details = Map.of("key", "value");
+        ErroNegocioBase ex = new ErroNegocioBase("Com Detalhes", "DET", HttpStatus.BAD_REQUEST, details) {};
+
+        ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
+
+        ErroApi body = (ErroApi) response.getBody();
+        assertThat(body.getDetails()).isEqualTo(details);
+    }
+
+    @Test
+    @DisplayName("Deve tratar ErroNegocioBase com detalhes vazios")
+    void deveTratarErroNegocioBaseComDetalhesVazios() {
+        Map<String, String> details = Collections.emptyMap();
+        ErroNegocioBase ex = new ErroNegocioBase("Detalhes Vazios", "DET_VAZIO", HttpStatus.BAD_REQUEST, details) {};
+
+        ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
+
+        ErroApi body = (ErroApi) response.getBody();
+        assertThat(body.getDetails()).isNullOrEmpty();
     }
 }

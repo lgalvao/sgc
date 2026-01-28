@@ -85,4 +85,25 @@ class MapaSalvamentoServiceCoverageTest {
 
         verify(mapaRepo).save(mapa);
     }
+
+    @Test
+    @DisplayName("Deve salvar mapa sem atividades (codMapa null no contexto)")
+    void deveSalvarMapaSemAtividades() {
+        Long codMapa = 1L;
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(codMapa);
+
+        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of()); // Lista vazia
+        when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(new ArrayList<>());
+
+        SalvarMapaRequest request = SalvarMapaRequest.builder()
+                .competencias(List.of())
+                .observacoes("Obs")
+                .build();
+
+        service.salvarMapaCompleto(codMapa, request);
+
+        verify(mapaRepo).save(mapa);
+    }
 }
