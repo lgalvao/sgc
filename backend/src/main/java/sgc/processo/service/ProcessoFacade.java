@@ -38,15 +38,6 @@ import static sgc.processo.model.TipoProcesso.REVISAO;
 
 /**
  * Facade para orquestrar operações de Processo.
- *
- * <p>
- * Implementa o padrão Facade para simplificar a interface de uso e centralizar
- * a coordenação entre múltiplos serviços relacionados a processos.
- *
- * <p>
- * <b>Nota sobre Injeção de Dependências:</b>
- * SubprocessoFacade é injetado normalmente. Dependência circular verificada e
- * refutada.
  */
 @Service
 @Slf4j
@@ -173,7 +164,6 @@ public class ProcessoFacade {
                     .tipoAnterior(tipoAnterior != requisicao.tipo() ? tipoAnterior : null)
                     .build();
             publicadorEventos.publishEvent(evento);
-            log.debug("Evento EventoProcessoAtualizado publicado para processo {}", codigo);
         }
 
         return processoMapper.toDto(processoAtualizado);
@@ -189,8 +179,7 @@ public class ProcessoFacade {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser removidos.");
         }
 
-        // Publica evento ANTES da exclusão para permitir listeners acessarem dados
-        // relacionados
+        // Publica evento ANTES da exclusão para permitir listeners acessarem dados relacionados
         EventoProcessoExcluido evento = EventoProcessoExcluido.builder()
                 .codProcesso(codigo)
                 .descricao(processo.getDescricao())
@@ -381,7 +370,13 @@ public class ProcessoFacade {
         executarAcoesBatch(codProcesso, usuario, unidadesAceitarCadastro, unidadesAceitarValidacao, unidadesHomologarCadastro, unidadesHomologarValidacao);
     }
 
-    private void executarAcoesBatch(Long codProcesso, Usuario usuario, List<Long> unidadesAceitarCadastro, List<Long> unidadesAceitarValidacao, List<Long> unidadesHomologarCadastro, List<Long> unidadesHomologarValidacao) {
+    private void executarAcoesBatch(Long codProcesso, 
+        Usuario usuario, 
+        List<Long> unidadesAceitarCadastro, 
+        List<Long> unidadesAceitarValidacao, 
+        List<Long> unidadesHomologarCadastro, 
+        List<Long> unidadesHomologarValidacao) {
+
         if (!unidadesAceitarCadastro.isEmpty()) {
             subprocessoFacade.aceitarCadastroEmBloco(unidadesAceitarCadastro, codProcesso, usuario);
         }
