@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.AtualizarConhecimentoRequest;
 import sgc.mapa.dto.ConhecimentoResponse;
@@ -12,7 +13,6 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Conhecimento;
 
-@SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Component
 @Mapper(componentModel = "spring")
 public abstract class ConhecimentoMapper {

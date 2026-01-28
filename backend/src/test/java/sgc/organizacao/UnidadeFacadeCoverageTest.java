@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
@@ -56,6 +57,9 @@ class UnidadeFacadeCoverageTest {
     private RepositorioComum repo;
     @Mock
     private UnidadeMapaRepo unidadeMapaRepo;
+
+    @Captor
+    private ArgumentCaptor<Function<Unidade, Boolean>> functionCaptor;
 
     @Test
     @DisplayName("Deve buscar unidade na hierarquia recursivamente")
@@ -281,9 +285,8 @@ class UnidadeFacadeCoverageTest {
         unidadeFacade.buscarArvoreComElegibilidade(true, Set.of(30L));
 
         // Capture function
-        ArgumentCaptor<Function<Unidade, Boolean>> captor = ArgumentCaptor.forClass(Function.class);
-        verify(unidadeHierarquiaService).buscarArvoreComElegibilidade(captor.capture());
-        Function<Unidade, Boolean> function = captor.getValue();
+        verify(unidadeHierarquiaService).buscarArvoreComElegibilidade(functionCaptor.capture());
+        Function<Unidade, Boolean> function = functionCaptor.getValue();
 
         // Test assertions
         Unidade uOk = new Unidade();
@@ -314,9 +317,8 @@ class UnidadeFacadeCoverageTest {
         unidadeFacade.buscarArvoreComElegibilidade(false, Set.of(30L));
 
         // Capture function
-        ArgumentCaptor<Function<Unidade, Boolean>> captor = ArgumentCaptor.forClass(Function.class);
-        verify(unidadeHierarquiaService).buscarArvoreComElegibilidade(captor.capture());
-        Function<Unidade, Boolean> function = captor.getValue();
+        verify(unidadeHierarquiaService).buscarArvoreComElegibilidade(functionCaptor.capture());
+        Function<Unidade, Boolean> function = functionCaptor.getValue();
 
         // Test assertions
         Unidade uOk = new Unidade();
@@ -347,6 +349,7 @@ class UnidadeFacadeCoverageTest {
 
     @Test
     @DisplayName("Deve verificar existência de mapa vigente (método legado)")
+    @SuppressWarnings("deprecation")
     void deveVerificarExistenciaMapaVigenteLegado() {
         when(unidadeMapaService.verificarMapaVigente(1L)).thenReturn(true);
         assertThat(unidadeFacade.verificarExistenciaMapaVigente(1L)).isTrue();
