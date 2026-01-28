@@ -1,19 +1,5 @@
 package sgc.organizacao.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.RepositorioComum;
-import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
-import sgc.organizacao.dto.ResponsavelDto;
-import sgc.organizacao.mapper.UsuarioMapper;
-import sgc.organizacao.model.*;
-
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -21,9 +7,30 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import static org.mockito.Mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import sgc.comum.erros.ErroValidacao;
+import sgc.comum.repo.RepositorioComum;
+import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.mapper.UsuarioMapper;
+import sgc.organizacao.model.AtribuicaoTemporaria;
+import sgc.organizacao.model.AtribuicaoTemporariaRepo;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.organizacao.model.UsuarioRepo;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -68,7 +75,6 @@ class UnidadeResponsavelServiceCoverageTest {
     @Test
     @DisplayName("Deve validar data termino anterior ao inicio quando inicio é nulo (usa hoje)")
     void deveValidarDataTerminoAnteriorHojeQuandoInicioNulo() {
-        // Data termino ontem, inicio nulo (hoje) -> Erro
         CriarAtribuicaoTemporariaRequest request = new CriarAtribuicaoTemporariaRequest(
                 "123", null, LocalDate.now().minusDays(1), "Justificativa");
 
@@ -131,7 +137,6 @@ class UnidadeResponsavelServiceCoverageTest {
     @Test
     @DisplayName("Deve lidar com lista de usuários vazia em carregarAtribuicoesEmLote")
     void deveLidarComListaUsuariosVaziaEmCarregarAtribuicoes() {
-        // Se findByIdInWithAtribuicoes retornar vazio (embora improvável dado o fluxo anterior, mas para cobrir o branch)
         Usuario chefeSimples = new Usuario();
         chefeSimples.setTituloEleitoral("123");
 
@@ -200,8 +205,6 @@ class UnidadeResponsavelServiceCoverageTest {
 
         Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
 
-        // Result deve ser vazio pois não achou perfil CHEFE, mas verificamos se usuario.setAtribuicoes foi chamado via debug ou comportamento implícito
-        // O teste aqui garante que passamos pelo loop de usuários e getOrDefault retornou vazio
         assertThat(result).isEmpty();
         assertThat(chefe.getAtribuicoes()).isEmpty();
     }

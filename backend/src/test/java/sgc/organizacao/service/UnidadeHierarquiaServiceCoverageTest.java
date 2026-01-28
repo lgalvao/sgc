@@ -1,30 +1,27 @@
 package sgc.organizacao.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.mapper.UsuarioMapper;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.mapper.UsuarioMapper;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -168,9 +165,6 @@ class UnidadeHierarquiaServiceCoverageTest {
     @Test
     @DisplayName("Deve lidar com subunidades vazias ou nulas ao montar hierarquia")
     void deveLidarComSubunidadesVazias() {
-        // Testa especificamente o branch if (filhas == null || filhas.isEmpty()) em montarComSubunidades
-        // Para isso, precisamos de um cenário onde uma unidade não tenha filhas no mapaFilhas
-
         Unidade unidadeIsolada = Unidade.builder().codigo(1L).build();
         UnidadeDto dto = UnidadeDto.builder().codigo(1L).subunidades(new ArrayList<>()).build();
 

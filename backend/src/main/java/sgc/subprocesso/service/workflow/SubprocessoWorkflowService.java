@@ -88,9 +88,7 @@ public class SubprocessoWorkflowService {
             TipoProcesso.MAPEAMENTO, MAPEAMENTO_MAPA_HOMOLOGADO,
             TipoProcesso.REVISAO, REVISAO_MAPA_HOMOLOGADO));
 
-    private static final String ENTIDADE_SUBPROCESSO = "Subprocesso";
     private static final String SIGLA_SEDOC = "SEDOC";
-    private static final String MSG_ERRO_SUBPROCESSO_NOT_FOUND = "processo=%d, unidade=%d";
 
     private final SubprocessoRepo subprocessoRepo;
     private final SubprocessoCrudService crudService;
@@ -439,17 +437,12 @@ public class SubprocessoWorkflowService {
 
     @Transactional
     public void aceitarCadastroEmBloco(List<Long> subprocessoCodigos, Long codSubprocessoBase, Usuario usuario) {
-        subprocessoCodigos.forEach(codSubprocesso -> {
-            self.aceitarCadastro(codSubprocesso, "De acordo com o cadastro de atividades da unidade (Em Bloco)",
-                    usuario);
-        });
+        subprocessoCodigos.forEach(codSubprocesso -> self.aceitarCadastro(codSubprocesso, "De acordo com o cadastro de atividades da unidade (Em Bloco)", usuario));
     }
 
     @Transactional
     public void homologarCadastroEmBloco(List<Long> subprocessoCodigos, Long codSubprocessoBase, Usuario usuario) {
-        subprocessoCodigos.forEach(codSubprocesso -> {
-            self.homologarCadastro(codSubprocesso, "Homologação em bloco", usuario);
-        });
+        subprocessoCodigos.forEach(codSubprocesso -> self.homologarCadastro(codSubprocesso, "Homologação em bloco", usuario));
     }
 
     public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request) {
@@ -504,8 +497,7 @@ public class SubprocessoWorkflowService {
         Long codMapa = subprocesso.getMapa().getCodigo();
         competenciaService.removerCompetencia(codCompetencia);
 
-        // Se o mapa ficou vazio e estava em MAPA_CRIADO, voltar para
-        // CADASTRO_HOMOLOGADO
+        // Se o mapa ficou vazio e estava em MAPA_CRIADO, voltar para CADASTRO_HOMOLOGADO
         boolean ficouVazio = competenciaService.buscarPorCodMapa(codMapa).isEmpty();
         if (ficouVazio && subprocesso.getSituacao() == MAPEAMENTO_MAPA_CRIADO) {
             subprocesso.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
@@ -525,9 +517,7 @@ public class SubprocessoWorkflowService {
                 && situacao != REVISAO_CADASTRO_HOMOLOGADA
                 && situacao != REVISAO_MAPA_AJUSTADO) {
 
-            throw new ErroMapaEmSituacaoInvalida(
-                    "Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: %s"
-                            .formatted(situacao));
+            throw new ErroMapaEmSituacaoInvalida("Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: %s".formatted(situacao));
         }
 
         return subprocesso;
@@ -730,23 +720,17 @@ public class SubprocessoWorkflowService {
     @Transactional
     public void disponibilizarMapaEmBloco(List<Long> subprocessoCodigos, Long codSubprocessoBase,
             DisponibilizarMapaRequest request, Usuario usuario) {
-        subprocessoCodigos.forEach(codSubprocesso -> {
-            self.disponibilizarMapa(codSubprocesso, request, usuario);
-        });
+        subprocessoCodigos.forEach(codSubprocesso -> self.disponibilizarMapa(codSubprocesso, request, usuario));
     }
 
     @Transactional
     public void aceitarValidacaoEmBloco(List<Long> subprocessoCodigos, Long codSubprocessoBase, Usuario usuario) {
-        subprocessoCodigos.forEach(codSubprocesso -> {
-            self.aceitarValidacao(codSubprocesso, usuario);
-        });
+        subprocessoCodigos.forEach(codSubprocesso -> self.aceitarValidacao(codSubprocesso, usuario));
     }
 
     @Transactional
     public void homologarValidacaoEmBloco(List<Long> subprocessoCodigos, Long codSubprocessoBase, Usuario usuario) {
-        subprocessoCodigos.forEach(codSubprocesso -> {
-            self.homologarValidacao(codSubprocesso, usuario);
-        });
+        subprocessoCodigos.forEach(codSubprocesso -> self.homologarValidacao(codSubprocesso, usuario));
     }
 
     private Subprocesso buscarSubprocesso(Long codSubprocesso) {
