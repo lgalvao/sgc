@@ -168,20 +168,18 @@ class PainelFacadeTest {
         assertThat(result).hasSize(1);
     }
 
+
+
     @Test
-    @DisplayName("Deve lidar com processo sem participantes")
-    void deveLidarComProcessoSemParticipantes() {
-        Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);
-        p.setParticipantes(new java.util.HashSet<>()); // Empty
+    @DisplayName("Deve lidar com solicitação não paginada")
+    void deveLidarComSolicitacaoNaoPaginada() {
+        when(processoFacade.listarTodos(any(Pageable.class)))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of()));
 
-        Page<Processo> page = new PageImpl<>(List.of(p));
-        when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(page);
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, Pageable.unpaged());
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
-
-        assertThat(result.getContent().get(0).unidadeCodigo()).isEqualTo(100L);
-        assertThat(result.getContent().get(0).unidadeNome()).isEqualTo("Unidade 100");
-        assertThat(result.getContent().get(0).unidadesParticipantes()).isEmpty();
+        assertThat(result).isEmpty();
+        verify(processoFacade).listarTodos(Pageable.unpaged());
     }
 
     private Processo criarProcesso(Long codigo, SituacaoProcesso situacao) {

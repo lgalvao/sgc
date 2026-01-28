@@ -142,8 +142,6 @@ public class PainelFacade {
     }
 
     private String formatarUnidadesParticipantes(Set<Unidade> participantes) {
-        if (participantes.isEmpty()) return "";
-
         Map<Long, Unidade> participantesPorCodigo =
                 participantes.stream().collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
 
