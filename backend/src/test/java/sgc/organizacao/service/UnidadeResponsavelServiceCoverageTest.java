@@ -205,4 +205,38 @@ class UnidadeResponsavelServiceCoverageTest {
         assertThat(result).isEmpty();
         assertThat(chefe.getAtribuicoes()).isEmpty();
     }
+
+    @Test
+    @DisplayName("Deve buscar responsáveis em lote com substituto")
+    void deveBuscarResponsaveisEmLoteComSubstituto() {
+        Usuario titular = new Usuario();
+        titular.setTituloEleitoral("TITULAR");
+        titular.setNome("Nome Titular");
+
+        Usuario substituto = new Usuario();
+        substituto.setTituloEleitoral("SUBSTITUTO");
+        substituto.setNome("Nome Substituto");
+
+        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(titular, substituto));
+        when(usuarioRepo.findByIdInWithAtribuicoes(anyList())).thenReturn(List.of(titular, substituto));
+
+        UsuarioPerfil perfilTitular = new UsuarioPerfil();
+        perfilTitular.setUsuarioTitulo("TITULAR");
+        perfilTitular.setUnidadeCodigo(1L);
+        perfilTitular.setPerfil(Perfil.CHEFE);
+
+        UsuarioPerfil perfilSubstituto = new UsuarioPerfil();
+        perfilSubstituto.setUsuarioTitulo("SUBSTITUTO");
+        perfilSubstituto.setUnidadeCodigo(1L);
+        perfilSubstituto.setPerfil(Perfil.CHEFE);
+
+        when(usuarioPerfilRepo.findByUsuarioTituloIn(anyList())).thenReturn(List.of(perfilTitular, perfilSubstituto));
+
+        Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
+
+        assertThat(result).hasSize(1);
+        ResponsavelDto resp = result.get(1L);
+        assertThat(resp.titularTitulo()).isEqualTo("TITULAR");
+        assertThat(resp.substitutoTitulo()).isEqualTo("SUBSTITUTO");
+    }
 }

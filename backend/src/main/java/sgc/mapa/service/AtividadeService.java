@@ -70,10 +70,7 @@ public class AtividadeService {
         Atividade existente = repo.buscar(Atividade.class, codigo);
 
         if (existente.getMapa() != null) {
-            var mapa = existente.getMapa();
-            if (mapa != null) {
-                notificarAlteracaoMapa(mapa.getCodigo());
-            }
+            notificarAlteracaoMapa(existente.getMapa().getCodigo());
         }
 
         var entidadeParaAtualizar = atividadeMapper.toEntity(request);
