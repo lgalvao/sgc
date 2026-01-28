@@ -175,6 +175,13 @@ class UnidadeResponsavelServiceCoverageTest {
     }
 
     @Test
+    @DisplayName("Deve lançar erro quando não encontra responsável da unidade")
+    void deveLancarErroQuandoNaoEncontraResponsavelUnidade() {
+        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(Collections.emptyList());
+        assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarResponsavelUnidade(1L));
+    }
+
+    @Test
     @DisplayName("Deve buscar responsáveis filtrando perfil não CHEFE")
     void deveBuscarResponsaveisFiltrandoPerfilNaoChefe() {
         Usuario chefe = new Usuario();
@@ -242,6 +249,27 @@ class UnidadeResponsavelServiceCoverageTest {
         ResponsavelDto resp = result.get(1L);
         assertThat(resp.titularTitulo()).isEqualTo("TITULAR");
         assertThat(resp.substitutoTitulo()).isEqualTo("SUBSTITUTO");
+    }
+
+    @Test
+    @DisplayName("Deve filtrar atribuições que não pertencem às unidades pesquisadas")
+    void deveFiltrarAtribuicoesDeOutrasUnidades() {
+        Usuario titular = new Usuario();
+        titular.setTituloEleitoral("TITULAR");
+
+        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(10L))).thenReturn(List.of(titular));
+        when(usuarioRepo.findByIdInWithAtribuicoes(anyList())).thenReturn(List.of(titular));
+
+        UsuarioPerfil perfilOutraUnidade = new UsuarioPerfil();
+        perfilOutraUnidade.setUsuarioTitulo("TITULAR");
+        perfilOutraUnidade.setUnidadeCodigo(99L); // Unidade diferente da pesquisada (10L)
+        perfilOutraUnidade.setPerfil(Perfil.CHEFE);
+
+        when(usuarioPerfilRepo.findByUsuarioTituloIn(anyList())).thenReturn(List.of(perfilOutraUnidade));
+
+        Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(10L));
+
+        assertThat(result).isEmpty();
     }
 
     @Test

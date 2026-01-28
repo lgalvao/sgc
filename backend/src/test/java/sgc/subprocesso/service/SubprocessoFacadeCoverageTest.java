@@ -442,4 +442,29 @@ class SubprocessoFacadeCoverageTest {
         // Verify activity was added to competence
         org.junit.jupiter.api.Assertions.assertFalse(competencia.getAtividades().isEmpty());
     }
+
+    @Test
+    @DisplayName("importarAtividades - Subprocesso Destino Nao Encontrado")
+    void importarAtividades_DestinoNaoEncontrado() {
+        Long codDestino = 999L;
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ErroEntidadeNaoEncontrada.class, () -> facade.importarAtividades(codDestino, 1L));
+    }
+
+    @Test
+    @DisplayName("importarAtividades - Subprocesso Origem Nao Encontrado")
+    void importarAtividades_OrigemNaoEncontrado() {
+        Long codDestino = 1L;
+        Long codOrigem = 999L;
+
+        Subprocesso spDestino = new Subprocesso();
+        spDestino.setCodigo(codDestino);
+        spDestino.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ErroEntidadeNaoEncontrada.class, () -> facade.importarAtividades(codDestino, codOrigem));
+    }
 }

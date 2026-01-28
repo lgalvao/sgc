@@ -659,6 +659,30 @@ class UsuarioFacadeCoverageTest {
     }
 
     @Test
+    @DisplayName("Deve retornar lista vazia se perfil não for CHEFE ao buscar unidades onde é responsável")
+    void deveRetornarVaziaSePerfilNaoChefeOndeEhResponsavel() {
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("T");
+
+        Unidade unAtiva = new Unidade();
+        unAtiva.setCodigo(1L);
+        unAtiva.setSituacao(SituacaoUnidade.ATIVA);
+
+        UsuarioPerfil up = new UsuarioPerfil();
+        up.setUsuario(u);
+        up.setUnidade(unAtiva);
+        up.setUnidadeCodigo(1L);
+        up.setPerfil(Perfil.SERVIDOR); // Não é CHEFE
+
+        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.of(u));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("T")).thenReturn(List.of(up));
+
+        List<Long> unidades = usuarioFacade.buscarUnidadesOndeEhResponsavel("T");
+
+        assertThat(unidades).isEmpty();
+    }
+
+    @Test
     @DisplayName("Deve retornar false se unidade inativa ao verificar se tem perfil")
     void deveRetornarFalseSeUnidadeInativaAoVerificarPerfil() {
         Usuario u = new Usuario();
