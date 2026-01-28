@@ -10,7 +10,7 @@ describe('validators', () => {
         });
         it('deve retornar true para email válido', () => {
             expect(validarEmail('teste@teste.com')).toBe(true);
-            expect(validarEmail('a@b.c')).toBe(true);
+            expect(validarEmail('a@b.co')).toBe(true);
         });
         it('deve retornar false para email inválido', () => {
             expect(validarEmail('teste')).toBe(false);

@@ -1,49 +1,47 @@
+import Papa from "papaparse";
+
 export type CSVData = Record<string, string | number | undefined>;
 
 /**
- * Escapes a value for CSV format and mitigates CSV Injection (Formula Injection).
- * - Wraps value in double quotes.
- * - Escapes existing double quotes by doubling them (" -> "").
- * - Prepends a single quote (') if the value starts with =, +, -, or @ to prevent formula execution.
+ * Preprocesses value to mitigate CSV Injection (Formula Injection).
+ * Prepends a single quote (') if the value starts with =, +, -, or @.
  */
-function escapeCSVValue(value: string | number | undefined): string {
+function sanitizeCSVValue(value: unknown): string | number | undefined {
   if (value === undefined || value === null) {
-    // Maintain behavior of converting undefined/null to string, or treat as empty?
-    // Original code used template literal `${item[header]}` which converts undefined to "undefined".
-    // We will stick to String(value) to minimize behavior change, although "undefined" in CSV is likely not desired.
-    // However, for security, let's treat it as string first.
-    // Actually, usually one wants empty string for null/undefined.
-    // Let's assume we want to match the original output "undefined" if that was the case,
-    // OR improve it. Given I am Sentinel, I should focus on Security.
-    // But let's check what `String(undefined)` returns. It is "undefined".
-    // I will use String(value) to be safe.
+    return "";
   }
-
-  let stringValue = String(value);
-
+  
+  const stringValue = String(value);
+  
   // CSV Injection prevention
-  // If value starts with =, +, -, or @, prepend a single quote
   if (/^[=+\-@]/.test(stringValue)) {
-    stringValue = "'" + stringValue;
+    return "'" + stringValue;
   }
-
-  // Escape double quotes by doubling them
-  if (stringValue.includes('"')) {
-    stringValue = stringValue.replace(/"/g, '""');
-  }
-
-  return `"${stringValue}"`;
+  
+  return value as string | number;
 }
 
 export function gerarCSV(dados: CSVData[]): string {
   if (dados.length === 0) return "";
 
-  const headers = Object.keys(dados[0]);
-  const linhas = dados.map((item) =>
-      headers.map((header) => escapeCSVValue(item[header])).join(","),
-  );
+  // Sanitize data before passing to PapaParse
+  const sanitizedData = dados.map(row => {
+    const newRow: Record<string, any> = {};
+    Object.keys(row).forEach(key => {
+      newRow[key] = sanitizeCSVValue(row[key]);
+    });
+    return newRow;
+  });
 
-  return [headers.join(","), ...linhas].join("\n");
+  return Papa.unparse(sanitizedData, {
+    quotes: true,
+    quoteChar: '"',
+    escapeChar: '"',
+    delimiter: ",",
+    header: true,
+    newline: "\n",
+    skipEmptyLines: true, // Good practice
+  });
 }
 
 export function downloadCSV(csv: string, nomeArquivo: string) {
@@ -57,6 +55,6 @@ export function downloadCSV(csv: string, nomeArquivo: string) {
     link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    link.remove();
   }
 }

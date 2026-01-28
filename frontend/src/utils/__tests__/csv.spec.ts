@@ -8,7 +8,7 @@ describe('csv utils', () => {
       { name: 'Jane', age: 25, city: 'London' }
     ];
     const csv = gerarCSV(data);
-    const expected = 'name,age,city\n"John","30","New York"\n"Jane","25","London"';
+    const expected = '"name","age","city"\n"John","30","New York"\n"Jane","25","London"';
     expect(csv).toBe(expected);
   });
 
@@ -18,7 +18,7 @@ describe('csv utils', () => {
     ];
     const csv = gerarCSV(data);
     // Expected: quotes inside value should be doubled: "Hello ""World"""
-    const expected = 'id,note\n"1","Hello ""World"""';
+    const expected = '"id","note"\n"1","Hello ""World"""';
     expect(csv).toBe(expected);
   });
 

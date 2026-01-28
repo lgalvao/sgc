@@ -10,6 +10,17 @@ import {useRoute} from "vue-router";
 // Mock de components
 vi.mock("@/components/BarraNavegacao.vue", () => ({default: {template: '<div data-testid="barra-navegacao"></div>'}}));
 vi.mock("@/components/MainNavbar.vue", () => ({default: {template: '<div data-testid="main-navbar"></div>'}}));
+vi.mock("bootstrap-vue-next", async () => {
+    const actual = await vi.importActual("bootstrap-vue-next");
+    return {
+        ...actual,
+        useToast: vi.fn(),
+        BOrchestrator: { template: '<div></div>' }
+    };
+});
+
+import {useToast} from "bootstrap-vue-next";
+import {useFeedbackStore} from "@/stores/feedback";
 
 // Mock do router
 vi.mock("vue-router", () => ({
@@ -33,7 +44,7 @@ const sessionStorageMock = (() => {
         }
     };
 })();
-Object.defineProperty(window, 'sessionStorage', {value: sessionStorageMock});
+Object.defineProperty(globalThis, 'sessionStorage', {value: sessionStorageMock});
 
 describe("App.vue", () => {
     beforeEach(() => {
@@ -58,10 +69,6 @@ describe("App.vue", () => {
         expect(wrapper.find('[data-testid="main-navbar"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="barra-navegacao"]').exists()).toBe(false);
         expect(wrapper.find('footer').exists()).toBe(false);
-        // Vue Test Utils renderiza router-view como <router-view-stub> ou usa o componente real se não stubbed.
-        // Como mockei RouterView no topo, ele deve usar meu mock se importado.
-        // Mas App.vue usa <router-view/> globalmente.
-        // Vamos verificar se existe algum router-view.
         expect(wrapper.findComponent({name: 'RouterView'}).exists() || wrapper.find('router-view-stub').exists()).toBe(true);
     });
 
@@ -124,41 +131,28 @@ describe("App.vue", () => {
         });
 
         expect(wrapper.find('[data-testid="barra-navegacao"]').exists()).toBe(false);
-        // Deve ter removido o item
         expect(sessionStorage.getItem("cameFromNavbar")).toBeNull();
     });
 
-    it("deve exibir alerta global quando feedbackStore tiver dados", async () => {
+    it("deve inicializar feedbackStore com instância do toast", () => {
+        const mockToast = { show: vi.fn() };
+        (useToast as any).mockReturnValue(mockToast);
         (useRoute as any).mockReturnValue({path: "/painel", fullPath: "/painel"});
 
-        const wrapper = mount(App, {
+        mount(App, {
             global: {
                 plugins: [createTestingPinia({
                     createSpy: vi.fn,
-                    initialState: {
-                        feedback: {
-                            currentFeedback: {
-                                show: true,
-                                title: "Erro Teste",
-                                message: "Mensagem de erro",
-                                variant: "danger"
-                            }
-                        }
-                    }
+                    stubActions: false // Precisamos que chamadas reais ou simuladas ocorram, mas queremos spy no init
                 })],
                 stubs: {
                     BOrchestrator: true,
-                    BAlert: {
-                        template: '<div class="b-alert"><slot></slot></div>',
-                        props: ['modelValue', 'variant', 'title']
-                    },
                     'router-view': true
                 }
             },
         });
-
-        expect(wrapper.find('.b-alert').exists()).toBe(true);
-        expect(wrapper.text()).toContain("Erro Teste");
-        expect(wrapper.text()).toContain("Mensagem de erro");
+        
+        const feedbackStore = useFeedbackStore();
+        expect(feedbackStore.init).toHaveBeenCalled();
     });
 });

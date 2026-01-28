@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {computed, ref, watch} from "vue";
 import {useRoute} from "vue-router";
-import {BAlert, BOrchestrator} from "bootstrap-vue-next";
+import {BOrchestrator, useToast} from "bootstrap-vue-next";
 import {useFeedbackStore} from "@/stores/feedback";
 import pkg from "../package.json";
 import BarraNavegacao from "./components/BarraNavegacao.vue";
@@ -15,6 +15,10 @@ interface PackageJson {
 
 const route = useRoute();
 const feedbackStore = useFeedbackStore();
+const toast = useToast();
+
+// Inicializa a store com a instância do toast para que possamos disparar toasts de qualquer lugar
+feedbackStore.init(toast);
 
 const hideExtrasOnce = ref(false);
 
@@ -54,25 +58,6 @@ const shouldShowNavBarExtras = computed(() => {
     Pular para o conteúdo principal
   </a>
   <BOrchestrator/>
-  <div class="position-fixed end-0 p-3" style="top: 4.5rem; z-index: 2050; pointer-events: none; max-width: 450px;">
-    <BAlert
-        v-model="feedbackStore.currentFeedback.show"
-        :fade="false"
-        :variant="feedbackStore.currentFeedback.variant"
-        class="shadow"
-        data-testid="global-alert"
-        dismissible
-        style="pointer-events: auto;"
-        @closed="feedbackStore.close()"
-    >
-      <h6 v-if="feedbackStore.currentFeedback.title" class="alert-heading fw-bold mb-1">
-        {{ feedbackStore.currentFeedback.title }}
-      </h6>
-      <p class="mb-0">
-        {{ feedbackStore.currentFeedback.message }}
-      </p>
-    </BAlert>
-  </div>
 
   <div class="d-flex flex-column min-vh-100">
     <MainNavbar v-if="route.path !== '/login'"/>
