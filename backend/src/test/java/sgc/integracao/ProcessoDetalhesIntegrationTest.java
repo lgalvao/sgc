@@ -44,7 +44,6 @@ class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
     private Processo processoFinalizado;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         Unidade unidade = unidadeRepo.findById(11L).orElseThrow(); // SENIC
 

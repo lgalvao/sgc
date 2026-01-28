@@ -33,7 +33,6 @@ class SubprocessoDetalheMapperTest {
     private MovimentacaoMapper movimentacaoMapper;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         mapper = Mappers.getMapper(SubprocessoDetalheMapper.class);
         ReflectionTestUtils.setField(mapper, "movimentacaoMapper", movimentacaoMapper);

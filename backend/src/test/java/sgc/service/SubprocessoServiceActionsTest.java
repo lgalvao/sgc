@@ -80,7 +80,6 @@ class SubprocessoServiceActionsTest {
     private Usuario gestor;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         unidade = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
         admin = carregarUsuarioComPerfis("6"); // Ricardo Alves - ADMIN
@@ -117,7 +116,6 @@ class SubprocessoServiceActionsTest {
 
     @Nested
     @DisplayName("Testes para aceitarCadastro")
-    @SuppressWarnings("unused")
     class AceitarCadastroTest {
         @Test
         @Transactional
@@ -138,7 +136,6 @@ class SubprocessoServiceActionsTest {
 
     @Nested
     @DisplayName("Testes para homologarCadastro")
-    @SuppressWarnings("unused")
     class HomologarCadastroTest {
         @Test
         @Transactional
@@ -154,7 +151,6 @@ class SubprocessoServiceActionsTest {
 
     @Nested
     @DisplayName("Testes para aceitarRevisaoCadastro")
-    @SuppressWarnings("unused")
     class AceitarRevisaoCadastroTest {
         @Test
         @Transactional
@@ -194,7 +190,6 @@ class SubprocessoServiceActionsTest {
 
     @Nested
     @DisplayName("Testes para homologarRevisaoCadastro")
-    @SuppressWarnings("unused")
     class HomologarRevisaoCadastroTest {
         @Test
         @Transactional
@@ -243,7 +238,6 @@ class SubprocessoServiceActionsTest {
 
     @Nested
     @DisplayName("Testes para devolverCadastro")
-    @SuppressWarnings("unused")
     class DevolverCadastroTest {
         @Test
         @Transactional

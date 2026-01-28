@@ -36,7 +36,6 @@ class SubprocessoMapperTest {
     private SubprocessoMapper mapper;
 
     @org.junit.jupiter.api.BeforeEach
-    @SuppressWarnings("unused")
     void setup() {
         mapper = org.mapstruct.factory.Mappers.getMapper(SubprocessoMapper.class);
         mapper.processoRepo = processoRepo;

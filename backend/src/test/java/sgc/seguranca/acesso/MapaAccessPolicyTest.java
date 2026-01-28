@@ -32,7 +32,6 @@ class MapaAccessPolicyTest {
     private Mapa mapa;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         mapa = new Mapa();
         mapa.setCodigo(1L);

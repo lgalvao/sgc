@@ -24,7 +24,6 @@ class MapaAjusteDtoTest {
     private Subprocesso subprocesso;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         Unidade unidade = new Unidade();
         unidade.setNome("Unidade Teste");
@@ -55,7 +54,6 @@ class MapaAjusteDtoTest {
 
     @Nested
     @DisplayName("Método de criação estático of")
-    @SuppressWarnings("unused")
     class OfMethodTests {
        @Test
         @DisplayName("Deve mapear corretamente os dados básicos")

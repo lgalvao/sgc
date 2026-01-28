@@ -43,7 +43,6 @@ class LoginFacadeCoverageTest {
     private LoginFacade facade;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         org.mockito.Mockito.lenient().when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(any(Unidade.class)))
                 .thenAnswer(inv -> {

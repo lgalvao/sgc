@@ -56,7 +56,6 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocesso;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Obter Unidade
         Unidade unidade = unidadeRepo.findById(1L).orElseThrow();

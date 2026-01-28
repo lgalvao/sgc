@@ -71,7 +71,6 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
     private Unidade unidadeLivre;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setup() {
         // Reset sequences
         try {

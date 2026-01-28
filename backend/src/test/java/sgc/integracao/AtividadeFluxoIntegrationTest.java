@@ -59,7 +59,6 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
     private Mapa mapa;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         try {
             jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 75000");

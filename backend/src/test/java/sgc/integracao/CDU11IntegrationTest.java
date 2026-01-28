@@ -62,7 +62,6 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Reset sequence
         try {
@@ -143,7 +142,6 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de Cenário de Sucesso")
-    @SuppressWarnings("unused")
     class Sucesso {
         @Test
         @WithMockChefe("111122223333")
@@ -194,7 +192,6 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de Casos de Borda e Falhas")
-    @SuppressWarnings("unused")
     class CasosDeBorda {
         @Test
         @WithMockAdmin

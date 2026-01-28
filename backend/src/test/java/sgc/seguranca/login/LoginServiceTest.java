@@ -41,7 +41,6 @@ class LoginServiceTest {
     private LoginFacade loginFacade;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         loginFacade = new LoginFacade(usuarioService, gerenciadorJwt, clienteAcessoAd, unidadeService, usuarioMapper);
         ReflectionTestUtils.setField(loginFacade, "ambienteTestes", false);

@@ -85,7 +85,6 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
     private Usuario gestorRevisao;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Ensure SEDOC exists (critical for homologation)
         if (unidadeRepo.findBySigla("SEDOC").isEmpty()) {

@@ -51,7 +51,6 @@ class E2eControllerCoverageTest {
     private Authentication authentication;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         SecurityContextHolder.setContext(securityContext);
     }

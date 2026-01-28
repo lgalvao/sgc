@@ -60,7 +60,6 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
     private Usuario usuarioChefe;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Use existing 3-level hierarchy from data.sql:
         // Unit 2 (STIC - INTEROPERACIONAL) - top level

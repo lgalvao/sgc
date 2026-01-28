@@ -112,7 +112,6 @@ class SubprocessoMapaWorkflowServiceTest {
 
     @Nested
     @DisplayName("Edição de Mapa")
-    @SuppressWarnings("unused")
     class EdicaoMapa {
         @Test
         @DisplayName("Deve salvar mapa com sucesso e alterar situação se novo")
@@ -412,7 +411,6 @@ class SubprocessoMapaWorkflowServiceTest {
 
     @Nested
     @DisplayName("Disponibilização de Mapa")
-    @SuppressWarnings("unused")
     class Disponibilizacao {
         @Test
         @DisplayName("Deve disponibilizar mapa com sucesso")
@@ -627,7 +625,6 @@ class SubprocessoMapaWorkflowServiceTest {
 
     @Nested
     @DisplayName("Workflow de Validação")
-    @SuppressWarnings("unused")
     class WorkflowValidacao {
         @Test
         @DisplayName("Deve apresentar sugestões")
@@ -718,7 +715,6 @@ class SubprocessoMapaWorkflowServiceTest {
 
     @Nested
     @DisplayName("Operações em Bloco")
-    @SuppressWarnings("unused")
     class EmBloco {
         @org.junit.jupiter.api.BeforeEach
         void injectSelf() throws Exception {
@@ -819,7 +815,6 @@ class SubprocessoMapaWorkflowServiceTest {
 
     @Nested
     @DisplayName("Submeter Mapa Ajustado")
-    @SuppressWarnings("unused")
     class SubmeterAjuste {
         @Test
         void deveSubmeterMapaAjustado() {

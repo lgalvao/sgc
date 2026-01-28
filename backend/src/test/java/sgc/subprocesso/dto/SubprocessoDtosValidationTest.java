@@ -19,7 +19,6 @@ class SubprocessoDtosValidationTest {
     private Validator validator;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
@@ -27,7 +26,6 @@ class SubprocessoDtosValidationTest {
 
     @Nested
     @DisplayName("AceitarCadastroRequest")
-    @SuppressWarnings("unused")
     class AceitarCadastroReqTests {
 
         @ParameterizedTest
@@ -89,7 +87,6 @@ class SubprocessoDtosValidationTest {
 
     @Nested
     @DisplayName("DevolverCadastroRequest")
-    @SuppressWarnings("unused")
     class DevolverCadastroReqTests {
         @Test
         @DisplayName("Deve aceitar observações válidas")
@@ -133,7 +130,6 @@ class SubprocessoDtosValidationTest {
 
     @Nested
     @DisplayName("HomologarCadastroRequest")
-    @SuppressWarnings("unused")
     class HomologarCadastroReqTests {
         @Test
         @DisplayName("Deve aceitar observações válidas")
@@ -177,7 +173,6 @@ class SubprocessoDtosValidationTest {
 
     @Nested
     @DisplayName("DevolverValidacaoRequest")
-    @SuppressWarnings("unused")
     class DevolverValidacaoReqTests {
 
         @Test

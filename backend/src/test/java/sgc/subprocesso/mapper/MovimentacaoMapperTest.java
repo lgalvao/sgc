@@ -20,7 +20,6 @@ class MovimentacaoMapperTest {
     private MovimentacaoMapper mapper;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         mapper = Mappers.getMapper(MovimentacaoMapper.class);
     }

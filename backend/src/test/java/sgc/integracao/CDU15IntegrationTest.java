@@ -45,7 +45,6 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
     private Atividade atividade2;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Criar Unidade via Fixture
         Unidade unidade = UnidadeFixture.unidadePadrao();
@@ -230,7 +229,6 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de CRUD de Competência Individual")
-    @SuppressWarnings("unused")
     class CrudCompetenciaTests {
 
         @Test

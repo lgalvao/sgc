@@ -46,7 +46,6 @@ class UsuarioServiceTest {
 
     @Nested
     @DisplayName("Consultas de Usuário")
-    @SuppressWarnings("unused")
     class ConsultasUsuario {
         @Test
         @DisplayName("Deve buscar usuário por título")
@@ -120,7 +119,6 @@ class UsuarioServiceTest {
 
     @Nested
     @DisplayName("Consultas de Unidade")
-    @SuppressWarnings("unused")
     class ConsultasUnidade {
         @Test
         @DisplayName("Deve buscar unidade por código")
@@ -197,7 +195,6 @@ class UsuarioServiceTest {
 
     @Nested
     @DisplayName("Gestão de Responsáveis")
-    @SuppressWarnings("unused")
     class GestaoResponsaveis {
         @Test
         @DisplayName("Deve buscar responsável da unidade")
@@ -243,7 +240,6 @@ class UsuarioServiceTest {
 
     @Nested
     @DisplayName("Gestão de Perfis")
-    @SuppressWarnings("unused")
     class GestaoPerfis {
         @Test
         @DisplayName("Deve buscar perfis do usuário")
@@ -279,7 +275,6 @@ class UsuarioServiceTest {
 
     @Nested
     @DisplayName("Cobertura Extra")
-    @SuppressWarnings("unused")
     class CoberturaExtra {
         @Test
         @DisplayName("Deve retornar null se não houver usuário autenticado")
@@ -328,7 +323,6 @@ class UsuarioServiceTest {
 
     @Nested
     @DisplayName("Gestão de Administradores")
-    @SuppressWarnings("unused")
     class GestaoAdministradores {
         @Test
         @DisplayName("Deve listar, adicionar e remover administradores")

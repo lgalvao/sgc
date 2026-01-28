@@ -58,7 +58,6 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocesso2;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Use existing units from data.sql:
         // Unit 6 (COSIS - INTERMEDIARIA) is the parent

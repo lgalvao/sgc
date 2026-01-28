@@ -66,7 +66,6 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocessoDestino;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Reset sequences
         try {
@@ -161,7 +160,6 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
     @Nested
     @DisplayName("Testes de importação de atividades")
     @WithMockChefe("888888888888")
-    @SuppressWarnings("unused")
     class ImportacaoAtividades {
         @Test
         @DisplayName("Deve importar atividades e conhecimentos")

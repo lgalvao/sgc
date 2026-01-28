@@ -72,7 +72,6 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
     private Mapa mapa;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Use existing SEDOC from data.sql (ID 15) instead of creating a duplicate with ID 100.
         // Creating a duplicate 'SEDOC' causes NonUniqueResultException in services looking up by sigla.
@@ -133,7 +132,6 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de Sucesso")
-    @SuppressWarnings("unused")
     class Sucesso {
 
         @Test
@@ -196,7 +194,6 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de Falha")
-    @SuppressWarnings("unused")
     class Falha {
         @Test
         @DisplayName("Não deve disponibilizar mapa com usuário sem permissão (não ADMIN)")

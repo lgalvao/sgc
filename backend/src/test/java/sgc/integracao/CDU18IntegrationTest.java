@@ -42,7 +42,6 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
     private Unidade unidade;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Criar Unidade via Fixture
         unidade = UnidadeFixture.unidadePadrao();

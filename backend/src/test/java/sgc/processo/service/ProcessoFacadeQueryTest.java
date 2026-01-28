@@ -55,7 +55,6 @@ class ProcessoFacadeQueryTest {
 
     @Nested
     @DisplayName("Consultas e Detalhes")
-    @SuppressWarnings("unused")
     class Consultas {
         @Test
         @DisplayName("Deve retornar detalhes do processo (DTO)")

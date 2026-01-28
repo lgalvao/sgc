@@ -41,7 +41,6 @@ class MapperTest {
     private RepositorioComum repo;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() throws NoSuchFieldException, IllegalAccessException {
         java.lang.reflect.Field processoRepoField =
                 SubprocessoMapper.class.getDeclaredField("processoRepo");

@@ -21,7 +21,6 @@ class LimitadorTentativasLoginTest {
     private java.time.Clock clock;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         environment = mock(Environment.class);
         clock = mock(java.time.Clock.class);

@@ -48,8 +48,7 @@ class SubprocessoMapaControllerTest {
         private ObjectMapper objectMapper;
 
         @BeforeEach
-        @SuppressWarnings("unused")
-        void setUp() {
+            void setUp() {
                 objectMapper = new ObjectMapper();
         }
 

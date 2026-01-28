@@ -73,7 +73,6 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocessoRevisao;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
 

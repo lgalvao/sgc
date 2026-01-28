@@ -27,7 +27,6 @@ class ProcessoFacadeSecurityTest {
 
     @Nested
     @DisplayName("Segurança e Controle de Acesso")
-    @SuppressWarnings("unused")
     class Seguranca {
         @Test
         @DisplayName("Deve negar acesso quando usuário não autenticado")

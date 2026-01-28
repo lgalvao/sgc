@@ -55,7 +55,6 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
     private Unidade unidadeSENIC;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         unidadeSENIC = unidadeRepo.findBySigla("SENIC")
                 .orElseThrow(() -> new RuntimeException("Unidade SENIC não encontrada"));

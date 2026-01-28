@@ -41,7 +41,6 @@ class SubprocessoBuscarIntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocessoFinalizado;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         unidade = unidadeRepo.findById(11L).orElseThrow(); // SENIC
 

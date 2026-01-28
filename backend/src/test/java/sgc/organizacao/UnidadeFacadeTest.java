@@ -101,7 +101,6 @@ class UnidadeFacadeTest {
 
     @Nested
     @DisplayName("Busca de Unidades e Hierarquia")
-    @SuppressWarnings("unused")
     class BuscaUnidades {
 
         @Test
@@ -235,7 +234,6 @@ class UnidadeFacadeTest {
 
     @Nested
     @DisplayName("Elegibilidade e Mapas")
-    @SuppressWarnings("unused")
     class ElegibilidadeMapas {
         @Test
         @DisplayName("Deve buscar árvore com elegibilidade")
@@ -315,7 +313,6 @@ class UnidadeFacadeTest {
 
     @Nested
     @DisplayName("Gestão de Atribuições e Usuários")
-    @SuppressWarnings("unused")
     class GestaoAtribuicoesUsuarios {
         @Test
         @DisplayName("Deve criar atribuição temporária com sucesso")
@@ -399,7 +396,6 @@ class UnidadeFacadeTest {
 
     @Nested
     @DisplayName("Outros Metodos de Cobertura")
-    @SuppressWarnings("unused")
     class OutrosMetodos {
         @Test
         @DisplayName("Buscar IDs descendentes recursivamente")
@@ -502,7 +498,6 @@ class UnidadeFacadeTest {
 
     @Nested
     @DisplayName("Testes Adicionais de Cobertura")
-    @SuppressWarnings("unused")
     class TestesAdicionaisCobertura {
 
         @Test

@@ -63,7 +63,6 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
     private Unidade outraUnidade;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Reset sequences
         try {

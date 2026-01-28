@@ -35,7 +35,6 @@ class PainelServiceIntegrationTest {
 
     @Nested
     @DisplayName("Listagem de Processos")
-    @SuppressWarnings("unused")
     class ListagemProcessos {
 
         @Test

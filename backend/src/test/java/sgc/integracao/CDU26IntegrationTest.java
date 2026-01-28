@@ -62,7 +62,6 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocesso2;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         Long idSuperior = 8000L;
         Long idUnidade1 = 8001L;

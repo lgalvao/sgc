@@ -58,7 +58,6 @@ class AtividadeServiceTest {
 
     @Nested
     @DisplayName("Cenários de Leitura")
-    @SuppressWarnings("unused")
     class LeituraTests {
         @Test
         @DisplayName("Deve listar todas as atividades")
@@ -141,7 +140,6 @@ class AtividadeServiceTest {
 
     @Nested
     @DisplayName("Criação de Atividade")
-    @SuppressWarnings("unused")
     class Criacao {
         @Test
         @DisplayName("Deve criar atividade com sucesso")
@@ -202,7 +200,6 @@ class AtividadeServiceTest {
 
     @Nested
     @DisplayName("Atualização e Exclusão")
-    @SuppressWarnings("unused")
     class AtualizacaoExclusao {
         @Test
         @DisplayName("Deve atualizar atividade")
@@ -284,7 +281,6 @@ class AtividadeServiceTest {
 
     @Nested
     @DisplayName("Atualização em Lote")
-    @SuppressWarnings("unused")
     class AtualizacaoLote {
 
         @Test

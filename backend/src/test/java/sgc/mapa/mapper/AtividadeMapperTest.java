@@ -20,13 +20,11 @@ class AtividadeMapperTest {
     private AtividadeMapper mapper;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         mapper = Mappers.getMapper(AtividadeMapper.class);
     }
 
     @Nested
-    @SuppressWarnings("unused")
     @DisplayName("toResponse")
     class ToResponseTests {
 
@@ -74,7 +72,6 @@ class AtividadeMapperTest {
 
     @Nested
     @DisplayName("toEntity")
-    @SuppressWarnings("unused")
     class ToEntityTests {
 
         @Test

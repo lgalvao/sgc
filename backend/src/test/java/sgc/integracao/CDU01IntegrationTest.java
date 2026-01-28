@@ -55,7 +55,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
     private Usuario usuarioGestor;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Reset sequences to avoid conflicts
         try {
@@ -115,7 +114,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de fluxo de login completo")
-    @SuppressWarnings("unused")
     class FluxoLoginTests {
         @Test
         @DisplayName("Deve realizar login completo para usuário com um único perfil")

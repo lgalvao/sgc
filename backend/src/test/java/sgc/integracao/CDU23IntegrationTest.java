@@ -64,7 +64,6 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocesso2;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Criar Unidades
         Long idSuperior = 5000L;

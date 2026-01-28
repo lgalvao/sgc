@@ -61,7 +61,6 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     private Unidade unidade;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Reset sequences
         jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 50000");

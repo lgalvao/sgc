@@ -20,7 +20,6 @@ class ParametroValidationTest {
     private static Validator validator;
 
     @BeforeAll
-    @SuppressWarnings("unused")
     static void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();

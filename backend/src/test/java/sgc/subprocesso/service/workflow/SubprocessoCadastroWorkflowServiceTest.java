@@ -35,7 +35,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
-@SuppressWarnings("unused")
 class SubprocessoCadastroWorkflowServiceTest {
     @Mock
     private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;

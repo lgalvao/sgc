@@ -45,7 +45,6 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
     private Usuario usuario2;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Usar unidade existente
         Unidade unidade = unidadeRepo.findById(1L).orElseThrow();

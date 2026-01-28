@@ -73,7 +73,6 @@ class ProcessoFacadeCrudTest {
 
     @Nested
     @DisplayName("Criação de Processo")
-    @SuppressWarnings("unused")
     class Criacao {
         @Test
         @DisplayName("Deve criar processo quando dados válidos")
@@ -227,7 +226,6 @@ class ProcessoFacadeCrudTest {
 
     @Nested
     @DisplayName("Atualização de Processo")
-    @SuppressWarnings("unused")
     class Atualizacao {
         @Test
         @DisplayName("Deve atualizar processo quando está em situação CRIADO")
@@ -483,7 +481,6 @@ class ProcessoFacadeCrudTest {
 
     @Nested
     @DisplayName("Exclusão de Processo")
-    @SuppressWarnings("unused")
     class Exclusao {
         @Test
         @DisplayName("Deve apagar processo quando está em situação CRIADO")

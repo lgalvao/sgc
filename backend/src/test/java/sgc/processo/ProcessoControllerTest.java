@@ -59,7 +59,6 @@ class ProcessoControllerTest {
     private org.mockito.ArgumentCaptor<AtualizarProcessoRequest> atualizarCaptor;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         org.mockito.MockitoAnnotations.openMocks(this);
         objectMapper = new ObjectMapper();
@@ -67,7 +66,6 @@ class ProcessoControllerTest {
 
     @Nested
     @DisplayName("Criação de Processo")
-    @SuppressWarnings("unused")
     class Criacao {
         @Test
         @WithMockUser
@@ -186,7 +184,6 @@ class ProcessoControllerTest {
 
     @Nested
     @DisplayName("Consulta de Processo")
-    @SuppressWarnings("unused")
     class Consulta {
         @Test
         @WithMockUser
@@ -278,7 +275,6 @@ class ProcessoControllerTest {
 
     @Nested
     @DisplayName("Atualização de Processo")
-    @SuppressWarnings("unused")
     class Atualizacao {
         @Test
         @WithMockUser
@@ -373,7 +369,6 @@ class ProcessoControllerTest {
 
     @Nested
     @DisplayName("Exclusão de Processo")
-    @SuppressWarnings("unused")
     class Exclusao {
         @Test
         @WithMockUser
@@ -415,7 +410,6 @@ class ProcessoControllerTest {
 
     @Nested
     @DisplayName("Workflow e Operações")
-    @SuppressWarnings("unused")
     class Workflow {
         @Test
         @WithMockUser
@@ -544,7 +538,6 @@ class ProcessoControllerTest {
     }
 
     @Nested
-    @SuppressWarnings("unused")
     @DisplayName("Listagens")
     class Listagens {
         @Test
@@ -645,7 +638,6 @@ class ProcessoControllerTest {
 
     @Nested
     @DisplayName("Cobertura de Branches Adicionais")
-    @SuppressWarnings("unused")
     class CoberturaBranches {
 
         @Test

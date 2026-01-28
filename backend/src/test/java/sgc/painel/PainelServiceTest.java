@@ -68,7 +68,6 @@ class PainelServiceTest {
 
     @Nested
     @DisplayName("Listar Processos - Consultas Básicas")
-    @SuppressWarnings("unused")
     class ListarProcessosBasico {
         @Test
         @DisplayName("listarProcessos para ADMIN deve listar todos")
@@ -127,7 +126,6 @@ class PainelServiceTest {
 
     @Nested
     @DisplayName("Listar Processos - Links de Destino")
-    @SuppressWarnings("unused")
     class ListarProcessosLinks {
         @Test
         @DisplayName("listarProcessos deve calcular link correto para ADMIN e processo CRIADO")
@@ -225,7 +223,6 @@ class PainelServiceTest {
 
     @Nested
     @DisplayName("Listar Processos - Formatação de Unidades")
-    @SuppressWarnings("unused")
     class ListarProcessosFormatacao {
         @Test
         @DisplayName("listarProcessos deve tratar exceção ao formatar unidades participantes")
@@ -336,7 +333,6 @@ class PainelServiceTest {
     }
 
     @Nested
-    @SuppressWarnings("unused")
     @DisplayName("Listar Processos - Outros")
     class ListarProcessosOutros {
         @Test
@@ -386,7 +382,6 @@ class PainelServiceTest {
 
     @Nested
     @DisplayName("Listar Alertas")
-    @SuppressWarnings("unused")
     class ListarAlertas {
         @Test
         @DisplayName("listarAlertas por unidade deve buscar alertas da unidade")

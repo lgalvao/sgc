@@ -39,7 +39,6 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
     private Processo processoFinalizado1;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Criar processo finalizado 1
         processoFinalizado1 = ProcessoFixture.processoPadrao();

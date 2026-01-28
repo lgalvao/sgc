@@ -32,7 +32,6 @@ class ConhecimentoMapperTest {
     private RepositorioComum repo;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         mapper = Mappers.getMapper(ConhecimentoMapper.class);
         mapper.atividadeRepo = atividadeRepo;
@@ -41,7 +40,6 @@ class ConhecimentoMapperTest {
 
     @Nested
     @DisplayName("toResponse")
-    @SuppressWarnings("unused")
     class ToResponseTests {
         @Test
         @DisplayName("Deve mapear entidade para Response")
@@ -65,7 +63,6 @@ class ConhecimentoMapperTest {
 
     @Nested
     @DisplayName("toEntity")
-    @SuppressWarnings("unused")
     class ToEntityTests {
 
         @Test

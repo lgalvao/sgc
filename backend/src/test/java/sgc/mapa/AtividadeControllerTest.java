@@ -41,7 +41,6 @@ class AtividadeControllerTest {
 
     @Nested
     @DisplayName("Operações de Atividade")
-    @SuppressWarnings("unused")
     class OperacoesAtividade {
         @Test
         @DisplayName("Deve obter por ID")
@@ -137,7 +136,6 @@ class AtividadeControllerTest {
 
     @Nested
     @DisplayName("Operações de Conhecimento")
-    @SuppressWarnings("unused")
     class OperacoesConhecimento {
         @Test
         @DisplayName("Deve listar conhecimentos")

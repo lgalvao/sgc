@@ -69,7 +69,6 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
     private Unidade unidadeOperacional1;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Criar hierarquia de unidades via Fixture
         // Unidade intermediária

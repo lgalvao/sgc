@@ -3,16 +3,16 @@ package sgc.subprocesso;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import sgc.mapa.service.MapaFacade;
@@ -22,16 +22,12 @@ import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
 import sgc.subprocesso.service.SubprocessoFacade;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("Testes de Cobertura para SubprocessoMapaController")
 class SubprocessoMapaControllerCoverageTest {
-
     @InjectMocks
     private SubprocessoMapaController controller;
-
     @Mock
     private SubprocessoFacade subprocessoFacade;
     @Mock

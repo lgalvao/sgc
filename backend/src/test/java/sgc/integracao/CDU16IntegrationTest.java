@@ -58,7 +58,6 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
     private Atividade atividade1;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Criar Unidade via Fixture
         Unidade unidade = UnidadeFixture.unidadePadrao();
@@ -137,7 +136,6 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de ajuste do mapa")
-    @SuppressWarnings("unused")
     class AjusteDoMapa {
         @Test
         @DisplayName("Deve salvar ajustes no mapa e alterar a situação do subprocesso")

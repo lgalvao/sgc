@@ -59,7 +59,6 @@ class E2eControllerTest {
     private E2eController controller;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         MockitoAnnotations.openMocks(this);
         // Default behavior for resource loader (file found in first path)

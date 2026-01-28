@@ -37,7 +37,6 @@ class E2eFixtureEndpointTest {
     private MockMvc mockMvc;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
     }

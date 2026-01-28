@@ -93,7 +93,6 @@ class AlertaFacadeTest {
 
     @Nested
     @DisplayName("Método: criarAlertasProcessoIniciado")
-    @SuppressWarnings("unused")
     class CriarAlertasProcessoIniciado {
         @Test
         @DisplayName("Deve criar alerta operacional com texto fixo")
@@ -166,7 +165,6 @@ class AlertaFacadeTest {
 
     @Nested
     @DisplayName("Métodos: criação de alertas específicos")
-    @SuppressWarnings("unused")
     class AlertasEspecificos {
         @Test
         @DisplayName("Deve criar alerta de cadastro disponibilizado com sucesso")
@@ -262,7 +260,6 @@ class AlertaFacadeTest {
 
     @Nested
     @DisplayName("Método: listarAlertasPorUsuario")
-    @SuppressWarnings("unused")
     class ListarAlertasPorUsuario {
         @Test
         @DisplayName("Deve listar alertas com sucesso")
@@ -354,7 +351,6 @@ class AlertaFacadeTest {
 
     @Nested
     @DisplayName("Listagens Paginadas e Outros")
-    @SuppressWarnings("unused")
     class OutrosMetodos {
         @Test
         @DisplayName("Listar por unidade paginado")
@@ -376,7 +372,6 @@ class AlertaFacadeTest {
 
     @Nested
     @DisplayName("Método: marcarComoLidos")
-    @SuppressWarnings("unused")
     class MarcarComoLidos {
         @Test
         @DisplayName("Deve ignorar alerta inexistente")
@@ -459,7 +454,6 @@ class AlertaFacadeTest {
 
     @Nested
     @DisplayName("Método: listarAlertasNaoLidos")
-    @SuppressWarnings("unused")
     class ListarAlertasNaoLidos {
         @Test
         @DisplayName("Deve filtrar alertas lidos")
@@ -500,7 +494,6 @@ class AlertaFacadeTest {
 
     @Nested
     @DisplayName("Método: getSedoc (Lazy Load)")
-    @SuppressWarnings("unused")
     class GetSedoc {
         @Test
         @DisplayName("Deve inicializar sedoc apenas na primeira chamada (lazy load)")

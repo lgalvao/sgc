@@ -61,7 +61,6 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocesso2;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Use existing units from data.sql:
         // Unit 8 (SEDESENV - OPERACIONAL) subordinate to 6

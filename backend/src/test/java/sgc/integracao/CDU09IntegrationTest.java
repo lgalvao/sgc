@@ -86,7 +86,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocessoMapeamento;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         try {
             jdbcTemplate.execute("ALTER SEQUENCE SGC.VW_UNIDADE_SEQ RESTART WITH 1000");
@@ -184,7 +183,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes para Disponibilizar Cadastro")
-    @SuppressWarnings("unused")
     class DisponibilizarCadastro {
         @Test
         @DisplayName("Deve disponibilizar o cadastro quando todas as condições são atendidas")
@@ -244,7 +242,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de Segurança")
-    @SuppressWarnings("unused")
     class Seguranca {
         @Test
         @DisplayName("Não deve permitir que um CHEFE de outra unidade disponibilize o cadastro")

@@ -72,7 +72,6 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     private Unidade unidade;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Reset sequence
         try {
@@ -156,7 +155,6 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Cenários de Sucesso")
-    @SuppressWarnings("unused")
     class Sucesso {
 
         @Test
@@ -241,7 +239,6 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Cenários de Borda e Falhas")
-    @SuppressWarnings("unused")
     class BordaEfalhas {
 
         @Test
@@ -268,7 +265,6 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de Controle de Acesso por Perfil e Situação")
-    @SuppressWarnings("unused")
     class Acesso {
 
         @Test

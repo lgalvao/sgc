@@ -94,7 +94,6 @@ class SubprocessoFacadeComplementaryTest {
 
     @Nested
     @DisplayName("Cenários de Leitura")
-    @SuppressWarnings("unused")
     class LeituraTests {
         @Test
         @DisplayName("Deve verificar acesso da unidade ao processo")
@@ -181,7 +180,6 @@ class SubprocessoFacadeComplementaryTest {
     }
 
     @Nested
-    @SuppressWarnings("unused")
     @DisplayName("Cenários de Escrita (CRUD)")
     class CrudTests {
         @Test
@@ -212,7 +210,6 @@ class SubprocessoFacadeComplementaryTest {
 
     @Nested
     @DisplayName("Cenários de Validação")
-    @SuppressWarnings("unused")
     class ValidacaoTests {
         @Test
         @DisplayName("Deve validar existência de atividades - Sucesso")
@@ -241,7 +238,6 @@ class SubprocessoFacadeComplementaryTest {
 
     @Nested
     @DisplayName("Cenários de Transição de Estado")
-    @SuppressWarnings("unused")
     class TransicaoEstadoTests {
         @Test
         @DisplayName("Deve atualizar situação para EM ANDAMENTO")
@@ -275,7 +271,6 @@ class SubprocessoFacadeComplementaryTest {
 
     @Nested
     @DisplayName("Cenários de Permissões e Detalhes")
-    @SuppressWarnings("unused")
     class PermissaoDetalheTests {
         @Test
         @DisplayName("obterPermissoes lança exceção quando não autenticado")
@@ -458,7 +453,6 @@ class SubprocessoFacadeComplementaryTest {
 
     @Nested
     @DisplayName("Cenários de DTO e Mapeamento")
-    @SuppressWarnings("unused")
     class DtoMappingTests {
         @Test
         @DisplayName("obterSugestoes")
@@ -543,7 +537,6 @@ class SubprocessoFacadeComplementaryTest {
 
     @Nested
     @DisplayName("Cenários Complexos")
-    @SuppressWarnings("unused")
     class SubprocessoFacadeRefactoredTest {
         @Test
         @DisplayName("Deve salvar ajustes do mapa")

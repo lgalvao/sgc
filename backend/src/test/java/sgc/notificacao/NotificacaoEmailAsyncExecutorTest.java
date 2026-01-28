@@ -42,7 +42,6 @@ class NotificacaoEmailAsyncExecutorTest {
     private MimeMessage mimeMessage;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         ReflectionTestUtils.setField(executor, "remetente", "teste@sgc.com.br");
         ReflectionTestUtils.setField(executor, "nomeRemetente", "SGC Teste");

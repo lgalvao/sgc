@@ -53,7 +53,6 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocesso;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Use existing units from data.sql to match @WithMockChefe user
         // Unit 6 (COSIS - INTERMEDIARIA) is the parent
@@ -86,7 +85,6 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes para o fluxo de 'Apresentar Sugestões'")
-    @SuppressWarnings("unused")
     class ApresentarSugestoesTest {
         @Test
         @DisplayName(
@@ -132,7 +130,6 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes para o fluxo de 'Validar Mapa'")
-    @SuppressWarnings("unused")
     class ValidarMapaTest {
         @Test
         @DisplayName("Deve validar o mapa, alterar status, registrar movimentação e criar alerta")

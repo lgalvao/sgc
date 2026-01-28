@@ -64,7 +64,6 @@ class AnaliseControllerTest {
     private Subprocesso subprocesso;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setup() {
         objectMapper = new ObjectMapper();
         subprocesso = new Subprocesso();
@@ -73,7 +72,6 @@ class AnaliseControllerTest {
 
     @Nested
     @DisplayName("Testes para listar análises de cadastro")
-    @SuppressWarnings("unused")
     class ListarAnalisesCadastro {
         @Test
         @DisplayName("Deve retornar lista de análises de cadastro com status 200 OK")
@@ -152,7 +150,6 @@ class AnaliseControllerTest {
 
     @Nested
     @DisplayName("Testes para criar análise de cadastro")
-    @SuppressWarnings("unused")
     class CriarAnaliseCadastro {
 
         @Test
@@ -310,7 +307,6 @@ class AnaliseControllerTest {
 
     @Nested
     @DisplayName("Testes para listar análises de validação")
-    @SuppressWarnings("unused")
     class ListarAnalisesValidacao {
 
         @Test
@@ -387,7 +383,6 @@ class AnaliseControllerTest {
 
     @Nested
     @DisplayName("Testes para criar análise de validação")
-    @SuppressWarnings("unused")
     class CriarAnaliseValidacao {
 
         @Test

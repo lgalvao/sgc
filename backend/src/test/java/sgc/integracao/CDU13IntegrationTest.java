@@ -73,7 +73,6 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocesso;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Criar Unidades via JDBC para contornar @Immutable
         Long idSuperior = 3000L;

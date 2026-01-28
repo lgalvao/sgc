@@ -37,7 +37,6 @@ class AnaliseFacadeTest {
     private Subprocesso subprocesso;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         subprocesso = new Subprocesso();
         subprocesso.setCodigo(1L);
@@ -45,7 +44,6 @@ class AnaliseFacadeTest {
 
     @Nested
     @DisplayName("Testes para listarPorSubprocesso")
-    @SuppressWarnings("unused")
     class ListarPorSubprocesso {
         @Test
         @DisplayName("Deve retornar lista de análises de cadastro")
@@ -107,7 +105,6 @@ class AnaliseFacadeTest {
 
     @Nested
     @DisplayName("Testes para criarAnalise")
-    @SuppressWarnings("unused")
     class CriarAnalise {
         @Test
         @DisplayName("Deve criar uma análise de cadastro")
@@ -183,7 +180,6 @@ class AnaliseFacadeTest {
 
     @Nested
     @DisplayName("Testes para removerPorSubprocesso")
-    @SuppressWarnings("unused")
     class RemoverPorSubprocesso {
         @Test
         @DisplayName("Deve remover análises por subprocesso")

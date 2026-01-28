@@ -77,8 +77,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         private Usuario admin;
 
         @BeforeEach
-        @SuppressWarnings("unused")
-        void setUp() {
+            void setUp() {
                 // Use existing users and units from data.sql
                 // Hierarchy: unit 100 (ADMIN) → unit 6 (GESTOR - COSIS) → unit 9 (CHEFE -
                 // SEDIA)
@@ -179,7 +178,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
         @Nested
         @DisplayName("Fluxo de Devolução")
-    @SuppressWarnings("unused")
         class Devolucao {
                 @Test
                 @DisplayName("GESTOR deve devolver, alterando status e criando registros")
@@ -210,8 +208,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
         @Nested
         @DisplayName("Fluxo de Aceite")
-        @SuppressWarnings("unused")
-        class Aceite {
+            class Aceite {
                 @Test
                 @DisplayName("GESTOR deve aceitar, alterando status e criando todos os registros")
                 void gestorAceitaRevisao() throws Exception {
@@ -239,8 +236,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
         @Nested
         @DisplayName("Fluxo de Homologação")
-        @SuppressWarnings("unused")
-        class Homologacao {
+            class Homologacao {
                 private Long subprocessoId;
 
                 @BeforeEach
@@ -300,7 +296,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
         @Nested
         @DisplayName("Endpoints de Consulta")
-    @SuppressWarnings("unused")
         class EndpointsDeConsulta {
                 @Test
                 @DisplayName("Deve retornar histórico de análise corretamente")
@@ -359,7 +354,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
         @Nested
         @DisplayName("Falhas e Segurança")
-    @SuppressWarnings("unused")
         class FalhasESeguranca {
                 @Test
                 @DisplayName("CHEFE não pode homologar revisão")

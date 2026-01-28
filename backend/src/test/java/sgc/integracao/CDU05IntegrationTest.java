@@ -65,7 +65,6 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
     private Conhecimento conhecimentoOriginal;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         // Reset sequences
         try {

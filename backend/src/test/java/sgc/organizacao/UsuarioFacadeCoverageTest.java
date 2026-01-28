@@ -61,7 +61,6 @@ class UsuarioFacadeCoverageTest {
     @Mock
     private UnidadeRepo unidadeRepo;
 
-    @SuppressWarnings("unused")
     @AfterEach
     void tearDown() {
         SecurityContextHolder.clearContext();

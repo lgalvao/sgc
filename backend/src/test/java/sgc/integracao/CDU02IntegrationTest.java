@@ -62,7 +62,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     private Processo processoFilha1;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setup() {
         // Ajusta sequências para evitar conflito com data.sql
         try {
@@ -162,7 +161,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de Visibilidade de Processos")
-    @SuppressWarnings("unused")
     class VisibilidadeProcessosTestes {
         @Test
         @WithMockAdmin
@@ -237,7 +235,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("Testes de Visibilidade de Alertas")
-    @SuppressWarnings("unused")
     class VisibilidadeAlertasTestes {
         @Test
         @DisplayName("Usuário deve ver alertas direcionados a ele")

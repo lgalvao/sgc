@@ -48,7 +48,6 @@ class LoginControllerTest {
     private LimitadorTentativasLogin limitadorTentativasLogin;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         objectMapper = new ObjectMapper();
     }

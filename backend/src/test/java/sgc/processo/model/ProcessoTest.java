@@ -20,14 +20,12 @@ class ProcessoTest {
     private Processo processo;
 
     @BeforeEach
-    @SuppressWarnings("unused")
     void setUp() {
         processo = new Processo();
     }
 
     @Nested
     @DisplayName("Construtores")
-    @SuppressWarnings("unused")
     class Construtores {
         @Test
         @DisplayName("Deve criar processo com Builder (setando código manualmente)")
@@ -119,7 +117,6 @@ class ProcessoTest {
 
     @Nested
     @DisplayName("Participantes")
-    @SuppressWarnings("unused")
     class Participantes {
 
         @Test
@@ -177,7 +174,6 @@ class ProcessoTest {
 
     @Nested
     @DisplayName("Datas")
-    @SuppressWarnings("unused")
     class Datas {
         @Test
         @DisplayName("Deve configurar data de criação")
@@ -224,7 +220,6 @@ class ProcessoTest {
 
     @Nested
     @DisplayName("Situação e Tipo")
-    @SuppressWarnings("unused")
     class SituacaoETipo {
         @Test
         @DisplayName("Deve configurar situação do processo")
@@ -269,7 +264,6 @@ class ProcessoTest {
 
     @Nested
     @DisplayName("Descrição")
-    @SuppressWarnings("unused")
     class Descricao {
         @Test
         @DisplayName("Deve configurar descrição do processo")
