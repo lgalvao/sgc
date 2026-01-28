@@ -259,4 +259,21 @@ public class ProcessoController {
             @RequestBody @Valid EnviarLembreteRequest request) {
         processoFacade.enviarLembrete(codigo, request.unidadeCodigo());
     }
+    /**
+     * Executa uma ação em bloco (aceitar, homologar, disponibilizar) para múltiplas unidades
+     * de um processo.
+     *
+     * @param codigo O código do processo.
+     * @param request O DTO com a lista de unidades e a ação.
+     * @return Um {@link ResponseEntity} com status 200 OK.
+     */
+    @PostMapping("/{codigo}/acao-em-bloco")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
+    @Operation(summary = "Executa ação em bloco para um processo")
+    public ResponseEntity<Void> executarAcaoEmBloco(
+            @PathVariable Long codigo,
+            @Valid @RequestBody AcaoEmBlocoRequest request) {
+        processoFacade.executarAcaoEmBloco(codigo, request);
+        return ResponseEntity.ok().build();
+    }
 }

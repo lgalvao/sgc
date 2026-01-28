@@ -11,6 +11,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.*;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
@@ -22,6 +23,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -60,12 +62,18 @@ public class ProcessoFacade {
     private final UsuarioFacade usuarioService;
     private final ProcessoInicializador processoInicializador;
     private final sgc.alerta.AlertaFacade alertaService;
+    
+    @org.springframework.beans.factory.annotation.Autowired
+    @org.springframework.context.annotation.Lazy
+    private ProcessoFacade self;
 
     // Services especializados
     private final ProcessoAcessoService processoAcessoService;
     private final ProcessoValidador processoValidador;
     private final ProcessoFinalizador processoFinalizador;
     private final ProcessoConsultaService processoConsultaService;
+
+    private static final String ENTIDADE_PROCESSO = "Processo";
 
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
         return processoAcessoService.checarAcesso(authentication, codProcesso);
@@ -109,7 +117,7 @@ public class ProcessoFacade {
     @PreAuthorize("hasRole('ADMIN')")
     public ProcessoDto atualizar(Long codigo, AtualizarProcessoRequest requisicao) {
         Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_PROCESSO, codigo));
 
         if (processo.getSituacao() != CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser editados.");
@@ -175,7 +183,7 @@ public class ProcessoFacade {
     @PreAuthorize("hasRole('ADMIN')")
     public void apagar(Long codigo) {
         Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_PROCESSO, codigo));
 
         if (processo.getSituacao() != CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser removidos.");
@@ -213,7 +221,7 @@ public class ProcessoFacade {
     @Transactional(readOnly = true)
     public Processo buscarEntidadePorId(Long codigo) {
         return processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_PROCESSO, codigo));
     }
 
     @Transactional(readOnly = true)
@@ -232,7 +240,7 @@ public class ProcessoFacade {
     @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codProcesso)")
     public ProcessoDetalheDto obterDetalhes(Long codProcesso) {
         Processo processo = processoRepo.findById(codProcesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_PROCESSO, codProcesso));
 
         return processoDetalheBuilder.build(processo);
     }
@@ -332,5 +340,70 @@ public class ProcessoFacade {
         return subprocessoFacade.listarEntidadesPorProcesso(codProcesso).stream()
                 .map(subprocessoMapper::toDto)
                 .toList();
+    }
+
+    @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
+    public void executarAcaoEmBloco(Long codProcesso, AcaoEmBlocoRequest req) {
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+
+        if (req.acao() == sgc.processo.model.AcaoProcesso.DISPONIBILIZAR) {
+             DisponibilizarMapaRequest dispReq = new DisponibilizarMapaRequest(
+                req.dataLimite(), 
+                "Disponibilização em bloco"
+            );
+            subprocessoFacade.disponibilizarMapaEmBloco(req.unidadeCodigos(), codProcesso, dispReq, usuario);
+            return;
+        }
+
+        processarAcoesAceiteHomologacao(codProcesso, req, usuario);
+    }
+
+    private void processarAcoesAceiteHomologacao(Long codProcesso, AcaoEmBlocoRequest req, Usuario usuario) {
+        List<Long> unidadesAceitarCadastro = new ArrayList<>();
+        List<Long> unidadesAceitarValidacao = new ArrayList<>();
+        List<Long> unidadesHomologarCadastro = new ArrayList<>();
+        List<Long> unidadesHomologarValidacao = new ArrayList<>();
+
+        for (Long codUnidade : req.unidadeCodigos()) {
+             SubprocessoDto spDto = subprocessoFacade.obterPorProcessoEUnidade(codProcesso, codUnidade);
+             
+             if (req.acao() == sgc.processo.model.AcaoProcesso.ACEITAR) {
+                 if (isSituacaoCadastro(spDto.getSituacao())) {
+                     unidadesAceitarCadastro.add(codUnidade);
+                 } else {
+                     unidadesAceitarValidacao.add(codUnidade);
+                 }
+             } else if (req.acao() == sgc.processo.model.AcaoProcesso.HOMOLOGAR) {
+                 if (isSituacaoCadastro(spDto.getSituacao())) {
+                     unidadesHomologarCadastro.add(codUnidade);
+                 } else {
+                     unidadesHomologarValidacao.add(codUnidade);
+                 }
+             }
+        }
+
+        executarAcoesBatch(codProcesso, usuario, unidadesAceitarCadastro, unidadesAceitarValidacao, unidadesHomologarCadastro, unidadesHomologarValidacao);
+    }
+
+    private void executarAcoesBatch(Long codProcesso, Usuario usuario, List<Long> unidadesAceitarCadastro, List<Long> unidadesAceitarValidacao, List<Long> unidadesHomologarCadastro, List<Long> unidadesHomologarValidacao) {
+        if (!unidadesAceitarCadastro.isEmpty()) {
+            subprocessoFacade.aceitarCadastroEmBloco(unidadesAceitarCadastro, codProcesso, usuario);
+        }
+        if (!unidadesAceitarValidacao.isEmpty()) {
+            subprocessoFacade.aceitarValidacaoEmBloco(unidadesAceitarValidacao, codProcesso, usuario);
+        }
+        if (!unidadesHomologarCadastro.isEmpty()) {
+            subprocessoFacade.homologarCadastroEmBloco(unidadesHomologarCadastro, codProcesso, usuario);
+        }
+        if (!unidadesHomologarValidacao.isEmpty()) {
+            subprocessoFacade.homologarValidacaoEmBloco(unidadesHomologarValidacao, codProcesso, usuario);
+        }
+    }
+
+    private boolean isSituacaoCadastro(sgc.subprocesso.model.SituacaoSubprocesso situacao) {
+        return situacao == sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO || 
+               situacao == sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
+               situacao == sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA; 
     }
 }
