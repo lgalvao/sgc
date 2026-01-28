@@ -179,4 +179,36 @@ class ProcessoAcessoServiceTest {
         // Deve retornar ambos e parar
         assertThat(descendentes).containsExactlyInAnyOrder(1L, 2L);
     }
+
+    @Test
+    @DisplayName("Deve permitir acesso quando usuário tem múltiplos perfis e um deles permite")
+    void devePermitirAcessoQuandoUsuarioTemMultiplosPerfisEUmDelesPermite() {
+        Authentication auth = mock(Authentication.class);
+        when(auth.isAuthenticated()).thenReturn(true);
+        when(auth.getName()).thenReturn("multi_perfil_user");
+        when(auth.getAuthorities()).thenAnswer(m -> List.of(new SimpleGrantedAuthority("ROLE_GESTOR")));
+
+        // Mock: Retorna Unidade 100 (Sem acesso) e depois Unidade 200 (Com acesso)
+        // A implementação com bug pegaria apenas o primeiro (100) e negaria o acesso.
+        when(usuarioService.buscarPerfisUsuario("multi_perfil_user")).thenReturn(List.of(
+                PerfilDto.builder().unidadeCodigo(100L).build(),
+                PerfilDto.builder().unidadeCodigo(200L).build()
+        ));
+
+        Unidade u100 = new Unidade();
+        u100.setCodigo(100L);
+        Unidade u200 = new Unidade();
+        u200.setCodigo(200L);
+
+        when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(u100, u200));
+
+        // Mock verification:
+        // Se a lista de IDs conter 200, acesso é permitido. Se tiver apenas 100, negado.
+        when(subprocessoFacade.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenAnswer(invocation -> {
+            List<Long> ids = invocation.getArgument(1);
+            return ids.contains(200L);
+        });
+
+        assertThat(processoAcessoService.checarAcesso(auth, 1L)).isTrue();
+    }
 }

@@ -13,6 +13,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Serviço responsável pelo controle de acesso a processos.
@@ -70,18 +71,28 @@ class ProcessoAcessoService {
         }
 
         List<PerfilDto> perfis = usuarioService.buscarPerfisUsuario(username);
-        Long codUnidadeUsuario = perfis.stream()
-                .findFirst()
-                .map(PerfilDto::unidadeCodigo)
-                .orElse(null);
-
-        if (codUnidadeUsuario == null) {
+        if (perfis.isEmpty()) {
             return false;
         }
 
-        List<Long> codigosUnidadesHierarquia = buscarCodigosDescendentes(codUnidadeUsuario);
+        Set<Long> unidadesUsuario = perfis.stream()
+                .map(PerfilDto::unidadeCodigo)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
-        return subprocessoFacade.verificarAcessoUnidadeAoProcesso(codProcesso, codigosUnidadesHierarquia);
+        if (unidadesUsuario.isEmpty()) {
+            return false;
+        }
+
+        List<Unidade> todasUnidades = unidadeService.buscarTodasEntidadesComHierarquia();
+        Map<Long, List<Unidade>> mapaPorPai = buildMapaPorPai(todasUnidades);
+
+        Set<Long> todasUnidadesAcesso = new HashSet<>();
+        for (Long codUnidade : unidadesUsuario) {
+            todasUnidadesAcesso.addAll(buscarDescendentesNoMapa(codUnidade, mapaPorPai));
+        }
+
+        return subprocessoFacade.verificarAcessoUnidadeAoProcesso(codProcesso, new ArrayList<>(todasUnidadesAcesso));
     }
 
     /**
@@ -93,7 +104,11 @@ class ProcessoAcessoService {
     @Transactional(readOnly = true)
     public List<Long> buscarCodigosDescendentes(Long codUnidade) {
         List<Unidade> todasUnidades = unidadeService.buscarTodasEntidadesComHierarquia();
+        Map<Long, List<Unidade>> mapaPorPai = buildMapaPorPai(todasUnidades);
+        return new ArrayList<>(buscarDescendentesNoMapa(codUnidade, mapaPorPai));
+    }
 
+    private Map<Long, List<Unidade>> buildMapaPorPai(List<Unidade> todasUnidades) {
         Map<Long, List<Unidade>> mapaPorPai = new HashMap<>();
         for (Unidade u : todasUnidades) {
             Unidade unidadeSuperior = u.getUnidadeSuperior();
@@ -101,30 +116,30 @@ class ProcessoAcessoService {
                 mapaPorPai.computeIfAbsent(unidadeSuperior.getCodigo(), k -> new ArrayList<>()).add(u);
             }
         }
+        return mapaPorPai;
+    }
 
-        List<Long> resultado = new ArrayList<>();
+    private Set<Long> buscarDescendentesNoMapa(Long codUnidade, Map<Long, List<Unidade>> mapaPorPai) {
+        Set<Long> resultado = new HashSet<>();
         Queue<Long> fila = new LinkedList<>();
-        Set<Long> visitados = new HashSet<>();
 
         fila.add(codUnidade);
-        visitados.add(codUnidade);
+        resultado.add(codUnidade);
 
         while (!fila.isEmpty()) {
             Long atual = fila.poll();
-            resultado.add(atual);
 
             List<Unidade> filhos = mapaPorPai.get(atual);
             if (filhos != null) {
                 for (Unidade filho : filhos) {
                     Long codigo = filho.getCodigo();
-                    if (!visitados.contains(codigo)) {
-                        visitados.add(codigo);
+                    if (!resultado.contains(codigo)) {
+                        resultado.add(codigo);
                         fila.add(codigo);
                     }
                 }
             }
         }
-
         return resultado;
     }
 }
