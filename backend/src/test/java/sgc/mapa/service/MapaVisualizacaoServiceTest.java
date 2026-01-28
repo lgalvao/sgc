@@ -66,4 +66,22 @@ class MapaVisualizacaoServiceTest {
         assertThat(dto.atividadesSemCompetencia()).hasSize(1);
         assertThat(dto.atividadesSemCompetencia().getFirst().codigo()).isEqualTo(2L);
     }
+    @Test
+    @DisplayName("Deve ignorar atividade não encontrada nos tuples de competência")
+    void deveIgnorarAtividadeNaoEncontrada() {
+        Subprocesso sub = new Subprocesso();
+        sub.setMapa(new Mapa());
+        sub.getMapa().setCodigo(10L);
+        sub.setUnidade(new Unidade());
+
+        List<Object[]> projectionResult = new java.util.ArrayList<>();
+        projectionResult.add(new Object[]{50L, "C1", 999L}); // 999L não existe nas atividades
+
+        when(atividadeRepo.findWithConhecimentosByMapaCodigo(10L)).thenReturn(List.of());
+        when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(10L)).thenReturn(projectionResult);
+
+        MapaVisualizacaoDto dto = service.obterMapaParaVisualizacao(sub);
+
+        assertThat(dto.competencias().getFirst().getAtividades()).isEmpty();
+    }
 }

@@ -88,4 +88,14 @@ class AnaliseMapperTest {
         assertThat(mapper.toAnaliseHistoricoDto(null)).isNull();
         assertThat(mapper.toAnaliseValidacaoHistoricoDto(null)).isNull();
     }
+
+    @Test
+    @DisplayName("Deve retornar null para sigla se unidadeCodigo for null")
+    void deveRetornarNullParaSiglaSeUnidadeCodigoNull() {
+        Analise analise = new Analise();
+        analise.setUnidadeCodigo(null);
+
+        AnaliseHistoricoDto dto = mapper.toAnaliseHistoricoDto(analise);
+        assertThat(dto.unidadeSigla()).isNull();
+    }
 }

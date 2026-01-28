@@ -293,7 +293,6 @@ public RespostaDto disponibilizar(Subprocesso sp) {
 3. **Testabilidade**
     - Testes de segurança centralizados em `AccessControlServiceTest`
     - Testes de policies isolados
-    - Cobertura de 95%+ alcançada
 
 4. **Consistência**
     - Padrão único para todas as verificações
@@ -371,67 +370,6 @@ public RespostaDto disponibilizar(Subprocesso sp) {
     - Performance adequada
 - **Contras**: Overhead mínimo de abstração
 - **Motivo da Escolha**: Melhor trade-off entre clareza, testabilidade e auditoria
-
-## Implementação
-
-### Status: ✅ 100% COMPLETO
-
-**Sprint 4 (2026-01-08 a 2026-01-09)**
-
-- ✅ AccessControlService implementado
-- ✅ 4 AccessPolicies implementadas (Processo, Subprocesso, Atividade, Mapa)
-- ✅ HierarchyService centralizado
-- ✅ AccessAuditService com logs estruturados
-- ✅ 26 ações mapeadas no enum `Acao`
-- ✅ Migração completa de 16 services
-- ✅ Depreciação de services antigos (MapaAcessoService, SubprocessoPermissoesService)
-- ✅ 1149/1149 testes passando (100%)
-- ✅ Cobertura de testes de segurança: 95%+
-- ✅ Documentação completa (JavaDoc + este ADR)
-
-### Arquivos Criados/Modificados
-
-**Novos Componentes (8 arquivos):**
-
-- `sgc.seguranca.acesso.AccessControlService`
-- `sgc.seguranca.acesso.AccessPolicy`
-- `sgc.seguranca.acesso.Acao`
-- `sgc.seguranca.acesso.ProcessoAccessPolicy`
-- `sgc.seguranca.acesso.SubprocessoAccessPolicy`
-- `sgc.seguranca.acesso.AtividadeAccessPolicy`
-- `sgc.seguranca.acesso.HierarchyService`
-- `sgc.seguranca.acesso.AccessAuditService`
-
-**Services Migrados (16 arquivos):**
-
-- ProcessoFacade
-- SubprocessoFacade
-- SubprocessoCadastroWorkflowService
-- SubprocessoMapaWorkflowService
-- SubprocessoTransicaoService
-- AtividadeFacade
-- MapaFacade
-- ... (outros)
-
-**Testes (31+ arquivos de teste):**
-
-- AccessControlServiceTest (4 testes)
-- SubprocessoAccessPolicyTest (26 testes)
-- ProcessoAccessPolicyTest (8 testes)
-- AtividadeAccessPolicyTest (6 testes)
-- CDU-* Integration Tests (atualizados)
-
-## Métricas de Sucesso
-
-| Métrica                             | Antes     | Depois    | Melhoria   |
-|-------------------------------------|-----------|-----------|------------|
-| Arquivos com lógica de acesso       | 22        | 5         | -77%       |
-| Padrões de verificação              | 4+        | 1         | -75%       |
-| Endpoints sem controle              | 15        | 0         | -100%      |
-| Cobertura de testes de segurança    | ~40%      | 95%+      | +137%      |
-| Tempo para adicionar regra          | ~2h       | ~15min    | -87%       |
-| Linhas de código duplicado (acesso) | ~300      | ~0        | -100%      |
-| Testes passando                     | 1122/1149 | 1149/1149 | +27 testes |
 
 ## Lições Aprendidas
 

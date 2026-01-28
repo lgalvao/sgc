@@ -114,7 +114,7 @@ public class PainelFacade {
 
     private ProcessoResumoDto paraProcessoResumoDto(Processo processo, Perfil perfil, Long codigoUnidade) {
         Set<Unidade> participantes = processo.getParticipantes();
-        Unidade participante = participantes.iterator().next();
+        Unidade participante = participantes == null || participantes.isEmpty() ? null : participantes.iterator().next();
 
         String linkDestino = calcularLinkDestinoProcesso(processo, perfil, codigoUnidade);
         String unidadesParticipantes = formatarUnidadesParticipantes(processo.getParticipantes());
@@ -126,8 +126,8 @@ public class PainelFacade {
                 .tipo(processo.getTipo().name())
                 .dataLimite(processo.getDataLimite())
                 .dataCriacao(processo.getDataCriacao())
-                .unidadeCodigo(participante.getCodigo())
-                .unidadeNome(participante.getNome())
+                .unidadeCodigo(participante != null ? participante.getCodigo() : null)
+                .unidadeNome(participante != null ? participante.getNome() : null)
                 .unidadesParticipantes(unidadesParticipantes)
                 .linkDestino(linkDestino)
                 .build();

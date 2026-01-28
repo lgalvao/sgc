@@ -190,6 +190,25 @@ class RestExceptionHandlerTest {
     }
 
     @Test
+    @DisplayName("Deve tratar ErroNegocioBase com detalhes")
+    void deveTratarErroNegocioBaseComDetalhes() {
+        java.util.Map<String, String> details = java.util.Map.of("campo", "erro");
+        ErroNegocioBase ex = new ErroNegocioBase("Erro Com Detalhe", "CODE", HttpStatus.BAD_REQUEST, details) {};
+        ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(details, ((ErroApi) response.getBody()).getDetails());
+    }
+
+    @Test
+    @DisplayName("Deve tratar ErroNegocioBase com lista de detalhes vazia")
+    void deveTratarErroNegocioBaseComDetalhesVazio() {
+        ErroNegocioBase ex = new ErroNegocioBase("Erro Detalhe Vazio", "CODE", HttpStatus.BAD_REQUEST, java.util.Collections.emptyMap()) {};
+        ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertThat(((ErroApi) response.getBody()).getDetails()).isNull();
+    }
+
+    @Test
     @DisplayName("Deve tratar ErroNegocioBase genérico (500)")
     void deveTratarErroNegocioBase500() {
         ErroNegocioBase ex = new ErroNegocioBase("Erro Server", "CODE", HttpStatus.INTERNAL_SERVER_ERROR) {

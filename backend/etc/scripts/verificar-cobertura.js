@@ -9,7 +9,7 @@ const REPORT_PATH = path.join(__dirname, '../../build/reports/jacoco/test/jacoco
 const args = process.argv.slice(2);
 const help = args.includes('--help') || args.includes('-h');
 const filterArg = args.find(a => !a.startsWith('-')) || null;
-const minCovArg = args.find(a => a.startsWith('--min='))?.split('=')[1] || '95';
+const minCovArg = args.find(a => a.startsWith('--min='))?.split('=')[1] || '99';
 const showMissed = args.includes('--missed') || args.includes('--details');
 const simpleMode = args.includes('--simple');
 
@@ -21,7 +21,7 @@ Argumentos:
   [filtro]       Filtrar por nome de pacote ou classe (opcional)
 
 Opções:
-  --min=<n>      Filtrar classes com cobertura de linha menor que <n>% (Padrão: 95)
+  --min=<n>      Filtrar classes com cobertura de linha menor que <n>% (Padrão: 99)
   --missed       Exibir detalhes das linhas e branches não cobertos (Ranking de perdidos)
   --simple       Saída simplificada (apenas classe e linhas/branches perdidas)
   --help, -h     Exibir esta ajuda
@@ -57,7 +57,7 @@ async function parseXml(filePath) {
 }
 
 function processPackage(pkg, filter) {
-    const pkgName = pkg.$.name.replace(/\//g, '.');
+    const pkgName = pkg.$.name.replaceAll('/', '.');
     if (filter && !pkgName.includes(filter)) return null;
 
     const metrics = getCounters(pkg);
@@ -75,10 +75,6 @@ function processPackage(pkg, filter) {
                 // Extrair linhas perdidas se necessário
                 let missedLines = [];
                 let partialBranches = [];
-
-                // Para extrair linhas, precisamos olhar o sourcefile correspondente
-                // Mas a estrutura do XML agrupa sourcefiles dentro do package, não dentro da class diretamente no formato JaCoCo padrão hierárquico
-                // O elemento 'class' tem 'sourcefilename'. Precisamos achar o 'sourcefile' no pacote com esse nome.
             }
 
             classes.push({
@@ -154,7 +150,6 @@ async function main() {
     console.log("=".repeat(100));
 
     if (showMissed) {
-        // Modo detalhado (substitui list_missed_lines.py)
         let allMissed = [];
         if (root.package) {
             root.package.forEach(pkg => {
@@ -164,7 +159,7 @@ async function main() {
 
         allMissed.sort((a, b) => b.weight - a.weight);
 
-        console.log(`\nTOP ARQUIVOS COM LINHAS/BRANCHES PERDIDAS (Total: ${allMissed.length})\n`);
+        console.log(`\n ARQUIVOS COM MAIS LINHAS/BRANCHES PERDIDAS (Total: ${allMissed.length})\n`);
 
         allMissed.slice(0, 50).forEach(r => {
             if (simpleMode) {

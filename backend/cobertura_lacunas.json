@@ -1,61 +1,13 @@
 {
-  "globalLineCoverage": "99.95%",
-  "totalFilesWithGaps": 17,
+  "globalLineCoverage": "100.00%",
+  "totalFilesWithGaps": 12,
   "gaps": [
-    {
-      "class": "sgc.organizacao.service.UnidadeResponsavelService",
-      "coverage": "98.57%",
-      "missed": [
-        120
-      ],
-      "partial": [
-        "119(1/2)",
-        "144(1/4)"
-      ],
-      "score": 2
-    },
-    {
-      "class": "sgc.subprocesso.service.SubprocessoFacade",
-      "coverage": "99.64%",
-      "missed": [
-        486
-      ],
-      "partial": [],
-      "score": 1
-    },
-    {
-      "class": "sgc.organizacao.UsuarioFacade",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "206(1/2)"
-      ],
-      "score": 0.5
-    },
     {
       "class": "sgc.e2e.E2eController",
       "coverage": "100.00%",
       "missed": [],
       "partial": [
         "218(1/2)"
-      ],
-      "score": 0.5
-    },
-    {
-      "class": "sgc.comum.erros.RestExceptionHandler",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "63(1/4)"
-      ],
-      "score": 0.5
-    },
-    {
-      "class": "sgc.seguranca.config.JwtProperties",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "18(1/2)"
       ],
       "score": 0.5
     },

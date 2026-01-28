@@ -271,6 +271,45 @@ class SubprocessoWorkflowServiceTest {
         assertNotNull(exception);
     }
 
+    @Test
+    @DisplayName("atualizarSituacaoParaEmAndamento - Revisao")
+    void atualizarSituacaoParaEmAndamento_Revisao() {
+        Long codMapa = 100L;
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.REVISAO);
+        sp.setProcesso(p);
+
+        when(repositorioSubprocesso.findByMapaCodigo(codMapa)).thenReturn(Optional.of(sp));
+
+        workflowService.atualizarSituacaoParaEmAndamento(codMapa);
+
+        assertEquals(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, sp.getSituacao());
+        verify(repositorioSubprocesso).save(sp);
+    }
+
+    @Test
+    @DisplayName("reabrirRevisaoCadastro - Sucesso")
+    void reabrirRevisaoCadastro_Sucesso() {
+        Long codigo = 1L;
+        Subprocesso sp = new Subprocesso();
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.REVISAO);
+        sp.setProcesso(p);
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        sp.setUnidade(new Unidade());
+
+        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+        when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
+
+        workflowService.reabrirRevisaoCadastro(codigo, "Justificativa");
+
+        assertEquals(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, sp.getSituacao());
+        verify(repositorioSubprocesso).save(sp);
+        verify(repositorioMovimentacao).save(any());
+    }
+
     private void sGC_Mapa(Subprocesso sp) {
         sgc.mapa.model.Mapa m = new sgc.mapa.model.Mapa();
         sp.setMapa(m);
