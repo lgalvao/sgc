@@ -113,7 +113,7 @@ import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {logger} from "@/utils";
 import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";
-import {buscarUnidadePorCodigo} from "@/services/unidadesService";
+import {buscarUnidadePorCodigo} from "@/services/unidadeService";
 import {buscarUsuariosPorUnidade} from "@/services/usuarioService";
 import type {Unidade, Usuario} from "@/types/tipos";
 import PageHeader from "@/components/layout/PageHeader.vue";

@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import CadAtribuicao from '@/views/CadAtribuicao.vue';
 import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
-import {buscarUnidadePorCodigo} from '@/services/unidadesService';
+import {buscarUnidadePorCodigo} from '@/services/unidadeService';
 import {buscarUsuariosPorUnidade} from '@/services/usuarioService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
@@ -29,7 +29,7 @@ vi.mock('@/stores/feedback', () => ({
 vi.mock('@/services/atribuicaoTemporariaService', () => ({
     criarAtribuicaoTemporaria: vi.fn(),
 }));
-vi.mock('@/services/unidadesService', () => ({
+vi.mock('@/services/unidadeService', () => ({
     buscarUnidadePorCodigo: vi.fn(),
 }));
 vi.mock('@/services/usuarioService', () => ({

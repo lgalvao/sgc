@@ -46,6 +46,14 @@ export function mapCriarAtividadeRequestToDto(
     };
 }
 
+export function mapAtualizarAtividadeToDto(request: Atividade): any {
+    return {
+        codigo: request.codigo,
+        descricao: request.descricao,
+        mapaCodigo: request.mapaCodigo,
+    };
+}
+
 export function mapCriarConhecimentoRequestToDto(
     request: CriarConhecimentoRequest,
     atividadeCodigo: number,
@@ -53,5 +61,16 @@ export function mapCriarConhecimentoRequestToDto(
     return {
         descricao: request.descricao,
         atividadeCodigo,
+    };
+}
+
+export function mapAtualizarConhecimentoToDto(
+    request: Conhecimento,
+    atividadeCodigo: number
+): any {
+    return {
+        codigo: request.codigo,
+        atividadeCodigo: atividadeCodigo,
+        descricao: request.descricao,
     };
 }

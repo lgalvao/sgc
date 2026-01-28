@@ -8,7 +8,7 @@ import {
     buscarTodasUnidades,
     buscarUnidadePorCodigo,
     buscarUnidadePorSigla,
-} from "../unidadesService";
+} from "../unidadeService";
 
 describe("unidadesService", () => {
     const { mockApi } = setupServiceTest();

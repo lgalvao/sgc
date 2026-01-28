@@ -8,7 +8,7 @@ import {
     buscarSuperior as serviceBuscarSuperior,
     buscarUnidadePorCodigo as serviceBuscarUnidadePorCodigo,
     buscarUnidadePorSigla,
-} from "@/services/unidadesService";
+} from "@/services/unidadeService";
 import type {Unidade} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 

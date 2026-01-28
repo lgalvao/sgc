@@ -2,7 +2,9 @@ import {
     mapAtividadeDtoToModel,
     mapConhecimentoDtoToModel,
     mapCriarAtividadeRequestToDto,
+    mapAtualizarAtividadeToDto,
     mapCriarConhecimentoRequestToDto,
+    mapAtualizarConhecimentoToDto,
 } from "@/mappers/atividades";
 import type {Atividade, AtividadeOperacaoResponse, Conhecimento, CriarConhecimentoRequest,} from "@/types/tipos";
 import apiClient from "@/axios-setup";

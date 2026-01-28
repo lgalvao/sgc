@@ -5,7 +5,7 @@ import {computed, defineComponent} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
-import * as unidadesService from "@/services/unidadesService";
+import * as unidadesService from "@/services/unidadeService";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
@@ -63,7 +63,7 @@ vi.mock("@/services/subprocessoService", () => ({
     listarAtividades: vi.fn(),
 }));
 
-vi.mock("@/services/unidadesService", () => ({
+vi.mock("@/services/unidadeService", () => ({
     buscarUnidadePorSigla: vi.fn(),
 }));
 
