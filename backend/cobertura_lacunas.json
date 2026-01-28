@@ -1,7 +1,19 @@
 {
   "globalLineCoverage": "100.00%",
-  "totalFilesWithGaps": 12,
+  "totalFilesWithGaps": 10,
   "gaps": [
+    {
+      "class": "sgc.painel.PainelFacade",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "117(2/4)",
+        "129(1/2)",
+        "130(1/2)",
+        "137(1/2)"
+      ],
+      "score": 2
+    },
     {
       "class": "sgc.e2e.E2eController",
       "coverage": "100.00%",
@@ -17,15 +29,6 @@
       "missed": [],
       "partial": [
         "151(1/2)"
-      ],
-      "score": 0.5
-    },
-    {
-      "class": "sgc.mapa.service.MapaVisualizacaoService",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "70(1/2)"
       ],
       "score": 0.5
     },
@@ -75,15 +78,6 @@
       "score": 0.5
     },
     {
-      "class": "sgc.analise.mapper.AnaliseMapper",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "40(1/2)"
-      ],
-      "score": 0.5
-    },
-    {
       "class": "sgc.subprocesso.service.workflow.SubprocessoWorkflowService",
       "coverage": "100.00%",
       "missed": [],
@@ -98,15 +92,6 @@
       "missed": [],
       "partial": [
         "64(1/2)"
-      ],
-      "score": 0.5
-    },
-    {
-      "class": "sgc.painel.PainelFacade",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "137(1/2)"
       ],
       "score": 0.5
     }

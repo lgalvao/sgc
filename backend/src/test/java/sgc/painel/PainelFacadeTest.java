@@ -115,14 +115,6 @@ class PainelFacadeTest {
     @Test
     @DisplayName("Deve listar alertas com ordenação definida (não paged ou unsorted)")
     void deveListarAlertasComOrdenacaoDefinida() {
-        // Teste para cobrir o 'else' ou o skip do 'if' em listarAlertas
-        // Se passarmos um Pageable que JÁ tem sort, ele usa o pageable como está.
-        // O if é: if (pageable.isPaged() && pageable.getSort().isUnsorted())
-
-        // Caso 1: Unsorted (já coberto pelo teste anterior com PageRequest.of(0,10) que é unsorted??
-        // Wait, PageRequest.of(0, 10) retorna sort unsorted by default.
-        // Então entra no IF.
-
         // Caso 2: Sorted.
         Pageable sorted = PageRequest.of(0, 10, Sort.by("dataHora"));
 
@@ -138,7 +130,7 @@ class PainelFacadeTest {
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
         // Mock deve esperar sortedPageable que é igual ao sorted passado (pois não entra no if)
-        when(alertaFacade.listarPorUnidade(eq(100L), eq(sorted))).thenReturn(page);
+        when(alertaFacade.listarPorUnidade(100L, sorted)).thenReturn(page);
         when(alertaFacade.obterDataHoraLeitura(1L, "123")).thenReturn(Optional.of(LocalDateTime.now()));
 
         Page<AlertaDto> result = painelFacade.listarAlertas("123", 100L, sorted);
@@ -176,6 +168,21 @@ class PainelFacadeTest {
         assertThat(result).hasSize(1);
     }
 
+    @Test
+    @DisplayName("Deve lidar com processo sem participantes")
+    void deveLidarComProcessoSemParticipantes() {
+        Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);
+        p.setParticipantes(new java.util.HashSet<>()); // Empty
+
+        Page<Processo> page = new PageImpl<>(List.of(p));
+        when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(page);
+
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
+
+        assertThat(result.getContent().get(0).unidadeCodigo()).isNull();
+        assertThat(result.getContent().get(0).unidadesParticipantes()).isEmpty();
+    }
+
     private Processo criarProcesso(Long codigo, SituacaoProcesso situacao) {
         Processo p = new Processo();
         p.setCodigo(codigo);
@@ -186,7 +193,7 @@ class PainelFacadeTest {
         u.setCodigo(10L);
         u.setNome("Unit");
         u.setSigla("U");
-        p.setParticipantes(Set.of(u));
+        p.setParticipantes(new java.util.HashSet<>(Set.of(u)));
         return p;
     }
 }
