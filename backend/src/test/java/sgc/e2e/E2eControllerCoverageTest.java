@@ -10,8 +10,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
@@ -36,6 +39,8 @@ class E2eControllerCoverageTest {
     private ProcessoFacade processoFacade;
     @Mock
     private UnidadeFacade unidadeFacade;
+    @Mock
+    private ResourceLoader resourceLoader;
 
     @InjectMocks
     private E2eController controller;
@@ -152,5 +157,23 @@ class E2eControllerCoverageTest {
 
         // Deve lançar a exceção do orElseThrow
         assertNotNull(assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> controller.criarProcessoMapeamento(request)));
+    }
+
+    @Test
+    @DisplayName("Reset database deve ignorar tabelas com nomes inválidos")
+    void resetDatabaseIgnoraTabelasInvalidas() {
+        // Setup
+        when(jdbcTemplate.queryForList(anyString(), eq(String.class)))
+                .thenReturn(java.util.List.of("VALID_TABLE", "INVALID-TABLE"));
+
+        Resource mockResource = mock(Resource.class);
+        when(resourceLoader.getResource(anyString())).thenReturn(mockResource);
+        when(mockResource.exists()).thenReturn(false);
+
+        // Act & Assert
+        assertThrows(ErroConfiguracao.class, () -> controller.resetDatabase());
+
+        verify(jdbcTemplate).execute("TRUNCATE TABLE sgc.VALID_TABLE");
+        verify(jdbcTemplate, never()).execute(contains("INVALID-TABLE"));
     }
 }
