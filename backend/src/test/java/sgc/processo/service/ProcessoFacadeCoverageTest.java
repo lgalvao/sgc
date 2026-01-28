@@ -17,6 +17,8 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.junit.jupiter.api.BeforeEach;
 
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
@@ -63,6 +65,11 @@ class ProcessoFacadeCoverageTest {
 
     @InjectMocks
     private ProcessoFacade facade;
+
+    @BeforeEach
+    void setup() {
+        ReflectionTestUtils.setField(facade, "self", facade);
+    }
 
     @Test
     @DisplayName("atualizar - Erro Situacao Invalida")
