@@ -166,7 +166,7 @@ public class UnidadeHierarquiaService {
         return raizes.stream().map(raiz -> montarComSubunidades(raiz, mapaFilhas)).toList();
     }
 
-    private UnidadeDto montarComSubunidades(UnidadeDto dto, Map<Long, List<UnidadeDto>> mapaFilhas) {
+    UnidadeDto montarComSubunidades(UnidadeDto dto, Map<Long, List<UnidadeDto>> mapaFilhas) {
         List<UnidadeDto> filhas = mapaFilhas.get(dto.getCodigo());
         if (filhas == null || filhas.isEmpty()) {
             return dto;
