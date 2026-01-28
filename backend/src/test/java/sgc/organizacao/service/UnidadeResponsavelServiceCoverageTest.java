@@ -145,4 +145,64 @@ class UnidadeResponsavelServiceCoverageTest {
         // Verifica que não tentou buscar perfis se não tem usuários
         verify(usuarioPerfilRepo, never()).findByUsuarioTituloIn(any());
     }
+
+    @Test
+    @DisplayName("Deve buscar responsável da unidade com substituto")
+    void deveBuscarResponsavelUnidadeComSubstituto() {
+        Usuario titular = new Usuario();
+        titular.setTituloEleitoral("TITULAR");
+        titular.setNome("Nome Titular");
+
+        Usuario substituto = new Usuario();
+        substituto.setTituloEleitoral("SUBSTITUTO");
+        substituto.setNome("Nome Substituto");
+
+        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L)))
+                .thenReturn(List.of(titular, substituto));
+
+        ResponsavelDto result = service.buscarResponsavelUnidade(1L);
+
+        assertThat(result.titularTitulo()).isEqualTo("TITULAR");
+        assertThat(result.titularNome()).isEqualTo("Nome Titular");
+        assertThat(result.substitutoTitulo()).isEqualTo("SUBSTITUTO");
+        assertThat(result.substitutoNome()).isEqualTo("Nome Substituto");
+    }
+
+    @Test
+    @DisplayName("Deve buscar responsáveis filtrando perfil não CHEFE")
+    void deveBuscarResponsaveisFiltrandoPerfilNaoChefe() {
+        Usuario chefe = new Usuario();
+        chefe.setTituloEleitoral("123");
+
+        UsuarioPerfil perfilGestor = new UsuarioPerfil();
+        perfilGestor.setUsuarioTitulo("123");
+        perfilGestor.setUnidadeCodigo(1L);
+        perfilGestor.setPerfil(Perfil.GESTOR); // Não é CHEFE
+
+        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(chefe));
+        when(usuarioRepo.findByIdInWithAtribuicoes(List.of("123"))).thenReturn(List.of(chefe));
+        when(usuarioPerfilRepo.findByUsuarioTituloIn(List.of("123"))).thenReturn(List.of(perfilGestor));
+
+        Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve carregar atribuições em lote para usuário sem perfil")
+    void deveCarregarAtribuicoesEmLoteUsuarioSemPerfil() {
+        Usuario chefe = new Usuario();
+        chefe.setTituloEleitoral("123");
+
+        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(chefe));
+        when(usuarioRepo.findByIdInWithAtribuicoes(List.of("123"))).thenReturn(List.of(chefe));
+        when(usuarioPerfilRepo.findByUsuarioTituloIn(List.of("123"))).thenReturn(Collections.emptyList());
+
+        Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
+
+        // Result deve ser vazio pois não achou perfil CHEFE, mas verificamos se usuario.setAtribuicoes foi chamado via debug ou comportamento implícito
+        // O teste aqui garante que passamos pelo loop de usuários e getOrDefault retornou vazio
+        assertThat(result).isEmpty();
+        assertThat(chefe.getAtribuicoes()).isEmpty();
+    }
 }

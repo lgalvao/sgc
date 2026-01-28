@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
@@ -28,6 +30,7 @@ import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.SituacaoUnidade;
+import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapaRepo;
 import sgc.organizacao.model.Usuario;
@@ -266,5 +269,87 @@ class UnidadeFacadeCoverageTest {
         when(repo.buscar(Unidade.class, 1L)).thenReturn(u);
 
         assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarEntidadePorId(1L)));
+    }
+
+    @Test
+    @DisplayName("Deve filtrar unidades na árvore com elegibilidade corretamente")
+    void deveFiltrarUnidadesNaArvoreComElegibilidade() {
+        // Setup
+        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(10L, 20L));
+
+        // Execute method to trigger lambda creation
+        unidadeFacade.buscarArvoreComElegibilidade(true, Set.of(30L));
+
+        // Capture function
+        ArgumentCaptor<Function<Unidade, Boolean>> captor = ArgumentCaptor.forClass(Function.class);
+        verify(unidadeHierarquiaService).buscarArvoreComElegibilidade(captor.capture());
+        Function<Unidade, Boolean> function = captor.getValue();
+
+        // Test assertions
+        Unidade uOk = new Unidade();
+        uOk.setCodigo(10L);
+        uOk.setTipo(TipoUnidade.OPERACIONAL);
+        assertThat(function.apply(uOk)).isTrue(); // In map, not blocked, not intermediary
+
+        Unidade uNotInMap = new Unidade();
+        uNotInMap.setCodigo(99L);
+        uNotInMap.setTipo(TipoUnidade.OPERACIONAL);
+        assertThat(function.apply(uNotInMap)).isFalse(); // Not in map
+
+        Unidade uBlocked = new Unidade();
+        uBlocked.setCodigo(30L);
+        uBlocked.setTipo(TipoUnidade.OPERACIONAL);
+        assertThat(function.apply(uBlocked)).isFalse(); // Blocked
+
+        Unidade uIntermediary = new Unidade();
+        uIntermediary.setCodigo(10L);
+        uIntermediary.setTipo(TipoUnidade.INTERMEDIARIA);
+        assertThat(function.apply(uIntermediary)).isFalse(); // Intermediary (even if in map and not blocked)
+    }
+
+    @Test
+    @DisplayName("Deve filtrar unidades na árvore com elegibilidade (sem requerer mapa)")
+    void deveFiltrarUnidadesNaArvoreComElegibilidadeSemMapa() {
+        // Execute method
+        unidadeFacade.buscarArvoreComElegibilidade(false, Set.of(30L));
+
+        // Capture function
+        ArgumentCaptor<Function<Unidade, Boolean>> captor = ArgumentCaptor.forClass(Function.class);
+        verify(unidadeHierarquiaService).buscarArvoreComElegibilidade(captor.capture());
+        Function<Unidade, Boolean> function = captor.getValue();
+
+        // Test assertions
+        Unidade uOk = new Unidade();
+        uOk.setCodigo(99L);
+        uOk.setTipo(TipoUnidade.OPERACIONAL);
+        assertThat(function.apply(uOk)).isTrue(); // Not in map but map not required, not blocked
+
+        Unidade uBlocked = new Unidade();
+        uBlocked.setCodigo(30L);
+        uBlocked.setTipo(TipoUnidade.OPERACIONAL);
+        assertThat(function.apply(uBlocked)).isFalse(); // Blocked
+
+        Unidade uIntermediary = new Unidade();
+        uIntermediary.setCodigo(99L);
+        uIntermediary.setTipo(TipoUnidade.INTERMEDIARIA);
+        assertThat(function.apply(uIntermediary)).isFalse(); // Intermediary
+    }
+
+    @Test
+    @DisplayName("Deve buscar árvore com elegibilidade sem requerer mapa")
+    void deveBuscarArvoreComElegibilidadeSemRequererMapa() {
+        unidadeFacade.buscarArvoreComElegibilidade(false, Collections.emptySet());
+
+        // Verify that findAllUnidadeCodigos was NOT called
+        verify(unidadeMapaRepo, never()).findAllUnidadeCodigos();
+        verify(unidadeHierarquiaService).buscarArvoreComElegibilidade(any());
+    }
+
+    @Test
+    @DisplayName("Deve verificar existência de mapa vigente (método legado)")
+    void deveVerificarExistenciaMapaVigenteLegado() {
+        when(unidadeMapaService.verificarMapaVigente(1L)).thenReturn(true);
+        assertThat(unidadeFacade.verificarExistenciaMapaVigente(1L)).isTrue();
+        verify(unidadeMapaService).verificarMapaVigente(1L);
     }
 }
