@@ -8,8 +8,6 @@ import io.jsonwebtoken.security.Keys;
 import sgc.organizacao.model.Perfil;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 

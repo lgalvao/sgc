@@ -1,24 +1,18 @@
 {
-  "globalLineCoverage": "100.00%",
-  "totalFilesWithGaps": 10,
+  "globalLineCoverage": "99.98%",
+  "totalFilesWithGaps": 4,
   "gaps": [
     {
-      "class": "sgc.e2e.E2eController",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "218(1/2)"
+      "class": "sgc.painel.PainelFacade",
+      "coverage": "98.97%",
+      "missed": [
+        121
       ],
-      "score": 0.5
-    },
-    {
-      "class": "sgc.mapa.service.MapaSalvamentoService",
-      "coverage": "100.00%",
-      "missed": [],
       "partial": [
-        "151(1/2)"
+        "120(1/2)",
+        "148(1/4)"
       ],
-      "score": 0.5
+      "score": 2
     },
     {
       "class": "sgc.seguranca.login.ClienteAcessoAd",
@@ -26,33 +20,6 @@
       "missed": [],
       "partial": [
         "40(1/4)"
-      ],
-      "score": 0.5
-    },
-    {
-      "class": "sgc.seguranca.login.LoginController",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "100(1/4)"
-      ],
-      "score": 0.5
-    },
-    {
-      "class": "sgc.seguranca.login.LoginFacade",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "141(1/4)"
-      ],
-      "score": 0.5
-    },
-    {
-      "class": "sgc.seguranca.login.GerenciadorJwt",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "82(1/6)"
       ],
       "score": 0.5
     },
@@ -66,29 +33,11 @@
       "score": 0.5
     },
     {
-      "class": "sgc.subprocesso.service.workflow.SubprocessoWorkflowService",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "185(1/2)"
-      ],
-      "score": 0.5
-    },
-    {
       "class": "sgc.seguranca.acesso.AtividadeAccessPolicy",
       "coverage": "100.00%",
       "missed": [],
       "partial": [
         "64(1/2)"
-      ],
-      "score": 0.5
-    },
-    {
-      "class": "sgc.painel.PainelFacade",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "117(1/4)"
       ],
       "score": 0.5
     }

@@ -24,6 +24,7 @@ class PainelFacadeGapTest {
         
         Processo p = new Processo();
         p.setCodigo(1L);
+        p.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
         p.setParticipantes(null); // Explicitamente null
         
         when(processoFacade.listarTodos(any(Pageable.class)))

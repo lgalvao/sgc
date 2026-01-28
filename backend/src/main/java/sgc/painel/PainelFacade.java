@@ -68,6 +68,9 @@ public class PainelFacade {
     }
 
     private Pageable garantirOrdenacaoPadrao(Pageable pageable) {
+        if (pageable.isUnpaged()) {
+            return pageable;
+        }
         if (pageable.getSort().isUnsorted()) {
             return PageRequest.of(
                     pageable.getPageNumber(),
@@ -114,10 +117,18 @@ public class PainelFacade {
 
     private ProcessoResumoDto paraProcessoResumoDto(Processo processo, Perfil perfil, Long codigoUnidade) {
         Set<Unidade> participantes = processo.getParticipantes();
-        Unidade participante = participantes == null || participantes.isEmpty() ? null : participantes.iterator().next();
+        if (participantes == null) {
+            participantes = Collections.emptySet();
+        }
+
+        // Se houver participantes, pega o primeiro. Se não (invariante violada), usa fallback da unidade atual.
+        Unidade participante = participantes.isEmpty() ? null : participantes.iterator().next();
+        
+        Long codUnidMapeado = participante != null ? participante.getCodigo() : codigoUnidade;
+        String nomeUnidMapeado = participante != null ? participante.getNome() : "Unidade " + codigoUnidade;
 
         String linkDestino = calcularLinkDestinoProcesso(processo, perfil, codigoUnidade);
-        String unidadesParticipantes = formatarUnidadesParticipantes(processo.getParticipantes());
+        String unidadesParticipantes = formatarUnidadesParticipantes(participantes);
 
         return ProcessoResumoDto.builder()
                 .codigo(processo.getCodigo())
@@ -126,8 +137,8 @@ public class PainelFacade {
                 .tipo(processo.getTipo().name())
                 .dataLimite(processo.getDataLimite())
                 .dataCriacao(processo.getDataCriacao())
-                .unidadeCodigo(participante != null ? participante.getCodigo() : null)
-                .unidadeNome(participante != null ? participante.getNome() : null)
+                .unidadeCodigo(codUnidMapeado)
+                .unidadeNome(nomeUnidMapeado)
                 .unidadesParticipantes(unidadesParticipantes)
                 .linkDestino(linkDestino)
                 .build();

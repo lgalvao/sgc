@@ -189,9 +189,7 @@ class E2eControllerCoverageTest {
 
         when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(unidadeDto);
         when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(processoDto);
-        
-        // Mocking para o security check interno
-        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(processoFacade.obterPorId(100L)).thenReturn(java.util.Optional.of(processoDto));
 
         // Act
         // Usando Reflection para chamar o método privado com um tipo que não tem tratamento específico de inicialização
