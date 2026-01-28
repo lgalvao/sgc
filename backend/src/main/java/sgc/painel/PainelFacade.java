@@ -117,15 +117,12 @@ public class PainelFacade {
 
     private ProcessoResumoDto paraProcessoResumoDto(Processo processo, Perfil perfil, Long codigoUnidade) {
         Set<Unidade> participantes = processo.getParticipantes();
-        if (participantes == null) {
-            participantes = Collections.emptySet();
-        }
-
-        // Se houver participantes, pega o primeiro. Se não (invariante violada), usa fallback da unidade atual.
-        Unidade participante = participantes.isEmpty() ? null : participantes.iterator().next();
         
-        Long codUnidMapeado = participante != null ? participante.getCodigo() : codigoUnidade;
-        String nomeUnidMapeado = participante != null ? participante.getNome() : "Unidade " + codigoUnidade;
+        // As invariantes de BD e o @NullMarked garantem que participantes nunca é null e processos no painel têm ao menos um participante.
+        Unidade participante = participantes.iterator().next();
+        
+        Long codUnidMapeado = participante.getCodigo();
+        String nomeUnidMapeado = participante.getNome();
 
         String linkDestino = calcularLinkDestinoProcesso(processo, perfil, codigoUnidade);
         String unidadesParticipantes = formatarUnidadesParticipantes(participantes);

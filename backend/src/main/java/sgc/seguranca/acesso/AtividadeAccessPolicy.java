@@ -29,20 +29,16 @@ public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
      */
     private static final Map<Acao, RegrasAcaoAtividade> REGRAS = Map.ofEntries(
             Map.entry(CRIAR_ATIVIDADE, new RegrasAcaoAtividade(
-                    EnumSet.of(ADMIN, GESTOR, CHEFE),
-                    true // Requer ser titular
+                    EnumSet.of(ADMIN, GESTOR, CHEFE)
             )),
             Map.entry(EDITAR_ATIVIDADE, new RegrasAcaoAtividade(
-                    EnumSet.of(ADMIN, GESTOR, CHEFE),
-                    true // Requer ser titular
+                    EnumSet.of(ADMIN, GESTOR, CHEFE)
             )),
             Map.entry(EXCLUIR_ATIVIDADE, new RegrasAcaoAtividade(
-                    EnumSet.of(ADMIN, GESTOR, CHEFE),
-                    true // Requer ser titular
+                    EnumSet.of(ADMIN, GESTOR, CHEFE)
             )),
             Map.entry(ASSOCIAR_CONHECIMENTOS, new RegrasAcaoAtividade(
-                    EnumSet.of(ADMIN, GESTOR, CHEFE),
-                    true // Requer ser titular
+                    EnumSet.of(ADMIN, GESTOR, CHEFE)
             ))
     );
 
@@ -60,22 +56,20 @@ public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
             return false;
         }
 
-        // 2. Verifica se é titular da unidade (quando requerido)
-        if (regras.requerTitular) {
-            Mapa mapa = atividade.getMapa();
-            Subprocesso subprocesso = mapa.getSubprocesso();
-            Unidade unidade = subprocesso.getUnidade();
+        // 2. Verifica se é titular da unidade (obrigatório para todas as ações atuais)
+        Mapa mapa = atividade.getMapa();
+        Subprocesso subprocesso = mapa.getSubprocesso();
+        Unidade unidade = subprocesso.getUnidade();
 
-            String tituloTitular = unidade.getTituloTitular();
-            if (!usuario.getTituloEleitoral().equals(tituloTitular)) {
-                definirMotivoNegacao(String.format(
-                        "Usuário '%s' não é o titular da unidade '%s'. Titular: %s",
-                        usuario.getTituloEleitoral(),
-                        unidade.getSigla(),
-                        java.util.Objects.toString(tituloTitular, "não definido")
-                ));
-                return false;
-            }
+        String tituloTitular = unidade.getTituloTitular();
+        if (!usuario.getTituloEleitoral().equals(tituloTitular)) {
+            definirMotivoNegacao(String.format(
+                    "Usuário '%s' não é o titular da unidade '%s'. Titular: %s",
+                    usuario.getTituloEleitoral(),
+                    unidade.getSigla(),
+                    java.util.Objects.toString(tituloTitular, "não definido")
+            ));
+            return false;
         }
 
         return true;
@@ -85,8 +79,7 @@ public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
      * Record para regras de ação de atividade
      */
     private record RegrasAcaoAtividade(
-            EnumSet<Perfil> perfisPermitidos,
-            boolean requerTitular
+            EnumSet<Perfil> perfisPermitidos
     ) {
     }
 }

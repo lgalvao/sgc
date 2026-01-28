@@ -136,28 +136,27 @@ public class ProcessoInicializador {
         java.util.Map<Long, sgc.organizacao.model.UnidadeMapa> mapaUnidadeMapa = unidadesMapas.stream()
                 .collect(Collectors.toMap(sgc.organizacao.model.UnidadeMapa::getUnidadeCodigo, m -> m));
 
-        switch (tipo) {
-            case MAPEAMENTO -> subprocessoFactory.criarParaMapeamento(processo, unidadesParaProcessar);
-            case REVISAO -> {
-                // Batch fetch units to avoid N+1 queries
-                List<Unidade> unidades = unidadeRepo.findAllById(codigosUnidades);
-                java.util.Map<Long, Unidade> mapaUnidades = unidades.stream()
-                        .collect(Collectors.toMap(Unidade::getCodigo, u -> u));
+        if (tipo == TipoProcesso.MAPEAMENTO) {
+            subprocessoFactory.criarParaMapeamento(processo, unidadesParaProcessar);
+        } else if (tipo == TipoProcesso.REVISAO) {
+            // Batch fetch units to avoid N+1 queries
+            List<Unidade> unidades = unidadeRepo.findAllById(codigosUnidades);
+            java.util.Map<Long, Unidade> mapaUnidades = unidades.stream()
+                    .collect(Collectors.toMap(Unidade::getCodigo, u -> u));
 
-                for (Long codUnidade : codigosUnidades) {
-                    Unidade unidade = mapaUnidades.get(codUnidade);
-                    if (unidade == null) {
-                        throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
-                    }
-                    sgc.organizacao.model.UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
-                    subprocessoFactory.criarParaRevisao(processo, unidade, um);
+            for (Long codUnidade : codigosUnidades) {
+                Unidade unidade = mapaUnidades.get(codUnidade);
+                if (unidade == null) {
+                    throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
                 }
+                sgc.organizacao.model.UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
+                subprocessoFactory.criarParaRevisao(processo, unidade, um);
             }
-            case DIAGNOSTICO -> {
-                for (Unidade unidade : unidadesParaProcessar) {
-                    sgc.organizacao.model.UnidadeMapa um = mapaUnidadeMapa.get(unidade.getCodigo());
-                    subprocessoFactory.criarParaDiagnostico(processo, unidade, um);
-                }
+        } else {
+            // Caso DIAGNOSTICO
+            for (Unidade unidade : unidadesParaProcessar) {
+                sgc.organizacao.model.UnidadeMapa um = mapaUnidadeMapa.get(unidade.getCodigo());
+                subprocessoFactory.criarParaDiagnostico(processo, unidade, um);
             }
         }
     }
