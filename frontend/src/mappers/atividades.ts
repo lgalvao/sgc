@@ -29,11 +29,7 @@ export function mapAtividadeDtoToModel(dto: any): Atividade {
 }
 
 export function mapConhecimentoDtoToModel(dto: any): Conhecimento {
-    if (!dto) return null as any;
-    return {
-        codigo: dto.codigo,
-        descricao: dto.descricao,
-    };
+    return mapConhecimentoVisualizacaoToModel(dto);
 }
 
 export function mapCriarAtividadeRequestToDto(

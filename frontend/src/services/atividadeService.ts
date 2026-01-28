@@ -32,11 +32,7 @@ export async function atualizarAtividade(
     codAtividade: number,
     request: Atividade,
 ): Promise<AtividadeOperacaoResponse> {
-    const payload = {
-        codigo: request.codigo,
-        descricao: request.descricao,
-        mapaCodigo: request.mapaCodigo,
-    };
+    const payload = mapAtualizarAtividadeToDto(request);
     const response = await apiClient.post<AtividadeOperacaoResponse>(
         `/atividades/${codAtividade}/atualizar`,
         payload,
@@ -75,11 +71,7 @@ export async function atualizarConhecimento(
     codConhecimento: number,
     request: Conhecimento,
 ): Promise<AtividadeOperacaoResponse> {
-    const payload = {
-        codigo: request.codigo,
-        atividadeCodigo: codAtividade,
-        descricao: request.descricao,
-    };
+    const payload = mapAtualizarConhecimentoToDto(request, codAtividade);
     const response = await apiClient.post<AtividadeOperacaoResponse>(
         `/atividades/${codAtividade}/conhecimentos/${codConhecimento}/atualizar`,
         payload,

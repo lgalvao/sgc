@@ -28,35 +28,32 @@ O frontend está assumindo responsabilidades de decisão que idealmente pertence
     *   **Recomendação**: O backend deve expor as ações disponíveis via HATEOAS ou permissões explícitas, ou um único endpoint que execute a "proxima etapa" baseada no usuário logado.
 
 ### 2.2. Repetições e Organização de Código
-*   **`src/utils/index.ts` (God Object)**:
-    *   **Problema**: Este arquivo mistura responsabilidades distintas: formatação de datas, classes CSS para badges, labels de status e utilitários de árvore.
-    *   **Impacto**: Dificulta a manutenção e testes.
-    *   **Recomendação**: Separar em arquivos específicos: `src/utils/dateUtils.ts`, `src/utils/statusUtils.ts`, `src/utils/styleUtils.ts`.
+*   **`src/utils/index.ts` (God Object)** (**Resolvido**):
+    *   O arquivo foi quebrado em módulos específicos: `dateUtils.ts`, `statusUtils.ts`, `styleUtils.ts`.
 
 *   **Duplicidade de Formatação**:
-    *   Existe lógica de parsing de datas customizada em `utils/index.ts` (`parseStringDate`) que tenta adivinhar formatos. Isso pode ser arriscado. O ideal é padronizar a comunicação da API (ISO 8601) e usar `date-fns` estritamente.
+    *   Existe lógica de parsing de datas customizada em `utils/dateUtils.ts` (`parseStringDate`) que tenta adivinhar formatos. Isso pode ser arriscado. O ideal é padronizar a comunicação da API (ISO 8601) e usar `date-fns` estritamente.
 
 ### 2.3. Inconsistências
-*   **Convenção de Nomes**:
-    *   **Services**: Maioria no singular (`atividadeService.ts`, `processoService.ts`), mas `unidadesService.ts` está no plural.
-    *   **Stores**: Maioria no plural (`processos.ts`, `atividades.ts`), mas `feedback.ts` e `perfil.ts` no singular.
-    *   **Recomendação**: Padronizar (sugestão: Services no singular, Stores no plural).
+*   **Convenção de Nomes** (**Resolvido**):
+    *   O service `unidadesService.ts` foi renomeado para `unidadeService.ts` para manter a consistência de nomenclaturas no singular.
 
-*   **Padrões HTTP (RESTful)**:
-    *   Em `atividadeService.ts`, rotas de atualização e exclusão utilizam o verbo `POST` com sufixos na URL (ex: `/atividades/{id}/excluir`).
-    *   **Padrão REST**: Deveria usar `DELETE /atividades/{id}` e `PUT` ou `PATCH` para atualizações.
-    *   **Recomendação**: Verificar se o backend suporta os verbos corretos e refatorar.
+*   **Padrões HTTP**:
+    *   O sistema utiliza exclusivamente `POST` e `GET` por regras de negócios corporativas. Embora não estritamente RESTful nos verbos, mantém consistência interna.
 
-*   **Construção de Payload**:
-    *   Em `atividadeService.ts`, o payload de atualização é construído manualmente objeto-a-objeto, ignorando o uso de mappers reversos (Model -> DTO), o que contradiz o padrão usado em outras partes do sistema.
+*   **Construção de Payload** (**Resolvido**):
+    *   A construção manual de DTOs em `atividadeService.ts` foi substituída por novos mappers em `mappers/atividades.ts`, padronizando a camada de transformação de dados.
 
 ### 2.4. Reinvenção da Roda
 *   **`utils/treeUtils.ts`**: Implementa `flattenTree` manualmente. Embora simples e funcional, é uma lógica comum que já existe em bibliotecas utilitárias, mas dado o tamanho do projeto, manter localmente é aceitável, desde que testado.
 
 ## 3. Conclusão
-O frontend do SGC está em um bom estado geral, mas sofre de "vazamento de regras de negócio". A complexidade de decidir "qual endpoint chamar" baseada em estados complexos está sobrecarregando as Stores e Composables.
+O frontend do SGC está em um bom estado geral, e as correções recentes melhoraram significativamente a consistência e manutenibilidade.
 
-**Ações Prioritárias Recomendadas:**
-1.  **Refatorar `utils/index.ts`**: Quebrar em arquivos menores.
-2.  **Centralizar Ações de Bloco**: Mover a lógica de decisão de `executarAcaoBloco` para o Backend.
-3.  **Padronizar Services**: Corrigir nomes de arquivos e uso de Mappers vs Objetos manuais.
+**Melhorias Implementadas:**
+1.  **Refatoração do `utils/index.ts`**: Quebrado em arquivos menores e mais coesos.
+2.  **Padronização de Services**: Renomeação de `unidadesService` e uso de mappers em `atividadeService`.
+3.  **Mappers de Atualização**: Criação de `mapAtualizarAtividadeToDto` e `mapAtualizarConhecimentoToDto`.
+
+**Próximos Passos (Recomendados):**
+1.  **Backend**: Implementar endpoint unificado para ações em bloco para remover a lógica complexa de `ProcessosStore`.

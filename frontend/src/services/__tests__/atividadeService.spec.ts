@@ -11,6 +11,8 @@ vi.mock("@/mappers/atividades", () => ({
     mapConhecimentoDtoToModel: vi.fn((dto) => ({...dto, mapped: true})),
     mapCriarAtividadeRequestToDto: vi.fn((req) => ({...req, mapped: true})),
     mapCriarConhecimentoRequestToDto: vi.fn((req) => ({...req, mapped: true})),
+    mapAtualizarAtividadeToDto: vi.fn((req) => ({...req, mapped: true})),
+    mapAtualizarConhecimentoToDto: vi.fn((req) => ({...req, mapped: true})),
 }));
 
 describe("atividadeService", () => {
@@ -79,12 +81,9 @@ describe("atividadeService", () => {
 
         const result = await service.atualizarAtividade(request.codigo, request);
 
-        const expectedPayload = {
-            codigo: request.codigo,
-            descricao: request.descricao,
-            mapaCodigo: request.mapaCodigo,
-        };
+        const expectedPayload = {...request, mapped: true};
 
+        expect(mappers.mapAtualizarAtividadeToDto).toHaveBeenCalledWith(request);
         expect(mockApi.post).toHaveBeenCalledWith(
             `/atividades/${request.codigo}/atualizar`,
             expectedPayload,
@@ -154,12 +153,9 @@ describe("atividadeService", () => {
 
         const result = await service.atualizarConhecimento(1, request.codigo, request);
 
-        const expectedPayload = {
-            codigo: request.codigo,
-            atividadeCodigo: 1,
-            descricao: request.descricao,
-        };
+        const expectedPayload = {...request, mapped: true};
 
+        expect(mappers.mapAtualizarConhecimentoToDto).toHaveBeenCalledWith(request, 1);
         expect(mockApi.post).toHaveBeenCalledWith(
             `/atividades/1/conhecimentos/${request.codigo}/atualizar`,
             expectedPayload,
