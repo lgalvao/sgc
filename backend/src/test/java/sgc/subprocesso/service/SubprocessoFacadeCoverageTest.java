@@ -406,4 +406,40 @@ class SubprocessoFacadeCoverageTest {
 
         verify(copiaMapaService).importarAtividadesDeOutroMapa(20L, 10L);
     }
+
+    @Test
+    @DisplayName("salvarAjustesMapa - Com Atividades (Coverage Loop)")
+    void salvarAjustesMapa_ComAtividades() {
+        Long codSubprocesso = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codSubprocesso);
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+
+        when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+
+        AtividadeAjusteDto ativDto = AtividadeAjusteDto.builder()
+                .codAtividade(200L)
+                .nome("Ativ")
+                .build();
+
+        CompetenciaAjusteDto compDto = CompetenciaAjusteDto.builder()
+                .codCompetencia(100L)
+                .nome("Comp")
+                .atividades(List.of(ativDto))
+                .build();
+
+        Competencia competencia = new Competencia();
+        competencia.setCodigo(100L);
+        when(competenciaService.buscarPorCodigos(any())).thenReturn(List.of(competencia));
+
+        Atividade atividade = new Atividade();
+        atividade.setCodigo(200L);
+        when(atividadeService.buscarPorCodigos(any())).thenReturn(List.of(atividade));
+
+        facade.salvarAjustesMapa(codSubprocesso, List.of(compDto));
+
+        verify(competenciaService).salvarTodas(any());
+        // Verify activity was added to competence
+        org.junit.jupiter.api.Assertions.assertFalse(competencia.getAtividades().isEmpty());
+    }
 }

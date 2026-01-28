@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -241,5 +242,31 @@ class UnidadeResponsavelServiceCoverageTest {
         ResponsavelDto resp = result.get(1L);
         assertThat(resp.titularTitulo()).isEqualTo("TITULAR");
         assertThat(resp.substitutoTitulo()).isEqualTo("SUBSTITUTO");
+    }
+
+    @Test
+    @DisplayName("Deve buscar responsável atual e carregar atribuições")
+    void deveBuscarResponsavelAtual() {
+        String sigla = "SIGLA";
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+
+        Usuario chefeSimples = new Usuario();
+        chefeSimples.setTituloEleitoral("123");
+
+        Usuario chefeCompleto = new Usuario();
+        chefeCompleto.setTituloEleitoral("123");
+
+        when(unidadeRepo.findBySigla(sigla)).thenReturn(Optional.of(unidade));
+        when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.of(chefeSimples));
+        when(usuarioRepo.findByIdWithAtribuicoes("123")).thenReturn(Optional.of(chefeCompleto));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(Collections.emptyList());
+
+        Usuario result = service.buscarResponsavelAtual(sigla);
+
+        assertThat(result).isSameAs(chefeCompleto);
+        // Verify carregarAtribuicoesUsuario was called
+        verify(usuarioPerfilRepo).findByUsuarioTitulo("123");
+        assertThat(chefeCompleto.getAtribuicoes()).isNotNull();
     }
 }

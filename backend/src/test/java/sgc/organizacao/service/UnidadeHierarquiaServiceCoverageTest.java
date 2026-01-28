@@ -175,4 +175,16 @@ class UnidadeHierarquiaServiceCoverageTest {
         assertThat(arvore).hasSize(1);
         assertThat(arvore.get(0).getSubunidades()).isEmpty();
     }
+
+    @Test
+    @DisplayName("Deve lidar com mapa de filhas inconsistente (defensive check null)")
+    void deveLidarComMapaFilhasInconsistente() {
+        UnidadeDto dto = UnidadeDto.builder().codigo(999L).build();
+        java.util.Map<Long, List<UnidadeDto>> mapaVazio = new java.util.HashMap<>();
+
+        // Chamada direta ao método package-private para cobrir branch de null check
+        UnidadeDto result = service.montarComSubunidades(dto, mapaVazio);
+
+        assertThat(result).isSameAs(dto);
+    }
 }
