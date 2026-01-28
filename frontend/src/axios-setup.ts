@@ -5,7 +5,7 @@ import {normalizeError, notifyError, shouldNotifyGlobally} from '@/utils/apiErro
 import {logger} from "@/utils";
 
 export const apiClient = axios.create({
-    baseURL: "http://localhost:10000/api",
+    baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:10000/api",
     withCredentials: true,
     xsrfCookieName: 'XSRF-TOKEN',
     xsrfHeaderName: 'X-XSRF-TOKEN',

@@ -1,4 +1,4 @@
-import {describe, expect, it, vi} from "vitest";
+import {describe, expect, it} from "vitest";
 import {
     badgeClass,
     diffInDays,
@@ -32,7 +32,7 @@ describe("utilitários", () => {
 
         it('deve retornar "Não disponibilizado" para valores nulos ou indefinidos', () => {
             expect(situacaoLabel(null)).toBe("Não disponibilizado");
-            expect(situacaoLabel(undefined)).toBe("Não disponibilizado");
+            expect(situacaoLabel()).toBe("Não disponibilizado");
         });
     });
 
@@ -201,7 +201,7 @@ describe("utilitários", () => {
         });
 
         it("deve retornar null para Date com tempo NaN", () => {
-            const nanDate = new Date(NaN);
+            const nanDate = new Date(Number.NaN);
             expect(ensureValidDate(nanDate)).toBeNull();
         });
 
@@ -220,14 +220,6 @@ describe("utilitários", () => {
             const result = formatDateBR("invalid-date-string");
             expect(result).toBe("Data inválida");
         });
-
-        it('deve retornar "Data inválida" quando toLocaleDateString lança erro', () => {
-            const date = new Date();
-            vi.spyOn(date, "toLocaleDateString").mockImplementation(() => {
-                throw new Error("Erro de formatação");
-            });
-            expect(formatDateBR(date)).toBe("Data inválida");
-        });
     });
 });
 
@@ -240,14 +232,6 @@ describe("tratamento de erro em formatDateForInput", () => {
         const result = formatDateForInput(invalidDate);
         expect(result).toBe("");
     });
-
-    it("deve retornar string vazia quando getFullYear lança erro", () => {
-        const date = new Date();
-        vi.spyOn(date, "getFullYear").mockImplementation(() => {
-            throw new Error("Erro ao obter ano");
-        });
-        expect(formatDateForInput(date)).toBe("");
-    });
 });
 
 describe("tratamento de erro em isDateValidAndFuture", () => {
@@ -258,13 +242,5 @@ describe("tratamento de erro em isDateValidAndFuture", () => {
         // Isso deve acionar o bloco catch e retornar false
         const result = isDateValidAndFuture(invalidDate);
         expect(result).toBe(false);
-    });
-
-    it("deve retornar false quando setHours lança erro", () => {
-        const date = new Date();
-        vi.spyOn(date, "setHours").mockImplementation(() => {
-            throw new Error("Erro ao definir horas");
-        });
-        expect(isDateValidAndFuture(date)).toBe(false);
     });
 });

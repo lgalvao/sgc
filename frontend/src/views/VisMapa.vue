@@ -165,7 +165,6 @@
             id="sugestoesTextarea"
             ref="sugestoesTextareaRef"
             v-model="sugestoes"
-            autofocus
             data-testid="inp-sugestoes-mapa-texto"
             placeholder="Digite suas sugestões para o mapa de competências..."
             rows="5"
@@ -238,7 +237,6 @@
             id="observacaoDevolucao"
             ref="observacaoDevolucaoRef"
             v-model="observacaoDevolucao"
-            autofocus
             data-testid="inp-devolucao-mapa-obs"
             placeholder="Digite observações sobre a devolução..."
             rows="3"
@@ -246,330 +244,69 @@
       </div>
     </ModalConfirmacao>
 
-    <BModal
-        v-model="mostrarModalHistorico"
-        :fade="false"
-        centered
-        hide-footer
-        size="lg"
-        title="Histórico de Análise"
-    >
-      <table
-          class="table table-striped"
-          data-testid="tbl-historico-analise"
-      >
-        <thead>
-        <tr>
-          <th>Data/Hora</th>
-          <th>Unidade</th>
-          <th>Resultado</th>
-          <th>Observações</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr
-            v-for="item in historicoAnalise"
-            :key="item.codigo"
-            data-testid="row-historico"
-        >
-          <td>{{ item.data }}</td>
-          <td>{{ item.unidade }}</td>
-          <td>{{ item.resultado }}</td>
-          <td>{{ item.observacoes }}</td>
-        </tr>
-        </tbody>
-      </table>
-      <template #footer>
-        <BButton
-            data-testid="btn-historico-analise-fechar"
-            variant="secondary"
-            @click="fecharModalHistorico"
-        >
-          Fechar
-        </BButton>
-      </template>
-    </BModal>
+    <HistoricoAnaliseModal
+        :historico="historicoAnalise"
+        :mostrar="mostrarModalHistorico"
+        @fechar="fecharModalHistorico"
+    />
   </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BContainer, BFormTextarea, BModal,} from "bootstrap-vue-next";
+import {
+  BButton,
+  BCard,
+  BCardBody,
+  BContainer,
+  BFormTextarea,
+  BModal,
+} from "bootstrap-vue-next";
 import EmptyState from "@/components/EmptyState.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import {storeToRefs} from "pinia";
-import {computed, onMounted, ref} from "vue";
-import {useRoute, useRouter} from "vue-router";
 import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
-import {usePerfil} from "@/composables/usePerfil";
-import {useAnalisesStore} from "@/stores/analises";
-import {useMapasStore} from "@/stores/mapas";
-import {useFeedbackStore} from "@/stores/feedback";
+import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
+import {ref} from "vue";
+import {useVisMapaLogic} from "@/composables/useVisMapaLogic";
 
-import {useProcessosStore} from "@/stores/processos";
-import {useSubprocessosStore} from "@/stores/subprocessos";
-import {useUnidadesStore} from "@/stores/unidades";
-import {SituacaoSubprocesso, TipoProcesso, type Unidade} from "@/types/tipos";
+const {
+  perfilSelecionado,
+  mapa,
+  unidade,
+  podeValidar,
+  podeAnalisar,
+  podeVerSugestoes,
+  temHistoricoAnalise,
+  historicoAnalise,
+  mostrarModalAceitar,
+  mostrarModalSugestoes,
+  mostrarModalVerSugestoes,
+  mostrarModalValidar,
+  mostrarModalDevolucao,
+  mostrarModalHistorico,
+  sugestoes,
+  sugestoesVisualizacao,
+  observacaoDevolucao,
+  isLoading,
+  confirmarSugestoes,
+  confirmarValidacao,
+  confirmarAceitacao,
+  confirmarDevolucao,
+  abrirModalAceitar,
+  fecharModalAceitar,
+  abrirModalSugestoes,
+  verSugestoes,
+  fecharModalVerSugestoes,
+  abrirModalValidar,
+  abrirModalDevolucao,
+  abrirModalHistorico,
+  fecharModalHistorico
+} = useVisMapaLogic();
 
-const route = useRoute();
-const router = useRouter();
-const sigla = computed(() => route.params.siglaUnidade as string);
-const codProcesso = computed(() => Number(route.params.codProcesso));
-const unidadesStore = useUnidadesStore();
-const mapaStore = useMapasStore();
-const processosStore = useProcessosStore();
-const feedbackStore = useFeedbackStore();
+const verHistorico = abrirModalHistorico;
 
-const analisesStore = useAnalisesStore();
-const subprocessosStore = useSubprocessosStore();
-const {perfilSelecionado} = usePerfil();
-
-const {mapaVisualizacao: mapa} = storeToRefs(mapaStore);
-
-const mostrarModalAceitar = ref(false);
-const mostrarModalSugestoes = ref(false);
-const mostrarModalVerSugestoes = ref(false);
-const mostrarModalValidar = ref(false);
-const mostrarModalDevolucao = ref(false);
-const mostrarModalHistorico = ref(false);
-const sugestoes = ref("");
-const sugestoesVisualizacao = ref("");
-const observacaoDevolucao = ref("");
-const isLoading = ref(false);
+// Refs para foco
 const sugestoesTextareaRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 const observacaoDevolucaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 
-const unidade = computed<Unidade | null>(() => unidadesStore.unidade);
-
-const subprocesso = computed(() => {
-  if (!processosStore.processoDetalhe) return null;
-  return processosStore.processoDetalhe.unidades.find(
-      (u) => u.sigla === sigla.value,
-  );
-});
-
-const processo = computed(() => processosStore.processoDetalhe);
-const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
-
-onMounted(async () => {
-  await unidadesStore.buscarUnidade(sigla.value);
-  await processosStore.buscarProcessoDetalhe(codProcesso.value);
-  if (codSubprocesso.value) {
-    await mapaStore.buscarMapaVisualizacao(codSubprocesso.value);
-  }
-});
-
-const podeValidar = computed(() => {
-  return (
-      perfilSelecionado.value === "CHEFE" &&
-      (subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO ||
-          subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO)
-  );
-});
-
-const podeAnalisar = computed(() => {
-  const situacao = subprocesso.value?.situacaoSubprocesso;
-  const isGestorOrAdmin = perfilSelecionado.value === "GESTOR" || perfilSelecionado.value === "ADMIN";
-  const isValidado =
-      situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
-      situacao === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO;
-  const isComSugestoes =
-      situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES ||
-      situacao === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES;
-
-  return isGestorOrAdmin && (isValidado || isComSugestoes);
-});
-
-const podeVerSugestoes = computed(() => {
-  const situacao = subprocesso.value?.situacaoSubprocesso;
-  return (
-      situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES ||
-      situacao === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES
-  );
-});
-
-const temHistoricoAnalise = computed(() => {
-  return historicoAnalise.value.length > 0;
-});
-
-const historicoAnalise = computed(() => {
-  if (!codSubprocesso.value) return [];
-
-  return analisesStore
-      .obterAnalisesPorSubprocesso(codSubprocesso.value)
-      .map((analise) => ({
-        codigo: analise.codigo,
-        data: new Date(analise.dataHora).toLocaleString("pt-BR"),
-        unidade: (analise as any).unidadeSigla || (analise as any).unidade,
-        resultado: analise.resultado,
-        observacoes: analise.observacoes || "",
-      }));
-});
-
-function abrirModalAceitar() {
-  mostrarModalAceitar.value = true;
-}
-
-function fecharModalAceitar() {
-  mostrarModalAceitar.value = false;
-}
-
-function abrirModalSugestoes() {
-  // if (mapa.value?.sugestoes) {
-  //   sugestoes.value = mapa.value.sugestoes
-  // }
-  mostrarModalSugestoes.value = true;
-}
-
-function fecharModalSugestoes() {
-  mostrarModalSugestoes.value = false;
-  sugestoes.value = "";
-}
-
-function fecharModalVerSugestoes() {
-  mostrarModalVerSugestoes.value = false;
-  sugestoesVisualizacao.value = "";
-}
-
-function abrirModalValidar() {
-  mostrarModalValidar.value = true;
-}
-
-function fecharModalValidar() {
-  mostrarModalValidar.value = false;
-}
-
-function abrirModalDevolucao() {
-  mostrarModalDevolucao.value = true;
-}
-
-function fecharModalDevolucao() {
-  mostrarModalDevolucao.value = false;
-  observacaoDevolucao.value = "";
-}
-
-function abrirModalHistorico() {
-  mostrarModalHistorico.value = true;
-}
-
-function fecharModalHistorico() {
-  mostrarModalHistorico.value = false;
-}
-
-function verSugestoes() {
-  sugestoesVisualizacao.value = mapa.value?.sugestoes || "Nenhuma sugestão registrada.";
-  mostrarModalVerSugestoes.value = true;
-}
-
-function verHistorico() {
-  abrirModalHistorico();
-}
-
-async function confirmarSugestoes() {
-  if (!codSubprocesso.value) return;
-  isLoading.value = true;
-  try {
-    await processosStore.apresentarSugestoes(codSubprocesso.value, {
-      sugestoes: sugestoes.value,
-    });
-
-    fecharModalSugestoes();
-
-    feedbackStore.show(
-        "Sugestões apresentadas",
-        "Sugestões submetidas para análise da unidade superior",
-        "success"
-    );
-
-    await router.push({name: "Painel"});
-  } catch {
-    feedbackStore.show(
-        "Erro ao apresentar sugestões",
-        "Ocorreu um erro. Tente novamente.",
-        "danger"
-    );
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-async function confirmarValidacao() {
-  if (!codSubprocesso.value) return;
-  isLoading.value = true;
-  try {
-    await processosStore.validarMapa(codSubprocesso.value);
-
-    fecharModalValidar();
-
-    feedbackStore.show(
-        "Mapa validado",
-        "Mapa validado e submetido para análise da unidade superior",
-        "success"
-    );
-
-    await router.push({name: "Painel"});
-  } catch {
-    feedbackStore.show(
-        "Erro ao validar mapa",
-        "Ocorreu um erro. Tente novamente.",
-        "danger"
-    );
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-async function confirmarAceitacao(observacoes?: string) {
-  if (!codSubprocesso.value) return;
-
-  isLoading.value = true;
-  const perfil = perfilSelecionado.value;
-  const isHomologacao = perfil === "ADMIN";
-  const tipoProcesso = processo.value?.tipo;
-
-  try {
-    if (isHomologacao) {
-      if (tipoProcesso === TipoProcesso.REVISAO) {
-        await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, {
-          observacoes: observacoes || "",
-        });
-      } else {
-        await processosStore.homologarValidacao(codSubprocesso.value);
-      }
-    } else {
-      // GESTOR: aceitar validação para MAPEAMENTO ou REVISAO
-      await processosStore.aceitarValidacao(codSubprocesso.value, {
-        observacoes: observacoes || "",
-      });
-    }
-
-    fecharModalAceitar();
-    // CDU-20 step 9.9: redireciona para Painel
-    await router.push({name: "Painel"});
-  } catch (error) {
-    console.error(error);
-    feedbackStore.show("Erro", "Erro ao realizar a operação.", "danger");
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-async function confirmarDevolucao() {
-  if (!codSubprocesso.value) return;
-
-  isLoading.value = true;
-  try {
-    await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, {
-      observacoes: observacaoDevolucao.value,
-    });
-
-    fecharModalDevolucao();
-    await router.push({name: "Painel"});
-  } catch (error) {
-    console.error(error);
-    feedbackStore.show("Erro", "Erro ao devolver.", "danger");
-  } finally {
-    isLoading.value = false;
-  }
-}
 </script>

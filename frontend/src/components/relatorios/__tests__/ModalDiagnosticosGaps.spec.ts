@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ModalDiagnosticosGaps from '../ModalDiagnosticosGaps.vue';
-import { BModal, BButton } from 'bootstrap-vue-next';
+import { BModal } from 'bootstrap-vue-next';
 import * as csvUtils from '@/utils/csv';
 
 // Mock dependencies
@@ -18,9 +18,9 @@ describe('ModalDiagnosticosGaps.vue', () => {
       unidade: 'Unidade X',
       gaps: 2,
       importanciaMedia: 4.5,
-      dominioMedio: 3.0,
+      dominioMedio: 3,
       competenciasCriticas: ['Comp A', 'Comp B'],
-      data: new Date('2023-10-15'),
+      data: new Date(2023, 9, 15), // 15 de Outubro (mês 0-indexed)
       status: 'Finalizado',
     },
     {
@@ -28,10 +28,10 @@ describe('ModalDiagnosticosGaps.vue', () => {
       processo: 'Processo B',
       unidade: 'Unidade Y',
       gaps: 5,
-      importanciaMedia: 3.0,
-      dominioMedio: 2.0,
+      importanciaMedia: 3,
+      dominioMedio: 2,
       competenciasCriticas: ['Comp C'],
-      data: new Date('2023-11-20'),
+      data: new Date(2023, 10, 20),
       status: 'Em análise',
     },
     {
@@ -42,7 +42,7 @@ describe('ModalDiagnosticosGaps.vue', () => {
       importanciaMedia: 0,
       dominioMedio: 0,
       competenciasCriticas: [],
-      data: new Date('2023-12-01'),
+      data: new Date(2023, 11, 1),
       status: 'Pendente',
     },
      {
@@ -53,7 +53,7 @@ describe('ModalDiagnosticosGaps.vue', () => {
       importanciaMedia: 1,
       dominioMedio: 1,
       competenciasCriticas: [],
-      data: new Date('2023-12-01'),
+      data: new Date(2023, 11, 1),
       status: 'Outro',
     },
   ];
@@ -121,9 +121,9 @@ describe('ModalDiagnosticosGaps.vue', () => {
       const wrapper = mount(ModalDiagnosticosGaps, mountOptions);
 
       const modal = wrapper.findComponent(BModal);
-      await modal.vm.$emit('update:modelValue', false);
+      modal.vm.$emit('update:modelValue', false);
 
       expect(wrapper.emitted('update:modelValue')).toBeTruthy();
-      expect(wrapper.emitted('update:modelValue')![0]).toEqual([false]);
+      expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false]);
   });
 });

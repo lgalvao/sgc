@@ -7,6 +7,7 @@ import {useMapasStore} from "@/stores/mapas";
 import {useAnalisesStore} from "@/stores/analises";
 import * as subprocessoService from "@/services/subprocessoService";
 import {SituacaoSubprocesso, TipoProcesso,} from "@/types/tipos";
+import {useFeedbackStore} from "@/stores/feedback";
 import {createTestingPinia} from "@pinia/testing";
 import {nextTick} from "vue";
 
@@ -16,22 +17,18 @@ const mocks = vi.hoisted(() => ({
     mockRoute: { query: {} as Record<string, string> }
 }));
 
-vi.mock("vue-router", () => ({
-    useRouter: () => ({
-        push: mocks.push,
-        back: vi.fn(),
-    }),
-    useRoute: () => mocks.mockRoute,
-    createRouter: vi.fn(() => ({
-        beforeEach: vi.fn(),
-        afterEach: vi.fn(),
-        push: mocks.push,
-        resolve: vi.fn(),
-        currentRoute: { value: mocks.mockRoute }
-    })),
-    createWebHistory: vi.fn(),
-    createMemoryHistory: vi.fn(),
-}));
+vi.mock("vue-router", async (importOriginal) => {
+    const actual = await importOriginal<typeof import('vue-router')>();
+    return {
+        ...actual,
+        useRouter: () => ({
+            push: mocks.push,
+            back: vi.fn(),
+            currentRoute: { value: mocks.mockRoute }
+        }),
+        useRoute: () => mocks.mockRoute,
+    };
+});
 
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
@@ -92,6 +89,7 @@ describe("CadAtividades.vue", () => {
     let atividadesStore: any;
     let analisesStore: any;
     let mapasStore: any;
+    let feedbackStore: any;
 
     const mockAtividades = [
         {
@@ -105,23 +103,18 @@ describe("CadAtividades.vue", () => {
         // Mock route
         mocks.mockRoute.query = {};
 
-        // Mock Services (kept for safety, though stubActions: true bypasses them mostly)
-        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({ codigo: 123 } as any);
-
         // Setup Pinia with Stubs
         const pinia = createTestingPinia({
             createSpy: vi.fn,
             initialState: {
                 perfil: {
                     perfilSelecionado: "CHEFE",
-                    unidadeSelecionada: 1,
-                    perfisUnidades: [{ perfil: "CHEFE", unidade: { codigo: 1 } }]
                 },
                 processos: {
                     processoDetalhe: {
                         codigo: 1,
                         tipo: isRevisao ? TipoProcesso.REVISAO : TipoProcesso.MAPEAMENTO,
-                        unidades: [{ codUnidade: 1, codSubprocesso: 123 }]
+                        unidades: [{ codUnidade: 1, sigla: "TESTE", codSubprocesso: 123 }]
                     }
                 },
                 mapas: {
@@ -153,13 +146,13 @@ describe("CadAtividades.vue", () => {
         });
 
         // PRE-CONFIGURE STORE SPIES
-        subprocessosStore = useSubprocessosStore(pinia);
+        subprocessosStore = useSubprocessosStore(pinia) as any;
         subprocessosStore.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(123);
         subprocessosStore.buscarContextoEdicao.mockResolvedValue(undefined);
         subprocessosStore.disponibilizarCadastro.mockResolvedValue(true);
         subprocessosStore.disponibilizarRevisaoCadastro.mockResolvedValue(true);
 
-        atividadesStore = useAtividadesStore(pinia);
+        atividadesStore = useAtividadesStore(pinia) as any;
         // Actions
         atividadesStore.adicionarAtividade.mockResolvedValue({});
         atividadesStore.removerAtividade.mockResolvedValue({});
@@ -169,11 +162,13 @@ describe("CadAtividades.vue", () => {
         atividadesStore.adicionarConhecimento.mockResolvedValue({});
         atividadesStore.buscarAtividadesParaSubprocesso.mockResolvedValue({});
 
-        mapasStore = useMapasStore(pinia);
+        mapasStore = useMapasStore(pinia) as any;
         mapasStore.buscarImpactoMapa.mockResolvedValue({});
 
-        analisesStore = useAnalisesStore(pinia);
+        analisesStore = useAnalisesStore(pinia) as any;
         analisesStore.buscarAnalisesCadastro.mockResolvedValue([]);
+
+        feedbackStore = useFeedbackStore(pinia) as any;
 
         const wrapper = mount(CadAtividades, {
             attachTo: document.body, // Important for focus testing
@@ -213,7 +208,7 @@ describe("CadAtividades.vue", () => {
             },
         });
 
-        return { wrapper, subprocessosStore, atividadesStore };
+        return { wrapper, subprocessosStore, atividadesStore, feedbackStore };
     };
 
     beforeEach(() => {
@@ -516,8 +511,7 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve tratar erro ao remover atividade", async () => {
-        const { wrapper, atividadesStore } = createWrapper();
-        const feedbackStore = (wrapper.vm as any).feedbackStore;
+        const { wrapper, atividadesStore, feedbackStore } = createWrapper();
 
         atividadesStore.removerAtividade.mockRejectedValue(new Error("Erro ao remover"));
 

@@ -3,26 +3,6 @@ import { normalizeError, type NormalizedError } from '@/utils/apiError';
 
 /**
  * Composable para tratamento centralizado de erros em stores.
- * 
- * Elimina duplicação de código de error handling em todos os stores,
- * fornecendo uma API consistente para gerenciar erros.
- * 
- * @example
- * ```typescript
- * export const useMyStore = defineStore('myStore', () => {
- *   const { lastError, clearError, withErrorHandling } = useErrorHandler();
- *   
- *   async function buscarDados() {
- *     return withErrorHandling(async () => {
- *       const dados = await apiService.buscar();
- *       // ... processar dados
- *       return dados;
- *     });
- *   }
- *   
- *   return { lastError, clearError, buscarDados };
- * });
- * ```
  */
 export function useErrorHandler() {
   const lastError = ref<NormalizedError | null>(null);

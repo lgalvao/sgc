@@ -6,6 +6,10 @@ import "vitest-axe/extend-expect";
 
 expect.extend(matchers);
 
+// Mock HTMLCanvasElement.prototype.getContext
+HTMLCanvasElement.prototype.getContext = vi.fn();
+
+
 vi.mock("@/utils/logger", () => ({
     default: {
         error: vi.fn(),

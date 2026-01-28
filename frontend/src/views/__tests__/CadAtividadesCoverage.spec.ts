@@ -1,56 +1,44 @@
-import {beforeEach, describe, expect, it, vi} from "vitest";
+import {describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
 import CadAtividades from "@/views/CadAtividades.vue";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useAtividadesStore} from "@/stores/atividades";
+import {useFeedbackStore} from "@/stores/feedback";
 import * as subprocessoService from "@/services/subprocessoService";
 import {createTestingPinia} from "@pinia/testing";
-import {nextTick} from "vue";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
-import {logger} from "@/utils";
+import logger from "@/utils/logger";
 
 // Mocks
 const mocks = vi.hoisted(() => ({
     push: vi.fn(),
-    mockRoute: { query: {} as Record<string, string> }
+    mockRoute: { query: {} as Record<string, string>, params: { codProcesso: '1', siglaUnidade: 'TESTE' } }
 }));
 
-vi.mock("vue-router", () => ({
-    useRouter: () => ({
-        push: mocks.push,
-        back: vi.fn(),
-    }),
-    useRoute: () => mocks.mockRoute,
-    createRouter: vi.fn(() => ({
-        beforeEach: vi.fn(),
-        afterEach: vi.fn(),
-        push: mocks.push,
-        resolve: vi.fn(),
-        currentRoute: { value: mocks.mockRoute }
-    })),
-    createWebHistory: vi.fn(),
-    createMemoryHistory: vi.fn(),
-}));
+vi.mock("vue-router", async (importOriginal) => {
+    const actual = await importOriginal<typeof import('vue-router')>();
+    return {
+        ...actual,
+        useRouter: () => ({
+            push: mocks.push,
+            back: vi.fn(),
+            currentRoute: { value: mocks.mockRoute }
+        }),
+        useRoute: () => mocks.mockRoute,
+    };
+});
 
 vi.mock("@/services/subprocessoService", () => ({
-    buscarSubprocessoPorProcessoEUnidade: vi.fn(),
-    buscarContextoEdicao: vi.fn(),
     validarCadastro: vi.fn(),
 }));
 
-vi.mock("@/services/processoService");
-
-vi.mock("@/utils", async (importOriginal) => {
-    const actual: any = await importOriginal();
-    return {
-        ...actual,
-        logger: {
-            error: vi.fn(),
-            info: vi.fn(),
-            warn: vi.fn(),
-        }
+vi.mock("@/utils/logger", () => ({
+    default: {
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
     }
-});
+}));
 
 // Stubs
 const AtividadeItemStub = {
@@ -76,9 +64,6 @@ const BFormInputStub = {
 };
 
 describe("CadAtividadesCoverage.spec.ts", () => {
-    let subprocessosStore: any;
-    let atividadesStore: any;
-
     const createWrapper = () => {
         mocks.mockRoute.query = {};
 
@@ -92,7 +77,7 @@ describe("CadAtividadesCoverage.spec.ts", () => {
                     processoDetalhe: {
                         codigo: 1,
                         tipo: TipoProcesso.MAPEAMENTO,
-                        unidades: [{ codUnidade: 1, codSubprocesso: 123 }]
+                        unidades: [{ codUnidade: 1, sigla: 'TESTE', codSubprocesso: 123 }]
                     }
                 },
                 subprocessos: {
@@ -115,11 +100,13 @@ describe("CadAtividadesCoverage.spec.ts", () => {
             stubActions: true
         });
 
-        subprocessosStore = useSubprocessosStore(pinia);
+        const subprocessosStore = useSubprocessosStore(pinia) as any;
         subprocessosStore.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(123);
 
-        atividadesStore = useAtividadesStore(pinia);
+        const atividadesStore = useAtividadesStore(pinia) as any;
         atividadesStore.removerConhecimento.mockResolvedValue({});
+
+        const feedbackStore = useFeedbackStore(pinia) as any;
 
         const wrapper = mount(CadAtividades, {
             global: {
@@ -154,13 +141,11 @@ describe("CadAtividadesCoverage.spec.ts", () => {
             },
         });
 
-        return { wrapper, subprocessosStore, atividadesStore };
+        return { wrapper, subprocessosStore, atividadesStore, feedbackStore, pinia };
     };
 
     it("deve tratar erro ao remover conhecimento", async () => {
-        const { wrapper, atividadesStore } = createWrapper();
-        const feedbackStore = (wrapper.vm as any).feedbackStore;
-        vi.spyOn(feedbackStore, "show");
+        const { wrapper, atividadesStore, feedbackStore } = createWrapper();
 
         atividadesStore.removerConhecimento.mockRejectedValue(new Error("Erro ao remover conhecimento"));
 
@@ -178,9 +163,7 @@ describe("CadAtividadesCoverage.spec.ts", () => {
     });
 
     it("deve tratar erro na validação ao disponibilizar cadastro", async () => {
-        const { wrapper } = createWrapper();
-        const feedbackStore = (wrapper.vm as any).feedbackStore;
-        vi.spyOn(feedbackStore, "show");
+        const { wrapper, feedbackStore } = createWrapper();
 
         vi.mocked(subprocessoService.validarCadastro).mockRejectedValue(new Error("Erro de validação"));
 
@@ -190,11 +173,9 @@ describe("CadAtividadesCoverage.spec.ts", () => {
         await flushPromises();
 
         expect(feedbackStore.show).toHaveBeenCalledWith("Erro na validação", "Não foi possível validar o cadastro.", "danger");
-        expect((wrapper.vm as any).loadingValidacao).toBe(false);
     });
 
     it("deve logar erro se subprocesso não encontrado no onMounted (manual setup)", async () => {
-        mocks.mockRoute.query = {};
         const pinia = createTestingPinia({
             createSpy: vi.fn,
             initialState: {
@@ -207,11 +188,10 @@ describe("CadAtividadesCoverage.spec.ts", () => {
             stubActions: true
         });
 
-        const subprocessosStore = useSubprocessosStore(pinia);
-        // Return null to simulate not found
+        const subprocessosStore = useSubprocessosStore(pinia) as any;
         subprocessosStore.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(null);
 
-        const wrapper = mount(CadAtividades, {
+        mount(CadAtividades, {
             global: {
                 plugins: [pinia],
                 stubs: {

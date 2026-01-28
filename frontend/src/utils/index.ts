@@ -1,13 +1,7 @@
-/**
- * Utilitários centralizados do projeto SGC (Português BR)
- */
-
 import {CLASSES_BADGE_SITUACAO, LABELS_SITUACAO} from "@/constants/situacoes";
-import logger from "@/utils/logger";
-// import type {TipoNotificacao} from "@/stores/notificacoes"; // Removed
 
 // ===== LOGGER =====
-export {logger};
+export {default as logger} from "@/utils/logger";
 
 // ===== TREE UTILS =====
 export {flattenTree} from "./treeUtils";
@@ -81,161 +75,104 @@ export const iconeTipo = (tipo: LocalTipoNotificacao): string => {
     }
 };
 
-// ===== UTILITÁRIOS DE DATA =====
-export function parseDate(
-    dateInput: string | number | Date | null | undefined,
-): Date | null {
-    if (dateInput === null || dateInput === undefined || dateInput === "")
-        return null;
+import {
+    format,
+    parseISO,
+    isValid,
+    isFuture,
+    startOfDay,
+    differenceInDays,
+    parse,
+} from "date-fns";
+import { ptBR } from "date-fns/locale";
 
-    // Se já for Date
-    if (dateInput instanceof Date) {
-        return isNaN(dateInput.getTime()) ? null : dateInput;
+// ===== UTILITÁRIOS DE DATA =====
+export type DateInput = string | number | Date | null | undefined;
+
+function parseStringDate(s: string): Date | null {
+    const trimmed = s.trim();
+    if (!trimmed) return null;
+
+    // ISO Date/DateTime
+    const isoDate = parseISO(trimmed);
+    if (isValid(isoDate)) return isoDate;
+
+    // DD/MM/YYYY
+    try {
+        const ddmmyyyy = parse(trimmed, "dd/MM/yyyy", new Date());
+        if (isValid(ddmmyyyy)) return ddmmyyyy;
+    } catch {
+        // ignore
     }
 
-    // Se for número (timestamp)
+    // Numeric string
+    if (/^\d{10,}$/.test(trimmed)) {
+        const d = new Date(Number(trimmed));
+        if (isValid(d)) return d;
+    }
+
+    return null;
+}
+
+export function parseDate(dateInput: DateInput): Date | null {
+    if (dateInput === null || dateInput === undefined || dateInput === "") {
+        return null;
+    }
+
+    if (dateInput instanceof Date) {
+        return isValid(dateInput) ? dateInput : null;
+    }
+
     if (typeof dateInput === "number") {
         const d = new Date(dateInput);
-        return isNaN(d.getTime()) ? null : d;
+        return isValid(d) ? d : null;
     }
 
-    // Se for string
     if (typeof dateInput === "string") {
-        const s = dateInput.trim();
-        if (!s) return null;
-
-        // Detecta ISO com tempo (ex.: 2023-10-01T00:00:00Z) ou somente data (YYYY-MM-DD)
-        // Para strings somente-data (YYYY-MM-DD) devemos construir a Date em horário local
-        // para evitar deslocamento de fuso horário que causa `getMonth()` diferente do esperado.
-        const isoDateWithOptionalTimeRe = /^\d{4}-\d{2}-\d{2}(T.*)?$/;
-        if (isoDateWithOptionalTimeRe.test(s)) {
-            // Se for somente data (sem 'T'), construir em horário local
-            if (!s.includes("T")) {
-                const parts = s.split("-");
-                const year = Number(parts[0]);
-                const month = Number(parts[1]);
-                const day = Number(parts[2]);
-                const d = new Date(year, month - 1, day);
-                if (!isNaN(d.getTime())) return d;
-            } else {
-                const d = new Date(s);
-                if (!isNaN(d.getTime())) return d;
-            }
-        }
-
-        // Detecta timestamp numérico em string
-        const numericRe = /^\d{10,}$/;
-        if (numericRe.test(s)) {
-            const n = Number(s);
-            const d = new Date(n);
-            if (!isNaN(d.getTime())) return d;
-        }
-
-        // Detecta DD/MM/YYYY
-        const ddmmyyyy = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-        const m = ddmmyyyy.exec(s);
-        if (m) {
-            const day = parseInt(m[1], 10);
-            const month = parseInt(m[2], 10);
-            const year = parseInt(m[3], 10);
-            if (year >= 1000 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-                const d = new Date(year, month - 1, day);
-                // Verifica componentes para evitar 31/02 etc.
-                if (
-                    !isNaN(d.getTime()) &&
-                    d.getUTCFullYear() === year &&
-                    d.getUTCMonth() === month - 1 &&
-                    d.getUTCDate() === day
-                ) {
-                    return d;
-                }
-            }
-        }
-
-        // Falha ao parsear
-        return null;
+        return parseStringDate(dateInput);
     }
 
     return null;
 }
 
 export function formatDateBR(
-    date: Date | string | number | null | undefined,
-    options: Intl.DateTimeFormatOptions = {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-    },
+    date: DateInput,
+    pattern = "dd/MM/yyyy",
 ): string {
     if (!date) return "Não informado";
-    const dateObj =
-        typeof date === "string" || typeof date === "number"
-            ? parseDate(date as any)
-            : date;
-    if (!dateObj || isNaN(dateObj.getTime())) return "Data inválida";
+    const dateObj = parseDate(date);
+    if (!dateObj) return "Data inválida";
     try {
-        return dateObj.toLocaleDateString("pt-BR", options);
+        return format(dateObj, pattern, { locale: ptBR });
     } catch {
         return "Data inválida";
     }
 }
 
 export function formatDateForInput(date: Date | null | undefined): string {
-    if (!date || isNaN(date.getTime())) return "";
-    try {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
-    } catch {
-        return "";
-    }
+    if (!date || !isValid(date)) return "";
+    return format(date, "yyyy-MM-dd");
 }
 
 export function formatDateTimeBR(
-    date: Date | string | number | null | undefined,
+    date: DateInput,
 ): string {
-    if (!date) return "Não informado";
-    const dateObj =
-        typeof date === "string" || typeof date === "number"
-            ? parseDate(date as any)
-            : date;
-    if (!dateObj || isNaN(dateObj.getTime())) return "Data inválida";
-    return formatDateBR(dateObj, {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
+    return formatDateBR(date, "dd/MM/yyyy HH:mm");
 }
 
-export function isDateValidAndFuture(date: Date | null | undefined): boolean {
-    if (!date) return false;
-    try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const d =
-            typeof date === "string" || typeof date === "number"
-                ? parseDate(date as any)
-                : date;
-        if (!d) return false;
-        d.setHours(0, 0, 0, 0);
-        return d >= today;
-    } catch {
-        return false;
-    }
+export function isDateValidAndFuture(date: DateInput): boolean {
+    const d = parseDate(date);
+    if (!d) return false;
+    const today = startOfDay(new Date());
+    const dateToCompare = startOfDay(d);
+    return isFuture(dateToCompare) || dateToCompare.getTime() === today.getTime();
 }
 
 export function diffInDays(date1: Date, date2: Date): number {
-    const diffTime = Math.abs(date2.getTime() - date1.getTime());
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.abs(differenceInDays(date2, date1));
 }
 
 export function ensureValidDate(date: Date | null | undefined): Date | null {
     if (!date) return null;
-    if (date instanceof Date && !isNaN(date.getTime())) {
-        return date;
-    }
-    return null;
+    return isValid(date) ? date : null;
 }

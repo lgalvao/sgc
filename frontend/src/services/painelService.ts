@@ -1,5 +1,3 @@
-import {mapAlertaDtoToFrontend} from "@/mappers/alertas";
-import {mapProcessoResumoDtoToFrontend} from "@/mappers/processos";
 import type {Alerta, ProcessoResumo} from "@/types/tipos";
 import apiClient from "../axios-setup";
 
@@ -33,13 +31,10 @@ export async function listarProcessos(
     if (sort) {
         params.sort = `${sort},${order}`;
     }
-    const response = await apiClient.get<Page<any>>("/painel/processos", {
+    const response = await apiClient.get<Page<ProcessoResumo>>("/painel/processos", {
         params,
     });
-    return {
-        ...response.data,
-        content: response.data.content.map(mapProcessoResumoDtoToFrontend),
-    };
+    return response.data;
 }
 
 export async function listarAlertas(
@@ -63,11 +58,8 @@ export async function listarAlertas(
     if (sort) {
         params.sort = `${sort},${order}`;
     }
-    const response = await apiClient.get<Page<any>>("/painel/alertas", {
+    const response = await apiClient.get<Page<Alerta>>("/painel/alertas", {
         params,
     });
-    return {
-        ...response.data,
-        content: response.data.content.map(mapAlertaDtoToFrontend),
-    };
+    return response.data;
 }

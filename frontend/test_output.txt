@@ -1,0 +1,1494 @@
+
+> sgc@1.0.0 test:unit
+> vitest --run --reporter=dot --no-color --reporter=verbose
+
+
+ RUN  v4.0.18 /Users/leonardo/sgc/frontend
+
+
+ RUN  v4.0.18 /Users/leonardo/sgc/frontend
+
+· ✓ src/router/__tests__/unidade.routes.spec.ts > unidade.routes > deve exportar um array de rotas 1ms
+x × src/services/__tests__/painelService.spec.ts > painelService > listarProcessos > deve buscar e mapear processos 7ms
+   → expected "vi.fn()" to be called at least once
+· ✓ src/services/__tests__/painelService.spec.ts > painelService > listarProcessos > deve lidar com paginação diferente 0ms
+· ✓ src/services/__tests__/painelService.spec.ts > painelService > listarProcessos > deve lidar com ordenação 0ms
+· ✓ src/services/__tests__/painelService.spec.ts > painelService > listarProcessos > deve lidar com erro 404 1ms
+· ✓ src/services/__tests__/painelService.spec.ts > painelService > listarProcessos > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/painelService.spec.ts > painelService > listarProcessos > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/painelService.spec.ts > painelService > listarAlertas > deve buscar e mapear alertas 0ms
+· ✓ src/services/__tests__/painelService.spec.ts > painelService > listarAlertas > deve lidar com ordenação 0ms
+· ✓ src/services/__tests__/painelService.spec.ts > painelService > listarAlertas > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/painelService.spec.ts > painelService > listarAlertas > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/painelService.spec.ts > painelService > listarAlertas > deve lidar com erro de rede 0ms
+· ✓ src/test-utils/__tests__/helpers.spec.ts > test-utils/helpers > getMockAtividadesData deve retornar um array não vazio 1ms
+· ✓ src/test-utils/__tests__/helpers.spec.ts > test-utils/helpers > initPinia deve inicializar e retornar uma instância do pinia 2ms
+· ✓ src/router/__tests__/main.routes.spec.ts > main.routes > deve exportar um array de rotas 2ms
+· ✓ src/router/__tests__/main.routes.spec.ts > main.routes > deve redirecionar da raiz para /login 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > situacaoLabel > deve retornar o label correto para situações mapeadas do backend 1ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > situacaoLabel > deve retornar o label correto para situações legadas 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > situacaoLabel > deve retornar o próprio valor se não houver mapeamento 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > situacaoLabel > deve retornar "Não disponibilizado" para valores nulos ou indefinidos 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > badgeClass > deve retornar a classe de badge correta para situações conhecidas 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > badgeClass > deve retornar a classe padrão para situações desconhecidas 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > iconeTipo > deve retornar os ícones corretos para tipos de notificação 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > iconeTipo > deve retornar o ícone padrão para tipos desconhecidos 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > parseDate > deve retornar null para entrada nula ou indefinida 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > parseDate > deve analisar strings de data ISO 1ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > parseDate > deve analisar o formato de data brasileiro DD/MM/YYYY 1ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > parseDate > deve retornar null para strings de data inválidas 3ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > formatDateBR > deve retornar "Não informado" para nulo ou indefinido 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > formatDateBR > deve formatar o objeto Date para o formato brasileiro 1ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > formatDateBR > deve retornar "Data inválida" para datas inválidas 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > formatDateForInput > deve retornar string vazia para nulo ou indefinido 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > formatDateForInput > deve formatar a data para o formato YYYY-MM-DD 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > formatDateForInput > deve preencher meses e dias de um único dígito 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > formatDateTimeBR > deve formatar data e hora no formato brasileiro 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > formatDateTimeBR > deve lidar com nulo e indefinido 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > isDateValidAndFuture > deve retornar false para nulo ou indefinido 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > isDateValidAndFuture > deve retornar true para hoje 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > isDateValidAndFuture > deve retornar true para datas futuras 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > isDateValidAndFuture > deve retornar false para datas passadas 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > diffInDays > deve calcular a diferença positiva entre as datas 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > diffInDays > deve calcular a diferença independentemente da ordem 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > diffInDays > deve retornar 0 para a mesma data 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > ensureValidDate > deve retornar null para nulo ou indefinido 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > ensureValidDate > deve retornar um objeto Date válido para uma data válida 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > ensureValidDate > deve retornar null para objeto Date inválido 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > ensureValidDate > deve retornar null para Date com tempo NaN 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > ensureValidDate > deve lidar com objetos Date com tempo válido, mas componentes inválidos 0ms
+· ✓ src/utils/__tests__/index.spec.ts > utilitários > tratamento de erro em formatDateBR > deve retornar "Data inválida" para strings de data inválidas 0ms
+x × src/utils/__tests__/index.spec.ts > utilitários > tratamento de erro em formatDateBR > deve retornar "Data inválida" quando toLocaleDateString lança erro 6ms
+   → expected '28/01/2026' to be 'Data inválida' // Object.is equality
+· ✓ src/utils/__tests__/index.spec.ts > tratamento de erro em formatDateForInput > deve retornar string vazia quando as operações de data geram um erro 0ms
+x × src/utils/__tests__/index.spec.ts > tratamento de erro em formatDateForInput > deve retornar string vazia quando getFullYear lança erro 1ms
+   → expected '2026-01-28' to be '' // Object.is equality
+· ✓ src/utils/__tests__/index.spec.ts > tratamento de erro em isDateValidAndFuture > deve retornar false quando as operações de data geram um erro 0ms
+x × src/utils/__tests__/index.spec.ts > tratamento de erro em isDateValidAndFuture > deve retornar false quando setHours lança erro 0ms
+   → expected true to be false // Object.is equality
+· ✓ src/router/__tests__/router.spec.ts > Router Guards > redirects to login if not authenticated and trying to access private route 3908ms
+· ✓ src/router/__tests__/router.spec.ts > Router Guards > allows access to login if not authenticated 3ms
+· ✓ src/router/__tests__/main.routes.spec.ts > main.routes > deve conter a rota Login 4076ms
+· ✓ src/components/relatorios/__tests__/ModalDiagnosticosGaps.spec.ts > ModalDiagnosticosGaps.vue > renders correctly 36ms
+· ✓ src/components/relatorios/__tests__/ModalDiagnosticosGaps.spec.ts > ModalDiagnosticosGaps.vue > applies correct status classes 19ms
+x × src/components/relatorios/__tests__/ModalDiagnosticosGaps.spec.ts > ModalDiagnosticosGaps.vue > formats date correctly 6ms
+   → expected 'ProcessoUnidadeGaps IdentificadosImpo…' to contain '15/10/2023'
+· ✓ src/components/relatorios/__tests__/ModalDiagnosticosGaps.spec.ts > ModalDiagnosticosGaps.vue > exports to CSV when button is clicked 5ms
+· ✓ src/components/relatorios/__tests__/ModalDiagnosticosGaps.spec.ts > ModalDiagnosticosGaps.vue > emits update:modelValue when modal is closed 3ms
+· ✓ src/router/__tests__/main.routes.spec.ts > main.routes > deve conter a rota Painel 46ms
+· ✓ src/router/__tests__/main.routes.spec.ts > main.routes > deve conter a rota Historico 17ms
+· ✓ src/router/__tests__/router.spec.ts > Router Guards > allows access to private route if authenticated 165ms
+· ✓ src/router/__tests__/router.spec.ts > Router Guards > updates document title 73ms
+· ✓ src/router/__tests__/router.spec.ts > Route Props Logic > Processo routes props transformation 1ms
+· ✓ src/router/__tests__/router.spec.ts > Route Props Logic > Unidade routes props transformation 0ms
+· ✓ src/router/__tests__/unidade.routes.spec.ts > unidade.routes > deve conter a rota Unidade e mapear props/meta corretamente 4392ms
+· ✓ src/router/__tests__/main.routes.spec.ts > main.routes > deve conter a rota Relatorios 93ms
+· ✓ src/router/__tests__/main.routes.spec.ts > main.routes > deve conter a rota Configuracoes 89ms
+· ✓ src/router/__tests__/processo.routes.spec.ts > processo.routes.ts > deve definir as rotas corretamente 1ms
+· ✓ src/router/__tests__/processo.routes.spec.ts > processo.routes.ts > deve tratar corretamente as props da rota para Subprocesso 0ms
+· ✓ src/router/__tests__/processo.routes.spec.ts > processo.routes.ts > deve tratar corretamente as props da rota para SubprocessoMapa 0ms
+· ✓ src/router/__tests__/processo.routes.spec.ts > processo.routes.ts > deve tratar corretamente as props da rota para SubprocessoVisMapa 0ms
+· ✓ src/router/__tests__/processo.routes.spec.ts > processo.routes.ts > deve tratar corretamente as props da rota para SubprocessoCadastro 0ms
+· ✓ src/router/__tests__/processo.routes.spec.ts > processo.routes.ts > deve tratar corretamente as props da rota para SubprocessoVisCadastro 0ms
+· ✓ src/router/__tests__/processo.routes.spec.ts > processo.routes.ts > deve carregar componentes sob demanda (lazy load) 4490ms
+· ✓ src/router/__tests__/unidade.routes.spec.ts > unidade.routes > deve conter a rota Mapa e mapear props corretamente (query params) 120ms
+· ✓ src/router/__tests__/unidade.routes.spec.ts > unidade.routes > deve conter a rota AtribuicaoTemporariaForm e mapear props corretamente 21ms
+· ✓ src/test-utils/__tests__/helpers.spec.ts > test-utils/helpers > prepareFreshAtividadesStore deve retornar uma store com dados 3879ms
+· ✓ src/test-utils/__tests__/helpers.spec.ts > test-utils/uiHelpers > selecionarProcessoEUnidade deve definir valores de seleção 30ms
+· ✓ src/test-utils/__tests__/helpers.spec.ts > test-utils/uiHelpers > expectImportButtonDisabled deve verificar atributo disabled 3ms
+· ✓ src/test-utils/__tests__/helpers.spec.ts > test-utils/uiHelpers > expectImportButtonEnabled deve verificar ausência de atributo disabled 3ms
+· ✓ src/test-utils/__tests__/helpers.spec.ts > test-utils/uiHelpers > selectFirstCheckbox deve marcar o primeiro checkbox 3ms
+· ✓ src/test-utils/__tests__/helpers.spec.ts > test-utils/uiHelpers > assertUnidadeOptions deve verificar opções de seleção 6ms
+· ✓ src/test-utils/__tests__/helpers.spec.ts > test-utils/uiHelpers > navigateAndAssertBreadcrumbs deve funcionar corretamente 6ms
+· ✓ src/test-utils/__tests__/helpers.spec.ts > test-utils/uiHelpers > expectContainsAll deve verificar se o array contém todos os itens 0ms
+· ✓ src/__tests__/components/BarraNavegacao.spec.ts > BarraNavegacao.vue > deve renderizar botão voltar e breadcrumbs quando não for login ou painel 340ms
+· ✓ src/__tests__/components/BarraNavegacao.spec.ts > BarraNavegacao.vue > não deve renderizar botão voltar e breadcrumbs na rota /login 12ms
+· ✓ src/__tests__/components/BarraNavegacao.spec.ts > BarraNavegacao.vue > não deve renderizar botão voltar e breadcrumbs na rota /painel 19ms
+· ✓ src/__tests__/components/BarraNavegacao.spec.ts > BarraNavegacao.vue > deve chamar router.back() ao clicar no botão voltar 35ms
+· ✓ src/__tests__/components/BarraNavegacao.spec.ts > BarraNavegacao.vue > Breadcrumbs Logic > deve sempre mostrar Home/Painel como primeiro item 63ms
+· ✓ src/__tests__/components/BarraNavegacao.spec.ts > BarraNavegacao.vue > Breadcrumbs Logic > deve mostrar "Detalhes do processo" se for rota de processo e perfil permitir 71ms
+· ✓ src/__tests__/components/BarraNavegacao.spec.ts > BarraNavegacao.vue > Breadcrumbs Logic > NÃO deve mostrar "Detalhes do processo" se perfil for CHEFE ou SERVIDOR 74ms
+· ✓ src/__tests__/components/BarraNavegacao.spec.ts > BarraNavegacao.vue > Breadcrumbs Logic > deve mostrar breadcrumbs hierárquicos para SubprocessoMapa 19ms
+· ✓ src/__tests__/components/BarraNavegacao.spec.ts > BarraNavegacao.vue > Breadcrumbs Logic > deve mostrar breadcrumbs para rotas de Unidade 16ms
+· ✓ src/__tests__/components/BarraNavegacao.spec.ts > BarraNavegacao.vue > Breadcrumbs Logic > deve usar ID da unidade se sigla não estiver na store 21ms
+· ✓ src/__tests__/components/BarraNavegacao.spec.ts > BarraNavegacao.vue > Breadcrumbs Logic > deve usar meta.breadcrumb para rotas genéricas 31ms
+· ✓ src/__tests__/components/BarraNavegacao.spec.ts > BarraNavegacao.vue > Breadcrumbs Logic > deve resolver meta.breadcrumb function 25ms
+· ✓ src/__tests__/components/BarraNavegacao.spec.ts > BarraNavegacao.vue > Breadcrumbs Logic > deve adicionar breadcrumb final para SubprocessoVisMapa 19ms
+· ✓ src/__tests__/components/BarraNavegacao.spec.ts > BarraNavegacao.vue > Breadcrumbs Logic > deve adicionar breadcrumb final para SubprocessoCadastro 107ms
+· ✓ src/__tests__/components/BarraNavegacao.spec.ts > BarraNavegacao.vue > Breadcrumbs Logic > deve adicionar breadcrumb final para Mapa (Rota de Unidade) 36ms
+· ✓ src/views/__tests__/ConfiguracoesView.spec.ts > ConfiguracoesView > deve carregar configurações ao montar 44ms
+· ✓ src/views/__tests__/ConfiguracoesView.spec.ts > ConfiguracoesView > deve exibir spinner quando carregando 22ms
+· ✓ src/views/__tests__/ConfiguracoesView.spec.ts > ConfiguracoesView > deve exibir erro quando houver falha 26ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > renders correctly with data from store 45ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > resolves nested unit from store 10ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > shows buttons for CHEFE when MAPEAMENTO_CONCLUIDO 12ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > shows buttons for GESTOR when MAPA_VALIDADO 12ms
+· ✓ src/views/__tests__/ConfiguracoesView.spec.ts > ConfiguracoesView > deve chamar carregarConfiguracoes ao clicar em Recarregar 20ms
+· ✓ src/views/__tests__/ConfiguracoesView.spec.ts > ConfiguracoesView > deve chamar salvarConfiguracoes ao submeter formulário 28ms
+· ✓ src/views/__tests__/ConfiguracoesView.spec.ts > ConfiguracoesView > deve exibir erro se falhar ao salvar 20ms
+· ✓ src/views/__tests__/ConfiguracoesView.spec.ts > ConfiguracoesView > Seção de Administradores > não deve exibir seção se não for admin 36ms
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve carregar e exibir os detalhes do processo ao montar 67ms
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve exibir alerta de erro da store 13ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > opens validar modal and confirms 42ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > opens sugestoes modal and confirms 29ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > opens devolucao modal and confirms (GESTOR) 17ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > opens aceitar modal and confirms (GESTOR) 7ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > confirms homologacao (ADMIN) 15ms
+· ✓ src/components/__tests__/BarraNavegacao.spec.ts > BarraNavegacao.vue > Visibilidade dos Elementos > não deve exibir o botão de voltar e os breadcrumbs na página de login 23ms
+· ✓ src/components/__tests__/BarraNavegacao.spec.ts > BarraNavegacao.vue > Visibilidade dos Elementos > não deve exibir o botão de voltar e os breadcrumbs na página do painel 2ms
+· ✓ src/views/__tests__/ConfiguracoesView.spec.ts > ConfiguracoesView > Seção de Administradores > deve listar administradores 47ms
+· ✓ src/views/__tests__/ConfiguracoesView.spec.ts > ConfiguracoesView > Seção de Administradores > deve abrir modal ao clicar em Adicionar 42ms
+stderr | src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > handles error in confirmarAceitacao
+Error: Fail
+    at [90m/Users/leonardo/sgc/frontend/[39msrc/views/__tests__/VisMapa.spec.ts:497:50
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+stderr | src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > handles error in confirmarAceitacao
+Error: Fail
+    at [90m/Users/leonardo/sgc/frontend/[39msrc/views/__tests__/VisMapa.spec.ts:497:50
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve exibir botões de ação em bloco se houver unidades elegíveis 26ms
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve abrir modal de ação em bloco ao clicar no botão 8ms
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve executar ação em bloco com sucesso (Aceitar Cadastro) 20ms
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve executar ação em bloco com sucesso (Aceitar Validação) 6ms
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve executar ação em bloco com sucesso (Homologar Cadastro) 7ms
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve executar ação em bloco com sucesso (Homologar Validação) 7ms
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve executar ação em bloco com sucesso (Disponibilizar) 5ms
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve lidar com erro na execução da ação em bloco 14ms
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve mostrar erro se unidade não for encontrada para ação em bloco 4ms
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve redirecionar para detalhes da unidade ao clicar na tabela (Gestor) 5ms
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > não deve redirecionar para detalhes da unidade se não tiver permissão (Servidor de outra unidade) 4ms
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve abrir modal de finalização de processo 6ms
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve confirmar finalização de processo 7ms
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve tratar erro na finalização do processo 8ms
+stderr | src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > handles error in confirmarDevolucao
+Error: Fail
+    at [90m/Users/leonardo/sgc/frontend/[39msrc/views/__tests__/VisMapa.spec.ts:529:57
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+stderr | src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > handles error in confirmarDevolucao
+Error: Fail
+    at [90m/Users/leonardo/sgc/frontend/[39msrc/views/__tests__/VisMapa.spec.ts:529:57
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///Users/leonardo/sgc/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+· ✓ src/components/__tests__/MainNavbar.spec.ts > MainNavbar.vue > deve navegar para a rota correta ao clicar nos links do menu 212ms
+· ✓ src/components/__tests__/MainNavbar.spec.ts > MainNavbar.vue > deve exibir o perfil e a unidade do usuário 35ms
+· ✓ src/components/__tests__/MainNavbar.spec.ts > MainNavbar.vue > deve exibir e navegar pelo ícone de configurações para o perfil ADMIN 32ms
+· ✓ src/components/__tests__/BarraNavegacao.spec.ts > BarraNavegacao.vue > Visibilidade dos Elementos > deve exibir o botão de voltar e os breadcrumbs em outras páginas 158ms
+· ✓ src/components/__tests__/BarraNavegacao.spec.ts > BarraNavegacao.vue > Renderização dos Breadcrumbs > deve renderizar breadcrumbs para rota de Processo 42ms
+· ✓ src/components/__tests__/BarraNavegacao.spec.ts > BarraNavegacao.vue > Renderização dos Breadcrumbs > deve renderizar breadcrumbs para rota de Subprocesso 34ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > shows historico de analise 37ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > view suggestions (GESTOR) 17ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > does not show content if unit not found 11ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > shows empty state if no map 14ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > confirms homologacao (ADMIN) for Mapeamento 11ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > handles error in confirmarAceitacao 25ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > handles error in confirmarDevolucao 8ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > handles error in confirmarValidacao 9ms
+· ✓ src/views/__tests__/VisMapa.spec.ts > VisMapa.vue > handles error in confirmarSugestoes 13ms
+· ✓ src/views/__tests__/ConfiguracoesView.spec.ts > ConfiguracoesView > Seção de Administradores > deve chamar adicionarAdministrador ao confirmar no modal 43ms
+· ✓ src/views/__tests__/ConfiguracoesView.spec.ts > ConfiguracoesView > Seção de Administradores > deve chamar removerAdministrador ao confirmar exclusão 42ms
+· ✓ src/views/__tests__/ConfiguracoesView.spec.ts > ConfiguracoesView > Seção de Administradores > deve exibir erro ao falhar listagem de administradores 33ms
+· ✓ src/components/__tests__/BarraNavegacao.spec.ts > BarraNavegacao.vue > Renderização dos Breadcrumbs > deve renderizar breadcrumbs para rotas de unidade 42ms
+· ✓ src/components/__tests__/BarraNavegacao.spec.ts > BarraNavegacao.vue > Lógica de Perfil > deve omitir o breadcrumb 'Detalhes do processo' para o perfil CHEFE 52ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+· ✓ src/views/__tests__/ProcessoView.spec.ts > ProcessoView.vue > deve ser acessível 169ms
+· ✓ src/views/__tests__/ConfiguracoesView.spec.ts > ConfiguracoesView > Seção de Administradores > deve exibir alerta se tentar adicionar administrador com título vazio 31ms
+· ✓ src/views/__tests__/ConfiguracoesView.spec.ts > ConfiguracoesView > Seção de Administradores > deve exibir erro ao falhar adição de administrador 42ms
+· ✓ src/views/__tests__/ConfiguracoesView.spec.ts > ConfiguracoesView > Seção de Administradores > deve exibir erro ao falhar remoção de administrador 38ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+· ✓ src/components/__tests__/BarraNavegacao.spec.ts > BarraNavegacao.vue > Lógica de Perfil > deve omitir o breadcrumb 'Detalhes do processo' para o perfil SERVIDOR 28ms
+· ✓ src/components/__tests__/BarraNavegacao.spec.ts > BarraNavegacao.vue > Lógica de Perfil > deve mostrar sigla da unidade para CHEFE em Subprocesso 21ms
+· ✓ src/components/__tests__/BarraNavegacao.spec.ts > BarraNavegacao.vue > Funcionalidade > deve chamar router.back() ao clicar no botão de voltar 30ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+· ✓ src/components/__tests__/MainNavbar.spec.ts > MainNavbar.vue > NÃO deve exibir o ícone de configurações para perfis diferentes de ADMIN 41ms
+· ✓ src/components/__tests__/MainNavbar.spec.ts > MainNavbar.vue > deve chamar router.push ao fazer logout 40ms
+· ✓ src/components/__tests__/MainNavbar.spec.ts > MainNavbar.vue > deve ser acessível 220ms
+· ✓ src/components/__tests__/BarraNavegacao.spec.ts > BarraNavegacao.vue > Funcionalidade > deve ser acessível 147ms
+· ✓ src/views/__tests__/RelatoriosView.spec.ts > RelatoriosView.vue > exibe cards de relatórios 47ms
+· ✓ src/views/__tests__/RelatoriosView.spec.ts > RelatoriosView.vue > filtra processos 31ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+· ✓ src/views/__tests__/RelatoriosView.spec.ts > RelatoriosView.vue > abre modais ao clicar nos cards 25ms
+· ✓ src/views/__tests__/RelatoriosView.spec.ts > RelatoriosView.vue > exporta CSV para Mapas Vigentes 18ms
+· ✓ src/views/__tests__/RelatoriosView.spec.ts > RelatoriosView.vue > exporta CSV para Diagnósticos Gaps 17ms
+· ✓ src/views/__tests__/RelatoriosView.spec.ts > RelatoriosView.vue > exporta CSV para Andamento Geral 11ms
+· ✓ src/views/__tests__/RelatoriosView.spec.ts > RelatoriosView.vue > deve ser acessível 241ms
+· ✓ src/views/__tests__/RelatoriosView.spec.ts > RelatoriosView.vue > filtra processos por data fim 5ms
+· ✓ src/views/__tests__/RelatoriosView.spec.ts > RelatoriosView.vue > filtra diagnosticos gaps 4ms
+· ✓ src/views/__tests__/RelatoriosView.spec.ts > RelatoriosView.vue > mapasVigentes retorna vazio se dados incompletos 7ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+· ✓ src/components/__tests__/SubprocessoCards.spec.ts > SubprocessoCards.vue > renderiza cards de edição para MAPEAMENTO com permissão 49ms
+· ✓ src/components/__tests__/SubprocessoCards.spec.ts > SubprocessoCards.vue > renderiza cards de visualização se não puder editar 14ms
+· ✓ src/components/__tests__/SubprocessoCards.spec.ts > SubprocessoCards.vue > renderiza cards de diagnostico e navega corretamente 20ms
+· ✓ src/components/__tests__/SubprocessoCards.spec.ts > SubprocessoCards.vue > trata estado desabilitado (sem mapa) corretamente 9ms
+· ✓ src/components/__tests__/SubprocessoCards.spec.ts > SubprocessoCards.vue > trata estado desabilitado (sem mapa) em modo visualização 3ms
+· ✓ src/components/__tests__/SubprocessoCards.spec.ts > SubprocessoCards.vue > deve ser acessível 158ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+· ✓ src/components/__tests__/Acessibilidade.spec.ts > Verificação de Acessibilidade (Axe) > EmptyState deve ser acessível 202ms
+· ✓ src/components/__tests__/Acessibilidade.spec.ts > Verificação de Acessibilidade (Axe) > BarraNavegacao deve ser acessível 173ms
+· ✓ src/components/__tests__/TabelaProcessos.spec.ts > TabelaProcessos.vue > deve renderizar a tabela e os cabeçalhos corretamente 45ms
+· ✓ src/components/__tests__/TabelaProcessos.spec.ts > TabelaProcessos.vue > deve exibir os processos passados via prop 40ms
+· ✓ src/components/__tests__/TabelaProcessos.spec.ts > TabelaProcessos.vue > deve emitir o evento ordenar ao receber o evento sort-changed 14ms
+· ✓ src/components/__tests__/TabelaProcessos.spec.ts > TabelaProcessos.vue > deve emitir o evento selecionarProcesso ao clicar em uma linha 61ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+· ✓ src/components/__tests__/TabelaProcessos.spec.ts > TabelaProcessos.vue > deve emitir o evento selecionarProcesso ao pressionar Enter em uma linha 57ms
+· ✓ src/components/__tests__/TabelaProcessos.spec.ts > TabelaProcessos.vue > deve exibir a coluna Finalizado em quando showDataFinalizacao é true 16ms
+· ✓ src/components/__tests__/TabelaProcessos.spec.ts > TabelaProcessos.vue > deve formatar corretamente situações e tipos variados e desconhecidos 39ms
+· ✓ src/components/__tests__/TabelaProcessos.spec.ts > TabelaProcessos.vue > deve aplicar atributos nas linhas 11ms
+· ✓ src/components/__tests__/TabelaProcessos.spec.ts > TabelaProcessos.vue > deve exibir mensagem de vazio quando não houver processos 17ms
+· ✓ src/components/__tests__/TabelaProcessos.spec.ts > TabelaProcessos.vue > Modo Compacto > deve exibir o rótulo reduzido 'Unidades' quando compacto é true 3ms
+· ✓ src/components/__tests__/TabelaProcessos.spec.ts > TabelaProcessos.vue > Modo Compacto > deve manter sortable: true mesmo em modo compacto 3ms
+· ✓ src/components/__tests__/TabelaProcessos.spec.ts > TabelaProcessos.vue > Modo Compacto > deve emitir evento de ordenação ao clicar no cabeçalho em modo compacto 10ms
+· ✓ src/components/__tests__/TabelaProcessos.spec.ts > TabelaProcessos.vue > deve ser acessível 226ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+· ✓ src/components/__tests__/TabelaAlertas.spec.ts > TabelaAlertas.vue > deve passar os alertas para o BTable 22ms
+· ✓ src/components/__tests__/TabelaAlertas.spec.ts > TabelaAlertas.vue > deve renderizar o texto 'Não lido' para alertas não lidos (acessibilidade) 22ms
+· ✓ src/components/__tests__/TabelaAlertas.spec.ts > TabelaAlertas.vue > deve passar a função rowClass correta 2ms
+· ✓ src/components/__tests__/TabelaAlertas.spec.ts > TabelaAlertas.vue > deve passar a função rowAttr correta 2ms
+· ✓ src/components/__tests__/TabelaAlertas.spec.ts > TabelaAlertas.vue > deve emitir 'ordenar' quando BTable emitir sort-changed 4ms
+· ✓ src/components/__tests__/TabelaAlertas.spec.ts > TabelaAlertas.vue > deve ser acessível 228ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve renderizar as unidades 17ms
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve expandir unidades iniciais 2ms
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve alternar expansão 5ms
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve calcular estado de seleção (checked) 1ms
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve selecionar todas as unidades elegíveis 5ms
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve limpar seleção 20ms
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve lidar com toggle de unidade (selecionar) 2ms
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve lidar com toggle de unidade (deselecionar) 1ms
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve calcular estado indeterminado 1ms
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > isHabilitado deve retornar false se não elegível e sem filhas 6ms
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > isHabilitado deve retornar true se elegível 14ms
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve atualizar ancestrais corretamente (selecionar pai se todos filhos selecionados) 4ms
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > não deve deselecionar pai INTEROPERACIONAL se filhos desmarcados 3ms
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve atualizar ancestrais: não selecionar pai se não for elegível, mesmo se todos filhos selecionados 5ms
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > selecionarTodas deve lidar com nós sem filhas definidas 8ms
+· ✓ src/components/__tests__/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve ser acessível 236ms
+· ✓ src/views/__tests__/SubprocessoView.spec.ts > SubprocessoView.vue > fetches data on mount 27ms
+· ✓ src/views/__tests__/SubprocessoView.spec.ts > SubprocessoView.vue > renders components when data is available 7ms
+· ✓ src/views/__tests__/SubprocessoView.spec.ts > SubprocessoView.vue > opens date limit modal when allowed 9ms
+· ✓ src/views/__tests__/SubprocessoView.spec.ts > SubprocessoView.vue > shows error when opening date limit modal is not allowed 13ms
+· ✓ src/views/__tests__/SubprocessoView.spec.ts > SubprocessoView.vue > handles date limit update confirmation 8ms
+· ✓ src/views/__tests__/SubprocessoView.spec.ts > SubprocessoView.vue > trata erro ao alterar data limite 10ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > renders correctly in creation mode 52ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > disables action buttons when form is incomplete and enables when complete 46ms
+· ✓ src/views/__tests__/SubprocessoView.spec.ts > SubprocessoView.vue > reabre cadastro com sucesso 33ms
+· ✓ src/views/__tests__/SubprocessoView.spec.ts > SubprocessoView.vue > reabre revisão com sucesso 11ms
+· ✓ src/views/__tests__/SubprocessoView.spec.ts > SubprocessoView.vue > impede reabertura se justificativa vazia (botão desabilitado) 4ms
+· ✓ src/views/__tests__/SubprocessoView.spec.ts > SubprocessoView.vue > trata erro na API ao reabrir 8ms
+· ✓ src/views/__tests__/SubprocessoView.spec.ts > SubprocessoView.vue > envia lembrete com sucesso 11ms
+· ✓ src/views/__tests__/SubprocessoView.spec.ts > SubprocessoView.vue > trata erro ao enviar lembrete 4ms
+· ✓ src/views/__tests__/SubprocessoView.spec.ts > SubprocessoView.vue > deve ser acessível 187ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > loads process data for editing 6ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > redirects if process is not editable 4ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > creates a new process 23ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > handles creation error 24ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > updates an existing process 21ms
+· ✓ src/components/__tests__/ImportarAtividadesModal.spec.ts > ImportarAtividadesModal > deve emitir "fechar" ao clicar em Cancelar 73ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+· ✓ src/components/__tests__/SubprocessoHeader.spec.ts > SubprocessoHeader.vue > deve renderizar as informações básicas 24ms
+· ✓ src/components/__tests__/SubprocessoHeader.spec.ts > SubprocessoHeader.vue > deve renderizar informações do responsável se diferente do titular 41ms
+· ✓ src/components/__tests__/SubprocessoHeader.spec.ts > SubprocessoHeader.vue > não deve renderizar responsável se for igual ao titular 2ms
+· ✓ src/components/__tests__/SubprocessoHeader.spec.ts > SubprocessoHeader.vue > deve emitir 'alterarDataLimite' ao clicar no botão 16ms
+· ✓ src/components/__tests__/SubprocessoHeader.spec.ts > SubprocessoHeader.vue > deve emitir 'reabrirCadastro' ao clicar no botão 4ms
+· ✓ src/components/__tests__/SubprocessoHeader.spec.ts > SubprocessoHeader.vue > deve emitir 'reabrirRevisao' ao clicar no botão 2ms
+· ✓ src/components/__tests__/SubprocessoHeader.spec.ts > SubprocessoHeader.vue > deve emitir 'enviarLembrete' ao clicar no botão 3ms
+· ✓ src/components/__tests__/SubprocessoHeader.spec.ts > SubprocessoHeader.vue > deve ser acessível 197ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > initiates a process (confirmation flow) 27ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > initiates an existing process 78ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > removes a process 7ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > updates unit list when type changes 3ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > handles error when starting a new process (creation fail) 7ms
+· ✓ src/components/__tests__/ImportarAtividadesModal.spec.ts > ImportarAtividadesModal > deve habilitar o botão de importação e chamar a API ao importar 33ms
+· ✓ src/components/__tests__/ImportarAtividadesModal.spec.ts > ImportarAtividadesModal > deve resetar o modal quando a prop 'mostrar' mudar para true 15ms
+· ✓ src/components/__tests__/ImportarAtividadesModal.spec.ts > ImportarAtividadesModal > deve lidar com erro na importação 59ms
+· ✓ src/components/__tests__/ImportarAtividadesModal.spec.ts > ImportarAtividadesModal > deve limpar seleção se selecionar processo vazio 26ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve renderizar a lista de atividades 94ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve adicionar nova atividade 23ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > não deve adicionar atividade vazia 12ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve remover atividade após confirmação 23ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve remover um conhecimento 11ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve adicionar conhecimento 16ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > não deve adicionar conhecimento vazio 8ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve disponibilizar o cadastro 20ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > handles error when starting a process (initiation fail) 13ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > handles error when removing a process 6ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > closes confirmation modal when cancel button is clicked 5ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > maps field-specific validation errors from subErrors 9ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > handles error without lastError (network/runtime error) 21ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > does nothing when confirmarRemocao is called without processoEditando 6ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > clears field errors when fields are updated 6ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > shows loading spinner when units are loading 5ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > shows alert with multiple errors 4ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > shows saving spinner on button 5ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > handles error when loading process details on mount 78ms
+· ✓ src/views/__tests__/CadProcesso.spec.ts > CadProcesso.vue > focuses on the first invalid field when validation errors occur 21ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve disponibilizar revisao de cadastro 9ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > não deve permitir disponibilizar se status incorreto 20ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve permitir edição inline de atividade 14ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > não deve salvar edição de atividade vazia 11ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve permitir edição inline de conhecimento 13ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > não deve salvar edição de conhecimento vazio 24ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve mostrar erros de validação ao tentar disponibilizar se cadastro inválido 10ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve mostrar erro global se validação falhar sem código de atividade 8ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve exibir e fechar modal de impacto 8ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve exibir e fechar modal de historico 7ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve processar importação de atividades 9ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve fazer scroll para erro de validação 17ms
+· ✓ src/views/__tests__/CadAtividades.spec.ts > CadAtividades.vue > deve tratar erro ao remover atividade 20ms
+· ✓ src/components/__tests__/ModalConfirmacao.spec.ts > ModalConfirmacao.vue > renderiza corretamente com props padrão 53ms
+· ✓ src/components/__tests__/ModalConfirmacao.spec.ts > ModalConfirmacao.vue > aplica variant correta e ícone quando fornecida 9ms
+· ✓ src/components/__tests__/ModalConfirmacao.spec.ts > ModalConfirmacao.vue > foca no botão cancelar ao abrir se variant for danger 7ms
+· ✓ src/components/__tests__/ModalConfirmacao.spec.ts > ModalConfirmacao.vue > fecha o modal ao clicar em cancelar 5ms
+· ✓ src/components/__tests__/ModalConfirmacao.spec.ts > ModalConfirmacao.vue > emite confirmar e fecha o modal ao clicar em confirmar (se autoClose=true) 5ms
+· ✓ src/components/__tests__/ModalConfirmacao.spec.ts > ModalConfirmacao.vue > emite confirmar mas NAO fecha o modal se autoClose=false 6ms
+· ✓ src/components/__tests__/ModalConfirmacao.spec.ts > ModalConfirmacao.vue > renderiza conteúdo customizado via slot 25ms
+· ✓ src/views/__tests__/ConclusaoDiagnostico.spec.ts > ConclusaoDiagnostico.vue > exibe estado de carregamento inicialmente 31ms
+· ✓ src/views/__tests__/ConclusaoDiagnostico.spec.ts > ConclusaoDiagnostico.vue > exibe estado pronto corretamente 61ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+· ✓ src/components/__tests__/ModalConfirmacao.spec.ts > ModalConfirmacao.vue > usa titulos customizados para os botoes 2ms
+· ✓ src/components/__tests__/ModalConfirmacao.spec.ts > ModalConfirmacao.vue > desabilita o botao confirmar se okDisabled=true 1ms
+· ✓ src/components/__tests__/ModalConfirmacao.spec.ts > ModalConfirmacao.vue > exibe estado de carregamento corretamente 2ms
+· ✓ src/components/__tests__/ModalConfirmacao.spec.ts > ModalConfirmacao.vue > deve ser acessível 172ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+· ✓ src/components/__tests__/EmptyState.spec.ts > EmptyState.vue > renderiza corretamente sem props 14ms
+· ✓ src/components/__tests__/EmptyState.spec.ts > EmptyState.vue > renderiza título quando fornecido 2ms
+· ✓ src/components/__tests__/EmptyState.spec.ts > EmptyState.vue > renderiza descrição quando fornecida 1ms
+· ✓ src/components/__tests__/EmptyState.spec.ts > EmptyState.vue > renderiza ícone quando fornecido 2ms
+· ✓ src/components/__tests__/EmptyState.spec.ts > EmptyState.vue > renderiza conteúdo do slot 33ms
+· ✓ src/components/__tests__/EmptyState.spec.ts > EmptyState.vue > não renderiza elementos se as props forem strings vazias 6ms
+· ✓ src/components/__tests__/EmptyState.spec.ts > EmptyState.vue > deve ser acessível 129ms
+· ✓ src/views/__tests__/ConclusaoDiagnostico.spec.ts > ConclusaoDiagnostico.vue > exibe estado pendente e requer justificativa 67ms
+· ✓ src/views/__tests__/ConclusaoDiagnostico.spec.ts > ConclusaoDiagnostico.vue > redireciona se já concluído 21ms
+· ✓ src/views/__tests__/ConclusaoDiagnostico.spec.ts > ConclusaoDiagnostico.vue > conclui diagnóstico 16ms
+· ✓ src/views/__tests__/ConclusaoDiagnostico.spec.ts > ConclusaoDiagnostico.vue > conclui diagnóstico com justificativa 27ms
+· ✓ src/components/__tests__/TreeTableView.spec.ts > TreeTable.vue > deve renderizar o título corretamente 52ms
+· ✓ src/components/__tests__/TreeTableView.spec.ts > TreeTable.vue > não deve renderizar o título se não for fornecido 4ms
+· ✓ src/components/__tests__/TreeTableView.spec.ts > TreeTable.vue > deve renderizar os cabeçalhos da tabela corretamente 31ms
+· ✓ src/components/__tests__/TreeTableView.spec.ts > TreeTable.vue > não deve renderizar os cabeçalhos se hideHeaders for true 3ms
+· ✓ src/components/__tests__/TreeTableView.spec.ts > TreeTable.vue > deve renderizar as linhas da tabela passando os dados para TreeRow 18ms
+· ✓ src/components/__tests__/TreeTableView.spec.ts > TreeTable.vue > deve emitir o evento row-click quando uma TreeRowItem filha emite 4ms
+· ✓ src/components/__tests__/TreeTableView.spec.ts > TreeTable.vue > deve expandir todos os itens ao chamar expandAll 14ms
+· ✓ src/components/__tests__/TreeTableView.spec.ts > TreeTable.vue > deve colapsar todos os itens ao chamar collapseAll 10ms
+· ✓ src/components/__tests__/TreeTableView.spec.ts > TreeTable.vue > deve encontrar item existente usando findItemByCodigo 7ms
+· ✓ src/components/__tests__/TreeTableView.spec.ts > TreeTable.vue > deve retornar null quando item não encontrado usando findItemByCodigo 3ms
+· ✓ src/components/__tests__/TreeTableView.spec.ts > TreeTable.vue > deve alternar expansão de item usando toggleExpand 2ms
+· ✓ src/components/__tests__/TreeTableView.spec.ts > TreeTable.vue > não deve fazer nada ao tentar alternar item inexistente usando toggleExpand 1ms
+· ✓ src/components/__tests__/TreeTableView.spec.ts > TreeTable.vue > deve renderizar o estado vazio quando não houver dados 1ms
+· ✓ src/components/__tests__/TreeTableView.spec.ts > TreeTable.vue > deve renderizar o estado vazio customizado 8ms
+· ✓ src/views/__tests__/AutoavaliacaoDiagnostico.spec.ts > AutoavaliacaoDiagnostico.vue > exibe estado de carregamento inicialmente 111ms
+· ✓ src/views/__tests__/AutoavaliacaoDiagnostico.spec.ts > AutoavaliacaoDiagnostico.vue > exibe competências e avaliações existentes 33ms
+· ✓ src/views/__tests__/AutoavaliacaoDiagnostico.spec.ts > AutoavaliacaoDiagnostico.vue > salva avaliação ao alterar 23ms
+· ✓ src/views/__tests__/AutoavaliacaoDiagnostico.spec.ts > AutoavaliacaoDiagnostico.vue > salva avaliação ao sair do campo de observação (blur) 24ms
+· ✓ src/views/__tests__/AutoavaliacaoDiagnostico.spec.ts > AutoavaliacaoDiagnostico.vue > habilita botão de concluir apenas quando todas as competências estão avaliadas 15ms
+· ✓ src/views/__tests__/AutoavaliacaoDiagnostico.spec.ts > AutoavaliacaoDiagnostico.vue > conclui autoavaliação 15ms
+· ✓ src/views/__tests__/AutoavaliacaoDiagnostico.spec.ts > AutoavaliacaoDiagnostico.vue > exibe alerta de competências vazias 16ms
+· ✓ src/views/__tests__/AutoavaliacaoDiagnostico.spec.ts > AutoavaliacaoDiagnostico.vue > não salva quando campos estão vazios 19ms
+· ✓ src/views/__tests__/AutoavaliacaoDiagnostico.spec.ts > AutoavaliacaoDiagnostico.vue > exibe erro ao falhar salvamento de avaliação 23ms
+· ✓ src/views/__tests__/AutoavaliacaoDiagnostico.spec.ts > AutoavaliacaoDiagnostico.vue > exibe erro ao falhar conclusão de autoavaliação 18ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+· ✓ src/components/__tests__/ProcessoAcoes.spec.ts > ProcessoAcoes.vue > deve renderizar botão "Aceitar em bloco" para GESTOR 56ms
+· ✓ src/components/__tests__/ProcessoAcoes.spec.ts > ProcessoAcoes.vue > não deve renderizar botões de bloco se mostrarBotoesBloco for falso 2ms
+· ✓ src/components/__tests__/ProcessoAcoes.spec.ts > ProcessoAcoes.vue > deve renderizar botão "Homologar em bloco" para ADMIN 21ms
+· ✓ src/components/__tests__/ProcessoAcoes.spec.ts > ProcessoAcoes.vue > deve renderizar botão "Finalizar processo" para ADMIN em processo EM_ANDAMENTO 3ms
+· ✓ src/components/__tests__/ProcessoAcoes.spec.ts > ProcessoAcoes.vue > não deve renderizar botão "Finalizar processo" se não for ADMIN 1ms
+· ✓ src/components/__tests__/ProcessoAcoes.spec.ts > ProcessoAcoes.vue > não deve renderizar botão "Finalizar processo" se situação não for EM_ANDAMENTO 4ms
+· ✓ src/components/__tests__/ProcessoAcoes.spec.ts > ProcessoAcoes.vue > deve ser acessível 189ms
+· ✓ src/views/__tests__/AutoavaliacaoDiagnostico.spec.ts > AutoavaliacaoDiagnostico.vue > não conclui quando podeConcluir é false 18ms
+· ✓ src/views/__tests__/AutoavaliacaoDiagnostico.spec.ts > AutoavaliacaoDiagnostico.vue > trata erro genérico ao salvar avaliação 25ms
+· ✓ src/views/__tests__/AutoavaliacaoDiagnostico.spec.ts > AutoavaliacaoDiagnostico.vue > trata erro genérico ao concluir autoavaliação 26ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > deve validar cadastro (Homologar) e redirecionar 92ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > deve validar cadastro (Aceitar) e redirecionar 20ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > deve devolver cadastro e redirecionar 21ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > deve abrir modal de impacto ao clicar no botão 8ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > deve abrir modal de histórico de análise 15ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > Fluxo Mapeamento (Não Revisão) > deve homologar cadastro de mapeamento 18ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > Fluxo Mapeamento (Não Revisão) > deve aceitar cadastro de mapeamento 7ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > Fluxo Mapeamento (Não Revisão) > deve devolver cadastro de mapeamento 12ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > Fluxo Mapeamento (Não Revisão) > deve mostrar texto correto no botão de impacto 8ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > Fluxo Mapeamento (Não Revisão) > não deve redirecionar se devolução de mapeamento falhar 15ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > Tratamento de Erros > não deve redirecionar se validação falhar 6ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > Tratamento de Erros > não deve redirecionar se devolução falhar 18ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > Cobertura de Casos de Borda > não deve buscar impacto se codSubprocesso não existir 10ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > Cobertura de Casos de Borda > não deve confirmar validação se codSubprocesso não existir 7ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > Cobertura de Casos de Borda > não deve confirmar devolução se codSubprocesso não existir 9ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > Cobertura de Casos de Borda > deve cobrir branches de isHomologacao (ADMIN e Mapeamento Homologado) 23ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > Cobertura de Casos de Borda > deve cobrir branches de isHomologacao (ADMIN e Revisao Homologada) 10ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > Cobertura de Casos de Borda > isHomologacao deve ser false se perfil não for ADMIN 9ms
+· ✓ src/views/__tests__/VisAtividades.spec.ts > VisAtividades.vue > Cobertura de Casos de Borda > podeVerImpacto deve ser false se subprocesso undefined 5ms
+· ✓ src/views/__tests__/MonitoramentoDiagnostico.spec.ts > MonitoramentoDiagnostico.vue > exibe estado de carregamento inicialmente 31ms
+· ✓ src/views/__tests__/MonitoramentoDiagnostico.spec.ts > MonitoramentoDiagnostico.vue > exibe cards de resumo corretamente 26ms
+· ✓ src/views/__tests__/MonitoramentoDiagnostico.spec.ts > MonitoramentoDiagnostico.vue > exibe lista de servidores corretamente 21ms
+· ✓ src/views/__tests__/MonitoramentoDiagnostico.spec.ts > MonitoramentoDiagnostico.vue > desabilita botões quando condições não são atendidas 27ms
+· ✓ src/views/__tests__/MonitoramentoDiagnostico.spec.ts > MonitoramentoDiagnostico.vue > habilita botões quando condições são atendidas 19ms
+· ✓ src/views/__tests__/MonitoramentoDiagnostico.spec.ts > MonitoramentoDiagnostico.vue > exibe badges de status corretamente para diferentes situações 19ms
+· ✓ src/views/__tests__/MonitoramentoDiagnostico.spec.ts > MonitoramentoDiagnostico.vue > trata erro ao buscar diagnóstico 18ms
+· ✓ src/components/__tests__/AtividadeItem.spec.ts > AtividadeItem.vue > deve renderizar os botões de ação com a classe d-flex para ficarem lado a lado 55ms
+· ✓ src/components/__tests__/AtividadeItem.spec.ts > AtividadeItem.vue > deve entrar em modo de edição de atividade e salvar 30ms
+· ✓ src/views/__tests__/CadMapa.spec.ts > CadMapa.vue > deve carregar dados no mount 43ms
+· ✓ src/views/__tests__/CadMapa.spec.ts > CadMapa.vue > deve mostrar empty state quando não houver competências 19ms
+· ✓ src/views/__tests__/CadMapa.spec.ts > CadMapa.vue > deve abrir modal e criar nova competência 33ms
+· ✓ src/components/__tests__/AtividadeItem.spec.ts > AtividadeItem.vue > deve adicionar novo conhecimento 17ms
+· ✓ src/components/__tests__/AtividadeItem.spec.ts > AtividadeItem.vue > não deve salvar edição de atividade se descrição vazia 20ms
+· ✓ src/components/__tests__/AtividadeItem.spec.ts > AtividadeItem.vue > não deve salvar edição de atividade se descrição igual 11ms
+· ✓ src/components/__tests__/AtividadeItem.spec.ts > AtividadeItem.vue > não deve adicionar conhecimento vazio 4ms
+· ✓ src/components/__tests__/AtividadeItem.spec.ts > AtividadeItem.vue > deve emitir 'remover-atividade' 7ms
+· ✓ src/components/__tests__/AtividadeItem.spec.ts > AtividadeItem.vue > deve emitir 'remover-conhecimento' 2ms
+· ✓ src/components/__tests__/AtividadeItem.spec.ts > AtividadeItem.vue > deve salvar edição de conhecimento 4ms
+· ✓ src/components/__tests__/AtividadeItem.spec.ts > AtividadeItem.vue > não deve salvar edição de conhecimento vazio 9ms
+· ✓ src/components/__tests__/AtividadeItem.spec.ts > AtividadeItem.vue > deve cancelar edição de conhecimento 3ms
+· ✓ src/views/__tests__/CadMapa.spec.ts > CadMapa.vue > deve editar uma competência existente 12ms
+· ✓ src/views/__tests__/CadMapa.spec.ts > CadMapa.vue > deve excluir uma competência 13ms
+· ✓ src/views/__tests__/CadMapa.spec.ts > CadMapa.vue > deve remover atividade associada 7ms
+· ✓ src/views/__tests__/CadMapa.spec.ts > CadMapa.vue > deve abrir modal de disponibilizar e enviar 9ms
+· ✓ src/views/__tests__/CadMapa.spec.ts > CadMapa.vue > deve abrir modal de impacto 9ms
+· ✓ src/views/__tests__/CadMapa.spec.ts > CadMapa.vue > deve mostrar o botão "Impacto no mapa" se tiver permissão 11ms
+· ✓ src/views/__tests__/CadMapa.spec.ts > CadMapa.vue > não deve mostrar o botão "Impacto no mapa" se não tiver permissão 5ms
+· ✓ src/views/__tests__/CadMapa.spec.ts > CadMapa.vue > deve tratar erro ao criar competência 7ms
+· ✓ src/views/__tests__/CadMapa.spec.ts > CadMapa.vue > deve tratar erro ao excluir competência 7ms
+· ✓ src/views/__tests__/CadMapa.spec.ts > CadMapa.vue > deve tratar erro ao disponibilizar mapa 26ms
+· ✓ src/components/__tests__/MainNavbarCoverage.spec.ts > MainNavbar.vue Coverage > deve atualizar isMobile ao redimensionar a janela 173ms
+· ✓ src/components/__tests__/MainNavbarCoverage.spec.ts > MainNavbar.vue Coverage > deve remover event listener ao desmontar 19ms
+· ✓ src/components/__tests__/DisponibilizarMapaModal.spec.ts > DisponibilizarMapaModal.vue > não deve renderizar o modal quando mostrar for falso 18ms
+· ✓ src/components/__tests__/DisponibilizarMapaModal.spec.ts > DisponibilizarMapaModal.vue > deve renderizar o modal com os campos iniciais 110ms
+· ✓ src/components/__tests__/DisponibilizarMapaModal.spec.ts > DisponibilizarMapaModal.vue > deve habilitar o botão de disponibilizar quando a data for selecionada 26ms
+· ✓ src/components/__tests__/DisponibilizarMapaModal.spec.ts > DisponibilizarMapaModal.vue > deve emitir o evento fechar ao clicar no botão de cancelar 27ms
+· ✓ src/components/__tests__/DisponibilizarMapaModal.spec.ts > DisponibilizarMapaModal.vue > deve emitir o evento disponibilizar com a data selecionada 10ms
+· ✓ src/components/__tests__/DisponibilizarMapaModal.spec.ts > DisponibilizarMapaModal.vue > deve exibir estado de carregamento quando loading for true 5ms
+· ✓ src/components/__tests__/DisponibilizarMapaModal.spec.ts > DisponibilizarMapaModal.vue > deve exibir erros de validação quando fornecidos 9ms
+· ✓ src/components/__tests__/DisponibilizarMapaModal.spec.ts > DisponibilizarMapaModal.vue > deve incluir observações no evento disponibilizar 24ms
+· ✓ src/components/__tests__/DisponibilizarMapaModal.spec.ts > DisponibilizarMapaModal.vue > deve resetar campos quando mostrar mudar para true 16ms
+· ✓ src/components/__tests__/ArvoreUnidades.visual.spec.ts > ArvoreUnidades - Estado Visual (getEstadoSelecao) > Bug 1: SECRETARIA_1 marcada com filhas desmarcadas > SECRETARIA_1 deve estar INDETERMINADA quando apenas ASSESSORIA_11 e ASSESSORIA_12 selecionadas 50ms
+· ✓ src/components/__tests__/ArvoreUnidades.visual.spec.ts > ArvoreUnidades - Estado Visual (getEstadoSelecao) > Bug 1: SECRETARIA_1 marcada com filhas desmarcadas > SECRETARIA_1 deve estar MARCADA quando todas filhas estão marcadas 13ms
+· ✓ src/components/__tests__/ArvoreUnidades.visual.spec.ts > ArvoreUnidades - Estado Visual (getEstadoSelecao) > Bug 2: COORD_11 marcada sem filhas > COORD_11 deve estar DESMARCADA quando nenhuma filha selecionada 4ms
+· ✓ src/components/__tests__/ArvoreUnidades.visual.spec.ts > ArvoreUnidades - Estado Visual (getEstadoSelecao) > Bug 2: COORD_11 marcada sem filhas > COORD_11 deve estar MARCADA quando todas filhas selecionadas 4ms
+· ✓ src/components/__tests__/ArvoreUnidades.visual.spec.ts > ArvoreUnidades - Estado Visual (getEstadoSelecao) > Bug 2: COORD_11 marcada sem filhas > COORD_11 deve estar INDETERMINADA quando algumas filhas selecionadas 3ms
+· ✓ src/components/__tests__/ArvoreUnidades.visual.spec.ts > ArvoreUnidades - Estado Visual (getEstadoSelecao) > Bug 3: Comportamento ao desmarcar > Desmarcar SECRETARIA_1 deve desmarcar todas filhas 5ms
+· ✓ src/components/__tests__/ArvoreUnidades.visual.spec.ts > ArvoreUnidades - Estado Visual (getEstadoSelecao) > Bug 3: Comportamento ao desmarcar > COORD_12 não deve ficar marcada ao desmarcar SECRETARIA_1 6ms
+· ✓ src/components/__tests__/ArvoreUnidades.visual.spec.ts > ArvoreUnidades - Estado Visual (getEstadoSelecao) > isHabilitado - Habilitação Recursiva > INTERMEDIARIA com filhas elegíveis deve estar habilitada 9ms
+· ✓ src/components/__tests__/ArvoreUnidades.visual.spec.ts > ArvoreUnidades - Estado Visual (getEstadoSelecao) > isHabilitado - Habilitação Recursiva > INTERMEDIARIA sem filhas elegíveis deve estar desabilitada 1ms
+· ✓ src/components/__tests__/ArvoreUnidades.visual.spec.ts > ArvoreUnidades - Estado Visual (getEstadoSelecao) > isHabilitado - Habilitação Recursiva > Unidade elegível deve sempre estar habilitada 3ms
+· ✓ src/components/__tests__/ArvoreUnidades.visual.spec.ts > ArvoreUnidades - Estado Visual (getEstadoSelecao) > Filtro de INTERMEDIARIA no modelValue > INTERMEDIARIA nunca deve estar no modelValue 3ms
+· ✓ src/components/__tests__/ArvoreUnidades.visual.spec.ts > ArvoreUnidades - Estado Visual (getEstadoSelecao) > Filtro de INTERMEDIARIA no modelValue > Selecionar COORD_11 deve adicionar apenas filhas ao modelValue 5ms
+· ✓ src/components/__tests__/UnidadeTreeNode.spec.ts > UnidadeTreeNode.vue > deve renderizar a sigla da unidade 26ms
+· ✓ src/components/__tests__/UnidadeTreeNode.spec.ts > UnidadeTreeNode.vue > deve renderizar checkbox desmarcado por padrão 5ms
+· ✓ src/components/__tests__/UnidadeTreeNode.spec.ts > UnidadeTreeNode.vue > deve renderizar checkbox marcado quando getEstadoSelecao retorna true 6ms
+· ✓ src/components/__tests__/UnidadeTreeNode.spec.ts > UnidadeTreeNode.vue > deve renderizar checkbox indeterminado quando getEstadoSelecao retorna 'indeterminate' 6ms
+· ✓ src/components/__tests__/UnidadeTreeNode.spec.ts > UnidadeTreeNode.vue > deve chamar onToggle ao clicar no checkbox 3ms
+· ✓ src/components/__tests__/UnidadeTreeNode.spec.ts > UnidadeTreeNode.vue > deve renderizar expansor se tiver filhas 6ms
+· ✓ src/components/__tests__/UnidadeTreeNode.spec.ts > UnidadeTreeNode.vue > não deve renderizar expansor se não tiver filhas 3ms
+· ✓ src/components/__tests__/UnidadeTreeNode.spec.ts > UnidadeTreeNode.vue > deve chamar onToggleExpand ao clicar no expansor 2ms
+· ✓ src/components/__tests__/UnidadeTreeNode.spec.ts > UnidadeTreeNode.vue > deve renderizar filhos recursivamente quando expandido 2ms
+· ✓ src/components/__tests__/UnidadeTreeNode.spec.ts > UnidadeTreeNode.vue > não deve renderizar filhos quando não expandido 1ms
+· ✓ src/components/__tests__/UnidadeTreeNode.spec.ts > UnidadeTreeNode.vue > deve estar desabilitado se isHabilitado retornar false 1ms
+· ✓ src/views/__tests__/UnidadeView.spec.ts > UnidadeView.vue > fetches data on mount 38ms
+· ✓ src/views/__tests__/UnidadeView.spec.ts > UnidadeView.vue > renders unit details correctly 22ms
+· ✓ src/views/__tests__/UnidadeView.spec.ts > UnidadeView.vue > renders "Criar atribuição" button only for ADMIN 21ms
+· ✓ src/views/__tests__/UnidadeView.spec.ts > UnidadeView.vue > navigates to create assignment 13ms
+· ✓ src/views/__tests__/UnidadeView.spec.ts > UnidadeView.vue > calculates dynamic responsible person correctly 7ms
+· ✓ src/views/__tests__/UnidadeView.spec.ts > UnidadeView.vue > renders subordinate units tree table 3ms
+· ✓ src/views/__tests__/UnidadeView.spec.ts > UnidadeView.vue > navigates to subordinate unit on row click 6ms
+· ✓ src/views/__tests__/UnidadeView.spec.ts > UnidadeView.vue > renders and clicks "Mapa vigente" button when map exists 3ms
+· ✓ src/views/__tests__/UnidadeView.spec.ts > UnidadeView.vue > displays error alert when unidadesStore has error 42ms
+· ✓ src/views/__tests__/UnidadeView.spec.ts > UnidadeView.vue > logs error when fetching titular fails 14ms
+· ✓ src/components/__tests__/AceitarMapaModal.spec.ts > AceitarMapaModal.vue > não deve renderizar o modal quando mostrarModal for falso 39ms
+· ✓ src/components/__tests__/AceitarMapaModal.spec.ts > AceitarMapaModal.vue > deve renderizar o modal com o perfil padrão (não ADMIN) 31ms
+· ✓ src/components/__tests__/AceitarMapaModal.spec.ts > AceitarMapaModal.vue > deve renderizar o modal com o perfil ADMIN 10ms
+· ✓ src/components/__tests__/AceitarMapaModal.spec.ts > AceitarMapaModal.vue > deve emitir o evento fecharModal ao clicar no botão de cancelar 12ms
+· ✓ src/components/__tests__/AceitarMapaModal.spec.ts > AceitarMapaModal.vue > deve emitir o evento confirmarAceitacao com a observação 6ms
+· ✓ src/components/__tests__/AceitarMapaModal.spec.ts > AceitarMapaModal.vue > deve emitir o evento confirmarAceitacao com uma observação vazia 3ms
+· ✓ src/views/__tests__/ProcessoViewCoverage.spec.ts > ProcessoViewCoverage.spec.ts > deve lidar com erro ao finalizar processo 54ms
+· ✓ src/views/__tests__/ProcessoViewCoverage.spec.ts > ProcessoViewCoverage.spec.ts > deve abrir detalhes da unidade (navegação) para ADMIN 17ms
+· ✓ src/views/__tests__/ProcessoViewCoverage.spec.ts > ProcessoViewCoverage.spec.ts > não deve navegar se item não clicável 6ms
+· ✓ src/views/__tests__/ProcessoViewCoverage.spec.ts > ProcessoViewCoverage.spec.ts > não deve navegar para unidade de terceiros se CHEFE 11ms
+· ✓ src/views/__tests__/ProcessoViewCoverage.spec.ts > ProcessoViewCoverage.spec.ts > deve navegar para própria unidade se CHEFE 7ms
+· ✓ src/views/__tests__/ProcessoViewCoverage.spec.ts > ProcessoViewCoverage.spec.ts > deve formatar data nula 4ms
+· ✓ src/views/__tests__/ProcessoViewCoverage.spec.ts > ProcessoViewCoverage.spec.ts > deve lidar com erro na ação em bloco 3ms
+· ✓ src/views/__tests__/ProcessoViewCoverage.spec.ts > ProcessoViewCoverage.spec.ts > deve calcular unidades elegíveis para Disponibilizar 11ms
+· ✓ src/views/__tests__/ProcessoViewCoverage.spec.ts > ProcessoViewCoverage.spec.ts > deve calcular unidades elegíveis para Homologar 2ms
+· ✓ src/views/__tests__/ProcessoViewCoverage.spec.ts > ProcessoViewCoverage.spec.ts > deve calcular unidades elegíveis para Aceitar (incluindo REVISAO_DISPONIBILIZADA) 2ms
+· ✓ src/__tests__/App.spec.ts > App.vue > deve renderizar corretamente na rota /login 39ms
+· ✓ src/__tests__/App.spec.ts > App.vue > deve renderizar layout completo na rota /processo 10ms
+· ✓ src/__tests__/App.spec.ts > App.vue > deve renderizar o link de 'pular para o conteúdo' com os atributos corretos 5ms
+· ✓ src/__tests__/App.spec.ts > App.vue > não deve renderizar BarraNavegacao na rota /painel 5ms
+· ✓ src/__tests__/App.spec.ts > App.vue > deve ocultar BarraNavegacao se sessionStorage indicar cameFromNavbar 4ms
+· ✓ src/__tests__/App.spec.ts > App.vue > deve exibir alerta global quando feedbackStore tiver dados 20ms
+· ✓ src/__tests__/views/LoginView.spec.ts > LoginView.vue > deve renderizar o formulário de login corretamente 41ms
+· ✓ src/__tests__/views/LoginView.spec.ts > LoginView.vue > deve mostrar erro se campos estiverem vazios 14ms
+· ✓ src/__tests__/views/LoginView.spec.ts > LoginView.vue > deve realizar login com sucesso e redirecionar para painel (perfil único) 13ms
+· ✓ src/__tests__/views/LoginView.spec.ts > LoginView.vue > deve exibir erro se login falhar 6ms
+· ✓ src/__tests__/views/LoginView.spec.ts > LoginView.vue > deve avançar para passo 2 se houver múltiplos perfis 14ms
+· ✓ src/__tests__/views/LoginView.spec.ts > LoginView.vue > deve selecionar perfil e logar no passo 2 15ms
+· ✓ src/__tests__/views/LoginView.spec.ts > LoginView.vue > deve tratar erro genérico durante o login (catch block) 24ms
+· ✓ src/__tests__/views/LoginView.spec.ts > LoginView.vue > deve exibir erro se nenhum perfil estiver disponível (array vazio) 12ms
+· ✓ src/__tests__/views/LoginView.spec.ts > LoginView.vue > deve tratar erro genérico durante seleção de perfil (step 2) 14ms
+· ✓ src/__tests__/views/LoginView.spec.ts > LoginView.vue > deve exibir erro se tentar submeter passo 2 sem seleção (caso edge) 11ms
+· ✓ src/__tests__/views/LoginView.spec.ts > LoginView.vue > deve exibir aviso de caps lock ativado 8ms
+· ✓ src/__tests__/views/LoginView.spec.ts > LoginView.vue > deve alternar visibilidade da senha 8ms
+· ✓ src/__tests__/views/HistoricoView.spec.ts > HistoricoView.vue > deve carregar processos finalizados ao montar 68ms
+· ✓ src/__tests__/views/HistoricoView.spec.ts > HistoricoView.vue > deve renderizar tabela com processos 23ms
+· ✓ src/__tests__/views/HistoricoView.spec.ts > HistoricoView.vue > deve exibir mensagem se não houver processos 53ms
+· ✓ src/__tests__/views/HistoricoView.spec.ts > HistoricoView.vue > deve navegar para detalhes ao clicar 14ms
+· ✓ src/components/__tests__/HistoricoAnaliseModal.spec.ts > HistoricoAnaliseModal > não deve renderizar o modal quando mostrar for falso 38ms
+· ✓ src/components/__tests__/HistoricoAnaliseModal.spec.ts > HistoricoAnaliseModal > deve renderizar a mensagem de "nenhuma análise" quando não houver análises 38ms
+· ✓ src/components/__tests__/HistoricoAnaliseModal.spec.ts > HistoricoAnaliseModal > deve renderizar a tabela com as análises 60ms
+· ✓ src/components/__tests__/HistoricoAnaliseModal.spec.ts > HistoricoAnaliseModal > deve emitir o evento fechar ao clicar no botão de fechar 11ms
+· ✓ src/components/__tests__/SubprocessoModal.spec.ts > SubprocessoModal > não deve renderizar o modal quando mostrarModal for falso 14ms
+· ✓ src/components/__tests__/SubprocessoModal.spec.ts > SubprocessoModal > deve inicializar o campo de data com a data limite atual 62ms
+· ✓ src/components/__tests__/SubprocessoModal.spec.ts > SubprocessoModal > deve desabilitar o botão de confirmar se a data for inválida 16ms
+· ✓ src/components/__tests__/SubprocessoModal.spec.ts > SubprocessoModal > deve habilitar o botão de confirmar se a data for válida 14ms
+· ✓ src/components/__tests__/SubprocessoModal.spec.ts > SubprocessoModal > deve emitir "fecharModal" ao clicar no botão de cancelar 16ms
+· ✓ src/components/__tests__/SubprocessoModal.spec.ts > SubprocessoModal > deve emitir "confirmarAlteracao" com a nova data 20ms
+· ✓ src/__tests__/axios-setup.spec.ts > axios-setup > interceptor de requisição deve adicionar token se existir 2ms
+· ✓ src/__tests__/axios-setup.spec.ts > axios-setup > interceptor de requisição não deve adicionar token se estiver faltando 0ms
+· ✓ src/__tests__/axios-setup.spec.ts > axios-setup > interceptor de erro de requisição deve rejeitar a promessa 1ms
+· ✓ src/__tests__/axios-setup.spec.ts > axios-setup > interceptor de erro de resposta deve redirecionar para login em caso de 401 2ms
+· ✓ src/__tests__/axios-setup.spec.ts > axios-setup > interceptor de erro de resposta não deve mostrar erro global para 400, 404, 409, 422 0ms
+· ✓ src/__tests__/axios-setup.spec.ts > axios-setup > interceptor de erro de resposta deve mostrar erro inesperado para 500 com mensagem 0ms
+· ✓ src/__tests__/axios-setup.spec.ts > axios-setup > interceptor de erro de resposta deve mostrar erro genérico para 500 sem mensagem 0ms
+· ✓ src/__tests__/axios-setup.spec.ts > axios-setup > interceptor de erro de resposta deve mostrar erro de rede 0ms
+· ✓ src/__tests__/axios-setup.spec.ts > axios-setup > interceptor de erro de resposta deve mostrar erro genérico com propriedade de mensagem 0ms
+· ✓ src/__tests__/axios-setup.spec.ts > axios-setup > interceptor de erro de resposta deve tratar erros da store graciosamente 0ms
+· ✓ src/components/__tests__/TreeRowItem.spec.ts > TreeRowItem.vue > deve renderizar o item corretamente 11ms
+· ✓ src/components/__tests__/TreeRowItem.spec.ts > TreeRowItem.vue > deve aplicar paddingLeft com base no level 5ms
+· ✓ src/components/__tests__/TreeRowItem.spec.ts > TreeRowItem.vue > deve exibir o toggle-icon se houver children 6ms
+· ✓ src/components/__tests__/TreeRowItem.spec.ts > TreeRowItem.vue > não deve exibir o toggle-icon se não houver children 2ms
+· ✓ src/components/__tests__/TreeRowItem.spec.ts > TreeRowItem.vue > deve emitir o evento toggle ao clicar no toggle-icon 3ms
+· ✓ src/components/__tests__/TreeRowItem.spec.ts > TreeRowItem.vue > deve emitir o evento row-click ao clicar na linha se clickable for true (padrao) 2ms
+· ✓ src/components/__tests__/TreeRowItem.spec.ts > TreeRowItem.vue > deve emitir o evento row-click ao clicar na linha se clickable for undefined (default true logic check) 1ms
+· ✓ src/components/__tests__/TreeRowItem.spec.ts > TreeRowItem.vue > não deve emitir o evento row-click ao clicar na linha se clickable for false 1ms
+· ✓ src/components/__tests__/TreeRowItem.spec.ts > TreeRowItem.vue > deve exibir o ícone chevron-down quando item está expandido 1ms
+· ✓ src/components/__tests__/TreeRowItem.spec.ts > TreeRowItem.vue > deve emitir o evento toggle ao pressionar Enter no toggle-icon 1ms
+· ✓ src/components/__tests__/TreeRowItem.spec.ts > TreeRowItem.vue > deve emitir o evento toggle ao pressionar Space no toggle-icon 1ms
+· ✓ src/components/__tests__/TreeRowItem.spec.ts > TreeRowItem.vue > deve emitir o evento row-click ao pressionar Enter na linha 1ms
+· ✓ src/components/__tests__/TreeRowItem.spec.ts > TreeRowItem.vue > deve emitir o evento row-click ao pressionar Space na linha 1ms
+· ✓ src/views/__tests__/VisAtividadesCoverage.spec.ts > VisAtividades.vue Coverage > deve encontrar unidade aninhada recursivamente 110ms
+· ✓ src/views/__tests__/VisAtividadesCoverage.spec.ts > VisAtividades.vue Coverage > deve resetar loadingValidacao quando ocorrer erro na homologação 27ms
+· ✓ src/views/__tests__/VisAtividadesCoverage.spec.ts > VisAtividades.vue Coverage > deve resetar loadingDevolucao quando ocorrer erro na devolução 13ms
+· ✓ src/views/__tests__/VisAtividadesCoverage.spec.ts > VisAtividades.vue Coverage > não deve buscar atividades no onMounted se codSubprocesso for undefined 9ms
+· ✓ src/components/__tests__/CriarCompetenciaModal.spec.ts > CriarCompetenciaModal.vue > não deve renderizar o modal quando mostrar for falso 21ms
+· ✓ src/components/__tests__/CriarCompetenciaModal.spec.ts > CriarCompetenciaModal.vue > deve renderizar o modal no modo de criação 29ms
+· ✓ src/components/__tests__/CriarCompetenciaModal.spec.ts > CriarCompetenciaModal.vue > deve renderizar o modal no modo de edição 8ms
+· ✓ src/components/__tests__/CriarCompetenciaModal.spec.ts > CriarCompetenciaModal.vue > deve habilitar o botão de salvar quando a descrição e pelo menos uma atividade forem selecionadas 13ms
+· ✓ src/components/__tests__/CriarCompetenciaModal.spec.ts > CriarCompetenciaModal.vue > deve emitir o evento fechar ao clicar no botão de cancelar 6ms
+· ✓ src/components/__tests__/CriarCompetenciaModal.spec.ts > CriarCompetenciaModal.vue > deve emitir o evento salvar com os dados corretos 24ms
+· ✓ src/components/__tests__/CompetenciaCard.spec.ts > CompetenciaCard.vue > deve renderizar descrição da competência 33ms
+· ✓ src/components/__tests__/CompetenciaCard.spec.ts > CompetenciaCard.vue > deve renderizar atividades associadas 20ms
+· ✓ src/components/__tests__/CompetenciaCard.spec.ts > CompetenciaCard.vue > deve emitir evento editar ao clicar no botão editar 8ms
+· ✓ src/components/__tests__/CompetenciaCard.spec.ts > CompetenciaCard.vue > deve emitir evento excluir ao clicar no botão excluir 24ms
+· ✓ src/components/__tests__/CompetenciaCard.spec.ts > CompetenciaCard.vue > deve emitir evento removerAtividade ao clicar na lixeira da atividade 3ms
+· ✓ src/components/__tests__/CompetenciaCard.spec.ts > CompetenciaCard.vue > deve mostrar badge de conhecimentos se atividade tiver conhecimentos 2ms
+· ✓ src/__tests__/views/PainelView.spec.ts > PainelView.vue > deve renderizar tabelas e títulos 43ms
+· ✓ src/__tests__/views/PainelView.spec.ts > PainelView.vue > deve carregar dados ao montar se perfil estiver selecionado 3ms
+· ✓ src/__tests__/views/PainelView.spec.ts > PainelView.vue > não deve carregar dados se perfil não estiver selecionado 2ms
+· ✓ src/__tests__/views/PainelView.spec.ts > PainelView.vue > deve mostrar botão de criar processo apenas para admin 24ms
+· ✓ src/__tests__/views/PainelView.spec.ts > PainelView.vue > deve reordenar processos ao receber evento da tabela 5ms
+· ✓ src/__tests__/views/PainelView.spec.ts > PainelView.vue > deve navegar ao selecionar processo 2ms
+· ✓ src/__tests__/views/PainelView.spec.ts > PainelView.vue > deve reordenar alertas 8ms
+· ✓ src/__tests__/views/ConfiguracoesView.spec.ts > ConfiguracoesView.vue > renders correctly and loads data 28ms
+· ✓ src/__tests__/views/ConfiguracoesView.spec.ts > ConfiguracoesView.vue > updates form values from store 35ms
+· ✓ src/__tests__/components/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve renderizar corretamente 16ms
+· ✓ src/__tests__/components/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve ocultar a raiz se props.ocultarRaiz for true 4ms
+· ✓ src/__tests__/components/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve mostrar a raiz se props.ocultarRaiz for false 3ms
+· ✓ src/__tests__/components/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve inicializar expandedUnits com base nas props.unidades 1ms
+· ✓ src/__tests__/components/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve alternar expansão (toggleExpand) 1ms
+· ✓ src/__tests__/components/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve verificar seleção (isChecked) 1ms
+· ✓ src/__tests__/components/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve calcular estado de habilitação (isHabilitado) 1ms
+· ✓ src/__tests__/components/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve calcular estado de seleção indeterminado (getEstadoSelecao) 1ms
+· ✓ src/__tests__/components/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve selecionar unidade e atualizar modelValue (toggle true) 4ms
+· ✓ src/__tests__/components/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve deselecionar unidade e atualizar modelValue (toggle false) 1ms
+· ✓ src/__tests__/components/ArvoreUnidades.spec.ts > ArvoreUnidades.vue > deve selecionar recursivamente (toggle true na raiz) 1ms
+· ✓ src/components/__tests__/ImpactoMapaModal.spec.ts > ImpactoMapaModal.vue > deve mostrar mensagem de nenhum impacto 25ms
+· ✓ src/components/__tests__/ImpactoMapaModal.spec.ts > ImpactoMapaModal.vue > deve mostrar atividades inseridas 5ms
+· ✓ src/components/__tests__/ImpactoMapaModal.spec.ts > ImpactoMapaModal.vue > deve mostrar atividades removidas 15ms
+· ✓ src/components/__tests__/ImpactoMapaModal.spec.ts > ImpactoMapaModal.vue > deve mostrar atividades alteradas 5ms
+· ✓ src/components/__tests__/ImpactoMapaModal.spec.ts > ImpactoMapaModal.vue > deve mostrar competências impactadas e formatar tipos de impacto corretamente 25ms
+· ✓ src/components/__tests__/ImpactoMapaModal.spec.ts > ImpactoMapaModal.vue > deve emitir evento 'fechar' ao clicar no botão 4ms
+· ✓ src/components/__tests__/ImpactoMapaModal.spec.ts > ImpactoMapaModal.vue > deve exibir estado de carregamento via prop 5ms
+· ✓ src/views/__tests__/CadAtribuicao.spec.ts > CadAtribuicao.vue > fetches data on mount 57ms
+· ✓ src/views/__tests__/CadAtribuicao.spec.ts > CadAtribuicao.vue > submits the form successfully 17ms
+· ✓ src/views/__tests__/CadAtribuicao.spec.ts > CadAtribuicao.vue > handles submission error 13ms
+· ✓ src/views/__tests__/CadAtribuicao.spec.ts > CadAtribuicao.vue > cancels and navigates back 5ms
+· ✓ src/components/__tests__/ConfirmacaoDisponibilizacaoModal.spec.ts > ConfirmacaoDisponibilizacaoModal.vue > renderiza corretamente para cadastro normal (isRevisao=false) 19ms
+· ✓ src/components/__tests__/ConfirmacaoDisponibilizacaoModal.spec.ts > ConfirmacaoDisponibilizacaoModal.vue > renderiza corretamente para revisão (isRevisao=true) 3ms
+· ✓ src/components/__tests__/ConfirmacaoDisponibilizacaoModal.spec.ts > ConfirmacaoDisponibilizacaoModal.vue > emite evento "confirmar" ao clicar no botão confirmar 9ms
+· ✓ src/components/__tests__/ConfirmacaoDisponibilizacaoModal.spec.ts > ConfirmacaoDisponibilizacaoModal.vue > emite evento "fechar" ao clicar em cancelar 4ms
+· ✓ src/components/__tests__/ModalAcaoBloco.spec.ts > ModalAcaoBloco.vue > deve inicializar e abrir o modal 29ms
+· ✓ src/components/__tests__/ModalAcaoBloco.spec.ts > ModalAcaoBloco.vue > deve selecionar/deselecionar todas as unidades 27ms
+· ✓ src/components/__tests__/ModalAcaoBloco.spec.ts > ModalAcaoBloco.vue > deve inicializar com unidades pré-selecionadas 3ms
+· ✓ src/components/__tests__/ModalAcaoBloco.spec.ts > ModalAcaoBloco.vue > deve emitir 'confirmar' com os IDs selecionados 25ms
+· ✓ src/components/__tests__/ModalAcaoBloco.spec.ts > ModalAcaoBloco.vue > deve validar data limite se obrigatória 5ms
+· ✓ src/components/__tests__/ModalAcaoBloco.spec.ts > ModalAcaoBloco.vue > deve fechar o modal e limpar estado 11ms
+· ✓ src/views/__tests__/OcupacoesCriticasDiagnostico.spec.ts > OcupacoesCriticasDiagnostico.vue > renders loading state initially 55ms
+· ✓ src/views/__tests__/OcupacoesCriticasDiagnostico.spec.ts > OcupacoesCriticasDiagnostico.vue > filters and displays only servers/competencies with Gap >= 2 18ms
+· ✓ src/views/__tests__/OcupacoesCriticasDiagnostico.spec.ts > OcupacoesCriticasDiagnostico.vue > saves occupation status on change 58ms
+· ✓ src/views/__tests__/OcupacoesCriticasDiagnostico.spec.ts > OcupacoesCriticasDiagnostico.vue > handles empty state 10ms
+· ✓ src/views/__tests__/OcupacoesCriticasDiagnostico.spec.ts > OcupacoesCriticasDiagnostico.vue > shows error when loading fails 33ms
+· ✓ src/views/__tests__/OcupacoesCriticasDiagnostico.spec.ts > OcupacoesCriticasDiagnostico.vue > shows error when saving fails 8ms
+· ✓ src/components/relatorios/__tests__/ModalMapasVigentes.spec.ts > ModalMapasVigentes.vue > renders correctly 28ms
+· ✓ src/components/relatorios/__tests__/ModalMapasVigentes.spec.ts > ModalMapasVigentes.vue > exports to CSV when button is clicked 8ms
+· ✓ src/components/relatorios/__tests__/ModalMapasVigentes.spec.ts > ModalMapasVigentes.vue > emits update:modelValue when modal is closed 5ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > buscarSubprocessoDetalhe > deve limpar o estado anterior antes de buscar novo detalhe 5ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > buscarSubprocessoDetalhe > deve falhar se não houver perfil selecionado 1ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > buscarSubprocessoDetalhe > deve buscar com sucesso para ADMIN (global) 5ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > buscarSubprocessoDetalhe > deve buscar com sucesso para SERVIDOR com unidade selecionada 4ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > buscarSubprocessoDetalhe > deve lidar com erro do serviço 1ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > buscarSubprocessoPorProcessoEUnidade > deve retornar codigo em caso de sucesso 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > buscarSubprocessoPorProcessoEUnidade > deve retornar null em caso de erro 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > buscarContextoEdicao > deve limpar o estado anterior antes de buscar novo contexto 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > buscarContextoEdicao > deve popular stores relacionados com dados retornados 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > buscarContextoEdicao > deve falhar se não houver perfil 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > buscarContextoEdicao > deve lidar com erro do serviço 1ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > disponibilizarCadastro deve executar com sucesso e feedback 1ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > disponibilizarCadastro deve lidar com erro 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > disponibilizarRevisaoCadastro deve executar com sucesso 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > disponibilizarRevisaoCadastro deve lidar com erro 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > devolverCadastro deve executar com sucesso 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > devolverCadastro deve lidar com erro 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > aceitarCadastro deve executar com sucesso 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > aceitarCadastro deve lidar com erro 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > homologarCadastro deve recarregar detalhes após sucesso 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > homologarCadastro deve lidar com erro 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > devolverRevisaoCadastro deve executar com sucesso 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > devolverRevisaoCadastro deve lidar com erro 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > aceitarRevisaoCadastro deve executar com sucesso 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > aceitarRevisaoCadastro deve lidar com erro 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > homologarRevisaoCadastro deve executar com sucesso e recarregar 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > Ações de Workflow > homologarRevisaoCadastro deve lidar com erro 0ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > alterarDataLimiteSubprocesso > deve delegar para apiClient e recarregar detalhes 1ms
+· ✓ src/stores/__tests__/subprocessos.spec.ts > Subprocessos Store > alterarDataLimiteSubprocesso > deve lidar com erro na API 0ms
+· ✓ src/views/__tests__/CadProcessoCoverage.spec.ts > CadProcesso.vue Coverage > handles mixed errors (field + generic) correctly in handleApiErrors 56ms
+· ✓ src/views/__tests__/CadProcessoCoverage.spec.ts > CadProcesso.vue Coverage > handles error creating process during initiation flow (without existing process) 26ms
+· ✓ src/views/__tests__/CadProcessoCoverage.spec.ts > CadProcesso.vue Coverage > handles error starting process during initiation flow 20ms
+· ✓ src/__tests__/views/PainelViewCoverage.spec.ts > PainelView Coverage > carregarDados calls only buscarProcessosPainel when usuarioCodigo is missing 23ms
+· ✓ src/__tests__/views/PainelViewCoverage.spec.ts > PainelView Coverage > ordenarAlertasPor does nothing when usuarioCodigo is missing 6ms
+· ✓ src/__tests__/views/PainelViewCoverage.spec.ts > PainelView Coverage > ordenarPor toggles asc/desc correctly 8ms
+· ✓ src/components/__tests__/TabelaProcessosCoverage.spec.ts > TabelaProcessos Coverage > handles Space key on row to select process 21ms
+· ✓ src/components/__tests__/TabelaProcessosCoverage.spec.ts > TabelaProcessos Coverage > returns empty class/attr for invalid inputs in row functions 7ms
+· ✓ src/components/__tests__/TabelaMovimentacoes.spec.ts > TabelaMovimentacoes.vue > deve renderizar a tabela com movimentações (verificar BTable) 19ms
+· ✓ src/components/__tests__/TabelaMovimentacoes.spec.ts > TabelaMovimentacoes.vue > deve renderizar mensagem quando não houver movimentações 10ms
+· ✓ src/components/__tests__/TabelaMovimentacoes.spec.ts > TabelaMovimentacoes.vue > deve passar a função rowAttr correta 3ms
+· ✓ src/components/__tests__/TabelaMovimentacoes.spec.ts > TabelaMovimentacoes.vue > deve renderizar conteúdo dos slots corretamente (formatação de data e sigla) 4ms
+· ✓ src/components/__tests__/TabelaMovimentacoes.spec.ts > TabelaMovimentacoes.vue > deve renderizar hífen quando unidade for nula nos slots 2ms
+· ✓ src/components/ui/__tests__/LoadingButton.spec.ts > LoadingButton.vue > renders correctly with default props 24ms
+· ✓ src/components/ui/__tests__/LoadingButton.spec.ts > LoadingButton.vue > renders correctly when loading is true 7ms
+· ✓ src/components/ui/__tests__/LoadingButton.spec.ts > LoadingButton.vue > renders icon when provided and not loading 2ms
+· ✓ src/components/ui/__tests__/LoadingButton.spec.ts > LoadingButton.vue > does not render icon when loading 15ms
+· ✓ src/components/ui/__tests__/LoadingButton.spec.ts > LoadingButton.vue > renders loading text when loading and loadingText provided 1ms
+· ✓ src/components/ui/__tests__/LoadingButton.spec.ts > LoadingButton.vue > renders normal text when not loading even if loadingText provided 1ms
+· ✓ src/components/ui/__tests__/LoadingButton.spec.ts > LoadingButton.vue > disables button when disabled prop is true 1ms
+· ✓ src/views/__tests__/CadAtividadesCoverage.spec.ts > CadAtividadesCoverage.spec.ts > deve tratar erro ao remover conhecimento 75ms
+· ✓ src/views/__tests__/CadAtividadesCoverage.spec.ts > CadAtividadesCoverage.spec.ts > deve tratar erro na validação ao disponibilizar cadastro 46ms
+· ✓ src/views/__tests__/CadAtividadesCoverage.spec.ts > CadAtividadesCoverage.spec.ts > deve logar erro se subprocesso não encontrado no onMounted (manual setup) 3ms
+· ✓ src/components/__tests__/ArvoreUnidadesCoverage.spec.ts > ArvoreUnidades.vue Coverage > deve atualizar unidades expandidas quando a prop unidades muda 17ms
+· ✓ src/components/__tests__/ArvoreUnidadesCoverage.spec.ts > ArvoreUnidades.vue Coverage > deve atualizar unidadesSelecionadasLocal quando modelValue muda externamente 5ms
+· ✓ src/components/__tests__/ArvoreUnidadesCoverage.spec.ts > ArvoreUnidades.vue Coverage > não deve atualizar unidadesSelecionadasLocal se modelValue for igual (evitar loop) 12ms
+· ✓ src/components/layout/__tests__/PageHeader.spec.ts > PageHeader.vue > renders title correctly 11ms
+· ✓ src/components/layout/__tests__/PageHeader.spec.ts > PageHeader.vue > renders subtitle from prop 2ms
+· ✓ src/components/layout/__tests__/PageHeader.spec.ts > PageHeader.vue > renders subtitle from slot 4ms
+· ✓ src/components/layout/__tests__/PageHeader.spec.ts > PageHeader.vue > renders actions slot 2ms
+· ✓ src/components/layout/__tests__/PageHeader.spec.ts > PageHeader.vue > does not render subtitle element if no prop or slot provided 1ms
+· ✓ src/views/__tests__/CadMapaCoverage.spec.ts > CadMapa Coverage > removerAtividadeAssociada does nothing if competency not found 22ms
+· ✓ src/views/__tests__/CadMapaCoverage.spec.ts > CadMapa Coverage > abrirModalImpacto does nothing if codSubprocesso is missing 3ms
+· ✓ src/components/__tests__/CompetenciaCardCoverage.spec.ts > CompetenciaCard Coverage > renders "Atividade não encontrada" for invalid activity ID 21ms
+· ✓ src/components/__tests__/CompetenciaCardCoverage.spec.ts > CompetenciaCard Coverage > getConhecimentosTooltip handles invalid activity gracefully 3ms
+· ✓ src/utils/__tests__/validators.prop.spec.ts > Propriedades de Validação (validators.ts) > validarEmail > deve rejeitar strings que não contêm @ 5ms
+· ✓ src/utils/__tests__/validators.prop.spec.ts > Propriedades de Validação (validators.ts) > validarEmail > deve aceitar emails válidos gerados 18ms
+· ✓ src/utils/__tests__/validators.prop.spec.ts > Propriedades de Validação (validators.ts) > validarEmail > deve rejeitar nulos ou undefined 10ms
+· ✓ src/utils/__tests__/validators.prop.spec.ts > Propriedades de Validação (validators.ts) > validarSenha > senhas válidas devem ter pelo menos 8 caracteres 4ms
+· ✓ src/utils/__tests__/validators.prop.spec.ts > Propriedades de Validação (validators.ts) > validarSenha > senhas válidas devem ter letras 1ms
+· ✓ src/components/relatorios/__tests__/ModalAndamentoGeral.spec.ts > ModalAndamentoGeral.vue > renders correctly 44ms
+· ✓ src/components/relatorios/__tests__/ModalAndamentoGeral.spec.ts > ModalAndamentoGeral.vue > exports to CSV when button is clicked 8ms
+· ✓ src/components/relatorios/__tests__/ModalAndamentoGeral.spec.ts > ModalAndamentoGeral.vue > emits update:modelValue when modal is closed 3ms
+· ✓ src/views/__tests__/SubprocessoViewCoverage.spec.ts > SubprocessoView Coverage > renders loading state when no data and no error 25ms
+· ✓ src/views/__tests__/SubprocessoViewCoverage.spec.ts > SubprocessoView Coverage > renders error state when lastError is present 6ms
+· ✓ src/views/__tests__/SubprocessoViewCoverage.spec.ts > SubprocessoView Coverage > confirmarAlteracaoDataLimite returns early if novaData is empty 3ms
+· ✓ src/views/__tests__/SubprocessoViewCoverage.spec.ts > SubprocessoView Coverage > confirmarReabertura returns early if justification is empty 8ms
+· ✓ src/stores/__tests__/feedback.spec.ts > Feedback Store > deve ter o estado inicial correto 11ms
+· ✓ src/stores/__tests__/feedback.spec.ts > Feedback Store > deve mostrar feedback corretamente 1ms
+· ✓ src/stores/__tests__/feedback.spec.ts > Feedback Store > deve fechar feedback 2ms
+· ✓ src/stores/__tests__/feedback.spec.ts > Feedback Store > deve fechar automaticamente após o delay 0ms
+· ✓ src/stores/__tests__/feedback.spec.ts > Feedback Store > deve limpar timer anterior ao mostrar novo feedback 0ms
+· ✓ src/stores/__tests__/feedback.spec.ts > Feedback Store > não deve setar timeout se delay for 0 0ms
+· ✓ src/__tests__/router.spec.ts > Router > deve definir o título do documento após a navegação 14ms
+· ✓ src/__tests__/router.spec.ts > Router > deve redirecionar da raiz para /login 1ms
+· ✓ src/__tests__/router.spec.ts > Router > deve resolver a rota de Login 0ms
+· ✓ src/__tests__/router.spec.ts > Router > deve resolver a rota de Painel com props 0ms
+· ✓ src/__tests__/router.spec.ts > Router > deve resolver a rota de Subprocesso com props dinâmicos 2ms
+· ✓ src/__tests__/router.spec.ts > Router > deve resolver a rota de SubprocessoMapa com props dinâmicos 2ms
+· ✓ src/__tests__/router.spec.ts > Router > deve resolver a rota de SubprocessoVisMapa com props dinâmicos 2ms
+· ✓ src/__tests__/router.spec.ts > Router > deve resolver a rota de SubprocessoCadastro com props dinâmicos 2ms
+· ✓ src/__tests__/router.spec.ts > Router > deve resolver a rota de SubprocessoVisCadastro com props dinâmicos 3ms
+· ✓ src/__tests__/router.spec.ts > Router > deve resolver a rota de Unidade com breadcrumb dinâmico 5ms
+· ✓ src/__tests__/router.spec.ts > Router > deve resolver a rota de Mapa de Unidade com props via query 1ms
+· ✓ src/__tests__/router.spec.ts > Router > deve resolver a rota de AtribuicaoTemporariaForm 5ms
+· ✓ src/__tests__/router.spec.ts > Router > deve usar o nome da rota como título se meta.title não estiver definido 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > deve inicializar com o estado padrão 3ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > deve limpar o erro com clearError 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > buscarProcessosPainel > deve atualizar o estado em caso de sucesso 1ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > buscarProcessosPainel > deve respeitar ordenacao personalizada 1ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > buscarProcessosPainel > não deve atualizar o estado em caso de falha 3ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > buscarContextoCompleto > deve limpar o estado anterior antes de buscar novo contexto 1ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > buscarContextoCompleto > deve atualizar processoDetalhe e subprocessosElegiveis 1ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > buscarContextoCompleto > deve lidar com erros 1ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > buscarProcessoDetalhe > deve limpar o estado anterior antes de buscar novo detalhe 1ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > buscarProcessoDetalhe > deve atualizar o estado em caso de sucesso 1ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > buscarProcessoDetalhe > não deve atualizar o estado em caso de falha 1ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > criarProcesso > deve chamar o processoService 1ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > criarProcesso > deve lançar um erro em caso de falha 2ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > atualizarProcesso > deve chamar o processoService 1ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > atualizarProcesso > deve lançar um erro em caso de falha 1ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > removerProcesso > deve chamar o processoService 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > removerProcesso > deve lançar um erro em caso de falha 1ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > iniciarProcesso > deve chamar o processoService corretamente 1ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > iniciarProcesso > deve lançar um erro em caso de falha 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > buscarProcessosFinalizados > deve atualizar o estado em caso de sucesso 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > buscarProcessosFinalizados > deve lançar erro em caso de falha 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > buscarSubprocessosElegiveis > deve atualizar o estado em caso de sucesso 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > buscarSubprocessosElegiveis > deve lançar erro em caso de falha 1ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > finalizarProcesso > deve chamar o processoService e recarregar os detalhes 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > finalizarProcesso > deve lançar erro em caso de falha 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > processarCadastroBloco > deve chamar o processoService e recarregar os detalhes 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > processarCadastroBloco > deve lançar erro em caso de falha 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > alterarDataLimiteSubprocesso > deve chamar o processoService e recarregar os detalhes se disponíveis 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > alterarDataLimiteSubprocesso > não deve recarregar detalhes se processoDetalhe for nulo 2ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > alterarDataLimiteSubprocesso > deve lançar erro em caso de falha 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > apresentarSugestoes > deve chamar o processoService e recarregar os detalhes 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > apresentarSugestoes > não deve recarregar detalhes se processoDetalhe for nulo 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > apresentarSugestoes > deve lançar erro em caso de falha 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > validarMapa > deve chamar o processoService e recarregar os detalhes 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > validarMapa > não deve recarregar detalhes se processoDetalhe for nulo 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > validarMapa > deve lançar erro em caso de falha 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > homologarValidacao > deve chamar o processoService e recarregar os detalhes 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > homologarValidacao > não deve recarregar detalhes se processoDetalhe for nulo 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > homologarValidacao > deve lançar erro em caso de falha 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > aceitarValidacao > deve chamar service corretamente 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > aceitarValidacao > não deve recarregar detalhes se processoDetalhe for nulo 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > aceitarValidacao > deve lançar erro em caso de falha 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > executarAcaoBloco > deve lançar erro se processoDetalhe não estiver carregado 1ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > executarAcaoBloco > deve lançar erro se unidade não for encontrada 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > executarAcaoBloco > deve executar aceitarCadastroEmBloco corretamente 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > executarAcaoBloco > deve executar aceitarValidacaoEmBloco corretamente 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > executarAcaoBloco > deve lançar erro se tentar aceitar unidade em situação inválida 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > executarAcaoBloco > deve executar homologarCadastroEmBloco corretamente 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > executarAcaoBloco > deve executar homologarValidacaoEmBloco corretamente 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > executarAcaoBloco > deve executar disponibilizarMapaEmBloco corretamente 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > obterUnidadesDoProcesso (Getter) > deve retornar unidades do processo correto 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > obterUnidadesDoProcesso (Getter) > deve retornar lista vazia se processo não corresponder 0ms
+· ✓ src/stores/__tests__/processos.spec.ts > useProcessosStore > Actions > obterUnidadesDoProcesso (Getter) > deve retornar lista vazia se processoDetalhe for nulo 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > deve inicializar com valores nulos 5ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > buscarMapaCompleto > deve limpar o estado anterior antes de buscar novo mapa completo 1ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > buscarMapaCompleto > deve chamar o serviço e atualizar o estado em caso de sucesso 1ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > buscarMapaCompleto > deve definir o estado como nulo em caso de falha 1ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > salvarMapa > deve chamar o serviço e atualizar o estado em caso de sucesso 1ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > salvarMapa > deve lançar erro em caso de falha 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > buscarMapaAjuste > deve chamar o serviço e atualizar o estado em caso de sucesso 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > buscarMapaAjuste > deve definir o estado como nulo em caso de falha 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > salvarAjustes > deve chamar o serviço com sucesso 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > salvarAjustes > deve lançar erro em caso de falha 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > buscarImpactoMapa > deve chamar o serviço e atualizar o estado em caso de sucesso 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > buscarImpactoMapa > deve definir o estado como nulo em caso de falha 1ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > adicionarCompetencia > deve chamar o serviço e atualizar o estado em caso de sucesso 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > adicionarCompetencia > deve lançar erro em caso de falha 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > atualizarCompetencia > deve chamar o serviço e atualizar o estado em caso de sucesso 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > atualizarCompetencia > deve validar se competência tem ID antes de atualizar 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > atualizarCompetencia > deve lançar erro em caso de falha 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > removerCompetencia > deve chamar o serviço e atualizar o estado em caso de sucesso 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > removerCompetencia > deve validar ID da competência antes de remover 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > removerCompetencia > deve lançar erro em caso de falha 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > buscarMapaVisualizacao > deve limpar o estado anterior antes de buscar novo mapa visualização 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > buscarMapaVisualizacao > deve chamar o serviço e atualizar o estado em caso de sucesso 0ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > buscarMapaVisualizacao > deve definir o estado como nulo em caso de falha 1ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > disponibilizarMapa > deve chamar o serviço com sucesso 1ms
+· ✓ src/stores/__tests__/mapas.spec.ts > useMapasStore > disponibilizarMapa > deve lançar erro em caso de falha 1ms
+· ✓ src/composables/__tests__/useApi.spec.ts > useApi > deve definir isLoading como verdadeiro enquanto a chamada da API estiver em andamento 12ms
+· ✓ src/composables/__tests__/useApi.spec.ts > useApi > deve definir dados na chamada da API bem-sucedida 0ms
+· ✓ src/composables/__tests__/useApi.spec.ts > useApi > deve definir erro na chamada da API com falha 1ms
+· ✓ src/composables/__tests__/useApi.spec.ts > useApi > deve limpar o erro quando clearError for chamado 1ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > disponibilizarCadastro > deve fazer POST em /subprocessos/1/cadastro/disponibilizar 3ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > disponibilizarCadastro > deve lidar com erro 404 1ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > disponibilizarCadastro > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > disponibilizarCadastro > deve lidar com erro de rede 1ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > disponibilizarRevisaoCadastro > deve fazer POST em /subprocessos/1/disponibilizar-revisao 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > disponibilizarRevisaoCadastro > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > disponibilizarRevisaoCadastro > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > disponibilizarRevisaoCadastro > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > devolverCadastro > deve fazer POST em /subprocessos/1/devolver-cadastro 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > devolverCadastro > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > devolverCadastro > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > devolverCadastro > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > aceitarCadastro > deve fazer POST em /subprocessos/1/aceitar-cadastro 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > aceitarCadastro > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > aceitarCadastro > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > aceitarCadastro > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > homologarCadastro > deve fazer POST em /subprocessos/1/homologar-cadastro 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > homologarCadastro > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > homologarCadastro > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > homologarCadastro > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > devolverRevisaoCadastro > deve fazer POST em /subprocessos/1/devolver-revisao-cadastro 2ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > devolverRevisaoCadastro > deve lidar com erro 404 1ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > devolverRevisaoCadastro > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > devolverRevisaoCadastro > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > aceitarRevisaoCadastro > deve fazer POST em /subprocessos/1/aceitar-revisao-cadastro 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > aceitarRevisaoCadastro > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > aceitarRevisaoCadastro > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > aceitarRevisaoCadastro > deve lidar com erro de rede 1ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > homologarRevisaoCadastro > deve fazer POST em /subprocessos/1/homologar-revisao-cadastro 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > homologarRevisaoCadastro > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > homologarRevisaoCadastro > deve lidar com erro 500 1ms
+· ✓ src/services/__tests__/cadastroService.spec.ts > cadastroService > homologarRevisaoCadastro > deve lidar com erro de rede 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/alertas > mapAlertaDtoToFrontend deve mapear todos os campos corretamente 3ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/atividades > mapAtividadeDtoToModel deve mapear corretamente 1ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/atividades > mapConhecimentoDtoToModel deve mapear corretamente 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/atividades > mapCriarAtividadeRequestToDto deve adicionar codSubrocesso 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/atividades > mapCriarConhecimentoRequestToDto deve mapear corretamente 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/mapas > mapMapaDtoToModel deve mapear campos e tratar datas 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/mapas > mapMapaCompletoDtoToModel should map nested structures 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/mapas > mapImpactoMapaDtoToModel deve mapear campos de impacto incluindo mudanças de atividade 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/mapas > mapMapaAjusteDtoToModel deve mapear campos de ajuste 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/processos > mapProcessoResumoDtoToFrontend deve copiar todas as propriedades 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/processos > mapProcessoDtoToFrontend deve copiar todas as propriedades 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/processos > mapProcessoDetalheDtoToFrontend deve mapear estruturas aninhadas 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/sgrh > mapPerfilUnidadeToFrontend deve mapear corretamente 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/sgrh > mapUsuarioToFrontend deve mapear corretamente 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/sgrh > LoginResponseToFrontend deve mapear corretamente 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/sgrh > perfisUnidadesParaDominio deve mapear array corretamente 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/usuarios > mapVWUsuarioToUsuario mapeia titulo numérico para codigo e campos 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/usuarios > mapVWUsuarioToUsuario usa codigo quando fornecido e define valores padrão para campos ausentes 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/usuarios > mapVWUsuariosArray mapeia array 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/unidades > mapUnidade mapeia campos, responsavel e filhas recursivas 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/unidades > mapUnidadeSnapshot mapeia estrutura simples de snapshot recursivamente 0ms
+· ✓ src/mappers/__tests__/mappers.spec.ts > mappers/unidades > mapUnidadesArray mapeia arrays 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > autenticar > deve fazer POST e retornar booleano 3ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > autenticar > deve lidar com erro 404 1ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > autenticar > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > autenticar > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > autorizar > deve fazer POST, mapear e retornar resposta 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > autorizar > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > autorizar > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > autorizar > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > entrar > deve fazer POST em /usuarios/entrar 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > entrar > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > entrar > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > entrar > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > buscarTodosUsuarios > deve fazer GET em /usuarios 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > buscarTodosUsuarios > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > buscarTodosUsuarios > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > buscarTodosUsuarios > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > buscarUsuariosPorUnidade > deve fazer GET em /unidades/1/usuarios 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > buscarUsuariosPorUnidade > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > buscarUsuariosPorUnidade > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > buscarUsuariosPorUnidade > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > buscarUsuarioPorTitulo > deve fazer GET em /usuarios/123 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > buscarUsuarioPorTitulo > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > buscarUsuarioPorTitulo > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/usuarioService.spec.ts > usuarioService > buscarUsuarioPorTitulo > deve lidar com erro de rede 0ms
+· ✓ src/stores/__tests__/unidades.spec.ts > useUnidadesStore > deve inicializar com unidades simuladas 2ms
+· ✓ src/stores/__tests__/unidades.spec.ts > useUnidadesStore > actions > deve buscar e definir unidades 0ms
+· ✓ src/stores/__tests__/unidades.spec.ts > useUnidadesStore > actions > deve lidar com erro em buscarUnidadesParaProcesso 1ms
+· ✓ src/stores/__tests__/unidades.spec.ts > useUnidadesStore > actions > buscarUnidade deve definir estado da unidade 2ms
+· ✓ src/stores/__tests__/unidades.spec.ts > useUnidadesStore > actions > buscarUnidade deve lidar com erro 0ms
+· ✓ src/stores/__tests__/unidades.spec.ts > useUnidadesStore > actions > buscarUnidadePorCodigo deve definir estado da unidade 0ms
+· ✓ src/stores/__tests__/unidades.spec.ts > useUnidadesStore > actions > buscarUnidadePorCodigo deve lidar com erro 0ms
+· ✓ src/stores/__tests__/unidades.spec.ts > useUnidadesStore > actions > buscarArvoreUnidade deve chamar serviço e definir unidade 0ms
+· ✓ src/stores/__tests__/unidades.spec.ts > useUnidadesStore > actions > buscarArvoreUnidade deve lidar com erro 1ms
+· ✓ src/stores/__tests__/unidades.spec.ts > useUnidadesStore > actions > obterUnidadesSubordinadas deve chamar serviço 1ms
+· ✓ src/stores/__tests__/unidades.spec.ts > useUnidadesStore > actions > obterUnidadesSubordinadas deve lidar com erro 1ms
+· ✓ src/stores/__tests__/unidades.spec.ts > useUnidadesStore > actions > obterUnidadeSuperior deve chamar serviço 2ms
+· ✓ src/stores/__tests__/unidades.spec.ts > useUnidadesStore > actions > obterUnidadeSuperior deve lidar com erro 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > buscarDiagnostico > deve fazer GET em /diagnosticos/123 2ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > buscarDiagnostico > deve lidar com erro 404 1ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > buscarDiagnostico > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > buscarDiagnostico > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > salvarAvaliacao > deve fazer POST em /diagnosticos/123/avaliacoes 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > salvarAvaliacao > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > salvarAvaliacao > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > salvarAvaliacao > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > buscarMinhasAvaliacoes > deve buscar minhas avaliações sem servidorTitulo 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > buscarMinhasAvaliacoes > deve buscar minhas avaliações com servidorTitulo 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > buscarMinhasAvaliacoes > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > buscarMinhasAvaliacoes > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > buscarMinhasAvaliacoes > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > concluirAutoavaliacao > deve fazer POST em /diagnosticos/123/avaliacoes/concluir 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > concluirAutoavaliacao > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > concluirAutoavaliacao > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > concluirAutoavaliacao > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > salvarOcupacao > deve fazer POST em /diagnosticos/123/ocupacoes 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > salvarOcupacao > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > salvarOcupacao > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > salvarOcupacao > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > buscarOcupacoes > deve fazer GET em /diagnosticos/123/ocupacoes 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > buscarOcupacoes > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > buscarOcupacoes > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > buscarOcupacoes > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > concluirDiagnostico > deve fazer POST em /diagnosticos/123/concluir 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > concluirDiagnostico > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > concluirDiagnostico > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/diagnosticoService.spec.ts > diagnosticoService > concluirDiagnostico > deve lidar com erro de rede 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > normalizeError > deve normalizar erro de rede (sem resposta) 2ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > normalizeError > deve normalizar erro 400 como validation 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > normalizeError > deve normalizar erro 401 como unauthorized 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > normalizeError > deve normalizar erro 403 como forbidden 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > normalizeError > deve normalizar erro 404 como notFound 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > normalizeError > deve normalizar erro 409 como conflict 1ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > normalizeError > deve normalizar erro 500 como unexpected 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > normalizeError > deve usar mensagem padrão se payload não tiver message 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > normalizeError > deve normalizar erro genérico (Error) 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > normalizeError > deve normalizar erro desconhecido (string/obj) 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > normalizeError > deve lidar com payload nulo em axios error 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > normalizeError > deve retornar unexpected para status desconhecido 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > notifyError > deve chamar feedbackStore.show com mensagem correta 7ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > notifyError > deve mapear corretamente títulos para cada kind 1ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > shouldNotifyGlobally > deve retornar true para unauthorized, forbidden, network, unexpected 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > shouldNotifyGlobally > deve retornar false para validation, notFound, conflict 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > existsOrFalse > deve retornar true se apiCall resolver 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > existsOrFalse > deve retornar false se apiCall rejeitar com 404 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > existsOrFalse > deve lançar erro se apiCall rejeitar com outro erro 1ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > getOrNull > deve retornar valor se apiCall resolver 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > getOrNull > deve retornar null se apiCall rejeitar com 404 0ms
+· ✓ src/utils/__tests__/apiError.spec.ts > apiError.ts > getOrNull > deve lançar erro se apiCall rejeitar com outro erro 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > listarAtividades deve buscar e mapear atividades 4ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > obterAtividadePorCodigo deve buscar e mapear uma atividade 1ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > criarAtividade deve mapear a requisição, enviar POST e retornar AtividadeOperacaoResponse 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > atualizarAtividade deve enviar POST e retornar AtividadeOperacaoResponse 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > excluirAtividade deve chamar POST e retornar AtividadeOperacaoResponse 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > listarConhecimentos deve buscar e mapear conhecimentos 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > criarConhecimento deve mapear a requisição, enviar POST e retornar AtividadeOperacaoResponse 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > atualizarConhecimento deve enviar POST e retornar AtividadeOperacaoResponse 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > excluirConhecimento deve chamar POST e retornar AtividadeOperacaoResponse 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 404 1ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro de rede 1ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/atividadeService.spec.ts > atividadeService > Tratamento de erros > deve lidar com erro de rede 0ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > buscarAtividadesParaSubprocesso > deve buscar e mapear as atividades 3ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > buscarAtividadesParaSubprocesso > deve lidar com erros 1ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > adicionarAtividade > deve adicionar uma atividade 5ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > adicionarAtividade > deve lidar com erros ao adicionar atividade 1ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > removerAtividade > deve remover uma atividade 1ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > removerAtividade > deve lidar com erros ao remover atividade 1ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > adicionarConhecimento > deve adicionar um conhecimento 1ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > adicionarConhecimento > deve lidar com erros ao adicionar conhecimento 0ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > removerConhecimento > deve remover um conhecimento 0ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > removerConhecimento > deve lidar com erros ao remover conhecimento 0ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > importarAtividades > deve importar atividades 1ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > importarAtividades > deve lidar com erros ao importar atividades 0ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > atualizarAtividade > deve atualizar uma atividade 0ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > atualizarAtividade > deve lidar com erros ao atualizar atividade 0ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > atualizarConhecimento > deve atualizar um conhecimento 0ms
+· ✓ src/stores/__tests__/atividades.spec.ts > useAtividadesStore > atualizarConhecimento > deve lidar com erros ao atualizar conhecimento 0ms
+· ✓ src/stores/__tests__/atribuicoes.spec.ts > useAtribuicaoTemporariaStore > deve limpar o erro com clearError 2ms
+· ✓ src/stores/__tests__/atribuicoes.spec.ts > useAtribuicaoTemporariaStore > actions > buscarAtribuicoes deve buscar e mapear atribuições corretamente (array direto) 1ms
+· ✓ src/stores/__tests__/atribuicoes.spec.ts > useAtribuicaoTemporariaStore > actions > buscarAtribuicoes deve lidar com resposta encapsulada em .data 0ms
+· ✓ src/stores/__tests__/atribuicoes.spec.ts > useAtribuicaoTemporariaStore > actions > buscarAtribuicoes deve lidar com resposta inválida (não array) 1ms
+· ✓ src/stores/__tests__/atribuicoes.spec.ts > useAtribuicaoTemporariaStore > actions > buscarAtribuicoes deve lidar com erros 1ms
+· ✓ src/stores/__tests__/atribuicoes.spec.ts > useAtribuicaoTemporariaStore > getters > obterAtribuicoesPorServidor deve retornar as atribuições corretas por ID do servidor 0ms
+· ✓ src/stores/__tests__/atribuicoes.spec.ts > useAtribuicaoTemporariaStore > getters > obterAtribuicoesPorServidor deve retornar uma lista vazia se nenhum servidor correspondente for encontrado 0ms
+· ✓ src/stores/__tests__/atribuicoes.spec.ts > useAtribuicaoTemporariaStore > getters > obterAtribuicoesPorUnidade deve retornar as atribuições corretas pela sigla da unidade 0ms
+· ✓ src/stores/__tests__/atribuicoes.spec.ts > useAtribuicaoTemporariaStore > getters > obterAtribuicoesPorUnidade deve retornar uma lista vazia se nenhuma unidade correspondente for encontrada 0ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > importarAtividades deve fazer requisição POST 8ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > listarAtividades deve fazer requisição GET e mapear dados 0ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > obterPermissoes deve fazer requisição GET 0ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > validarCadastro deve fazer requisição GET 0ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > obterStatus deve fazer requisição GET 0ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > buscarSubprocessoDetalhe deve fazer requisição GET com query params 0ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > buscarContextoEdicao deve fazer requisição GET com query params 3ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > buscarSubprocessoPorProcessoEUnidade deve fazer requisição GET com query params 0ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > adicionarCompetencia deve fazer requisição POST e mapear resposta 0ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > atualizarCompetencia deve fazer requisição POST e mapear resposta 0ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > removerCompetencia deve fazer requisição POST e mapear resposta 0ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > aceitarCadastroEmBloco deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > homologarCadastroEmBloco deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > aceitarValidacaoEmBloco deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > homologarValidacaoEmBloco deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/subprocessoService.spec.ts > subprocessoService > disponibilizarMapaEmBloco deve fazer requisição POST 0ms
+· ✓ src/stores/__tests__/analises.spec.ts > useAnalisesStore > deve inicializar com um mapa vazio para análises 3ms
+· ✓ src/stores/__tests__/analises.spec.ts > useAnalisesStore > getters > obterAnalisesPorSubprocesso deve retornar uma lista vazia se nenhuma análise estiver presente para o subprocesso 1ms
+· ✓ src/stores/__tests__/analises.spec.ts > useAnalisesStore > getters > obterAnalisesPorSubprocesso deve retornar as análises corretas para um dado subprocesso 0ms
+· ✓ src/stores/__tests__/analises.spec.ts > useAnalisesStore > actions > buscarAnalisesCadastro deve chamar o serviço e atualizar o estado 1ms
+· ✓ src/stores/__tests__/analises.spec.ts > useAnalisesStore > actions > buscarAnalisesValidacao deve chamar o serviço e atualizar o estado 0ms
+· ✓ src/stores/__tests__/analises.spec.ts > useAnalisesStore > actions > deve mesclar resultados ao buscar análises de cadastro e validação 1ms
+· ✓ src/stores/__tests__/analises.spec.ts > useAnalisesStore > actions > deve lidar com erro em buscarAnalisesCadastro 1ms
+· ✓ src/stores/__tests__/analises.spec.ts > useAnalisesStore > actions > deve lidar com erro em buscarAnalisesValidacao 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > obterMapaVisualizacao > deve fazer GET em /subprocessos/1/mapa-visualizacao 1ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > obterMapaVisualizacao > deve lidar com erro 404 1ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > obterMapaVisualizacao > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > obterMapaVisualizacao > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > verificarImpactosMapa > deve chamar o endpoint correto e mapear a resposta 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > verificarImpactosMapa > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > verificarImpactosMapa > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > verificarImpactosMapa > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > obterMapaCompleto > deve chamar o endpoint correto e mapear a resposta 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > obterMapaCompleto > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > obterMapaCompleto > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > obterMapaCompleto > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > salvarMapaCompleto > deve chamar o endpoint correto e mapear a resposta 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > salvarMapaCompleto > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > salvarMapaCompleto > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > salvarMapaCompleto > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > obterMapaAjuste > deve chamar o endpoint correto e mapear a resposta 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > obterMapaAjuste > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > obterMapaAjuste > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > obterMapaAjuste > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > salvarMapaAjuste > deve fazer POST em /subprocessos/1/mapa-ajuste/salvar 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > salvarMapaAjuste > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > salvarMapaAjuste > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > salvarMapaAjuste > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > verificarMapaVigente > deve chamar o endpoint correto 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > verificarMapaVigente > deve retornar false em caso de 404 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > verificarMapaVigente > deve retornar false se a resposta não contiver temMapaVigente 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > verificarMapaVigente > deve lançar exceção para outros erros 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > disponibilizarMapa > deve fazer POST em /subprocessos/1/disponibilizar-mapa 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > disponibilizarMapa > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > disponibilizarMapa > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/mapaService.spec.ts > mapaService > disponibilizarMapa > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarTodasUnidades > deve fazer GET em /unidades 1ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarTodasUnidades > deve lidar com erro 404 1ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarTodasUnidades > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarTodasUnidades > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarUnidadePorSigla > deve fazer GET em /unidades/sigla/TESTE 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarUnidadePorSigla > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarUnidadePorSigla > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarUnidadePorSigla > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarUnidadePorCodigo > deve fazer GET em /unidades/1 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarUnidadePorCodigo > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarUnidadePorCodigo > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarUnidadePorCodigo > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarArvoreComElegibilidade > deve fazer GET com código do processo 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarArvoreComElegibilidade > deve fazer GET sem código do processo 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarArvoreComElegibilidade > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarArvoreComElegibilidade > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarArvoreComElegibilidade > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarArvoreUnidade > deve fazer GET em /unidades/10/arvore 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarArvoreUnidade > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarArvoreUnidade > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarArvoreUnidade > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarSubordinadas > deve fazer GET em /unidades/sigla/SIGLA/subordinadas 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarSubordinadas > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarSubordinadas > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarSubordinadas > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarSuperior > deve fazer GET em /unidades/sigla/SIGLA/superior 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarSuperior > deve retornar null se a resposta for vazia 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarSuperior > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarSuperior > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/unidadesService.spec.ts > unidadesService > buscarSuperior > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/alertaService.spec.ts > AlertaService > marcarComoLido > deve fazer POST em /alertas/123/marcar-como-lido 4ms
+· ✓ src/services/__tests__/alertaService.spec.ts > AlertaService > marcarComoLido > deve lidar com erro 404 1ms
+· ✓ src/services/__tests__/alertaService.spec.ts > AlertaService > marcarComoLido > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/alertaService.spec.ts > AlertaService > marcarComoLido > deve lidar com erro de rede 0ms
+· ✓ src/composables/__tests__/useErrorHandler.spec.ts > useErrorHandler > inicializa com lastError como null 1ms
+· ✓ src/composables/__tests__/useErrorHandler.spec.ts > useErrorHandler > clearError limpa o erro 0ms
+· ✓ src/composables/__tests__/useErrorHandler.spec.ts > useErrorHandler > withErrorHandling limpa erro antes de executar 0ms
+· ✓ src/composables/__tests__/useErrorHandler.spec.ts > useErrorHandler > withErrorHandling retorna resultado quando bem-sucedido 1ms
+· ✓ src/composables/__tests__/useErrorHandler.spec.ts > useErrorHandler > withErrorHandling captura e normaliza erro 3ms
+· ✓ src/composables/__tests__/useErrorHandler.spec.ts > useErrorHandler > withErrorHandling chama callback onError quando fornecido 4ms
+· ✓ src/composables/__tests__/useErrorHandler.spec.ts > useErrorHandler > withErrorHandling não chama callback quando não há erro 0ms
+· ✓ src/composables/__tests__/useErrorHandler.spec.ts > useErrorHandler > withErrorHandling re-lança o erro original 0ms
+· ✓ src/__tests__/mappers/atividades.spec.ts > mappers/atividades.ts > mapAtividadeVisualizacaoToModel > deve mapear corretamente DTO completo 3ms
+· ✓ src/__tests__/mappers/atividades.spec.ts > mappers/atividades.ts > mapAtividadeVisualizacaoToModel > deve lidar com conhecimentos vazios 1ms
+· ✓ src/__tests__/mappers/atividades.spec.ts > mappers/atividades.ts > mapAtividadeVisualizacaoToModel > deve retornar null se entrada for null 1ms
+· ✓ src/__tests__/mappers/atividades.spec.ts > mappers/atividades.ts > mapConhecimentoVisualizacaoToModel > deve mapear corretamente 0ms
+· ✓ src/__tests__/mappers/atividades.spec.ts > mappers/atividades.ts > mapConhecimentoVisualizacaoToModel > deve retornar null se input null 0ms
+· ✓ src/__tests__/mappers/atividades.spec.ts > mappers/atividades.ts > mapAtividadeDtoToModel > deve mapear DTO de resposta 0ms
+· ✓ src/__tests__/mappers/atividades.spec.ts > mappers/atividades.ts > mapAtividadeDtoToModel > deve lidar com conhecimentos null 0ms
+· ✓ src/__tests__/mappers/atividades.spec.ts > mappers/atividades.ts > mapAtividadeDtoToModel > deve retornar null se input null 0ms
+· ✓ src/__tests__/mappers/atividades.spec.ts > mappers/atividades.ts > mapConhecimentoDtoToModel > deve mapear usando id 0ms
+· ✓ src/__tests__/mappers/atividades.spec.ts > mappers/atividades.ts > mapConhecimentoDtoToModel > deve mapear usando codigo (fallback) 0ms
+· ✓ src/__tests__/mappers/atividades.spec.ts > mappers/atividades.ts > mapConhecimentoDtoToModel > deve retornar null se input null 0ms
+· ✓ src/__tests__/mappers/atividades.spec.ts > mappers/atividades.ts > mapCriarAtividadeRequestToDto > deve adicionar mapaCodigo 0ms
+· ✓ src/__tests__/mappers/atividades.spec.ts > mappers/atividades.ts > mapCriarConhecimentoRequestToDto > deve formatar request 0ms
+· ✓ src/services/__tests__/analiseService.spec.ts > analiseService > listarAnalisesCadastro > deve fazer GET em /subprocessos/1/historico-cadastro 3ms
+· ✓ src/services/__tests__/analiseService.spec.ts > analiseService > listarAnalisesCadastro > deve lidar com erro 404 2ms
+· ✓ src/services/__tests__/analiseService.spec.ts > analiseService > listarAnalisesCadastro > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/analiseService.spec.ts > analiseService > listarAnalisesCadastro > deve lidar com erro de rede 1ms
+· ✓ src/services/__tests__/analiseService.spec.ts > analiseService > listarAnalisesValidacao > deve fazer GET em /subprocessos/1/historico-validacao 0ms
+· ✓ src/services/__tests__/analiseService.spec.ts > analiseService > listarAnalisesValidacao > deve lidar com erro 404 1ms
+· ✓ src/services/__tests__/analiseService.spec.ts > analiseService > listarAnalisesValidacao > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/analiseService.spec.ts > analiseService > listarAnalisesValidacao > deve lidar com erro de rede 0ms
+· ✓ src/router/__tests__/index.spec.ts > router/index.ts > deve criar uma instância do router 1ms
+· ✓ src/router/__tests__/index.spec.ts > router/index.ts > deve redirecionar para /login se não autenticado e rota requer auth 8ms
+· ✓ src/router/__tests__/index.spec.ts > router/index.ts > deve permitir navegação se autenticado 1ms
+· ✓ src/router/__tests__/index.spec.ts > router/index.ts > deve atualizar o título da página após navegação 1ms
+· ✓ src/router/__tests__/index.spec.ts > router/index.ts > deve usar o nome da rota como título se meta.title não existir 1ms
+· ✓ src/mappers/__tests__/unidades.spec.ts > mappers/unidades > mapUnidadeSnapshot > handles null/undefined input 2ms
+· ✓ src/mappers/__tests__/unidades.spec.ts > mappers/unidades > mapUnidadeSnapshot > maps alternative fields 1ms
+· ✓ src/mappers/__tests__/unidades.spec.ts > mappers/unidades > mapUnidadeSnapshot > maps another alternative for sigla 0ms
+· ✓ src/mappers/__tests__/unidades.spec.ts > mappers/unidades > mapUnidade > handles null/undefined input object 0ms
+· ✓ src/mappers/__tests__/unidades.spec.ts > mappers/unidades > mapUnidade > maps alternative fields 0ms
+· ✓ src/mappers/__tests__/unidades.spec.ts > mappers/unidades > mapUnidade > maps other alternative fields for user 0ms
+· ✓ src/mappers/__tests__/unidades.spec.ts > mappers/unidades > mapUnidade > maps responsavel with all fallback fields 0ms
+· ✓ src/mappers/__tests__/unidades.spec.ts > mappers/unidades > mapUnidade > maps responsavel using alternative fields 0ms
+· ✓ src/mappers/__tests__/unidades.spec.ts > mappers/unidades > mapUnidadesArray > handles undefined input 0ms
+· ✓ src/services/__tests__/atribuicaoTemporariaService.spec.ts > atribuicaoTemporariaService > buscarTodasAtribuicoes > deve fazer GET em /unidades/atribuicoes 1ms
+· ✓ src/services/__tests__/atribuicaoTemporariaService.spec.ts > atribuicaoTemporariaService > buscarTodasAtribuicoes > deve lidar com erro 404 1ms
+· ✓ src/services/__tests__/atribuicaoTemporariaService.spec.ts > atribuicaoTemporariaService > buscarTodasAtribuicoes > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/atribuicaoTemporariaService.spec.ts > atribuicaoTemporariaService > buscarTodasAtribuicoes > deve lidar com erro de rede 0ms
+· ✓ src/services/__tests__/atribuicaoTemporariaService.spec.ts > atribuicaoTemporariaService > criarAtribuicaoTemporaria > deve fazer POST em /unidades/1/atribuicoes-temporarias 0ms
+· ✓ src/services/__tests__/atribuicaoTemporariaService.spec.ts > atribuicaoTemporariaService > criarAtribuicaoTemporaria > deve lidar com erro 404 0ms
+· ✓ src/services/__tests__/atribuicaoTemporariaService.spec.ts > atribuicaoTemporariaService > criarAtribuicaoTemporaria > deve lidar com erro 500 0ms
+· ✓ src/services/__tests__/atribuicaoTemporariaService.spec.ts > atribuicaoTemporariaService > criarAtribuicaoTemporaria > deve lidar com erro de rede 0ms
+· ✓ src/stores/__tests__/usuarios.spec.ts > useUsuariosStore > deve inicializar com usuários simulados 2ms
+· ✓ src/stores/__tests__/usuarios.spec.ts > useUsuariosStore > actions > buscarUsuarios deve buscar e definir usuários 0ms
+· ✓ src/stores/__tests__/usuarios.spec.ts > useUsuariosStore > actions > buscarUsuarios deve lidar com erros 0ms
+· ✓ src/stores/__tests__/usuarios.spec.ts > useUsuariosStore > getters > obterUsuarioPorTitulo deve retornar o usuário correto pelo título 1ms
+· ✓ src/stores/__tests__/usuarios.spec.ts > useUsuariosStore > getters > obterUsuarioPorTitulo deve retornar undefined se nenhum usuário correspondente for encontrado 1ms
+· ✓ src/stores/__tests__/usuarios.spec.ts > useUsuariosStore > getters > obterUsuarioPorId deve retornar o usuário correto pelo id 1ms
+· ✓ src/stores/__tests__/usuarios.spec.ts > useUsuariosStore > getters > obterUsuarioPorId deve retornar undefined se nenhum usuário correspondente for encontrado 0ms
+· ✓ src/composables/__tests__/useFormErrors.spec.ts > useFormErrors > initializes with default values 1ms
+· ✓ src/composables/__tests__/useFormErrors.spec.ts > useFormErrors > sets errors from normalized error 0ms
+· ✓ src/composables/__tests__/useFormErrors.spec.ts > useFormErrors > clears errors 0ms
+· ✓ src/composables/__tests__/useFormErrors.spec.ts > useFormErrors > detects errors 0ms
+· ✓ src/composables/__tests__/useFormErrors.spec.ts > useFormErrors > handles null normalized error 0ms
+· ✓ src/composables/__tests__/useFormErrors.spec.ts > useFormErrors > handles normalized error without subErrors 0ms
+· ✓ src/composables/__tests__/useFormErrors.spec.ts > useFormErrors > ignores subErrors with missing fields 0ms
+· ✓ src/composables/__tests__/useFormErrors.spec.ts > useFormErrors > ignores subErrors for fields not in tracking list 0ms
+· ✓ src/composables/__tests__/useFormErrors.spec.ts > useFormErrors > uses default message if subError message is missing 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > criarProcesso deve fazer requisição POST 2ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > buscarProcessosFinalizados deve fazer requisição GET 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > iniciarProcesso deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > finalizarProcesso deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > obterProcessoPorCodigo deve fazer requisição GET 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > atualizarProcesso deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > excluirProcesso deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > obterDetalhesProcesso deve fazer requisição GET 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > processarAcaoEmBloco deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > buscarSubprocessosElegiveis deve fazer requisição GET 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > alterarDataLimiteSubprocesso deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > apresentarSugestoes deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > validarMapa deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > homologarValidacao deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > aceitarValidacao deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > buscarSubprocessos deve fazer requisição GET 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > buscarContextoCompleto deve fazer requisição GET 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > reabrirCadastro deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > reabrirRevisaoCadastro deve fazer requisição POST 0ms
+· ✓ src/services/__tests__/processoService.spec.ts > processoService > enviarLembrete deve fazer requisição POST 0ms
+· ✓ src/stores/__tests__/perfil.spec.ts > usePerfilStore > deve inicializar com valores padrão se o localStorage estiver vazio 2ms
+· ✓ src/stores/__tests__/perfil.spec.ts > usePerfilStore > deve inicializar com valores do localStorage se disponíveis 0ms
+· ✓ src/stores/__tests__/perfil.spec.ts > usePerfilStore > actions > definirUsuarioCodigo deve atualizar usuarioCodigo e armazená-lo no localStorage 1ms
+· ✓ src/stores/__tests__/perfil.spec.ts > usePerfilStore > actions > definirPerfilUnidade deve atualizar perfilSelecionado e unidadeSelecionada e armazená-los no localStorage 4ms
+· ✓ src/stores/__tests__/perfil.spec.ts > usePerfilStore > actions > loginCompleto deve autenticar, buscar perfis e selecionar automaticamente se houver apenas um perfil 2ms
+· ✓ src/stores/__tests__/perfil.spec.ts > usePerfilStore > actions > loginCompleto não deve selecionar automaticamente se houver múltiplos perfis 1ms
+· ✓ src/stores/__tests__/perfil.spec.ts > usePerfilStore > actions > selecionarPerfilUnidade deve chamar entrar e definir o perfil 1ms
+· ✓ src/stores/__tests__/perfil.spec.ts > usePerfilStore > actions > deve lidar com erro em loginCompleto 2ms
+· ✓ src/stores/__tests__/perfil.spec.ts > usePerfilStore > actions > deve lidar com erro em selecionarPerfilUnidade 1ms
+· ✓ src/stores/__tests__/perfil.spec.ts > usePerfilStore > actions > deve retornar falso se a autenticação falhar em loginCompleto 1ms
+· ✓ src/stores/__tests__/perfil.spec.ts > usePerfilStore > actions > deve fazer logout corretamente 1ms
+· ✓ src/stores/__tests__/perfil.spec.ts > usePerfilStore > actions > deve limpar o erro 0ms
+· ✓ src/mappers/__tests__/mapas.spec.ts > mappers/mapas.ts > mapMapaDtoToModel > mapeia todos os campos do DTO para o modelo 1ms
+· ✓ src/mappers/__tests__/mapas.spec.ts > mappers/mapas.ts > mapMapaDtoToModel > retorna array vazio quando competencias é undefined 0ms
+· ✓ src/mappers/__tests__/mapas.spec.ts > mappers/mapas.ts > mapMapaCompletoDtoToModel > mapeia todos os campos incluindo competencias 0ms
+· ✓ src/mappers/__tests__/mapas.spec.ts > mappers/mapas.ts > mapMapaCompletoDtoToModel > retorna valores padrão quando campos são undefined 0ms
+· ✓ src/mappers/__tests__/mapas.spec.ts > mappers/mapas.ts > mapMapaCompletoDtoToModel > retorna array vazio para atividadesCodigos quando undefined 0ms
+· ✓ src/mappers/__tests__/mapas.spec.ts > mappers/mapas.ts > mapImpactoMapaDtoToModel > mapeia todos os campos de impacto 0ms
+· ✓ src/mappers/__tests__/mapas.spec.ts > mappers/mapas.ts > mapImpactoMapaDtoToModel > retorna arrays vazios quando campos são undefined 0ms
+· ✓ src/mappers/__tests__/mapas.spec.ts > mappers/mapas.ts > mapImpactoMapaDtoToModel > retorna array vazio para atividadesAfetadas quando undefined 0ms
+· ✓ src/mappers/__tests__/mapas.spec.ts > mappers/mapas.ts > mapMapaAjusteDtoToModel > mapeia todos os campos de ajuste 0ms
+· ✓ src/mappers/__tests__/mapas.spec.ts > mappers/mapas.ts > mapMapaAjusteDtoToModel > retorna array vazio quando competencias é undefined 0ms
+· ✓ src/__tests__/utils/logger.spec.ts > utils/logger.ts > deve exportar uma instância do logger 1ms
+· ✓ src/__tests__/utils/logger.spec.ts > utils/logger.ts > getLogLevel > deve retornar 1 (ERROR) para ambiente de teste 0ms
+· ✓ src/__tests__/utils/logger.spec.ts > utils/logger.ts > getLogLevel > deve retornar 3 (WARN) para ambiente de produção 0ms
+· ✓ src/__tests__/utils/logger.spec.ts > utils/logger.ts > getLogLevel > deve retornar 4 (INFO) para ambiente de desenvolvimento 0ms
+· ✓ src/__tests__/utils/logger.spec.ts > utils/logger.ts > getLogLevel > deve retornar 4 (INFO) para outros ambientes 0ms
+· ✓ src/__tests__/utils/logger.spec.ts > utils/logger.ts > getLogLevel > deve usar import.meta.env.MODE como padrão 0ms
+· ✓ src/mappers/__tests__/processos.spec.ts > mappers/processos > mapUnidadeParticipanteDtoToFrontend handles missing children (filhos) 2ms
+· ✓ src/mappers/__tests__/processos.spec.ts > mappers/processos > mapProcessoDetalheDtoToFrontend handles missing lists 0ms
+· ✓ src/mappers/__tests__/usuarios.spec.ts > mappers/usuarios > mapVWUsuarioToUsuario handles null/undefined input 2ms
+· ✓ src/mappers/__tests__/usuarios.spec.ts > mappers/usuarios > mapVWUsuarioToUsuario resolves ID correctly (id > codigo > titulo number) 0ms
+· ✓ src/mappers/__tests__/usuarios.spec.ts > mappers/usuarios > mapVWUsuarioToUsuario handles non-numeric titulo 0ms
+· ✓ src/mappers/__tests__/usuarios.spec.ts > mappers/usuarios > mapVWUsuarioToUsuario maps alternative fields 0ms
+· ✓ src/mappers/__tests__/usuarios.spec.ts > mappers/usuarios > mapVWUsuarioToUsuario maps other alternative fields set 2 0ms
+· ✓ src/mappers/__tests__/usuarios.spec.ts > mappers/usuarios > mapVWUsuariosArray handles undefined input 1ms
+· ✓ src/stores/__tests__/alertas.spec.ts > useAlertasStore > deve inicializar com alertas simulados e datas formatadas 4ms
+· ✓ src/stores/__tests__/alertas.spec.ts > useAlertasStore > deve limpar o erro com clearError 1ms
+· ✓ src/stores/__tests__/alertas.spec.ts > useAlertasStore > actions > buscarAlertas > deve chamar painelService e atualizar o estado 1ms
+· ✓ src/stores/__tests__/alertas.spec.ts > useAlertasStore > actions > buscarAlertas > deve lidar com erros no serviço 1ms
+· ✓ src/stores/__tests__/alertas.spec.ts > useAlertasStore > actions > marcarAlertaComoLido > deve realizar update otimista e chamar alertaService sem recarregar tudo 1ms
+· ✓ src/stores/__tests__/alertas.spec.ts > useAlertasStore > actions > marcarAlertaComoLido > deve reverter estado em caso de falha do serviço 0ms
+· ✓ src/stores/__tests__/alertas.spec.ts > useAlertasStore > actions > marcarAlertaComoLido > deve lidar com alerta não encontrado na lista local 0ms
+· ✓ src/stores/__tests__/configuracoes.spec.ts > Configuracoes Store > carregarConfiguracoes deve preencher parametros em caso de sucesso 4ms
+· ✓ src/stores/__tests__/configuracoes.spec.ts > Configuracoes Store > carregarConfiguracoes deve definir erro em caso de falha 0ms
+· ✓ src/stores/__tests__/configuracoes.spec.ts > Configuracoes Store > salvarConfiguracoes deve atualizar parametros em caso de sucesso 2ms
+· ✓ src/stores/__tests__/configuracoes.spec.ts > Configuracoes Store > salvarConfiguracoes deve definir erro em caso de falha 1ms
+· ✓ src/stores/__tests__/configuracoes.spec.ts > Configuracoes Store > getValor deve retornar valor correto ou padrao 1ms
+· ✓ src/stores/__tests__/configuracoes.spec.ts > Configuracoes Store > getDiasInativacaoProcesso deve retornar valor configurado ou padrao 0ms
+· ✓ src/stores/__tests__/configuracoes.spec.ts > Configuracoes Store > getDiasAlertaNovo deve retornar valor configurado ou padrao 0ms
+· ✓ src/utils/__tests__/csv.spec.ts > csv utils > should generate correct CSV for simple data 1ms
+· ✓ src/utils/__tests__/csv.spec.ts > csv utils > should escape double quotes in data 0ms
+· ✓ src/utils/__tests__/csv.spec.ts > csv utils > should sanitize fields to prevent CSV Injection 0ms
+· ✓ src/utils/__tests__/csv.spec.ts > csv utils > should handle empty data 0ms
+· ✓ src/utils/__tests__/validators.spec.ts > validators > validarEmail > deve retornar false para email vazio 1ms
+· ✓ src/utils/__tests__/validators.spec.ts > validators > validarEmail > deve retornar true para email válido 0ms
+· ✓ src/utils/__tests__/validators.spec.ts > validators > validarEmail > deve retornar false para email inválido 0ms
+· ✓ src/utils/__tests__/validators.spec.ts > validators > validarSenha > deve retornar false para senha vazia 0ms
+· ✓ src/utils/__tests__/validators.spec.ts > validators > validarSenha > deve retornar false para senha curta 0ms
+· ✓ src/utils/__tests__/validators.spec.ts > validators > validarSenha > deve retornar false se não tiver letra 0ms
+· ✓ src/utils/__tests__/validators.spec.ts > validators > validarSenha > deve retornar false se não tiver número 0ms
+· ✓ src/utils/__tests__/validators.spec.ts > validators > validarSenha > deve retornar true para senha válida 0ms
+· ✓ src/utils/__tests__/formatters.spec.ts > formatters > formatarSituacaoProcesso > deve formatar CRIADO 1ms
+· ✓ src/utils/__tests__/formatters.spec.ts > formatters > formatarSituacaoProcesso > deve formatar FINALIZADO 0ms
+· ✓ src/utils/__tests__/formatters.spec.ts > formatters > formatarSituacaoProcesso > deve formatar EM_ANDAMENTO 0ms
+· ✓ src/utils/__tests__/formatters.spec.ts > formatters > formatarSituacaoProcesso > deve retornar a string original se desconhecido 0ms
+· ✓ src/utils/__tests__/formatters.spec.ts > formatters > formatarTipoProcesso > deve formatar MAPEAMENTO 0ms
+· ✓ src/utils/__tests__/formatters.spec.ts > formatters > formatarTipoProcesso > deve formatar REVISAO 0ms
+· ✓ src/utils/__tests__/formatters.spec.ts > formatters > formatarTipoProcesso > deve formatar DIAGNOSTICO 0ms
+· ✓ src/utils/__tests__/formatters.spec.ts > formatters > formatarTipoProcesso > deve retornar a string original se desconhecido 0ms
+· ✓ src/utils/__tests__/formatters.spec.ts > formatters > limparCpf > deve remover caracteres não numéricos 0ms
+· ✓ src/utils/__tests__/formatters.spec.ts > formatters > formatarCpf > deve retornar string vazia para entrada vazia 0ms
+· ✓ src/utils/__tests__/formatters.spec.ts > formatters > formatarCpf > deve formatar CPF válido corretamente 0ms
+· ✓ src/utils/__tests__/formatters.spec.ts > formatters > formatarCpf > deve retornar limpo se não tiver 11 dígitos 0ms
+· ✓ src/utils/__tests__/formatters.spec.ts > formatters > formatarCpf > deve formatar CPF com caracteres extras removidos 0ms
+· ✓ src/utils/__tests__/parseDate.spec.ts > parseDate - utilitário > deve parsear ISO date string 3ms
+· ✓ src/utils/__tests__/parseDate.spec.ts > parseDate - utilitário > deve parsear ISO datetime string com timezone 0ms
+· ✓ src/utils/__tests__/parseDate.spec.ts > parseDate - utilitário > deve parsear DD/MM/YYYY válido 1ms
+· ✓ src/utils/__tests__/parseDate.spec.ts > parseDate - utilitário > deve retornar null para DD/MM/YYYY inválido 0ms
+· ✓ src/utils/__tests__/parseDate.spec.ts > parseDate - utilitário > deve parsear timestamp numérico 0ms
+· ✓ src/utils/__tests__/parseDate.spec.ts > parseDate - utilitário > deve aceitar objeto Date válido 0ms
+· ✓ src/utils/__tests__/parseDate.spec.ts > parseDate - utilitário > deve retornar null para entrada vazia 0ms
+· ✓ src/utils/__tests__/parseDate.spec.ts > parseDate - utilitário > deve retornar null para string inválida 0ms
+· ✓ src/services/__tests__/administradorService.spec.ts > AdministradorService > listarAdministradores deve fazer uma requisição GET para /usuarios/administradores 1ms
+· ✓ src/services/__tests__/administradorService.spec.ts > AdministradorService > adicionarAdministrador deve fazer uma requisição POST para /usuarios/administradores 0ms
+· ✓ src/services/__tests__/administradorService.spec.ts > AdministradorService > removerAdministrador deve fazer uma requisição POST para /usuarios/administradores/{titulo}/remover 0ms
+· ✓ src/composables/__tests__/usePerfil.spec.ts > usePerfil > deve retornar o perfil e a unidade selecionada corretamente 1ms
+· ✓ src/composables/__tests__/usePerfil.spec.ts > usePerfil > deve retornar o servidor logado com os dados corretos 0ms
+· ✓ src/composables/__tests__/usePerfil.spec.ts > usePerfil > deve retornar null se servidorLogado não encontrar usuário 0ms
+· ✓ src/composables/__tests__/usePerfil.spec.ts > usePerfil > deve retornar unidadeSelecionada como ID se sigla não encontrada e unidades vazias 0ms
+· ✓ src/composables/__tests__/usePerfil.spec.ts > usePerfil > deve usar unidadeSelecionadaSigla se disponível 0ms
+· ✓ src/composables/__tests__/usePerfil.spec.ts > usePerfil > deve achatar hierarquia de unidades corretamente 0ms
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/services/__tests__/painelService.spec.ts > painelService > listarProcessos > deve buscar e mapear processos
+AssertionError: expected "vi.fn()" to be called at least once
+ ❯ src/services/__tests__/painelService.spec.ts:52:15
+     50|             expect(
+     51|                 mockProcessoMappers.mapProcessoResumoDtoToFrontend,
+     52|             ).toHaveBeenCalled();
+       |               ^
+     53|             expect(
+     54|                 mockProcessoMappers.mapProcessoResumoDtoToFrontend.moc…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/utils/__tests__/index.spec.ts > utilitários > tratamento de erro em formatDateBR > deve retornar "Data inválida" quando toLocaleDateString lança erro
+AssertionError: expected '28/01/2026' to be 'Data inválida' // Object.is equality
+
+Expected: [32m"Data inválida"[39m
+Received: [31m"28/01/2026"[39m
+
+ ❯ src/utils/__tests__/index.spec.ts:229:40
+    227|                 throw new Error("Erro de formatação");
+    228|             });
+    229|             expect(formatDateBR(date)).toBe("Data inválida");
+       |                                        ^
+    230|         });
+    231|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/utils/__tests__/index.spec.ts > tratamento de erro em formatDateForInput > deve retornar string vazia quando getFullYear lança erro
+AssertionError: expected '2026-01-28' to be '' // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[31m+ 2026-01-28[39m
+
+ ❯ src/utils/__tests__/index.spec.ts:249:42
+    247|             throw new Error("Erro ao obter ano");
+    248|         });
+    249|         expect(formatDateForInput(date)).toBe("");
+       |                                          ^
+    250|     });
+    251| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  src/utils/__tests__/index.spec.ts > tratamento de erro em isDateValidAndFuture > deve retornar false quando setHours lança erro
+AssertionError: expected true to be false // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- false[39m
+[31m+ true[39m
+
+ ❯ src/utils/__tests__/index.spec.ts:268:44
+    266|             throw new Error("Erro ao definir horas");
+    267|         });
+    268|         expect(isDateValidAndFuture(date)).toBe(false);
+       |                                            ^
+    269|     });
+    270| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  src/components/relatorios/__tests__/ModalDiagnosticosGaps.spec.ts > ModalDiagnosticosGaps.vue > formats date correctly
+AssertionError: expected 'ProcessoUnidadeGaps IdentificadosImpo…' to contain '15/10/2023'
+
+Expected: [32m"[7m15/10[27m/2023"[39m
+Received: [31m"[7mProcessoUnidadeGaps IdentificadosImportância MédiaDominio MédioCompetências CríticasStatusData DiagnósticoProcesso AUnidade X24.5/53/5Comp A, Comp BFinalizado14/10/2023Processo BUnidade Y53/52/5Comp CEm análise19/11/2023Processo CUnidade Z00/50/5Pendente30/11/2023Processo DUnidade W11/51/5Outro30/11[27m/2023"[39m
+
+ ❯ src/components/relatorios/__tests__/ModalDiagnosticosGaps.spec.ts:106:29
+    104|      const wrapper = mount(ModalDiagnosticosGaps, mountOptions);
+    105|      // 15/10/2023 for first item
+    106|      expect(wrapper.text()).toContain('15/10/2023');
+       |                             ^
+    107|   });
+    108| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  3 failed | 113 passed (116)
+      Tests  5 failed | 1227 passed (1232)
+   Start at  16:41:32
+   Duration  37.78s (transform 4.51s, setup 22.14s, import 139.01s, tests 35.35s, environment 45.52s)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/services/__tests__/painelService.spec.ts > painelService > listarProcessos > deve buscar e mapear processos
+AssertionError: expected "vi.fn()" to be called at least once
+ ❯ src/services/__tests__/painelService.spec.ts:52:15
+     50|             expect(
+     51|                 mockProcessoMappers.mapProcessoResumoDtoToFrontend,
+     52|             ).toHaveBeenCalled();
+       |               ^
+     53|             expect(
+     54|                 mockProcessoMappers.mapProcessoResumoDtoToFrontend.moc…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/utils/__tests__/index.spec.ts > utilitários > tratamento de erro em formatDateBR > deve retornar "Data inválida" quando toLocaleDateString lança erro
+AssertionError: expected '28/01/2026' to be 'Data inválida' // Object.is equality
+
+Expected: [32m"Data inválida"[39m
+Received: [31m"28/01/2026"[39m
+
+ ❯ src/utils/__tests__/index.spec.ts:229:40
+    227|                 throw new Error("Erro de formatação");
+    228|             });
+    229|             expect(formatDateBR(date)).toBe("Data inválida");
+       |                                        ^
+    230|         });
+    231|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/utils/__tests__/index.spec.ts > tratamento de erro em formatDateForInput > deve retornar string vazia quando getFullYear lança erro
+AssertionError: expected '2026-01-28' to be '' // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[31m+ 2026-01-28[39m
+
+ ❯ src/utils/__tests__/index.spec.ts:249:42
+    247|             throw new Error("Erro ao obter ano");
+    248|         });
+    249|         expect(formatDateForInput(date)).toBe("");
+       |                                          ^
+    250|     });
+    251| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  src/utils/__tests__/index.spec.ts > tratamento de erro em isDateValidAndFuture > deve retornar false quando setHours lança erro
+AssertionError: expected true to be false // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- false[39m
+[31m+ true[39m
+
+ ❯ src/utils/__tests__/index.spec.ts:268:44
+    266|             throw new Error("Erro ao definir horas");
+    267|         });
+    268|         expect(isDateValidAndFuture(date)).toBe(false);
+       |                                            ^
+    269|     });
+    270| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  src/components/relatorios/__tests__/ModalDiagnosticosGaps.spec.ts > ModalDiagnosticosGaps.vue > formats date correctly
+AssertionError: expected 'ProcessoUnidadeGaps IdentificadosImpo…' to contain '15/10/2023'
+
+Expected: [32m"[7m15/10[27m/2023"[39m
+Received: [31m"[7mProcessoUnidadeGaps IdentificadosImportância MédiaDominio MédioCompetências CríticasStatusData DiagnósticoProcesso AUnidade X24.5/53/5Comp A, Comp BFinalizado14/10/2023Processo BUnidade Y53/52/5Comp CEm análise19/11/2023Processo CUnidade Z00/50/5Pendente30/11/2023Processo DUnidade W11/51/5Outro30/11[27m/2023"[39m
+
+ ❯ src/components/relatorios/__tests__/ModalDiagnosticosGaps.spec.ts:106:29
+    104|      const wrapper = mount(ModalDiagnosticosGaps, mountOptions);
+    105|      // 15/10/2023 for first item
+    106|      expect(wrapper.text()).toContain('15/10/2023');
+       |                             ^
+    107|   });
+    108| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  3 failed | 113 passed (116)
+      Tests  5 failed | 1227 passed (1232)
+   Start at  16:41:32
+   Duration  37.79s (transform 4.51s, setup 22.14s, import 139.01s, tests 35.35s, environment 45.52s)
+

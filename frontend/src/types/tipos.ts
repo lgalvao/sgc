@@ -94,19 +94,22 @@ export interface Conhecimento {
 export interface Atividade {
     codigo: number;
     descricao: string;
-    conhecimentos: { codigo: number; descricao: string }[];
+    conhecimentos: Conhecimento[];
     mapaCodigo?: number;
 }
 
 export interface Competencia {
     codigo: number;
     descricao: string;
-    atividadesAssociadas: number[];
+    atividades: Atividade[];
+    atividadesAssociadas?: number[];
 }
 
-export interface CompetenciaCompleta extends Competencia {
-    atividades: Atividade[];
-}
+// Mantendo para retrocompatibilidade se necessário, mas marcando como depreciado se possível
+export type CompetenciaCompleta = Competencia;
+export type CompetenciaVisualizacao = Competencia;
+export type AtividadeVisualizacao = Atividade;
+export type ConhecimentoVisualizacao = Conhecimento;
 
 export interface Mapa {
     codigo: number;
@@ -308,22 +311,7 @@ export interface SubprocessoDetalhe {
     permissoes: SubprocessoPermissoes;
 }
 
-export interface ConhecimentoVisualizacao {
-    codigo: number;
-    descricao: string;
-}
-
-export interface AtividadeVisualizacao {
-    codigo: number;
-    descricao: string;
-    conhecimentos: ConhecimentoVisualizacao[];
-}
-
-export interface CompetenciaVisualizacao {
-    codigo: number;
-    descricao: string;
-    atividades: AtividadeVisualizacao[];
-}
+// Interfaces de visualização removidas (consolidadas no início do arquivo)
 
 export interface MapaVisualizacao {
     codigo: number;

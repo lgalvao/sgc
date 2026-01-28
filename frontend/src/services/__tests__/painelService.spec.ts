@@ -1,7 +1,5 @@
-import {describe, expect, it, vi} from "vitest";
+import {describe, expect, it} from "vitest";
 import {setupServiceTest, testErrorHandling} from "@/test-utils/serviceTestHelpers";
-import * as alertaMappers from "@/mappers/alertas";
-import * as processoMappers from "@/mappers/processos";
 import * as service from "../painelService";
 
 // Mock do axios no nível do arquivo ainda é necessário se a implementação importa diretamente
@@ -24,9 +22,6 @@ describe("painelService", () => {
     // Usando helper centralizado
     const { mockApi } = setupServiceTest();
 
-    const mockProcessoMappers = vi.mocked(processoMappers);
-    const mockAlertaMappers = vi.mocked(alertaMappers);
-
     describe("listarProcessos", () => {
         it("deve buscar e mapear processos", async () => {
             const dtoList = [{codigo: 1, tipo: "MAPEAMENTO"}];
@@ -47,13 +42,7 @@ describe("painelService", () => {
             expect(mockApi.get).toHaveBeenCalledWith("/painel/processos", {
                 params: {perfil: "CHEFE", unidade: 1, page: 0, size: 20},
             });
-            expect(
-                mockProcessoMappers.mapProcessoResumoDtoToFrontend,
-            ).toHaveBeenCalled();
-            expect(
-                mockProcessoMappers.mapProcessoResumoDtoToFrontend.mock.calls[0][0],
-            ).toEqual(dtoList[0]);
-            expect(result.content[0]).toHaveProperty("mapped", true);
+            expect(result.content[0]).toEqual(dtoList[0]);
             expect(result.totalPages).toBe(1);
         });
 
@@ -96,11 +85,7 @@ describe("painelService", () => {
             expect(mockApi.get).toHaveBeenCalledWith("/painel/alertas", {
                 params: {usuarioTitulo: "123", unidade: 1, page: 0, size: 20},
             });
-            expect(mockAlertaMappers.mapAlertaDtoToFrontend).toHaveBeenCalled();
-            expect(mockAlertaMappers.mapAlertaDtoToFrontend.mock.calls[0][0]).toEqual(
-                dtoList[0],
-            );
-            expect(result.content[0]).toHaveProperty("mapped", true);
+            expect(result.content[0]).toEqual(dtoList[0]);
             expect(result.totalElements).toBe(1);
         });
 
