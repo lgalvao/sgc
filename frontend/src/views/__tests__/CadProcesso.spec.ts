@@ -63,7 +63,7 @@ describe('CadProcesso.vue', () => {
                     BContainer: { template: '<div><slot /></div>' },
                     BAlert: { template: '<div class="alert"><slot /></div>', props: ['modelValue', 'variant'] },
                     BForm: { template: '<form @submit.prevent><slot /></form>' },
-                    BFormGroup: { template: '<div><slot /></div>', props: ['label'] },
+                    BFormGroup: { template: '<div><slot name="label">{{ label }}</slot><slot /></div>', props: ['label'] },
                     BFormInput: {
                         template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
                         props: ['modelValue']
@@ -577,6 +577,27 @@ describe('CadProcesso.vue', () => {
         expect(focusMock).toHaveBeenCalled();
 
         querySelectorSpy.mockRestore();
+    });
+
+    it('displays required field indicators (asterisks)', async () => {
+        const { wrapper } = createWrapper();
+
+        const asterisks = wrapper.findAll('span.text-danger');
+
+        // Should have at least 4 asterisks (Description, Type, Units, Date Limit)
+        // Note: LoginView might use similar spans, but we are testing CadProcesso here.
+        // Based on our implementation plan, we are adding 4 asterisks.
+        // We verify that they are inside BFormGroup labels.
+
+        expect(asterisks.length).toBeGreaterThanOrEqual(4);
+
+        // We can check if specific labels contain the asterisk
+
+        // Since we stubbed BFormGroup to render slot 'label', we can check the text content of the wrapper
+        expect(wrapper.html()).toContain('Descrição <span class="text-danger" aria-hidden="true">*</span>');
+        expect(wrapper.html()).toContain('Tipo <span class="text-danger" aria-hidden="true">*</span>');
+        expect(wrapper.html()).toContain('Unidades participantes <span class="text-danger" aria-hidden="true">*</span>');
+        expect(wrapper.html()).toContain('Data limite <span class="text-danger" aria-hidden="true">*</span>');
     });
 
 });

@@ -25,3 +25,7 @@ scenarios are handled gracefully and consistently by default without extra boile
 ## 2026-01-27 - [Explicit Choice vs Smart Default]
 **Learning:** For critical classifications like "Process Type", defaulting to the first option (e.g., "Mapeamento") prone to user error, as users often skip fields with pre-filled values.
 **Action:** Initialize such fields as null/empty and force an explicit user selection using a disabled placeholder option (e.g., "-- Selecione --"), ensuring the user makes a conscious decision.
+
+## 2026-01-29 - [Bootstrap Form Required Indicators]
+**Learning:** `BFormGroup` does not automatically add a required indicator (asterisk) based on validation rules or props. This leaves users guessing which fields are mandatory until they hit "Save".
+**Action:** Use the `#label` slot in `BFormGroup` to explicitly include a `<span class="text-danger" aria-hidden="true">*</span>` for required fields, ensuring the indicator is visually consistent.

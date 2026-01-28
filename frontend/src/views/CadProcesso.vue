@@ -19,9 +19,11 @@
 
       <BFormGroup
           class="mb-3"
-          label="Descrição"
           label-for="descricao"
       >
+        <template #label>
+          Descrição <span class="text-danger" aria-hidden="true">*</span>
+        </template>
         <BFormInput
             id="descricao"
             ref="inputDescricaoRef"
@@ -30,6 +32,7 @@
             data-testid="inp-processo-descricao"
             placeholder="Descreva o processo"
             type="text"
+            required
         />
         <BFormInvalidFeedback :state="fieldErrors.descricao ? false : null">
           {{ fieldErrors.descricao }}
@@ -38,15 +41,18 @@
 
       <BFormGroup
           class="mb-3"
-          label="Tipo"
           label-for="tipo"
       >
+        <template #label>
+          Tipo <span class="text-danger" aria-hidden="true">*</span>
+        </template>
         <BFormSelect
             id="tipo"
             v-model="tipo"
             :options="tipoOptions"
             :state="fieldErrors.tipo ? false : null"
             data-testid="sel-processo-tipo"
+            required
         >
           <template #first>
             <BFormSelectOption :value="null" disabled>-- Selecione o tipo --</BFormSelectOption>
@@ -57,10 +63,10 @@
         </BFormInvalidFeedback>
       </BFormGroup>
 
-      <BFormGroup
-          class="mb-3"
-          label="Unidades participantes"
-      >
+      <BFormGroup class="mb-3">
+        <template #label>
+          Unidades participantes <span class="text-danger" aria-hidden="true">*</span>
+        </template>
         <div class="border rounded p-3" :class="{ 'border-danger': fieldErrors.unidades }">
           <ArvoreUnidades
               v-if="!unidadesStore.isLoading"
@@ -83,15 +89,18 @@
       <BFormGroup
           class="mb-3"
           description="Prazo para conclusão da primeira etapa (Mapeamento/Revisão)."
-          label="Data limite"
           label-for="dataLimite"
       >
+        <template #label>
+          Data limite <span class="text-danger" aria-hidden="true">*</span>
+        </template>
         <BFormInput
             id="dataLimite"
             v-model="dataLimite"
             :state="fieldErrors.dataLimite ? false : null"
             data-testid="inp-processo-data-limite"
             type="date"
+            required
         />
         <BFormInvalidFeedback :state="fieldErrors.dataLimite ? false : null">
           {{ fieldErrors.dataLimite }}
