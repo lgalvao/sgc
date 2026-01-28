@@ -1,5 +1,6 @@
 package sgc.processo.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
@@ -52,6 +54,11 @@ class ProcessoFacadeQueryTest {
 
     @InjectMocks
     private ProcessoFacade processoFacade;
+
+    @BeforeEach
+    void setup() {
+        ReflectionTestUtils.setField(processoFacade, "self", processoFacade);
+    }
 
     @Nested
     @DisplayName("Consultas e Detalhes")
