@@ -3,7 +3,6 @@ package sgc.seguranca.login;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAccessoNegado;
@@ -16,10 +15,7 @@ import sgc.organizacao.model.Usuario;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.seguranca.login.dto.PerfilUnidadeDto;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Serviço responsável pelo fluxo de login: autenticação, autorização e geração
@@ -35,7 +31,7 @@ public class LoginFacade {
     private final ClienteAcessoAd clienteAcessoAd;
     private final UnidadeFacade unidadeService;
     private final sgc.organizacao.mapper.UsuarioMapper usuarioMapper;
-    private final Map<String, LocalDateTime> autenticacoesRecentes = new ConcurrentHashMap<>();
+
     @Value("${aplicacao.ambiente-testes:false}")
     private boolean ambienteTestes;
 
@@ -52,16 +48,6 @@ public class LoginFacade {
     }
 
     /**
-     * Remove autenticações pendentes expiradas a cada minuto.
-     * O tempo limite é de 5 minutos.
-     */
-    @Scheduled(fixedRate = 60000)
-    public void limparAutenticacoesExpiradas() {
-        LocalDateTime limite = LocalDateTime.now().minusMinutes(5);
-        autenticacoesRecentes.entrySet().removeIf(entry -> entry.getValue().isBefore(limite));
-    }
-
-    /**
      * Autentica um usuário com título de eleitor e senha.
      *
      * @param tituloEleitoral Título de eleitor do usuário
@@ -71,7 +57,6 @@ public class LoginFacade {
     public boolean autenticar(String tituloEleitoral, String senha) {
         if (ambienteTestes) {
             log.info("Autenticação em ambiente de testes/homologação para o usuário {}", tituloEleitoral);
-            autenticacoesRecentes.put(tituloEleitoral, LocalDateTime.now());
             return true;
         }
 
@@ -80,18 +65,12 @@ public class LoginFacade {
             return false;
         }
 
-        boolean autenticado;
         try {
-            autenticado = clienteAcessoAd.autenticar(tituloEleitoral, senha);
+            return clienteAcessoAd.autenticar(tituloEleitoral, senha);
         } catch (ErroAutenticacao e) {
             log.warn("Falha na autenticação do usuário {}: {}", tituloEleitoral, e.getMessage());
-            autenticado = false;
+            return false;
         }
-
-        if (autenticado) {
-            autenticacoesRecentes.put(tituloEleitoral, LocalDateTime.now());
-        }
-        return autenticado;
     }
 
     /**
@@ -103,11 +82,6 @@ public class LoginFacade {
      */
     @Transactional(readOnly = true)
     public List<PerfilUnidadeDto> autorizar(String tituloEleitoral) {
-        if (!autenticacoesRecentes.containsKey(tituloEleitoral)) {
-            log.warn("Tentativa de autorização sem autenticação prévia para usuário {}", tituloEleitoral);
-            throw new ErroAutenticacao("É necessário autenticar-se antes de consultar autorizações.");
-        }
-
         return buscarAutorizacoesInterno(tituloEleitoral);
     }
 
@@ -119,20 +93,10 @@ public class LoginFacade {
      */
     @Transactional(readOnly = true)
     public String entrar(EntrarRequest request) {
-        LocalDateTime ultimoAcesso = autenticacoesRecentes.get(request.tituloEleitoral());
-
-        if (ultimoAcesso == null || ultimoAcesso.isBefore(LocalDateTime.now().minusMinutes(5))) {
-            log.warn("Tentativa de acesso não autorizada (sem login prévio) para usuário {}",
-                    request.tituloEleitoral());
-            throw new ErroAutenticacao("Sessão de login expirada ou inválida. Por favor, autentique-se novamente.");
-        }
-
         Long codUnidade = request.unidadeCodigo();
         unidadeService.buscarEntidadePorId(codUnidade);
 
         List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoesInterno(request.tituloEleitoral());
-
-        autenticacoesRecentes.remove(request.tituloEleitoral());
 
         boolean autorizado = autorizacoes.stream()
                 .anyMatch(pu -> {
@@ -165,13 +129,4 @@ public class LoginFacade {
                 .toList();
     }
 
-    // Métodos para testes
-    int getAutenticacoesRecentesSize() {
-        return autenticacoesRecentes.size();
-    }
-
-    void expireAllAuthenticationsForTest() {
-        LocalDateTime passado = LocalDateTime.now().minusMinutes(10);
-        autenticacoesRecentes.replaceAll((k, v) -> passado);
-    }
 }

@@ -1,5 +1,6 @@
 package sgc.seguranca.login;
 
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import sgc.seguranca.login.dto.PerfilUnidadeDto;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -47,6 +49,9 @@ class LoginControllerTest {
     @MockitoBean
     private LimitadorTentativasLogin limitadorTentativasLogin;
 
+    @MockitoBean
+    private GerenciadorJwt gerenciadorJwt;
+
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
@@ -63,13 +68,16 @@ class LoginControllerTest {
 
         doNothing().when(limitadorTentativasLogin).verificar(anyString());
         when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+        when(gerenciadorJwt.gerarTokenPreAuth("123")).thenReturn("token-pre-auth");
 
         mockMvc.perform(post("/api/usuarios/autenticar")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(content().string("true"));
+                .andExpect(content().string("true"))
+                .andExpect(cookie().exists("SGC_PRE_AUTH"))
+                .andExpect(cookie().httpOnly("SGC_PRE_AUTH", true));
 
         verify(limitadorTentativasLogin).verificar(anyString());
     }
@@ -166,11 +174,13 @@ class LoginControllerTest {
         UnidadeDto unidadeDto = UnidadeDto.builder().codigo(1L).nome("AdmUnit").sigla("ADM").build();
         PerfilUnidadeDto pu = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
         when(loginFacade.autorizar("123")).thenReturn(List.of(pu));
+        when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth")).thenReturn(Optional.of("123"));
 
         AutorizarRequest req = AutorizarRequest.builder().tituloEleitoral("123").build();
 
         mockMvc.perform(post("/api/usuarios/autorizar")
                         .with(csrf())
+                        .cookie(new Cookie("SGC_PRE_AUTH", "token-pre-auth"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
@@ -193,13 +203,58 @@ class LoginControllerTest {
 
         when(loginFacade.entrar(any(EntrarRequest.class))).thenReturn("token-jwt");
         when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
+        when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth")).thenReturn(Optional.of("123"));
 
         mockMvc.perform(post("/api/usuarios/entrar")
                         .with(csrf())
+                        .cookie(new Cookie("SGC_PRE_AUTH", "token-pre-auth"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value("token-jwt"))
                 .andExpect(jsonPath("$.nome").value("Admin User"));
+    }
+
+    @Test
+    @DisplayName("POST /api/usuarios/autorizar - Deve falhar sem cookie")
+    @WithMockUser
+    void autorizar_SemCookie_DeveFalhar() throws Exception {
+        AutorizarRequest req = AutorizarRequest.builder().tituloEleitoral("123").build();
+
+        mockMvc.perform(post("/api/usuarios/autorizar")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("POST /api/usuarios/autorizar - Deve falhar com token invalido")
+    @WithMockUser
+    void autorizar_TokenInvalido_DeveFalhar() throws Exception {
+        AutorizarRequest req = AutorizarRequest.builder().tituloEleitoral("123").build();
+        when(gerenciadorJwt.validarTokenPreAuth("token-invalido")).thenReturn(Optional.empty());
+
+        mockMvc.perform(post("/api/usuarios/autorizar")
+                        .with(csrf())
+                        .cookie(new Cookie("SGC_PRE_AUTH", "token-invalido"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("POST /api/usuarios/autorizar - Deve falhar se token nao corresponder ao usuario")
+    @WithMockUser
+    void autorizar_TokenOutroUsuario_DeveFalhar() throws Exception {
+        AutorizarRequest req = AutorizarRequest.builder().tituloEleitoral("123").build();
+        when(gerenciadorJwt.validarTokenPreAuth("token-outro")).thenReturn(Optional.of("456"));
+
+        mockMvc.perform(post("/api/usuarios/autorizar")
+                        .with(csrf())
+                        .cookie(new Cookie("SGC_PRE_AUTH", "token-outro"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isUnauthorized());
     }
 }

@@ -75,10 +75,6 @@ class LoginServiceTest {
                 .unidadeCodigo(1L)
                 .build();
 
-        // Prepara a autenticação recente
-        when(clienteAcessoAd.autenticar(titulo, "senha")).thenReturn(true);
-        loginFacade.autenticar(titulo, "senha");
-
         // Simula busca de autorizações retornando lista vazia ou sem o perfil/unidade
         sgc.organizacao.model.Usuario usuario = new sgc.organizacao.model.Usuario();
         usuario.setTituloEleitoral(titulo);
@@ -100,44 +96,5 @@ class LoginServiceTest {
 
         // Deve retornar true pois encontrou usuário
         org.junit.jupiter.api.Assertions.assertTrue(result);
-    }
-
-    @Test
-    @DisplayName("Deve falhar autorização sem autenticação prévia")
-    void deveFalharAutorizacaoSemAutenticacaoPrevia() {
-        var exception = assertThrows(ErroAutenticacao.class, () -> loginFacade.autorizar("user_nao_autenticado"));
-        assertNotNull(exception);
-    }
-
-    @Test
-    @DisplayName("Deve falhar entrar com autenticação expirada")
-    void deveFalharEntrarComAutenticacaoExpirada() {
-        String titulo = "user_expirado";
-        // Autentica
-        when(clienteAcessoAd.autenticar(titulo, "senha")).thenReturn(true);
-        loginFacade.autenticar(titulo, "senha");
-
-        // Força expiração
-        loginFacade.expireAllAuthenticationsForTest();
-
-        EntrarRequest req = EntrarRequest.builder().tituloEleitoral(titulo).build();
-        var exception = assertThrows(ErroAutenticacao.class, () -> loginFacade.entrar(req));
-        assertNotNull(exception);
-    }
-
-    @Test
-    @DisplayName("Deve limpar autenticações expiradas")
-    void deveLimparAutenticacoesExpiradas() {
-        String titulo = "user_clean";
-        when(clienteAcessoAd.autenticar(titulo, "senha")).thenReturn(true);
-        loginFacade.autenticar(titulo, "senha");
-
-        // Força expiração
-        loginFacade.expireAllAuthenticationsForTest();
-
-        loginFacade.limparAutenticacoesExpiradas();
-
-        var exception = assertThrows(ErroAutenticacao.class, () -> loginFacade.autorizar(titulo));
-        assertNotNull(exception);
     }
 }
