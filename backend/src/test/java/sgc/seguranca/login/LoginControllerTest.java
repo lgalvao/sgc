@@ -78,11 +78,7 @@ class LoginControllerTest {
     @DisplayName("POST /api/usuarios/autenticar - Deve obter IP do header X-Forwarded-For")
     @WithMockUser
     void autenticar_IpHeader() throws Exception {
-        AutenticarRequest req = AutenticarRequest.builder()
-                .tituloEleitoral("123")
-                .senha("senha")
-                .build();
-
+        AutenticarRequest req = criarRequestPadrao();
         when(loginFacade.autenticar("123", "senha")).thenReturn(true);
 
         mockMvc.perform(post("/api/usuarios/autenticar")
@@ -93,6 +89,54 @@ class LoginControllerTest {
                 .andExpect(status().isOk());
 
         verify(limitadorTentativasLogin).verificar("10.0.0.1");
+    }
+
+    @Test
+    @DisplayName("POST /api/usuarios/autenticar - Deve usar RemoteAddr quando X-Forwarded-For for nulo")
+    @WithMockUser
+    void autenticar_IpRemoteAddrQuandoHeaderNull() throws Exception {
+        AutenticarRequest req = criarRequestPadrao();
+        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+
+        mockMvc.perform(post("/api/usuarios/autenticar")
+                        .with(csrf())
+                        .with(request -> {
+                            request.setRemoteAddr("192.168.1.1");
+                            return request;
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk());
+
+        verify(limitadorTentativasLogin).verificar("192.168.1.1");
+    }
+
+    @Test
+    @DisplayName("POST /api/usuarios/autenticar - Deve usar RemoteAddr quando X-Forwarded-For for vazio")
+    @WithMockUser
+    void autenticar_IpRemoteAddrQuandoHeaderVazio() throws Exception {
+        AutenticarRequest req = criarRequestPadrao();
+        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+
+        mockMvc.perform(post("/api/usuarios/autenticar")
+                        .with(csrf())
+                        .header("X-Forwarded-For", "")
+                        .with(request -> {
+                            request.setRemoteAddr("192.168.1.1");
+                            return request;
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk());
+
+        verify(limitadorTentativasLogin).verificar("192.168.1.1");
+    }
+
+    private AutenticarRequest criarRequestPadrao() {
+        return AutenticarRequest.builder()
+                .tituloEleitoral("123")
+                .senha("senha")
+                .build();
     }
 
     @Test

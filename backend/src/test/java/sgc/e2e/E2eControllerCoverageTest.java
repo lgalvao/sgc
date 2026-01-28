@@ -175,4 +175,41 @@ class E2eControllerCoverageTest {
         verify(jdbcTemplate).execute("TRUNCATE TABLE sgc.VALID_TABLE");
         verify(jdbcTemplate, never()).execute(contains("INVALID-TABLE"));
     }
+
+    @Test
+    @DisplayName("Deve ignorar tipo desconhecido ao criar fixture (branch coverage)")
+    void deveIgnorarTipoDesconhecidoAoCriarFixture() {
+        // Arrange
+        E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
+                "Teste Diagnostico", "SIGLA", true, 10
+        );
+        
+        UnidadeDto unidadeDto = UnidadeDto.builder().codigo(1L).sigla("SIGLA").build();
+        ProcessoDto processoDto = ProcessoDto.builder().codigo(100L).build();
+
+        when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(unidadeDto);
+        when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(processoDto);
+        
+        // Mocking para o security check interno
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+
+        // Act
+        // Usando Reflection para chamar o método privado com um tipo que não tem tratamento específico de inicialização
+        org.springframework.test.util.ReflectionTestUtils.invokeMethod(
+                controller, 
+                "criarProcessoFixture", 
+                request, 
+                sgc.processo.model.TipoProcesso.DIAGNOSTICO
+        );
+
+        // Assert
+        // Verifica que criou o processo
+        verify(processoFacade).criar(any(CriarProcessoRequest.class));
+        
+        // E verifica que NÃO chamou nenhum iniciador específico
+        verify(processoFacade, never()).iniciarProcessoMapeamento(anyLong(), anyList());
+        verify(processoFacade, never()).iniciarProcessoRevisao(anyLong(), anyList());
+        // O método recarrega o processo se iniciar=true, vamos verificar se buscou
+        verify(processoFacade).obterPorId(100L);
+    }
 }

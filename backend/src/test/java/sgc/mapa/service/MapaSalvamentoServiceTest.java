@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.CompetenciaMapaDto;
+import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.mapper.MapaCompletoMapper;
 import sgc.mapa.model.*;
@@ -18,8 +19,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -106,14 +111,45 @@ class MapaSalvamentoServiceTest {
         ativ1.setCompetencias(new HashSet<>(List.of(compExistente)));
 
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-        when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(List.of(compExistente));
+        when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(new java.util.ArrayList<>(List.of(compExistente)));
         when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of(ativ1));
         when(competenciaRepo.saveAll(any())).thenAnswer(i -> i.getArgument(0));
         when(mapaRepo.save(any())).thenAnswer(i -> i.getArgument(0));
-        when(mapaCompletoMapper.toDto(any(), any(), any())).thenReturn(sgc.mapa.dto.MapaCompletoDto.builder().build());
+        when(mapaCompletoMapper.toDto(any(), any(), any())).thenReturn(MapaCompletoDto.builder().build());
 
         // Deve executar sem erros, cobrindo a remoção e os warns de integridade
         var result = mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
         org.junit.jupiter.api.Assertions.assertNotNull(result);
+    }
+
+    @Test
+    @DisplayName("Deve salvar mapa sem atividades pré-existentes (branch coverage)")
+    void deveSalvarMapaSemAtividadesPreExistentes() {
+        // Arrange
+        Long codMapa = 100L;
+        SalvarMapaRequest request = new SalvarMapaRequest("Obs", List.of());
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(codMapa);
+
+        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        // Retorna lista vazia de competências
+        when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(List.of());
+        // Retorna lista vazia de atividades -> Branch a ser coberto no ternário
+        when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of());
+
+        // Mocks auxiliares
+        when(competenciaRepo.saveAll(anyList())).thenReturn(List.of());
+        when(atividadeRepo.saveAll(anyList())).thenReturn(List.of());
+
+        MapaCompletoDto dto = new MapaCompletoDto(codMapa, null, "Obs", List.of());
+        when(mapaCompletoMapper.toDto(eq(mapa), any(), anyList())).thenReturn(dto);
+
+        // Act
+        MapaCompletoDto result = mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
+
+        // Assert
+        assertThat(result).isNotNull();
+        // Verifica que passou sem erro e salvou
+        verify(mapaRepo).save(mapa);
     }
 }

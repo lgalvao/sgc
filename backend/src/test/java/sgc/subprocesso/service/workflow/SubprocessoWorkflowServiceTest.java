@@ -115,6 +115,27 @@ class SubprocessoWorkflowServiceTest {
 
         assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, sp.getSituacao());
         verify(repositorioSubprocesso).save(sp);
+        verify(repositorioSubprocesso).save(sp);
+    }
+
+    @Test
+    @DisplayName("atualizarSituacaoParaEmAndamento - Outro Tipo (Inalterado/Branch Gap)")
+    void atualizarSituacaoParaEmAndamento_OutroTipo() {
+        Long codMapa = 100L;
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.DIAGNOSTICO); // Caso não tratado nos ifs
+        sp.setProcesso(p);
+
+        when(repositorioSubprocesso.findByMapaCodigo(codMapa)).thenReturn(Optional.of(sp));
+
+        workflowService.atualizarSituacaoParaEmAndamento(codMapa);
+
+        // Situação não deve mudar
+        assertEquals(SituacaoSubprocesso.NAO_INICIADO, sp.getSituacao());
+        // Não deve salvar
+        verify(repositorioSubprocesso, never()).save(sp);
     }
 
     @Test
