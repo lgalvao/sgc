@@ -213,11 +213,6 @@ public class ProcessoFacade {
         return processoRepo.findById(codigo).map(processoMapper::toDto);
     }
 
-    /**
-     * Busca a entidade Processo por ID.
-     * Método público para permitir uso por outros serviços (ex:
-     * EventoProcessoListener).
-     */
     @Transactional(readOnly = true)
     public Processo buscarEntidadePorId(Long codigo) {
         return processoRepo.findById(codigo)
@@ -227,8 +222,8 @@ public class ProcessoFacade {
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
     public ProcessoContextoDto obterContextoCompleto(Long codigo) {
-        ProcessoDetalheDto detalhes = obterDetalhes(codigo);
-        List<SubprocessoElegivelDto> elegiveis = listarSubprocessosElegiveis(codigo);
+        ProcessoDetalheDto detalhes = self.obterDetalhes(codigo);
+        List<SubprocessoElegivelDto> elegiveis = self.listarSubprocessosElegiveis(codigo);
 
         return ProcessoContextoDto.builder()
                 .processo(detalhes)
@@ -302,7 +297,7 @@ public class ProcessoFacade {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void enviarLembrete(Long codProcesso, Long unidadeCodigo) {
-        Processo processo = buscarEntidadePorId(codProcesso);
+        Processo processo = self.buscarEntidadePorId(codProcesso);
         Unidade unidade = unidadeService.buscarEntidadePorId(unidadeCodigo);
 
         // Verifica se unidade participa do processo
