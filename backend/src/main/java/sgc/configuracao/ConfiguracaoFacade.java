@@ -2,37 +2,61 @@ package sgc.configuracao;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import sgc.configuracao.model.Parametro;
-import sgc.configuracao.model.ParametroRepo;
 
 import java.util.List;
 
+/**
+ * Facade para gerenciamento de configurações do sistema.
+ *
+ * <p>Esta facade orquestra operações relacionadas a parâmetros de configuração,
+ * delegando a persistência para {@link ConfiguracaoService}.
+ *
+ * @see ConfiguracaoService
+ */
 @Service
 @RequiredArgsConstructor
 public class ConfiguracaoFacade {
 
-    private final ParametroRepo parametroRepo;
+    private final ConfiguracaoService configuracaoService;
 
+    /**
+     * Busca todos os parâmetros de configuração.
+     *
+     * @return lista com todos os parâmetros
+     */
     public List<Parametro> buscarTodos() {
-        return parametroRepo.findAll();
+        return configuracaoService.buscarTodos();
     }
 
+    /**
+     * Busca um parâmetro por chave.
+     *
+     * @param chave chave do parâmetro
+     * @return parâmetro encontrado
+     */
     public Parametro buscarPorChave(String chave) {
-        return parametroRepo.findByChave(chave)
-                .orElseThrow(() -> new sgc.comum.erros.ErroConfiguracao(
-                        "Parâmetro '%s' não encontrado. Configure o parâmetro no banco de dados.".formatted(chave)));
+        return configuracaoService.buscarPorChave(chave);
     }
 
-    @Transactional
+    /**
+     * Salva uma lista de parâmetros.
+     *
+     * @param parametros lista de parâmetros a salvar
+     * @return lista de parâmetros salvos
+     */
     public List<Parametro> salvar(List<Parametro> parametros) {
-        return parametroRepo.saveAll(parametros);
+        return configuracaoService.salvar(parametros);
     }
 
-    @Transactional
+    /**
+     * Atualiza o valor de um parâmetro existente.
+     *
+     * @param chave chave do parâmetro
+     * @param novoValor novo valor do parâmetro
+     * @return parâmetro atualizado
+     */
     public Parametro atualizar(String chave, String novoValor) {
-        Parametro parametro = buscarPorChave(chave);
-        parametro.setValor(novoValor);
-        return parametroRepo.save(parametro);
+        return configuracaoService.atualizar(chave, novoValor);
     }
 }
