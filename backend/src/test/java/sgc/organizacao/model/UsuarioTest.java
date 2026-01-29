@@ -14,15 +14,15 @@ import org.junit.jupiter.api.Test;
 class UsuarioTest {
 
     @Test
-    @DisplayName("Deve retornar atribuições do cache")
-    void deveRetornarAtribuicoesDoCache() {
+    @DisplayName("Deve retornar atribuições permanentes")
+    void deveRetornarAtribuicoesPermanentes() {
         Usuario usuario = new Usuario();
-        Set<UsuarioPerfil> cache = new HashSet<>();
+        Set<UsuarioPerfil> permanentes = new HashSet<>();
         UsuarioPerfil perfil = new UsuarioPerfil();
         perfil.setPerfil(Perfil.ADMIN);
-        cache.add(perfil);
+        permanentes.add(perfil);
 
-        usuario.setAtribuicoes(cache);
+        usuario.setAtribuicoesPermanentes(permanentes);
 
         assertThat(usuario.getTodasAtribuicoes()).containsExactly(perfil);
     }
@@ -32,7 +32,7 @@ class UsuarioTest {
     void deveIncluirAtribuicoesTemporariasVigentes() {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("12345");
-        usuario.setAtribuicoes(new HashSet<>());
+        usuario.setAtribuicoesPermanentes(new HashSet<>());
         usuario.setAtribuicoesTemporarias(new HashSet<>());
 
         Unidade unidade = new Unidade();
@@ -56,7 +56,7 @@ class UsuarioTest {
     void deveIgnorarAtribuicoesTemporariasExpiradas() {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("12345");
-        usuario.setAtribuicoes(new HashSet<>());
+        usuario.setAtribuicoesPermanentes(new HashSet<>());
         usuario.setAtribuicoesTemporarias(new HashSet<>());
 
         AtribuicaoTemporaria temp = new AtribuicaoTemporaria();
@@ -77,7 +77,7 @@ class UsuarioTest {
     void deveIgnorarAtribuicoesTemporariasFuturas() {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("12345");
-        usuario.setAtribuicoes(new HashSet<>());
+        usuario.setAtribuicoesPermanentes(new HashSet<>());
         usuario.setAtribuicoesTemporarias(new HashSet<>());
 
         AtribuicaoTemporaria temp = new AtribuicaoTemporaria();
@@ -98,7 +98,6 @@ class UsuarioTest {
     void deveFuncionarSemAtribuicoes() {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("12345");
-        usuario.setAtribuicoes(new HashSet<>());
         usuario.setAtribuicoesTemporarias(new HashSet<>());
         assertThat(usuario.getTodasAtribuicoes()).isEmpty();
     }
@@ -118,23 +117,6 @@ class UsuarioTest {
     }
 
     @Test
-    @DisplayName("Deve lidar com LazyInitializationException em todas atribuições")
-    void deveLidarComLazyInitExceptionEmTodasAtribuicoes() {
-        Usuario usuario = new Usuario();
-        @SuppressWarnings("unchecked")
-        Set<AtribuicaoTemporaria> mockSet = org.mockito.Mockito.mock(Set.class);
-
-        org.mockito.Mockito.doThrow(new org.hibernate.LazyInitializationException("Lazy")).when(mockSet).iterator();
-
-        // Injetar mock no campo privado
-        org.springframework.test.util.ReflectionTestUtils.setField(usuario, "atribuicoesTemporarias", mockSet);
-
-        // Should return empty set (or cached ones) and catch exception
-        assertThat(usuario.getTodasAtribuicoes()).isEmpty();
-        org.mockito.Mockito.verify(mockSet).iterator();
-    }
-
-    @Test
     @DisplayName("Deve mapear perfil para authority")
     void deveMapearPerfilParaAuthority() {
         Usuario usuario = new Usuario();
@@ -143,7 +125,7 @@ class UsuarioTest {
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.ADMIN);
         atribuicoes.add(up);
-        usuario.setAtribuicoes(atribuicoes);
+        usuario.setAtribuicoesPermanentes(atribuicoes);
 
         var authorities = usuario.getAuthorities();
         assertThat(authorities).extracting("authority").containsExactly("ROLE_ADMIN");

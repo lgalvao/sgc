@@ -68,7 +68,7 @@ class UsuarioServiceUnitTest {
 
             assertThat(result).isNotNull();
             verify(usuario).getAuthorities();
-            verify(usuario).setAtribuicoes(any());
+            verify(usuario).setAtribuicoesPermanentes(any());
         }
     }
 

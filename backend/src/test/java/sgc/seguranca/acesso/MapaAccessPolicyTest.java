@@ -13,6 +13,7 @@ import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static sgc.organizacao.model.Perfil.ADMIN;
@@ -73,7 +74,7 @@ class MapaAccessPolicyTest {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(titulo);
         usuario.setNome(nome);
-        usuario.setAtribuicoes(new HashSet<>());
+        usuario.setAtribuicoesPermanentes(new HashSet<>());
         return usuario;
     }
 
@@ -81,6 +82,9 @@ class MapaAccessPolicyTest {
         UsuarioPerfil atribuicao = new UsuarioPerfil();
         atribuicao.setUsuario(usuario);
         atribuicao.setPerfil(perfil);
-        usuario.getAtribuicoes().add(atribuicao);
+        
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getTodasAtribuicoes());
+        atribuicoes.add(atribuicao);
+        usuario.setAtribuicoesPermanentes(atribuicoes);
     }
 }

@@ -17,6 +17,8 @@ import sgc.seguranca.login.dto.EntrarRequest;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
@@ -79,7 +81,6 @@ class LoginFacadeGapTest {
     private Usuario criarUsuarioComAtribuicao(String titulo, Perfil perfil, Long codUnidade) {
         Usuario u = new Usuario();
         u.setTituloEleitoral(titulo);
-        u.setAtribuicoes(new HashSet<>());
         
         Unidade unidade = new Unidade();
         unidade.setCodigo(codUnidade);
@@ -90,7 +91,7 @@ class LoginFacadeGapTest {
         up.setUnidade(unidade);
         up.setUsuario(u);
 
-        u.getAtribuicoes().add(up);
+        u.setAtribuicoesPermanentes(Set.of(up));
         return u;
     }
 }

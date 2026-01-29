@@ -127,7 +127,7 @@ public class UsuarioFacade {
 
     private void carregarAtribuicoes(Usuario usuario) {
         var atribuicoes = usuarioRepositoryService.findByUsuarioTitulo(usuario.getTituloEleitoral());
-        usuario.setAtribuicoes(new HashSet<>(atribuicoes));
+        usuario.setAtribuicoesPermanentes(new HashSet<>(atribuicoes));
     }
 
     private void carregarAtribuicoesEmLote(List<Usuario> usuarios) {
@@ -145,7 +145,7 @@ public class UsuarioFacade {
         for (Usuario usuario : usuarios) {
             Set<UsuarioPerfil> atribuicoes = atribuicoesPorUsuario
                     .getOrDefault(usuario.getTituloEleitoral(), new java.util.HashSet<>());
-            usuario.setAtribuicoes(atribuicoes);
+            usuario.setAtribuicoesPermanentes(atribuicoes);
         }
     }
 

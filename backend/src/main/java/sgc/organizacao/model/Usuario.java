@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.LazyInitializationException;
 import org.hibernate.annotations.Immutable;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,6 +17,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 @Immutable
@@ -56,41 +56,41 @@ public class Usuario implements UserDetails {
     private Set<AtribuicaoTemporaria> atribuicoesTemporarias = new HashSet<>();
 
     @Transient
-    private Set<UsuarioPerfil> atribuicoesCache;
+    private Set<UsuarioPerfil> atribuicoesPermanentes;
 
-    public Set<UsuarioPerfil> getAtribuicoes() {
-        if (atribuicoesCache == null) {
-            atribuicoesCache = new HashSet<>();
-        }
-        return atribuicoesCache;
-    }
-
-    public void setAtribuicoes(Set<UsuarioPerfil> atribuicoes) {
-        this.atribuicoesCache = atribuicoes;
-    }
-
+    /**
+     * Retorna todas as atribuições do usuário (permanentes + temporárias ativas).
+     * Atribuições permanentes devem ser carregadas previamente via setAtribuicoesPermanentes().
+     * Atribuições temporárias são lidas diretamente do relacionamento atribuicoesTemporarias.
+     */
     public Set<UsuarioPerfil> getTodasAtribuicoes() {
-        Set<UsuarioPerfil> todas = new HashSet<>(getAtribuicoes());
-        LocalDateTime now = LocalDateTime.now();
-        try {
-            if (atribuicoesTemporarias != null) {
-                for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
-                    if (!temp.getDataInicio().isAfter(now) && !temp.getDataTermino().isBefore(now)) {
-                        UsuarioPerfil perfil = new UsuarioPerfil()
-                                .setUsuarioTitulo(this.tituloEleitoral)
-                                .setUsuario(this)
-                                .setUnidadeCodigo(temp.getUnidade().getCodigo())
-                                .setUnidade(temp.getUnidade())
-                                .setPerfil(temp.getPerfil());
+        Set<UsuarioPerfil> permanentes = atribuicoesPermanentes != null ? atribuicoesPermanentes : new HashSet<>();
+        Set<UsuarioPerfil> todas = new HashSet<>(permanentes);
 
-                        todas.add(perfil);
-                    }
+        LocalDateTime now = LocalDateTime.now();
+        if (atribuicoesTemporarias != null) {
+            for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
+                if (!temp.getDataInicio().isAfter(now) && !temp.getDataTermino().isBefore(now)) {
+                    UsuarioPerfil perfil = new UsuarioPerfil()
+                            .setUsuarioTitulo(this.tituloEleitoral)
+                            .setUsuario(this)
+                            .setUnidadeCodigo(temp.getUnidade().getCodigo())
+                            .setUnidade(temp.getUnidade())
+                            .setPerfil(temp.getPerfil());
+
+                    todas.add(perfil);
                 }
             }
-        } catch (LazyInitializationException e) {
-            // Se não há sessão disponível, apenas retorna as atribuições do cache
         }
         return todas;
+    }
+
+    /**
+     * Define as atribuições permanentes do usuário (carregadas de UsuarioPerfilRepo).
+     * Este método deve ser chamado antes de usar getTodasAtribuicoes() fora de sessão Hibernate.
+     */
+    public void setAtribuicoesPermanentes(Set<UsuarioPerfil> atribuicoes) {
+        this.atribuicoesPermanentes = atribuicoes;
     }
 
     @Override

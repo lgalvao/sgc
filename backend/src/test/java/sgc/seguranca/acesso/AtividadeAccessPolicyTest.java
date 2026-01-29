@@ -16,6 +16,7 @@ import sgc.organizacao.model.UsuarioPerfil;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static sgc.organizacao.model.Perfil.CHEFE;
@@ -95,7 +96,7 @@ class AtividadeAccessPolicyTest {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(titulo);
         usuario.setNome(nome);
-        usuario.setAtribuicoes(new HashSet<>());
+        usuario.setAtribuicoesPermanentes(new HashSet<>());
         return usuario;
     }
 
@@ -105,6 +106,9 @@ class AtividadeAccessPolicyTest {
         atribuicao.setUsuarioTitulo(usuario.getTituloEleitoral());
         atribuicao.setPerfil(perfil);
         atribuicao.setUnidade(unidade);
-        usuario.getAtribuicoes().add(atribuicao);
+        
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getTodasAtribuicoes());
+        atribuicoes.add(atribuicao);
+        usuario.setAtribuicoesPermanentes(atribuicoes);
     }
 }
