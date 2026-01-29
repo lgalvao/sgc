@@ -3,22 +3,7 @@
 ## 🔴 P1: Críticos (Lógica de Negócio e Segurança)
 Estas classes contêm regras de negócio, validações, segurança ou orquestração complexa. A falta de testes aqui representa alto risco.
 
-- [ ] `sgc/alerta/AlertaService.java`
-- [ ] `sgc/analise/AnaliseService.java`
-- [ ] `sgc/comum/erros/ErroAccessoNegado.java`
-- [ ] `sgc/configuracao/ConfiguracaoService.java`
-- [ ] `sgc/mapa/service/AtividadeFacade.java`
-- [ ] `sgc/mapa/service/ImpactoMapaService.java`
-- [ ] `sgc/organizacao/service/UnidadeMapaService.java`
-- [ ] `sgc/processo/service/ProcessoRepositoryService.java`
-- [ ] `sgc/relatorio/service/PdfFactory.java`
-- [ ] `sgc/seguranca/acesso/AbstractAccessPolicy.java`
-- [ ] `sgc/seguranca/acesso/AccessPolicy.java`
-- [ ] `sgc/seguranca/sanitizacao/SanitizarHtml.java`
-- [ ] `sgc/seguranca/sanitizacao/UtilSanitizacao.java`
-- [ ] `sgc/subprocesso/listener/SubprocessoMapaListener.java`
-- [ ] `sgc/subprocesso/service/notificacao/SubprocessoComunicacaoListener.java`
-- [ ] `sgc/subprocesso/service/workflow/SubprocessoWorkflowFacade.java`
+✅ **Nenhuma pendência crítica de lógica encontrada.**
 
 ## 🟡 P2: Importantes (Integração e Contratos)
 Controladores e Mappers. Importantes para garantir que a API respeite os contratos e que os dados sejam transformados corretamente.
@@ -50,6 +35,7 @@ DTOs, Modelos (Getters/Setters), Repositórios (Interfaces) e Configurações. G
 - [ ] `sgc/comum/config/ConfigAplicacao.java`
 - [ ] `sgc/comum/config/ConfigOpenApi.java`
 - [ ] `sgc/comum/config/ConfigThymeleaf.java`
+- [ ] `sgc/comum/erros/ErroAccessoNegado.java`
 - [ ] `sgc/comum/erros/ErroApi.java`
 - [ ] `sgc/comum/erros/ErroAutenticacao.java`
 - [ ] `sgc/comum/erros/ErroConfiguracao.java`
@@ -151,6 +137,7 @@ DTOs, Modelos (Getters/Setters), Repositórios (Interfaces) e Configurações. G
 - [ ] `sgc/processo/model/TipoProcesso.java`
 - [ ] `sgc/relatorio/service/ErroRelatorio.java`
 - [ ] `sgc/seguranca/acesso/Acao.java`
+- [ ] `sgc/seguranca/acesso/AccessPolicy.java`
 - [ ] `sgc/seguranca/config/ConfigCorsProperties.java`
 - [ ] `sgc/seguranca/config/ConfigSeguranca.java`
 - [ ] `sgc/seguranca/login/ConfiguracaoAcessoAd.java`
@@ -161,6 +148,7 @@ DTOs, Modelos (Getters/Setters), Repositórios (Interfaces) e Configurações. G
 - [ ] `sgc/seguranca/login/dto/EntrarRequest.java`
 - [ ] `sgc/seguranca/login/dto/EntrarResponse.java`
 - [ ] `sgc/seguranca/login/dto/PerfilUnidadeDto.java`
+- [ ] `sgc/seguranca/sanitizacao/SanitizarHtml.java`
 - [ ] `sgc/subprocesso/dto/AceitarCadastroRequest.java`
 - [ ] `sgc/subprocesso/dto/AlterarDataLimiteRequest.java`
 - [ ] `sgc/subprocesso/dto/AnaliseValidacaoDto.java`

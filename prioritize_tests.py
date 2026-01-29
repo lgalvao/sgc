@@ -4,18 +4,25 @@ input_file = "unit-test-report.md"
 output_file = "prioritized-tests.md"
 
 p1_patterns = [
-    r"Service\.java$", r"Facade\.java$", r"Policy\.java$", r"Validator\.java$",
-    r"Listener\.java$", r"Factory\.java$", r"Builder\.java$", r"Manager\.java$",
-    r"Access.*\.java$", r"Sanitiz.*\.java$", r"Provider\.java$", r"Calculat.*\.java$"
+    r"Service.java$", r"Facade.java$", r"Policy.java$", r"Validator.java$",
+    r"Listener.java$", r"Factory.java$", r"Builder.java$", r"Manager.java$",
+    r"Access.*.java$", r"Sanitiz.*.java$", r"Provider.java$", r"Calculat.*.java$"
 ]
 
 p2_patterns = [
-    r"Controller\.java$", r"Mapper\.java$"
+    r"Controller.java$", r"Mapper.java$"
 ]
 
 # Patterns to downgrade to P3 (even if they match others, though unlikely with above)
 ignore_patterns = [
-    r"Mock\.java$", r"Test\.java$"
+    r"Mock.java$", r"Test.java$"
+]
+
+# Structural patterns to ignore in P1/P2 (Interfaces, Annotations, simple Exceptions)
+structural_patterns = [
+    r"AccessPolicy.java$", # Interface
+    r"SanitizarHtml.java$", # Annotation
+    r"Erro.*.java$" # Exceptions (simple)
 ]
 
 prioritized = {
@@ -31,10 +38,8 @@ try:
     current_file = None
     for line in lines:
         if line.strip().startswith("- `"):
-            # Extract filename: - `sgc/pkg/File.java` -> sgc/pkg/File.java
             file_path = line.strip().replace("- `", "").replace("`", "")
             
-            # Skip mocks immediately
             if any(re.search(pat, file_path) for pat in ignore_patterns):
                 continue
 
@@ -42,7 +47,11 @@ try:
             is_p1 = any(re.search(pat, file_path) for pat in p1_patterns)
             is_p2 = any(re.search(pat, file_path) for pat in p2_patterns)
             
-            if is_p1:
+            is_structural = any(re.search(pat, file_path) for pat in structural_patterns)
+
+            if is_structural:
+                prioritized["P3"].append(file_path)
+            elif is_p1:
                 prioritized["P1"].append(file_path)
             elif is_p2:
                 prioritized["P2"].append(file_path)
@@ -60,7 +69,7 @@ try:
         out.write("## 🔴 P1: Críticos (Lógica de Negócio e Segurança)\n")
         out.write("Estas classes contêm regras de negócio, validações, segurança ou orquestração complexa. A falta de testes aqui representa alto risco.\n\n")
         if not prioritized["P1"]:
-            out.write("_Nenhum arquivo encontrado._\n")
+            out.write("✅ **Nenhuma pendência crítica de lógica encontrada.**\n")
         for f in prioritized["P1"]:
             out.write(f"- [ ] `{f}`\n")
         
@@ -82,4 +91,3 @@ try:
 
 except FileNotFoundError:
     print(f"Error: {input_file} not found. Please run the analysis step first.")
-

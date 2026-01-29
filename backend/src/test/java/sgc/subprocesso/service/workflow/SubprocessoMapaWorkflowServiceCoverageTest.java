@@ -25,7 +25,7 @@ import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoRepositoryService;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,15 +43,14 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     @InjectMocks
     private SubprocessoMapaWorkflowService service;
     @Mock
-    private SubprocessoRepo subprocessoRepo;
+    private SubprocessoRepositoryService subprocessoService;
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
     private MapaFacade mapaFacade;
     @Mock
     private AnaliseFacade analiseFacade;
-    @Mock
-    private RepositorioComum repo;
+
     @Mock
     private sgc.seguranca.acesso.AccessControlService accessControlService;
     @Mock
@@ -100,7 +99,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         service.salvarMapaSubprocesso(1L, req);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
-        verify(subprocessoRepo).save(sp);
+        verify(subprocessoService).save(sp);
     }
 
     // --- ADICIONAR COMPETENCIA ---
@@ -126,7 +125,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         service.adicionarCompetencia(1L, req);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
-        verify(subprocessoRepo).save(sp);
+        verify(subprocessoService).save(sp);
     }
 
     // --- REMOVER COMPETENCIA ---
@@ -150,7 +149,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         service.removerCompetencia(1L, 100L);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-        verify(subprocessoRepo).save(sp);
+        verify(subprocessoService).save(sp);
     }
 
     // --- DISPONIBILIZAR MAPA ---
@@ -273,5 +272,6 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         verify(analiseFacade).criarAnalise(any(), any());
+        verify(subprocessoService).save(sp);
     }
 }

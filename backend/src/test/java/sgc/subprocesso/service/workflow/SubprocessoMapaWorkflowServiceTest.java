@@ -20,7 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.RepositorioComum;
+
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Atividade;
@@ -40,14 +40,14 @@ import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoRepositoryService;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("SubprocessoMapaWorkflowService")
 class SubprocessoMapaWorkflowServiceTest {
     @Mock
-    private SubprocessoRepo subprocessoRepo;
+    private SubprocessoRepositoryService subprocessoService;
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
@@ -60,8 +60,7 @@ class SubprocessoMapaWorkflowServiceTest {
     private UnidadeFacade unidadeService;
     @Mock
     private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
-    @Mock
-    private RepositorioComum repo;
+
     @Mock
     private sgc.seguranca.acesso.AccessControlService accessControlService;
     @Mock
@@ -89,8 +88,8 @@ class SubprocessoMapaWorkflowServiceTest {
         Subprocesso sp = mock(Subprocesso.class);
         lenient().when(sp.getCodigo()).thenReturn(codigo);
         // Suporte para ambos os padrões enquanto migramos os testes
-        lenient().when(subprocessoRepo.findById(codigo)).thenReturn(Optional.of(sp));
-        lenient().when(repo.buscar(eq(Subprocesso.class), eq(codigo))).thenReturn(sp);
+        lenient().when(subprocessoService.findById(codigo)).thenReturn(Optional.of(sp));
+        lenient().when(subprocessoService.buscar(codigo)).thenReturn(sp);
         lenient().when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
  
         Processo p = new Processo();
@@ -127,7 +126,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.salvarMapaSubprocesso(1L, req);
 
-            verify(subprocessoRepo).save(sp);
+            verify(subprocessoService).save(sp);
             verify(mapaFacade).salvarMapaCompleto(10L, req);
         }
 
@@ -147,8 +146,8 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.salvarMapaSubprocesso(1L, req);
 
-            // Não deve salvar (não mudou status)
-            verify(subprocessoRepo, never()).save(sp);
+            // Não deve alterar situação se já estava correta
+            verify(subprocessoService, never()).save(sp);
         }
 
         @Test
@@ -198,7 +197,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.adicionarCompetencia(1L, req);
 
-            verify(subprocessoRepo).save(sp);
+            verify(subprocessoService).save(sp);
             verify(mapaManutencaoService).criarCompetenciaComAtividades(mapa, "Nova Comp", List.of(1L));
         }
 
@@ -217,7 +216,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.adicionarCompetencia(1L, req);
 
-            verify(subprocessoRepo, never()).save(sp);
+            verify(subprocessoService, never()).save(sp);
         }
 
         @Test
@@ -237,7 +236,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.adicionarCompetencia(1L, req);
 
-            verify(subprocessoRepo, never()).save(sp);
+            verify(subprocessoService, never()).save(sp);
         }
 
         @Test
@@ -272,7 +271,7 @@ class SubprocessoMapaWorkflowServiceTest {
             service.removerCompetencia(1L, 5L);
 
             verify(mapaManutencaoService).removerCompetencia(5L);
-            verify(subprocessoRepo).save(sp);
+            verify(subprocessoService).save(sp);
         }
 
         @Test
@@ -288,7 +287,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.removerCompetencia(1L, 5L);
 
-            verify(subprocessoRepo, never()).save(sp);
+            verify(subprocessoService, never()).save(sp);
         }
 
         @Test
@@ -304,7 +303,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.removerCompetencia(1L, 5L);
 
-            verify(subprocessoRepo, never()).save(sp);
+            verify(subprocessoService, never()).save(sp);
         }
 
         @Test
@@ -343,7 +342,7 @@ class SubprocessoMapaWorkflowServiceTest {
             service.salvarMapaSubprocesso(1L, req);
 
             // Não deve salvar porque não mudou situação
-            verify(subprocessoRepo, never()).save(sp);
+            verify(subprocessoService, never()).save(sp);
             verify(mapaFacade).salvarMapaCompleto(10L, req);
         }
 
@@ -364,7 +363,7 @@ class SubprocessoMapaWorkflowServiceTest {
             service.salvarMapaSubprocesso(1L, req);
 
             // Não deve salvar porque não tem novas competências
-            verify(subprocessoRepo, never()).save(sp);
+            verify(subprocessoService, never()).save(sp);
         }
 
         @Test
@@ -385,7 +384,7 @@ class SubprocessoMapaWorkflowServiceTest {
             service.adicionarCompetencia(1L, req);
 
             // Não deve salvar porque o mapa já não era vazio
-            verify(subprocessoRepo, never()).save(sp);
+            verify(subprocessoService, never()).save(sp);
         }
 
         @Test
@@ -403,7 +402,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             verify(mapaManutencaoService).removerCompetencia(5L);
             // Não deve salvar porque ainda tem competências
-            verify(subprocessoRepo, never()).save(sp);
+            verify(subprocessoService, never()).save(sp);
         }
     }
 
@@ -435,7 +434,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.disponibilizarMapa(1L, req, new Usuario());
 
-            verify(subprocessoRepo).save(sp);
+            verify(subprocessoService).save(sp);
             verify(transicaoService).registrar(eq(sp), eq(TipoTransicao.MAPA_DISPONIBILIZADO), any(), any(), any(),
                     eq("Obs"));
         }
@@ -633,7 +632,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.apresentarSugestoes(1L, "Sugestao", new Usuario());
 
-            verify(subprocessoRepo).save(sp);
+            verify(subprocessoService).save(sp);
             verify(transicaoService).registrar(eq(sp), eq(TipoTransicao.MAPA_SUGESTOES_APRESENTADAS), any(), any(),
                     any(), eq("Sugestao"));
         }
@@ -645,7 +644,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.validarMapa(1L, new Usuario());
 
-            verify(subprocessoRepo).save(sp);
+            verify(subprocessoService).save(sp);
             verify(transicaoService).registrar(eq(sp), eq(TipoTransicao.MAPA_VALIDADO), any(), any(), any());
         }
 
@@ -676,7 +675,7 @@ class SubprocessoMapaWorkflowServiceTest {
             service.aceitarValidacao(1L, new Usuario());
 
             verify(analiseFacade).criarAnalise(eq(sp), argThat(req -> req.acao() == TipoAcaoAnalise.ACEITE_MAPEAMENTO));
-            verify(subprocessoRepo).save(sp);
+            verify(subprocessoService).save(sp);
         }
 
         @Test
@@ -690,7 +689,7 @@ class SubprocessoMapaWorkflowServiceTest {
             service.aceitarValidacao(1L, new Usuario());
 
             verify(analiseFacade).criarAnalise(eq(sp), argThat(req -> req.acao() == TipoAcaoAnalise.ACEITE_MAPEAMENTO));
-            verify(subprocessoRepo).save(sp);
+            verify(subprocessoService).save(sp);
         }
 
         @Test
@@ -754,7 +753,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.homologarValidacaoEmBloco(List.of(10L), new Usuario());
 
-            verify(subprocessoRepo).save(target);
+            verify(subprocessoService).save(target);
             verify(transicaoService).registrar(eq(target), eq(TipoTransicao.MAPA_HOMOLOGADO), any(), any(), any());
         }
 
@@ -800,7 +799,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.aceitarValidacaoEmBloco(List.of(10L), new Usuario());
 
-            verify(subprocessoRepo).save(target);
+            verify(subprocessoService).save(target);
             verify(analiseFacade).criarAnalise(eq(target), any());
         }
     }
@@ -824,7 +823,7 @@ class SubprocessoMapaWorkflowServiceTest {
             service.submeterMapaAjustado(1L, req, new Usuario());
 
             verify(validacaoService).validarAssociacoesMapa(any());
-            verify(subprocessoRepo).save(sp);
+            verify(subprocessoService).save(sp);
             verify(sp).setSituacao(SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO);
         }
 

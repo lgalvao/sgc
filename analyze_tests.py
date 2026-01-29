@@ -88,4 +88,3 @@ for cat in priority_categories + secondary_categories:
     else:
         print("✅ Todos cobertos.")
     print("")
-

@@ -32,7 +32,8 @@ import static sgc.seguranca.acesso.Acao.HOMOLOGAR_REVISAO_CADASTRO;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.service.MovimentacaoRepositoryService;
+import sgc.subprocesso.service.SubprocessoRepositoryService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
@@ -42,7 +43,6 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDA
 import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA;
 import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
@@ -53,11 +53,11 @@ public class SubprocessoCadastroWorkflowService {
 
     private static final String SIGLA_SEDOC = "SEDOC";
 
-    private final SubprocessoRepo subprocessoRepo;
+    private final SubprocessoRepositoryService subprocessoService;
     private final SubprocessoCrudService crudService;
     private final AlertaFacade alertaService;
     private final UnidadeFacade unidadeService;
-    private final MovimentacaoRepo repositorioMovimentacao;
+    private final MovimentacaoRepositoryService movimentacaoService;
     private final SubprocessoTransicaoService transicaoService;
     private final AnaliseFacade analiseFacade;
     @Lazy private final SubprocessoValidacaoService validacaoService;
@@ -79,7 +79,7 @@ public class SubprocessoCadastroWorkflowService {
 
         sp.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setDataFimEtapa1(null);
-        subprocessoRepo.save(sp);
+        subprocessoService.save(sp);
 
         registrarMovimentacaoReabertura(sp, "Reabertura de cadastro");
         enviarAlertasReabertura(sp, justificativa, false);
@@ -98,7 +98,7 @@ public class SubprocessoCadastroWorkflowService {
 
         sp.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
         sp.setDataFimEtapa1(null);
-        subprocessoRepo.save(sp);
+        subprocessoService.save(sp);
 
         registrarMovimentacaoReabertura(sp, "Reabertura de revisão de cadastro");
         enviarAlertasReabertura(sp, justificativa, true);
@@ -112,7 +112,7 @@ public class SubprocessoCadastroWorkflowService {
         mov.setUnidadeOrigem(sedoc);
         mov.setUnidadeDestino(sp.getUnidade());
         mov.setDescricao(descricao);
-        repositorioMovimentacao.save(mov);
+        movimentacaoService.save(mov);
     }
 
     private void enviarAlertasReabertura(Subprocesso sp, String justificativa, boolean isRevisao) {
@@ -161,7 +161,7 @@ public class SubprocessoCadastroWorkflowService {
 
         sp.setSituacao(novaSituacao);
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
-        subprocessoRepo.save(sp);
+        subprocessoService.save(sp);
 
         analiseFacade.removerPorSubprocesso(sp.getCodigo());
         transicaoService.registrar(sp, transicao, origem, destino, usuario);
@@ -233,7 +233,7 @@ public class SubprocessoCadastroWorkflowService {
 
         Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
         sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
-        subprocessoRepo.save(sp);
+        subprocessoService.save(sp);
 
         transicaoService.registrar(sp, TipoTransicao.CADASTRO_HOMOLOGADO, sedoc, sedoc, usuario, observacoes);
     }
@@ -301,12 +301,12 @@ public class SubprocessoCadastroWorkflowService {
         if (impactos.temImpactos()) {
             Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
             sp.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
-            subprocessoRepo.save(sp);
+            subprocessoService.save(sp);
             transicaoService.registrar(sp, TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA, sedoc, sedoc, usuario,
                     observacoes);
         } else {
             sp.setSituacao(REVISAO_MAPA_HOMOLOGADO);
-            subprocessoRepo.save(sp);
+            subprocessoService.save(sp);
         }
     }
 

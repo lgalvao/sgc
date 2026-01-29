@@ -1,10 +1,10 @@
 # Relatório de Cobertura de Testes Unitários (Backend)
 
 **Data:** 29/01/2026
-**Total de Classes:** 282
-**Com Testes Unitários:** 87
-**Sem Testes Unitários:** 195
-**Cobertura (Arquivos):** 30.85%
+**Total de Classes:** 288
+**Com Testes Unitários:** 106
+**Sem Testes Unitários:** 182
+**Cobertura (Arquivos):** 36.81%
 
 ## Detalhamento por Categoria
 
@@ -14,21 +14,12 @@
 - `sgc/painel/PainelController.java`
 - `sgc/relatorio/controller/RelatorioController.java`
 
-### Facades (11/13 testados)
-**Faltando Testes (2):**
-- `sgc/mapa/service/AtividadeFacade.java`
-- `sgc/subprocesso/service/workflow/SubprocessoWorkflowFacade.java`
+### Facades (13/13 testados)
+✅ Todos cobertos.
 
-### Services (25/34 testados)
-**Faltando Testes (9):**
-- `sgc/alerta/AlertaService.java`
-- `sgc/analise/AnaliseService.java`
-- `sgc/configuracao/ConfiguracaoService.java`
+### Services (38/40 testados)
+**Faltando Testes (2):**
 - `sgc/e2e/mock/NotificacaoEmailServiceMock.java`
-- `sgc/mapa/service/ImpactoMapaService.java`
-- `sgc/organizacao/service/UnidadeMapaService.java`
-- `sgc/processo/service/ProcessoRepositoryService.java`
-- `sgc/seguranca/acesso/AbstractAccessPolicy.java`
 - `sgc/seguranca/acesso/AccessPolicy.java`
 
 ### Mappers (11/13 testados)
@@ -171,8 +162,8 @@
 - `sgc/subprocesso/dto/SugestoesDto.java`
 - `sgc/subprocesso/dto/ValidacaoCadastroDto.java`
 
-### Others (19/72 testados)
-**Faltando Testes (53):**
+### Others (23/72 testados)
+**Faltando Testes (49):**
 - `sgc/Sgc.java`
 - `sgc/analise/dto/CriarAnaliseCommand.java`
 - `sgc/comum/config/Config.java`
@@ -208,7 +199,6 @@
 - `sgc/processo/eventos/EventoProcessoFinalizado.java`
 - `sgc/processo/eventos/EventoProcessoIniciado.java`
 - `sgc/relatorio/service/ErroRelatorio.java`
-- `sgc/relatorio/service/PdfFactory.java`
 - `sgc/seguranca/acesso/Acao.java`
 - `sgc/seguranca/config/ConfigCorsProperties.java`
 - `sgc/seguranca/config/ConfigSeguranca.java`
@@ -216,7 +206,6 @@
 - `sgc/seguranca/login/FiltroJwt.java`
 - `sgc/seguranca/login/PropriedadesAcessoAd.java`
 - `sgc/seguranca/sanitizacao/SanitizarHtml.java`
-- `sgc/seguranca/sanitizacao/UtilSanitizacao.java`
 - `sgc/subprocesso/erros/ErroAtividadesEmSituacaoInvalida.java`
 - `sgc/subprocesso/erros/ErroMapaEmSituacaoInvalida.java`
 - `sgc/subprocesso/erros/ErroMapaNaoAssociado.java`
@@ -224,6 +213,4 @@
 - `sgc/subprocesso/eventos/EventoSubprocessoCriado.java`
 - `sgc/subprocesso/eventos/EventoSubprocessoExcluido.java`
 - `sgc/subprocesso/eventos/EventoTransicaoSubprocesso.java`
-- `sgc/subprocesso/listener/SubprocessoMapaListener.java`
-- `sgc/subprocesso/service/notificacao/SubprocessoComunicacaoListener.java`
 

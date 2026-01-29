@@ -51,7 +51,6 @@ import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
@@ -92,7 +91,7 @@ public class SubprocessoFacade {
     // Dependencies for detail/context operations (previously in
     // SubprocessoDetalheService/SubprocessoContextoService)
     private final MapaManutencaoService mapaManutencaoService;
-    private final MovimentacaoRepo repositorioMovimentacao;
+    private final MovimentacaoRepositoryService movimentacaoService;
     private final SubprocessoDetalheMapper subprocessoDetalheMapper;
     private final ConhecimentoMapper conhecimentoMapper;
     private final AnaliseFacade analiseFacade;
@@ -100,7 +99,7 @@ public class SubprocessoFacade {
     private final sgc.seguranca.acesso.AccessControlService accessControlService;
 
     // Dependencies for map operations (from SubprocessoMapaService)
-    private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private final SubprocessoRepositoryService subprocessoService;
     private final sgc.mapa.service.CopiaMapaService copiaMapaService;
 
     // ===== Operações CRUD =====
@@ -403,7 +402,7 @@ public class SubprocessoFacade {
     }
 
     private void salvarAjustesMapaInterno(Long codSubprocesso, List<CompetenciaAjusteDto> competencias) {
-        Subprocesso sp = subprocessoRepo.findById(codSubprocesso)
+        Subprocesso sp = subprocessoService.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
                         "Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
@@ -412,7 +411,7 @@ public class SubprocessoFacade {
         atualizarCompetenciasEAssociacoes(competencias);
 
         sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
-        subprocessoRepo.save(sp);
+        subprocessoService.save(sp);
     }
 
     private void validarSituacaoParaAjuste(Subprocesso sp) {
@@ -475,7 +474,7 @@ public class SubprocessoFacade {
     }
 
     private void importarAtividadesInterno(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
-        final Subprocesso spDestino = subprocessoRepo
+        final Subprocesso spDestino = subprocessoService
                 .findById(codSubprocessoDestino)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
                         "Subprocesso de destino não encontrado: %d".formatted(codSubprocessoDestino)));
@@ -489,7 +488,7 @@ public class SubprocessoFacade {
                     com cadastro em elaboração ou não iniciado.""");
         }
 
-        Subprocesso spOrigem = subprocessoRepo.findById(codSubprocessoOrigem)
+        Subprocesso spOrigem = subprocessoService.findById(codSubprocessoOrigem)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
                         "Subprocesso de origem não encontrado: %d".formatted(codSubprocessoOrigem)));
 
@@ -507,7 +506,7 @@ public class SubprocessoFacade {
                     log.debug("Tipo de processo {} não requer atualização automática de situação no import.",
                             tipoProcesso);
             }
-            subprocessoRepo.save(spDestino);
+            subprocessoService.save(spDestino);
         }
 
         final sgc.organizacao.model.Unidade unidadeOrigem = spOrigem.getUnidade();
@@ -515,7 +514,7 @@ public class SubprocessoFacade {
                 spOrigem.getCodigo(),
                 unidadeOrigem.getSigla());
 
-        repositorioMovimentacao.save(Movimentacao.builder()
+        movimentacaoService.save(Movimentacao.builder()
                 .subprocesso(spDestino)
                 .unidadeOrigem(unidadeOrigem)
                 .unidadeDestino(spDestino.getUnidade())
@@ -568,7 +567,7 @@ public class SubprocessoFacade {
             log.warn("Erro ao buscar titular: {}", e.getMessage());
         }
 
-        List<Movimentacao> movimentacoes = repositorioMovimentacao
+        List<Movimentacao> movimentacoes = movimentacaoService
                 .findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
         SubprocessoPermissoesDto permissoes = calcularPermissoesInterno(sp, usuarioAutenticado);
 

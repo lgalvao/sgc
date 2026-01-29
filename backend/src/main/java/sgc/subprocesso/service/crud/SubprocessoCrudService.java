@@ -4,7 +4,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.repo.RepositorioComum;
+
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioFacade;
@@ -18,7 +18,7 @@ import sgc.subprocesso.eventos.EventoSubprocessoExcluido;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoRepositoryService;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -50,12 +50,11 @@ import java.util.Set;
 @Transactional
 public class SubprocessoCrudService {
     private static final String MSG_SUBPROCESSO_NAO_ENCONTRADO = "Subprocesso não encontrado";
-    private final SubprocessoRepo repositorioSubprocesso;
+    private final SubprocessoRepositoryService subprocessoService;
     private final SubprocessoMapper subprocessoMapper;
     private final MapaFacade mapaFacade;
     private final ApplicationEventPublisher eventPublisher;
     private final UsuarioFacade usuarioService;
-    private final RepositorioComum repo;
 
     /**
      * Constructor with @Lazy injection to break circular dependency.
@@ -64,22 +63,20 @@ public class SubprocessoCrudService {
      *                   BeanCurrentlyInCreationException
      */
     public SubprocessoCrudService(
-            SubprocessoRepo repositorioSubprocesso,
+            SubprocessoRepositoryService subprocessoService,
             SubprocessoMapper subprocessoMapper,
             @Lazy MapaFacade mapaFacade,
             ApplicationEventPublisher eventPublisher,
-            UsuarioFacade usuarioService,
-            RepositorioComum repo) {
-        this.repositorioSubprocesso = repositorioSubprocesso;
+            UsuarioFacade usuarioService) {
+        this.subprocessoService = subprocessoService;
         this.subprocessoMapper = subprocessoMapper;
         this.mapaFacade = mapaFacade;
         this.eventPublisher = eventPublisher;
         this.usuarioService = usuarioService;
-        this.repo = repo;
     }
 
     public Subprocesso buscarSubprocesso(Long codigo) {
-        return repo.buscar(Subprocesso.class, codigo);
+        return subprocessoService.buscar(codigo);
     }
 
     /**
@@ -94,18 +91,18 @@ public class SubprocessoCrudService {
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listarEntidadesPorProcesso(Long codProcesso) {
-        return repositorioSubprocesso.findByProcessoCodigoWithUnidade(codProcesso);
+        return subprocessoService.findByProcessoCodigoWithUnidade(codProcesso);
     }
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listarPorProcessoESituacao(Long codProcesso, SituacaoSubprocesso situacao) {
-        return repositorioSubprocesso.findByProcessoCodigoAndSituacaoWithUnidade(codProcesso, situacao);
+        return subprocessoService.findByProcessoCodigoAndSituacaoWithUnidade(codProcesso, situacao);
     }
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listarPorProcessoUnidadeESituacoes(Long codProcesso, Long codUnidade,
             List<SituacaoSubprocesso> situacoes) {
-        return repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso,
+        return subprocessoService.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso,
                 codUnidade, situacoes);
     }
 
@@ -121,22 +118,18 @@ public class SubprocessoCrudService {
 
     @Transactional(readOnly = true)
     public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
-        return repositorioSubprocesso
+        return subprocessoService
                 .findByMapaCodigo(codMapa)
                 .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada(
                         "%s para o mapa com código %d".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codMapa)));
     }
 
     public SubprocessoDto criar(CriarSubprocessoRequest request) {
-        return criar(request, false);
-    }
-
-    public SubprocessoDto criar(CriarSubprocessoRequest request, boolean criadoPorProcesso) {
         var entity = new Subprocesso();
-        // Mapear manualmente do Request
         var processo = new sgc.processo.model.Processo();
         processo.setCodigo(request.codProcesso());
         entity.setProcesso(processo);
+
         var unidade = new sgc.organizacao.model.Unidade();
         unidade.setCodigo(request.codUnidade());
         entity.setUnidade(unidade);
@@ -144,21 +137,20 @@ public class SubprocessoCrudService {
         entity.setDataLimiteEtapa2(request.dataLimiteEtapa2());
         entity.setMapa(null);
 
-        var subprocessoSalvo = repositorioSubprocesso.save(entity);
+        var subprocessoSalvo = subprocessoService.save(entity);
 
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocessoSalvo);
         Mapa mapaSalvo = mapaFacade.salvar(mapa);
 
         subprocessoSalvo.setMapa(mapaSalvo);
-        var salvo = repositorioSubprocesso.save(subprocessoSalvo);
+        var salvo = subprocessoService.save(subprocessoSalvo);
 
-        // Publica evento de criação
         EventoSubprocessoCriado evento = EventoSubprocessoCriado.builder()
                 .subprocesso(salvo)
                 .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
                 .dataHoraCriacao(LocalDateTime.now())
-                .criadoPorProcesso(true)
+                .criadoPorProcesso(false)
                 .codProcesso(salvo.getProcesso().getCodigo())
                 .codUnidade(salvo.getUnidade().getCodigo())
                 .build();
@@ -172,7 +164,7 @@ public class SubprocessoCrudService {
         SituacaoSubprocesso situacaoAnterior = subprocesso.getSituacao();
         Set<String> camposAlterados = processarAlteracoes(subprocesso, request);
 
-        Subprocesso salvo = repositorioSubprocesso.save(subprocesso);
+        Subprocesso salvo = subprocessoService.save(subprocesso);
 
         // Publica evento de atualização se houve mudanças
         if (!camposAlterados.isEmpty()) {
@@ -195,8 +187,7 @@ public class SubprocessoCrudService {
         java.util.Optional.ofNullable(request.codMapa()).ifPresent(cod -> {
             Mapa m = new Mapa();
             m.setCodigo(cod);
-            // Compara IDs para evitar atualização desnecessária (já que Mapa não implementa
-            // equals)
+            // Compara IDs para evitar atualização desnecessária (já que Mapa não implementa equals)
             Long codAtual = subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null;
             if (!Objects.equals(codAtual, cod)) {
                 campos.add("mapa");
@@ -235,17 +226,17 @@ public class SubprocessoCrudService {
                 .build();
         eventPublisher.publishEvent(evento);
 
-        repositorioSubprocesso.deleteById(codigo);
+        subprocessoService.deleteById(codigo);
     }
 
     @Transactional(readOnly = true)
     public List<SubprocessoDto> listar() {
-        return repositorioSubprocesso.findAllComFetch().stream().map(subprocessoMapper::toDto).toList();
+        return subprocessoService.findAllComFetch().stream().map(subprocessoMapper::toDto).toList();
     }
 
     @Transactional(readOnly = true)
     public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
-        Subprocesso sp = repositorioSubprocesso
+        Subprocesso sp = subprocessoService
                 .findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
                 .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada(
                         "%s para o processo %s e unidade %s".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codProcesso,
@@ -255,6 +246,6 @@ public class SubprocessoCrudService {
 
     @Transactional(readOnly = true)
     public boolean verificarAcessoUnidadeAoProcesso(Long codProcesso, List<Long> codigosUnidadesHierarquia) {
-        return repositorioSubprocesso.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, codigosUnidadesHierarquia);
+        return subprocessoService.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, codigosUnidadesHierarquia);
     }
 }

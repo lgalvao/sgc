@@ -39,7 +39,7 @@ import static org.mockito.Mockito.*;
 @Tag("unit")
 class SubprocessoCadastroWorkflowServiceTest {
     @Mock
-    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private sgc.subprocesso.service.SubprocessoRepositoryService subprocessoService;
     @Mock
     private SubprocessoTransicaoService transicaoService;
     @Mock
@@ -59,7 +59,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     @Mock
     private sgc.alerta.AlertaFacade alertaService;
     @Mock
-    private sgc.subprocesso.model.MovimentacaoRepo repositorioMovimentacao;
+    private sgc.subprocesso.service.MovimentacaoRepositoryService movimentacaoService;
     @Mock
     private sgc.mapa.service.MapaFacade mapaFacade;
 
@@ -535,8 +535,8 @@ class SubprocessoCadastroWorkflowServiceTest {
         service.reabrirCadastro(codigo, "Justificativa");
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        verify(subprocessoRepo).save(sp);
-        verify(repositorioMovimentacao).save(any());
+        verify(subprocessoService).save(sp);
+        verify(movimentacaoService).save(any());
     }
 
     @Test
@@ -571,7 +571,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         service.reabrirRevisaoCadastro(codigo, "Justificativa");
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-        verify(subprocessoRepo).save(sp);
-        verify(repositorioMovimentacao).save(any());
+        verify(subprocessoService).save(sp);
+        verify(movimentacaoService).save(any());
     }
 }

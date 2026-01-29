@@ -23,6 +23,9 @@ public final class UtilSanitizacao {
      * @return O texto sem tags HTML, ou nulo se a entrada for nula.
      */
     public static String sanitizar(String entrada) {
+        if (entrada == null) {
+            return null;
+        }
         return POLITICA_PADRAO.sanitize(entrada);
     }
 }

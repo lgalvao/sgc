@@ -24,7 +24,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoRepositoryService;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,7 +34,7 @@ class SubprocessoAdminWorkflowServiceTest {
     private SubprocessoAdminWorkflowService service;
 
     @Mock
-    private SubprocessoRepo repositorioSubprocesso;
+    private SubprocessoRepositoryService subprocessoService;
     @Mock
     private SubprocessoCrudService crudService;
     @Mock
@@ -53,7 +53,7 @@ class SubprocessoAdminWorkflowServiceTest {
 
         service.alterarDataLimite(codigo, novaData);
 
-        verify(repositorioSubprocesso).save(sp);
+        verify(subprocessoService).save(sp);
         assertEquals(novaData.atStartOfDay(), sp.getDataLimiteEtapa1());
         verify(alertaService).criarAlertaAlteracaoDataLimite(any(), any(), any(), eq(1));
     }
@@ -71,7 +71,7 @@ class SubprocessoAdminWorkflowServiceTest {
 
         service.alterarDataLimite(codigo, novaData);
 
-        verify(repositorioSubprocesso).save(sp);
+        verify(subprocessoService).save(sp);
         assertEquals(novaData.atStartOfDay(), sp.getDataLimiteEtapa2());
         verify(alertaService).criarAlertaAlteracaoDataLimite(any(), any(), any(), eq(2));
     }
@@ -86,12 +86,12 @@ class SubprocessoAdminWorkflowServiceTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         sp.setProcesso(p);
 
-        when(repositorioSubprocesso.findByMapaCodigo(codMapa)).thenReturn(Optional.of(sp));
+        when(subprocessoService.findByMapaCodigo(codMapa)).thenReturn(Optional.of(sp));
 
         service.atualizarSituacaoParaEmAndamento(codMapa);
 
         assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, sp.getSituacao());
-        verify(repositorioSubprocesso).save(sp);
+        verify(subprocessoService).save(sp);
     }
 
     @Test
@@ -104,14 +104,14 @@ class SubprocessoAdminWorkflowServiceTest {
         p.setTipo(TipoProcesso.DIAGNOSTICO); // Caso não tratado nos ifs
         sp.setProcesso(p);
 
-        when(repositorioSubprocesso.findByMapaCodigo(codMapa)).thenReturn(Optional.of(sp));
+        when(subprocessoService.findByMapaCodigo(codMapa)).thenReturn(Optional.of(sp));
 
         service.atualizarSituacaoParaEmAndamento(codMapa);
 
         // Situação não deve mudar
         assertEquals(SituacaoSubprocesso.NAO_INICIADO, sp.getSituacao());
         // Não deve salvar
-        verify(repositorioSubprocesso, never()).save(sp);
+        verify(subprocessoService, never()).save(sp);
     }
 
     @Test
@@ -124,19 +124,19 @@ class SubprocessoAdminWorkflowServiceTest {
         p.setTipo(TipoProcesso.REVISAO);
         sp.setProcesso(p);
 
-        when(repositorioSubprocesso.findByMapaCodigo(codMapa)).thenReturn(Optional.of(sp));
+        when(subprocessoService.findByMapaCodigo(codMapa)).thenReturn(Optional.of(sp));
 
         service.atualizarSituacaoParaEmAndamento(codMapa);
 
         assertEquals(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, sp.getSituacao());
-        verify(repositorioSubprocesso).save(sp);
+        verify(subprocessoService).save(sp);
     }
 
     @Test
     @DisplayName("listarSubprocessosHomologados")
     void listarSubprocessosHomologados() {
         service.listarSubprocessosHomologados();
-        verify(repositorioSubprocesso).findBySituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        verify(subprocessoService).findBySituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
     }
 
     @Test
@@ -153,7 +153,7 @@ class SubprocessoAdminWorkflowServiceTest {
 
         service.alterarDataLimite(codigo, novaData);
 
-        verify(repositorioSubprocesso).save(sp);
+        verify(subprocessoService).save(sp);
         assertEquals(novaData.atStartOfDay(), sp.getDataLimiteEtapa1());
     }
 }
