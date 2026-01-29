@@ -19,5 +19,6 @@ export function mapProcessoDetalheDtoToFrontend(dto: ProcessoDetalheDto): Proces
         unidades: dto.unidades
             ? dto.unidades.map(mapUnidadeParticipanteDtoToFrontend)
             : [],
-    };
+        resumoSubprocessos: (dto as any).resumoSubprocessos || [],
+    } as Processo;
 }

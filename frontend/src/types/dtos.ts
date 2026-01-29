@@ -76,3 +76,34 @@ export interface ProcessoDetalheDto {
     [key: string]: any; // Para campos adicionais do spread
 }
 
+// DTOs para SGRH (autenticação e login)
+export interface UnidadeDto {
+    codigo: number;
+    nome: string;
+    sigla: string;
+}
+
+export interface PerfilUnidadeDto {
+    perfil: string;
+    unidade: UnidadeDto;
+    siglaUnidade: string;
+}
+
+export interface UsuarioDto {
+    tituloEleitoral: string;
+    nome: string;
+    email: string;
+    ramal: string;
+    unidade: UnidadeDto;
+    perfis: string[];
+}
+
+export interface LoginResponseDto {
+    tituloEleitoral: string;
+    nome: string;
+    perfil: string;
+    unidadeCodigo: number;
+    token: string;
+}
+
+
