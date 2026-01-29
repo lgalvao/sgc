@@ -13,7 +13,9 @@ import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.subprocesso.service.workflow.SubprocessoWorkflowFacade;
+import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
 
 import java.util.Collections;
 
@@ -29,7 +31,11 @@ class SubprocessoFacadeTest {
     @Mock
     private SubprocessoValidacaoService validacaoService;
     @Mock
-    private SubprocessoWorkflowFacade workflowService;
+    private SubprocessoCadastroWorkflowService cadastroWorkflowService;
+    @Mock
+    private SubprocessoMapaWorkflowService mapaWorkflowService;
+    @Mock
+    private SubprocessoAdminWorkflowService adminWorkflowService;
     @Mock
     private UsuarioFacade usuarioService;
     @Mock
@@ -90,19 +96,19 @@ class SubprocessoFacadeTest {
         verify(validacaoService).validarAssociacoesMapa(1L);
 
         facade.atualizarSituacaoParaEmAndamento(1L);
-        verify(workflowService).atualizarSituacaoParaEmAndamento(1L);
+        verify(adminWorkflowService).atualizarSituacaoParaEmAndamento(1L);
 
         facade.listarSubprocessosHomologados();
-        verify(workflowService).listarSubprocessosHomologados();
+        verify(adminWorkflowService).listarSubprocessosHomologados();
 
         facade.reabrirCadastro(1L, "j");
-        verify(workflowService).reabrirCadastro(1L, "j");
+        verify(cadastroWorkflowService).reabrirCadastro(1L, "j");
 
         facade.reabrirRevisaoCadastro(1L, "j");
-        verify(workflowService).reabrirRevisaoCadastro(1L, "j");
+        verify(cadastroWorkflowService).reabrirRevisaoCadastro(1L, "j");
 
         facade.alterarDataLimite(1L, java.time.LocalDate.now());
-        verify(workflowService).alterarDataLimite(1L, java.time.LocalDate.now());
+        verify(adminWorkflowService).alterarDataLimite(1L, java.time.LocalDate.now());
     }
 
     @Test

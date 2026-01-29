@@ -284,7 +284,7 @@ class ProcessoDetalheBuilderTest {
         Unidade u2 = new Unidade();
         u2.setCodigo(2L); // Different unit
         atribuicao.setUnidade(u2);
-        usuario.setAtribuicoes(Set.of(atribuicao));
+        usuario.setAtribuicoesPermanentes(Set.of(atribuicao));
 
         when(auth.getPrincipal()).thenReturn(usuario);
         when(securityContext.getAuthentication()).thenReturn(auth);

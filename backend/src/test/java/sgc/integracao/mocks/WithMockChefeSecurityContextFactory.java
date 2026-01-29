@@ -30,7 +30,7 @@ public class WithMockChefeSecurityContextFactory
                 // Carregar atribuições do banco de dados se o usuário existir
                 if (usuario != null && usuarioPerfilRepo != null) {
                     var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(annotation.value());
-                    usuario.setAtribuicoes(new HashSet<>(atribuicoes));
+                    usuario.setAtribuicoesPermanentes(new HashSet<>(atribuicoes));
                 }
             } catch (Exception e) {
                 System.err.println(e.getMessage());
@@ -67,10 +67,10 @@ public class WithMockChefeSecurityContextFactory
                             .unidade(unidade)
                             .perfil(Perfil.CHEFE)
                             .build());
-            usuario.setAtribuicoes(atribuicoes);
+            usuario.setAtribuicoesPermanentes(atribuicoes);
         } else {
             // Usuário existe - garantir que tem pelo menos um perfil CHEFE
-            Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getAtribuicoes());
+            Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getTodasAtribuicoes());
             if (atribuicoes.stream().noneMatch(a -> a.getPerfil() == Perfil.CHEFE)) {
                 // Se não tem perfil CHEFE, adicionar com sua unidade de lotação
                 Unidade unidadeLotacao = usuario.getUnidadeLotacao();
@@ -80,7 +80,7 @@ public class WithMockChefeSecurityContextFactory
                                 .unidade(unidadeLotacao)
                                 .perfil(Perfil.CHEFE)
                                 .build());
-                usuario.setAtribuicoes(atribuicoes);
+                usuario.setAtribuicoesPermanentes(atribuicoes);
             }
         }
 

@@ -23,7 +23,7 @@ class UsuarioCoverageTest {
         UsuarioPerfil permanente = new UsuarioPerfil();
         permanente.setUnidadeCodigo(1L);
         permanente.setPerfil(Perfil.GESTOR);
-        u.setAtribuicoes(Set.of(permanente));
+        u.setAtribuicoesPermanentes(Set.of(permanente));
 
         LocalDateTime agora = LocalDateTime.now();
 

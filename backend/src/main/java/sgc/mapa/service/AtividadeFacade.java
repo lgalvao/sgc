@@ -1,10 +1,7 @@
 package sgc.mapa.service;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -13,9 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
-import sgc.mapa.evento.EventoAtividadeAtualizada;
-import sgc.mapa.evento.EventoAtividadeCriada;
-import sgc.mapa.evento.EventoAtividadeExcluida;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
@@ -101,20 +95,6 @@ public class AtividadeFacade {
 
         AtividadeResponse salvo = mapaManutencaoService.criarAtividade(request);
 
-        // Publica evento de criação
-        Atividade atividadeCriada = mapaManutencaoService.obterAtividadePorCodigo(salvo.codigo());
-        Subprocesso subprocesso = mapa.getSubprocesso();
-
-        EventoAtividadeCriada evento = EventoAtividadeCriada.builder()
-                .atividade(atividadeCriada)
-                .codMapa(mapaCodigo)
-                .codSubprocesso(subprocesso.getCodigo())
-                .usuario(usuario)
-                .dataHoraCriacao(LocalDateTime.now())
-                .totalAtividadesNoMapa(mapaManutencaoService.contarAtividadesPorMapa(mapaCodigo))
-                .build();
-        eventPublisher.publishEvent(evento);
-
         return criarRespostaOperacaoPorMapaCodigo(mapaCodigo, salvo.codigo(), true);
     }
 
@@ -130,38 +110,7 @@ public class AtividadeFacade {
         // Verifica permissão
         accessControlService.verificarPermissao(usuario, EDITAR_ATIVIDADE, atividade);
 
-        // Captura estado anterior para detectar mudanças
-
-        Set<String> camposAlterados = new HashSet<>();
-
-        if (!Objects.equals(atividade.getDescricao(), request.descricao())) {
-            camposAlterados.add("descricao");
-        }
-        // Nota: Competências são afetadas apenas via conhecimentos (endpoints separados)
-        // Este método atualiza somente a descrição da atividade
-
         mapaManutencaoService.atualizarAtividade(codigo, request);
-
-        // Busca estado atualizado
-        Atividade atividadeAtualizada = mapaManutencaoService.obterAtividadePorCodigo(codigo);
-        Mapa mapaAtualizado = Objects.requireNonNull(atividadeAtualizada.getMapa(), MAPA_NAO_PODE_SER_NULO);
-        Long codMapa = mapaAtualizado.getCodigo();
-        Subprocesso subprocesso = Objects.requireNonNull(mapaAtualizado.getSubprocesso(), "Subprocesso não pode ser nulo");
-
-        // Publica evento de atualização se houve mudanças
-        if (!camposAlterados.isEmpty()) {
-            EventoAtividadeAtualizada evento = EventoAtividadeAtualizada.builder()
-                    .atividade(atividadeAtualizada)
-                    .codMapa(codMapa)
-                    .codSubprocesso(subprocesso.getCodigo())
-                    .usuario(usuario)
-                    .camposAlterados(camposAlterados)
-                    .dataHoraAtualizacao(LocalDateTime.now())
-                    // Nota: false pois este método atualiza apenas descrição, não competências
-                    .afetouCompetencias(false)
-                    .build();
-            eventPublisher.publishEvent(evento);
-        }
 
         return criarRespostaOperacaoPorAtividade(codigo);
     }
@@ -179,25 +128,6 @@ public class AtividadeFacade {
 
         // Verifica permissão
         accessControlService.verificarPermissao(usuario, EXCLUIR_ATIVIDADE, atividade);
-
-        // Captura dados para o evento ANTES da exclusão
-        String descricao = atividade.getDescricao();
-        Subprocesso subprocesso = Objects.requireNonNull(mapa.getSubprocesso(), "Subprocesso não pode ser nulo");
-        int quantidadeConhecimentos = atividade.getConhecimentos().size();
-        int totalAntes = mapaManutencaoService.contarAtividadesPorMapa(codMapa);
-
-        // Publica evento ANTES da exclusão
-        EventoAtividadeExcluida evento = EventoAtividadeExcluida.builder()
-                .codAtividade(codigo)
-                .descricao(descricao)
-                .codMapa(codMapa)
-                .codSubprocesso(subprocesso.getCodigo())
-                .usuario(usuario)
-                .quantidadeConhecimentos(quantidadeConhecimentos)
-                .dataHoraExclusao(LocalDateTime.now())
-                .totalAtividadesRestantes(totalAntes - 1)
-                .build();
-        eventPublisher.publishEvent(evento);
 
         mapaManutencaoService.excluirAtividade(codigo);
 

@@ -39,7 +39,7 @@ public class WithMockAdminSecurityContextFactory
                 // Carregar atribuições do banco de dados se o usuário existir
                 if (principal != null && usuarioPerfilRepo != null) {
                     var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(tituloAdmin);
-                    principal.setAtribuicoes(new HashSet<>(atribuicoes));
+                    principal.setAtribuicoesPermanentes(new HashSet<>(atribuicoes));
                 }
             } catch (Exception e) {
                 log.error("Erro ao buscar usuario admin", e);
@@ -61,10 +61,10 @@ public class WithMockAdminSecurityContextFactory
                             .unidade(u)
                             .perfil(Perfil.ADMIN)
                             .build());
-            principal.setAtribuicoes(atribuicoes);
+            principal.setAtribuicoesPermanentes(atribuicoes);
 
         } else {
-            Set<sgc.organizacao.model.UsuarioPerfil> atribuicoes = new HashSet<>(principal.getAtribuicoes());
+            Set<sgc.organizacao.model.UsuarioPerfil> atribuicoes = new HashSet<>(principal.getTodasAtribuicoes());
             if (atribuicoes.stream().noneMatch(a -> a.getPerfil() == Perfil.ADMIN)) {
                 // Usuário existe mas não tem perfil ADMIN, adicionar com sua unidade de lotação
                 Unidade unidade = principal.getUnidadeLotacao();
@@ -74,7 +74,7 @@ public class WithMockAdminSecurityContextFactory
                                 .unidade(unidade)
                                 .perfil(Perfil.ADMIN)
                                 .build());
-                principal.setAtribuicoes(atribuicoes);
+                principal.setAtribuicoesPermanentes(atribuicoes);
             }
         }
 

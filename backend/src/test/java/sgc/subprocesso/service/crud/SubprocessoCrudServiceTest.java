@@ -23,9 +23,6 @@ import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
-import sgc.subprocesso.eventos.EventoSubprocessoAtualizado;
-import sgc.subprocesso.eventos.EventoSubprocessoCriado;
-import sgc.subprocesso.eventos.EventoSubprocessoExcluido;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -257,12 +254,10 @@ class SubprocessoCrudServiceTest {
         when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
         service.atualizar(1L, request);
-
-        verify(eventPublisher).publishEvent(any(EventoSubprocessoAtualizado.class));
     }
 
     @Test
-    @DisplayName("Deve atualizar sem publicar evento se nada mudar")
+    @DisplayName("Deve atualizar quando nada mudar")
     void deveAtualizarSemMudancas() {
         Subprocesso sp = criarSubprocessoCompleto();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
@@ -274,12 +269,10 @@ class SubprocessoCrudServiceTest {
         when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
         service.atualizar(1L, request);
-
-        verify(eventPublisher, org.mockito.Mockito.never()).publishEvent(any(EventoSubprocessoAtualizado.class));
     }
 
     @Test
-    @DisplayName("Deve criar subprocesso publicando evento com relacionamentos nulos")
+    @DisplayName("Deve criar subprocesso com relacionamentos nulos")
     void deveCriarComRelacionamentosNulos() {
         CriarSubprocessoRequest request = CriarSubprocessoRequest.builder().codProcesso(1L).codUnidade(1L).build();
         SubprocessoDto responseDto = SubprocessoDto.builder().build();
@@ -290,12 +283,10 @@ class SubprocessoCrudServiceTest {
         when(subprocessoMapper.toDto(any())).thenReturn(responseDto);
 
         service.criar(request);
-
-        verify(eventPublisher).publishEvent(any(EventoSubprocessoCriado.class));
     }
 
     @Test
-    @DisplayName("Deve criar subprocesso publicando evento com relacionamentos presentes")
+    @DisplayName("Deve criar subprocesso com relacionamentos presentes")
     void deveCriarComRelacionamentosPresentes() {
         CriarSubprocessoRequest request = CriarSubprocessoRequest.builder().codProcesso(100L).codUnidade(200L).build();
         SubprocessoDto responseDto = SubprocessoDto.builder().build();
@@ -314,46 +305,6 @@ class SubprocessoCrudServiceTest {
         when(subprocessoMapper.toDto(any())).thenReturn(responseDto);
 
         service.criar(request);
-
-        verify(eventPublisher).publishEvent(any(EventoSubprocessoCriado.class));
-    }
-
-    @Test
-    @DisplayName("Deve excluir subprocesso publicando evento com relacionamentos nulos")
-    void deveExcluirComRelacionamentosNulos() {
-        Subprocesso sp = criarSubprocessoCompleto();
-        when(subprocessoService.buscar(1L)).thenReturn(sp);
-
-        service.excluir(1L);
-
-        verify(eventPublisher).publishEvent(any(EventoSubprocessoExcluido.class));
-        verify(subprocessoService).deleteById(1L);
-    }
-
-    @Test
-    @DisplayName("Deve excluir subprocesso publicando evento com relacionamentos presentes")
-    void deveExcluirComRelacionamentosPresentes() {
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(1L);
-
-        sgc.processo.model.Processo proc = new sgc.processo.model.Processo();
-        proc.setCodigo(100L);
-        sp.setProcesso(proc);
-
-        sgc.organizacao.model.Unidade uni = new sgc.organizacao.model.Unidade();
-        uni.setCodigo(200L);
-        sp.setUnidade(uni);
-
-        Mapa mapa = new Mapa();
-        mapa.setCodigo(300L);
-        sp.setMapa(mapa);
-
-        when(subprocessoService.buscar(1L)).thenReturn(sp);
-
-        service.excluir(1L);
-
-        verify(eventPublisher).publishEvent(any(EventoSubprocessoExcluido.class));
-        verify(subprocessoService).deleteById(1L);
     }
 
     @Test
@@ -393,9 +344,6 @@ class SubprocessoCrudServiceTest {
         when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
         service.atualizar(1L, request);
-
-        // Como o ID do mapa é igual, não deve haver alteração nem evento
-        verify(eventPublisher, org.mockito.Mockito.never()).publishEvent(any(EventoSubprocessoAtualizado.class));
     }
 
     @Test
@@ -416,6 +364,5 @@ class SubprocessoCrudServiceTest {
 
         assertThat(sp.getMapa()).isNotNull();
         assertThat(sp.getMapa().getCodigo()).isEqualTo(5L);
-        verify(eventPublisher).publishEvent(any(EventoSubprocessoAtualizado.class));
     }
 }

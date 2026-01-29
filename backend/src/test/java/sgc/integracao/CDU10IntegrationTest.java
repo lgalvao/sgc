@@ -148,12 +148,10 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
                 .perfil(perfil)
                 .build();
 
-        Set<UsuarioPerfil> atribuicoes = usuario.getAtribuicoes();
-        if (atribuicoes.isEmpty()) {
-            atribuicoes = new HashSet<>();
-        }
+        Set<UsuarioPerfil> atribuicoes = usuario.getTodasAtribuicoes();
+        atribuicoes = new HashSet<>(atribuicoes); // Create mutable copy
         atribuicoes.add(up);
-        usuario.setAtribuicoes(atribuicoes);
+        usuario.setAtribuicoesPermanentes(atribuicoes);
     }
 
     private void definirTitular(Unidade unidade, Usuario usuario) {

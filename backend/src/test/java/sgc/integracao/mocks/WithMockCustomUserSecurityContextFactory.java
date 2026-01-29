@@ -47,18 +47,17 @@ public class WithMockCustomUserSecurityContextFactory
                 .ramal("321")
                 .unidadeLotacao(unidade)
                 .build();
-        principal.setAtribuicoes(new java.util.HashSet<>());
+        
+        java.util.Set<UsuarioPerfil> atribuicoes = new java.util.HashSet<>();
         final Unidade finalUnidade = unidade;
         Arrays.stream(customUser.perfis())
-                .forEach(
-                        p -> principal
-                                .getAtribuicoes()
-                                .add(
-                                        sgc.organizacao.model.UsuarioPerfil.builder()
-                                                .usuario(principal)
-                                                .unidade(finalUnidade)
-                                                .perfil(Perfil.valueOf(p))
-                                                .build()));
+                .forEach(p -> atribuicoes.add(
+                        sgc.organizacao.model.UsuarioPerfil.builder()
+                                .usuario(principal)
+                                .unidade(finalUnidade)
+                                .perfil(Perfil.valueOf(p))
+                                .build()));
+        principal.setAtribuicoesPermanentes(atribuicoes);
 
         if (dbAvailable && usuarioRepo != null) {
             try {

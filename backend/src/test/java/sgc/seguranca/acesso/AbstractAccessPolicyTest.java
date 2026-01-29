@@ -51,7 +51,7 @@ class AbstractAccessPolicyTest {
         Usuario usuario = new Usuario();
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.GESTOR);
-        usuario.setAtribuicoes(new HashSet<>(Collections.singletonList(up)));
+        usuario.setAtribuicoesPermanentes(new HashSet<>(Collections.singletonList(up)));
 
         boolean result = policy.testTemPerfilPermitido(usuario, EnumSet.of(Perfil.GESTOR, Perfil.ADMIN));
         assertTrue(result);
@@ -63,7 +63,7 @@ class AbstractAccessPolicyTest {
         Usuario usuario = new Usuario();
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.SERVIDOR);
-        usuario.setAtribuicoes(new HashSet<>(Collections.singletonList(up)));
+        usuario.setAtribuicoesPermanentes(new HashSet<>(Collections.singletonList(up)));
 
         boolean result = policy.testTemPerfilPermitido(usuario, EnumSet.of(Perfil.GESTOR, Perfil.ADMIN));
         assertFalse(result);

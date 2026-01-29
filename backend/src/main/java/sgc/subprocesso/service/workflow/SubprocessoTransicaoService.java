@@ -15,9 +15,9 @@ import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.MovimentacaoRepositoryService;
 import sgc.subprocesso.service.SubprocessoRepositoryService;
 
 /**
@@ -38,7 +38,7 @@ import sgc.subprocesso.service.SubprocessoRepositoryService;
 @RequiredArgsConstructor
 @Slf4j
 public class SubprocessoTransicaoService {
-    private final MovimentacaoRepositoryService movimentacaoService;
+    private final MovimentacaoRepo movimentacaoRepo;
     private final ApplicationEventPublisher eventPublisher;
     private final SubprocessoRepositoryService subprocessoService;
     private final AnaliseFacade analiseFacade;
@@ -69,7 +69,7 @@ public class SubprocessoTransicaoService {
                 .descricao(tipo.getDescricaoMovimentacao())
                 .usuario(usuario)
                 .build();
-        movimentacaoService.save(movimentacao);
+        movimentacaoRepo.save(movimentacao);
 
         // 2. Publicar evento para comunicação (alertas/emails)
         EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()

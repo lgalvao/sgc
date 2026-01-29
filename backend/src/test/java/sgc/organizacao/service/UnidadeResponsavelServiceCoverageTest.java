@@ -131,8 +131,8 @@ class UnidadeResponsavelServiceCoverageTest {
         assertThat(result).hasSize(1);
         assertThat(result.get(1L).titularTitulo()).isEqualTo("123");
 
-        // Verifica se setAtribuicoes foi chamado no chefeCompleto (embora difícil de verificar diretamente sem spy, o fluxo depende disso)
-        assertThat(chefeCompleto.getAtribuicoes()).contains(perfil);
+        // Verifica se setAtribuicoesPermanentes foi chamado no chefeCompleto
+        assertThat(chefeCompleto.getTodasAtribuicoes()).contains(perfil);
     }
 
     @Test
@@ -214,7 +214,7 @@ class UnidadeResponsavelServiceCoverageTest {
         Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
 
         assertThat(result).isEmpty();
-        assertThat(chefe.getAtribuicoes()).isEmpty();
+        assertThat(chefe.getTodasAtribuicoes()).isEmpty();
     }
 
     @Test
@@ -295,6 +295,6 @@ class UnidadeResponsavelServiceCoverageTest {
         assertThat(result).isSameAs(chefeCompleto);
         // Verify carregarAtribuicoesUsuario was called
         verify(usuarioPerfilRepo).findByUsuarioTitulo("123");
-        assertThat(chefeCompleto.getAtribuicoes()).isNotNull();
+        assertThat(chefeCompleto.getTodasAtribuicoes()).isNotNull();
     }
 }

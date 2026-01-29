@@ -257,7 +257,7 @@ class SubprocessoAccessPolicyTest {
         up.setUnidade(un);
         up.setUnidadeCodigo(codUnidade);
 
-        u.setAtribuicoes(Set.of(up));
+        u.setAtribuicoesPermanentes(Set.of(up));
         return u;
     }
 

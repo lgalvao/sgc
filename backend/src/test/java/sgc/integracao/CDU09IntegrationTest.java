@@ -161,12 +161,10 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         up.setUnidadeCodigo(unidade.getCodigo());
         up.setPerfil(perfil);
 
-        Set<UsuarioPerfil> atribuicoes = usuario.getAtribuicoes();
-        if (atribuicoes.isEmpty()) { // Handle empty set from Fixture/Immutable
-            atribuicoes = new HashSet<>();
-        }
+        Set<UsuarioPerfil> atribuicoes = usuario.getTodasAtribuicoes();
+        atribuicoes = new HashSet<>(atribuicoes); // Create mutable copy
         atribuicoes.add(up);
-        usuario.setAtribuicoes(atribuicoes);
+        usuario.setAtribuicoesPermanentes(atribuicoes);
     }
 
     private void definirTitular(Unidade unidade, Usuario usuario) {

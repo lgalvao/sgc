@@ -39,11 +39,14 @@ import sgc.subprocesso.dto.SugestoesDto;
 import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.subprocesso.service.workflow.SubprocessoWorkflowFacade;
+import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
 
 @ExtendWith(MockitoExtension.class)
 @org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
@@ -58,11 +61,15 @@ class SubprocessoFacadeComplementaryTest {
     @Mock
     private SubprocessoValidacaoService validacaoService;
     @Mock
-    private SubprocessoWorkflowFacade workflowService;
+    private SubprocessoCadastroWorkflowService cadastroWorkflowService;
+    @Mock
+    private SubprocessoMapaWorkflowService mapaWorkflowService;
+    @Mock
+    private SubprocessoAdminWorkflowService adminWorkflowService;
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
-    private MovimentacaoRepositoryService movimentacaoService;
+    private MovimentacaoRepo movimentacaoRepo;
     @Mock
     private SubprocessoDetalheMapper subprocessoDetalheMapper;
     @Mock
@@ -165,7 +172,7 @@ class SubprocessoFacadeComplementaryTest {
         @Test
         @DisplayName("Deve listar subprocessos homologados")
         void deveListarSubprocessosHomologados() {
-            when(workflowService.listarSubprocessosHomologados()).thenReturn(Collections.emptyList());
+            when(adminWorkflowService.listarSubprocessosHomologados()).thenReturn(Collections.emptyList());
             assertThat(subprocessoFacade.listarSubprocessosHomologados()).isEmpty();
         }
     }
@@ -234,7 +241,7 @@ class SubprocessoFacadeComplementaryTest {
         @DisplayName("Deve atualizar situação para EM ANDAMENTO")
         void deveAtualizarParaEmAndamentoMapeamento() {
             subprocessoFacade.atualizarSituacaoParaEmAndamento(100L);
-            verify(workflowService).atualizarSituacaoParaEmAndamento(100L);
+            verify(adminWorkflowService).atualizarSituacaoParaEmAndamento(100L);
         }
 
         @Test
@@ -242,21 +249,21 @@ class SubprocessoFacadeComplementaryTest {
         void deveAlterarDataLimite() {
             LocalDate novaData = java.time.LocalDate.now();
             subprocessoFacade.alterarDataLimite(1L, novaData);
-            verify(workflowService).alterarDataLimite(1L, novaData);
+            verify(adminWorkflowService).alterarDataLimite(1L, novaData);
         }
 
         @Test
         @DisplayName("Deve reabrir cadastro")
         void deveReabrirCadastro() {
             subprocessoFacade.reabrirCadastro(1L, "Justificativa");
-            verify(workflowService).reabrirCadastro(1L, "Justificativa");
+            verify(cadastroWorkflowService).reabrirCadastro(1L, "Justificativa");
         }
 
         @Test
         @DisplayName("Deve reabrir revisão cadastro")
         void deveReabrirRevisaoCadastro() {
             subprocessoFacade.reabrirRevisaoCadastro(1L, "Justificativa");
-            verify(workflowService).reabrirRevisaoCadastro(1L, "Justificativa");
+            verify(cadastroWorkflowService).reabrirRevisaoCadastro(1L, "Justificativa");
         }
     }
 
@@ -327,7 +334,7 @@ class SubprocessoFacadeComplementaryTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
             when(unidadeFacade.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
             when(usuarioService.buscarPorLogin("TITULAR")).thenReturn(new Usuario());
-            when(movimentacaoService.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
+            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
 
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().unidade(SubprocessoDetalheDto.UnidadeDto.builder().sigla("SIGLA").build()).build());
 
@@ -358,7 +365,7 @@ class SubprocessoFacadeComplementaryTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
             when(unidadeFacade.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
             when(usuarioService.buscarPorLogin("TITULAR")).thenThrow(new RuntimeException("Erro"));
-            when(movimentacaoService.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
+            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().build());
 
             SubprocessoDetalheDto result = subprocessoFacade.obterDetalhes(codigo, sgc.organizacao.model.Perfil.ADMIN);
@@ -388,7 +395,7 @@ class SubprocessoFacadeComplementaryTest {
 
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
             when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
-            when(movimentacaoService.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
+            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
             when(usuarioService.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
 
             sgc.organizacao.dto.UnidadeDto unidadeDto = sgc.organizacao.dto.UnidadeDto.builder().sigla("SIGLA").build();
@@ -618,7 +625,7 @@ class SubprocessoFacadeComplementaryTest {
             subprocessoFacade.importarAtividades(dest, orig);
 
             verify(copiaMapaService).importarAtividadesDeOutroMapa(20L, 10L);
-            verify(movimentacaoService).save(any());
+            verify(movimentacaoRepo).save(any());
             assertThat(spDest.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         }
 
