@@ -32,7 +32,7 @@ export const useUsuariosStore = defineStore("usuarios", () => {
                 ...u,
                 unidade: {sigla: u.unidade},
             })) as Usuario[];
-        }).catch(() => {
+        }, () => {
             error.value = lastError.value?.message || "Erro ao buscar usuários";
         }).finally(() => {
             isLoading.value = false;

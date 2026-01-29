@@ -52,9 +52,8 @@ export const useAtribuicaoTemporariaStore = defineStore(
                     logger.error("Expected array but got:", data);
                     atribuicoes.value = [];
                 }
-            }).catch((err: any) => {
+            }, () => {
                 error.value = lastError.value?.message || "Erro ao buscar atribuições";
-                throw err;
             }).finally(() => {
                 isLoading.value = false;
             });
