@@ -5,6 +5,7 @@ import {ref} from "vue";
 import {type Atividade, type ProcessoResumo, SituacaoProcesso, TipoProcesso} from "@/types/tipos";
 import ImportarAtividadesModal from "../ImportarAtividadesModal.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {useAtividadesStore} from "@/stores/atividades";
 
 // Helper type for the component instance
 type ImportarAtividadesModalVM = InstanceType<typeof ImportarAtividadesModal>;
@@ -61,6 +62,12 @@ describe("ImportarAtividadesModal", () => {
             props: {mostrar: true, codSubprocessoDestino: 999},
         });
         wrapper = context.wrapper as VueWrapper<ImportarAtividadesModalVM>;
+
+        // Mock getter that was converted from computed property
+        const atividadesStore = useAtividadesStore();
+        atividadesStore.obterAtividadesPorSubprocesso = vi.fn((id: number) => {
+            return mapAtividades.get(id) || [];
+        });
     });
 
     it('deve emitir "fechar" ao clicar em Cancelar', async () => {

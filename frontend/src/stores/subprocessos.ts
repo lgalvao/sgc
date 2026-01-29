@@ -40,18 +40,20 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
     const feedbackStore = useFeedbackStore();
 
     async function _executarAcao(acao: () => Promise<any>, sucessoMsg: string, _: string): Promise<boolean> {
-        return withErrorHandling(async () => {
-            await acao();
-            feedbackStore.show(sucessoMsg, `${sucessoMsg}.`, 'success');
+        try {
+            await withErrorHandling(async () => {
+                await acao();
+                feedbackStore.show(sucessoMsg, `${sucessoMsg}.`, 'success');
 
-            const processosStore = useProcessosStore();
-            if (processosStore.processoDetalhe) {
-                await processosStore.buscarProcessoDetalhe(processosStore.processoDetalhe.codigo);
-            }
+                const processosStore = useProcessosStore();
+                if (processosStore.processoDetalhe) {
+                    await processosStore.buscarProcessoDetalhe(processosStore.processoDetalhe.codigo);
+                }
+            });
             return true;
-        }).catch(() => {
+        } catch {
             return false;
-        });
+        }
     }
 
     async function alterarDataLimiteSubprocesso(
@@ -96,7 +98,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
             subprocessoDetalhe.value = null;
         }).catch(() => {
             // Silenciar erro - lastError já foi populado pelo withErrorHandling
-            subprocessoDetalhe.value = null;
+            // Esta função não deve lançar exceção pois é chamada de componentes
         });
     }
 
@@ -104,12 +106,14 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         codProcesso: number,
         siglaUnidade: string,
     ): Promise<number | null> {
-        return withErrorHandling(async () => {
-            const dto = await serviceBuscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
-            return dto.codigo;
-        }).catch(() => {
+        try {
+            return await withErrorHandling(async () => {
+                const dto = await serviceBuscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
+                return dto.codigo;
+            });
+        } catch {
             return null;
-        });
+        }
     }
 
     async function buscarContextoEdicao(id: number) {
