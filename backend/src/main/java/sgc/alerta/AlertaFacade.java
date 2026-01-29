@@ -10,9 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.mapper.AlertaMapper;
 import sgc.alerta.model.Alerta;
-import sgc.alerta.model.AlertaRepo;
 import sgc.alerta.model.AlertaUsuario;
-import sgc.alerta.model.AlertaUsuarioRepo;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.TipoUnidade;
@@ -24,17 +22,19 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 /**
- * Serviço para gerenciar alertas do sistema.
+ * Facade para gerenciamento de alertas do sistema.
  *
  * <p>Responsável por criar alertas para unidades participantes de processos
- * e gerenciar a visualização/leitura de alertas por usuários.
+ * e gerenciar a visualização/leitura de alertas por usuários. Delega operações
+ * de persistência para {@link AlertaService}.
+ *
+ * @see AlertaService
  */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AlertaFacade {
-    private final AlertaRepo alertaRepo;
-    private final AlertaUsuarioRepo alertaUsuarioRepo;
+    private final AlertaService alertaService;
     private final UsuarioFacade usuarioService;
     private final AlertaMapper alertaMapper;
     private final UnidadeFacade unidadeService;
@@ -52,7 +52,7 @@ public class AlertaFacade {
      * Criar e persistir um alerta.
      */
     private Alerta criarAlerta(Processo processo, Unidade origem, Unidade destino, String descricao) {
-        return alertaRepo.save(new Alerta()
+        return alertaService.salvar(new Alerta()
                 .setProcesso(processo)
                 .setDataHora(LocalDateTime.now())
                 .setUnidadeOrigem(origem)
@@ -173,9 +173,9 @@ public class AlertaFacade {
                     .usuarioTitulo(usuarioTitulo)
                     .build();
 
-            AlertaUsuario alertaUsuario = alertaUsuarioRepo.findById(chave)
+            AlertaUsuario alertaUsuario = alertaService.buscarAlertaUsuario(chave)
                     .orElseGet(() -> {
-                        Alerta alerta = alertaRepo.findById(codigo).orElse(null);
+                        Alerta alerta = alertaService.buscarPorCodigo(codigo).orElse(null);
                         if (alerta == null) {
                             return null;
                         }
@@ -189,7 +189,7 @@ public class AlertaFacade {
             // Persists read timestamp if alert was unread
             if (alertaUsuario != null && alertaUsuario.getDataHoraLeitura() == null) {
                 alertaUsuario.setDataHoraLeitura(agora);
-                alertaUsuarioRepo.save(alertaUsuario);
+                alertaService.salvarAlertaUsuario(alertaUsuario);
             }
         }
     }
@@ -207,7 +207,7 @@ public class AlertaFacade {
         Usuario usuario = usuarioService.buscarPorId(usuarioTitulo);
         Unidade lotacao = usuario.getUnidadeLotacao();
 
-        List<Alerta> alertasUnidade = alertaRepo.findByUnidadeDestino_Codigo(lotacao.getCodigo());
+        List<Alerta> alertasUnidade = alertaService.buscarPorUnidadeDestino(lotacao.getCodigo());
 
         if (alertasUnidade.isEmpty()) {
             return Collections.emptyList();
@@ -216,7 +216,7 @@ public class AlertaFacade {
         List<Long> alertaCodigos = alertasUnidade.stream().map(Alerta::getCodigo).toList();
 
         // Fetch all read statuses in a single query to avoid N+1 problem (Optimization)
-        List<AlertaUsuario> leituras = alertaUsuarioRepo.findByUsuarioAndAlertas(usuarioTitulo, alertaCodigos);
+        List<AlertaUsuario> leituras = alertaService.buscarPorUsuarioEAlertas(usuarioTitulo, alertaCodigos);
 
         Map<Long, LocalDateTime> mapaLeitura = new HashMap<>();
         for (AlertaUsuario au : leituras) {
@@ -244,16 +244,11 @@ public class AlertaFacade {
      * Lista alertas destinados a uma unidade específica.
      */
     public Page<Alerta> listarPorUnidade(Long codigoUnidade, Pageable pageable) {
-        return alertaRepo.findByUnidadeDestino_Codigo(codigoUnidade, pageable);
+        return alertaService.buscarPorUnidadeDestino(codigoUnidade, pageable);
     }
 
     public Optional<LocalDateTime> obterDataHoraLeitura(Long codigoAlerta, String usuarioTitulo) {
-        return alertaUsuarioRepo
-                .findById(AlertaUsuario.Chave.builder()
-                        .alertaCodigo(codigoAlerta)
-                        .usuarioTitulo(usuarioTitulo)
-                        .build())
-                .map(AlertaUsuario::getDataHoraLeitura);
+        return alertaService.obterDataHoraLeitura(codigoAlerta, usuarioTitulo);
     }
 
     @Transactional
