@@ -4,8 +4,8 @@ import {mapUnidade, mapUnidadesArray, mapUnidadeSnapshot,} from "@/mappers/unida
 import type {Alerta, Mapa, MapaAjuste} from "@/types/tipos";
 import {mapAlertaDtoToFrontend} from "../alertas";
 import {
-    mapAtividadeDtoToModel,
-    mapConhecimentoDtoToModel,
+    mapAtividadeToModel,
+    mapConhecimentoToModel,
     mapCriarAtividadeRequestToDto,
     mapCriarConhecimentoRequestToDto,
 } from "../atividades";
@@ -15,7 +15,7 @@ import {
     mapMapaCompletoDtoToModel,
     mapMapaDtoToModel,
 } from "../mapas";
-import {mapProcessoDetalheDtoToFrontend, mapProcessoDtoToFrontend, mapProcessoResumoDtoToFrontend,} from "../processos";
+import {mapProcessoDetalheDtoToFrontend} from "../processos";
 import {
     LoginResponseToFrontend,
     mapPerfilUnidadeToFrontend,
@@ -56,22 +56,22 @@ describe("mappers/alertas", () => {
 });
 
 describe("mappers/atividades", () => {
-    it("mapAtividadeDtoToModel deve mapear corretamente", () => {
+    it("mapAtividadeToModel deve mapear corretamente", () => {
         const dto = {
             codigo: 1,
             descricao: "Atividade Teste",
             conhecimentos: [{codigo: 101, descricao: "Conhecimento Teste"}],
         };
-        const model = mapAtividadeDtoToModel(dto);
+        const model = mapAtividadeToModel(dto);
         expect(model.codigo).toBe(1);
         expect(model.descricao).toBe("Atividade Teste");
         expect(model.conhecimentos).toHaveLength(1);
         expect(model.conhecimentos[0].codigo).toBe(101);
     });
 
-    it("mapConhecimentoDtoToModel deve mapear corretamente", () => {
+    it("mapConhecimentoToModel deve mapear corretamente", () => {
         const dto = {codigo: 101, descricao: "Conhecimento Teste"};
-        const model = mapConhecimentoDtoToModel(dto);
+        const model = mapConhecimentoToModel(dto);
         expect(model.codigo).toBe(101);
         expect(model.descricao).toBe("Conhecimento Teste");
     });
@@ -152,32 +152,13 @@ describe("mappers/mapas", () => {
 });
 
 describe("mappers/processos", () => {
-    it("mapProcessoResumoDtoToFrontend deve copiar todas as propriedades", () => {
-        const dto = {codigo: 1, tipo: "MAPEAMENTO", situacao: "EM_ANDAMENTO"};
-        const model = mapProcessoResumoDtoToFrontend(dto);
-        expect(model).toEqual(dto);
-    });
-
-    it("mapProcessoDtoToFrontend deve copiar todas as propriedades", () => {
-        const dto = {
-            codigo: 1,
-            tipo: "REVISAO",
-            situacao: "INICIADO",
-            responsavel: "user",
-        };
-        const model = mapProcessoDtoToFrontend(dto);
-        expect(model).toEqual(dto);
-    });
-
     it("mapProcessoDetalheDtoToFrontend deve mapear estruturas aninhadas", () => {
         const dto = {
             codigo: 1,
             unidades: [{codigo: 10, filhos: [{codigo: 11}]}],
-            resumoSubprocessos: [{codigo: 100}],
         };
         const model = mapProcessoDetalheDtoToFrontend(dto);
         expect(model.unidades[0].filhos[0].codUnidade).toBe(11);
-        expect(model.resumoSubprocessos[0].codigo).toBe(100);
     });
 });
 

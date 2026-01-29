@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {computed, ref} from "vue";
+import {ref} from "vue";
 import {buscarTodasAtribuicoes} from "@/services/atribuicaoTemporariaService";
 import type {AtribuicaoTemporaria} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
@@ -18,23 +18,17 @@ export const useAtribuicaoTemporariaStore = defineStore(
             error.value = null;
         }
 
-        const obterAtribuicoesPorServidor = computed(
-            () =>
-                (usuarioCodigo: number): AtribuicaoTemporaria[] => {
-                    return atribuicoes.value.filter(
-                        (a) => a.usuario.codigo === usuarioCodigo,
-                    );
-                },
-        );
+        function obterAtribuicoesPorServidor(usuarioCodigo: number): AtribuicaoTemporaria[] {
+            return atribuicoes.value.filter(
+                (a) => a.usuario.codigo === usuarioCodigo,
+            );
+        }
 
-        const obterAtribuicoesPorUnidade = computed(
-            () =>
-                (unidadeSigla: string): AtribuicaoTemporaria[] => {
-                    return atribuicoes.value.filter(
-                        (a) => a.unidade.sigla === unidadeSigla,
-                    );
-                },
-        );
+        function obterAtribuicoesPorUnidade(unidadeSigla: string): AtribuicaoTemporaria[] {
+            return atribuicoes.value.filter(
+                (a) => a.unidade.sigla === unidadeSigla,
+            );
+        }
 
         async function buscarAtribuicoes() {
             isLoading.value = true;

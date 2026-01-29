@@ -7,7 +7,7 @@ import * as service from "../atividadeService";
 
 // Mocking mappers as they are used in the service
 vi.mock("@/mappers/atividades", () => ({
-    mapAtividadeDtoToModel: vi.fn((dto) => ({...dto, mapped: true})),
+    mapAtividadeToModel: vi.fn((dto) => ({...dto, mapped: true})),
     mapConhecimentoDtoToModel: vi.fn((dto) => ({...dto, mapped: true})),
     mapCriarAtividadeRequestToDto: vi.fn((req) => ({...req, mapped: true})),
     mapCriarConhecimentoRequestToDto: vi.fn((req) => ({...req, mapped: true})),
@@ -29,8 +29,8 @@ describe("atividadeService", () => {
         const result = await service.listarAtividades();
 
         expect(mockApi.get).toHaveBeenCalledWith("/atividades");
-        expect(mappers.mapAtividadeDtoToModel).toHaveBeenCalled();
-        expect((mappers.mapAtividadeDtoToModel as any).mock.calls[0][0]).toEqual(
+        expect(mappers.mapAtividadeToModel).toHaveBeenCalled();
+        expect((mappers.mapAtividadeToModel as any).mock.calls[0][0]).toEqual(
             dtoList[0],
         );
         expect(result[0]).toHaveProperty("mapped", true);
@@ -43,7 +43,7 @@ describe("atividadeService", () => {
         const result = await service.obterAtividadePorCodigo(1);
 
         expect(mockApi.get).toHaveBeenCalledWith("/atividades/1");
-        expect(mappers.mapAtividadeDtoToModel).toHaveBeenCalledWith(dto);
+        expect(mappers.mapAtividadeToModel).toHaveBeenCalledWith(dto);
         expect(result).toHaveProperty("mapped", true);
     });
 

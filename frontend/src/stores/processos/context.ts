@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import type {
     ProcessoResumo,
     SubprocessoElegivel,
@@ -13,15 +13,12 @@ export const useProcessosContextStore = defineStore("processos-context", () => {
     const { lastError, clearError, withErrorHandling } = useErrorHandler();
     const coreStore = useProcessosCoreStore();
 
-    const obterUnidadesProcesso = computed(
-        () =>
-            (idProcesso: number): ProcessoResumo[] => {
-                if (coreStore.processoDetalhe && coreStore.processoDetalhe.codigo === idProcesso) {
-                    return coreStore.processoDetalhe.resumoSubprocessos;
-                }
-                return [];
-            },
-    );
+    function obterUnidadesDoProcesso(idProcesso: number): ProcessoResumo[] {
+        if (coreStore.processoDetalhe && coreStore.processoDetalhe.codigo === idProcesso) {
+            return coreStore.processoDetalhe.resumoSubprocessos;
+        }
+        return [];
+    }
 
     async function buscarContextoCompleto(idProcesso: number) {
         return withErrorHandling(async () => {
@@ -42,7 +39,7 @@ export const useProcessosContextStore = defineStore("processos-context", () => {
     return {
         subprocessosElegiveis,
         lastError,
-        obterUnidadesDoProcesso: obterUnidadesProcesso,
+        obterUnidadesDoProcesso,
         buscarContextoCompleto,
         buscarSubprocessosElegiveis,
         clearError,

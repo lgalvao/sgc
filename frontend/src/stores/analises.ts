@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {computed, ref} from "vue";
+import {ref} from "vue";
 import * as analiseService from "@/services/analiseService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 
@@ -12,9 +12,9 @@ export const useAnalisesStore = defineStore("analises", () => {
     const { lastError, clearError, withErrorHandling } = useErrorHandler();
     const isLoading = ref(false);
 
-    const obterAnalisesPorSubprocesso = computed(() => (codSubrocesso: number) => {
+    function obterAnalisesPorSubprocesso(codSubrocesso: number): Analise[] {
         return analisesPorSubprocesso.value.get(codSubrocesso) || [];
-    });
+    }
 
     async function buscarAnalisesCadastro(codSubrocesso: number) {
         if (isLoading.value) return; // Previne race conditions
