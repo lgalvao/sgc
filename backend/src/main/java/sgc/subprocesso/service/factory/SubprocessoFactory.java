@@ -63,11 +63,9 @@ public class SubprocessoFactory {
 
         List<Subprocesso> subprocessosSalvos = subprocessoService.saveAll(subprocessos);
         List<Mapa> mapas = subprocessosSalvos.stream()
-                .map(sp -> {
-                    Mapa mapa = new Mapa();
-                    mapa.setSubprocesso(sp);
-                    return mapa;
-                })
+                .<Mapa>map(sp -> Mapa.builder()
+                        .subprocesso(sp)
+                        .build())
                 .toList();
 
         List<Mapa> mapasSalvos = mapaRepo.saveAll(mapas);

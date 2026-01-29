@@ -71,10 +71,11 @@ public class CopiaMapaService {
     // ===================================================================================
 
     private Mapa criarNovoMapa(Mapa fonte) {
-        return new Mapa()
-                .setDataHoraDisponibilizado(fonte.getDataHoraDisponibilizado())
-                .setObservacoesDisponibilizacao(fonte.getObservacoesDisponibilizacao())
-                .setDataHoraHomologado(null);
+        return Mapa.builder()
+                .dataHoraDisponibilizado(fonte.getDataHoraDisponibilizado())
+                .observacoesDisponibilizacao(fonte.getObservacoesDisponibilizacao())
+                .dataHoraHomologado(null)
+                .build();
     }
 
     private Map<Long, Atividade> copiarAtividades(Long codMapaFonte, Mapa mapaSalvo) {
@@ -105,16 +106,18 @@ public class CopiaMapaService {
     }
 
     private Atividade prepararCopiaAtividade(Atividade atividadeFonte, Mapa mapaDestino) {
-        Atividade novaAtividade = new Atividade();
-        novaAtividade.setDescricao(atividadeFonte.getDescricao());
-        novaAtividade.setMapa(mapaDestino);
+        Atividade novaAtividade = Atividade.builder()
+                .descricao(atividadeFonte.getDescricao())
+                .mapa(mapaDestino)
+                .build();
 
         List<Conhecimento> conhecimentosFonte = atividadeFonte.getConhecimentos();
         if (!conhecimentosFonte.isEmpty()) {
             for (Conhecimento conhecimentoFonte : conhecimentosFonte) {
-                Conhecimento novoConhecimento = new Conhecimento()
-                        .setAtividade(novaAtividade)
-                        .setDescricao(conhecimentoFonte.getDescricao());
+                Conhecimento novoConhecimento = Conhecimento.builder()
+                        .atividade(novaAtividade)
+                        .descricao(conhecimentoFonte.getDescricao())
+                        .build();
 
                 novaAtividade.getConhecimentos().add(novoConhecimento);
             }
@@ -130,19 +133,24 @@ public class CopiaMapaService {
         List<Competencia> novasCompetencias = new ArrayList<>();
 
         for (Competencia competenciaFonte : competenciasFonte) {
-            Competencia novaCompetencia = new Competencia()
-                    .setDescricao(competenciaFonte.getDescricao())
-                    .setMapa(mapaSalvo);
-
             Set<Atividade> novasAtividadesAssociadas = new HashSet<>();
             for (Atividade atividadeFonteAssociada : competenciaFonte.getAtividades()) {
                 Atividade novaAtividade = mapaAtividades.get(atividadeFonteAssociada.getCodigo());
                 if (novaAtividade != null) {
                     novasAtividadesAssociadas.add(novaAtividade);
-                    novaAtividade.getCompetencias().add(novaCompetencia);
                 }
             }
-            novaCompetencia.setAtividades(novasAtividadesAssociadas);
+
+            Competencia novaCompetencia = Competencia.builder()
+                    .descricao(competenciaFonte.getDescricao())
+                    .mapa(mapaSalvo)
+                    .atividades(novasAtividadesAssociadas)
+                    .build();
+
+            for (Atividade novaAtividade : novasAtividadesAssociadas) {
+                novaAtividade.getCompetencias().add(novaCompetencia);
+            }
+
             novasCompetencias.add(novaCompetencia);
         }
 

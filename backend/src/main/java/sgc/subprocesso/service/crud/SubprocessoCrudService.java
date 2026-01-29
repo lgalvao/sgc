@@ -139,8 +139,9 @@ public class SubprocessoCrudService {
 
         var subprocessoSalvo = subprocessoService.save(entity);
 
-        Mapa mapa = new Mapa();
-        mapa.setSubprocesso(subprocessoSalvo);
+        Mapa mapa = Mapa.builder()
+                .subprocesso(subprocessoSalvo)
+                .build();
         Mapa mapaSalvo = mapaFacade.salvar(mapa);
 
         subprocessoSalvo.setMapa(mapaSalvo);
@@ -185,8 +186,9 @@ public class SubprocessoCrudService {
         Set<String> campos = new HashSet<>();
 
         java.util.Optional.ofNullable(request.codMapa()).ifPresent(cod -> {
-            Mapa m = new Mapa();
-            m.setCodigo(cod);
+            Mapa m = Mapa.builder()
+                    .codigo(cod)
+                    .build();
             Long codAtual = subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null;
             if (!Objects.equals(codAtual, cod)) {
                 campos.add("mapa");

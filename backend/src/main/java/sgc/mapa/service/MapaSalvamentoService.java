@@ -138,9 +138,10 @@ public class MapaSalvamentoService {
                 throw new sgc.comum.erros.ErroEntidadeNaoEncontrada("Competência", codigo);
             }
         } else {
-            competencia = new Competencia();
-            competencia.setMapa(mapa);
-            competencia.setAtividades(new HashSet<>());
+            competencia = Competencia.builder()
+                    .mapa(mapa)
+                    .atividades(new HashSet<>())
+                    .build();
         }
 
         competencia.setDescricao(compDto.descricao());
@@ -216,26 +217,11 @@ public class MapaSalvamentoService {
         }
     }
 
-    @SuppressWarnings("ClassCanBeRecord")
-    private static class ContextoSalvamento {
-        final List<Competencia> competenciasAtuais;
-        final List<Atividade> atividadesAtuais;
-        final Set<Long> atividadesDoMapaIds;
-        final Set<Long> codigosNovos;
-        final SalvarMapaRequest request;
-
-        ContextoSalvamento(
-                List<Competencia> competenciasAtuais,
-                List<Atividade> atividadesAtuais,
-                Set<Long> atividadesDoMapaIds,
-                Set<Long> codigosNovos,
-                SalvarMapaRequest request) {
-
-            this.competenciasAtuais = competenciasAtuais;
-            this.atividadesAtuais = atividadesAtuais;
-            this.atividadesDoMapaIds = atividadesDoMapaIds;
-            this.codigosNovos = codigosNovos;
-            this.request = request;
-        }
+    private record ContextoSalvamento(
+            List<Competencia> competenciasAtuais,
+            List<Atividade> atividadesAtuais,
+            Set<Long> atividadesDoMapaIds,
+            Set<Long> codigosNovos,
+            SalvarMapaRequest request) {
     }
 }
