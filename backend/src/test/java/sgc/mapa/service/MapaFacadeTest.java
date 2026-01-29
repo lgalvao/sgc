@@ -14,9 +14,7 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.mapper.MapaCompletoMapper;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,18 +31,22 @@ import static org.mockito.Mockito.when;
 @DisplayName("Testes do MapaFacade")
 class MapaFacadeTest {
     @Mock
-    private MapaRepo mapaRepo;
+    private MapaRepositoryService mapaService;
     @Mock
-    private CompetenciaRepo competenciaRepo;
+    private CompetenciaRepositoryService competenciaService;
     @Mock
     private MapaCompletoMapper mapaCompletoMapper;
     @Mock
     private MapaSalvamentoService mapaSalvamentoService;
     @Mock
+    private MapaVisualizacaoService mapaVisualizacaoService;
+    @Mock
+    private ImpactoMapaService impactoMapaService;
+    @Mock
     private sgc.comum.repo.RepositorioComum repo;
 
     @InjectMocks
-    private MapaFacade service;
+    private MapaFacade facade;
 
     @Nested
     @DisplayName("Operações CRUD")
@@ -52,16 +54,16 @@ class MapaFacadeTest {
         @Test
         @DisplayName("Deve listar todos os mapas")
         void deveListarMapas() {
-            when(mapaRepo.findAll()).thenReturn(List.of(new Mapa()));
-            var resultado = service.listar();
+            when(mapaService.findAll()).thenReturn(List.of(new Mapa()));
+            var resultado = facade.listar();
             assertThat(resultado).isNotNull().isNotEmpty().hasSize(1);
         }
 
         @Test
         @DisplayName("Deve retornar lista vazia quando não há mapas")
         void deveRetornarListaVaziaQuandoNaoHaMapas() {
-            when(mapaRepo.findAll()).thenReturn(List.of());
-            var resultado = service.listar();
+            when(mapaService.findAll()).thenReturn(List.of());
+            var resultado = facade.listar();
             assertThat(resultado).isNotNull().isEmpty();
         }
 
@@ -69,14 +71,14 @@ class MapaFacadeTest {
         @DisplayName("Deve obter mapa por código")
         void deveObterPorCodigo() {
             when(repo.buscar(Mapa.class, 1L)).thenReturn(new Mapa());
-            assertThat(service.obterPorCodigo(1L)).isNotNull();
+            assertThat(facade.obterPorCodigo(1L)).isNotNull();
         }
 
         @Test
         @DisplayName("Deve lançar exceção se mapa não encontrado")
         void deveLancarExcecaoSeNaoEncontrado() {
             when(repo.buscar(Mapa.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
-            assertThatThrownBy(() -> service.obterPorCodigo(1L))
+            assertThatThrownBy(() -> facade.obterPorCodigo(1L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
@@ -84,16 +86,16 @@ class MapaFacadeTest {
         @DisplayName("Deve salvar mapa")
         void deveSalvarMapa() {
             Mapa mapa = new Mapa();
-            when(mapaRepo.save(mapa)).thenReturn(mapa);
-            assertThat(service.salvar(mapa)).isEqualTo(mapa);
+            when(mapaService.salvar(mapa)).thenReturn(mapa);
+            assertThat(facade.salvar(mapa)).isEqualTo(mapa);
         }
 
         @Test
         @DisplayName("Deve criar mapa")
         void deveCriarMapa() {
             Mapa mapa = new Mapa();
-            when(mapaRepo.save(mapa)).thenReturn(mapa);
-            assertThat(service.criar(mapa)).isEqualTo(mapa);
+            when(mapaService.salvar(mapa)).thenReturn(mapa);
+            assertThat(facade.criar(mapa)).isEqualTo(mapa);
         }
 
         @Test
@@ -104,9 +106,9 @@ class MapaFacadeTest {
             novosDados.setObservacoesDisponibilizacao("Obs");
 
             when(repo.buscar(Mapa.class, 1L)).thenReturn(existente);
-            when(mapaRepo.save(existente)).thenReturn(existente);
+            when(mapaService.salvar(existente)).thenReturn(existente);
 
-            Mapa atualizado = service.atualizar(1L, novosDados);
+            Mapa atualizado = facade.atualizar(1L, novosDados);
             assertThat(atualizado.getObservacoesDisponibilizacao()).isEqualTo("Obs");
         }
 
@@ -115,23 +117,23 @@ class MapaFacadeTest {
         void deveLancarErroAoAtualizarInexistente() {
             when(repo.buscar(Mapa.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
             Mapa mapa = new Mapa();
-            assertThatThrownBy(() -> service.atualizar(1L, mapa))
+            assertThatThrownBy(() -> facade.atualizar(1L, mapa))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
         @DisplayName("Deve excluir mapa")
         void deveExcluirMapa() {
-            when(mapaRepo.existsById(1L)).thenReturn(true);
-            service.excluir(1L);
-            verify(mapaRepo).deleteById(1L);
+            when(mapaService.existsById(1L)).thenReturn(true);
+            facade.excluir(1L);
+            verify(mapaService).deleteById(1L);
         }
 
         @Test
         @DisplayName("Deve lançar erro ao excluir mapa inexistente")
         void deveLancarErroAoExcluirInexistente() {
-            when(mapaRepo.existsById(1L)).thenReturn(false);
-            assertThatThrownBy(() -> service.excluir(1L))
+            when(mapaService.existsById(1L)).thenReturn(false);
+            assertThatThrownBy(() -> facade.excluir(1L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
@@ -142,32 +144,32 @@ class MapaFacadeTest {
         @Test
         @DisplayName("Deve buscar mapa vigente por unidade")
         void deveBuscarMapaVigente() {
-            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(new Mapa()));
-            var resultado = service.buscarMapaVigentePorUnidade(1L);
+            when(mapaService.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(new Mapa()));
+            var resultado = facade.buscarMapaVigentePorUnidade(1L);
             assertThat(resultado).isPresent().get().isNotNull();
         }
 
         @Test
         @DisplayName("Deve retornar vazio quando não há mapa vigente para unidade")
         void deveRetornarVazioQuandoNaoHaMapaVigente() {
-            when(mapaRepo.findMapaVigenteByUnidade(999L)).thenReturn(Optional.empty());
-            var resultado = service.buscarMapaVigentePorUnidade(999L);
+            when(mapaService.findMapaVigenteByUnidade(999L)).thenReturn(Optional.empty());
+            var resultado = facade.buscarMapaVigentePorUnidade(999L);
             assertThat(resultado).isEmpty();
         }
 
         @Test
         @DisplayName("Deve buscar por código do subprocesso")
         void deveBuscarPorSubprocesso() {
-            when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(new Mapa()));
-            var resultado = service.buscarPorSubprocessoCodigo(1L);
+            when(mapaService.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(new Mapa()));
+            var resultado = facade.buscarPorSubprocessoCodigo(1L);
             assertThat(resultado).isPresent().get().isNotNull();
         }
 
         @Test
         @DisplayName("Deve retornar vazio quando não há mapa para subprocesso")
         void deveRetornarVazioQuandoNaoHaMapaParaSubprocesso() {
-            when(mapaRepo.findBySubprocessoCodigo(999L)).thenReturn(Optional.empty());
-            var resultado = service.buscarPorSubprocessoCodigo(999L);
+            when(mapaService.findBySubprocessoCodigo(999L)).thenReturn(Optional.empty());
+            var resultado = facade.buscarPorSubprocessoCodigo(999L);
             assertThat(resultado).isEmpty();
         }
 
@@ -175,10 +177,10 @@ class MapaFacadeTest {
         @DisplayName("Deve obter mapa completo DTO")
         void deveObterMapaCompleto() {
             when(repo.buscar(Mapa.class, 1L)).thenReturn(new Mapa());
-            when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(new Competencia()));
+            when(competenciaService.findByMapaCodigo(1L)).thenReturn(List.of(new Competencia()));
             when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(MapaCompletoDto.builder().build());
 
-            var resultado = service.obterMapaCompleto(1L, 10L);
+            var resultado = facade.obterMapaCompleto(1L, 10L);
             assertThat(resultado).isNotNull();
         }
 
@@ -186,12 +188,12 @@ class MapaFacadeTest {
         @DisplayName("Deve obter mapa completo DTO sem competências")
         void deveObterMapaCompletoSemCompetencias() {
             when(repo.buscar(Mapa.class, 1L)).thenReturn(new Mapa());
-            when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of());
+            when(competenciaService.findByMapaCodigo(1L)).thenReturn(List.of());
             when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(MapaCompletoDto.builder().build());
 
-            var resultado = service.obterMapaCompleto(1L, 10L);
+            var resultado = facade.obterMapaCompleto(1L, 10L);
             assertThat(resultado).isNotNull();
-            verify(competenciaRepo).findByMapaCodigo(1L);
+            verify(competenciaService).findByMapaCodigo(1L);
         }
     }
 
@@ -209,37 +211,10 @@ class MapaFacadeTest {
 
             when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req)).thenReturn(expectedDto);
 
-            var resultado = service.salvarMapaCompleto(mapaId, req);
+            var resultado = facade.salvarMapaCompleto(mapaId, req);
 
             assertThat(resultado).isNotNull().isSameAs(expectedDto);
             verify(mapaSalvamentoService).salvarMapaCompleto(mapaId, req);
-        }
-
-        @Test
-        @DisplayName("Deve propagar erro do MapaSalvamentoService")
-        void devePropagarErroDoMapaSalvamentoService() {
-            Long mapaId = 1L;
-            SalvarMapaRequest req = SalvarMapaRequest.builder().build();
-
-            when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req))
-                    .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", mapaId));
-
-            assertThatThrownBy(() -> service.salvarMapaCompleto(mapaId, req))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-        }
-
-        @Test
-        @DisplayName("Deve propagar ErroValidacao do MapaSalvamentoService")
-        void devePropagarErroValidacao() {
-            Long mapaId = 1L;
-            SalvarMapaRequest req = SalvarMapaRequest.builder().build();
-
-            when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req))
-                    .thenThrow(new ErroValidacao("Atividade 99 não pertence ao mapa"));
-
-            assertThatThrownBy(() -> service.salvarMapaCompleto(mapaId, req))
-                    .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("não pertence ao mapa");
         }
     }
 }

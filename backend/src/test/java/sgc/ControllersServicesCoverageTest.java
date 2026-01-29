@@ -17,12 +17,11 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.service.CompetenciaRepositoryService;
 import sgc.mapa.service.MapaFacade;
+import sgc.mapa.service.MapaRepositoryService;
 import sgc.mapa.service.MapaSalvamentoService;
-import sgc.organizacao.model.Unidade;
 import sgc.painel.PainelFacade;
 import sgc.subprocesso.SubprocessoMapaController;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
@@ -45,9 +44,9 @@ class ControllersServicesCoverageTest {
     @Mock
     private SubprocessoFacade subprocessoFacade;
     @Mock
-    private MapaRepo mapaRepo;
+    private MapaRepositoryService mapaService;
     @Mock
-    private CompetenciaRepo competenciaRepo;
+    private CompetenciaRepositoryService competenciaService;
     @Mock
     private sgc.alerta.AlertaFacade alertaService;
     @Mock
@@ -74,7 +73,7 @@ class ControllersServicesCoverageTest {
     @BeforeEach
     void setUp() {
         mapaFacade = new MapaFacade(
-                mapaRepo, competenciaRepo, mapaCompletoMapper, mapaSalvamentoService,
+                mapaService, competenciaService, mapaCompletoMapper, mapaSalvamentoService,
                 mapaVisualizacaoService, impactoMapaService, repo
         );
 
@@ -165,7 +164,7 @@ class ControllersServicesCoverageTest {
     @Test
     @DisplayName("Deve lançar erro ao excluir mapa inexistente")
     void deveLancarErroExcluirMapaInexistente() {
-        when(mapaRepo.existsById(99L)).thenReturn(false);
+        when(mapaService.existsById(99L)).thenReturn(false);
         assertThatThrownBy(() -> mapaFacade.excluir(99L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }

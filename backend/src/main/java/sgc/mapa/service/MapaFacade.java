@@ -8,9 +8,7 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.mapper.MapaCompletoMapper;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
@@ -26,7 +24,6 @@ import java.util.Optional;
  *
  * @see MapaSalvamentoService para lógica complexa de salvamento
  * @see MapaVisualizacaoService para operações de visualização
- * @see CompetenciaService para operações de competências
  * @see AtividadeFacade para operações de atividades
  */
 @Service
@@ -34,28 +31,24 @@ import java.util.Optional;
 @Slf4j
 public class MapaFacade {
 
-    private final MapaRepo mapaRepo;
-    private final CompetenciaRepo competenciaRepo;
+    private final MapaRepositoryService mapaService;
+    private final CompetenciaRepositoryService competenciaService;
     private final MapaCompletoMapper mapaCompletoMapper;
     private final MapaSalvamentoService mapaSalvamentoService;
     private final MapaVisualizacaoService mapaVisualizacaoService;
     private final ImpactoMapaService impactoMapaService;
     private final sgc.comum.repo.RepositorioComum repo;
 
-    /**
-     * Constructor with @Lazy injection to break circular dependency.
-     * MapaFacade → MapaVisualizacaoService → SubprocessoFacade → SubprocessoCrudService → MapaFacade
-     */
     public MapaFacade(
-            MapaRepo mapaRepo,
-            CompetenciaRepo competenciaRepo,
+            MapaRepositoryService mapaService,
+            CompetenciaRepositoryService competenciaService,
             MapaCompletoMapper mapaCompletoMapper,
             MapaSalvamentoService mapaSalvamentoService,
             MapaVisualizacaoService mapaVisualizacaoService,
             ImpactoMapaService impactoMapaService,
             sgc.comum.repo.RepositorioComum repo) {
-        this.mapaRepo = mapaRepo;
-        this.competenciaRepo = competenciaRepo;
+        this.mapaService = mapaService;
+        this.competenciaService = competenciaService;
         this.mapaCompletoMapper = mapaCompletoMapper;
         this.mapaSalvamentoService = mapaSalvamentoService;
         this.mapaVisualizacaoService = mapaVisualizacaoService;
@@ -69,7 +62,7 @@ public class MapaFacade {
 
     @Transactional(readOnly = true)
     public List<Mapa> listar() {
-        return mapaRepo.findAll();
+        return mapaService.findAll();
     }
 
     @Transactional(readOnly = true)
@@ -79,19 +72,19 @@ public class MapaFacade {
 
     @Transactional(readOnly = true)
     public Optional<Mapa> buscarMapaVigentePorUnidade(Long codigoUnidade) {
-        return mapaRepo.findMapaVigenteByUnidade(codigoUnidade);
+        return mapaService.findMapaVigenteByUnidade(codigoUnidade);
     }
 
     @Transactional(readOnly = true)
     public Optional<Mapa> buscarPorSubprocessoCodigo(Long codSubprocesso) {
-        return mapaRepo.findBySubprocessoCodigo(codSubprocesso);
+        return mapaService.findBySubprocessoCodigo(codSubprocesso);
     }
 
     @Transactional(readOnly = true)
     public MapaCompletoDto obterMapaCompleto(Long codMapa, Long codSubprocesso) {
         Mapa mapa = repo.buscar(Mapa.class, codMapa);
 
-        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
+        List<Competencia> competencias = competenciaService.findByMapaCodigo(codMapa);
         return mapaCompletoMapper.toDto(mapa, codSubprocesso, competencias);
     }
 
@@ -100,11 +93,11 @@ public class MapaFacade {
     // ===================================================================================
 
     public Mapa salvar(Mapa mapa) {
-        return mapaRepo.save(mapa);
+        return mapaService.salvar(mapa);
     }
 
     public Mapa criar(Mapa mapa) {
-        return mapaRepo.save(mapa);
+        return mapaService.salvar(mapa);
     }
 
     public Mapa atualizar(Long codigo, Mapa mapa) {
@@ -112,29 +105,21 @@ public class MapaFacade {
         existente.setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado());
         existente.setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao());
         existente.setDataHoraHomologado(mapa.getDataHoraHomologado());
-        return mapaRepo.save(existente);
+        return mapaService.salvar(existente);
     }
 
     public void excluir(Long codigo) {
-        if (!mapaRepo.existsById(codigo)) {
+        if (!mapaService.existsById(codigo)) {
             throw new ErroEntidadeNaoEncontrada("Mapa", codigo);
         }
-        mapaRepo.deleteById(codigo);
+        mapaService.deleteById(codigo);
     }
 
     // ===================================================================================
     // Operação complexa delegada
     // ===================================================================================
 
-    /**
-     * Salva o mapa completo com competências e associações.
-     *
-     * @param codMapa O código do mapa.
-     * @param request A requisição com os dados a salvar.
-     * @return O DTO do mapa completo atualizado.
-     */
-    public MapaCompletoDto salvarMapaCompleto(
-            Long codMapa, SalvarMapaRequest request) {
+    public MapaCompletoDto salvarMapaCompleto(Long codMapa, SalvarMapaRequest request) {
         return mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
     }
 
@@ -142,27 +127,11 @@ public class MapaFacade {
     // Operações de visualização e análise
     // ===================================================================================
 
-    /**
-     * Obtém uma representação aninhada e formatada do mapa de um subprocesso.
-     * Delega para {@link MapaVisualizacaoService}.
-     *
-     * @return Um {@link sgc.mapa.dto.visualizacao.MapaVisualizacaoDto} com a estrutura hierárquica completa do mapa.
-     */
     @Transactional(readOnly = true)
     public sgc.mapa.dto.visualizacao.MapaVisualizacaoDto obterMapaParaVisualizacao(Subprocesso subprocesso) {
         return mapaVisualizacaoService.obterMapaParaVisualizacao(subprocesso);
     }
 
-    /**
-     * Analisa e retorna os impactos de uma revisão de mapa de competências.
-     * Delega para {@link ImpactoMapaService}.
-     *
-     * <p>Compara o mapa em elaboração no subprocesso com o mapa vigente da unidade para identificar
-     * atividades inseridas, removidas ou alteradas, e as competências afetadas.
-     *
-     * @param usuario O usuário autenticado (para verificação de permissões).
-     * @return Um {@link sgc.mapa.dto.ImpactoMapaDto} com o detalhamento dos impactos.
-     */
     @Transactional(readOnly = true)
     public sgc.mapa.dto.ImpactoMapaDto verificarImpactos(Subprocesso subprocesso, sgc.organizacao.model.Usuario usuario) {
         return impactoMapaService.verificarImpactos(subprocesso, usuario);
