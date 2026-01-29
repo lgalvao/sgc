@@ -20,12 +20,14 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
 
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
+import java.util.Optional;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,7 +39,7 @@ import static org.mockito.Mockito.*;
 @DisplayName("ProcessoFacade - Workflow e Inicialização")
 class ProcessoFacadeWorkflowTest {
     @Mock
-    private ProcessoRepositoryService processoRepositoryService;
+    private ProcessoRepo processoRepo;
     @Mock
     private UnidadeFacade unidadeService;
     @Mock
@@ -198,7 +200,7 @@ class ProcessoFacadeWorkflowTest {
             Unidade u = UnidadeFixture.unidadeComId(10L);
             p.setParticipantes(java.util.Set.of(u));
 
-            when(processoRepositoryService.buscarPorId(1L)).thenReturn(p);
+            when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
 
             processoFacade.enviarLembrete(1L, 10L);
@@ -214,7 +216,7 @@ class ProcessoFacadeWorkflowTest {
             Unidade outra = UnidadeFixture.unidadeComId(20L);
             p.setParticipantes(java.util.Set.of(outra));
 
-            when(processoRepositoryService.buscarPorId(1L)).thenReturn(p);
+            when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
 
             assertThatThrownBy(() -> processoFacade.enviarLembrete(1L, 10L))
