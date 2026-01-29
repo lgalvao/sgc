@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {computed, ref} from "vue";
+import {ref} from "vue";
 import {buscarTodosUsuarios} from "@/services/usuarioService";
 import type {Usuario} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
@@ -15,13 +15,13 @@ export const useUsuariosStore = defineStore("usuarios", () => {
         error.value = null;
     }
 
-    const obterUsuarioPorTitulo = computed(() => (titulo: string): Usuario | undefined => {
+    function obterUsuarioPorTitulo(titulo: string): Usuario | undefined {
         return usuarios.value.find((u) => u.tituloEleitoral === titulo);
-    });
+    }
 
-    const obterUsuarioPorId = computed(() => (id: number): Usuario | undefined => {
+    function obterUsuarioPorId(id: number): Usuario | undefined {
         return usuarios.value.find((u) => u.codigo === id);
-    });
+    }
 
     async function buscarUsuarios() {
         isLoading.value = true;

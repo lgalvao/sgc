@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {computed, ref} from "vue";
+import {ref} from "vue";
 import * as atividadeService from "@/services/atividadeService";
 import * as subprocessoService from "@/services/subprocessoService";
 import type {Atividade, AtividadeOperacaoResponse, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest,} from "@/types/tipos";
@@ -11,12 +11,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
     const atividadesPorSubprocesso = ref(new Map<number, Atividade[]>());
     const { lastError, clearError, withErrorHandling } = useErrorHandler();
 
-    const obterAtividadesPorSubprocesso = computed(
-        () =>
-            (codSubrocesso: number): Atividade[] => {
-                return atividadesPorSubprocesso.value.get(codSubrocesso) || [];
-            },
-    );
+    function obterAtividadesPorSubprocesso(codSubrocesso: number): Atividade[] {
+        return atividadesPorSubprocesso.value.get(codSubrocesso) || [];
+    }
 
     function setAtividadesParaSubprocesso(codSubprocesso: number, atividades: Atividade[]) {
         atividadesPorSubprocesso.value.set(codSubprocesso, atividades);
