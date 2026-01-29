@@ -6,9 +6,53 @@
 
 ---
 
+## 📑 Índice
+
+- [📋 Sumário Executivo](#-sumário-executivo)
+- [🔍 Análise Detalhada - Backend](#-análise-detalhada---backend)
+  - [1. Repositories - Padrões Inconsistentes](#1-repositories---padrões-inconsistentes-de-fetch)
+  - [2. Mappers Backend - Violação de Responsabilidade](#2-mappers-backend---violação-de-responsabilidade)
+  - [3. Facades - Hierarquia Excessiva](#3-facades---hierarquia-excessiva)
+  - [4. @Transactional - Uso Inconsistente](#4-transactional---uso-inconsistente)
+  - [5. DTOs - Proliferação Excessiva](#5-dtos---proliferação-excessiva)
+- [🔍 Análise Detalhada - Frontend](#-análise-detalhada---frontend)
+  - [1. Stores Pinia - Inconsistência de Erro](#1-stores-pinia---inconsistência-de-erro)
+  - [2. Mappers Frontend - Conversões Triviais](#2-mappers-frontend---conversões-triviais)
+  - [3. Computed Properties - Anti-pattern](#3-computed-properties---anti-pattern)
+  - [4. Complexidade de Mapas Aninhados](#4-complexidade-de-mapas-aninhados)
+- [📊 Resumo de Complexidade Desnecessária](#-resumo-de-complexidade-desnecessária)
+- [🎯 Plano de Ação Priorizado](#-plano-de-ação-priorizado)
+- [📈 Roadmap de Implementação](#-roadmap-de-implementação)
+- [🎯 Métricas de Sucesso](#-métricas-de-sucesso)
+- [⚠️ Riscos e Mitigações](#️-riscos-e-mitigações)
+- [📚 Referências e Padrões](#-referências-e-padrões)
+- [🔗 Próximos Passos](#-próximos-passos)
+- [📝 Notas Finais](#-notas-finais)
+
+---
+
 ## 📋 Sumário Executivo
 
 Após análise profunda do código backend (Java/Spring Boot) e frontend (Vue 3/TypeScript), foram identificados **múltiplos padrões inconsistentes** de otimização, cache e consultas que adicionam complexidade desnecessária sem benefícios mensuráveis dado o baixo volume de uso concorrente (~20 usuários).
+
+### 🎯 TL;DR - Principais Recomendações
+
+1. **Backend:**
+   - ✅ Padronizar repositories em **EntityGraph** (remover 50% de métodos redundantes)
+   - ✅ Purificar mappers (remover injeção de repositórios)
+   - ⚠️ Simplificar facades de 3 para 2 níveis (Fase 2)
+   - ℹ️ Remover @Transactional(readOnly=true) - ganho marginal
+
+2. **Frontend:**
+   - ✅ Eliminar mappers triviais (75% de redução)
+   - ✅ Converter computed anti-pattern para getters
+   - ✅ Remover .catch() redundante em stores
+   - ✅ Adicionar type safety (substituir `any`)
+
+3. **Impacto Esperado:**
+   - 📉 Reduzir código em ~20% (menos duplicação)
+   - 📈 Melhorar clareza e consistência
+   - ⏱️ Tempo de implementação: Fase 1 = 16h, Fase 2 = 40h
 
 ### Principais Achados
 
