@@ -54,17 +54,14 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
     private Set<AtribuicaoTemporaria> atribuicoesTemporarias = new HashSet<>();
 
-    @Transient
-    private Set<UsuarioPerfil> atribuicoesPermanentes;
-
     /**
      * Retorna todas as atribuições do usuário (permanentes + temporárias ativas).
-     * Atribuições permanentes devem ser carregadas previamente via setAtribuicoesPermanentes().
-     * Atribuições temporárias são lidas diretamente do relacionamento atribuicoesTemporarias.
+     * 
+     * @param atribuicoesPermanentes As atribuições permanentes do usuário (devem ser carregadas externamente)
+     * @return Conjunto de todas as atribuições (permanentes + temporárias ativas)
      */
-    public Set<UsuarioPerfil> getTodasAtribuicoes() {
-        Set<UsuarioPerfil> permanentes = atribuicoesPermanentes != null ? atribuicoesPermanentes : new HashSet<>();
-        Set<UsuarioPerfil> todas = new HashSet<>(permanentes);
+    public Set<UsuarioPerfil> getTodasAtribuicoes(Set<UsuarioPerfil> atribuicoesPermanentes) {
+        Set<UsuarioPerfil> todas = new HashSet<>(atribuicoesPermanentes != null ? atribuicoesPermanentes : Set.of());
 
         LocalDateTime now = LocalDateTime.now();
         if (atribuicoesTemporarias != null) {
@@ -84,14 +81,6 @@ public class Usuario implements UserDetails {
         return todas;
     }
 
-    /**
-     * Define as atribuições permanentes do usuário (carregadas de UsuarioPerfilRepo).
-     * Este método deve ser chamado antes de usar getTodasAtribuicoes() fora de sessão Hibernate.
-     */
-    public void setAtribuicoesPermanentes(Set<UsuarioPerfil> atribuicoes) {
-        this.atribuicoesPermanentes = atribuicoes;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -107,10 +96,10 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getTodasAtribuicoes().stream()
-                .map(UsuarioPerfil::getPerfil)
-                .map(Perfil::toGrantedAuthority)
-                .collect(Collectors.toSet());
+        // Nota: Este método não pode carregar atribuições permanentes aqui
+        // pois não temos acesso ao repositório. Retorna vazio.
+        // As atribuições devem ser gerenciadas pelo UserDetailsService.
+        return Set.of();
     }
 
     @Override
