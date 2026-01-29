@@ -1274,9 +1274,26 @@ Nenhuma tarefa em andamento no momento.
 3. **Fase 2 - Refatoração Estrutural** (Priorizada por Análise Profunda)
 
    **Alta Prioridade - Quick Wins Adicionais (8-12h):**
-   - [ ] **ProcessoRepo**: Consolidar 3 métodos de projeção SQL em query nomeada (2h)
-   - [ ] **AtividadeRepo**: Remover `listarPorCompetencia()` redundante com EntityGraph (1h)
-   - [ ] **SubprocessoMovimentacaoRepo**: Deletar repository duplicado (30min + testes)
+   - [x] **SubprocessoMovimentacaoRepo**: Deletar repository duplicado ✅ CONCLUÍDO (2h)
+     - Removido arquivo duplicado (11 linhas)
+     - Atualizado 2 arquivos de produção
+     - Atualizado 12 arquivos de teste
+     - Economizou ~12 linhas + melhorou JOIN FETCH padrão
+   - [x] **ProcessoRepo**: Analisada consolidação de 3 métodos de projeção SQL ✅ NÃO APLICÁVEL
+     - Descoberta: Queries servem propósitos distintos e específicos
+     - findUnidadeCodigosBySituacaoAndUnidadeCodigosIn: filtro por unidades
+     - findUnidadeCodigosBySituacaoAndTipo: filtro por tipo de processo
+     - findUnidadeCodigosBySituacaoInAndProcessoCodigoNot: filtro por múltiplas situações
+     - Decisão: Manter separadas, não consolidar
+   - [x] **AtividadeRepo**: Analisado remoção de `listarPorCompetencia()` ✅ NÃO APLICÁVEL
+     - Descoberta: Método NÃO é redundante, serve propósito específico
+     - listarPorCompetencia: busca atividades que TÊM uma competência (MEMBER OF)
+     - findByMapaCodigo: busca atividades DE um mapa (diferente)
+     - Decisão: Manter, não é redundância
+   - [x] **Testes de Mappers**: Atualizados após purificação ✅ CONCLUÍDO (1h)
+     - MapperTest.java: Removido setup obsoleto de injeção de repos
+     - MappersCoverageTest.java: Substituído por teste real de mapeamento
+     - Testes agora validam apenas funcionalidade pura de mappers
    - [ ] **DTOs Duplicados**: Resolver `ResponsavelDto` e `PerfilUnidadeDto` duplicatas (3h)
    - [ ] **DTOs Wrappers**: Remover 4 wrappers triviais (ProcessoContextoDto, etc.) (2h)
 
@@ -1299,6 +1316,7 @@ Nenhuma tarefa em andamento no momento.
    - ✅ Análise de uso @Transactional (207 usos, 95 com readOnly)
    - ✅ Documento atualizado com descobertas e métricas reais
    - ✅ Roadmap repriorizado com base em análise quantitativa
+   - ✅ Execução de quick wins iniciada (SubprocessoMovimentacaoRepo removido)
 
 ### 📈 Métricas
 
@@ -1306,19 +1324,20 @@ Nenhuma tarefa em andamento no momento.
 |---------|-------|-------|------|--------|
 | Mappers Backend com Repos | 2 | 0 | 0 | ✅ Concluído |
 | Queries Customizadas AtividadeRepo | 4 | 3 | 2-3 | ✅ Concluído |
-| Linhas de Código (Backend) | ~50k | ~49.7k | ~40k | 🔄 Parcial |
+| Linhas de Código (Backend) | ~50k | ~49.6k | ~40k | 🔄 Parcial (-400 linhas) |
 | Stores com .catch() Redundante | 3 | 0 | 0 | ✅ Concluído |
 | Mappers Frontend com `any` | 10+ | 0 | 0 | ✅ Concluído |
 | Mappers Triviais Frontend | 3 | 0 | 0 | ✅ Concluído |
 | Documentação JavaDoc Repositories | Básica | Detalhada | Detalhada | ✅ Concluído |
 | DTOs tipados (Frontend) | 0 | 12 | 10+ | ✅ Concluído |
-| Testes Passando (Mappers) | 60/60 | 60/60 | 100% | ✅ Concluído |
+| Testes Passando (Backend) | ? | 1352/1360 | 100% | 🔄 99.4% |
 | **Repositories Analisados** | 0 | 20 | 20 | ✅ Concluído |
 | **DTOs Analisados** | 0 | 46 | 40+ | ✅ Concluído |
 | **Facades Analisadas** | 0 | 13 | 13 | ✅ Concluído |
 | **Repos com Padrão Inconsistente** | ? | 6 | 0-2 | 🔄 Identificado |
 | **Facades com Violations** | ? | 8 | 0 | 🔄 Identificado |
 | **DTOs Duplicados Críticos** | ? | 2 | 0 | 🔄 Identificado |
+| **Repositories Duplicados** | 1 | 0 | 0 | ✅ Removido |
 
 **Notas:**
 - ✅ **Fase 1 (Quick Wins) - 100% Concluída:**
@@ -1335,15 +1354,24 @@ Nenhuma tarefa em andamento no momento.
   - 207 usos de @Transactional quantificados
   - Documento atualizado com 200+ linhas de análise detalhada
 
+- ✅ **Fase 2 - Quick Wins Adicionais - Parcialmente Concluída:**
+  - SubprocessoMovimentacaoRepo eliminado completamente
+  - ~12 linhas de código removidas + 2 produção + 12 testes atualizados
+  - Testes de mappers corrigidos para refletir arquitetura purificada
+  - ProcessoRepo analisado: queries servem propósitos distintos (não consolidar)
+  - AtividadeRepo analisado: listarPorCompetencia() não é redundante (manter)
+  - 1352/1360 testes passando (99.4% - 8 falhas pré-existentes em LoginFacade)
+
 - 🎯 **Descobertas Críticas:**
   - 6 Repositories (30%) com padrões inconsistentes documentados
   - 8 Facades (62%) violam padrão injetando Repositories
   - 2 DTOs duplicados críticos (`ResponsavelDto`, `PerfilUnidadeDto`)
   - 17 Repositories injetados diretamente em Facades (deveria ser 0)
   - 2 dependências circulares em Facades
+  - 1 Repository duplicado eliminado ✅
 
 - 📋 **Roadmap Fase 2 Atualizado:**
-  - Quick Wins adicionais priorizados (8-12h)
+  - Quick Wins adicionais: 2 concluídos, 2 não aplicáveis (análise revelou necessidade), 2 pendentes
   - Refatorações estruturais médias identificadas (20-30h)
   - Itens de alto risco claramente marcados para Fase 3
 
@@ -1351,5 +1379,6 @@ Nenhuma tarefa em andamento no momento.
 
 **Documento criado em:** 2026-01-29  
 **Última análise profunda:** 2026-01-29  
+**Última atualização:** 2026-01-29  
 **Responsável:** Análise de IA (Gemini)  
-**Status:** ✅ Análise profunda concluída - Fase 1 completa - Roadmap Fase 2 atualizado
+**Status:** ✅ Análise profunda concluída - Fase 1 completa - Fase 2 parcial (3/6 quick wins executados) - 1352/1360 testes passando
