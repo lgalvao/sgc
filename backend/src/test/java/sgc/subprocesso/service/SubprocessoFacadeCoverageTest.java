@@ -41,7 +41,7 @@ class SubprocessoFacadeCoverageTest {
     @Mock
     private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     @Mock
-    private sgc.subprocesso.model.SubprocessoMovimentacaoRepo movimentacaoRepo;
+    private sgc.subprocesso.model.MovimentacaoRepo movimentacaoRepo;
     @Mock
     private sgc.mapa.service.CopiaMapaService copiaMapaService;
 

@@ -25,7 +25,7 @@ import sgc.subprocesso.dto.ReabrirProcessoRequest;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
+import sgc.subprocesso.model.MovimentacaoRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,7 +45,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
     private static final String API_REABRIR_REVISAO = "/api/subprocessos/{codigo}/reabrir-revisao-cadastro";
 
     @Autowired
-    private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    private MovimentacaoRepo movimentacaoRepo;
 
     @Autowired
     private AlertaRepo alertaRepo;

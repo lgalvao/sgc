@@ -41,7 +41,7 @@ import sgc.subprocesso.dto.HomologarCadastroRequest;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import tools.jackson.core.type.TypeReference;
 
 @Tag("integration")
@@ -57,7 +57,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
     private UsuarioRepo usuarioRepo;
 
     @Autowired
-    private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    private MovimentacaoRepo movimentacaoRepo;
 
     @Autowired
     private AnaliseRepo analiseRepo;

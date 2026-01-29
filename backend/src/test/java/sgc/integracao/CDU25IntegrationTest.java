@@ -26,7 +26,7 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
+import sgc.subprocesso.model.MovimentacaoRepo;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-25: Aceitar validação de mapas em bloco")
 class CDU25IntegrationTest extends BaseIntegrationTest {
     @Autowired
-    private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    private MovimentacaoRepo movimentacaoRepo;
 
     @Autowired
     private AnaliseRepo analiseRepo;

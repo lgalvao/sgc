@@ -35,7 +35,7 @@ import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
+import sgc.subprocesso.model.MovimentacaoRepo;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -46,7 +46,7 @@ import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 class CDU24IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    private MovimentacaoRepo movimentacaoRepo;
 
     @Autowired
     private CompetenciaRepo competenciaRepo;

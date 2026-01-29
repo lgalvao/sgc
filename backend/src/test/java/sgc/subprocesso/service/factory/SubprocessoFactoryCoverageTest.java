@@ -12,7 +12,7 @@ import sgc.mapa.service.CopiaMapaService;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.time.LocalDateTime;
@@ -31,7 +31,7 @@ class SubprocessoFactoryCoverageTest {
     private MapaRepo mapaRepo;
 
     @Mock
-    private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    private MovimentacaoRepo movimentacaoRepo;
 
     @Mock
     private CopiaMapaService servicoDeCopiaDeMapa;

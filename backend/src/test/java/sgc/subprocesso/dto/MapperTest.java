@@ -3,65 +3,34 @@ package sgc.subprocesso.dto;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.Mock;
-import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.subprocesso.mapper.MovimentacaoMapper;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
+/**
+ * Testes para mappers de Subprocesso e Movimentação.
+ * 
+ * <p><b>Nota:</b> Após simplificação (Fase 1), os mappers foram purificados
+ * e não possuem mais dependências de repositories. Os mappers agora são
+ * funções puras que apenas extraem dados das entidades.
+ */
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 class MapperTest {
     private final SubprocessoMapper subprocessoMapper = Mappers.getMapper(SubprocessoMapper.class);
     private final MovimentacaoMapper movimentacaoMapper =
             Mappers.getMapper(MovimentacaoMapper.class);
-    @Mock
-    private ProcessoRepo processoRepo;
-    @Mock
-    private UnidadeRepo unidadeRepo;
-    @Mock
-    private MapaRepo mapaRepo;
-    @Mock
-    private RepositorioComum repo;
-
-    @BeforeEach
-    void setUp() throws NoSuchFieldException, IllegalAccessException {
-        java.lang.reflect.Field processoRepoField =
-                SubprocessoMapper.class.getDeclaredField("processoRepo");
-        processoRepoField.setAccessible(true);
-        processoRepoField.set(subprocessoMapper, processoRepo);
-
-        java.lang.reflect.Field unidadeRepoField =
-                SubprocessoMapper.class.getDeclaredField("unidadeRepo");
-        unidadeRepoField.setAccessible(true);
-        unidadeRepoField.set(subprocessoMapper, unidadeRepo);
-
-        java.lang.reflect.Field mapaRepoField =
-                SubprocessoMapper.class.getDeclaredField("mapaRepo");
-        mapaRepoField.setAccessible(true);
-        mapaRepoField.set(subprocessoMapper, mapaRepo);
-
-        java.lang.reflect.Field repoField =
-                SubprocessoMapper.class.getDeclaredField("repo");
-        repoField.setAccessible(true);
-        repoField.set(subprocessoMapper, repo);
-    }
 
     @Test
     void subprocessoMapper_MapsEntityToDtoCorrectly() {
@@ -94,9 +63,6 @@ class MapperTest {
         assertEquals(300L, dto.getCodMapa());
         assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, dto.getSituacao());
     }
-
-    // REMOVIDO: Teste do método toEntity() que não é mais usado após simplificação
-    // O método toEntity(SubprocessoDto) foi removido do mapper por não ser necessário
 
     @Test
     void movimentacaoMapper_MapsEntityToDtoCorrectly() {
