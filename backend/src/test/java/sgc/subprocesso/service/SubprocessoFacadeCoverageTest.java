@@ -40,7 +40,7 @@ class SubprocessoFacadeCoverageTest {
     @Mock
     private sgc.seguranca.acesso.AccessControlService accessControlService;
     @Mock
-    private SubprocessoRepositoryService subprocessoService;
+    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     @Mock
     private MovimentacaoRepo movimentacaoRepo;
     @Mock
@@ -74,8 +74,8 @@ class SubprocessoFacadeCoverageTest {
         spOrigem.setUnidade(new sgc.organizacao.model.Unidade());
         spOrigem.getUnidade().setSigla("ORIG");
 
-        when(subprocessoService.findById(codDestino)).thenReturn(Optional.of(spDestino));
-        when(subprocessoService.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
 
         facade.importarAtividades(codDestino, codOrigem);
 
@@ -127,7 +127,7 @@ class SubprocessoFacadeCoverageTest {
     @DisplayName("salvarAjustesMapa - Subprocesso Nao Encontrado")
     void salvarAjustesMapa_SubprocessoNaoEncontrado() {
         Long codSubprocesso = 999L;
-        when(subprocessoService.findById(codSubprocesso)).thenReturn(Optional.empty());
+        when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.empty());
 
         List<CompetenciaAjusteDto> ajustes = java.util.Collections.emptyList();
         var exception = Assertions.assertThrows(ErroEntidadeNaoEncontrada.class, () -> facade.salvarAjustesMapa(codSubprocesso, ajustes));
@@ -158,7 +158,7 @@ class SubprocessoFacadeCoverageTest {
         sp.setCodigo(codSubprocesso);
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
 
-        when(subprocessoService.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+        when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
 
         CompetenciaAjusteDto compRequest = CompetenciaAjusteDto.builder()
                 .codCompetencia(100L)
@@ -201,13 +201,13 @@ class SubprocessoFacadeCoverageTest {
         spOrigem.setUnidade(new sgc.organizacao.model.Unidade());
         spOrigem.getUnidade().setSigla("ORIG");
 
-        when(subprocessoService.findById(codDestino)).thenReturn(Optional.of(spDestino));
-        when(subprocessoService.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
 
         facade.importarAtividades(codDestino, codOrigem);
 
         org.junit.jupiter.api.Assertions.assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, spDestino.getSituacao());
-        verify(subprocessoService).save(spDestino);
+        verify(subprocessoRepo).save(spDestino);
     }
 
     @Test
@@ -235,13 +235,13 @@ class SubprocessoFacadeCoverageTest {
         spOrigem.setUnidade(new sgc.organizacao.model.Unidade());
         spOrigem.getUnidade().setSigla("ORIG");
 
-        when(subprocessoService.findById(codDestino)).thenReturn(Optional.of(spDestino));
-        when(subprocessoService.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
 
         facade.importarAtividades(codDestino, codOrigem);
 
         org.junit.jupiter.api.Assertions.assertEquals(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, spDestino.getSituacao());
-        verify(subprocessoService).save(spDestino);
+        verify(subprocessoRepo).save(spDestino);
     }
 
     @Test
@@ -269,8 +269,8 @@ class SubprocessoFacadeCoverageTest {
         spOrigem.setUnidade(new sgc.organizacao.model.Unidade());
         spOrigem.getUnidade().setSigla("ORIG");
 
-        when(subprocessoService.findById(codDestino)).thenReturn(Optional.of(spDestino));
-        when(subprocessoService.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
 
         facade.importarAtividades(codDestino, codOrigem);
 
@@ -278,7 +278,7 @@ class SubprocessoFacadeCoverageTest {
         org.junit.jupiter.api.Assertions.assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, spDestino.getSituacao());
 
         // Verify save was NOT called
-        verify(subprocessoService, org.mockito.Mockito.never()).save(spDestino);
+        verify(subprocessoRepo, org.mockito.Mockito.never()).save(spDestino);
 
         // But movimentacao IS saved.
         verify(movimentacaoRepo).save(any(Movimentacao.class));
@@ -293,7 +293,7 @@ class SubprocessoFacadeCoverageTest {
         // Set invalid status (not REVISAO_CADASTRO_HOMOLOGADA or REVISAO_MAPA_AJUSTADO)
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
 
-        when(subprocessoService.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+        when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
 
         List<CompetenciaAjusteDto> ajustes = java.util.Collections.emptyList();
         var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () -> facade.salvarAjustesMapa(codSubprocesso, ajustes));
@@ -312,7 +312,7 @@ class SubprocessoFacadeCoverageTest {
         // Invalid status for import
         spDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
-        when(subprocessoService.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
 
         var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida.class, () -> facade.importarAtividades(codDestino, codOrigem));
         org.junit.jupiter.api.Assertions.assertNotNull(exception);
@@ -357,7 +357,7 @@ class SubprocessoFacadeCoverageTest {
         sp.setCodigo(codSubprocesso);
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
 
-        when(subprocessoService.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+        when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
 
         CompetenciaAjusteDto compDto = CompetenciaAjusteDto.builder()
                 .codCompetencia(100L)
@@ -397,8 +397,8 @@ class SubprocessoFacadeCoverageTest {
         spOrigem.setUnidade(new sgc.organizacao.model.Unidade());
         spOrigem.getUnidade().setSigla("ORIG");
 
-        when(subprocessoService.findById(codDestino)).thenReturn(Optional.of(spDestino));
-        when(subprocessoService.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
 
         facade.importarAtividades(codDestino, codOrigem);
 
@@ -413,7 +413,7 @@ class SubprocessoFacadeCoverageTest {
         sp.setCodigo(codSubprocesso);
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
 
-        when(subprocessoService.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+        when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
 
         AtividadeAjusteDto ativDto = AtividadeAjusteDto.builder()
                 .codAtividade(200L)
@@ -445,7 +445,7 @@ class SubprocessoFacadeCoverageTest {
     @DisplayName("importarAtividades - Subprocesso Destino Nao Encontrado")
     void importarAtividades_DestinoNaoEncontrado() {
         Long codDestino = 999L;
-        when(subprocessoService.findById(codDestino)).thenReturn(Optional.empty());
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(ErroEntidadeNaoEncontrada.class, () -> facade.importarAtividades(codDestino, 1L));
     }
@@ -460,8 +460,8 @@ class SubprocessoFacadeCoverageTest {
         spDestino.setCodigo(codDestino);
         spDestino.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
 
-        when(subprocessoService.findById(codDestino)).thenReturn(Optional.of(spDestino));
-        when(subprocessoService.findById(codOrigem)).thenReturn(Optional.empty());
+        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(ErroEntidadeNaoEncontrada.class, () -> facade.importarAtividades(codDestino, codOrigem));
     }

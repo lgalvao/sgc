@@ -13,7 +13,6 @@ import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoRepositoryService;
 
 import java.util.List;
 
@@ -34,7 +33,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
 @RequiredArgsConstructor
 @Slf4j
 public class SubprocessoFactory {
-    private final SubprocessoRepositoryService subprocessoService;
+    private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     private final MapaRepo mapaRepo;
     private final MovimentacaoRepo movimentacaoRepo;
     private final CopiaMapaService servicoDeCopiaDeMapa;
@@ -61,7 +60,7 @@ public class SubprocessoFactory {
                 .map(Subprocesso.class::cast)
                 .toList();
 
-        List<Subprocesso> subprocessosSalvos = subprocessoService.saveAll(subprocessos);
+        List<Subprocesso> subprocessosSalvos = subprocessoRepo.saveAll(subprocessos);
         List<Mapa> mapas = subprocessosSalvos.stream()
                 .<Mapa>map(sp -> Mapa.builder()
                         .subprocesso(sp)
@@ -98,7 +97,7 @@ public class SubprocessoFactory {
                 .situacao(NAO_INICIADO)
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build();
-        Subprocesso subprocessoSalvo = subprocessoService.save(subprocesso);
+        Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
 
         Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente);
 
@@ -130,7 +129,7 @@ public class SubprocessoFactory {
                 .build();
 
         Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente);
-        Subprocesso subprocessoSalvo = subprocessoService.save(subprocesso);
+        Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
         mapaCopiado.setSubprocesso(subprocessoSalvo);
 
         Mapa mapaSalvo = mapaRepo.save(mapaCopiado);

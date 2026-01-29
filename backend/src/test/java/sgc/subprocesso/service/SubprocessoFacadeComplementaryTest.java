@@ -79,7 +79,7 @@ class SubprocessoFacadeComplementaryTest {
     @Mock
     private sgc.seguranca.acesso.AccessControlService accessControlService;
     @Mock
-    private SubprocessoRepositoryService subprocessoService;
+    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     @Mock
     private sgc.mapa.service.CopiaMapaService copiaMapaService;
     @Mock
@@ -544,7 +544,7 @@ class SubprocessoFacadeComplementaryTest {
             sp.setCodigo(codigo);
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
 
-            when(subprocessoService.findById(codigo)).thenReturn(java.util.Optional.of(sp));
+            when(subprocessoRepo.findById(codigo)).thenReturn(java.util.Optional.of(sp));
 
             CompetenciaAjusteDto compDto = CompetenciaAjusteDto.builder()
                     .codCompetencia(10L)
@@ -559,7 +559,7 @@ class SubprocessoFacadeComplementaryTest {
             subprocessoFacade.salvarAjustesMapa(codigo, List.of(compDto));
 
             verify(mapaManutencaoService).salvarTodasCompetencias(anyList());
-            verify(subprocessoService).save(sp);
+            verify(subprocessoRepo).save(sp);
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         }
 
@@ -571,7 +571,7 @@ class SubprocessoFacadeComplementaryTest {
             sp.setCodigo(codigo);
             sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
 
-            when(subprocessoService.findById(codigo)).thenReturn(java.util.Optional.of(sp));
+            when(subprocessoRepo.findById(codigo)).thenReturn(java.util.Optional.of(sp));
             // empty list of adjustments
             subprocessoFacade.salvarAjustesMapa(codigo, List.of());
 
@@ -586,7 +586,7 @@ class SubprocessoFacadeComplementaryTest {
             sp.setCodigo(codigo);
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-            when(subprocessoService.findById(codigo)).thenReturn(java.util.Optional.of(sp));
+            when(subprocessoRepo.findById(codigo)).thenReturn(java.util.Optional.of(sp));
 
             List<CompetenciaAjusteDto> ajustes = List.of();
             var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () ->
@@ -619,8 +619,8 @@ class SubprocessoFacadeComplementaryTest {
             spOrig.setMapa(mapaOrig);
             spOrig.setUnidade(new Unidade());
 
-            when(subprocessoService.findById(dest)).thenReturn(java.util.Optional.of(spDest));
-            when(subprocessoService.findById(orig)).thenReturn(java.util.Optional.of(spOrig));
+            when(subprocessoRepo.findById(dest)).thenReturn(java.util.Optional.of(spDest));
+            when(subprocessoRepo.findById(orig)).thenReturn(java.util.Optional.of(spOrig));
 
             subprocessoFacade.importarAtividades(dest, orig);
 
@@ -637,7 +637,7 @@ class SubprocessoFacadeComplementaryTest {
             spDest.setCodigo(dest);
             spDest.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO); // Invalid for import
 
-            when(subprocessoService.findById(dest)).thenReturn(java.util.Optional.of(spDest));
+            when(subprocessoRepo.findById(dest)).thenReturn(java.util.Optional.of(spDest));
 
             var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida.class, () ->
                     subprocessoFacade.importarAtividades(dest, 2L)
@@ -664,8 +664,8 @@ class SubprocessoFacadeComplementaryTest {
             spOrig.setMapa(new Mapa());
             spOrig.setUnidade(new Unidade()); // Origem unidade not null
 
-            when(subprocessoService.findById(dest)).thenReturn(java.util.Optional.of(spDest));
-            when(subprocessoService.findById(orig)).thenReturn(java.util.Optional.of(spOrig));
+            when(subprocessoRepo.findById(dest)).thenReturn(java.util.Optional.of(spDest));
+            when(subprocessoRepo.findById(orig)).thenReturn(java.util.Optional.of(spOrig));
 
             subprocessoFacade.importarAtividades(dest, orig);
             assertThat(spDest.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);

@@ -107,7 +107,8 @@ public class SubprocessoFacade {
     private final sgc.seguranca.acesso.AccessControlService accessControlService;
 
     // Dependencies for map operations (from SubprocessoMapaService)
-    private final SubprocessoRepositoryService subprocessoService;
+    private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private final sgc.comum.repo.RepositorioComum repositorioComum;
     private final sgc.mapa.service.CopiaMapaService copiaMapaService;
 
     // ===== Operações CRUD =====
@@ -410,7 +411,7 @@ public class SubprocessoFacade {
     }
 
     private void salvarAjustesMapaInterno(Long codSubprocesso, List<CompetenciaAjusteDto> competencias) {
-        Subprocesso sp = subprocessoService.findById(codSubprocesso)
+        Subprocesso sp = subprocessoRepo.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
                         "Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
@@ -419,7 +420,7 @@ public class SubprocessoFacade {
         atualizarCompetenciasEAssociacoes(competencias);
 
         sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
-        subprocessoService.save(sp);
+        subprocessoRepo.save(sp);
     }
 
     private void validarSituacaoParaAjuste(Subprocesso sp) {
@@ -482,7 +483,7 @@ public class SubprocessoFacade {
     }
 
     private void importarAtividadesInterno(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
-        final Subprocesso spDestino = subprocessoService
+        final Subprocesso spDestino = subprocessoRepo
                 .findById(codSubprocessoDestino)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
                         "Subprocesso de destino não encontrado: %d".formatted(codSubprocessoDestino)));
@@ -496,7 +497,7 @@ public class SubprocessoFacade {
                     com cadastro em elaboração ou não iniciado.""");
         }
 
-        Subprocesso spOrigem = subprocessoService.findById(codSubprocessoOrigem)
+        Subprocesso spOrigem = subprocessoRepo.findById(codSubprocessoOrigem)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
                         "Subprocesso de origem não encontrado: %d".formatted(codSubprocessoOrigem)));
 
@@ -514,7 +515,7 @@ public class SubprocessoFacade {
                     log.debug("Tipo de processo {} não requer atualização automática de situação no import.",
                             tipoProcesso);
             }
-            subprocessoService.save(spDestino);
+            subprocessoRepo.save(spDestino);
         }
 
         final sgc.organizacao.model.Unidade unidadeOrigem = spOrigem.getUnidade();

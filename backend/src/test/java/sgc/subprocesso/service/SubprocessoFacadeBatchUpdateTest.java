@@ -25,7 +25,7 @@ class SubprocessoFacadeBatchUpdateTest {
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
-    private SubprocessoRepositoryService subprocessoService;
+    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
 
     @InjectMocks
     private SubprocessoFacade facade;
@@ -38,7 +38,7 @@ class SubprocessoFacadeBatchUpdateTest {
         subprocesso.setCodigo(codSubprocesso);
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
 
-        when(subprocessoService.findById(codSubprocesso)).thenReturn(Optional.of(subprocesso));
+        when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(subprocesso));
 
         CompetenciaAjusteDto comp1 = CompetenciaAjusteDto.builder()
                 .codCompetencia(1L)
@@ -82,7 +82,7 @@ class SubprocessoFacadeBatchUpdateTest {
         verify(mapaManutencaoService, times(1)).atualizarDescricoesAtividadeEmLote(any());
         verify(mapaManutencaoService, times(1)).buscarCompetenciasPorCodigos(any());
         verify(mapaManutencaoService, times(1)).salvarTodasCompetencias(any());
-        verify(subprocessoService, times(1)).save(subprocesso);
+        verify(subprocessoRepo, times(1)).save(subprocesso);
 
         // Verify singular methods NOT called (N+1 avoidance)
         verify(mapaManutencaoService, never()).obterAtividadePorCodigo(any());
