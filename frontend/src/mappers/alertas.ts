@@ -1,6 +1,7 @@
 import type {Alerta} from "@/types/tipos";
+import type {AlertaDto} from "@/types/dtos";
 
-export function mapAlertaDtoToFrontend(dto: any): Alerta {
+export function mapAlertaDtoToFrontend(dto: AlertaDto): Alerta {
     return {
         codigo: dto.codigo,
         codProcesso: dto.codProcesso,

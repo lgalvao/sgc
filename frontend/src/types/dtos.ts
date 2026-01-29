@@ -43,3 +43,36 @@ export interface ImpactoMapaDto {
     atividadesAlteradas?: AtividadeImpactadaDto[];
     competenciasImpactadas?: CompetenciaImpactadaDto[];
 }
+
+export interface AlertaDto {
+    codigo: number;
+    codProcesso: number;
+    descricao: string;
+    dataHora: string;
+    unidadeOrigem: string;
+    unidadeDestino: string;
+    dataHoraLeitura?: string;
+    mensagem: string;
+    dataHoraFormatada: string;
+    origem: string;
+    processo: string;
+}
+
+export interface UnidadeParticipanteDto {
+    codigo: number;
+    sigla?: string;
+    nome?: string;
+    filhos?: UnidadeParticipanteDto[];
+}
+
+export interface ProcessoDetalheDto {
+    codigo?: number;
+    tipo?: string;
+    situacao?: string;
+    dataCriacao?: string;
+    dataInicio?: string;
+    dataFinalizacao?: string;
+    unidades?: UnidadeParticipanteDto[];
+    [key: string]: any; // Para campos adicionais do spread
+}
+

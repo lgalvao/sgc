@@ -1,5 +1,4 @@
 import type {
-    AtividadeImpactada,
     CompetenciaCompleta,
     CompetenciaImpactada,
     ImpactoMapa,
