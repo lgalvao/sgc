@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import sgc.processo.model.TipoProcesso;
 import sgc.seguranca.sanitizacao.SanitizarHtml;
@@ -19,7 +20,7 @@ import java.util.List;
 public record AtualizarProcessoRequest(
                 Long codigo,
 
-                @NotBlank(message = "Preencha a descrição") @SanitizarHtml String descricao,
+                @NotBlank(message = "Preencha a descrição") @Size(max = 255, message = "A descrição deve ter no máximo 255 caracteres") @SanitizarHtml String descricao,
 
                 @NotNull(message = "Tipo do processo é obrigatório") TipoProcesso tipo,
 
