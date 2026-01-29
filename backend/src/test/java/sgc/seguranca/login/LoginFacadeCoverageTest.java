@@ -80,7 +80,7 @@ class LoginFacadeCoverageTest {
         // Mock user not found
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(null);
 
-        var exception = assertThrows(ErroEntidadeNaoEncontrada.class, () -> facade.autorizar(titulo));
+        var exception = assertThrows(ErroAutenticacao.class, () -> facade.autorizar(titulo));
         assertNotNull(exception);
     }
 

@@ -123,18 +123,20 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
             AutenticarRequest authRequest = AutenticarRequest.builder().tituloEleitoral(tituloEleitoral)
                     .senha(senha).build();
 
-            mockMvc.perform(post(BASE_URL + "/autenticar")
+            jakarta.servlet.http.Cookie[] cookies = mockMvc.perform(post(BASE_URL + "/autenticar")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(testUtil.toJson(authRequest)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$").value(true));
+                    .andExpect(jsonPath("$").value(true))
+                    .andReturn().getResponse().getCookies();
 
             AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral)
                     .build();
 
             mockMvc.perform(post(BASE_URL + "/autorizar")
                             .with(csrf())
+                            .cookie(cookies)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(testUtil.toJson(autorizarReq)))
                     .andExpect(status().isOk())
@@ -150,6 +152,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(post(BASE_URL + "/entrar")
                             .with(csrf())
+                            .cookie(cookies)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(testUtil.toJson(entrarReq)))
                     .andExpect(status().isOk());
@@ -163,18 +166,20 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
             AutenticarRequest authRequest = AutenticarRequest.builder().tituloEleitoral(tituloEleitoral)
                     .senha(senha).build();
 
-            mockMvc.perform(post(BASE_URL + "/autenticar")
+            jakarta.servlet.http.Cookie[] cookies = mockMvc.perform(post(BASE_URL + "/autenticar")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(testUtil.toJson(authRequest)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$").value(true));
+                    .andExpect(jsonPath("$").value(true))
+                    .andReturn().getResponse().getCookies();
 
             AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral)
                     .build();
 
             mockMvc.perform(post(BASE_URL + "/autorizar")
                             .with(csrf())
+                            .cookie(cookies)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(testUtil.toJson(autorizarReq)))
                     .andExpect(status().isOk())
@@ -190,6 +195,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                     .build();
             mockMvc.perform(post(BASE_URL + "/entrar")
                             .with(csrf())
+                            .cookie(cookies)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(testUtil.toJson(entrarReq)))
                     .andExpect(status().isOk());
@@ -228,10 +234,11 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                     .tituloEleitoral(tituloEleitoral)
                     .senha("any")
                     .build();
-            mockMvc.perform(post(BASE_URL + "/autenticar")
+            jakarta.servlet.http.Cookie[] cookies = mockMvc.perform(post(BASE_URL + "/autenticar")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(testUtil.toJson(authRequest)));
+                    .content(testUtil.toJson(authRequest)))
+                    .andReturn().getResponse().getCookies();
 
             EntrarRequest entrarReq = EntrarRequest.builder()
                     .tituloEleitoral(tituloEleitoral)
@@ -243,6 +250,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
             // A unidade inexistente retorna 404 (NOT_FOUND) via ErroEntidadeNaoEncontrada
             mockMvc.perform(post(BASE_URL + "/entrar")
                             .with(csrf())
+                            .cookie(cookies)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(testUtil.toJson(entrarReq)))
                     .andExpect(status().is(404))

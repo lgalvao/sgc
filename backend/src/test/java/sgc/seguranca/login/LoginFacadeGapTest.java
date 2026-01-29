@@ -37,15 +37,15 @@ class LoginFacadeGapTest {
     @Test
     @DisplayName("Deve negar acesso se perfil não corresponder (branch coverage)")
     void deveNegarSePerfilNaoCorresponder() throws Exception {
-        // Setup autenticacao recente
-        injectAutenticacaoRecente("123");
-
         // Request pede ADMIN na unidade 1
         EntrarRequest req = new EntrarRequest("123", "ADMIN", 1L);
 
         // Usuario tem GESTOR na unidade 1
         Usuario usuario = criarUsuarioComAtribuicao("123", Perfil.GESTOR, 1L);
         when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
+        
+        // Mock unidadeService
+        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(usuario.getTodasAtribuicoes().iterator().next().getUnidade());
         
         // Mock mapper (para evitar NPE no stream map)
         when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(usuario.getTodasAtribuicoes().iterator().next().getUnidade()))
@@ -58,9 +58,6 @@ class LoginFacadeGapTest {
     @Test
     @DisplayName("Deve negar acesso se unidade não corresponder (branch coverage)")
     void deveNegarSeUnidadeNaoCorresponder() throws Exception {
-        // Setup autenticacao recente
-        injectAutenticacaoRecente("123");
-
         // Request pede ADMIN na unidade 1
         EntrarRequest req = new EntrarRequest("123", "ADMIN", 1L);
 
@@ -68,20 +65,15 @@ class LoginFacadeGapTest {
         Usuario usuario = criarUsuarioComAtribuicao("123", Perfil.ADMIN, 2L);
         when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
 
+        // Mock unidadeService
+        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(usuario.getTodasAtribuicoes().iterator().next().getUnidade());
+
         // Mock mapper
         when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(usuario.getTodasAtribuicoes().iterator().next().getUnidade()))
             .thenReturn(sgc.organizacao.dto.UnidadeDto.builder().codigo(2L).build());
 
         assertThatThrownBy(() -> loginFacade.entrar(req))
                 .isInstanceOf(ErroAccessoNegado.class);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void injectAutenticacaoRecente(String titulo) throws Exception {
-        java.lang.reflect.Field field = LoginFacade.class.getDeclaredField("autenticacoesRecentes");
-        field.setAccessible(true);
-        Map<String, LocalDateTime> map = (Map<String, LocalDateTime>) field.get(loginFacade);
-        map.put(titulo, LocalDateTime.now());
     }
 
     private Usuario criarUsuarioComAtribuicao(String titulo, Perfil perfil, Long codUnidade) {

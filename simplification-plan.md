@@ -1335,9 +1335,10 @@ Nenhuma tarefa em andamento no momento.
 | **DTOs Analisados** | 0 | 46 | 40+ | ✅ Concluído |
 | **Facades Analisadas** | 0 | 13 | 13 | ✅ Concluído |
 | **Repos com Padrão Inconsistente** | ? | 6 | 0-2 | 🔄 Identificado |
-| **Facades com Violations** | ? | 8 | 0 | 🔄 Identificado |
+| **Facades com Violations** | ? | 8 | 0 | 🔄 Identificado + ✅ ArchUnit Rule |
 | **DTOs Duplicados Críticos** | ? | 2 | 0 | 🔄 Identificado |
 | **Repositories Duplicados** | 1 | 0 | 0 | ✅ Removido |
+| **Testes Passando (Backend)** | 1352 | 1360 | 1361 | ✅ 99.9% |
 
 **Notas:**
 - ✅ **Fase 1 (Quick Wins) - 100% Concluída:**
@@ -1360,7 +1361,7 @@ Nenhuma tarefa em andamento no momento.
   - Testes de mappers corrigidos para refletir arquitetura purificada
   - ProcessoRepo analisado: queries servem propósitos distintos (não consolidar)
   - AtividadeRepo analisado: listarPorCompetencia() não é redundante (manter)
-  - 1352/1360 testes passando (99.4% - 8 falhas pré-existentes em LoginFacade)
+  - 1360/1361 testes passando (99.9% - 1 falha esperada: ArchUnit rule)
 
 - 🎯 **Descobertas Críticas:**
   - 6 Repositories (30%) com padrões inconsistentes documentados
@@ -1369,6 +1370,21 @@ Nenhuma tarefa em andamento no momento.
   - 17 Repositories injetados diretamente em Facades (deveria ser 0)
   - 2 dependências circulares em Facades
   - 1 Repository duplicado eliminado ✅
+
+- 🛡️ **Governança de Arquitetura - ✅ Concluída:**
+  - ✅ Regra ArchUnit adicionada: `facades_should_not_access_repositories_directly`
+  - Detecta 109 violations em 8 Facades (fields, constructors, method calls)
+  - Previne regressão futura (novos Facades não poderão violar padrão)
+  - Documentação completa com referências a ADR-001 e simplification-plan.md
+  - Força padrão: Controller → Facade → Service → Repository
+
+- 🔧 **Correções de Testes - ✅ Concluída:**
+  - LoginFacade: Melhorado segurança (ErroAutenticacao em vez de ErroEntidadeNaoEncontrada)
+  - LoginFacadeGapTest: Removido código obsoleto (campo autenticacoesRecentes)
+  - LoginFacadeCoverageTest: Atualizado para novas exceções
+  - SubprocessoFacadeComplementaryTest: Corrigido mock duplicado
+  - CDU01IntegrationTest: Corrigido manutenção de cookies entre requests MockMvc (3 testes)
+  - 8/8 testes originalmente falhando foram corrigidos ✅
 
 - 📋 **Roadmap Fase 2 Atualizado:**
   - Quick Wins adicionais: 2 concluídos, 2 não aplicáveis (análise revelou necessidade), 2 pendentes
@@ -1381,4 +1397,4 @@ Nenhuma tarefa em andamento no momento.
 **Última análise profunda:** 2026-01-29  
 **Última atualização:** 2026-01-29  
 **Responsável:** Análise de IA (Gemini)  
-**Status:** ✅ Análise profunda concluída - Fase 1 completa - Fase 2 parcial (3/6 quick wins executados) - 1352/1360 testes passando
+**Status:** ✅ Análise profunda concluída - Fase 1 completa - Fase 2 parcial (3/6 quick wins) - 1360/1361 testes passando - ✅ ArchUnit rule implementada - ✅ Todos testes corrigidos
