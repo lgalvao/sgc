@@ -257,7 +257,7 @@ class SubprocessoCrudServiceTest {
     }
 
     @Test
-    @DisplayName("Deve atualizar sem publicar evento se nada mudar")
+    @DisplayName("Deve atualizar quando nada mudar")
     void deveAtualizarSemMudancas() {
         Subprocesso sp = criarSubprocessoCompleto();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
@@ -272,7 +272,7 @@ class SubprocessoCrudServiceTest {
     }
 
     @Test
-    @DisplayName("Deve criar subprocesso publicando evento com relacionamentos nulos")
+    @DisplayName("Deve criar subprocesso com relacionamentos nulos")
     void deveCriarComRelacionamentosNulos() {
         CriarSubprocessoRequest request = CriarSubprocessoRequest.builder().codProcesso(1L).codUnidade(1L).build();
         SubprocessoDto responseDto = SubprocessoDto.builder().build();
@@ -286,7 +286,7 @@ class SubprocessoCrudServiceTest {
     }
 
     @Test
-    @DisplayName("Deve criar subprocesso publicando evento com relacionamentos presentes")
+    @DisplayName("Deve criar subprocesso com relacionamentos presentes")
     void deveCriarComRelacionamentosPresentes() {
         CriarSubprocessoRequest request = CriarSubprocessoRequest.builder().codProcesso(100L).codUnidade(200L).build();
         SubprocessoDto responseDto = SubprocessoDto.builder().build();

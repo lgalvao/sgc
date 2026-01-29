@@ -17,10 +17,8 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoRepositoryService;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Serviço especializado para operações CRUD básicas de Subprocesso.
@@ -155,8 +153,7 @@ public class SubprocessoCrudService {
         return subprocessoMapper.toDto(salvo);
     }
 
-    private Set<String> processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
-        Set<String> campos = new HashSet<>();
+    private void processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
 
         java.util.Optional.ofNullable(request.codMapa()).ifPresent(cod -> {
             Mapa m = Mapa.builder()
@@ -164,25 +161,19 @@ public class SubprocessoCrudService {
                     .build();
             Long codAtual = subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null;
             if (!Objects.equals(codAtual, cod)) {
-                campos.add("mapa");
                 subprocesso.setMapa(m);
             }
         });
 
         if (!Objects.equals(subprocesso.getDataLimiteEtapa1(), request.dataLimiteEtapa1())) {
-            campos.add("dataLimiteEtapa1");
             subprocesso.setDataLimiteEtapa1(request.dataLimiteEtapa1());
         }
         if (!Objects.equals(subprocesso.getDataFimEtapa1(), request.dataFimEtapa1())) {
-            campos.add("dataFimEtapa1");
             subprocesso.setDataFimEtapa1(request.dataFimEtapa1());
         }
         if (!Objects.equals(subprocesso.getDataFimEtapa2(), request.dataFimEtapa2())) {
-            campos.add("dataFimEtapa2");
             subprocesso.setDataFimEtapa2(request.dataFimEtapa2());
         }
-
-        return campos;
     }
 
     public void excluir(Long codigo) {
