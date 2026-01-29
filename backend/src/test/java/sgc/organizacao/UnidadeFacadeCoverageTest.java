@@ -33,7 +33,6 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeMapaRepo;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.*;
 
@@ -53,8 +52,6 @@ class UnidadeFacadeCoverageTest {
     private UnidadeResponsavelService unidadeResponsavelService;
     @Mock
     private UnidadeRepositoryService unidadeRepositoryService;
-    @Mock
-    private UnidadeMapaRepo unidadeMapaRepo;
     @Mock
     private UsuarioRepositoryService usuarioRepositoryService;
 
@@ -163,7 +160,7 @@ class UnidadeFacadeCoverageTest {
         dtoRaiz.setCodigo(1L);
         dtoRaiz.setSubunidades(new ArrayList<>());
 
-        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L));
+        when(unidadeMapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(1L));
         when(unidadeHierarquiaService.buscarArvoreComElegibilidade(any()))
                 .thenReturn(List.of(dtoRaiz));
 
@@ -252,7 +249,7 @@ class UnidadeFacadeCoverageTest {
         dto3.setCodigo(3L);
         dto3.setSubunidades(new ArrayList<>());
 
-        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(3L));
+        when(unidadeMapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(3L));
         when(unidadeHierarquiaService.buscarArvoreComElegibilidade(any()))
                 .thenReturn(List.of(dto1, dto2, dto3));
 
@@ -279,7 +276,7 @@ class UnidadeFacadeCoverageTest {
     @DisplayName("Deve filtrar unidades na árvore com elegibilidade corretamente")
     void deveFiltrarUnidadesNaArvoreComElegibilidade() {
         // Setup
-        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(10L, 20L));
+        when(unidadeMapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(10L, 20L));
 
         // Execute method to trigger lambda creation
         unidadeFacade.buscarArvoreComElegibilidade(true, Set.of(30L));
@@ -343,7 +340,7 @@ class UnidadeFacadeCoverageTest {
         unidadeFacade.buscarArvoreComElegibilidade(false, Collections.emptySet());
 
         // Verify that findAllUnidadeCodigos was NOT called
-        verify(unidadeMapaRepo, never()).findAllUnidadeCodigos();
+        verify(unidadeMapaService, never()).buscarTodosCodigosUnidades();
         verify(unidadeHierarquiaService).buscarArvoreComElegibilidade(any());
     }
 

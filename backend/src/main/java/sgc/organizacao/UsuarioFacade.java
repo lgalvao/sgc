@@ -17,6 +17,7 @@ import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.AdministradorRepositoryService;
 import sgc.organizacao.service.UnidadeRepositoryService;
 import sgc.organizacao.service.UsuarioRepositoryService;
 
@@ -31,7 +32,7 @@ import static java.util.stream.Collectors.toMap;
 public class UsuarioFacade {
     private static final String ENTIDADE_USUARIO = "Usuário";
     private final UsuarioRepositoryService usuarioRepositoryService;
-    private final AdministradorRepo administradorRepo;
+    private final AdministradorRepositoryService administradorService;
     private final UnidadeRepositoryService unidadeRepositoryService;
 
 
@@ -276,7 +277,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public List<AdministradorDto> listarAdministradores() {
-        return administradorRepo.findAll().stream()
+        return administradorService.listarTodos().stream()
                 .flatMap(admin -> usuarioRepositoryService.findById(admin.getUsuarioTitulo())
                         .map(this::toAdministradorDto)
                         .stream())
@@ -287,14 +288,14 @@ public class UsuarioFacade {
     public AdministradorDto adicionarAdministrador(String usuarioTitulo) {
         Usuario usuario = usuarioRepositoryService.buscarPorId(usuarioTitulo);
 
-        if (administradorRepo.existsById(usuarioTitulo)) {
+        if (administradorService.existePorTitulo(usuarioTitulo)) {
             throw new ErroValidacao("Usuário já é administrador");
         }
 
         Administrador administrador = Administrador.builder()
                 .usuarioTitulo(usuarioTitulo)
                 .build();
-        administradorRepo.save(administrador);
+        administradorService.salvar(administrador);
 
         log.info("Administrador {} adicionado", usuarioTitulo);
         return toAdministradorDto(usuario);
@@ -306,22 +307,22 @@ public class UsuarioFacade {
             throw new ErroValidacao("Não é permitido remover a si mesmo como administrador");
         }
 
-        if (!administradorRepo.existsById(usuarioTitulo)) {
+        if (!administradorService.existePorTitulo(usuarioTitulo)) {
             throw new ErroValidacao("Usuário informado não é um administrador");
         }
 
-        long totalAdministradores = administradorRepo.count();
+        long totalAdministradores = administradorService.contar();
         if (totalAdministradores <= 1) {
             throw new ErroValidacao("Não é permitido remover o único administrador do sistema");
         }
 
-        administradorRepo.deleteById(usuarioTitulo);
+        administradorService.removerPorTitulo(usuarioTitulo);
         log.info("Administrador {} removido com sucesso", usuarioTitulo);
     }
 
     @Transactional(readOnly = true)
     public boolean isAdministrador(String usuarioTitulo) {
-        return administradorRepo.existsById(usuarioTitulo);
+        return administradorService.existePorTitulo(usuarioTitulo);
     }
 
     private AdministradorDto toAdministradorDto(Usuario usuario) {

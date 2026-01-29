@@ -25,7 +25,6 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
@@ -42,7 +41,7 @@ class SubprocessoFacadeCoverageTest {
     @Mock
     private SubprocessoRepositoryService subprocessoService;
     @Mock
-    private MovimentacaoRepo movimentacaoRepo;
+    private MovimentacaoRepositoryService movimentacaoService;
     @Mock
     private sgc.mapa.service.CopiaMapaService copiaMapaService;
 
@@ -80,7 +79,7 @@ class SubprocessoFacadeCoverageTest {
         facade.importarAtividades(codDestino, codOrigem);
 
         verify(copiaMapaService).importarAtividadesDeOutroMapa(20L, 10L);
-        verify(movimentacaoRepo).save(any(Movimentacao.class));
+        verify(movimentacaoService).salvar(any(Movimentacao.class));
 
         assert spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO;
     }
@@ -281,7 +280,7 @@ class SubprocessoFacadeCoverageTest {
         verify(subprocessoService, org.mockito.Mockito.never()).save(spDestino);
 
         // But movimentacao IS saved.
-        verify(movimentacaoRepo).save(any(Movimentacao.class));
+        verify(movimentacaoService).salvar(any(Movimentacao.class));
     }
 
     @Test

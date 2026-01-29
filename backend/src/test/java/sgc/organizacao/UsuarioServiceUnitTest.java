@@ -13,7 +13,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
-import sgc.organizacao.model.AdministradorRepo;
+import sgc.organizacao.service.AdministradorRepositoryService;
 import sgc.organizacao.service.UnidadeRepositoryService;
 import sgc.organizacao.service.UsuarioRepositoryService;
 
@@ -37,7 +37,7 @@ class UsuarioServiceUnitTest {
     private UsuarioRepositoryService usuarioRepositoryService;
     
     @Mock
-    private AdministradorRepo administradorRepo;
+    private AdministradorRepositoryService administradorService;
     
     @Mock
     private UnidadeRepositoryService unidadeRepositoryService;
@@ -214,7 +214,7 @@ class UsuarioServiceUnitTest {
         @DisplayName("Deve ignorar administradores inexistentes ao listar")
         void deveIgnorarAdministradoresInexistentesAoListar() {
             Administrador admin = Administrador.builder().usuarioTitulo("user").build();
-            when(administradorRepo.findAll()).thenReturn(List.of(admin));
+            when(administradorService.listarTodos()).thenReturn(List.of(admin));
             when(usuarioRepositoryService.findById("user")).thenReturn(Optional.empty());
 
             assertThat(service.listarAdministradores()).isEmpty();
@@ -226,7 +226,7 @@ class UsuarioServiceUnitTest {
             Usuario u = new Usuario();
             u.setTituloEleitoral("user");
             when(usuarioRepositoryService.buscarPorId("user")).thenReturn(u);
-            when(administradorRepo.existsById("user")).thenReturn(true);
+            when(administradorService.existePorTitulo("user")).thenReturn(true);
 
             assertThatThrownBy(() -> service.adicionarAdministrador("user"))
                     .isInstanceOf(ErroValidacao.class);
@@ -242,17 +242,17 @@ class UsuarioServiceUnitTest {
             u.setUnidadeLotacao(unidade);
 
             when(usuarioRepositoryService.buscarPorId("user")).thenReturn(u);
-            when(administradorRepo.existsById("user")).thenReturn(false);
+            when(administradorService.existePorTitulo("user")).thenReturn(false);
 
             service.adicionarAdministrador("user");
 
-            verify(administradorRepo).save(any());
+            verify(administradorService).salvar(any());
         }
 
         @Test
         @DisplayName("Deve lançar erro ao remover não-administrador")
         void deveLancarErroAoRemoverNaoAdministrador() {
-            when(administradorRepo.existsById("user")).thenReturn(false);
+            when(administradorService.existePorTitulo("user")).thenReturn(false);
 
             assertThatThrownBy(() -> service.removerAdministrador("user", "other"))
                     .isInstanceOf(ErroValidacao.class);
@@ -268,8 +268,8 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve lançar erro ao remover único administrador")
         void deveLancarErroAoRemoverUnicoAdministrador() {
-            when(administradorRepo.existsById("user")).thenReturn(true);
-            when(administradorRepo.count()).thenReturn(1L);
+            when(administradorService.existePorTitulo("user")).thenReturn(true);
+            when(administradorService.contar()).thenReturn(1L);
 
             assertThatThrownBy(() -> service.removerAdministrador("user", "other"))
                     .isInstanceOf(ErroValidacao.class);
@@ -278,18 +278,18 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve remover administrador com sucesso")
         void deveRemoverAdministradorComSucesso() {
-            when(administradorRepo.existsById("user")).thenReturn(true);
-            when(administradorRepo.count()).thenReturn(2L);
+            when(administradorService.existePorTitulo("user")).thenReturn(true);
+            when(administradorService.contar()).thenReturn(2L);
 
             service.removerAdministrador("user", "other");
 
-            verify(administradorRepo).deleteById("user");
+            verify(administradorService).removerPorTitulo("user");
         }
 
         @Test
         @DisplayName("Deve verificar se é administrador")
         void deveVerificarSeEhAdministrador() {
-            when(administradorRepo.existsById("user")).thenReturn(true);
+            when(administradorService.existePorTitulo("user")).thenReturn(true);
 
             assertThat(service.isAdministrador("user")).isTrue();
         }

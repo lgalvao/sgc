@@ -52,7 +52,6 @@ import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
@@ -99,7 +98,7 @@ public class SubprocessoFacade {
     // Dependencies for detail/context operations (previously in
     // SubprocessoDetalheService/SubprocessoContextoService)
     private final MapaManutencaoService mapaManutencaoService;
-    private final MovimentacaoRepo movimentacaoRepo;
+    private final MovimentacaoRepositoryService movimentacaoService;
     private final SubprocessoDetalheMapper subprocessoDetalheMapper;
     private final ConhecimentoMapper conhecimentoMapper;
     private final AnaliseFacade analiseFacade;
@@ -522,7 +521,7 @@ public class SubprocessoFacade {
                 spOrigem.getCodigo(),
                 unidadeOrigem.getSigla());
 
-        movimentacaoRepo.save(Movimentacao.builder()
+        movimentacaoService.salvar(Movimentacao.builder()
                 .subprocesso(spDestino)
                 .unidadeOrigem(unidadeOrigem)
                 .unidadeDestino(spDestino.getUnidade())
@@ -575,8 +574,8 @@ public class SubprocessoFacade {
             log.warn("Erro ao buscar titular: {}", e.getMessage());
         }
 
-        List<Movimentacao> movimentacoes = movimentacaoRepo
-                .findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        List<Movimentacao> movimentacoes = movimentacaoService
+                .buscarPorSubprocesso(sp.getCodigo());
         SubprocessoPermissoesDto permissoes = calcularPermissoesInterno(sp, usuarioAutenticado);
 
         return subprocessoDetalheMapper.toDto(sp, responsavel, titular, movimentacoes, permissoes);

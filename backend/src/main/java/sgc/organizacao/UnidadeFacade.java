@@ -32,7 +32,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UnidadeFacade {
     private final UnidadeRepositoryService unidadeRepositoryService;
-    private final UnidadeMapaRepo unidadeMapaRepo;
     private final UsuarioRepositoryService usuarioRepositoryService;
     private final UsuarioMapper usuarioMapper;
     private final UnidadeHierarquiaService hierarquiaService;
@@ -50,7 +49,7 @@ public class UnidadeFacade {
     public List<UnidadeDto> buscarArvoreComElegibilidade(
             boolean requerMapaVigente, java.util.Set<Long> unidadesBloqueadas) {
         Set<Long> unidadesComMapa = requerMapaVigente
-                ? new HashSet<>(unidadeMapaRepo.findAllUnidadeCodigos())
+                ? new HashSet<>(mapaService.buscarTodosCodigosUnidades())
                 : Collections.emptySet();
 
         return hierarquiaService.buscarArvoreComElegibilidade(u ->
