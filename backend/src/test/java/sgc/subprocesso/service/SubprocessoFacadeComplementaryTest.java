@@ -75,8 +75,6 @@ class SubprocessoFacadeComplementaryTest {
     @Mock
     private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     @Mock
-    private sgc.subprocesso.model.MovimentacaoRepo movimentacaoRepo;
-    @Mock
     private sgc.mapa.service.CopiaMapaService copiaMapaService;
     @Mock
     private sgc.mapa.service.MapaFacade mapaFacade;
@@ -621,7 +619,7 @@ class SubprocessoFacadeComplementaryTest {
             subprocessoFacade.importarAtividades(dest, orig);
 
             verify(copiaMapaService).importarAtividadesDeOutroMapa(20L, 10L);
-            verify(movimentacaoRepo).save(any());
+            verify(repositorioMovimentacao).save(any());
             assertThat(spDest.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         }
 

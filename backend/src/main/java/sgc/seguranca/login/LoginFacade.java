@@ -118,7 +118,9 @@ public class LoginFacade {
     private List<PerfilUnidadeDto> buscarAutorizacoesInterno(String tituloEleitoral) {
         Usuario usuario = usuarioService.carregarUsuarioParaAutenticacao(tituloEleitoral);
         if (usuario == null) {
-            throw new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, tituloEleitoral);
+            // Lançar ErroAutenticacao em vez de ErroEntidadeNaoEncontrada por questões de segurança
+            // (não revelar se o usuário existe ou não)
+            throw new ErroAutenticacao("Credenciais inválidas");
         }
 
         return usuario.getTodasAtribuicoes().stream()
