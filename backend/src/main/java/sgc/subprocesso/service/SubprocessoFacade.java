@@ -15,6 +15,7 @@ import sgc.analise.AnaliseFacade;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.ConhecimentoResponse;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -107,8 +108,8 @@ public class SubprocessoFacade {
     private final sgc.seguranca.acesso.AccessControlService accessControlService;
 
     // Dependencies for map operations (from SubprocessoMapaService)
-    private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
-    private final sgc.comum.repo.RepositorioComum repositorioComum;
+    private final SubprocessoRepo subprocessoRepo;
+    private final RepositorioComum repositorioComum;
     private final sgc.mapa.service.CopiaMapaService copiaMapaService;
 
     // ===== Operações CRUD =====
