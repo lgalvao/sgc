@@ -146,15 +146,33 @@ const dto: UserDto = {
 
 ## 4. Próximos Passos (Priorizado)
 
-### Fase 1: Backend - Refatoração de Código de Produção
+### Fase 1: Backend - Refatoração de Código de Produção ✅ CONCLUÍDO
 1. ✅ **Análise Completa** - Confirmar achados e adicionar contexto
-2. [ ] **CopiaMapaService** - Refatorar 4 ocorrências (PRIORIDADE ALTA)
-3. [ ] **MapaSalvamentoService** - Refatorar 2 ocorrências incluindo conversão de ContextoSalvamento para record
-4. [ ] **AtividadeFacade** - Refatorar 1 ocorrência
-5. [ ] **SubprocessoCrudService** - Refatorar 2 ocorrências
-6. [ ] **SubprocessoFactory** - Refatorar 1 ocorrência
-7. [ ] **Executar Testes** - Validar que refatorações não introduziram regressões
+2. ✅ **CopiaMapaService** - Refatoradas 4 ocorrências (CONCLUÍDO)
+3. ✅ **MapaSalvamentoService** - Refatoradas 2 ocorrências incluindo conversão de ContextoSalvamento para record (CONCLUÍDO)
+4. ✅ **AtividadeFacade** - Refatorada 1 ocorrência (CONCLUÍDO)
+5. ✅ **SubprocessoCrudService** - Refatoradas 2 ocorrências (CONCLUÍDO)
+6. ✅ **SubprocessoFactory** - Refatorada 1 ocorrência (CONCLUÍDO)
+7. ✅ **Executar Testes** - Todos os 1414 testes do backend passaram com sucesso (CONCLUÍDO)
+
+**RESULTADO FINAL:**
+- ✅ **0 ocorrências** de `new Atividade()` em código de produção
+- ✅ **0 ocorrências** de `new Competencia()` em código de produção
+- ✅ **0 ocorrências** de `new Conhecimento()` em código de produção
+- ✅ **0 ocorrências** de `new Mapa()` em código de produção
+- ✅ Todos os testes passaram (1414 testes, 100% de sucesso)
+- ✅ Compilação sem erros ou warnings
 
 ### Fase 2: Frontend (Planejamento Futuro)
-- Padronizar DTOs TypeScript como interfaces
-- Substituir classes de modelo por interfaces/types quando apropriado
+- [ ] Padronizar DTOs TypeScript como interfaces
+- [ ] Substituir classes de modelo por interfaces/types quando apropriado
+
+## 5. Lições Aprendidas
+
+1. **Type Hints em Streams:** Quando usando builders com `@SuperBuilder` em streams, pode ser necessário adicionar type hints explícitos (ex: `.<Mapa>map(...)`) para ajudar o compilador Java.
+
+2. **Records vs Classes:** A conversão de classes internas privadas para `records` elimina boilerplate significativo e melhora a clareza do código.
+
+3. **Builders Fluentes:** O uso consistente de builders torna o código mais legível e menos propenso a erros de configuração de objetos.
+
+4. **Testes como Garantia:** A execução completa da suite de testes após refatorações garante que o comportamento foi preservado.
