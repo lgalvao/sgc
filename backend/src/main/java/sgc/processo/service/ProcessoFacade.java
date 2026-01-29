@@ -207,14 +207,12 @@ public class ProcessoFacade {
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
-    public ProcessoContextoDto obterContextoCompleto(Long codigo) {
+    public ProcessoDetalheDto obterContextoCompleto(Long codigo) {
         ProcessoDetalheDto detalhes = self.obterDetalhes(codigo);
         List<SubprocessoElegivelDto> elegiveis = self.listarSubprocessosElegiveis(codigo);
 
-        return ProcessoContextoDto.builder()
-                .processo(detalhes)
-                .elegiveis(elegiveis)
-                .build();
+        detalhes.getElegiveis().addAll(elegiveis);
+        return detalhes;
     }
 
     @Transactional(readOnly = true)

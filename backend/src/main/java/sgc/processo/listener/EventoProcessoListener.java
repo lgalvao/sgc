@@ -12,7 +12,7 @@ import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
@@ -123,7 +123,7 @@ public class EventoProcessoListener {
                 .map(s -> s.getUnidade().getCodigo())
                 .toList();
 
-        Map<Long, ResponsavelDto> responsaveis = unidadeService.buscarResponsaveisUnidades(todosCodigosUnidades);
+        Map<Long, UnidadeResponsavelDto> responsaveis = unidadeService.buscarResponsaveisUnidades(todosCodigosUnidades);
 
         List<String> todosTitulos = new ArrayList<>();
         responsaveis.values().forEach(r -> {
@@ -153,10 +153,10 @@ public class EventoProcessoListener {
         }
 
         List<Long> todosCodigosUnidades = unidadesParticipantes.stream().map(Unidade::getCodigo).toList();
-        Map<Long, ResponsavelDto> responsaveis = unidadeService.buscarResponsaveisUnidades(todosCodigosUnidades);
+        Map<Long, UnidadeResponsavelDto> responsaveis = unidadeService.buscarResponsaveisUnidades(todosCodigosUnidades);
 
         Map<String, UsuarioDto> usuarios = usuarioService.buscarUsuariosPorTitulos(responsaveis.values().stream()
-                .map(ResponsavelDto::titularTitulo)
+                .map(UnidadeResponsavelDto::titularTitulo)
                 .filter(java.util.Objects::nonNull)
                 .distinct()
                 .toList());
@@ -172,11 +172,11 @@ public class EventoProcessoListener {
     }
 
     private void enviarNotificacaoFinalizacao(Processo processo, Unidade unidade,
-            Map<Long, ResponsavelDto> responsaveis,
+            Map<Long, UnidadeResponsavelDto> responsaveis,
             Map<String, UsuarioDto> usuarios,
             List<Unidade> todasSubordinadas) {
         try {
-            ResponsavelDto responsavel = responsaveis.get(unidade.getCodigo());
+            UnidadeResponsavelDto responsavel = responsaveis.get(unidade.getCodigo());
             if (responsavel == null || responsavel.titularTitulo() == null)
                 return;
 
@@ -232,14 +232,14 @@ public class EventoProcessoListener {
     private void enviarEmailProcessoIniciado(
             Processo processo,
             Subprocesso subprocesso,
-            Map<Long, ResponsavelDto> responsaveis,
+            Map<Long, UnidadeResponsavelDto> responsaveis,
             Map<String, UsuarioDto> usuarios) {
 
         Unidade unidade = subprocesso.getUnidade();
         Long codigoUnidade = unidade.getCodigo();
 
         try {
-            ResponsavelDto responsavel = responsaveis.get(codigoUnidade);
+            UnidadeResponsavelDto responsavel = responsaveis.get(codigoUnidade);
             if (responsavel == null || responsavel.titularTitulo() == null)
                 return;
 

@@ -8,7 +8,7 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.RepositorioComum;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
-import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
 
@@ -114,7 +114,7 @@ public class UnidadeResponsavelService {
      * @return DTO do responsável com dados do titular e substituto
      * @throws ErroEntidadeNaoEncontrada se não houver responsável
      */
-    public ResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
+    public UnidadeResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
         List<Usuario> chefes = usuarioRepo.findChefesByUnidadesCodigos(List.of(unidadeCodigo));
         if (chefes.isEmpty()) {
             throw new ErroEntidadeNaoEncontrada("Responsável da unidade", unidadeCodigo);
@@ -129,7 +129,7 @@ public class UnidadeResponsavelService {
      * @return mapa de código de unidade para DTO de responsável
      */
     @Transactional(readOnly = true)
-    public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
+    public Map<Long, UnidadeResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         if (unidadesCodigos.isEmpty()) return Collections.emptyMap();
 
         List<Usuario> todosChefes = usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos);
@@ -179,11 +179,11 @@ public class UnidadeResponsavelService {
         }
     }
 
-    private ResponsavelDto montarResponsavelDto(Long unidadeCodigo, List<Usuario> chefes) {
+    private UnidadeResponsavelDto montarResponsavelDto(Long unidadeCodigo, List<Usuario> chefes) {
         Usuario titular = chefes.getFirst();
         Usuario substituto = chefes.size() > 1 ? chefes.get(1) : null;
 
-        return ResponsavelDto.builder()
+        return UnidadeResponsavelDto.builder()
                 .unidadeCodigo(unidadeCodigo)
                 .titularTitulo(titular.getTituloEleitoral())
                 .titularNome(titular.getNome())

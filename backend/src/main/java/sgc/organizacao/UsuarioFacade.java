@@ -14,7 +14,7 @@ import sgc.comum.erros.ErroValidacao;
 
 import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.dto.PerfilDto;
-import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.AdministradorRepositoryService;
@@ -159,7 +159,7 @@ public class UsuarioFacade {
     }
 
 
-    public ResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
+    public UnidadeResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
         List<Usuario> chefes = usuarioRepositoryService.findChefesByUnidadesCodigos(List.of(unidadeCodigo));
         if (chefes.isEmpty()) {
             throw new ErroEntidadeNaoEncontrada("Responsável da unidade", unidadeCodigo);
@@ -168,7 +168,7 @@ public class UsuarioFacade {
     }
 
     @Transactional(readOnly = true)
-    public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
+    public Map<Long, UnidadeResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         if (unidadesCodigos.isEmpty()) return Collections.emptyMap();
 
         List<Usuario> todosChefes = usuarioRepositoryService.findChefesByUnidadesCodigos(unidadesCodigos);
@@ -262,11 +262,11 @@ public class UsuarioFacade {
                 .build();
     }
 
-    private ResponsavelDto montarResponsavelDto(Long unidadeCodigo, List<Usuario> chefes) {
+    private UnidadeResponsavelDto montarResponsavelDto(Long unidadeCodigo, List<Usuario> chefes) {
         Usuario titular = chefes.getFirst();
         Usuario substituto = chefes.size() > 1 ? chefes.get(1) : null;
 
-        return ResponsavelDto.builder()
+        return UnidadeResponsavelDto.builder()
                 .unidadeCodigo(unidadeCodigo)
                 .titularTitulo(titular.getTituloEleitoral())
                 .titularNome(titular.getNome())

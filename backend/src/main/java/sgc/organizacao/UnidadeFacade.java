@@ -98,12 +98,12 @@ public class UnidadeFacade {
         return responsavelService.buscarResponsavelAtual(siglaUnidade);
     }
 
-    public ResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
+    public UnidadeResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
         return responsavelService.buscarResponsavelUnidade(unidadeCodigo);
     }
 
     @Transactional(readOnly = true)
-    public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
+    public Map<Long, UnidadeResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         return responsavelService.buscarResponsaveisUnidades(unidadesCodigos);
     }
 

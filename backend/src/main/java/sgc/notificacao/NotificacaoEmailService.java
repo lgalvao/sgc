@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.notificacao.dto.EmailDto;
+
 import sgc.notificacao.model.Notificacao;
 import sgc.notificacao.model.NotificacaoRepo;
 
@@ -36,7 +36,7 @@ public class NotificacaoEmailService {
      */
     @Transactional
     public void enviarEmail(String para, String assunto, String corpo) {
-        processarEnvioDeEmail(new EmailDto(para, assunto, corpo, false));
+        processarEnvioDeEmail(para, assunto, corpo, false);
     }
 
     /**
@@ -51,41 +51,41 @@ public class NotificacaoEmailService {
      */
     @Transactional
     public void enviarEmailHtml(String para, String assunto, String corpoHtml) {
-        processarEnvioDeEmail(new EmailDto(para, assunto, corpoHtml, true));
+        processarEnvioDeEmail(para, assunto, corpoHtml, true);
     }
 
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
-    private void processarEnvioDeEmail(EmailDto emailDto) {
-        if (!isEmailValido(emailDto.destinatario())) {
+    private void processarEnvioDeEmail(String para, String assunto, String corpo, boolean html) {
+        if (!isEmailValido(para)) {
             log.error(
-                    "Endereço de e-mail inválido, envio cancelado: {}", emailDto.destinatario());
+                    "Endereço de e-mail inválido, envio cancelado: {}", para);
             return;
         }
 
         try {
-            Notificacao notificacao = criarEntidadeNotificacao(emailDto);
+            Notificacao notificacao = criarEntidadeNotificacao(para, assunto, corpo);
             repositorioNotificacao.save(notificacao);
             log.info(
                     "Notificação persistida no banco - Código: {}, Destinatário: {}",
                     notificacao.getCodigo(),
-                    emailDto.destinatario());
+                    para);
 
-            emailExecutor.enviarEmailAssincrono(emailDto)
+            emailExecutor.enviarEmailAssincrono(para, assunto, corpo, html)
                     .thenAccept(
                             sucesso -> {
                                 if (Boolean.TRUE.equals(sucesso)) {
-                                    log.info("E-mail para {} enviado.", emailDto.destinatario());
+                                    log.info("E-mail para {} enviado.", para);
                                 } else {
                                     log.error(
                                             "Falha ao enviar e-mail para {} após tentativas.",
-                                            emailDto.destinatario());
+                                            para);
                                 }
                             })
                     .exceptionally(
                             ex -> {
                                 log.error(
                                         "Erro inesperado ao enviar e-mail para: {}",
-                                        emailDto.destinatario(),
+                                        para,
                                         ex);
                                 return null;
                             });
@@ -93,18 +93,18 @@ public class NotificacaoEmailService {
         } catch (RuntimeException e) {
             log.error(
                     "Erro ao processar notificação para {}: {}",
-                    emailDto.destinatario(),
+                    para,
                     e.getMessage(),
                     e);
         }
     }
 
-    private Notificacao criarEntidadeNotificacao(EmailDto emailDto) {
+    private Notificacao criarEntidadeNotificacao(String para, String assunto, String corpo) {
         Notificacao notificacao = new Notificacao();
         notificacao.setDataHora(LocalDateTime.now());
         String conteudo = String.format(
                 "Para: %s | Assunto: %s | Corpo: %s",
-                emailDto.destinatario(), emailDto.assunto(), emailDto.corpo());
+                para, assunto, corpo);
         final int limite = 500;
         if (conteudo.length() > limite) {
             conteudo = "%s...".formatted(conteudo.substring(0, limite - 3));

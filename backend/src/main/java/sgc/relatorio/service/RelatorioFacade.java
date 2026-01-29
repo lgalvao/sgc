@@ -10,7 +10,7 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UnidadeFacade;
-import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.service.ProcessoFacade;
@@ -43,7 +43,7 @@ public class RelatorioFacade {
 
             for (Subprocesso sp : subprocessos) {
                 Unidade unidade = sp.getUnidade();
-                ResponsavelDto respDto = unidadeService.buscarResponsavelUnidade(unidade.getCodigo());
+                UnidadeResponsavelDto respDto = unidadeService.buscarResponsavelUnidade(unidade.getCodigo());
                 String responsavel = respDto.titularNome();
 
                 String texto = String.format(

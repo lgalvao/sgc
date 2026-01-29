@@ -154,7 +154,7 @@ public class ProcessoController {
 
     @GetMapping("/{codigo}/contexto-completo")
     @Operation(summary = "Obtém o contexto completo para visualização de processo (BFF)")
-    public ResponseEntity<ProcessoContextoDto> obterContextoCompleto(@PathVariable Long codigo) {
+    public ResponseEntity<ProcessoDetalheDto> obterContextoCompleto(@PathVariable Long codigo) {
         return ResponseEntity.ok(processoFacade.obterContextoCompleto(codigo));
     }
 

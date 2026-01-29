@@ -12,7 +12,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import sgc.comum.util.Sleeper;
-import sgc.notificacao.dto.EmailDto;
+
 
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.CompletableFuture;
@@ -57,12 +57,12 @@ public class NotificacaoEmailAsyncExecutor {
      */
     @Async
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
-    public CompletableFuture<Boolean> enviarEmailAssincrono(EmailDto emailDto) {
+    public CompletableFuture<Boolean> enviarEmailAssincrono(String destinatario, String assunto, String corpo, boolean html) {
         Exception excecaoFinal = null;
         for (int tentativa = 1; tentativa <= MAX_TENTATIVAS; tentativa++) {
             try {
-                enviarEmailSmtp(emailDto);
-                log.info("E-mail enviado para: {}", emailDto.destinatario());
+                enviarEmailSmtp(destinatario, assunto, corpo, html);
+                log.info("E-mail enviado para: {}", destinatario);
                 return CompletableFuture.completedFuture(true);
             } catch (MessagingException | UnsupportedEncodingException | RuntimeException e) {
                 excecaoFinal = e;
@@ -70,7 +70,7 @@ public class NotificacaoEmailAsyncExecutor {
                         "Falha na tentativa {} de {} ao enviar e-mail para {}: {}",
                         tentativa,
                         MAX_TENTATIVAS,
-                        emailDto.destinatario(),
+                        destinatario,
                         e.getMessage());
                 if (tentativa < MAX_TENTATIVAS) {
                     try {
@@ -89,21 +89,21 @@ public class NotificacaoEmailAsyncExecutor {
         log.error(
                 "Não foi possível enviar o e-mail para {} após {} tentativas.",
                 MAX_TENTATIVAS,
-                emailDto.destinatario(),
+                destinatario,
                 excecaoFinal);
         return CompletableFuture.completedFuture(false);
     }
 
-    private void enviarEmailSmtp(EmailDto emailDto)
+    private void enviarEmailSmtp(String destinatario, String assunto, String corpo, boolean html)
             throws UnsupportedEncodingException, MessagingException {
         MimeMessage mensagem = enviadorDeEmail.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
 
         helper.setFrom(new InternetAddress(remetente, nomeRemetente));
-        helper.setTo(emailDto.destinatario());
-        String assuntoCompleto = "%s %s".formatted(prefixoAssunto, emailDto.assunto());
+        helper.setTo(destinatario);
+        String assuntoCompleto = "%s %s".formatted(prefixoAssunto, assunto);
         helper.setSubject(assuntoCompleto);
-        helper.setText(emailDto.corpo(), emailDto.html());
+        helper.setText(corpo, html);
 
         enviadorDeEmail.send(mensagem);
     }

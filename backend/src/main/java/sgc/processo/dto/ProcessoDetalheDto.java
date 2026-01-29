@@ -18,6 +18,8 @@ public class ProcessoDetalheDto {
     private final List<UnidadeParticipanteDto> unidades = new ArrayList<>();
     @Builder.Default
     private final List<ProcessoResumoDto> resumoSubprocessos = new ArrayList<>();
+    @Builder.Default
+    private final List<SubprocessoElegivelDto> elegiveis = new ArrayList<>();
     private Long codigo;
     private String descricao;
     private String tipo;
