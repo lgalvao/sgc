@@ -8,9 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.dto.*;
-import sgc.mapa.evento.EventoAtividadeAtualizada;
-import sgc.mapa.evento.EventoAtividadeCriada;
-import sgc.mapa.evento.EventoAtividadeExcluida;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
@@ -58,14 +55,10 @@ class AtividadeFacadeTest {
         mapa.setSubprocesso(subprocesso);
         
         AtividadeResponse responseSalvo = new AtividadeResponse(atividadeCodigo, mapaCodigo, "Desc");
-        Atividade atividadeCriada = new Atividade();
-        atividadeCriada.setCodigo(atividadeCodigo);
-        atividadeCriada.setMapa(mapa);
         
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
         when(mapaFacade.obterPorCodigo(mapaCodigo)).thenReturn(mapa);
         when(mapaManutencaoService.criarAtividade(request)).thenReturn(responseSalvo);
-        when(mapaManutencaoService.obterAtividadePorCodigo(atividadeCodigo)).thenReturn(atividadeCriada);
         when(subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
         when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Cadastro em Andamento"));
         when(subprocessoFacade.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
@@ -76,7 +69,6 @@ class AtividadeFacadeTest {
 
         assertNotNull(result);
         verify(accessControlService).verificarPermissao(eq(usuario), eq(Acao.CRIAR_ATIVIDADE), any(Atividade.class));
-        verify(eventPublisher).publishEvent(any(EventoAtividadeCriada.class));
     }
 
     @Test
@@ -110,7 +102,6 @@ class AtividadeFacadeTest {
         assertNotNull(result);
         verify(accessControlService).verificarPermissao(usuario, Acao.EDITAR_ATIVIDADE, atividade);
         verify(mapaManutencaoService).atualizarAtividade(atividadeCodigo, request);
-        verify(eventPublisher).publishEvent(any(EventoAtividadeAtualizada.class));
     }
 
     @Test
@@ -141,7 +132,6 @@ class AtividadeFacadeTest {
         assertNotNull(result);
         verify(accessControlService).verificarPermissao(usuario, Acao.EXCLUIR_ATIVIDADE, atividade);
         verify(mapaManutencaoService).excluirAtividade(atividadeCodigo);
-        verify(eventPublisher).publishEvent(any(EventoAtividadeExcluida.class));
     }
 
     @Test

@@ -12,15 +12,11 @@ import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
-import sgc.subprocesso.eventos.EventoSubprocessoAtualizado;
-import sgc.subprocesso.eventos.EventoSubprocessoCriado;
-import sgc.subprocesso.eventos.EventoSubprocessoExcluido;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoRepositoryService;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -147,37 +143,14 @@ public class SubprocessoCrudService {
         subprocessoSalvo.setMapa(mapaSalvo);
         var salvo = subprocessoService.save(subprocessoSalvo);
 
-        EventoSubprocessoCriado evento = EventoSubprocessoCriado.builder()
-                .subprocesso(salvo)
-                .usuario(usuarioService.obterUsuarioAutenticado())
-                .dataHoraCriacao(LocalDateTime.now())
-                .criadoPorProcesso(false)
-                .codProcesso(salvo.getProcesso().getCodigo())
-                .codUnidade(salvo.getUnidade().getCodigo())
-                .build();
-        eventPublisher.publishEvent(evento);
-
         return subprocessoMapper.toDto(salvo);
     }
 
     public SubprocessoDto atualizar(Long codigo, AtualizarSubprocessoRequest request) {
         Subprocesso subprocesso = buscarSubprocesso(codigo);
-        SituacaoSubprocesso situacaoAnterior = subprocesso.getSituacao();
-        Set<String> camposAlterados = processarAlteracoes(subprocesso, request);
+        processarAlteracoes(subprocesso, request);
 
         Subprocesso salvo = subprocessoService.save(subprocesso);
-
-        // Publica evento de atualização se houve mudanças
-        if (!camposAlterados.isEmpty()) {
-            EventoSubprocessoAtualizado evento = EventoSubprocessoAtualizado.builder()
-                    .subprocesso(salvo)
-                    .usuario(usuarioService.obterUsuarioAutenticado())
-                    .camposAlterados(camposAlterados)
-                    .dataHoraAtualizacao(LocalDateTime.now())
-                    .situacaoAnterior(situacaoAnterior)
-                    .build();
-            eventPublisher.publishEvent(evento);
-        }
 
         return subprocessoMapper.toDto(salvo);
     }
@@ -213,19 +186,7 @@ public class SubprocessoCrudService {
     }
 
     public void excluir(Long codigo) {
-        Subprocesso subprocesso = buscarSubprocesso(codigo);
-
-        // Publica evento ANTES da exclusão
-        EventoSubprocessoExcluido evento = EventoSubprocessoExcluido.builder()
-                .codSubprocesso(codigo)
-                .codProcesso(subprocesso.getProcesso().getCodigo())
-                .codUnidade(subprocesso.getUnidade().getCodigo())
-                .codMapa(subprocesso.getMapa().getCodigo())
-                .situacao(subprocesso.getSituacao())
-                .usuario(usuarioService.obterUsuarioAutenticado())
-                .dataHoraExclusao(LocalDateTime.now())
-                .build();
-        eventPublisher.publishEvent(evento);
+        buscarSubprocesso(codigo);
 
         subprocessoService.deleteById(codigo);
     }
