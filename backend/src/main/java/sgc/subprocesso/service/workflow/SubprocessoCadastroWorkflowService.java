@@ -32,7 +32,7 @@ import static sgc.seguranca.acesso.Acao.HOMOLOGAR_REVISAO_CADASTRO;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.service.MovimentacaoRepositoryService;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.service.SubprocessoRepositoryService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
@@ -57,7 +57,7 @@ public class SubprocessoCadastroWorkflowService {
     private final SubprocessoCrudService crudService;
     private final AlertaFacade alertaService;
     private final UnidadeFacade unidadeService;
-    private final MovimentacaoRepositoryService movimentacaoService;
+    private final MovimentacaoRepo movimentacaoRepo;
     private final SubprocessoTransicaoService transicaoService;
     private final AnaliseFacade analiseFacade;
     @Lazy private final SubprocessoValidacaoService validacaoService;
@@ -112,7 +112,7 @@ public class SubprocessoCadastroWorkflowService {
         mov.setUnidadeOrigem(sedoc);
         mov.setUnidadeDestino(sp.getUnidade());
         mov.setDescricao(descricao);
-        movimentacaoService.save(mov);
+        movimentacaoRepo.save(mov);
     }
 
     private void enviarAlertasReabertura(Subprocesso sp, String justificativa, boolean isRevisao) {

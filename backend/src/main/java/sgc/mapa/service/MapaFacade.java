@@ -8,7 +8,9 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.mapper.MapaCompletoMapper;
 import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
@@ -31,8 +33,8 @@ import java.util.Optional;
 @Slf4j
 public class MapaFacade {
 
-    private final MapaRepositoryService mapaService;
-    private final CompetenciaRepositoryService competenciaService;
+    private final MapaRepo mapaRepo;
+    private final CompetenciaRepo competenciaRepo;
     private final MapaCompletoMapper mapaCompletoMapper;
     private final MapaSalvamentoService mapaSalvamentoService;
     private final MapaVisualizacaoService mapaVisualizacaoService;
@@ -40,15 +42,15 @@ public class MapaFacade {
     private final sgc.comum.repo.RepositorioComum repo;
 
     public MapaFacade(
-            MapaRepositoryService mapaService,
-            CompetenciaRepositoryService competenciaService,
+            MapaRepo mapaRepo,
+            CompetenciaRepo competenciaRepo,
             MapaCompletoMapper mapaCompletoMapper,
             MapaSalvamentoService mapaSalvamentoService,
             MapaVisualizacaoService mapaVisualizacaoService,
             ImpactoMapaService impactoMapaService,
             sgc.comum.repo.RepositorioComum repo) {
-        this.mapaService = mapaService;
-        this.competenciaService = competenciaService;
+        this.mapaRepo = mapaRepo;
+        this.competenciaRepo = competenciaRepo;
         this.mapaCompletoMapper = mapaCompletoMapper;
         this.mapaSalvamentoService = mapaSalvamentoService;
         this.mapaVisualizacaoService = mapaVisualizacaoService;
@@ -62,7 +64,7 @@ public class MapaFacade {
 
     @Transactional(readOnly = true)
     public List<Mapa> listar() {
-        return mapaService.findAll();
+        return mapaRepo.findAll();
     }
 
     @Transactional(readOnly = true)
@@ -72,19 +74,19 @@ public class MapaFacade {
 
     @Transactional(readOnly = true)
     public Optional<Mapa> buscarMapaVigentePorUnidade(Long codigoUnidade) {
-        return mapaService.findMapaVigenteByUnidade(codigoUnidade);
+        return mapaRepo.findMapaVigenteByUnidade(codigoUnidade);
     }
 
     @Transactional(readOnly = true)
     public Optional<Mapa> buscarPorSubprocessoCodigo(Long codSubprocesso) {
-        return mapaService.findBySubprocessoCodigo(codSubprocesso);
+        return mapaRepo.findBySubprocessoCodigo(codSubprocesso);
     }
 
     @Transactional(readOnly = true)
     public MapaCompletoDto obterMapaCompleto(Long codMapa, Long codSubprocesso) {
         Mapa mapa = repo.buscar(Mapa.class, codMapa);
 
-        List<Competencia> competencias = competenciaService.findByMapaCodigo(codMapa);
+        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
         return mapaCompletoMapper.toDto(mapa, codSubprocesso, competencias);
     }
 
@@ -93,11 +95,11 @@ public class MapaFacade {
     // ===================================================================================
 
     public Mapa salvar(Mapa mapa) {
-        return mapaService.salvar(mapa);
+        return mapaRepo.save(mapa);
     }
 
     public Mapa criar(Mapa mapa) {
-        return mapaService.salvar(mapa);
+        return mapaRepo.save(mapa);
     }
 
     public Mapa atualizar(Long codigo, Mapa mapa) {
@@ -105,14 +107,14 @@ public class MapaFacade {
         existente.setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado());
         existente.setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao());
         existente.setDataHoraHomologado(mapa.getDataHoraHomologado());
-        return mapaService.salvar(existente);
+        return mapaRepo.save(existente);
     }
 
     public void excluir(Long codigo) {
-        if (!mapaService.existsById(codigo)) {
+        if (!mapaRepo.existsById(codigo)) {
             throw new ErroEntidadeNaoEncontrada("Mapa", codigo);
         }
-        mapaService.deleteById(codigo);
+        mapaRepo.deleteById(codigo);
     }
 
     // ===================================================================================

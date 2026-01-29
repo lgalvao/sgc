@@ -11,8 +11,8 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.MovimentacaoRepositoryService;
 import sgc.subprocesso.service.SubprocessoRepositoryService;
 
 import java.util.List;
@@ -36,7 +36,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
 public class SubprocessoFactory {
     private final SubprocessoRepositoryService subprocessoService;
     private final MapaRepo mapaRepo;
-    private final MovimentacaoRepositoryService movimentacaoService;
+    private final MovimentacaoRepo movimentacaoRepo;
     private final CopiaMapaService servicoDeCopiaDeMapa;
 
     /**
@@ -81,7 +81,7 @@ public class SubprocessoFactory {
                     .descricao("Processo iniciado")
                     .build());
         }
-        movimentacaoService.saveAll(movimentacoes);
+        movimentacaoRepo.saveAll(movimentacoes);
     }
 
     /**
@@ -106,7 +106,7 @@ public class SubprocessoFactory {
         Mapa mapaSalvo = mapaRepo.save(mapaCopiado);
         subprocessoSalvo.setMapa(mapaSalvo);
 
-        movimentacaoService.save(Movimentacao.builder()
+        movimentacaoRepo.save(Movimentacao.builder()
                 .subprocesso(subprocessoSalvo)
                 .unidadeDestino(unidade)
                 .descricao("Processo de revisão iniciado")
@@ -136,7 +136,7 @@ public class SubprocessoFactory {
         Mapa mapaSalvo = mapaRepo.save(mapaCopiado);
         subprocessoSalvo.setMapa(mapaSalvo);
 
-        movimentacaoService.save(Movimentacao.builder()
+        movimentacaoRepo.save(Movimentacao.builder()
                 .subprocesso(subprocessoSalvo)
                 .unidadeDestino(unidade)
                 .descricao("Processo de diagnóstico iniciado")

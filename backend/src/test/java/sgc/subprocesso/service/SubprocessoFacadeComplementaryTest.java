@@ -39,6 +39,7 @@ import sgc.subprocesso.dto.SugestoesDto;
 import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
@@ -62,7 +63,7 @@ class SubprocessoFacadeComplementaryTest {
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
-    private MovimentacaoRepositoryService movimentacaoService;
+    private MovimentacaoRepo movimentacaoRepo;
     @Mock
     private SubprocessoDetalheMapper subprocessoDetalheMapper;
     @Mock
@@ -327,7 +328,7 @@ class SubprocessoFacadeComplementaryTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
             when(unidadeFacade.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
             when(usuarioService.buscarPorLogin("TITULAR")).thenReturn(new Usuario());
-            when(movimentacaoService.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
+            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
 
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().unidade(SubprocessoDetalheDto.UnidadeDto.builder().sigla("SIGLA").build()).build());
 
@@ -358,7 +359,7 @@ class SubprocessoFacadeComplementaryTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
             when(unidadeFacade.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
             when(usuarioService.buscarPorLogin("TITULAR")).thenThrow(new RuntimeException("Erro"));
-            when(movimentacaoService.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
+            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().build());
 
             SubprocessoDetalheDto result = subprocessoFacade.obterDetalhes(codigo, sgc.organizacao.model.Perfil.ADMIN);
@@ -388,7 +389,7 @@ class SubprocessoFacadeComplementaryTest {
 
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
             when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
-            when(movimentacaoService.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
+            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
             when(usuarioService.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
 
             sgc.organizacao.dto.UnidadeDto unidadeDto = sgc.organizacao.dto.UnidadeDto.builder().sigla("SIGLA").build();
@@ -618,7 +619,7 @@ class SubprocessoFacadeComplementaryTest {
             subprocessoFacade.importarAtividades(dest, orig);
 
             verify(copiaMapaService).importarAtividadesDeOutroMapa(20L, 10L);
-            verify(movimentacaoService).save(any());
+            verify(movimentacaoRepo).save(any());
             assertThat(spDest.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         }
 

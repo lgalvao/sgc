@@ -59,7 +59,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     @Mock
     private sgc.alerta.AlertaFacade alertaService;
     @Mock
-    private sgc.subprocesso.service.MovimentacaoRepositoryService movimentacaoService;
+    private sgc.subprocesso.model.MovimentacaoRepo movimentacaoRepo;
     @Mock
     private sgc.mapa.service.MapaFacade mapaFacade;
 
@@ -536,7 +536,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         verify(subprocessoService).save(sp);
-        verify(movimentacaoService).save(any());
+        verify(movimentacaoRepo).save(any());
     }
 
     @Test
@@ -572,6 +572,6 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         verify(subprocessoService).save(sp);
-        verify(movimentacaoService).save(any());
+        verify(movimentacaoRepo).save(any());
     }
 }

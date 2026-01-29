@@ -8,7 +8,11 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.*;
+import sgc.organizacao.service.UnidadeRepositoryService;
+import sgc.organizacao.service.UsuarioRepositoryService;
+import sgc.organizacao.service.UnidadeHierarquiaService;
+import sgc.organizacao.service.UnidadeMapaService;
+import sgc.organizacao.service.UnidadeResponsavelService;
 
 import java.util.*;
 
@@ -28,7 +32,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UnidadeFacade {
     private final UnidadeRepositoryService unidadeRepositoryService;
-    private final UnidadeMapaRepositoryService unidadeMapaRepositoryService;
+    private final UnidadeMapaRepo unidadeMapaRepo;
     private final UsuarioRepositoryService usuarioRepositoryService;
     private final UsuarioMapper usuarioMapper;
     private final UnidadeHierarquiaService hierarquiaService;
@@ -46,7 +50,7 @@ public class UnidadeFacade {
     public List<UnidadeDto> buscarArvoreComElegibilidade(
             boolean requerMapaVigente, java.util.Set<Long> unidadesBloqueadas) {
         Set<Long> unidadesComMapa = requerMapaVigente
-                ? new HashSet<>(unidadeMapaRepositoryService.findAllUnidadeCodigos())
+                ? new HashSet<>(unidadeMapaRepo.findAllUnidadeCodigos())
                 : Collections.emptySet();
 
         return hierarquiaService.buscarArvoreComElegibilidade(u ->

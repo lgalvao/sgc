@@ -14,7 +14,7 @@ import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.MovimentacaoRepositoryService;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.service.SubprocessoRepositoryService;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.verify;
 class SubprocessoTransicaoServiceTest {
 
     @Mock
-    private MovimentacaoRepositoryService movimentacaoService;
+    private MovimentacaoRepo movimentacaoRepo;
 
     @Mock
     private SubprocessoRepositoryService subprocessoService;
@@ -58,7 +58,7 @@ class SubprocessoTransicaoServiceTest {
         );
 
         // Assert
-        verify(movimentacaoService).save(any(Movimentacao.class));
+        verify(movimentacaoRepo).save(any(Movimentacao.class));
         verify(eventPublisher).publishEvent(any(EventoTransicaoSubprocesso.class));
     }
 
@@ -81,7 +81,7 @@ class SubprocessoTransicaoServiceTest {
         );
 
         // Assert
-        verify(movimentacaoService).save(any(Movimentacao.class));
+        verify(movimentacaoRepo).save(any(Movimentacao.class));
         verify(eventPublisher).publishEvent(any(EventoTransicaoSubprocesso.class));
     }
 
@@ -103,7 +103,7 @@ class SubprocessoTransicaoServiceTest {
         );
 
         // Assert
-        verify(movimentacaoService).save(any(Movimentacao.class));
+        verify(movimentacaoRepo).save(any(Movimentacao.class));
         verify(eventPublisher).publishEvent(any(EventoTransicaoSubprocesso.class));
     }
 }

@@ -17,7 +17,7 @@ import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.MovimentacaoRepositoryService;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.service.SubprocessoRepositoryService;
 
 import java.time.LocalDateTime;
@@ -35,7 +35,7 @@ class SubprocessoFactoryTest {
     private MapaRepo mapaRepo;
 
     @Mock
-    private MovimentacaoRepositoryService movimentacaoService;
+    private MovimentacaoRepo movimentacaoRepo;
 
     @Mock
     private CopiaMapaService servicoDeCopiaDeMapa;
@@ -59,7 +59,7 @@ class SubprocessoFactoryTest {
 
         verify(subprocessoService, times(1)).saveAll(anyList());
         verify(mapaRepo).saveAll(anyList());
-        verify(movimentacaoService).saveAll(anyList());
+        verify(movimentacaoRepo).saveAll(anyList());
     }
 
     @Test
@@ -99,7 +99,7 @@ class SubprocessoFactoryTest {
 
         verify(subprocessoService, times(1)).save(any(Subprocesso.class));
         verify(mapaRepo).save(any(Mapa.class));
-        verify(movimentacaoService).save(any(Movimentacao.class));
+        verify(movimentacaoRepo).save(any(Movimentacao.class));
     }
 
     @Test
@@ -127,6 +127,6 @@ class SubprocessoFactoryTest {
 
         // Verifica situacao inicial
         verify(subprocessoService, atLeastOnce()).save(argThat(s -> s.getSituacao() == SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO));
-        verify(movimentacaoService).save(any(Movimentacao.class));
+        verify(movimentacaoRepo).save(any(Movimentacao.class));
     }
 }
