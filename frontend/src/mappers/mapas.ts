@@ -1,5 +1,4 @@
 import type {
-    AtividadeImpactada,
     CompetenciaCompleta,
     CompetenciaImpactada,
     ImpactoMapa,
@@ -7,6 +6,7 @@ import type {
     MapaAjuste,
     MapaCompleto,
 } from "@/types/tipos";
+import type {ImpactoMapaDto} from "@/types/dtos";
 
 export function mapMapaDtoToModel(dto: any): Mapa {
     return {
@@ -46,28 +46,17 @@ export function mapMapaCompletoDtoToModel(dto: any): MapaCompleto {
     };
 }
 
-export function mapImpactoMapaDtoToModel(dto: any): ImpactoMapa {
+export function mapImpactoMapaDtoToModel(dto: ImpactoMapaDto): ImpactoMapa {
     return {
         temImpactos: dto.temImpactos,
         totalAtividadesInseridas: dto.totalAtividadesInseridas,
         totalAtividadesRemovidas: dto.totalAtividadesRemovidas,
         totalAtividadesAlteradas: dto.totalAtividadesAlteradas,
         totalCompetenciasImpactadas: dto.totalCompetenciasImpactadas,
-        atividadesInseridas: (dto.atividadesInseridas || []).map(
-            (a: any): AtividadeImpactada => ({
-                ...a,
-            }),
-        ),
-        atividadesRemovidas: (dto.atividadesRemovidas || []).map(
-            (a: any): AtividadeImpactada => ({
-                ...a,
-            }),
-        ),
-        atividadesAlteradas: (dto.atividadesAlteradas || []).map(
-            (a: any): AtividadeImpactada => ({
-                ...a,
-            }),
-        ),
+        // Arrays de atividades impactadas - sem mapeamento trivial
+        atividadesInseridas: dto.atividadesInseridas || [],
+        atividadesRemovidas: dto.atividadesRemovidas || [],
+        atividadesAlteradas: dto.atividadesAlteradas || [],
         competenciasImpactadas: (dto.competenciasImpactadas || []).map(
             (c: any): CompetenciaImpactada => ({
                 codigo: c.codigo,

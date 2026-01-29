@@ -1,19 +1,22 @@
 import type {Atividade, Conhecimento, CriarConhecimentoRequest,} from "@/types/tipos";
+import type {AtividadeDto, ConhecimentoDto} from "@/types/dtos";
 
-export function mapAtividadeToModel(dto: any): Atividade {
-    if (!dto) return null as any;
+export function mapAtividadeToModel(dto: AtividadeDto | null | undefined): Atividade | null {
+    if (!dto) return null;
     return {
         codigo: dto.codigo,
         descricao: dto.descricao,
-        conhecimentos: (dto.conhecimentos || []).map(mapConhecimentoToModel).filter((c: any) => c !== null),
+        conhecimentos: (dto.conhecimentos || [])
+            .map(mapConhecimentoToModel)
+            .filter((c): c is Conhecimento => c !== null),
     };
 }
 
 // Alias for backwards compatibility
 export const mapAtividadeVisualizacaoToModel = mapAtividadeToModel;
 
-export function mapConhecimentoToModel(dto: any): Conhecimento {
-    if (!dto) return null as any;
+export function mapConhecimentoToModel(dto: ConhecimentoDto | null | undefined): Conhecimento | null {
+    if (!dto) return null;
     return {
         codigo: dto.codigo,
         descricao: dto.descricao,

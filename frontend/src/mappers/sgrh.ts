@@ -1,3 +1,5 @@
+import type {PerfilUnidadeDto, UsuarioDto, LoginResponseDto} from "@/types/dtos";
+
 export interface AutenticacaoRequest {
     tituloEleitoral: string;
     senha: string;
@@ -33,10 +35,10 @@ export interface PerfilUnidade {
 }
 
 export function mapPerfilUnidadeToFrontend(
-    perfilUnidadeDto: any,
+    perfilUnidadeDto: PerfilUnidadeDto,
 ): PerfilUnidade {
     return {
-        perfil: perfilUnidadeDto.perfil,
+        perfil: perfilUnidadeDto.perfil as Perfil,
         unidade: {
             codigo: perfilUnidadeDto.unidade.codigo,
             nome: perfilUnidadeDto.unidade.nome,
@@ -46,7 +48,7 @@ export function mapPerfilUnidadeToFrontend(
     };
 }
 
-export function mapUsuarioToFrontend(usuarioDto: any): Usuario {
+export function mapUsuarioToFrontend(usuarioDto: UsuarioDto): Usuario {
     return {
         tituloEleitoral: usuarioDto.tituloEleitoral,
         nome: usuarioDto.nome,
@@ -57,7 +59,7 @@ export function mapUsuarioToFrontend(usuarioDto: any): Usuario {
             nome: usuarioDto.unidade.nome,
             sigla: usuarioDto.unidade.sigla,
         },
-        perfis: usuarioDto.perfis,
+        perfis: usuarioDto.perfis as Perfil[],
     };
 }
 
@@ -69,21 +71,21 @@ export interface LoginResponse {
     token: string;
 }
 
-export function LoginResponseToFrontend(response: any): LoginResponse {
+export function LoginResponseToFrontend(response: LoginResponseDto): LoginResponse {
     return {
         tituloEleitoral: response.tituloEleitoral,
         nome: response.nome,
-        perfil: response.perfil,
+        perfil: response.perfil as Perfil,
         unidadeCodigo: response.unidadeCodigo,
         token: response.token,
     };
 }
 
 export function perfisUnidadesParaDominio(
-    perfisUnidadesBackend: any[]
+    perfisUnidadesBackend: PerfilUnidadeDto[]
 ): PerfilUnidade[] {
     return perfisUnidadesBackend.map((item) => ({
-        perfil: item.perfil,
+        perfil: item.perfil as Perfil,
         unidade: {
             codigo: item.unidade.codigo,
             nome: item.unidade.nome,

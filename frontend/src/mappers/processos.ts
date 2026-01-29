@@ -1,7 +1,8 @@
 import type {Processo, UnidadeParticipante} from "@/types/tipos";
+import type {ProcessoDetalheDto, UnidadeParticipanteDto} from "@/types/dtos";
 
 export function mapUnidadeParticipanteDtoToFrontend(
-    dto: any,
+    dto: UnidadeParticipanteDto,
 ): UnidadeParticipante {
     return {
         ...dto,
@@ -12,11 +13,12 @@ export function mapUnidadeParticipanteDtoToFrontend(
     };
 }
 
-export function mapProcessoDetalheDtoToFrontend(dto: any): Processo {
+export function mapProcessoDetalheDtoToFrontend(dto: ProcessoDetalheDto): Processo {
     return {
         ...dto,
         unidades: dto.unidades
             ? dto.unidades.map(mapUnidadeParticipanteDtoToFrontend)
             : [],
-    };
+        resumoSubprocessos: (dto as any).resumoSubprocessos || [],
+    } as Processo;
 }
