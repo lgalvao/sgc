@@ -11,7 +11,7 @@ import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
@@ -70,7 +70,7 @@ class EventoProcessoListenerCoverageTest {
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
 
         // Responsável SEM titular
-        ResponsavelDto responsavel = ResponsavelDto.builder()
+        UnidadeResponsavelDto responsavel = UnidadeResponsavelDto.builder()
                 .unidadeCodigo(10L)
                 .titularTitulo(null)
                 .substitutoTitulo("Substituto")
@@ -108,7 +108,7 @@ class EventoProcessoListenerCoverageTest {
 
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
 
-        ResponsavelDto responsavel = ResponsavelDto.builder()
+        UnidadeResponsavelDto responsavel = UnidadeResponsavelDto.builder()
                 .unidadeCodigo(10L)
                 .titularTitulo("123")
                 .build();
@@ -144,8 +144,8 @@ class EventoProcessoListenerCoverageTest {
         u2.setTipo(TipoUnidade.OPERACIONAL);
         processo.setParticipantes(Set.of(u1, u2));
 
-        ResponsavelDto r1 = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
-        ResponsavelDto r2 = ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build();
+        UnidadeResponsavelDto r1 = UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
+        UnidadeResponsavelDto r2 = UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build();
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1, 2L, r2));
 
@@ -171,7 +171,7 @@ class EventoProcessoListenerCoverageTest {
         u1.setTipo(TipoUnidade.INTEROPERACIONAL);
         processo.setParticipantes(Set.of(u1));
 
-        ResponsavelDto r1 = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
+        UnidadeResponsavelDto r1 = UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1));
 
         UsuarioDto user1 = UsuarioDto.builder().tituloEleitoral("T1").email("t1@mail.com").build();
@@ -239,7 +239,7 @@ class EventoProcessoListenerCoverageTest {
         s1.setUnidade(u1);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1));
 
-        ResponsavelDto r1 = ResponsavelDto.builder()
+        UnidadeResponsavelDto r1 = UnidadeResponsavelDto.builder()
                 .unidadeCodigo(10L)
                 .titularTitulo("T1")
                 .substitutoTitulo("S1")
@@ -279,7 +279,7 @@ class EventoProcessoListenerCoverageTest {
         u1.setSigla("U1");
         processo.setParticipantes(Set.of(u1));
 
-        ResponsavelDto r1 = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
+        UnidadeResponsavelDto r1 = UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1));
 
         UsuarioDto t1 = UsuarioDto.builder().tituloEleitoral("T1").email("t1@mail.com").build();
@@ -340,7 +340,7 @@ class EventoProcessoListenerCoverageTest {
         // Set participants: Only INTER
         processo.setParticipantes(Set.of(inter));
 
-        ResponsavelDto r1 = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
+        UnidadeResponsavelDto r1 = UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1));
 
         UsuarioDto t1 = UsuarioDto.builder().tituloEleitoral("T1").email("t1@mail.com").build();
@@ -370,7 +370,7 @@ class EventoProcessoListenerCoverageTest {
         s1.setUnidade(u1);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1));
 
-        ResponsavelDto r1 = ResponsavelDto.builder()
+        UnidadeResponsavelDto r1 = UnidadeResponsavelDto.builder()
                 .unidadeCodigo(10L)
                 .titularTitulo("T1")
                 .build();

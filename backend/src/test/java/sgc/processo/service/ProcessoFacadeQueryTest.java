@@ -245,7 +245,7 @@ class ProcessoFacadeQueryTest {
             // Arrange
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
-            ProcessoDetalheDto detalhes = new ProcessoDetalheDto();
+            ProcessoDetalheDto detalhes = ProcessoDetalheDto.builder().build();
 
             when(processoRepositoryService.buscarPorId(id)).thenReturn(processo);
             when(processoDetalheBuilder.build(processo)).thenReturn(detalhes);
@@ -257,8 +257,8 @@ class ProcessoFacadeQueryTest {
 
             // Assert
             assertThat(res).isNotNull();
-            assertThat(res.processo()).isEqualTo(detalhes);
-            assertThat(res.elegiveis()).isEmpty();
+            assertThat(res).isEqualTo(detalhes);
+            assertThat(res.getElegiveis()).isEmpty();
         }
 
         @Test

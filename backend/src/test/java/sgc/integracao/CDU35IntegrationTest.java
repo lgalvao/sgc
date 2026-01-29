@@ -54,7 +54,7 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
         Unidade unidade = unidadeRepo.findById(1L).orElseThrow();
 
         when(unidadeService.buscarResponsavelUnidade(anyLong()))
-                .thenReturn(sgc.organizacao.dto.ResponsavelDto.builder()
+                .thenReturn(sgc.organizacao.dto.UnidadeResponsavelDto.builder()
                         .titularNome("Responsável Teste")
                         .build());
 

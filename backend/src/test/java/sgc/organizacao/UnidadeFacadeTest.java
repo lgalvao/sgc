@@ -25,7 +25,7 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
-import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.SituacaoUnidade;
@@ -530,14 +530,14 @@ class UnidadeFacadeTest {
         @DisplayName("Deve montar responsável sem substituto")
         void deveMontarResponsavelSemSubstituto() {
             // Arrange
-            ResponsavelDto dto = ResponsavelDto.builder()
+            UnidadeResponsavelDto dto = UnidadeResponsavelDto.builder()
                     .titularTitulo("123")
                     .substitutoTitulo(null)
                     .build();
             when(responsavelService.buscarResponsavelUnidade(1L)).thenReturn(dto);
 
             // Act
-            ResponsavelDto result = service.buscarResponsavelUnidade(1L);
+            UnidadeResponsavelDto result = service.buscarResponsavelUnidade(1L);
 
             // Assert
             assertThat(result.titularTitulo()).isEqualTo("123");
@@ -560,14 +560,14 @@ class UnidadeFacadeTest {
         @DisplayName("Deve montar responsável com substituto")
         void deveMontarResponsavelComSubstituto() {
             // Arrange
-            ResponsavelDto dto = ResponsavelDto.builder()
+            UnidadeResponsavelDto dto = UnidadeResponsavelDto.builder()
                     .titularTitulo("123")
                     .substitutoTitulo("456")
                     .build();
             when(responsavelService.buscarResponsavelUnidade(1L)).thenReturn(dto);
 
             // Act
-            ResponsavelDto result = service.buscarResponsavelUnidade(1L);
+            UnidadeResponsavelDto result = service.buscarResponsavelUnidade(1L);
 
             // Assert
             assertThat(result.titularTitulo()).isEqualTo("123");
@@ -583,7 +583,7 @@ class UnidadeFacadeTest {
                     .thenReturn(Collections.emptyMap());
 
             // Act
-            Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
+            Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
 
             // Assert
             assertThat(result).isEmpty();

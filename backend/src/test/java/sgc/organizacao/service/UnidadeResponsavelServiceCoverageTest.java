@@ -21,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.RepositorioComum;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
-import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.AtribuicaoTemporaria;
 import sgc.organizacao.model.AtribuicaoTemporariaRepo;
@@ -92,7 +92,7 @@ class UnidadeResponsavelServiceCoverageTest {
     @Test
     @DisplayName("Deve retornar mapa vazio quando lista de códigos vazia")
     void deveRetornarMapaVazioListaVazia() {
-        Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(Collections.emptyList());
+        Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(Collections.emptyList());
         assertThat(result).isEmpty();
         verifyNoInteractions(usuarioRepo);
     }
@@ -102,7 +102,7 @@ class UnidadeResponsavelServiceCoverageTest {
     void deveRetornarMapaVazioSemChefes() {
         when(usuarioRepo.findChefesByUnidadesCodigos(any())).thenReturn(Collections.emptyList());
 
-        Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
+        Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
         assertThat(result).isEmpty();
     }
 
@@ -126,7 +126,7 @@ class UnidadeResponsavelServiceCoverageTest {
         when(usuarioRepo.findByIdInWithAtribuicoes(List.of("123"))).thenReturn(List.of(chefeCompleto));
         when(usuarioPerfilRepo.findByUsuarioTituloIn(List.of("123"))).thenReturn(List.of(perfil));
 
-        Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
+        Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
 
         assertThat(result).hasSize(1);
         assertThat(result.get(1L).titularTitulo()).isEqualTo("123");
@@ -145,7 +145,7 @@ class UnidadeResponsavelServiceCoverageTest {
         when(usuarioRepo.findByIdInWithAtribuicoes(List.of("123"))).thenReturn(Collections.emptyList());
 
         // Se retornar lista vazia de usuarios completos, o stream final será vazio
-        Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
+        Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
         assertThat(result).isEmpty();
 
         // Verifica que não tentou buscar perfis se não tem usuários
@@ -166,7 +166,7 @@ class UnidadeResponsavelServiceCoverageTest {
         when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L)))
                 .thenReturn(List.of(titular, substituto));
 
-        ResponsavelDto result = service.buscarResponsavelUnidade(1L);
+        UnidadeResponsavelDto result = service.buscarResponsavelUnidade(1L);
 
         assertThat(result.titularTitulo()).isEqualTo("TITULAR");
         assertThat(result.titularNome()).isEqualTo("Nome Titular");
@@ -196,7 +196,7 @@ class UnidadeResponsavelServiceCoverageTest {
         when(usuarioRepo.findByIdInWithAtribuicoes(List.of("123"))).thenReturn(List.of(chefe));
         when(usuarioPerfilRepo.findByUsuarioTituloIn(List.of("123"))).thenReturn(List.of(perfilGestor));
 
-        Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
+        Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
 
         assertThat(result).isEmpty();
     }
@@ -211,7 +211,7 @@ class UnidadeResponsavelServiceCoverageTest {
         when(usuarioRepo.findByIdInWithAtribuicoes(List.of("123"))).thenReturn(List.of(chefe));
         when(usuarioPerfilRepo.findByUsuarioTituloIn(List.of("123"))).thenReturn(Collections.emptyList());
 
-        Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
+        Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
 
         assertThat(result).isEmpty();
         assertThat(chefe.getAtribuicoes()).isEmpty();
@@ -243,10 +243,10 @@ class UnidadeResponsavelServiceCoverageTest {
 
         when(usuarioPerfilRepo.findByUsuarioTituloIn(anyList())).thenReturn(List.of(perfilTitular, perfilSubstituto));
 
-        Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
+        Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
 
         assertThat(result).hasSize(1);
-        ResponsavelDto resp = result.get(1L);
+        UnidadeResponsavelDto resp = result.get(1L);
         assertThat(resp.titularTitulo()).isEqualTo("TITULAR");
         assertThat(resp.substitutoTitulo()).isEqualTo("SUBSTITUTO");
     }
@@ -267,7 +267,7 @@ class UnidadeResponsavelServiceCoverageTest {
 
         when(usuarioPerfilRepo.findByUsuarioTituloIn(anyList())).thenReturn(List.of(perfilOutraUnidade));
 
-        Map<Long, ResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(10L));
+        Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(10L));
 
         assertThat(result).isEmpty();
     }

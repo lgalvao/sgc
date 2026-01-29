@@ -21,7 +21,7 @@ import sgc.mapa.model.Mapa;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -146,21 +146,21 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
                 .thenReturn(
                         Map.of(
                                 unidadeIntermediaria.getCodigo(),
-                                new ResponsavelDto(
+                                new UnidadeResponsavelDto(
                                         unidadeIntermediaria.getCodigo(),
                                         titularIntermediaria.getTituloEleitoral(),
                                         titularIntermediaria.getNome(),
                                         null,
                                         null),
                                 unidadeOperacional1.getCodigo(),
-                                new ResponsavelDto(
+                                new UnidadeResponsavelDto(
                                         unidadeOperacional1.getCodigo(),
                                         titularOp1.getTituloEleitoral(),
                                         titularOp1.getNome(),
                                         null,
                                         null),
                                 unidadeOperacional2.getCodigo(),
-                                new ResponsavelDto(
+                                new UnidadeResponsavelDto(
                                         unidadeOperacional2.getCodigo(),
                                         titularOp2.getTituloEleitoral(),
                                         titularOp2.getNome(),

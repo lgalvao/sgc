@@ -29,7 +29,7 @@ import sgc.comum.erros.ErroValidacao;
 
 import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.dto.PerfilDto;
-import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.Administrador;
 
@@ -273,7 +273,7 @@ class UsuarioFacadeCoverageTest {
         u.setNome("Nome");
         when(usuarioRepositoryService.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(u));
 
-        ResponsavelDto resp = usuarioFacade.buscarResponsavelUnidade(1L);
+        UnidadeResponsavelDto resp = usuarioFacade.buscarResponsavelUnidade(1L);
         assertThat(resp.titularTitulo()).isEqualTo("T");
     }
 
@@ -318,7 +318,7 @@ class UsuarioFacadeCoverageTest {
         // carregarAtribuicoesEmLote vai chamar findByUsuarioTituloIn
         when(usuarioRepositoryService.findByUsuarioTituloIn(List.of("T"))).thenReturn(List.of(up));
 
-        Map<Long, ResponsavelDto> map = usuarioFacade.buscarResponsaveisUnidades(List.of(1L));
+        Map<Long, UnidadeResponsavelDto> map = usuarioFacade.buscarResponsaveisUnidades(List.of(1L));
         assertThat(map).containsKey(1L);
     }
 
@@ -535,7 +535,7 @@ class UsuarioFacadeCoverageTest {
         when(usuarioRepositoryService.findByIdInWithAtribuicoes(List.of("T"))).thenReturn(List.of(u));
         when(usuarioRepositoryService.findByUsuarioTituloIn(List.of("T"))).thenReturn(List.of(up1, up2, up3));
 
-        Map<Long, ResponsavelDto> map = usuarioFacade.buscarResponsaveisUnidades(List.of(1L));
+        Map<Long, UnidadeResponsavelDto> map = usuarioFacade.buscarResponsaveisUnidades(List.of(1L));
 
         // Deve conter apenas a unidade 1
         assertThat(map)
@@ -560,7 +560,7 @@ class UsuarioFacadeCoverageTest {
 
         when(usuarioRepositoryService.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(titular, substituto));
 
-        ResponsavelDto result = usuarioFacade.buscarResponsavelUnidade(1L);
+        UnidadeResponsavelDto result = usuarioFacade.buscarResponsavelUnidade(1L);
 
         assertThat(result.titularTitulo()).isEqualTo("T");
         assertThat(result.substitutoTitulo()).isEqualTo("S");
@@ -578,7 +578,7 @@ class UsuarioFacadeCoverageTest {
         // Simula que o usuário não foi encontrado na busca detalhada (inconsistência)
         when(usuarioRepositoryService.findByIdInWithAtribuicoes(List.of("T"))).thenReturn(Collections.emptyList());
 
-        Map<Long, ResponsavelDto> map = usuarioFacade.buscarResponsaveisUnidades(List.of(1L));
+        Map<Long, UnidadeResponsavelDto> map = usuarioFacade.buscarResponsaveisUnidades(List.of(1L));
 
         assertThat(map).isEmpty();
     }
@@ -746,7 +746,7 @@ class UsuarioFacadeCoverageTest {
         when(usuarioRepositoryService.findByIdInWithAtribuicoes(List.of("T"))).thenReturn(List.of(u));
         when(usuarioRepositoryService.findByUsuarioTituloIn(List.of("T"))).thenReturn(List.of(up));
 
-        Map<Long, ResponsavelDto> result = usuarioFacade.buscarResponsaveisUnidades(List.of(2L));
+        Map<Long, UnidadeResponsavelDto> result = usuarioFacade.buscarResponsaveisUnidades(List.of(2L));
 
         assertThat(result).isEmpty();
     }

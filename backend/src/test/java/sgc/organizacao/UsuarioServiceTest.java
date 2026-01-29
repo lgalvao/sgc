@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.dto.PerfilDto;
-import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.Perfil;
@@ -200,7 +200,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar responsável da unidade")
         void deveBuscarResponsavelUnidade() {
             // Act
-            ResponsavelDto result = unidadeService.buscarResponsavelUnidade(2L);
+            UnidadeResponsavelDto result = unidadeService.buscarResponsavelUnidade(2L);
 
             // Assert
             assertNotNull(result);
@@ -227,7 +227,7 @@ class UsuarioServiceTest {
             List<Long> unidades = List.of(2L, 9L);
 
             // Act
-            Map<Long, ResponsavelDto> result = unidadeService.buscarResponsaveisUnidades(unidades);
+            Map<Long, UnidadeResponsavelDto> result = unidadeService.buscarResponsaveisUnidades(unidades);
 
             // Assert
             assertNotNull(result);
@@ -305,7 +305,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar responsáveis ignorando unidades sem chefe")
         void deveBuscarResponsaveisIgnorandoSemChefe() {
             // Unidade 9999 não existe ou não tem chefe
-            Map<Long, ResponsavelDto> res = unidadeService.buscarResponsaveisUnidades(List.of(9999L));
+            Map<Long, UnidadeResponsavelDto> res = unidadeService.buscarResponsaveisUnidades(List.of(9999L));
             assertTrue(res.isEmpty());
         }
 

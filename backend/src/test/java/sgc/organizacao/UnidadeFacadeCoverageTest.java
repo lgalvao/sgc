@@ -28,7 +28,7 @@ import sgc.comum.erros.ErroValidacao;
 
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
-import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.TipoUnidade;
@@ -196,11 +196,11 @@ class UnidadeFacadeCoverageTest {
     @Test
     @DisplayName("Deve buscar responsáveis de múltiplas unidades")
     void deveBuscarResponsaveisMultiplasUnidades() {
-        ResponsavelDto dto = new ResponsavelDto(1L, "T", "Nome", null, null);
+        UnidadeResponsavelDto dto = new UnidadeResponsavelDto(1L, "T", "Nome", null, null);
         when(unidadeResponsavelService.buscarResponsaveisUnidades(List.of(1L)))
                 .thenReturn(Map.of(1L, dto));
 
-        Map<Long, ResponsavelDto> map = unidadeFacade.buscarResponsaveisUnidades(List.of(1L));
+        Map<Long, UnidadeResponsavelDto> map = unidadeFacade.buscarResponsaveisUnidades(List.of(1L));
         assertThat(map).containsKey(1L);
         verify(unidadeResponsavelService).buscarResponsaveisUnidades(List.of(1L));
     }
@@ -208,11 +208,11 @@ class UnidadeFacadeCoverageTest {
     @Test
     @DisplayName("Deve montar DTO com titular e substituto")
     void deveMontarDtoComTitularESubstituto() {
-        ResponsavelDto dto = new ResponsavelDto(1L, "T", "Titular", "S", "Substituto");
+        UnidadeResponsavelDto dto = new UnidadeResponsavelDto(1L, "T", "Titular", "S", "Substituto");
         when(unidadeResponsavelService.buscarResponsavelUnidade(1L))
                 .thenReturn(dto);
 
-        ResponsavelDto result = unidadeFacade.buscarResponsavelUnidade(1L);
+        UnidadeResponsavelDto result = unidadeFacade.buscarResponsavelUnidade(1L);
 
         assertThat(result.titularTitulo()).isEqualTo("T");
         assertThat(result.substitutoTitulo()).isEqualTo("S");

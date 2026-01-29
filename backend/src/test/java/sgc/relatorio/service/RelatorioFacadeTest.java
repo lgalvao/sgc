@@ -15,7 +15,7 @@ import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UnidadeFacade;
-import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.service.ProcessoFacade;
@@ -71,7 +71,7 @@ class RelatorioFacadeTest {
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(unidadeService.buscarResponsavelUnidade(1L)).thenReturn(ResponsavelDto.builder().titularNome("Resp").build());
+        when(unidadeService.buscarResponsavelUnidade(1L)).thenReturn(UnidadeResponsavelDto.builder().titularNome("Resp").build());
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);

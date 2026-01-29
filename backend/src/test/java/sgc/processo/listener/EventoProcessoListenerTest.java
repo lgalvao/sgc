@@ -12,7 +12,7 @@ import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
@@ -96,7 +96,7 @@ class EventoProcessoListenerTest {
         subprocesso.setUnidade(unidade);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
 
-        ResponsavelDto responsavel = ResponsavelDto.builder()
+        UnidadeResponsavelDto responsavel = UnidadeResponsavelDto.builder()
                 .unidadeCodigo(10L)
                 .titularTitulo("111")
                 .substitutoTitulo("222")
@@ -143,7 +143,7 @@ class EventoProcessoListenerTest {
         // Testa ErroEstadoImpossivel ao definir assunto no fluxo principal
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
-        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, ResponsavelDto.builder().titularTitulo("T").build()));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, UnidadeResponsavelDto.builder().titularTitulo("T").build()));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", UsuarioDto.builder().build()));
 
         listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
@@ -163,7 +163,7 @@ class EventoProcessoListenerTest {
         s.setUnidade(u);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
 
-        ResponsavelDto r = ResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").substitutoTitulo("S").build();
+        UnidadeResponsavelDto r = UnidadeResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").substitutoTitulo("S").build();
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r));
 
         UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("T").email("t@mail.com").build();
@@ -203,8 +203,8 @@ class EventoProcessoListenerTest {
         processo.setParticipantes(Set.of(operacional, intermediaria));
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
-                1L, ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
-                2L, ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build()
+                1L, UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
+                2L, UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build()
         ));
 
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
@@ -226,9 +226,9 @@ class EventoProcessoListenerTest {
         processo.setParticipantes(Set.of(operacional, intermediaria, sub));
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
-                1L, ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
-                2L, ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build(),
-                21L, ResponsavelDto.builder().unidadeCodigo(21L).titularTitulo("TS").build()
+                1L, UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
+                2L, UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build(),
+                21L, UnidadeResponsavelDto.builder().unidadeCodigo(21L).titularTitulo("TS").build()
         ));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
                 "T1", UsuarioDto.builder().email("op@mail.com").build(),
@@ -254,7 +254,7 @@ class EventoProcessoListenerTest {
 
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
 
-        ResponsavelDto r = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T").build();
+        UnidadeResponsavelDto r = UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T").build();
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", UsuarioDto.builder().email("t@mail.com").build()));
 
@@ -276,7 +276,7 @@ class EventoProcessoListenerTest {
         processo.setParticipantes(Set.of(raiz));
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
-                1L, ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build()
+                1L, UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build()
         ));
 
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
@@ -325,7 +325,7 @@ class EventoProcessoListenerTest {
         s.setUnidade(u);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
 
-        ResponsavelDto r = ResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").build();
+        UnidadeResponsavelDto r = UnidadeResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").build();
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r));
 
         // Quando buscar usuário por titulo retornar null, o try interno vai estourar NPE
@@ -353,7 +353,7 @@ class EventoProcessoListenerTest {
 
         // u1 sem responsável no mapa
         // u2 com responsável mas sem titularTitulo
-        ResponsavelDto r2 = ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo(null).build();
+        UnidadeResponsavelDto r2 = UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo(null).build();
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(2L, r2));
 
@@ -377,8 +377,8 @@ class EventoProcessoListenerTest {
 
         processo.setParticipantes(Set.of(u1, u2));
 
-        ResponsavelDto r1 = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
-        ResponsavelDto r2 = ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build();
+        UnidadeResponsavelDto r1 = UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
+        UnidadeResponsavelDto r2 = UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build();
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1, 2L, r2));
 
@@ -437,9 +437,9 @@ class EventoProcessoListenerTest {
 
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1, s2, s3));
 
-        ResponsavelDto r1 = ResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
-        ResponsavelDto r2 = ResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build();
-        ResponsavelDto r3 = ResponsavelDto.builder().unidadeCodigo(3L).titularTitulo("T3").build();
+        UnidadeResponsavelDto r1 = UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
+        UnidadeResponsavelDto r2 = UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build();
+        UnidadeResponsavelDto r3 = UnidadeResponsavelDto.builder().unidadeCodigo(3L).titularTitulo("T3").build();
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1, 2L, r2, 3L, r3));
 
