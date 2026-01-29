@@ -1,9 +1,0 @@
-{
-  "sonarlint.rules": {
-    "java:S1144": {
-      "level": "off"
-    }
-  },
-  "sonarlint.pathToCompileCommands": null,
-  "sonarlint.connectedMode.project": null
-}
