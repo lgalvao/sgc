@@ -13,9 +13,6 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
-import sgc.organizacao.model.AdministradorRepo;
-import sgc.organizacao.service.UnidadeRepositoryService;
-import sgc.organizacao.service.UsuarioRepositoryService;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,13 +31,16 @@ class UsuarioServiceUnitTest {
     private UsuarioFacade service;
     
     @Mock
-    private UsuarioRepositoryService usuarioRepositoryService;
+    private UsuarioRepo usuarioRepo;
+    
+    @Mock
+    private UsuarioPerfilRepo usuarioPerfilRepo;
     
     @Mock
     private AdministradorRepo administradorRepo;
     
     @Mock
-    private UnidadeRepositoryService unidadeRepositoryService;
+    private UnidadeRepo unidadeRepo;
 
     // ========== MÉTODOS DE BUSCA E MAPEAMENTO ==========
 
@@ -51,7 +51,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar nulo se usuário não encontrado ao carregar para autenticação")
         void deveRetornarNuloQuandoUsuarioNaoEncontrado() {
-            when(usuarioRepositoryService.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
+            when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
 
             assertThat(service.carregarUsuarioParaAutenticacao("user")).isNull();
         }
@@ -61,8 +61,8 @@ class UsuarioServiceUnitTest {
         void deveCarregarAtribuicoesQuandoEncontrado() {
             Usuario usuario = mock(Usuario.class);
             when(usuario.getTituloEleitoral()).thenReturn("user");
-            when(usuarioRepositoryService.findByIdWithAtribuicoes("user")).thenReturn(Optional.of(usuario));
-            when(usuarioRepositoryService.findByUsuarioTitulo("user")).thenReturn(Collections.emptyList());
+            when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.of(usuario));
+            when(usuarioPerfilRepo.findByUsuarioTitulo("user")).thenReturn(Collections.emptyList());
 
             Usuario result = service.carregarUsuarioParaAutenticacao("user");
 
@@ -79,7 +79,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar empty se usuário não encontrado por título")
         void deveRetornarEmptyQuandoNaoEncontradoPorTitulo() {
-            when(usuarioRepositoryService.findById("user")).thenReturn(Optional.empty());
+            when(usuarioRepo.findById("user")).thenReturn(Optional.empty());
 
             assertThat(service.buscarUsuarioPorTitulo("user")).isEmpty();
         }
@@ -92,7 +92,7 @@ class UsuarioServiceUnitTest {
             Unidade lotacao = Unidade.builder().build();
             lotacao.setCodigo(1L);
             u.setUnidadeLotacao(lotacao);
-            when(usuarioRepositoryService.findById("user")).thenReturn(Optional.of(u));
+            when(usuarioRepo.findById("user")).thenReturn(Optional.of(u));
 
             Optional<UsuarioDto> res = service.buscarUsuarioPorTitulo("user");
 
@@ -103,7 +103,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar lista vazia se não há usuários na unidade")
         void deveRetornarListaVaziaSeNaoHaUsuariosNaUnidade() {
-            when(usuarioRepositoryService.findByUnidadeLotacaoCodigo(1L)).thenReturn(Collections.emptyList());
+            when(usuarioRepo.findByUnidadeLotacaoCodigo(1L)).thenReturn(Collections.emptyList());
 
             assertThat(service.buscarUsuariosPorUnidade(1L)).isEmpty();
         }
@@ -111,7 +111,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve lançar erro se usuário não encontrado por ID")
         void deveLancarErroSeUsuarioNaoEncontradoPorId() {
-            when(usuarioRepositoryService.buscarPorId("user")).thenThrow(new ErroEntidadeNaoEncontrada("Usuario", "user"));
+            when(usuarioRepo.findById("user")).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> service.buscarPorId("user"))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -120,7 +120,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve lançar erro se usuário não encontrado por login")
         void deveLancarErroSeUsuarioNaoEncontradoPorLogin() {
-            when(usuarioRepositoryService.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
+            when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> service.buscarPorLogin("user"))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -131,8 +131,8 @@ class UsuarioServiceUnitTest {
         void deveBuscarUsuarioPorLoginComSucesso() {
             Usuario u = new Usuario();
             u.setTituloEleitoral("user");
-            when(usuarioRepositoryService.findByIdWithAtribuicoes("user")).thenReturn(Optional.of(u));
-            when(usuarioRepositoryService.findByUsuarioTitulo("user")).thenReturn(Collections.emptyList());
+            when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.of(u));
+            when(usuarioPerfilRepo.findByUsuarioTitulo("user")).thenReturn(Collections.emptyList());
 
             Usuario res = service.buscarPorLogin("user");
 
@@ -142,7 +142,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar empty se usuário não encontrado por email")
         void deveRetornarEmptySeUsuarioNaoEncontradoPorEmail() {
-            when(usuarioRepositoryService.findByEmail("email")).thenReturn(Optional.empty());
+            when(usuarioRepo.findByEmail("email")).thenReturn(Optional.empty());
 
             assertThat(service.buscarUsuarioPorEmail("email")).isEmpty();
         }
@@ -150,7 +150,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar lista vazia se não há usuários ativos")
         void deveRetornarListaVaziaSeNaoHaUsuariosAtivos() {
-            when(usuarioRepositoryService.findAll()).thenReturn(Collections.emptyList());
+            when(usuarioRepo.findAll()).thenReturn(Collections.emptyList());
 
             assertThat(service.buscarUsuariosAtivos()).isEmpty();
         }
@@ -163,7 +163,7 @@ class UsuarioServiceUnitTest {
             Unidade lotacao = new Unidade();
             lotacao.setCodigo(1L);
             u.setUnidadeLotacao(lotacao);
-            when(usuarioRepositoryService.findAllById(anyList())).thenReturn(List.of(u));
+            when(usuarioRepo.findAllById(anyList())).thenReturn(List.of(u));
 
             var map = service.buscarUsuariosPorTitulos(List.of("u"));
 
@@ -173,7 +173,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar lista vazia se usuário não encontrado ao buscar unidades onde é responsável")
         void deveRetornarListaVaziaSeUsuarioNaoEncontradoAoBuscarUnidadesOndeEhResponsavel() {
-            when(usuarioRepositoryService.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
+            when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
 
             assertThat(service.buscarUnidadesOndeEhResponsavel("user")).isEmpty();
         }
@@ -181,7 +181,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar lista vazia se usuário não encontrado ao buscar unidades por perfil")
         void deveRetornarListaVaziaSeUsuarioNaoEncontradoAoBuscarUnidadesPorPerfil() {
-            when(usuarioRepositoryService.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
+            when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
 
             assertThat(service.buscarUnidadesPorPerfil("user", String.valueOf(Perfil.GESTOR))).isEmpty();
         }
@@ -189,7 +189,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar false se usuário não encontrado ao verificar perfil")
         void deveRetornarFalseSeUsuarioNaoEncontradoAoVerificarPerfil() {
-            when(usuarioRepositoryService.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
+            when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
 
             assertThat(service.usuarioTemPerfil("user", String.valueOf(Perfil.GESTOR), 1L)).isFalse();
         }
@@ -197,7 +197,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar empty se usuário não encontrado ao buscar perfis")
         void deveRetornarEmptySeUsuarioNaoEncontradoAoBuscarPerfis() {
-            when(usuarioRepositoryService.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
+            when(usuarioRepo.findByIdWithAtribuicoes("user")).thenReturn(Optional.empty());
 
             assertThat(service.buscarPerfisUsuario("user")).isEmpty();
         }
@@ -215,7 +215,7 @@ class UsuarioServiceUnitTest {
         void deveIgnorarAdministradoresInexistentesAoListar() {
             Administrador admin = Administrador.builder().usuarioTitulo("user").build();
             when(administradorRepo.findAll()).thenReturn(List.of(admin));
-            when(usuarioRepositoryService.findById("user")).thenReturn(Optional.empty());
+            when(usuarioRepo.findById("user")).thenReturn(Optional.empty());
 
             assertThat(service.listarAdministradores()).isEmpty();
         }
@@ -225,7 +225,7 @@ class UsuarioServiceUnitTest {
         void deveLancarErroAoAdicionarAdministradorQueJaExiste() {
             Usuario u = new Usuario();
             u.setTituloEleitoral("user");
-            when(usuarioRepositoryService.buscarPorId("user")).thenReturn(u);
+            when(usuarioRepo.findById("user")).thenReturn(Optional.of(u));
             when(administradorRepo.existsById("user")).thenReturn(true);
 
             assertThatThrownBy(() -> service.adicionarAdministrador("user"))
@@ -241,7 +241,7 @@ class UsuarioServiceUnitTest {
             unidade.setCodigo(1L);
             u.setUnidadeLotacao(unidade);
 
-            when(usuarioRepositoryService.buscarPorId("user")).thenReturn(u);
+            when(usuarioRepo.findById("user")).thenReturn(Optional.of(u));
             when(administradorRepo.existsById("user")).thenReturn(false);
 
             service.adicionarAdministrador("user");

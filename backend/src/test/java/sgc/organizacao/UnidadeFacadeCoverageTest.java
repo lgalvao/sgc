@@ -35,7 +35,9 @@ import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapaRepo;
 import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
+import sgc.organizacao.mapper.UsuarioMapper;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -52,11 +54,13 @@ class UnidadeFacadeCoverageTest {
     @Mock
     private UnidadeResponsavelService unidadeResponsavelService;
     @Mock
-    private UnidadeRepositoryService unidadeRepositoryService;
+    private UnidadeRepo unidadeRepo;
     @Mock
     private UnidadeMapaRepo unidadeMapaRepo;
     @Mock
-    private UsuarioRepositoryService usuarioRepositoryService;
+    private UsuarioRepo usuarioRepo;
+    @Mock
+    private UsuarioMapper usuarioMapper;
 
     @Captor
     private ArgumentCaptor<Function<Unidade, Boolean>> functionCaptor;
@@ -270,7 +274,7 @@ class UnidadeFacadeCoverageTest {
         u.setCodigo(1L);
         u.setSituacao(SituacaoUnidade.INATIVA);
 
-        when(unidadeRepositoryService.buscarPorId(1L)).thenReturn(u);
+        when(unidadeRepo.findById(1L)).thenReturn(Optional.of(u));
 
         assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarEntidadePorId(1L)));
     }
