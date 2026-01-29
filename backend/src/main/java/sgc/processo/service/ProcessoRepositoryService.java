@@ -60,7 +60,7 @@ public class ProcessoRepositoryService {
 
     @Transactional(readOnly = true)
     public List<Processo> findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso situacao) {
-        return processoRepo.findBySituacaoOrderByDataFinalizacaoDesc(situacao);
+        return processoRepo.listarPorSituacaoComParticipantes(situacao);
     }
 
     @Transactional(readOnly = true)
