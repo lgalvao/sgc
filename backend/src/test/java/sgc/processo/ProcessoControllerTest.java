@@ -180,6 +180,27 @@ class ProcessoControllerTest {
                                     .content(objectMapper.writeValueAsString(req)))
                     .andExpect(status().isBadRequest());
         }
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve retornar 400 Bad Request quando descrição excede o limite")
+        void deveRetornarBadRequestQuandoDescricaoExcedeLimite() throws Exception {
+            // Arrange
+            var req =
+                    new CriarProcessoRequest(
+                            "a".repeat(256),
+                            TipoProcesso.MAPEAMENTO,
+                            LocalDateTime.now().plusDays(30),
+                            List.of(1L));
+
+            // Act & Assert
+            mockMvc.perform(
+                            post(API_PROCESSOS)
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(req)))
+                    .andExpect(status().isBadRequest());
+        }
     }
 
     @Nested

@@ -204,7 +204,7 @@ public class ProcessoFacade {
 
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarFinalizados() {
-        return processoRepo.findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso.FINALIZADO).stream()
+        return processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO).stream()
                 .map(processoMapper::toDto)
                 .toList();
     }

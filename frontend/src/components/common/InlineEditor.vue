@@ -123,11 +123,15 @@ function cancel() {
 
 <style scoped>
 .fade-controls {
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.2s;
 }
 
 @media (hover: hover) {
+  .fade-controls {
+    opacity: 0;
+  }
+
   .d-flex:hover > .fade-controls,
   .d-flex:focus-within > .fade-controls {
     opacity: 1;
