@@ -25,7 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.RepositorioComum;
+
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.ResponsavelDto;
@@ -33,11 +33,9 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeMapaRepo;
+
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.UnidadeHierarquiaService;
-import sgc.organizacao.service.UnidadeMapaService;
-import sgc.organizacao.service.UnidadeResponsavelService;
+import sgc.organizacao.service.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -54,9 +52,11 @@ class UnidadeFacadeCoverageTest {
     @Mock
     private UnidadeResponsavelService unidadeResponsavelService;
     @Mock
-    private RepositorioComum repo;
+    private UnidadeRepositoryService unidadeRepositoryService;
     @Mock
-    private UnidadeMapaRepo unidadeMapaRepo;
+    private UnidadeMapaRepositoryService unidadeMapaRepositoryService;
+    @Mock
+    private UsuarioRepositoryService usuarioRepositoryService;
 
     @Captor
     private ArgumentCaptor<Function<Unidade, Boolean>> functionCaptor;
@@ -163,7 +163,7 @@ class UnidadeFacadeCoverageTest {
         dtoRaiz.setCodigo(1L);
         dtoRaiz.setSubunidades(new ArrayList<>());
 
-        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L));
+        when(unidadeMapaRepositoryService.findAllUnidadeCodigos()).thenReturn(List.of(1L));
         when(unidadeHierarquiaService.buscarArvoreComElegibilidade(any()))
                 .thenReturn(List.of(dtoRaiz));
 
@@ -252,7 +252,7 @@ class UnidadeFacadeCoverageTest {
         dto3.setCodigo(3L);
         dto3.setSubunidades(new ArrayList<>());
 
-        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(3L));
+        when(unidadeMapaRepositoryService.findAllUnidadeCodigos()).thenReturn(List.of(3L));
         when(unidadeHierarquiaService.buscarArvoreComElegibilidade(any()))
                 .thenReturn(List.of(dto1, dto2, dto3));
 
@@ -270,7 +270,7 @@ class UnidadeFacadeCoverageTest {
         u.setCodigo(1L);
         u.setSituacao(SituacaoUnidade.INATIVA);
 
-        when(repo.buscar(Unidade.class, 1L)).thenReturn(u);
+        when(unidadeRepositoryService.buscarPorId(1L)).thenReturn(u);
 
         assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarEntidadePorId(1L)));
     }
@@ -279,7 +279,7 @@ class UnidadeFacadeCoverageTest {
     @DisplayName("Deve filtrar unidades na árvore com elegibilidade corretamente")
     void deveFiltrarUnidadesNaArvoreComElegibilidade() {
         // Setup
-        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(10L, 20L));
+        when(unidadeMapaRepositoryService.findAllUnidadeCodigos()).thenReturn(List.of(10L, 20L));
 
         // Execute method to trigger lambda creation
         unidadeFacade.buscarArvoreComElegibilidade(true, Set.of(30L));
@@ -343,16 +343,9 @@ class UnidadeFacadeCoverageTest {
         unidadeFacade.buscarArvoreComElegibilidade(false, Collections.emptySet());
 
         // Verify that findAllUnidadeCodigos was NOT called
-        verify(unidadeMapaRepo, never()).findAllUnidadeCodigos();
+        verify(unidadeMapaRepositoryService, never()).findAllUnidadeCodigos();
         verify(unidadeHierarquiaService).buscarArvoreComElegibilidade(any());
     }
 
-    @Test
-    @DisplayName("Deve verificar existência de mapa vigente (método legado)")
-    @SuppressWarnings("deprecation")
-    void deveVerificarExistenciaMapaVigenteLegado() {
-        when(unidadeMapaService.verificarMapaVigente(1L)).thenReturn(true);
-        assertThat(unidadeFacade.verificarExistenciaMapaVigente(1L)).isTrue();
-        verify(unidadeMapaService).verificarMapaVigente(1L);
-    }
+
 }

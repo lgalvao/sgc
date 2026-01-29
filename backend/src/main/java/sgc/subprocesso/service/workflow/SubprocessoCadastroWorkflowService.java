@@ -298,7 +298,7 @@ public class SubprocessoCadastroWorkflowService {
         accessControlService.verificarPermissao(usuario, HOMOLOGAR_REVISAO_CADASTRO, sp);
 
         var impactos = impactoMapaService.verificarImpactos(sp, usuario);
-        if (impactos.isTemImpactos()) {
+        if (impactos.temImpactos()) {
             Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
             sp.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
             subprocessoRepo.save(sp);

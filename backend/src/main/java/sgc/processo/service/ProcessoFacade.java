@@ -7,7 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
@@ -20,7 +20,7 @@ import sgc.processo.eventos.EventoProcessoCriado;
 import sgc.processo.eventos.EventoProcessoExcluido;
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
+
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
@@ -43,7 +43,7 @@ import static sgc.processo.model.TipoProcesso.REVISAO;
 @Slf4j
 @RequiredArgsConstructor
 public class ProcessoFacade {
-    private final ProcessoRepo processoRepo;
+    private final ProcessoRepositoryService processoRepositoryService;
     private final UnidadeFacade unidadeService;
     private final SubprocessoFacade subprocessoFacade;
     private final ApplicationEventPublisher publicadorEventos;
@@ -96,7 +96,7 @@ public class ProcessoFacade {
                 .setDataCriacao(LocalDateTime.now())
                 .setParticipantes(participantes);
 
-        Processo processoSalvo = processoRepo.saveAndFlush(processo);
+        Processo processoSalvo = processoRepositoryService.salvarEFlush(processo);
 
         publicadorEventos.publishEvent(new EventoProcessoCriado(this, processoSalvo.getCodigo()));
         log.info("Processo {} criado.", processoSalvo.getCodigo());
@@ -107,8 +107,7 @@ public class ProcessoFacade {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public ProcessoDto atualizar(Long codigo, AtualizarProcessoRequest requisicao) {
-        Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_PROCESSO, codigo));
+        Processo processo = processoRepositoryService.buscarPorId(codigo);
 
         if (processo.getSituacao() != CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser editados.");
@@ -151,7 +150,7 @@ public class ProcessoFacade {
 
         processo.setParticipantes(participantes);
 
-        Processo processoAtualizado = processoRepo.saveAndFlush(processo);
+        Processo processoAtualizado = processoRepositoryService.salvarEFlush(processo);
         log.info("Processo {} atualizado.", codigo);
 
         // Publica evento de atualização
@@ -172,8 +171,7 @@ public class ProcessoFacade {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void apagar(Long codigo) {
-        Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_PROCESSO, codigo));
+        Processo processo = processoRepositoryService.buscarPorId(codigo);
 
         if (processo.getSituacao() != CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser removidos.");
@@ -193,19 +191,18 @@ public class ProcessoFacade {
         publicadorEventos.publishEvent(evento);
         log.debug("Evento EventoProcessoExcluido publicado para processo {}", codigo);
 
-        processoRepo.deleteById(codigo);
+        processoRepositoryService.excluir(codigo);
         log.info("Processo {} removido.", codigo);
     }
 
     @Transactional(readOnly = true)
     public Optional<ProcessoDto> obterPorId(Long codigo) {
-        return processoRepo.findById(codigo).map(processoMapper::toDto);
+        return processoRepositoryService.findById(codigo).map(processoMapper::toDto);
     }
 
     @Transactional(readOnly = true)
     public Processo buscarEntidadePorId(Long codigo) {
-        return processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_PROCESSO, codigo));
+        return processoRepositoryService.buscarPorId(codigo);
     }
 
     @Transactional(readOnly = true)
@@ -223,34 +220,33 @@ public class ProcessoFacade {
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codProcesso)")
     public ProcessoDetalheDto obterDetalhes(Long codProcesso) {
-        Processo processo = processoRepo.findById(codProcesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_PROCESSO, codProcesso));
+        Processo processo = processoRepositoryService.buscarPorId(codProcesso);
 
         return processoDetalheBuilder.build(processo);
     }
 
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarFinalizados() {
-        return processoRepo.findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso.FINALIZADO).stream()
+        return processoRepositoryService.findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso.FINALIZADO).stream()
                 .map(processoMapper::toDto)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarAtivos() {
-        return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).stream()
+        return processoRepositoryService.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).stream()
                 .map(processoMapper::toDto)
                 .toList();
     }
 
     public org.springframework.data.domain.Page<Processo> listarTodos(
             org.springframework.data.domain.Pageable pageable) {
-        return processoRepo.findAll(pageable);
+        return processoRepositoryService.findAll(pageable);
     }
 
     public org.springframework.data.domain.Page<Processo> listarPorParticipantesIgnorandoCriado(
             List<Long> unidadeIds, org.springframework.data.domain.Pageable pageable) {
-        return processoRepo.findDistinctByParticipantes_CodigoInAndSituacaoNot(
+        return processoRepositoryService.listarPorParticipantesIgnorandoSituacao(
                 unidadeIds, CRIADO, pageable);
     }
 

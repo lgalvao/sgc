@@ -21,6 +21,8 @@ class ProcessoFacadeSecurityTest {
     // Specialized services
     @Mock
     private ProcessoAcessoService processoAcessoService;
+    @Mock
+    private ProcessoRepositoryService processoRepositoryService;
 
     @InjectMocks
     private ProcessoFacade processoFacade;

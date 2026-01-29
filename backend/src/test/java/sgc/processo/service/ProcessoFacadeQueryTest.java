@@ -16,7 +16,6 @@ import sgc.processo.dto.ProcessoDto;
 import sgc.processo.dto.SubprocessoElegivelDto;
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
@@ -36,7 +35,7 @@ import static org.mockito.Mockito.*;
 @DisplayName("ProcessoFacade - Consultas e Detalhes")
 class ProcessoFacadeQueryTest {
     @Mock
-    private ProcessoRepo processoRepo;
+    private ProcessoRepositoryService processoRepositoryService;
     @Mock
     private SubprocessoFacade subprocessoFacade;
     @Mock
@@ -69,7 +68,7 @@ class ProcessoFacadeQueryTest {
             // Arrange
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoRepositoryService.buscarPorId(id)).thenReturn(processo);
             when(processoDetalheBuilder.build(processo)).thenReturn(new ProcessoDetalheDto());
 
             // Act
@@ -82,7 +81,7 @@ class ProcessoFacadeQueryTest {
         @Test
         @DisplayName("Deve falhar ao obter detalhes de processo inexistente")
         void deveFalharAoObterDetalhesProcessoInexistente() {
-            when(processoRepo.findById(999L)).thenReturn(Optional.empty());
+            when(processoRepositoryService.buscarPorId(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 999L));
             assertThatThrownBy(() -> processoFacade.obterDetalhes(999L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
@@ -92,7 +91,7 @@ class ProcessoFacadeQueryTest {
         void deveBuscarEntidadePorId() {
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoRepositoryService.buscarPorId(id)).thenReturn(processo);
 
             Processo res = processoFacade.buscarEntidadePorId(id);
             assertThat(res).isEqualTo(processo);
@@ -101,7 +100,7 @@ class ProcessoFacadeQueryTest {
         @Test
         @DisplayName("Deve falhar buscar entidade inexistente")
         void deveFalharBuscarEntidadeInexistente() {
-            when(processoRepo.findById(999L)).thenReturn(Optional.empty());
+            when(processoRepositoryService.buscarPorId(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 999L));
             assertThatThrownBy(() -> processoFacade.buscarEntidadePorId(999L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
@@ -111,7 +110,7 @@ class ProcessoFacadeQueryTest {
         void deveObterPorIdOptional() {
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoRepositoryService.findById(id)).thenReturn(Optional.of(processo));
             when(processoMapper.toDto(processo)).thenReturn(ProcessoDto.builder().build());
 
             Optional<ProcessoDto> res = processoFacade.obterPorId(id);
@@ -122,9 +121,9 @@ class ProcessoFacadeQueryTest {
         @DisplayName("Deve listar processos finalizados e ativos")
         void deveListarProcessosFinalizadosEAtivos() {
             // Arrange
-            when(processoRepo.findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso.FINALIZADO))
+            when(processoRepositoryService.findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso.FINALIZADO))
                     .thenReturn(List.of(ProcessoFixture.processoPadrao()));
-            when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO))
+            when(processoRepositoryService.findBySituacao(SituacaoProcesso.EM_ANDAMENTO))
                     .thenReturn(List.of(ProcessoFixture.processoPadrao()));
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
@@ -137,7 +136,7 @@ class ProcessoFacadeQueryTest {
         @DisplayName("Deve listar todos com paginação")
         void deveListarTodosPaginado() {
             org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.Pageable.unpaged();
-            when(processoRepo.findAll(pageable)).thenReturn(org.springframework.data.domain.Page.empty());
+            when(processoRepositoryService.findAll(pageable)).thenReturn(org.springframework.data.domain.Page.empty());
 
             var res = processoFacade.listarTodos(pageable);
             assertThat(res).isEmpty();
@@ -225,7 +224,7 @@ class ProcessoFacadeQueryTest {
         @DisplayName("Listar por participantes ignorando criado")
         void listarPorParticipantesIgnorandoCriado() {
             processoFacade.listarPorParticipantesIgnorandoCriado(List.of(1L), null);
-            verify(processoRepo).findDistinctByParticipantes_CodigoInAndSituacaoNot(anyList(),
+            verify(processoRepositoryService).listarPorParticipantesIgnorandoSituacao(anyList(),
                     eq(SituacaoProcesso.CRIADO), any());
         }
 
@@ -248,7 +247,7 @@ class ProcessoFacadeQueryTest {
             Processo processo = ProcessoFixture.processoPadrao();
             ProcessoDetalheDto detalhes = new ProcessoDetalheDto();
 
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoRepositoryService.buscarPorId(id)).thenReturn(processo);
             when(processoDetalheBuilder.build(processo)).thenReturn(detalhes);
             when(processoConsultaService.listarSubprocessosElegiveis(id))
                     .thenReturn(List.of());
@@ -267,7 +266,7 @@ class ProcessoFacadeQueryTest {
         void obterContextoCompleto_Sucesso() {
             Processo p = new Processo();
             p.setCodigo(1L);
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+            when(processoRepositoryService.buscarPorId(1L)).thenReturn(p);
             when(processoDetalheBuilder.build(p)).thenReturn(ProcessoDetalheDto.builder().build());
 
             assertThat(processoFacade.obterDetalhes(1L)).isNotNull();

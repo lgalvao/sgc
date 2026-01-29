@@ -11,12 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.RepositorioComum;
+
 import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.AdministradorRepositoryService;
+import sgc.organizacao.service.UnidadeRepositoryService;
+import sgc.organizacao.service.UsuarioRepositoryService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,15 +31,14 @@ import static java.util.stream.Collectors.toMap;
 @RequiredArgsConstructor
 public class UsuarioFacade {
     private static final String ENTIDADE_USUARIO = "Usuário";
-    private final UsuarioRepo usuarioRepo;
-    private final UsuarioPerfilRepo usuarioPerfilRepo;
-    private final AdministradorRepo administradorRepo;
-    private final RepositorioComum repo;
-    private final UnidadeRepo unidadeRepo;
+    private final UsuarioRepositoryService usuarioRepositoryService;
+    private final AdministradorRepositoryService administradorRepositoryService;
+    private final UnidadeRepositoryService unidadeRepositoryService;
+
 
     @Transactional(readOnly = true)
     public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
-        Usuario usuario = usuarioRepo.findByIdWithAtribuicoes(titulo).orElse(null);
+        Usuario usuario = usuarioRepositoryService.findByIdWithAtribuicoes(titulo).orElse(null);
         if (usuario != null) {
             carregarAtribuicoes(usuario);
             usuario.getAuthorities();
@@ -45,18 +47,18 @@ public class UsuarioFacade {
     }
 
     public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
-        return usuarioRepo.findById(titulo).map(this::toUsuarioDto);
+        return usuarioRepositoryService.findById(titulo).map(this::toUsuarioDto);
     }
 
     public List<UsuarioDto> buscarUsuariosPorUnidade(Long codigoUnidade) {
-        return usuarioRepo.findByUnidadeLotacaoCodigo(codigoUnidade).stream()
+        return usuarioRepositoryService.findByUnidadeLotacaoCodigo(codigoUnidade).stream()
                 .map(this::toUsuarioDto)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public Usuario buscarPorId(String titulo) {
-        return repo.buscar(Usuario.class, titulo);
+        return usuarioRepositoryService.buscarPorId(titulo);
     }
 
     @Transactional(readOnly = true)
@@ -65,7 +67,7 @@ public class UsuarioFacade {
     }
 
     private Usuario buscarPorLoginInterno(String login) {
-        Usuario usuario = usuarioRepo
+        Usuario usuario = usuarioRepositoryService
                 .findByIdWithAtribuicoes(login)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, login));
 
@@ -97,14 +99,14 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String sigla) {
-        Unidade unidade = unidadeRepo.findBySigla(sigla)
+        Unidade unidade = unidadeRepositoryService.findBySigla(sigla)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", sigla));
 
-        Usuario usuarioSimples = usuarioRepo
+        Usuario usuarioSimples = usuarioRepositoryService
                 .chefePorCodUnidade(unidade.getCodigo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Responsável da unidade", sigla));
 
-        Usuario usuarioCompleto = usuarioRepo.findByIdWithAtribuicoes(usuarioSimples.getTituloEleitoral())
+        Usuario usuarioCompleto = usuarioRepositoryService.findByIdWithAtribuicoes(usuarioSimples.getTituloEleitoral())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, usuarioSimples.getTituloEleitoral()));
 
         carregarAtribuicoes(usuarioCompleto);
@@ -113,7 +115,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
-        return usuarioRepo.findByIdWithAtribuicoes(titulo)
+        return usuarioRepositoryService.findByIdWithAtribuicoes(titulo)
                 .map(usuario -> {
                     carregarAtribuicoes(usuario);
                     return usuario.getTodasAtribuicoes().stream()
@@ -125,7 +127,7 @@ public class UsuarioFacade {
     }
 
     private void carregarAtribuicoes(Usuario usuario) {
-        var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral());
+        var atribuicoes = usuarioRepositoryService.findByUsuarioTitulo(usuario.getTituloEleitoral());
         usuario.setAtribuicoes(new HashSet<>(atribuicoes));
     }
 
@@ -136,7 +138,7 @@ public class UsuarioFacade {
                 .map(Usuario::getTituloEleitoral)
                 .toList();
 
-        List<UsuarioPerfil> todasAtribuicoes = usuarioPerfilRepo.findByUsuarioTituloIn(titulos);
+        List<UsuarioPerfil> todasAtribuicoes = usuarioRepositoryService.findByUsuarioTituloIn(titulos);
 
         Map<String, Set<UsuarioPerfil>> atribuicoesPorUsuario = todasAtribuicoes.stream()
                 .collect(Collectors.groupingBy(UsuarioPerfil::getUsuarioTitulo, Collectors.toSet()));
@@ -149,16 +151,16 @@ public class UsuarioFacade {
     }
 
     public Optional<UsuarioDto> buscarUsuarioPorEmail(String email) {
-        return usuarioRepo.findByEmail(email).map(this::toUsuarioDto);
+        return usuarioRepositoryService.findByEmail(email).map(this::toUsuarioDto);
     }
 
     public List<UsuarioDto> buscarUsuariosAtivos() {
-        return usuarioRepo.findAll().stream().map(this::toUsuarioDto).toList();
+        return usuarioRepositoryService.findAll().stream().map(this::toUsuarioDto).toList();
     }
 
 
     public ResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
-        List<Usuario> chefes = usuarioRepo.findChefesByUnidadesCodigos(List.of(unidadeCodigo));
+        List<Usuario> chefes = usuarioRepositoryService.findChefesByUnidadesCodigos(List.of(unidadeCodigo));
         if (chefes.isEmpty()) {
             throw new ErroEntidadeNaoEncontrada("Responsável da unidade", unidadeCodigo);
         }
@@ -169,11 +171,11 @@ public class UsuarioFacade {
     public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         if (unidadesCodigos.isEmpty()) return Collections.emptyMap();
 
-        List<Usuario> todosChefes = usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos);
+        List<Usuario> todosChefes = usuarioRepositoryService.findChefesByUnidadesCodigos(unidadesCodigos);
         if (todosChefes.isEmpty()) return Collections.emptyMap();
 
         List<String> titulos = todosChefes.stream().map(Usuario::getTituloEleitoral).toList();
-        List<Usuario> chefesCompletos = usuarioRepo.findByIdInWithAtribuicoes(titulos);
+        List<Usuario> chefesCompletos = usuarioRepositoryService.findByIdInWithAtribuicoes(titulos);
         carregarAtribuicoesEmLote(chefesCompletos);
 
         Map<Long, List<Usuario>> chefesPorUnidade = chefesCompletos.stream()
@@ -191,13 +193,13 @@ public class UsuarioFacade {
     }
 
     public Map<String, UsuarioDto> buscarUsuariosPorTitulos(List<String> titulos) {
-        return usuarioRepo.findAllById(titulos).stream()
+        return usuarioRepositoryService.findAllById(titulos).stream()
                 .collect(toMap(Usuario::getTituloEleitoral, this::toUsuarioDto, (u1, u2) -> u1));
     }
 
     @Transactional(readOnly = true)
     public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
-        return usuarioRepo
+        return usuarioRepositoryService
                 .findByIdWithAtribuicoes(titulo)
                 .map(u -> {
                     carregarAtribuicoes(u);
@@ -212,7 +214,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public boolean usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo) {
-        return usuarioRepo
+        return usuarioRepositoryService
                 .findByIdWithAtribuicoes(titulo)
                 .map(u -> {
                     carregarAtribuicoes(u);
@@ -226,7 +228,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
-        return usuarioRepo
+        return usuarioRepositoryService
                 .findByIdWithAtribuicoes(titulo)
                 .map(u -> {
                     carregarAtribuicoes(u);
@@ -275,8 +277,8 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public List<AdministradorDto> listarAdministradores() {
-        return administradorRepo.findAll().stream()
-                .flatMap(admin -> usuarioRepo.findById(admin.getUsuarioTitulo())
+        return administradorRepositoryService.findAll().stream()
+                .flatMap(admin -> usuarioRepositoryService.findById(admin.getUsuarioTitulo())
                         .map(this::toAdministradorDto)
                         .stream())
                 .toList();
@@ -284,16 +286,16 @@ public class UsuarioFacade {
 
     @Transactional
     public AdministradorDto adicionarAdministrador(String usuarioTitulo) {
-        Usuario usuario = repo.buscar(Usuario.class, usuarioTitulo);
+        Usuario usuario = usuarioRepositoryService.buscarPorId(usuarioTitulo);
 
-        if (administradorRepo.existsById(usuarioTitulo)) {
+        if (administradorRepositoryService.existsById(usuarioTitulo)) {
             throw new ErroValidacao("Usuário já é administrador");
         }
 
         Administrador administrador = Administrador.builder()
                 .usuarioTitulo(usuarioTitulo)
                 .build();
-        administradorRepo.save(administrador);
+        administradorRepositoryService.salvar(administrador);
 
         log.info("Administrador {} adicionado", usuarioTitulo);
         return toAdministradorDto(usuario);
@@ -305,22 +307,22 @@ public class UsuarioFacade {
             throw new ErroValidacao("Não é permitido remover a si mesmo como administrador");
         }
 
-        if (!administradorRepo.existsById(usuarioTitulo)) {
+        if (!administradorRepositoryService.existsById(usuarioTitulo)) {
             throw new ErroValidacao("Usuário informado não é um administrador");
         }
 
-        long totalAdministradores = administradorRepo.count();
+        long totalAdministradores = administradorRepositoryService.count();
         if (totalAdministradores <= 1) {
             throw new ErroValidacao("Não é permitido remover o único administrador do sistema");
         }
 
-        administradorRepo.deleteById(usuarioTitulo);
+        administradorRepositoryService.deleteById(usuarioTitulo);
         log.info("Administrador {} removido com sucesso", usuarioTitulo);
     }
 
     @Transactional(readOnly = true)
     public boolean isAdministrador(String usuarioTitulo) {
-        return administradorRepo.existsById(usuarioTitulo);
+        return administradorRepositoryService.existsById(usuarioTitulo);
     }
 
     private AdministradorDto toAdministradorDto(Usuario usuario) {

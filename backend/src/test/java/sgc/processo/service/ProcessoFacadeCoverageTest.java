@@ -25,7 +25,6 @@ import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.eventos.EventoProcessoAtualizado;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 
@@ -33,7 +32,7 @@ import sgc.processo.model.TipoProcesso;
 @DisplayName("ProcessoFacadeCoverageTest")
 class ProcessoFacadeCoverageTest {
     @Mock
-    private ProcessoRepo processoRepo;
+    private ProcessoRepositoryService processoRepositoryService;
     @Mock
     private UnidadeFacade unidadeService;
     @Mock
@@ -79,7 +78,7 @@ class ProcessoFacadeCoverageTest {
         processo.setCodigo(codigo);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-        when(processoRepo.findById(codigo)).thenReturn(Optional.of(processo));
+        when(processoRepositoryService.buscarPorId(codigo)).thenReturn(processo);
 
         AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
                 .codigo(codigo)
@@ -103,7 +102,7 @@ class ProcessoFacadeCoverageTest {
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setDescricao("Desc");
 
-        when(processoRepo.findById(codigo)).thenReturn(Optional.of(processo));
+        when(processoRepositoryService.buscarPorId(codigo)).thenReturn(processo);
 
         AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
                 .codigo(codigo)
@@ -137,9 +136,9 @@ class ProcessoFacadeCoverageTest {
         unidade.setCodigo(codUnidade);
         processo.setParticipantes(Set.of(unidade));
 
-        when(processoRepo.findById(codigo)).thenReturn(Optional.of(processo));
+        when(processoRepositoryService.buscarPorId(codigo)).thenReturn(processo);
         when(unidadeService.buscarEntidadePorId(codUnidade)).thenReturn(unidade);
-        when(processoRepo.saveAndFlush(any())).thenReturn(processo);
+        when(processoRepositoryService.salvarEFlush(any())).thenReturn(processo);
 
         AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
                 .codigo(codigo)
@@ -165,7 +164,7 @@ class ProcessoFacadeCoverageTest {
         processo.setCodigo(codProcesso);
         processo.setParticipantes(Collections.emptySet());
 
-        when(processoRepo.findById(codProcesso)).thenReturn(Optional.of(processo));
+        when(processoRepositoryService.buscarPorId(codProcesso)).thenReturn(processo);
         when(unidadeService.buscarEntidadePorId(codUnidade)).thenReturn(new Unidade());
 
         var exception = assertThrows(ErroProcesso.class, () -> facade.enviarLembrete(codProcesso, codUnidade));

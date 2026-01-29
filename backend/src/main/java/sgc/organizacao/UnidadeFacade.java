@@ -4,21 +4,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.repo.RepositorioComum;
+
 import sgc.organizacao.dto.*;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.UnidadeHierarquiaService;
-import sgc.organizacao.service.UnidadeMapaService;
-import sgc.organizacao.service.UnidadeResponsavelService;
+import sgc.organizacao.service.*;
 
 import java.util.*;
 
 /**
  * Facade para operações de unidades organizacionais.
  *
- * <p>Este facade delega operações para serviços especializados seguindo o
- * Single Responsibility Principle (SRP):
+ * <p>Este facade delega operações para serviços especializados
  * <ul>
  *   <li>{@link UnidadeHierarquiaService} - Hierarquia e navegação</li>
  *   <li>{@link UnidadeMapaService} - Mapas vigentes</li>
@@ -30,18 +27,13 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class UnidadeFacade {
-    private final UnidadeRepo unidadeRepo;
-    private final sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo;
-    private final UsuarioRepo usuarioRepo;
+    private final UnidadeRepositoryService unidadeRepositoryService;
+    private final UnidadeMapaRepositoryService unidadeMapaRepositoryService;
+    private final UsuarioRepositoryService usuarioRepositoryService;
     private final UsuarioMapper usuarioMapper;
-    private final RepositorioComum repo;
-
-    // Serviços especializados (SRP)
     private final UnidadeHierarquiaService hierarquiaService;
     private final UnidadeMapaService mapaService;
     private final UnidadeResponsavelService responsavelService;
-
-    // ============ Métodos de Hierarquia (delegação para UnidadeHierarquiaService) ============
 
     public List<UnidadeDto> buscarArvoreHierarquica() {
         return hierarquiaService.buscarArvoreHierarquica();
@@ -54,7 +46,7 @@ public class UnidadeFacade {
     public List<UnidadeDto> buscarArvoreComElegibilidade(
             boolean requerMapaVigente, java.util.Set<Long> unidadesBloqueadas) {
         Set<Long> unidadesComMapa = requerMapaVigente
-                ? new HashSet<>(unidadeMapaRepo.findAllUnidadeCodigos())
+                ? new HashSet<>(unidadeMapaRepositoryService.findAllUnidadeCodigos())
                 : Collections.emptySet();
 
         return hierarquiaService.buscarArvoreComElegibilidade(u ->
@@ -84,29 +76,14 @@ public class UnidadeFacade {
         return hierarquiaService.buscarSubordinadas(codUnidade);
     }
 
-    // ============ Métodos de Mapa Vigente (delegação para UnidadeMapaService) ============
-
     public boolean verificarMapaVigente(Long codigoUnidade) {
         return mapaService.verificarMapaVigente(codigoUnidade);
-    }
-
-    /**
-     * Método legado mantido para compatibilidade com APIs antigas.
-     * Delega para {@link #verificarMapaVigente(Long)}.
-     *
-     * @deprecated Use {@link #verificarMapaVigente(Long)} em vez deste método.
-     */
-    @Deprecated(since = "2026-01")
-    public boolean verificarExistenciaMapaVigente(Long codigoUnidade) {
-        return verificarMapaVigente(codigoUnidade);
     }
 
     @Transactional
     public void definirMapaVigente(Long codigoUnidade, sgc.mapa.model.Mapa mapa) {
         mapaService.definirMapaVigente(codigoUnidade, mapa);
     }
-
-    // ============ Métodos de Responsáveis (delegação para UnidadeResponsavelService) ============
 
     public List<AtribuicaoTemporariaDto> buscarTodasAtribuicoes() {
         return responsavelService.buscarTodasAtribuicoes();
@@ -130,15 +107,13 @@ public class UnidadeFacade {
         return responsavelService.buscarResponsaveisUnidades(unidadesCodigos);
     }
 
-    // ============ Métodos Básicos de Consulta ============
-
     public UnidadeDto buscarPorSigla(String sigla) {
         Unidade unidade = buscarEntidadePorSigla(sigla);
         return usuarioMapper.toUnidadeDto(unidade, false);
     }
 
     public Unidade buscarEntidadePorSigla(String sigla) {
-        return unidadeRepo
+        return unidadeRepositoryService
                 .findBySigla(sigla)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com sigla " + sigla + " não encontrada"));
     }
@@ -149,7 +124,7 @@ public class UnidadeFacade {
     }
 
     public Unidade buscarEntidadePorId(Long codigo) {
-        Unidade unidade = repo.buscar(Unidade.class, codigo);
+        Unidade unidade = unidadeRepositoryService.buscarPorId(codigo);
         if (unidade.getSituacao() != SituacaoUnidade.ATIVA) {
             throw new ErroEntidadeNaoEncontrada("Unidade", codigo);
         }
@@ -157,19 +132,19 @@ public class UnidadeFacade {
     }
 
     public List<Unidade> buscarEntidadesPorIds(List<Long> codigos) {
-        return unidadeRepo.findAllById(codigos);
+        return unidadeRepositoryService.findAllById(codigos);
     }
 
     public List<Unidade> buscarTodasEntidadesComHierarquia() {
-        return unidadeRepo.findAllWithHierarquia();
+        return unidadeRepositoryService.findAllWithHierarquia();
     }
 
     public List<String> buscarSiglasPorIds(List<Long> codigos) {
-        return unidadeRepo.findSiglasByCodigos(codigos);
+        return unidadeRepositoryService.findSiglasByCodigos(codigos);
     }
 
     public List<UsuarioDto> buscarUsuariosPorUnidade(Long codigoUnidade) {
-        return usuarioRepo.findByUnidadeLotacaoCodigo(codigoUnidade).stream()
+        return usuarioRepositoryService.findByUnidadeLotacaoCodigo(codigoUnidade).stream()
                 .map(usuarioMapper::toUsuarioDto)
                 .toList();
     }

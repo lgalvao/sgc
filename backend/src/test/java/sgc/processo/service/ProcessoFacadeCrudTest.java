@@ -31,7 +31,6 @@ import sgc.processo.eventos.EventoProcessoAtualizado;
 import sgc.processo.eventos.EventoProcessoCriado;
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 
@@ -40,7 +39,7 @@ import sgc.processo.model.TipoProcesso;
 @DisplayName("ProcessoFacade - CRUD Operations")
 class ProcessoFacadeCrudTest {
     @Mock
-    private ProcessoRepo processoRepo;
+    private ProcessoRepositoryService processoRepositoryService;
     @Mock
     private UnidadeFacade unidadeService;
     @Mock
@@ -83,7 +82,7 @@ class ProcessoFacadeCrudTest {
             Unidade unidade = UnidadeFixture.unidadeComId(1L);
 
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidade);
-            when(processoRepo.saveAndFlush(any()))
+            when(processoRepositoryService.salvarEFlush(any()))
                     .thenAnswer(
                             i -> {
                                 Processo p = i.getArgument(0);
@@ -97,7 +96,7 @@ class ProcessoFacadeCrudTest {
 
             // Assert
             assertThat(resultado).isNotNull();
-            verify(processoRepo).saveAndFlush(argThat(p -> p.getDescricao().equals("Teste") &&
+            verify(processoRepositoryService).salvarEFlush(argThat(p -> p.getDescricao().equals("Teste") &&
                     p.getTipo() == TipoProcesso.MAPEAMENTO &&
                     p.getSituacao() == SituacaoProcesso.CRIADO));
             verify(publicadorEventos).publishEvent(any(EventoProcessoCriado.class));
@@ -158,7 +157,7 @@ class ProcessoFacadeCrudTest {
             Unidade u = UnidadeFixture.unidadeComId(1L);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
             when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty()); // No error - all units have maps
-            when(processoRepo.saveAndFlush(any())).thenReturn(new Processo());
+            when(processoRepositoryService.salvarEFlush(any())).thenReturn(new Processo());
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             ProcessoDto resultado = processoFacade.criar(req);
@@ -174,7 +173,7 @@ class ProcessoFacadeCrudTest {
             Unidade u = UnidadeFixture.unidadeComId(1L);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
             when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty()); // No error - all units have maps
-            when(processoRepo.saveAndFlush(any())).thenReturn(new Processo());
+            when(processoRepositoryService.salvarEFlush(any())).thenReturn(new Processo());
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             ProcessoDto resultado = processoFacade.criar(req);
@@ -215,12 +214,12 @@ class ProcessoFacadeCrudTest {
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
             when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
 
-            when(processoRepo.saveAndFlush(any())).thenAnswer(inv -> inv.getArgument(0));
+            when(processoRepositoryService.salvarEFlush(any())).thenAnswer(inv -> inv.getArgument(0));
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             processoFacade.criar(req);
 
-            verify(processoRepo).saveAndFlush(any());
+            verify(processoRepositoryService).salvarEFlush(any());
         }
     }
 
@@ -243,9 +242,9 @@ class ProcessoFacadeCrudTest {
                     .unidades(List.of(1L))
                     .build();
 
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoRepositoryService.buscarPorId(id)).thenReturn(processo);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
-            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
+            when(processoRepositoryService.salvarEFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
@@ -253,7 +252,7 @@ class ProcessoFacadeCrudTest {
 
             // Assert
             assertThat(resultado).isNotNull();
-            verify(processoRepo).saveAndFlush(processo);
+            verify(processoRepositoryService).salvarEFlush(processo);
             verify(publicadorEventos).publishEvent(any(EventoProcessoAtualizado.class));
         }
 
@@ -261,7 +260,7 @@ class ProcessoFacadeCrudTest {
         @DisplayName("Deve lançar exceção quando atualizar e processo não encontrado")
         void deveLancarExcecaoQuandoAtualizarEProcessoNaoEncontrado() {
             // Arrange
-            when(processoRepo.findById(99L)).thenReturn(Optional.empty());
+            when(processoRepositoryService.buscarPorId(99L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 99L));
 
             // Act & Assert
             var req = AtualizarProcessoRequest.builder().build();
@@ -277,7 +276,7 @@ class ProcessoFacadeCrudTest {
             Processo processo = ProcessoFixture.processoEmAndamento();
             processo.setCodigo(id);
 
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoRepositoryService.buscarPorId(id)).thenReturn(processo);
 
             // Act & Assert
             var req = AtualizarProcessoRequest.builder().build();
@@ -300,16 +299,16 @@ class ProcessoFacadeCrudTest {
                     .unidades(List.of(1L))
                     .build();
 
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoRepositoryService.buscarPorId(id)).thenReturn(processo);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
-            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
+            when(processoRepositoryService.salvarEFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
             processoFacade.atualizar(id, req);
 
             // Assert
-            verify(processoRepo).saveAndFlush(argThat(p ->
+            verify(processoRepositoryService).salvarEFlush(argThat(p ->
                     p.getDescricao().equals("Nova Descrição Atualizada")));
         }
 
@@ -329,17 +328,17 @@ class ProcessoFacadeCrudTest {
                     .unidades(List.of(1L))
                     .build();
 
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoRepositoryService.buscarPorId(id)).thenReturn(processo);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
             when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty());
-            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
+            when(processoRepositoryService.salvarEFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
             processoFacade.atualizar(id, req);
 
             // Assert
-            verify(processoRepo).saveAndFlush(argThat(p ->
+            verify(processoRepositoryService).salvarEFlush(argThat(p ->
                     p.getTipo() == TipoProcesso.DIAGNOSTICO));
         }
 
@@ -361,16 +360,16 @@ class ProcessoFacadeCrudTest {
                     .unidades(List.of(1L))
                     .build();
 
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoRepositoryService.buscarPorId(id)).thenReturn(processo);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
-            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
+            when(processoRepositoryService.salvarEFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
             processoFacade.atualizar(id, req);
 
             // Assert
-            verify(processoRepo).saveAndFlush(argThat(p ->
+            verify(processoRepositoryService).salvarEFlush(argThat(p ->
                     p.getDataLimite().equals(novaDataLimite)));
         }
 
@@ -394,16 +393,16 @@ class ProcessoFacadeCrudTest {
                     .dataLimiteEtapa1(dataOriginal) // Mantendo a data original
                     .build();
 
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoRepositoryService.buscarPorId(id)).thenReturn(processo);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
-            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
+            when(processoRepositoryService.salvarEFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
             processoFacade.atualizar(id, req);
 
             // Assert - verifica que a data original foi mantida
-            verify(processoRepo).saveAndFlush(argThat(p ->
+            verify(processoRepositoryService).salvarEFlush(argThat(p ->
                     p.getDataLimite().equals(dataOriginal)));
         }
 
@@ -422,9 +421,9 @@ class ProcessoFacadeCrudTest {
                     .unidades(List.of(1L))
                     .build();
 
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoRepositoryService.buscarPorId(id)).thenReturn(processo);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
-            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
+            when(processoRepositoryService.salvarEFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
@@ -453,9 +452,9 @@ class ProcessoFacadeCrudTest {
                     .unidades(List.of(2L))
                     .build();
 
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoRepositoryService.buscarPorId(id)).thenReturn(processo);
             when(unidadeService.buscarEntidadePorId(2L)).thenReturn(novaUnidade);
-            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
+            when(processoRepositoryService.salvarEFlush(any())).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
@@ -463,7 +462,7 @@ class ProcessoFacadeCrudTest {
 
             // Assert
             verify(unidadeService).buscarEntidadePorId(2L);
-            verify(processoRepo).saveAndFlush(any());
+            verify(processoRepositoryService).salvarEFlush(any());
         }
 
         @Test
@@ -471,7 +470,7 @@ class ProcessoFacadeCrudTest {
         void atualizar_ErroSeNaoCriado() {
             Processo p = new Processo();
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+            when(processoRepositoryService.buscarPorId(1L)).thenReturn(p);
 
             var req = AtualizarProcessoRequest.builder().build();
             assertThatThrownBy(() -> processoFacade.atualizar(1L, req))
@@ -489,20 +488,20 @@ class ProcessoFacadeCrudTest {
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
             processo.setCodigo(id);
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoRepositoryService.buscarPorId(id)).thenReturn(processo);
 
             // Act
             processoFacade.apagar(id);
 
             // Assert
-            verify(processoRepo).deleteById(id);
+            verify(processoRepositoryService).excluir(id);
         }
 
         @Test
         @DisplayName("Deve lançar exceção quando apagar e processo não encontrado")
         void deveLancarExcecaoQuandoApagarEProcessoNaoEncontrado() {
             // Arrange
-            when(processoRepo.findById(99L)).thenReturn(Optional.empty());
+            when(processoRepositoryService.buscarPorId(99L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 99L));
 
             // Act & Assert
             assertThatThrownBy(() -> processoFacade.apagar(99L))
@@ -516,7 +515,7 @@ class ProcessoFacadeCrudTest {
             Long id = 100L;
             Processo processo = ProcessoFixture.processoEmAndamento();
             processo.setCodigo(id);
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoRepositoryService.buscarPorId(id)).thenReturn(processo);
 
             // Act & Assert
             assertThatThrownBy(() -> processoFacade.apagar(id))

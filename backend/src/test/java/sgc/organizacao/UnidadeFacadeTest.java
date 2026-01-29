@@ -21,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.RepositorioComum;
+
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
@@ -30,13 +30,13 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeMapaRepo;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
 import sgc.organizacao.service.UnidadeHierarquiaService;
+import sgc.organizacao.service.UnidadeMapaRepositoryService;
 import sgc.organizacao.service.UnidadeMapaService;
+import sgc.organizacao.service.UnidadeRepositoryService;
 import sgc.organizacao.service.UnidadeResponsavelService;
+import sgc.organizacao.service.UsuarioRepositoryService;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -44,15 +44,13 @@ import sgc.organizacao.service.UnidadeResponsavelService;
 class UnidadeFacadeTest {
 
     @Mock
-    private UnidadeRepo unidadeRepo;
+    private UnidadeRepositoryService unidadeRepositoryService;
     @Mock
-    private UnidadeMapaRepo unidadeMapaRepo;
+    private UnidadeMapaRepositoryService unidadeMapaRepositoryService;
     @Mock
-    private UsuarioRepo usuarioRepo;
+    private UsuarioRepositoryService usuarioRepositoryService;
     @Mock
     private UsuarioMapper usuarioMapper;
-    @Mock
-    private RepositorioComum repo;
 
     // Novos mocks para serviços especializados
     @Mock
@@ -122,7 +120,7 @@ class UnidadeFacadeTest {
         @DisplayName("Deve buscar unidade por sigla")
         void deveBuscarPorSigla() {
             // Arrange
-            when(unidadeRepo.findBySigla("U1")).thenReturn(Optional.of(new Unidade()));
+            when(unidadeRepositoryService.findBySigla("U1")).thenReturn(Optional.of(new Unidade()));
             when(usuarioMapper.toUnidadeDto(any(), eq(false))).thenReturn(UnidadeDto.builder().build());
 
             // Act & Assert
@@ -135,7 +133,7 @@ class UnidadeFacadeTest {
             // Arrange
             Unidade unidade = new Unidade();
             unidade.setSituacao(SituacaoUnidade.ATIVA);
-            when(repo.buscar(Unidade.class, 1L)).thenReturn(unidade);
+            when(unidadeRepositoryService.buscarPorId(1L)).thenReturn(unidade);
             when(usuarioMapper.toUnidadeDto(any(), eq(false))).thenReturn(UnidadeDto.builder().build());
 
             // Act & Assert
@@ -255,7 +253,7 @@ class UnidadeFacadeTest {
         void deveBuscarArvoreComElegibilidadeComMapa() {
             // Arrange
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
-            when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L));
+            when(unidadeMapaRepositoryService.findAllUnidadeCodigos()).thenReturn(List.of(1L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
 
             // Act
@@ -263,7 +261,7 @@ class UnidadeFacadeTest {
 
             // Assert
             assertThat(result).hasSize(1);
-            verify(unidadeMapaRepo).findAllUnidadeCodigos();
+            verify(unidadeMapaRepositoryService).findAllUnidadeCodigos();
             verify(hierarquiaService).buscarArvoreComElegibilidade(any());
         }
 
@@ -272,7 +270,7 @@ class UnidadeFacadeTest {
         void deveSerIneligivelParaRevisaoSeSemMapa() {
             // Arrange
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
-            when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(2L));
+            when(unidadeMapaRepositoryService.findAllUnidadeCodigos()).thenReturn(List.of(2L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
 
             // Act
@@ -280,7 +278,7 @@ class UnidadeFacadeTest {
 
             // Assert
             assertThat(result).hasSize(1);
-            verify(unidadeMapaRepo).findAllUnidadeCodigos();
+            verify(unidadeMapaRepositoryService).findAllUnidadeCodigos();
             verify(hierarquiaService).buscarArvoreComElegibilidade(any());
         }
 
@@ -372,7 +370,7 @@ class UnidadeFacadeTest {
         @DisplayName("Deve buscar usuários por unidade")
         void deveBuscarUsuariosPorUnidade() {
             // Arrange
-            when(usuarioRepo.findByUnidadeLotacaoCodigo(1L)).thenReturn(List.of(new Usuario()));
+            when(usuarioRepositoryService.findByUnidadeLotacaoCodigo(1L)).thenReturn(List.of(new Usuario()));
 
             // Act & Assert
             assertThat(service.buscarUsuariosPorUnidade(1L)).hasSize(1);
@@ -415,21 +413,21 @@ class UnidadeFacadeTest {
         @DisplayName("Buscar entidades por IDs")
         void buscarEntidadesPorIds() {
             service.buscarEntidadesPorIds(List.of(1L));
-            verify(unidadeRepo).findAllById(any());
+            verify(unidadeRepositoryService).findAllById(any());
         }
 
         @Test
         @DisplayName("Buscar todas entidades com hierarquia (cache)")
         void buscarTodasEntidadesComHierarquia() {
             service.buscarTodasEntidadesComHierarquia();
-            verify(unidadeRepo).findAllWithHierarquia();
+            verify(unidadeRepositoryService).findAllWithHierarquia();
         }
 
         @Test
         @DisplayName("Buscar siglas por IDs")
         void buscarSiglasPorIds() {
             service.buscarSiglasPorIds(List.of(1L));
-            verify(unidadeRepo).findSiglasByCodigos(any());
+            verify(unidadeRepositoryService).findSiglasByCodigos(any());
         }
 
         @Test
@@ -458,7 +456,7 @@ class UnidadeFacadeTest {
         @Test
         @DisplayName("Deve falhar ao buscar entidade por ID inexistente")
         void deveFalharAoBuscarEntidadePorIdInexistente() {
-            when(repo.buscar(Unidade.class, 999L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 999L));
+            when(unidadeRepositoryService.buscarPorId(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 999L));
             assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(999L)));
         }
 
@@ -522,7 +520,7 @@ class UnidadeFacadeTest {
             Unidade u1 = new Unidade();
             u1.setCodigo(1L);
             u1.setSituacao(SituacaoUnidade.INATIVA); // INATIVA
-            when(repo.buscar(Unidade.class, 1L)).thenReturn(u1);
+            when(unidadeRepositoryService.buscarPorId(1L)).thenReturn(u1);
 
             // Act & Assert
             assertNotNull(assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(1L)));

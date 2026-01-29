@@ -1,9 +1,6 @@
 package sgc.mapa.dto;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 
 import java.util.List;
 
@@ -13,20 +10,18 @@ import java.util.List;
  *
  * <p>CDU-12 - Verificar impactos no mapa de competências
  */
-@Getter
 @Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE) // to encourage use of factory methods
-public class ImpactoMapaDto {
-
-    private final boolean temImpactos;
-    private final int totalAtividadesInseridas;
-    private final int totalAtividadesRemovidas;
-    private final int totalAtividadesAlteradas;
-    private final int totalCompetenciasImpactadas;
-    private final List<AtividadeImpactadaDto> atividadesInseridas;
-    private final List<AtividadeImpactadaDto> atividadesRemovidas;
-    private final List<AtividadeImpactadaDto> atividadesAlteradas;
-    private final List<CompetenciaImpactadaDto> competenciasImpactadas;
+public record ImpactoMapaDto(
+        boolean temImpactos,
+        int totalAtividadesInseridas,
+        int totalAtividadesRemovidas,
+        int totalAtividadesAlteradas,
+        int totalCompetenciasImpactadas,
+        List<AtividadeImpactadaDto> atividadesInseridas,
+        List<AtividadeImpactadaDto> atividadesRemovidas,
+        List<AtividadeImpactadaDto> atividadesAlteradas,
+        List<CompetenciaImpactadaDto> competenciasImpactadas
+) {
 
     /**
      * Factory method for creating an ImpactoMapaDto with no impacts.

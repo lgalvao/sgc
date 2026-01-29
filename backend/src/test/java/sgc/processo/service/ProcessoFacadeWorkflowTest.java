@@ -20,13 +20,13 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
+
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
-import java.util.Optional;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.*;
 @DisplayName("ProcessoFacade - Workflow e Inicialização")
 class ProcessoFacadeWorkflowTest {
     @Mock
-    private ProcessoRepo processoRepo;
+    private ProcessoRepositoryService processoRepositoryService;
     @Mock
     private UnidadeFacade unidadeService;
     @Mock
@@ -156,34 +156,21 @@ class ProcessoFacadeWorkflowTest {
             verify(processoInicializador).iniciar(id, List.of(1L));
         }
 
-        @Test
-        @DisplayName("Deve falhar ao finalizar se houver subprocessos não homologados")
-        void deveFalharAoFinalizarSeSubprocessosNaoHomologados() {
-            // Arrange
+        @org.junit.jupiter.params.ParameterizedTest
+        @org.junit.jupiter.params.provider.CsvSource({
+            "Não é possível encerrar o processo. Unidades pendentes de homologação:, pendentes de homologação",
+            "Apenas processos 'EM ANDAMENTO' podem ser finalizados., Apenas processos 'EM ANDAMENTO'",
+            "Subprocesso 1 sem unidade associada., sem unidade associada",
+            "Subprocesso 1 sem mapa associado., sem mapa associado",
+            "'Não é possível encerrar o processo. Unidades pendentes de homologação:\n- Subprocesso 55 (Situação: MAPEAMENTO_CADASTRO_EM_ANDAMENTO)', Subprocesso 55"
+        })
+        @DisplayName("Deve falhar ao finalizar em casos de erro de negócio")
+        void deveFalharAoFinalizar(String mensagemInjetada, String mensagemEsperada) {
             Long id = 100L;
-
-            doThrow(new ErroProcesso("Não é possível encerrar o processo. Unidades pendentes de homologação:\n- U1 (Situação: MAPEAMENTO_CADASTRO_EM_ANDAMENTO)"))
-                    .when(processoFinalizador).finalizar(id);
-
-            // Act & Assert
+            doThrow(new ErroProcesso(mensagemInjetada)).when(processoFinalizador).finalizar(id);
             assertThatThrownBy(() -> processoFacade.finalizar(id))
                     .isInstanceOf(ErroProcesso.class)
-                    .hasMessageContaining("pendentes de homologação");
-        }
-
-        @Test
-        @DisplayName("Deve falhar ao finalizar se processo não está em andamento")
-        void deveFalharAoFinalizarSeProcessoNaoEmAndamento() {
-            // Arrange
-            Long id = 100L;
-
-            doThrow(new ErroProcesso("Apenas processos 'EM ANDAMENTO' podem ser finalizados."))
-                    .when(processoFinalizador).finalizar(id);
-
-            // Act & Assert
-            assertThatThrownBy(() -> processoFacade.finalizar(id))
-                    .isInstanceOf(ErroProcesso.class)
-                    .hasMessageContaining("Apenas processos 'EM ANDAMENTO'");
+                    .hasMessageContaining(mensagemEsperada);
         }
 
         @Test
@@ -198,99 +185,6 @@ class ProcessoFacadeWorkflowTest {
             // Assert
             verify(processoFinalizador).finalizar(id);
         }
-
-        @Test
-        @DisplayName("Deve falhar ao finalizar se subprocesso não tem unidade associada")
-        void deveFalharAoFinalizarSeSubprocessoSemUnidade() {
-            // Arrange
-            Long id = 100L;
-
-            doThrow(new ErroProcesso("Subprocesso 1 sem unidade associada."))
-                    .when(processoFinalizador).finalizar(id);
-
-            // Act & Assert
-            assertThatThrownBy(() -> processoFacade.finalizar(id))
-                    .isInstanceOf(ErroProcesso.class)
-                    .hasMessageContaining("sem unidade associada");
-        }
-
-        @Test
-        @DisplayName("Deve falhar ao finalizar se subprocesso não tem mapa")
-        void deveFalharAoFinalizarSeSubprocessoSemMapa() {
-            // Arrange
-            Long id = 100L;
-
-            doThrow(new ErroProcesso("Subprocesso 1 sem mapa associado."))
-                    .when(processoFinalizador).finalizar(id);
-
-            // Act & Assert
-            assertThatThrownBy(() -> processoFacade.finalizar(id))
-                    .isInstanceOf(ErroProcesso.class)
-                    .hasMessageContaining("sem mapa associado");
-        }
-
-        @Test
-        @DisplayName("Deve formatar mensagem de erro corretamente para subprocesso sem unidade ao finalizar")
-        void deveFormatarMensagemErroParaSubprocessoSemUnidade() {
-            Long id = 100L;
-
-            doThrow(new ErroProcesso("Não é possível encerrar o processo. Unidades pendentes de homologação:\n- Subprocesso 55 (Situação: MAPEAMENTO_CADASTRO_EM_ANDAMENTO)"))
-                    .when(processoFinalizador).finalizar(id);
-
-            assertThatThrownBy(() -> processoFacade.finalizar(id))
-                    .isInstanceOf(ErroProcesso.class)
-                    .hasMessageContaining("Subprocesso 55 (Situação: MAPEAMENTO_CADASTRO_EM_ANDAMENTO)");
-        }
-
-        @Test
-        @DisplayName("iniciarProcessoDiagnostico: delega para inicializador")
-        void iniciarProcessoDiagnostico_Sucesso() {
-            processoFacade.iniciarProcessoDiagnostico(1L, List.of(2L));
-            verify(processoInicializador).iniciar(1L, List.of(2L));
-        }
-
-        @Test
-        @DisplayName("finalizar: erro se processo não está em andamento")
-        void finalizar_ErroStatus() {
-            doThrow(new ErroProcesso("Apenas processos 'EM ANDAMENTO' podem ser finalizados."))
-                    .when(processoFinalizador).finalizar(1L);
-
-            assertThatThrownBy(() -> processoFacade.finalizar(1L))
-                    .isInstanceOf(ErroProcesso.class)
-                    .hasMessageContaining("Apenas processos 'EM ANDAMENTO' podem ser finalizados");
-        }
-
-        @Test
-        @DisplayName("finalizar: erro se subprocesso sem unidade")
-        void finalizar_SubprocessoSemUnidade() {
-            doThrow(new ErroProcesso("Subprocesso 1 sem unidade associada."))
-                    .when(processoFinalizador).finalizar(1L);
-
-            assertThatThrownBy(() -> processoFacade.finalizar(1L))
-                    .isInstanceOf(ErroProcesso.class)
-                    .hasMessageContaining("sem unidade associada");
-        }
-
-        @Test
-        @DisplayName("finalizar: erro se subprocesso sem mapa")
-        void finalizar_SubprocessoSemMapa() {
-            doThrow(new ErroProcesso("Subprocesso 1 sem mapa associado."))
-                    .when(processoFinalizador).finalizar(1L);
-
-            assertThatThrownBy(() -> processoFacade.finalizar(1L))
-                    .isInstanceOf(ErroProcesso.class)
-                    .hasMessageContaining("sem mapa associado");
-        }
-
-        @Test
-        @DisplayName("finalizar: sucesso define mapa vigente")
-        void finalizar_Sucesso() {
-            doNothing().when(processoFinalizador).finalizar(1L);
-
-            processoFacade.finalizar(1L);
-
-            verify(processoFinalizador).finalizar(1L);
-        }
     }
 
     @Nested
@@ -304,7 +198,7 @@ class ProcessoFacadeWorkflowTest {
             Unidade u = UnidadeFixture.unidadeComId(10L);
             p.setParticipantes(java.util.Set.of(u));
 
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+            when(processoRepositoryService.buscarPorId(1L)).thenReturn(p);
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
 
             processoFacade.enviarLembrete(1L, 10L);
@@ -320,7 +214,7 @@ class ProcessoFacadeWorkflowTest {
             Unidade outra = UnidadeFixture.unidadeComId(20L);
             p.setParticipantes(java.util.Set.of(outra));
 
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+            when(processoRepositoryService.buscarPorId(1L)).thenReturn(p);
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
 
             assertThatThrownBy(() -> processoFacade.enviarLembrete(1L, 10L))
@@ -328,35 +222,5 @@ class ProcessoFacadeWorkflowTest {
                     .hasMessageContaining("não participa");
         }
 
-        @Test
-        @DisplayName("enviarLembrete: lança erro se unidade não participa")
-        void enviarLembrete_NaoParticipa() {
-            Processo p = new Processo();
-            p.setParticipantes(java.util.Set.of());
-
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
-            when(unidadeService.buscarEntidadePorId(2L)).thenReturn(new Unidade());
-
-            assertThatThrownBy(() -> processoFacade.enviarLembrete(1L, 2L))
-                    .isInstanceOf(ErroProcesso.class)
-                    .hasMessage("Unidade não participa deste processo.");
-        }
-
-        @Test
-        @DisplayName("enviarLembrete: sucesso")
-        void enviarLembrete_Sucesso() {
-            Unidade u = new Unidade();
-            u.setCodigo(2L);
-            Processo p = new Processo();
-            p.setDescricao("P1");
-            p.setDataLimite(java.time.LocalDateTime.now());
-            p.setParticipantes(java.util.Set.of(u));
-
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
-            when(unidadeService.buscarEntidadePorId(2L)).thenReturn(u);
-
-            processoFacade.enviarLembrete(1L, 2L);
-            verify(alertaService).criarAlertaSedoc(eq(p), eq(u), anyString());
-        }
     }
 }
