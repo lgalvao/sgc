@@ -7,13 +7,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.mapa.service.AtividadeService;
+import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoWorkflowFacade;
 
 import java.util.Collections;
 
@@ -29,11 +29,11 @@ class SubprocessoFacadeTest {
     @Mock
     private SubprocessoValidacaoService validacaoService;
     @Mock
-    private SubprocessoWorkflowService workflowService;
+    private SubprocessoWorkflowFacade workflowService;
     @Mock
     private UsuarioFacade usuarioService;
     @Mock
-    private AtividadeService atividadeService;
+    private MapaManutencaoService mapaManutencaoService;
     @Mock
     private sgc.seguranca.acesso.AccessControlService accessControlService;
 
@@ -120,7 +120,7 @@ class SubprocessoFacadeTest {
 
         org.mockito.Mockito.when(crudService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
         org.mockito.Mockito.when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
-        org.mockito.Mockito.when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(Collections.emptyList());
+        org.mockito.Mockito.when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(10L)).thenReturn(Collections.emptyList());
 
         facade.obterCadastro(codSubprocesso);
 

@@ -40,7 +40,7 @@ import static sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS;
 public class ImpactoMapaService {
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
-    private final AtividadeService atividadeService;
+    private final MapaManutencaoService mapaManutencaoService;
     private final AccessControlService accessControlService;
 
     /**
@@ -117,7 +117,7 @@ public class ImpactoMapaService {
      * Obtém todas as atividades associadas a um mapa, com seus conhecimentos.
      */
     private List<Atividade> obterAtividadesDoMapa(Mapa mapa) {
-        return atividadeService.buscarPorMapaCodigoComConhecimentos(mapa.getCodigo());
+        return mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(mapa.getCodigo());
     }
 
     /**

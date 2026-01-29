@@ -13,7 +13,7 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.CompetenciaService;
+import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.model.Unidade;
@@ -42,7 +42,7 @@ class RelatorioFacadeTest {
     @Mock
     private UnidadeFacade unidadeService;
     @Mock
-    private CompetenciaService competenciaService;
+    private MapaManutencaoService mapaManutencaoService;
 
     @Mock
     private PdfFactory pdfFactory;
@@ -109,7 +109,7 @@ class RelatorioFacadeTest {
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
+        when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(1L, 1L, out);
@@ -141,7 +141,7 @@ class RelatorioFacadeTest {
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
-        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of());
+        when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of());
 
         OutputStream out = new ByteArrayOutputStream();
         // Filtra pela unidade 1
@@ -170,7 +170,7 @@ class RelatorioFacadeTest {
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
+        when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(1L, 1L, out);
@@ -200,7 +200,7 @@ class RelatorioFacadeTest {
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(competenciaService.buscarPorCodMapa(10L)).thenReturn(List.of(c));
+        when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(1L, 1L, out);

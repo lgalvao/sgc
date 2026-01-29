@@ -19,9 +19,7 @@ import sgc.analise.AnaliseFacade;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.AtividadeService;
-import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.service.ConhecimentoService;
+import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
@@ -46,7 +44,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoWorkflowFacade;
 
 @ExtendWith(MockitoExtension.class)
 @org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
@@ -61,19 +59,15 @@ class SubprocessoFacadeComplementaryTest {
     @Mock
     private SubprocessoValidacaoService validacaoService;
     @Mock
-    private SubprocessoWorkflowService workflowService;
+    private SubprocessoWorkflowFacade workflowService;
     @Mock
-    private AtividadeService atividadeService;
+    private MapaManutencaoService mapaManutencaoService;
     @Mock
     private MovimentacaoRepo repositorioMovimentacao;
     @Mock
     private SubprocessoDetalheMapper subprocessoDetalheMapper;
     @Mock
     private AnaliseFacade analiseFacade;
-    @Mock
-    private CompetenciaService competenciaService;
-    @Mock
-    private ConhecimentoService conhecimentoService;
     @Mock
     private MapaAjusteMapper mapaAjusteMapper;
     @Mock
@@ -120,7 +114,7 @@ class SubprocessoFacadeComplementaryTest {
             sp.setMapa(mapa);
 
             when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of());
+            when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of());
 
             List<AtividadeVisualizacaoDto> result = subprocessoFacade.listarAtividadesSubprocesso(1L);
 
@@ -404,7 +398,7 @@ class SubprocessoFacadeComplementaryTest {
             SubprocessoDetalheDto.UnidadeDto subUnidadeDto = SubprocessoDetalheDto.UnidadeDto.builder().sigla("SIGLA").build();
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().unidade(subUnidadeDto).build());
             when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(unidadeDto);
-            when(atividadeService.buscarPorMapaCodigoComConhecimentos(100L)).thenReturn(java.util.Collections.emptyList());
+            when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L)).thenReturn(java.util.Collections.emptyList());
 
             ContextoEdicaoDto result = subprocessoFacade.obterContextoEdicao(codigo, sgc.organizacao.model.Perfil.ADMIN);
             assertThat(result).isNotNull();
@@ -505,7 +499,7 @@ class SubprocessoFacadeComplementaryTest {
             Atividade ativ = new Atividade();
             ativ.setCodigo(100L);
             ativ.setConhecimentos(List.of());
-            when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(ativ));
+            when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(ativ));
 
             SubprocessoCadastroDto result = subprocessoFacade.obterCadastro(codigo);
             assertThat(result).isNotNull();
@@ -524,10 +518,10 @@ class SubprocessoFacadeComplementaryTest {
 
             when(crudService.buscarSubprocessoComMapa(codigo)).thenReturn(sp);
             when(analiseFacade.listarPorSubprocesso(codigo, sgc.analise.model.TipoAnalise.VALIDACAO)).thenReturn(List.of());
-            when(competenciaService.buscarPorCodMapaSemRelacionamentos(10L)).thenReturn(List.of());
-            when(competenciaService.buscarIdsAssociacoesCompetenciaAtividade(10L)).thenReturn(Collections.emptyMap());
-            when(atividadeService.buscarPorMapaCodigoSemRelacionamentos(10L)).thenReturn(List.of());
-            when(conhecimentoService.listarPorMapa(10L)).thenReturn(List.of());
+            when(mapaManutencaoService.buscarCompetenciasPorCodMapaSemRelacionamentos(10L)).thenReturn(List.of());
+            when(mapaManutencaoService.buscarIdsAssociacoesCompetenciaAtividade(10L)).thenReturn(Collections.emptyMap());
+            when(mapaManutencaoService.buscarAtividadesPorMapaCodigoSemRelacionamentos(10L)).thenReturn(List.of());
+            when(mapaManutencaoService.listarConhecimentosPorMapa(10L)).thenReturn(List.of());
             when(mapaAjusteMapper.toDto(any(), any(), any(), any(), any(), any())).thenReturn(MapaAjusteDto.builder().build());
 
             MapaAjusteDto result = subprocessoFacade.obterMapaParaAjuste(codigo);
@@ -556,11 +550,11 @@ class SubprocessoFacadeComplementaryTest {
 
             Competencia comp = new Competencia();
             comp.setCodigo(10L);
-            when(competenciaService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(comp));
+            when(mapaManutencaoService.buscarCompetenciasPorCodigos(List.of(10L))).thenReturn(List.of(comp));
 
             subprocessoFacade.salvarAjustesMapa(codigo, List.of(compDto));
 
-            verify(competenciaService).salvarTodas(anyList());
+            verify(mapaManutencaoService).salvarTodasCompetencias(anyList());
             verify(subprocessoRepo).save(sp);
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         }

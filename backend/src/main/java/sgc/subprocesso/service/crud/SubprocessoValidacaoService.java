@@ -9,8 +9,7 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.AtividadeService;
-import sgc.mapa.service.CompetenciaService;
+import sgc.mapa.service.MapaManutencaoService;
 import sgc.subprocesso.dto.ErroValidacaoDto;
 import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.model.Subprocesso;
@@ -26,8 +25,7 @@ import static java.util.Collections.emptyList;
 @Slf4j
 @Transactional(readOnly = true)
 public class SubprocessoValidacaoService {
-    private final AtividadeService atividadeService;
-    private final CompetenciaService competenciaService;
+    private final MapaManutencaoService mapaManutencaoService;
     private final SubprocessoCrudService crudService; // Reuse lookups
 
     public List<Atividade> obterAtividadesSemConhecimento(Long codSubprocesso) {
@@ -39,7 +37,7 @@ public class SubprocessoValidacaoService {
         if (mapa == null || mapa.getCodigo() == null) {
             return emptyList();
         }
-        List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(mapa.getCodigo());
+        List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(mapa.getCodigo());
         if (atividades.isEmpty()) {
             return emptyList();
         }
@@ -52,7 +50,7 @@ public class SubprocessoValidacaoService {
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
         Mapa mapa = subprocesso.getMapa();
 
-        List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(mapa.getCodigo());
+        List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(mapa.getCodigo());
         if (atividades.isEmpty()) {
             throw new ErroValidacao("O mapa de competências deve ter ao menos uma atividade cadastrada.");
         }
@@ -67,7 +65,7 @@ public class SubprocessoValidacaoService {
     }
 
     public void validarAssociacoesMapa(Long mapaId) {
-        List<Competencia> competencias = competenciaService.buscarPorCodMapa(mapaId);
+        List<Competencia> competencias = mapaManutencaoService.buscarCompetenciasPorCodMapa(mapaId);
         List<String> competenciasSemAssociacao = competencias.stream()
                 .filter(c -> c.getAtividades().isEmpty())
                 .map(Competencia::getDescricao)
@@ -79,7 +77,7 @@ public class SubprocessoValidacaoService {
                     Map.of("competenciasNaoAssociadas", competenciasSemAssociacao));
         }
 
-        List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(mapaId);
+        List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigo(mapaId);
         List<String> atividadesSemAssociacao = atividades.stream()
                 .filter(a -> a.getCompetencias().isEmpty())
                 .map(Atividade::getDescricao)
@@ -96,7 +94,7 @@ public class SubprocessoValidacaoService {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
         List<ErroValidacaoDto> erros = new ArrayList<>();
 
-        List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
+        List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
         if (atividades.isEmpty()) {
             erros.add(ErroValidacaoDto.builder()
                     .tipo("SEM_ATIVIDADES")

@@ -2,16 +2,21 @@ package sgc.mapa.service;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -22,49 +27,56 @@ import sgc.mapa.dto.AtualizarAtividadeRequest;
 import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.evento.EventoMapaAlterado;
 import sgc.mapa.mapper.AtividadeMapper;
+import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.AtividadeRepo;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.ConhecimentoRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
-@DisplayName("Testes do Serviço de Atividade")
-class AtividadeServiceTest {
+@DisplayName("Testes do Serviço de Manutenção de Mapa")
+class MapaManutencaoServiceTest {
 
     @Mock
     private AtividadeRepo atividadeRepo;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
+    @Mock
+    private ConhecimentoRepo conhecimentoRepo;
     @Mock
     private RepositorioComum repo;
     @Mock
     private AtividadeMapper atividadeMapper;
     @Mock
-    private ConhecimentoService conhecimentoService;
+    private ConhecimentoMapper conhecimentoMapper;
     @Mock
     private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
-    private AtividadeService service;
+    private MapaManutencaoService service;
 
     @Test
     @DisplayName("Deve buscar por mapa sem relacionamentos")
     void deveBuscarPorMapaSemRelacionamentos() {
         when(atividadeRepo.findByMapaCodigoSemFetch(1L)).thenReturn(List.of(new Atividade()));
-        assertThat(service.buscarPorMapaCodigoSemRelacionamentos(1L))
+        assertThat(service.buscarAtividadesPorMapaCodigoSemRelacionamentos(1L))
                 .isNotNull()
                 .hasSize(1);
     }
 
     @Nested
-    @DisplayName("Cenários de Leitura")
+    @DisplayName("Cenários de Leitura (Atividade)")
     class LeituraTests {
         @Test
         @DisplayName("Deve listar todas as atividades")
         void deveListarTodas() {
             when(atividadeRepo.findAllWithMapa()).thenReturn(List.of(new Atividade()));
             when(atividadeMapper.toResponse(any())).thenReturn(AtividadeResponse.builder().build());
-            assertThat(service.listar())
+            assertThat(service.listarAtividades())
                     .isNotNull()
                     .hasSize(1);
         }
@@ -74,14 +86,14 @@ class AtividadeServiceTest {
         void deveObterPorCodigoDto() {
             when(repo.buscar(Atividade.class, 1L)).thenReturn(new Atividade());
             when(atividadeMapper.toResponse(any())).thenReturn(AtividadeResponse.builder().build());
-            assertThat(service.obterResponse(1L)).isNotNull();
+            assertThat(service.obterAtividadeResponse(1L)).isNotNull();
         }
 
         @Test
         @DisplayName("Deve lançar erro se obter por código não encontrar")
         void deveLancarErroObterPorCodigo() {
             when(repo.buscar(Atividade.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 1L));
-            assertThatThrownBy(() -> service.obterResponse(1L))
+            assertThatThrownBy(() -> service.obterAtividadeResponse(1L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
@@ -90,14 +102,14 @@ class AtividadeServiceTest {
         void deveListarEntidades() {
             Atividade ativ = new Atividade();
             when(repo.buscar(Atividade.class, 1L)).thenReturn(ativ);
-            assertThat(service.obterPorCodigo(1L)).isNotNull();
+            assertThat(service.obterAtividadePorCodigo(1L)).isNotNull();
         }
 
         @Test
         @DisplayName("Deve lançar erro entidade não encontrada")
         void deveLancarErro() {
             when(repo.buscar(Atividade.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 1L));
-            assertThatThrownBy(() -> service.obterPorCodigo(1L))
+            assertThatThrownBy(() -> service.obterAtividadePorCodigo(1L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
@@ -105,7 +117,7 @@ class AtividadeServiceTest {
         @DisplayName("Deve buscar por mapa")
         void deveBuscarPorMapa() {
             when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(List.of(new Atividade()));
-            assertThat(service.buscarPorMapaCodigo(1L))
+            assertThat(service.buscarAtividadesPorMapaCodigo(1L))
                     .isNotNull()
                     .hasSize(1);
         }
@@ -114,7 +126,7 @@ class AtividadeServiceTest {
         @DisplayName("Deve retornar lista vazia quando mapa não possui atividades")
         void deveRetornarListaVaziaQuandoMapaSemAtividades() {
             when(atividadeRepo.findByMapaCodigo(999L)).thenReturn(List.of());
-            assertThat(service.buscarPorMapaCodigo(999L))
+            assertThat(service.buscarAtividadesPorMapaCodigo(999L))
                     .isNotNull()
                     .isEmpty();
         }
@@ -123,7 +135,7 @@ class AtividadeServiceTest {
         @DisplayName("Deve buscar por mapa com conhecimentos")
         void deveBuscarPorMapaComConhecimentos() {
             when(atividadeRepo.findWithConhecimentosByMapaCodigo(1L)).thenReturn(List.of(new Atividade()));
-            assertThat(service.buscarPorMapaCodigoComConhecimentos(1L))
+            assertThat(service.buscarAtividadesPorMapaCodigoComConhecimentos(1L))
                     .isNotNull()
                     .hasSize(1);
         }
@@ -132,7 +144,7 @@ class AtividadeServiceTest {
         @DisplayName("Deve retornar lista vazia quando mapa não possui atividades com conhecimentos")
         void deveRetornarListaVaziaQuandoMapaSemAtividadesComConhecimentos() {
             when(atividadeRepo.findWithConhecimentosByMapaCodigo(999L)).thenReturn(List.of());
-            assertThat(service.buscarPorMapaCodigoComConhecimentos(999L))
+            assertThat(service.buscarAtividadesPorMapaCodigoComConhecimentos(999L))
                     .isNotNull()
                     .isEmpty();
         }
@@ -165,7 +177,7 @@ class AtividadeServiceTest {
             when(atividadeRepo.save(any())).thenReturn(new Atividade());
             when(atividadeMapper.toResponse(any())).thenReturn(dto);
 
-            AtividadeResponse res = service.criar(request);
+            AtividadeResponse res = service.criarAtividade(request);
 
             assertThat(res).isNotNull();
             verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
@@ -180,7 +192,7 @@ class AtividadeServiceTest {
 
             when(repo.buscar(Mapa.class, null)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", null));
 
-            assertThatThrownBy(() -> service.criar(request))
+            assertThatThrownBy(() -> service.criarAtividade(request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
@@ -193,13 +205,13 @@ class AtividadeServiceTest {
 
             when(repo.buscar(Mapa.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
 
-            assertThatThrownBy(() -> service.criar(request))
+            assertThatThrownBy(() -> service.criarAtividade(request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
 
     @Nested
-    @DisplayName("Atualização e Exclusão")
+    @DisplayName("Atualização e Exclusão (Atividade)")
     class AtualizacaoExclusao {
         @Test
         @DisplayName("Deve atualizar atividade")
@@ -215,7 +227,7 @@ class AtividadeServiceTest {
             when(atividadeMapper.toEntity(request)).thenReturn(new Atividade());
             when(atividadeRepo.save(any())).thenReturn(atividade);
 
-            service.atualizar(id, request);
+            service.atualizarAtividade(id, request);
 
             verify(atividadeRepo).save(atividade);
             verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
@@ -233,7 +245,7 @@ class AtividadeServiceTest {
             when(atividadeMapper.toEntity(request)).thenReturn(new Atividade());
             when(atividadeRepo.save(any())).thenReturn(atividade);
 
-            service.atualizar(id, request);
+            service.atualizarAtividade(id, request);
 
             verify(atividadeRepo).save(atividade);
             verify(eventPublisher, never()).publishEvent(any());
@@ -247,7 +259,7 @@ class AtividadeServiceTest {
 
             when(repo.buscar(Atividade.class, id)).thenThrow(new RuntimeException("Erro banco"));
 
-            assertThatThrownBy(() -> service.atualizar(id, request))
+            assertThatThrownBy(() -> service.atualizarAtividade(id, request))
                     .isInstanceOf(RuntimeException.class)
                     .hasMessage("Erro banco");
         }
@@ -257,13 +269,15 @@ class AtividadeServiceTest {
         void deveExcluirAtividade() {
             Long id = 1L;
             Atividade atividade = new Atividade();
+            atividade.setCodigo(1L);
             atividade.setMapa(new Mapa());
 
             when(repo.buscar(Atividade.class, id)).thenReturn(atividade);
+            when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(List.of());
 
-            service.excluir(id);
+            service.excluirAtividade(id);
 
-            verify(conhecimentoService).excluirTodosDaAtividade(atividade);
+            verify(conhecimentoRepo).deleteAll(anyList());
             verify(atividadeRepo).delete(atividade);
             verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
         }
@@ -274,7 +288,7 @@ class AtividadeServiceTest {
             Long id = 1L;
             when(repo.buscar(Atividade.class, id)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", id));
 
-            assertThatThrownBy(() -> service.excluir(id))
+            assertThatThrownBy(() -> service.excluirAtividade(id))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
@@ -305,7 +319,7 @@ class AtividadeServiceTest {
 
             when(atividadeRepo.findAllById(descricoes.keySet())).thenReturn(List.of(atividade1, atividade2));
 
-            service.atualizarDescricoesEmLote(descricoes);
+            service.atualizarDescricoesAtividadeEmLote(descricoes);
 
             assertThat(atividade1.getDescricao()).isEqualTo("Nova 1");
             assertThat(atividade2.getDescricao()).isEqualTo("Nova 2");
@@ -326,7 +340,7 @@ class AtividadeServiceTest {
 
             when(atividadeRepo.findAllById(descricoes.keySet())).thenReturn(List.of(atividade1));
 
-            service.atualizarDescricoesEmLote(descricoes);
+            service.atualizarDescricoesAtividadeEmLote(descricoes);
 
             assertThat(atividade1.getDescricao()).isEqualTo("Antiga 1");
         }

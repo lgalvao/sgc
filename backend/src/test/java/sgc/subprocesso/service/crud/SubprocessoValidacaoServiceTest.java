@@ -12,8 +12,7 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.AtividadeService;
-import sgc.mapa.service.CompetenciaService;
+import sgc.mapa.service.MapaManutencaoService;
 import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -32,9 +31,7 @@ import static org.mockito.Mockito.when;
 class SubprocessoValidacaoServiceTest {
 
     @Mock
-    private AtividadeService atividadeService;
-    @Mock
-    private CompetenciaService competenciaService;
+    private MapaManutencaoService mapaManutencaoService;
     @Mock
     private SubprocessoCrudService crudService;
 
@@ -62,7 +59,7 @@ class SubprocessoValidacaoServiceTest {
     void obterAtividadesSemConhecimentoAtividadesVazia() {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of());
+        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of());
         assertThat(service.obterAtividadesSemConhecimento(mapa)).isEmpty();
     }
 
@@ -75,7 +72,7 @@ class SubprocessoValidacaoServiceTest {
         a1.setConhecimentos(List.of(new Conhecimento()));
         Atividade a2 = new Atividade();
         a2.setConhecimentos(List.of()); // Sem
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1, a2));
+        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1, a2));
 
         assertThat(service.obterAtividadesSemConhecimento(mapa)).containsExactly(a2);
     }
@@ -88,7 +85,7 @@ class SubprocessoValidacaoServiceTest {
         m.setCodigo(1L);
         sp.setMapa(m);
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of());
+        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of());
 
         assertThatThrownBy(() -> service.validarExistenciaAtividades(1L))
                 .isInstanceOf(ErroValidacao.class)
@@ -106,7 +103,7 @@ class SubprocessoValidacaoServiceTest {
         a.setConhecimentos(List.of());
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
+        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
 
         assertThatThrownBy(() -> service.validarExistenciaAtividades(1L))
                 .isInstanceOf(ErroValidacao.class)
@@ -118,7 +115,7 @@ class SubprocessoValidacaoServiceTest {
     void validarAssociacoesMapaErroCompetencias() {
         Competencia c = new Competencia();
         c.setAtividades(Collections.emptySet());
-        when(competenciaService.buscarPorCodMapa(1L)).thenReturn(List.of(c));
+        when(mapaManutencaoService.buscarCompetenciasPorCodMapa(1L)).thenReturn(List.of(c));
 
         assertThatThrownBy(() -> service.validarAssociacoesMapa(1L))
                 .isInstanceOf(ErroValidacao.class)
@@ -130,11 +127,11 @@ class SubprocessoValidacaoServiceTest {
     void validarAssociacoesMapaErroAtividades() {
         Competencia c = new Competencia();
         c.setAtividades(Set.of(new Atividade()));
-        when(competenciaService.buscarPorCodMapa(1L)).thenReturn(List.of(c));
+        when(mapaManutencaoService.buscarCompetenciasPorCodMapa(1L)).thenReturn(List.of(c));
 
         Atividade a = new Atividade();
         a.setCompetencias(Collections.emptySet());
-        when(atividadeService.buscarPorMapaCodigo(1L)).thenReturn(List.of(a));
+        when(mapaManutencaoService.buscarAtividadesPorMapaCodigo(1L)).thenReturn(List.of(a));
 
         assertThatThrownBy(() -> service.validarAssociacoesMapa(1L))
                 .isInstanceOf(ErroValidacao.class)
@@ -149,13 +146,13 @@ class SubprocessoValidacaoServiceTest {
         c.setAtividades(Set.of(a));
         a.setCompetencias(Set.of(c));
 
-        when(competenciaService.buscarPorCodMapa(1L)).thenReturn(List.of(c));
-        when(atividadeService.buscarPorMapaCodigo(1L)).thenReturn(List.of(a));
+        when(mapaManutencaoService.buscarCompetenciasPorCodMapa(1L)).thenReturn(List.of(c));
+        when(mapaManutencaoService.buscarAtividadesPorMapaCodigo(1L)).thenReturn(List.of(a));
 
         service.validarAssociacoesMapa(1L);
 
-        verify(competenciaService).buscarPorCodMapa(1L);
-        verify(atividadeService).buscarPorMapaCodigo(1L);
+        verify(mapaManutencaoService).buscarCompetenciasPorCodMapa(1L);
+        verify(mapaManutencaoService).buscarAtividadesPorMapaCodigo(1L);
     }
 
     @Test
@@ -166,7 +163,7 @@ class SubprocessoValidacaoServiceTest {
         m.setCodigo(1L);
         sp.setMapa(m);
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of());
+        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of());
 
         ValidacaoCadastroDto res = service.validarCadastro(1L);
         assertThat(res.valido()).isFalse();
@@ -185,7 +182,7 @@ class SubprocessoValidacaoServiceTest {
         a.setConhecimentos(List.of());
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
+        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
 
         ValidacaoCadastroDto res = service.validarCadastro(1L);
         assertThat(res.valido()).isFalse();
@@ -203,7 +200,7 @@ class SubprocessoValidacaoServiceTest {
         a.setConhecimentos(List.of(new Conhecimento()));
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
+        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
 
         ValidacaoCadastroDto res = service.validarCadastro(1L);
         assertThat(res.valido()).isTrue();

@@ -64,6 +64,13 @@ class ProcessoFacadeCoverageTest {
     @InjectMocks
     private ProcessoFacade facade;
 
+    @org.junit.jupiter.api.BeforeEach
+    void injectSelf() throws Exception {
+        java.lang.reflect.Field selfField = ProcessoFacade.class.getDeclaredField("self");
+        selfField.setAccessible(true);
+        selfField.set(facade, facade);
+    }
+
     @Test
     @DisplayName("atualizar - Erro Situacao Invalida")
     void atualizar_ErroSituacaoInvalida() {

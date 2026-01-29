@@ -3,6 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import ProcessoView from "@/views/ProcessoView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useProcessosStore} from "@/stores/processos";
+import {useProcessosCoreStore} from "@/stores/processos/core";
 import {useFeedbackStore} from "@/stores/feedback";
 import {usePerfilStore} from "@/stores/perfil";
 import {Perfil, SituacaoSubprocesso} from "@/types/tipos";
@@ -185,7 +186,8 @@ describe("ProcessoView.vue", () => {
     it("deve exibir alerta de erro da store", async () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();
-        processosStore.$patch({ lastError: { message: "Erro ao carregar", details: "Detalhes do erro" } });
+        const coreStore = useProcessosCoreStore();
+        coreStore.$patch({ lastError: { message: "Erro ao carregar", details: "Detalhes do erro" } });
 
         await nextTick();
         await flushPromises();

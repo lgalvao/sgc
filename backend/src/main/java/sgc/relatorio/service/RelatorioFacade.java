@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
-import sgc.mapa.service.CompetenciaService;
+import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.ResponsavelDto;
 import sgc.organizacao.model.Unidade;
@@ -26,7 +26,7 @@ public class RelatorioFacade {
     private final ProcessoFacade processoFacade;
     private final SubprocessoFacade subprocessoFacade;
     private final UnidadeFacade unidadeService;
-    private final CompetenciaService competenciaService;
+    private final MapaManutencaoService mapaManutencaoService;
     private final PdfFactory pdfFactory;
 
     @Transactional(readOnly = true)
@@ -79,7 +79,7 @@ public class RelatorioFacade {
                 document.add(new Paragraph("Unidade: %s - %s".formatted(unidade.getSigla(), unidade.getNome())));
                 document.add(new Paragraph(" "));
 
-                List<Competencia> competencias = competenciaService.buscarPorCodMapa(sp.getMapa().getCodigo());
+                List<Competencia> competencias = mapaManutencaoService.buscarCompetenciasPorCodMapa(sp.getMapa().getCodigo());
                 competencias.forEach(c -> {
                     document.add(new Paragraph("Competência: %s".formatted(c.getDescricao())));
                     c.getAtividades().forEach(a -> {

@@ -22,9 +22,7 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.AtividadeService;
-import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.service.ConhecimentoService;
+import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
@@ -58,7 +56,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoWorkflowFacade;
 
 /**
  * Facade para orquestrar operações de Subprocesso.
@@ -74,7 +72,7 @@ import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
  *
  * @see SubprocessoCrudService Para operações CRUD básicas
  * @see SubprocessoValidacaoService Para validações
- * @see SubprocessoWorkflowService Para operações de workflow (unificado)
+ * @see SubprocessoWorkflowFacade Para operações de workflow (unificado)
  */
 @Service
 @RequiredArgsConstructor
@@ -84,7 +82,7 @@ public class SubprocessoFacade {
     // Services decomposed (package-private)
     private final SubprocessoCrudService crudService;
     private final SubprocessoValidacaoService validacaoService;
-    private final SubprocessoWorkflowService workflowService;
+    private final SubprocessoWorkflowFacade workflowService;
 
     // Utility services
     private final UsuarioFacade usuarioService;
@@ -93,13 +91,11 @@ public class SubprocessoFacade {
 
     // Dependencies for detail/context operations (previously in
     // SubprocessoDetalheService/SubprocessoContextoService)
-    private final AtividadeService atividadeService;
+    private final MapaManutencaoService mapaManutencaoService;
     private final MovimentacaoRepo repositorioMovimentacao;
     private final SubprocessoDetalheMapper subprocessoDetalheMapper;
     private final ConhecimentoMapper conhecimentoMapper;
     private final AnaliseFacade analiseFacade;
-    private final CompetenciaService competenciaService;
-    private final ConhecimentoService conhecimentoService;
     private final MapaAjusteMapper mapaAjusteMapper;
     private final sgc.seguranca.acesso.AccessControlService accessControlService;
 
@@ -437,7 +433,7 @@ public class SubprocessoFacade {
             }
         }
         if (!atividadeDescricoes.isEmpty()) {
-            atividadeService.atualizarDescricoesEmLote(atividadeDescricoes);
+            mapaManutencaoService.atualizarDescricoesAtividadeEmLote(atividadeDescricoes);
         }
     }
 
@@ -447,7 +443,7 @@ public class SubprocessoFacade {
                 .map(CompetenciaAjusteDto::getCodCompetencia)
                 .toList();
 
-        java.util.Map<Long, Competencia> mapaCompetencias = competenciaService.buscarPorCodigos(competenciaIds).stream()
+        java.util.Map<Long, Competencia> mapaCompetencias = mapaManutencaoService.buscarCompetenciasPorCodigos(competenciaIds).stream()
                 .collect(java.util.stream.Collectors.toMap(Competencia::getCodigo,
                         java.util.function.Function.identity()));
 
@@ -457,7 +453,7 @@ public class SubprocessoFacade {
                 .distinct()
                 .toList();
 
-        java.util.Map<Long, Atividade> mapaAtividades = atividadeService.buscarPorCodigos(todasAtividadesIds).stream()
+        java.util.Map<Long, Atividade> mapaAtividades = mapaManutencaoService.buscarAtividadesPorCodigos(todasAtividadesIds).stream()
                 .collect(java.util.stream.Collectors.toMap(Atividade::getCodigo,
                         java.util.function.Function.identity()));
 
@@ -476,7 +472,7 @@ public class SubprocessoFacade {
                 competenciasParaSalvar.add(competencia);
             }
         }
-        competenciaService.salvarTodas(competenciasParaSalvar);
+        mapaManutencaoService.salvarTodasCompetencias(competenciasParaSalvar);
     }
 
     private void importarAtividadesInterno(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
@@ -536,8 +532,8 @@ public class SubprocessoFacade {
 
     private List<AtividadeVisualizacaoDto> listarAtividadesSubprocessoInterno(Long codSubprocesso) {
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
-        List<Atividade> todasAtividades = atividadeService
-                .buscarPorMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
+        List<Atividade> todasAtividades = mapaManutencaoService
+                .buscarAtividadesPorMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
         return todasAtividades.stream().map(this::mapAtividadeToDto).toList();
     }
 
@@ -587,7 +583,7 @@ public class SubprocessoFacade {
         accessControlService.verificarPermissao(usuario, Acao.VISUALIZAR_SUBPROCESSO, sp);
 
         List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos = new ArrayList<>();
-        List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
+        List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
         for (Atividade a : atividades) {
             List<ConhecimentoResponse> ksDto = a.getConhecimentos().stream().map(conhecimentoMapper::toResponse)
                     .toList();
@@ -617,12 +613,12 @@ public class SubprocessoFacade {
         Long codMapa = sp.getMapa().getCodigo();
         Analise analise = analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst()
                 .orElse(null);
-        List<Competencia> competencias = competenciaService.buscarPorCodMapaSemRelacionamentos(codMapa);
+        List<Competencia> competencias = mapaManutencaoService.buscarCompetenciasPorCodMapaSemRelacionamentos(codMapa);
         // Optimization: Fetch activities without eager loading competencies to avoid
         // redundant data transfer
-        List<Atividade> atividades = atividadeService.buscarPorMapaCodigoSemRelacionamentos(codMapa);
-        List<Conhecimento> conhecimentos = conhecimentoService.listarPorMapa(codMapa);
-        java.util.Map<Long, java.util.Set<Long>> associacoes = competenciaService
+        List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoSemRelacionamentos(codMapa);
+        List<Conhecimento> conhecimentos = mapaManutencaoService.listarConhecimentosPorMapa(codMapa);
+        java.util.Map<Long, java.util.Set<Long>> associacoes = mapaManutencaoService
                 .buscarIdsAssociacoesCompetenciaAtividade(codMapa);
         return mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos, associacoes);
     }

@@ -23,9 +23,8 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.AtividadeService;
-import sgc.mapa.service.ConhecimentoService;
 import sgc.mapa.service.ImpactoMapaService;
+import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.CriarProcessoRequest;
@@ -36,7 +35,7 @@ import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoWorkflowFacade;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -63,11 +62,9 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private ProcessoFacade processoFacade;
     @Autowired
-    private SubprocessoWorkflowService workflowService;
+    private SubprocessoWorkflowFacade workflowService;
     @Autowired
-    private AtividadeService atividadeService;
-    @Autowired
-    private ConhecimentoService conhecimentoService;
+    private MapaManutencaoService mapaManutencaoService;
     @Autowired
     private UsuarioFacade usuarioService;
     @Autowired
@@ -178,7 +175,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 .descricao("Atividade Teste")
                 .mapaCodigo(subprocessoDto.getCodMapa())
                 .build();
-        AtividadeResponse ativCriada = atividadeService.criar(ativReq);
+        AtividadeResponse ativCriada = mapaManutencaoService.criarAtividade(ativReq);
 
         // Chefe adiciona conhecimento (necessário para validação)
         autenticar(chefeMapeamento, "ROLE_CHEFE");
@@ -186,7 +183,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 .descricao("Conhecimento Teste")
                 .atividadeCodigo(ativCriada.codigo())
                 .build();
-        conhecimentoService.criar(ativCriada.codigo(), conReq);
+        mapaManutencaoService.criarConhecimento(ativCriada.codigo(), conReq);
 
         em.flush();
         em.clear();
@@ -274,9 +271,9 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
         // Adicionar dados
         autenticar(chefeMapeamento, "ROLE_CHEFE");
-        AtividadeResponse ativ = atividadeService.criar(
+        AtividadeResponse ativ = mapaManutencaoService.criarAtividade(
                 CriarAtividadeRequest.builder().descricao("A").mapaCodigo(codMapa).build());
-        conhecimentoService.criar(ativ.codigo(),
+        mapaManutencaoService.criarConhecimento(ativ.codigo(),
                 CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.codigo())
                         .build());
 
@@ -330,10 +327,10 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
         // 3. Chefe inicia revisão (adiciona atividade -> Em Andamento)
         autenticar(chefeRevisao, "ROLE_CHEFE");
-        AtividadeResponse ativ = atividadeService.criar(
+        AtividadeResponse ativ = mapaManutencaoService.criarAtividade(
                 CriarAtividadeRequest.builder().descricao("Nova Ativ Revisao").mapaCodigo(codMapa)
                         .build());
-        conhecimentoService.criar(ativ.codigo(),
+        mapaManutencaoService.criarConhecimento(ativ.codigo(),
                 CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.codigo())
                         .build());
 
@@ -411,9 +408,9 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
         // 3. Chefe faz alteração
         autenticar(chefeRevisao, "ROLE_CHEFE");
-        AtividadeResponse ativ = atividadeService.criar(
+        AtividadeResponse ativ = mapaManutencaoService.criarAtividade(
                 CriarAtividadeRequest.builder().descricao("Ativ").mapaCodigo(codMapa).build());
-        conhecimentoService.criar(ativ.codigo(),
+        mapaManutencaoService.criarConhecimento(ativ.codigo(),
                 CriarConhecimentoRequest.builder().descricao("C").atividadeCodigo(ativ.codigo())
                         .build());
 

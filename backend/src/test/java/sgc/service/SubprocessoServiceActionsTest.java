@@ -37,7 +37,7 @@ import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.workflow.SubprocessoWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoWorkflowFacade;
 
 @Tag("integration")
 @SpringBootTest
@@ -48,7 +48,7 @@ class SubprocessoServiceActionsTest {
     private static final String OBSERVACOES = "Observações de teste";
 
     @Autowired
-    private SubprocessoWorkflowService subprocessoWorkflowService;
+    private SubprocessoWorkflowFacade subprocessoWorkflowService;
 
     @Autowired
     private SubprocessoRepo subprocessoRepo;

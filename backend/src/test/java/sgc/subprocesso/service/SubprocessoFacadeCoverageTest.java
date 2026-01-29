@@ -19,8 +19,7 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.AtividadeService;
-import sgc.mapa.service.CompetenciaService;
+import sgc.mapa.service.MapaManutencaoService;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
@@ -36,9 +35,7 @@ class SubprocessoFacadeCoverageTest {
     @Mock
     private SubprocessoCrudService crudService;
     @Mock
-    private AtividadeService atividadeService;
-    @Mock
-    private CompetenciaService competenciaService;
+    private MapaManutencaoService mapaManutencaoService;
     @Mock
     private sgc.seguranca.acesso.AccessControlService accessControlService;
     @Mock
@@ -170,12 +167,12 @@ class SubprocessoFacadeCoverageTest {
                 ))
                 .build();
 
-        when(atividadeService.atualizarDescricoesEmLote(any())).thenReturn(java.util.Collections.emptyList());
-        when(competenciaService.buscarPorCodigos(any())).thenReturn(java.util.Collections.emptyList());
+        when(mapaManutencaoService.atualizarDescricoesAtividadeEmLote(any())).thenReturn(java.util.Collections.emptyList());
+        when(mapaManutencaoService.buscarCompetenciasPorCodigos(any())).thenReturn(java.util.Collections.emptyList());
 
         facade.salvarAjustesMapa(codSubprocesso, java.util.List.of(compRequest));
 
-        verify(competenciaService).salvarTodas(any());
+        verify(mapaManutencaoService).salvarTodasCompetencias(any());
     }
 
     @Test
@@ -343,7 +340,7 @@ class SubprocessoFacadeCoverageTest {
 
         atividade.setConhecimentos(List.of(conhecimento));
 
-        when(atividadeService.buscarPorMapaCodigoComConhecimentos(codMapa)).thenReturn(List.of(atividade));
+        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(codMapa)).thenReturn(List.of(atividade));
 
         var result = facade.listarAtividadesSubprocesso(codSubprocesso);
 
@@ -369,11 +366,11 @@ class SubprocessoFacadeCoverageTest {
 
         Competencia competencia = new Competencia();
         competencia.setCodigo(100L);
-        when(competenciaService.buscarPorCodigos(any())).thenReturn(List.of(competencia));
+        when(mapaManutencaoService.buscarCompetenciasPorCodigos(any())).thenReturn(List.of(competencia));
 
         facade.salvarAjustesMapa(codSubprocesso, List.of(compDto));
 
-        verify(competenciaService).salvarTodas(any());
+        verify(mapaManutencaoService).salvarTodasCompetencias(any());
     }
 
     @Test
@@ -430,15 +427,15 @@ class SubprocessoFacadeCoverageTest {
 
         Competencia competencia = new Competencia();
         competencia.setCodigo(100L);
-        when(competenciaService.buscarPorCodigos(any())).thenReturn(List.of(competencia));
+        when(mapaManutencaoService.buscarCompetenciasPorCodigos(any())).thenReturn(List.of(competencia));
 
         Atividade atividade = new Atividade();
         atividade.setCodigo(200L);
-        when(atividadeService.buscarPorCodigos(any())).thenReturn(List.of(atividade));
+        when(mapaManutencaoService.buscarAtividadesPorCodigos(any())).thenReturn(List.of(atividade));
 
         facade.salvarAjustesMapa(codSubprocesso, List.of(compDto));
 
-        verify(competenciaService).salvarTodas(any());
+        verify(mapaManutencaoService).salvarTodasCompetencias(any());
         // Verify activity was added to competence
         org.junit.jupiter.api.Assertions.assertFalse(competencia.getAtividades().isEmpty());
     }

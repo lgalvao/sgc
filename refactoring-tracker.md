@@ -11,10 +11,10 @@
 |---------------------------|--------------|-----------|------------------|---------------------------|
 | **Sprint 1** - Quick Wins | 🟢 Concluída | 100%      | 5/5              | [Ver detalhes](#sprint-1) |
 | **Sprint 2** - Frontend   | 🟢 Concluída | 100%      | 3/3              | [Ver detalhes](#sprint-2) |
-| **Sprint 3** - Backend    | 🔵 Planejada | 0%        | 0/3              | [Ver detalhes](#sprint-3) |
-| **Sprint 4** - Opcionais  | 🔵 Planejada | 0%        | 0/3              | [Ver detalhes](#sprint-4) |
+| **Sprint 3** - Backend    | 🟢 Concluída | 100%      | 3/3              | [Ver detalhes](#sprint-3) |
+| **Sprint 4** - Opcionais  | 🟡 Em Andamento| 33%       | 1/3              | [Ver detalhes](#sprint-4) |
 
-**Total Geral:** 8/14 ações (57%)
+**Total Geral:** 12/14 ações (85%)
 
 ---
 
@@ -80,13 +80,22 @@
 **Objetivo:** Arquitetura mais clara, SRP respeitado  
 **Status:** 🔵 Planejada
 
-| #  | Ação                                                                      | Prioridade | Status     | Esforço  | Impacto  |
-|----|---------------------------------------------------------------------------|------------|------------|----------|----------|
-| 6  | Decompor `UnidadeFacade` em 3 services                                    | 🟡 Média   | ⚪ Pendente | 🔴 Alto  | 🟠 Médio |
-| 8  | Dividir `SubprocessoWorkflowService` (775 linhas)                         | 🟡 Média   | ⚪ Pendente | 🔴 Alto  | 🟠 Médio |
-| 10 | Consolidar AtividadeService + CompetenciaService em MapaManutencaoService | 🟡 Média   | ⚪ Pendente | 🟡 Médio | 🟠 Médio |
+| #  | Ação                                                                      | Prioridade | Status       | Esforço  | Impacto  |
+|----|---------------------------------------------------------------------------|------------|--------------|----------|----------|
+| 6  | Decompor `UnidadeFacade` em 3 services                                    | 🟡 Média   | 🟢 Concluída | 🔴 Alto  | 🟠 Médio |
+| 8  | Dividir `SubprocessoWorkflowService` (775 linhas)                         | 🟡 Média   | 🟢 Concluída | 🔴 Alto  | 🟠 Médio |
+| 10 | Consolidar AtividadeService + CompetenciaService em MapaManutencaoService | 🟡 Média   | 🟢 Concluída | 🟡 Médio | 🟠 Médio |
 
 **Documentação:** [backend-sprint-3.md](./backend-sprint-3.md)
+
+**Resultados Alcançados:**
+
+- ✅ `UnidadeFacade` decomposto em services especializados (Hierarquia, Mapa, Responsavel)
+- ✅ `SubprocessoWorkflowService` (God Object) dividido em `SubprocessoCadastroWorkflowService`, `SubprocessoMapaWorkflowService`, `SubprocessoAdminWorkflowService`
+- ✅ `SubprocessoWorkflowFacade` criado para manter contrato
+- ✅ `AtividadeService`, `CompetenciaService`, `ConhecimentoService` consolidados em `MapaManutencaoService` (eliminando dependências circulares)
+- ✅ 1369/1369 testes backend passando (100%)
+- ✅ Código morto/obsoleto removido
 
 ---
 
@@ -99,7 +108,7 @@
 |----|--------------------------------------------|------------|------------|----------|----------|
 | 9  | Implementar cache HTTP parcial (frontend)  | 🟡 Média   | ⚪ Pendente | 🟡 Médio | 🟡 Baixo |
 | 13 | Adicionar @EntityGraph onde apropriado     | 🟢 Baixa   | ⚪ Pendente | 🟡 Médio | 🟢 Baixo |
-| 14 | Decompor `processos.ts` store (345 linhas) | 🟢 Baixa   | ⚪ Pendente | 🔴 Alto  | 🟢 Baixo |
+| 14 | Decompor `processos.ts` store (345 linhas) | 🟢 Baixa   | 🟢 Concluída | 🔴 Alto  | 🟢 Baixo |
 
 **Documentação:** [otimizacoes-sprint-4.md](./otimizacoes-sprint-4.md)
 

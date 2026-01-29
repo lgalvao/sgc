@@ -53,6 +53,13 @@ class ProcessoFacadeQueryTest {
     @InjectMocks
     private ProcessoFacade processoFacade;
 
+    @org.junit.jupiter.api.BeforeEach
+    void injectSelf() throws Exception {
+        java.lang.reflect.Field selfField = ProcessoFacade.class.getDeclaredField("self");
+        selfField.setAccessible(true);
+        selfField.set(processoFacade, processoFacade);
+    }
+
     @Nested
     @DisplayName("Consultas e Detalhes")
     class Consultas {

@@ -45,7 +45,7 @@
  *
  * <h4>📁 service/ (raiz) - Services de Suporte</h4>
  * <ul>
- *   <li>{@code SubprocessoWorkflowService} - Operações genéricas de workflow</li>
+ *   <li>{@code SubprocessoWorkflowFacade} - Operações genéricas de workflow</li>
  * </ul>
  *
  * <h2>Fluxo de Uso</h2>
@@ -163,7 +163,7 @@
  * <ul>
  *   <li><strong>Fase 5:</strong> Consolidar services (13 → 6-7)
  *       <ul>
- *         <li>🎯 Unificar workflows em SubprocessoWorkflowService único</li>
+ *         <li>🎯 Unificar workflows em SubprocessoWorkflowFacade único</li>
  *         <li>✅ Lógica movida de SubprocessoDetalheService e SubprocessoContextoService para Facade</li>
  *         <li>🎯 Resolver violações ArchUnit detectadas na Fase 2</li>
  *       </ul>

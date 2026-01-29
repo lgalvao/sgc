@@ -21,7 +21,7 @@ Esta sprint contém otimizações **não críticas** que devem ser implementadas
 |----|--------------------------------------------|------------|----------|----------|-------------------------------------------|
 | 9  | Implementar cache HTTP parcial (frontend)  | 🟡 Média   | 🟡 Médio | 🟡 Baixo | **SE** UX apresentar latência perceptível |
 | 13 | Adicionar @EntityGraph onde apropriado     | 🟢 Baixa   | 🟡 Médio | 🟢 Baixo | **SE** surgir problema N+1 medido         |
-| 14 | Decompor `processos.ts` store (345 linhas) | 🟢 Baixa   | 🔴 Alto  | 🟢 Baixo | **SE** manutenção se tornar difícil       |
+| 14 | Decompor `processos.ts` store (345 linhas) | 🟢 Baixa   | 🔴 Alto  | 🟢 Baixo | 🟢 Concluída (28/01/2026) |
 
 **Resultado Esperado:** Otimizações pontuais apenas quando justificadas por métricas reais.
 

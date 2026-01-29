@@ -52,8 +52,17 @@ describe("useProcessosStore", () => {
         expect(context.store.processoDetalhe).toBeNull();
     });
 
-    it("deve limpar o erro com clearError", () => {
-        context.store.lastError = normalizeError(new Error("Erro de teste"));
+    it("deve limpar o erro com clearError", async () => {
+        // Trigger an error via action
+        painelService.listarProcessos.mockRejectedValue(MOCK_ERROR);
+        try {
+            await context.store.buscarProcessosPainel("perfil", 1, 0, 10);
+        } catch (e) {
+            // Ignore expected error
+        }
+        
+        expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
+        
         context.store.clearError();
         expect(context.store.lastError).toBeNull();
     });

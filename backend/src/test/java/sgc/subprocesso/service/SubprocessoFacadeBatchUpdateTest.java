@@ -8,8 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.service.AtividadeService;
-import sgc.mapa.service.CompetenciaService;
+import sgc.mapa.service.MapaManutencaoService;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -25,9 +24,7 @@ import static org.mockito.Mockito.*;
 @DisplayName("SubprocessoFacade Batch Update Test")
 class SubprocessoFacadeBatchUpdateTest {
     @Mock
-    private AtividadeService atividadeService;
-    @Mock
-    private CompetenciaService competenciaService;
+    private MapaManutencaoService mapaManutencaoService;
     @Mock
     private SubprocessoRepo subprocessoRepo;
 
@@ -70,28 +67,28 @@ class SubprocessoFacadeBatchUpdateTest {
         a11.setCodigo(11L);
         Atividade a12 = new Atividade();
         a12.setCodigo(12L);
-        when(atividadeService.atualizarDescricoesEmLote(any())).thenReturn(List.of(a10, a11, a12));
+        when(mapaManutencaoService.atualizarDescricoesAtividadeEmLote(any())).thenReturn(List.of(a10, a11, a12));
 
         Competencia c1 = new Competencia();
         c1.setCodigo(1L);
         Competencia c2 = new Competencia();
         c2.setCodigo(2L);
-        when(competenciaService.buscarPorCodigos(any())).thenReturn(List.of(c1, c2));
+        when(mapaManutencaoService.buscarCompetenciasPorCodigos(any())).thenReturn(List.of(c1, c2));
 
         // Act
         facade.salvarAjustesMapa(codSubprocesso, ajustes);
 
         // Assert
         // Verify batch methods called ONCE
-        verify(atividadeService, times(1)).atualizarDescricoesEmLote(any());
-        verify(competenciaService, times(1)).buscarPorCodigos(any());
-        verify(competenciaService, times(1)).salvarTodas(any());
+        verify(mapaManutencaoService, times(1)).atualizarDescricoesAtividadeEmLote(any());
+        verify(mapaManutencaoService, times(1)).buscarCompetenciasPorCodigos(any());
+        verify(mapaManutencaoService, times(1)).salvarTodasCompetencias(any());
         verify(subprocessoRepo, times(1)).save(subprocesso);
 
         // Verify singular methods NOT called (N+1 avoidance)
-        verify(atividadeService, never()).obterPorCodigo(any());
-        verify(atividadeService, never()).atualizar(any(), any());
-        verify(competenciaService, never()).buscarPorCodigo(any());
-        verify(competenciaService, never()).salvar(any());
+        verify(mapaManutencaoService, never()).obterAtividadePorCodigo(any());
+        verify(mapaManutencaoService, never()).atualizarAtividade(any(), any());
+        verify(mapaManutencaoService, never()).buscarCompetenciaPorCodigo(any());
+        verify(mapaManutencaoService, never()).salvarCompetencia(any());
     }
 }
