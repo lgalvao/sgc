@@ -14,7 +14,6 @@ import org.mockito.quality.Strictness;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.util.ReflectionTestUtils;
 import sgc.comum.util.Sleeper;
-import sgc.notificacao.dto.EmailDto;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -22,7 +21,6 @@ import java.util.concurrent.ExecutionException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -52,11 +50,15 @@ class NotificacaoEmailAsyncExecutorTest {
     @DisplayName("Deve enviar email com sucesso na primeira tentativa")
     void enviarEmailAssincrono_sucessoPrimeiraTentativa() throws ExecutionException, InterruptedException {
         // Arrange
-        EmailDto email = new EmailDto("dest@teste.com", "Assunto", "Corpo", false);
+        String para = "dest@teste.com";
+        String assunto = "Assunto";
+        String corpo = "Corpo";
+        boolean html = false;
+        
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 
         // Act
-        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(email);
+        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(para, assunto, corpo, html);
         Boolean resultado = future.get();
 
         // Assert
@@ -68,7 +70,11 @@ class NotificacaoEmailAsyncExecutorTest {
     @DisplayName("Deve realizar retentativas e ter sucesso")
     void enviarEmailAssincrono_sucessoComRetentativa() throws ExecutionException, InterruptedException {
         // Arrange
-        EmailDto email = new EmailDto("dest@teste.com", "Assunto", "Corpo", false);
+        String para = "dest@teste.com";
+        String assunto = "Assunto";
+        String corpo = "Corpo";
+        boolean html = false;
+        
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 
         // Falha na primeira, sucesso na segunda
@@ -77,7 +83,7 @@ class NotificacaoEmailAsyncExecutorTest {
                 .when(javaMailSender).send(mimeMessage);
 
         // Act
-        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(email);
+        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(para, assunto, corpo, html);
         Boolean resultado = future.get();
 
         // Assert
@@ -89,14 +95,18 @@ class NotificacaoEmailAsyncExecutorTest {
     @DisplayName("Deve falhar após exceder tentativas máximas")
     void enviarEmailAssincrono_falhaAposRetentativas() throws ExecutionException, InterruptedException {
         // Arrange
-        EmailDto email = new EmailDto("dest@teste.com", "Assunto", "Corpo", false);
+        String para = "dest@teste.com";
+        String assunto = "Assunto";
+        String corpo = "Corpo";
+        boolean html = false;
+        
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 
         // Falha sempre
         doThrow(new RuntimeException("Erro Fatal")).when(javaMailSender).send(mimeMessage);
 
         // Act
-        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(email);
+        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(para, assunto, corpo, html);
         Boolean resultado = future.get();
 
         // Assert
@@ -109,7 +119,11 @@ class NotificacaoEmailAsyncExecutorTest {
     @DisplayName("Deve lidar com interrupção da thread durante espera")
     void enviarEmailAssincrono_interrupcaoThread() throws ExecutionException, InterruptedException {
         // Arrange
-        EmailDto email = new EmailDto("dest@teste.com", "Assunto", "Corpo", false);
+        String para = "dest@teste.com";
+        String assunto = "Assunto";
+        String corpo = "Corpo";
+        boolean html = false;
+        
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 
         // Falha na primeira tentativa
@@ -119,7 +133,7 @@ class NotificacaoEmailAsyncExecutorTest {
         doThrow(new InterruptedException("Interrompido")).when(sleeper).sleep(anyLong());
 
         // Act
-        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(email);
+        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(para, assunto, corpo, html);
         Boolean resultado = future.get();
 
         // Assert

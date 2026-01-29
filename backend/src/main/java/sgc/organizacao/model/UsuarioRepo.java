@@ -17,6 +17,7 @@ public interface UsuarioRepo extends JpaRepository<Usuario, String> {
     @Query("""
             SELECT DISTINCT u FROM Usuario u
             JOIN sgc.organizacao.model.UsuarioPerfil up ON up.usuarioTitulo = u.tituloEleitoral
+            LEFT JOIN FETCH u.atribuicoesTemporarias
             WHERE up.unidadeCodigo = :codigoUnidade AND up.perfil = 'CHEFE'
             """)
     Optional<Usuario> chefePorCodUnidade(@Param("codigoUnidade") Long codigoUnidade);
@@ -24,6 +25,7 @@ public interface UsuarioRepo extends JpaRepository<Usuario, String> {
     @Query("""
             SELECT DISTINCT u FROM Usuario u
             JOIN sgc.organizacao.model.UsuarioPerfil up ON up.usuarioTitulo = u.tituloEleitoral
+            LEFT JOIN FETCH u.atribuicoesTemporarias
             WHERE up.unidadeCodigo IN :codigosUnidades AND up.perfil = 'CHEFE'
             """)
     List<Usuario> findChefesByUnidadesCodigos(@Param("codigosUnidades") List<Long> codigosUnidades);

@@ -8,7 +8,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.notificacao.dto.EmailDto;
 import sgc.notificacao.model.Notificacao;
 import sgc.notificacao.model.NotificacaoRepo;
 
@@ -18,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
-
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
 class NotificacaoEmailServiceTest {
@@ -38,7 +36,7 @@ class NotificacaoEmailServiceTest {
     @DisplayName("Deve enviar e-mail HTML")
     void enviarEmailHtml_deveEnviarComSucesso() {
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
-        when(emailExecutor.enviarEmailAssincrono(any(EmailDto.class))).thenReturn(CompletableFuture.completedFuture(true));
+        when(emailExecutor.enviarEmailAssincrono(anyString(), anyString(), anyString(), anyBoolean())).thenReturn(CompletableFuture.completedFuture(true));
 
         String para = "recipient@test.com";
         String assunto = "Test Subject";
@@ -46,15 +44,8 @@ class NotificacaoEmailServiceTest {
 
         notificacaoServico.enviarEmailHtml(para, assunto, corpoHtml);
 
-        ArgumentCaptor<EmailDto> captorEmailDto = ArgumentCaptor.forClass(EmailDto.class);
-        verify(emailExecutor).enviarEmailAssincrono(captorEmailDto.capture());
-
-        EmailDto emailCapturado = captorEmailDto.getValue();
-        assertEquals(para, emailCapturado.destinatario());
-        assertEquals(assunto, emailCapturado.assunto());
-        assertTrue(emailCapturado.html());
-        assertEquals(corpoHtml, emailCapturado.corpo());
-
+        verify(emailExecutor).enviarEmailAssincrono(eq(para), eq(assunto), eq(corpoHtml), eq(true));
+        
         verify(repositorioNotificacao, times(1)).save(any(Notificacao.class));
     }
 
@@ -67,7 +58,7 @@ class NotificacaoEmailServiceTest {
 
         notificacaoServico.enviarEmailHtml(para, assunto, corpoHtml);
 
-        verify(emailExecutor, never()).enviarEmailAssincrono(any());
+        verify(emailExecutor, never()).enviarEmailAssincrono(anyString(), anyString(), anyString(), anyBoolean());
         verify(repositorioNotificacao, never()).save(any(Notificacao.class));
     }
 
@@ -76,7 +67,7 @@ class NotificacaoEmailServiceTest {
     void deveEnviarEmailTextoSimples() {
         // Arrange
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
-        when(emailExecutor.enviarEmailAssincrono(any(EmailDto.class))).thenReturn(CompletableFuture.completedFuture(true));
+        when(emailExecutor.enviarEmailAssincrono(anyString(), anyString(), anyString(), anyBoolean())).thenReturn(CompletableFuture.completedFuture(true));
 
         String para = "recipient@test.com";
         String assunto = "Test Subject Plain";
@@ -86,15 +77,8 @@ class NotificacaoEmailServiceTest {
         notificacaoServico.enviarEmail(para, assunto, corpo);
 
         // Assert
-        ArgumentCaptor<EmailDto> captorEmailDto = ArgumentCaptor.forClass(EmailDto.class);
-        verify(emailExecutor).enviarEmailAssincrono(captorEmailDto.capture());
-
-        EmailDto emailCapturado = captorEmailDto.getValue();
-        assertEquals(para, emailCapturado.destinatario());
-        assertEquals(assunto, emailCapturado.assunto());
-        org.junit.jupiter.api.Assertions.assertFalse(emailCapturado.html());
-        assertEquals(corpo, emailCapturado.corpo());
-
+        verify(emailExecutor).enviarEmailAssincrono(eq(para), eq(assunto), eq(corpo), eq(false));
+        
         verify(repositorioNotificacao, times(1)).save(any(Notificacao.class));
     }
 
@@ -110,7 +94,7 @@ class NotificacaoEmailServiceTest {
         notificacaoServico.enviarEmail(para, assunto, corpo);
 
         // Assert
-        verify(emailExecutor, never()).enviarEmailAssincrono(any());
+        verify(emailExecutor, never()).enviarEmailAssincrono(anyString(), anyString(), anyString(), anyBoolean());
         verify(repositorioNotificacao, never()).save(any(Notificacao.class));
     }
 
@@ -119,7 +103,7 @@ class NotificacaoEmailServiceTest {
     void deveTruncarConteudoLongoDaNotificacao() {
         // Arrange
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
-        when(emailExecutor.enviarEmailAssincrono(any(EmailDto.class))).thenReturn(CompletableFuture.completedFuture(true));
+        when(emailExecutor.enviarEmailAssincrono(anyString(), anyString(), anyString(), anyBoolean())).thenReturn(CompletableFuture.completedFuture(true));
 
         String para = "recipient@test.com";
         String assunto = "Test";
@@ -142,7 +126,7 @@ class NotificacaoEmailServiceTest {
     void deveLogarErroQuandoEnvioFalha() {
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
         CompletableFuture<Boolean> futureFalho = CompletableFuture.completedFuture(false);
-        when(emailExecutor.enviarEmailAssincrono(any(EmailDto.class))).thenReturn(futureFalho);
+        when(emailExecutor.enviarEmailAssincrono(anyString(), anyString(), anyString(), anyBoolean())).thenReturn(futureFalho);
 
         String para = "recipient@test.com";
         String assunto = "Test";
@@ -150,7 +134,7 @@ class NotificacaoEmailServiceTest {
 
         notificacaoServico.enviarEmail(para, assunto, corpo);
 
-        verify(emailExecutor).enviarEmailAssincrono(any(EmailDto.class));
+        verify(emailExecutor).enviarEmailAssincrono(eq(para), eq(assunto), eq(corpo), eq(false));
     }
 
     @Test
@@ -159,7 +143,7 @@ class NotificacaoEmailServiceTest {
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
         CompletableFuture<Boolean> futureComErro = new CompletableFuture<>();
         futureComErro.completeExceptionally(new RuntimeException("Erro de teste"));
-        when(emailExecutor.enviarEmailAssincrono(any(EmailDto.class))).thenReturn(futureComErro);
+        when(emailExecutor.enviarEmailAssincrono(anyString(), anyString(), anyString(), anyBoolean())).thenReturn(futureComErro);
 
         String para = "recipient@test.com";
         String assunto = "Test";
@@ -167,7 +151,7 @@ class NotificacaoEmailServiceTest {
 
         notificacaoServico.enviarEmail(para, assunto, corpo);
 
-        verify(emailExecutor).enviarEmailAssincrono(any(EmailDto.class));
+        verify(emailExecutor).enviarEmailAssincrono(eq(para), eq(assunto), eq(corpo), eq(false));
     }
 
     @Test
@@ -183,6 +167,6 @@ class NotificacaoEmailServiceTest {
         notificacaoServico.enviarEmail(para, assunto, corpo);
 
         verify(repositorioNotificacao).save(any(Notificacao.class));
-        verify(emailExecutor, never()).enviarEmailAssincrono(any(EmailDto.class));
+        verify(emailExecutor, never()).enviarEmailAssincrono(anyString(), anyString(), anyString(), anyBoolean());
     }
 }

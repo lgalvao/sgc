@@ -19,14 +19,14 @@ Existem 3 facades que ainda injetam repositories diretamente, violando o padrão
 | **MapaFacade** | Média/Alta | 18 | Criar `MapaRepositoryService`, resolver circularidade |
 | **UnidadeFacade** | Alta | 0 | ✅ CONCLUÍDO |
 | **UsuarioFacade** | Alta | 0 | ✅ CONCLUÍDO |
-| **SubprocessoFacade** | Alta | 15 | Criar `SubprocessoRepositoryService` e `MovimentacaoService` |
+| **SubprocessoFacade** | Alta | 0 | ✅ CONCLUÍDO |
 
 ### 2. Saneamento de DTOs e Repositories
 | Item | Descrição | Esforço |
 |------|-----------|---------|
-| **DTOs Duplicados** | Resolver `ResponsavelDto` e `PerfilUnidadeDto` (duplicados em packages diferentes) | 3h |
-| **Wrappers Triviais** | Remover wrappers como `ProcessoContextoDto` e `EmailDto` | 2h |
-| **Padronização Repos** | `UsuarioRepo`: Padronizar JOIN vs LEFT JOIN FETCH em métodos de chefes | 2h |
+| **DTOs Duplicados** | Resolver `ResponsavelDto` e `PerfilUnidadeDto` (duplicados em packages diferentes) | ✅ CONCLUÍDO |
+| **Wrappers Triviais** | Remover wrappers como `ProcessoContextoDto` e `EmailDto` | ✅ CONCLUÍDO |
+| **Padronização Repos** | `UsuarioRepo`: Padronizar JOIN vs LEFT JOIN FETCH em métodos de chefes | ✅ CONCLUÍDO |
 
 ---
 
@@ -39,7 +39,7 @@ Existem 3 facades que ainda injetam repositories diretamente, violando o padrão
 | **Stores Pinia** | ✅ 100% | Removido `.catch()` redundante, unificado tratamento de erro. |
 | **Computed Anti-patterns**| ✅ 100% | Convertidos para getters reativos. |
 | **ArchUnit** | ✅ Ativo | Regra ativa impedindo novos acessos diretos de Facade a Repo. |
-| **Limpeza de Código** | 🔄 20% | Removido `SubprocessoMovimentacaoRepo` (duplicado). |
+| **Limpeza de Código** | ✅ 100% | DTOs unificados, Services de repositório criados. |
 
 ---
 

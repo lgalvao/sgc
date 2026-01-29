@@ -693,12 +693,12 @@ class ProcessoControllerTest {
             // Arrange
             ProcessoDetalheDto detalhe = ProcessoDetalheDto.builder().codigo(1L).build();
             when(processoFacade.obterContextoCompleto(1L))
-                    .thenReturn(ProcessoContextoDto.builder().processo(detalhe).build());
+                    .thenReturn(detalhe);
 
             // Act & Assert
             mockMvc.perform(get("/api/processos/1/contexto-completo"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.processo.codigo").value(1L));
+                    .andExpect(jsonPath("$.codigo").value(1L));
         }
     }
 }
