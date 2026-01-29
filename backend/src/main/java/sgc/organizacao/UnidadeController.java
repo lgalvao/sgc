@@ -1,5 +1,6 @@
 package sgc.organizacao;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,7 +43,7 @@ public class UnidadeController {
     @PostMapping("/{codUnidade}/atribuicoes-temporarias")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> criarAtribuicaoTemporaria(
-            @PathVariable Long codUnidade, @RequestBody CriarAtribuicaoTemporariaRequest request) {
+            @PathVariable Long codUnidade, @Valid @RequestBody CriarAtribuicaoTemporariaRequest request) {
 
         unidadeService.criarAtribuicaoTemporaria(codUnidade, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();

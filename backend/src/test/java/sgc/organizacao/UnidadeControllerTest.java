@@ -74,6 +74,25 @@ class UnidadeControllerTest {
     }
 
     @Test
+    @DisplayName("Deve retornar 400 ao criar atribuição temporária com justificativa longa")
+    @WithMockUser(roles = "ADMIN")
+    void deveRetornar400AoCriarAtribuicaoTemporariaComJustificativaLonga() throws Exception {
+        // Act & Assert
+        mockMvc.perform(
+                        post("/api/unidades/1/atribuicoes-temporarias")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "tituloEleitoralUsuario":"123",
+                                            "dataTermino":"2025-12-31",
+                                            "justificativa":"%s"
+                                        }
+                                        """.formatted("a".repeat(501))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("Deve retornar lista ao buscar todas as unidades")
     @WithMockUser
     void deveRetornarListaAoBuscarTodasUnidades() throws Exception {
