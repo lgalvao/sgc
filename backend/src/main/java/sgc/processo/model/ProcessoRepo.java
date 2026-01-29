@@ -22,7 +22,12 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
             """)
     List<Processo> findBySituacao(@Param("situacao") SituacaoProcesso situacao);
 
-    List<Processo> findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso situacao);
+    @Query("""
+            SELECT DISTINCT p FROM Processo p LEFT JOIN FETCH p.participantes
+            WHERE p.situacao = :situacao
+            ORDER BY p.dataFinalizacao DESC
+            """)
+    List<Processo> listarPorSituacaoComParticipantes(@Param("situacao") SituacaoProcesso situacao);
 
     Page<Processo> findDistinctByParticipantes_CodigoInAndSituacaoNot(
             List<Long> codigos, SituacaoProcesso situacao, Pageable pageable);
