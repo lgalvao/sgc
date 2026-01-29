@@ -2,38 +2,28 @@ package sgc.mapa.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import sgc.comum.repo.RepositorioComum;
 import sgc.mapa.dto.AtualizarConhecimentoRequest;
 import sgc.mapa.dto.ConhecimentoResponse;
 import sgc.mapa.dto.CriarConhecimentoRequest;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Conhecimento;
 
-@Component
+/**
+ * Mapper (usando MapStruct) entre a entidade Conhecimento e seus DTOs.
+ * 
+ * <p>Este mapper é puro e não injeta repositórios. Conversões de IDs para entidades
+ * devem ser feitas nos Services antes de chamar o mapper.</p>
+ */
 @Mapper(componentModel = "spring")
-public abstract class ConhecimentoMapper {
-    @Autowired
-    protected AtividadeRepo atividadeRepo;
-
-    @Autowired
-    protected RepositorioComum repo;
-
+public interface ConhecimentoMapper {
     @Mapping(source = "atividade.codigo", target = "atividadeCodigo")
-    public abstract ConhecimentoResponse toResponse(Conhecimento conhecimento);
-
-    @Mapping(source = "atividadeCodigo", target = "atividade")
-    @Mapping(target = "codigo", ignore = true)
-    public abstract Conhecimento toEntity(CriarConhecimentoRequest request);
+    ConhecimentoResponse toResponse(Conhecimento conhecimento);
 
     @Mapping(target = "codigo", ignore = true)
     @Mapping(target = "atividade", ignore = true)
-    public abstract Conhecimento toEntity(AtualizarConhecimentoRequest request);
+    Conhecimento toEntity(CriarConhecimentoRequest request);
 
-    public Atividade map(Long codigo) {
-        return repo.buscar(Atividade.class, codigo);
-    }
+    @Mapping(target = "codigo", ignore = true)
+    @Mapping(target = "atividade", ignore = true)
+    Conhecimento toEntity(AtualizarConhecimentoRequest request);
 }

@@ -95,42 +95,8 @@ class MapperTest {
         assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, dto.getSituacao());
     }
 
-    @Test
-    void subprocessoMapper_MapsDtoToEntityCorrectly() {
-        SubprocessoDto dto = new SubprocessoDto(
-                1L,
-                100L,
-                200L,
-                300L,
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now().plusDays(10),
-                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-
-        Processo processo = new Processo();
-        processo.setCodigo(100L);
-        when(repo.buscar(Processo.class, 100L)).thenReturn(processo);
-
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(200L);
-        when(repo.buscar(Unidade.class, 200L)).thenReturn(unidade);
-
-        Mapa mapa = new Mapa();
-        mapa.setCodigo(300L);
-        when(repo.buscar(Mapa.class, 300L)).thenReturn(mapa);
-
-        Subprocesso entity = subprocessoMapper.toEntity(dto);
-
-        assertNotNull(entity);
-        assertNotNull(entity.getProcesso());
-        assertEquals(100L, entity.getProcesso().getCodigo());
-        assertNotNull(entity.getUnidade());
-        assertEquals(200L, entity.getUnidade().getCodigo());
-        assertNotNull(entity.getMapa());
-        assertEquals(300L, entity.getMapa().getCodigo());
-        assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, entity.getSituacao());
-    }
+    // REMOVIDO: Teste do método toEntity() que não é mais usado após simplificação
+    // O método toEntity(SubprocessoDto) foi removido do mapper por não ser necessário
 
     @Test
     void movimentacaoMapper_MapsEntityToDtoCorrectly() {
