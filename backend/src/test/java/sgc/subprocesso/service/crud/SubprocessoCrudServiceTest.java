@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
@@ -34,6 +35,8 @@ import sgc.subprocesso.model.SubprocessoRepo;
 class SubprocessoCrudServiceTest {
     @Mock
     private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    @Mock
+    private sgc.comum.repo.RepositorioComum repositorioComum;
     @Mock
     private SubprocessoMapper subprocessoMapper;
     @Mock
@@ -77,14 +80,15 @@ class SubprocessoCrudServiceTest {
     @DisplayName("Deve buscar subprocesso por código")
     void deveBuscarPorCodigo() {
         Subprocesso sp = new Subprocesso();
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         assertThat(service.buscarSubprocesso(1L)).isNotNull();
     }
 
     @Test
     @DisplayName("Deve lançar exceção se não encontrar")
     void deveLancarExcecaoSeNaoEncontrar() {
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.empty());
+        when(repositorioComum.buscar(eq(Subprocesso.class), eq(1L)))
+                .thenThrow(new ErroEntidadeNaoEncontrada("Subprocesso", 1L));
         assertThatThrownBy(() -> service.buscarSubprocesso(1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
@@ -94,7 +98,7 @@ class SubprocessoCrudServiceTest {
     void deveBuscarSubprocessoComMapa() {
         Subprocesso sp = new Subprocesso();
         sp.setMapa(new Mapa());
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
         Subprocesso resultado = service.buscarSubprocessoComMapa(1L);
         assertThat(resultado).isNotNull();
@@ -117,7 +121,7 @@ class SubprocessoCrudServiceTest {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
         SubprocessoSituacaoDto status = service.obterStatus(1L);
         assertThat(status.codigo()).isEqualTo(1L);
@@ -131,7 +135,7 @@ class SubprocessoCrudServiceTest {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
         sp.setSituacao(null);
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
         SubprocessoSituacaoDto status = service.obterStatus(1L);
         assertThat(status.situacaoLabel()).isNull();
@@ -163,7 +167,7 @@ class SubprocessoCrudServiceTest {
         AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder().codMapa(5L).build();
         SubprocessoDto responseDto = SubprocessoDto.builder().codMapa(5L).build();
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(subprocessoRepo.save(sp)).thenReturn(sp);
         when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
@@ -175,7 +179,8 @@ class SubprocessoCrudServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao atualizar subprocesso inexistente")
     void deveLancarExcecaoAoAtualizarInexistente() {
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.empty());
+        when(repositorioComum.buscar(eq(Subprocesso.class), eq(1L)))
+                .thenThrow(new ErroEntidadeNaoEncontrada("Subprocesso", 1L));
         AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder().build();
 
         assertThatThrownBy(() -> service.atualizar(1L, request))
@@ -187,7 +192,7 @@ class SubprocessoCrudServiceTest {
     void deveExcluirSubprocesso() {
         Subprocesso sp = criarSubprocessoCompleto();
         sp.setCodigo(1L);
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         service.excluir(1L);
         verify(subprocessoRepo).deleteById(1L);
     }
@@ -195,7 +200,8 @@ class SubprocessoCrudServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao excluir subprocesso inexistente")
     void deveLancarExcecaoAoExcluirInexistente() {
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.empty());
+        when(repositorioComum.buscar(eq(Subprocesso.class), eq(1L)))
+                .thenThrow(new ErroEntidadeNaoEncontrada("Subprocesso", 1L));
         assertThatThrownBy(() -> service.excluir(1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
@@ -249,7 +255,7 @@ class SubprocessoCrudServiceTest {
                 .build();
         SubprocessoDto responseDto = SubprocessoDto.builder().build();
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(subprocessoRepo.save(sp)).thenReturn(sp);
         when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
@@ -264,7 +270,7 @@ class SubprocessoCrudServiceTest {
         AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder().build();
         SubprocessoDto responseDto = SubprocessoDto.builder().build();
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(subprocessoRepo.save(sp)).thenReturn(sp);
         when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
@@ -317,7 +323,7 @@ class SubprocessoCrudServiceTest {
         AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder().build(); // codMapa null
         SubprocessoDto responseDto = SubprocessoDto.builder().build();
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(subprocessoRepo.save(sp)).thenReturn(sp);
         when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
@@ -339,7 +345,7 @@ class SubprocessoCrudServiceTest {
         AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder().codMapa(50L).build();
         SubprocessoDto responseDto = SubprocessoDto.builder().codMapa(50L).build();
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(subprocessoRepo.save(sp)).thenReturn(sp);
         when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
@@ -356,7 +362,7 @@ class SubprocessoCrudServiceTest {
         AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder().codMapa(5L).build();
         SubprocessoDto responseDto = SubprocessoDto.builder().codMapa(5L).build();
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, 1L)).thenReturn(sp);
         when(subprocessoRepo.save(sp)).thenReturn(sp);
         when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 

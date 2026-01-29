@@ -33,6 +33,8 @@ class SubprocessoCrudServiceCoverageTest {
     @Mock
     private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     @Mock
+    private sgc.comum.repo.RepositorioComum repositorioComum;
+    @Mock
     private SubprocessoMapper mapper;
 
     @Mock
@@ -70,7 +72,7 @@ class SubprocessoCrudServiceCoverageTest {
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         AtualizarSubprocessoRequest req = AtualizarSubprocessoRequest.builder().build();
-        when(subprocessoRepo.findById(codigo)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, codigo)).thenReturn(sp);
         when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
         crudService.atualizar(codigo, req);
@@ -115,7 +117,7 @@ class SubprocessoCrudServiceCoverageTest {
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(99L); // Different map
 
-        when(subprocessoRepo.findById(codigo)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, codigo)).thenReturn(sp);
         when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
         crudService.atualizar(codigo, req);
@@ -182,7 +184,7 @@ class SubprocessoCrudServiceCoverageTest {
         sp.setProcesso(new Processo());
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-        when(subprocessoRepo.findById(codigo)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, codigo)).thenReturn(sp);
         when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
         crudService.atualizar(codigo, req);
@@ -198,7 +200,7 @@ class SubprocessoCrudServiceCoverageTest {
         sp.setCodigo(codigo);
         sp.setSituacao(null); // Situação nula
 
-        when(subprocessoRepo.findById(codigo)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, codigo)).thenReturn(sp);
 
         var status = crudService.obterStatus(codigo);
 
