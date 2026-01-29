@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
@@ -17,6 +18,7 @@ import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
 
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
@@ -40,7 +42,7 @@ import static sgc.processo.model.TipoProcesso.REVISAO;
 @Slf4j
 @RequiredArgsConstructor
 public class ProcessoFacade {
-    private final ProcessoRepositoryService processoRepositoryService;
+    private final ProcessoRepo processoRepo;
     private final UnidadeFacade unidadeService;
     private final SubprocessoFacade subprocessoFacade;
     private final ProcessoMapper processoMapper;
@@ -61,6 +63,14 @@ public class ProcessoFacade {
     private final ProcessoConsultaService processoConsultaService;
 
     private static final String ENTIDADE_PROCESSO = "Processo";
+
+    /**
+     * Busca um processo por ID ou lança exceção se não encontrado.
+     */
+    private Processo buscarPorId(Long id) {
+        return processoRepo.findById(id)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_PROCESSO, id));
+    }
 
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
         return processoAcessoService.checarAcesso(authentication, codProcesso);
@@ -92,7 +102,7 @@ public class ProcessoFacade {
                 .setDataCriacao(LocalDateTime.now())
                 .setParticipantes(participantes);
 
-        Processo processoSalvo = processoRepositoryService.salvarEFlush(processo);
+        Processo processoSalvo = processoRepo.saveAndFlush(processo);
 
         log.info("Processo {} criado.", processoSalvo.getCodigo());
 
@@ -102,7 +112,7 @@ public class ProcessoFacade {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public ProcessoDto atualizar(Long codigo, AtualizarProcessoRequest requisicao) {
-        Processo processo = processoRepositoryService.buscarPorId(codigo);
+        Processo processo = buscarPorId(codigo);
 
         if (processo.getSituacao() != CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser editados.");
@@ -145,7 +155,7 @@ public class ProcessoFacade {
 
         processo.setParticipantes(participantes);
 
-        Processo processoAtualizado = processoRepositoryService.salvarEFlush(processo);
+        Processo processoAtualizado = processoRepo.saveAndFlush(processo);
         log.info("Processo {} atualizado.", codigo);
 
         return processoMapper.toDto(processoAtualizado);
@@ -154,24 +164,24 @@ public class ProcessoFacade {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void apagar(Long codigo) {
-        Processo processo = processoRepositoryService.buscarPorId(codigo);
+        Processo processo = buscarPorId(codigo);
 
         if (processo.getSituacao() != CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser removidos.");
         }
 
-        processoRepositoryService.excluir(codigo);
+        processoRepo.deleteById(codigo);
         log.info("Processo {} removido.", codigo);
     }
 
     @Transactional(readOnly = true)
     public Optional<ProcessoDto> obterPorId(Long codigo) {
-        return processoRepositoryService.findById(codigo).map(processoMapper::toDto);
+        return processoRepo.findById(codigo).map(processoMapper::toDto);
     }
 
     @Transactional(readOnly = true)
     public Processo buscarEntidadePorId(Long codigo) {
-        return processoRepositoryService.buscarPorId(codigo);
+        return buscarPorId(codigo);
     }
 
     @Transactional(readOnly = true)
@@ -187,33 +197,33 @@ public class ProcessoFacade {
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codProcesso)")
     public ProcessoDetalheDto obterDetalhes(Long codProcesso) {
-        Processo processo = processoRepositoryService.buscarPorId(codProcesso);
+        Processo processo = buscarPorId(codProcesso);
 
         return processoDetalheBuilder.build(processo);
     }
 
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarFinalizados() {
-        return processoRepositoryService.findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso.FINALIZADO).stream()
+        return processoRepo.findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso.FINALIZADO).stream()
                 .map(processoMapper::toDto)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarAtivos() {
-        return processoRepositoryService.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).stream()
+        return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).stream()
                 .map(processoMapper::toDto)
                 .toList();
     }
 
     public org.springframework.data.domain.Page<Processo> listarTodos(
             org.springframework.data.domain.Pageable pageable) {
-        return processoRepositoryService.findAll(pageable);
+        return processoRepo.findAll(pageable);
     }
 
     public org.springframework.data.domain.Page<Processo> listarPorParticipantesIgnorandoCriado(
             List<Long> unidadeIds, org.springframework.data.domain.Pageable pageable) {
-        return processoRepositoryService.listarPorParticipantesIgnorandoSituacao(
+        return processoRepo.findDistinctByParticipantes_CodigoInAndSituacaoNot(
                 unidadeIds, CRIADO, pageable);
     }
 
