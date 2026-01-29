@@ -96,9 +96,6 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
             );
         }, () => {
             subprocessoDetalhe.value = null;
-        }).catch(() => {
-            // Silenciar erro - lastError já foi populado pelo withErrorHandling
-            // Esta função não deve lançar exceção pois é chamada de componentes
         });
     }
 

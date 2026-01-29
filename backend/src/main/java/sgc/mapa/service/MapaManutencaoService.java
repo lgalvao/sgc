@@ -59,7 +59,7 @@ public class MapaManutencaoService {
 
     @Transactional(readOnly = true)
     public List<AtividadeResponse> listarAtividades() {
-        return atividadeRepo.findAllWithMapa().stream().map(atividadeMapper::toResponse).toList();
+        return atividadeRepo.findAll().stream().map(atividadeMapper::toResponse).toList();
     }
 
     @Transactional(readOnly = true)

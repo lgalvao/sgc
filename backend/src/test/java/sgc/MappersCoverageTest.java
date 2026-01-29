@@ -26,15 +26,7 @@ class MappersCoverageTest {
             throw new RuntimeException(e);
         }
 
-        // Test exception
-        org.mockito.Mockito.when(repo.buscar(sgc.mapa.model.Atividade.class, 1L))
-                .thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Atividade", 1L));
-        org.assertj.core.api.Assertions.assertThatThrownBy(() -> conhecimentoMapper.map(1L))
-                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
-
-        // Test success
-        org.mockito.Mockito.when(repo.buscar(sgc.mapa.model.Atividade.class, 2L))
-                .thenReturn(new sgc.mapa.model.Atividade());
-        assertThat(conhecimentoMapper.map(2L)).isNotNull();
+        // REMOVIDO: Teste do método map() que não é mais usado após simplificação
+        // O método map(Long) foi removido do ConhecimentoMapper por não ser necessário
     }
 }
