@@ -44,7 +44,9 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.subprocesso.service.workflow.SubprocessoWorkflowFacade;
+import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
+import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
 
 @ExtendWith(MockitoExtension.class)
 @org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
@@ -59,7 +61,11 @@ class SubprocessoFacadeComplementaryTest {
     @Mock
     private SubprocessoValidacaoService validacaoService;
     @Mock
-    private SubprocessoWorkflowFacade workflowService;
+    private SubprocessoCadastroWorkflowService cadastroWorkflowService;
+    @Mock
+    private SubprocessoMapaWorkflowService mapaWorkflowService;
+    @Mock
+    private SubprocessoAdminWorkflowService adminWorkflowService;
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
@@ -166,7 +172,7 @@ class SubprocessoFacadeComplementaryTest {
         @Test
         @DisplayName("Deve listar subprocessos homologados")
         void deveListarSubprocessosHomologados() {
-            when(workflowService.listarSubprocessosHomologados()).thenReturn(Collections.emptyList());
+            when(adminWorkflowService.listarSubprocessosHomologados()).thenReturn(Collections.emptyList());
             assertThat(subprocessoFacade.listarSubprocessosHomologados()).isEmpty();
         }
     }
@@ -235,7 +241,7 @@ class SubprocessoFacadeComplementaryTest {
         @DisplayName("Deve atualizar situação para EM ANDAMENTO")
         void deveAtualizarParaEmAndamentoMapeamento() {
             subprocessoFacade.atualizarSituacaoParaEmAndamento(100L);
-            verify(workflowService).atualizarSituacaoParaEmAndamento(100L);
+            verify(adminWorkflowService).atualizarSituacaoParaEmAndamento(100L);
         }
 
         @Test
@@ -243,21 +249,21 @@ class SubprocessoFacadeComplementaryTest {
         void deveAlterarDataLimite() {
             LocalDate novaData = java.time.LocalDate.now();
             subprocessoFacade.alterarDataLimite(1L, novaData);
-            verify(workflowService).alterarDataLimite(1L, novaData);
+            verify(adminWorkflowService).alterarDataLimite(1L, novaData);
         }
 
         @Test
         @DisplayName("Deve reabrir cadastro")
         void deveReabrirCadastro() {
             subprocessoFacade.reabrirCadastro(1L, "Justificativa");
-            verify(workflowService).reabrirCadastro(1L, "Justificativa");
+            verify(cadastroWorkflowService).reabrirCadastro(1L, "Justificativa");
         }
 
         @Test
         @DisplayName("Deve reabrir revisão cadastro")
         void deveReabrirRevisaoCadastro() {
             subprocessoFacade.reabrirRevisaoCadastro(1L, "Justificativa");
-            verify(workflowService).reabrirRevisaoCadastro(1L, "Justificativa");
+            verify(cadastroWorkflowService).reabrirRevisaoCadastro(1L, "Justificativa");
         }
     }
 
