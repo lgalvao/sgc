@@ -1,5 +1,6 @@
 package sgc.subprocesso.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -601,8 +602,8 @@ public class SubprocessoFacade {
     private SugestoesDto obterSugestoesInterno(Long codSubprocesso) {
         crudService.buscarSubprocesso(codSubprocesso); 
         return SugestoesDto.builder()
-                .sugestoes(null)
-                .dataHora(null)
+                .sugestoes("")
+                .dataHora(LocalDateTime.now())
                 .build();
     }
 
@@ -612,8 +613,6 @@ public class SubprocessoFacade {
         Analise analise = analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst()
                 .orElse(null);
         List<Competencia> competencias = mapaManutencaoService.buscarCompetenciasPorCodMapaSemRelacionamentos(codMapa);
-        // Optimization: Fetch activities without eager loading competencies to avoid
-        // redundant data transfer
         List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoSemRelacionamentos(codMapa);
         List<Conhecimento> conhecimentos = mapaManutencaoService.listarConhecimentosPorMapa(codMapa);
         java.util.Map<Long, java.util.Set<Long>> associacoes = mapaManutencaoService

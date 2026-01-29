@@ -14,7 +14,11 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
-import sgc.subprocesso.model.*;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.MovimentacaoRepositoryService;
+import sgc.subprocesso.service.SubprocessoRepositoryService;
 
 /**
  * Serviço consolidado para gerenciar transições e workflows de subprocessos.
@@ -34,9 +38,9 @@ import sgc.subprocesso.model.*;
 @RequiredArgsConstructor
 @Slf4j
 public class SubprocessoTransicaoService {
-    private final MovimentacaoRepo movimentacaoRepo;
+    private final MovimentacaoRepositoryService movimentacaoService;
     private final ApplicationEventPublisher eventPublisher;
-    private final SubprocessoRepo repositorioSubprocesso;
+    private final SubprocessoRepositoryService subprocessoService;
     private final AnaliseFacade analiseFacade;
 
     /**
@@ -52,8 +56,8 @@ public class SubprocessoTransicaoService {
     public void registrar(
             Subprocesso subprocesso,
             TipoTransicao tipo,
-            @Nullable Unidade origem,
-            @Nullable Unidade destino,
+            Unidade origem,
+            Unidade destino,
             Usuario usuario,
             @Nullable String observacoes) {
 
@@ -65,7 +69,7 @@ public class SubprocessoTransicaoService {
                 .descricao(tipo.getDescricaoMovimentacao())
                 .usuario(usuario)
                 .build();
-        movimentacaoRepo.save(movimentacao);
+        movimentacaoService.save(movimentacao);
 
         // 2. Publicar evento para comunicação (alertas/emails)
         EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
@@ -88,8 +92,8 @@ public class SubprocessoTransicaoService {
     public void registrar(
             Subprocesso subprocesso,
             TipoTransicao tipo,
-            @Nullable Unidade origem,
-            @Nullable Unidade destino,
+            Unidade origem,
+            Unidade destino,
             Usuario usuario) {
         registrar(subprocesso, tipo, origem, destino, usuario, null);
     }
@@ -121,7 +125,7 @@ public class SubprocessoTransicaoService {
 
         // 2. Atualizar Estado
         req.sp().setSituacao(req.novaSituacao());
-        repositorioSubprocesso.save(req.sp());
+        subprocessoService.save(req.sp());
 
         // 3. Registrar Transição
         registrar(

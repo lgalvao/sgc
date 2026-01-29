@@ -77,4 +77,9 @@ public class SubprocessoRepositoryService {
     public void deleteById(Long codigo) {
         subprocessoRepo.deleteById(codigo);
     }
+
+    @Transactional
+    public List<Subprocesso> saveAll(Iterable<Subprocesso> entities) {
+        return subprocessoRepo.saveAll(entities);
+    }
 }

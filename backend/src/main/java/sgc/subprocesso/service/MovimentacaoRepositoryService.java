@@ -27,4 +27,9 @@ public class MovimentacaoRepositoryService {
     public Movimentacao save(Movimentacao movimentacao) {
         return movimentacaoRepo.save(movimentacao);
     }
+
+    @Transactional
+    public List<Movimentacao> saveAll(Iterable<Movimentacao> entities) {
+        return movimentacaoRepo.saveAll(entities);
+    }
 }
