@@ -2,6 +2,25 @@
 
 Este documento foca na remoção do `new` em classes de produção (Entidades, DTOs e Records), onde o acoplamento é mais prejudicial à manutenção.
 
+## ✅ Status da Análise (Atualizado em 29/01/2026)
+
+**Entidades JPA:** Todas já possuem `@SuperBuilder` (Lombok) configurado corretamente:
+- ✅ `Atividade` - linha 25 (`@SuperBuilder`)
+- ✅ `Competencia` - linha 19 (`@SuperBuilder`)
+- ✅ `Conhecimento` - linha 15 (`@SuperBuilder`)
+- ✅ `Mapa` - linha 19 (`@SuperBuilder`)
+
+**DTOs e Records:** Maioria já usa `@Builder` ou são `record`:
+- ✅ `CompetenciaImpactadaDto` - linha 16 (`@Builder` + `record`)
+- ✅ `EventoMapaAlterado` - linha 7 (`record` simples)
+- ⚠️ `ContextoSalvamento` - classe interna em `MapaSalvamentoService` (linha 220) - **PODE SER CONVERTIDA PARA RECORD**
+
+**Contagem de Ocorrências em Código de Produção:**
+- `new Atividade()`: **2 ocorrências** (CopiaMapaService, AtividadeFacade)
+- `new Competencia()`: **2 ocorrências** (MapaSalvamentoService, CopiaMapaService)
+- `new Conhecimento()`: **1 ocorrência** (CopiaMapaService)
+- `new Mapa()`: **4 ocorrências** (SubprocessoCrudService x2, SubprocessoFactory, CopiaMapaService)
+
 ## 1. Prioridade Inicial: Classes de Produção
 
 O foco está em substituir a instanciação manual por padrões que promovam imutabilidade e fluidez.
@@ -54,7 +73,88 @@ const dto: UserDto = {
 };
 ```
 
-## 3. Próximos Passos
-1. **Refatorar `CopiaMapaService`:** É o arquivo com maior densidade de `new` para entidades de produção.
-2. **Refatorar `ImpactoMapaService`:** Foco em DTOs de retorno.
-3. **Padronizar DTOs do Frontend:** Garantir que sejam interfaces.
+## 3. Arquivos Identificados para Refatoração
+
+### 3.1. CopiaMapaService (ALTA DENSIDADE - 4 ocorrências)
+**Localização:** `backend/src/main/java/sgc/mapa/service/CopiaMapaService.java`
+
+**Ocorrências:**
+1. **Linha 74:** `new Mapa()` - método `criarNovoMapa()`
+   - Usa setters encadeados
+   - **Substituir por:** `Mapa.builder()...build()`
+
+2. **Linha 108:** `new Atividade()` - método `prepararCopiaAtividade()`
+   - Usa setters
+   - **Substituir por:** `Atividade.builder()...build()`
+
+3. **Linha 115:** `new Conhecimento()` - dentro de loop
+   - Usa setters encadeados
+   - **Substituir por:** `Conhecimento.builder()...build()`
+
+4. **Linha 133:** `new Competencia()` - método `copiarCompetencias()`
+   - Usa setters
+   - **Substituir por:** `Competencia.builder()...build()`
+
+### 3.2. MapaSalvamentoService (2 ocorrências)
+**Localização:** `backend/src/main/java/sgc/mapa/service/MapaSalvamentoService.java`
+
+**Ocorrências:**
+1. **Linha 141:** `new Competencia()` - método `processarCompetenciaDto()`
+   - Criação condicional (quando `codigo == null`)
+   - **Substituir por:** `Competencia.builder()...build()`
+
+2. **Linha 220-240:** `class ContextoSalvamento` - classe interna privada
+   - Atualmente usa construtor explícito
+   - Tem `@SuppressWarnings("ClassCanBeRecord")`
+   - **Substituir por:** `record ContextoSalvamento(...)`
+
+### 3.3. AtividadeFacade (1 ocorrência)
+**Localização:** `backend/src/main/java/sgc/mapa/service/AtividadeFacade.java`
+
+**Ocorrências:**
+1. **Linha 95-96:** `new Atividade()` - método `criarAtividade()`
+   - Cria objeto temporário apenas para verificação de acesso
+   - **Substituir por:** `Atividade.builder()...build()`
+
+### 3.4. SubprocessoCrudService (2 ocorrências)
+**Localização:** `backend/src/main/java/sgc/subprocesso/service/crud/SubprocessoCrudService.java`
+
+**Ocorrências:**
+1. Criação de `Mapa` para novo subprocesso
+   - **Substituir por:** `Mapa.builder()...build()`
+
+2. Atualização com referência de `Mapa` em `processarAlteracoes()`
+   - **Substituir por:** `Mapa.builder()...build()`
+
+### 3.5. SubprocessoFactory (1 ocorrência)
+**Localização:** `backend/src/main/java/sgc/subprocesso/service/factory/SubprocessoFactory.java`
+
+**Ocorrências:**
+1. Criação de `Mapa` em stream
+   - **Substituir por:** `Mapa.builder()...build()`
+
+### 3.6. ImpactoMapaService (✅ SEM OCORRÊNCIAS)
+**Localização:** `backend/src/main/java/sgc/mapa/service/ImpactoMapaService.java`
+
+**Análise:** Este serviço já utiliza builders corretamente:
+- Linha 131-137: `AtividadeImpactadaDto.builder()...build()`
+- Linha 159-165: `AtividadeImpactadaDto.builder()...build()`
+- Linha 193-200: `AtividadeImpactadaDto.builder()...build()`
+- Linha 356-358: Usa construtor de classe interna `CompetenciaImpactoAcumulador`, mas não é problema pois é classe auxiliar privada
+
+**Status:** ✅ Nenhuma refatoração necessária
+
+## 4. Próximos Passos (Priorizado)
+
+### Fase 1: Backend - Refatoração de Código de Produção
+1. ✅ **Análise Completa** - Confirmar achados e adicionar contexto
+2. [ ] **CopiaMapaService** - Refatorar 4 ocorrências (PRIORIDADE ALTA)
+3. [ ] **MapaSalvamentoService** - Refatorar 2 ocorrências incluindo conversão de ContextoSalvamento para record
+4. [ ] **AtividadeFacade** - Refatorar 1 ocorrência
+5. [ ] **SubprocessoCrudService** - Refatorar 2 ocorrências
+6. [ ] **SubprocessoFactory** - Refatorar 1 ocorrência
+7. [ ] **Executar Testes** - Validar que refatorações não introduziram regressões
+
+### Fase 2: Frontend (Planejamento Futuro)
+- Padronizar DTOs TypeScript como interfaces
+- Substituir classes de modelo por interfaces/types quando apropriado
