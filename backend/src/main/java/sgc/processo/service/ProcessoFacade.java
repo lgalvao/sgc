@@ -2,7 +2,6 @@ package sgc.processo.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -15,9 +14,7 @@ import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.*;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
-import sgc.processo.eventos.EventoProcessoAtualizado;
-import sgc.processo.eventos.EventoProcessoCriado;
-import sgc.processo.eventos.EventoProcessoExcluido;
+
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
 
@@ -46,7 +43,6 @@ public class ProcessoFacade {
     private final ProcessoRepositoryService processoRepositoryService;
     private final UnidadeFacade unidadeService;
     private final SubprocessoFacade subprocessoFacade;
-    private final ApplicationEventPublisher publicadorEventos;
     private final ProcessoMapper processoMapper;
     private final ProcessoDetalheBuilder processoDetalheBuilder;
     private final SubprocessoMapper subprocessoMapper;
@@ -98,7 +94,6 @@ public class ProcessoFacade {
 
         Processo processoSalvo = processoRepositoryService.salvarEFlush(processo);
 
-        publicadorEventos.publishEvent(new EventoProcessoCriado(this, processoSalvo.getCodigo()));
         log.info("Processo {} criado.", processoSalvo.getCodigo());
 
         return processoMapper.toDto(processoSalvo);
@@ -153,18 +148,6 @@ public class ProcessoFacade {
         Processo processoAtualizado = processoRepositoryService.salvarEFlush(processo);
         log.info("Processo {} atualizado.", codigo);
 
-        // Publica evento de atualização
-        if (!camposAlterados.isEmpty()) {
-            EventoProcessoAtualizado evento = EventoProcessoAtualizado.builder()
-                    .processo(processoAtualizado)
-                    .usuario(usuarioService.obterUsuarioAutenticado())
-                    .camposAlterados(camposAlterados)
-                    .dataHoraAtualizacao(LocalDateTime.now())
-                    .tipoAnterior(tipoAnterior != requisicao.tipo() ? tipoAnterior : null)
-                    .build();
-            publicadorEventos.publishEvent(evento);
-        }
-
         return processoMapper.toDto(processoAtualizado);
     }
 
@@ -176,20 +159,6 @@ public class ProcessoFacade {
         if (processo.getSituacao() != CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser removidos.");
         }
-
-        // Publica evento ANTES da exclusão para permitir listeners acessarem dados relacionados
-        EventoProcessoExcluido evento = EventoProcessoExcluido.builder()
-                .codProcesso(codigo)
-                .descricao(processo.getDescricao())
-                .tipo(processo.getTipo())
-                .usuario(usuarioService.obterUsuarioAutenticado())
-                .codigosUnidades(processo.getParticipantes().stream()
-                        .map(Unidade::getCodigo)
-                        .collect(Collectors.toSet()))
-                .dataHoraExclusao(LocalDateTime.now())
-                .build();
-        publicadorEventos.publishEvent(evento);
-        log.debug("Evento EventoProcessoExcluido publicado para processo {}", codigo);
 
         processoRepositoryService.excluir(codigo);
         log.info("Processo {} removido.", codigo);

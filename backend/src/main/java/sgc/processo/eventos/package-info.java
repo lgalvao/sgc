@@ -6,7 +6,6 @@
  *
  * <h2>Eventos Implementados</h2>
  * <ul>
- *   <li>{@link sgc.processo.eventos.EventoProcessoCriado} - Disparado quando um processo é criado</li>
  *   <li>{@link sgc.processo.eventos.EventoProcessoIniciado} - Disparado quando um processo é iniciado</li>
  *   <li>{@link sgc.processo.eventos.EventoProcessoFinalizado} - Disparado quando um processo é finalizado</li>
  * </ul>
@@ -14,7 +13,7 @@
  * <h2>Padrão de Eventos</h2>
  * <p>Todos os eventos seguem as convenções:
  * <ul>
- *   <li>Nome começa com "Evento" seguido do recurso e ação (ex: {@code EventoProcessoCriado})</li>
+ *   <li>Nome começa com "Evento" seguido do recurso e ação (ex: {@code EventoProcessoIniciado})</li>
  *   <li>São classes imutáveis (records ou classes com campos final)</li>
  *   <li>Contêm apenas os dados essenciais para os listeners</li>
  *   <li>São publicados via {@code ApplicationEventPublisher} do Spring</li>
@@ -28,9 +27,9 @@
  * public class ProcessoFacade {
  *     private final ApplicationEventPublisher eventPublisher;
  *
- *     public void criarProcesso(CriarProcessoDto dto) {
- *         // ... lógica de criação
- *         eventPublisher.publishEvent(new EventoProcessoCriado(processo.getCodigo()));
+ *     public void iniciarProcesso(Long codigo) {
+ *         // ... lógica de início
+ *         eventPublisher.publishEvent(new EventoProcessoIniciado(codigo, ...));
  *     }
  * }
  * }</pre>
@@ -40,7 +39,7 @@
  * @Component
  * public class NotificacaoListener {
  *     @EventListener
- *     public void aoProcessoCriado(EventoProcessoCriado evento) {
+ *     public void aoProcessoIniciado(EventoProcessoIniciado evento) {
  *         // ... lógica de notificação
  *     }
  * }

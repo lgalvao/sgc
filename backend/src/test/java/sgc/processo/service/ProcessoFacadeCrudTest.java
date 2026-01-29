@@ -15,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.fixture.ProcessoFixture;
@@ -27,8 +26,6 @@ import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
-import sgc.processo.eventos.EventoProcessoAtualizado;
-import sgc.processo.eventos.EventoProcessoCriado;
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
@@ -42,8 +39,6 @@ class ProcessoFacadeCrudTest {
     private ProcessoRepositoryService processoRepositoryService;
     @Mock
     private UnidadeFacade unidadeService;
-    @Mock
-    private ApplicationEventPublisher publicadorEventos;
     @Mock
     private ProcessoMapper processoMapper;
     @Mock
@@ -99,7 +94,6 @@ class ProcessoFacadeCrudTest {
             verify(processoRepositoryService).salvarEFlush(argThat(p -> p.getDescricao().equals("Teste") &&
                     p.getTipo() == TipoProcesso.MAPEAMENTO &&
                     p.getSituacao() == SituacaoProcesso.CRIADO));
-            verify(publicadorEventos).publishEvent(any(EventoProcessoCriado.class));
         }
 
         @Test
@@ -253,7 +247,6 @@ class ProcessoFacadeCrudTest {
             // Assert
             assertThat(resultado).isNotNull();
             verify(processoRepositoryService).salvarEFlush(processo);
-            verify(publicadorEventos).publishEvent(any(EventoProcessoAtualizado.class));
         }
 
         @Test
@@ -429,10 +422,8 @@ class ProcessoFacadeCrudTest {
             // Act
             processoFacade.atualizar(id, req);
 
-            // Assert
-            var captor = org.mockito.ArgumentCaptor.forClass(EventoProcessoAtualizado.class);
-            verify(publicadorEventos).publishEvent(captor.capture());
-            assertThat(captor.getValue().getProcesso().getCodigo()).isEqualTo(id);
+            // Assert - verifica que o processo foi salvo
+            verify(processoRepositoryService).salvarEFlush(any(Processo.class));
         }
 
         @Test

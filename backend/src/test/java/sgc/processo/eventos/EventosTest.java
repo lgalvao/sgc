@@ -14,17 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @DisplayName("Eventos de Processo")
 class EventosTest {
     @Test
-    @DisplayName("Deve retornar valores corretos para EventoProcessoCriado")
-    void deveRetornarValoresCorretosParaEventoProcessoCriado() {
-        // Arrange
-        EventoProcessoCriado evento = new EventoProcessoCriado(this, 1L);
-
-        // Act & Assert
-        assertEquals(1L, evento.getCodProcesso());
-        assertEquals(this, evento.getSource());
-    }
-
-    @Test
     @DisplayName("Deve retornar valores corretos para EventoProcessoFinalizado")
     void deveRetornarValoresCorretosParaEventoProcessoFinalizado() {
         // Arrange

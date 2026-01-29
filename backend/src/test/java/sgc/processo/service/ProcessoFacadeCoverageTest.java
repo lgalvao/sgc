@@ -16,14 +16,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.AtualizarProcessoRequest;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
-import sgc.processo.eventos.EventoProcessoAtualizado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
@@ -35,8 +33,6 @@ class ProcessoFacadeCoverageTest {
     private ProcessoRepositoryService processoRepositoryService;
     @Mock
     private UnidadeFacade unidadeService;
-    @Mock
-    private ApplicationEventPublisher publicadorEventos;
     @Mock
     private ProcessoValidador processoValidador;
     @Mock
@@ -150,8 +146,8 @@ class ProcessoFacadeCoverageTest {
 
         facade.atualizar(codigo, req);
 
-        // No event published
-        verify(publicadorEventos, never()).publishEvent(any(EventoProcessoAtualizado.class));
+        // Verifica que o processo foi salvo
+        verify(processoRepositoryService).salvarEFlush(any(Processo.class));
     }
 
     @Test
