@@ -31,7 +31,7 @@ class SubprocessoFactoryTest {
     private MapaRepo mapaRepo;
 
     @Mock
-    private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    private MovimentacaoRepo movimentacaoRepo;
 
     @Mock
     private CopiaMapaService servicoDeCopiaDeMapa;

@@ -11,8 +11,8 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.List;
@@ -36,7 +36,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
 public class SubprocessoFactory {
     private final SubprocessoRepo subprocessoRepo;
     private final MapaRepo mapaRepo;
-    private final SubprocessoMovimentacaoRepo movimentacaoRepo;
+    private final MovimentacaoRepo movimentacaoRepo;
     private final CopiaMapaService servicoDeCopiaDeMapa;
 
     /**

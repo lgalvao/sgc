@@ -22,7 +22,7 @@ import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.subprocesso.mapper.SubprocessoMapper;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
@@ -51,7 +51,7 @@ class ProcessoFacadeWorkflowTest {
     @Mock
     private MapaRepo mapaRepo;
     @Mock
-    private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    private MovimentacaoRepo movimentacaoRepo;
     @Mock
     private SubprocessoMapper subprocessoMapper;
     @Mock

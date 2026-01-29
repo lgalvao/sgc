@@ -101,7 +101,6 @@ public class SubprocessoFacade {
 
     // Dependencies for map operations (from SubprocessoMapaService)
     private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
-    private final sgc.subprocesso.model.SubprocessoMovimentacaoRepo movimentacaoRepo;
     private final sgc.mapa.service.CopiaMapaService copiaMapaService;
 
     // ===== Operações CRUD =====
@@ -516,7 +515,7 @@ public class SubprocessoFacade {
                 spOrigem.getCodigo(),
                 unidadeOrigem.getSigla());
 
-        movimentacaoRepo.save(Movimentacao.builder()
+        repositorioMovimentacao.save(Movimentacao.builder()
                 .subprocesso(spDestino)
                 .unidadeOrigem(unidadeOrigem)
                 .unidadeDestino(spDestino.getUnidade())

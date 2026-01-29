@@ -28,7 +28,7 @@ import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
+import sgc.subprocesso.model.MovimentacaoRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -50,7 +50,7 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
     private UsuarioRepo usuarioRepo;
 
     @Autowired
-    private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    private MovimentacaoRepo movimentacaoRepo;
 
     @Autowired
     private EntityManager entityManager;
