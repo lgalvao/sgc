@@ -96,6 +96,40 @@ public class GerenciadorJwt {
         }
     }
 
+    public String gerarTokenPreAuth(String tituloEleitoral) {
+        Instant now = Instant.now();
+        Instant expiration = now.plus(5, ChronoUnit.MINUTES);
+
+        return Jwts.builder()
+                .subject(tituloEleitoral)
+                .claim("type", "PRE_AUTH")
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(expiration))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    public Optional<String> validarTokenPreAuth(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+            if (!"PRE_AUTH".equals(claims.get("type"))) {
+                log.warn("Tentativa de uso de token inválido para pré-autenticação");
+                return Optional.empty();
+            }
+
+            return Optional.ofNullable(claims.getSubject());
+
+        } catch (JwtException | IllegalArgumentException e) {
+            log.warn("Falha na validação do token pré-auth: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
     public record JwtClaims(String tituloEleitoral, Perfil perfil, Long unidadeCodigo) {
     }
 }

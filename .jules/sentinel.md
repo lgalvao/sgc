@@ -1,0 +1,4 @@
+## 2026-01-28 - Stateful Authentication Bypass
+**Vulnerability:** The authentication flow relied on an in-memory `ConcurrentHashMap` (`autenticacoesRecentes`) to track "authenticated" users by username only. This allowed a race condition where an attacker could hijack a session by polling the authorization endpoint while a legitimate user was logging in.
+**Learning:** Storing authentication state in application memory based solely on user identity (without a unique session token bound to the client) is insecure and prone to race conditions, especially in a REST API which should be stateless.
+**Prevention:** Always use cryptographically signed tokens (like JWTs) or secure random session IDs stored in HttpOnly cookies to bind the authentication state to the client. Ensure that every step of a multi-step login process verifies this token.
