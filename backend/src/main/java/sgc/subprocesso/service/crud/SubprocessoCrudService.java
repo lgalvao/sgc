@@ -148,7 +148,7 @@ public class SubprocessoCrudService {
 
         EventoSubprocessoCriado evento = EventoSubprocessoCriado.builder()
                 .subprocesso(salvo)
-                .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
+                .usuario(usuarioService.obterUsuarioAutenticado())
                 .dataHoraCriacao(LocalDateTime.now())
                 .criadoPorProcesso(false)
                 .codProcesso(salvo.getProcesso().getCodigo())
@@ -170,7 +170,7 @@ public class SubprocessoCrudService {
         if (!camposAlterados.isEmpty()) {
             EventoSubprocessoAtualizado evento = EventoSubprocessoAtualizado.builder()
                     .subprocesso(salvo)
-                    .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
+                    .usuario(usuarioService.obterUsuarioAutenticado())
                     .camposAlterados(camposAlterados)
                     .dataHoraAtualizacao(LocalDateTime.now())
                     .situacaoAnterior(situacaoAnterior)
@@ -187,7 +187,6 @@ public class SubprocessoCrudService {
         java.util.Optional.ofNullable(request.codMapa()).ifPresent(cod -> {
             Mapa m = new Mapa();
             m.setCodigo(cod);
-            // Compara IDs para evitar atualização desnecessária (já que Mapa não implementa equals)
             Long codAtual = subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null;
             if (!Objects.equals(codAtual, cod)) {
                 campos.add("mapa");
@@ -221,7 +220,7 @@ public class SubprocessoCrudService {
                 .codUnidade(subprocesso.getUnidade().getCodigo())
                 .codMapa(subprocesso.getMapa().getCodigo())
                 .situacao(subprocesso.getSituacao())
-                .usuario(usuarioService.obterUsuarioAutenticadoOuNull())
+                .usuario(usuarioService.obterUsuarioAutenticado())
                 .dataHoraExclusao(LocalDateTime.now())
                 .build();
         eventPublisher.publishEvent(evento);

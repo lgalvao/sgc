@@ -78,7 +78,7 @@ public class EventoSubprocessoExcluido {
     /**
      * Usuário que realizou a exclusão.
      */
-    private @org.jspecify.annotations.Nullable Usuario usuario;
+    private Usuario usuario;
 
     /**
      * Data e hora da exclusão.
