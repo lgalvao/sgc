@@ -9,10 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.configuracao.model.Parametro;
-import sgc.configuracao.model.ParametroRepo;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -27,7 +25,7 @@ class ConfiguracaoFacadeTest {
     private ConfiguracaoFacade configuracaoFacade;
 
     @Mock
-    private ParametroRepo parametroRepo;
+    private ConfiguracaoService configuracaoService;
 
     @Test
     @DisplayName("Deve buscar todos os parâmetros")
@@ -35,14 +33,14 @@ class ConfiguracaoFacadeTest {
         // Arrange
         Parametro p1 = Parametro.builder().chave("CHAVE_1").valor("VALOR_1").descricao("Desc 1").build();
         Parametro p2 = Parametro.builder().chave("CHAVE_2").valor("VALOR_2").descricao("Desc 2").build();
-        when(parametroRepo.findAll()).thenReturn(List.of(p1, p2));
+        when(configuracaoService.buscarTodos()).thenReturn(List.of(p1, p2));
 
         // Act
         List<Parametro> resultado = configuracaoFacade.buscarTodos();
 
         // Assert
         assertThat(resultado).hasSize(2).contains(p1, p2);
-        verify(parametroRepo).findAll();
+        verify(configuracaoService).buscarTodos();
     }
 
     @Test
@@ -51,14 +49,14 @@ class ConfiguracaoFacadeTest {
         // Arrange
         String chave = "TESTE_CHAVE";
         Parametro parametro = Parametro.builder().chave(chave).valor("VALOR").descricao("Desc").build();
-        when(parametroRepo.findByChave(chave)).thenReturn(Optional.of(parametro));
+        when(configuracaoService.buscarPorChave(chave)).thenReturn(parametro);
 
         // Act
         Parametro resultado = configuracaoFacade.buscarPorChave(chave);
 
         // Assert
         assertThat(resultado).isEqualTo(parametro);
-        verify(parametroRepo).findByChave(chave);
+        verify(configuracaoService).buscarPorChave(chave);
     }
 
     @Test
@@ -66,7 +64,8 @@ class ConfiguracaoFacadeTest {
     void buscarPorChave_naoEncontrado() {
         // Arrange
         String chave = "INEXISTENTE";
-        when(parametroRepo.findByChave(chave)).thenReturn(Optional.empty());
+        when(configuracaoService.buscarPorChave(chave)).thenThrow(new ErroConfiguracao(
+                "Parâmetro '%s' não encontrado. Configure o parâmetro no banco de dados.".formatted(chave)));
 
         // Act & Assert
         assertThatThrownBy(() -> configuracaoFacade.buscarPorChave(chave))
@@ -80,14 +79,14 @@ class ConfiguracaoFacadeTest {
         // Arrange
         Parametro p1 = Parametro.builder().chave("CHAVE_1").valor("VALOR_1").descricao("Desc 1").build();
         List<Parametro> lista = List.of(p1);
-        when(parametroRepo.saveAll(lista)).thenReturn(lista);
+        when(configuracaoService.salvar(lista)).thenReturn(lista);
 
         // Act
         List<Parametro> resultado = configuracaoFacade.salvar(lista);
 
         // Assert
         assertThat(resultado).isEqualTo(lista);
-        verify(parametroRepo).saveAll(lista);
+        verify(configuracaoService).salvar(lista);
     }
 
     @Test
@@ -95,20 +94,17 @@ class ConfiguracaoFacadeTest {
     void atualizar_sucesso() {
         // Arrange
         String chave = "CHAVE_ATUALIZAR";
-        String valorAntigo = "VALOR_ANTIGO";
         String novoValor = "VALOR_NOVO";
-        Parametro parametro = Parametro.builder().chave(chave).valor(valorAntigo).descricao("Desc").build();
+        Parametro parametroAtualizado = Parametro.builder().chave(chave).valor(novoValor).descricao("Desc").build();
 
-        when(parametroRepo.findByChave(chave)).thenReturn(Optional.of(parametro));
-        when(parametroRepo.save(any(Parametro.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(configuracaoService.atualizar(chave, novoValor)).thenReturn(parametroAtualizado);
 
         // Act
         Parametro resultado = configuracaoFacade.atualizar(chave, novoValor);
 
         // Assert
         assertThat(resultado.getValor()).isEqualTo(novoValor);
-        verify(parametroRepo).findByChave(chave);
-        verify(parametroRepo).save(parametro);
+        verify(configuracaoService).atualizar(chave, novoValor);
     }
 
     @Test
@@ -116,11 +112,12 @@ class ConfiguracaoFacadeTest {
     void atualizar_naoEncontrado() {
         // Arrange
         String chave = "INEXISTENTE";
-        when(parametroRepo.findByChave(chave)).thenReturn(Optional.empty());
+        when(configuracaoService.atualizar(chave, "novo"))
+                .thenThrow(new ErroConfiguracao(
+                        "Parâmetro '%s' não encontrado. Configure o parâmetro no banco de dados.".formatted(chave)));
 
         // Act & Assert
         assertThatThrownBy(() -> configuracaoFacade.atualizar(chave, "novo"))
                 .isInstanceOf(ErroConfiguracao.class);
-        verify(parametroRepo, never()).save(any());
     }
 }

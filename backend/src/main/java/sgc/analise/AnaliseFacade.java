@@ -10,20 +10,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.Analise;
-import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAnalise;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
 
 /**
- * Serviço para gerenciar as análises de subprocessos.
+ * Facade para gerenciamento de análises de subprocessos.
+ *
+ * <p>Esta facade orquestra operações relacionadas a análises,
+ * delegando a persistência para {@link AnaliseService}.
+ *
+ * @see AnaliseService
  */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AnaliseFacade {
-    private final AnaliseRepo analiseRepo;
+    private final AnaliseService analiseService;
     private final UnidadeFacade unidadeService;
 
     /**
@@ -35,7 +39,7 @@ public class AnaliseFacade {
      */
     @Transactional(readOnly = true)
     public List<Analise> listarPorSubprocesso(Long codSubprocesso, TipoAnalise tipoAnalise) {
-        return analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso).stream()
+        return analiseService.listarPorSubprocesso(codSubprocesso).stream()
                 .filter(analise -> analise.getTipo() == tipoAnalise)
                 .toList();
     }
@@ -66,7 +70,7 @@ public class AnaliseFacade {
                 .motivo(command.motivo())
                 .build();
 
-        return analiseRepo.save(analise);
+        return analiseService.salvar(analise);
     }
 
     /**
@@ -80,7 +84,6 @@ public class AnaliseFacade {
      * @param codSubprocesso O código do subprocesso cujas análises serão removidas.
      */
     public void removerPorSubprocesso(Long codSubprocesso) {
-        List<Analise> analises = analiseRepo.findBySubprocessoCodigo(codSubprocesso);
-        if (!analises.isEmpty()) analiseRepo.deleteAll(analises);
+        analiseService.removerPorSubprocesso(codSubprocesso);
     }
 }

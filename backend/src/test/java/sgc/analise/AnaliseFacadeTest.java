@@ -7,12 +7,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.Analise;
-import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAnalise;
 import sgc.organizacao.UnidadeFacade;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,13 +24,13 @@ class AnaliseFacadeTest {
     private static final String OBS = "Observação";
 
     @Mock
-    private AnaliseRepo analiseRepo;
+    private AnaliseService analiseService;
 
     @Mock
     private UnidadeFacade unidadeService;
 
     @InjectMocks
-    private AnaliseFacade service;
+    private AnaliseFacade facade;
 
     private Subprocesso subprocesso;
 
@@ -50,10 +48,10 @@ class AnaliseFacadeTest {
         void deveRetornarListaDeAnalisesCadastro() {
             Analise analise = new Analise();
             analise.setTipo(TipoAnalise.CADASTRO);
-            when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L))
+            when(analiseService.listarPorSubprocesso(1L))
                     .thenReturn(List.of(analise));
 
-            List<Analise> resultado = service.listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
+            List<Analise> resultado = facade.listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
 
             assertThat(resultado)
                     .isNotEmpty()
@@ -61,7 +59,7 @@ class AnaliseFacadeTest {
                     .first()
                     .extracting(Analise::getTipo)
                     .isEqualTo(TipoAnalise.CADASTRO);
-            verify(analiseRepo).findBySubprocessoCodigoOrderByDataHoraDesc(1L);
+            verify(analiseService).listarPorSubprocesso(1L);
         }
 
         @Test
@@ -69,10 +67,10 @@ class AnaliseFacadeTest {
         void deveRetornarListaDeAnalisesValidacao() {
             Analise analise = new Analise();
             analise.setTipo(TipoAnalise.VALIDACAO);
-            when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L))
+            when(analiseService.listarPorSubprocesso(1L))
                     .thenReturn(List.of(analise));
 
-            List<Analise> resultado = service.listarPorSubprocesso(1L, TipoAnalise.VALIDACAO);
+            List<Analise> resultado = facade.listarPorSubprocesso(1L, TipoAnalise.VALIDACAO);
 
             assertThat(resultado)
                     .isNotEmpty()
@@ -80,7 +78,7 @@ class AnaliseFacadeTest {
                     .first()
                     .extracting(Analise::getTipo)
                     .isEqualTo(TipoAnalise.VALIDACAO);
-            verify(analiseRepo).findBySubprocessoCodigoOrderByDataHoraDesc(1L);
+            verify(analiseService).listarPorSubprocesso(1L);
         }
 
         @Test
@@ -91,10 +89,10 @@ class AnaliseFacadeTest {
             Analise analiseValidacao = new Analise();
             analiseValidacao.setTipo(TipoAnalise.VALIDACAO);
 
-            when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L))
+            when(analiseService.listarPorSubprocesso(1L))
                     .thenReturn(List.of(analiseCadastro, analiseValidacao));
 
-            List<Analise> resultado = service.listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
+            List<Analise> resultado = facade.listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
 
             assertThat(resultado)
                     .hasSize(1)
@@ -109,9 +107,9 @@ class AnaliseFacadeTest {
         @Test
         @DisplayName("Deve criar uma análise de cadastro")
         void deveCriarAnaliseCadastro() {
-            when(analiseRepo.save(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
+            when(analiseService.salvar(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
-            Analise resultado = service.criarAnalise(
+            Analise resultado = facade.criarAnalise(
                     subprocesso,
                     CriarAnaliseCommand.builder()
                             .tipo(TipoAnalise.CADASTRO)
@@ -126,15 +124,15 @@ class AnaliseFacadeTest {
             assertThat(resultado.getSubprocesso()).isEqualTo(subprocesso);
             assertThat(resultado.getObservacoes()).isEqualTo(OBS);
             assertThat(resultado.getTipo()).isEqualTo(TipoAnalise.CADASTRO);
-            verify(analiseRepo).save(any(Analise.class));
+            verify(analiseService).salvar(any(Analise.class));
         }
 
         @Test
         @DisplayName("Deve criar uma análise de validação")
         void deveCriarAnaliseValidacao() {
-            when(analiseRepo.save(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
+            when(analiseService.salvar(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
-            Analise resultado = service.criarAnalise(
+            Analise resultado = facade.criarAnalise(
                     subprocesso,
                     CriarAnaliseCommand.builder()
                             .tipo(TipoAnalise.VALIDACAO)
@@ -149,7 +147,7 @@ class AnaliseFacadeTest {
             assertThat(resultado.getSubprocesso()).isEqualTo(subprocesso);
             assertThat(resultado.getObservacoes()).isEqualTo(OBS);
             assertThat(resultado.getTipo()).isEqualTo(TipoAnalise.VALIDACAO);
-            verify(analiseRepo).save(any(Analise.class));
+            verify(analiseService).salvar(any(Analise.class));
         }
 
         @Test
@@ -163,9 +161,9 @@ class AnaliseFacadeTest {
 
             when(unidadeService.buscarPorSigla(sigla)).thenReturn(unidadeDto);
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(unidade);
-            when(analiseRepo.save(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
+            when(analiseService.salvar(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
-            Analise resultado = service.criarAnalise(
+            Analise resultado = facade.criarAnalise(
                     subprocesso,
                     CriarAnaliseCommand.builder()
                             .tipo(TipoAnalise.VALIDACAO)
@@ -184,25 +182,9 @@ class AnaliseFacadeTest {
         @Test
         @DisplayName("Deve remover análises por subprocesso")
         void deveRemoverAnalisesPorSubprocesso() {
-            Analise analise = new Analise();
-            List<Analise> analises = List.of(analise);
-            when(analiseRepo.findBySubprocessoCodigo(1L)).thenReturn(analises);
+            facade.removerPorSubprocesso(1L);
 
-            service.removerPorSubprocesso(1L);
-
-            verify(analiseRepo).findBySubprocessoCodigo(1L);
-            verify(analiseRepo).deleteAll(analises);
-        }
-
-        @Test
-        @DisplayName("Não deve tentar remover se lista estiver vazia")
-        void naoDeveRemoverSeListaVazia() {
-            when(analiseRepo.findBySubprocessoCodigo(1L)).thenReturn(Collections.emptyList());
-
-            service.removerPorSubprocesso(1L);
-
-            verify(analiseRepo).findBySubprocessoCodigo(1L);
-            verify(analiseRepo, never()).deleteAll(any());
+            verify(analiseService).removerPorSubprocesso(1L);
         }
     }
 }

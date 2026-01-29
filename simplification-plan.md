@@ -1335,7 +1335,8 @@ Nenhuma tarefa em andamento no momento.
 | **DTOs Analisados** | 0 | 46 | 40+ | ✅ Concluído |
 | **Facades Analisadas** | 0 | 13 | 13 | ✅ Concluído |
 | **Repos com Padrão Inconsistente** | ? | 6 | 0-2 | 🔄 Identificado |
-| **Facades com Violations** | ? | 8 | 0 | 🔄 Identificado + ✅ ArchUnit Rule |
+| **Facades com Violations** | 8 | 5 | 0 | 🔄 Em Andamento (3/8 corrigidas - 38%) |
+| **ArchUnit Violations** | 109 | 85 | 0 | 🔄 Em Andamento (24 violations corrigidas - 22%) |
 | **DTOs Duplicados Críticos** | ? | 2 | 0 | 🔄 Identificado |
 | **Repositories Duplicados** | 1 | 0 | 0 | ✅ Removido |
 | **Testes Passando (Backend)** | 1352 | 1360 | 1361 | ✅ 99.9% |
@@ -1361,7 +1362,19 @@ Nenhuma tarefa em andamento no momento.
   - Testes de mappers corrigidos para refletir arquitetura purificada
   - ProcessoRepo analisado: queries servem propósitos distintos (não consolidar)
   - AtividadeRepo analisado: listarPorCompetencia() não é redundante (manter)
-  - 1360/1361 testes passando (99.9% - 1 falha esperada: ArchUnit rule)
+  
+- 🏗️ **Fase 2 - Correção de Violações de Arquitetura - Em Andamento:**
+  - ✅ ConfiguracaoFacade: Criado ConfiguracaoService, 6 testes passando
+  - ✅ AnaliseFacade: Criado AnaliseService, 7 testes passando
+  - ✅ AlertaFacade: Criado AlertaService, 21 testes passando
+  - ⏳ ProcessoFacade: Pendente (1 repo - ProcessoRepo)
+  - ⏳ MapaFacade: Pendente (2 repos - MapaRepo, CompetenciaRepo)
+  - ⏳ UnidadeFacade: Pendente (3 repos - UnidadeRepo, UnidadeMapaRepo, UsuarioRepo)
+  - ⏳ UsuarioFacade: Pendente (4 repos - UsuarioRepo, UsuarioPerfilRepo, AdministradorRepo, UnidadeRepo)
+  - ⏳ SubprocessoFacade: Pendente (2 repos - SubprocessoRepo, MovimentacaoRepo)
+  - **Progresso:** 3/8 Facades corrigidas (38%), 24/109 violations corrigidas (22%)
+  - **Services Criados:** 3 novos services com documentação completa
+  - **Testes Atualizados:** 34 testes unitários refatorados e passando
 
 - 🎯 **Descobertas Críticas:**
   - 6 Repositories (30%) com padrões inconsistentes documentados
@@ -1393,8 +1406,105 @@ Nenhuma tarefa em andamento no momento.
 
 ---
 
+## 📋 Próximos Passos - Correção de Violações Restantes
+
+### Facades Pendentes (5/8)
+
+#### 1. ProcessoFacade (Complexidade Média - 4h estimado)
+**Repositório:** ProcessoRepo (1 repo)
+**Abordagem:**
+1. Criar `ProcessoRepositoryService` para encapsular acesso ao ProcessoRepo
+2. Métodos a mover:
+   - `buscarPorId()`, `salvar()`, `saveAndFlush()`, `deleteById()`
+   - `findBySituacao()`, `findBySituacaoOrderByDataFinalizacaoDesc()`
+   - `findDistinctByParticipantes_CodigoInAndSituacaoNot()`
+   - `findAll(Pageable)`
+3. Atualizar ProcessoFacade para delegar ao service
+4. Atualizar testes (ProcessoFacadeTest tem ~40 testes)
+
+**Impacto:** ~15 violations a corrigir
+
+#### 2. MapaFacade (Complexidade Média/Alta - 6h estimado)
+**Repositórios:** MapaRepo, CompetenciaRepo (2 repos)
+**Abordagem:**
+1. Criar `MapaRepositoryService` para encapsular ambos os repositórios
+2. Métodos a mover de MapaRepo:
+   - `findAll()`, `save()`, `deleteById()`, `existsById()`
+   - `findMapaVigenteByUnidade()`, `findBySubprocessoCodigo()`
+3. Métodos a mover de CompetenciaRepo:
+   - `findByMapaCodigo()`
+4. **Atenção:** MapaFacade já tem MapaSalvamentoService, MapaVisualizacaoService, ImpactoMapaService
+   - Garantir que não há duplicação de responsabilidades
+5. Atualizar testes (MapaFacadeTest complexo)
+
+**Impacto:** ~18 violations a corrigir
+
+#### 3. UnidadeFacade (Complexidade Alta - 8h estimado)
+**Repositórios:** UnidadeRepo, UnidadeMapaRepo, UsuarioRepo (3 repos)
+**Desafio:** Acesso a UsuarioRepo em UnidadeFacade viola separação de módulos
+**Abordagem:**
+1. Criar `UnidadeRepositoryService` para UnidadeRepo e UnidadeMapaRepo
+2. Para UsuarioRepo:
+   - Verificar se pode ser substituído por chamadas a UsuarioFacade
+   - Se necessário acesso direto, considerar mover lógica para UsuarioFacade
+3. Métodos críticos:
+   - `findBySigla()`, `findAllById()`, `findSiglasByCodigos()`
+   - `findAllWithHierarquia()`, `findByUnidadeLotacaoCodigo()`
+   - `findAllUnidadeCodigos()` (UnidadeMapaRepo)
+4. Atualizar testes (UnidadeFacadeTest tem ~35 testes)
+
+**Impacto:** ~25 violations a corrigir
+
+#### 4. UsuarioFacade (Complexidade Alta - 10h estimado)
+**Repositórios:** UsuarioRepo, UsuarioPerfilRepo, AdministradorRepo, UnidadeRepo (4 repos)
+**Desafio:** Maior número de repositórios, muitas dependências
+**Abordagem:**
+1. Criar `UsuarioRepositoryService` para UsuarioRepo e UsuarioPerfilRepo
+2. Criar `AdministradorService` para AdministradorRepo (responsabilidade distinta)
+3. Para UnidadeRepo:
+   - Substituir por chamadas a UnidadeFacade sempre que possível
+4. Métodos críticos (~30 métodos usando repositórios):
+   - Queries de usuário: `findByIdWithAtribuicoes()`, `findByEmail()`, `findAll()`
+   - Queries de perfis: `findByUsuarioTitulo()`, `findByUsuarioTituloIn()`
+   - Queries de chefes: `chefePorCodUnidade()`, `findChefesByUnidadesCodigos()`
+   - Administradores: `existsById()`, `save()`, `deleteById()`, `count()`, `findAll()`
+5. Atualizar testes (UsuarioFacadeTest tem ~50+ testes)
+
+**Impacto:** ~40 violations a corrigir
+
+#### 5. SubprocessoFacade (Complexidade Alta - 10h estimado)
+**Repositórios:** SubprocessoRepo, MovimentacaoRepo (2 repos)
+**Desafio:** Facade grande (~450 linhas), muitas dependências (15 injeções)
+**Abordagem:**
+1. Verificar se SubprocessoCrudService já encapsula parte do acesso
+2. Criar `SubprocessoRepositoryService` se necessário
+3. Criar `MovimentacaoService` para MovimentacaoRepo
+4. Métodos críticos:
+   - Subprocesso: `findById()`, `save()`
+   - Movimentação: `findBySubprocessoCodigoOrderByDataHoraDesc()`, `save()`
+5. Considerar refatoração maior (muitas dependências indicam violação SRP)
+6. Atualizar testes (SubprocessoFacadeTest tem ~60+ testes)
+
+**Impacto:** ~15 violations a corrigir
+
+### Estimativa Total
+- **Tempo:** 38-40 horas
+- **Violations a corrigir:** 85 (restantes)
+- **Services a criar:** 6-8 novos services
+- **Testes a atualizar:** ~200+ testes unitários
+
+### Recomendações
+1. **Prioridade Alta:** ProcessoFacade e MapaFacade (menor complexidade)
+2. **Prioridade Média:** UnidadeFacade (desafio de separação de módulos)
+3. **Prioridade Baixa:** UsuarioFacade e SubprocessoFacade (alta complexidade, considerar refatoração maior)
+4. **Estratégia:** Corrigir em ordem crescente de complexidade
+5. **Validação:** Executar ArchUnit rule após cada facade corrigida
+6. **Documentação:** Atualizar simplification-plan.md após cada facade
+
+---
+
 **Documento criado em:** 2026-01-29  
 **Última análise profunda:** 2026-01-29  
 **Última atualização:** 2026-01-29  
-**Responsável:** Análise de IA (Gemini)  
-**Status:** ✅ Análise profunda concluída - Fase 1 completa - Fase 2 parcial (3/6 quick wins) - 1360/1361 testes passando - ✅ ArchUnit rule implementada - ✅ Todos testes corrigidos
+**Responsável:** Análise de IA (Gemini/Copilot)  
+**Status:** ✅ Fase 1 completa - 🔄 Fase 2 em andamento (3/8 facades corrigidas, 24/109 violations) - ✅ ArchUnit rule implementada

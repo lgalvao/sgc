@@ -22,9 +22,8 @@ import org.springframework.data.domain.Pageable;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.mapper.AlertaMapper;
 import sgc.alerta.model.Alerta;
-import sgc.alerta.model.AlertaRepo;
 import sgc.alerta.model.AlertaUsuario;
-import sgc.alerta.model.AlertaUsuarioRepo;
+import sgc.alerta.AlertaService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.TipoUnidade;
@@ -44,10 +43,7 @@ import sgc.processo.model.Processo;
 @DisplayName("AlertaFacade - Testes Unitários")
 class AlertaFacadeTest {
     @Mock
-    private AlertaRepo alertaRepo;
-
-    @Mock
-    private AlertaUsuarioRepo alertaUsuarioRepo;
+    private AlertaService alertaService;
 
     @Mock
     private UsuarioFacade usuarioService;
@@ -80,14 +76,16 @@ class AlertaFacadeTest {
             Unidade u = new Unidade();
             u.setCodigo(1L);
 
-            when(alertaRepo.save(any())).thenReturn(new Alerta().setCodigo(100L));
+            Alerta alertaSalvo = new Alerta();
+            alertaSalvo.setCodigo(100L);
+            when(alertaService.salvar(any())).thenReturn(alertaSalvo);
 
             // When
             Alerta resultado = service.criarAlertaSedoc(p, u, "desc");
 
             // Then
             assertThat(resultado).isNotNull();
-            verify(alertaRepo).save(any());
+            verify(alertaService).salvar(any());
         }
     }
 
@@ -105,13 +103,13 @@ class AlertaFacadeTest {
             u.setCodigo(1L);
             u.setTipo(TipoUnidade.OPERACIONAL);
 
-            when(alertaRepo.save(any())).thenReturn(new Alerta());
+            when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
             // When
             service.criarAlertasProcessoIniciado(p, List.of(u));
 
             // Then
-            verify(alertaRepo).save(argThat(a -> "Início do processo".equals(a.getDescricao())));
+            verify(alertaService).salvar(argThat(a -> "Início do processo".equals(a.getDescricao())));
         }
 
         @Test
@@ -128,18 +126,18 @@ class AlertaFacadeTest {
             filho.setCodigo(2L);
             filho.setUnidadeSuperior(root);
 
-            when(alertaRepo.save(any())).thenReturn(new Alerta());
+            when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
             // When
             service.criarAlertasProcessoIniciado(p, List.of(filho));
 
             // Then
             // 1 alerta operacional para o filho
-            verify(alertaRepo).save(argThat(a -> "Início do processo".equals(a.getDescricao())
+            verify(alertaService).salvar(argThat(a -> "Início do processo".equals(a.getDescricao())
                     && a.getUnidadeDestino().getCodigo().equals(2L)));
 
             // 1 alerta intermediário para o pai (root)
-            verify(alertaRepo).save(argThat(a -> "Início do processo em unidades subordinadas".equals(a.getDescricao())
+            verify(alertaService).salvar(argThat(a -> "Início do processo em unidades subordinadas".equals(a.getDescricao())
                     && a.getUnidadeDestino().getCodigo().equals(1L)));
         }
 
@@ -152,14 +150,14 @@ class AlertaFacadeTest {
             Unidade u = Unidade.builder().tipo(TipoUnidade.INTEROPERACIONAL).build();
             u.setCodigo(1L);
 
-            when(alertaRepo.save(any())).thenReturn(new Alerta());
+            when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
             // When
             List<Alerta> resultado = service.criarAlertasProcessoIniciado(p, List.of(u));
 
             // Then
             assertThat(resultado).hasSize(2);
-            verify(alertaRepo, times(2)).save(any());
+            verify(alertaService, times(2)).salvar(any());
         }
     }
 
@@ -176,13 +174,13 @@ class AlertaFacadeTest {
             uOrigem.setSigla("UO");
             Unidade uDestino = new Unidade();
 
-            when(alertaRepo.save(any())).thenReturn(new Alerta());
+            when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
             // When
             service.criarAlertaCadastroDisponibilizado(p, uOrigem, uDestino);
 
             // Then
-            verify(alertaRepo).save(any());
+            verify(alertaService).salvar(any());
         }
 
         @Test
@@ -194,13 +192,13 @@ class AlertaFacadeTest {
             p.setDescricao("P");
             Unidade uDestino = new Unidade();
 
-            when(alertaRepo.save(any())).thenReturn(new Alerta());
+            when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
             // When
             service.criarAlertaCadastroDevolvido(p, uDestino, "motivo");
 
             // Then
-            verify(alertaRepo).save(any());
+            verify(alertaService).salvar(any());
         }
 
         @Test
@@ -219,11 +217,11 @@ class AlertaFacadeTest {
             Unidade uOrigem = new Unidade();
             Unidade uDestino = new Unidade();
             uDestino.setSigla("DEST");
-            when(alertaRepo.save(any())).thenReturn(new Alerta());
+            when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
             Alerta resultado = service.criarAlertaTransicao(p, "desc", uOrigem, uDestino);
             assertThat(resultado).isNotNull();
-            verify(alertaRepo).save(any());
+            verify(alertaService).salvar(any());
         }
 
         @Test
@@ -232,10 +230,10 @@ class AlertaFacadeTest {
             criarSedocMock();
             Processo p = new Processo();
             Unidade uDestino = new Unidade();
-            when(alertaRepo.save(any())).thenReturn(new Alerta());
+            when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
             service.criarAlertaAlteracaoDataLimite(p, uDestino, "20/10/2023", 1);
-            verify(alertaRepo).save(any());
+            verify(alertaService).salvar(any());
         }
 
         @Test
@@ -247,14 +245,14 @@ class AlertaFacadeTest {
             u.setSigla("U1");
             Unidade sup = new Unidade();
 
-            when(alertaRepo.save(any())).thenReturn(new Alerta());
+            when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
             service.criarAlertaReaberturaCadastro(p, u, "Justificativa Teste");
             service.criarAlertaReaberturaCadastroSuperior(p, sup, u);
             service.criarAlertaReaberturaRevisao(p, u, "Justificativa Teste");
             service.criarAlertaReaberturaRevisaoSuperior(p, sup, u);
 
-            verify(alertaRepo, times(4)).save(any());
+            verify(alertaService, times(4)).salvar(any());
         }
     }
 
@@ -279,8 +277,8 @@ class AlertaFacadeTest {
             alerta.setCodigo(100L);
 
             when(usuarioService.buscarPorId(usuarioTitulo)).thenReturn(usuario);
-            when(alertaRepo.findByUnidadeDestino_Codigo(codUnidade)).thenReturn(List.of(alerta));
-            when(alertaUsuarioRepo.findByUsuarioAndAlertas(eq(usuarioTitulo), anyList())).thenReturn(List.of());
+            when(alertaService.buscarPorUnidadeDestino(codUnidade)).thenReturn(List.of(alerta));
+            when(alertaService.buscarPorUsuarioEAlertas(eq(usuarioTitulo), anyList())).thenReturn(List.of());
             when(alertaMapper.toDto(eq(alerta), any())).thenReturn(AlertaDto.builder().codigo(100L).build());
 
             // When
@@ -289,7 +287,7 @@ class AlertaFacadeTest {
             // Then
             assertThat(resultado).hasSize(1);
             // Não deve salvar pois listar agora é somente leitura
-            verify(alertaUsuarioRepo, never()).save(any());
+            verify(alertaService, never()).salvarAlertaUsuario(any());
         }
 
         @Test
@@ -315,8 +313,8 @@ class AlertaFacadeTest {
             alertaUsuarioExistente.setDataHoraLeitura(LocalDateTime.now());
 
             when(usuarioService.buscarPorId(usuarioTitulo)).thenReturn(usuario);
-            when(alertaRepo.findByUnidadeDestino_Codigo(codUnidade)).thenReturn(List.of(alerta));
-            when(alertaUsuarioRepo.findByUsuarioAndAlertas(eq(usuarioTitulo), anyList())).thenReturn(List.of(alertaUsuarioExistente));
+            when(alertaService.buscarPorUnidadeDestino(codUnidade)).thenReturn(List.of(alerta));
+            when(alertaService.buscarPorUsuarioEAlertas(eq(usuarioTitulo), anyList())).thenReturn(List.of(alertaUsuarioExistente));
             when(alertaMapper.toDto(eq(alerta), any())).thenReturn(AlertaDto.builder().codigo(100L).build());
 
             // When
@@ -324,7 +322,7 @@ class AlertaFacadeTest {
 
             // Then
             assertThat(resultado).hasSize(1);
-            verify(alertaUsuarioRepo, never()).save(any());
+            verify(alertaService, never()).salvarAlertaUsuario(any());
         }
 
         @Test
@@ -341,7 +339,7 @@ class AlertaFacadeTest {
             usuario.setUnidadeLotacao(unidade);
 
             when(usuarioService.buscarPorId(usuarioTitulo)).thenReturn(usuario);
-            when(alertaRepo.findByUnidadeDestino_Codigo(codUnidade)).thenReturn(List.of());
+            when(alertaService.buscarPorUnidadeDestino(codUnidade)).thenReturn(List.of());
 
             List<AlertaDto> resultado = service.listarAlertasPorUsuario(usuarioTitulo);
 
@@ -356,7 +354,7 @@ class AlertaFacadeTest {
         @DisplayName("Listar por unidade paginado")
         void listarPorUnidadePaginado() {
             Pageable p = Pageable.unpaged();
-            when(alertaRepo.findByUnidadeDestino_Codigo(1L, p)).thenReturn(Page.empty());
+            when(alertaService.buscarPorUnidadeDestino(1L, p)).thenReturn(Page.empty());
             assertThat(service.listarPorUnidade(1L, p)).isEmpty();
         }
 
@@ -365,7 +363,7 @@ class AlertaFacadeTest {
         void obterDataHoraLeitura() {
             AlertaUsuario au = new AlertaUsuario();
             au.setDataHoraLeitura(LocalDateTime.now());
-            when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.of(au));
+            when(alertaService.obterDataHoraLeitura(1L, "user")).thenReturn(Optional.of(au.getDataHoraLeitura()));
             assertThat(service.obterDataHoraLeitura(1L, "user")).isPresent();
         }
     }
@@ -381,12 +379,12 @@ class AlertaFacadeTest {
             Usuario usuario = new Usuario();
 
             when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
-            when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.empty());
-            when(alertaRepo.findById(codigoInexistente)).thenReturn(Optional.empty());
+            when(alertaService.buscarAlertaUsuario(any())).thenReturn(Optional.empty());
+            when(alertaService.buscarPorCodigo(codigoInexistente)).thenReturn(Optional.empty());
 
             service.marcarComoLidos(titulo, List.of(codigoInexistente));
 
-            verify(alertaUsuarioRepo, never()).save(any());
+            verify(alertaService, never()).salvarAlertaUsuario(any());
         }
 
         @Test
@@ -398,13 +396,13 @@ class AlertaFacadeTest {
             Alerta alerta = new Alerta();
 
             when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
-            when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.empty());
-            when(alertaRepo.findById(codigo)).thenReturn(Optional.of(alerta));
+            when(alertaService.buscarAlertaUsuario(any())).thenReturn(Optional.empty());
+            when(alertaService.buscarPorCodigo(codigo)).thenReturn(Optional.of(alerta));
 
             service.marcarComoLidos(titulo, List.of(codigo));
 
             ArgumentCaptor<AlertaUsuario> captor = ArgumentCaptor.forClass(AlertaUsuario.class);
-            verify(alertaUsuarioRepo).save(captor.capture());
+            verify(alertaService).salvarAlertaUsuario(captor.capture());
 
             AlertaUsuario salvo = captor.getValue();
             assertThat(salvo.getDataHoraLeitura()).isNotNull();
@@ -424,11 +422,11 @@ class AlertaFacadeTest {
             existente.setUsuario(usuario);
 
             when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
-            when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.of(existente));
+            when(alertaService.buscarAlertaUsuario(any())).thenReturn(Optional.of(existente));
 
             service.marcarComoLidos(titulo, List.of(codigo));
 
-            verify(alertaUsuarioRepo).save(existente);
+            verify(alertaService).salvarAlertaUsuario(existente);
             assertThat(existente.getDataHoraLeitura()).isNotNull();
         }
 
@@ -444,11 +442,11 @@ class AlertaFacadeTest {
             existente.setUsuario(usuario);
 
             when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
-            when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.of(existente));
+            when(alertaService.buscarAlertaUsuario(any())).thenReturn(Optional.of(existente));
 
             service.marcarComoLidos(titulo, List.of(codigo));
 
-            verify(alertaUsuarioRepo, never()).save(any());
+            verify(alertaService, never()).salvarAlertaUsuario(any());
         }
     }
 
@@ -470,13 +468,13 @@ class AlertaFacadeTest {
             a2.setCodigo(2L);
 
             when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
-            when(alertaRepo.findByUnidadeDestino_Codigo(1L)).thenReturn(List.of(a1, a2));
+            when(alertaService.buscarPorUnidadeDestino(1L)).thenReturn(List.of(a1, a2));
 
             // a1 lido, a2 nao lido
             AlertaUsuario au1 = new AlertaUsuario();
             au1.setId(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build());
             au1.setDataHoraLeitura(LocalDateTime.now());
-            when(alertaUsuarioRepo.findByUsuarioAndAlertas(eq(titulo), anyList())).thenReturn(List.of(au1));
+            when(alertaService.buscarPorUsuarioEAlertas(eq(titulo), anyList())).thenReturn(List.of(au1));
 
             // Mocks do mapper
             AlertaDto dto1 = AlertaDto.builder().codigo(1L).dataHoraLeitura(LocalDateTime.now()).build();
@@ -502,7 +500,7 @@ class AlertaFacadeTest {
             sedocMock.setSigla("SEDOC");
 
             when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(sedocMock);
-            when(alertaRepo.save(any())).thenReturn(new Alerta());
+            when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
             // Primeira chamada: deve buscar sedoc
             service.criarAlertaSedoc(new Processo(), new Unidade(), "Teste");
