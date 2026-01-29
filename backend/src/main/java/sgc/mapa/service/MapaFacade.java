@@ -8,9 +8,7 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.mapper.MapaCompletoMapper;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
@@ -33,26 +31,26 @@ import java.util.Optional;
 @Slf4j
 public class MapaFacade {
 
-    private final MapaRepo mapaRepo;
-    private final CompetenciaRepo competenciaRepo;
+    private final MapaRepositoryService mapaRepositoryService;
     private final MapaCompletoMapper mapaCompletoMapper;
     private final MapaSalvamentoService mapaSalvamentoService;
+    private final MapaManutencaoService mapaManutencaoService; // Added/Explicit dependency usage
     private final MapaVisualizacaoService mapaVisualizacaoService;
     private final ImpactoMapaService impactoMapaService;
     private final sgc.comum.repo.RepositorioComum repo;
 
     public MapaFacade(
-            MapaRepo mapaRepo,
-            CompetenciaRepo competenciaRepo,
+            MapaRepositoryService mapaRepositoryService,
             MapaCompletoMapper mapaCompletoMapper,
             MapaSalvamentoService mapaSalvamentoService,
+            MapaManutencaoService mapaManutencaoService,
             MapaVisualizacaoService mapaVisualizacaoService,
             ImpactoMapaService impactoMapaService,
             sgc.comum.repo.RepositorioComum repo) {
-        this.mapaRepo = mapaRepo;
-        this.competenciaRepo = competenciaRepo;
+        this.mapaRepositoryService = mapaRepositoryService;
         this.mapaCompletoMapper = mapaCompletoMapper;
         this.mapaSalvamentoService = mapaSalvamentoService;
+        this.mapaManutencaoService = mapaManutencaoService;
         this.mapaVisualizacaoService = mapaVisualizacaoService;
         this.impactoMapaService = impactoMapaService;
         this.repo = repo;
@@ -64,7 +62,7 @@ public class MapaFacade {
 
     @Transactional(readOnly = true)
     public List<Mapa> listar() {
-        return mapaRepo.findAll();
+        return mapaRepositoryService.listarTodos();
     }
 
     @Transactional(readOnly = true)
@@ -74,19 +72,19 @@ public class MapaFacade {
 
     @Transactional(readOnly = true)
     public Optional<Mapa> buscarMapaVigentePorUnidade(Long codigoUnidade) {
-        return mapaRepo.findMapaVigenteByUnidade(codigoUnidade);
+        return mapaRepositoryService.buscarMapaVigentePorUnidade(codigoUnidade);
     }
 
     @Transactional(readOnly = true)
     public Optional<Mapa> buscarPorSubprocessoCodigo(Long codSubprocesso) {
-        return mapaRepo.findBySubprocessoCodigo(codSubprocesso);
+        return mapaRepositoryService.buscarPorSubprocessoCodigo(codSubprocesso);
     }
 
     @Transactional(readOnly = true)
     public MapaCompletoDto obterMapaCompleto(Long codMapa, Long codSubprocesso) {
         Mapa mapa = repo.buscar(Mapa.class, codMapa);
 
-        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
+        List<Competencia> competencias = mapaManutencaoService.buscarCompetenciasPorCodMapa(codMapa);
         return mapaCompletoMapper.toDto(mapa, codSubprocesso, competencias);
     }
 
@@ -95,11 +93,11 @@ public class MapaFacade {
     // ===================================================================================
 
     public Mapa salvar(Mapa mapa) {
-        return mapaRepo.save(mapa);
+        return mapaRepositoryService.salvar(mapa);
     }
 
     public Mapa criar(Mapa mapa) {
-        return mapaRepo.save(mapa);
+        return mapaRepositoryService.salvar(mapa);
     }
 
     public Mapa atualizar(Long codigo, Mapa mapa) {
@@ -107,14 +105,14 @@ public class MapaFacade {
         existente.setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado());
         existente.setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao());
         existente.setDataHoraHomologado(mapa.getDataHoraHomologado());
-        return mapaRepo.save(existente);
+        return mapaRepositoryService.salvar(existente);
     }
 
     public void excluir(Long codigo) {
-        if (!mapaRepo.existsById(codigo)) {
+        if (!mapaRepositoryService.existe(codigo)) {
             throw new ErroEntidadeNaoEncontrada("Mapa", codigo);
         }
-        mapaRepo.deleteById(codigo);
+        mapaRepositoryService.excluir(codigo);
     }
 
     // ===================================================================================

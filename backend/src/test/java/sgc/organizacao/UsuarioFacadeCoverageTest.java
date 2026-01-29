@@ -40,7 +40,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
 
-import sgc.organizacao.model.AdministradorRepo;
+import sgc.organizacao.service.AdministradorRepositoryService;
 import sgc.organizacao.service.UnidadeRepositoryService;
 import sgc.organizacao.service.UsuarioRepositoryService;
 
@@ -55,7 +55,7 @@ class UsuarioFacadeCoverageTest {
     @Mock
     private UsuarioRepositoryService usuarioRepositoryService;
     @Mock
-    private AdministradorRepo administradorRepo;
+    private AdministradorRepositoryService administradorService;
     @Mock
     private UnidadeRepositoryService unidadeRepositoryService;
 
@@ -394,7 +394,7 @@ class UsuarioFacadeCoverageTest {
     void deveListarAdministradores() {
         Administrador admin = new Administrador();
         admin.setUsuarioTitulo("T");
-        when(administradorRepo.findAll()).thenReturn(List.of(admin));
+        when(administradorService.listarTodos()).thenReturn(List.of(admin));
 
         Usuario u = new Usuario();
         u.setTituloEleitoral("T");
@@ -417,18 +417,18 @@ class UsuarioFacadeCoverageTest {
         u.setUnidadeLotacao(unidade);
 
         when(usuarioRepositoryService.buscarPorId("T")).thenReturn(u);
-        when(administradorRepo.existsById("T")).thenReturn(false);
+        when(administradorService.existePorTitulo("T")).thenReturn(false);
 
         usuarioFacade.adicionarAdministrador("T");
 
-        verify(administradorRepo).save(any(Administrador.class));
+        verify(administradorService).salvar(any(Administrador.class));
     }
 
     @Test
     @DisplayName("Deve lançar erro ao adicionar administrador existente")
     void deveLancarErroAdicionarAdminExistente() {
         when(usuarioRepositoryService.buscarPorId("T")).thenReturn(new Usuario());
-        when(administradorRepo.existsById("T")).thenReturn(true);
+        when(administradorService.existePorTitulo("T")).thenReturn(true);
 
         var erro = assertThrows(ErroValidacao.class, () -> usuarioFacade.adicionarAdministrador("T"));
         assertThat(erro).isNotNull();
@@ -437,12 +437,12 @@ class UsuarioFacadeCoverageTest {
     @Test
     @DisplayName("Deve remover administrador")
     void deveRemoverAdministrador() {
-        when(administradorRepo.existsById("Outro")).thenReturn(true);
-        when(administradorRepo.count()).thenReturn(2L);
+        when(administradorService.existePorTitulo("Outro")).thenReturn(true);
+        when(administradorService.contar()).thenReturn(2L);
 
         usuarioFacade.removerAdministrador("Outro", "Eu");
 
-        verify(administradorRepo).deleteById("Outro");
+        verify(administradorService).removerPorTitulo("Outro");
     }
 
     @Test
@@ -455,7 +455,7 @@ class UsuarioFacadeCoverageTest {
     @Test
     @DisplayName("Deve lançar erro ao remover não admin")
     void deveLancarErroRemoverNaoAdmin() {
-        when(administradorRepo.existsById("Outro")).thenReturn(false);
+        when(administradorService.existePorTitulo("Outro")).thenReturn(false);
         var erro = assertThrows(ErroValidacao.class, () -> usuarioFacade.removerAdministrador("Outro", "Eu"));
         assertThat(erro).isNotNull();
     }
@@ -463,8 +463,8 @@ class UsuarioFacadeCoverageTest {
     @Test
     @DisplayName("Deve lançar erro ao remover único admin")
     void deveLancarErroRemoverUnicoAdmin() {
-        when(administradorRepo.existsById("Outro")).thenReturn(true);
-        when(administradorRepo.count()).thenReturn(1L);
+        when(administradorService.existePorTitulo("Outro")).thenReturn(true);
+        when(administradorService.contar()).thenReturn(1L);
         var erro = assertThrows(ErroValidacao.class, () -> usuarioFacade.removerAdministrador("Outro", "Eu"));
         assertThat(erro).isNotNull();
     }
@@ -472,7 +472,7 @@ class UsuarioFacadeCoverageTest {
     @Test
     @DisplayName("Deve verificar se é administrador")
     void deveVerificarSeEhAdmin() {
-        when(administradorRepo.existsById("T")).thenReturn(true);
+        when(administradorService.existePorTitulo("T")).thenReturn(true);
         assertThat(usuarioFacade.isAdministrador("T")).isTrue();
     }
 

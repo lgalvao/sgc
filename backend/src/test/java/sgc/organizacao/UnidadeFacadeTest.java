@@ -30,7 +30,6 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeMapaRepo;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeMapaService;
@@ -45,8 +44,6 @@ class UnidadeFacadeTest {
 
     @Mock
     private UnidadeRepositoryService unidadeRepositoryService;
-    @Mock
-    private UnidadeMapaRepo unidadeMapaRepo;
     @Mock
     private UsuarioRepositoryService usuarioRepositoryService;
     @Mock
@@ -253,7 +250,7 @@ class UnidadeFacadeTest {
         void deveBuscarArvoreComElegibilidadeComMapa() {
             // Arrange
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
-            when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L));
+            when(mapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(1L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
 
             // Act
@@ -261,7 +258,7 @@ class UnidadeFacadeTest {
 
             // Assert
             assertThat(result).hasSize(1);
-            verify(unidadeMapaRepo).findAllUnidadeCodigos();
+            verify(mapaService).buscarTodosCodigosUnidades();
             verify(hierarquiaService).buscarArvoreComElegibilidade(any());
         }
 
@@ -270,7 +267,7 @@ class UnidadeFacadeTest {
         void deveSerIneligivelParaRevisaoSeSemMapa() {
             // Arrange
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
-            when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(2L));
+            when(mapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(2L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
 
             // Act
@@ -278,7 +275,7 @@ class UnidadeFacadeTest {
 
             // Assert
             assertThat(result).hasSize(1);
-            verify(unidadeMapaRepo).findAllUnidadeCodigos();
+            verify(mapaService).buscarTodosCodigosUnidades();
             verify(hierarquiaService).buscarArvoreComElegibilidade(any());
         }
 
