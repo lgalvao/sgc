@@ -283,4 +283,44 @@ public class ArchConsistencyTest {
             .should()
             .haveSimpleNameStartingWith("Evento")
             .because("Domain events should start with 'Evento' prefix for consistency");
+
+    /**
+     * Garante que Facades não acessem Repositories diretamente.
+     * Facades devem delegar operações de dados para Services especializados,
+     * que por sua vez acessam os Repositories (ADR-001).
+     *
+     * <p><b>Contexto:</b> Durante análise arquitetural foi descoberto que 8 facades
+     * (62% do total) estavam injetando 17 repositórios diretamente, violando o
+     * padrão Facade e criando acoplamento desnecessário.
+     *
+     * <p><b>Padrão Correto:</b>
+     * <ul>
+     *   <li>Controller → Facade → Service → Repository ✅</li>
+     *   <li>Controller → Facade → Repository ❌ (violação)</li>
+     * </ul>
+     *
+     * <p><b>Facades Identificadas com Violações:</b>
+     * <ul>
+     *   <li>UnidadeFacade (3 repos)</li>
+     *   <li>UsuarioFacade (4 repos)</li>
+     *   <li>SubprocessoFacade (2 repos)</li>
+     *   <li>MapaFacade (2 repos)</li>
+     *   <li>ProcessoFacade (1 repo)</li>
+     *   <li>AnaliseFacade (1 repo)</li>
+     *   <li>AlertaFacade (2 repos)</li>
+     *   <li>ConfiguracaoFacade (1 repo)</li>
+     * </ul>
+     *
+     * @see <a href="/simplification-plan.md">Plano de Simplificação - Seção 3</a>
+     * @see <a href="/docs/adr/ADR-001-facade-pattern.md">ADR-001: Facade Pattern</a>
+     */
+    @ArchTest
+    static final ArchRule facades_should_not_access_repositories_directly = noClasses()
+            .that()
+            .haveSimpleNameEndingWith("Facade")
+            .should()
+            .dependOnClassesThat()
+            .areAssignableTo(org.springframework.data.jpa.repository.JpaRepository.class)
+            .because("Facades should delegate to Services, not access Repositories directly (ADR-001). " +
+                    "See simplification-plan.md section 3 'Facades - Hierarquia Excessiva'");
 }
