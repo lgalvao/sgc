@@ -92,8 +92,9 @@ public class AtividadeFacade {
         Mapa mapa = mapaFacade.obterPorCodigo(mapaCodigo);
 
         // Cria atividade temporária para verificação de acesso
-        Atividade atividadeTemp = new Atividade();
-        atividadeTemp.setMapa(mapa);
+        Atividade atividadeTemp = Atividade.builder()
+                .mapa(mapa)
+                .build();
 
         // Verifica permissão usando AccessControlService
         accessControlService.verificarPermissao(usuario, CRIAR_ATIVIDADE, atividadeTemp);
