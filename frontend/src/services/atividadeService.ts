@@ -1,6 +1,6 @@
 import {
-    mapAtividadeDtoToModel,
-    mapConhecimentoDtoToModel,
+    mapAtividadeToModel,
+    mapConhecimentoToModel,
     mapCriarAtividadeRequestToDto,
     mapAtualizarAtividadeToDto,
     mapCriarConhecimentoRequestToDto,
@@ -11,12 +11,12 @@ import apiClient from "@/axios-setup";
 
 export async function listarAtividades(): Promise<Atividade[]> {
     const response = await apiClient.get<any[]>("/atividades");
-    return response.data.map(mapAtividadeDtoToModel);
+    return response.data.map(mapAtividadeToModel);
 }
 
 export async function obterAtividadePorCodigo(codAtividade: number): Promise<Atividade> {
     const response = await apiClient.get<any>(`/atividades/${codAtividade}`);
-    return mapAtividadeDtoToModel(response.data);
+    return mapAtividadeToModel(response.data);
 }
 
 export async function criarAtividade(
@@ -51,7 +51,7 @@ export async function listarConhecimentos(
     const response = await apiClient.get<any[]>(
         `/atividades/${codAtividade}/conhecimentos`,
     );
-    return response.data.map(mapConhecimentoDtoToModel);
+    return response.data.map(mapConhecimentoToModel);
 }
 
 export async function criarConhecimento(

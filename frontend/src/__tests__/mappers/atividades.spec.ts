@@ -1,8 +1,8 @@
 import {describe, expect, it} from "vitest";
 import {
-    mapAtividadeDtoToModel,
+    mapAtividadeToModel,
     mapAtividadeVisualizacaoToModel,
-    mapConhecimentoDtoToModel,
+    mapConhecimentoToModel,
     mapConhecimentoVisualizacaoToModel,
     mapCriarAtividadeRequestToDto,
     mapCriarConhecimentoRequestToDto
@@ -48,42 +48,42 @@ describe("mappers/atividades.ts", () => {
         });
     });
 
-    describe("mapAtividadeDtoToModel", () => {
+    describe("mapAtividadeToModel", () => {
         it("deve mapear DTO de resposta", () => {
             const dto = {
                 codigo: 1,
                 descricao: "A",
                 conhecimentos: [{codigo: 2, descricao: "C"}]
             };
-            const result = mapAtividadeDtoToModel(dto);
+            const result = mapAtividadeToModel(dto);
             expect(result.codigo).toBe(1);
             expect(result.conhecimentos[0].codigo).toBe(2);
         });
 
         it("deve lidar com conhecimentos null", () => {
             const dto = {codigo: 1, descricao: "A", conhecimentos: null};
-            const result = mapAtividadeDtoToModel(dto);
+            const result = mapAtividadeToModel(dto);
             expect(result.conhecimentos).toEqual([]);
         });
 
         it("deve retornar null se input null", () => {
-            expect(mapAtividadeDtoToModel(null)).toBeNull();
+            expect(mapAtividadeToModel(null)).toBeNull();
         });
     });
 
-    describe("mapConhecimentoDtoToModel", () => {
+    describe("mapConhecimentoToModel", () => {
         it("deve mapear usando id", () => {
             const dto = {codigo: 5, descricao: "D"};
-            expect(mapConhecimentoDtoToModel(dto).codigo).toBe(5);
+            expect(mapConhecimentoToModel(dto).codigo).toBe(5);
         });
 
         it("deve mapear usando codigo (fallback)", () => {
             const dto = {codigo: 6, descricao: "E"};
-            expect(mapConhecimentoDtoToModel(dto).codigo).toBe(6);
+            expect(mapConhecimentoToModel(dto).codigo).toBe(6);
         });
 
         it("deve retornar null se input null", () => {
-            expect(mapConhecimentoDtoToModel(null)).toBeNull();
+            expect(mapConhecimentoToModel(null)).toBeNull();
         });
     });
 
