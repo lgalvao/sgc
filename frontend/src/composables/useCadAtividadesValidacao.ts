@@ -12,7 +12,7 @@ export interface CadAtividadesValidacao {
     erroGlobal: Ref<string | null>;
     mapaErros: ComputedRef<Map<number, string>>;
     obterErroParaAtividade: (atividadeCodigo: number) => string | undefined;
-    setAtividadeRef: (atividadeCodigo: number, el: any) => void;
+    setAtividadeRef: (atividadeCodigo: number, el: unknown) => void;
     scrollParaPrimeiroErro: () => void;
     disponibilizarCadastro: (codSubprocesso: number | null, subprocesso: SubprocessoDetalhe | null, isRevisao: boolean, mostrarModal: Ref<boolean>) => Promise<void>;
     confirmarDisponibilizacao: (codSubprocesso: number | null, isRevisao: boolean, mostrarModal: Ref<boolean>, router: Router) => Promise<void>;
@@ -32,7 +32,7 @@ export function useCadAtividadesValidacao(): CadAtividadesValidacao {
     const errosValidacao = ref<ErroValidacao[]>([]);
     const erroGlobal = ref<string | null>(null);
 
-    const atividadeRefs = new Map<number, any>();
+    const atividadeRefs = new Map<number, Element>();
 
     const mapaErros = computed(() => {
         const mapa = new Map<number, string>();
@@ -48,8 +48,8 @@ export function useCadAtividadesValidacao(): CadAtividadesValidacao {
         return mapaErros.value.get(atividadeCodigo);
     }
 
-    function setAtividadeRef(atividadeCodigo: number, el: any) {
-        if (el) {
+    function setAtividadeRef(atividadeCodigo: number, el: unknown) {
+        if (el && el instanceof Element) {
             atividadeRefs.set(atividadeCodigo, el);
         }
     }

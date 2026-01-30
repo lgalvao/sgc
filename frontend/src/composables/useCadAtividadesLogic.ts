@@ -54,7 +54,7 @@ export function useCadAtividadesLogic(props: { codProcesso: number | string; sig
         errosValidacao: validacao.errosValidacao,
         erroGlobal: validacao.erroGlobal,
         podeVerImpacto: state.podeVerImpacto,
-        adicionarAtividade: async () => await crud.adicionarAtividade(state.codSubprocesso.value, state.codMapa.value),
+        adicionarAtividade: () => crud.adicionarAtividade(state.codSubprocesso.value, state.codMapa.value),
         removerAtividade: (idx: number) => crud.removerAtividade(idx, state.codSubprocesso.value, modais.dadosRemocao, modais.mostrarModalConfirmacaoRemocao),
         confirmarRemocao: () => crud.confirmarRemocao(modais.dadosRemocao, state.codSubprocesso.value, state.atividades.value, modais.mostrarModalConfirmacaoRemocao),
         adicionarConhecimento: (idx: number, descricao: string) => crud.adicionarConhecimento(idx, descricao, state.codSubprocesso.value, state.atividades.value),
