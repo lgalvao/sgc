@@ -23,6 +23,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Assertions;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -85,6 +86,6 @@ class ProcessoValidadorTest {
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
 
         // Should not throw exception
-        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> validador.validarTodosSubprocessosHomologados(p));
+        Assertions.assertDoesNotThrow(() -> validador.validarTodosSubprocessosHomologados(p));
     }
 }

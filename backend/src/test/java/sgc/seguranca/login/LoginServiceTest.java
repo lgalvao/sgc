@@ -8,17 +8,23 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.mapper.UsuarioMapper;
+import sgc.organizacao.service.UsuarioPerfilService;
 import sgc.seguranca.login.dto.EntrarRequest;
+
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Assertions;
+import sgc.organizacao.model.Usuario;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -35,21 +41,21 @@ class LoginServiceTest {
     private UnidadeFacade unidadeService;
     @Mock
     private UsuarioMapper usuarioMapper;
+    @Mock
+    private UsuarioPerfilService usuarioPerfilService;
 
     private LoginFacade loginFacade;
-    @Mock
-    private sgc.organizacao.model.UsuarioPerfilRepo usuarioPerfilRepo;
 
     @BeforeEach
     void setUp() {
-        loginFacade = new LoginFacade(usuarioService, gerenciadorJwt, clienteAcessoAd, unidadeService, usuarioMapper, usuarioPerfilRepo);
+        loginFacade = new LoginFacade(usuarioService, gerenciadorJwt, clienteAcessoAd, unidadeService, usuarioMapper, usuarioPerfilService);
         ReflectionTestUtils.setField(loginFacade, "ambienteTestes", false);
     }
 
     @Test
     @DisplayName("Linhas 86, 89: Deve falhar autenticação se AD for null e não for ambiente de testes")
     void deveFalharAutenticacaoSemAdEmProducao() {
-        LoginFacade serviceSemAd = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService, usuarioMapper, usuarioPerfilRepo);
+        LoginFacade serviceSemAd = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService, usuarioMapper, usuarioPerfilService);
         ReflectionTestUtils.setField(serviceSemAd, "ambienteTestes", false);
 
         boolean result = serviceSemAd.autenticar("123", "senha");
@@ -76,24 +82,25 @@ class LoginServiceTest {
                 .build();
 
         // Simula busca de autorizações retornando lista vazia ou sem o perfil/unidade
-        sgc.organizacao.model.Usuario usuario = new sgc.organizacao.model.Usuario();
+        Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(titulo);
 
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
+        when(usuarioPerfilService.buscarPorUsuario(anyString())).thenReturn(Collections.emptyList());
 
-        var exception = assertThrows(ErroAccessoNegado.class, () -> loginFacade.entrar(req));
+        var exception = assertThrows(ErroAcessoNegado.class, () -> loginFacade.entrar(req));
         assertNotNull(exception);
     }
 
     @Test
     @DisplayName("Deve autenticar em ambiente de testes sem AD")
     void deveAutenticarEmAmbienteTestesSemAd() {
-        LoginFacade serviceSemAd = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService, usuarioMapper, usuarioPerfilRepo);
+        LoginFacade serviceSemAd = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService, usuarioMapper, usuarioPerfilService);
         ReflectionTestUtils.setField(serviceSemAd, "ambienteTestes", true);
 
         boolean result = serviceSemAd.autenticar("123", "senha");
 
         // Deve retornar true pois encontrou usuário
-        org.junit.jupiter.api.Assertions.assertTrue(result);
+        Assertions.assertTrue(result);
     }
 }

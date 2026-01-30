@@ -11,6 +11,8 @@ import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.util.CollectionUtils;
+import sgc.organizacao.model.Unidade;
 
 @Mapper(componentModel = "spring", uses = MovimentacaoMapper.class)
 public interface SubprocessoDetalheMapper {
@@ -32,7 +34,7 @@ public interface SubprocessoDetalheMapper {
     @Mapping(target = "codigo", source = "codigo")
     @Mapping(target = "sigla", source = "sigla")
     @Mapping(target = "nome", source = "nome")
-    SubprocessoDetalheDto.UnidadeDto toUnidadeDto(sgc.organizacao.model.Unidade unidade);
+    SubprocessoDetalheDto.UnidadeDto toUnidadeDto(Unidade unidade);
 
     default SubprocessoDetalheDto.@Nullable ResponsavelDto mapResponsavel(Subprocesso sp, @Nullable Usuario responsavel) {
         if (responsavel == null) return null;
@@ -62,7 +64,7 @@ public interface SubprocessoDetalheMapper {
     }
 
     default String mapLocalizacaoAtual(List<Movimentacao> movimentacoes) {
-        if (!org.springframework.util.CollectionUtils.isEmpty(movimentacoes)) {
+        if (!CollectionUtils.isEmpty(movimentacoes)) {
             Movimentacao movimentacaoRecente = movimentacoes.getFirst();
             if (movimentacaoRecente.getUnidadeDestino() != null) {
                 return movimentacaoRecente.getUnidadeDestino().getSigla();

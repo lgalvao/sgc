@@ -10,6 +10,7 @@ import sgc.seguranca.acesso.Acao;
 import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.seguranca.acesso.AccessControlService;
 
 /**
  * Service responsável por calcular permissões de acesso a subprocessos.
@@ -29,7 +30,7 @@ import sgc.subprocesso.service.crud.SubprocessoCrudService;
 @Slf4j
 class SubprocessoPermissaoCalculator {
 
-    private final sgc.seguranca.acesso.AccessControlService accessControlService;
+    private final AccessControlService accessControlService;
     private final SubprocessoCrudService crudService;
 
     /**

@@ -9,6 +9,8 @@ import sgc.organizacao.model.*;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import org.springframework.security.core.GrantedAuthority;
 
 public class WithMockChefeSecurityContextFactory
         implements WithSecurityContextFactory<WithMockChefe> {
@@ -30,6 +32,10 @@ public class WithMockChefeSecurityContextFactory
                 // Carregar atribuições do banco de dados se o usuário existir
                 if (usuario != null && usuarioPerfilRepo != null) {
                     var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(annotation.value());
+                    Set<GrantedAuthority> simpleAuthorities = atribuicoes.stream()
+                            .map(a -> a.getPerfil().toGrantedAuthority())
+                            .collect(Collectors.toSet());
+                    usuario.setAuthorities(simpleAuthorities);
                 }
             } catch (Exception e) {
                 System.err.println(e.getMessage());
@@ -66,6 +72,11 @@ public class WithMockChefeSecurityContextFactory
                             .unidade(unidade)
                             .perfil(Perfil.CHEFE)
                             .build());
+            
+            Set<GrantedAuthority> simpleAuthorities = atribuicoes.stream()
+                    .map(a -> a.getPerfil().toGrantedAuthority())
+                    .collect(Collectors.toSet());
+            usuario.setAuthorities(simpleAuthorities);
         } else {
             // Usuário existe - garantir que tem pelo menos um perfil CHEFE
             Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getTodasAtribuicoes(new HashSet<>()));
@@ -79,6 +90,10 @@ public class WithMockChefeSecurityContextFactory
                                 .perfil(Perfil.CHEFE)
                                 .build());
             }
+            Set<GrantedAuthority> simpleAuthorities = atribuicoes.stream()
+                    .map(a -> a.getPerfil().toGrantedAuthority())
+                    .collect(Collectors.toSet());
+            usuario.setAuthorities(simpleAuthorities);
         }
 
         UsernamePasswordAuthenticationToken authentication =

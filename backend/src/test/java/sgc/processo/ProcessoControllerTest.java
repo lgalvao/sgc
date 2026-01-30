@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.processo.dto.*;
@@ -29,6 +29,11 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.MockitoAnnotations;
+import sgc.processo.dto.SubprocessoElegivelDto;
+import sgc.subprocesso.dto.SubprocessoDto;
 
 @WebMvcTest(ProcessoController.class)
 @Import(RestExceptionHandler.class)
@@ -52,15 +57,15 @@ class ProcessoControllerTest {
 
     private ObjectMapper objectMapper;
 
-    @org.mockito.Captor
-    private org.mockito.ArgumentCaptor<CriarProcessoRequest> criarCaptor;
+    @Captor
+    private ArgumentCaptor<CriarProcessoRequest> criarCaptor;
 
-    @org.mockito.Captor
-    private org.mockito.ArgumentCaptor<AtualizarProcessoRequest> atualizarCaptor;
+    @Captor
+    private ArgumentCaptor<AtualizarProcessoRequest> atualizarCaptor;
 
     @BeforeEach
     void setUp() {
-        org.mockito.MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.openMocks(this);
         objectMapper = new ObjectMapper();
     }
 
@@ -287,7 +292,7 @@ class ProcessoControllerTest {
         @DisplayName("Deve retornar 403 Forbidden ao obter detalhes se acesso negado")
         void deveRetornarForbiddenAoObterDetalhesQuandoAcessoNegado() throws Exception {
             // Arrange
-            doThrow(new ErroAccessoNegado("Acesso negado")).when(processoFacade).obterDetalhes(1L);
+            doThrow(new ErroAcessoNegado("Acesso negado")).when(processoFacade).obterDetalhes(1L);
 
             // Act & Assert
             mockMvc.perform(get("/api/processos/1/detalhes")).andExpect(status().isForbidden());
@@ -629,7 +634,7 @@ class ProcessoControllerTest {
             when(processoFacade.listarSubprocessosElegiveis(1L))
                     .thenReturn(
                             List.of(
-                                    sgc.processo.dto.SubprocessoElegivelDto.builder()
+                                    SubprocessoElegivelDto.builder()
                                             .codSubprocesso(10L)
                                             .build()));
 
@@ -647,7 +652,7 @@ class ProcessoControllerTest {
             // Arrange
             when(processoFacade.listarTodosSubprocessos(1L))
                     .thenReturn(
-                            List.of(sgc.subprocesso.dto.SubprocessoDto.builder().codigo(10L).build()));
+                            List.of(SubprocessoDto.builder().codigo(10L).build()));
 
             // Act & Assert
             mockMvc.perform(get("/api/processos/1/subprocessos"))

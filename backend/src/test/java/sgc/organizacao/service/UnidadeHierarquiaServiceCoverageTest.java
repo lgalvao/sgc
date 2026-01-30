@@ -22,6 +22,8 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
+import java.util.HashMap;
+import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -180,7 +182,7 @@ class UnidadeHierarquiaServiceCoverageTest {
     @DisplayName("Deve lidar com mapa de filhas inconsistente (defensive check null)")
     void deveLidarComMapaFilhasInconsistente() {
         UnidadeDto dto = UnidadeDto.builder().codigo(999L).build();
-        java.util.Map<Long, List<UnidadeDto>> mapaVazio = new java.util.HashMap<>();
+        Map<Long, List<UnidadeDto>> mapaVazio = new HashMap<>();
 
         // Chamada direta ao método package-private para cobrir branch de null check
         UnidadeDto result = service.montarComSubunidades(dto, mapaVazio);

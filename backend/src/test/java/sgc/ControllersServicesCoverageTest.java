@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import sgc.alerta.dto.AlertaDto;
-import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -36,6 +36,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
+import sgc.alerta.AlertaFacade;
+import sgc.mapa.mapper.MapaCompletoMapper;
+import sgc.mapa.service.ImpactoMapaService;
+import sgc.mapa.service.MapaManutencaoService;
+import sgc.mapa.service.MapaVisualizacaoService;
+import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.UsuarioFacade;
+import sgc.processo.service.ProcessoFacade;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
@@ -48,25 +56,23 @@ class ControllersServicesCoverageTest {
     @Mock
     private CompetenciaRepo competenciaRepo;
     @Mock
-    private sgc.alerta.AlertaFacade alertaService;
+    private AlertaFacade alertaService;
     @Mock
-    private sgc.mapa.mapper.MapaCompletoMapper mapaCompletoMapper;
+    private MapaCompletoMapper mapaCompletoMapper;
     @Mock
     private MapaSalvamentoService mapaSalvamentoService;
     @Mock
-    private sgc.mapa.service.ImpactoMapaService impactoMapaService;
+    private ImpactoMapaService impactoMapaService;
     @Mock
-    private sgc.mapa.service.MapaVisualizacaoService mapaVisualizacaoService;
+    private MapaVisualizacaoService mapaVisualizacaoService;
     @Mock
-    private sgc.mapa.service.MapaManutencaoService mapaManutencaoService;
+    private MapaManutencaoService mapaManutencaoService;
     @Mock
-    private sgc.organizacao.UsuarioFacade usuarioService;
+    private UsuarioFacade usuarioService;
     @Mock
-    private sgc.organizacao.UnidadeFacade unidadeService;
+    private UnidadeFacade unidadeService;
     @Mock
-    private sgc.processo.service.ProcessoFacade processoFacade;
-    @Mock
-    private sgc.comum.repo.RepositorioComum repo;
+    private ProcessoFacade processoFacade;
 
     private SubprocessoMapaController subprocessoMapaController;
     private MapaFacade mapaFacade;
@@ -76,7 +82,7 @@ class ControllersServicesCoverageTest {
     void setUp() {
         mapaFacade = new MapaFacade(
                 mapaCompletoMapper, mapaSalvamentoService, mapaManutencaoService,
-                mapaVisualizacaoService, impactoMapaService, repo
+                mapaVisualizacaoService, impactoMapaService
         );
 
         subprocessoMapaController = new SubprocessoMapaController(
@@ -110,16 +116,16 @@ class ControllersServicesCoverageTest {
     @DisplayName("Deve lançar erro de acesso negado quando usuário não autenticado em verificarImpactos")
     void deveLancarErroAcessoNegado() {
         when(usuarioService.obterUsuarioAutenticado())
-                .thenThrow(new ErroAccessoNegado("Usuário não autenticado"));
+                .thenThrow(new ErroAcessoNegado("Usuário não autenticado"));
 
         assertThatThrownBy(() -> subprocessoMapaController.verificarImpactos(1L))
-                .isInstanceOf(ErroAccessoNegado.class);
+                .isInstanceOf(ErroAcessoNegado.class);
     }
 
     @Test
     @DisplayName("Deve lançar erro ao obter mapa completo inexistente")
     void deveLancarErroObterMapaCompletoInexistente() {
-        when(repo.buscar(Mapa.class, 99L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 99L));
+        when(mapaManutencaoService.buscarMapaPorCodigo(99L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 99L));
         assertThatThrownBy(() -> mapaFacade.obterMapaCompleto(99L, 1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
@@ -157,7 +163,7 @@ class ControllersServicesCoverageTest {
     @Test
     @DisplayName("Deve lançar erro ao atualizar mapa inexistente")
     void deveLancarErroAtualizarMapaInexistente() {
-        when(repo.buscar(Mapa.class, 99L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 99L));
+        when(mapaManutencaoService.buscarMapaPorCodigo(99L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 99L));
         Mapa mapa = new Mapa();
         assertThatThrownBy(() -> mapaFacade.atualizar(99L, mapa))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -166,7 +172,7 @@ class ControllersServicesCoverageTest {
     @Test
     @DisplayName("Deve lançar erro ao excluir mapa inexistente")
     void deveLancarErroExcluirMapaInexistente() {
-        when(mapaRepo.existsById(99L)).thenReturn(false);
+        when(mapaManutencaoService.mapaExiste(99L)).thenReturn(false);
         assertThatThrownBy(() -> mapaFacade.excluir(99L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }

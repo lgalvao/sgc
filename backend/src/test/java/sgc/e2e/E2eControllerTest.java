@@ -30,6 +30,12 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.service.ProcessoFacade;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import org.junit.jupiter.api.Assertions;
+import org.mockito.Mockito;
+import sgc.comum.erros.ErroConfiguracao;
 
 @Tag("integration")
 @SpringBootTest
@@ -67,12 +73,12 @@ class E2eControllerTest {
     }
 
     private void mockResourceLoader(String path, boolean exists) {
-        Resource mockResource = org.mockito.Mockito.mock(Resource.class);
+        Resource mockResource = Mockito.mock(Resource.class);
         when(mockResource.exists()).thenReturn(exists);
         if (exists) {
             try {
-                when(mockResource.getInputStream()).thenReturn(new java.io.ByteArrayInputStream("SELECT 1;".getBytes(java.nio.charset.StandardCharsets.UTF_8)));
-            } catch (java.io.IOException e) {
+                when(mockResource.getInputStream()).thenReturn(new ByteArrayInputStream("SELECT 1;".getBytes(StandardCharsets.UTF_8)));
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -188,9 +194,9 @@ class E2eControllerTest {
     @DisplayName("Deve usar segundo caminho se primeiro falhar para seed.sql")
     void deveUsarSegundoCaminhoParaSeedSql() throws SQLException {
         // Usa mocks de DB para focar na lógica de recursos e evitar erros de SQL
-        JdbcTemplate mockJdbc = org.mockito.Mockito.mock(JdbcTemplate.class);
-        NamedParameterJdbcTemplate mockNamed = org.mockito.Mockito.mock(NamedParameterJdbcTemplate.class);
-        DataSource mockDs = org.mockito.Mockito.mock(DataSource.class);
+        JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
+        NamedParameterJdbcTemplate mockNamed = Mockito.mock(NamedParameterJdbcTemplate.class);
+        DataSource mockDs = Mockito.mock(DataSource.class);
 
         // Simula erro ao conectar para evitar execução do script (que trava com mocks)
         // O teste foca apenas na lógica de seleção do recurso (mockResourceLoader)
@@ -201,8 +207,8 @@ class E2eControllerTest {
         mockResourceLoader("file:../e2e/setup/seed.sql", false);
         mockResourceLoader("file:e2e/setup/seed.sql", true);
 
-        var exception = org.junit.jupiter.api.Assertions.assertThrows(SQLException.class, localController::resetDatabase);
-        org.junit.jupiter.api.Assertions.assertNotNull(exception);
+        var exception = Assertions.assertThrows(SQLException.class, localController::resetDatabase);
+        Assertions.assertNotNull(exception);
 
         // Verifica se tentou carregar o segundo caminho
         verify(resourceLoader).getResource("file:e2e/setup/seed.sql");
@@ -212,14 +218,14 @@ class E2eControllerTest {
     @DisplayName("Deve lançar erro se seed.sql não encontrado em nenhum lugar")
     void deveLancarErroSeSeedNaoEncontrado() {
         // Usa mocks de DB
-        JdbcTemplate mockJdbc = org.mockito.Mockito.mock(JdbcTemplate.class);
+        JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
         E2eController localController = new E2eController(mockJdbc, namedJdbcTemplate, dataSource, processoFacade, unidadeFacade, resourceLoader);
 
         mockResourceLoader("file:../e2e/setup/seed.sql", false);
         mockResourceLoader("file:e2e/setup/seed.sql", false);
 
-        var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroConfiguracao.class, localController::resetDatabase);
-        org.junit.jupiter.api.Assertions.assertNotNull(exception);
+        var exception = Assertions.assertThrows(ErroConfiguracao.class, localController::resetDatabase);
+        Assertions.assertNotNull(exception);
     }
 
     private void assertCount(String tableAndWhere, int expected) {
@@ -302,13 +308,13 @@ class E2eControllerTest {
     @Test
     @DisplayName("Deve lidar com erro ao resetar banco")
     void deveLidarComErroAoResetarBanco() {
-        JdbcTemplate mockJdbc = org.mockito.Mockito.mock(JdbcTemplate.class);
-        org.mockito.Mockito.doThrow(new RuntimeException("Error")).when(mockJdbc).execute(any(String.class));
+        JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
+        Mockito.doThrow(new RuntimeException("Error")).when(mockJdbc).execute(any(String.class));
 
         E2eController localController = new E2eController(mockJdbc, namedJdbcTemplate, dataSource, processoFacade, unidadeFacade, resourceLoader);
 
-        var exception = org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class, localController::resetDatabase);
-        org.junit.jupiter.api.Assertions.assertNotNull(exception);
+        var exception = Assertions.assertThrows(RuntimeException.class, localController::resetDatabase);
+        Assertions.assertNotNull(exception);
     }
 
     @Test

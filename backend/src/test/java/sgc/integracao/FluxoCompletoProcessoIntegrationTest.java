@@ -26,6 +26,7 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import sgc.integracao.mocks.TestSecurityConfig;
 
 /**
  * Teste de integração que replica o fluxo completo do sistema para um processo
@@ -42,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("Fluxo Completo: Processo de Mapeamento até Finalização")
-@Import(sgc.integracao.mocks.TestSecurityConfig.class)
+@Import(TestSecurityConfig.class)
 class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
     private static final String API_SUBPROCESSOS_BUSCAR = "/api/subprocessos/buscar";
 

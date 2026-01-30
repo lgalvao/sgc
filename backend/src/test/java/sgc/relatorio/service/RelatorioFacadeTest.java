@@ -29,6 +29,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import java.util.Set;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
@@ -105,7 +106,7 @@ class RelatorioFacadeTest {
         Conhecimento k = new Conhecimento();
         k.setDescricao("Conh 1");
         a.setConhecimentos(List.of(k));
-        c.setAtividades(java.util.Set.of(a));
+        c.setAtividades(Set.of(a));
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
@@ -166,7 +167,7 @@ class RelatorioFacadeTest {
 
         Competencia c = new Competencia();
         c.setDescricao("Comp 1");
-        c.setAtividades(java.util.Set.of()); // Atividades vazias
+        c.setAtividades(Set.of()); // Atividades vazias
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
@@ -196,7 +197,7 @@ class RelatorioFacadeTest {
         Atividade a = new Atividade();
         a.setDescricao("Ativ 1");
         a.setConhecimentos(List.of()); // Conhecimentos vazios
-        c.setAtividades(java.util.Set.of(a));
+        c.setAtividades(Set.of(a));
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));

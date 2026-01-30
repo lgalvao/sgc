@@ -13,6 +13,9 @@ import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 import java.util.Optional;
+import sgc.mapa.dto.ImpactoMapaDto;
+import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
+import sgc.organizacao.model.Usuario;
 
 /**
  * Facade para operações com Mapas de Competências.
@@ -36,21 +39,18 @@ public class MapaFacade {
     private final MapaManutencaoService mapaManutencaoService;
     private final MapaVisualizacaoService mapaVisualizacaoService;
     private final ImpactoMapaService impactoMapaService;
-    private final sgc.comum.repo.RepositorioComum repo;
 
     public MapaFacade(
             MapaCompletoMapper mapaCompletoMapper,
             MapaSalvamentoService mapaSalvamentoService,
             MapaManutencaoService mapaManutencaoService,
             MapaVisualizacaoService mapaVisualizacaoService,
-            ImpactoMapaService impactoMapaService,
-            sgc.comum.repo.RepositorioComum repo) {
+            ImpactoMapaService impactoMapaService) {
         this.mapaCompletoMapper = mapaCompletoMapper;
         this.mapaSalvamentoService = mapaSalvamentoService;
         this.mapaManutencaoService = mapaManutencaoService;
         this.mapaVisualizacaoService = mapaVisualizacaoService;
         this.impactoMapaService = impactoMapaService;
-        this.repo = repo;
     }
 
     // ===================================================================================
@@ -64,7 +64,7 @@ public class MapaFacade {
 
     @Transactional(readOnly = true)
     public Mapa obterPorCodigo(Long codigo) {
-        return repo.buscar(Mapa.class, codigo);
+        return mapaManutencaoService.buscarMapaPorCodigo(codigo);
     }
 
     @Transactional(readOnly = true)
@@ -79,7 +79,7 @@ public class MapaFacade {
 
     @Transactional(readOnly = true)
     public MapaCompletoDto obterMapaCompleto(Long codMapa, Long codSubprocesso) {
-        Mapa mapa = repo.buscar(Mapa.class, codMapa);
+        Mapa mapa = mapaManutencaoService.buscarMapaPorCodigo(codMapa);
 
         List<Competencia> competencias = mapaManutencaoService.buscarCompetenciasPorCodMapa(codMapa);
         return mapaCompletoMapper.toDto(mapa, codSubprocesso, competencias);
@@ -98,7 +98,7 @@ public class MapaFacade {
     }
 
     public Mapa atualizar(Long codigo, Mapa mapa) {
-        Mapa existente = repo.buscar(Mapa.class, codigo);
+        Mapa existente = mapaManutencaoService.buscarMapaPorCodigo(codigo);
         existente.setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado());
         existente.setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao());
         existente.setDataHoraHomologado(mapa.getDataHoraHomologado());
@@ -125,12 +125,12 @@ public class MapaFacade {
     // ===================================================================================
 
     @Transactional(readOnly = true)
-    public sgc.mapa.dto.visualizacao.MapaVisualizacaoDto obterMapaParaVisualizacao(Subprocesso subprocesso) {
+    public MapaVisualizacaoDto obterMapaParaVisualizacao(Subprocesso subprocesso) {
         return mapaVisualizacaoService.obterMapaParaVisualizacao(subprocesso);
     }
 
     @Transactional(readOnly = true)
-    public sgc.mapa.dto.ImpactoMapaDto verificarImpactos(Subprocesso subprocesso, sgc.organizacao.model.Usuario usuario) {
+    public ImpactoMapaDto verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
         return impactoMapaService.verificarImpactos(subprocesso, usuario);
     }
 }

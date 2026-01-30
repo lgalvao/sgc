@@ -26,6 +26,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.Optional;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.organizacao.model.UsuarioRepo;
+import sgc.processo.service.ProcessoFacade;
+import sgc.seguranca.login.GerenciadorJwt;
 
 @WebMvcTest(UnidadeController.class)
 @Import(RestExceptionHandler.class)
@@ -37,16 +43,16 @@ class UnidadeControllerTest {
     private UnidadeFacade unidadeService;
 
     @MockitoBean
-    private sgc.processo.service.ProcessoFacade processoFacade;
+    private ProcessoFacade processoFacade;
 
     @MockitoBean
-    private sgc.seguranca.login.GerenciadorJwt gerenciadorJwt;
+    private GerenciadorJwt gerenciadorJwt;
 
     @MockitoBean
-    private sgc.organizacao.model.UsuarioRepo usuarioRepo;
+    private UsuarioRepo usuarioRepo;
 
     @MockitoBean
-    private sgc.organizacao.model.UsuarioPerfilRepo usuarioPerfilRepo;
+    private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Autowired
     private MockMvc mockMvc;
@@ -170,7 +176,7 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornar404AoBuscarArvoreDeUnidadeInexistente() throws Exception {
         // Arrange
-        when(unidadeService.buscarArvore(99L)).thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Unidade não encontrada"));
+        when(unidadeService.buscarArvore(99L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade não encontrada"));
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/99/arvore"))
@@ -206,7 +212,7 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornarSiglaSuperior() throws Exception {
         // Arrange
-        when(unidadeService.buscarSiglaSuperior("FILHA")).thenReturn(java.util.Optional.of("SIGLA"));
+        when(unidadeService.buscarSiglaSuperior("FILHA")).thenReturn(Optional.of("SIGLA"));
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/sigla/FILHA/superior"))
@@ -218,7 +224,7 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornar204AoBuscarSiglaSuperiorDeRaiz() throws Exception {
         // Arrange
-        when(unidadeService.buscarSiglaSuperior("RAIZ")).thenReturn(java.util.Optional.empty());
+        when(unidadeService.buscarSiglaSuperior("RAIZ")).thenReturn(Optional.empty());
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/sigla/RAIZ/superior"))

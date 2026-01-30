@@ -41,6 +41,7 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+import org.springframework.security.core.Authentication;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -84,7 +85,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         SecurityContextHolder.clearContext();
     }
 
-    private org.springframework.security.core.Authentication setupSecurityContext(Unidade unidade, Perfil perfil) {
+    private Authentication setupSecurityContext(Unidade unidade, Perfil perfil) {
         Usuario principal = UsuarioFixture.usuarioPadrao();
         principal.setTituloEleitoral(TEST_USER_ID);
         principal.setUnidadeLotacao(unidade);
@@ -159,7 +160,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     void testPodeFinalizar_false_semAdmin() throws Exception {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
-        org.springframework.security.core.Authentication auth = setupSecurityContext(unidade, Perfil.CHEFE);
+        Authentication auth = setupSecurityContext(unidade, Perfil.CHEFE);
         subprocessoRepo.save(Subprocesso.builder()
                 .processo(processo)
                 .unidade(unidade)
@@ -178,7 +179,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     void testPodeHomologarCadastro_true() throws Exception {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
-        org.springframework.security.core.Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
+        Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
         subprocessoRepo.save(Subprocesso.builder()
                 .processo(processo)
                 .unidade(unidade)
@@ -197,7 +198,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     void testPodeHomologarMapa_true() throws Exception {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
-        org.springframework.security.core.Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
+        Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
         subprocessoRepo.save(Subprocesso.builder()
                 .processo(processo)
                 .unidade(unidade)

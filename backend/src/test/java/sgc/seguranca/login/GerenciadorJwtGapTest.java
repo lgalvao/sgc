@@ -10,6 +10,8 @@ import sgc.organizacao.model.Perfil;
 import java.nio.charset.StandardCharsets;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import org.springframework.core.env.Environment;
+import sgc.seguranca.config.JwtProperties;
 
 @Tag("unit")
 @DisplayName("GerenciadorJwt - Gap Tests for Null Claims")
@@ -42,9 +44,9 @@ class GerenciadorJwtGapTest {
     }
 
     private GerenciadorJwt criarService() {
-        sgc.seguranca.config.JwtProperties props = mock(sgc.seguranca.config.JwtProperties.class);
+        JwtProperties props = mock(JwtProperties.class);
         when(props.secret()).thenReturn(SECRET);
-        return new GerenciadorJwt(props, mock(org.springframework.core.env.Environment.class));
+        return new GerenciadorJwt(props, mock(Environment.class));
     }
 
     private String gerarTokenCustomizado(String sub, String perfil, Long unidade) {

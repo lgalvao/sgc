@@ -24,6 +24,7 @@ import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 
 /**
  * Service responsável por operações relacionadas a ajustes de mapa em subprocessos.
@@ -104,7 +105,7 @@ class SubprocessoAjusteMapaService {
     private void validarSituacaoParaAjuste(Subprocesso sp) {
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
                 && sp.getSituacao() != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {
-            throw new sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida(
+            throw new ErroMapaEmSituacaoInvalida(
                     "Ajustes no mapa só podem ser feitos em estados específicos. "
                             + "Situação atual: %s".formatted(sp.getSituacao()));
         }

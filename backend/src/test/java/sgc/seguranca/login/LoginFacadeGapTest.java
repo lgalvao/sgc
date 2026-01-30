@@ -7,16 +7,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroAcessoNegado;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.UsuarioPerfilService;
 import sgc.seguranca.login.dto.EntrarRequest;
 
-import java.util.HashSet;
+import java.util.List;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
+import sgc.organizacao.dto.UnidadeDto;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -28,6 +30,7 @@ class LoginFacadeGapTest {
     @Mock private ClienteAcessoAd clienteAcessoAd;
     @Mock private UnidadeFacade unidadeService;
     @Mock private UsuarioMapper usuarioMapper;
+    @Mock private UsuarioPerfilService usuarioPerfilService;
 
     @InjectMocks
     private LoginFacade loginFacade;
@@ -39,18 +42,28 @@ class LoginFacadeGapTest {
         EntrarRequest req = new EntrarRequest("123", "ADMIN", 1L);
 
         // Usuario tem GESTOR na unidade 1
-        Usuario usuario = criarUsuarioComAtribuicao("123", Perfil.GESTOR, 1L);
-        when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123");
         
-        // Mock unidadeService
-        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(usuario.getTodasAtribuicoes(new HashSet<>()).iterator().next().getUnidade());
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+        unidade.setSituacao(SituacaoUnidade.ATIVA);
+
+        UsuarioPerfil up = new UsuarioPerfil();
+        up.setPerfil(Perfil.GESTOR);
+        up.setUnidade(unidade);
+        up.setUnidadeCodigo(1L);
+        up.setUsuario(usuario);
+
+        when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
+        when(usuarioPerfilService.buscarPorUsuario("123")).thenReturn(List.of(up));
         
         // Mock mapper (para evitar NPE no stream map)
-        when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(usuario.getTodasAtribuicoes(new HashSet<>()).iterator().next().getUnidade()))
-            .thenReturn(sgc.organizacao.dto.UnidadeDto.builder().codigo(1L).build());
+        when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(unidade))
+            .thenReturn(UnidadeDto.builder().codigo(1L).build());
 
         assertThatThrownBy(() -> loginFacade.entrar(req))
-                .isInstanceOf(ErroAccessoNegado.class);
+                .isInstanceOf(ErroAcessoNegado.class);
     }
 
     @Test
@@ -60,33 +73,27 @@ class LoginFacadeGapTest {
         EntrarRequest req = new EntrarRequest("123", "ADMIN", 1L);
 
         // Usuario tem ADMIN na unidade 2
-        Usuario usuario = criarUsuarioComAtribuicao("123", Perfil.ADMIN, 2L);
-        when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
-
-        // Mock unidadeService
-        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(usuario.getTodasAtribuicoes(new HashSet<>()).iterator().next().getUnidade());
-
-        // Mock mapper
-        when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(usuario.getTodasAtribuicoes(new HashSet<>()).iterator().next().getUnidade()))
-            .thenReturn(sgc.organizacao.dto.UnidadeDto.builder().codigo(2L).build());
-
-        assertThatThrownBy(() -> loginFacade.entrar(req))
-                .isInstanceOf(ErroAccessoNegado.class);
-    }
-
-    private Usuario criarUsuarioComAtribuicao(String titulo, Perfil perfil, Long codUnidade) {
-        Usuario u = new Usuario();
-        u.setTituloEleitoral(titulo);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123");
         
         Unidade unidade = new Unidade();
-        unidade.setCodigo(codUnidade);
+        unidade.setCodigo(2L);
         unidade.setSituacao(SituacaoUnidade.ATIVA);
 
         UsuarioPerfil up = new UsuarioPerfil();
-        up.setPerfil(perfil);
+        up.setPerfil(Perfil.ADMIN);
         up.setUnidade(unidade);
-        up.setUsuario(u);
+        up.setUnidadeCodigo(2L);
+        up.setUsuario(usuario);
 
-        return u;
+        when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
+        when(usuarioPerfilService.buscarPorUsuario("123")).thenReturn(List.of(up));
+
+        // Mock mapper
+        when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(unidade))
+            .thenReturn(UnidadeDto.builder().codigo(2L).build());
+
+        assertThatThrownBy(() -> loginFacade.entrar(req))
+                .isInstanceOf(ErroAcessoNegado.class);
     }
 }

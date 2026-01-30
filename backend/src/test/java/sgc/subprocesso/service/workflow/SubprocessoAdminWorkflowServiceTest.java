@@ -25,6 +25,7 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoAdminWorkflowService")
@@ -33,7 +34,7 @@ class SubprocessoAdminWorkflowServiceTest {
     private SubprocessoAdminWorkflowService service;
 
     @Mock
-    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private SubprocessoRepo subprocessoRepo;
     @Mock
     private SubprocessoCrudService crudService;
     @Mock

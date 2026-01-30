@@ -14,6 +14,7 @@ import java.util.Map;
 
 import static sgc.organizacao.model.Perfil.*;
 import static sgc.seguranca.acesso.Acao.*;
+import java.util.Objects;
 
 /**
  * Política de acesso para operações em atividades.
@@ -70,7 +71,7 @@ public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
                     "Usuário '%s' não é o titular da unidade '%s'. Titular: %s",
                     usuario.getTituloEleitoral(),
                     unidade.getSigla(),
-                    java.util.Objects.toString(tituloTitular, "não definido")
+                    Objects.toString(tituloTitular, "não definido")
             ));
             return false;
         }

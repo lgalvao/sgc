@@ -19,6 +19,7 @@ import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
+import java.util.ArrayList;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -53,7 +54,7 @@ class MapaVisualizacaoServiceTest {
         ativ2.setCodigo(2L);
         ativ2.setDescricao("A2");
 
-        List<Object[]> projectionResult = new java.util.ArrayList<>();
+        List<Object[]> projectionResult = new ArrayList<>();
         projectionResult.add(new Object[]{50L, "C1", 1L});
 
         when(atividadeRepo.findWithConhecimentosByMapaCodigo(10L)).thenReturn(List.of(ativ1, ativ2));
@@ -74,7 +75,7 @@ class MapaVisualizacaoServiceTest {
         sub.getMapa().setCodigo(10L);
         sub.setUnidade(new Unidade());
 
-        List<Object[]> projectionResult = new java.util.ArrayList<>();
+        List<Object[]> projectionResult = new ArrayList<>();
         projectionResult.add(new Object[]{50L, "C1", 999L}); // 999L não existe nas atividades
 
         when(atividadeRepo.findWithConhecimentosByMapaCodigo(10L)).thenReturn(List.of());

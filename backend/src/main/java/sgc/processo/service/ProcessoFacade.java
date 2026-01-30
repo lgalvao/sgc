@@ -7,41 +7,39 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.*;
 import sgc.processo.erros.ErroProcesso;
-import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.service.SubprocessoFacade;
 
-import java.time.LocalDateTime;
 import java.util.*;
-
-import static sgc.processo.model.SituacaoProcesso.CRIADO;
-import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
-import static sgc.processo.model.TipoProcesso.REVISAO;
+import java.time.format.DateTimeFormatter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import sgc.alerta.AlertaFacade;
+import sgc.processo.model.AcaoProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
 /**
- * Facade para orquestrar operações de Processo.
+ * Orquestra operações de Processo.
  */
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ProcessoFacade {
-    private final ProcessoRepo processoRepo;
+    private final ProcessoConsultaService processoConsultaService;
+    private final ProcessoManutencaoService processoManutencaoService;
     private final UnidadeFacade unidadeService;
     private final SubprocessoFacade subprocessoFacade;
     private final ProcessoMapper processoMapper;
@@ -49,17 +47,14 @@ public class ProcessoFacade {
     private final SubprocessoMapper subprocessoMapper;
     private final UsuarioFacade usuarioService;
     private final ProcessoInicializador processoInicializador;
-    private final sgc.alerta.AlertaFacade alertaService;
+    private final AlertaFacade alertaService;
     
-    @org.springframework.beans.factory.annotation.Autowired
-    @org.springframework.context.annotation.Lazy
+    @Autowired
+    @Lazy
     private ProcessoFacade self;
 
-    // Services especializados
     private final ProcessoAcessoService processoAcessoService;
-    private final ProcessoValidador processoValidador;
     private final ProcessoFinalizador processoFinalizador;
-    private final ProcessoConsultaService processoConsultaService;
 
     private static final String ENTIDADE_PROCESSO = "Processo";
 
@@ -67,8 +62,7 @@ public class ProcessoFacade {
      * Busca um processo por ID ou lança exceção se não encontrado.
      */
     private Processo buscarPorId(Long id) {
-        return processoRepo.findById(id)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_PROCESSO, id));
+        return processoConsultaService.buscarPorId(id);
     }
 
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
@@ -78,86 +72,26 @@ public class ProcessoFacade {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public ProcessoDto criar(CriarProcessoRequest req) {
-        Set<Unidade> participantes = new HashSet<>();
-        for (Long codigoUnidade : req.unidades()) {
-            Unidade unidade = unidadeService.buscarEntidadePorId(codigoUnidade);
-            participantes.add(unidade);
-        }
-
-        TipoProcesso tipoProcesso = req.tipo();
-
-        if (tipoProcesso == REVISAO || tipoProcesso == DIAGNOSTICO) {
-            processoValidador.getMensagemErroUnidadesSemMapa(new ArrayList<>(req.unidades()))
-                    .ifPresent(msg -> {
-                        throw new ErroProcesso(msg);
-                    });
-        }
-
-        Processo processo = new Processo()
-                .setDescricao(req.descricao())
-                .setTipo(tipoProcesso)
-                .setDataLimite(req.dataLimiteEtapa1())
-                .setSituacao(CRIADO)
-                .setDataCriacao(LocalDateTime.now())
-                .setParticipantes(participantes);
-
-        Processo processoSalvo = processoRepo.saveAndFlush(processo);
-
-        log.info("Processo {} criado.", processoSalvo.getCodigo());
-
+        Processo processoSalvo = processoManutencaoService.criar(req);
         return processoMapper.toDto(processoSalvo);
     }
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public ProcessoDto atualizar(Long codigo, AtualizarProcessoRequest requisicao) {
-        Processo processo = buscarPorId(codigo);
-
-        if (processo.getSituacao() != CRIADO) {
-            throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser editados.");
-        }
-
-        processo.setDescricao(requisicao.descricao());
-        processo.setTipo(requisicao.tipo());
-        processo.setDataLimite(requisicao.dataLimiteEtapa1());
-
-        if (requisicao.tipo() == REVISAO || requisicao.tipo() == DIAGNOSTICO) {
-            processoValidador.getMensagemErroUnidadesSemMapa(new ArrayList<>(requisicao.unidades()))
-                    .ifPresent(msg -> {
-                        throw new ErroProcesso(msg);
-                    });
-        }
-
-        Set<Unidade> participantes = new HashSet<>();
-        for (Long codigoUnidade : requisicao.unidades()) {
-            participantes.add(unidadeService.buscarEntidadePorId(codigoUnidade));
-        }
-
-        // Atualiza participantes
-        processo.setParticipantes(participantes);
-
-        Processo processoAtualizado = processoRepo.saveAndFlush(processo);
-        log.info("Processo {} atualizado.", codigo);
-
+        Processo processoAtualizado = processoManutencaoService.atualizar(codigo, requisicao);
         return processoMapper.toDto(processoAtualizado);
     }
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void apagar(Long codigo) {
-        Processo processo = buscarPorId(codigo);
-
-        if (processo.getSituacao() != CRIADO) {
-            throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser removidos.");
-        }
-
-        processoRepo.deleteById(codigo);
-        log.info("Processo {} removido.", codigo);
+        processoManutencaoService.apagar(codigo);
     }
 
     @Transactional(readOnly = true)
     public Optional<ProcessoDto> obterPorId(Long codigo) {
-        return processoRepo.findById(codigo).map(processoMapper::toDto);
+        return processoConsultaService.buscarPorIdOpcional(codigo).map(processoMapper::toDto);
     }
 
     @Transactional(readOnly = true)
@@ -185,31 +119,27 @@ public class ProcessoFacade {
 
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarFinalizados() {
-        return processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO).stream()
+        return processoConsultaService.listarFinalizados().stream()
                 .map(processoMapper::toDto)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarAtivos() {
-        return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).stream()
+        return processoConsultaService.listarAtivos().stream()
                 .map(processoMapper::toDto)
                 .toList();
     }
 
-    public org.springframework.data.domain.Page<Processo> listarTodos(
-            org.springframework.data.domain.Pageable pageable) {
-        return processoRepo.findAll(pageable);
+    public Page<Processo> listarTodos(
+            Pageable pageable) {
+        return processoConsultaService.listarTodos(pageable);
     }
 
-    public org.springframework.data.domain.Page<Processo> listarPorParticipantesIgnorandoCriado(
-            List<Long> unidadeIds, org.springframework.data.domain.Pageable pageable) {
-        return processoRepo.findDistinctByParticipantes_CodigoInAndSituacaoNot(
-                unidadeIds, CRIADO, pageable);
+    public Page<Processo> listarPorParticipantesIgnorandoCriado(
+            List<Long> unidadeIds, Pageable pageable) {
+        return processoConsultaService.listarPorParticipantesIgnorandoCriado(unidadeIds, pageable);
     }
-
-    // ========== MÉTODOS DE INICIALIZAÇÃO (delegam para ProcessoInicializador)
-    // ==========
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
@@ -229,8 +159,6 @@ public class ProcessoFacade {
         return processoInicializador.iniciar(codigo, codsUnidades);
     }
 
-    // ========== FINALIZAÇÃO ==========
-
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void finalizar(Long codigo) {
@@ -248,15 +176,12 @@ public class ProcessoFacade {
             throw new ErroProcesso("Unidade não participa deste processo.");
         }
 
-        // Enviar alerta (CDU-34)
-        String dataLimite = processo.getDataLimite().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String dataLimite = processo.getDataLimite().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         String descricao = "Lembrete: Prazo do processo %s encerra em %s"
                 .formatted(processo.getDescricao(), dataLimite);
 
         alertaService.criarAlertaSedoc(processo, unidade, descricao);
     }
-
-    // ========== LISTAGENS E CONSULTAS ==========
 
     public List<Long> listarUnidadesBloqueadasPorTipo(String tipo) {
         return processoConsultaService.listarUnidadesBloqueadasPorTipo(tipo);
@@ -285,7 +210,7 @@ public class ProcessoFacade {
     public void executarAcaoEmBloco(Long codProcesso, AcaoEmBlocoRequest req) {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
 
-        if (req.acao() == sgc.processo.model.AcaoProcesso.DISPONIBILIZAR) {
+        if (req.acao() == AcaoProcesso.DISPONIBILIZAR) {
              DisponibilizarMapaRequest dispReq = new DisponibilizarMapaRequest(
                 req.dataLimite(), 
                 "Disponibilização em bloco"
@@ -306,13 +231,13 @@ public class ProcessoFacade {
         for (Long codUnidade : req.unidadeCodigos()) {
              SubprocessoDto spDto = subprocessoFacade.obterPorProcessoEUnidade(codProcesso, codUnidade);
              
-             if (req.acao() == sgc.processo.model.AcaoProcesso.ACEITAR) {
+             if (req.acao() == AcaoProcesso.ACEITAR) {
                  if (isSituacaoCadastro(spDto.getSituacao())) {
                      unidadesAceitarCadastro.add(codUnidade);
                  } else {
                      unidadesAceitarValidacao.add(codUnidade);
                  }
-             } else if (req.acao() == sgc.processo.model.AcaoProcesso.HOMOLOGAR) {
+             } else if (req.acao() == AcaoProcesso.HOMOLOGAR) {
                  if (isSituacaoCadastro(spDto.getSituacao())) {
                      unidadesHomologarCadastro.add(codUnidade);
                  } else {
@@ -345,9 +270,9 @@ public class ProcessoFacade {
         }
     }
 
-    private boolean isSituacaoCadastro(sgc.subprocesso.model.SituacaoSubprocesso situacao) {
-        return situacao == sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO || 
-               situacao == sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
-               situacao == sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA; 
+    private boolean isSituacaoCadastro(SituacaoSubprocesso situacao) {
+        return situacao == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO || 
+               situacao == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
+               situacao == SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA; 
     }
 }

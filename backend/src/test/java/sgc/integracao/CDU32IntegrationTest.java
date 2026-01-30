@@ -34,11 +34,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.security.test.context.support.WithMockUser;
+import sgc.integracao.mocks.TestThymeleafConfig;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-32: Reabrir cadastro")
 class CDU32IntegrationTest extends BaseIntegrationTest {
@@ -127,7 +129,7 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Não deve permitir reabrir cadastro sem ser ADMIN")
-    @org.springframework.security.test.context.support.WithMockUser(roles = "GESTOR")
+    @WithMockUser(roles = "GESTOR")
     void reabrirCadastro_semPermissao_proibido() throws Exception {
         // Given
         ReabrirProcessoRequest request = new ReabrirProcessoRequest("Tentativa sem permissão");

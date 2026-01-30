@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import sgc.organizacao.model.UnidadeRepo;
+import sgc.processo.model.ProcessoRepo;
 
 @SpringBootTest
 @Transactional
@@ -26,10 +28,10 @@ class MovimentacaoRepoPerformanceTest {
     private MovimentacaoRepo movimentacaoRepo;
 
     @Autowired
-    private sgc.organizacao.model.UnidadeRepo unidadeRepo;
+    private UnidadeRepo unidadeRepo;
 
     @Autowired
-    private sgc.processo.model.ProcessoRepo processoRepo;
+    private ProcessoRepo processoRepo;
 
     @Autowired
     private SubprocessoRepo subprocessoRepo;

@@ -30,11 +30,16 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import sgc.integracao.mocks.TestThymeleafConfig;
+import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-35: Gerar relatório de andamento")
 class CDU35IntegrationTest extends BaseIntegrationTest {
@@ -43,8 +48,8 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
-    @org.springframework.test.context.bean.override.mockito.MockitoBean
-    private sgc.organizacao.UnidadeFacade unidadeService;
+    @MockitoBean
+    private UnidadeFacade unidadeService;
 
     private Processo processo;
 
@@ -54,7 +59,7 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
         Unidade unidade = unidadeRepo.findById(1L).orElseThrow();
 
         when(unidadeService.buscarResponsavelUnidade(anyLong()))
-                .thenReturn(sgc.organizacao.dto.UnidadeResponsavelDto.builder()
+                .thenReturn(UnidadeResponsavelDto.builder()
                         .titularNome("Responsável Teste")
                         .build());
 
@@ -92,7 +97,7 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Não deve permitir gerar relatório de andamento sem ser ADMIN")
-    @org.springframework.security.test.context.support.WithMockUser(roles = "GESTOR")
+    @WithMockUser(roles = "GESTOR")
     void gerarRelatorioAndamento_semPermissao_proibido() throws Exception {
         // When/Then
         mockMvc.perform(

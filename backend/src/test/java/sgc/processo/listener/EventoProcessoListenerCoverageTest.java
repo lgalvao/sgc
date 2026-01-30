@@ -29,10 +29,13 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.mockito.Mockito.*;
+import org.assertj.core.api.Assertions;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-@org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class EventoProcessoListenerCoverageTest {
     @InjectMocks
     private EventoProcessoListener listener;
@@ -190,7 +193,7 @@ class EventoProcessoListenerCoverageTest {
         EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
         doThrow(new RuntimeException("Erro processando inicio")).when(processoFacade).buscarEntidadePorId(1L);
 
-        org.assertj.core.api.Assertions.assertThatCode(() -> listener.aoIniciarProcesso(evento))
+        Assertions.assertThatCode(() -> listener.aoIniciarProcesso(evento))
                 .doesNotThrowAnyException();
     }
 
@@ -199,7 +202,7 @@ class EventoProcessoListenerCoverageTest {
         EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(1L).build();
         doThrow(new RuntimeException("Erro processando fim")).when(processoFacade).buscarEntidadePorId(1L);
 
-        org.assertj.core.api.Assertions.assertThatCode(() -> listener.aoFinalizarProcesso(evento))
+        Assertions.assertThatCode(() -> listener.aoFinalizarProcesso(evento))
                 .doesNotThrowAnyException();
     }
 
@@ -380,7 +383,7 @@ class EventoProcessoListenerCoverageTest {
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", t1));
 
         // Deve capturar a exceção ErroEstadoImpossivel internamente e logar, não estourar
-        org.assertj.core.api.Assertions.assertThatCode(() ->
+        Assertions.assertThatCode(() ->
                 listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build())
         ).doesNotThrowAnyException();
 

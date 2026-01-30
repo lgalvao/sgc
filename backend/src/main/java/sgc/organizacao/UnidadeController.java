@@ -21,6 +21,7 @@ import java.util.Set;
 
 import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
 import static sgc.processo.model.TipoProcesso.REVISAO;
+import sgc.processo.service.ProcessoFacade;
 
 /**
  * Controle para operações relacionadas a unidades organizacionais
@@ -31,7 +32,7 @@ import static sgc.processo.model.TipoProcesso.REVISAO;
 @Validated
 public class UnidadeController {
     private final UnidadeFacade unidadeService;
-    private final sgc.processo.service.ProcessoFacade processoFacade;
+    private final ProcessoFacade processoFacade;
 
     /**
      * Cria uma nova atribuição temporária para um usuário em uma unidade.

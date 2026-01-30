@@ -20,6 +20,8 @@ import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
 import java.util.Collections;
 
 import static org.mockito.Mockito.verify;
+import java.time.LocalDate;
+import sgc.seguranca.acesso.AccessControlService;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -49,7 +51,7 @@ class SubprocessoFacadeTest {
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
-    private sgc.seguranca.acesso.AccessControlService accessControlService;
+    private AccessControlService accessControlService;
 
     @InjectMocks
     private SubprocessoFacade facade;
@@ -115,8 +117,8 @@ class SubprocessoFacadeTest {
         facade.reabrirRevisaoCadastro(1L, "j");
         verify(cadastroWorkflowService).reabrirRevisaoCadastro(1L, "j");
 
-        facade.alterarDataLimite(1L, java.time.LocalDate.now());
-        verify(adminWorkflowService).alterarDataLimite(1L, java.time.LocalDate.now());
+        facade.alterarDataLimite(1L, LocalDate.now());
+        verify(adminWorkflowService).alterarDataLimite(1L, LocalDate.now());
     }
 
     @Test

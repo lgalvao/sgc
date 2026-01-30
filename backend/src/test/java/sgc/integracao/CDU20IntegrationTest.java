@@ -35,6 +35,7 @@ import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import tools.jackson.core.type.TypeReference;
+import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 
 @Tag("integration")
 @SpringBootTest
@@ -117,7 +118,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
-        List<sgc.analise.dto.AnaliseValidacaoHistoricoDto> historicoDevolucao =
+        List<AnaliseValidacaoHistoricoDto> historicoDevolucao =
                 objectMapper.readValue(responseDevolucao, new TypeReference<>() {
                 });
 
@@ -171,7 +172,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
-        List<sgc.analise.dto.AnaliseValidacaoHistoricoDto> historicoAceite =
+        List<AnaliseValidacaoHistoricoDto> historicoAceite =
                 objectMapper.readValue(responseAceite, new TypeReference<>() {
                 });
 

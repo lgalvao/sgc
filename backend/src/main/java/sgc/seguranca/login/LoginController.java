@@ -24,6 +24,7 @@ import sgc.seguranca.login.dto.PerfilUnidadeDto;
 
 import java.util.List;
 import java.util.Optional;
+import sgc.seguranca.login.dto.AutorizarRequest;
 
 /**
  * Controller responsável pelo fluxo de login: autenticação, autorização e
@@ -82,7 +83,7 @@ public class LoginController {
     @PostMapping("/autorizar")
     @Operation(summary = "Retorna os perfis e unidades disponíveis para o usuário")
     public ResponseEntity<List<PerfilUnidadeDto>> autorizar(
-            @Valid @RequestBody sgc.seguranca.login.dto.AutorizarRequest request,
+            @Valid @RequestBody AutorizarRequest request,
             HttpServletRequest httpRequest) {
         verificarTokenPreAuth(httpRequest, request.tituloEleitoral());
         List<PerfilUnidadeDto> perfis = loginFacade.autorizar(request.tituloEleitoral());

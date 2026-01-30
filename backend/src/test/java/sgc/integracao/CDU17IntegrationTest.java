@@ -44,13 +44,16 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+import org.hamcrest.Matchers;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import sgc.integracao.mocks.TestThymeleafConfig;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-17: Disponibilizar Mapa de Competências")
-@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 class CDU17IntegrationTest extends BaseIntegrationTest {
     private static final String API_URL = "/api/subprocessos/{codigo}/disponibilizar-mapa";
     private static final String OBS_LITERAL = "Obs";
@@ -153,7 +156,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
-                    .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
+                    .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
                     .andExpect(
                             jsonPath("$.mensagem").value("Mapa de competências disponibilizado."));
@@ -246,7 +249,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnprocessableContent())
                     // Adjusted expectation based on actual error message
-                    .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Todas as atividades devem estar associadas a pelo menos uma competência.")));
+                    .andExpect(jsonPath("$.message").value(Matchers.containsString("Todas as atividades devem estar associadas a pelo menos uma competência.")));
         }
 
         @Test

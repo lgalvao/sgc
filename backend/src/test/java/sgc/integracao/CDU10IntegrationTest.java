@@ -41,6 +41,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import jakarta.persistence.EntityManager;
+import sgc.integracao.mocks.TestThymeleafConfig;
+import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.Mapa;
+import sgc.processo.model.Processo;
 
 @Tag("integration")
 @SpringBootTest
@@ -48,7 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({
         TestSecurityConfig.class,
         WithMockChefeSecurityContextFactory.class,
-        sgc.integracao.mocks.TestThymeleafConfig.class
+        TestThymeleafConfig.class
 })
 @Transactional
 @DisplayName("CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos")
@@ -64,7 +69,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UsuarioRepo usuarioRepo;
     @Autowired
-    private jakarta.persistence.EntityManager entityManager;
+    private EntityManager entityManager;
 
     @MockitoBean
     private JavaMailSender javaMailSender;
@@ -112,14 +117,14 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         definirTitular(unidadeSuperior, usuarioSuperior);
 
         // 4. Criar Processo, Mapa e Subprocesso
-        sgc.processo.model.Processo processoRevisao = ProcessoFixture.processoPadrao();
+        Processo processoRevisao = ProcessoFixture.processoPadrao();
         processoRevisao.setCodigo(null);
         processoRevisao.setTipo(TipoProcesso.REVISAO);
         processoRevisao.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processoRevisao.setDataLimite(LocalDateTime.now().plusDays(30));
         processoRevisao = processoRepo.save(processoRevisao);
 
-        var mapa = mapaRepo.save(new sgc.mapa.model.Mapa());
+        var mapa = mapaRepo.save(new Mapa());
 
         subprocessoRevisao = SubprocessoFixture.subprocessoPadrao(processoRevisao, unidadeChefe);
         subprocessoRevisao.setCodigo(null);
@@ -196,7 +201,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         competencia.getAtividades().add(atividade);
         competenciaRepo.save(competencia);
 
-        conhecimentoRepo.save(sgc.mapa.model.Conhecimento.builder().descricao("Conhecimento de Teste")
+        conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento de Teste")
                 .atividade(atividade).build());
 
         entityManager.flush();

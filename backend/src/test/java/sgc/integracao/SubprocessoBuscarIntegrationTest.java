@@ -24,13 +24,14 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.integracao.mocks.TestSecurityConfig;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("Endpoint: /api/subprocessos/buscar")
-@Import(sgc.integracao.mocks.TestSecurityConfig.class)
+@Import(TestSecurityConfig.class)
 class SubprocessoBuscarIntegrationTest extends BaseIntegrationTest {
     private static final String API_SUBPROCESSOS_BUSCAR = "/api/subprocessos/buscar";
 

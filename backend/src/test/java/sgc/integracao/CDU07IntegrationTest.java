@@ -35,6 +35,7 @@ import java.time.LocalDateTime;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.assertj.core.api.Assertions;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -232,7 +233,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     @DisplayName("Deve falhar ao buscar subprocesso inexistente")
     void falhaSubprocessoInexistente() {
-        org.assertj.core.api.Assertions
+        Assertions
                 .assertThatThrownBy(() -> subprocessoFacade.obterDetalhes(99999L, Perfil.ADMIN))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }

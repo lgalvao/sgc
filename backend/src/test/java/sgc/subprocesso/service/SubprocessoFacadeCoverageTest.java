@@ -16,6 +16,12 @@ import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import java.util.Collections;
+import sgc.mapa.service.CopiaMapaService;
+import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.model.Perfil;
+import sgc.seguranca.acesso.AccessControlService;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoFacadeCoverageTest")
@@ -25,13 +31,13 @@ class SubprocessoFacadeCoverageTest {
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
-    private sgc.seguranca.acesso.AccessControlService accessControlService;
+    private AccessControlService accessControlService;
     @Mock
-    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private SubprocessoRepo subprocessoRepo;
     @Mock
     private MovimentacaoRepo movimentacaoRepo;
     @Mock
-    private sgc.mapa.service.CopiaMapaService copiaMapaService;
+    private CopiaMapaService copiaMapaService;
     @Mock
     private SubprocessoAjusteMapaService ajusteMapaService;
     @Mock
@@ -41,7 +47,7 @@ class SubprocessoFacadeCoverageTest {
     @Mock
     private SubprocessoPermissaoCalculator permissaoCalculator;
     @Mock
-    private sgc.organizacao.UsuarioFacade usuarioService;
+    private UsuarioFacade usuarioService;
 
     @InjectMocks
     private SubprocessoFacade facade;
@@ -93,7 +99,7 @@ class SubprocessoFacadeCoverageTest {
     @DisplayName("salvarAjustesMapa - Delegação para AjusteMapaService")
     void salvarAjustesMapa_Delegation() {
         Long codSubprocesso = 1L;
-        List<CompetenciaAjusteDto> ajustes = java.util.Collections.emptyList();
+        List<CompetenciaAjusteDto> ajustes = Collections.emptyList();
 
         facade.salvarAjustesMapa(codSubprocesso, ajustes);
 
@@ -141,7 +147,7 @@ class SubprocessoFacadeCoverageTest {
 
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
-        facade.obterDetalhes(codigo, sgc.organizacao.model.Perfil.ADMIN);
+        facade.obterDetalhes(codigo, Perfil.ADMIN);
 
         verify(contextoService).obterDetalhes(codigo, usuario);
     }
@@ -151,7 +157,7 @@ class SubprocessoFacadeCoverageTest {
     void obterContextoEdicao_Delegation() {
         Long codigo = 1L;
 
-        facade.obterContextoEdicao(codigo, sgc.organizacao.model.Perfil.ADMIN);
+        facade.obterContextoEdicao(codigo, Perfil.ADMIN);
 
         verify(contextoService).obterContextoEdicao(codigo);
     }

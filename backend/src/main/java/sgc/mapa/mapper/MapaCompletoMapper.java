@@ -11,6 +11,8 @@ import sgc.mapa.model.Mapa;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.Set;
+import sgc.mapa.model.Atividade;
 
 @Mapper(componentModel = "spring")
 public interface MapaCompletoMapper {
@@ -29,10 +31,10 @@ public interface MapaCompletoMapper {
     CompetenciaMapaDto toDto(Competencia competencia);
 
     @Named("mapAtividadesCodigos")
-    default List<Long> mapAtividadesCodigos(java.util.Set<sgc.mapa.model.Atividade> atividades) {
+    default List<Long> mapAtividadesCodigos(Set<Atividade> atividades) {
 
         return atividades.stream()
-                .map(sgc.mapa.model.Atividade::getCodigo)
+                .map(Atividade::getCodigo)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }

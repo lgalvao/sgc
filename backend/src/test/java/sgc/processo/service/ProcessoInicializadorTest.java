@@ -18,8 +18,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.service.factory.SubprocessoFactory;
-
+import sgc.subprocesso.service.SubprocessoFacade;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -45,7 +45,9 @@ class ProcessoInicializadorTest {
     @Mock
     private ApplicationEventPublisher publicadorEventos;
     @Mock
-    private SubprocessoFactory subprocessoFactory;
+    private SubprocessoFacade subprocessoFacade;
+    @Mock
+    private ProcessoValidador processoValidador;
 
     @InjectMocks
     private ProcessoInicializador inicializador;
@@ -57,7 +59,8 @@ class ProcessoInicializadorTest {
         p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
 
-        assertThatThrownBy(() -> inicializador.iniciar(1L, List.of()))
+        List<Long> unidades = List.of();
+        assertThatThrownBy(() -> inicializador.iniciar(1L, unidades))
                 .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 
@@ -69,7 +72,8 @@ class ProcessoInicializadorTest {
         p.setTipo(TipoProcesso.REVISAO);
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
 
-        assertThatThrownBy(() -> inicializador.iniciar(1L, Collections.emptyList()))
+        List<Long> unidades = Collections.emptyList();
+        assertThatThrownBy(() -> inicializador.iniciar(1L, unidades))
                 .isInstanceOf(ErroUnidadesNaoDefinidas.class);
     }
 
@@ -102,8 +106,7 @@ class ProcessoInicializadorTest {
         List<String> erros = inicializador.iniciar(1L, null);
 
         assertThat(erros).isEmpty();
-        verify(subprocessoFactory).criarParaMapeamento(eq(p), any());
-        // Verify publishEvent is called with ANY object, as we don't care about the specific timestamp or instance here for this test
+        verify(subprocessoFacade).criarParaMapeamento(eq(p), any());
         verify(publicadorEventos).publishEvent(any(Object.class));
         assertThat(p.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
     }
@@ -116,8 +119,8 @@ class ProcessoInicializadorTest {
         p.setTipo(TipoProcesso.REVISAO);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
-        when(unidadeMapaRepo.findAllById(any())).thenReturn(List.of()); // Nenhuma unidade tem mapa
-        when(unidadeRepo.findSiglasByCodigos(any())).thenReturn(List.of("U1"));
+        when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.of("As seguintes unidades não possuem mapa vigente: U1"));
+        when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of());
 
         List<String> erros = inicializador.iniciar(1L, List.of(1L));
 
@@ -153,6 +156,7 @@ class ProcessoInicializadorTest {
         p.setTipo(TipoProcesso.REVISAO);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
 
         UnidadeMapa um = new UnidadeMapa();
         um.setUnidadeCodigo(1L);
@@ -165,7 +169,7 @@ class ProcessoInicializadorTest {
         List<String> erros = inicializador.iniciar(1L, List.of(1L));
 
         assertThat(erros).isEmpty();
-        verify(subprocessoFactory).criarParaRevisao(eq(p), any(), any());
+        verify(subprocessoFacade).criarParaRevisao(eq(p), any(), any());
     }
 
     @Test
@@ -179,6 +183,7 @@ class ProcessoInicializadorTest {
         p.setParticipantes(Set.of(u));
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
 
         UnidadeMapa um = new UnidadeMapa();
         um.setUnidadeCodigo(1L);
@@ -187,7 +192,7 @@ class ProcessoInicializadorTest {
         List<String> erros = inicializador.iniciar(1L, null);
 
         assertThat(erros).isEmpty();
-        verify(subprocessoFactory).criarParaDiagnostico(eq(p), any(), any());
+        verify(subprocessoFacade).criarParaDiagnostico(eq(p), any(), any());
     }
 
     @Test
@@ -198,12 +203,14 @@ class ProcessoInicializadorTest {
         p.setTipo(TipoProcesso.REVISAO);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
         UnidadeMapa um = new UnidadeMapa();
         um.setUnidadeCodigo(99L);
         when(unidadeMapaRepo.findAllById(any())).thenReturn(List.of(um));
         when(unidadeRepo.findAllById(any())).thenReturn(List.of()); // Retorna vazio
 
-        assertThatThrownBy(() -> inicializador.iniciar(1L, List.of(99L)))
-                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
+        List<Long> unidades = List.of(99L);
+        assertThatThrownBy(() -> inicializador.iniciar(1L, unidades))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }

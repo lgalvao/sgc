@@ -31,6 +31,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 @RestController
 @RequestMapping("/e2e")
@@ -157,7 +159,7 @@ public class E2eController {
     /**
      * Executa uma operação com contexto de segurança ADMIN.
      */
-    private <T> T executeAsAdmin(java.util.function.Supplier<T> operation) {
+    private <T> T executeAsAdmin(Supplier<T> operation) {
         var auth = new UsernamePasswordAuthenticationToken(
                 "e2e-admin",
                 null,
@@ -185,7 +187,7 @@ public class E2eController {
         UnidadeDto unidade = unidadeFacade.buscarPorSigla(request.unidadeSigla());
 
         // Calcular data limite
-        int diasLimite = java.util.Objects.requireNonNullElse(request.diasLimite(), 30);
+        int diasLimite = Objects.requireNonNullElse(request.diasLimite(), 30);
         LocalDateTime dataLimite = LocalDate.now().plusDays(diasLimite).atStartOfDay();
 
         // Criar requisição de processo

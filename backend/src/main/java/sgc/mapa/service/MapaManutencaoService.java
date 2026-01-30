@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.repo.RepositorioComum;
+import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.AtualizarAtividadeRequest;
 import sgc.mapa.dto.AtualizarConhecimentoRequest;
@@ -30,6 +30,8 @@ import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.ConhecimentoRepo;
 import sgc.mapa.model.Mapa;
+import java.util.HashMap;
+import sgc.mapa.model.MapaRepo;
 
 /**
  * Serviço unificado responsável pela manutenção da estrutura do Mapa de Competências.
@@ -46,9 +48,9 @@ public class MapaManutencaoService {
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaRepo competenciaRepo;
     private final ConhecimentoRepo conhecimentoRepo;
-    private final sgc.mapa.model.MapaRepo mapaRepo;
+    private final MapaRepo mapaRepo;
     
-    private final RepositorioComum repo;
+    private final ComumRepo repo;
     
     private final AtividadeMapper atividadeMapper;
     private final ConhecimentoMapper conhecimentoMapper;
@@ -185,7 +187,7 @@ public class MapaManutencaoService {
 
     public Map<Long, Set<Long>> buscarIdsAssociacoesCompetenciaAtividade(Long codMapa) {
         List<Object[]> rows = competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(codMapa);
-        Map<Long, Set<Long>> result = new java.util.HashMap<>();
+        Map<Long, Set<Long>> result = new HashMap<>();
         for (Object[] row : rows) {
             Long compId = (Long) row[0];
             Long ativId = (Long) row[2];
@@ -354,6 +356,11 @@ public class MapaManutencaoService {
     @Transactional(readOnly = true)
     public Optional<Mapa> buscarMapaPorSubprocessoCodigo(Long subprocessoCodigo) {
         return mapaRepo.findBySubprocessoCodigo(subprocessoCodigo);
+    }
+
+    @Transactional(readOnly = true)
+    public Mapa buscarMapaPorCodigo(Long codigo) {
+        return repo.buscar(Mapa.class, codigo);
     }
 
     public Mapa salvarMapa(Mapa mapa) {

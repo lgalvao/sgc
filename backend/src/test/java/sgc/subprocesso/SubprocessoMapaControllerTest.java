@@ -30,18 +30,22 @@ import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesRequest;
 import sgc.subprocesso.model.Subprocesso;
 import tools.jackson.databind.ObjectMapper;
+import sgc.mapa.dto.CompetenciaMapaDto;
+import sgc.organizacao.UsuarioFacade;
+import sgc.subprocesso.dto.CompetenciaAjusteDto;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 @WebMvcTest(SubprocessoMapaController.class)
 @Import(RestExceptionHandler.class)
 class SubprocessoMapaControllerTest {
         @MockitoBean
-        private sgc.subprocesso.service.SubprocessoFacade subprocessoFacade;
+        private SubprocessoFacade subprocessoFacade;
 
         @MockitoBean
         private MapaFacade mapaFacade;
 
         @MockitoBean
-        private sgc.organizacao.UsuarioFacade usuarioFacade;
+        private UsuarioFacade usuarioFacade;
 
         @Autowired
         private MockMvc mockMvc;
@@ -94,7 +98,7 @@ class SubprocessoMapaControllerTest {
         void salvarMapa() throws Exception {
                 SalvarMapaRequest req = SalvarMapaRequest.builder()
                                 .observacoes("obs")
-                                .competencias(List.of(sgc.mapa.dto.CompetenciaMapaDto.builder().descricao("Comp 1")
+                                .competencias(List.of(CompetenciaMapaDto.builder().descricao("Comp 1")
                                                 .atividadesCodigos(List.of(1L)).build()))
                                 .build();
 
@@ -123,7 +127,7 @@ class SubprocessoMapaControllerTest {
     @DisplayName("salvarAjustesMapa")
     @WithMockUser
     void salvarAjustesMapa() throws Exception {
-        sgc.subprocesso.dto.CompetenciaAjusteDto comp = sgc.subprocesso.dto.CompetenciaAjusteDto.builder()
+        CompetenciaAjusteDto comp = CompetenciaAjusteDto.builder()
                 .codCompetencia(1L)
                 .nome("Competencia Teste")
                 .atividades(List.of())
@@ -161,7 +165,7 @@ class SubprocessoMapaControllerTest {
         void salvarMapaCompleto() throws Exception {
                 SalvarMapaRequest req = SalvarMapaRequest.builder()
                                 .observacoes("obs")
-                                .competencias(List.of(sgc.mapa.dto.CompetenciaMapaDto.builder().descricao("Comp 1")
+                                .competencias(List.of(CompetenciaMapaDto.builder().descricao("Comp 1")
                                                 .atividadesCodigos(List.of(1L)).build()))
                                 .build();
 

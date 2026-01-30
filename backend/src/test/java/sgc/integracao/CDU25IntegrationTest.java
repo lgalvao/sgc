@@ -34,11 +34,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import sgc.integracao.mocks.TestThymeleafConfig;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-25: Aceitar validação de mapas em bloco")
 class CDU25IntegrationTest extends BaseIntegrationTest {
@@ -84,12 +86,12 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         // Create subprocesses in MAPEAMENTO_MAPA_VALIDADO state
         subprocesso1 = SubprocessoFixture.subprocessoPadrao(processo, unidade1);
         subprocesso1.setCodigo(null);
-        subprocesso1.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+        subprocesso1.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         subprocesso1 = subprocessoRepo.save(subprocesso1);
 
         subprocesso2 = SubprocessoFixture.subprocessoPadrao(processo, unidade2);
         subprocesso2.setCodigo(null);
-        subprocesso2.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+        subprocesso2.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         subprocesso2 = subprocessoRepo.save(subprocesso2);
 
         entityManager.flush();

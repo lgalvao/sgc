@@ -18,6 +18,9 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -108,10 +111,10 @@ class GerenciadorJwtTest {
         when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
 
         // Gerar token "mal formado" (business logic wise) mas valido (crypto wise)
-        String token = io.jsonwebtoken.Jwts.builder()
+        String token = Jwts.builder()
                 .subject(null) // missing subject
-                .signWith(io.jsonwebtoken.security.Keys
-                        .hmacShaKeyFor(SECURE_SECRET.getBytes(java.nio.charset.StandardCharsets.UTF_8)))
+                .signWith(Keys
+                        .hmacShaKeyFor(SECURE_SECRET.getBytes(StandardCharsets.UTF_8)))
                 .compact();
 
         Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken(token);
@@ -123,12 +126,12 @@ class GerenciadorJwtTest {
     void validateMissingPerfil() {
         when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
 
-        String token = io.jsonwebtoken.Jwts.builder()
+        String token = Jwts.builder()
                 .subject("123")
                 .claim("unidade", 1L)
                 // Missing perfil
-                .signWith(io.jsonwebtoken.security.Keys
-                        .hmacShaKeyFor(SECURE_SECRET.getBytes(java.nio.charset.StandardCharsets.UTF_8)))
+                .signWith(Keys
+                        .hmacShaKeyFor(SECURE_SECRET.getBytes(StandardCharsets.UTF_8)))
                 .compact();
 
         Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken(token);
@@ -140,12 +143,12 @@ class GerenciadorJwtTest {
     void validateMissingUnidade() {
         when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
 
-        String token = io.jsonwebtoken.Jwts.builder()
+        String token = Jwts.builder()
                 .subject("123")
                 .claim("perfil", Perfil.ADMIN.name())
                 // Missing unidade
-                .signWith(io.jsonwebtoken.security.Keys
-                        .hmacShaKeyFor(SECURE_SECRET.getBytes(java.nio.charset.StandardCharsets.UTF_8)))
+                .signWith(Keys
+                        .hmacShaKeyFor(SECURE_SECRET.getBytes(StandardCharsets.UTF_8)))
                 .compact();
 
         Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken(token);

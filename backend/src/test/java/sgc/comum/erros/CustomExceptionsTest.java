@@ -11,10 +11,10 @@ class CustomExceptionsTest {
 
 
     @Test
-    @DisplayName("Deve instanciar ErroAccessoNegado")
+    @DisplayName("Deve instanciar ErroAcessoNegado")
     void testErroDominioAccessoNegado() {
         String message = "Acesso negado";
-        ErroAccessoNegado exception = new ErroAccessoNegado(message);
+        ErroAcessoNegado exception = new ErroAcessoNegado(message);
         assertEquals(message, exception.getMessage());
     }
 

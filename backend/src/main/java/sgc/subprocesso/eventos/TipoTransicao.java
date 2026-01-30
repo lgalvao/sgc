@@ -2,6 +2,7 @@ package sgc.subprocesso.eventos;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Define os tipos de transição de subprocesso e seus metadados para comunicação.
@@ -43,6 +44,12 @@ public enum TipoTransicao {
             null   // Não envia e-mail
     ),
 
+    CADASTRO_REABERTO(
+            "Reabertura do cadastro de atividades",
+            "Cadastro de atividades da unidade %s reaberto para ajustes",
+            "cadastro-reaberto"
+    ),
+
     // ===== REVISÃO DO CADASTRO (Revisão) =====
 
     REVISAO_CADASTRO_DISPONIBILIZADA(
@@ -67,6 +74,12 @@ public enum TipoTransicao {
             "Revisão do cadastro homologada",
             null,
             null
+    ),
+
+    REVISAO_CADASTRO_REABERTA(
+            "Reabertura da revisão do cadastro de atividades",
+            "Revisão do cadastro da unidade %s reaberta para ajustes",
+            "revisao-cadastro-reaberta"
     ),
 
     // ===== MAPA =====
@@ -125,7 +138,7 @@ public enum TipoTransicao {
      * @param siglaUnidade Sigla da unidade para substituir no template
      * @return Descrição formatada ou null se não gera alerta
      */
-    public String formatarAlerta(String siglaUnidade) {
+    public @Nullable String formatarAlerta(String siglaUnidade) {
         if (templateAlerta == null) {
             return null;
         }

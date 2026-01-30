@@ -20,6 +20,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import sgc.analise.AnaliseFacade;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -32,7 +33,7 @@ class SubprocessoCadastroControllerCoverageTest {
     @Mock
     private SubprocessoFacade subprocessoFacade;
     @Mock
-    private sgc.analise.AnaliseFacade analiseFacade;
+    private AnaliseFacade analiseFacade;
     @Mock
     private AnaliseMapper analiseMapper;
     @Mock

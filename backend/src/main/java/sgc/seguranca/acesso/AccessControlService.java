@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroAcessoNegado;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Usuario;
@@ -35,7 +35,7 @@ public class AccessControlService {
         if (!podeExecutar(usuario, acao, recurso)) {
             String motivo = obterMotivoNegacao(usuario, acao, recurso);
             auditService.logAccessDenied(usuario, acao, recurso, motivo);
-            throw new ErroAccessoNegado(motivo);
+            throw new ErroAcessoNegado(motivo);
         }
 
         auditService.logAccessGranted(usuario, acao, recurso);

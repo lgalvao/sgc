@@ -13,6 +13,8 @@ import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.List;
 import static org.mockito.Mockito.*;
+import sgc.organizacao.UsuarioFacade;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoFacade Batch Update Test")
@@ -20,7 +22,7 @@ class SubprocessoFacadeBatchUpdateTest {
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
-    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private SubprocessoRepo subprocessoRepo;
     @Mock
     private SubprocessoAjusteMapaService ajusteMapaService;
     @Mock
@@ -32,7 +34,7 @@ class SubprocessoFacadeBatchUpdateTest {
     @Mock
     private SubprocessoPermissaoCalculator permissaoCalculator;
     @Mock
-    private sgc.organizacao.UsuarioFacade usuarioService;
+    private UsuarioFacade usuarioService;
 
     @InjectMocks
     private SubprocessoFacade facade;

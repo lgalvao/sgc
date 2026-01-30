@@ -32,9 +32,13 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import sgc.comum.erros.ErroEstadoImpossivel;
 
 @ExtendWith(MockitoExtension.class)
-@org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @Tag("unit")
 @DisplayName("Testes do EventoProcessoListener")
 class EventoProcessoListenerTest {
@@ -63,7 +67,7 @@ class EventoProcessoListenerTest {
     @Mock
     private AlertaFacade servicoAlertas;
 
-    @org.junit.jupiter.api.BeforeEach
+    @BeforeEach
     void setup() {
         lenient().when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         lenient().when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
@@ -138,7 +142,7 @@ class EventoProcessoListenerTest {
 
         // Testa ErroEstadoImpossivel ao criar corpo
         assertThatThrownBy(() -> listener.criarCorpoEmailPorTipo(TipoUnidade.RAIZ, processo, s))
-                .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
+                .isInstanceOf(ErroEstadoImpossivel.class);
 
         // Testa ErroEstadoImpossivel ao definir assunto no fluxo principal
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
@@ -405,7 +409,7 @@ class EventoProcessoListenerTest {
         s.setUnidade(u);
 
         assertThatThrownBy(() -> listener.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, processo, s))
-                .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
+                .isInstanceOf(ErroEstadoImpossivel.class);
     }
 
     @Test

@@ -25,6 +25,11 @@ import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.subprocesso.SubprocessoMapaController;
 import sgc.subprocesso.service.SubprocessoFacade;
 import tools.jackson.databind.ObjectMapper;
+import org.assertj.core.api.Assertions;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import sgc.mapa.service.MapaFacade;
+import sgc.organizacao.UsuarioFacade;
 
 @WebMvcTest(SubprocessoMapaController.class)
 @Import(RestExceptionHandler.class)
@@ -41,10 +46,10 @@ class SanitizacaoMapaTest {
     private SubprocessoFacade subprocessoFacade;
 
     @MockitoBean
-    private sgc.mapa.service.MapaFacade mapaFacade;
+    private MapaFacade mapaFacade;
 
     @MockitoBean
-    private sgc.organizacao.UsuarioFacade usuarioFacade;
+    private UsuarioFacade usuarioFacade;
 
 
     @Test
@@ -72,14 +77,14 @@ class SanitizacaoMapaTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        org.mockito.ArgumentCaptor<SalvarMapaRequest> captor = org.mockito.ArgumentCaptor.forClass(SalvarMapaRequest.class);
+        ArgumentCaptor<SalvarMapaRequest> captor = ArgumentCaptor.forClass(SalvarMapaRequest.class);
         verify(subprocessoFacade).salvarMapaSubprocesso(eq(1L), captor.capture());
 
         SalvarMapaRequest capturado = captor.getValue();
         // Verificação manual para ver o que realmente chegou
         System.out.println("Valor sanitizado recebido: " + capturado.observacoes());
         
-        org.assertj.core.api.Assertions.assertThat(capturado.observacoes())
+        Assertions.assertThat(capturado.observacoes())
             .doesNotContain("<script>")
             .contains("Observação válida");
     }
@@ -110,7 +115,7 @@ class SanitizacaoMapaTest {
 
         verify(subprocessoFacade).salvarMapaSubprocesso(
                 eq(1L),
-                org.mockito.ArgumentMatchers.argThat(arg ->
+                ArgumentMatchers.argThat(arg ->
                         !arg.competencias().get(0).descricao().contains("<img") &&
                                 arg.competencias().get(0).descricao().contains("Descricao")
                 )

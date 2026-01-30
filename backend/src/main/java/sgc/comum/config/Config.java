@@ -2,6 +2,8 @@ package sgc.comum.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import java.time.Clock;
+import org.springframework.context.annotation.Bean;
 
 /**
  * Configuração geral do Spring Data para serialização de Pagination.
@@ -17,8 +19,8 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 @EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
 public class Config {
 
-    @org.springframework.context.annotation.Bean
-    public java.time.Clock clock() {
-        return java.time.Clock.systemDefaultZone();
+    @Bean
+    public Clock clock() {
+        return Clock.systemDefaultZone();
     }
 }

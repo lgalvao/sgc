@@ -22,6 +22,7 @@ import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
 import java.util.Map;
+import sgc.analise.AnaliseFacade;
 
 @RestController
 @RequestMapping("/api/subprocessos")
@@ -30,7 +31,7 @@ import java.util.Map;
 public class SubprocessoCadastroController {
 
     private final SubprocessoFacade subprocessoFacade;
-    private final sgc.analise.AnaliseFacade analiseFacade;
+    private final AnaliseFacade analiseFacade;
     private final AnaliseMapper analiseMapper;
     private final UsuarioFacade usuarioService;
 

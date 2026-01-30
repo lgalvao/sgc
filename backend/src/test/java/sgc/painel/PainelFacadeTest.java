@@ -27,6 +27,8 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import java.util.HashSet;
+import org.springframework.data.domain.PageImpl;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -174,7 +176,7 @@ class PainelFacadeTest {
     @DisplayName("Deve lidar com solicitação não paginada")
     void deveLidarComSolicitacaoNaoPaginada() {
         when(processoFacade.listarTodos(any(Pageable.class)))
-                .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of()));
+                .thenReturn(new PageImpl<>(List.of()));
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, Pageable.unpaged());
 
@@ -192,7 +194,7 @@ class PainelFacadeTest {
         u.setCodigo(10L);
         u.setNome("Unit");
         u.setSigla("U");
-        p.setParticipantes(new java.util.HashSet<>(Set.of(u)));
+        p.setParticipantes(new HashSet<>(Set.of(u)));
         return p;
     }
 }

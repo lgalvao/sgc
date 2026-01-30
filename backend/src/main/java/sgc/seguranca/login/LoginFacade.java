@@ -5,20 +5,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.organizacao.service.UsuarioPerfilService;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.seguranca.login.dto.PerfilUnidadeDto;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import sgc.organizacao.mapper.UsuarioMapper;
+import sgc.organizacao.model.SituacaoUnidade;
 
 /**
  * Serviço responsável pelo fluxo de login: autenticação, autorização e geração
@@ -33,8 +35,8 @@ public class LoginFacade {
     private final GerenciadorJwt gerenciadorJwt;
     private final ClienteAcessoAd clienteAcessoAd;
     private final UnidadeFacade unidadeService;
-    private final sgc.organizacao.mapper.UsuarioMapper usuarioMapper;
-    private final UsuarioPerfilRepo usuarioPerfilRepo;
+    private final UsuarioMapper usuarioMapper;
+    private final UsuarioPerfilService usuarioPerfilService;
 
     @Value("${aplicacao.ambiente-testes:false}")
     private boolean ambienteTestes;
@@ -43,14 +45,14 @@ public class LoginFacade {
             GerenciadorJwt gerenciadorJwt,
             @Autowired(required = false) ClienteAcessoAd clienteAcessoAd,
             UnidadeFacade unidadeService,
-            sgc.organizacao.mapper.UsuarioMapper usuarioMapper,
-            UsuarioPerfilRepo usuarioPerfilRepo) {
+            UsuarioMapper usuarioMapper,
+            UsuarioPerfilService usuarioPerfilService) {
         this.usuarioService = usuarioService;
         this.gerenciadorJwt = gerenciadorJwt;
         this.clienteAcessoAd = clienteAcessoAd;
         this.unidadeService = unidadeService;
         this.usuarioMapper = usuarioMapper;
-        this.usuarioPerfilRepo = usuarioPerfilRepo;
+        this.usuarioPerfilService = usuarioPerfilService;
     }
 
     /**
@@ -112,7 +114,7 @@ public class LoginFacade {
                 });
 
         if (!autorizado) {
-            throw new ErroAccessoNegado("Usuário não tem permissão para acessar com perfil e unidade informados.");
+            throw new ErroAcessoNegado("Usuário não tem permissão para acessar com perfil e unidade informados.");
         }
 
         return gerenciadorJwt.gerarToken(
@@ -128,10 +130,10 @@ public class LoginFacade {
         }
 
         Set<UsuarioPerfil> atribuicoes = new HashSet<>(
-                usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral())
+                usuarioPerfilService.buscarPorUsuario(usuario.getTituloEleitoral())
         );
         return usuario.getTodasAtribuicoes(atribuicoes).stream()
-                .filter(a -> a.getUnidade().getSituacao() == sgc.organizacao.model.SituacaoUnidade.ATIVA)
+                .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                 .map(atribuicao -> new PerfilUnidadeDto(
                         atribuicao.getPerfil(),
                         usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(atribuicao.getUnidade())))

@@ -7,6 +7,7 @@ import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.model.Analise;
 import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.Unidade;
 
 /**
  * Mapper para converter a entidade {@link Analise} em DTOs.
@@ -39,7 +40,7 @@ public abstract class AnaliseMapper {
     protected String getUnidadeSigla(Long codUnidade) {
         if (codUnidade == null) return null;
         return unidadeRepo.findById(codUnidade)
-                .map(sgc.organizacao.model.Unidade::getSigla)
+                .map(Unidade::getSigla)
                 .orElse(null);
     }
 }

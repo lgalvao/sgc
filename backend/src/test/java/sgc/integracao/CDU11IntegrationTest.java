@@ -29,6 +29,7 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import sgc.integracao.mocks.TestSecurityConfig;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -36,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-11: Visualizar cadastro de atividades e conhecimentos")
 @Import({
-        sgc.integracao.mocks.TestSecurityConfig.class,
+        TestSecurityConfig.class,
         UnidadeFixture.class,
         ProcessoFixture.class,
         SubprocessoFixture.class,

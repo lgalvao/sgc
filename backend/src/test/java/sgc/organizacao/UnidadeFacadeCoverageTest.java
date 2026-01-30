@@ -30,12 +30,9 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeMapaRepo;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.organizacao.mapper.UsuarioMapper;
 
@@ -54,11 +51,9 @@ class UnidadeFacadeCoverageTest {
     @Mock
     private UnidadeResponsavelService unidadeResponsavelService;
     @Mock
-    private UnidadeRepo unidadeRepo;
+    private UnidadeConsultaService unidadeConsultaService;
     @Mock
-    private UnidadeMapaRepo unidadeMapaRepo;
-    @Mock
-    private UsuarioRepo usuarioRepo;
+    private UsuarioConsultaService usuarioConsultaService;
     @Mock
     private UsuarioMapper usuarioMapper;
 
@@ -167,7 +162,7 @@ class UnidadeFacadeCoverageTest {
         dtoRaiz.setCodigo(1L);
         dtoRaiz.setSubunidades(new ArrayList<>());
 
-        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L));
+        when(unidadeMapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(1L));
         when(unidadeHierarquiaService.buscarArvoreComElegibilidade(any()))
                 .thenReturn(List.of(dtoRaiz));
 
@@ -256,7 +251,7 @@ class UnidadeFacadeCoverageTest {
         dto3.setCodigo(3L);
         dto3.setSubunidades(new ArrayList<>());
 
-        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(3L));
+        when(unidadeMapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(3L));
         when(unidadeHierarquiaService.buscarArvoreComElegibilidade(any()))
                 .thenReturn(List.of(dto1, dto2, dto3));
 
@@ -270,11 +265,7 @@ class UnidadeFacadeCoverageTest {
     @Test
     @DisplayName("Deve lançar erro ao buscar entidade por id se unidade inativa")
     void deveLancarErroBuscarEntidadePorIdInativa() {
-        Unidade u = new Unidade();
-        u.setCodigo(1L);
-        u.setSituacao(SituacaoUnidade.INATIVA);
-
-        when(unidadeRepo.findById(1L)).thenReturn(Optional.of(u));
+        when(unidadeConsultaService.buscarPorId(1L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 1L));
 
         assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeFacade.buscarEntidadePorId(1L)));
     }
@@ -283,7 +274,7 @@ class UnidadeFacadeCoverageTest {
     @DisplayName("Deve filtrar unidades na árvore com elegibilidade corretamente")
     void deveFiltrarUnidadesNaArvoreComElegibilidade() {
         // Setup
-        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(10L, 20L));
+        when(unidadeMapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(10L, 20L));
 
         // Execute method to trigger lambda creation
         unidadeFacade.buscarArvoreComElegibilidade(true, Set.of(30L));
@@ -347,7 +338,7 @@ class UnidadeFacadeCoverageTest {
         unidadeFacade.buscarArvoreComElegibilidade(false, Collections.emptySet());
 
         // Verify that findAllUnidadeCodigos was NOT called
-        verify(unidadeMapaRepo, never()).findAllUnidadeCodigos();
+        verify(unidadeMapaService, never()).buscarTodosCodigosUnidades();
         verify(unidadeHierarquiaService).buscarArvoreComElegibilidade(any());
     }
 

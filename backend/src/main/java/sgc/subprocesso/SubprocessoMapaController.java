@@ -34,6 +34,8 @@ import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
 import sgc.subprocesso.dto.SalvarAjustesRequest;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
+import java.time.LocalDate;
+import sgc.organizacao.model.Perfil;
 
 @RestController
 @RequestMapping("/api/subprocessos")
@@ -56,7 +58,7 @@ public class SubprocessoMapaController {
     @Operation(summary = "Obtém o contexto completo para edição de mapa (BFF)")
     public ContextoEdicaoDto obterContextoEdicao(
             @PathVariable Long codigo,
-            @RequestParam(required = false) sgc.organizacao.model.Perfil perfil) {
+            @RequestParam(required = false) Perfil perfil) {
         return subprocessoFacade.obterContextoEdicao(codigo, perfil);
     }
 
@@ -229,7 +231,7 @@ public class SubprocessoMapaController {
             @RequestBody @Valid ProcessarEmBlocoRequest request,
             @AuthenticationPrincipal Usuario usuario) {
         DisponibilizarMapaRequest serviceRequest = DisponibilizarMapaRequest.builder()
-                .dataLimite(request.dataLimite() != null ? request.dataLimite() : java.time.LocalDate.now().plusDays(15))
+                .dataLimite(request.dataLimite() != null ? request.dataLimite() : LocalDate.now().plusDays(15))
                 .build();
         subprocessoFacade.disponibilizarMapaEmBloco(request.subprocessos(), codigo, serviceRequest, usuario);
     }

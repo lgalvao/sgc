@@ -14,6 +14,8 @@ import sgc.processo.model.Processo;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Immutable
@@ -53,7 +55,7 @@ public class Unidade extends EntidadeBase {
 
     @OneToMany(mappedBy = "unidadeSuperior")
     @Builder.Default
-    private java.util.List<Unidade> subunidades = new java.util.ArrayList<>();
+    private List<Unidade> subunidades = new ArrayList<>();
 
     @ManyToMany(mappedBy = "participantes")
     @Builder.Default

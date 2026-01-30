@@ -30,6 +30,7 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import sgc.organizacao.model.Perfil;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -150,7 +151,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     // Helper to insert User/Profile data for security checks that hit the DB (or View)
     private void setupChefeForUnidade(String titulo, Unidade unidade) {
         jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-                titulo, unidade.getCodigo(), sgc.organizacao.model.Perfil.CHEFE.name());
+                titulo, unidade.getCodigo(), Perfil.CHEFE.name());
     }
 
     @Nested

@@ -26,15 +26,21 @@ import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+import java.time.LocalDateTime;
+import sgc.comum.repo.ComumRepo;
+import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.Processo;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes para SubprocessoCrudService")
 class SubprocessoCrudServiceTest {
     @Mock
-    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private SubprocessoRepo subprocessoRepo;
     @Mock
-    private sgc.comum.repo.RepositorioComum repositorioComum;
+    private ComumRepo repositorioComum;
     @Mock
     private SubprocessoMapper subprocessoMapper;
     @Mock
@@ -42,20 +48,20 @@ class SubprocessoCrudServiceTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
     @Mock
-    private sgc.organizacao.UsuarioFacade usuarioService;
+    private UsuarioFacade usuarioService;
 
     @InjectMocks
     private SubprocessoCrudService service;
 
     private Subprocesso criarSubprocessoCompleto() {
         Subprocesso sp = new Subprocesso();
-        sgc.processo.model.Processo proc = new sgc.processo.model.Processo();
+        Processo proc = new Processo();
         proc.setCodigo(1L);
         sp.setProcesso(proc);
-        sgc.organizacao.model.Unidade uni = new sgc.organizacao.model.Unidade();
+        Unidade uni = new Unidade();
         uni.setCodigo(1L);
         sp.setUnidade(uni);
-        sgc.mapa.model.Mapa mapa = new sgc.mapa.model.Mapa();
+        Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
         sp.setMapa(mapa);
         return sp;
@@ -247,9 +253,9 @@ class SubprocessoCrudServiceTest {
         Subprocesso sp = criarSubprocessoCompleto();
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
-                .dataLimiteEtapa1(java.time.LocalDateTime.now())
-                .dataFimEtapa1(java.time.LocalDateTime.now())
-                .dataFimEtapa2(java.time.LocalDateTime.now())
+                .dataLimiteEtapa1(LocalDateTime.now())
+                .dataFimEtapa1(LocalDateTime.now())
+                .dataFimEtapa2(LocalDateTime.now())
                 .build();
         SubprocessoDto responseDto = SubprocessoDto.builder().build();
 
@@ -292,7 +298,7 @@ class SubprocessoCrudServiceTest {
 
         SubprocessoDto resultado = service.criar(request);
         assertThat(resultado).isNotNull();
-        verify(subprocessoRepo).save(any());
+        verify(subprocessoRepo, times(2)).save(any());
     }
 
     @Test
@@ -302,11 +308,11 @@ class SubprocessoCrudServiceTest {
         SubprocessoDto responseDto = SubprocessoDto.builder().build();
         Subprocesso entity = new Subprocesso();
 
-        sgc.processo.model.Processo proc = new sgc.processo.model.Processo();
+        Processo proc = new Processo();
         proc.setCodigo(100L);
         entity.setProcesso(proc);
 
-        sgc.organizacao.model.Unidade uni = new sgc.organizacao.model.Unidade();
+        Unidade uni = new Unidade();
         uni.setCodigo(200L);
         entity.setUnidade(uni);
 
@@ -316,7 +322,7 @@ class SubprocessoCrudServiceTest {
 
         SubprocessoDto resultado = service.criar(request);
         assertThat(resultado).isNotNull();
-        verify(subprocessoRepo).save(any());
+        verify(subprocessoRepo, times(2)).save(any());
     }
 
     @Test

@@ -2,8 +2,6 @@ package sgc.processo.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,9 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.fixture.ProcessoFixture;
-import sgc.fixture.UnidadeFixture;
 import sgc.organizacao.UnidadeFacade;
-import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.AtualizarProcessoRequest;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
@@ -28,16 +24,21 @@ import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.alerta.AlertaFacade;
+import sgc.organizacao.UsuarioFacade;
+import sgc.subprocesso.mapper.SubprocessoMapper;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("ProcessoFacade - CRUD Operations")
 class ProcessoFacadeCrudTest {
     @Mock
-    private ProcessoRepo processoRepo;
+    private ProcessoManutencaoService processoManutencaoService;
+    @Mock
+    private ProcessoConsultaService processoConsultaService;
     @Mock
     private UnidadeFacade unidadeService;
     @Mock
@@ -45,23 +46,21 @@ class ProcessoFacadeCrudTest {
     @Mock
     private ProcessoValidador processoValidador;
     @Mock
-    private sgc.subprocesso.service.SubprocessoFacade subprocessoFacade;
+    private SubprocessoFacade subprocessoFacade;
     @Mock
     private ProcessoDetalheBuilder processoDetalheBuilder;
     @Mock
-    private sgc.subprocesso.mapper.SubprocessoMapper subprocessoMapper;
+    private SubprocessoMapper subprocessoMapper;
     @Mock
-    private sgc.organizacao.UsuarioFacade usuarioService;
+    private UsuarioFacade usuarioService;
     @Mock
     private ProcessoInicializador processoInicializador;
     @Mock
-    private sgc.alerta.AlertaFacade alertaService;
+    private AlertaFacade alertaService;
     @Mock
     private ProcessoAcessoService processoAcessoService;
     @Mock
     private ProcessoFinalizador processoFinalizador;
-    @Mock
-    private ProcessoConsultaService processoConsultaService;
 
     @InjectMocks
     private ProcessoFacade processoFacade;
@@ -75,16 +74,17 @@ class ProcessoFacadeCrudTest {
             // Arrange
             CriarProcessoRequest req = new CriarProcessoRequest(
                     "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
-            Unidade unidade = UnidadeFixture.unidadeComId(1L);
-
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidade);
-            when(processoRepo.saveAndFlush(any()))
-                    .thenAnswer(
-                            i -> {
-                                Processo p = i.getArgument(0);
-                                p.setCodigo(100L);
-                                return p;
-                            });
+            
+            when(processoManutencaoService.criar(req)).thenAnswer(
+                    i -> {
+                        // Simula retorno do serviço
+                        Processo p = new Processo();
+                        p.setCodigo(100L);
+                        p.setDescricao(req.descricao());
+                        p.setTipo(req.tipo());
+                        p.setSituacao(SituacaoProcesso.CRIADO);
+                        return p;
+                    });
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
@@ -92,18 +92,18 @@ class ProcessoFacadeCrudTest {
 
             // Assert
             assertThat(resultado).isNotNull();
-            verify(processoRepo).saveAndFlush(argThat((Processo p) -> p.getDescricao().equals("Teste") &&
-                    p.getTipo() == TipoProcesso.MAPEAMENTO &&
-                    p.getSituacao() == SituacaoProcesso.CRIADO));
+            verify(processoManutencaoService).criar(req);
         }
 
         @Test
-        @DisplayName("Deve lançar exceção quando unidade não encontrada")
+        @DisplayName("Deve lançar exceção quando unidade não encontrada (propagada do serviço)")
         void deveLancarExcecaoQuandoUnidadeNaoEncontrada() {
             // Arrange
             CriarProcessoRequest req = new CriarProcessoRequest(
                     "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(99L));
-            when(unidadeService.buscarEntidadePorId(99L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 99L));
+            
+            when(processoManutencaoService.criar(req))
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 99L));
 
             // Act & Assert
             assertThatThrownBy(() -> processoFacade.criar(req))
@@ -113,108 +113,15 @@ class ProcessoFacadeCrudTest {
         }
 
         @Test
-        @DisplayName("Deve validar mapa para processo REVISAO")
-        void deveValidarMapaParaRevisao() {
-            CriarProcessoRequest req = new CriarProcessoRequest(
-                    "Teste", TipoProcesso.REVISAO, LocalDateTime.now(), List.of(1L));
-
-            Unidade u = UnidadeFixture.unidadeComId(1L);
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
-            when(processoValidador.getMensagemErroUnidadesSemMapa(anyList()))
-                    .thenReturn(Optional.of("Unidades sem mapa vigente: U1"));
-
-            assertThatThrownBy(() -> processoFacade.criar(req))
-                    .isInstanceOf(ErroProcesso.class)
-                    .hasMessageContaining("U1");
-        }
-
-        @Test
-        @DisplayName("Deve retornar erro se REVISAO e validador retornar mensagem")
+        @DisplayName("Deve retornar erro se REVISAO e validador retornar mensagem (propagado do serviço)")
         void deveRetornarErroSeRevisaoEValidadorFalhar() {
             var req = new CriarProcessoRequest("T", TipoProcesso.REVISAO, LocalDateTime.now(), List.of(1L));
-            Unidade u = new Unidade();
-            u.setCodigo(1L);
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
-            when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.of("Erro"));
+            
+            when(processoManutencaoService.criar(req)).thenThrow(new ErroProcesso("Erro"));
 
             assertThatThrownBy(() -> processoFacade.criar(req))
                     .isInstanceOf(ErroProcesso.class)
                     .hasMessage("Erro");
-        }
-
-
-        @Test
-        @DisplayName("Deve criar processo de REVISAO quando todas unidades tem mapa vigente")
-        void deveCriarProcessoRevisaoQuandoUnidadesTemMapa() {
-            CriarProcessoRequest req = new CriarProcessoRequest(
-                    "Revisao", TipoProcesso.REVISAO, LocalDateTime.now(), List.of(1L));
-
-            Unidade u = UnidadeFixture.unidadeComId(1L);
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
-            when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty()); // No error - all units have maps
-            when(processoRepo.saveAndFlush(any())).thenReturn(new Processo());
-            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
-
-            ProcessoDto resultado = processoFacade.criar(req);
-            assertThat(resultado).isNotNull();
-        }
-
-        @Test
-        @DisplayName("Deve criar processo de DIAGNOSTICO quando todas unidades tem mapa vigente")
-        void deveCriarProcessoDiagnosticoQuandoUnidadesTemMapa() {
-            CriarProcessoRequest req = new CriarProcessoRequest(
-                    "Diagnostico", TipoProcesso.DIAGNOSTICO, LocalDateTime.now(), List.of(1L));
-
-            Unidade u = UnidadeFixture.unidadeComId(1L);
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
-            when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty()); // No error - all units have maps
-            when(processoRepo.saveAndFlush(any())).thenReturn(new Processo());
-            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
-
-            ProcessoDto resultado = processoFacade.criar(req);
-            assertThat(resultado).isNotNull();
-        }
-
-        @Test
-        @DisplayName("criar: erro se REVISAO e unidades sem mapa")
-        void criar_ErroRevisaoSemMapa() {
-            CriarProcessoRequest req = CriarProcessoRequest.builder()
-                    .descricao("Teste")
-                    .unidades(List.of(1L))
-                    .tipo(TipoProcesso.REVISAO)
-                    .build();
-
-            Unidade u = new Unidade();
-            u.setCodigo(1L);
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
-            when(processoValidador.getMensagemErroUnidadesSemMapa(any()))
-                    .thenReturn(Optional.of("As seguintes unidades não possuem mapa vigente: SIGLA"));
-
-            assertThatThrownBy(() -> processoFacade.criar(req))
-                    .isInstanceOf(ErroProcesso.class)
-                    .hasMessageContaining("não possuem mapa vigente");
-        }
-
-        @Test
-        @DisplayName("criar: sucesso se REVISAO e unidades com mapa")
-        void criar_SucessoRevisaoComMapa() {
-            CriarProcessoRequest req = CriarProcessoRequest.builder()
-                    .descricao("Teste")
-                    .unidades(List.of(1L))
-                    .tipo(TipoProcesso.REVISAO)
-                    .build();
-
-            Unidade u = new Unidade();
-            u.setCodigo(1L);
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(u);
-            when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
-
-            when(processoRepo.saveAndFlush(any())).thenAnswer(inv -> inv.getArgument(0));
-            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
-
-            processoFacade.criar(req);
-
-            verify(processoRepo).saveAndFlush(any());
         }
     }
 
@@ -237,9 +144,7 @@ class ProcessoFacadeCrudTest {
                     .unidades(List.of(1L))
                     .build();
 
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
-            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
+            when(processoManutencaoService.atualizar(id, req)).thenReturn(processo);
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
@@ -247,225 +152,33 @@ class ProcessoFacadeCrudTest {
 
             // Assert
             assertThat(resultado).isNotNull();
-            verify(processoRepo).saveAndFlush(processo);
+            verify(processoManutencaoService).atualizar(id, req);
         }
 
         @Test
-        @DisplayName("Deve lançar exceção quando atualizar e processo não encontrado")
+        @DisplayName("Deve lançar exceção quando atualizar e processo não encontrado (propagado)")
         void deveLancarExcecaoQuandoAtualizarEProcessoNaoEncontrado() {
             // Arrange
-            when(processoRepo.findById(99L)).thenReturn(Optional.empty());
+            var req = AtualizarProcessoRequest.builder().build();
+            when(processoManutencaoService.atualizar(99L, req)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 99L));
 
             // Act & Assert
-            var req = AtualizarProcessoRequest.builder().build();
             assertThatThrownBy(() -> processoFacade.atualizar(99L, req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
-        @DisplayName("Deve lançar exceção quando atualizar e processo não está em situação CRIADO")
+        @DisplayName("Deve lançar exceção quando atualizar e processo não está em situação CRIADO (propagado)")
         void deveLancarExcecaoQuandoAtualizarEProcessoNaoCriado() {
             // Arrange
             Long id = 100L;
-            Processo processo = ProcessoFixture.processoEmAndamento();
-            processo.setCodigo(id);
-
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            var req = AtualizarProcessoRequest.builder().build();
+            
+            when(processoManutencaoService.atualizar(id, req))
+                    .thenThrow(new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser editados."));
 
             // Act & Assert
-            var req = AtualizarProcessoRequest.builder().build();
             assertThatThrownBy(() -> processoFacade.atualizar(id, req))
-                    .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
-        }
-
-        @Test
-        @DisplayName("Deve atualizar descrição quando válida")
-        void deveAtualizarDescricaoQuandoValida() {
-            // Arrange
-            Long id = 100L;
-            Processo processo = ProcessoFixture.processoPadrao();
-            processo.setCodigo(id);
-
-            AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
-                    .codigo(id)
-                    .descricao("Nova Descrição Atualizada")
-                    .tipo(TipoProcesso.MAPEAMENTO)
-                    .unidades(List.of(1L))
-                    .build();
-
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
-            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
-            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
-
-            // Act
-            processoFacade.atualizar(id, req);
-
-            // Assert
-            verify(processoRepo).saveAndFlush(argThat((Processo p) ->
-                    p.getDescricao().equals("Nova Descrição Atualizada")));
-        }
-
-        @Test
-        @DisplayName("Deve atualizar tipo quando válido")
-        void deveAtualizarTipoQuandoValido() {
-            // Arrange
-            Long id = 100L;
-            Processo processo = ProcessoFixture.processoPadrao();
-            processo.setCodigo(id);
-            processo.setTipo(TipoProcesso.MAPEAMENTO);
-
-            AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
-                    .codigo(id)
-                    .descricao("Desc")
-                    .tipo(TipoProcesso.DIAGNOSTICO)
-                    .unidades(List.of(1L))
-                    .build();
-
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
-            when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty());
-            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
-            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
-
-            // Act
-            processoFacade.atualizar(id, req);
-
-            // Assert
-            verify(processoRepo).saveAndFlush(argThat((Processo p) ->
-                    p.getTipo() == TipoProcesso.DIAGNOSTICO));
-        }
-
-        @Test
-        @DisplayName("Deve atualizar datas quando válidas")
-        void deveAtualizarDatasQuandoValidas() {
-            // Arrange
-            Long id = 100L;
-            Processo processo = ProcessoFixture.processoPadrao();
-            processo.setCodigo(id);
-
-            LocalDateTime novaDataLimite = LocalDateTime.now().plusDays(30);
-
-            AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
-                    .codigo(id)
-                    .descricao("Desc")
-                    .tipo(TipoProcesso.MAPEAMENTO)
-                    .dataLimiteEtapa1(novaDataLimite)
-                    .unidades(List.of(1L))
-                    .build();
-
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
-            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
-            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
-
-            // Act
-            processoFacade.atualizar(id, req);
-
-            // Assert
-            verify(processoRepo).saveAndFlush(argThat((Processo p) ->
-                    p.getDataLimite().equals(novaDataLimite)));
-        }
-
-        @Test
-        @DisplayName("Deve manter dados não especificados")
-        void deveManterDadosNaoEspecificados() {
-            // Arrange
-            Long id = 100L;
-            Processo processo = ProcessoFixture.processoPadrao();
-            processo.setCodigo(id);
-            LocalDateTime dataOriginal = LocalDateTime.now().minusDays(5);
-            processo.setDataLimite(dataOriginal);
-
-            // Como dataLimiteEtapa1 é @NotNull no DTO, sempre deve ser fornecida
-            // Este teste verifica que outros campos do processo são mantidos
-            AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
-                    .codigo(id)
-                    .descricao("Nova Desc")
-                    .tipo(TipoProcesso.MAPEAMENTO)
-                    .unidades(List.of(1L))
-                    .dataLimiteEtapa1(dataOriginal) // Mantendo a data original
-                    .build();
-
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
-            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
-            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
-
-            // Act
-            processoFacade.atualizar(id, req);
-
-            // Assert - verifica que a data original foi mantida
-            verify(processoRepo).saveAndFlush(argThat((Processo p) ->
-                    p.getDataLimite().equals(dataOriginal)));
-        }
-
-        @Test
-        @DisplayName("Deve publicar evento de atualização")
-        void devePublicarEventoDeAtualizacao() {
-            // Arrange
-            Long id = 100L;
-            Processo processo = ProcessoFixture.processoPadrao();
-            processo.setCodigo(id);
-
-            AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
-                    .codigo(id)
-                    .descricao("Nova Desc")
-                    .tipo(TipoProcesso.MAPEAMENTO)
-                    .unidades(List.of(1L))
-                    .build();
-
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(UnidadeFixture.unidadeComId(1L));
-            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
-            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
-
-            // Act
-            processoFacade.atualizar(id, req);
-
-            // Assert - verifica que o processo foi salvo
-            verify(processoRepo).saveAndFlush(any(Processo.class));
-        }
-
-        @Test
-        @DisplayName("Deve permitir adicionar unidades na atualização")
-        void devePermitirAdicionarUnidadesNaAtualizacao() {
-            // Arrange
-            Long id = 100L;
-            Processo processo = ProcessoFixture.processoPadrao();
-            processo.setCodigo(id);
-
-            Unidade novaUnidade = UnidadeFixture.unidadeComId(2L);
-
-            AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
-                    .codigo(id)
-                    .descricao("Desc")
-                    .tipo(TipoProcesso.MAPEAMENTO)
-                    .unidades(List.of(2L))
-                    .build();
-
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-            when(unidadeService.buscarEntidadePorId(2L)).thenReturn(novaUnidade);
-            when(processoRepo.saveAndFlush(any())).thenReturn(processo);
-            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
-
-            // Act
-            processoFacade.atualizar(id, req);
-
-            // Assert
-            verify(unidadeService).buscarEntidadePorId(2L);
-            verify(processoRepo).saveAndFlush(any());
-        }
-
-        @Test
-        @DisplayName("atualizar: erro se processo não está CRIADO")
-        void atualizar_ErroSeNaoCriado() {
-            Processo p = new Processo();
-            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
-
-            var req = AtualizarProcessoRequest.builder().build();
-            assertThatThrownBy(() -> processoFacade.atualizar(1L, req))
                     .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
         }
     }
@@ -478,22 +191,20 @@ class ProcessoFacadeCrudTest {
         void deveApagarProcessoQuandoEmSituacaoCriado() {
             // Arrange
             Long id = 100L;
-            Processo processo = ProcessoFixture.processoPadrao();
-            processo.setCodigo(id);
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-
+            
             // Act
             processoFacade.apagar(id);
 
             // Assert
-            verify(processoRepo).deleteById(id);
+            verify(processoManutencaoService).apagar(id);
         }
 
         @Test
-        @DisplayName("Deve lançar exceção quando apagar e processo não encontrado")
+        @DisplayName("Deve lançar exceção quando apagar e processo não encontrado (propagado)")
         void deveLancarExcecaoQuandoApagarEProcessoNaoEncontrado() {
             // Arrange
-            when(processoRepo.findById(99L)).thenReturn(Optional.empty());
+            doThrow(new ErroEntidadeNaoEncontrada("Processo", 99L))
+                    .when(processoManutencaoService).apagar(99L);
 
             // Act & Assert
             assertThatThrownBy(() -> processoFacade.apagar(99L))
@@ -501,13 +212,13 @@ class ProcessoFacadeCrudTest {
         }
 
         @Test
-        @DisplayName("Deve lançar exceção quando apagar e processo não está em situação CRIADO")
+        @DisplayName("Deve lançar exceção quando apagar e processo não está em situação CRIADO (propagado)")
         void deveLancarExcecaoQuandoApagarEProcessoNaoCriado() {
             // Arrange
             Long id = 100L;
-            Processo processo = ProcessoFixture.processoEmAndamento();
-            processo.setCodigo(id);
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            
+            doThrow(new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser removidos."))
+                    .when(processoManutencaoService).apagar(id);
 
             // Act & Assert
             assertThatThrownBy(() -> processoFacade.apagar(id))

@@ -18,6 +18,8 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.List;
+import sgc.organizacao.model.Unidade;
+import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
 
 /**
  * Service responsável por operações relacionadas a atividades de subprocessos.
@@ -67,7 +69,7 @@ class SubprocessoAtividadeService {
                 && spDestino.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
                 && spDestino.getSituacao() != SituacaoSubprocesso.NAO_INICIADO) {
 
-            throw new sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida("""
+            throw new ErroAtividadesEmSituacaoInvalida("""
                     Atividades só podem ser importadas para um subprocesso
                     com cadastro em elaboração ou não iniciado.""");
         }
@@ -93,7 +95,7 @@ class SubprocessoAtividadeService {
             subprocessoRepo.save(spDestino);
         }
 
-        final sgc.organizacao.model.Unidade unidadeOrigem = spOrigem.getUnidade();
+        final Unidade unidadeOrigem = spOrigem.getUnidade();
         String descMovimentacao = String.format("Importação de atividades do subprocesso #%d (Unidade: %s)",
                 spOrigem.getCodigo(),
                 unidadeOrigem.getSigla());

@@ -17,6 +17,7 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.comum.erros.ErroAcessoNegado;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -162,21 +163,21 @@ class AccessControlServiceTest {
         when(processoAccessPolicy.canExecute(any(), any(), any())).thenReturn(false);
         try {
             accessControlService.verificarPermissao(usuario, acao, new Processo());
-        } catch (sgc.comum.erros.ErroAccessoNegado e) {
+        } catch (ErroAcessoNegado e) {
             assertThat(e.getMessage()).isEqualTo("Motivo Processo");
         }
 
         when(atividadeAccessPolicy.canExecute(any(), any(), any())).thenReturn(false);
         try {
             accessControlService.verificarPermissao(usuario, acao, new Atividade());
-        } catch (sgc.comum.erros.ErroAccessoNegado e) {
+        } catch (ErroAcessoNegado e) {
             assertThat(e.getMessage()).isEqualTo("Motivo Atividade");
         }
 
         when(mapaAccessPolicy.canExecute(any(), any(), any())).thenReturn(false);
         try {
             accessControlService.verificarPermissao(usuario, acao, new Mapa());
-        } catch (sgc.comum.erros.ErroAccessoNegado e) {
+        } catch (ErroAcessoNegado e) {
             assertThat(e.getMessage()).isEqualTo("Motivo Mapa");
         }
     }
@@ -189,7 +190,7 @@ class AccessControlServiceTest {
         Usuario usuario = criarUsuario("1");
         try {
             accessControlService.verificarPermissao(usuario, Acao.VISUALIZAR_PROCESSO, "String de recurso");
-        } catch (sgc.comum.erros.ErroAccessoNegado e) {
+        } catch (ErroAcessoNegado e) {
             assertThat(e.getMessage()).contains("não tem permissão para executar a ação");
         }
     }
@@ -218,7 +219,7 @@ class AccessControlServiceTest {
 
         try {
             accessControlService.verificarPermissao(usuario, Acao.CRIAR_PROCESSO, recurso);
-        } catch (sgc.comum.erros.ErroAccessoNegado e) {
+        } catch (ErroAcessoNegado e) {
             assertThat(e.getMessage()).contains("não tem permissão para executar a ação");
         }
     }

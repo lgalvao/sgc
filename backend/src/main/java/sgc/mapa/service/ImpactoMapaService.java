@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
@@ -66,7 +66,7 @@ public class ImpactoMapaService {
      *         sem impactos se a unidade não possuir um mapa vigente.
      * @throws ErroEntidadeNaoEncontrada se o subprocesso ou seu mapa não forem
      *                                   encontrados.
-     * @throws ErroAccessoNegado         se o usuário não tiver permissão para
+     * @throws ErroAcessoNegado         se o usuário não tiver permissão para
      *                                   executar a operação na
      *                                   situação atual do subprocesso.
      */

@@ -15,7 +15,7 @@ específicas** do projeto que diferem dos padrões genéricos.
       `use{Nome}Store`.
 
 * **Qualidade de Código:**
-    * **Limite de Parâmetros:** Métodos devem ter no máximo **7 parâmetros**. Se ultrapassar, use um objeto de
+    * **Limite de Parâmetros:** Métodos devem ter no máximo **3 parâmetros**. Se ultrapassar, use um objeto de
       transporte (Record ou DTO).
     * **Código Depreciado:** Código marcado como `@Deprecated` deve ser removido sumariamente assim que não houver mais
       dependências internas (especialmente após consolidações arquiteturais).
@@ -42,7 +42,7 @@ específicas** do projeto que diferem dos padrões genéricos.
     * **Ações:** Use enum `Acao` do pacote `sgc.seguranca.acesso`
     * **Hierarquia:** Use `HierarchyService` para verificações de hierarquia de unidades
     * **Auditoria:** Todas as decisões de acesso são automaticamente logadas por `AccessAuditService`
-    * **Documentação completa:** Ver `SECURITY-REFACTORING.md` e `security-refactoring-plan.md`
+    * **Documentação completa:** Ver [`SECURITY-REFACTORING-COMPLETE.md`](/backend/etc/docs/SECURITY-REFACTORING-COMPLETE.md)
 
 ## 3. Frontend (Vue 3.5 / TypeScript)
 
@@ -75,23 +75,23 @@ específicas** do projeto que diferem dos padrões genéricos.
 
 * **Backend:** `./gradlew :backend:test` (JUnit 5 + Mockito + H2).
 * **Frontend:** `npm run typecheck`, `npm run lint`, `npm run test:unit` (Vitest).
-* **E2E:** Playwright (consulte `/regras/e2e_regras.md`).
+* **E2E:** Playwright (consulte `/e2e/README.md`).
 
 ## 5. Padrões Arquiteturais (ADRs)
 
 O SGC segue padrões arquiteturais bem definidos, documentados em ADRs (Architectural Decision Records):
 
-* **[ADR-001: Facade Pattern](/docs/adr/ADR-001-facade-pattern.md)** - ✅ Implementado
+* **[ADR-001: Facade Pattern](/backend/etc/docs/adr/ADR-001-facade-pattern.md)** - ✅ Implementado
     * Controllers usam APENAS Facades, nunca Services especializados diretamente
     * Facades orquestram operações complexas delegando para Services especializados
     * Exemplo: `ProcessoFacade`, `SubprocessoFacade`, `MapaFacade`, `AtividadeFacade`
 
-* **[ADR-002: Unified Events Pattern](/docs/adr/ADR-002-unified-events.md)** - ✅ Implementado
+* **[ADR-002: Unified Events Pattern](/backend/etc/docs/adr/ADR-002-unified-events.md)** - ✅ Implementado
     * Eventos de domínio para comunicação assíncrona entre módulos
     * Padrão unificado: `EventoTransicaoSubprocesso` (design ⭐)
     * Exemplo: `EventoProcessoCriado`, `EventoProcessoIniciado`, `EventoMapaAlterado`
 
-* **[ADR-003: Security Architecture](/docs/adr/ADR-003-security-architecture.md)** - ✅ Implementado
+* **[ADR-003: Security Architecture](/backend/etc/docs/adr/ADR-003-security-architecture.md)** - ✅ Implementado
     * Arquitetura centralizada de controle de acesso em 3 camadas
     * `AccessControlService` centraliza TODAS as verificações de permissão
     * `AccessPolicy` especializada por tipo de recurso (Processo, Subprocesso, Atividade, Mapa)
@@ -99,7 +99,7 @@ O SGC segue padrões arquiteturais bem definidos, documentados em ADRs (Architec
     * `AccessAuditService` para auditoria completa de decisões de acesso
     * **CRÍTICO:** Services NUNCA fazem verificações de acesso diretas
 
-* **[ADR-004: DTO Pattern](/docs/adr/ADR-004-dto-pattern.md)**
+* **[ADR-004: DTO Pattern](/backend/etc/docs/adr/ADR-004-dto-pattern.md)**
     * DTOs obrigatórios em TODAS as APIs REST
     * Entidades JPA NUNCA são expostas diretamente
     * Mappers implementados com MapStruct para conversão Entidade ↔ DTO
@@ -116,9 +116,9 @@ O SGC segue padrões arquiteturais bem definidos, documentados em ADRs (Architec
         * Preferir `record` para DTOs imutáveis, `class` quando mutabilidade é necessária
         * Lombok: `@Builder` para todos; **`@Data` está PROIBIDO**; classes usam `@Getter` + `@Builder`; preferir
           `record`
-    * **Documentação completa:** Ver [`backend/regras-dtos.md`](/backend/regras-dtos.md)
+    * **Documentação completa:** Ver [`backend/etc/regras/guia-dtos.md`](/backend/etc/regras/guia-dtos.md)
 
-* **[ADR-005: Controller Organization](/docs/adr/ADR-005-controller-organization.md)** - ✅ Implementado
+* **[ADR-005: Controller Organization](/backend/etc/docs/adr/ADR-005-controller-organization.md)** - ✅ Implementado
     * Controllers organizados por workflow phase, não consolidados em arquivos grandes
     * Separação clara: CRUD, Cadastro, Mapa, Validação
     * Mantém arquivos de tamanho gerenciável (~200-300 linhas)
@@ -130,14 +130,14 @@ O SGC segue padrões arquiteturais bem definidos, documentados em ADRs (Architec
 Para detalhes técnicos e exemplos de código, consulte:
 
 * **Padrões de Código:**
-    * [Backend Patterns](/regras/backend-padroes.md)
-    * [Frontend Patterns](/regras/frontend-padroes.md)
-    * [Regras de DTOs](/backend/regras-dtos.md) - Taxonomia e convenções de DTOs
-    * [Regras para execução de testes e2e e correção de bugs](/regras/guia-correcao-e2e.md)
+    * [Backend Patterns](/backend/etc/regras/backend-padroes.md)
+    * [Frontend Patterns](/frontend/etc/regras/frontend-padroes.md)
+    * [Regras de DTOs](/backend/etc/regras/guia-dtos.md) - Taxonomia e convenções de DTOs
+    * [Regras para execução de testes e2e e correção de bugs](/frontend/etc/regras/guia-correcao-e2e.md)
 
 * **Arquitetura e Decisões:**
-    * [ARCHITECTURE.md](/docs/ARCHITECTURE.md) - Visão geral da arquitetura
-    * [ADRs](/docs/adr/) - Decisões arquiteturais documentadas
+    * [ARCHITECTURE.md](/backend/etc/docs/ARCHITECTURE.md) - Visão geral da arquitetura
+    * [ADRs](/backend/etc/docs/adr/) - Decisões arquiteturais documentadas
 
 * **Módulo-Específico:**
     * `README.md` de cada módulo e diretório para responsabilidades específicas

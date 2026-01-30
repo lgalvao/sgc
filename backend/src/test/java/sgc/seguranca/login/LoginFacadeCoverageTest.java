@@ -13,6 +13,7 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.UsuarioPerfilService;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.seguranca.login.dto.PerfilUnidadeDto;
 
@@ -20,6 +21,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import org.mockito.Mockito;
+import sgc.comum.erros.ErroAcessoNegado;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("LoginFacadeCoverageTest")
@@ -35,13 +38,15 @@ class LoginFacadeCoverageTest {
     private UnidadeFacade unidadeService;
     @Mock
     private UsuarioMapper usuarioMapper;
+    @Mock
+    private UsuarioPerfilService usuarioPerfilService;
 
     @InjectMocks
     private LoginFacade facade;
 
     @BeforeEach
     void setUp() {
-        org.mockito.Mockito.lenient().when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(any(Unidade.class)))
+        Mockito.lenient().when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(any(Unidade.class)))
                 .thenAnswer(inv -> {
                     Unidade u = inv.getArgument(0);
                     if (u == null)
@@ -58,7 +63,7 @@ class LoginFacadeCoverageTest {
                 });
 
         // Stubbing generico para evitar NPE se chamado
-        org.mockito.Mockito.lenient().when(unidadeService.buscarEntidadePorId(any())).thenAnswer(inv -> {
+        Mockito.lenient().when(unidadeService.buscarEntidadePorId(any())).thenAnswer(inv -> {
             Unidade u = new Unidade();
             u.setCodigo(inv.getArgument(0));
             u.setSituacao(SituacaoUnidade.ATIVA);
@@ -114,6 +119,7 @@ class LoginFacadeCoverageTest {
 
 
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
+        when(usuarioPerfilService.buscarPorUsuario(titulo)).thenReturn(List.of(p1, p2));
 
         List<PerfilUnidadeDto> result = facade.autorizar(titulo);
 
@@ -149,8 +155,10 @@ class LoginFacadeCoverageTest {
         UsuarioPerfil p1 = new UsuarioPerfil();
         p1.setPerfil(Perfil.SERVIDOR);
         p1.setUnidade(u1);
+        p1.setUnidadeCodigo(codUnidade);
 
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
+        when(usuarioPerfilService.buscarPorUsuario(titulo)).thenReturn(List.of(p1));
         when(gerenciadorJwt.gerarToken(titulo, Perfil.SERVIDOR, codUnidade)).thenReturn("jwt-token");
 
         EntrarRequest request = EntrarRequest.builder()
@@ -179,8 +187,10 @@ class LoginFacadeCoverageTest {
         UsuarioPerfil p1 = new UsuarioPerfil();
         p1.setPerfil(Perfil.SERVIDOR);
         p1.setUnidade(u1);
+        p1.setUnidadeCodigo(1L);
 
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
+        when(usuarioPerfilService.buscarPorUsuario(titulo)).thenReturn(List.of(p1));
 
         EntrarRequest request = EntrarRequest.builder()
                 .tituloEleitoral(titulo)
@@ -188,7 +198,7 @@ class LoginFacadeCoverageTest {
                 .unidadeCodigo(1L)
                 .build();
 
-        var exception = assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () -> facade.entrar(request));
+        var exception = assertThrows(ErroAcessoNegado.class, () -> facade.entrar(request));
         assertNotNull(exception);
     }
 
@@ -213,15 +223,18 @@ class LoginFacadeCoverageTest {
         UsuarioPerfil p1 = new UsuarioPerfil();
         p1.setPerfil(Perfil.SERVIDOR);
         p1.setUnidade(uAtiva);
+        p1.setUnidadeCodigo(1L);
         p1.setUsuarioTitulo(titulo);
 
         UsuarioPerfil p2 = new UsuarioPerfil();
         p2.setPerfil(Perfil.GESTOR);
         p2.setUnidade(uInativa);
+        p2.setUnidadeCodigo(2L);
         p2.setUsuarioTitulo(titulo);
 
 
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
+        when(usuarioPerfilService.buscarPorUsuario(titulo)).thenReturn(List.of(p1, p2));
 
         List<PerfilUnidadeDto> result = facade.autorizar(titulo);
         assertEquals(1, result.size());

@@ -15,11 +15,18 @@ import org.junit.jupiter.api.Tag;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
+import static com.tngtech.archunit.core.domain.properties.CanBeAnnotated.Predicates.annotatedWith;
+import jakarta.persistence.Entity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
 
-@Tag("architecture")
-@AnalyzeClasses(packages = "sgc", importOptions = {ImportOption.DoNotIncludeTests.class,
-        ImportOption.DoNotIncludeJars.class})
-@SuppressWarnings("PMD.TestClassWithoutTestCases")
+@Tag("integration")
+@AnalyzeClasses(packages = "sgc", importOptions = {
+        ImportOption.DoNotIncludeTests.class,
+        ImportOption.DoNotIncludeJars.class}
+)
 public class ArchConsistencyTest {
     @ArchTest
     static final ArchRule controllers_should_not_access_repositories = noClasses()
@@ -32,10 +39,10 @@ public class ArchConsistencyTest {
     @ArchTest
     static final ArchRule mapa_controller_should_only_access_mapa_service = classes()
             .that()
-            .haveNameMatching("sgc.mapa.MapaController")
+            .haveNameMatching("MapaController")
             .should()
             .onlyAccessClassesThat()
-            .haveNameMatching("sgc.mapa.service.MapaFacade")
+            .haveNameMatching("MapaFacade")
             .orShould()
             .accessClassesThat()
             .resideOutsideOfPackage("sgc.mapa..");
@@ -43,10 +50,10 @@ public class ArchConsistencyTest {
     @ArchTest
     static final ArchRule processo_controller_should_only_access_processo_service = classes()
             .that()
-            .haveNameMatching("sgc.processo.ProcessoController")
+            .haveNameMatching("ProcessoController")
             .should()
             .onlyAccessClassesThat()
-            .haveNameMatching("sgc.processo.service.ProcessoService")
+            .haveNameMatching("ProcessoService")
             .orShould()
             .accessClassesThat()
             .resideOutsideOfPackage("sgc.processo..");
@@ -151,7 +158,7 @@ public class ArchConsistencyTest {
                         JavaClass targetClass = dependency.getTargetClass();
 
                         // Verifica se é um @Service
-                        boolean isService = targetClass.isAnnotatedWith(org.springframework.stereotype.Service.class);
+                        boolean isService = targetClass.isAnnotatedWith(Service.class);
 
                         // Verifica se NÃO é um Facade
                         boolean isNotFacade = !targetClass.getSimpleName().endsWith("Facade");
@@ -177,7 +184,7 @@ public class ArchConsistencyTest {
             .that()
             .resideInAPackage("..service..")
             .and()
-            .areAnnotatedWith(org.springframework.stereotype.Service.class)
+            .areAnnotatedWith(Service.class)
             .and()
             .haveSimpleNameContaining("Facade")
             .should()
@@ -193,21 +200,24 @@ public class ArchConsistencyTest {
             .that()
             .haveSimpleNameEndingWith("Dto")
             .should()
-            .beAnnotatedWith(jakarta.persistence.Entity.class)
+            .beAnnotatedWith(Entity.class)
             .because("DTOs should never be JPA entities - use separate entity classes");
 
     /**
      * Garante que entidades JPA não sejam retornadas diretamente pelos controllers.
      * Controllers devem sempre usar DTOs.
      */
+
+
     @ArchTest
-    static final ArchRule controllers_should_not_return_jpa_entities = noClasses()
+    static final ArchRule controllers_should_not_return_jpa_entities = methods()
             .that()
-            .areAnnotatedWith(jakarta.persistence.Entity.class)
+            .arePublic()
+            .and()
+            .areDeclaredInClassesThat()
+            .areAnnotatedWith(RestController.class)
             .should()
-            .beInterfaces()
-            .orShould()
-            .beAnnotatedWith(org.springframework.web.bind.annotation.RestController.class)
+            .notHaveRawReturnType(annotatedWith(Entity.class))
             .because("JPA entities should never be exposed directly - use DTOs instead");
 
     /**
@@ -224,16 +234,16 @@ public class ArchConsistencyTest {
             .doNotHaveSimpleName("AccessAuditService")
             .and()
             .resideOutsideOfPackage("sgc.seguranca.acesso..")
-            .should(new ArchCondition<>("throw ErroAccessoNegado directly - use AccessControlService instead") {
+            .should(new ArchCondition<>("throw ErroAcessoNegado directly - use AccessControlService instead") {
                 @Override
                 public void check(JavaClass item, ConditionEvents events) {
-                    // Verificar se o service cria instâncias de ErroAccessoNegado
+                    // Verificar se o service cria instâncias de ErroAcessoNegado
                     item.getCodeUnits().forEach(codeUnit -> codeUnit.getCallsFromSelf().stream()
-                            .filter(call -> call.getTargetOwner().getSimpleName().equals("ErroAccessoNegado"))
+                            .filter(call -> call.getTargetOwner().getSimpleName().equals("ErroAcessoNegado"))
                             .filter(call -> call.getName().equals("<init>"))
                             .forEach(call -> {
                                 String message = String.format(
-                                        "Service %s throws ErroAccessoNegado directly in method %s. " +
+                                        "Service %s throws ErroAcessoNegado directly in method %s. " +
                                                 "Use AccessControlService.verificarPermissao() instead.",
                                         item.getSimpleName(), codeUnit.getName());
                                 events.add(SimpleConditionEvent.violated(call, message));
@@ -248,7 +258,7 @@ public class ArchConsistencyTest {
     @ArchTest
     static final ArchRule controllers_should_have_controller_suffix = classes()
             .that()
-            .areAnnotatedWith(org.springframework.web.bind.annotation.RestController.class)
+            .areAnnotatedWith(RestController.class)
             .should()
             .haveSimpleNameEndingWith("Controller")
             .because("Controllers should have 'Controller' suffix for consistency");
@@ -259,7 +269,7 @@ public class ArchConsistencyTest {
     @ArchTest
     static final ArchRule repositories_should_have_repo_suffix = classes()
             .that()
-            .areAssignableTo(org.springframework.data.jpa.repository.JpaRepository.class)
+            .areAssignableTo(JpaRepository.class)
             .should()
             .haveSimpleNameEndingWith("Repo")
             .because("Repositories should have 'Repo' suffix for consistency");
@@ -320,7 +330,10 @@ public class ArchConsistencyTest {
             .haveSimpleNameEndingWith("Facade")
             .should()
             .dependOnClassesThat()
-            .areAssignableTo(org.springframework.data.jpa.repository.JpaRepository.class)
+            .areAssignableTo(JpaRepository.class)
+            .orShould()
+            .dependOnClassesThat()
+            .haveSimpleName("ComumRepo")
             .because("Facades should delegate to Services, not access Repositories directly (ADR-001). " +
                     "See simplification-plan.md section 3 'Facades - Hierarquia Excessiva'");
 }

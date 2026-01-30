@@ -36,6 +36,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import jakarta.persistence.EntityManager;
+import sgc.subprocesso.model.Movimentacao;
 
 @Tag("integration")
 @SpringBootTest
@@ -60,7 +62,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private jakarta.persistence.EntityManager entityManager;
+    private EntityManager entityManager;
 
     private Subprocesso subprocessoOrigem;
     private Subprocesso subprocessoDestino;
@@ -202,7 +204,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             assertThat(conhecimentos2.stream().map(Conhecimento::getDescricao).toList())
                     .containsExactlyInAnyOrder("Conhecimento 2.1", "Conhecimento 2.2");
 
-            List<sgc.subprocesso.model.Movimentacao> movimentacoes =
+            List<Movimentacao> movimentacoes =
                     movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
                             subprocessoDestino.getCodigo());
             assertThat(movimentacoes).hasSize(1);

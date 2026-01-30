@@ -18,12 +18,16 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.model.Subprocesso;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import org.mapstruct.factory.Mappers;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("Testes do MapaAjusteMapper")
 class MapaAjusteMapperTest {
-    private final MapaAjusteMapper mapper = org.mapstruct.factory.Mappers.getMapper(MapaAjusteMapper.class);
+    private final MapaAjusteMapper mapper = Mappers.getMapper(MapaAjusteMapper.class);
 
     @Test
     @DisplayName("Deve mapear corretamente para DTO")
@@ -55,8 +59,8 @@ class MapaAjusteMapperTest {
         // Linkar
         comp.setAtividades(new HashSet<>(List.of(ativ)));
 
-        java.util.Map<Long, java.util.Set<Long>> associacoes = new java.util.HashMap<>();
-        associacoes.put(comp.getCodigo(), java.util.Set.of(ativ.getCodigo()));
+        Map<Long, Set<Long>> associacoes = new HashMap<>();
+        associacoes.put(comp.getCodigo(), Set.of(ativ.getCodigo()));
 
         MapaAjusteDto dto = mapper.toDto(sp, analise, List.of(comp), List.of(ativ), List.of(con), associacoes);
 

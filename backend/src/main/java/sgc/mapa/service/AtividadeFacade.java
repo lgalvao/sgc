@@ -24,6 +24,11 @@ import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.mapa.dto.AtualizarAtividadeRequest;
+import sgc.mapa.dto.AtualizarConhecimentoRequest;
+import sgc.mapa.dto.ConhecimentoResponse;
+import sgc.mapa.dto.CriarAtividadeRequest;
+import sgc.mapa.dto.CriarConhecimentoRequest;
 
 /**
  * Facade para orquestrar operações de atividades e conhecimentos,
@@ -57,7 +62,7 @@ public class AtividadeFacade {
      * @return Response da atividade
      */
     @Transactional(readOnly = true)
-    public sgc.mapa.dto.AtividadeResponse obterAtividadePorId(Long codAtividade) {
+    public AtividadeResponse obterAtividadePorId(Long codAtividade) {
         return mapaManutencaoService.obterAtividadeResponse(codAtividade);
     }
 
@@ -68,7 +73,7 @@ public class AtividadeFacade {
      * @return Lista de conhecimentos
      */
     @Transactional(readOnly = true)
-    public List<sgc.mapa.dto.ConhecimentoResponse> listarConhecimentosPorAtividade(Long codAtividade) {
+    public List<ConhecimentoResponse> listarConhecimentosPorAtividade(Long codAtividade) {
         return mapaManutencaoService.listarConhecimentosPorAtividade(codAtividade);
     }
 
@@ -77,7 +82,7 @@ public class AtividadeFacade {
     /**
      * Cria uma nova atividade e retorna a resposta formatada.
      */
-    public AtividadeOperacaoResponse criarAtividade(sgc.mapa.dto.CriarAtividadeRequest request) {
+    public AtividadeOperacaoResponse criarAtividade(CriarAtividadeRequest request) {
         Long mapaCodigo = request.mapaCodigo();
 
         // Busca usuário autenticado através do contexto Spring Security
@@ -101,7 +106,7 @@ public class AtividadeFacade {
     /**
      * Atualiza uma atividade e retorna a resposta formatada.
      */
-    public AtividadeOperacaoResponse atualizarAtividade(Long codigo, sgc.mapa.dto.AtualizarAtividadeRequest request) {
+    public AtividadeOperacaoResponse atualizarAtividade(Long codigo, AtualizarAtividadeRequest request) {
         Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codigo);
 
         // Busca usuário autenticado através do contexto Spring Security
@@ -137,7 +142,7 @@ public class AtividadeFacade {
     /**
      * Cria um conhecimento e retorna a resposta formatada junto com o ID criado.
      */
-    public ResultadoOperacaoConhecimento criarConhecimento(Long codAtividade, sgc.mapa.dto.CriarConhecimentoRequest request) {
+    public ResultadoOperacaoConhecimento criarConhecimento(Long codAtividade, CriarConhecimentoRequest request) {
         Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codAtividade);
 
         // Busca usuário autenticado
@@ -155,7 +160,7 @@ public class AtividadeFacade {
     /**
      * Atualiza um conhecimento e retorna a resposta formatada.
      */
-    public AtividadeOperacaoResponse atualizarConhecimento(Long codAtividade, Long codConhecimento, sgc.mapa.dto.AtualizarConhecimentoRequest request) {
+    public AtividadeOperacaoResponse atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
         Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codAtividade);
 
         // Busca usuário autenticado

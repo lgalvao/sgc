@@ -19,6 +19,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.processo.dto.IniciarProcessoRequest;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
+import java.util.function.BiFunction;
+import org.assertj.core.api.Assertions;
+import org.mockito.Mockito;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -41,7 +45,7 @@ class ProcessoControllerCoverageTest {
         when(processoFacade.obterPorId(cod)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> processoController.iniciar(cod, req))
-                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -52,7 +56,7 @@ class ProcessoControllerCoverageTest {
 
         var response = processoController.obterPorId(cod);
 
-        org.assertj.core.api.Assertions.assertThat(response.getStatusCode().value()).isEqualTo(404);
+        Assertions.assertThat(response.getStatusCode().value()).isEqualTo(404);
     }
 
     @Test
@@ -65,8 +69,8 @@ class ProcessoControllerCoverageTest {
 
         var response = processoController.iniciar(cod, req);
 
-        org.assertj.core.api.Assertions.assertThat(response.getStatusCode().value()).isEqualTo(400);
-        org.assertj.core.api.Assertions.assertThat(response.getBody()).isInstanceOf(java.util.Map.class);
+        Assertions.assertThat(response.getStatusCode().value()).isEqualTo(400);
+        Assertions.assertThat(response.getBody()).isInstanceOf(Map.class);
     }
 
 
@@ -75,9 +79,9 @@ class ProcessoControllerCoverageTest {
     @DisplayName("Deve retornar Bad Request se processador nao encontrado (branch defensivo)")
     void deveRetornarBadRequestSeProcessadorNaoEncontrado() {
         // Spy
-        ProcessoController spy = org.mockito.Mockito.spy(new ProcessoController(processoFacade));
+        ProcessoController spy = Mockito.spy(new ProcessoController(processoFacade));
         @SuppressWarnings("unchecked")
-        Map<TipoProcesso, java.util.function.BiFunction<Long, List<Long>, List<String>>> map = org.mockito.Mockito.mock(Map.class);
+        Map<TipoProcesso, BiFunction<Long, List<Long>, List<String>>> map = Mockito.mock(Map.class);
         when(map.get(any(TipoProcesso.class))).thenReturn(null);
         doReturn(map).when(spy).getProcessadoresInicio();
 
@@ -86,6 +90,6 @@ class ProcessoControllerCoverageTest {
 
         var response = spy.iniciar(cod, req);
 
-        org.assertj.core.api.Assertions.assertThat(response.getStatusCode().value()).isEqualTo(400);
+        Assertions.assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
 }

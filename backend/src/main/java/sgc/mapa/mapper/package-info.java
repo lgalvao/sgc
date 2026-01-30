@@ -100,7 +100,7 @@
  * public abstract class ConhecimentoMapper {
  *
  *     @Autowired
- *     protected RepositorioComum repo;
+ *     protected ComumRepo repo;
  *
  *     @Mapping(source = "atividadeCodigo", target = "atividade")
  *     public abstract Conhecimento toEntity(ConhecimentoDto dto);
@@ -161,7 +161,7 @@
  * public abstract class ConhecimentoMapper {
  *
  *     @Autowired // Injeta o repositório comum centralizado
- *     protected RepositorioComum repo;
+ *     protected ComumRepo repo;
  *
  *     // ... métodos de mapeamento
  * }
@@ -233,5 +233,6 @@
  * @see sgc.mapa.service.MapaFacade
  * @see <a href="https://mapstruct.org/">MapStruct Documentation</a>
  */
-@org.jspecify.annotations.NullMarked
+@NullMarked
 package sgc.mapa.mapper;
+import org.jspecify.annotations.NullMarked;

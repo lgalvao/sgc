@@ -34,6 +34,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
+import org.springframework.data.domain.Sort;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -338,7 +339,7 @@ class PainelServiceTest {
         @Test
         @DisplayName("garantirOrdenacaoPadrao deve retornar pageable original se já estiver ordenado")
         void garantirOrdenacaoPadrao_JaOrdenado() {
-            PageRequest pageRequestWithSort = PageRequest.of(0, 10, org.springframework.data.domain.Sort.by("descricao"));
+            PageRequest pageRequestWithSort = PageRequest.of(0, 10, Sort.by("descricao"));
             when(processoFacade.listarTodos(pageRequestWithSort)).thenReturn(Page.empty(pageRequestWithSort));
 
             painelService.listarProcessos(Perfil.ADMIN, null, pageRequestWithSort);
@@ -369,12 +370,12 @@ class PainelServiceTest {
             Long raizId = 1L;
 
             when(processoFacade.listarPorParticipantesIgnorandoCriado(any(), any()))
-                    .thenReturn(org.springframework.data.domain.Page.empty());
+                    .thenReturn(Page.empty());
 
             when(unidadeService.buscarIdsDescendentes(raizId))
                     .thenReturn(List.of(2L, 3L, 4L, 5L));
 
-            painelService.listarProcessos(Perfil.GESTOR, raizId, org.springframework.data.domain.PageRequest.of(0, 10));
+            painelService.listarProcessos(Perfil.GESTOR, raizId, PageRequest.of(0, 10));
 
             verify(unidadeService, times(1)).buscarIdsDescendentes(raizId);
         }
@@ -392,7 +393,7 @@ class PainelServiceTest {
             alerta.setDataHora(LocalDateTime.now());
 
             // Setup obrigatorio para evitar NPE
-            sgc.processo.model.Processo p = new sgc.processo.model.Processo();
+            Processo p = new Processo();
             p.setCodigo(123L);
             alerta.setProcesso(p);
 

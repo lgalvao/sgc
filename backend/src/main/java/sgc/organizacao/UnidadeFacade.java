@@ -3,16 +3,19 @@ package sgc.organizacao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-
 import sgc.organizacao.dto.*;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.UnidadeConsultaService;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeMapaService;
 import sgc.organizacao.service.UnidadeResponsavelService;
+import sgc.organizacao.service.UsuarioConsultaService;
 
 import java.util.*;
+import java.util.Set;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.TipoUnidade;
 
 /**
  * Facade para operações de unidades organizacionais.
@@ -29,9 +32,8 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class UnidadeFacade {
-    private final UnidadeRepo unidadeRepo;
-    private final UnidadeMapaRepo unidadeMapaRepo;
-    private final UsuarioRepo usuarioRepo;
+    private final UnidadeConsultaService unidadeConsultaService;
+    private final UsuarioConsultaService usuarioConsultaService;
     private final UsuarioMapper usuarioMapper;
     private final UnidadeHierarquiaService hierarquiaService;
     private final UnidadeMapaService mapaService;
@@ -48,13 +50,13 @@ public class UnidadeFacade {
     }
 
     public List<UnidadeDto> buscarArvoreComElegibilidade(
-            boolean requerMapaVigente, java.util.Set<Long> unidadesBloqueadas) {
+            boolean requerMapaVigente, Set<Long> unidadesBloqueadas) {
         Set<Long> unidadesComMapa = requerMapaVigente
-                ? new HashSet<>(unidadeMapaRepo.findAllUnidadeCodigos())
+                ? new HashSet<>(mapaService.buscarTodosCodigosUnidades())
                 : Collections.emptySet();
 
         return hierarquiaService.buscarArvoreComElegibilidade(u ->
-                u.getTipo() != sgc.organizacao.model.TipoUnidade.INTERMEDIARIA
+                u.getTipo() != TipoUnidade.INTERMEDIARIA
                         && (!requerMapaVigente || unidadesComMapa.contains(u.getCodigo()))
                         && !unidadesBloqueadas.contains(u.getCodigo())
         );
@@ -85,7 +87,7 @@ public class UnidadeFacade {
     }
 
     @Transactional
-    public void definirMapaVigente(Long codigoUnidade, sgc.mapa.model.Mapa mapa) {
+    public void definirMapaVigente(Long codigoUnidade, Mapa mapa) {
         mapaService.definirMapaVigente(codigoUnidade, mapa);
     }
 
@@ -117,9 +119,7 @@ public class UnidadeFacade {
     }
 
     public Unidade buscarEntidadePorSigla(String sigla) {
-        return unidadeRepo
-                .findBySigla(sigla)
-                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada("Unidade com sigla " + sigla + " não encontrada"));
+        return unidadeConsultaService.buscarPorSigla(sigla);
     }
 
     public UnidadeDto buscarPorCodigo(Long codigo) {
@@ -128,28 +128,23 @@ public class UnidadeFacade {
     }
 
     public Unidade buscarEntidadePorId(Long codigo) {
-        Unidade unidade = unidadeRepo.findById(codigo)
-                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(ENTIDADE_UNIDADE, codigo));
-        if (unidade.getSituacao() != SituacaoUnidade.ATIVA) {
-            throw new ErroEntidadeNaoEncontrada(ENTIDADE_UNIDADE, codigo);
-        }
-        return unidade;
+        return unidadeConsultaService.buscarPorId(codigo);
     }
 
     public List<Unidade> buscarEntidadesPorIds(List<Long> codigos) {
-        return unidadeRepo.findAllById(codigos);
+        return unidadeConsultaService.buscarEntidadesPorIds(codigos);
     }
 
     public List<Unidade> buscarTodasEntidadesComHierarquia() {
-        return unidadeRepo.findAllWithHierarquia();
+        return unidadeConsultaService.buscarTodasEntidadesComHierarquia();
     }
 
     public List<String> buscarSiglasPorIds(List<Long> codigos) {
-        return unidadeRepo.findSiglasByCodigos(codigos);
+        return unidadeConsultaService.buscarSiglasPorIds(codigos);
     }
 
     public List<UsuarioDto> buscarUsuariosPorUnidade(Long codigoUnidade) {
-        return usuarioRepo.findByUnidadeLotacaoCodigo(codigoUnidade).stream()
+        return usuarioConsultaService.buscarPorUnidadeLotacao(codigoUnidade).stream()
                 .map(usuarioMapper::toUsuarioDto)
                 .toList();
     }

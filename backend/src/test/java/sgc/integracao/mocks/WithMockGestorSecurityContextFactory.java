@@ -15,6 +15,10 @@ import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioRepo;
+import java.util.stream.Collectors;
+import org.springframework.security.core.GrantedAuthority;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 
 @Component
 public class WithMockGestorSecurityContextFactory
@@ -23,7 +27,7 @@ public class WithMockGestorSecurityContextFactory
     private UsuarioRepo usuarioRepo;
 
     @Autowired(required = false)
-    private sgc.organizacao.model.UsuarioPerfilRepo usuarioPerfilRepo;
+    private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Override
     public SecurityContext createSecurityContext(WithMockGestor customUser) {
@@ -36,6 +40,10 @@ public class WithMockGestorSecurityContextFactory
                 // Carregar atribuições do banco de dados se o usuário existir
                 if (principal != null && usuarioPerfilRepo != null) {
                     var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(tituloGestor);
+                    Set<GrantedAuthority> simpleAuthorities = atribuicoes.stream()
+                            .map(a -> a.getPerfil().toGrantedAuthority())
+                            .collect(Collectors.toSet());
+                    principal.setAuthorities(simpleAuthorities);
                 }
             } catch (Exception e) {
                 System.err.println(e.getMessage());
@@ -50,27 +58,35 @@ public class WithMockGestorSecurityContextFactory
             Unidade u = Unidade.builder().nome("Unidade Mock").sigla("UO_SUP").build();
             principal.setUnidadeLotacao(u);
 
-            Set<sgc.organizacao.model.UsuarioPerfil> atribuicoes = new HashSet<>();
+            Set<UsuarioPerfil> atribuicoes = new HashSet<>();
             atribuicoes.add(
-                    sgc.organizacao.model.UsuarioPerfil.builder()
+                    UsuarioPerfil.builder()
                             .usuario(principal)
                             .unidade(u)
                             .perfil(Perfil.GESTOR)
                             .build());
 
+            Set<GrantedAuthority> simpleAuthorities = atribuicoes.stream()
+                    .map(a -> a.getPerfil().toGrantedAuthority())
+                    .collect(Collectors.toSet());
+            principal.setAuthorities(simpleAuthorities);
         } else {
-            Set<sgc.organizacao.model.UsuarioPerfil> atribuicoes = new HashSet<>(principal.getTodasAtribuicoes(new HashSet<>()));
+            Set<UsuarioPerfil> atribuicoes = new HashSet<>(principal.getTodasAtribuicoes(new HashSet<>()));
             if (atribuicoes.stream()
                     .noneMatch(a -> a.getPerfil() == Perfil.GESTOR)) {
                 // Usuário existe mas não tem perfil GESTOR, adicionar com sua unidade de lotação
                 Unidade unidade = principal.getUnidadeLotacao();
                 atribuicoes.add(
-                        sgc.organizacao.model.UsuarioPerfil.builder()
+                        UsuarioPerfil.builder()
                                 .usuario(principal)
                                 .unidade(unidade)
                                 .perfil(Perfil.GESTOR)
                                 .build());
             }
+            Set<GrantedAuthority> simpleAuthorities = atribuicoes.stream()
+                    .map(a -> a.getPerfil().toGrantedAuthority())
+                    .collect(Collectors.toSet());
+            principal.setAuthorities(simpleAuthorities);
         }
 
         Authentication auth =

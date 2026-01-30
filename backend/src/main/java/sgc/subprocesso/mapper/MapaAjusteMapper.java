@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 @Mapper(componentModel = "spring")
 public interface MapaAjusteMapper {
@@ -25,9 +27,9 @@ public interface MapaAjusteMapper {
     @Mapping(target = "unidadeNome", source = "sp.unidade.nome")
     @Mapping(target = "competencias", expression = "java(mapCompetencias(competencias, atividades, conhecimentos, associacoes))")
     @Mapping(target = "justificativaDevolucao", source = "analise.observacoes")
-    MapaAjusteDto toDto(Subprocesso sp, @org.jspecify.annotations.Nullable Analise analise, List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, @Context Map<Long, java.util.Set<Long>> associacoes);
+    MapaAjusteDto toDto(Subprocesso sp, @Nullable Analise analise, List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, @Context Map<Long, Set<Long>> associacoes);
 
-    default List<CompetenciaAjusteDto> mapCompetencias(List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, Map<Long, java.util.Set<Long>> associacoes) {
+    default List<CompetenciaAjusteDto> mapCompetencias(List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, Map<Long, Set<Long>> associacoes) {
         Map<Long, List<Conhecimento>> conhecimentosPorAtividade = conhecimentos.stream()
                 .collect(Collectors.groupingBy(Conhecimento::getCodigoAtividade));
 
@@ -35,7 +37,7 @@ public interface MapaAjusteMapper {
 
         for (Competencia comp : competencias) {
             List<AtividadeAjusteDto> atividadeDtos = new ArrayList<>();
-            java.util.Set<Long> atividadesAssociadas = associacoes.getOrDefault(comp.getCodigo(), Collections.emptySet());
+            Set<Long> atividadesAssociadas = associacoes.getOrDefault(comp.getCodigo(), Collections.emptySet());
 
             for (Atividade ativ : atividades) {
                 List<Conhecimento> conhecimentosDaAtividade =

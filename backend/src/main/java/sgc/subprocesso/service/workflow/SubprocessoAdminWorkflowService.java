@@ -17,18 +17,21 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDA
 import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class SubprocessoAdminWorkflowService {
 
-    private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private final SubprocessoRepo subprocessoRepo;
     private final SubprocessoCrudService crudService;
     private final AlertaFacade alertaService;
 
     @Transactional
-    public void alterarDataLimite(Long codSubprocesso, java.time.LocalDate novaDataLimite) {
+    public void alterarDataLimite(Long codSubprocesso, LocalDate novaDataLimite) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
         SituacaoSubprocesso s = sp.getSituacao();
         int etapa = 1;
@@ -45,7 +48,7 @@ public class SubprocessoAdminWorkflowService {
         subprocessoRepo.save(sp);
 
         try {
-            String novaDataStr = novaDataLimite.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            String novaDataStr = novaDataLimite.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             alertaService.criarAlertaAlteracaoDataLimite(sp.getProcesso(), sp.getUnidade(), novaDataStr, etapa);
         } catch (Exception e) {
             log.error("Erro ao enviar notificações de alteração de prazo: {}", e.getMessage());

@@ -34,11 +34,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import sgc.integracao.mocks.TestThymeleafConfig;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-22: Aceitar cadastros em bloco")
 class CDU22IntegrationTest extends BaseIntegrationTest {
@@ -82,13 +84,13 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         // Create subprocesses for both units
         subprocesso1 = SubprocessoFixture.subprocessoPadrao(processo, unidade1);
         subprocesso1.setCodigo(null);
-        subprocesso1.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        subprocesso1.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocesso1.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocesso1 = subprocessoRepo.save(subprocesso1);
 
         subprocesso2 = SubprocessoFixture.subprocessoPadrao(processo, unidade2);
         subprocesso2.setCodigo(null);
-        subprocesso2.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        subprocesso2.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocesso2.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocesso2 = subprocessoRepo.save(subprocesso2);
 

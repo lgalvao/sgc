@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 import sgc.organizacao.model.*;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import sgc.organizacao.model.UsuarioPerfil;
 
 @Slf4j
 @Component
@@ -48,11 +51,11 @@ public class WithMockCustomUserSecurityContextFactory
                 .unidadeLotacao(unidade)
                 .build();
         
-        java.util.Set<UsuarioPerfil> atribuicoes = new java.util.HashSet<>();
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>();
         final Unidade finalUnidade = unidade;
         Arrays.stream(customUser.perfis())
                 .forEach(p -> atribuicoes.add(
-                        sgc.organizacao.model.UsuarioPerfil.builder()
+                        UsuarioPerfil.builder()
                                 .usuario(principal)
                                 .unidade(finalUnidade)
                                 .perfil(Perfil.valueOf(p))

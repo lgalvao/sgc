@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.RepositorioComum;
+import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
@@ -41,7 +41,7 @@ public class UnidadeResponsavelService {
     private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     private final UsuarioMapper usuarioMapper;
-    private final RepositorioComum repo;
+    private final ComumRepo repo;
 
     /**
      * Busca todas as atribuições temporárias cadastradas.

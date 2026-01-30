@@ -10,7 +10,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
  * Evita a poluição de orElseThrow(ErroEntidadeNaoEncontrada) em toda a aplicação.
  */
 @Component
-public class RepositorioComum {
+public class ComumRepo {
 
     @PersistenceContext
     private EntityManager em;

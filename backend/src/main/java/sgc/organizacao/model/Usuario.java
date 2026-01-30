@@ -25,6 +25,9 @@ import java.util.Set;
 @NoArgsConstructor
 @SuperBuilder
 public class Usuario implements UserDetails {
+    @Transient
+    private Set<GrantedAuthority> authorities;
+
     @Id
     @Column(name = "titulo", length = 12, nullable = false)
     private String tituloEleitoral;
@@ -62,6 +65,10 @@ public class Usuario implements UserDetails {
     public Set<UsuarioPerfil> getTodasAtribuicoes(Set<UsuarioPerfil> atribuicoesPermanentes) {
         Set<UsuarioPerfil> todas = new HashSet<>(atribuicoesPermanentes);
 
+        if (atribuicoesTemporarias == null) {
+            return todas;
+        }
+
         LocalDateTime now = LocalDateTime.now();
         for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
             if (!temp.getDataInicio().isAfter(now) && !temp.getDataTermino().isBefore(now)) {
@@ -93,10 +100,11 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Nota: Este método não pode carregar atribuições permanentes aqui
-        // pois não temos acesso ao repositório. Retorna vazio.
-        // As atribuições devem ser gerenciadas pelo UserDetailsService.
-        return Set.of();
+        return authorities != null ? authorities : Set.of();
+    }
+
+    public void setAuthorities(Set<GrantedAuthority> authorities) {
+        this.authorities = authorities;
     }
 
     @Override

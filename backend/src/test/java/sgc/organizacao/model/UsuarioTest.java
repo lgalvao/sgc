@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Tag("unit")
 @DisplayName("Entidade: Usuario")
@@ -22,8 +23,7 @@ class UsuarioTest {
         perfil.setPerfil(Perfil.ADMIN);
         permanentes.add(perfil);
 
-
-        assertThat(usuario.getTodasAtribuicoes(new HashSet<>())).containsExactly(perfil);
+        assertThat(usuario.getTodasAtribuicoes(permanentes)).containsExactly(perfil);
     }
 
     @Test
@@ -117,10 +117,7 @@ class UsuarioTest {
     void deveMapearPerfilParaAuthority() {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("123");
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>();
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setPerfil(Perfil.ADMIN);
-        atribuicoes.add(up);
+        usuario.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
 
         var authorities = usuario.getAuthorities();
         assertThat(authorities).extracting("authority").containsExactly("ROLE_ADMIN");

@@ -49,6 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import sgc.processo.model.SituacaoProcesso;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -203,12 +204,12 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
         // 5. Aceitar Cadastro (Gestor)
         autenticar(gestorMapeamento, "ROLE_GESTOR");
-        cadastroWorkflowService.aceitarCadastro(codSubprocesso, "Aceito pelo Gestor", gestorMapeamento);
+        cadastroWorkflowService.aceitarCadastro(codSubprocesso, gestorMapeamento, "Aceito pelo Gestor");
         verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         // 6. Homologar Cadastro (Admin)
         autenticar(admin, "ROLE_ADMIN");
-        cadastroWorkflowService.homologarCadastro(codSubprocesso, "Homologado pelo Admin", admin);
+        cadastroWorkflowService.homologarCadastro(codSubprocesso, admin, "Homologado pelo Admin");
         verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_HOMOLOGADO);
 
         // 7. Disponibilizar Mapa (Admin - SEDOC cria mapa)
@@ -256,7 +257,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
         autenticar(admin, "ROLE_ADMIN");
         processoFacade.finalizar(codProcesso);
         assertThat(processoFacade.obterPorId(codProcesso).orElseThrow().getSituacao())
-                .isEqualTo(sgc.processo.model.SituacaoProcesso.FINALIZADO);
+                .isEqualTo(SituacaoProcesso.FINALIZADO);
     }
 
     @Test
@@ -293,7 +294,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
         // Gestor DEVOLVE
         autenticar(gestorMapeamento, "ROLE_GESTOR");
-        cadastroWorkflowService.devolverCadastro(codSubprocesso, "Ajuste necessário", gestorMapeamento);
+        cadastroWorkflowService.devolverCadastro(codSubprocesso, gestorMapeamento, "Ajuste necessário");
         verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         // Chefe ajusta (não precisa fazer nada real, só tentar disponibilizar de novo)
@@ -360,12 +361,12 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
         // 5. Aceitar Revisão (Gestor)
         autenticar(gestorRevisao, "ROLE_GESTOR");
-        cadastroWorkflowService.aceitarRevisaoCadastro(codSubprocesso, "Ok", gestorRevisao);
+        cadastroWorkflowService.aceitarRevisaoCadastro(codSubprocesso, gestorRevisao, "Ok");
         verificarSituacao(codSubprocesso, REVISAO_CADASTRO_DISPONIBILIZADA);
 
         // 6. Homologar Revisão (Admin) - Com Impactos (Simulado)
         autenticar(admin, "ROLE_ADMIN");
-        cadastroWorkflowService.homologarRevisaoCadastro(codSubprocesso, "Homologado", admin);
+        cadastroWorkflowService.homologarRevisaoCadastro(codSubprocesso, admin, "Homologado");
         verificarSituacao(codSubprocesso, REVISAO_CADASTRO_HOMOLOGADA);
 
         // 7. Submeter Mapa Ajustado (Admin)
@@ -429,7 +430,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
 
         // 5. Homologar (Admin) - Sem Impactos
         autenticar(admin, "ROLE_ADMIN");
-        cadastroWorkflowService.homologarRevisaoCadastro(codSubprocesso, "Ok", admin);
+        cadastroWorkflowService.homologarRevisaoCadastro(codSubprocesso, admin, "Ok");
 
         // Deve ir direto para MAPA_HOMOLOGADO (ou REVISAO_MAPA_HOMOLOGADO)
         verificarSituacao(codSubprocesso, REVISAO_MAPA_HOMOLOGADO);

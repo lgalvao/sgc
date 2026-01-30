@@ -38,6 +38,10 @@ import sgc.processo.dto.ProcessoDto;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+import jakarta.persistence.EntityManager;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.integracao.mocks.TestEventConfig;
+import sgc.integracao.mocks.TestThymeleafConfig;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -45,10 +49,10 @@ import sgc.subprocesso.model.Subprocesso;
 @DisplayName("CDU-14: Analisar revisão de cadastro de atividades e conhecimentos")
 @Import({
                 TestSecurityConfig.class,
-                sgc.integracao.mocks.TestThymeleafConfig.class,
-                sgc.integracao.mocks.TestEventConfig.class
+                TestThymeleafConfig.class,
+                TestEventConfig.class
 })
-@org.springframework.transaction.annotation.Transactional
+@Transactional
 class CDU14IntegrationTest extends BaseIntegrationTest {
         private static final String APPLICATION_JSON = "application/json";
         private static final String API_SUBPROCESSOS_ID_DISPONIBILIZAR = "/api/subprocessos/{id}/disponibilizar-revisao";
@@ -69,7 +73,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         @Autowired
         private MovimentacaoRepo movimentacaoRepo;
         @Autowired
-        private jakarta.persistence.EntityManager entityManager;
+        private EntityManager entityManager;
 
         private Unidade unidadeChefe;
         private Usuario chefe;

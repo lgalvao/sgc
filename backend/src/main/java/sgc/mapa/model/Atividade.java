@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import jakarta.annotation.Nullable;
 
 /**
  * Representa uma atividade desempenhada em um determinado contexto, associada a um mapa de
@@ -26,7 +27,7 @@ import java.util.Set;
 public class Atividade extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "mapa_codigo")
-    @jakarta.annotation.Nullable
+    @Nullable
     private Mapa mapa;
 
     @Column(name = "descricao")

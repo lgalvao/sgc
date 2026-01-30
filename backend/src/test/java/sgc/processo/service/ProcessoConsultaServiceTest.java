@@ -27,6 +27,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import sgc.processo.model.TipoProcesso;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -88,7 +89,7 @@ class ProcessoConsultaServiceTest {
     @Test
     @DisplayName("Deve listar unidades bloqueadas por tipo")
     void deveListarUnidadesBloqueadasPorTipo() {
-        when(processoRepo.findUnidadeCodigosBySituacaoAndTipo(SituacaoProcesso.EM_ANDAMENTO, sgc.processo.model.TipoProcesso.MAPEAMENTO))
+        when(processoRepo.findUnidadeCodigosBySituacaoAndTipo(SituacaoProcesso.EM_ANDAMENTO, TipoProcesso.MAPEAMENTO))
                 .thenReturn(List.of(10L, 20L));
 
         List<Long> ids = processoConsultaService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");

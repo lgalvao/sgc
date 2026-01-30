@@ -12,20 +12,23 @@ import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 
 @Tag("unit")
 @DisplayName("LimitadorTentativasLogin - Testes Unitários")
 class LimitadorTentativasLoginTest {
     private LimitadorTentativasLogin limitador;
     private Environment environment;
-    private java.time.Clock clock;
+    private Clock clock;
 
     @BeforeEach
     void setUp() {
         environment = mock(Environment.class);
-        clock = mock(java.time.Clock.class);
-        when(clock.getZone()).thenReturn(java.time.ZoneId.systemDefault());
-        when(clock.instant()).thenReturn(java.time.Instant.now());
+        clock = mock(Clock.class);
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        when(clock.instant()).thenReturn(Instant.now());
 
         when(environment.getProperty("aplicacao.ambiente-testes", Boolean.class, false)).thenReturn(false);
         when(environment.getActiveProfiles()).thenReturn(new String[]{});
@@ -94,7 +97,7 @@ class LimitadorTentativasLoginTest {
         limitador.verificar(ip);
 
         // 2. Avança o tempo para expirar a tentativa (11 minutos, janela é 10)
-        when(clock.instant()).thenReturn(java.time.Instant.now().plusSeconds(660));
+        when(clock.instant()).thenReturn(Instant.now().plusSeconds(660));
 
         // 3. Verifica novamente o mesmo IP.
         // Isso deve chamar limparTentativasAntigas(ip), remover a antiga,
@@ -117,7 +120,7 @@ class LimitadorTentativasLoginTest {
         assertEquals(limiteTeste, limitadorTeste.getCacheSize());
 
         // Avança o tempo para além da janela (2 minutos)
-        when(clock.instant()).thenReturn(java.time.Instant.now().plusSeconds(120));
+        when(clock.instant()).thenReturn(Instant.now().plusSeconds(120));
 
         // Adiciona mais uma entrada, deve acionar a limpeza
         // Como o tempo passou, ele deve limpar as antigas e NÃO precisar limpar tudo

@@ -26,6 +26,7 @@ import sgc.mapa.service.AtividadeFacade;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
+import org.hamcrest.Matchers;
 
 @WebMvcTest(AtividadeController.class)
 @Import({ TestSecurityConfig.class, RestExceptionHandler.class })
@@ -158,7 +159,7 @@ class AtividadeControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("{\"atividadeCodigo\": 1, \"descricao\": \"C1\"}"))
                     .andExpect(status().isCreated())
-                    .andExpect(header().string("Location", org.hamcrest.Matchers.containsString("/999")));
+                    .andExpect(header().string("Location", Matchers.containsString("/999")));
 
             Mockito.verify(atividadeFacade).criarConhecimento(eq(1L), any());
         }

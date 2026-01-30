@@ -27,6 +27,10 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+import java.util.List;
+import org.springframework.test.util.ReflectionTestUtils;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.processo.model.TipoProcesso;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -155,7 +159,7 @@ class E2eControllerCoverageTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
 
         // Deve lançar a exceção do orElseThrow
-        assertNotNull(assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> controller.criarProcessoMapeamento(request)));
+        assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> controller.criarProcessoMapeamento(request)));
     }
 
     @Test
@@ -163,7 +167,7 @@ class E2eControllerCoverageTest {
     void resetDatabaseIgnoraTabelasInvalidas() {
         // Setup
         when(jdbcTemplate.queryForList(anyString(), eq(String.class)))
-                .thenReturn(java.util.List.of("VALID_TABLE", "INVALID-TABLE"));
+                .thenReturn(List.of("VALID_TABLE", "INVALID-TABLE"));
 
         Resource mockResource = mock(Resource.class);
         when(resourceLoader.getResource(anyString())).thenReturn(mockResource);
@@ -189,15 +193,15 @@ class E2eControllerCoverageTest {
 
         when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(unidadeDto);
         when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(processoDto);
-        when(processoFacade.obterPorId(100L)).thenReturn(java.util.Optional.of(processoDto));
+        when(processoFacade.obterPorId(100L)).thenReturn(Optional.of(processoDto));
 
         // Act
         // Usando Reflection para chamar o método privado com um tipo que não tem tratamento específico de inicialização
-        org.springframework.test.util.ReflectionTestUtils.invokeMethod(
+        ReflectionTestUtils.invokeMethod(
                 controller, 
                 "criarProcessoFixture", 
                 request, 
-                sgc.processo.model.TipoProcesso.DIAGNOSTICO
+                TipoProcesso.DIAGNOSTICO
         );
 
         // Assert

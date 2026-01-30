@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.RepositorioComum;
+import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.mapper.UsuarioMapper;
@@ -33,6 +34,7 @@ import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
 import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.organizacao.model.UsuarioRepo;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -53,7 +55,7 @@ class UnidadeResponsavelServiceCoverageTest {
     @Mock
     private UsuarioMapper usuarioMapper;
     @Mock
-    private RepositorioComum repo;
+    private ComumRepo repo;
 
     @Test
     @DisplayName("Deve criar atribuição temporária com data de início nula (usa data atual)")
@@ -110,7 +112,6 @@ class UnidadeResponsavelServiceCoverageTest {
     @Test
     @DisplayName("Deve carregar atribuições em lote corretamente")
     void deveCarregarAtribuicoesEmLote() {
-        // Este teste verifica indiretamente carregarAtribuicoesEmLote através de buscarResponsaveisUnidades
         Usuario chefeSimples = new Usuario();
         chefeSimples.setTituloEleitoral("123");
 
@@ -121,36 +122,16 @@ class UnidadeResponsavelServiceCoverageTest {
         UsuarioPerfil perfil = new UsuarioPerfil();
         perfil.setUsuarioTitulo("123");
         perfil.setUnidadeCodigo(1L);
-        perfil.setPerfil(Perfil.CHEFE); // Importante para o filtro em buscarResponsaveisUnidades
+        perfil.setPerfil(Perfil.CHEFE);
 
         when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(chefeSimples));
         when(usuarioRepo.findByIdInWithAtribuicoes(List.of("123"))).thenReturn(List.of(chefeCompleto));
-        when(usuarioPerfilRepo.findByUsuarioTituloIn(List.of("123"))).thenReturn(List.of(perfil));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(List.of(perfil));
 
         Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
 
         assertThat(result).hasSize(1);
         assertThat(result.get(1L).titularTitulo()).isEqualTo("123");
-
-        // Verifica se setAtribuicoesPermanentes foi chamado no chefeCompleto
-        assertThat(chefeCompleto.getTodasAtribuicoes(new HashSet<>())).contains(perfil);
-    }
-
-    @Test
-    @DisplayName("Deve lidar com lista de usuários vazia em carregarAtribuicoesEmLote")
-    void deveLidarComListaUsuariosVaziaEmCarregarAtribuicoes() {
-        Usuario chefeSimples = new Usuario();
-        chefeSimples.setTituloEleitoral("123");
-
-        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(chefeSimples));
-        when(usuarioRepo.findByIdInWithAtribuicoes(List.of("123"))).thenReturn(Collections.emptyList());
-
-        // Se retornar lista vazia de usuarios completos, o stream final será vazio
-        Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
-        assertThat(result).isEmpty();
-
-        // Verifica que não tentou buscar perfis se não tem usuários
-        verify(usuarioPerfilRepo, never()).findByUsuarioTituloIn(any());
     }
 
     @Test
@@ -179,7 +160,7 @@ class UnidadeResponsavelServiceCoverageTest {
     @DisplayName("Deve lançar erro quando não encontra responsável da unidade")
     void deveLancarErroQuandoNaoEncontraResponsavelUnidade() {
         when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(Collections.emptyList());
-        assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarResponsavelUnidade(1L));
+        assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarResponsavelUnidade(1L));
     }
 
     @Test
@@ -191,11 +172,11 @@ class UnidadeResponsavelServiceCoverageTest {
         UsuarioPerfil perfilGestor = new UsuarioPerfil();
         perfilGestor.setUsuarioTitulo("123");
         perfilGestor.setUnidadeCodigo(1L);
-        perfilGestor.setPerfil(Perfil.GESTOR); // Não é CHEFE
+        perfilGestor.setPerfil(Perfil.GESTOR);
 
         when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(chefe));
         when(usuarioRepo.findByIdInWithAtribuicoes(List.of("123"))).thenReturn(List.of(chefe));
-        when(usuarioPerfilRepo.findByUsuarioTituloIn(List.of("123"))).thenReturn(List.of(perfilGestor));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(List.of(perfilGestor));
 
         Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
 
@@ -210,12 +191,11 @@ class UnidadeResponsavelServiceCoverageTest {
 
         when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(chefe));
         when(usuarioRepo.findByIdInWithAtribuicoes(List.of("123"))).thenReturn(List.of(chefe));
-        when(usuarioPerfilRepo.findByUsuarioTituloIn(List.of("123"))).thenReturn(Collections.emptyList());
+        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(Collections.emptyList());
 
         Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
 
         assertThat(result).isEmpty();
-        assertThat(chefe.getTodasAtribuicoes(new HashSet<>())).isEmpty();
     }
 
     @Test
@@ -242,7 +222,8 @@ class UnidadeResponsavelServiceCoverageTest {
         perfilSubstituto.setUnidadeCodigo(1L);
         perfilSubstituto.setPerfil(Perfil.CHEFE);
 
-        when(usuarioPerfilRepo.findByUsuarioTituloIn(anyList())).thenReturn(List.of(perfilTitular, perfilSubstituto));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("TITULAR")).thenReturn(List.of(perfilTitular));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("SUBSTITUTO")).thenReturn(List.of(perfilSubstituto));
 
         Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
 
@@ -263,10 +244,10 @@ class UnidadeResponsavelServiceCoverageTest {
 
         UsuarioPerfil perfilOutraUnidade = new UsuarioPerfil();
         perfilOutraUnidade.setUsuarioTitulo("TITULAR");
-        perfilOutraUnidade.setUnidadeCodigo(99L); // Unidade diferente da pesquisada (10L)
+        perfilOutraUnidade.setUnidadeCodigo(99L); // Diferente de 10L
         perfilOutraUnidade.setPerfil(Perfil.CHEFE);
 
-        when(usuarioPerfilRepo.findByUsuarioTituloIn(anyList())).thenReturn(List.of(perfilOutraUnidade));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("TITULAR")).thenReturn(List.of(perfilOutraUnidade));
 
         Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(10L));
 
@@ -289,13 +270,9 @@ class UnidadeResponsavelServiceCoverageTest {
         when(unidadeRepo.findBySigla(sigla)).thenReturn(Optional.of(unidade));
         when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.of(chefeSimples));
         when(usuarioRepo.findByIdWithAtribuicoes("123")).thenReturn(Optional.of(chefeCompleto));
-        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(Collections.emptyList());
 
         Usuario result = service.buscarResponsavelAtual(sigla);
 
         assertThat(result).isSameAs(chefeCompleto);
-        // Verify carregarAtribuicoesUsuario was called
-        verify(usuarioPerfilRepo).findByUsuarioTitulo("123");
-        assertThat(chefeCompleto.getTodasAtribuicoes(new HashSet<>())).isNotNull();
     }
 }

@@ -54,9 +54,9 @@ Dado o contexto de uso (500 usuários, máx. 10 simultâneos), as melhorias deve
 
 ### 1.1 Duplicação de Código
 
-#### 1.1.1 Validações Duplicadas em SubprocessoFacade
+#### 1.1.1 Lógica de Validação Espalhada
 
-**Problema:** Código idêntico de validação de subprocesso repetido em múltiplos métodos.
+**Problema:** Embora a `SubprocessoFacade` delegue corretamente para serviços especializados (Workflows), a validação de estado (ex: `PENDENTE`) está fragmentada entre os Services de Workflow e as Access Policies.
 
 ```java
 // Repetido em iniciar(), concluir(), cancelar(), reabrir(), etc.
@@ -77,9 +77,9 @@ if (subprocesso.getStatus() != StatusSubprocesso.PENDENTE) {
 
 ---
 
-#### 1.1.2 Access Policies com Código Idêntico
+#### 1.1.2 Access Policies com Lógica Duplicada (Hierarquia/Titularidade)
 
-**Problema:** As 4 Access Policies (ProcessoAccessPolicy, SubprocessoAccessPolicy, AtividadeAccessPolicy, MapaAccessPolicy) contêm código praticamente idêntico.
+**Problema:** `SubprocessoAccessPolicy` e `AtividadeAccessPolicy` (e outras) reimplementam a mesma lógica complexa de verificação de hierarquia e titularidade (`TITULAR_UNIDADE`). A `AbstractAccessPolicy` existe mas não centraliza essas regras comuns adequadamente.
 
 ```java
 // ProcessoAccessPolicy.java
@@ -778,9 +778,9 @@ import { ProcessoService } from '../../services';  // relativo ❌
 
 ## 3. Análise de Testes
 
-### 3.1 Testes Duplicados
+### 3.1 Testes de "Cobertura Artificial"
 
-**Problema:** 11 arquivos `*Coverage.java` testam a mesma coisa de formas diferentes.
+**Problema:** 27+ arquivos com padrão `*CoverageTest.java` (ex: `SubprocessoFacadeCoverageTest`) que testam apenas getters, setters e construtores para inflar métricas, sem validar comportamento real.
 
 ```java
 // ProcessoCoverageTest.java
@@ -801,11 +801,11 @@ void testTitulo() {
 ```
 
 **Impacto:**
-- 🔴 11 arquivos duplicados (~300 linhas)
-- Manutenção dobrada
-- Suíte de testes lenta
+- 🔴 27+ arquivos de "cobertura artificial"
+- Métricas infladas que mascaram a falta de testes reais
+- Manutenção desnecessária de código sem valor
 
-**Solução:** Remover arquivos `*Coverage.java`, manter apenas testes semânticos.
+**Solução:** Remover arquivos `*CoverageTest.java` imediatamente para expor a cobertura real.
 
 ---
 
@@ -940,37 +940,26 @@ Unitários (mocked) ───────── E2E
 
 ## 4. Plano de Ação Prioritizado
 
-### Prioridade CRÍTICA (~60h)
+### Prioridade CRÍTICA (Imediata ~62h)
 
-#### Backend (35h)
-
-| # | Ação | Problema | Estimativa | Impacto |
-|---|------|----------|------------|---------|
-| 1 | Consolidar Access Policies em AbstractAccessPolicy | 1.1.2 | 4h | Reduz 80 linhas duplicadas |
-| 2 | Refatorar ProcessoFacade (13→4 dependências) | 1.2.1 | 8h | Melhora testabilidade 70% |
-| 3 | Mover @PreAuthorize de Facades para Controllers | 1.3.1 | 6h | Conformidade ADR-001 |
-| 4 | Centralizar verificações de acesso via AccessControlService | 1.3.2 | 8h | Conformidade ADR-003 |
-| 5 | Criar DTOs para AnaliseController e ConfiguracaoController | 1.3.3 | 4h | Conformidade ADR-004 |
-| 6 | Extrair validações duplicadas em SubprocessoFacade | 1.1.1 | 3h | Reduz duplicação 60% |
-| 7 | Eliminar ciclos de dependência via Events | 1.2.3 | 2h | Reduz acoplamento |
-
-#### Frontend (15h)
+#### Ações de Ganho Rápido (Quick Wins) e Segurança
 
 | # | Ação | Problema | Estimativa | Impacto |
 |---|------|----------|------------|---------|
-| 8 | Dividir GOD Composables (5 composables > 200 linhas) | 2.2.1 | 8h | Melhora testabilidade |
+| 1 | **Remover arquivos `*CoverageTest.java`** (27+ arquivos) | 3.1 | 2h | Visão real da cobertura (Immediate Win) |
+| 2 | Consolidar Access Policies em AbstractAccessPolicy | 1.1.2 | 6h | Segurança robusta e sem duplicação |
+| 3 | Dividir GOD Composables (ex: `useCadAtividadesLogic`) | 2.2.1 | 8h | Frontend testável e manutenível |
+| 4 | Refatorar `SubprocessoFacade` e centralizar validações | 1.1.1, 1.2.1 | 8h | Arquitetura limpa |
+| 5 | Mover @PreAuthorize de Facades para Controllers | 1.3.1 | 6h | Conformidade ADR-001 |
+| 6 | Centralizar verificações de acesso via AccessControlService | 1.3.2 | 8h | Conformidade ADR-003 |
+| 7 | Criar DTOs para AnaliseController e ConfiguracaoController | 1.3.3 | 4h | Conformidade ADR-004 |
+| 8 | Eliminar ciclos de dependência via Events | 1.2.3 | 2h | Reduz acoplamento |
 | 9 | Padronizar acesso a services (View→Store→Service→API) | 2.2.2 | 4h | Consistência arquitetural |
-| 10 | Substituir console.* por logger (36 ocorrências) | 2.3.2 | 3h | Logs estruturados |
+| 10 | Substituir console.* por logger | 2.3.2 | 3h | Logs estruturados |
+| 11 | Adotar fixtures E2E (36 arquivos) | 3.5 | 6h | Reduz duplicação 90% |
+| 12 | Reduzir over-mocking (46 arquivos) | 3.2 | 5h | Testes mais robustos |
 
-#### Testes (10h)
-
-| # | Ação | Problema | Estimativa | Impacto |
-|---|------|----------|------------|---------|
-| 11 | Remover arquivos *Coverage.java (11 arquivos) | 3.1 | 2h | Reduz 300 linhas |
-| 12 | Adotar fixtures E2E (36 arquivos) | 3.5 | 6h | Reduz duplicação 90% |
-| 13 | Reduzir over-mocking (46 arquivos) | 3.2 | 2h | Testes mais robustos |
-
-**Total CRÍTICA: 60h**
+**Total CRÍTICA: ~62h**
 
 ---
 
@@ -1072,7 +1061,7 @@ Unitários (mocked) ───────── E2E
 ### 5.2 Testabilidade
 
 - ✅ **Melhoria de cobertura efetiva**
-  - Remoção de 11 arquivos de teste duplicados
+  - Remoção de 27+ arquivos de teste artificiais
   - Redução de over-mocking em 46 arquivos
   - Adoção de fixtures E2E em 36 arquivos
 

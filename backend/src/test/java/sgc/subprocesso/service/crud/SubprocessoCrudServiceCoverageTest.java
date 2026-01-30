@@ -24,24 +24,30 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.springframework.context.ApplicationEventPublisher;
+import sgc.comum.repo.ComumRepo;
+import sgc.mapa.service.MapaFacade;
+import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.model.Unidade;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoCrudServiceCoverageTest {
     @InjectMocks
     private SubprocessoCrudService crudService;
     @Mock
-    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private SubprocessoRepo subprocessoRepo;
     @Mock
-    private sgc.comum.repo.RepositorioComum repositorioComum;
+    private ComumRepo repositorioComum;
     @Mock
     private SubprocessoMapper mapper;
 
     @Mock
-    private sgc.mapa.service.MapaFacade mapaFacade;
+    private MapaFacade mapaFacade;
     @Mock
-    private org.springframework.context.ApplicationEventPublisher eventPublisher;
+    private ApplicationEventPublisher eventPublisher;
     @Mock
-    private sgc.organizacao.UsuarioFacade usuarioService;
+    private UsuarioFacade usuarioService;
 
     @Test
     @DisplayName("criar - Sucesso")
@@ -65,7 +71,7 @@ class SubprocessoCrudServiceCoverageTest {
         Processo proc = new Processo();
         proc.setCodigo(1L);
         sp.setProcesso(proc);
-        sgc.organizacao.model.Unidade uni = new sgc.organizacao.model.Unidade();
+        Unidade uni = new Unidade();
         uni.setCodigo(1L);
         sp.setUnidade(uni);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);

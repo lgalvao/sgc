@@ -17,6 +17,7 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
+import sgc.analise.AnaliseFacade;
 
 @RestController
 @RequestMapping("/api/subprocessos")
@@ -25,7 +26,7 @@ import java.util.List;
 @Tag(name = "Subprocessos", description = "Gerenciamento do workflow de subprocessos")
 public class SubprocessoValidacaoController {
     private final SubprocessoFacade subprocessoFacade;
-    private final sgc.analise.AnaliseFacade analiseFacade;
+    private final AnaliseFacade analiseFacade;
     private final AnaliseMapper analiseMapper;
 
     /**

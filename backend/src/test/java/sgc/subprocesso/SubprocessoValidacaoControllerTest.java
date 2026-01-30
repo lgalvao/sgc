@@ -23,6 +23,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import java.time.LocalDateTime;
+import sgc.analise.AnaliseFacade;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -36,7 +38,7 @@ class SubprocessoValidacaoControllerTest {
     private SubprocessoFacade subprocessoFacade;
 
     @Mock
-    private sgc.analise.AnaliseFacade analiseFacade;
+    private AnaliseFacade analiseFacade;
 
     @Mock
     private AnaliseMapper analiseMapper;
@@ -84,7 +86,7 @@ class SubprocessoValidacaoControllerTest {
         Long codigo = 1L;
         SugestoesDto dto = SugestoesDto.builder()
                 .sugestoes("Texto")
-                .dataHora(java.time.LocalDateTime.now())
+                .dataHora(LocalDateTime.now())
                 .build();
         when(subprocessoFacade.obterSugestoes(codigo)).thenReturn(dto);
 

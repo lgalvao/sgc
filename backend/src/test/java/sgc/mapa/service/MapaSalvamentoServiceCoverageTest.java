@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import sgc.comum.repo.RepositorioComum;
+import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Atividade;
@@ -23,6 +23,8 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
+import java.util.concurrent.atomic.AtomicLong;
+import sgc.mapa.mapper.MapaCompletoMapper;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -34,9 +36,9 @@ class MapaSalvamentoServiceCoverageTest {
     @Mock
     private AtividadeRepo atividadeRepo;
     @Mock
-    private RepositorioComum repo;
+    private ComumRepo repo;
     @Mock
-    private sgc.mapa.mapper.MapaCompletoMapper mapaCompletoMapper;
+    private MapaCompletoMapper mapaCompletoMapper;
 
     @InjectMocks
     private MapaSalvamentoService service;
@@ -72,7 +74,7 @@ class MapaSalvamentoServiceCoverageTest {
                 .build();
 
         // Mocks de salvamento
-        var idCounter = new java.util.concurrent.atomic.AtomicLong(100L);
+        var idCounter = new AtomicLong(100L);
         when(competenciaRepo.saveAll(any())).thenAnswer(inv -> {
             List<Competencia> list = inv.getArgument(0);
             // Simula salvamento retornando as mesmas instancias com IDs sequenciais

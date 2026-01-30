@@ -9,6 +9,7 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import sgc.mapa.dto.ConhecimentoResponse;
 
 /**
  * Cobertura de Mappers.
@@ -33,7 +34,7 @@ class MappersCoverageTest {
         conhecimento.setDescricao("Conhecimento de teste");
         conhecimento.setAtividade(atividade);
 
-        sgc.mapa.dto.ConhecimentoResponse response = conhecimentoMapper.toResponse(conhecimento);
+        ConhecimentoResponse response = conhecimentoMapper.toResponse(conhecimento);
 
         assertThat(response).isNotNull();
         assertThat(response.codigo()).isEqualTo(100L);

@@ -36,11 +36,13 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.MovimentacaoRepo;
+import java.time.LocalDate;
+import sgc.integracao.mocks.TestThymeleafConfig;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-24: Disponibilizar mapas de competências em bloco")
 class CDU24IntegrationTest extends BaseIntegrationTest {
@@ -133,7 +135,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .subprocessos(unidadesSelecionadas)
                 .acao("DISPONIBILIZAR")
-                .dataLimite(java.time.LocalDate.now().plusDays(10))
+                .dataLimite(LocalDate.now().plusDays(10))
                 .build();
 
         // When

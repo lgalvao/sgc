@@ -21,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.repo.RepositorioComum;
+import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.AtualizarAtividadeRequest;
 import sgc.mapa.dto.CriarAtividadeRequest;
@@ -35,6 +35,8 @@ import sgc.mapa.model.ConhecimentoRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
+import java.util.HashMap;
+import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -48,7 +50,7 @@ class MapaManutencaoServiceTest {
     @Mock
     private ConhecimentoRepo conhecimentoRepo;
     @Mock
-    private RepositorioComum repo;
+    private ComumRepo repo;
     @Mock
     private AtividadeMapper atividadeMapper;
     @Mock
@@ -312,7 +314,7 @@ class MapaManutencaoServiceTest {
             atividade2.setDescricao("Antiga 2");
             // Sem mapa
 
-            java.util.Map<Long, String> descricoes = java.util.Map.of(
+            Map<Long, String> descricoes = Map.of(
                     1L, "Nova 1",
                     2L, "Nova 2"
             );
@@ -335,7 +337,7 @@ class MapaManutencaoServiceTest {
             atividade1.setCodigo(1L);
             atividade1.setDescricao("Antiga 1");
 
-            java.util.Map<Long, String> descricoes = new java.util.HashMap<>();
+            Map<Long, String> descricoes = new HashMap<>();
             descricoes.put(1L, null);
 
             when(atividadeRepo.findAllById(descricoes.keySet())).thenReturn(List.of(atividade1));

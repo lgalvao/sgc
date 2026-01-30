@@ -2,13 +2,17 @@ package sgc.processo.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.processo.dto.SubprocessoElegivelDto;
+import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
@@ -16,10 +20,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Serviço responsável por consultas e queries relacionadas a Processos.
@@ -41,6 +42,7 @@ public class ProcessoConsultaService {
     private final ProcessoRepo processoRepo;
     private final SubprocessoFacade subprocessoFacade;
     private final UsuarioFacade usuarioService;
+    private static final String ENTIDADE_PROCESSO = "Processo";
 
     /**
      * Constructor com @Lazy para quebrar dependência circular.
@@ -52,6 +54,35 @@ public class ProcessoConsultaService {
         this.processoRepo = processoRepo;
         this.subprocessoFacade = subprocessoFacade;
         this.usuarioService = usuarioService;
+    }
+
+    public Processo buscarPorId(Long id) {
+        return processoRepo.findById(id)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_PROCESSO, id));
+    }
+
+    public Optional<Processo> buscarPorIdOpcional(Long id) {
+        return processoRepo.findById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Processo> listarFinalizados() {
+        return processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Processo> listarAtivos() {
+        return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO);
+    }
+
+    public Page<Processo> listarTodos(Pageable pageable) {
+        return processoRepo.findAll(pageable);
+    }
+
+    public Page<Processo> listarPorParticipantesIgnorandoCriado(
+            List<Long> unidadeIds, Pageable pageable) {
+        return processoRepo.findDistinctByParticipantes_CodigoInAndSituacaoNot(
+                unidadeIds, SituacaoProcesso.CRIADO, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -125,3 +156,4 @@ public class ProcessoConsultaService {
                 .build();
     }
 }
+

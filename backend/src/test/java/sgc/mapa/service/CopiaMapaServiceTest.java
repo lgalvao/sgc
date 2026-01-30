@@ -24,6 +24,7 @@ import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
+import java.util.ArrayList;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -58,7 +59,7 @@ class CopiaMapaServiceTest {
         atividadeOrigem.setDescricao("Atividade 1");
         Conhecimento conhecimentoOrigem = new Conhecimento();
         conhecimentoOrigem.setDescricao("Conhecimento 1");
-        atividadeOrigem.setConhecimentos(new java.util.ArrayList<>(List.of(conhecimentoOrigem))); // Mutable list
+        atividadeOrigem.setConhecimentos(new ArrayList<>(List.of(conhecimentoOrigem))); // Mutable list
 
         Competencia competenciaOrigem = new Competencia();
         competenciaOrigem.setDescricao("Competencia 1");

@@ -22,12 +22,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 class SubprocessoFactoryTest {
     @Mock
-    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private SubprocessoRepo subprocessoRepo;
 
     @Mock
     private MapaRepo mapaRepo;

@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
-import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.Mapa;
@@ -181,7 +181,7 @@ class SubprocessoServiceActionsTest {
             Subprocesso sp = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
             Long spCodigo = sp.getCodigo();
-            ErroAccessoNegado erro = assertThrows(ErroAccessoNegado.class,
+            ErroAcessoNegado erro = assertThrows(ErroAcessoNegado.class,
                     () -> subprocessoFacade.aceitarRevisaoCadastro(spCodigo, OBSERVACOES, gestor));
             assertTrue(erro.getMessage().contains("situação"),
                     "Mensagem de erro deve mencionar a situação incorreta");
@@ -228,7 +228,7 @@ class SubprocessoServiceActionsTest {
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
             Long spCodigo = subprocesso.getCodigo();
-            ErroAccessoNegado erro = assertThrows(ErroAccessoNegado.class,
+            ErroAcessoNegado erro = assertThrows(ErroAcessoNegado.class,
                     () -> subprocessoFacade.homologarRevisaoCadastro(spCodigo, OBSERVACOES, admin));
 
             assertTrue(erro.getMessage().contains("situação"),

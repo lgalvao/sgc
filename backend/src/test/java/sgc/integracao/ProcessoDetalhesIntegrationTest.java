@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import sgc.integracao.mocks.TestSecurityConfig;
 
 /**
  * Testes de integração focados no endpoint /api/processos/{id}. Este endpoint é
@@ -36,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("Endpoint: /api/processos/{id}")
-@Import(sgc.integracao.mocks.TestSecurityConfig.class)
+@Import(TestSecurityConfig.class)
 class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
     private static final String API_PROCESSO_DETALHES = "/api/processos/{codProcesso}";
 

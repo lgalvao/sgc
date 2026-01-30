@@ -18,6 +18,9 @@ import java.util.List;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
+import java.util.ArrayList;
+import java.util.Collection;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 /**
  * Factory para criação de entidades Subprocesso.
@@ -33,7 +36,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
 @RequiredArgsConstructor
 @Slf4j
 public class SubprocessoFactory {
-    private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private final SubprocessoRepo subprocessoRepo;
     private final MapaRepo mapaRepo;
     private final MovimentacaoRepo movimentacaoRepo;
     private final CopiaMapaService servicoDeCopiaDeMapa;
@@ -42,7 +45,7 @@ public class SubprocessoFactory {
      * Cria subprocessos para processo de mapeamento em lote.
      * Aplicável apenas a unidades OPERACIONAL ou INTEROPERACIONAL.
      */
-    public void criarParaMapeamento(Processo processo, java.util.Collection<Unidade> unidades) {
+    public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades) {
         List<Unidade> unidadesElegiveis = unidades.stream()
                 .filter(u -> TipoUnidade.OPERACIONAL == u.getTipo() || TipoUnidade.INTEROPERACIONAL == u.getTipo())
                 .toList();
@@ -72,7 +75,7 @@ public class SubprocessoFactory {
             subprocessosSalvos.get(i).setMapa(mapasSalvos.get(i));
         }
 
-        List<Movimentacao> movimentacoes = new java.util.ArrayList<>();
+        List<Movimentacao> movimentacoes = new ArrayList<>();
         for (Subprocesso sp : subprocessosSalvos) {
             movimentacoes.add(Movimentacao.builder()
                     .subprocesso(sp)

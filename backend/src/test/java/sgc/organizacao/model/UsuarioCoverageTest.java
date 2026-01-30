@@ -56,9 +56,9 @@ class UsuarioCoverageTest {
 
         u.setAtribuicoesTemporarias(new HashSet<>(Set.of(tempFutura, tempPassada, tempAtiva, tempAtiva2)));
 
-        Set<UsuarioPerfil> todas = u.getTodasAtribuicoes(new HashSet<>());
+        Set<UsuarioPerfil> todas = u.getTodasAtribuicoes(new HashSet<>(Set.of(permanente)));
 
-        // Deve conter: permanente, tempAtiva e tempNull
+        // Deve conter: permanente, tempAtiva e tempAtiva2
         assertThat(todas).hasSize(3);
     }
 

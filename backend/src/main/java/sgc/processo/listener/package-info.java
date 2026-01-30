@@ -22,5 +22,6 @@
  * @see sgc.notificacao
  * @see sgc.alerta
  */
-@org.jspecify.annotations.NullMarked
+@NullMarked
 package sgc.processo.listener;
+import org.jspecify.annotations.NullMarked;

@@ -51,6 +51,10 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+import jakarta.persistence.EntityManager;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
+import sgc.subprocesso.model.MovimentacaoRepo;
 
 @Tag("integration")
 @SpringBootTest
@@ -64,9 +68,9 @@ import sgc.subprocesso.model.Subprocesso;
 @DisplayName("CDU-09: Disponibilizar Cadastro de Atividades e Conhecimentos")
 class CDU09IntegrationTest extends BaseIntegrationTest {
     @Autowired
-    private sgc.mapa.model.CompetenciaRepo competenciaRepo;
+    private CompetenciaRepo competenciaRepo;
     @Autowired
-    private sgc.subprocesso.model.MovimentacaoRepo movimentacaoRepo;
+    private MovimentacaoRepo movimentacaoRepo;
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
     @Autowired
@@ -76,7 +80,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UsuarioRepo usuarioRepo;
     @Autowired
-    private jakarta.persistence.EntityManager entityManager;
+    private EntityManager entityManager;
 
     @MockitoBean
     private JavaMailSender javaMailSender;
@@ -137,7 +141,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         subprocessoMapeamento.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoMapeamento = subprocessoRepo.save(subprocessoMapeamento);
 
-        sgc.mapa.model.Mapa mapa = new sgc.mapa.model.Mapa();
+        Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocessoMapeamento);
         mapa = mapaRepo.save(mapa);
 

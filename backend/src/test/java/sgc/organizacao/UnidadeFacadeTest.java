@@ -32,6 +32,10 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeMapaService;
 import sgc.organizacao.service.UnidadeResponsavelService;
+import sgc.organizacao.service.UnidadeConsultaService;
+import sgc.organizacao.service.UsuarioConsultaService;
+import java.time.LocalDate;
+import java.util.HashSet;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -39,11 +43,9 @@ import sgc.organizacao.service.UnidadeResponsavelService;
 class UnidadeFacadeTest {
 
     @Mock
-    private UnidadeRepo unidadeRepo;
+    private UnidadeConsultaService unidadeConsultaService;
     @Mock
-    private UnidadeMapaRepo unidadeMapaRepo;
-    @Mock
-    private UsuarioRepo usuarioRepo;
+    private UsuarioConsultaService usuarioConsultaService;
     @Mock
     private UsuarioMapper usuarioMapper;
 
@@ -115,7 +117,7 @@ class UnidadeFacadeTest {
         @DisplayName("Deve buscar unidade por sigla")
         void deveBuscarPorSigla() {
             // Arrange
-            when(unidadeRepo.findBySigla("U1")).thenReturn(Optional.of(new Unidade()));
+            when(unidadeConsultaService.buscarPorSigla("U1")).thenReturn(new Unidade());
             when(usuarioMapper.toUnidadeDto(any(), eq(false))).thenReturn(UnidadeDto.builder().build());
 
             // Act & Assert
@@ -128,7 +130,7 @@ class UnidadeFacadeTest {
             // Arrange
             Unidade unidade = new Unidade();
             unidade.setSituacao(SituacaoUnidade.ATIVA);
-            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
+            when(unidadeConsultaService.buscarPorId(1L)).thenReturn(unidade);
             when(usuarioMapper.toUnidadeDto(any(), eq(false))).thenReturn(UnidadeDto.builder().build());
 
             // Act & Assert
@@ -248,7 +250,7 @@ class UnidadeFacadeTest {
         void deveBuscarArvoreComElegibilidadeComMapa() {
             // Arrange
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
-            when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L));
+            when(mapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(1L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
 
             // Act
@@ -256,7 +258,7 @@ class UnidadeFacadeTest {
 
             // Assert
             assertThat(result).hasSize(1);
-            verify(unidadeMapaRepo).findAllUnidadeCodigos();
+            verify(mapaService).buscarTodosCodigosUnidades();
             verify(hierarquiaService).buscarArvoreComElegibilidade(any());
         }
 
@@ -265,7 +267,7 @@ class UnidadeFacadeTest {
         void deveSerIneligivelParaRevisaoSeSemMapa() {
             // Arrange
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
-            when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(2L));
+            when(mapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(2L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
 
             // Act
@@ -273,7 +275,7 @@ class UnidadeFacadeTest {
 
             // Assert
             assertThat(result).hasSize(1);
-            verify(unidadeMapaRepo).findAllUnidadeCodigos();
+            verify(mapaService).buscarTodosCodigosUnidades();
             verify(hierarquiaService).buscarArvoreComElegibilidade(any());
         }
 
@@ -285,7 +287,7 @@ class UnidadeFacadeTest {
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
 
             // Act
-            List<UnidadeDto> result = service.buscarArvoreComElegibilidade(false, new java.util.HashSet<>(List.of(1L)));
+            List<UnidadeDto> result = service.buscarArvoreComElegibilidade(false, new HashSet<>(List.of(1L)));
 
             // Assert
             assertThat(result).hasSize(1);
@@ -312,7 +314,7 @@ class UnidadeFacadeTest {
         void deveCriarAtribuicaoTemporariaComSucesso() {
             // Arrange
             CriarAtribuicaoTemporariaRequest req = new CriarAtribuicaoTemporariaRequest(
-                    "123", java.time.LocalDate.now(), java.time.LocalDate.now().plusDays(1), "Justificativa");
+                    "123", LocalDate.now(), LocalDate.now().plusDays(1), "Justificativa");
 
             // Act
             service.criarAtribuicaoTemporaria(1L, req);
@@ -326,7 +328,7 @@ class UnidadeFacadeTest {
         void deveFalharCriarAtribuicaoDatasInvalidas() {
             // Arrange
             CriarAtribuicaoTemporariaRequest req = new CriarAtribuicaoTemporariaRequest(
-                    "123", java.time.LocalDate.now().plusDays(1), java.time.LocalDate.now(), "Justificativa");
+                    "123", LocalDate.now().plusDays(1), LocalDate.now(), "Justificativa");
             doThrow(new ErroValidacao("Data fim deve ser posterior à data início"))
                     .when(responsavelService).criarAtribuicaoTemporaria(1L, req);
 
@@ -339,7 +341,7 @@ class UnidadeFacadeTest {
         void deveFalharCriarAtribuicaoSeUnidadeNaoEncontrada() {
             // Arrange
             CriarAtribuicaoTemporariaRequest req = new CriarAtribuicaoTemporariaRequest(
-                    "123", java.time.LocalDate.now(), java.time.LocalDate.now().plusDays(1), "Justificativa");
+                    "123", LocalDate.now(), LocalDate.now().plusDays(1), "Justificativa");
             doThrow(new ErroEntidadeNaoEncontrada("Unidade", 99L))
                     .when(responsavelService).criarAtribuicaoTemporaria(99L, req);
 
@@ -352,7 +354,7 @@ class UnidadeFacadeTest {
         void deveCriarAtribuicaoComDataAtualSeInicioNulo() {
             // Arrange
             CriarAtribuicaoTemporariaRequest req = new CriarAtribuicaoTemporariaRequest(
-                    "123", null, java.time.LocalDate.now().plusDays(1), "Justificativa");
+                    "123", null, LocalDate.now().plusDays(1), "Justificativa");
 
             // Act
             service.criarAtribuicaoTemporaria(1L, req);
@@ -365,7 +367,7 @@ class UnidadeFacadeTest {
         @DisplayName("Deve buscar usuários por unidade")
         void deveBuscarUsuariosPorUnidade() {
             // Arrange
-            when(usuarioRepo.findByUnidadeLotacaoCodigo(1L)).thenReturn(List.of(new Usuario()));
+            when(usuarioConsultaService.buscarPorUnidadeLotacao(1L)).thenReturn(List.of(new Usuario()));
 
             // Act & Assert
             assertThat(service.buscarUsuariosPorUnidade(1L)).hasSize(1);
@@ -408,21 +410,21 @@ class UnidadeFacadeTest {
         @DisplayName("Buscar entidades por IDs")
         void buscarEntidadesPorIds() {
             service.buscarEntidadesPorIds(List.of(1L));
-            verify(unidadeRepo).findAllById(any());
+            verify(unidadeConsultaService).buscarEntidadesPorIds(any());
         }
 
         @Test
         @DisplayName("Buscar todas entidades com hierarquia (cache)")
         void buscarTodasEntidadesComHierarquia() {
             service.buscarTodasEntidadesComHierarquia();
-            verify(unidadeRepo).findAllWithHierarquia();
+            verify(unidadeConsultaService).buscarTodasEntidadesComHierarquia();
         }
 
         @Test
         @DisplayName("Buscar siglas por IDs")
         void buscarSiglasPorIds() {
             service.buscarSiglasPorIds(List.of(1L));
-            verify(unidadeRepo).findSiglasByCodigos(any());
+            verify(unidadeConsultaService).buscarSiglasPorIds(any());
         }
 
         @Test
@@ -451,7 +453,7 @@ class UnidadeFacadeTest {
         @Test
         @DisplayName("Deve falhar ao buscar entidade por ID inexistente")
         void deveFalharAoBuscarEntidadePorIdInexistente() {
-            when(unidadeRepo.findById(999L)).thenReturn(Optional.empty());
+            when(unidadeConsultaService.buscarPorId(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 999L));
             assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(999L)));
         }
 
@@ -512,13 +514,10 @@ class UnidadeFacadeTest {
         @DisplayName("Deve lançar exceção se unidade inativa ao buscar por ID")
         void deveLancarExcecaoSeUnidadeInativa() {
             // Arrange
-            Unidade u1 = new Unidade();
-            u1.setCodigo(1L);
-            u1.setSituacao(SituacaoUnidade.INATIVA); // INATIVA
-            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(u1));
+            when(unidadeConsultaService.buscarPorId(1L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 1L));
 
             // Act & Assert
-            assertNotNull(assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(1L)));
+            assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(1L)));
         }
 
         @Test

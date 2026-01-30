@@ -1,27 +1,29 @@
 package sgc.processo.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
+import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.UsuarioFacade;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.dto.SubprocessoElegivelDto;
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.service.SubprocessoFacade;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -30,13 +32,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("ProcessoFacade - Consultas e Detalhes")
 class ProcessoFacadeQueryTest {
     @Mock
-    private ProcessoRepo processoRepo;
+    private ProcessoConsultaService processoConsultaService;
+    @Mock
+    private ProcessoManutencaoService processoManutencaoService;
+    @Mock
+    private UnidadeFacade unidadeService;
     @Mock
     private SubprocessoFacade subprocessoFacade;
     @Mock
@@ -45,19 +53,43 @@ class ProcessoFacadeQueryTest {
     private ProcessoDetalheBuilder processoDetalheBuilder;
     @Mock
     private SubprocessoMapper subprocessoMapper;
+    @Mock
+    private UsuarioFacade usuarioService;
+    @Mock
+    private ProcessoInicializador processoInicializador;
+    @Mock
+    private AlertaFacade alertaService;
+    @Mock
+    private ProcessoAcessoService processoAcessoService;
+    @Mock
+    private ProcessoFinalizador processoFinalizador;
     
     private static final String MAPEAMENTO = "MAPEAMENTO";
     @Mock
-    private ProcessoConsultaService processoConsultaService;
-    @Mock
     private ProcessoValidador processoValidador;
 
-    @InjectMocks
     private ProcessoFacade processoFacade;
 
-    @org.junit.jupiter.api.BeforeEach
-    void injectSelf() {
-        org.springframework.test.util.ReflectionTestUtils.setField(processoFacade, "self", processoFacade);
+    @BeforeEach
+    void setUp() throws Exception {
+        processoFacade = new ProcessoFacade(
+            processoConsultaService,
+            processoManutencaoService,
+            unidadeService,
+            subprocessoFacade,
+            processoMapper,
+            processoDetalheBuilder,
+            subprocessoMapper,
+            usuarioService,
+            processoInicializador,
+            alertaService,
+            processoAcessoService,
+            processoFinalizador
+        );
+
+        Field selfField = ProcessoFacade.class.getDeclaredField("self");
+        selfField.setAccessible(true);
+        selfField.set(processoFacade, processoFacade);
     }
 
     @Nested
@@ -69,7 +101,7 @@ class ProcessoFacadeQueryTest {
             // Arrange
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoConsultaService.buscarPorId(id)).thenReturn(processo);
             when(processoDetalheBuilder.build(processo)).thenReturn(new ProcessoDetalheDto());
 
             // Act
@@ -82,7 +114,7 @@ class ProcessoFacadeQueryTest {
         @Test
         @DisplayName("Deve falhar ao obter detalhes de processo inexistente")
         void deveFalharAoObterDetalhesProcessoInexistente() {
-            when(processoRepo.findById(999L)).thenReturn(Optional.empty());
+            when(processoConsultaService.buscarPorId(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 999L));
             assertThatThrownBy(() -> processoFacade.obterDetalhes(999L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
@@ -92,7 +124,7 @@ class ProcessoFacadeQueryTest {
         void deveBuscarEntidadePorId() {
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoConsultaService.buscarPorId(id)).thenReturn(processo);
 
             Processo res = processoFacade.buscarEntidadePorId(id);
             assertThat(res).isEqualTo(processo);
@@ -101,7 +133,7 @@ class ProcessoFacadeQueryTest {
         @Test
         @DisplayName("Deve falhar buscar entidade inexistente")
         void deveFalharBuscarEntidadeInexistente() {
-            when(processoRepo.findById(999L)).thenReturn(Optional.empty());
+            when(processoConsultaService.buscarPorId(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 999L));
             assertThatThrownBy(() -> processoFacade.buscarEntidadePorId(999L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
@@ -111,7 +143,7 @@ class ProcessoFacadeQueryTest {
         void deveObterPorIdOptional() {
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoConsultaService.buscarPorIdOpcional(id)).thenReturn(Optional.of(processo));
             when(processoMapper.toDto(processo)).thenReturn(ProcessoDto.builder().build());
 
             Optional<ProcessoDto> res = processoFacade.obterPorId(id);
@@ -122,9 +154,9 @@ class ProcessoFacadeQueryTest {
         @DisplayName("Deve listar processos finalizados e ativos")
         void deveListarProcessosFinalizadosEAtivos() {
             // Arrange
-            when(processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO))
+            when(processoConsultaService.listarFinalizados())
                     .thenReturn(List.of(ProcessoFixture.processoPadrao()));
-            when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO))
+            when(processoConsultaService.listarAtivos())
                     .thenReturn(List.of(ProcessoFixture.processoPadrao()));
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
@@ -136,8 +168,8 @@ class ProcessoFacadeQueryTest {
         @Test
         @DisplayName("Deve listar todos com paginação")
         void deveListarTodosPaginado() {
-            org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.Pageable.unpaged();
-            when(processoRepo.findAll(pageable)).thenReturn(org.springframework.data.domain.Page.empty());
+            Pageable pageable = Pageable.unpaged();
+            when(processoConsultaService.listarTodos(pageable)).thenReturn(Page.empty());
 
             var res = processoFacade.listarTodos(pageable);
             assertThat(res).isEmpty();
@@ -183,7 +215,7 @@ class ProcessoFacadeQueryTest {
 
             // Assert
             assertThat(res).hasSize(1);
-            assertThat(res.getFirst().getCodSubprocesso()).isEqualTo(1L);
+            assertThat(res.get(0).getCodSubprocesso()).isEqualTo(1L);
         }
 
         @Test
@@ -225,8 +257,7 @@ class ProcessoFacadeQueryTest {
         @DisplayName("Listar por participantes ignorando criado")
         void listarPorParticipantesIgnorandoCriado() {
             processoFacade.listarPorParticipantesIgnorandoCriado(List.of(1L), null);
-            verify(processoRepo).findDistinctByParticipantes_CodigoInAndSituacaoNot(anyList(),
-                    eq(SituacaoProcesso.CRIADO), any());
+            verify(processoConsultaService).listarPorParticipantesIgnorandoCriado(anyList(), any());
         }
 
         @Test
@@ -248,7 +279,7 @@ class ProcessoFacadeQueryTest {
             Processo processo = ProcessoFixture.processoPadrao();
             ProcessoDetalheDto detalhes = ProcessoDetalheDto.builder().build();
 
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(processoConsultaService.buscarPorId(id)).thenReturn(processo);
             when(processoDetalheBuilder.build(processo)).thenReturn(detalhes);
             when(processoConsultaService.listarSubprocessosElegiveis(id))
                     .thenReturn(List.of());
@@ -268,7 +299,7 @@ class ProcessoFacadeQueryTest {
         void obterContextoCompletoSucesso() {
             Processo p = new Processo();
             p.setCodigo(1L);
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+            when(processoConsultaService.buscarPorId(1L)).thenReturn(p);
             when(processoDetalheBuilder.build(p)).thenReturn(ProcessoDetalheDto.builder().build());
 
             assertThat(processoFacade.obterDetalhes(1L)).isNotNull();
@@ -276,7 +307,7 @@ class ProcessoFacadeQueryTest {
 
         @Test
         @DisplayName("listarUnidadesBloqueadasPorTipo: chama repo")
-        void listarUnidadesBloqueadasPorTipo() {
+        void listarUnidadesBloqueadasPorTipo_Test() {
             when(processoConsultaService.listarUnidadesBloqueadasPorTipo(MAPEAMENTO)).thenReturn(List.of(1L, 2L));
 
             processoFacade.listarUnidadesBloqueadasPorTipo(MAPEAMENTO);
@@ -286,9 +317,6 @@ class ProcessoFacadeQueryTest {
         @Test
         @DisplayName("getMensagemErroUnidadesSemMapa: empty list returns empty")
         void getMensagemErroUnidadesSemMapaEmpty() {
-            // This method is now in ProcessoValidador, not in ProcessoFacade
-            // Testing through the facade by creating a process with REVISAO type
-
             when(processoValidador.getMensagemErroUnidadesSemMapa(Collections.emptyList()))
                     .thenReturn(Optional.empty());
 

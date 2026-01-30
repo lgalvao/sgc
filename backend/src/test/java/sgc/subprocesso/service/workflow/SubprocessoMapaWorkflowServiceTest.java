@@ -40,13 +40,22 @@ import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+import java.time.LocalDateTime;
+import sgc.alerta.AlertaFacade;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.mapa.service.ImpactoMapaService;
+import sgc.seguranca.acesso.AccessControlService;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("SubprocessoMapaWorkflowService")
 class SubprocessoMapaWorkflowServiceTest {
     @Mock
-    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private SubprocessoRepo subprocessoRepo;
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
@@ -58,18 +67,18 @@ class SubprocessoMapaWorkflowServiceTest {
     @Mock
     private UnidadeFacade unidadeService;
     @Mock
-    private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
+    private SubprocessoValidacaoService validacaoService;
 
     @Mock
-    private sgc.seguranca.acesso.AccessControlService accessControlService;
+    private AccessControlService accessControlService;
     @Mock
-    private sgc.subprocesso.service.crud.SubprocessoCrudService crudService;
+    private SubprocessoCrudService crudService;
     @Mock
-    private sgc.alerta.AlertaFacade alertaService;
+    private AlertaFacade alertaService;
     @Mock
-    private sgc.subprocesso.model.MovimentacaoRepo repositorioMovimentacao;
+    private MovimentacaoRepo repositorioMovimentacao;
     @Mock
-    private sgc.mapa.service.ImpactoMapaService impactoMapaService;
+    private ImpactoMapaService impactoMapaService;
 
     @InjectMocks
     private SubprocessoMapaWorkflowService service;
@@ -78,9 +87,9 @@ class SubprocessoMapaWorkflowServiceTest {
     @DisplayName("Deve falhar ao buscar subprocesso inexistente")
     void deveFalharSubprocessoInexistente() {
         when(crudService.buscarSubprocesso(999L))
-                .thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Subprocesso", 999L));
+                .thenThrow(new ErroEntidadeNaoEncontrada("Subprocesso", 999L));
         assertThatThrownBy(() -> service.adicionarCompetencia(999L, CompetenciaRequest.builder().build()))
-                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     private Subprocesso mockSubprocesso(Long codigo, SituacaoSubprocesso situacao) {
@@ -95,6 +104,7 @@ class SubprocessoMapaWorkflowServiceTest {
         lenient().when(sp.getProcesso()).thenReturn(p);
  
         Unidade u = mock(Unidade.class);
+        lenient().when(u.getUnidadeSuperior()).thenReturn(mock(Unidade.class));
         lenient().when(sp.getUnidade()).thenReturn(u);
  
         // Lenient for situations where we set it
@@ -433,8 +443,11 @@ class SubprocessoMapaWorkflowServiceTest {
             service.disponibilizarMapa(1L, req, new Usuario());
 
             verify(subprocessoRepo).save(sp);
-            verify(transicaoService).registrar(eq(sp), eq(TipoTransicao.MAPA_DISPONIBILIZADO), any(), any(), any(),
-                    eq("Obs"));
+            verify(transicaoService).registrar(argThat(cmd ->
+                    cmd.sp().equals(sp) &&
+                            cmd.tipo() == TipoTransicao.MAPA_DISPONIBILIZADO &&
+                            "Obs".equals(cmd.observacoes())
+            ));
         }
 
         @Test
@@ -474,7 +487,7 @@ class SubprocessoMapaWorkflowServiceTest {
             when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(c));
 
             DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder()
-                    .dataLimite(java.time.LocalDate.now())
+                    .dataLimite(LocalDate.now())
                     .build();
             Usuario usuario = new Usuario();
 
@@ -503,7 +516,7 @@ class SubprocessoMapaWorkflowServiceTest {
             when(mapaManutencaoService.buscarAtividadesPorMapaCodigo(10L)).thenReturn(List.of(a1, a2));
 
             DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder()
-                    .dataLimite(java.time.LocalDate.now())
+                    .dataLimite(LocalDate.now())
                     .build();
             Usuario usuario = new Usuario();
 
@@ -631,8 +644,11 @@ class SubprocessoMapaWorkflowServiceTest {
             service.apresentarSugestoes(1L, "Sugestao", new Usuario());
 
             verify(subprocessoRepo).save(sp);
-            verify(transicaoService).registrar(eq(sp), eq(TipoTransicao.MAPA_SUGESTOES_APRESENTADAS), any(), any(),
-                    any(), eq("Sugestao"));
+            verify(transicaoService).registrar(argThat(cmd ->
+                    cmd.sp().equals(sp) &&
+                            cmd.tipo() == TipoTransicao.MAPA_SUGESTOES_APRESENTADAS &&
+                            "Sugestao".equals(cmd.observacoes())
+            ));
         }
 
         @Test
@@ -643,7 +659,10 @@ class SubprocessoMapaWorkflowServiceTest {
             service.validarMapa(1L, new Usuario());
 
             verify(subprocessoRepo).save(sp);
-            verify(transicaoService).registrar(eq(sp), eq(TipoTransicao.MAPA_VALIDADO), any(), any(), any());
+            verify(transicaoService).registrar(argThat(cmd ->
+                    cmd.sp().equals(sp) &&
+                            cmd.tipo() == TipoTransicao.MAPA_VALIDADO
+            ));
         }
 
         @Test
@@ -736,8 +755,10 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.disponibilizarMapaEmBloco(List.of(10L), req, new Usuario());
 
-            verify(transicaoService).registrar(eq(target), eq(TipoTransicao.MAPA_DISPONIBILIZADO), any(), any(), any(),
-                    any());
+            verify(transicaoService).registrar(argThat(cmd ->
+                    cmd.sp().equals(target) &&
+                            cmd.tipo() == TipoTransicao.MAPA_DISPONIBILIZADO
+            ));
         }
 
         @Test
@@ -752,7 +773,10 @@ class SubprocessoMapaWorkflowServiceTest {
             service.homologarValidacaoEmBloco(List.of(10L), new Usuario());
 
             verify(subprocessoRepo).save(target);
-            verify(transicaoService).registrar(eq(target), eq(TipoTransicao.MAPA_HOMOLOGADO), any(), any(), any());
+            verify(transicaoService).registrar(argThat(cmd ->
+                    cmd.sp().equals(target) &&
+                            cmd.tipo() == TipoTransicao.MAPA_HOMOLOGADO
+            ));
         }
 
         @Test
@@ -814,7 +838,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             SubmeterMapaAjustadoRequest req = SubmeterMapaAjustadoRequest.builder()
                     .justificativa("Justificativa")
-                    .dataLimiteEtapa2(java.time.LocalDateTime.now())
+                    .dataLimiteEtapa2(LocalDateTime.now())
                     .competencias(List.of())
                     .build();
 
@@ -834,7 +858,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.submeterMapaAjustado(1L, SubmeterMapaAjustadoRequest.builder()
                     .justificativa("Justificativa")
-                    .dataLimiteEtapa2(java.time.LocalDateTime.now())
+                    .dataLimiteEtapa2(LocalDateTime.now())
                     .competencias(List.of())
                     .build(), new Usuario());
 

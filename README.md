@@ -29,7 +29,8 @@ documentos abaixo para detalhes sobre padrões, arquitetura e regras:
   padrões de projeto e regras fundamentais.
 * **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos e comunicação.
 * **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
-* **[regras/](/regras)**: Diretório contendo guias específicos de padrões (backend, frontend, E2E).
+* **[backend/etc/regras/](/backend/etc/regras)**: Guias de padrões do Backend.
+* **[frontend/etc/regras/](/frontend/etc/regras)**: Guias de padrões do Frontend.
 
 ---
 
@@ -40,9 +41,9 @@ sgc/
 ├── backend/            # Código-fonte da API REST (Spring Boot)
 ├── frontend/           # Código-fonte da aplicação Web (Vue.js)
 ├── e2e/                # Testes End-to-End (Playwright)
-├── reqs/               # Documentação de requisitos (Casos de Uso)
-├── regras/             # Guias de padrões e convenções
-├── scripts/            # Scripts utilitários (captura de telas, quality checks)
+├── etc/                # Configurações, requisitos e scripts globais
+│   ├── reqs/           # Documentação de requisitos (Casos de Uso)
+│   └── scripts/        # Scripts utilitários
 └── build.gradle.kts    # Configuração de build raiz
 ```
 
@@ -110,13 +111,13 @@ Os relatórios são gerados em:
 
 Para aprender como criar novos testes unitários e de integração seguindo as melhores práticas do projeto, consulte:
 
-* **[guia-testes-junit.md](/regras/guia-testes-junit.md)**: Guia completo com recomendações, exemplos e checklist
+* **[guia-testes-junit.md](/backend/etc/regras/guia-testes-junit.md)**: Guia completo com recomendações, exemplos e checklist
 
 ---
 
 ## 📚 Documentação de Negócio
 
-Os requisitos do sistema estão documentados em casos de uso (CDUs) no diretório `reqs/`.
+Os requisitos do sistema estão documentados em casos de uso (CDUs) no diretório `etc/reqs/`.
 
 * **Processo de Mapeamento**: Criação e definição de mapas de competências.
 * **Revisão**: Fluxo de aprovação e ajuste de mapas.

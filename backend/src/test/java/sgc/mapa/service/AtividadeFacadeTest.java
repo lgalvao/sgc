@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
 @ExtendWith(MockitoExtension.class)
 class AtividadeFacadeTest {
@@ -60,7 +61,7 @@ class AtividadeFacadeTest {
         when(mapaFacade.obterPorCodigo(mapaCodigo)).thenReturn(mapa);
         when(mapaManutencaoService.criarAtividade(request)).thenReturn(responseSalvo);
         when(subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
-        when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Cadastro em Andamento"));
+        when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Cadastro em Andamento"));
         when(subprocessoFacade.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
                 new AtividadeVisualizacaoDto(atividadeCodigo, "Desc", null)
         ));
@@ -95,7 +96,7 @@ class AtividadeFacadeTest {
         when(mapaManutencaoService.obterAtividadePorCodigo(atividadeCodigo)).thenReturn(atividade);
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
         when(subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
-        when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Cadastro em Andamento"));
+        when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Cadastro em Andamento"));
 
         AtividadeOperacaoResponse result = atividadeFacade.atualizarAtividade(atividadeCodigo, request);
 
@@ -125,7 +126,7 @@ class AtividadeFacadeTest {
         when(mapaManutencaoService.obterAtividadePorCodigo(atividadeCodigo)).thenReturn(atividade);
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
         when(subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
-        when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Cadastro em Andamento"));
+        when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Cadastro em Andamento"));
 
         AtividadeOperacaoResponse result = atividadeFacade.excluirAtividade(atividadeCodigo);
 
@@ -161,7 +162,7 @@ class AtividadeFacadeTest {
         
         // Mocking for response creation
         when(subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
-        when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Cadastro em Andamento"));
+        when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Cadastro em Andamento"));
         when(subprocessoFacade.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
                 new AtividadeVisualizacaoDto(atividadeCodigo, "Desc", null)
         ));

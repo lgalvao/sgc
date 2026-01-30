@@ -14,6 +14,7 @@ import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.net.URI;
 import java.util.List;
+import sgc.organizacao.model.Perfil;
 
 @RestController
 @RequestMapping("/api/subprocessos")
@@ -75,7 +76,7 @@ public class SubprocessoCrudController {
     @PreAuthorize("isAuthenticated()")
     public SubprocessoDetalheDto obterPorCodigo(
             @PathVariable Long codigo,
-            @RequestParam(required = false) sgc.organizacao.model.Perfil perfil,
+            @RequestParam(required = false) Perfil perfil,
             @RequestParam(required = false) Long unidadeUsuario) {
         return subprocessoFacade.obterDetalhes(codigo, null);
     }

@@ -11,6 +11,7 @@ import sgc.seguranca.config.ConfigCorsProperties;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 @Tag("unit")
 @DisplayName("ConfigCors - Testes de Configuração CORS")
@@ -30,7 +31,7 @@ class ConfigCorsTest {
         ConfigCors config = new ConfigCors(properties);
 
         CorsConfigurationSource source = config.corsConfigurationSource();
-        org.springframework.mock.web.MockHttpServletRequest request = new org.springframework.mock.web.MockHttpServletRequest();
+        MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRequestURI("/api/test");
 
         CorsConfiguration configuration = source.getCorsConfiguration(request);

@@ -18,6 +18,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
+import java.util.ArrayList;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -261,7 +262,7 @@ class ValidadorDadosOrgServiceTest {
         void deveGerarExceptionComMuitasViolacoes() {
             // Arrange
             // Cria 4 unidades com problemas (sem titular)
-            List<Unidade> unidades = new java.util.ArrayList<>();
+            List<Unidade> unidades = new ArrayList<>();
             for (long i = 1; i <= 4; i++) {
                 Unidade u = criarUnidadeValida(i, "U" + i, TipoUnidade.OPERACIONAL);
                 u.setTituloTitular(""); // Violação

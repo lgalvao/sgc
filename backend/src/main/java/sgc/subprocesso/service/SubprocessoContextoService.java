@@ -29,6 +29,8 @@ import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import sgc.mapa.service.MapaFacade;
+import sgc.seguranca.acesso.AccessControlService;
 
 /**
  * Service responsável por preparar contextos de visualização de subprocessos.
@@ -50,12 +52,12 @@ class SubprocessoContextoService {
     private final SubprocessoCrudService crudService;
     private final UsuarioFacade usuarioService;
     private final UnidadeFacade unidadeFacade;
-    private final sgc.mapa.service.MapaFacade mapaFacade;
+    private final MapaFacade mapaFacade;
     private final MapaManutencaoService mapaManutencaoService;
     private final MovimentacaoRepo movimentacaoRepo;
     private final SubprocessoDetalheMapper subprocessoDetalheMapper;
     private final ConhecimentoMapper conhecimentoMapper;
-    private final sgc.seguranca.acesso.AccessControlService accessControlService;
+    private final AccessControlService accessControlService;
     private final SubprocessoAtividadeService atividadeService;
     private final SubprocessoPermissaoCalculator permissaoCalculator;
 

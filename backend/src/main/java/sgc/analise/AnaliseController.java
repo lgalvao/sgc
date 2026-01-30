@@ -8,8 +8,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.dto.CriarAnaliseRequest;
+import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.subprocesso.model.Subprocesso;
@@ -30,19 +32,23 @@ import java.util.List;
 public class AnaliseController {
     private final AnaliseFacade analiseFacade;
     private final SubprocessoFacade subprocessoFacade;
+    private final AnaliseMapper analiseMapper;
 
     /**
      * Recupera o histórico de análises associadas à fase de cadastro de um subprocesso.
      *
      * @param codigo O código do subprocesso.
-     * @return Uma lista de {@link Analise} contendo o histórico de análises de cadastro.
+     * @return Uma lista de {@link AnaliseHistoricoDto} contendo o histórico de análises de cadastro.
      */
     @GetMapping("/analises-cadastro")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista o histórico de análises de cadastro")
-    public List<Analise> listarAnalisesCadastro(@PathVariable("codSubprocesso") Long codigo) {
+    public List<AnaliseHistoricoDto> listarAnalisesCadastro(@PathVariable("codSubprocesso") Long codigo) {
         subprocessoFacade.buscarSubprocesso(codigo); // Valida existência (lança 404 se não existir)
-        return analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.CADASTRO);
+        return analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.CADASTRO)
+                .stream()
+                .map(analiseMapper::toAnaliseHistoricoDto)
+                .toList();
     }
 
     /**
@@ -54,13 +60,13 @@ public class AnaliseController {
      * @param codSubprocesso O código do subprocesso ao qual a análise pertence.
      * @param request        O DTO contendo os dados da análise. Campos esperados incluem 'observacoes',
      *                       'siglaUnidade', 'tituloUsuario' e 'motivo'.
-     * @return A entidade {@link Analise} recém-criada.
+     * @return O DTO {@link AnaliseHistoricoDto} recém-criado.
      */
     @PostMapping("/analises-cadastro")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de cadastro")
-    public Analise criarAnaliseCadastro(@PathVariable Long codSubprocesso,
+    public AnaliseHistoricoDto criarAnaliseCadastro(@PathVariable Long codSubprocesso,
                                         @RequestBody @Valid CriarAnaliseRequest request) {
 
         return criarAnalise(codSubprocesso, request, TipoAnalise.CADASTRO);
@@ -70,14 +76,17 @@ public class AnaliseController {
      * Recupera o histórico de análises associadas à fase de validação de um subprocesso.
      *
      * @param codSubprocesso O código do subprocesso.
-     * @return Uma lista de {@link Analise} contendo o histórico de análises de validação.
+     * @return Uma lista de {@link AnaliseHistoricoDto} contendo o histórico de análises de validação.
      */
     @GetMapping("/analises-validacao")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista o histórico de análises de validação")
-    public List<Analise> listarAnalisesValidacao(@PathVariable Long codSubprocesso) {
+    public List<AnaliseHistoricoDto> listarAnalisesValidacao(@PathVariable Long codSubprocesso) {
         subprocessoFacade.buscarSubprocesso(codSubprocesso);
-        return analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO);
+        return analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO)
+                .stream()
+                .map(analiseMapper::toAnaliseHistoricoDto)
+                .toList();
     }
 
     /**
@@ -89,17 +98,17 @@ public class AnaliseController {
      * @param codSubprocesso O código do subprocesso ao qual a análise pertence.
      * @param request        O DTO contendo os dados da análise. Campos esperados incluem 'observacoes',
      *                       'siglaUnidade', 'tituloUsuario' e 'motivo'.
-     * @return A entidade {@link Analise} recém-criada.
+     * @return O DTO {@link AnaliseHistoricoDto} recém-criado.
      */
     @PostMapping("/analises-validacao")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de validação")
-    public Analise criarAnaliseValidacao(@PathVariable Long codSubprocesso, @RequestBody @Valid CriarAnaliseRequest request) {
+    public AnaliseHistoricoDto criarAnaliseValidacao(@PathVariable Long codSubprocesso, @RequestBody @Valid CriarAnaliseRequest request) {
         return criarAnalise(codSubprocesso, request, TipoAnalise.VALIDACAO);
     }
 
-    private Analise criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo) {
+    private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo) {
         Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codSubprocesso);
         String observacoes = StringUtils.stripToEmpty(request.observacoes());
 
@@ -113,6 +122,7 @@ public class AnaliseController {
                 .motivo(request.motivo())
                 .build();
 
-        return analiseFacade.criarAnalise(subprocesso, command);
+        Analise analise = analiseFacade.criarAnalise(subprocesso, command);
+        return analiseMapper.toAnaliseHistoricoDto(analise);
     }
 }

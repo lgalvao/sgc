@@ -22,14 +22,14 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
     @Query("""
             SELECT u.sigla FROM Unidade u
             WHERE u.codigo IN :codigos
-            AND u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
+            AND u.situacao = SituacaoUnidade.ATIVA
             """)
     List<String> findSiglasByCodigos(@Param("codigos") List<Long> codigos);
 
     @Query("""
             SELECT u FROM Unidade u
             LEFT JOIN FETCH u.unidadeSuperior
-            WHERE u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
+            WHERE u.situacao = SituacaoUnidade.ATIVA
             """)
     List<Unidade> findAllWithHierarquia();
 

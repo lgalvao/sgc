@@ -5,6 +5,7 @@ import lombok.Getter;
 import sgc.mapa.dto.ConhecimentoResponse;
 
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * DTO agregado retornado pelo endpoint GET /api/subprocessos/{codigo}/cadastro Estrutura: {
@@ -16,7 +17,7 @@ import java.util.List;
 public class SubprocessoCadastroDto {
 
     private final Long subprocessoCodigo;
-    private final @org.jspecify.annotations.Nullable String unidadeSigla;
+    private final @Nullable String unidadeSigla;
     private final List<AtividadeCadastroDto> atividades;
 
     @Getter

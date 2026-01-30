@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
+import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
@@ -18,6 +19,7 @@ import sgc.subprocesso.model.MovimentacaoRepo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -28,7 +30,7 @@ class SubprocessoTransicaoServiceTest {
     private MovimentacaoRepo movimentacaoRepo;
 
     @Mock
-    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private SubprocessoRepo subprocessoRepo;
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
@@ -46,14 +48,14 @@ class SubprocessoTransicaoServiceTest {
         Usuario usuario = new Usuario();
 
         // Act
-        service.registrar(
-                subprocesso,
-                TipoTransicao.CADASTRO_DISPONIBILIZADO,
-                origem,
-                destino,
-                usuario,
-                "OBS"
-        );
+        service.registrar(RegistrarTransicaoCommand.builder()
+                .sp(subprocesso)
+                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
+                .origem(origem)
+                .destino(destino)
+                .usuario(usuario)
+                .observacoes("OBS")
+                .build());
 
         // Assert
         verify(movimentacaoRepo).save(any(Movimentacao.class));
@@ -61,7 +63,7 @@ class SubprocessoTransicaoServiceTest {
     }
 
     @Test
-    @DisplayName("Deve registrar transição sem observações (sobrecarga)")
+    @DisplayName("Deve registrar transição sem observações")
     void deveRegistrarSemObservacoes() {
         // Arrange
         Subprocesso subprocesso = mock(Subprocesso.class);
@@ -70,13 +72,13 @@ class SubprocessoTransicaoServiceTest {
         Usuario usuario = new Usuario();
 
         // Act
-        service.registrar(
-                subprocesso,
-                TipoTransicao.CADASTRO_DEVOLVIDO,
-                origem,
-                destino,
-                usuario
-        );
+        service.registrar(RegistrarTransicaoCommand.builder()
+                .sp(subprocesso)
+                .tipo(TipoTransicao.CADASTRO_DEVOLVIDO)
+                .origem(origem)
+                .destino(destino)
+                .usuario(usuario)
+                .build());
 
         // Assert
         verify(movimentacaoRepo).save(any(Movimentacao.class));
@@ -84,21 +86,18 @@ class SubprocessoTransicaoServiceTest {
     }
 
     @Test
-    @DisplayName("Deve lidar com unidades nulas no log")
+    @DisplayName("Deve lidar com unidades nulas")
     void deveLidarComUnidadesNulas() {
         // Arrange
         Subprocesso subprocesso = mock(Subprocesso.class);
         Usuario usuario = new Usuario();
 
         // Act
-        service.registrar(
-                subprocesso,
-                TipoTransicao.CADASTRO_DISPONIBILIZADO,
-                null,
-                null,
-                usuario,
-                null
-        );
+        service.registrar(RegistrarTransicaoCommand.builder()
+                .sp(subprocesso)
+                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
+                .usuario(usuario)
+                .build());
 
         // Assert
         verify(movimentacaoRepo).save(any(Movimentacao.class));

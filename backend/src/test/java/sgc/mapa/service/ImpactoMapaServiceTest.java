@@ -25,10 +25,10 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
 class ImpactoMapaServiceTest {
-
     @Mock private MapaRepo mapaRepo;
     @Mock private CompetenciaRepo competenciaRepo;
     @Mock private MapaManutencaoService mapaManutencaoService;
@@ -126,7 +126,7 @@ class ImpactoMapaServiceTest {
         Competencia comp = new Competencia();
         comp.setCodigo(50L);
         comp.setDescricao("Comp A");
-        comp.setAtividades(java.util.Set.of(antiga));
+        comp.setAtividades(Set.of(antiga));
         when(competenciaRepo.findByMapaCodigo(100L)).thenReturn(Collections.singletonList(comp));
 
         ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);

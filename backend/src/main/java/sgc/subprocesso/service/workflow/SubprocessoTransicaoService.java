@@ -2,21 +2,16 @@ package sgc.subprocesso.service.workflow;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.CriarAnaliseCommand;
-import sgc.analise.model.TipoAcaoAnalise;
-import sgc.analise.model.TipoAnalise;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
+import sgc.subprocesso.dto.RegistrarTransicaoCommand;
+import sgc.subprocesso.dto.RegistrarWorkflowCommand;
 import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
-import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
 /**
@@ -39,120 +34,75 @@ import sgc.subprocesso.model.Subprocesso;
 public class SubprocessoTransicaoService {
     private final MovimentacaoRepo movimentacaoRepo;
     private final ApplicationEventPublisher eventPublisher;
-    private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     private final AnaliseFacade analiseFacade;
 
     /**
-     * Registra uma transição de subprocesso: salva movimentação e publica evento.
+     * Registra uma transição de subprocesso (auditoria e eventos).
      *
-     * @param subprocesso Subprocesso que está transitando
-     * @param tipo        Tipo da transição (define descrição e templates de comunicação)
-     * @param origem      Unidade de origem da transição
-     * @param destino     Unidade de destino da transição
-     * @param usuario     Usuário que executou a ação
-     * @param observacoes Observações opcionais (ex: motivo de devolução)
+     * @param cmd Comando contendo os dados da transição
      */
-    public void registrar(
-            Subprocesso subprocesso,
-            TipoTransicao tipo,
-            Unidade origem,
-            Unidade destino,
-            Usuario usuario,
-            @Nullable String observacoes) {
-
-        // 1. Salvar movimentação (atômico com a transação do chamador)
+    @Transactional
+    public void registrar(RegistrarTransicaoCommand cmd) {
+        // 1. Salvar movimentação (trilha de auditoria completa)
         Movimentacao movimentacao = Movimentacao.builder()
-                .subprocesso(subprocesso)
-                .unidadeOrigem(origem)
-                .unidadeDestino(destino)
-                .descricao(tipo.getDescricaoMovimentacao())
-                .usuario(usuario)
+                .subprocesso(cmd.sp())
+                .unidadeOrigem(cmd.origem())
+                .unidadeDestino(cmd.destino())
+                .descricao(cmd.tipo().getDescricaoMovimentacao())
+                .observacoes(cmd.observacoes())
+                .usuario(cmd.usuario())
                 .build();
         movimentacaoRepo.save(movimentacao);
 
         // 2. Publicar evento para comunicação (alertas/emails)
         EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
-                .subprocesso(subprocesso)
-                .tipo(tipo)
-                .usuario(usuario)
-                .unidadeOrigem(origem)
-                .unidadeDestino(destino)
-                .observacoes(observacoes)
+                .subprocesso(cmd.sp())
+                .tipo(cmd.tipo())
+                .usuario(cmd.usuario())
+                .unidadeOrigem(cmd.origem())
+                .unidadeDestino(cmd.destino())
+                .observacoes(cmd.observacoes())
                 .build();
 
         eventPublisher.publishEvent(evento);
     }
 
     /**
-     * Registra uma transição sem observações.
-     *
-     * @see #registrar(Subprocesso, TipoTransicao, Unidade, Unidade, Usuario, String)
-     */
-    public void registrar(
-            Subprocesso subprocesso,
-            TipoTransicao tipo,
-            Unidade origem,
-            Unidade destino,
-            Usuario usuario) {
-                
-        registrar(subprocesso, tipo, origem, destino, usuario, null);
-    }
-
-    /**
      * Executa um workflow completo com análise e transição.
-     *
-     * <p>Utilizado principalmente em workflows de aprovação/devolução onde
-     * é necessário registrar análise + mudança de estado.
-     *
-     * @param req Objeto contendo todos os parâmetros da transição de workflow
+     * 
+     * @param cmd Comando contendo dados da análise e da transição
      */
     @Transactional
-    public void registrarAnaliseETransicao(RegistrarWorkflowReq req) {
-        // 1. Criar Análise
+    public void registrarAnaliseETransicao(RegistrarWorkflowCommand cmd) {
+        Subprocesso sp = cmd.sp();
+
+        // 1. Criar Análise (Registro histórico da decisão técnica)
         analiseFacade.criarAnalise(
-                req.sp(),
+                sp,
                 CriarAnaliseCommand.builder()
-                        .codSubprocesso(req.sp().getCodigo())
-                        .observacoes(req.observacoes())
-                        .tipo(req.tipoAnalise())
-                        .acao(req.tipoAcaoAnalise())
-                        .siglaUnidade(req.unidadeAnalise().getSigla())
-                        .tituloUsuario(req.usuario().getTituloEleitoral())
-                        .motivo(req.motivoAnalise())
+                        .codSubprocesso(sp.getCodigo())
+                        .observacoes(cmd.observacoes())
+                        .tipo(cmd.tipoAnalise())
+                        .acao(cmd.tipoAcaoAnalise())
+                        .siglaUnidade(cmd.unidadeAnalise().getSigla())
+                        .tituloUsuario(cmd.usuario().getTituloEleitoral())
+                        .motivo(cmd.motivoAnalise())
                         .build());
 
         // 2. Atualizar Estado
-        req.sp().setSituacao(req.novaSituacao());
-        subprocessoRepo.save(req.sp());
+        sp.setSituacao(cmd.novaSituacao());
 
-        // 3. Registrar Transição
-        registrar(
-                req.sp(),
-                req.tipoTransicao(),
-                req.unidadeOrigemTransicao(),
-                req.unidadeDestinoTransicao(),
-                req.usuario(),
-                req.observacoes());
+        // 3. Registrar Transição e Eventos
+        registrar(RegistrarTransicaoCommand.builder()
+                .sp(sp)
+                .tipo(cmd.tipoTransicao())
+                .origem(cmd.unidadeOrigemTransicao())
+                .destino(cmd.unidadeDestinoTransicao())
+                .usuario(cmd.usuario())
+                .observacoes(cmd.observacoes())
+                .build());
 
         log.info("Workflow executado: Subprocesso {} -> {}, Transição {}",
-                req.sp().getCodigo(), req.novaSituacao(), req.tipoTransicao());
-    }
-
-    /**
-     * Parâmetros para registro de workflow completo.
-     */
-    public record RegistrarWorkflowReq(
-            Subprocesso sp,
-            @Nullable SituacaoSubprocesso novaSituacao,
-            TipoTransicao tipoTransicao,
-            TipoAnalise tipoAnalise,
-            TipoAcaoAnalise tipoAcaoAnalise,
-            @Nullable Unidade unidadeAnalise,
-            @Nullable Unidade unidadeOrigemTransicao,
-            @Nullable Unidade unidadeDestinoTransicao,
-            Usuario usuario,
-            @Nullable String observacoes,
-            @Nullable String motivoAnalise
-    ) {
+                sp.getCodigo(), cmd.novaSituacao(), cmd.tipoTransicao());
     }
 }

@@ -43,14 +43,18 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import tools.jackson.core.type.TypeReference;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import sgc.analise.dto.AnaliseHistoricoDto;
+import sgc.integracao.mocks.TestThymeleafConfig;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-13: Analisar cadastro de atividades e conhecimentos")
-@org.springframework.test.annotation.DirtiesContext(classMode = org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CDU13IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
@@ -282,7 +286,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk());
 
         String jsonResponse = mockMvc
-                .perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get(
+                .perform(MockMvcRequestBuilders.get(
                                 "/api/subprocessos/{id}/historico-cadastro",
                                 subprocesso.getCodigo())
                         .accept(MediaType.APPLICATION_JSON))
@@ -291,18 +295,18 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<sgc.analise.dto.AnaliseHistoricoDto> historico = objectMapper.readValue(jsonResponse,
+        List<AnaliseHistoricoDto> historico = objectMapper.readValue(jsonResponse,
                 new TypeReference<>() {
                 });
 
         assertThat(historico).hasSize(2);
 
-        sgc.analise.dto.AnaliseHistoricoDto aceite = historico.getFirst();
+        AnaliseHistoricoDto aceite = historico.getFirst();
         assertThat(aceite.acao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
         assertThat(aceite.observacoes()).isEqualTo(obsAceite);
         assertThat(aceite.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
 
-        sgc.analise.dto.AnaliseHistoricoDto devolucao = historico.get(1);
+        AnaliseHistoricoDto devolucao = historico.get(1);
         assertThat(devolucao.acao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
         assertThat(devolucao.observacoes()).isEqualTo(obsDevolucao);
         assertThat(devolucao.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());

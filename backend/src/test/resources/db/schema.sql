@@ -570,15 +570,10 @@ create table if not exists sgc.movimentacao
 (
     12
 ),
-    descricao varchar
-(
-    255
-),
-    primary key
-(
-    codigo
-)
-    );
+    descricao varchar(255),
+    observacoes varchar(1000),
+    primary key (codigo)
+);
 
 create table if not exists sgc.notificacao
 (

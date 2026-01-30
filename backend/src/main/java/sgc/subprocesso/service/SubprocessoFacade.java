@@ -37,6 +37,12 @@ import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
 import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
+import java.time.LocalDate;
+import java.util.Collection;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeMapa;
+import sgc.processo.model.Processo;
+import sgc.subprocesso.service.factory.SubprocessoFactory;
 
 /**
  * Facade para orquestrar operações de Subprocesso.
@@ -71,7 +77,7 @@ public class SubprocessoFacade {
     private final SubprocessoAtividadeService atividadeService;
     private final SubprocessoContextoService contextoService;
     private final SubprocessoPermissaoCalculator permissaoCalculator;
-    private final sgc.subprocesso.service.factory.SubprocessoFactory subprocessoFactory;
+    private final SubprocessoFactory subprocessoFactory;
 
     // Utility services
     private final UsuarioFacade usuarioService;
@@ -239,42 +245,48 @@ public class SubprocessoFacade {
 
     @Transactional
     public void devolverCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.devolverCadastro(codigo, observacoes, usuario);
+        cadastroWorkflowService.devolverCadastro(codigo, usuario, observacoes);
     }
 
     @Transactional
     public void aceitarCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.aceitarCadastro(codigo, observacoes, usuario);
+        cadastroWorkflowService.aceitarCadastro(codigo, usuario, observacoes);
     }
 
     @Transactional
     public void homologarCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.homologarCadastro(codigo, observacoes, usuario);
+        cadastroWorkflowService.homologarCadastro(codigo, usuario, observacoes);
     }
 
     @Transactional
     public void devolverRevisaoCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.devolverRevisaoCadastro(codigo, observacoes, usuario);
+        cadastroWorkflowService.devolverRevisaoCadastro(codigo, usuario, observacoes);
     }
 
     @Transactional
     public void aceitarRevisaoCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.aceitarRevisaoCadastro(codigo, observacoes, usuario);
+        cadastroWorkflowService.aceitarRevisaoCadastro(codigo, usuario, observacoes);
     }
 
     @Transactional
     public void homologarRevisaoCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.homologarRevisaoCadastro(codigo, observacoes, usuario);
+        cadastroWorkflowService.homologarRevisaoCadastro(codigo, usuario, observacoes);
     }
 
     @Transactional
     public void aceitarCadastroEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        cadastroWorkflowService.aceitarCadastroEmBloco(codUnidades, usuario);
+        for (Long codUnidade : codUnidades) {
+            SubprocessoDto sp = crudService.obterPorProcessoEUnidade(codProcesso, codUnidade);
+            cadastroWorkflowService.aceitarCadastroEmBloco(List.of(sp.getCodigo()), usuario);
+        }
     }
 
     @Transactional
     public void homologarCadastroEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        cadastroWorkflowService.homologarCadastroEmBloco(codUnidades, usuario);
+        for (Long codUnidade : codUnidades) {
+            SubprocessoDto sp = crudService.obterPorProcessoEUnidade(codProcesso, codUnidade);
+            cadastroWorkflowService.homologarCadastroEmBloco(List.of(sp.getCodigo()), usuario);
+        }
     }
 
     // ===== Workflow de Mapa =====
@@ -337,17 +349,26 @@ public class SubprocessoFacade {
     @Transactional
     public void disponibilizarMapaEmBloco(List<Long> codUnidades, Long codProcesso, DisponibilizarMapaRequest request,
             Usuario usuario) {
-        mapaWorkflowService.disponibilizarMapaEmBloco(codUnidades, request, usuario);
+        for (Long codUnidade : codUnidades) {
+            SubprocessoDto sp = crudService.obterPorProcessoEUnidade(codProcesso, codUnidade);
+            mapaWorkflowService.disponibilizarMapaEmBloco(List.of(sp.getCodigo()), request, usuario);
+        }
     }
 
     @Transactional
     public void aceitarValidacaoEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        mapaWorkflowService.aceitarValidacaoEmBloco(codUnidades, usuario);
+        for (Long codUnidade : codUnidades) {
+            SubprocessoDto sp = crudService.obterPorProcessoEUnidade(codProcesso, codUnidade);
+            mapaWorkflowService.aceitarValidacaoEmBloco(List.of(sp.getCodigo()), usuario);
+        }
     }
 
     @Transactional
     public void homologarValidacaoEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        mapaWorkflowService.homologarValidacaoEmBloco(codUnidades, usuario);
+        for (Long codUnidade : codUnidades) {
+            SubprocessoDto sp = crudService.obterPorProcessoEUnidade(codProcesso, codUnidade);
+            mapaWorkflowService.homologarValidacaoEmBloco(List.of(sp.getCodigo()), usuario);
+        }
     }
 
     @Transactional
@@ -361,7 +382,7 @@ public class SubprocessoFacade {
     }
 
     @Transactional
-    public void alterarDataLimite(Long codigo, java.time.LocalDate novaDataLimite) {
+    public void alterarDataLimite(Long codigo, LocalDate novaDataLimite) {
         adminWorkflowService.alterarDataLimite(codigo, novaDataLimite);
     }
 
@@ -387,7 +408,7 @@ public class SubprocessoFacade {
      * @param unidades as {@link sgc.organizacao.model.Unidade}s para as quais criar subprocessos
      */
     @Transactional
-    public void criarParaMapeamento(sgc.processo.model.Processo processo, java.util.Collection<sgc.organizacao.model.Unidade> unidades) {
+    public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades) {
         subprocessoFactory.criarParaMapeamento(processo, unidades);
     }
 
@@ -402,7 +423,7 @@ public class SubprocessoFacade {
      * @param unidadeMapa o {@link sgc.organizacao.model.UnidadeMapa} vigente da unidade
      */
     @Transactional
-    public void criarParaRevisao(sgc.processo.model.Processo processo, sgc.organizacao.model.Unidade unidade, sgc.organizacao.model.UnidadeMapa unidadeMapa) {
+    public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa) {
         subprocessoFactory.criarParaRevisao(processo, unidade, unidadeMapa);
     }
 
@@ -417,7 +438,7 @@ public class SubprocessoFacade {
      * @param unidadeMapa o {@link sgc.organizacao.model.UnidadeMapa} vigente da unidade
      */
     @Transactional
-    public void criarParaDiagnostico(sgc.processo.model.Processo processo, sgc.organizacao.model.Unidade unidade, sgc.organizacao.model.UnidadeMapa unidadeMapa) {
+    public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa) {
         subprocessoFactory.criarParaDiagnostico(processo, unidade, unidadeMapa);
     }
 }

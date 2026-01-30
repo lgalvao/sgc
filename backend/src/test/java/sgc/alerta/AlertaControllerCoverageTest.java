@@ -11,6 +11,7 @@ import sgc.organizacao.model.Usuario;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mockito.Mockito;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AlertaControllerCoverageTest")
@@ -36,7 +37,7 @@ class AlertaControllerCoverageTest {
     @Test
     @DisplayName("listarAlertas - Principal UserDetails")
     void listarAlertas_PrincipalUserDetails() {
-        UserDetails userDetails = org.mockito.Mockito.mock(UserDetails.class);
+        UserDetails userDetails = Mockito.mock(UserDetails.class);
         when(userDetails.getUsername()).thenReturn("user_details");
 
         controller.listarAlertas(userDetails);

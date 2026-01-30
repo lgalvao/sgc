@@ -32,6 +32,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import sgc.integracao.mocks.TestSecurityConfig;
+import jakarta.validation.Path;
+import java.util.Collections;
+import java.util.Map;
+import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpInputMessage;
 
 @Tag("unit")
 @WebMvcTest(TestSecurityController.class)
@@ -140,7 +145,7 @@ class RestExceptionHandlerTest {
         ConstraintViolation<Object> violation = Mockito.mock(ConstraintViolation.class);
         Mockito.when(violation.getMessage()).thenReturn("Violação de constraint");
         Mockito.doReturn(Object.class).when(violation).getRootBeanClass();
-        Mockito.when(violation.getPropertyPath()).thenAnswer(i -> Mockito.mock(jakarta.validation.Path.class));
+        Mockito.when(violation.getPropertyPath()).thenAnswer(i -> Mockito.mock(Path.class));
 
         Mockito.doThrow(new ConstraintViolationException("Erro constraint", Set.of(violation)))
                 .when(controller).teste(any());
@@ -156,7 +161,7 @@ class RestExceptionHandlerTest {
     @Test
     @DisplayName("Deve tratar HttpMessageNotReadableException (400)")
     void deveTratarHttpMessageNotReadableException() {
-        HttpMessageNotReadableException ex = new HttpMessageNotReadableException("JSON Error", Mockito.mock(org.springframework.http.HttpInputMessage.class));
+        HttpMessageNotReadableException ex = new HttpMessageNotReadableException("JSON Error", Mockito.mock(HttpInputMessage.class));
         ResponseEntity<Object> response = restExceptionHandler.handleHttpMessageNotReadable(ex, new HttpHeaders(), HttpStatus.BAD_REQUEST, null);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Requisição JSON malformada", ((ErroApi) response.getBody()).getMessage());
@@ -168,7 +173,7 @@ class RestExceptionHandlerTest {
         BindingResult bindingResult = Mockito.mock(BindingResult.class);
         FieldError error = new FieldError("obj", "field", "defaultMessage");
         Mockito.when(bindingResult.getFieldErrors()).thenReturn(List.of(error));
-        org.springframework.core.MethodParameter methodParameter = Mockito.mock(org.springframework.core.MethodParameter.class);
+        MethodParameter methodParameter = Mockito.mock(MethodParameter.class);
         Mockito.when(methodParameter.getExecutable()).thenReturn(Object.class.getMethod("toString"));
         MethodArgumentNotValidException ex = new MethodArgumentNotValidException(methodParameter, bindingResult);
 
@@ -192,7 +197,7 @@ class RestExceptionHandlerTest {
     @Test
     @DisplayName("Deve tratar ErroNegocioBase com detalhes")
     void deveTratarErroNegocioBaseComDetalhes() {
-        java.util.Map<String, String> details = java.util.Map.of("campo", "erro");
+        Map<String, String> details = Map.of("campo", "erro");
         ErroNegocioBase ex = new ErroNegocioBase("Erro Com Detalhe", "CODE", HttpStatus.BAD_REQUEST, details) {};
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -202,7 +207,7 @@ class RestExceptionHandlerTest {
     @Test
     @DisplayName("Deve tratar ErroNegocioBase com lista de detalhes vazia")
     void deveTratarErroNegocioBaseComDetalhesVazio() {
-        ErroNegocioBase ex = new ErroNegocioBase("Erro Detalhe Vazio", "CODE", HttpStatus.BAD_REQUEST, java.util.Collections.emptyMap()) {};
+        ErroNegocioBase ex = new ErroNegocioBase("Erro Detalhe Vazio", "CODE", HttpStatus.BAD_REQUEST, Collections.emptyMap()) {};
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertThat(((ErroApi) response.getBody()).getDetails()).isNull();

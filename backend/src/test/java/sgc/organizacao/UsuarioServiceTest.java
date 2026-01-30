@@ -20,6 +20,11 @@ import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.Perfil;
+import org.springframework.security.core.context.SecurityContextHolder;
+import sgc.comum.erros.ErroAcessoNegado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
+import sgc.organizacao.model.Usuario;
 
 @Tag("integration")
 @SpringBootTest
@@ -188,8 +193,8 @@ class UsuarioServiceTest {
         @Test
         @DisplayName("Deve lançar erro ao buscar unidade inexistente por código ou sigla")
         void deveRetornarErroAoBuscarUnidadeInexistente() {
-            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> unidadeService.buscarPorCodigo(9999L));
-            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> unidadeService.buscarPorSigla("SIGLA_NAO_EXISTE"));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeService.buscarPorCodigo(9999L));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeService.buscarPorSigla("SIGLA_NAO_EXISTE"));
         }
     }
 
@@ -280,11 +285,11 @@ class UsuarioServiceTest {
         @DisplayName("Deve retornar null se não houver usuário autenticado")
         void deveRetornarNullSeNaoAutenticado() {
             // Limpa contexto
-            org.springframework.security.core.context.SecurityContextHolder.clearContext();
+            SecurityContextHolder.clearContext();
 
             assertNull(usuarioService.obterUsuarioAutenticadoOuNull());
 
-            assertThrows(sgc.comum.erros.ErroAccessoNegado.class,
+            assertThrows(ErroAcessoNegado.class,
                     () -> usuarioService.obterUsuarioAutenticado());
         }
 
@@ -294,7 +299,7 @@ class UsuarioServiceTest {
             assertNull(usuarioService.extrairTituloUsuario(null));
             assertEquals("123", usuarioService.extrairTituloUsuario("123"));
 
-            sgc.organizacao.model.Usuario u = new sgc.organizacao.model.Usuario();
+            Usuario u = new Usuario();
             u.setTituloEleitoral("456");
             assertEquals("456", usuarioService.extrairTituloUsuario(u));
 
@@ -339,7 +344,7 @@ class UsuarioServiceTest {
             assertTrue(admins.stream().anyMatch(a -> a.tituloEleitoral().equals(tituloNovoAdmin)));
 
             // Falhar ao adicionar duplicado
-            assertThrows(sgc.comum.erros.ErroValidacao.class,
+            assertThrows(ErroValidacao.class,
                     () -> usuarioService.adicionarAdministrador(tituloNovoAdmin));
 
             // Remover
@@ -350,7 +355,7 @@ class UsuarioServiceTest {
         @Test
         @DisplayName("Deve falhar ao remover a si mesmo")
         void deveFalharRemoverSiMesmo() {
-            assertThrows(sgc.comum.erros.ErroValidacao.class,
+            assertThrows(ErroValidacao.class,
                     () -> usuarioService.removerAdministrador(TITULO_ADMIN, TITULO_ADMIN));
         }
 
@@ -361,7 +366,7 @@ class UsuarioServiceTest {
             usuarioService.removerAdministrador("6", "OUTRO");
             usuarioService.removerAdministrador("999999999999", "OUTRO");
 
-            assertThrows(sgc.comum.erros.ErroValidacao.class,
+            assertThrows(ErroValidacao.class,
                     () -> usuarioService.removerAdministrador(TITULO_ADMIN, "OUTRO"));
         }
     }

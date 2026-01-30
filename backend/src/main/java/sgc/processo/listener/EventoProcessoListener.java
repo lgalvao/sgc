@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import static sgc.organizacao.model.TipoUnidade.*;
+import java.util.Objects;
 
 /**
  * Listener assíncrono para eventos de processo.
@@ -157,7 +158,7 @@ public class EventoProcessoListener {
 
         Map<String, UsuarioDto> usuarios = usuarioService.buscarUsuariosPorTitulos(responsaveis.values().stream()
                 .map(UnidadeResponsavelDto::titularTitulo)
-                .filter(java.util.Objects::nonNull)
+                .filter(Objects::nonNull)
                 .distinct()
                 .toList());
 

@@ -10,6 +10,7 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.TipoUnidade;
 
 @Tag("unit")
 @DisplayName("Testes de Mapper: UsuarioMapper")
@@ -25,7 +26,7 @@ class UsuarioMapperTest {
         unidade.setCodigo(1L);
         unidade.setNome("Unidade Teste");
         unidade.setSigla("UT");
-        unidade.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
 
         // Act
         UnidadeDto dto = mapper.toUnidadeDto(unidade);
@@ -73,7 +74,7 @@ class UsuarioMapperTest {
         // 2. Cenário: Unidade Operacional (Elegível)
         Unidade uOp = new Unidade();
         uOp.setCodigo(1L);
-        uOp.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+        uOp.setTipo(TipoUnidade.OPERACIONAL);
 
         UnidadeDto dtoOp = mapper.toUnidadeDtoComElegibilidadeCalculada(uOp);
         assertThat(dtoOp).isNotNull();
@@ -82,7 +83,7 @@ class UsuarioMapperTest {
         // 3. Cenário: Unidade Intermediária (Inelegível)
         Unidade uInt = new Unidade();
         uInt.setCodigo(2L);
-        uInt.setTipo(sgc.organizacao.model.TipoUnidade.INTERMEDIARIA);
+        uInt.setTipo(TipoUnidade.INTERMEDIARIA);
 
         UnidadeDto dtoInt = mapper.toUnidadeDtoComElegibilidadeCalculada(uInt);
         assertThat(dtoInt).isNotNull();

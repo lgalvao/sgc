@@ -29,6 +29,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.mockito.Mockito;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -42,7 +48,7 @@ class ProcessoDetalheBuilderTest {
     private ProcessoDetalheMapper processoDetalheMapper;
 
     @Mock
-    private sgc.organizacao.model.UsuarioPerfilRepo usuarioPerfilRepo;
+    private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @InjectMocks
     private ProcessoDetalheBuilder builder;
@@ -86,9 +92,9 @@ class ProcessoDetalheBuilderTest {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
         sp.setUnidade(u1);
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         sp.setDataLimiteEtapa1(processo.getDataLimite());
-        sp.setMapa(new sgc.mapa.model.Mapa());
+        sp.setMapa(new Mapa());
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
 
@@ -125,7 +131,7 @@ class ProcessoDetalheBuilderTest {
         SecurityContext securityContext = mock(SecurityContext.class);
         Authentication auth = mock(Authentication.class);
         when(auth.isAuthenticated()).thenReturn(true);
-        org.mockito.Mockito.doReturn(List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))).when(auth).getAuthorities();
+        Mockito.doReturn(List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))).when(auth).getAuthorities();
         when(securityContext.getAuthentication()).thenReturn(auth);
         SecurityContextHolder.setContext(securityContext);
 
@@ -150,7 +156,7 @@ class ProcessoDetalheBuilderTest {
         SecurityContext securityContext = mock(SecurityContext.class);
         Authentication auth = mock(Authentication.class);
         when(auth.isAuthenticated()).thenReturn(true);
-        org.mockito.Mockito.doReturn(List.of(new SimpleGrantedAuthority("ROLE_USER"))).when(auth).getAuthorities();
+        Mockito.doReturn(List.of(new SimpleGrantedAuthority("ROLE_USER"))).when(auth).getAuthorities();
         when(securityContext.getAuthentication()).thenReturn(auth);
         SecurityContextHolder.setContext(securityContext);
 
@@ -219,14 +225,14 @@ class ProcessoDetalheBuilderTest {
 
         Subprocesso spPai = new Subprocesso();
         spPai.setUnidade(pai);
-        spPai.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
-        spPai.setMapa(new sgc.mapa.model.Mapa());
+        spPai.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        spPai.setMapa(new Mapa());
         spPai.getMapa().setCodigo(100L);
 
         Subprocesso spFilho = new Subprocesso();
         spFilho.setUnidade(filho);
-        spFilho.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
-        spFilho.setMapa(new sgc.mapa.model.Mapa());
+        spFilho.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        spFilho.setMapa(new Mapa());
         spFilho.getMapa().setCodigo(101L);
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(spPai, spFilho));
@@ -282,9 +288,9 @@ class ProcessoDetalheBuilderTest {
         Authentication auth = mock(Authentication.class);
         when(auth.isAuthenticated()).thenReturn(true);
 
-        sgc.organizacao.model.Usuario usuario = new sgc.organizacao.model.Usuario();
+        Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("12345678901");
-        sgc.organizacao.model.UsuarioPerfil atribuicao = new sgc.organizacao.model.UsuarioPerfil();
+        UsuarioPerfil atribuicao = new UsuarioPerfil();
         Unidade u2 = new Unidade();
         u2.setCodigo(2L); // Different unit
         atribuicao.setUnidade(u2);
@@ -349,7 +355,7 @@ class ProcessoDetalheBuilderTest {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
         sp.setUnidade(u1);
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         sp.setDataLimiteEtapa1(processo.getDataLimite());
         sp.setMapa(null); // Mapa nulo
 
@@ -381,7 +387,7 @@ class ProcessoDetalheBuilderTest {
         Unidade u1 = new Unidade();
         u1.setCodigo(10L);
         sp.setUnidade(u1);
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
 
         // Subprocesso existe mas unidade não está em participantes
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));

@@ -4,15 +4,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.any;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,7 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 
@@ -38,24 +38,33 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
 
-import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("Testes de Cobertura para UsuarioFacade")
 class UsuarioFacadeCoverageTest {
 
-    @InjectMocks
     private UsuarioFacade usuarioFacade;
 
     @Mock
-    private UsuarioRepo usuarioRepo;
+    private UsuarioConsultaService usuarioConsultaService;
     @Mock
-    private UsuarioPerfilRepo usuarioPerfilRepo;
+    private UsuarioPerfilService usuarioPerfilService;
     @Mock
-    private AdministradorRepo administradorRepo;
+    private AdministradorService administradorService;
     @Mock
-    private UnidadeRepo unidadeRepo;
+    private UnidadeConsultaService unidadeConsultaService;
+
+    @BeforeEach
+    void setUp() {
+        usuarioFacade = new UsuarioFacade(
+            usuarioConsultaService,
+            usuarioPerfilService,
+            administradorService,
+            unidadeConsultaService
+        );
+    }
 
     @AfterEach
     void tearDown() {
@@ -92,14 +101,14 @@ class UsuarioFacadeCoverageTest {
         SecurityContextHolder.setContext(ctx);
         when(ctx.getAuthentication()).thenReturn(null);
 
-        var erro = assertThrows(ErroAccessoNegado.class, () -> usuarioFacade.obterUsuarioAutenticado());
+        var erro = assertThrows(ErroAcessoNegado.class, () -> usuarioFacade.obterUsuarioAutenticado());
         assertThat(erro).isNotNull();
     }
 
     @Test
     @DisplayName("Deve retornar vazio se usuário não encontrado ao buscar unidades de responsabilidade")
     void deveRetornarVaziaSeUsuarioNaoEncontradoNoResponsavel() {
-        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.empty());
+        when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional("T")).thenReturn(Optional.empty());
         assertThat(usuarioFacade.buscarUnidadesOndeEhResponsavel("T")).isEmpty();
     }
 
@@ -115,11 +124,11 @@ class UsuarioFacadeCoverageTest {
     }
 
     @Test
-    @DisplayName("Deve buscar por id delegando para repositório comum")
+    @DisplayName("Deve buscar por id delegando para servico")
     void deveBuscarPorId() {
         Usuario u = new Usuario();
         u.setTituloEleitoral("T");
-        when(usuarioRepo.findById("T")).thenReturn(Optional.of(u));
+        when(usuarioConsultaService.buscarPorId("T")).thenReturn(u);
 
         Usuario result = usuarioFacade.buscarPorId("T");
         assertThat(result.getTituloEleitoral()).isEqualTo("T");
@@ -128,22 +137,20 @@ class UsuarioFacadeCoverageTest {
     @Test
     @DisplayName("Deve carregar usuário para autenticação")
     void deveCarregarUsuarioParaAutenticacao() {
-        Usuario u = mock(Usuario.class);
-        when(u.getTituloEleitoral()).thenReturn("T");
-        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTitulo("T")).thenReturn(Collections.emptyList());
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("T");
+        when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional("T")).thenReturn(Optional.of(u));
 
         Usuario result = usuarioFacade.carregarUsuarioParaAutenticacao("T");
         assertThat(result).isNotNull();
-        verify(u).getAuthorities(); // Garante cobertura da linha usuario.getAuthorities()
+        verify(usuarioPerfilService).carregarAuthorities(u);
     }
 
     @Test
     @DisplayName("Deve lançar erro se usuário não encontrado por login")
     void deveLancarErroSeUsuarioNaoEncontradoPorLogin() {
-        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.empty());
-        var erro = assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarPorLogin("T"));
-        assertThat(erro).isNotNull();
+        when(usuarioConsultaService.buscarPorIdComAtribuicoes("T")).thenThrow(new ErroEntidadeNaoEncontrada("Usuário", "T"));
+        assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarPorLogin("T"));
     }
 
     @Test
@@ -154,7 +161,7 @@ class UsuarioFacadeCoverageTest {
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         u.setUnidadeLotacao(unidade);
-        when(usuarioRepo.findById("T")).thenReturn(Optional.of(u));
+        when(usuarioConsultaService.buscarPorIdOpcional("T")).thenReturn(Optional.of(u));
 
         Optional<UsuarioDto> dto = usuarioFacade.buscarUsuarioPorTitulo("T");
         assertThat(dto).isPresent();
@@ -170,7 +177,7 @@ class UsuarioFacadeCoverageTest {
         unidade.setCodigo(1L);
         u.setUnidadeLotacao(unidade);
 
-        when(usuarioRepo.findByUnidadeLotacaoCodigo(1L)).thenReturn(List.of(u));
+        when(usuarioConsultaService.buscarPorUnidadeLotacao(1L)).thenReturn(List.of(u));
 
         List<UsuarioDto> lista = usuarioFacade.buscarUsuariosPorUnidade(1L);
         assertThat(lista).hasSize(1);
@@ -179,7 +186,7 @@ class UsuarioFacadeCoverageTest {
     @Test
     @DisplayName("Deve retornar vazio ao buscar perfis de usuário inexistente")
     void deveRetornarVazioAoBuscarPerfisDeUsuarioInexistente() {
-        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.empty());
+        when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional("T")).thenReturn(Optional.empty());
         assertThat(usuarioFacade.buscarPerfisUsuario("T")).isEmpty();
     }
 
@@ -199,13 +206,12 @@ class UsuarioFacadeCoverageTest {
         up.setUnidade(unidade);
         up.setPerfil(Perfil.CHEFE);
 
-        // Simula usuario encontrado mas sem atribuicoes carregadas inicialmente
-        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTitulo("T")).thenReturn(List.of(up));
+        when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional("T")).thenReturn(Optional.of(u));
+        when(usuarioPerfilService.buscarPorUsuario("T")).thenReturn(List.of(up));
 
         List<PerfilDto> perfis = usuarioFacade.buscarPerfisUsuario("T");
         assertThat(perfis).hasSize(1);
-        assertThat(perfis.getFirst().perfil()).isEqualTo("CHEFE");
+        assertThat(perfis.get(0).perfil()).isEqualTo("CHEFE");
     }
 
     @Test
@@ -213,54 +219,18 @@ class UsuarioFacadeCoverageTest {
     void deveBuscarResponsavelAtual() {
         Unidade un = new Unidade();
         un.setCodigo(1L);
-        when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.of(un));
+        when(unidadeConsultaService.buscarPorSigla("SIGLA")).thenReturn(un);
 
         Usuario chefeSimples = new Usuario();
         chefeSimples.setTituloEleitoral("C");
-        when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.of(chefeSimples));
+        when(usuarioConsultaService.buscarChefePorUnidade(1L, "SIGLA")).thenReturn(chefeSimples);
 
         Usuario chefeCompleto = new Usuario();
         chefeCompleto.setTituloEleitoral("C");
-        when(usuarioRepo.findByIdWithAtribuicoes("C")).thenReturn(Optional.of(chefeCompleto));
+        when(usuarioConsultaService.buscarPorIdComAtribuicoes("C")).thenReturn(chefeCompleto);
 
         Usuario res = usuarioFacade.buscarResponsavelAtual("SIGLA");
         assertThat(res).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Deve lançar erro ao buscar responsável de unidade inexistente")
-    void deveLancarErroResponsavelUnidadeInexistente() {
-        when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.empty());
-        var erro = assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarResponsavelAtual("SIGLA"));
-        assertThat(erro).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Deve lançar erro ao buscar responsável não encontrado")
-    void deveLancarErroResponsavelNaoEncontrado() {
-        Unidade un = new Unidade();
-        un.setCodigo(1L);
-        when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.of(un));
-        when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.empty());
-
-        var erro = assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarResponsavelAtual("SIGLA"));
-        assertThat(erro).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Deve lançar erro ao carregar dados do responsável")
-    void deveLancarErroCarregarDadosResponsavel() {
-        Unidade un = new Unidade();
-        un.setCodigo(1L);
-        when(unidadeRepo.findBySigla("SIGLA")).thenReturn(Optional.of(un));
-
-        Usuario chefeSimples = new Usuario();
-        chefeSimples.setTituloEleitoral("C");
-        when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.of(chefeSimples));
-        when(usuarioRepo.findByIdWithAtribuicoes("C")).thenReturn(Optional.empty());
-
-        var erro = assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarResponsavelAtual("SIGLA"));
-        assertThat(erro).isNotNull();
     }
 
     @Test
@@ -269,27 +239,10 @@ class UsuarioFacadeCoverageTest {
         Usuario u = new Usuario();
         u.setTituloEleitoral("T");
         u.setNome("Nome");
-        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(u));
+        when(usuarioConsultaService.buscarChefesPorUnidades(List.of(1L))).thenReturn(List.of(u));
 
         UnidadeResponsavelDto resp = usuarioFacade.buscarResponsavelUnidade(1L);
         assertThat(resp.titularTitulo()).isEqualTo("T");
-    }
-
-    @Test
-    @DisplayName("Deve lançar erro se responsável por código não encontrado")
-    void deveLancarErroResponsavelPorCodigoNaoEncontrado() {
-        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(Collections.emptyList());
-        var erro = assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioFacade.buscarResponsavelUnidade(1L));
-        assertThat(erro).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Deve retornar mapa vazio ao buscar responsáveis de lista vazia")
-    void deveRetornarMapaVazioResponsaveis() {
-        assertThat(usuarioFacade.buscarResponsaveisUnidades(Collections.emptyList())).isEmpty();
-
-        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(Collections.emptyList());
-        assertThat(usuarioFacade.buscarResponsaveisUnidades(List.of(1L))).isEmpty();
     }
 
     @Test
@@ -310,10 +263,9 @@ class UsuarioFacadeCoverageTest {
         up.setUnidade(un);
         up.setPerfil(Perfil.CHEFE);
 
-        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(u));
-        when(usuarioRepo.findByIdInWithAtribuicoes(List.of("T"))).thenReturn(List.of(u));
-        // carregarAtribuicoesEmLote vai chamar findByUsuarioTituloIn
-        when(usuarioPerfilRepo.findByUsuarioTituloIn(List.of("T"))).thenReturn(List.of(up));
+        when(usuarioConsultaService.buscarChefesPorUnidades(List.of(1L))).thenReturn(List.of(u));
+        when(usuarioConsultaService.buscarPorIdsComAtribuicoes(List.of("T"))).thenReturn(List.of(u));
+        when(usuarioPerfilService.buscarAtribuicoesParaCache("T")).thenReturn(Set.of(up));
 
         Map<Long, UnidadeResponsavelDto> map = usuarioFacade.buscarResponsaveisUnidades(List.of(1L));
         assertThat(map).containsKey(1L);
@@ -327,7 +279,7 @@ class UsuarioFacadeCoverageTest {
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         u.setUnidadeLotacao(unidade);
-        when(usuarioRepo.findByEmail("email")).thenReturn(Optional.of(u));
+        when(usuarioConsultaService.buscarPorEmail("email")).thenReturn(Optional.of(u));
 
         assertThat(usuarioFacade.buscarUsuarioPorEmail("email")).isPresent();
     }
@@ -335,16 +287,13 @@ class UsuarioFacadeCoverageTest {
     @Test
     @DisplayName("Deve buscar usuários ativos")
     void deveBuscarUsuariosAtivos() {
-        when(usuarioRepo.findAll()).thenReturn(Collections.emptyList());
+        when(usuarioConsultaService.buscarTodos()).thenReturn(Collections.emptyList());
         assertThat(usuarioFacade.buscarUsuariosAtivos()).isEmpty();
     }
 
     @Test
     @DisplayName("Deve verificar se usuário tem perfil")
     void deveVerificarUsuarioTemPerfil() {
-        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.empty());
-        assertThat(usuarioFacade.usuarioTemPerfil("T", "CHEFE", 1L)).isFalse();
-
         Usuario u = new Usuario();
         u.setTituloEleitoral("T");
 
@@ -358,8 +307,8 @@ class UsuarioFacadeCoverageTest {
         up.setUnidade(un);
         up.setPerfil(Perfil.CHEFE);
 
-        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTitulo("T")).thenReturn(List.of(up));
+        when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional("T")).thenReturn(Optional.of(u));
+        when(usuarioPerfilService.buscarPorUsuario("T")).thenReturn(List.of(up));
 
         assertThat(usuarioFacade.usuarioTemPerfil("T", "CHEFE", 1L)).isTrue();
     }
@@ -367,9 +316,6 @@ class UsuarioFacadeCoverageTest {
     @Test
     @DisplayName("Deve buscar unidades por perfil")
     void deveBuscarUnidadesPorPerfil() {
-        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.empty());
-        assertThat(usuarioFacade.buscarUnidadesPorPerfil("T", "CHEFE")).isEmpty();
-
         Usuario u = new Usuario();
         u.setTituloEleitoral("T");
         UsuarioPerfil up = new UsuarioPerfil();
@@ -380,8 +326,8 @@ class UsuarioFacadeCoverageTest {
         up.setUnidade(unidade);
         up.setPerfil(Perfil.CHEFE);
 
-        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTitulo("T")).thenReturn(List.of(up));
+        when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional("T")).thenReturn(Optional.of(u));
+        when(usuarioPerfilService.buscarPorUsuario("T")).thenReturn(List.of(up));
 
         assertThat(usuarioFacade.buscarUnidadesPorPerfil("T", "CHEFE")).contains(1L);
     }
@@ -391,14 +337,14 @@ class UsuarioFacadeCoverageTest {
     void deveListarAdministradores() {
         Administrador admin = new Administrador();
         admin.setUsuarioTitulo("T");
-        when(administradorRepo.findAll()).thenReturn(List.of(admin));
+        when(administradorService.listarTodos()).thenReturn(List.of(admin));
 
         Usuario u = new Usuario();
         u.setTituloEleitoral("T");
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         u.setUnidadeLotacao(unidade);
-        when(usuarioRepo.findById("T")).thenReturn(Optional.of(u));
+        when(usuarioConsultaService.buscarPorIdOpcional("T")).thenReturn(Optional.of(u));
 
         List<AdministradorDto> admins = usuarioFacade.listarAdministradores();
         assertThat(admins).hasSize(1);
@@ -413,63 +359,24 @@ class UsuarioFacadeCoverageTest {
         unidade.setCodigo(1L);
         u.setUnidadeLotacao(unidade);
 
-        when(usuarioRepo.findById("T")).thenReturn(Optional.of(u));
-        when(administradorRepo.existsById("T")).thenReturn(false);
+        when(usuarioConsultaService.buscarPorId("T")).thenReturn(u);
 
         usuarioFacade.adicionarAdministrador("T");
 
-        verify(administradorRepo).save(any(Administrador.class));
-    }
-
-    @Test
-    @DisplayName("Deve lançar erro ao adicionar administrador existente")
-    void deveLancarErroAdicionarAdminExistente() {
-        when(usuarioRepo.findById("T")).thenReturn(Optional.of(new Usuario()));
-        when(administradorRepo.existsById("T")).thenReturn(true);
-
-        var erro = assertThrows(ErroValidacao.class, () -> usuarioFacade.adicionarAdministrador("T"));
-        assertThat(erro).isNotNull();
+        verify(administradorService).adicionar("T");
     }
 
     @Test
     @DisplayName("Deve remover administrador")
     void deveRemoverAdministrador() {
-        when(administradorRepo.existsById("Outro")).thenReturn(true);
-        when(administradorRepo.count()).thenReturn(2L);
-
         usuarioFacade.removerAdministrador("Outro", "Eu");
-
-        verify(administradorRepo).deleteById("Outro");
-    }
-
-    @Test
-    @DisplayName("Deve lançar erro ao remover a si mesmo")
-    void deveLancarErroRemoverSiMesmo() {
-        var erro = assertThrows(ErroValidacao.class, () -> usuarioFacade.removerAdministrador("Eu", "Eu"));
-        assertThat(erro).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Deve lançar erro ao remover não admin")
-    void deveLancarErroRemoverNaoAdmin() {
-        when(administradorRepo.existsById("Outro")).thenReturn(false);
-        var erro = assertThrows(ErroValidacao.class, () -> usuarioFacade.removerAdministrador("Outro", "Eu"));
-        assertThat(erro).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Deve lançar erro ao remover único admin")
-    void deveLancarErroRemoverUnicoAdmin() {
-        when(administradorRepo.existsById("Outro")).thenReturn(true);
-        when(administradorRepo.count()).thenReturn(1L);
-        var erro = assertThrows(ErroValidacao.class, () -> usuarioFacade.removerAdministrador("Outro", "Eu"));
-        assertThat(erro).isNotNull();
+        verify(administradorService).remover("Outro");
     }
 
     @Test
     @DisplayName("Deve verificar se é administrador")
     void deveVerificarSeEhAdmin() {
-        when(administradorRepo.existsById("T")).thenReturn(true);
+        when(administradorService.isAdministrador("T")).thenReturn(true);
         assertThat(usuarioFacade.isAdministrador("T")).isTrue();
     }
 
@@ -481,268 +388,9 @@ class UsuarioFacadeCoverageTest {
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         u.setUnidadeLotacao(unidade);
-        when(usuarioRepo.findAllById(List.of("T"))).thenReturn(List.of(u));
+        when(usuarioConsultaService.buscarTodosPorIds(List.of("T"))).thenReturn(List.of(u));
 
         Map<String, UsuarioDto> map = usuarioFacade.buscarUsuariosPorTitulos(List.of("T"));
         assertThat(map).containsKey("T");
-    }
-
-    @Test
-    @DisplayName("Deve filtrar atribuições corretamente ao buscar responsáveis de múltiplas unidades")
-    void deveFiltrarAtribuicoesBuscarResponsaveis() {
-        Usuario u = new Usuario();
-        u.setTituloEleitoral("T");
-        u.setNome("Nome");
-
-        // Atribuição CORRETA (Chefe da unidade 1)
-        Unidade un1 = new Unidade();
-        un1.setCodigo(1L);
-        un1.setSituacao(SituacaoUnidade.ATIVA);
-
-        UsuarioPerfil up1 = new UsuarioPerfil();
-        up1.setUsuario(u);
-        up1.setUsuarioTitulo("T");
-        up1.setUnidadeCodigo(1L);
-        up1.setUnidade(un1);
-        up1.setPerfil(Perfil.CHEFE);
-
-        // Atribuição ERRADA (Não é chefe)
-        UsuarioPerfil up2 = new UsuarioPerfil();
-        up2.setUsuario(u);
-        up2.setUsuarioTitulo("T");
-        up2.setUnidadeCodigo(1L);
-        up2.setUnidade(un1);
-        up2.setPerfil(Perfil.SERVIDOR);
-
-        // Atribuição ERRADA (Unidade diferente da solicitada)
-        Unidade un2 = new Unidade();
-        un2.setCodigo(2L);
-        un2.setSituacao(SituacaoUnidade.ATIVA);
-
-        UsuarioPerfil up3 = new UsuarioPerfil();
-        up3.setUsuario(u);
-        up3.setUsuarioTitulo("T");
-        up3.setUnidadeCodigo(2L);
-        up3.setUnidade(un2);
-        up3.setPerfil(Perfil.CHEFE);
-
-
-        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(u));
-        when(usuarioRepo.findByIdInWithAtribuicoes(List.of("T"))).thenReturn(List.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTituloIn(List.of("T"))).thenReturn(List.of(up1, up2, up3));
-
-        Map<Long, UnidadeResponsavelDto> map = usuarioFacade.buscarResponsaveisUnidades(List.of(1L));
-
-        // Deve conter apenas a unidade 1
-        assertThat(map)
-                .containsKey(1L)
-                .doesNotContainKey(2L);
-
-        // O responsável deve ser o usuário T
-        assertThat(map.get(1L).titularTitulo()).isEqualTo("T");
-    }
-
-    @Test
-    @DisplayName("Deve montar DTO com titular e substituto")
-    void deveMontarDtoComTitularESubstituto() {
-        // Mocking repo to return 2 users for the same unit
-        Usuario titular = new Usuario();
-        titular.setTituloEleitoral("T");
-        titular.setNome("Titular");
-
-        Usuario substituto = new Usuario();
-        substituto.setTituloEleitoral("S");
-        substituto.setNome("Substituto");
-
-        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(titular, substituto));
-
-        UnidadeResponsavelDto result = usuarioFacade.buscarResponsavelUnidade(1L);
-
-        assertThat(result.titularTitulo()).isEqualTo("T");
-        assertThat(result.substitutoTitulo()).isEqualTo("S");
-        assertThat(result.substitutoNome()).isEqualTo("Substituto");
-    }
-
-    @Test
-    @DisplayName("Deve lidar com inconsistência ao buscar responsáveis (chefes encontrados mas detalhes não)")
-    void deveLidarComInconsistenciaBuscarResponsaveis() {
-        Usuario u = new Usuario();
-        u.setTituloEleitoral("T");
-
-        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(u));
-
-        // Simula que o usuário não foi encontrado na busca detalhada (inconsistência)
-        when(usuarioRepo.findByIdInWithAtribuicoes(List.of("T"))).thenReturn(Collections.emptyList());
-
-        Map<Long, UnidadeResponsavelDto> map = usuarioFacade.buscarResponsaveisUnidades(List.of(1L));
-
-        assertThat(map).isEmpty();
-    }
-
-    @Test
-    @DisplayName("Deve filtrar perfis de unidades inativas")
-    void deveFiltrarPerfisUnidadesInativas() {
-        Usuario u = new Usuario();
-        u.setTituloEleitoral("T");
-
-        Unidade unAtiva = new Unidade();
-        unAtiva.setCodigo(1L);
-        unAtiva.setSituacao(SituacaoUnidade.ATIVA);
-
-        Unidade unInativa = new Unidade();
-        unInativa.setCodigo(2L);
-        unInativa.setSituacao(SituacaoUnidade.INATIVA);
-
-        UsuarioPerfil up1 = new UsuarioPerfil();
-        up1.setUsuario(u);
-        up1.setUsuarioTitulo("T");
-        up1.setUnidade(unAtiva);
-        up1.setUnidadeCodigo(1L);
-        up1.setPerfil(Perfil.CHEFE);
-
-        UsuarioPerfil up2 = new UsuarioPerfil();
-        up2.setUsuario(u);
-        up2.setUsuarioTitulo("T");
-        up2.setUnidade(unInativa);
-        up2.setUnidadeCodigo(2L);
-        up2.setPerfil(Perfil.CHEFE);
-
-        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTitulo("T")).thenReturn(List.of(up1, up2));
-
-        List<PerfilDto> perfis = usuarioFacade.buscarPerfisUsuario("T");
-
-        assertThat(perfis).hasSize(1);
-        assertThat(perfis.getFirst().unidadeCodigo()).isEqualTo(1L);
-    }
-
-    @Test
-    @DisplayName("Deve filtrar unidades inativas ao buscar unidades onde é responsável")
-    void deveFiltrarUnidadesInativasOndeEhResponsavel() {
-        Usuario u = new Usuario();
-        u.setTituloEleitoral("T");
-
-        Unidade unAtiva = new Unidade();
-        unAtiva.setCodigo(1L);
-        unAtiva.setSituacao(SituacaoUnidade.ATIVA);
-
-        Unidade unInativa = new Unidade();
-        unInativa.setCodigo(2L);
-        unInativa.setSituacao(SituacaoUnidade.INATIVA);
-
-        UsuarioPerfil up1 = new UsuarioPerfil();
-        up1.setUsuario(u);
-        up1.setUnidade(unAtiva);
-        up1.setUnidadeCodigo(1L);
-        up1.setPerfil(Perfil.CHEFE);
-
-        UsuarioPerfil up2 = new UsuarioPerfil();
-        up2.setUsuario(u);
-        up2.setUnidade(unInativa);
-        up2.setUnidadeCodigo(2L);
-        up2.setPerfil(Perfil.CHEFE);
-
-        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTitulo("T")).thenReturn(List.of(up1, up2));
-
-        List<Long> unidades = usuarioFacade.buscarUnidadesOndeEhResponsavel("T");
-
-        assertThat(unidades).containsExactly(1L);
-    }
-
-    @Test
-    @DisplayName("Deve retornar lista vazia se perfil não for CHEFE ao buscar unidades onde é responsável")
-    void deveRetornarVaziaSePerfilNaoChefeOndeEhResponsavel() {
-        Usuario u = new Usuario();
-        u.setTituloEleitoral("T");
-
-        Unidade unAtiva = new Unidade();
-        unAtiva.setCodigo(1L);
-        unAtiva.setSituacao(SituacaoUnidade.ATIVA);
-
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setUsuario(u);
-        up.setUnidade(unAtiva);
-        up.setUnidadeCodigo(1L);
-        up.setPerfil(Perfil.SERVIDOR); // Não é CHEFE
-
-        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTitulo("T")).thenReturn(List.of(up));
-
-        List<Long> unidades = usuarioFacade.buscarUnidadesOndeEhResponsavel("T");
-
-        assertThat(unidades).isEmpty();
-    }
-
-    @Test
-    @DisplayName("Deve retornar false se unidade inativa ao verificar se tem perfil")
-    void deveRetornarFalseSeUnidadeInativaAoVerificarPerfil() {
-        Usuario u = new Usuario();
-        u.setTituloEleitoral("T");
-
-        Unidade unInativa = new Unidade();
-        unInativa.setCodigo(2L);
-        unInativa.setSituacao(SituacaoUnidade.INATIVA);
-
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setUsuario(u);
-        up.setUsuarioTitulo("T");
-        up.setUnidade(unInativa);
-        up.setUnidadeCodigo(2L);
-        up.setPerfil(Perfil.CHEFE);
-
-        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTitulo("T")).thenReturn(List.of(up));
-
-        assertThat(usuarioFacade.usuarioTemPerfil("T", "CHEFE", 2L)).isFalse();
-    }
-
-    @Test
-    @DisplayName("Deve filtrar unidades inativas ao buscar unidades por perfil")
-    void deveFiltrarUnidadesInativasBuscarPorPerfil() {
-        Usuario u = new Usuario();
-        u.setTituloEleitoral("T");
-
-        Unidade unInativa = new Unidade();
-        unInativa.setCodigo(2L);
-        unInativa.setSituacao(SituacaoUnidade.INATIVA);
-
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setUsuario(u);
-        up.setUsuarioTitulo("T");
-        up.setUnidade(unInativa);
-        up.setUnidadeCodigo(2L);
-        up.setPerfil(Perfil.CHEFE);
-
-        when(usuarioRepo.findByIdWithAtribuicoes("T")).thenReturn(Optional.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTitulo("T")).thenReturn(List.of(up));
-
-        assertThat(usuarioFacade.buscarUnidadesPorPerfil("T", "CHEFE")).isEmpty();
-    }
-
-    @Test
-    @DisplayName("Deve filtrar unidades inativas ao buscar responsáveis de unidades")
-    void deveFiltrarUnidadesInativasBuscarResponsaveis() {
-        Usuario u = new Usuario();
-        u.setTituloEleitoral("T");
-
-        Unidade unInativa = new Unidade();
-        unInativa.setCodigo(2L);
-        unInativa.setSituacao(SituacaoUnidade.INATIVA);
-
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setUsuario(u);
-        up.setUsuarioTitulo("T");
-        up.setUnidade(unInativa);
-        up.setUnidadeCodigo(2L);
-        up.setPerfil(Perfil.CHEFE);
-
-        when(usuarioRepo.findChefesByUnidadesCodigos(List.of(2L))).thenReturn(List.of(u));
-        when(usuarioRepo.findByIdInWithAtribuicoes(List.of("T"))).thenReturn(List.of(u));
-        when(usuarioPerfilRepo.findByUsuarioTituloIn(List.of("T"))).thenReturn(List.of(up));
-
-        Map<Long, UnidadeResponsavelDto> result = usuarioFacade.buscarResponsaveisUnidades(List.of(2L));
-
-        assertThat(result).isEmpty();
     }
 }

@@ -21,7 +21,7 @@ package sgc.comum.erros;
  *   <li>Validações de entrada do usuário → Use {@link ErroValidacao}</li>
  *   <li>Recursos não encontrados → Use {@link ErroEntidadeNaoEncontrada}</li>
  *   <li>Operações em estado inválido de workflow → Use exceções específicas como ErroProcessoEmSituacaoInvalida</li>
- *   <li>Violações de permissão → Use {@link ErroAccessoNegado}</li>
+ *   <li>Violações de permissão → Use {@link ErroAcessoNegado}</li>
  * </ul>
  *
  * <p><strong>Tratamento:</strong>

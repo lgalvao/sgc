@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseFacade;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.RepositorioComum;
+import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -35,6 +35,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import java.time.LocalDate;
+import java.util.Set;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Competencia;
+import sgc.organizacao.UnidadeFacade;
+import sgc.seguranca.acesso.AccessControlService;
+import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -43,7 +51,7 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     @InjectMocks
     private SubprocessoMapaWorkflowService service;
     @Mock
-    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private SubprocessoRepo subprocessoRepo;
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
@@ -52,15 +60,15 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
     private AnaliseFacade analiseFacade;
 
     @Mock
-    private sgc.seguranca.acesso.AccessControlService accessControlService;
+    private AccessControlService accessControlService;
     @Mock
-    private sgc.subprocesso.service.crud.SubprocessoCrudService crudService;
+    private SubprocessoCrudService crudService;
     @Mock
-    private sgc.organizacao.UnidadeFacade unidadeService;
+    private UnidadeFacade unidadeService;
     @Mock
     private SubprocessoTransicaoService transicaoService;
     @Mock
-    private sgc.subprocesso.service.crud.SubprocessoValidacaoService validacaoService;
+    private SubprocessoValidacaoService validacaoService;
 
     // --- SALVAR MAPA ---
 
@@ -178,13 +186,13 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
-        sgc.mapa.model.Competencia comp = new sgc.mapa.model.Competencia();
+        Competencia comp = new Competencia();
         comp.setAtividades(Collections.emptySet()); // Sem atividade
 
         when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(comp));
 
         DisponibilizarMapaRequest request = DisponibilizarMapaRequest.builder()
-                .dataLimite(java.time.LocalDate.now())
+                .dataLimite(LocalDate.now())
                 .build();
         Usuario user = new Usuario();
         assertThatThrownBy(() -> service.disponibilizarMapa(1L, request, user))
@@ -204,21 +212,21 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
 
         // Competencia com atividade 1
-        sgc.mapa.model.Competencia comp = new sgc.mapa.model.Competencia();
-        sgc.mapa.model.Atividade a1 = new sgc.mapa.model.Atividade();
+        Competencia comp = new Competencia();
+        Atividade a1 = new Atividade();
         a1.setCodigo(100L);
-        comp.setAtividades(java.util.Set.of(a1));
+        comp.setAtividades(Set.of(a1));
 
         when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(comp));
 
         // Atividades do mapa: 1 e 2. A 2 nao esta associada
-        sgc.mapa.model.Atividade a2 = new sgc.mapa.model.Atividade();
+        Atividade a2 = new Atividade();
         a2.setCodigo(200L);
         a2.setDescricao("A2");
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigo(10L)).thenReturn(List.of(a1, a2));
 
         DisponibilizarMapaRequest request = DisponibilizarMapaRequest.builder()
-                .dataLimite(java.time.LocalDate.now())
+                .dataLimite(LocalDate.now())
                 .build();
         Usuario user = new Usuario();
         assertThatThrownBy(() -> service.disponibilizarMapa(1L, request, user))

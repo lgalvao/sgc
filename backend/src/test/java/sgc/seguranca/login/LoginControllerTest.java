@@ -29,6 +29,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import sgc.organizacao.UsuarioFacade;
 
 @WebMvcTest(LoginController.class)
 @Import(RestExceptionHandler.class)
@@ -44,7 +45,7 @@ class LoginControllerTest {
     private LoginFacade loginFacade;
 
     @MockitoBean
-    private sgc.organizacao.UsuarioFacade usuarioService;
+    private UsuarioFacade usuarioService;
 
     @MockitoBean
     private LimitadorTentativasLogin limitadorTentativasLogin;

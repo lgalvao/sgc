@@ -18,6 +18,12 @@ import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.Processo;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 /**
  * Serviço especializado para operações CRUD básicas de Subprocesso.
@@ -43,8 +49,8 @@ import java.util.Objects;
 @Transactional
 public class SubprocessoCrudService {
     private static final String MSG_SUBPROCESSO_NAO_ENCONTRADO = "Subprocesso não encontrado";
-    private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
-    private final sgc.comum.repo.RepositorioComum repositorioComum;
+    private final SubprocessoRepo subprocessoRepo;
+    private final ComumRepo repositorioComum;
     private final SubprocessoMapper subprocessoMapper;
     private final MapaFacade mapaFacade;
     private final ApplicationEventPublisher eventPublisher;
@@ -57,8 +63,8 @@ public class SubprocessoCrudService {
      *                   BeanCurrentlyInCreationException
      */
     public SubprocessoCrudService(
-            sgc.subprocesso.model.SubprocessoRepo subprocessoRepo,
-            sgc.comum.repo.RepositorioComum repositorioComum,
+            SubprocessoRepo subprocessoRepo,
+            ComumRepo repositorioComum,
             SubprocessoMapper subprocessoMapper,
             @Lazy MapaFacade mapaFacade,
             ApplicationEventPublisher eventPublisher,
@@ -116,17 +122,17 @@ public class SubprocessoCrudService {
     public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
         return subprocessoRepo
                 .findByMapaCodigo(codMapa)
-                .orElseThrow(sgc.comum.erros.ErroEntidadeNaoEncontrada.naoEncontrada(
+                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(
                         "%s para o mapa com código %d".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codMapa)));
     }
 
     public SubprocessoDto criar(CriarSubprocessoRequest request) {
         var entity = new Subprocesso();
-        var processo = new sgc.processo.model.Processo();
+        var processo = new Processo();
         processo.setCodigo(request.codProcesso());
         entity.setProcesso(processo);
 
-        var unidade = new sgc.organizacao.model.Unidade();
+        var unidade = new Unidade();
         unidade.setCodigo(request.codUnidade());
         entity.setUnidade(unidade);
         entity.setDataLimiteEtapa1(request.dataLimiteEtapa1());
@@ -157,7 +163,7 @@ public class SubprocessoCrudService {
 
     private void processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
 
-        java.util.Optional.ofNullable(request.codMapa()).ifPresent(cod -> {
+        Optional.ofNullable(request.codMapa()).ifPresent(cod -> {
             Mapa m = Mapa.builder()
                     .codigo(cod)
                     .build();
@@ -193,7 +199,7 @@ public class SubprocessoCrudService {
     public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
         Subprocesso sp = subprocessoRepo
                 .findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
-                .orElseThrow(sgc.comum.erros.ErroEntidadeNaoEncontrada.naoEncontrada(
+                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(
                         "%s para o processo %s e unidade %s".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codProcesso,
                                 codUnidade)));
         return subprocessoMapper.toDto(sp);

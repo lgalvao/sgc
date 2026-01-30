@@ -31,11 +31,14 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.AlterarDataLimiteRequest;
 import sgc.subprocesso.model.Subprocesso;
+import org.springframework.security.test.context.support.WithMockUser;
+import sgc.integracao.mocks.TestThymeleafConfig;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-27: Alterar data limite de subprocesso")
 class CDU27IntegrationTest extends BaseIntegrationTest {
@@ -64,7 +67,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
         // Criar Subprocesso
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
-        subprocesso.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocesso = subprocessoRepo.save(subprocesso);
 
@@ -110,7 +113,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Não deve permitir alterar data limite se não for ADMIN")
-    @org.springframework.security.test.context.support.WithMockUser(roles = "GESTOR")
+    @WithMockUser(roles = "GESTOR")
     void alterarDataLimite_semPermissao_proibido() throws Exception {
         // Given
         LocalDate novaData = LocalDate.now().plusDays(20);

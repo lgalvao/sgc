@@ -23,12 +23,13 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 @WebMvcTest(SubprocessoCrudController.class)
 @Import(RestExceptionHandler.class)
 class SubprocessoCrudControllerTest {
     @MockitoBean
-    private sgc.subprocesso.service.SubprocessoFacade subprocessoFacade;
+    private SubprocessoFacade subprocessoFacade;
 
     @MockitoBean
     private UnidadeFacade unidadeService;

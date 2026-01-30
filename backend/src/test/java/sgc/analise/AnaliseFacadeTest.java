@@ -16,6 +16,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.model.Unidade;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -154,9 +156,9 @@ class AnaliseFacadeTest {
         @DisplayName("Deve criar uma análise com sigla de unidade")
         void deveCriarAnaliseComSiglaUnidade() {
             String sigla = "UNIDADE1";
-            sgc.organizacao.dto.UnidadeDto unidadeDto = new sgc.organizacao.dto.UnidadeDto();
+            UnidadeDto unidadeDto = new UnidadeDto();
             unidadeDto.setCodigo(10L);
-            sgc.organizacao.model.Unidade unidade = new sgc.organizacao.model.Unidade();
+            Unidade unidade = new Unidade();
             unidade.setCodigo(10L);
 
             when(unidadeService.buscarPorSigla(sigla)).thenReturn(unidadeDto);

@@ -14,6 +14,7 @@ import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.time.Clock;
 
 /**
  * Componente que limita tentativas de login por IP para prevenir ataques de
@@ -28,16 +29,16 @@ public class LimitadorTentativasLogin {
     private final Environment environment;
     private final int maxCacheEntries;
     private final Map<String, Deque<LocalDateTime>> tentativasPorIp = new ConcurrentHashMap<>();
-    private final java.time.Clock clock;
+    private final Clock clock;
 
     @Autowired
-    public LimitadorTentativasLogin(Environment environment, java.time.Clock clock) {
+    public LimitadorTentativasLogin(Environment environment, Clock clock) {
         this.environment = environment;
         this.clock = clock;
         this.maxCacheEntries = DEFAULT_MAX_CACHE_ENTRIES;
     }
 
-    LimitadorTentativasLogin(Environment environment, int maxCacheEntries, java.time.Clock clock) {
+    LimitadorTentativasLogin(Environment environment, int maxCacheEntries, Clock clock) {
         this.environment = environment;
         this.maxCacheEntries = maxCacheEntries;
         this.clock = clock;

@@ -38,6 +38,8 @@ import static sgc.seguranca.acesso.Acao.VALIDAR_MAPA;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.CompetenciaRequest;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
+import sgc.subprocesso.dto.RegistrarTransicaoCommand;
+import sgc.subprocesso.dto.RegistrarWorkflowCommand;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.eventos.TipoTransicao;
@@ -57,6 +59,9 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_VALIDADO;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
+import org.springframework.util.StringUtils;
+import sgc.comum.erros.ErroInvarianteViolada;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 @Service
 @Slf4j
@@ -81,7 +86,7 @@ public class SubprocessoMapaWorkflowService {
             TipoProcesso.MAPEAMENTO, MAPEAMENTO_MAPA_HOMOLOGADO,
             TipoProcesso.REVISAO, REVISAO_MAPA_HOMOLOGADO));
 
-    private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private final SubprocessoRepo subprocessoRepo;
     private final SubprocessoCrudService crudService;
     private final MapaManutencaoService mapaManutencaoService;
     private final MapaFacade mapaFacade;
@@ -171,6 +176,10 @@ public class SubprocessoMapaWorkflowService {
 
     @Transactional
     public void disponibilizarMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
+        executarDisponibilizacaoMapa(codSubprocesso, request, usuario);
+    }
+
+    private void executarDisponibilizacaoMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
         if (request.dataLimite() == null) {
             throw new ErroValidacao("Data limite é obrigatória.");
         }
@@ -183,7 +192,7 @@ public class SubprocessoMapaWorkflowService {
         sp.getMapa().setSugestoes(null);
         analiseFacade.removerPorSubprocesso(codSubprocesso);
 
-        if (org.springframework.util.StringUtils.hasText(request.observacoes())) {
+        if (StringUtils.hasText(request.observacoes())) {
             sp.getMapa().setSugestoes(request.observacoes());
         }
 
@@ -195,13 +204,14 @@ public class SubprocessoMapaWorkflowService {
 
         Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
 
-        transicaoService.registrar(
-                sp,
-                TipoTransicao.MAPA_DISPONIBILIZADO,
-                sedoc,
-                sp.getUnidade(),
-                usuario,
-                request.observacoes());
+        transicaoService.registrar(RegistrarTransicaoCommand.builder()
+                .sp(sp)
+                .tipo(TipoTransicao.MAPA_DISPONIBILIZADO)
+                .origem(sedoc)
+                .destino(sp.getUnidade())
+                .usuario(usuario)
+                .observacoes(request.observacoes())
+                .build());
     }
 
     private void validarMapaParaDisponibilizacao(Subprocesso subprocesso) {
@@ -246,13 +256,19 @@ public class SubprocessoMapaWorkflowService {
 
         analiseFacade.removerPorSubprocesso(sp.getCodigo());
 
-        transicaoService.registrar(
-                sp,
-                TipoTransicao.MAPA_SUGESTOES_APRESENTADAS,
-                sp.getUnidade(),
-                sp.getUnidade().getUnidadeSuperior(),
-                usuario,
-                sugestoes);
+        Unidade destino = sp.getUnidade().getUnidadeSuperior();
+        if (destino == null) {
+            throw new ErroInvarianteViolada("Não foi possível identificar a unidade superior para apresentar sugestões.");
+        }
+
+        transicaoService.registrar(RegistrarTransicaoCommand.builder()
+                .sp(sp)
+                .tipo(TipoTransicao.MAPA_SUGESTOES_APRESENTADAS)
+                .origem(sp.getUnidade())
+                .destino(destino)
+                .usuario(usuario)
+                .observacoes(sugestoes)
+                .build());
     }
 
     @Transactional
@@ -262,11 +278,21 @@ public class SubprocessoMapaWorkflowService {
 
         sp.setSituacao(SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo()));
 
-        sp.setDataFimEtapa2(java.time.LocalDateTime.now());
+        sp.setDataFimEtapa2(LocalDateTime.now());
         subprocessoRepo.save(sp);
 
-        transicaoService.registrar(sp, TipoTransicao.MAPA_VALIDADO, sp.getUnidade(),
-                sp.getUnidade().getUnidadeSuperior(), usuario);
+        Unidade destino = sp.getUnidade().getUnidadeSuperior();
+        if (destino == null) {
+            throw new ErroInvarianteViolada("Não foi possível identificar a unidade superior para validar o mapa.");
+        }
+
+        transicaoService.registrar(RegistrarTransicaoCommand.builder()
+                .sp(sp)
+                .tipo(TipoTransicao.MAPA_VALIDADO)
+                .origem(sp.getUnidade())
+                .destino(destino)
+                .usuario(usuario)
+                .build());
     }
 
     @Transactional
@@ -277,22 +303,32 @@ public class SubprocessoMapaWorkflowService {
         SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo());
         sp.setDataFimEtapa2(null);
 
-        transicaoService.registrarAnaliseETransicao(new SubprocessoTransicaoService.RegistrarWorkflowReq(
-                sp,
-                novaSituacao,
-                TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA,
-                TipoAnalise.VALIDACAO,
-                TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO,
-                sp.getUnidade().getUnidadeSuperior(), // Analise
-                sp.getUnidade().getUnidadeSuperior(), // Origem da Transição
-                sp.getUnidade(), // Destino da Transição
-                usuario,
-                justificativa,
-                justificativa));
+        Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
+        if (unidadeSuperior == null) {
+            throw new ErroInvarianteViolada("Não foi possível identificar a unidade superior para devolver a validação.");
+        }
+
+        transicaoService.registrarAnaliseETransicao(RegistrarWorkflowCommand.builder()
+                .sp(sp)
+                .novaSituacao(novaSituacao)
+                .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA)
+                .tipoAnalise(TipoAnalise.VALIDACAO)
+                .tipoAcaoAnalise(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
+                .unidadeAnalise(unidadeSuperior)
+                .unidadeOrigemTransicao(unidadeSuperior)
+                .unidadeDestinoTransicao(sp.getUnidade())
+                .usuario(usuario)
+                .motivoAnalise(justificativa)
+                .observacoes(justificativa)
+                .build());
     }
 
     @Transactional
     public void aceitarValidacao(Long codSubprocesso, Usuario usuario) {
+        executarAceiteValidacao(codSubprocesso, usuario);
+    }
+
+    private void executarAceiteValidacao(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, ACEITAR_MAPA, sp);
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
@@ -318,23 +354,27 @@ public class SubprocessoMapaWorkflowService {
             subprocessoRepo.save(sp);
         } else {
             SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo());
-            transicaoService.registrarAnaliseETransicao(new SubprocessoTransicaoService.RegistrarWorkflowReq(
-                    sp,
-                    novaSituacao,
-                    TipoTransicao.MAPA_VALIDACAO_ACEITA,
-                    TipoAnalise.VALIDACAO,
-                    TipoAcaoAnalise.ACEITE_MAPEAMENTO,
-                    unidadeSuperior, // Analise
-                    unidadeSuperior, // Origem
-                    proximaUnidade, // Destino
-                    usuario,
-                    "Aceite da validação",
-                    null));
+            transicaoService.registrarAnaliseETransicao(RegistrarWorkflowCommand.builder()
+                    .sp(sp)
+                    .novaSituacao(novaSituacao)
+                    .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_ACEITA)
+                    .tipoAnalise(TipoAnalise.VALIDACAO)
+                    .tipoAcaoAnalise(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                    .unidadeAnalise(unidadeSuperior)
+                    .unidadeOrigemTransicao(unidadeSuperior)
+                    .unidadeDestinoTransicao(proximaUnidade)
+                    .usuario(usuario)
+                    .motivoAnalise("Aceite da validação")
+                    .build());
         }
     }
 
     @Transactional
     public void homologarValidacao(Long codSubprocesso, Usuario usuario) {
+        executarHomologacaoValidacao(codSubprocesso, usuario);
+    }
+
+    private void executarHomologacaoValidacao(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, HOMOLOGAR_MAPA, sp);
 
@@ -342,7 +382,13 @@ public class SubprocessoMapaWorkflowService {
         subprocessoRepo.save(sp);
 
         Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
-        transicaoService.registrar(sp, TipoTransicao.MAPA_HOMOLOGADO, sedoc, sedoc, usuario);
+        transicaoService.registrar(RegistrarTransicaoCommand.builder()
+                .sp(sp)
+                .tipo(TipoTransicao.MAPA_HOMOLOGADO)
+                .origem(sedoc)
+                .destino(sedoc)
+                .usuario(usuario)
+                .build());
     }
 
     @Transactional
@@ -352,30 +398,31 @@ public class SubprocessoMapaWorkflowService {
         validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
 
         sp.setSituacao(SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo()));
-        sp.setDataFimEtapa1(java.time.LocalDateTime.now());
+        sp.setDataFimEtapa1(LocalDateTime.now());
         subprocessoRepo.save(sp);
 
-        transicaoService.registrar(
-                sp,
-                TipoTransicao.MAPA_DISPONIBILIZADO,
-                sp.getUnidade(),
-                sp.getUnidade(),
-                usuario);
+        transicaoService.registrar(RegistrarTransicaoCommand.builder()
+                .sp(sp)
+                .tipo(TipoTransicao.MAPA_DISPONIBILIZADO)
+                .origem(sp.getUnidade())
+                .destino(sp.getUnidade())
+                .usuario(usuario)
+                .build());
     }
 
     @Transactional
     public void disponibilizarMapaEmBloco(List<Long> subprocessoCodigos,
             DisponibilizarMapaRequest request, Usuario usuario) {
-        subprocessoCodigos.forEach(codSubprocesso -> disponibilizarMapa(codSubprocesso, request, usuario));
+        subprocessoCodigos.forEach(codSubprocesso -> executarDisponibilizacaoMapa(codSubprocesso, request, usuario));
     }
 
     @Transactional
     public void aceitarValidacaoEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
-        subprocessoCodigos.forEach(codSubprocesso -> aceitarValidacao(codSubprocesso, usuario));
+        subprocessoCodigos.forEach(codSubprocesso -> executarAceiteValidacao(codSubprocesso, usuario));
     }
 
     @Transactional
     public void homologarValidacaoEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
-        subprocessoCodigos.forEach(codSubprocesso -> homologarValidacao(codSubprocesso, usuario));
+        subprocessoCodigos.forEach(codSubprocesso -> executarHomologacaoValidacao(codSubprocesso, usuario));
     }
 }

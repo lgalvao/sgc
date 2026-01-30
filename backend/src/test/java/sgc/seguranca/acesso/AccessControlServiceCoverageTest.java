@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroAcessoNegado;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 
@@ -47,10 +47,10 @@ class AccessControlServiceCoverageTest {
     }
 
     @Test
-    @DisplayName("verificarPermissao deve lançar ErroAccessoNegado com mensagem padrão quando usuário é nulo")
+    @DisplayName("verificarPermissao deve lançar ErroAcessoNegado com mensagem padrão quando usuário é nulo")
     void verificarPermissaoLancaErroUsuarioNulo() {
         Processo processo = new Processo();
-        ErroAccessoNegado erro = assertThrows(ErroAccessoNegado.class, () ->
+        ErroAcessoNegado erro = assertThrows(ErroAcessoNegado.class, () ->
             service.verificarPermissao(null, Acao.VISUALIZAR_PROCESSO, processo)
         );
         assertTrue(erro.getMessage().contains("Usuário não autenticado"));
@@ -66,7 +66,7 @@ class AccessControlServiceCoverageTest {
         when(processoAccessPolicy.canExecute(usuario, Acao.VISUALIZAR_PROCESSO, processo)).thenReturn(false);
         when(processoAccessPolicy.getMotivoNegacao()).thenReturn("Motivo específico da policy");
 
-        ErroAccessoNegado erro = assertThrows(ErroAccessoNegado.class, () ->
+        ErroAcessoNegado erro = assertThrows(ErroAcessoNegado.class, () ->
                 service.verificarPermissao(usuario, Acao.VISUALIZAR_PROCESSO, processo)
         );
         assertEquals("Motivo específico da policy", erro.getMessage());
@@ -82,7 +82,7 @@ class AccessControlServiceCoverageTest {
         when(processoAccessPolicy.canExecute(usuario, Acao.VISUALIZAR_PROCESSO, processo)).thenReturn(false);
         when(processoAccessPolicy.getMotivoNegacao()).thenReturn(null);
 
-        ErroAccessoNegado erro = assertThrows(ErroAccessoNegado.class, () ->
+        ErroAcessoNegado erro = assertThrows(ErroAcessoNegado.class, () ->
                 service.verificarPermissao(usuario, Acao.VISUALIZAR_PROCESSO, processo)
         );
         assertTrue(erro.getMessage().contains("não tem permissão para executar a ação"));
@@ -98,7 +98,7 @@ class AccessControlServiceCoverageTest {
         when(processoAccessPolicy.canExecute(usuario, Acao.VISUALIZAR_PROCESSO, processo)).thenReturn(false);
         when(processoAccessPolicy.getMotivoNegacao()).thenReturn("  ");
 
-        ErroAccessoNegado erro = assertThrows(ErroAccessoNegado.class, () ->
+        ErroAcessoNegado erro = assertThrows(ErroAcessoNegado.class, () ->
                 service.verificarPermissao(usuario, Acao.VISUALIZAR_PROCESSO, processo)
         );
         assertTrue(erro.getMessage().contains("não tem permissão para executar a ação"));

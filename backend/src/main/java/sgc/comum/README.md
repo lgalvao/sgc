@@ -49,7 +49,7 @@ graph TD
         - `ErroEntidadeNaoEncontrada`: HTTP 404.
         - `ErroValidacao`: HTTP 400.
         - `ErroSituacaoInvalida`: HTTP 409 (Conflito de estado).
-        - `ErroAccessoNegado`: HTTP 403.
+        - `ErroAcessoNegado`: HTTP 403.
 
 ### 2. `model`
 

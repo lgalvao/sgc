@@ -8,6 +8,7 @@ import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.Processo;
 
 import java.util.stream.Collectors;
+import sgc.organizacao.model.Unidade;
 
 /**
  * Mapper (usando MapStruct) entre a entidade Processo e seu DTO principal.
@@ -29,7 +30,7 @@ public interface ProcessoMapper {
     default void mapUnidadesParticipantes(Processo processo, @MappingTarget ProcessoDto dto) {
         if (processo.getParticipantes() != null) {
             String siglas = processo.getParticipantes().stream()
-                    .map(sgc.organizacao.model.Unidade::getSigla)
+                    .map(Unidade::getSigla)
                     .sorted()
                     .collect(Collectors.joining(", "));
             dto.setUnidadesParticipantes(siglas);

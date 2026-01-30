@@ -29,6 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.springframework.data.domain.Sort;
+import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.model.Unidade;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -45,13 +48,13 @@ class PainelFacadeCoverageTest {
     @Test
     @DisplayName("Deve mapear AlertaDto corretamente")
     void deveMapearAlertaDtoCorretamente() {
-        sgc.processo.model.Processo p = new sgc.processo.model.Processo();
+        Processo p = new Processo();
         p.setCodigo(55L);
         
-        sgc.organizacao.model.Unidade origem = new sgc.organizacao.model.Unidade();
+        Unidade origem = new Unidade();
         origem.setSigla("ORG");
         
-        sgc.organizacao.model.Unidade destino = new sgc.organizacao.model.Unidade();
+        Unidade destino = new Unidade();
         destino.setSigla("DST");
 
         Alerta a = new Alerta();
@@ -81,7 +84,7 @@ class PainelFacadeCoverageTest {
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.MAPEAMENTO); // Inicializando tipo para evitar NPE se mapper usar
         
-        sgc.organizacao.model.Unidade u = new sgc.organizacao.model.Unidade();
+        Unidade u = new Unidade();
         u.setCodigo(1L);
         u.setSigla("U1");
         u.setNome("Unidade 1");
@@ -101,7 +104,7 @@ class PainelFacadeCoverageTest {
         p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         p.setTipo(TipoProcesso.MAPEAMENTO);
 
-        sgc.organizacao.model.Unidade u = new sgc.organizacao.model.Unidade();
+        Unidade u = new Unidade();
         u.setCodigo(1L);
         u.setSigla("U1");
         p.getParticipantes().add(u);
@@ -136,16 +139,16 @@ class PainelFacadeCoverageTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
 
         // A -> B -> C
-        sgc.organizacao.model.Unidade a = new sgc.organizacao.model.Unidade();
+        Unidade a = new Unidade();
         a.setCodigo(1L);
         a.setSigla("A");
 
-        sgc.organizacao.model.Unidade b = new sgc.organizacao.model.Unidade();
+        Unidade b = new Unidade();
         b.setCodigo(2L);
         b.setSigla("B");
         b.setUnidadeSuperior(a);
 
-        sgc.organizacao.model.Unidade c = new sgc.organizacao.model.Unidade();
+        Unidade c = new Unidade();
         c.setCodigo(3L);
         c.setSigla("C");
         c.setUnidadeSuperior(b);
@@ -162,7 +165,7 @@ class PainelFacadeCoverageTest {
         when(unidadeService.buscarIdsDescendentes(2L)).thenReturn(List.of(2L, 3L));
         when(unidadeService.buscarIdsDescendentes(3L)).thenReturn(List.of(3L));
 
-        sgc.organizacao.dto.UnidadeDto aDto = sgc.organizacao.dto.UnidadeDto.builder().sigla("A").build();
+        UnidadeDto aDto = UnidadeDto.builder().sigla("A").build();
         when(unidadeService.buscarPorCodigo(anyLong())).thenReturn(aDto);
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.SERVIDOR, 1L, PageRequest.of(0, 10));
@@ -181,14 +184,14 @@ class PainelFacadeCoverageTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
 
         // Unidade participante para evitar NPE
-        sgc.organizacao.model.Unidade u = new sgc.organizacao.model.Unidade();
+        Unidade u = new Unidade();
         u.setCodigo(1L);
         u.setSigla("U");
         p.getParticipantes().add(u);
 
         when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
 
-        Pageable sorted = PageRequest.of(0, 10, org.springframework.data.domain.Sort.by("codigo"));
+        Pageable sorted = PageRequest.of(0, 10, Sort.by("codigo"));
 
         painelFacade.listarProcessos(Perfil.ADMIN, null, sorted);
 

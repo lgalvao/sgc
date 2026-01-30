@@ -14,6 +14,8 @@ import sgc.processo.model.ProcessoRepo;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -45,8 +47,8 @@ class ProcessoFacadeSecurityTest {
             assertThat(processoFacade.checarAcesso(null, 1L)).isFalse();
         }
 
-        @org.junit.jupiter.params.ParameterizedTest
-        @org.junit.jupiter.params.provider.ValueSource(longs = {1L, 2L})
+        @ParameterizedTest
+        @ValueSource(longs = {1L, 2L})
         @DisplayName("Deve delegar verificação de acesso para o ProcessoAcessoService")
         void deveDelegarVerificacaoDeAcesso(Long processoCodigo) {
             Authentication auth = mock(Authentication.class);

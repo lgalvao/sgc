@@ -27,6 +27,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import jakarta.servlet.http.Cookie;
 
 @Tag("integration")
 @SpringBootTest
@@ -123,7 +124,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
             AutenticarRequest authRequest = AutenticarRequest.builder().tituloEleitoral(tituloEleitoral)
                     .senha(senha).build();
 
-            jakarta.servlet.http.Cookie[] cookies = mockMvc.perform(post(BASE_URL + "/autenticar")
+            Cookie[] cookies = mockMvc.perform(post(BASE_URL + "/autenticar")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(testUtil.toJson(authRequest)))
@@ -166,7 +167,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
             AutenticarRequest authRequest = AutenticarRequest.builder().tituloEleitoral(tituloEleitoral)
                     .senha(senha).build();
 
-            jakarta.servlet.http.Cookie[] cookies = mockMvc.perform(post(BASE_URL + "/autenticar")
+            Cookie[] cookies = mockMvc.perform(post(BASE_URL + "/autenticar")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(testUtil.toJson(authRequest)))
@@ -234,7 +235,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                     .tituloEleitoral(tituloEleitoral)
                     .senha("any")
                     .build();
-            jakarta.servlet.http.Cookie[] cookies = mockMvc.perform(post(BASE_URL + "/autenticar")
+            Cookie[] cookies = mockMvc.perform(post(BASE_URL + "/autenticar")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(testUtil.toJson(authRequest)))

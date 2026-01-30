@@ -36,9 +36,19 @@ import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
 import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
+import org.junit.jupiter.api.Assertions;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import sgc.comum.erros.ErroAcessoNegado;
+import sgc.mapa.mapper.ConhecimentoMapper;
+import sgc.mapa.service.CopiaMapaService;
+import sgc.mapa.service.MapaFacade;
+import sgc.organizacao.model.Perfil;
+import sgc.seguranca.acesso.AccessControlService;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 @ExtendWith(MockitoExtension.class)
-@org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("SubprocessoFacade - Testes Complementares")
 class SubprocessoFacadeComplementaryTest {
     @Mock
@@ -66,7 +76,7 @@ class SubprocessoFacadeComplementaryTest {
     @Mock
     private MapaAjusteMapper mapaAjusteMapper;
     @Mock
-    private sgc.seguranca.acesso.AccessControlService accessControlService;
+    private AccessControlService accessControlService;
     @Mock
     private SubprocessoAjusteMapaService ajusteMapaService;
     @Mock
@@ -76,13 +86,13 @@ class SubprocessoFacadeComplementaryTest {
     @Mock
     private SubprocessoPermissaoCalculator permissaoCalculator;
     @Mock
-    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private SubprocessoRepo subprocessoRepo;
     @Mock
-    private sgc.mapa.service.CopiaMapaService copiaMapaService;
+    private CopiaMapaService copiaMapaService;
     @Mock
-    private sgc.mapa.service.MapaFacade mapaFacade;
+    private MapaFacade mapaFacade;
     @Mock
-    private sgc.mapa.mapper.ConhecimentoMapper conhecimentoMapper;
+    private ConhecimentoMapper conhecimentoMapper;
 
     @InjectMocks
     private SubprocessoFacade subprocessoFacade;
@@ -236,7 +246,7 @@ class SubprocessoFacadeComplementaryTest {
         @Test
         @DisplayName("Deve alterar data limite")
         void deveAlterarDataLimite() {
-            LocalDate novaData = java.time.LocalDate.now();
+            LocalDate novaData = LocalDate.now();
             subprocessoFacade.alterarDataLimite(1L, novaData);
             verify(adminWorkflowService).alterarDataLimite(1L, novaData);
         }
@@ -263,9 +273,9 @@ class SubprocessoFacadeComplementaryTest {
         @DisplayName("obterPermissoes - Delegação para PermissaoCalculator")
         void obterPermissoesLancaExcecaoQuandoNaoAutenticado() {
             when(usuarioService.obterUsuarioAutenticado())
-                    .thenThrow(new sgc.comum.erros.ErroAccessoNegado("Nenhum usuário autenticado"));
+                    .thenThrow(new ErroAcessoNegado("Nenhum usuário autenticado"));
 
-            var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () ->
+            var exception = Assertions.assertThrows(ErroAcessoNegado.class, () ->
                     subprocessoFacade.obterPermissoes(1L)
             );
             assertThat(exception).isNotNull();
@@ -275,9 +285,9 @@ class SubprocessoFacadeComplementaryTest {
         @DisplayName("obterPermissoes - Delegação para PermissaoCalculator")
         void obterPermissoesComAutenticacaoSemNome() {
             when(usuarioService.obterUsuarioAutenticado())
-                    .thenThrow(new sgc.comum.erros.ErroAccessoNegado("Usuário sem nome"));
+                    .thenThrow(new ErroAcessoNegado("Usuário sem nome"));
 
-            var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAccessoNegado.class, () ->
+            var exception = Assertions.assertThrows(ErroAcessoNegado.class, () ->
                     subprocessoFacade.obterPermissoes(1L)
             );
             assertThat(exception).isNotNull();
@@ -304,7 +314,7 @@ class SubprocessoFacadeComplementaryTest {
 
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
-            subprocessoFacade.obterDetalhes(codigo, sgc.organizacao.model.Perfil.ADMIN);
+            subprocessoFacade.obterDetalhes(codigo, Perfil.ADMIN);
 
             verify(contextoService).obterDetalhes(codigo, usuario);
         }
@@ -315,7 +325,7 @@ class SubprocessoFacadeComplementaryTest {
         void deveObterContextoEdicao() {
             Long codigo = 1L;
 
-            subprocessoFacade.obterContextoEdicao(codigo, sgc.organizacao.model.Perfil.ADMIN);
+            subprocessoFacade.obterContextoEdicao(codigo, Perfil.ADMIN);
 
             verify(contextoService).obterContextoEdicao(codigo);
         }

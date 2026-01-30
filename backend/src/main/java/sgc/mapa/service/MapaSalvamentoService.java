@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.RepositorioComum;
+import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -42,7 +42,7 @@ public class MapaSalvamentoService {
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
     private final AtividadeRepo atividadeRepo;
-    private final RepositorioComum repo;
+    private final ComumRepo repo;
     private final MapaCompletoMapper mapaCompletoMapper;
 
     /**
@@ -135,7 +135,7 @@ public class MapaSalvamentoService {
         if (codigo != null) {
             competencia = mapaCompetenciasExistentes.get(codigo);
             if (competencia == null) {
-                throw new sgc.comum.erros.ErroEntidadeNaoEncontrada("Competência", codigo);
+                throw new ErroEntidadeNaoEncontrada("Competência", codigo);
             }
         } else {
             competencia = Competencia.builder()

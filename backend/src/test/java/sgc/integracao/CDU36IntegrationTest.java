@@ -29,11 +29,13 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.security.test.context.support.WithMockUser;
+import sgc.integracao.mocks.TestThymeleafConfig;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-36: Gerar relatório de mapas")
 class CDU36IntegrationTest extends BaseIntegrationTest {
@@ -99,7 +101,7 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Não deve permitir gerar relatório de mapas sem ser ADMIN")
-    @org.springframework.security.test.context.support.WithMockUser(roles = "GESTOR")
+    @WithMockUser(roles = "GESTOR")
     void gerarRelatorioMapas_semPermissao_proibido() throws Exception {
         // When/Then
         mockMvc.perform(get(API_REL_MAPAS, processo.getCodigo()).with(csrf()))
