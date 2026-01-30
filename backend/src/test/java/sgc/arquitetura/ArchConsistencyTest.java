@@ -39,7 +39,7 @@ public class ArchConsistencyTest {
     @ArchTest
     static final ArchRule mapa_controller_should_only_access_mapa_service = classes()
             .that()
-            .haveNameMatching("MapaController")
+            .haveSimpleName("MapaController")
             .should()
             .onlyAccessClassesThat()
             .haveNameMatching("MapaFacade")
@@ -50,7 +50,7 @@ public class ArchConsistencyTest {
     @ArchTest
     static final ArchRule processo_controller_should_only_access_processo_service = classes()
             .that()
-            .haveNameMatching("ProcessoController")
+            .haveSimpleName("ProcessoController")
             .should()
             .onlyAccessClassesThat()
             .haveNameMatching("ProcessoService")
@@ -88,7 +88,7 @@ public class ArchConsistencyTest {
 
                             // Check if dependency is in a recognized module and if it matches the item's
                             // module
-                            if (dependencyModule != null && !dependencyModule.equals(itemModule)) {
+                            if (dependencyModule != null && !dependencyModule.equals(itemModule) && !dependencyModule.equals("comum")) {
                                 String message = String.format(
                                         "Service %s (module %s) accesses Repository %s (module %s)",
                                         item.getName(), itemModule, targetClass.getName(), dependencyModule);

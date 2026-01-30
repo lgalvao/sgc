@@ -1,5 +1,7 @@
 import os
 
+JAVA_EXT = '.java'
+
 source_files = []
 test_files = set()
 
@@ -8,7 +10,7 @@ backend_test = 'backend/src/test/java'
 
 for root, dirs, files in os.walk(backend_src):
     for file in files:
-        if file.endswith('.java') and file != 'package-info.java':
+        if file.endswith(JAVA_EXT) and file != 'package-info.java':
             full_path = os.path.join(root, file)
             # Rel path from src root (e.g., sgc/analise/AnaliseService.java)
             rel_path = os.path.relpath(full_path, backend_src)
@@ -16,7 +18,7 @@ for root, dirs, files in os.walk(backend_src):
 
 for root, dirs, files in os.walk(backend_test):
     for file in files:
-        if file.endswith('.java'):
+        if file.endswith(JAVA_EXT):
             test_files.add(file)
 
 # Analysis
@@ -34,11 +36,11 @@ report = {
 stats = {"total": 0, "tested": 0}
 
 for src_rel in source_files:
-    class_name = os.path.basename(src_rel).replace('.java', '')
+    class_name = os.path.basename(src_rel).replace(JAVA_EXT, '')
     
     # Heuristic for test name: ClassNameTest.java or ClassNameCoverageTest.java
     # We look for ANY file in test_files that matches expected patterns
-    expected_tests = [class_name + 'Test.java', class_name + 'CoverageTest.java', class_name + 'UnitTest.java']
+    expected_tests = [class_name + 'Test' + JAVA_EXT, class_name + 'CoverageTest' + JAVA_EXT, class_name + 'UnitTest' + JAVA_EXT]
     
     is_tested = any(t in test_files for t in expected_tests)
     
@@ -59,15 +61,15 @@ for src_rel in source_files:
         report[category]["untested"].append(src_rel)
 
 # Output Markdown
-print(f"# Relatório de Cobertura de Testes Unitários (Backend)\n")
-print(f"**Data:** 29/01/2026")
+print("# Relatório de Cobertura de Testes Unitários (Backend)\n")
+print("**Data:** 29/01/2026")
 print(f"**Total de Classes:** {stats['total']}")
 print(f"**Com Testes Unitários:** {stats['tested']}")
 print(f"**Sem Testes Unitários:** {stats['total'] - stats['tested']}")
 if stats['total'] > 0:
     print(f"**Cobertura (Arquivos):** {stats['tested'] / stats['total'] * 100:.2f}%\n")
 else:
-    print(f"**Cobertura (Arquivos):** 0%\n")
+    print("**Cobertura (Arquivos):** 0%\n")
 
 print("## Detalhamento por Categoria\n")
 

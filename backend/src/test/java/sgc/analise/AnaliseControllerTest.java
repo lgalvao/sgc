@@ -17,7 +17,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -52,7 +52,6 @@ class AnaliseControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
     private ObjectMapper objectMapper;
 
     @MockitoBean
@@ -68,6 +67,7 @@ class AnaliseControllerTest {
 
     @BeforeEach
     void setup() {
+        objectMapper = new ObjectMapper();
         subprocesso = new Subprocesso();
         subprocesso.setCodigo(1L);
     }

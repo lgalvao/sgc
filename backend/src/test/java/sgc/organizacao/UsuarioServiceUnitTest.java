@@ -72,7 +72,6 @@ class UsuarioServiceUnitTest {
         @DisplayName("Deve carregar atribuições se usuário encontrado")
         void deveCarregarAtribuicoesQuandoEncontrado() {
             Usuario usuario = mock(Usuario.class);
-            when(usuario.getTituloEleitoral()).thenReturn("user");
             when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional("user")).thenReturn(Optional.of(usuario));
 
             Usuario result = service.carregarUsuarioParaAutenticacao("user");

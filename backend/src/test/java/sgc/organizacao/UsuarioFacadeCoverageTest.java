@@ -23,8 +23,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroValidacao;
-
 import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
