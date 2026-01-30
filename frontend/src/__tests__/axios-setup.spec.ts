@@ -2,7 +2,6 @@ import {createPinia, setActivePinia} from "pinia";
 import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from "vitest";
 import router from "@/router";
 import {useFeedbackStore} from "@/stores/feedback";
-import {logger} from "@/utils";
 
 // Hoist mock instance so it's shared between module and test
 const {mockInstance} = vi.hoisted(() => {

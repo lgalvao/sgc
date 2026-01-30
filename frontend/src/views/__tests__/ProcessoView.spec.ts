@@ -91,6 +91,7 @@ describe("ProcessoView.vue", () => {
     let processosStore: any;
     let feedbackStore: any;
     let perfilStore: any;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let router: any;
 
     const commonStubs = {

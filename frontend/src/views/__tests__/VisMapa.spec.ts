@@ -7,7 +7,6 @@ import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useFeedbackStore} from "@/stores/feedback";
-import {useAnalisesStore} from "@/stores/analises";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
@@ -406,16 +405,6 @@ describe("VisMapa.vue", () => {
     });
 
     it("shows historico de analise", async () => {
-        const analisesData = [
-            {
-                codigo: 1,
-                dataHora: "2023-01-01T12:00:00",
-                unidadeSigla: "UNIT",
-                resultado: "APROVADO",
-                observacoes: "Bom",
-            },
-        ];
-
         const { wrapper } = mountComponent({
             perfil: { perfilSelecionado: "GESTOR" }, // GESTOR tem podeAnalisar
         });
