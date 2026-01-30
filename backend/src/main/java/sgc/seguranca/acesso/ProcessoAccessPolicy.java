@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.organizacao.service.HierarquiaService;
 import sgc.processo.model.Processo;
 
 import java.util.EnumSet;
@@ -20,8 +21,8 @@ import static sgc.seguranca.acesso.Acao.*;
 @Component
 public class ProcessoAccessPolicy extends AbstractAccessPolicy<Processo> {
 
-    public ProcessoAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo) {
-        super(usuarioPerfilRepo);
+    public ProcessoAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo, HierarquiaService hierarquiaService) {
+        super(usuarioPerfilRepo, hierarquiaService);
     }
 
     /**

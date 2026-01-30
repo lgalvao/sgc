@@ -216,11 +216,9 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                     EnumSet.of(ADMIN, GESTOR, CHEFE),
                     EnumSet.of(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO),
                     RequisitoHierarquia.MESMA_UNIDADE)));
-    private final HierarquiaService hierarquiaService;
 
     public SubprocessoAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo, HierarquiaService hierarquiaService) {
-        super(usuarioPerfilRepo);
-        this.hierarquiaService = hierarquiaService;
+        super(usuarioPerfilRepo, hierarquiaService);
     }
 
     @Override
@@ -257,8 +255,8 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
             return true;
         }
 
-        if (!verificaHierarquia(usuario, sp, regras.requisitoHierarquia)) {
-            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, sp, regras.requisitoHierarquia));
+        if (!verificaHierarquia(usuario, sp.getUnidade(), regras.requisitoHierarquia)) {
+            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, sp.getUnidade(), regras.requisitoHierarquia));
             return false;
         }
 
@@ -287,10 +285,10 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
 
         // CHEFE: situações iniciais, mas precisa estar na mesma unidade
         if (temPerfil(usuario, CHEFE) && SITUACOES_VERIFICAR_IMPACTOS_CHEFE.contains(situacao)) {
-            if (verificaHierarquia(usuario, sp, RequisitoHierarquia.MESMA_UNIDADE)) {
+            if (verificaHierarquia(usuario, sp.getUnidade(), RequisitoHierarquia.MESMA_UNIDADE)) {
                 return true;
             }
-            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, sp, RequisitoHierarquia.MESMA_UNIDADE));
+            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, sp.getUnidade(), RequisitoHierarquia.MESMA_UNIDADE));
             return false;
         }
 
@@ -323,74 +321,6 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                 situacoesPermitidas));
     }
 
-    /**
-     * Verifica se o usuário possui o perfil especificado.
-     */
-    private boolean temPerfil(Usuario usuario, Perfil perfil) {
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>(
-                usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral())
-        );
-        return usuario.getTodasAtribuicoes(atribuicoes).stream()
-                .anyMatch(a -> a.getPerfil() == perfil);
-    }
-
-    private boolean verificaHierarquia(Usuario usuario, Subprocesso sp, RequisitoHierarquia requisito) {
-        final Unidade unidadeSp = sp.getUnidade();
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>(
-                usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral())
-        );
-        final Set<UsuarioPerfil> todasAtribuicoes = usuario.getTodasAtribuicoes(atribuicoes);
-        final Long codUnidade = unidadeSp.getCodigo();
-
-        return switch (requisito) {
-            case NENHUM -> true;
-            case MESMA_UNIDADE -> todasAtribuicoes.stream()
-                    .anyMatch(a -> Objects.equals(a.getUnidade().getCodigo(), codUnidade));
-
-            case MESMA_OU_SUBORDINADA -> todasAtribuicoes.stream()
-                    .anyMatch(a -> Objects.equals(a.getUnidade().getCodigo(), codUnidade)
-                            || hierarquiaService.isSubordinada(unidadeSp, a.getUnidade()));
-
-            case SUPERIOR_IMEDIATA -> todasAtribuicoes.stream()
-                    .anyMatch(a -> hierarquiaService.isSuperiorImediata(unidadeSp, a.getUnidade()));
-
-            case TITULAR_UNIDADE -> {
-                String tituloTitular = unidadeSp.getTituloTitular();
-                yield tituloTitular.equals(usuario.getTituloEleitoral());
-            }
-        };
-    }
-
-    private String obterMotivoNegacaoHierarquia(
-            Usuario usuario, Subprocesso sp, RequisitoHierarquia requisito) {
-
-        Unidade unidadeSubprocesso = sp.getUnidade();
-        String siglaUnidade = unidadeSubprocesso.getSigla();
-
-        return switch (requisito) {
-            case NENHUM -> "Erro inesperado na verificação de hierarquia";
-
-            case MESMA_UNIDADE -> String.format(
-                    "Usuário '%s' não pertence à unidade '%s' do sp",
-                    usuario.getTituloEleitoral(), siglaUnidade);
-
-            case MESMA_OU_SUBORDINADA -> String.format(
-                    "Usuário '%s' não pertence à unidade '%s' nem a uma unidade superior na hierarquia",
-                    usuario.getTituloEleitoral(), siglaUnidade);
-
-            case SUPERIOR_IMEDIATA -> String.format(
-                    "Usuário '%s' não pertence à unidade superior imediata da unidade '%s'",
-                    usuario.getTituloEleitoral(), siglaUnidade);
-
-            case TITULAR_UNIDADE -> {
-                String tituloTitular = unidadeSubprocesso.getTituloTitular();
-                yield String.format(
-                        "Usuário '%s' não é o titular da unidade '%s'. Titular: %s",
-                        usuario.getTituloEleitoral(), siglaUnidade, tituloTitular);
-            }
-        };
-    }
-
     private String formatarSituacoes(EnumSet<SituacaoSubprocesso> situacoes) {
         if (situacoes.size() > 5) {
             return "%d situações".formatted(situacoes.size());
@@ -399,17 +329,6 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                 .map(SituacaoSubprocesso::getDescricao)
                 .reduce((a, b) -> a + ", " + b)
                 .orElse("nenhuma");
-    }
-
-    /**
-     * Enum para requisitos de hierarquia de unidades
-     */
-    private enum RequisitoHierarquia {
-        NENHUM,             // Sem verificação de hierarquia
-        MESMA_UNIDADE,      // Usuário deve estar na mesma unidade
-        MESMA_OU_SUBORDINADA, // Usuário deve estar na mesma unidade ou em unidade superior
-        SUPERIOR_IMEDIATA,  // Usuário deve estar na unidade superior imediata
-        TITULAR_UNIDADE     // Usuário deve ser o titular da unidade
     }
 
     /**

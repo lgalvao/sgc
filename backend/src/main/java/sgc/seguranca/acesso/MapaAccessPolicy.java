@@ -5,6 +5,7 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.organizacao.service.HierarquiaService;
 
 import java.util.EnumSet;
 import java.util.Map;
@@ -21,8 +22,8 @@ import static sgc.seguranca.acesso.Acao.*;
 @Component
 public class MapaAccessPolicy extends AbstractAccessPolicy<Mapa> {
 
-    public MapaAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo) {
-        super(usuarioPerfilRepo);
+    public MapaAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo, HierarquiaService hierarquiaService) {
+        super(usuarioPerfilRepo, hierarquiaService);
     }
 
     /**
