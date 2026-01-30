@@ -24,6 +24,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO;
+import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO;
+import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
+import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
+import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
@@ -210,11 +216,11 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoPermitida: com Set - sucesso quando situação está no conjunto")
     void validarSituacaoPermitidaSetSucesso() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         
         service.validarSituacaoPermitida(sp, Set.of(
-            sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-            sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
+            MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+            MAPEAMENTO_CADASTRO_HOMOLOGADO
         ));
     }
 
@@ -222,11 +228,11 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoPermitida: com Set - erro quando situação não está no conjunto")
     void validarSituacaoPermitidaSetErro() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacao(NAO_INICIADO);
         
         assertThatThrownBy(() -> service.validarSituacaoPermitida(sp, Set.of(
-            sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-            sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
+            MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+            MAPEAMENTO_CADASTRO_HOMOLOGADO
         )))
             .isInstanceOf(ErroValidacao.class)
             .hasMessageContaining("Situação do subprocesso não permite esta operação");
@@ -236,11 +242,11 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoPermitida: varargs - sucesso quando situação está entre as permitidas")
     void validarSituacaoPermitidaVarargsSucesso() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
         
         service.validarSituacaoPermitida(sp,
-            sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
-            sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO
+            MAPEAMENTO_CADASTRO_HOMOLOGADO,
+            MAPEAMENTO_MAPA_CRIADO
         );
     }
 
@@ -248,11 +254,11 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoPermitida: varargs - erro quando situação não está entre as permitidas")
     void validarSituacaoPermitidaVarargsErro() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacao(NAO_INICIADO);
         
         assertThatThrownBy(() -> service.validarSituacaoPermitida(sp,
-            sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
-            sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO
+            MAPEAMENTO_CADASTRO_HOMOLOGADO,
+            MAPEAMENTO_MAPA_CRIADO
         ))
             .isInstanceOf(ErroValidacao.class)
             .hasMessageContaining("Situação do subprocesso não permite esta operação");
@@ -262,10 +268,10 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoPermitida: com mensagem customizada - sucesso")
     void validarSituacaoPermitidaMensagemSucesso() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
         
         service.validarSituacaoPermitida(sp, "Mensagem customizada",
-            sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
+            MAPEAMENTO_CADASTRO_HOMOLOGADO
         );
     }
 
@@ -273,10 +279,10 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoPermitida: com mensagem customizada - erro")
     void validarSituacaoPermitidaMensagemErro() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacao(NAO_INICIADO);
         
         assertThatThrownBy(() -> service.validarSituacaoPermitida(sp, "Mensagem customizada de teste",
-            sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
+            MAPEAMENTO_CADASTRO_HOMOLOGADO
         ))
             .isInstanceOf(ErroValidacao.class)
             .hasMessage("Mensagem customizada de teste");
@@ -286,28 +292,27 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoMinima: sucesso quando situação é igual à mínima")
     void validarSituacaoMinimaSucessoIgual() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
         
-        service.validarSituacaoMinima(sp, sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        service.validarSituacaoMinima(sp, MAPEAMENTO_CADASTRO_HOMOLOGADO);
     }
 
     @Test
     @DisplayName("validarSituacaoMinima: sucesso quando situação é maior que a mínima")
     void validarSituacaoMinimaSucessoMaior() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+        sp.setSituacao(MAPEAMENTO_MAPA_CRIADO);
         
-        service.validarSituacaoMinima(sp, sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        service.validarSituacaoMinima(sp, MAPEAMENTO_CADASTRO_HOMOLOGADO);
     }
 
     @Test
     @DisplayName("validarSituacaoMinima: erro quando situação é menor que a mínima")
     void validarSituacaoMinimaErro() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         
-        assertThatThrownBy(() -> service.validarSituacaoMinima(sp, 
-            sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO))
+        assertThatThrownBy(() -> service.validarSituacaoMinima(sp, MAPEAMENTO_CADASTRO_HOMOLOGADO))
             .isInstanceOf(ErroValidacao.class)
             .hasMessageContaining("não atingiu a situação mínima necessária");
     }
@@ -316,21 +321,19 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoMinima: com mensagem customizada - sucesso")
     void validarSituacaoMinimaMensagemSucesso() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        sp.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
         
-        service.validarSituacaoMinima(sp, 
-            sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, 
-            "Mensagem customizada");
+        service.validarSituacaoMinima(sp, REVISAO_CADASTRO_HOMOLOGADA, "Mensagem customizada");
     }
 
     @Test
     @DisplayName("validarSituacaoMinima: com mensagem customizada - erro")
     void validarSituacaoMinimaMensagemErro() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        sp.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
         
         assertThatThrownBy(() -> service.validarSituacaoMinima(sp,
-            sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
+            REVISAO_CADASTRO_HOMOLOGADA,
             "Subprocesso ainda está em fase de revisão."
         ))
             .isInstanceOf(ErroValidacao.class)
