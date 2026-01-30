@@ -92,6 +92,7 @@ public class SubprocessoFacade {
     private final SubprocessoCadastroWorkflowService cadastroWorkflowService;
     private final SubprocessoMapaWorkflowService mapaWorkflowService;
     private final SubprocessoAdminWorkflowService adminWorkflowService;
+    private final SubprocessoAjusteMapaService ajusteMapaService;
 
     // Utility services
     private final UsuarioFacade usuarioService;
@@ -216,7 +217,7 @@ public class SubprocessoFacade {
 
     @Transactional(readOnly = true)
     public MapaAjusteDto obterMapaParaAjuste(Long codigo) {
-        return obterMapaParaAjusteInterno(codigo);
+        return ajusteMapaService.obterMapaParaAjuste(codigo);
     }
 
     @Transactional(readOnly = true)
@@ -404,84 +405,12 @@ public class SubprocessoFacade {
 
     @Transactional
     public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias) {
-        salvarAjustesMapaInterno(codSubprocesso, competencias);
+        ajusteMapaService.salvarAjustesMapa(codSubprocesso, competencias);
     }
 
     @Transactional
     public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
         importarAtividadesInterno(codSubprocessoDestino, codSubprocessoOrigem);
-    }
-
-    private void salvarAjustesMapaInterno(Long codSubprocesso, List<CompetenciaAjusteDto> competencias) {
-        Subprocesso sp = subprocessoRepo.findById(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                        "Subprocesso não encontrado: %d".formatted(codSubprocesso)));
-
-        validarSituacaoParaAjuste(sp);
-        atualizarDescricoesAtividades(competencias);
-        atualizarCompetenciasEAssociacoes(competencias);
-
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
-        subprocessoRepo.save(sp);
-    }
-
-    private void validarSituacaoParaAjuste(Subprocesso sp) {
-        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
-                && sp.getSituacao() != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {
-            throw new sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida(
-                    "Ajustes no mapa só podem ser feitos em estados específicos. "
-                            + "Situação atual: %s".formatted(sp.getSituacao()));
-        }
-    }
-
-    private void atualizarDescricoesAtividades(List<CompetenciaAjusteDto> competencias) {
-        java.util.Map<Long, String> atividadeDescricoes = new java.util.HashMap<>();
-        for (CompetenciaAjusteDto compDto : competencias) {
-            for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
-                atividadeDescricoes.put(ativDto.codAtividade(), ativDto.nome());
-            }
-        }
-        if (!atividadeDescricoes.isEmpty()) {
-            mapaManutencaoService.atualizarDescricoesAtividadeEmLote(atividadeDescricoes);
-        }
-    }
-
-    private void atualizarCompetenciasEAssociacoes(List<CompetenciaAjusteDto> competencias) {
-        // Carregar todas as competências envolvidas
-        List<Long> competenciaIds = competencias.stream()
-                .map(CompetenciaAjusteDto::getCodCompetencia)
-                .toList();
-
-        java.util.Map<Long, Competencia> mapaCompetencias = mapaManutencaoService.buscarCompetenciasPorCodigos(competenciaIds).stream()
-                .collect(java.util.stream.Collectors.toMap(Competencia::getCodigo,
-                        java.util.function.Function.identity()));
-
-        List<Long> todasAtividadesIds = competencias.stream()
-                .flatMap(c -> c.getAtividades().stream())
-                .map(AtividadeAjusteDto::codAtividade)
-                .distinct()
-                .toList();
-
-        java.util.Map<Long, Atividade> mapaAtividades = mapaManutencaoService.buscarAtividadesPorCodigos(todasAtividadesIds).stream()
-                .collect(java.util.stream.Collectors.toMap(Atividade::getCodigo,
-                        java.util.function.Function.identity()));
-
-        List<Competencia> competenciasParaSalvar = new ArrayList<>();
-        for (CompetenciaAjusteDto compDto : competencias) {
-            Competencia competencia = mapaCompetencias.get(compDto.getCodCompetencia());
-            if (competencia != null) {
-                competencia.setDescricao(compDto.getNome());
-
-                Set<Atividade> atividadesSet = new HashSet<>();
-                for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
-                    Atividade ativ = mapaAtividades.get(ativDto.codAtividade());
-                    atividadesSet.add(ativ);
-                }
-                competencia.setAtividades(atividadesSet);
-                competenciasParaSalvar.add(competencia);
-            }
-        }
-        mapaManutencaoService.salvarTodasCompetencias(competenciasParaSalvar);
     }
 
     private void importarAtividadesInterno(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
@@ -615,19 +544,6 @@ public class SubprocessoFacade {
                 .sugestoes("")
                 .dataHora(LocalDateTime.now())
                 .build();
-    }
-
-    private MapaAjusteDto obterMapaParaAjusteInterno(Long codSubprocesso) {
-        Subprocesso sp = crudService.buscarSubprocessoComMapa(codSubprocesso);
-        Long codMapa = sp.getMapa().getCodigo();
-        Analise analise = analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst()
-                .orElse(null);
-        List<Competencia> competencias = mapaManutencaoService.buscarCompetenciasPorCodMapaSemRelacionamentos(codMapa);
-        List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoSemRelacionamentos(codMapa);
-        List<Conhecimento> conhecimentos = mapaManutencaoService.listarConhecimentosPorMapa(codMapa);
-        java.util.Map<Long, java.util.Set<Long>> associacoes = mapaManutencaoService
-                .buscarIdsAssociacoesCompetenciaAtividade(codMapa);
-        return mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos, associacoes);
     }
 
     private SubprocessoPermissoesDto obterPermissoesInterno(Long codSubprocesso, Usuario usuario) {

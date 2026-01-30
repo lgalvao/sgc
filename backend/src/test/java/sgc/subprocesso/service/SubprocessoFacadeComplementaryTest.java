@@ -79,6 +79,8 @@ class SubprocessoFacadeComplementaryTest {
     @Mock
     private sgc.seguranca.acesso.AccessControlService accessControlService;
     @Mock
+    private SubprocessoAjusteMapaService ajusteMapaService;
+    @Mock
     private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     @Mock
     private sgc.mapa.service.CopiaMapaService copiaMapaService;
