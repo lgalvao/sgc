@@ -7,7 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import sgc.configuracao.model.Parametro;
+import sgc.configuracao.dto.ParametroRequest;
+import sgc.configuracao.dto.ParametroResponse;
 
 import java.util.List;
 
@@ -22,14 +23,14 @@ public class ConfiguracaoController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Listar todas as configurações")
-    public List<Parametro> listar() {
+    public List<ParametroResponse> listar() {
         return configuracaoFacade.buscarTodos();
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualizar configurações em bloco")
-    public List<Parametro> atualizar(@RequestBody @Valid List<Parametro> parametros) {
+    public List<ParametroResponse> atualizar(@RequestBody @Valid List<ParametroRequest> parametros) {
         return configuracaoFacade.salvar(parametros);
     }
 }

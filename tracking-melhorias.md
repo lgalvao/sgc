@@ -10,10 +10,10 @@
 
 | Prioridade | Total | Completo | Em Progresso | Pendente |
 |-----------|-------|----------|--------------|----------|
-| 🔴 CRÍTICA | 13 | 3 | 0 | 10 |
+| 🔴 CRÍTICA | 13 | 4 | 0 | 9 |
 | 🟠 MÉDIA | 14 | 0 | 0 | 14 |
 | 🟡 BAIXA | 6 | 0 | 0 | 6 |
-| **TOTAL** | **33** | **3** | **0** | **30** |
+| **TOTAL** | **33** | **4** | **0** | **29** |
 
 ---
 
@@ -27,7 +27,7 @@
 - [ ] **#4** Refatorar SubprocessoFacade e centralizar validações - 8h
 - [x] **#5** Mover @PreAuthorize de Facades para Controllers - 6h
 - [ ] **#6** Centralizar verificações de acesso via AccessControlService - 8h
-- [ ] **#7** Criar DTOs para AnaliseController e ConfiguracaoController - 4h
+- [x] **#7** Criar DTOs para AnaliseController e ConfiguracaoController - 4h
 - [ ] **#8** Eliminar ciclos de dependência via Events - 2h
 - [ ] **#9** Padronizar acesso a services (View→Store→Service→API) - 4h
 - [x] **#10** Substituir console.* por logger - 3h
@@ -100,6 +100,14 @@
   - ProcessoController: Adicionada 1 anotação faltante em listarSubprocessosElegiveis
   - Conformidade com ADR-001: Controllers definem segurança, Facades orquestram lógica
   - Compilação: ✅ Bem-sucedida com Java 21
+- ✅ **Ação #7 COMPLETA**: DTOs criados para ConfiguracaoController
+  - AnaliseController: Já estava conforme (usa DTOs)
+  - ConfiguracaoController: Criados ParametroRequest e ParametroResponse
+  - ParametroMapper: Implementado com MapStruct
+  - ConfiguracaoService: Adicionado método buscarPorId
+  - ConfiguracaoFacade: Atualizado para usar DTOs
+  - Conformidade com ADR-004: Entidades JPA não são mais expostas diretamente
+  - Compilação: ✅ Bem-sucedida
 
 ---
 

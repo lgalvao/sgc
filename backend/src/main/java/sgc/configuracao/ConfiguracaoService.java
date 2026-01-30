@@ -34,6 +34,19 @@ public class ConfiguracaoService {
     }
 
     /**
+     * Busca um parâmetro por código.
+     *
+     * @param codigo código do parâmetro
+     * @return parâmetro encontrado
+     * @throws ErroConfiguracao se o parâmetro não for encontrado
+     */
+    public Parametro buscarPorId(Long codigo) {
+        return parametroRepo.findById(codigo)
+                .orElseThrow(() -> new ErroConfiguracao(
+                        "Parâmetro com código '%d' não encontrado.".formatted(codigo)));
+    }
+
+    /**
      * Busca um parâmetro por chave.
      *
      * @param chave chave do parâmetro
