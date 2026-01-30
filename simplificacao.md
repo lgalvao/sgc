@@ -76,7 +76,7 @@ Este plano de simplificação foi executado com sucesso em todas as suas fases (
 
 **Frontend:**
 - ✅ unidadeAtual computed otimizado
-- ⏸️ Lookups com Map (opcional - não crítico para 10 usuários)
+- ✅ Lookups com Map (3 stores otimizados: perfil, configuracoes, usuarios)
 
 ---
 
