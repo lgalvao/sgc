@@ -39,6 +39,12 @@ class SubprocessoFacadeTest {
     @Mock
     private SubprocessoAjusteMapaService ajusteMapaService;
     @Mock
+    private SubprocessoAtividadeService atividadeService;
+    @Mock
+    private SubprocessoContextoService contextoService;
+    @Mock
+    private SubprocessoPermissaoCalculator permissaoCalculator;
+    @Mock
     private UsuarioFacade usuarioService;
     @Mock
     private MapaManutencaoService mapaManutencaoService;

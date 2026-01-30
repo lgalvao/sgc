@@ -47,6 +47,14 @@ class SubprocessoFacadeCoverageTest {
     private sgc.mapa.service.CopiaMapaService copiaMapaService;
     @Mock
     private SubprocessoAjusteMapaService ajusteMapaService;
+    @Mock
+    private SubprocessoAtividadeService atividadeService;
+    @Mock
+    private SubprocessoContextoService contextoService;
+    @Mock
+    private SubprocessoPermissaoCalculator permissaoCalculator;
+    @Mock
+    private sgc.organizacao.UsuarioFacade usuarioService;
 
     @InjectMocks
     private SubprocessoFacade facade;
@@ -57,34 +65,9 @@ class SubprocessoFacadeCoverageTest {
         Long codDestino = 1L;
         Long codOrigem = 2L;
 
-        Subprocesso spDestino = new Subprocesso();
-        spDestino.setCodigo(codDestino);
-        spDestino.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        spDestino.setMapa(new Mapa());
-        spDestino.getMapa().setCodigo(10L);
-        spDestino.setUnidade(new sgc.organizacao.model.Unidade());
-        spDestino.getUnidade().setSigla("DEST");
-
-        Processo processo = new Processo();
-        processo.setTipo(TipoProcesso.DIAGNOSTICO);
-        spDestino.setProcesso(processo);
-
-        Subprocesso spOrigem = new Subprocesso();
-        spOrigem.setCodigo(codOrigem);
-        spOrigem.setMapa(new Mapa());
-        spOrigem.getMapa().setCodigo(20L);
-        spOrigem.setUnidade(new sgc.organizacao.model.Unidade());
-        spOrigem.getUnidade().setSigla("ORIG");
-
-        when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
-        when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
-
         facade.importarAtividades(codDestino, codOrigem);
 
-        verify(copiaMapaService).importarAtividadesDeOutroMapa(20L, 10L);
-        verify(movimentacaoRepo).save(any(Movimentacao.class));
-
-        assert spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO;
+        verify(atividadeService).importarAtividades(codDestino, codOrigem);
     }
 
     @Test

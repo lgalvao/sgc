@@ -13,6 +13,7 @@ import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,16 @@ class SubprocessoFacadeBatchUpdateTest {
     private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     @Mock
     private SubprocessoAjusteMapaService ajusteMapaService;
+    @Mock
+    private SubprocessoCrudService crudService;
+    @Mock
+    private SubprocessoAtividadeService atividadeService;
+    @Mock
+    private SubprocessoContextoService contextoService;
+    @Mock
+    private SubprocessoPermissaoCalculator permissaoCalculator;
+    @Mock
+    private sgc.organizacao.UsuarioFacade usuarioService;
 
     @InjectMocks
     private SubprocessoFacade facade;

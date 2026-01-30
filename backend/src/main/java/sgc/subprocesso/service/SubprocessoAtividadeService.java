@@ -1,0 +1,145 @@
+package sgc.subprocesso.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.service.CopiaMapaService;
+import sgc.mapa.service.MapaManutencaoService;
+import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
+import sgc.subprocesso.dto.ConhecimentoVisualizacaoDto;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.crud.SubprocessoCrudService;
+
+import java.util.List;
+
+/**
+ * Service responsável por operações relacionadas a atividades de subprocessos.
+ * 
+ * <p>Extrai lógica de manipulação de atividades que estava em métodos privados de {@link SubprocessoFacade}.
+ * Responsabilidades:
+ * <ul>
+ *   <li>Importar atividades entre subprocessos</li>
+ *   <li>Listar atividades de um subprocesso para visualização</li>
+ *   <li>Transformar atividades em DTOs para visualização</li>
+ * </ul>
+ */
+@Service
+@RequiredArgsConstructor
+@Slf4j
+class SubprocessoAtividadeService {
+
+    private final SubprocessoRepo subprocessoRepo;
+    private final SubprocessoCrudService crudService;
+    private final MapaManutencaoService mapaManutencaoService;
+    private final CopiaMapaService copiaMapaService;
+    private final MovimentacaoRepo movimentacaoRepo;
+
+    /**
+     * Importa atividades de um subprocesso de origem para um subprocesso de destino.
+     * 
+     * <p>Regras:
+     * <ul>
+     *   <li>Destino deve estar em NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO ou REVISAO_CADASTRO_EM_ANDAMENTO</li>
+     *   <li>Se destino está em NAO_INICIADO, atualiza situação para cadastro em andamento</li>
+     *   <li>Registra movimentação da importação</li>
+     * </ul>
+     * 
+     * @param codSubprocessoDestino código do subprocesso de destino
+     * @param codSubprocessoOrigem código do subprocesso de origem
+     * @throws ErroEntidadeNaoEncontrada se algum subprocesso não existe
+     * @throws sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida se destino está em situação inválida
+     */
+    @Transactional
+    public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
+        final Subprocesso spDestino = subprocessoRepo
+                .findById(codSubprocessoDestino)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
+                        "Subprocesso de destino não encontrado: %d".formatted(codSubprocessoDestino)));
+
+        if (spDestino.getSituacao() != SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+                && spDestino.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+                && spDestino.getSituacao() != SituacaoSubprocesso.NAO_INICIADO) {
+
+            throw new sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida("""
+                    Atividades só podem ser importadas para um subprocesso
+                    com cadastro em elaboração ou não iniciado.""");
+        }
+
+        Subprocesso spOrigem = subprocessoRepo.findById(codSubprocessoOrigem)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
+                        "Subprocesso de origem não encontrado: %d".formatted(codSubprocessoOrigem)));
+
+        copiaMapaService.importarAtividadesDeOutroMapa(
+                spOrigem.getMapa().getCodigo(),
+                spDestino.getMapa().getCodigo());
+
+        if (spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
+            var tipoProcesso = spDestino.getProcesso().getTipo();
+
+            switch (tipoProcesso) {
+                case MAPEAMENTO -> spDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+                case REVISAO -> spDestino.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+                default ->
+                    log.debug("Tipo de processo {} não requer atualização automática de situação no import.",
+                            tipoProcesso);
+            }
+            subprocessoRepo.save(spDestino);
+        }
+
+        final sgc.organizacao.model.Unidade unidadeOrigem = spOrigem.getUnidade();
+        String descMovimentacao = String.format("Importação de atividades do subprocesso #%d (Unidade: %s)",
+                spOrigem.getCodigo(),
+                unidadeOrigem.getSigla());
+
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(spDestino)
+                .unidadeOrigem(unidadeOrigem)
+                .unidadeDestino(spDestino.getUnidade())
+                .descricao(descMovimentacao)
+                .build());
+
+        log.info("Atividades importadas do subprocesso {} para {}", codSubprocessoOrigem, codSubprocessoDestino);
+    }
+
+    /**
+     * Lista todas as atividades de um subprocesso para visualização.
+     * 
+     * @param codSubprocesso código do subprocesso
+     * @return lista de atividades com seus conhecimentos
+     */
+    @Transactional(readOnly = true)
+    public List<AtividadeVisualizacaoDto> listarAtividadesSubprocesso(Long codSubprocesso) {
+        Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
+        List<Atividade> todasAtividades = mapaManutencaoService
+                .buscarAtividadesPorMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
+        return todasAtividades.stream().map(this::mapAtividadeToDto).toList();
+    }
+
+    /**
+     * Transforma uma atividade em DTO para visualização.
+     * 
+     * @param atividade atividade a transformar
+     * @return DTO com dados da atividade e seus conhecimentos
+     */
+    private AtividadeVisualizacaoDto mapAtividadeToDto(Atividade atividade) {
+        List<ConhecimentoVisualizacaoDto> conhecimentosDto = atividade.getConhecimentos().stream()
+                .map(c -> ConhecimentoVisualizacaoDto.builder()
+                        .codigo(c.getCodigo())
+                        .descricao(c.getDescricao())
+                        .build())
+                .toList();
+
+        return AtividadeVisualizacaoDto.builder()
+                .codigo(atividade.getCodigo())
+                .descricao(atividade.getDescricao())
+                .conhecimentos(conhecimentosDto)
+                .build();
+    }
+}
