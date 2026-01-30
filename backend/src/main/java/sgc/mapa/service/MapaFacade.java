@@ -31,23 +31,20 @@ import java.util.Optional;
 @Slf4j
 public class MapaFacade {
 
-    private final MapaRepositoryService mapaRepositoryService;
     private final MapaCompletoMapper mapaCompletoMapper;
     private final MapaSalvamentoService mapaSalvamentoService;
-    private final MapaManutencaoService mapaManutencaoService; // Added/Explicit dependency usage
+    private final MapaManutencaoService mapaManutencaoService;
     private final MapaVisualizacaoService mapaVisualizacaoService;
     private final ImpactoMapaService impactoMapaService;
     private final sgc.comum.repo.RepositorioComum repo;
 
     public MapaFacade(
-            MapaRepositoryService mapaRepositoryService,
             MapaCompletoMapper mapaCompletoMapper,
             MapaSalvamentoService mapaSalvamentoService,
             MapaManutencaoService mapaManutencaoService,
             MapaVisualizacaoService mapaVisualizacaoService,
             ImpactoMapaService impactoMapaService,
             sgc.comum.repo.RepositorioComum repo) {
-        this.mapaRepositoryService = mapaRepositoryService;
         this.mapaCompletoMapper = mapaCompletoMapper;
         this.mapaSalvamentoService = mapaSalvamentoService;
         this.mapaManutencaoService = mapaManutencaoService;
@@ -62,7 +59,7 @@ public class MapaFacade {
 
     @Transactional(readOnly = true)
     public List<Mapa> listar() {
-        return mapaRepositoryService.listarTodos();
+        return mapaManutencaoService.listarTodosMapas();
     }
 
     @Transactional(readOnly = true)
@@ -72,12 +69,12 @@ public class MapaFacade {
 
     @Transactional(readOnly = true)
     public Optional<Mapa> buscarMapaVigentePorUnidade(Long codigoUnidade) {
-        return mapaRepositoryService.buscarMapaVigentePorUnidade(codigoUnidade);
+        return mapaManutencaoService.buscarMapaVigentePorUnidade(codigoUnidade);
     }
 
     @Transactional(readOnly = true)
     public Optional<Mapa> buscarPorSubprocessoCodigo(Long codSubprocesso) {
-        return mapaRepositoryService.buscarPorSubprocessoCodigo(codSubprocesso);
+        return mapaManutencaoService.buscarMapaPorSubprocessoCodigo(codSubprocesso);
     }
 
     @Transactional(readOnly = true)
@@ -93,11 +90,11 @@ public class MapaFacade {
     // ===================================================================================
 
     public Mapa salvar(Mapa mapa) {
-        return mapaRepositoryService.salvar(mapa);
+        return mapaManutencaoService.salvarMapa(mapa);
     }
 
     public Mapa criar(Mapa mapa) {
-        return mapaRepositoryService.salvar(mapa);
+        return mapaManutencaoService.salvarMapa(mapa);
     }
 
     public Mapa atualizar(Long codigo, Mapa mapa) {
@@ -105,14 +102,14 @@ public class MapaFacade {
         existente.setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado());
         existente.setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao());
         existente.setDataHoraHomologado(mapa.getDataHoraHomologado());
-        return mapaRepositoryService.salvar(existente);
+        return mapaManutencaoService.salvarMapa(existente);
     }
 
     public void excluir(Long codigo) {
-        if (!mapaRepositoryService.existe(codigo)) {
+        if (!mapaManutencaoService.mapaExiste(codigo)) {
             throw new ErroEntidadeNaoEncontrada("Mapa", codigo);
         }
-        mapaRepositoryService.excluir(codigo);
+        mapaManutencaoService.excluirMapa(codigo);
     }
 
     // ===================================================================================

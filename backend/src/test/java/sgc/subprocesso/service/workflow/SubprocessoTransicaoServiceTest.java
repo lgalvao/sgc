@@ -15,7 +15,7 @@ import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.service.SubprocessoRepositoryService;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -30,7 +30,7 @@ class SubprocessoTransicaoServiceTest {
     private MovimentacaoRepo movimentacaoRepo;
 
     @Mock
-    private SubprocessoRepositoryService subprocessoService;
+    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
 
     @Mock
     private ApplicationEventPublisher eventPublisher;

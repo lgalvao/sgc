@@ -8,8 +8,6 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.UnidadeRepositoryService;
-import sgc.organizacao.service.UsuarioRepositoryService;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeMapaService;
 import sgc.organizacao.service.UnidadeResponsavelService;
@@ -31,12 +29,15 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class UnidadeFacade {
-    private final UnidadeRepositoryService unidadeRepositoryService;
-    private final UsuarioRepositoryService usuarioRepositoryService;
+    private final UnidadeRepo unidadeRepo;
+    private final UnidadeMapaRepo unidadeMapaRepo;
+    private final UsuarioRepo usuarioRepo;
     private final UsuarioMapper usuarioMapper;
     private final UnidadeHierarquiaService hierarquiaService;
     private final UnidadeMapaService mapaService;
     private final UnidadeResponsavelService responsavelService;
+
+    private static final String ENTIDADE_UNIDADE = "Unidade";
 
     public List<UnidadeDto> buscarArvoreHierarquica() {
         return hierarquiaService.buscarArvoreHierarquica();
@@ -49,7 +50,7 @@ public class UnidadeFacade {
     public List<UnidadeDto> buscarArvoreComElegibilidade(
             boolean requerMapaVigente, java.util.Set<Long> unidadesBloqueadas) {
         Set<Long> unidadesComMapa = requerMapaVigente
-                ? new HashSet<>(mapaService.buscarTodosCodigosUnidades())
+                ? new HashSet<>(unidadeMapaRepo.findAllUnidadeCodigos())
                 : Collections.emptySet();
 
         return hierarquiaService.buscarArvoreComElegibilidade(u ->
@@ -116,7 +117,7 @@ public class UnidadeFacade {
     }
 
     public Unidade buscarEntidadePorSigla(String sigla) {
-        return unidadeRepositoryService
+        return unidadeRepo
                 .findBySigla(sigla)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com sigla " + sigla + " não encontrada"));
     }
@@ -127,27 +128,28 @@ public class UnidadeFacade {
     }
 
     public Unidade buscarEntidadePorId(Long codigo) {
-        Unidade unidade = unidadeRepositoryService.buscarPorId(codigo);
+        Unidade unidade = unidadeRepo.findById(codigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_UNIDADE, codigo));
         if (unidade.getSituacao() != SituacaoUnidade.ATIVA) {
-            throw new ErroEntidadeNaoEncontrada("Unidade", codigo);
+            throw new ErroEntidadeNaoEncontrada(ENTIDADE_UNIDADE, codigo);
         }
         return unidade;
     }
 
     public List<Unidade> buscarEntidadesPorIds(List<Long> codigos) {
-        return unidadeRepositoryService.findAllById(codigos);
+        return unidadeRepo.findAllById(codigos);
     }
 
     public List<Unidade> buscarTodasEntidadesComHierarquia() {
-        return unidadeRepositoryService.findAllWithHierarquia();
+        return unidadeRepo.findAllWithHierarquia();
     }
 
     public List<String> buscarSiglasPorIds(List<Long> codigos) {
-        return unidadeRepositoryService.findSiglasByCodigos(codigos);
+        return unidadeRepo.findSiglasByCodigos(codigos);
     }
 
     public List<UsuarioDto> buscarUsuariosPorUnidade(Long codigoUnidade) {
-        return usuarioRepositoryService.findByUnidadeLotacaoCodigo(codigoUnidade).stream()
+        return usuarioRepo.findByUnidadeLotacaoCodigo(codigoUnidade).stream()
                 .map(usuarioMapper::toUsuarioDto)
                 .toList();
     }

@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 
+import sgc.processo.model.ProcessoRepo;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -22,7 +24,7 @@ class ProcessoFacadeSecurityTest {
     @Mock
     private ProcessoAcessoService processoAcessoService;
     @Mock
-    private ProcessoRepositoryService processoRepositoryService;
+    private ProcessoRepo processoRepo;
 
     @InjectMocks
     private ProcessoFacade processoFacade;

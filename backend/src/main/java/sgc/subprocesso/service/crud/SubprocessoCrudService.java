@@ -15,7 +15,6 @@ import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoRepositoryService;
 
 import java.util.List;
 import java.util.Objects;
@@ -44,7 +43,8 @@ import java.util.Objects;
 @Transactional
 public class SubprocessoCrudService {
     private static final String MSG_SUBPROCESSO_NAO_ENCONTRADO = "Subprocesso não encontrado";
-    private final SubprocessoRepositoryService subprocessoService;
+    private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    private final sgc.comum.repo.RepositorioComum repositorioComum;
     private final SubprocessoMapper subprocessoMapper;
     private final MapaFacade mapaFacade;
     private final ApplicationEventPublisher eventPublisher;
@@ -57,12 +57,14 @@ public class SubprocessoCrudService {
      *                   BeanCurrentlyInCreationException
      */
     public SubprocessoCrudService(
-            SubprocessoRepositoryService subprocessoService,
+            sgc.subprocesso.model.SubprocessoRepo subprocessoRepo,
+            sgc.comum.repo.RepositorioComum repositorioComum,
             SubprocessoMapper subprocessoMapper,
             @Lazy MapaFacade mapaFacade,
             ApplicationEventPublisher eventPublisher,
             UsuarioFacade usuarioService) {
-        this.subprocessoService = subprocessoService;
+        this.subprocessoRepo = subprocessoRepo;
+        this.repositorioComum = repositorioComum;
         this.subprocessoMapper = subprocessoMapper;
         this.mapaFacade = mapaFacade;
         this.eventPublisher = eventPublisher;
@@ -70,7 +72,7 @@ public class SubprocessoCrudService {
     }
 
     public Subprocesso buscarSubprocesso(Long codigo) {
-        return subprocessoService.buscar(codigo);
+        return repositorioComum.buscar(Subprocesso.class, codigo);
     }
 
     /**
@@ -85,18 +87,18 @@ public class SubprocessoCrudService {
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listarEntidadesPorProcesso(Long codProcesso) {
-        return subprocessoService.findByProcessoCodigoWithUnidade(codProcesso);
+        return subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso);
     }
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listarPorProcessoESituacao(Long codProcesso, SituacaoSubprocesso situacao) {
-        return subprocessoService.findByProcessoCodigoAndSituacaoWithUnidade(codProcesso, situacao);
+        return subprocessoRepo.findByProcessoCodigoAndSituacaoWithUnidade(codProcesso, situacao);
     }
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listarPorProcessoUnidadeESituacoes(Long codProcesso, Long codUnidade,
             List<SituacaoSubprocesso> situacoes) {
-        return subprocessoService.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso,
+        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso,
                 codUnidade, situacoes);
     }
 
@@ -112,7 +114,7 @@ public class SubprocessoCrudService {
 
     @Transactional(readOnly = true)
     public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
-        return subprocessoService
+        return subprocessoRepo
                 .findByMapaCodigo(codMapa)
                 .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada(
                         "%s para o mapa com código %d".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codMapa)));
@@ -131,7 +133,7 @@ public class SubprocessoCrudService {
         entity.setDataLimiteEtapa2(request.dataLimiteEtapa2());
         entity.setMapa(null);
 
-        var subprocessoSalvo = subprocessoService.save(entity);
+        var subprocessoSalvo = subprocessoRepo.save(entity);
 
         Mapa mapa = Mapa.builder()
                 .subprocesso(subprocessoSalvo)
@@ -139,7 +141,7 @@ public class SubprocessoCrudService {
         Mapa mapaSalvo = mapaFacade.salvar(mapa);
 
         subprocessoSalvo.setMapa(mapaSalvo);
-        var salvo = subprocessoService.save(subprocessoSalvo);
+        var salvo = subprocessoRepo.save(subprocessoSalvo);
 
         return subprocessoMapper.toDto(salvo);
     }
@@ -148,7 +150,7 @@ public class SubprocessoCrudService {
         Subprocesso subprocesso = buscarSubprocesso(codigo);
         processarAlteracoes(subprocesso, request);
 
-        Subprocesso salvo = subprocessoService.save(subprocesso);
+        Subprocesso salvo = subprocessoRepo.save(subprocesso);
 
         return subprocessoMapper.toDto(salvo);
     }
@@ -179,17 +181,17 @@ public class SubprocessoCrudService {
     public void excluir(Long codigo) {
         buscarSubprocesso(codigo);
 
-        subprocessoService.deleteById(codigo);
+        subprocessoRepo.deleteById(codigo);
     }
 
     @Transactional(readOnly = true)
     public List<SubprocessoDto> listar() {
-        return subprocessoService.findAllComFetch().stream().map(subprocessoMapper::toDto).toList();
+        return subprocessoRepo.findAllComFetch().stream().map(subprocessoMapper::toDto).toList();
     }
 
     @Transactional(readOnly = true)
     public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
-        Subprocesso sp = subprocessoService
+        Subprocesso sp = subprocessoRepo
                 .findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
                 .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada(
                         "%s para o processo %s e unidade %s".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codProcesso,
@@ -199,6 +201,6 @@ public class SubprocessoCrudService {
 
     @Transactional(readOnly = true)
     public boolean verificarAcessoUnidadeAoProcesso(Long codProcesso, List<Long> codigosUnidadesHierarquia) {
-        return subprocessoService.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, codigosUnidadesHierarquia);
+        return subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, codigosUnidadesHierarquia);
     }
 }

@@ -15,7 +15,7 @@ import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoRepositoryService;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +31,9 @@ class SubprocessoCrudServiceCoverageTest {
     @InjectMocks
     private SubprocessoCrudService crudService;
     @Mock
-    private SubprocessoRepositoryService subprocessoService;
+    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    @Mock
+    private sgc.comum.repo.RepositorioComum repositorioComum;
     @Mock
     private SubprocessoMapper mapper;
 
@@ -49,7 +51,7 @@ class SubprocessoCrudServiceCoverageTest {
                 .codProcesso(10L)
                 .codUnidade(20L)
                 .build();
-        when(subprocessoService.save(any())).thenAnswer(i -> i.getArgument(0));
+        when(subprocessoRepo.save(any())).thenAnswer(i -> i.getArgument(0));
         when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
         SubprocessoDto dto = crudService.criar(req);
@@ -70,12 +72,12 @@ class SubprocessoCrudServiceCoverageTest {
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         AtualizarSubprocessoRequest req = AtualizarSubprocessoRequest.builder().build();
-        when(subprocessoService.buscar(codigo)).thenReturn(sp);
+        when(repositorioComum.buscar(Subprocesso.class, codigo)).thenReturn(sp);
         when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
         crudService.atualizar(codigo, req);
 
-        verify(subprocessoService).save(sp);
+        verify(subprocessoRepo).save(sp);
     }
 
     @Test
@@ -84,7 +86,7 @@ class SubprocessoCrudServiceCoverageTest {
         Long codProcesso = 1L;
         List<Long> unidades = List.of(10L, 20L);
 
-        when(subprocessoService.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, unidades)).thenReturn(true);
+        when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, unidades)).thenReturn(true);
 
         boolean result = crudService.verificarAcessoUnidadeAoProcesso(codProcesso, unidades);
         assertTrue(result);
@@ -93,7 +95,7 @@ class SubprocessoCrudServiceCoverageTest {
     @Test
     @DisplayName("obterEntidadePorCodigoMapa - Erro")
     void obterEntidadePorCodigoMapa_Erro() {
-        when(subprocessoService.findByMapaCodigo(1L)).thenReturn(Optional.empty());
+        when(subprocessoRepo.findByMapaCodigo(1L)).thenReturn(Optional.empty());
         var exception = assertThrows(ErroEntidadeNaoEncontrada.class, () -> crudService.obterEntidadePorCodigoMapa(1L));
         assertNotNull(exception);
     }
@@ -115,11 +117,11 @@ class SubprocessoCrudServiceCoverageTest {
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(99L); // Different map
 
-        when(subprocessoService.buscar(codigo)).thenReturn(sp);
+        when(repositorioComum.buscar(Subprocesso.class, codigo)).thenReturn(sp);
         when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
         crudService.atualizar(codigo, req);
-        verify(subprocessoService).save(sp);
+        verify(subprocessoRepo).save(sp);
     }
 
     @Test
@@ -128,13 +130,13 @@ class SubprocessoCrudServiceCoverageTest {
         Long codProcesso = 1L;
         SituacaoSubprocesso situacao = SituacaoSubprocesso.NAO_INICIADO;
 
-        when(subprocessoService.findByProcessoCodigoAndSituacaoWithUnidade(codProcesso, situacao)).thenReturn(List.of(new Subprocesso()));
+        when(subprocessoRepo.findByProcessoCodigoAndSituacaoWithUnidade(codProcesso, situacao)).thenReturn(List.of(new Subprocesso()));
 
         List<Subprocesso> result = crudService.listarPorProcessoESituacao(codProcesso, situacao);
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(subprocessoService).findByProcessoCodigoAndSituacaoWithUnidade(codProcesso, situacao);
+        verify(subprocessoRepo).findByProcessoCodigoAndSituacaoWithUnidade(codProcesso, situacao);
     }
 
     @Test
@@ -144,13 +146,13 @@ class SubprocessoCrudServiceCoverageTest {
         Long codUnidade = 2L;
         List<SituacaoSubprocesso> situacoes = List.of(SituacaoSubprocesso.NAO_INICIADO);
 
-        when(subprocessoService.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso, codUnidade, situacoes)).thenReturn(List.of(new Subprocesso()));
+        when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso, codUnidade, situacoes)).thenReturn(List.of(new Subprocesso()));
 
         List<Subprocesso> result = crudService.listarPorProcessoUnidadeESituacoes(codProcesso, codUnidade, situacoes);
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(subprocessoService).findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso, codUnidade, situacoes);
+        verify(subprocessoRepo).findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso, codUnidade, situacoes);
     }
 
     @Test
@@ -160,7 +162,7 @@ class SubprocessoCrudServiceCoverageTest {
                 .codProcesso(null)
                 .codUnidade(null)
                 .build();
-        when(subprocessoService.save(any())).thenAnswer(i -> i.getArgument(0));
+        when(subprocessoRepo.save(any())).thenAnswer(i -> i.getArgument(0));
         when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
         SubprocessoDto dto = crudService.criar(req);
@@ -182,12 +184,12 @@ class SubprocessoCrudServiceCoverageTest {
         sp.setProcesso(new Processo());
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-        when(subprocessoService.buscar(codigo)).thenReturn(sp);
+        when(repositorioComum.buscar(Subprocesso.class, codigo)).thenReturn(sp);
         when(mapper.toDto(any())).thenReturn(new SubprocessoDto());
 
         crudService.atualizar(codigo, req);
 
-        verify(subprocessoService).save(sp);
+        verify(subprocessoRepo).save(sp);
     }
 
     @Test
@@ -198,7 +200,7 @@ class SubprocessoCrudServiceCoverageTest {
         sp.setCodigo(codigo);
         sp.setSituacao(null); // Situação nula
 
-        when(subprocessoService.buscar(codigo)).thenReturn(sp);
+        when(repositorioComum.buscar(Subprocesso.class, codigo)).thenReturn(sp);
 
         var status = crudService.obterStatus(codigo);
 

@@ -39,6 +39,7 @@ import sgc.subprocesso.dto.SugestoesDto;
 import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
@@ -68,7 +69,7 @@ class SubprocessoFacadeComplementaryTest {
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
-    private MovimentacaoRepositoryService movimentacaoService;
+    private MovimentacaoRepo movimentacaoRepo;
     @Mock
     private SubprocessoDetalheMapper subprocessoDetalheMapper;
     @Mock
@@ -78,7 +79,7 @@ class SubprocessoFacadeComplementaryTest {
     @Mock
     private sgc.seguranca.acesso.AccessControlService accessControlService;
     @Mock
-    private SubprocessoRepositoryService subprocessoService;
+    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     @Mock
     private sgc.mapa.service.CopiaMapaService copiaMapaService;
     @Mock
@@ -333,7 +334,7 @@ class SubprocessoFacadeComplementaryTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
             when(unidadeFacade.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
             when(usuarioService.buscarPorLogin("TITULAR")).thenReturn(new Usuario());
-            when(movimentacaoService.buscarPorSubprocesso(codigo)).thenReturn(List.of());
+            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
 
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().unidade(SubprocessoDetalheDto.UnidadeDto.builder().sigla("SIGLA").build()).build());
 
@@ -364,7 +365,7 @@ class SubprocessoFacadeComplementaryTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
             when(unidadeFacade.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
             when(usuarioService.buscarPorLogin("TITULAR")).thenThrow(new RuntimeException("Erro"));
-            when(movimentacaoService.buscarPorSubprocesso(codigo)).thenReturn(List.of());
+            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any())).thenReturn(SubprocessoDetalheDto.builder().build());
 
             SubprocessoDetalheDto result = subprocessoFacade.obterDetalhes(codigo, sgc.organizacao.model.Perfil.ADMIN);
@@ -394,7 +395,7 @@ class SubprocessoFacadeComplementaryTest {
 
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
             when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
-            when(movimentacaoService.buscarPorSubprocesso(codigo)).thenReturn(List.of());
+            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codigo)).thenReturn(List.of());
             when(usuarioService.buscarResponsavelAtual("SIGLA")).thenReturn(new Usuario());
 
             sgc.organizacao.dto.UnidadeDto unidadeDto = sgc.organizacao.dto.UnidadeDto.builder().sigla("SIGLA").build();
@@ -543,7 +544,7 @@ class SubprocessoFacadeComplementaryTest {
             sp.setCodigo(codigo);
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
 
-            when(subprocessoService.findById(codigo)).thenReturn(java.util.Optional.of(sp));
+            when(subprocessoRepo.findById(codigo)).thenReturn(java.util.Optional.of(sp));
 
             CompetenciaAjusteDto compDto = CompetenciaAjusteDto.builder()
                     .codCompetencia(10L)
@@ -558,7 +559,7 @@ class SubprocessoFacadeComplementaryTest {
             subprocessoFacade.salvarAjustesMapa(codigo, List.of(compDto));
 
             verify(mapaManutencaoService).salvarTodasCompetencias(anyList());
-            verify(subprocessoService).save(sp);
+            verify(subprocessoRepo).save(sp);
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         }
 
@@ -570,7 +571,7 @@ class SubprocessoFacadeComplementaryTest {
             sp.setCodigo(codigo);
             sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
 
-            when(subprocessoService.findById(codigo)).thenReturn(java.util.Optional.of(sp));
+            when(subprocessoRepo.findById(codigo)).thenReturn(java.util.Optional.of(sp));
             // empty list of adjustments
             subprocessoFacade.salvarAjustesMapa(codigo, List.of());
 
@@ -585,7 +586,7 @@ class SubprocessoFacadeComplementaryTest {
             sp.setCodigo(codigo);
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-            when(subprocessoService.findById(codigo)).thenReturn(java.util.Optional.of(sp));
+            when(subprocessoRepo.findById(codigo)).thenReturn(java.util.Optional.of(sp));
 
             List<CompetenciaAjusteDto> ajustes = List.of();
             var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class, () ->
@@ -618,13 +619,13 @@ class SubprocessoFacadeComplementaryTest {
             spOrig.setMapa(mapaOrig);
             spOrig.setUnidade(new Unidade());
 
-            when(subprocessoService.findById(dest)).thenReturn(java.util.Optional.of(spDest));
-            when(subprocessoService.findById(orig)).thenReturn(java.util.Optional.of(spOrig));
+            when(subprocessoRepo.findById(dest)).thenReturn(java.util.Optional.of(spDest));
+            when(subprocessoRepo.findById(orig)).thenReturn(java.util.Optional.of(spOrig));
 
             subprocessoFacade.importarAtividades(dest, orig);
 
             verify(copiaMapaService).importarAtividadesDeOutroMapa(20L, 10L);
-            verify(movimentacaoService).salvar(any());
+            verify(movimentacaoRepo).save(any());
             assertThat(spDest.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         }
 
@@ -636,7 +637,7 @@ class SubprocessoFacadeComplementaryTest {
             spDest.setCodigo(dest);
             spDest.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO); // Invalid for import
 
-            when(subprocessoService.findById(dest)).thenReturn(java.util.Optional.of(spDest));
+            when(subprocessoRepo.findById(dest)).thenReturn(java.util.Optional.of(spDest));
 
             var exception = org.junit.jupiter.api.Assertions.assertThrows(sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida.class, () ->
                     subprocessoFacade.importarAtividades(dest, 2L)
@@ -663,8 +664,8 @@ class SubprocessoFacadeComplementaryTest {
             spOrig.setMapa(new Mapa());
             spOrig.setUnidade(new Unidade()); // Origem unidade not null
 
-            when(subprocessoService.findById(dest)).thenReturn(java.util.Optional.of(spDest));
-            when(subprocessoService.findById(orig)).thenReturn(java.util.Optional.of(spOrig));
+            when(subprocessoRepo.findById(dest)).thenReturn(java.util.Optional.of(spDest));
+            when(subprocessoRepo.findById(orig)).thenReturn(java.util.Optional.of(spOrig));
 
             subprocessoFacade.importarAtividades(dest, orig);
             assertThat(spDest.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);

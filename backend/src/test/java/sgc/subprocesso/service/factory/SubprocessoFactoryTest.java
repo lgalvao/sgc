@@ -18,7 +18,7 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.service.SubprocessoRepositoryService;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 @Tag("unit")
 class SubprocessoFactoryTest {
     @Mock
-    private SubprocessoRepositoryService subprocessoService;
+    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
 
     @Mock
     private MapaRepo mapaRepo;
@@ -52,12 +52,12 @@ class SubprocessoFactoryTest {
         unidade.setTipo(TipoUnidade.OPERACIONAL);
         unidade.setSigla("U1");
 
-        when(subprocessoService.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
+        when(subprocessoRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
         when(mapaRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
 
         factory.criarParaMapeamento(processo, List.of(unidade));
 
-        verify(subprocessoService, times(1)).saveAll(anyList());
+        verify(subprocessoRepo, times(1)).saveAll(anyList());
         verify(mapaRepo).saveAll(anyList());
         verify(movimentacaoRepo).saveAll(anyList());
     }
@@ -71,7 +71,7 @@ class SubprocessoFactoryTest {
 
         factory.criarParaMapeamento(processo, List.of(unidade));
 
-        verifyNoInteractions(subprocessoService);
+        verifyNoInteractions(subprocessoRepo);
     }
 
     @Test
@@ -88,7 +88,7 @@ class SubprocessoFactoryTest {
         UnidadeMapa unidadeMapa = new UnidadeMapa();
         unidadeMapa.setMapaVigente(mapaVigente);
 
-        when(subprocessoService.save(any(Subprocesso.class))).thenAnswer(i -> i.getArgument(0));
+        when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(i -> i.getArgument(0));
 
         Mapa mapaCopiado = new Mapa();
         mapaCopiado.setCodigo(200L);
@@ -97,7 +97,7 @@ class SubprocessoFactoryTest {
 
         factory.criarParaRevisao(processo, unidade, unidadeMapa);
 
-        verify(subprocessoService, times(1)).save(any(Subprocesso.class));
+        verify(subprocessoRepo, times(1)).save(any(Subprocesso.class));
         verify(mapaRepo).save(any(Mapa.class));
         verify(movimentacaoRepo).save(any(Movimentacao.class));
     }
@@ -116,7 +116,7 @@ class SubprocessoFactoryTest {
         UnidadeMapa unidadeMapa = new UnidadeMapa();
         unidadeMapa.setMapaVigente(mapaVigente);
 
-        when(subprocessoService.save(any(Subprocesso.class))).thenAnswer(i -> i.getArgument(0));
+        when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(i -> i.getArgument(0));
 
         Mapa mapaCopiado = new Mapa();
         mapaCopiado.setCodigo(200L);
@@ -126,7 +126,7 @@ class SubprocessoFactoryTest {
         factory.criarParaDiagnostico(processo, unidade, unidadeMapa);
 
         // Verifica situacao inicial
-        verify(subprocessoService, atLeastOnce()).save(argThat(s -> s.getSituacao() == SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO));
+        verify(subprocessoRepo, atLeastOnce()).save(argThat(s -> s.getSituacao() == SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO));
         verify(movimentacaoRepo).save(any(Movimentacao.class));
     }
 }

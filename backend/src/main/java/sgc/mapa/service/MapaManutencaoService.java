@@ -45,6 +45,7 @@ public class MapaManutencaoService {
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaRepo competenciaRepo;
     private final ConhecimentoRepo conhecimentoRepo;
+    private final sgc.mapa.model.MapaRepo mapaRepo;
     
     private final RepositorioComum repo;
     
@@ -333,5 +334,37 @@ public class MapaManutencaoService {
 
     private void notificarAlteracaoMapa(Long mapaCodigo) {
         eventPublisher.publishEvent(new EventoMapaAlterado(mapaCodigo));
+    }
+
+    // ============================================================================================
+    // SEÇÃO: MAPA - Operações básicas consolidadas
+    // ============================================================================================
+
+    @Transactional(readOnly = true)
+    public List<Mapa> listarTodosMapas() {
+        return mapaRepo.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Mapa> buscarMapaVigentePorUnidade(Long unidadeCodigo) {
+        return mapaRepo.findMapaVigenteByUnidade(unidadeCodigo);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Mapa> buscarMapaPorSubprocessoCodigo(Long subprocessoCodigo) {
+        return mapaRepo.findBySubprocessoCodigo(subprocessoCodigo);
+    }
+
+    public Mapa salvarMapa(Mapa mapa) {
+        return mapaRepo.save(mapa);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean mapaExiste(Long codigo) {
+        return mapaRepo.existsById(codigo);
+    }
+
+    public void excluirMapa(Long codigo) {
+        mapaRepo.deleteById(codigo);
     }
 }

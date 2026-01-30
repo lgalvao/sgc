@@ -120,7 +120,7 @@ public class ProcessoInicializador {
 
         // Validar mapa vigente para revisão e diagnóstico
         if (tipo == TipoProcesso.REVISAO || tipo == TipoProcesso.DIAGNOSTICO) {
-            getMensagemErroUnidadesSemMapa(codigosUnidades).ifPresent(erros::add);
+            processoValidador.getMensagemErroUnidadesSemMapa(codigosUnidades).ifPresent(erros::add);
         }
 
         // Validar se unidades já estão em uso
@@ -170,24 +170,6 @@ public class ProcessoInicializador {
             List<String> siglasUnidadesBloqueadas = unidadeRepo.findSiglasByCodigos(unidadesBloqueadas);
             return Optional.of("As seguintes unidades já participam de outro processo ativo: %s"
                     .formatted(String.join(", ", siglasUnidadesBloqueadas)));
-        }
-        return Optional.empty();
-    }
-
-    private Optional<String> getMensagemErroUnidadesSemMapa(List<Long> codigosUnidades) {
-        // Validation done upstream ensures list is not empty
-        List<Long> codigosComMapa = unidadeMapaRepo.findAllById(codigosUnidades).stream()
-                .map(sgc.organizacao.model.UnidadeMapa::getUnidadeCodigo)
-                .toList();
-
-        List<Long> unidadesSemMapa = codigosUnidades.stream()
-                .filter(codigo -> !codigosComMapa.contains(codigo))
-                .toList();
-
-        if (!unidadesSemMapa.isEmpty()) {
-            List<String> siglasUnidadesSemMapa = unidadeRepo.findSiglasByCodigos(unidadesSemMapa);
-            return Optional.of(("As seguintes unidades não possuem mapa vigente e não podem participar"
-                    + " de um processo de revisão: %s").formatted(String.join(", ", siglasUnidadesSemMapa)));
         }
         return Optional.empty();
     }

@@ -16,7 +16,6 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoRepositoryService;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 @Service
@@ -24,7 +23,7 @@ import sgc.subprocesso.service.crud.SubprocessoCrudService;
 @RequiredArgsConstructor
 public class SubprocessoAdminWorkflowService {
 
-    private final SubprocessoRepositoryService subprocessoService;
+    private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     private final SubprocessoCrudService crudService;
     private final AlertaFacade alertaService;
 
@@ -43,7 +42,7 @@ public class SubprocessoAdminWorkflowService {
             sp.setDataLimiteEtapa1(novaDataLimite.atStartOfDay());
         }
 
-        subprocessoService.save(sp);
+        subprocessoRepo.save(sp);
 
         try {
             String novaDataStr = novaDataLimite.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -55,22 +54,22 @@ public class SubprocessoAdminWorkflowService {
 
     @Transactional
     public void atualizarSituacaoParaEmAndamento(Long mapaCodigo) {
-        var subprocesso = subprocessoService.findByMapaCodigo(mapaCodigo)
+        var subprocesso = subprocessoRepo.findByMapaCodigo(mapaCodigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso do mapa", mapaCodigo));
 
         if (subprocesso.getSituacao() == NAO_INICIADO) {
             var tipoProcesso = subprocesso.getProcesso().getTipo();
             if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
                 subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-                subprocessoService.save(subprocesso);
+                subprocessoRepo.save(subprocesso);
             } else if (tipoProcesso == TipoProcesso.REVISAO) {
                 subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
-                subprocessoService.save(subprocesso);
+                subprocessoRepo.save(subprocesso);
             }
         }
     }
 
     public List<Subprocesso> listarSubprocessosHomologados() {
-        return subprocessoService.findBySituacao(REVISAO_CADASTRO_HOMOLOGADA);
+        return subprocessoRepo.findBySituacao(REVISAO_CADASTRO_HOMOLOGADA);
     }
 }

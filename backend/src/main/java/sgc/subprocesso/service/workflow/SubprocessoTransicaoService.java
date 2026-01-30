@@ -18,7 +18,6 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoRepositoryService;
 
 /**
  * Serviço consolidado para gerenciar transições e workflows de subprocessos.
@@ -40,7 +39,7 @@ import sgc.subprocesso.service.SubprocessoRepositoryService;
 public class SubprocessoTransicaoService {
     private final MovimentacaoRepo movimentacaoRepo;
     private final ApplicationEventPublisher eventPublisher;
-    private final SubprocessoRepositoryService subprocessoService;
+    private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     private final AnaliseFacade analiseFacade;
 
     /**
@@ -125,7 +124,7 @@ public class SubprocessoTransicaoService {
 
         // 2. Atualizar Estado
         req.sp().setSituacao(req.novaSituacao());
-        subprocessoService.save(req.sp());
+        subprocessoRepo.save(req.sp());
 
         // 3. Registrar Transição
         registrar(

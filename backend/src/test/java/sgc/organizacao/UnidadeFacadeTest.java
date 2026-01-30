@@ -28,14 +28,10 @@ import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
-import sgc.organizacao.model.SituacaoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.*;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeMapaService;
-import sgc.organizacao.service.UnidadeRepositoryService;
 import sgc.organizacao.service.UnidadeResponsavelService;
-import sgc.organizacao.service.UsuarioRepositoryService;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -43,9 +39,11 @@ import sgc.organizacao.service.UsuarioRepositoryService;
 class UnidadeFacadeTest {
 
     @Mock
-    private UnidadeRepositoryService unidadeRepositoryService;
+    private UnidadeRepo unidadeRepo;
     @Mock
-    private UsuarioRepositoryService usuarioRepositoryService;
+    private UnidadeMapaRepo unidadeMapaRepo;
+    @Mock
+    private UsuarioRepo usuarioRepo;
     @Mock
     private UsuarioMapper usuarioMapper;
 
@@ -117,7 +115,7 @@ class UnidadeFacadeTest {
         @DisplayName("Deve buscar unidade por sigla")
         void deveBuscarPorSigla() {
             // Arrange
-            when(unidadeRepositoryService.findBySigla("U1")).thenReturn(Optional.of(new Unidade()));
+            when(unidadeRepo.findBySigla("U1")).thenReturn(Optional.of(new Unidade()));
             when(usuarioMapper.toUnidadeDto(any(), eq(false))).thenReturn(UnidadeDto.builder().build());
 
             // Act & Assert
@@ -130,7 +128,7 @@ class UnidadeFacadeTest {
             // Arrange
             Unidade unidade = new Unidade();
             unidade.setSituacao(SituacaoUnidade.ATIVA);
-            when(unidadeRepositoryService.buscarPorId(1L)).thenReturn(unidade);
+            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
             when(usuarioMapper.toUnidadeDto(any(), eq(false))).thenReturn(UnidadeDto.builder().build());
 
             // Act & Assert
@@ -250,7 +248,7 @@ class UnidadeFacadeTest {
         void deveBuscarArvoreComElegibilidadeComMapa() {
             // Arrange
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
-            when(mapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(1L));
+            when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
 
             // Act
@@ -258,7 +256,7 @@ class UnidadeFacadeTest {
 
             // Assert
             assertThat(result).hasSize(1);
-            verify(mapaService).buscarTodosCodigosUnidades();
+            verify(unidadeMapaRepo).findAllUnidadeCodigos();
             verify(hierarquiaService).buscarArvoreComElegibilidade(any());
         }
 
@@ -267,7 +265,7 @@ class UnidadeFacadeTest {
         void deveSerIneligivelParaRevisaoSeSemMapa() {
             // Arrange
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
-            when(mapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(2L));
+            when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(2L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
 
             // Act
@@ -275,7 +273,7 @@ class UnidadeFacadeTest {
 
             // Assert
             assertThat(result).hasSize(1);
-            verify(mapaService).buscarTodosCodigosUnidades();
+            verify(unidadeMapaRepo).findAllUnidadeCodigos();
             verify(hierarquiaService).buscarArvoreComElegibilidade(any());
         }
 
@@ -367,7 +365,7 @@ class UnidadeFacadeTest {
         @DisplayName("Deve buscar usuários por unidade")
         void deveBuscarUsuariosPorUnidade() {
             // Arrange
-            when(usuarioRepositoryService.findByUnidadeLotacaoCodigo(1L)).thenReturn(List.of(new Usuario()));
+            when(usuarioRepo.findByUnidadeLotacaoCodigo(1L)).thenReturn(List.of(new Usuario()));
 
             // Act & Assert
             assertThat(service.buscarUsuariosPorUnidade(1L)).hasSize(1);
@@ -410,21 +408,21 @@ class UnidadeFacadeTest {
         @DisplayName("Buscar entidades por IDs")
         void buscarEntidadesPorIds() {
             service.buscarEntidadesPorIds(List.of(1L));
-            verify(unidadeRepositoryService).findAllById(any());
+            verify(unidadeRepo).findAllById(any());
         }
 
         @Test
         @DisplayName("Buscar todas entidades com hierarquia (cache)")
         void buscarTodasEntidadesComHierarquia() {
             service.buscarTodasEntidadesComHierarquia();
-            verify(unidadeRepositoryService).findAllWithHierarquia();
+            verify(unidadeRepo).findAllWithHierarquia();
         }
 
         @Test
         @DisplayName("Buscar siglas por IDs")
         void buscarSiglasPorIds() {
             service.buscarSiglasPorIds(List.of(1L));
-            verify(unidadeRepositoryService).findSiglasByCodigos(any());
+            verify(unidadeRepo).findSiglasByCodigos(any());
         }
 
         @Test
@@ -453,7 +451,7 @@ class UnidadeFacadeTest {
         @Test
         @DisplayName("Deve falhar ao buscar entidade por ID inexistente")
         void deveFalharAoBuscarEntidadePorIdInexistente() {
-            when(unidadeRepositoryService.buscarPorId(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 999L));
+            when(unidadeRepo.findById(999L)).thenReturn(Optional.empty());
             assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(999L)));
         }
 
@@ -517,7 +515,7 @@ class UnidadeFacadeTest {
             Unidade u1 = new Unidade();
             u1.setCodigo(1L);
             u1.setSituacao(SituacaoUnidade.INATIVA); // INATIVA
-            when(unidadeRepositoryService.buscarPorId(1L)).thenReturn(u1);
+            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(u1));
 
             // Act & Assert
             assertNotNull(assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(1L)));

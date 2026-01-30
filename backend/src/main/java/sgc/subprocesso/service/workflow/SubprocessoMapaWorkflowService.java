@@ -55,7 +55,6 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILI
 import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_VALIDADO;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoRepositoryService;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
@@ -82,7 +81,7 @@ public class SubprocessoMapaWorkflowService {
             TipoProcesso.MAPEAMENTO, MAPEAMENTO_MAPA_HOMOLOGADO,
             TipoProcesso.REVISAO, REVISAO_MAPA_HOMOLOGADO));
 
-    private final SubprocessoRepositoryService subprocessoService;
+    private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     private final SubprocessoCrudService crudService;
     private final MapaManutencaoService mapaManutencaoService;
     private final MapaFacade mapaFacade;
@@ -101,7 +100,7 @@ public class SubprocessoMapaWorkflowService {
         MapaCompletoDto mapaDto = mapaFacade.salvarMapaCompleto(codMapa, request);
         if (eraVazio && temNovasCompetencias && subprocesso.getSituacao() == MAPEAMENTO_CADASTRO_HOMOLOGADO) {
             subprocesso.setSituacao(MAPEAMENTO_MAPA_CRIADO);
-            subprocessoService.save(subprocesso);
+            subprocessoRepo.save(subprocesso);
         }
 
         return mapaDto;
@@ -120,7 +119,7 @@ public class SubprocessoMapaWorkflowService {
         // Alterar situação para MAPA_CRIADO se era vazio e passou a ter competências
         if (eraVazio && subprocesso.getSituacao() == MAPEAMENTO_CADASTRO_HOMOLOGADO) {
             subprocesso.setSituacao(MAPEAMENTO_MAPA_CRIADO);
-            subprocessoService.save(subprocesso);
+            subprocessoRepo.save(subprocesso);
         }
 
         return mapaFacade.obterMapaCompleto(mapa.getCodigo(), codSubprocesso);
@@ -148,7 +147,7 @@ public class SubprocessoMapaWorkflowService {
         boolean ficouVazio = mapaManutencaoService.buscarCompetenciasPorCodMapa(codMapa).isEmpty();
         if (ficouVazio && subprocesso.getSituacao() == MAPEAMENTO_MAPA_CRIADO) {
             subprocesso.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
-            subprocessoService.save(subprocesso);
+            subprocessoRepo.save(subprocesso);
             log.info("Situação do subprocesso {} alterada para CADASTRO_HOMOLOGADO (mapa ficou vazio)", codSubprocesso);
         }
 
@@ -192,7 +191,7 @@ public class SubprocessoMapaWorkflowService {
 
         sp.setDataLimiteEtapa2(request.dataLimite().atStartOfDay());
         sp.setDataFimEtapa1(LocalDateTime.now());
-        subprocessoService.save(sp);
+        subprocessoRepo.save(sp);
 
         Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
 
@@ -243,7 +242,7 @@ public class SubprocessoMapaWorkflowService {
         sp.setSituacao(SITUACAO_MAPA_COM_SUGESTOES.get(sp.getProcesso().getTipo()));
 
         sp.setDataFimEtapa2(LocalDateTime.now());
-        subprocessoService.save(sp);
+        subprocessoRepo.save(sp);
 
         analiseFacade.removerPorSubprocesso(sp.getCodigo());
 
@@ -264,7 +263,7 @@ public class SubprocessoMapaWorkflowService {
         sp.setSituacao(SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo()));
 
         sp.setDataFimEtapa2(java.time.LocalDateTime.now());
-        subprocessoService.save(sp);
+        subprocessoRepo.save(sp);
 
         transicaoService.registrar(sp, TipoTransicao.MAPA_VALIDADO, sp.getUnidade(),
                 sp.getUnidade().getUnidadeSuperior(), usuario);
@@ -316,7 +315,7 @@ public class SubprocessoMapaWorkflowService {
                     .build());
 
             sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
-            subprocessoService.save(sp);
+            subprocessoRepo.save(sp);
         } else {
             SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo());
             transicaoService.registrarAnaliseETransicao(new SubprocessoTransicaoService.RegistrarWorkflowReq(
@@ -340,7 +339,7 @@ public class SubprocessoMapaWorkflowService {
         accessControlService.verificarPermissao(usuario, HOMOLOGAR_MAPA, sp);
 
         sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
-        subprocessoService.save(sp);
+        subprocessoRepo.save(sp);
 
         Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
         transicaoService.registrar(sp, TipoTransicao.MAPA_HOMOLOGADO, sedoc, sedoc, usuario);
@@ -354,7 +353,7 @@ public class SubprocessoMapaWorkflowService {
 
         sp.setSituacao(SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo()));
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
-        subprocessoService.save(sp);
+        subprocessoRepo.save(sp);
 
         transicaoService.registrar(
                 sp,

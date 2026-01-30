@@ -13,7 +13,7 @@ import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.service.SubprocessoRepositoryService;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 @Tag("unit")
 class SubprocessoFactoryCoverageTest {
     @Mock
-    private SubprocessoRepositoryService subprocessoService;
+    private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
 
     @Mock
     private MapaRepo mapaRepo;
@@ -48,12 +48,12 @@ class SubprocessoFactoryCoverageTest {
         unidade.setTipo(TipoUnidade.INTEROPERACIONAL);
         unidade.setSigla("UI1");
 
-        when(subprocessoService.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
+        when(subprocessoRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
         when(mapaRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
 
         factory.criarParaMapeamento(processo, List.of(unidade));
 
-        verify(subprocessoService, times(1)).saveAll(anyList());
+        verify(subprocessoRepo, times(1)).saveAll(anyList());
         verify(mapaRepo).saveAll(anyList());
         verify(movimentacaoRepo).saveAll(anyList());
     }
