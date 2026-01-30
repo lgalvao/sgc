@@ -1,4 +1,5 @@
 import { ref, type Ref } from 'vue';
+import { logger } from '@/utils';
 
 /**
  * Estado de uma modal individual
@@ -60,7 +61,7 @@ export function useModalManager(modalNames: string[]): ModalManager {
      */
     const open = (name: string, data?: any) => {
         if (!modals[name]) {
-            console.warn(`Modal "${name}" não foi registrada`);
+            logger.warn(`Modal "${name}" não foi registrada`);
             return;
         }
         modals[name].value = { isOpen: true, data };
@@ -71,7 +72,7 @@ export function useModalManager(modalNames: string[]): ModalManager {
      */
     const close = (name: string) => {
         if (!modals[name]) {
-            console.warn(`Modal "${name}" não foi registrada`);
+            logger.warn(`Modal "${name}" não foi registrada`);
             return;
         }
         modals[name].value = { isOpen: false, data: undefined };
@@ -82,7 +83,7 @@ export function useModalManager(modalNames: string[]): ModalManager {
      */
     const toggle = (name: string) => {
         if (!modals[name]) {
-            console.warn(`Modal "${name}" não foi registrada`);
+            logger.warn(`Modal "${name}" não foi registrada`);
             return;
         }
         const currentState = modals[name].value;

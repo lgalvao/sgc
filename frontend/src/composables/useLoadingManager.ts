@@ -1,12 +1,5 @@
 import { ref, computed, type Ref } from 'vue';
-
-/**
- * Estado de loading individual
- */
-interface LoadingState {
-    isLoading: boolean;
-    taskName?: string;
-}
+import { logger } from '@/utils';
 
 /**
  * Gerenciador de múltiplos estados de loading
@@ -64,7 +57,7 @@ export function useLoadingManager(names: string[]): LoadingManager {
      */
     const start = (name: string) => {
         if (!states[name]) {
-            console.warn(`Estado de loading "${name}" não foi registrado`);
+            logger.warn(`Estado de loading "${name}" não foi registrado`);
             return;
         }
         states[name].value = true;
@@ -75,7 +68,7 @@ export function useLoadingManager(names: string[]): LoadingManager {
      */
     const stop = (name: string) => {
         if (!states[name]) {
-            console.warn(`Estado de loading "${name}" não foi registrado`);
+            logger.warn(`Estado de loading "${name}" não foi registrado`);
             return;
         }
         states[name].value = false;

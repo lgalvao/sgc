@@ -158,7 +158,6 @@
             maxlength="12"
             placeholder="Digite o título eleitoral"
             required
-            autofocus
             type="text"
             @keydown.enter.prevent="adicionarAdmin"
         />

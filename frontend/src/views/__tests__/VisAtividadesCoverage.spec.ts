@@ -174,7 +174,7 @@ describe("VisAtividades.vue Coverage", () => {
         // Trigger validation
         try {
             await (wrapper.vm as any).confirmarValidacao();
-        } catch (e) {
+        } catch {
             // Error is caught in component or propagates? Component uses try/finally but doesn't catch explicitly.
             // If it propagates, we catch it here.
         }
@@ -223,7 +223,9 @@ describe("VisAtividades.vue Coverage", () => {
 
         try {
             await (wrapper.vm as any).confirmarDevolucao();
-        } catch (e) {}
+        } catch {
+            // Erro esperado
+        }
 
         expect(subprocessosStore.devolverRevisaoCadastro).toHaveBeenCalled();
         expect((wrapper.vm as any).loadingDevolucao).toBe(false);
@@ -248,7 +250,7 @@ describe("VisAtividades.vue Coverage", () => {
             }
         };
 
-        const wrapper = mount(VisAtividades, mountOptions(initialState));
+        mount(VisAtividades, mountOptions(initialState));
         const atividadesStore = useAtividadesStore();
 
         await flushPromises();

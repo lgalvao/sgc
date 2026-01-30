@@ -51,8 +51,6 @@ describe("ArvoreUnidades.vue Coverage", () => {
             global: { stubs: { UnidadeTreeNode: true } }
         });
 
-        const local = (wrapper.vm as any).unidadesSelecionadasLocal;
-
         // Update modelValue with same values (different reference)
         await wrapper.setProps({ modelValue: [1] });
 

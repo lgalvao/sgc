@@ -162,7 +162,7 @@ describe("CadAtividades.vue", () => {
         atividadesStore.adicionarConhecimento.mockResolvedValue({});
         atividadesStore.buscarAtividadesParaSubprocesso.mockResolvedValue({});
         // Getter (converted from computed)
-        atividadesStore.obterAtividadesPorSubprocesso = vi.fn((id: number) => atividades);
+        atividadesStore.obterAtividadesPorSubprocesso = vi.fn(() => atividades);
 
         mapasStore = useMapasStore(pinia) as any;
         mapasStore.buscarImpactoMapa.mockResolvedValue({});

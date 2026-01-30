@@ -1,4 +1,4 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import UnidadeView from '@/views/UnidadeView.vue';
 import {useUnidadesStore} from '@/stores/unidades';
@@ -283,7 +283,7 @@ describe('UnidadeView.vue', () => {
     it('logs error when fetching titular fails', async () => {
         (buscarUsuarioPorTitulo as any).mockRejectedValue(new Error('Fetch error'));
 
-        const { wrapper } = createWrapper({
+        createWrapper({
             unidades: {
                 unidade: { ...mockUnidade, tituloTitular: '123' }
             }

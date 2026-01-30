@@ -57,7 +57,7 @@ describe("useProcessosStore", () => {
         painelService.listarProcessos.mockRejectedValue(MOCK_ERROR);
         try {
             await context.store.buscarProcessosPainel("perfil", 1, 0, 10);
-        } catch (e) {
+        } catch {
             // Ignore expected error
         }
         

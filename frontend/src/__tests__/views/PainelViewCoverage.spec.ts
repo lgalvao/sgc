@@ -100,13 +100,7 @@ describe('PainelView Coverage', () => {
 
         const alertasStore = useAlertasStore(pinia);
 
-        // Trigger manually or via event
-        const tabela = wrapper.findComponent({ name: 'TabelaAlertas' });
-        // Since we stubbed it, we can't emit from it unless we mounted it.
-        // We can access the method directly or emit if the stub is valid component.
-        // The stub is a simple object, so `wrapper.findComponent` should work if we look by name or stub.
-
-        // Actually, let's call the method directly to be sure we hit the branch
+        // Call the method directly to trigger the branch
         await (wrapper.vm as any).ordenarAlertasPor('processo');
 
         expect(alertasStore.buscarAlertas).not.toHaveBeenCalled();
