@@ -1,37 +1,19 @@
 package sgc.mapa.service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.ComumRepo;
-import sgc.mapa.dto.AtividadeResponse;
-import sgc.mapa.dto.AtualizarAtividadeRequest;
-import sgc.mapa.dto.AtualizarConhecimentoRequest;
-import sgc.mapa.dto.ConhecimentoResponse;
-import sgc.mapa.dto.CriarAtividadeRequest;
-import sgc.mapa.dto.CriarConhecimentoRequest;
+import sgc.mapa.dto.*;
 import sgc.mapa.evento.EventoMapaAlterado;
 import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.mapper.ConhecimentoMapper;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.AtividadeRepo;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.ConhecimentoRepo;
-import sgc.mapa.model.Mapa;
-import java.util.HashMap;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.*;
+
+import java.util.*;
 
 /**
  * Serviço unificado responsável pela manutenção da estrutura do Mapa de Competências.
@@ -111,7 +93,7 @@ public class MapaManutencaoService {
         atividadeRepo.save(existente);
     }
 
-    public List<Atividade> atualizarDescricoesAtividadeEmLote(Map<Long, String> descricoesPorId) {
+    public void atualizarDescricoesAtividadeEmLote(Map<Long, String> descricoesPorId) {
         List<Atividade> atividades = atividadeRepo.findAllById(descricoesPorId.keySet());
         Set<Long> mapasAfetados = new HashSet<>();
 
@@ -132,7 +114,6 @@ public class MapaManutencaoService {
             notificarAlteracaoMapa(codMapa);
         }
 
-        return atividades;
     }
 
     public void excluirAtividade(Long codAtividade) {

@@ -8,7 +8,7 @@ import { useAnalisesStore } from "@/stores/analises";
 import { useFeedbackStore } from "@/stores/feedback";
 import { useSubprocessosStore } from "@/stores/subprocessos";
 import { usePerfil } from "@/composables/usePerfil";
-import { SituacaoSubprocesso, TipoProcesso } from "@/types/tipos";
+import { TipoProcesso } from "@/types/tipos";
 import logger from "@/utils/logger";
 
 
@@ -62,7 +62,7 @@ export function useVisMapaLogic() {
 
     const historicoAnalise = computed(() => {
         if (!codSubprocesso.value) return [];
-        return analisesStore.obterAnalisesPorSubprocesso(codSubprocesso.value);
+        return analisesStore.obterAnalisesPorSubprocesso(codSubprocesso.value) || [];
     });
 
     const temHistoricoAnalise = computed(() => historicoAnalise.value.length > 0);

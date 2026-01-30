@@ -16,19 +16,10 @@ import java.util.List;
  */
 @Builder
 public record SubmeterMapaAjustadoRequest(
-                /**
-                 * Justificativa para os ajustes realizados (obrigatória).
-                 */
-                @NotBlank(message = "A justificativa é obrigatória") @SanitizarHtml String justificativa,
+        @NotBlank(message = "A justificativa é obrigatória") @SanitizarHtml String justificativa,
 
-                /**
-                 * Nova data limite para a próxima etapa (opcional).
-                 */
                 LocalDateTime dataLimiteEtapa2,
 
-                /**
-                 * Lista de competências com os ajustes feitos (opcional em alguns fluxos).
-                 */
                 @Valid List<CompetenciaAjusteDto> competencias) {
 
         /**

@@ -1,4 +1,4 @@
-import { ref, reactive, type Ref } from 'vue';
+import { ref, type Ref } from 'vue';
 
 /**
  * Estado de uma modal individual

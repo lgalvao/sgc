@@ -29,7 +29,6 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
     test.afterAll(async ({request}) => await cleanup.limpar(request));
 
     test('Preparacao: Admin cria e inicia processo', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         await criarProcesso(page, {
@@ -59,7 +58,6 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
     test('Cenario 1: Validacao - Atividade sem conhecimento', async ({page}) => {
         // Login como Chefe
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         // Navegar para o subprocesso (CHEFE vai direto para o subprocesso)
@@ -94,7 +92,6 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
     });
 
     test('Cenario 2: Caminho feliz - Disponibilizar Cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcesso);
         await navegarParaAtividades(page);
@@ -124,7 +121,6 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
     test('Cenario 3: Devolucao e Historico de Analise', async ({page}) => {
         // 1. Admin devolve o cadastro
-        await page.goto('/login');
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);

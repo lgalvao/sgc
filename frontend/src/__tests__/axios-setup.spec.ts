@@ -187,11 +187,13 @@ describe("axios-setup", () => {
         vi.spyOn(feedbackStore, "show").mockImplementation(() => {
             throw new Error("Store error");
         });
+        
+        const loggerSpy = vi.spyOn(logger, "error");
 
         const error = new Error("Generic failure");
 
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
 
-        expect(logger.error).toHaveBeenCalledWith("Erro ao exibir notificação:", expect.any(Error));
+        expect(loggerSpy).toHaveBeenCalledWith("Erro ao exibir notificação:", expect.any(Error));
     });
 });

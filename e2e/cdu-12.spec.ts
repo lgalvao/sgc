@@ -47,7 +47,6 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     test('Preparacao 1: Setup Mapeamento (Atividades, Competências, Homologação)', async ({page}) => {
         test.slow();
         // 1. Criar Processo Mapeamento
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await criarProcesso(page, {
             descricao: descProcessoMapeamento,
@@ -162,7 +161,6 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     });
 
     test('Preparacao 2: Iniciar Processo de Revisão', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await criarProcesso(page, {
             descricao: descProcessoRevisao,
@@ -188,7 +186,6 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     // ========================================================================
 
     test('Cenario 1: Verificar Sem Impactos (Estado Inicial)', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
@@ -204,7 +201,6 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     });
 
     test('Cenario 2: Verificar Impacto de Inclusão de Atividade', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -227,7 +223,6 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     });
 
     test('Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -253,7 +248,6 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     });
 
     test('Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -280,7 +274,6 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
     test('Cenario 5: Verificar visualização pelo Admin (Somente Leitura)', async ({page}) => {
         // Chefe disponibiliza a revisão
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);

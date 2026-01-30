@@ -13,9 +13,8 @@ import sgc.organizacao.service.UnidadeResponsavelService;
 import sgc.organizacao.service.UsuarioConsultaService;
 
 import java.util.*;
-import java.util.Set;
+
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.model.TipoUnidade;
 
 /**
  * Facade para operações de unidades organizacionais.

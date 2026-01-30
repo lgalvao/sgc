@@ -137,7 +137,7 @@ class SubprocessoAccessPolicyTest {
  
         Unidade sub = sp.getUnidade();
         List<UsuarioPerfil> atribuicoes = atribuicoesPorUsuario.get(u.getTituloEleitoral());
-        Unidade sup = atribuicoes.get(0).getUnidade();
+        Unidade sup = atribuicoes.getFirst().getUnidade();
  
         when(hierarquiaService.isSuperiorImediata(sub, sup)).thenReturn(true);
 

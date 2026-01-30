@@ -53,7 +53,6 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -77,7 +76,6 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     });
 
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE_1, SENHA_CHEFE_1);
 
         await page.getByText(descProcesso).click();
@@ -97,7 +95,6 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     // ========================================================================
 
     test('Cenario 1: GESTOR visualiza botão Aceitar em Bloco', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await page.getByText(descProcesso).click();
@@ -112,7 +109,6 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     });
 
     test('Cenario 2: GESTOR abre modal de aceite em bloco', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await page.getByText(descProcesso).click();
@@ -134,7 +130,6 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     });
 
     test('Cenario 3: Cancelar aceite em bloco permanece na tela', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await page.getByText(descProcesso).click();

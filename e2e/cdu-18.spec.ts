@@ -22,7 +22,6 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
 
     test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({page}) => {
         await test.step('1. Login como ADMIN', async () => {
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         });
 
@@ -72,7 +71,6 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
 
     test('Cenário 2: CHEFE visualiza mapa da própria unidade', async ({page}) => {
         await test.step('1. Login como CHEFE_ASSESSORIA_12', async () => {
-            await page.goto('/login');
             await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
         });
 

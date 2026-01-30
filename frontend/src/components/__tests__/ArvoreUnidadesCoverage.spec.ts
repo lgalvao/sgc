@@ -1,7 +1,6 @@
 import {describe, expect, it} from "vitest";
 import {mount} from "@vue/test-utils";
 import ArvoreUnidades from "../ArvoreUnidades.vue";
-import {nextTick} from "vue";
 
 describe("ArvoreUnidades.vue Coverage", () => {
     it("deve atualizar unidades expandidas quando a prop unidades muda", async () => {

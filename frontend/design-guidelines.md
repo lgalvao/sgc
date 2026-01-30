@@ -17,8 +17,6 @@ across Views, Components, and Interactions using **Bootstrap 5.3** and **Bootstr
 5. [Composables](#-composables)
 6. [Accessibility](#-accessibility)
 7. [Component Inventory](#-component-inventory)
-8. [Anti-Patterns](#-anti-patterns)
-9. [Decision Trees](#-decision-trees)
 
 ---
 

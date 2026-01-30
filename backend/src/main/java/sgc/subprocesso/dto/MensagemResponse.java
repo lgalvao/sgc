@@ -7,8 +7,5 @@ import lombok.Builder;
  */
 @Builder
 public record MensagemResponse(
-        /**
-         * A mensagem de retorno.
-         */
         String mensagem) {
 }

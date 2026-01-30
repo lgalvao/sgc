@@ -50,7 +50,6 @@ public class NotificacaoEmailAsyncExecutor {
      * até {@code
      * MAX_TENTATIVAS} vezes, com um tempo de espera crescente entre as tentativas.
      *
-     * @param emailDto O DTO contendo os detalhes do email a ser enviado.
      * @return Um {@link CompletableFuture} que será concluído com {@code true} se o
      *         email for
      *         enviado, ou {@code false} caso contrário.

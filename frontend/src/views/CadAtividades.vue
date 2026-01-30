@@ -110,7 +110,7 @@
 
     <!-- Empty State -->
     <EmptyState
-        v-if="atividades.length === 0"
+        v-if="atividades?.length === 0"
         icon="bi-list-check"
         title="Lista de atividades"
         :description="`Não há atividades cadastradas. Utilize o campo acima para adicionar uma nova atividade${isChefe ? ' ou importe de outro processo' : ''}.`"
@@ -265,7 +265,7 @@ async function handleAdicionarAtividade() {
 }
 
 // Auto-focus if empty on load
-watch(() => atividades.value.length, (newLen, oldLen) => {
+watch(() => atividades.value?.length, (newLen, oldLen) => {
   if (newLen === 0 && oldLen === undefined) {
     nextTick(() => inputNovaAtividadeRef.value?.$el?.focus());
   }

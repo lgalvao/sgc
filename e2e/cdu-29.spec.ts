@@ -31,7 +31,6 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
 
     test('Cenario 1: ADMIN navega para página de histórico', async ({page}) => {
         // CDU-29: Passos 1-2
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         // Passo 1: Clicar em Histórico na navbar
@@ -43,7 +42,6 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
     });
 
     test('Cenario 2: GESTOR pode acessar histórico', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         // Navegar para histórico
@@ -54,7 +52,6 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
     });
 
     test('Cenario 3: CHEFE pode acessar histórico', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         // Navegar para histórico
@@ -70,7 +67,6 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
 
     test('Cenario 4: Tabela apresenta colunas corretas', async ({page}) => {
         // CDU-29: Passo 2 - Verificar colunas da tabela
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByRole('link', {name: /Histórico/i}).click();

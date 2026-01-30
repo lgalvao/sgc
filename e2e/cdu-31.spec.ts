@@ -27,7 +27,6 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
 
     test('Cenario 1: ADMIN navega para configurações', async ({page}) => {
         // CDU-31: Passos 1-2
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         // Passo 1: Clicar no botão de engrenagem
@@ -43,7 +42,6 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
     // ========================================================================
 
     test('Cenario 2: Tela exibe configurações editáveis', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByTestId('btn-configuracoes').click();
@@ -64,7 +62,6 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
 
     test('Cenario 3: ADMIN salva configurações com sucesso', async ({page}) => {
         // CDU-31: Passos 3-4
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByTestId('btn-configuracoes').click();

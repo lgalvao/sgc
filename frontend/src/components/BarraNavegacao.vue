@@ -31,6 +31,7 @@ Responsável por: mostrar caminho atual na hierarquia, botão voltar
         <i
             v-if="crumb.isHome"
             aria-label="Início"
+            role="img"
             class="bi bi-house-door"
             data-testid="btn-nav-home"
         />

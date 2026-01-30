@@ -9,8 +9,5 @@ import lombok.Builder;
  */
 @Builder
 public record AceitarCadastroRequest(
-                /**
-                 * Observações adicionais.
-                 */
-                @NotBlank(message = "As observações são obrigatórias") @Size(max = 500, message = "Observações devem ter no máximo 500 caracteres") String observacoes) {
+        @NotBlank(message = "As observações são obrigatórias") @Size(max = 500, message = "Observações devem ter no máximo 500 caracteres") String observacoes) {
 }

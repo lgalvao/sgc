@@ -14,28 +14,13 @@ import java.util.List;
  */
 @Builder
 public record AtividadeImpactadaDto(
-                /**
-                 * O código da atividade.
-                 */
-                Long codigo,
+        Long codigo,
 
-                /**
-                 * A descrição atual da atividade.
-                 */
                 String descricao,
 
-                /**
-                 * O tipo de impacto (INSERIDA, REMOVIDA, ALTERADA).
-                 */
                 TipoImpactoAtividade tipoImpacto,
 
-                /**
-                 * A descrição anterior da atividade.
-                 */
                 String descricaoAnterior,
 
-                /**
-                 * Nomes das competências vinculadas a esta atividade.
-                 */
                 List<String> competenciasVinculadas) {
 }

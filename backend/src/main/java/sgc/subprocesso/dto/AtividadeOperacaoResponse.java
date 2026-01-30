@@ -16,21 +16,9 @@ import java.util.List;
  */
 @Builder
 public record AtividadeOperacaoResponse(
-                /**
-                 * A atividade que foi criada, atualizada ou afetada pela operação.
-                 * Pode ser null em caso de exclusão.
-                 */
-                @Nullable AtividadeVisualizacaoDto atividade,
+        @Nullable AtividadeVisualizacaoDto atividade,
 
-                /**
-                 * Status atualizado do subprocesso após a operação.
-                 * Inclui situação, label e timestamp.
-                 */
                 SubprocessoSituacaoDto subprocesso,
 
-                /**
-                 * Lista completa de atividades do subprocesso após a operação.
-                 * Permite que o frontend atualize o cache local sem chamadas adicionais.
-                 */
                 List<AtividadeVisualizacaoDto> atividadesAtualizadas) {
 }

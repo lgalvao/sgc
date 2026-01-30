@@ -30,7 +30,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -215,7 +214,7 @@ class ProcessoFacadeQueryTest {
 
             // Assert
             assertThat(res).hasSize(1);
-            assertThat(res.get(0).getCodSubprocesso()).isEqualTo(1L);
+            assertThat(res.getFirst().getCodSubprocesso()).isEqualTo(1L);
         }
 
         @Test

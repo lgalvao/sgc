@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import CompetenciaCard from '@/components/CompetenciaCard.vue';
-import { BCard, BCardHeader, BCardBody, BButton } from 'bootstrap-vue-next';
 
 describe('CompetenciaCard Coverage', () => {
     const commonStubs = {

@@ -48,7 +48,6 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -72,7 +71,6 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     });
 
     test('Preparacao 2: Chefe disponibiliza revisão de cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE_1, SENHA_CHEFE_1);
 
         await page.getByText(descProcesso).click();
@@ -92,7 +90,6 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     // ========================================================================
 
     test('Cenario 1: ADMIN navega para subprocesso de revisão', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -102,7 +99,6 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     });
 
     test('Cenario 2: ADMIN visualiza botão Reabrir Revisão', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -117,7 +113,6 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     });
 
     test('Cenario 3: ADMIN abre modal de reabertura de revisão', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();

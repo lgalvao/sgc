@@ -15,25 +15,11 @@ import java.util.List;
  */
 @Builder
 public record CompetenciaImpactadaDto(
-                /**
-                 * O código da competência.
-                 */
-                Long codigo,
+        Long codigo,
 
-                /**
-                 * A descrição da competência.
-                 */
                 String descricao,
 
-                /**
-                 * Lista com as descrições das atividades que causaram o impacto.
-                 */
                 List<String> atividadesAfetadas,
 
-                /**
-                 * Os tipos de impacto sofridos pela competência.
-                 * Uma competência pode ser afetada por múltiplos tipos de mudança (ex:
-                 * atividade removida E alterada).
-                 */
                 List<TipoImpactoCompetencia> tiposImpacto) {
 }

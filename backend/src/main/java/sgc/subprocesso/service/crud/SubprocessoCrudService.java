@@ -53,8 +53,6 @@ public class SubprocessoCrudService {
     private final ComumRepo repositorioComum;
     private final SubprocessoMapper subprocessoMapper;
     private final MapaFacade mapaFacade;
-    private final ApplicationEventPublisher eventPublisher;
-    private final UsuarioFacade usuarioService;
 
     /**
      * Constructor with @Lazy injection to break circular dependency.
@@ -73,8 +71,6 @@ public class SubprocessoCrudService {
         this.repositorioComum = repositorioComum;
         this.subprocessoMapper = subprocessoMapper;
         this.mapaFacade = mapaFacade;
-        this.eventPublisher = eventPublisher;
-        this.usuarioService = usuarioService;
     }
 
     public Subprocesso buscarSubprocesso(Long codigo) {

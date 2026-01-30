@@ -46,7 +46,6 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     // ========================================================================
 
     test('Preparacao: Admin cria e inicia processo', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -75,7 +74,6 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
 
     test('Cenario 1: ADMIN navega para detalhes do subprocesso', async ({page}) => {
         // CDU-27: Passos 1-2
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -87,7 +85,6 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
 
     test('Cenario 2: ADMIN visualiza botão Alterar data limite', async ({page}) => {
         // CDU-27: Passo 3
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();

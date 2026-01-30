@@ -58,7 +58,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
     test('Preparacao 0.1: ADMIN cria e inicia processo de mapeamento', async ({page}) => {
         // Passo 1: ADMIN cria e inicia processo de mapeamento
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -79,7 +78,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
     test('Preparacao 0.2: CHEFE adiciona atividades e disponibiliza cadastro', async ({page}) => {
         // Passo 2: CHEFE adiciona atividades e disponibiliza cadastro
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
@@ -96,7 +94,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
     test('Preparacao 0.3: GESTOR aceita cadastro', async ({page}) => {
         // Passo 3: GESTOR aceita cadastro
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await acessarSubprocessoGestor(page, descMapeamento, UNIDADE_ALVO);
@@ -106,7 +103,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
     test('Preparacao 0.4: ADMIN homologa cadastro', async ({page}) => {
         // Passo 4: ADMIN homologa cadastro
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descMapeamento, UNIDADE_ALVO);
@@ -118,7 +114,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         // Passo 5: ADMIN cria competências e disponibiliza mapa
         // Após homologação, precisamos de um login se o teste for isolado (mas aqui é serial)
         // No entanto, cada bloco test() inicia uma nova página limpa por padrão se não configurado
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         
         await acessarSubprocessoAdmin(page, descMapeamento, UNIDADE_ALVO);
@@ -129,7 +124,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
     test('Preparacao 0.6: CHEFE valida mapa', async ({page}) => {
         // Passo 6: CHEFE valida mapa
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
@@ -147,7 +141,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
     test('Preparacao 0.7: ADMIN homologa mapa', async ({page}) => {
         // Passo 7: ADMIN homologa mapa
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descMapeamento, UNIDADE_ALVO);
@@ -161,7 +154,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
     test('Preparacao 0.8: ADMIN finaliza o processo', async ({page}) => {
         // Passo 8: ADMIN finaliza o processo
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.locator('tr').filter({has: page.getByText(descMapeamento)}).click();
@@ -177,7 +169,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     });
 
     test('Preparacao 1: ADMIN cria e inicia processo de revisão', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -202,7 +193,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     });
 
     test('Preparacao 2: CHEFE revisa atividades e disponibiliza', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descProcesso);
@@ -232,7 +222,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     // ========================================================================
 
     test('Cenario 1: GESTOR visualiza histórico de análise (vazio inicialmente)', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -248,7 +237,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     });
 
     test('Cenario 2: GESTOR verifica botão "Impactos no mapa" está disponível', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -259,7 +247,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     });
 
     test('Cenario 3: GESTOR devolve cadastro para ajustes COM observação', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -270,7 +257,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     });
 
     test('Cenario 4: CHEFE visualiza histórico após devolução e disponibiliza novamente', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descProcesso);
@@ -296,7 +282,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     });
 
     test('Cenario 5: GESTOR cancela devolução', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -310,7 +295,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     });
 
     test('Cenario 6: GESTOR registra aceite COM observação', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -322,7 +306,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
     test('Cenario 7: ADMIN devolve para nova rodada de aceite', async ({page}) => {
         // Devolver para permitir novo aceite sem observação
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
@@ -343,7 +326,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     });
 
     test('Cenario 8: GESTOR registra aceite com observação padrão', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -354,7 +336,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     });
 
     test('Cenario 9: ADMIN visualiza histórico com múltiplas análises', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
@@ -383,7 +364,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     });
 
     test('Cenario 10: ADMIN cancela homologação', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
@@ -397,7 +377,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     });
 
     test('Cenario 11: ADMIN homologa cadastro de revisão', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);

@@ -40,7 +40,8 @@ export function testGetEndpoint(
     it(`deve fazer GET em ${url}`, async () => {
         mockApi.get.mockResolvedValue({ data: response });
         await action();
-        expect(mockApi.get).toHaveBeenCalledWith(url);
+        expect(mockApi.get).toHaveBeenCalled();
+        expect(mockApi.get.mock.calls[0][0]).toBe(url);
     });
 }
 
@@ -56,10 +57,11 @@ export function testPostEndpoint(
     it(`deve fazer POST em ${url}`, async () => {
         mockApi.post.mockResolvedValue({ data: response });
         await action();
+        expect(mockApi.post).toHaveBeenCalled();
+        expect(mockApi.post.mock.calls[0][0]).toBe(url);
+        
         if (payload !== undefined) {
-            expect(mockApi.post).toHaveBeenCalledWith(url, payload);
-        } else {
-            expect(mockApi.post).toHaveBeenCalledWith(url);
+            expect(mockApi.post.mock.calls[0][1]).toEqual(payload);
         }
     });
 }

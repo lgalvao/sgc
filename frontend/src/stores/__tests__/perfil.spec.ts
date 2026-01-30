@@ -30,7 +30,7 @@ describe("usePerfilStore", () => {
     // Setup localStorage BEFORE the store is initialized
     beforeEach(() => {
         mockLocalStorage.clear();
-        mockLocalStorage.setItem("usuarioCodigo", "9"); // Set default for initial state
+        mockLocalStorage.setItem("usuarioCodigo", JSON.stringify("9")); // Set default for initial state
     });
 
     const context = setupStoreTest(usePerfilStore);
@@ -42,10 +42,10 @@ describe("usePerfilStore", () => {
     });
 
     it("deve inicializar com valores do localStorage se disponíveis", () => {
-        mockLocalStorage.setItem("usuarioCodigo", "10");
-        mockLocalStorage.setItem("perfilSelecionado", "USER");
-        mockLocalStorage.setItem("unidadeSelecionada", "123");
-        mockLocalStorage.setItem("unidadeSelecionadaSigla", "U10");
+        mockLocalStorage.setItem("usuarioCodigo", JSON.stringify("10"));
+        mockLocalStorage.setItem("perfilSelecionado", JSON.stringify("USER"));
+        mockLocalStorage.setItem("unidadeSelecionada", JSON.stringify(123));
+        mockLocalStorage.setItem("unidadeSelecionadaSigla", JSON.stringify("U10"));
 
         // Re-initialize store to pick up new localStorage values
         setActivePinia(createPinia());
@@ -63,7 +63,7 @@ describe("usePerfilStore", () => {
         it("definirUsuarioCodigo deve atualizar usuarioCodigo e armazená-lo no localStorage", () => {
             context.store.definirUsuarioCodigo("15");
             expect(context.store.usuarioCodigo).toBe("15");
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith("usuarioCodigo", "15");
+            expect(mockLocalStorage.setItem).toHaveBeenCalledWith("usuarioCodigo", JSON.stringify("15"));
         });
 
         it("definirPerfilUnidade deve atualizar perfilSelecionado e unidadeSelecionada e armazená-los no localStorage", () => {
@@ -77,19 +77,19 @@ describe("usePerfilStore", () => {
             expect(context.store.unidadeSelecionadaSigla).toBe(unidadeSigla);
             expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
                 "perfilSelecionado",
-                Perfil.ADMIN,
+                JSON.stringify(Perfil.ADMIN),
             );
             expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
                 "unidadeSelecionada",
-                unidadeCodigo.toString(),
+                JSON.stringify(unidadeCodigo),
             );
             expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
                 "unidadeSelecionadaSigla",
-                unidadeSigla,
+                JSON.stringify(unidadeSigla),
             );
             context.store.definirPerfilUnidade(Perfil.ADMIN, unidadeCodigo, unidadeSigla, "Nome Teste");
             expect(context.store.usuarioNome).toBe("Nome Teste");
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith("usuarioNome", "Nome Teste");
+            expect(mockLocalStorage.setItem).toHaveBeenCalledWith("usuarioNome", JSON.stringify("Nome Teste"));
         });
 
         it("loginCompleto deve autenticar, buscar perfis e selecionar automaticamente se houver apenas um perfil", async () => {

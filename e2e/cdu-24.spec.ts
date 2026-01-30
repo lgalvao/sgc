@@ -52,7 +52,6 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -76,7 +75,6 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     });
 
     test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE_1, SENHA_CHEFE_1);
 
         await page.getByText(descProcesso).click();
@@ -92,7 +90,6 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     });
 
     test('Preparacao 3: Admin homologa cadastro e cria competências', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -121,7 +118,6 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
 
     test('Cenario 1: ADMIN visualiza botão Disponibilizar Mapas em Bloco', async ({page}) => {
         // CDU-24: Passos 1-4
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -138,7 +134,6 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
 
     test('Cenario 2: Modal de disponibilização inclui campo de data limite', async ({page}) => {
         // CDU-24: Passo 5 - Modal inclui campo de data limite obrigatório
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -170,7 +165,6 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
 
     test('Cenario 3: Cancelar disponibilização em bloco', async ({page}) => {
         // CDU-24: Passo 6 - Cancelar
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();

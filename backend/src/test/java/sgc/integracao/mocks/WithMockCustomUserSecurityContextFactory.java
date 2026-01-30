@@ -12,7 +12,6 @@ import sgc.organizacao.model.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import sgc.organizacao.model.UsuarioPerfil;
 
 @Slf4j
 @Component

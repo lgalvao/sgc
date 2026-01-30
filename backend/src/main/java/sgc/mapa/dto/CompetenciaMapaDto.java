@@ -15,18 +15,9 @@ import java.util.List;
  */
 @Builder
 public record CompetenciaMapaDto(
-                /**
-                 * O código da competência (pode ser nulo para novas competências).
-                 */
-                @Nullable Long codigo,
+        @Nullable Long codigo,
 
-                /**
-                 * A descrição da competência.
-                 */
                 @NotBlank(message = "Descrição da competência é obrigatória") @SanitizarHtml String descricao,
 
-                /**
-                 * Lista com os códigos das atividades vinculadas à competência.
-                 */
                 @NotEmpty(message = "Lista de atividades não pode ser vazia") List<Long> atividadesCodigos) {
 }

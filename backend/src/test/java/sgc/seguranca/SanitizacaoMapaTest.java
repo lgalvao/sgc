@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.*;
+
 import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -116,8 +116,8 @@ class SanitizacaoMapaTest {
         verify(subprocessoFacade).salvarMapaSubprocesso(
                 eq(1L),
                 ArgumentMatchers.argThat(arg ->
-                        !arg.competencias().get(0).descricao().contains("<img") &&
-                                arg.competencias().get(0).descricao().contains("Descricao")
+                        !arg.competencias().getFirst().descricao().contains("<img") &&
+                                arg.competencias().getFirst().descricao().contains("Descricao")
                 )
         );
     }

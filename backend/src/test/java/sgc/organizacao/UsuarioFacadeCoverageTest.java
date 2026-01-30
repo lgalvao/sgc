@@ -209,7 +209,7 @@ class UsuarioFacadeCoverageTest {
 
         List<PerfilDto> perfis = usuarioFacade.buscarPerfisUsuario("T");
         assertThat(perfis).hasSize(1);
-        assertThat(perfis.get(0).perfil()).isEqualTo("CHEFE");
+        assertThat(perfis.getFirst().perfil()).isEqualTo("CHEFE");
     }
 
     @Test

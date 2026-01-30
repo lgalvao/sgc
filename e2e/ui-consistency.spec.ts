@@ -5,7 +5,6 @@ test.describe('UI Consistency & Accessibility', () => {
 
     test.beforeEach(async ({ page }) => {
         // Navigate to login
-        await page.goto('/login');
         // Login as Admin
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
     });

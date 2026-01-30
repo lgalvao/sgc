@@ -39,7 +39,6 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -63,7 +62,6 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     });
 
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         // Acessar subprocesso
@@ -88,7 +86,6 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     });
 
     test('Preparacao 3: Admin homologa cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -101,7 +98,6 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     });
 
     test('Preparacao 4: Admin cria competências com todas as atividades associadas', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -128,7 +124,6 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
     test('Cenario 1: ADMIN navega para tela de edição do mapa', async ({page}) => {
         // CDU-17: Passos 1-6
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         // Passo 1: ADMIN escolhe o processo de mapeamento
@@ -152,7 +147,6 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
     test('Cenario 2: ADMIN abre modal de disponibilização', async ({page}) => {
         // CDU-17: Passo 7, 10
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -172,7 +166,6 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
     test('Cenario 3: ADMIN cancela disponibilização - permanece na tela', async ({page}) => {
         // CDU-17: Passo 11
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -193,7 +186,6 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
     test('Cenario 4: ADMIN disponibiliza mapa com sucesso', async ({page}) => {
         // CDU-17: Passos 12-14, 20
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();

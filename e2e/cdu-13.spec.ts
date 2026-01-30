@@ -51,7 +51,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     // ========================================================================
 
     test('Preparacao 1: ADMIN cria e inicia processo de mapeamento', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -76,7 +75,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     });
 
     test('Preparacao 2: CHEFE preenche atividades e disponibiliza', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descProcesso);
@@ -106,7 +104,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     // ========================================================================
 
     test('Cenario 1: GESTOR visualiza histórico de análise (vazio inicialmente)', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -123,7 +120,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     });
 
     test('Cenario 2: GESTOR devolve cadastro para ajustes COM observação', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -134,7 +130,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     });
 
     test('Cenario 3: CHEFE visualiza histórico após devolução e disponibiliza novamente', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descProcesso);
@@ -160,7 +155,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     });
 
     test('Cenario 4: GESTOR cancela devolução', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -174,7 +168,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     });
 
     test('Cenario 5: GESTOR registra aceite COM observação', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -186,7 +179,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 
     test('Cenario 6: ADMIN devolve para nova rodada de aceite', async ({page}) => {
         // Devolver para permitir novo aceite sem observação
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
@@ -208,7 +200,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     });
 
     test('Cenario 7: GESTOR registra aceite com observação padrão', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -219,7 +210,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     });
 
     test('Cenario 8: ADMIN visualiza histórico com múltiplas análises', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
@@ -248,7 +238,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     });
 
     test('Cenario 9: ADMIN cancela homologação', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
@@ -262,7 +251,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     });
 
     test('Cenario 10: ADMIN homologa cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);

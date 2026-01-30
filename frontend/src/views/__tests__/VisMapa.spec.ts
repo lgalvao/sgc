@@ -10,6 +10,24 @@ import {useFeedbackStore} from "@/stores/feedback";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
+// Mocks for services
+vi.mock("@/services/unidadeService", () => ({
+    buscarUnidadePorSigla: vi.fn().mockResolvedValue({ sigla: 'TEST', nome: 'Unidade' }),
+}));
+vi.mock("@/services/processoService", () => ({
+    obterDetalhesProcesso: vi.fn().mockResolvedValue({ unidades: [] }),
+}));
+vi.mock("@/services/subprocessoService", () => ({
+    buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({ permissoes: {} }),
+}));
+vi.mock("@/services/mapaService", () => ({
+    obterMapaVisualizacao: vi.fn().mockResolvedValue({ competencias: [] }),
+}));
+vi.mock("@/services/analiseService", () => ({
+    listarAnalisesCadastro: vi.fn().mockResolvedValue([]),
+    listarAnalisesValidacao: vi.fn().mockResolvedValue([]),
+}));
+
 const router = createRouter({
     history: createMemoryHistory(),
     routes: [
@@ -47,6 +65,7 @@ describe("VisMapa.vue", () => {
                 plugins: [
                     createTestingPinia({
                         createSpy: vi.fn,
+                        stubActions: false,
                         initialState: {
                             mapas: {
                                 mapaVisualizacao: {

@@ -31,7 +31,6 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
 
     test('Cenario 1: ADMIN acessa menu de Unidades', async ({page}) => {
         // CDU-28: Passos 1-2
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         // Para ADMIN, o menu mostra "Unidades" em vez de "Minha unidade"
@@ -49,7 +48,6 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
 
     test('Cenario 2: ADMIN seleciona unidade na árvore', async ({page}) => {
         // CDU-28: Passos 3-4
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         const linkUnidades = page.getByRole('link', {name: /Unidades/i});
@@ -79,7 +77,6 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
 
     test('Cenario 3: Verificar botão de criar atribuição', async ({page}) => {
         // CDU-28: Passo 5
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         const linkUnidades = page.getByRole('link', {name: /Unidades/i});

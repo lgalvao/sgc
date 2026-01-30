@@ -108,7 +108,7 @@ class SubprocessoValidacaoControllerTest {
         List<AnaliseValidacaoHistoricoDto> result = controller.obterHistoricoValidacao(codigo);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(dto);
+        assertThat(result.getFirst()).isEqualTo(dto);
     }
 
     @Test

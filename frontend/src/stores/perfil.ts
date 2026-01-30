@@ -4,7 +4,7 @@ import type {PerfilUnidade} from "@/mappers/sgrh";
 import type {Perfil} from "@/types/tipos";
 import * as usuarioService from "../services/usuarioService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
-import {useLocalStorage, removeMultipleFromLocalStorage} from "@/composables/useLocalStorage";
+import {useLocalStorage} from "@/composables/useLocalStorage";
 
 export const usePerfilStore = defineStore("perfil", () => {
     // Estados sincronizados com localStorage usando composable

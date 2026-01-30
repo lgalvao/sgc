@@ -9,13 +9,7 @@ import java.time.LocalDateTime;
  */
 @Builder
 public record SugestoesDto(
-        /**
-         * As sugestões apresentadas.
-         */
         String sugestoes,
 
-        /**
-         * A data/hora em que as sugestões foram apresentadas.
-         */
         LocalDateTime dataHora) {
 }

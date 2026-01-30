@@ -42,7 +42,6 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     // ========================================================================
 
     test('Preparacao: Admin cria e inicia processo', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -71,7 +70,6 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
 
     test('Cenario 1: ADMIN navega para detalhes do processo', async ({page}) => {
         // CDU-34: Passo 1
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -80,7 +78,6 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
 
     test('Cenario 2: Verificar indicadores de prazo', async ({page}) => {
         // CDU-34: Passo 2 - Sistema exibe indicadores de prazo
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -97,7 +94,6 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
 
     test('Cenario 3: Verificar opção de enviar lembrete', async ({page}) => {
         // CDU-34: Passo 4
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();

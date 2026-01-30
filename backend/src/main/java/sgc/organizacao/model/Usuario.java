@@ -103,10 +103,6 @@ public class Usuario implements UserDetails {
         return authorities != null ? authorities : Set.of();
     }
 
-    public void setAuthorities(Set<GrantedAuthority> authorities) {
-        this.authorities = authorities;
-    }
-
     @Override
     @Nullable
     public String getPassword() {

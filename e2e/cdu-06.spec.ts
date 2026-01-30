@@ -18,7 +18,6 @@ test.describe('CDU-06 - Detalhar processo', () => {
         const descricao = `Processo CDU-06 ${timestamp}`;
 
         // Login ADMIN
-        await page.goto('/login');
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         // Criar e iniciar processo
@@ -62,7 +61,6 @@ test.describe('CDU-06 - Detalhar processo', () => {
         const descricao = `Processo CDU-06 Gestor ${timestamp}`;
         const UNIDADE_PROCESSO = 'SECAO_111';
 
-        await page.goto('/login');
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         await criarProcesso(page, {

@@ -18,6 +18,13 @@ vi.mock('vue-router', () => ({
     useRouter: () => ({
         push: mockPush,
     }),
+    createRouter: vi.fn(() => ({
+        push: mockPush,
+        beforeEach: vi.fn(),
+        afterEach: vi.fn(),
+    })),
+    createWebHistory: vi.fn(),
+    createMemoryHistory: vi.fn(),
 }));
 
 vi.mock('@/stores/feedback', () => ({

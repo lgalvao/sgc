@@ -9,8 +9,5 @@ import lombok.Builder;
  */
 @Builder
 public record HomologarCadastroRequest(
-                /**
-                 * Observações adicionais.
-                 */
-                @Size(max = 500, message = "Observações devem ter no máximo 500 caracteres") String observacoes) {
+        @Size(max = 500, message = "Observações devem ter no máximo 500 caracteres") String observacoes) {
 }

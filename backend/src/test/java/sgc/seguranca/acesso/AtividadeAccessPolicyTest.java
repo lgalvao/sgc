@@ -44,8 +44,6 @@ class AtividadeAccessPolicyTest {
     private Usuario usuarioServidor;
     private Atividade atividade;
     private Unidade unidade;
-    private List<UsuarioPerfil> atribuicoesChefe;
-    private List<UsuarioPerfil> atribuicoesServidor;
 
     @BeforeEach
     void setUp() {
@@ -55,10 +53,10 @@ class AtividadeAccessPolicyTest {
         unidade.setTituloTitular("123");
 
         usuarioChefe = criarUsuario("123", "Chefe");
-        atribuicoesChefe = adicionarAtribuicao(usuarioChefe, CHEFE, unidade);
+        List<UsuarioPerfil> atribuicoesChefe = adicionarAtribuicao(usuarioChefe, CHEFE, unidade);
 
         usuarioServidor = criarUsuario("456", "Servidor");
-        atribuicoesServidor = adicionarAtribuicao(usuarioServidor, SERVIDOR, unidade);
+        List<UsuarioPerfil> atribuicoesServidor = adicionarAtribuicao(usuarioServidor, SERVIDOR, unidade);
         
         when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(atribuicoesChefe);
         when(usuarioPerfilRepo.findByUsuarioTitulo("456")).thenReturn(atribuicoesServidor);

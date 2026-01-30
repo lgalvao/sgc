@@ -19,7 +19,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
@@ -54,15 +53,12 @@ class NotificacaoEmailAsyncExecutorTest {
     @DisplayName("Deve enviar email com sucesso na primeira tentativa")
     void enviarEmailAssincronoSucessoPrimeiraTentativa() throws ExecutionException, InterruptedException {
         // Arrange
-        String para = DESTINATARIO;
-        String assunto = ASSUNTO;
-        String corpo = CORPO;
         boolean html = false;
         
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 
         // Act
-        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(para, assunto, corpo, html);
+        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(DESTINATARIO, ASSUNTO, CORPO, html);
         Boolean resultado = future.get();
 
         // Assert
@@ -74,9 +70,6 @@ class NotificacaoEmailAsyncExecutorTest {
     @DisplayName("Deve realizar retentativas e ter sucesso")
     void enviarEmailAssincronoSucessoComRetentativa() throws ExecutionException, InterruptedException {
         // Arrange
-        String para = DESTINATARIO;
-        String assunto = ASSUNTO;
-        String corpo = CORPO;
         boolean html = false;
         
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
@@ -87,7 +80,7 @@ class NotificacaoEmailAsyncExecutorTest {
                 .when(javaMailSender).send(mimeMessage);
 
         // Act
-        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(para, assunto, corpo, html);
+        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(DESTINATARIO, ASSUNTO, CORPO, html);
         Boolean resultado = future.get();
 
         // Assert
@@ -99,9 +92,6 @@ class NotificacaoEmailAsyncExecutorTest {
     @DisplayName("Deve falhar após exceder tentativas máximas")
     void enviarEmailAssincronoFalhaAposRetentativas() throws ExecutionException, InterruptedException {
         // Arrange
-        String para = DESTINATARIO;
-        String assunto = ASSUNTO;
-        String corpo = CORPO;
         boolean html = false;
         
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
@@ -110,7 +100,7 @@ class NotificacaoEmailAsyncExecutorTest {
         doThrow(new RuntimeException("Erro Fatal")).when(javaMailSender).send(mimeMessage);
 
         // Act
-        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(para, assunto, corpo, html);
+        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(DESTINATARIO, ASSUNTO, CORPO, html);
         Boolean resultado = future.get();
 
         // Assert
@@ -123,9 +113,6 @@ class NotificacaoEmailAsyncExecutorTest {
     @DisplayName("Deve lidar com interrupção da thread durante espera")
     void enviarEmailAssincronoInterrupcaoThread() throws ExecutionException, InterruptedException {
         // Arrange
-        String para = DESTINATARIO;
-        String assunto = ASSUNTO;
-        String corpo = CORPO;
         boolean html = false;
         
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
@@ -137,7 +124,7 @@ class NotificacaoEmailAsyncExecutorTest {
         doThrow(new InterruptedException("Interrompido")).when(sleeper).sleep(anyLong());
 
         // Act
-        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(para, assunto, corpo, html);
+        CompletableFuture<Boolean> future = executor.enviarEmailAssincrono(DESTINATARIO, ASSUNTO, CORPO, html);
         Boolean resultado = future.get();
 
         // Assert

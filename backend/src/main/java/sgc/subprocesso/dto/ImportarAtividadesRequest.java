@@ -9,8 +9,5 @@ import lombok.Builder;
  */
 @Builder
 public record ImportarAtividadesRequest(
-                /**
-                 * O código do subprocesso do qual as atividades serão importadas.
-                 */
-                @NotNull(message = "O código do subprocesso de origem é obrigatório") Long codSubprocessoOrigem) {
+        @NotNull(message = "O código do subprocesso de origem é obrigatório") Long codSubprocessoOrigem) {
 }

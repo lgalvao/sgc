@@ -69,56 +69,42 @@ public class SubprocessoCadastroWorkflowService {
 
     @Transactional
     public void reabrirCadastro(Long codigo, String justificativa) {
-        Subprocesso sp = crudService.buscarSubprocesso(codigo);
-
-        if (sp.getSituacao().ordinal() < MAPEAMENTO_CADASTRO_HOMOLOGADO.ordinal()) {
-            throw new ErroValidacao("Subprocesso ainda está em fase de cadastro.", Map.of());
-        }
-
-        Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
-        Usuario usuario = usuarioServiceFacade.obterUsuarioAutenticadoOuNull();
-
-        sp.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        sp.setDataFimEtapa1(null);
-        subprocessoRepo.save(sp);
-
-        transicaoService.registrar(RegistrarTransicaoCommand.builder()
-                .sp(sp)
-                .tipo(TipoTransicao.CADASTRO_REABERTO)
-                .origem(sedoc)
-                .destino(sp.getUnidade())
-                .usuario(usuario)
-                .observacoes(justificativa)
-                .build());
-
-        enviarAlertasReabertura(sp, justificativa, false);
+        executarReabertura(codigo, justificativa, MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                TipoTransicao.CADASTRO_REABERTO, false);
     }
 
     @Transactional
     public void reabrirRevisaoCadastro(Long codigo, String justificativa) {
+        executarReabertura(codigo, justificativa, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_CADASTRO_EM_ANDAMENTO,
+                TipoTransicao.REVISAO_CADASTRO_REABERTA, true);
+    }
+
+    private void executarReabertura(Long codigo, String justificativa, SituacaoSubprocesso situacaoMinima,
+                                    SituacaoSubprocesso novaSituacao, TipoTransicao tipoTransicao, boolean isRevisao) {
         Subprocesso sp = crudService.buscarSubprocesso(codigo);
 
-        if (sp.getSituacao().ordinal() < REVISAO_CADASTRO_HOMOLOGADA.ordinal()) {
-            throw new ErroValidacao("Subprocesso ainda está em fase de revisão.", Map.of());
+        if (sp.getSituacao().ordinal() < situacaoMinima.ordinal()) {
+            throw new ErroValidacao("Subprocesso ainda está em fase de " + (isRevisao ? "revisão" : "cadastro") + ".",
+                    Map.of());
         }
 
         Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
         Usuario usuario = usuarioServiceFacade.obterUsuarioAutenticadoOuNull();
 
-        sp.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+        sp.setSituacao(novaSituacao);
         sp.setDataFimEtapa1(null);
         subprocessoRepo.save(sp);
 
         transicaoService.registrar(RegistrarTransicaoCommand.builder()
                 .sp(sp)
-                .tipo(TipoTransicao.REVISAO_CADASTRO_REABERTA)
+                .tipo(tipoTransicao)
                 .origem(sedoc)
                 .destino(sp.getUnidade())
                 .usuario(usuario)
                 .observacoes(justificativa)
                 .build());
 
-        enviarAlertasReabertura(sp, justificativa, true);
+        enviarAlertasReabertura(sp, justificativa, isRevisao);
     }
 
 

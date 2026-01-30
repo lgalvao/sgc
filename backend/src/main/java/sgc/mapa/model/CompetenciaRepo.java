@@ -21,8 +21,6 @@ import java.util.List;
  * <li>{@link #findByMapaCodigoSemFetch(Long)} - Sem relacionamentos (mais leve)</li>
  * </ul>
  * 
- * @see MapaVisualizacaoService Uso de projeção SQL
- * @see MapaManutencaoService Uso de fetch seletivo
  */
 @Repository
 public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {

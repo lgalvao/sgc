@@ -38,7 +38,6 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -62,7 +61,6 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     });
 
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcesso).click();
@@ -82,7 +80,6 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     });
 
     test('Preparacao 3: Admin homologa cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -95,7 +92,6 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     });
 
     test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -119,7 +115,6 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 
     test('Cenario 1: CHEFE navega para visualização do mapa', async ({page}) => {
         // CDU-19: Passos 1-2
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         // Passo 1: CHEFE escolhe o processo
@@ -143,7 +138,6 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 
     test('Cenario 2: CHEFE cancela validação - permanece na tela', async ({page}) => {
         // CDU-19: Passo 5.1.1
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcesso).click();
@@ -167,7 +161,6 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 
     test('Cenario 3: CHEFE valida mapa com sucesso', async ({page}) => {
         // CDU-19: Passos 5.2-5.6, 6-8
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcesso).click();

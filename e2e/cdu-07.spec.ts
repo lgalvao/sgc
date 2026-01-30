@@ -20,7 +20,6 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         const descricao = `Processo CDU-07 ${timestamp}`;
 
         // 1. ADMIN cria e inicia processo
-        await page.goto('/login');
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         await criarProcesso(page, {

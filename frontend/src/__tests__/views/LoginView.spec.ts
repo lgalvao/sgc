@@ -91,6 +91,11 @@ describe("LoginView.vue", () => {
         );
     });
 
+    const MOCK_PERFIS = [
+        {perfil: Perfil.ADMIN, unidade: {sigla: "SEDE", codigo: 1, nome: "Sede"}, siglaUnidade: "SEDE"},
+        {perfil: Perfil.SERVIDOR, unidade: {sigla: "FILIAL", codigo: 2, nome: "Filial"}, siglaUnidade: "FILIAL"}
+    ];
+
     it("deve realizar login com sucesso e redirecionar para painel (perfil único)", async () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
@@ -98,7 +103,7 @@ describe("LoginView.vue", () => {
         // Mock do loginCompleto retornando sucesso
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
         // Mock de um único perfil
-        perfilStore.perfisUnidades = [{perfil: Perfil.ADMIN, unidade: {sigla: "SEDE", codigo: 1, nome: "Sede"}, siglaUnidade: "SEDE"}];
+        perfilStore.perfisUnidades = [MOCK_PERFIS[0]];
 
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
@@ -132,10 +137,7 @@ describe("LoginView.vue", () => {
         const perfilStore = usePerfilStore();
 
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
-        perfilStore.perfisUnidades = [
-            {perfil: Perfil.ADMIN, unidade: {sigla: "SEDE", codigo: 1, nome: "Sede"}, siglaUnidade: "SEDE"},
-            {perfil: Perfil.SERVIDOR, unidade: {sigla: "FILIAL", codigo: 2, nome: "Filial"}, siglaUnidade: "FILIAL"}
-        ];
+        perfilStore.perfisUnidades = MOCK_PERFIS;
 
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
@@ -156,11 +158,7 @@ describe("LoginView.vue", () => {
 
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
         perfilStore.selecionarPerfilUnidade = vi.fn().mockResolvedValue(true);
-        const mockPerfis = [
-            {perfil: Perfil.ADMIN, unidade: {sigla: "SEDE", codigo: 1, nome: "Sede"}, siglaUnidade: "SEDE"},
-            {perfil: Perfil.SERVIDOR, unidade: {sigla: "FILIAL", codigo: 2, nome: "Filial"}, siglaUnidade: "FILIAL"}
-        ];
-        perfilStore.perfisUnidades = mockPerfis;
+        perfilStore.perfisUnidades = MOCK_PERFIS;
 
         // Passo 1
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
@@ -177,7 +175,7 @@ describe("LoginView.vue", () => {
         // Trigger submit novamente para confirmar seleção
         await wrapper.find('form').trigger('submit');
 
-        expect(perfilStore.selecionarPerfilUnidade).toHaveBeenCalledWith("123", mockPerfis[0]);
+        expect(perfilStore.selecionarPerfilUnidade).toHaveBeenCalledWith("123", MOCK_PERFIS[0]);
         expect(routerPushMock).toHaveBeenCalledWith("/painel");
     });
 
@@ -233,10 +231,7 @@ describe("LoginView.vue", () => {
 
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
         perfilStore.selecionarPerfilUnidade = vi.fn().mockRejectedValue(new Error("Erro ao selecionar"));
-        perfilStore.perfisUnidades = [
-            {perfil: Perfil.ADMIN, unidade: {sigla: "SEDE", codigo: 1, nome: "Sede"}, siglaUnidade: "SEDE"},
-            {perfil: Perfil.SERVIDOR, unidade: {sigla: "FILIAL", codigo: 2, nome: "Filial"}, siglaUnidade: "FILIAL"}
-        ];
+        perfilStore.perfisUnidades = MOCK_PERFIS;
 
         // Precisamos mockar console.error para não poluir o output do teste
         const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -266,10 +261,7 @@ describe("LoginView.vue", () => {
         const feedbackStore = useFeedbackStore();
 
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
-        perfilStore.perfisUnidades = [
-            {perfil: Perfil.ADMIN, unidade: {sigla: "SEDE", codigo: 1, nome: "Sede"}, siglaUnidade: "SEDE"},
-            {perfil: Perfil.SERVIDOR, unidade: {sigla: "FILIAL", codigo: 2, nome: "Filial"}, siglaUnidade: "FILIAL"}
-        ];
+        perfilStore.perfisUnidades = MOCK_PERFIS;
 
         // Passo 1
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");

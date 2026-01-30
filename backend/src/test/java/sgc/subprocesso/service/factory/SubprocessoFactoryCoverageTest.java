@@ -17,7 +17,6 @@ import sgc.subprocesso.model.MovimentacaoRepo;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 import sgc.subprocesso.model.SubprocessoRepo;
 

@@ -45,7 +45,7 @@ public enum TipoTransicao {
     ),
 
     CADASTRO_REABERTO(
-            "Reabertura do cadastro de atividades",
+            "Reabertura de cadastro de atividades",
             "Cadastro de atividades da unidade %s reaberto para ajustes",
             "cadastro-reaberto"
     ),
@@ -77,7 +77,7 @@ public enum TipoTransicao {
     ),
 
     REVISAO_CADASTRO_REABERTA(
-            "Reabertura da revisão do cadastro de atividades",
+            "Reabertura de revisão de cadastro de atividades",
             "Revisão do cadastro da unidade %s reaberta para ajustes",
             "revisao-cadastro-reaberta"
     ),

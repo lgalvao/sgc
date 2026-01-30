@@ -29,7 +29,6 @@ test.describe.serial('CDU-30 - Manter Administradores', () => {
     // ========================================================================
 
     test('Cenario 1: ADMIN acessa página de configurações', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         // Acessar configurações
@@ -42,7 +41,6 @@ test.describe.serial('CDU-30 - Manter Administradores', () => {
     // ========================================================================
 
     test('Cenario 2: Página de configurações contém seção de administradores', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByTestId('btn-configuracoes').click();
@@ -71,7 +69,6 @@ test.describe.serial('CDU-30 - Manter Administradores', () => {
     // ========================================================================
 
     test('Cenario 3: Lista de administradores é exibida', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByTestId('btn-configuracoes').click();

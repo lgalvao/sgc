@@ -49,6 +49,7 @@ describe("unidadesService", () => {
 
             expect(mockApi.get).toHaveBeenCalledWith(
                 "/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO&codProcesso=1",
+                expect.objectContaining({})
             );
             expect(result).toEqual(mockData);
         });
@@ -61,6 +62,7 @@ describe("unidadesService", () => {
 
             expect(mockApi.get).toHaveBeenCalledWith(
                 "/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO",
+                expect.objectContaining({})
             );
             expect(result).toEqual(mockData);
         });
@@ -98,7 +100,10 @@ describe("unidadesService", () => {
 
             const result = await buscarSuperior("SIGLA");
 
-            expect(mockApi.get).toHaveBeenCalledWith("/unidades/sigla/SIGLA/superior");
+            expect(mockApi.get).toHaveBeenCalledWith(
+                "/unidades/sigla/SIGLA/superior",
+                expect.objectContaining({})
+            );
             expect(result).toBeNull();
         });
 

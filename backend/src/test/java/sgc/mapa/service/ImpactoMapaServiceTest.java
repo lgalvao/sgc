@@ -91,7 +91,7 @@ class ImpactoMapaServiceTest {
         ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
         assertEquals(1, result.atividadesInseridas().size());
-        assertEquals("Nova", result.atividadesInseridas().get(0).descricao());
+        assertEquals("Nova", result.atividadesInseridas().getFirst().descricao());
     }
 
     @Test
@@ -132,10 +132,10 @@ class ImpactoMapaServiceTest {
         ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
         assertEquals(1, result.atividadesRemovidas().size());
-        assertEquals("Antiga", result.atividadesRemovidas().get(0).descricao());
+        assertEquals("Antiga", result.atividadesRemovidas().getFirst().descricao());
         
         assertEquals(1, result.competenciasImpactadas().size());
-        assertEquals("Comp A", result.competenciasImpactadas().get(0).descricao());
+        assertEquals("Comp A", result.competenciasImpactadas().getFirst().descricao());
     }
 
     @Test
@@ -181,6 +181,6 @@ class ImpactoMapaServiceTest {
         ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
         assertEquals(1, result.atividadesAlteradas().size());
-        assertEquals("Ativ A", result.atividadesAlteradas().get(0).descricao());
+        assertEquals("Ativ A", result.atividadesAlteradas().getFirst().descricao());
     }
 }

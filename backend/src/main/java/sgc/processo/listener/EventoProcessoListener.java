@@ -26,9 +26,9 @@ import sgc.subprocesso.service.SubprocessoFacade;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static sgc.organizacao.model.TipoUnidade.*;
-import java.util.Objects;
 
 /**
  * Listener assíncrono para eventos de processo.
@@ -227,7 +227,7 @@ public class EventoProcessoListener {
                 processo.getDescricao(), siglasSubordinadas);
 
         notificacaoEmailService.enviarEmailHtml(email, assunto, html);
-        log.info("E-mail de finalização enviado para {}", unidade.getSigla());
+        log.info("E-mail de finalização (unidade intermediaria) enviado para {}", unidade.getSigla());
     }
 
     private void enviarEmailProcessoIniciado(

@@ -48,7 +48,6 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -72,7 +71,6 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     });
 
     test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE_1, SENHA_CHEFE_1);
 
         await page.getByText(descProcesso).click();
@@ -92,7 +90,6 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     // ========================================================================
 
     test('Cenario 1: ADMIN navega para subprocesso disponibilizado', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -103,7 +100,6 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     });
 
     test('Cenario 2: ADMIN visualiza botão Reabrir cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -118,7 +114,6 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     });
 
     test('Cenario 3: ADMIN abre modal de reabertura de cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -138,7 +133,6 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     });
 
     test('Cenario 4: Botão confirmar desabilitado sem justificativa', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();

@@ -80,7 +80,6 @@ test.describe('CDU-02 - Visualizar Painel', () => {
 
             // Faz logout e login como GESTOR
             await page.evaluate(() => localStorage.clear());
-            await page.goto('/login');
             await expect(page).toHaveURL('/login');
             await login(page,
                 USUARIOS.GESTOR_COORD.titulo,

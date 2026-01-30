@@ -238,7 +238,7 @@ class LoginFacadeCoverageTest {
 
         List<PerfilUnidadeDto> result = facade.autorizar(titulo);
         assertEquals(1, result.size());
-        assertEquals(1L, result.get(0).unidade().getCodigo());
+        assertEquals(1L, result.getFirst().unidade().getCodigo());
     }
 
     @Test

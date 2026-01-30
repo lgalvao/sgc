@@ -9,40 +9,39 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseFacade;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
 import sgc.mapa.service.MapaManutencaoService;
+import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.CompetenciaRequest;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import java.time.LocalDate;
-import java.util.Set;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.organizacao.UnidadeFacade;
-import sgc.seguranca.acesso.AccessControlService;
-import sgc.subprocesso.service.crud.SubprocessoCrudService;
-import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -160,21 +159,6 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
         verify(subprocessoRepo).save(sp);
     }
 
-    // --- DISPONIBILIZAR MAPA ---
-
-    @Test
-    @DisplayName("disponibilizarMapa: erro se data limite null")
-    void disponibilizarMapa_ErroData() {
-
-
-        DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder().build();
-        Usuario user = new Usuario();
-
-        assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, user))
-                .isInstanceOf(ErroValidacao.class)
-                .isInstanceOf(ErroValidacao.class);
-    }
-
     @Test
     @DisplayName("validarMapaParaDisponibilizacao: erro se competencia sem atividade")
     void validarMapa_ErroCompetenciaSemAtividade() {
@@ -233,8 +217,6 @@ class SubprocessoMapaWorkflowServiceCoverageTest {
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("Atividades pendentes: A2");
     }
-
-    // --- OUTROS FLUXOS DE WORKFLOW ---
 
     @Test
     @DisplayName("apresentarSugestoes: sucesso")

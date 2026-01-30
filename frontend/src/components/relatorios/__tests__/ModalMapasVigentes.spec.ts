@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ModalMapasVigentes from '../ModalMapasVigentes.vue';
-import { BModal, BButton } from 'bootstrap-vue-next';
+import { BModal } from 'bootstrap-vue-next';
 import * as csvUtils from '@/utils/csv';
 
 // Mock dependencies

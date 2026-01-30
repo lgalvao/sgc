@@ -4,7 +4,6 @@ import { createTestingPinia } from '@pinia/testing';
 import CadMapa from '@/views/CadMapa.vue';
 import { useMapasStore } from '@/stores/mapas';
 import { useSubprocessosStore } from '@/stores/subprocessos';
-import { useRouter, useRoute } from 'vue-router';
 
 // Mock router
 vi.mock("vue-router", () => ({

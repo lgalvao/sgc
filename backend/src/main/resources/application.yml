@@ -4,10 +4,6 @@ spring:
   task:
     execution:
       pool:
-        # Configuração otimizada para ~10 usuários simultâneos
-        # core-size: threads mínimas mantidas no pool
-        # max-size: threads máximas permitidas (usuários simultâneos)
-        # queue-capacity: tarefas em fila antes de criar novas threads
         core-size: 5
         max-size: 10
         queue-capacity: 25

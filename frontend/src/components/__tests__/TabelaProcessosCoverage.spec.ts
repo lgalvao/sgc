@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import TabelaProcessos from '../TabelaProcessos.vue';
 import { SituacaoProcesso, TipoProcesso } from '@/types/tipos';

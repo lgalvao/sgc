@@ -16,18 +16,10 @@ export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
         }
         
         try {
-            // Se for string simples, retorna direto
-            if (typeof defaultValue === 'string') {
-                return item as T;
-            }
-            // Se for número, faz parse
-            if (typeof defaultValue === 'number') {
-                return Number(item) as T;
-            }
-            // Para objetos e arrays, faz JSON.parse
             return JSON.parse(item) as T;
         } catch {
-            return defaultValue;
+            // Se falhar o parse (ex: dado legado não-JSON), retorna o item como-está se T for string
+            return item as unknown as T;
         }
     };
 
@@ -38,10 +30,6 @@ export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
     watch(storedValue, (newValue) => {
         if (newValue === null || newValue === undefined) {
             localStorage.removeItem(key);
-        } else if (typeof newValue === 'string') {
-            localStorage.setItem(key, newValue);
-        } else if (typeof newValue === 'number') {
-            localStorage.setItem(key, newValue.toString());
         } else {
             localStorage.setItem(key, JSON.stringify(newValue));
         }

@@ -55,7 +55,6 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
     test('Preparacao: Criar processo e homologar cadastro de atividades', async ({page}) => {
         // 1. Admin cria e inicia processo
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -80,7 +79,6 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByText('Processo iniciado')).toBeVisible();
 
         // 2. Chefe adiciona atividades e conhecimentos
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descProcesso);
@@ -96,7 +94,6 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // 3. Gestor aceita
-        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -104,7 +101,6 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await aceitarCadastroMapeamento(page);
 
         // 4. Admin homologa
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
@@ -116,7 +112,6 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     });
 
     test('CT-00 e CT-01: Acessar Edição de Mapa e verificar elementos', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
@@ -138,7 +133,6 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     });
 
     test('CT-02: Criar Competência', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -154,7 +148,6 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     });
 
     test('CT-03: Editar Competência', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -170,7 +163,6 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     });
 
     test('CT-05: Validar Cancelamento da Exclusão', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -183,7 +175,6 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     });
 
     test('CT-04: Excluir Competência com Confirmação', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -198,7 +189,6 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
     test('CT-06: Navegar para Disponibilização', async ({page}) => {
         // Recriar uma competência para poder disponibilizar
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);

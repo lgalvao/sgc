@@ -40,8 +40,6 @@ class ProcessoAccessPolicyTest {
     private Usuario usuarioAdmin;
     private Usuario usuarioGestor;
     private Processo processo;
-    private List<UsuarioPerfil> atribuicoesAdmin;
-    private List<UsuarioPerfil> atribuicoesGestor;
 
     @BeforeEach
     void setUp() {
@@ -49,10 +47,10 @@ class ProcessoAccessPolicyTest {
         processo.setCodigo(1L);
 
         usuarioAdmin = criarUsuario("1", "Admin");
-        atribuicoesAdmin = adicionarAtribuicao(usuarioAdmin, ADMIN);
+        List<UsuarioPerfil> atribuicoesAdmin = adicionarAtribuicao(usuarioAdmin, ADMIN);
 
         usuarioGestor = criarUsuario("2", "Gestor");
-        atribuicoesGestor = adicionarAtribuicao(usuarioGestor, GESTOR);
+        List<UsuarioPerfil> atribuicoesGestor = adicionarAtribuicao(usuarioGestor, GESTOR);
         
         when(usuarioPerfilRepo.findByUsuarioTitulo("1")).thenReturn(atribuicoesAdmin);
         when(usuarioPerfilRepo.findByUsuarioTitulo("2")).thenReturn(atribuicoesGestor);

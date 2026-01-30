@@ -26,7 +26,6 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
     // ========================================================================
 
     test('Cenario 1: ADMIN navega para página de relatórios', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
@@ -36,7 +35,6 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
     });
 
     test('Cenario 2: Página exibe card de relatório de mapas', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
@@ -46,7 +44,6 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
     });
 
     test('Cenario 3: Abrir modal de Mapas Vigentes', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
@@ -60,7 +57,6 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
     });
 
     test('Cenario 4: Botão de exportação está disponível', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByRole('link', {name: /Relatórios/i}).click();

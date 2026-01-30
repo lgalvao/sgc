@@ -55,7 +55,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -79,7 +78,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     });
 
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
@@ -103,7 +101,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     });
 
     test('Preparacao 3: Admin homologa cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
@@ -115,7 +112,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     });
 
     test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
@@ -133,7 +129,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     });
 
     test('Preparacao 5: Chefe valida mapa', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
@@ -148,7 +143,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     });
 
     test('Preparacao 6: Admin homologa mapa e finaliza processo de mapeamento', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
@@ -173,7 +167,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     });
 
     test('Preparacao 7: Admin cria e inicia processo de revisão', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -197,7 +190,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     });
 
     test('Preparacao 8: Chefe revisa atividades com alterações', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
@@ -229,7 +221,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     test('Preparacao 9: Admin homologa revisão do cadastro', async ({page}) => {
         // Esta homologação leva o subprocesso ao estado "Revisão do cadastro homologada"
         // que é a pré-condição para CDU-16
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
@@ -251,7 +242,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
     test('Cenario 1: ADMIN navega para tela de edição do mapa', async ({page}) => {
         // CDU-16: Passo 1-6
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         // Passo 1: No Painel, ADMIN escolhe o processo de revisão
@@ -284,7 +274,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
     test('Cenario 2: ADMIN visualiza impactos no mapa', async ({page}) => {
         // CDU-16: Passo 7-8
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
@@ -318,7 +307,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
     test('Cenario 3: ADMIN pode abrir modal para editar competência', async ({page}) => {
         // CDU-16: Passo 9 - ADMIN pode acessar edição de competências
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
@@ -346,7 +334,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
     test('Cenario 4: ADMIN associa atividade não vinculada a nova competência', async ({page}) => {
         // CDU-16: Passo 9.1 - ADMIN deve associar todas as atividades não associadas
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);

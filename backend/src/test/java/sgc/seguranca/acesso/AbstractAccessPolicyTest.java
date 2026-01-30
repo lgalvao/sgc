@@ -1,5 +1,6 @@
 package sgc.seguranca.acesso;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ class AbstractAccessPolicyTest {
         }
         
         @Override
-        public boolean canExecute(Usuario usuario, Acao acao, Object recurso) {
+        public boolean canExecute(@NonNull Usuario usuario, @NonNull Acao acao, Object recurso) {
             return false;
         }
 

@@ -106,12 +106,11 @@ class NotificacaoEmailServiceTest {
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
         when(emailExecutor.enviarEmailAssincrono(anyString(), anyString(), anyString(), anyBoolean())).thenReturn(CompletableFuture.completedFuture(true));
 
-        String para = RECIPIENT;
         String assunto = "Test";
         String corpoLongo = "A".repeat(TAMANHO_CORPO_LONGO);
 
         // Act
-        notificacaoServico.enviarEmail(para, assunto, corpoLongo);
+        notificacaoServico.enviarEmail(RECIPIENT, assunto, corpoLongo);
 
         // Assert
         ArgumentCaptor<Notificacao> captorNotificacao = ArgumentCaptor.forClass(Notificacao.class);
@@ -160,12 +159,10 @@ class NotificacaoEmailServiceTest {
     void deveCapturaRuntimeException() {
         when(repositorioNotificacao.save(any(Notificacao.class))).thenThrow(new RuntimeException("Erro de teste"));
 
-        String para = RECIPIENT;
         String assunto = "Test";
-        String corpo = TEST_BODY;
 
         // Não deve lançar exceção, apenas logar
-        notificacaoServico.enviarEmail(para, assunto, corpo);
+        notificacaoServico.enviarEmail(RECIPIENT, assunto, TEST_BODY);
 
         verify(repositorioNotificacao).save(any(Notificacao.class));
         verify(emailExecutor, never()).enviarEmailAssincrono(anyString(), anyString(), anyString(), anyBoolean());

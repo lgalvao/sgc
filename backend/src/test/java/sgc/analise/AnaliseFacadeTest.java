@@ -14,7 +14,6 @@ import sgc.subprocesso.model.Subprocesso;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Unidade;

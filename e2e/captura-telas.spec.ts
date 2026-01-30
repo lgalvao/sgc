@@ -57,7 +57,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     test.describe('01 - Autenticação', () => {
         test('Captura telas de login', async ({page}) => {
             // Tela de login inicial
-            await page.goto('/login');
             await capturarTela(page, '01-seguranca', '01-login-inicial');
 
             // Erro de credenciais inválidas
@@ -68,7 +67,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '01-seguranca', '02-login-erro-credenciais');
 
             // Limpar e fazer login com múltiplos perfis
-            await page.goto('/login');
             await page.getByTestId('inp-login-usuario').fill(USUARIOS.ADMIN_2_PERFIS.titulo);
             await page.getByTestId('inp-login-senha').fill(USUARIOS.ADMIN_2_PERFIS.senha);
             await page.getByTestId('btn-login-entrar').click();
@@ -77,7 +75,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Login com perfil selecionado
             // Reiniciar a página para garantir estado limpo para a função helper
-            await page.goto('/login');
             await loginComPerfil(page, USUARIOS.ADMIN_2_PERFIS.titulo, USUARIOS.ADMIN_2_PERFIS.senha, USUARIOS.ADMIN_2_PERFIS.perfil);
             await capturarTela(page, '01-seguranca', '04-painel-apos-login', {fullPage: true});
         });
@@ -85,7 +82,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
     test.describe('02 - Painel Principal', () => {
         test('Captura painel ADMIN', async ({page}) => {
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Painel inicial vazio
@@ -144,7 +140,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
         test('Captura painel GESTOR', async ({page}) => {
             // Criar processo para o Gestor primeiro como ADMIN
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             const desc = `Processo Gestor ${Date.now()}`;
             await criarProcesso(page, {
@@ -165,7 +160,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
         test('Captura painel CHEFE', async ({page}) => {
             // Criar processo para o Chefe primeiro como ADMIN
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             const desc = `Processo Chefe ${Date.now()}`;
             await criarProcesso(page, {
@@ -187,7 +181,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
     test.describe('03 - Fluxo de Processo', () => {
         test('Captura criação e detalhamento de processo', async ({page}) => {
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             const descricao = `Processo Detalhado ${Date.now()}`;
@@ -227,7 +220,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         });
 
         test('Captura validações de formulário', async ({page}) => {
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             await page.getByTestId('btn-painel-criar-processo').click();
@@ -265,7 +257,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const UNIDADE_ALVO = 'SECAO_211';
 
             // Admin cria processo
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             await criarProcesso(page, {
@@ -332,7 +323,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const descricao = `Proc Validação ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_212';
 
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             await criarProcesso(page, {
@@ -442,7 +432,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const UNIDADE_ALVO = 'SECAO_121';
 
             // Setup: criar processo e disponibilizar atividades
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             await criarProcesso(page, {
@@ -543,7 +532,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
     test.describe('06 - Navegação e Menus', () => {
         test('Captura elementos de navegação', async ({page}) => {
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Menu principal
@@ -579,7 +567,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
     test.describe('07 - Estados e Situações', () => {
         test('Captura diferentes estados de processo', async ({page}) => {
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Processo CRIADO
@@ -619,7 +606,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
     test.describe('08 - Responsividade (Tamanhos de Tela)', () => {
         test('Captura em diferentes resoluções', async ({page}) => {
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Desktop padrão (1920x1080)
@@ -646,7 +632,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     test.describe('09 - Operações em Bloco', () => {
         test('Captura fluxo de aceitar cadastros em bloco', async ({page}) => {
             // Prepara cenário: criar processo com unidades subordinadas e disponibilizar cadastros
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             const descricao = `Processo Bloco ${Date.now()}`;
@@ -744,7 +729,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // ========================================================================
     test.describe('10 - Gestão de Subprocessos', () => {
         test('Captura modais de gestão de subprocesso', async ({page}) => {
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             const descricao = `Processo Gestão ${Date.now()}`;
@@ -802,7 +786,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // ========================================================================
     test.describe('11 - Gestão de Unidades', () => {
         test('Captura página de unidades e atribuição temporária', async ({page}) => {
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Navegar para página de unidades
@@ -845,7 +828,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // ========================================================================
     test.describe('12 - Histórico', () => {
         test('Captura seção de histórico', async ({page}) => {
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Acessar seção de histórico
@@ -869,7 +851,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // ========================================================================
     test.describe('13 - Configurações', () => {
         test('Captura página de configurações e administradores', async ({page}) => {
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Acessar configurações
@@ -908,7 +889,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     test.describe('14 - Relatórios', () => {
         test('Captura página e modais de relatórios', async ({page}) => {
             test.setTimeout(60_000);
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Acessar relatórios

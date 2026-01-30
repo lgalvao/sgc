@@ -58,7 +58,6 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -82,7 +81,6 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE_1, SENHA_CHEFE_1);
 
         await page.getByText(descProcesso).click();
@@ -98,7 +96,6 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Preparacao 3: Admin homologa cadastro e cria mapa', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -116,7 +113,6 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Preparacao 4: Chefe valida o mapa', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE_1, SENHA_CHEFE_1);
 
         await acessarSubprocessoChefe(page, descProcesso);
@@ -133,7 +129,6 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     // ========================================================================
 
     test('Cenario 1: ADMIN visualiza botão Homologar Mapa em Bloco', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -148,7 +143,6 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
@@ -170,7 +164,6 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Cenario 3: Cancelar homologação de mapa em bloco', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();

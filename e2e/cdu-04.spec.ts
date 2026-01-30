@@ -10,7 +10,6 @@ test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
 
     test.beforeEach(async ({page}) => {
         cleanup = useProcessoCleanup();
-        await page.goto('/login');
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
     });
 

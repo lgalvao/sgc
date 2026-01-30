@@ -28,7 +28,6 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import java.util.HashSet;
-import org.springframework.data.domain.PageImpl;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -55,7 +54,7 @@ class PainelFacadeTest {
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
 
         assertThat(result).hasSize(1);
-        assertThat(result.getContent().get(0).linkDestino()).isEqualTo("/processo/cadastro?codProcesso=1");
+        assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/cadastro?codProcesso=1");
     }
 
     @Test
@@ -69,7 +68,7 @@ class PainelFacadeTest {
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.GESTOR, 100L, PageRequest.of(0, 10));
 
         assertThat(result).hasSize(1);
-        assertThat(result.getContent().get(0).linkDestino()).isEqualTo("/processo/1");
+        assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/1");
     }
 
     @Test
@@ -88,7 +87,7 @@ class PainelFacadeTest {
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.CHEFE, 100L, PageRequest.of(0, 10));
 
         // Link deve ser null
-        assertThat(result.getContent().get(0).linkDestino()).isNull();
+        assertThat(result.getContent().getFirst().linkDestino()).isNull();
     }
 
     @Test
@@ -111,7 +110,7 @@ class PainelFacadeTest {
         Page<AlertaDto> result = painelFacade.listarAlertas("123", 100L, Pageable.unpaged());
 
         assertThat(result).hasSize(1);
-        assertThat(result.getContent().get(0).getDataHoraLeitura()).isNotNull();
+        assertThat(result.getContent().getFirst().getDataHoraLeitura()).isNotNull();
     }
 
     @Test

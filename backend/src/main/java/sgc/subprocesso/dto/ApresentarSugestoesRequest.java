@@ -11,8 +11,5 @@ import sgc.seguranca.sanitizacao.SanitizarHtml;
  */
 @Builder
 public record ApresentarSugestoesRequest(
-                /**
-                 * Texto com as sugestões do CHEFE (obrigatório).
-                 */
-                @NotBlank(message = "As sugestões são obrigatórias") @SanitizarHtml String sugestoes) {
+        @NotBlank(message = "As sugestões são obrigatórias") @SanitizarHtml String sugestoes) {
 }

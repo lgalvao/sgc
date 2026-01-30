@@ -43,7 +43,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
     // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await criarProcesso(page, {
@@ -72,7 +71,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
     });
 
     test('Preparacao 2: Chefe adiciona atividades e conhecimentos, e disponibiliza cadastro', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcessoMapeamento).click();
@@ -109,7 +107,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         // 2.2 Usuário clica em unidade subordinada operacional/interoperacional
         // 2.3 Sistema mostra tela Detalhes do subprocesso
 
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
@@ -155,7 +152,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
     test('Cenario 2: CHEFE visualiza cadastro diretamente (sem navegar por unidades)', async ({page}) => {
         // Fluxo principal passo 3 - CHEFE/SERVIDOR:
         // 3.1 Sistema exibe diretamente a tela Detalhes do subprocesso
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         // Passo 1: Clicar no processo em andamento
@@ -185,7 +181,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
     test('Cenario 3: Visualizar processo finalizado', async ({page}) => {
         // Preparar: Admin homologa o cadastro
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
@@ -271,7 +266,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
     test('Cenario 4: CHEFE visualiza cadastro de processo finalizado', async ({page}) => {
         // Mesmo cenário mas com perfil CHEFE - deve ir direto para subprocesso
-        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         // Clicar no processo finalizado

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ModalAndamentoGeral from '../ModalAndamentoGeral.vue';
-import { BModal, BButton } from 'bootstrap-vue-next';
+import { BModal } from 'bootstrap-vue-next';
 import * as csvUtils from '@/utils/csv';
 import { TipoProcesso, SituacaoProcesso } from '@/types/tipos';
 

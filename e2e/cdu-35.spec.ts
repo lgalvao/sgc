@@ -26,7 +26,6 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
     // ========================================================================
 
     test('Cenario 1: ADMIN navega para página de relatórios', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
@@ -36,7 +35,6 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
     });
 
     test('Cenario 2: Página exibe card de relatório de andamento', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
@@ -46,7 +44,6 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
     });
 
     test('Cenario 3: Abrir modal de Andamento Geral', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
@@ -60,7 +57,6 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
     });
 
     test('Cenario 4: Modal contém tabela de dados', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
@@ -75,7 +71,6 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
     });
 
     test('Cenario 5: Botão de exportação está disponível', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
@@ -86,7 +81,6 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
     });
 
     test('Cenario 6: Filtros estão disponíveis', async ({page}) => {
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByRole('link', {name: /Relatórios/i}).click();

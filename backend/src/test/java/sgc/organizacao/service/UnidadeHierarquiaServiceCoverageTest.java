@@ -80,10 +80,10 @@ class UnidadeHierarquiaServiceCoverageTest {
         List<UnidadeDto> resultado = service.buscarArvoreComElegibilidade(elegibilidadeChecker);
 
         assertThat(resultado).hasSize(1);
-        UnidadeDto dtoResultado = resultado.get(0);
+        UnidadeDto dtoResultado = resultado.getFirst();
         assertThat(dtoResultado.getCodigo()).isEqualTo(1L);
         assertThat(dtoResultado.getSubunidades()).hasSize(1);
-        assertThat(dtoResultado.getSubunidades().get(0).getCodigo()).isEqualTo(2L);
+        assertThat(dtoResultado.getSubunidades().getFirst().getCodigo()).isEqualTo(2L);
     }
 
     @Test
@@ -175,7 +175,7 @@ class UnidadeHierarquiaServiceCoverageTest {
 
         List<UnidadeDto> arvore = service.buscarArvoreHierarquica();
         assertThat(arvore).hasSize(1);
-        assertThat(arvore.get(0).getSubunidades()).isEmpty();
+        assertThat(arvore.getFirst().getSubunidades()).isEmpty();
     }
 
     @Test

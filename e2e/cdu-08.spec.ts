@@ -20,7 +20,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
 
         await test.step('1. Setup: Criar Processo de Mapeamento', async () => {
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await criarProcesso(page, {
                 descricao: descricaoProcesso,
@@ -34,7 +33,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
 
         await test.step('2. Acessar tela de Atividades', async () => {
-            await page.goto('/login');
             await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
             
             // Navega para o subprocesso usando helper robusto
@@ -89,7 +87,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const SENHA_REVISAO = USUARIOS.CHEFE_ASSESSORIA_12.senha;
 
         await test.step('Setup: Criar Processo de Revisão', async () => {
-            await page.goto('/login');
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await criarProcesso(page, {
                 descricao,
@@ -103,7 +100,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
 
         await test.step('Verificar Botão Impacto', async () => {
-            await page.goto('/login');
             await login(page, CHEFE_REVISAO, SENHA_REVISAO);
             
             // Navega para o subprocesso usando helper robusto

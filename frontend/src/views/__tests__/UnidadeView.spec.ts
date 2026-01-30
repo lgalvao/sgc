@@ -11,8 +11,21 @@ import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentT
 import {logger} from "@/utils";
 
 // Mocks
-const { mockPush } = vi.hoisted(() => {
-    return { mockPush: vi.fn() };
+const { mockPush, mockUnidadeData } = vi.hoisted(() => {
+    return { 
+        mockPush: vi.fn(),
+        mockUnidadeData: {
+            codigo: 1,
+            sigla: 'TEST',
+            nome: 'Unidade Teste',
+            usuarioCodigo: 10,
+            tituloTitular: '123456',
+            filhas: [
+                { codigo: 2, sigla: 'SUB1', nome: 'Subordinada 1', filhas: [] },
+                { codigo: 3, sigla: 'SUB2', nome: 'Subordinada 2', filhas: [] }
+            ]
+        }
+    };
 });
 
 vi.mock("@/utils", () => ({
@@ -39,6 +52,19 @@ vi.mock('@/services/usuarioService', async (importOriginal) => {
     }
 });
 
+vi.mock('@/services/unidadeService', () => ({
+    buscarArvoreUnidade: vi.fn().mockResolvedValue(mockUnidadeData),
+    buscarUnidadePorSigla: vi.fn().mockResolvedValue(mockUnidadeData),
+}));
+
+vi.mock('@/services/atribuicaoTemporariaService', () => ({
+    buscarTodasAtribuicoes: vi.fn().mockResolvedValue([]),
+}));
+
+vi.mock('@/services/mapaService', () => ({
+    obterMapaCompleto: vi.fn().mockResolvedValue(null),
+}));
+
 const TreeTableStub = {
     template: '<div data-testid="tree-table"></div>',
     props: ['data', 'columns', 'title'],
@@ -53,31 +79,8 @@ describe('UnidadeView.vue', () => {
     let usuariosStore: any;
     let mapasStore: any;
 
-    const mockUnidade = {
-        codigo: 1,
-        sigla: 'TEST',
-        nome: 'Unidade Teste',
-        usuarioCodigo: 10,
-        tituloTitular: '123456',
-        filhas: [
-            { codigo: 2, sigla: 'SUB1', nome: 'Subordinada 1', filhas: [] },
-            { codigo: 3, sigla: 'SUB2', nome: 'Subordinada 2', filhas: [] }
-        ]
-    };
+    const mockUnidade = mockUnidadeData;
 
-    const mockUsuario = {
-        codigo: 10,
-        nome: 'Titular Teste',
-        email: 'titular@test.com',
-        ramal: '123'
-    };
-
-    const mockUsuarioResponsavel = {
-        codigo: 20,
-        nome: 'Responsavel Teste',
-        email: 'resp@test.com',
-        ramal: '456'
-    }
 
     const createWrapper = (initialStateOverride = {}) => {
         context.wrapper = mount(UnidadeView, {
@@ -106,7 +109,8 @@ describe('UnidadeView.vue', () => {
                     BCardBody: { template: '<div><slot /></div>' },
                     BButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
                     TreeTable: TreeTableStub,
-                }
+                },
+                { stubActions: false }
             ),
             props: {
                 codUnidade: 1
@@ -119,9 +123,11 @@ describe('UnidadeView.vue', () => {
         usuariosStore = useUsuariosStore();
         mapasStore = useMapasStore();
 
-        unidadesStore.buscarArvoreUnidade.mockResolvedValue(null);
-        atribuicaoStore.buscarAtribuicoes.mockResolvedValue(null);
-        atribuicaoStore.obterAtribuicoesPorUnidade = vi.fn().mockReturnValue([]);
+        // Spies are already created by Pinia for actions if stubActions: true, 
+        // but since we used false, we should only mock those we want to change behavior
+        vi.spyOn(unidadesStore, 'buscarArvoreUnidade').mockResolvedValue(null);
+        vi.spyOn(atribuicaoStore, 'buscarAtribuicoes').mockResolvedValue(null);
+        
         usuariosStore.obterUsuarioPorId = vi.fn().mockImplementation((codigo: number) => {
             if (codigo === 10) return mockUsuario;
             if (codigo === 20) return mockUsuarioResponsavel;
@@ -199,12 +205,12 @@ describe('UnidadeView.vue', () => {
 
         const mockAtribuicao = {
             usuario: { ...mockUsuarioResponsavel, unidade: { codigo: 1 } },
-            unidade: { codigo: 1 },
+            unidade: { ...mockUnidade },
             dataInicio: yesterday.toISOString(),
             dataTermino: tomorrow.toISOString(),
         };
 
-        atribuicaoStore.obterAtribuicoesPorUnidade.mockReturnValue([mockAtribuicao]);
+        atribuicaoStore.atribuicoes = [mockAtribuicao];
 
         // Force re-computation
         await wrapper.vm.$nextTick();

@@ -9,28 +9,13 @@ import java.time.LocalDateTime;
  */
 @Builder
 public record AnaliseValidacaoDto(
-                /**
-                 * O código da análise.
-                 */
-                Long codigo,
+        Long codigo,
 
-                /**
-                 * A data e hora da análise.
-                 */
-                LocalDateTime dataHora,
+        LocalDateTime dataHora,
 
-                /**
-                 * As observações registradas.
-                 */
-                String observacoes,
+        String observacoes,
 
-                /**
-                 * A ação realizada (e.g., APROVADO, DEVOLVIDO).
-                 */
-                String acao,
+        String acao,
 
-                /**
-                 * A sigla da unidade que realizou a análise.
-                 */
-                String unidadeSigla) {
+        String unidadeSigla) {
 }
