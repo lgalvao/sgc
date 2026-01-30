@@ -11,7 +11,17 @@ import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentT
 import {logger} from "@/utils";
 
 // Mocks
-const { mockPush, mockUnidadeData } = vi.hoisted(() => {
+const { mockPush, mockUnidadeData, mockUsuario, mockUsuarioResponsavel } = vi.hoisted(() => {
+    const u = {
+        codigo: 10,
+        nome: 'Titular Teste',
+        unidade: { codigo: 1, sigla: 'TEST' }
+    };
+    const ur = {
+        codigo: 20,
+        nome: 'Responsavel Teste',
+        unidade: { codigo: 1, sigla: 'TEST' }
+    };
     return { 
         mockPush: vi.fn(),
         mockUnidadeData: {
@@ -24,7 +34,9 @@ const { mockPush, mockUnidadeData } = vi.hoisted(() => {
                 { codigo: 2, sigla: 'SUB1', nome: 'Subordinada 1', filhas: [] },
                 { codigo: 3, sigla: 'SUB2', nome: 'Subordinada 2', filhas: [] }
             ]
-        }
+        },
+        mockUsuario: u,
+        mockUsuarioResponsavel: ur
     };
 });
 
@@ -48,7 +60,7 @@ vi.mock('@/services/usuarioService', async (importOriginal) => {
     const actual: any = await importOriginal();
     return {
         ...actual,
-        buscarUsuarioPorTitulo: vi.fn(),
+        buscarUsuarioPorTitulo: vi.fn().mockResolvedValue(mockUsuario),
     }
 });
 
