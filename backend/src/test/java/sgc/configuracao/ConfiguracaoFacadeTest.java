@@ -8,6 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroConfiguracao;
+import sgc.configuracao.dto.ParametroRequest;
+import sgc.configuracao.dto.ParametroResponse;
+import sgc.configuracao.mapper.ParametroMapper;
 import sgc.configuracao.model.Parametro;
 
 import java.util.List;
@@ -27,6 +30,9 @@ class ConfiguracaoFacadeTest {
     @Mock
     private ConfiguracaoService configuracaoService;
 
+    @Mock
+    private ParametroMapper parametroMapper;
+
     @Test
     @DisplayName("Deve buscar todos os parâmetros")
     void buscarTodos_sucesso() {
@@ -34,12 +40,13 @@ class ConfiguracaoFacadeTest {
         Parametro p1 = Parametro.builder().chave("CHAVE_1").valor("VALOR_1").descricao("Desc 1").build();
         Parametro p2 = Parametro.builder().chave("CHAVE_2").valor("VALOR_2").descricao("Desc 2").build();
         when(configuracaoService.buscarTodos()).thenReturn(List.of(p1, p2));
+        when(parametroMapper.toResponse(any())).thenReturn(mock(ParametroResponse.class));
 
         // Act
-        List<Parametro> resultado = configuracaoFacade.buscarTodos();
+        List<ParametroResponse> resultado = configuracaoFacade.buscarTodos();
 
         // Assert
-        assertThat(resultado).hasSize(2).contains(p1, p2);
+        assertThat(resultado).hasSize(2);
         verify(configuracaoService).buscarTodos();
     }
 
@@ -77,16 +84,19 @@ class ConfiguracaoFacadeTest {
     @DisplayName("Deve salvar lista de parâmetros")
     void salvar_sucesso() {
         // Arrange
+        ParametroRequest req = new ParametroRequest(1L, "CHAVE_1", "VALOR_1", "Desc 1");
         Parametro p1 = Parametro.builder().chave("CHAVE_1").valor("VALOR_1").descricao("Desc 1").build();
-        List<Parametro> lista = List.of(p1);
-        when(configuracaoService.salvar(lista)).thenReturn(lista);
+        List<ParametroRequest> lista = List.of(req);
+        when(configuracaoService.buscarPorChave("CHAVE_1")).thenReturn(p1);
+        when(configuracaoService.salvar(any())).thenReturn(List.of(p1));
+        when(parametroMapper.toResponse(any())).thenReturn(mock(ParametroResponse.class));
 
         // Act
-        List<Parametro> resultado = configuracaoFacade.salvar(lista);
+        List<ParametroResponse> resultado = configuracaoFacade.salvar(lista);
 
         // Assert
-        assertThat(resultado).isEqualTo(lista);
-        verify(configuracaoService).salvar(lista);
+        assertThat(resultado).hasSize(1);
+        verify(configuracaoService).salvar(any());
     }
 
     @Test

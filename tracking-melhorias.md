@@ -10,10 +10,10 @@
 
 | Prioridade | Total | Completo | Em Progresso | Pendente |
 |-----------|-------|----------|--------------|----------|
-| 🔴 CRÍTICA | 13 | 4 | 0 | 9 |
+| 🔴 CRÍTICA | 13 | 7 | 0 | 6 |
 | 🟠 MÉDIA | 14 | 0 | 0 | 14 |
 | 🟡 BAIXA | 6 | 0 | 0 | 6 |
-| **TOTAL** | **33** | **4** | **0** | **29** |
+| **TOTAL** | **33** | **7** | **0** | **26** |
 
 ---
 
@@ -22,11 +22,11 @@
 ### Quick Wins e Segurança (13 ações)
 
 - [x] **#1** Remover arquivos `*CoverageTest.java` (27+ arquivos) - 2h
-- [ ] **#2** Consolidar Access Policies em AbstractAccessPolicy - 6h
+- [x] **#2** Consolidar Access Policies em AbstractAccessPolicy - 6h
 - [ ] **#3** Dividir GOD Composables (useCadAtividadesLogic) - 8h
-- [ ] **#4** Refatorar SubprocessoFacade e centralizar validações - 8h
+- [x] **#4** Refatorar SubprocessoFacade e centralizar validações - 8h
 - [x] **#5** Mover @PreAuthorize de Facades para Controllers - 6h
-- [ ] **#6** Centralizar verificações de acesso via AccessControlService - 8h
+- [x] **#6** Centralizar verificações de acesso via AccessControlService - 8h
 - [x] **#7** Criar DTOs para AnaliseController e ConfiguracaoController - 4h
 - [ ] **#8** Eliminar ciclos de dependência via Events - 2h
 - [ ] **#9** Padronizar acesso a services (View→Store→Service→API) - 4h
@@ -84,7 +84,7 @@
 
 ## 📝 Log de Execução
 
-### 2026-01-30
+### 2026-01-30 - Sessão 1 (Histórico)
 
 **Início da Execução**
 - ✅ Leitura do plano-melhorias.md completo
@@ -109,14 +109,44 @@
   - Conformidade com ADR-004: Entidades JPA não são mais expostas diretamente
   - Compilação: ✅ Bem-sucedida
 
+### 2026-01-30 - Sessão 2 (Continuação)
+
+- ✅ **Ação #2 COMPLETA**: Consolidar Access Policies em AbstractAccessPolicy
+  - AbstractAccessPolicy: Adicionados métodos protegidos de hierarquia
+  - Enum RequisitoHierarquia movido para AbstractAccessPolicy
+  - SubprocessoAccessPolicy: Removidas ~90 linhas de código duplicado
+  - AtividadeAccessPolicy: Simplificada verificação de titular
+  - ProcessoAccessPolicy e MapaAccessPolicy: Atualizados para conformidade
+  - Compilação: ✅ Bem-sucedida
+  - Impacto: Lógica de hierarquia centralizada, mensagens de erro consistentes
+
+- ✅ **Ação #4 COMPLETA**: Refatorar SubprocessoFacade e centralizar validações
+  - SubprocessoValidacaoService: Criados 5 métodos de validação centralizados
+  - SubprocessoCadastroWorkflowService: Refatorado para usar validarSituacaoMinima
+  - SubprocessoMapaWorkflowService: Refatorado para usar validarSituacaoPermitida
+  - SubprocessoValidacaoServiceTest: 23 testes unitários (100% passando)
+  - Compilação: ✅ Bem-sucedida
+  - CodeQL: ✅ 0 vulnerabilidades
+  - Impacto: ~8 validações duplicadas eliminadas
+
+- ✅ **Ação #6 COMPLETA**: Centralizar verificações de acesso via AccessControlService
+  - ProcessoDetalheBuilder: Refatorado para usar AccessControlService
+  - ProcessoAccessPolicy: Adicionadas ações em bloco (HOMOLOGAR_*_EM_BLOCO)
+  - ProcessoController: Injeta @AuthenticationPrincipal Usuario
+  - ProcessoFacade: Propaga Usuario para builder
+  - Testes: 167 testes do pacote sgc.processo passando
+  - Compilação: ✅ Bem-sucedida
+  - Impacto: ADR-003 100% conforme, todas verificações via AccessControlService
+
 ---
 
 ## 🎯 Próximos Passos Imediatos
 
-1. **Ação #1:** Identificar e remover todos os arquivos `*CoverageTest.java` (Quick Win)
-2. **Ação #10:** Substituir console.* por logger no frontend
-3. **Ação #5:** Mover @PreAuthorize de Facades para Controllers
-4. Continuar com as demais ações críticas
+1. **Ação #3:** Dividir GOD Composables (useCadAtividadesLogic) - Frontend
+2. **Ação #8:** Eliminar ciclos de dependência via Events
+3. **Ação #9:** Padronizar acesso a services (View→Store→Service→API)
+4. **Ação #11:** Adotar fixtures E2E (36 arquivos)
+5. **Ação #12:** Reduzir over-mocking (46 arquivos)
 
 ---
 
@@ -162,26 +192,47 @@
    - ConfiguracaoService: Método buscarPorId adicionado
    - **Impacto:** Entidades JPA protegidas de exposição direta
 
+4. **Ação #2 - Consolidação de Access Policies:**
+   - AbstractAccessPolicy: Métodos de hierarquia centralizados
+   - Enum RequisitoHierarquia movido para classe base
+   - SubprocessoAccessPolicy: ~90 linhas de duplicação removidas
+   - AtividadeAccessPolicy: Simplificada verificação de titular
+   - **Impacto:** Manutenção centralizada, mensagens de erro consistentes
+
+5. **Ação #4 - Validações Centralizadas:**
+   - SubprocessoValidacaoService: 5 métodos de validação reutilizáveis
+   - Workflow services refatorados
+   - 23 testes unitários (100% passando)
+   - **Impacto:** ~8 validações duplicadas eliminadas, código mais limpo
+
+6. **Ação #6 - Conformidade ADR-003:**
+   - ProcessoDetalheBuilder: Usa AccessControlService
+   - ProcessoAccessPolicy: Ações em bloco adicionadas
+   - 167 testes passando
+   - **Impacto:** ADR-003 100% conforme, auditoria centralizada
+
 ### Recomendações para Próximas Iterações
 
-1. **Priorizar #2 e #6:** Consolidação de Access Policies é crítica para segurança
-2. **Considerar #4:** SubprocessoFacade pode estar com violações similares ao ProcessoFacade
-3. **Revisar estimativas:** Algumas ações já estavam completas, tempo pode ser realocado
-4. **Validar com testes:** Executar suite de testes para garantir não-regressão
+1. **Priorizar #3:** GOD Composables no frontend precisam ser divididos
+2. **Priorizar #8 e #9:** Padronização arquitetural para consistência
+3. **Considerar #11 e #12:** Fixtures E2E e redução de over-mocking para testes mais robustos
+4. **Revisar estimativas:** 7 ações completas em ~1 dia vs estimativa de 44h sugere boa produtividade
+5. **Validar com testes E2E:** Executar suite completa após próximas 3 ações
 
 ---
 
-**Última Atualização:** 2026-01-30 20:33 UTC
+**Última Atualização:** 2026-01-30 21:45 UTC
 
 ## 📌 Status Final
 
-**Execução Inicial Completa:** 4 de 33 ações (12%)
-- ✅ Quick wins implementados com sucesso
-- ✅ Conformidade com ADRs críticos melhorada
-- ✅ Base de código mais limpa (~4.400 linhas removidas)
+**Execução Sessão 2 Completa:** 7 de 33 ações (21%)
+- ✅ 7 ações CRÍTICAS completadas (58% das críticas)
+- ✅ Conformidade com ADRs 001, 003, 004 alcançada
+- ✅ Base de código mais limpa (~4.600 linhas removidas/refatoradas)
+- ✅ Segurança centralizada e auditável
 - ✅ Documentação atualizada com achados reais
 
 **Próximos Passos Recomendados:**
-1. Executar suite de testes completa para validação
-2. Continuar com ações #2, #4, #6 (segurança e arquitetura)
-3. Revisar plano baseado nos achados de conformidades existentes
+1. Continuar com ações CRÍTICAS restantes (#3, #8, #9, #11, #12)
+2. Executar suite de testes E2E completa para validação
+3. Revisar plano baseado na produtividade observada

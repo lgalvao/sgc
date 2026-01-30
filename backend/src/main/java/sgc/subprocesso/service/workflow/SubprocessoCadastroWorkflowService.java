@@ -83,10 +83,8 @@ public class SubprocessoCadastroWorkflowService {
                                     SituacaoSubprocesso novaSituacao, TipoTransicao tipoTransicao, boolean isRevisao) {
         Subprocesso sp = crudService.buscarSubprocesso(codigo);
 
-        if (sp.getSituacao().ordinal() < situacaoMinima.ordinal()) {
-            throw new ErroValidacao("Subprocesso ainda está em fase de " + (isRevisao ? "revisão" : "cadastro") + ".",
-                    Map.of());
-        }
+        validacaoService.validarSituacaoMinima(sp, situacaoMinima,
+            "Subprocesso ainda está em fase de " + (isRevisao ? "revisão" : "cadastro") + ".");
 
         Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
         Usuario usuario = usuarioServiceFacade.obterUsuarioAutenticadoOuNull();

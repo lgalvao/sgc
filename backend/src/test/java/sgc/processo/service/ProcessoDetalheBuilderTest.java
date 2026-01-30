@@ -7,10 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.mapper.ProcessoDetalheMapper;
@@ -26,14 +22,11 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import org.mockito.Mockito;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,10 +41,16 @@ class ProcessoDetalheBuilderTest {
     private ProcessoDetalheMapper processoDetalheMapper;
 
     @Mock
-    private UsuarioPerfilRepo usuarioPerfilRepo;
+    private AccessControlService accessControlService;
 
     @InjectMocks
     private ProcessoDetalheBuilder builder;
+
+    private Usuario criarUsuarioMock() {
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("12345678901");
+        return usuario;
+    }
 
     /**
      * Configura o mock do mapper para retornar DTOs corretamente mapeados.
@@ -74,6 +73,7 @@ class ProcessoDetalheBuilderTest {
     void deveConstruirDtoQuandoDadosValidos() {
         // Arrange
         configurarMockDoMapper();
+        Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setDescricao("Processo Teste");
@@ -98,12 +98,8 @@ class ProcessoDetalheBuilderTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
 
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(null);
-        SecurityContextHolder.setContext(securityContext);
-
         // Act
-        ProcessoDetalheDto dto = builder.build(processo);
+        ProcessoDetalheDto dto = builder.build(processo, usuario);
 
         // Assert
         assertThat(dto).isNotNull();
@@ -121,22 +117,18 @@ class ProcessoDetalheBuilderTest {
     @DisplayName("Deve permitir finalizar quando usuário é admin")
     void devePermitirFinalizarQuandoUsuarioAdmin() {
         // Arrange
+        Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.CRIADO);
         processo.setParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
-
-        SecurityContext securityContext = mock(SecurityContext.class);
-        Authentication auth = mock(Authentication.class);
-        when(auth.isAuthenticated()).thenReturn(true);
-        Mockito.doReturn(List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))).when(auth).getAuthorities();
-        when(securityContext.getAuthentication()).thenReturn(auth);
-        SecurityContextHolder.setContext(securityContext);
+        when(accessControlService.podeExecutar(eq(usuario), eq(sgc.seguranca.acesso.Acao.FINALIZAR_PROCESSO), eq(processo)))
+                .thenReturn(true);
 
         // Act
-        ProcessoDetalheDto dto = builder.build(processo);
+        ProcessoDetalheDto dto = builder.build(processo, usuario);
 
         // Assert
         assertThat(dto.isPodeFinalizar()).isTrue();
@@ -146,22 +138,18 @@ class ProcessoDetalheBuilderTest {
     @DisplayName("Não deve permitir finalizar quando usuário não é admin")
     void naoDevePermitirFinalizarQuandoUsuarioNaoAdmin() {
         // Arrange
+        Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.CRIADO);
         processo.setParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
-
-        SecurityContext securityContext = mock(SecurityContext.class);
-        Authentication auth = mock(Authentication.class);
-        when(auth.isAuthenticated()).thenReturn(true);
-        Mockito.doReturn(List.of(new SimpleGrantedAuthority("ROLE_USER"))).when(auth).getAuthorities();
-        when(securityContext.getAuthentication()).thenReturn(auth);
-        SecurityContextHolder.setContext(securityContext);
+        when(accessControlService.podeExecutar(eq(usuario), eq(sgc.seguranca.acesso.Acao.FINALIZAR_PROCESSO), eq(processo)))
+                .thenReturn(false);
 
         // Act
-        ProcessoDetalheDto dto = builder.build(processo);
+        ProcessoDetalheDto dto = builder.build(processo, usuario);
 
         // Assert
         assertThat(dto.isPodeFinalizar()).isFalse();
@@ -172,6 +160,7 @@ class ProcessoDetalheBuilderTest {
     void deveVerificarOrdenacaoDasUnidades() {
         // Arrange
         configurarMockDoMapper();
+        Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -189,12 +178,8 @@ class ProcessoDetalheBuilderTest {
         processo.setParticipantes(Set.of(u1, u2));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
 
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(null);
-        SecurityContextHolder.setContext(securityContext);
-
         // Act
-        ProcessoDetalheDto dto = builder.build(processo);
+        ProcessoDetalheDto dto = builder.build(processo, usuario);
 
         // Assert
         assertThat(dto.getUnidades()).hasSize(2);
@@ -207,6 +192,7 @@ class ProcessoDetalheBuilderTest {
     void deveConstruirDtoComHierarquiaParticipantes() {
         // Arrange
         configurarMockDoMapper();
+        Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -237,10 +223,8 @@ class ProcessoDetalheBuilderTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(spPai, spFilho));
 
-        SecurityContextHolder.setContext(mock(SecurityContext.class));
-
         // Act
-        ProcessoDetalheDto dto = builder.build(processo);
+        ProcessoDetalheDto dto = builder.build(processo, usuario);
 
         // Assert
         assertThat(dto.getUnidades()).hasSize(1); // Somente o pai na raiz
@@ -253,27 +237,24 @@ class ProcessoDetalheBuilderTest {
     @Test
     @DisplayName("Deve retornar false para chefe/coordenador se principal não for Usuario")
     void deveRetornarFalseSePrincipalNaoForUsuario() {
+        Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
+        when(accessControlService.podeExecutar(any(Usuario.class), any(), any(Processo.class)))
+                .thenReturn(false);
 
-        SecurityContext securityContext = mock(SecurityContext.class);
-        Authentication auth = mock(Authentication.class);
-        when(auth.isAuthenticated()).thenReturn(true);
-        when(auth.getPrincipal()).thenReturn("principalString"); // Not Usuario
-        when(securityContext.getAuthentication()).thenReturn(auth);
-        SecurityContextHolder.setContext(securityContext);
-
-        ProcessoDetalheDto dto = builder.build(processo);
+        ProcessoDetalheDto dto = builder.build(processo, usuario);
         assertThat(dto.isPodeHomologarCadastro()).isFalse();
     }
 
     @Test
     @DisplayName("Deve retornar false para chefe/coordenador se usuário não é participante")
     void deveRetornarFalseSeUsuarioNaoParticipante() {
+        Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -283,30 +264,17 @@ class ProcessoDetalheBuilderTest {
         u1.setCodigo(1L);
         processo.setParticipantes(Set.of(u1));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
+        when(accessControlService.podeExecutar(any(Usuario.class), any(), any(Processo.class)))
+                .thenReturn(false);
 
-        SecurityContext securityContext = mock(SecurityContext.class);
-        Authentication auth = mock(Authentication.class);
-        when(auth.isAuthenticated()).thenReturn(true);
-
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral("12345678901");
-        UsuarioPerfil atribuicao = new UsuarioPerfil();
-        Unidade u2 = new Unidade();
-        u2.setCodigo(2L); // Different unit
-        atribuicao.setUnidade(u2);
-
-        when(auth.getPrincipal()).thenReturn(usuario);
-        when(securityContext.getAuthentication()).thenReturn(auth);
-        when(usuarioPerfilRepo.findByUsuarioTituloWithUnidade("12345678901")).thenReturn(List.of(atribuicao));
-        SecurityContextHolder.setContext(securityContext);
-
-        ProcessoDetalheDto dto = builder.build(processo);
+        ProcessoDetalheDto dto = builder.build(processo, usuario);
         assertThat(dto.isPodeHomologarCadastro()).isFalse();
     }
 
     @Test
     @DisplayName("Deve lidar com unidade filha cujo pai não está nos participantes")
     void deveLidarComPaiNaoParticipanteNaHierarquia() {
+        Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -325,9 +293,7 @@ class ProcessoDetalheBuilderTest {
         processo.setParticipantes(Set.of(filho));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
 
-        SecurityContextHolder.setContext(mock(SecurityContext.class));
-
-        ProcessoDetalheDto dto = builder.build(processo);
+        ProcessoDetalheDto dto = builder.build(processo, usuario);
 
         // Filho deve aparecer na raiz pois pai não participa
         assertThat(dto.getUnidades()).hasSize(1);
@@ -339,6 +305,7 @@ class ProcessoDetalheBuilderTest {
     void deveLidarComSubprocessoSemMapa() {
         // Arrange
         configurarMockDoMapper();
+        Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -361,10 +328,8 @@ class ProcessoDetalheBuilderTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
 
-        SecurityContextHolder.setContext(mock(SecurityContext.class));
-
         // Act
-        ProcessoDetalheDto dto = builder.build(processo);
+        ProcessoDetalheDto dto = builder.build(processo, usuario);
 
         // Assert
         assertThat(dto.getUnidades()).hasSize(1);
@@ -375,6 +340,7 @@ class ProcessoDetalheBuilderTest {
     @DisplayName("Deve lidar com subprocesso sem unidade correspondente nos participantes")
     void deveLidarComSubprocessoSemUnidadeCorrespondente() {
         // Arrange
+        Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -392,10 +358,8 @@ class ProcessoDetalheBuilderTest {
         // Subprocesso existe mas unidade não está em participantes
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
 
-        SecurityContextHolder.setContext(mock(SecurityContext.class));
-
         // Act
-        ProcessoDetalheDto dto = builder.build(processo);
+        ProcessoDetalheDto dto = builder.build(processo, usuario);
 
         // Assert
         assertThat(dto.getUnidades()).isEmpty();
@@ -404,20 +368,17 @@ class ProcessoDetalheBuilderTest {
     @Test
     @DisplayName("Deve retornar false se não autenticado")
     void deveRetornarFalseSeNaoAutenticado() {
+        Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
+        when(accessControlService.podeExecutar(any(Usuario.class), any(), any(Processo.class)))
+                .thenReturn(false);
 
-        SecurityContext securityContext = mock(SecurityContext.class);
-        Authentication auth = mock(Authentication.class);
-        when(auth.isAuthenticated()).thenReturn(false);
-        when(securityContext.getAuthentication()).thenReturn(auth);
-        SecurityContextHolder.setContext(securityContext);
-
-        ProcessoDetalheDto dto = builder.build(processo);
+        ProcessoDetalheDto dto = builder.build(processo, usuario);
 
         assertThat(dto.isPodeFinalizar()).isFalse();
         assertThat(dto.isPodeHomologarCadastro()).isFalse();

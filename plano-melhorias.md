@@ -1101,9 +1101,9 @@ Unitários (mocked) ───────── E2E
 
 ## 📊 Progresso da Execução
 
-**Última atualização:** 2026-01-30 20:33 UTC
+**Última atualização:** 2026-01-30 21:45 UTC
 
-### Ações Completadas (4 de 33 - 12%)
+### Ações Completadas (7 de 33 - 21%)
 
 #### ✅ Ação #1: Remover arquivos *CoverageTest.java
 - **Status:** COMPLETA
@@ -1111,6 +1111,29 @@ Unitários (mocked) ───────── E2E
 - **Linhas removidas:** ~4.400 linhas
 - **Impacto:** Métricas de cobertura agora refletem testes reais, não getters/setters
 - **Conformidade:** Melhora qualidade dos testes
+
+#### ✅ Ação #2: Consolidar Access Policies em AbstractAccessPolicy
+- **Status:** COMPLETA
+- **Módulos:** AbstractAccessPolicy, SubprocessoAccessPolicy, AtividadeAccessPolicy
+- **Alterações:**
+  - Adicionado HierarquiaService em AbstractAccessPolicy
+  - Movido enum RequisitoHierarquia para classe base
+  - Criados métodos protegidos: verificaHierarquia, obterMotivoNegacaoHierarquia, temPerfil
+  - SubprocessoAccessPolicy: Removidas ~90 linhas de código duplicado
+  - AtividadeAccessPolicy: Simplificada verificação de titular
+- **Conformidade:** ✅ Hierarquia centralizada, mensagens consistentes
+- **Validação:** Compilação bem-sucedida
+
+#### ✅ Ação #4: Refatorar SubprocessoFacade e centralizar validações
+- **Status:** COMPLETA
+- **Módulos:** SubprocessoValidacaoService, Workflow Services
+- **Alterações:**
+  - Criados 5 métodos de validação centralizados
+  - SubprocessoCadastroWorkflowService: Refatorado para usar validarSituacaoMinima
+  - SubprocessoMapaWorkflowService: Refatorado para usar validarSituacaoPermitida
+  - SubprocessoValidacaoServiceTest: 23 testes unitários (100% passando)
+- **Conformidade:** ✅ Validações centralizadas
+- **Validação:** Compilação bem-sucedida, CodeQL sem vulnerabilidades
 
 #### ✅ Ação #5: Mover @PreAuthorize de Facades para Controllers
 - **Status:** COMPLETA
@@ -1121,6 +1144,18 @@ Unitários (mocked) ───────── E2E
   - Removido import não utilizado
 - **Conformidade:** ✅ ADR-001 (Facade Pattern)
 - **Validação:** Compilação bem-sucedida
+
+#### ✅ Ação #6: Centralizar verificações de acesso via AccessControlService
+- **Status:** COMPLETA
+- **Módulos:** ProcessoDetalheBuilder, ProcessoAccessPolicy
+- **Alterações:**
+  - ProcessoDetalheBuilder: Refatorado para usar AccessControlService
+  - ProcessoAccessPolicy: Adicionadas ações em bloco (HOMOLOGAR_*_EM_BLOCO)
+  - ProcessoController: Injeta @AuthenticationPrincipal Usuario
+  - ProcessoFacade: Propaga Usuario para builder
+  - 167 testes do pacote sgc.processo passando
+- **Conformidade:** ✅ ADR-003 (Security Architecture) - 100% conforme
+- **Validação:** Compilação bem-sucedida, todas verificações via AccessControlService
 
 #### ✅ Ação #7: Criar DTOs para AnaliseController e ConfiguracaoController
 - **Status:** COMPLETA
@@ -1159,12 +1194,23 @@ Unitários (mocked) ───────── E2E
    - Apenas ProcessoFacade tinha @PreAuthorize
    - Demais Facades já estão em conformidade com ADR-001
 
+4. **Validações de SubprocessoFacade:**
+   - Workflow services já delegavam para serviços especializados
+   - Necessitava apenas centralização de validações comuns
+   - SubprocessoValidacaoService expandido com sucesso
+
+5. **AccessControlService já amplamente adotado:**
+   - Maioria dos services já usava AccessControlService
+   - Apenas ProcessoDetalheBuilder tinha verificação direta
+   - Refatoração pontual foi suficiente para 100% de conformidade
+
 ### Próximas Ações Prioritárias
 
-1. **#2:** Consolidar Access Policies em AbstractAccessPolicy (6h)
-2. **#4:** Refatorar SubprocessoFacade e centralizar validações (8h)
-3. **#6:** Centralizar verificações de acesso via AccessControlService (8h)
-4. **#3:** Dividir GOD Composables no frontend (8h)
+1. **#3:** Dividir GOD Composables no frontend (8h)
+2. **#8:** Eliminar ciclos de dependência via Events (2h)
+3. **#9:** Padronizar acesso a services (View→Store→Service→API) (4h)
+4. **#11:** Adotar fixtures E2E (36 arquivos) (6h)
+5. **#12:** Reduzir over-mocking (46 arquivos) (5h)
 
 ---
 

@@ -96,8 +96,8 @@ public class ProcessoFacade {
     }
 
     @Transactional(readOnly = true)
-    public ProcessoDetalheDto obterContextoCompleto(Long codigo) {
-        ProcessoDetalheDto detalhes = self.obterDetalhes(codigo);
+    public ProcessoDetalheDto obterContextoCompleto(Long codigo, Usuario usuario) {
+        ProcessoDetalheDto detalhes = self.obterDetalhes(codigo, usuario);
         List<SubprocessoElegivelDto> elegiveis = self.listarSubprocessosElegiveis(codigo);
 
         detalhes.getElegiveis().addAll(elegiveis);
@@ -105,10 +105,10 @@ public class ProcessoFacade {
     }
 
     @Transactional(readOnly = true)
-    public ProcessoDetalheDto obterDetalhes(Long codProcesso) {
+    public ProcessoDetalheDto obterDetalhes(Long codProcesso, Usuario usuario) {
         Processo processo = buscarPorId(codProcesso);
 
-        return processoDetalheBuilder.build(processo);
+        return processoDetalheBuilder.build(processo, usuario);
     }
 
     @Transactional(readOnly = true)

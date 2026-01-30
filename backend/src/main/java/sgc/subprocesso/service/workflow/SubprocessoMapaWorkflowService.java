@@ -41,7 +41,6 @@ import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.dto.RegistrarWorkflowCommand;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
-import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO;
@@ -162,14 +161,12 @@ public class SubprocessoMapaWorkflowService {
     private Subprocesso getSubprocessoParaEdicao(Long codSubprocesso) {
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
 
-        SituacaoSubprocesso situacao = subprocesso.getSituacao();
-        if (situacao != MAPEAMENTO_CADASTRO_HOMOLOGADO
-                && situacao != MAPEAMENTO_MAPA_CRIADO
-                && situacao != REVISAO_CADASTRO_HOMOLOGADA
-                && situacao != REVISAO_MAPA_AJUSTADO) {
-
-            throw new ErroMapaEmSituacaoInvalida("Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: %s".formatted(situacao));
-        }
+        validacaoService.validarSituacaoPermitida(subprocesso,
+            "Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: %s".formatted(subprocesso.getSituacao()),
+            MAPEAMENTO_CADASTRO_HOMOLOGADO,
+            MAPEAMENTO_MAPA_CRIADO,
+            REVISAO_CADASTRO_HOMOLOGADA,
+            REVISAO_MAPA_AJUSTADO);
 
         return subprocesso;
     }

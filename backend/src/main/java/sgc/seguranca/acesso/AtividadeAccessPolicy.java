@@ -7,6 +7,7 @@ import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.organizacao.service.HierarquiaService;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.EnumSet;
@@ -14,7 +15,6 @@ import java.util.Map;
 
 import static sgc.organizacao.model.Perfil.*;
 import static sgc.seguranca.acesso.Acao.*;
-import java.util.Objects;
 
 /**
  * Política de acesso para operações em atividades.
@@ -24,8 +24,8 @@ import java.util.Objects;
 @Component
 public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
 
-    public AtividadeAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo) {
-        super(usuarioPerfilRepo);
+    public AtividadeAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo, HierarquiaService hierarquiaService) {
+        super(usuarioPerfilRepo, hierarquiaService);
     }
 
     /**
@@ -65,14 +65,8 @@ public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
         Subprocesso subprocesso = mapa.getSubprocesso();
         Unidade unidade = subprocesso.getUnidade();
 
-        String tituloTitular = unidade.getTituloTitular();
-        if (!usuario.getTituloEleitoral().equals(tituloTitular)) {
-            definirMotivoNegacao(String.format(
-                    "Usuário '%s' não é o titular da unidade '%s'. Titular: %s",
-                    usuario.getTituloEleitoral(),
-                    unidade.getSigla(),
-                    Objects.toString(tituloTitular, "não definido")
-            ));
+        if (!verificaHierarquia(usuario, unidade, RequisitoHierarquia.TITULAR_UNIDADE)) {
+            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, unidade, RequisitoHierarquia.TITULAR_UNIDADE));
             return false;
         }
 

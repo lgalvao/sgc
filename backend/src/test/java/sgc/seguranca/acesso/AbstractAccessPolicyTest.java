@@ -13,6 +13,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
 import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.organizacao.service.HierarquiaService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -28,10 +29,13 @@ class AbstractAccessPolicyTest {
     @Mock
     private UsuarioPerfilRepo usuarioPerfilRepo;
 
+    @Mock
+    private HierarquiaService hierarquiaService;
+
     // Concrete implementation for testing
     static class TestAccessPolicy extends AbstractAccessPolicy<Object> {
-        public TestAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo) {
-            super(usuarioPerfilRepo);
+        public TestAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo, HierarquiaService hierarquiaService) {
+            super(usuarioPerfilRepo, hierarquiaService);
         }
         
         @Override
@@ -61,7 +65,7 @@ class AbstractAccessPolicyTest {
 
     @BeforeEach
     void setUp() {
-        policy = new TestAccessPolicy(usuarioPerfilRepo);
+        policy = new TestAccessPolicy(usuarioPerfilRepo, hierarquiaService);
     }
 
     @Test

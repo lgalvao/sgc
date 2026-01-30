@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.SubprocessoDto;
 
 @WebMvcTest(ProcessoController.class)
@@ -261,7 +263,7 @@ class ProcessoControllerTest {
                             .dataCriacao(LocalDateTime.now())
                             .build();
 
-            when(processoFacade.obterDetalhes(1L)).thenReturn(dto);
+            when(processoFacade.obterDetalhes(eq(1L), any(Usuario.class))).thenReturn(dto);
 
             // Act & Assert
             mockMvc.perform(get("/api/processos/1/detalhes"))
@@ -269,7 +271,7 @@ class ProcessoControllerTest {
                     .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
                     .andExpect(jsonPath("$.descricao").value("Processo Detalhado"));
 
-            verify(processoFacade).obterDetalhes(1L);
+            verify(processoFacade).obterDetalhes(eq(1L), any(Usuario.class));
         }
 
         @Test
@@ -279,7 +281,7 @@ class ProcessoControllerTest {
             // Arrange
             doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
                     .when(processoFacade)
-                    .obterDetalhes(999L);
+                    .obterDetalhes(eq(999L), any(Usuario.class));
 
             // Act & Assert
             mockMvc.perform(get("/api/processos/999/detalhes")).andExpect(status().isNotFound());
@@ -290,7 +292,7 @@ class ProcessoControllerTest {
         @DisplayName("Deve retornar 403 Forbidden ao obter detalhes se acesso negado")
         void deveRetornarForbiddenAoObterDetalhesQuandoAcessoNegado() throws Exception {
             // Arrange
-            doThrow(new ErroAcessoNegado("Acesso negado")).when(processoFacade).obterDetalhes(1L);
+            doThrow(new ErroAcessoNegado("Acesso negado")).when(processoFacade).obterDetalhes(eq(1L), any(Usuario.class));
 
             // Act & Assert
             mockMvc.perform(get("/api/processos/1/detalhes")).andExpect(status().isForbidden());
@@ -716,7 +718,7 @@ class ProcessoControllerTest {
         void deveRetornarContextoCompletoComSucesso() throws Exception {
             // Arrange
             ProcessoDetalheDto detalhe = ProcessoDetalheDto.builder().codigo(1L).build();
-            when(processoFacade.obterContextoCompleto(1L))
+            when(processoFacade.obterContextoCompleto(eq(1L), any(Usuario.class)))
                     .thenReturn(detalhe);
 
             // Act & Assert

@@ -6,8 +6,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.*;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
@@ -144,20 +146,25 @@ public class ProcessoController {
      * de seus respectivos subprocessos.
      *
      * @param codigo O código do processo a ser detalhado.
+     * @param usuario Usuário autenticado (injetado automaticamente).
      * @return Um {@link ResponseEntity} com o {@link ProcessoDetalheDto}.
      */
     @GetMapping("/{codigo}/detalhes")
     @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
-    public ResponseEntity<ProcessoDetalheDto> obterDetalhes(@PathVariable Long codigo) {
-        ProcessoDetalheDto detalhes = processoFacade.obterDetalhes(codigo);
+    public ResponseEntity<ProcessoDetalheDto> obterDetalhes(
+            @PathVariable Long codigo,
+            @AuthenticationPrincipal Usuario usuario) {
+        ProcessoDetalheDto detalhes = processoFacade.obterDetalhes(codigo, usuario);
         return ResponseEntity.ok(detalhes);
     }
 
     @GetMapping("/{codigo}/contexto-completo")
     @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
     @Operation(summary = "Obtém o contexto completo para visualização de processo (BFF)")
-    public ResponseEntity<ProcessoDetalheDto> obterContextoCompleto(@PathVariable Long codigo) {
-        return ResponseEntity.ok(processoFacade.obterContextoCompleto(codigo));
+    public ResponseEntity<ProcessoDetalheDto> obterContextoCompleto(
+            @PathVariable Long codigo,
+            @AuthenticationPrincipal Usuario usuario) {
+        return ResponseEntity.ok(processoFacade.obterContextoCompleto(codigo, usuario));
     }
 
     /**
