@@ -120,24 +120,11 @@ class SubprocessoFacadeTest {
     }
 
     @Test
-    void deveVerificarPermissaoAoObterCadastro() {
+    void deveDelegarObterCadastroParaContextoService() {
         Long codSubprocesso = 1L;
-        sgc.subprocesso.model.Subprocesso subprocesso = new sgc.subprocesso.model.Subprocesso();
-        sgc.mapa.model.Mapa mapa = new sgc.mapa.model.Mapa();
-        mapa.setCodigo(10L);
-        subprocesso.setMapa(mapa);
-        sgc.organizacao.model.Unidade unidade = new sgc.organizacao.model.Unidade();
-        unidade.setSigla("TEST");
-        subprocesso.setUnidade(unidade);
-
-        sgc.organizacao.model.Usuario usuario = new sgc.organizacao.model.Usuario();
-
-        org.mockito.Mockito.when(crudService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
-        org.mockito.Mockito.when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
-        org.mockito.Mockito.when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(10L)).thenReturn(Collections.emptyList());
 
         facade.obterCadastro(codSubprocesso);
 
-        verify(accessControlService).verificarPermissao(usuario, sgc.seguranca.acesso.Acao.VISUALIZAR_SUBPROCESSO, subprocesso);
+        verify(contextoService).obterCadastro(codSubprocesso);
     }
 }
