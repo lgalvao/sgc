@@ -105,4 +105,15 @@ describe("AceitarMapaModal.vue", () => {
         expect(wrapper.emitted("confirmarAceitacao")).toBeTruthy();
         expect(wrapper.emitted("confirmarAceitacao")?.[0]).toEqual([""]);
     });
+
+    it("deve desabilitar botões e mostrar spinner quando loading for true", () => {
+        const wrapper = createWrapper({ loading: true });
+
+        const btnCancelar = wrapper.find('[data-testid="btn-aceite-mapa-cancelar"]');
+        const btnConfirmar = wrapper.find('[data-testid="btn-aceite-mapa-confirmar"]');
+
+        expect(btnCancelar.attributes("disabled")).toBeDefined();
+        expect(btnConfirmar.attributes("disabled")).toBeDefined();
+        expect(btnConfirmar.text()).toContain("Processando...");
+    });
 });
