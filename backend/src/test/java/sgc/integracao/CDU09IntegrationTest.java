@@ -1,5 +1,6 @@
 package sgc.integracao;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -87,7 +88,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
     private Unidade unidadeChefe;
     private Unidade unidadeSuperior;
-    private Subprocesso subprocessoMapeamento;
+    private Subprocesso sp;
 
     @BeforeEach
     void setUp() {
@@ -136,16 +137,16 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
 
-        subprocessoMapeamento = SubprocessoFixture.subprocessoPadrao(processo, unidadeChefe);
-        subprocessoMapeamento.setCodigo(null);
-        subprocessoMapeamento.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        subprocessoMapeamento = subprocessoRepo.save(subprocessoMapeamento);
+        sp = SubprocessoFixture.subprocessoPadrao(processo, unidadeChefe);
+        sp.setCodigo(null);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp = subprocessoRepo.save(sp);
 
         Mapa mapa = new Mapa();
-        mapa.setSubprocesso(subprocessoMapeamento);
+        mapa.setSubprocesso(sp);
         mapa = mapaRepo.save(mapa);
 
-        subprocessoMapeamento.setMapa(mapa);
+        sp.setMapa(mapa);
         // No need to save subprocesso again as it is the inverse side, but updating the object is good for consistency.
 
         // 5. Autenticar
@@ -153,9 +154,9 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     }
 
     private void setupUsuarioPerfil(Usuario usuario, Unidade unidade, Perfil perfil) {
-        // Insert na VIEW_USUARIO_PERFIL_UNIDADE para consultas nativas/views
-        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-                usuario.getTituloEleitoral(), unidade.getCodigo(), perfil.name());
+        // Insert na ATRIBUICAO_TEMPORARIA (refletirá nas views)
+        jdbcTemplate.update("INSERT INTO SGC.ATRIBUICAO_TEMPORARIA (usuario_titulo, unidade_codigo, data_inicio, data_termino) VALUES (?, ?, ?, ?)",
+                usuario.getTituloEleitoral(), unidade.getCodigo(), LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1));
 
         // Atualizar objeto em memória para autenticação do Spring Security
         UsuarioPerfil up = new UsuarioPerfil();
@@ -189,8 +190,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve disponibilizar o cadastro quando todas as condições são atendidas")
         void deveDisponibilizarCadastroComSucesso() throws Exception {
-            var competencia = competenciaRepo.save(Competencia.builder().descricao("Competência de Teste").mapa(subprocessoMapeamento.getMapa()).build());
-            var atividade = Atividade.builder().mapa(subprocessoMapeamento.getMapa()).descricao("Atividade de Teste").build();
+            var competencia = competenciaRepo.save(Competencia.builder().descricao("Competência de Teste").mapa(sp.getMapa()).build());
+            var atividade = Atividade.builder().mapa(sp.getMapa()).descricao("Atividade de Teste").build();
 
             atividade.getCompetencias().add(competencia);
             atividadeRepo.save(atividade);
@@ -201,12 +202,12 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
             entityManager.flush();
             entityManager.clear();
 
-            mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", subprocessoMapeamento.getCodigo()).with(csrf()))
+            mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", sp.getCodigo()).with(csrf()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.mensagem", is("Cadastro de atividades disponibilizado")));
 
             Subprocesso subprocessoAtualizado =
-                    subprocessoRepo.findById(subprocessoMapeamento.getCodigo()).orElseThrow();
+                    subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
             assertThat(subprocessoAtualizado.getSituacao())
                     .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             assertThat(subprocessoAtualizado.getDataFimEtapa1()).isNotNull();
@@ -219,7 +220,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
             assertThat(movimentacao.getUnidadeOrigem().getCodigo()).isEqualTo(unidadeChefe.getCodigo());
             assertThat(movimentacao.getUnidadeDestino().getCodigo()).isEqualTo(unidadeSuperior.getCodigo());
 
-            var alertas = alertaRepo.findByProcessoCodigo(subprocessoMapeamento.getProcesso().getCodigo());
+            var alertas = alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
             var alerta = alertas.getFirst();
             assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades/conhecimentos da unidade " + unidadeChefe.getSigla() + " disponibilizado" + " para análise");
@@ -229,15 +230,15 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Não deve disponibilizar se houver atividade sem conhecimento associado")
         void naoDeveDisponibilizarComAtividadeSemConhecimento() throws Exception {
-            Atividade atividade = Atividade.builder().mapa(subprocessoMapeamento.getMapa()).descricao("Atividade Vazia").build();
+            Atividade atividade = Atividade.builder().mapa(sp.getMapa()).descricao("Atividade Vazia").build();
             atividadeRepo.save(atividade);
 
-            mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", subprocessoMapeamento.getCodigo()).with(csrf()))
+            mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", sp.getCodigo()).with(csrf()))
                     .andExpect(status().isUnprocessableContent())
                     .andExpect(jsonPath("$.message", is("Existem atividades sem conhecimentos associados.")))
                     .andExpect(jsonPath("$.details.atividadesSemConhecimento[0].descricao", is("Atividade Vazia")));
 
-            Subprocesso subprocessoNaoAlterado = subprocessoRepo.findById(subprocessoMapeamento.getCodigo()).orElseThrow();
+            Subprocesso subprocessoNaoAlterado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
             assertThat(subprocessoNaoAlterado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         }
     }
@@ -259,7 +260,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
             setupUsuarioPerfil(outroChefe, outraUnidade, Perfil.CHEFE);
             autenticarUsuario(outroChefe, Perfil.CHEFE);
 
-            mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", subprocessoMapeamento.getCodigo()).with(csrf()))
+            mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", sp.getCodigo()).with(csrf()))
                     .andExpect(status().isForbidden());
         }
     }
