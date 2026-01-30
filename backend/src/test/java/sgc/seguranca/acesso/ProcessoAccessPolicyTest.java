@@ -6,31 +6,42 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.processo.model.Processo;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static sgc.organizacao.model.Perfil.ADMIN;
 import static sgc.organizacao.model.Perfil.GESTOR;
 import static sgc.seguranca.acesso.Acao.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @Tag("unit")
 @DisplayName("ProcessoAccessPolicyTest")
 class ProcessoAccessPolicyTest {
 
     @InjectMocks
     private ProcessoAccessPolicy policy;
+    
+    @Mock
+    private UsuarioPerfilRepo usuarioPerfilRepo;
 
     private Usuario usuarioAdmin;
     private Usuario usuarioGestor;
     private Processo processo;
+    private List<UsuarioPerfil> atribuicoesAdmin;
+    private List<UsuarioPerfil> atribuicoesGestor;
 
     @BeforeEach
     void setUp() {
@@ -38,10 +49,13 @@ class ProcessoAccessPolicyTest {
         processo.setCodigo(1L);
 
         usuarioAdmin = criarUsuario("1", "Admin");
-        adicionarAtribuicao(usuarioAdmin, ADMIN);
+        atribuicoesAdmin = adicionarAtribuicao(usuarioAdmin, ADMIN);
 
         usuarioGestor = criarUsuario("2", "Gestor");
-        adicionarAtribuicao(usuarioGestor, GESTOR);
+        atribuicoesGestor = adicionarAtribuicao(usuarioGestor, GESTOR);
+        
+        when(usuarioPerfilRepo.findByUsuarioTitulo("1")).thenReturn(atribuicoesAdmin);
+        when(usuarioPerfilRepo.findByUsuarioTitulo("2")).thenReturn(atribuicoesGestor);
     }
 
     @Test
@@ -74,17 +88,17 @@ class ProcessoAccessPolicyTest {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(titulo);
         usuario.setNome(nome);
-        usuario.setAtribuicoesPermanentes(new HashSet<>());
         return usuario;
     }
 
-    private void adicionarAtribuicao(Usuario usuario, Perfil perfil) {
+    private List<UsuarioPerfil> adicionarAtribuicao(Usuario usuario, Perfil perfil) {
         UsuarioPerfil atribuicao = new UsuarioPerfil();
         atribuicao.setUsuario(usuario);
+        atribuicao.setUsuarioTitulo(usuario.getTituloEleitoral());
         atribuicao.setPerfil(perfil);
         
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getTodasAtribuicoes());
+        List<UsuarioPerfil> atribuicoes = new ArrayList<>();
         atribuicoes.add(atribuicao);
-        usuario.setAtribuicoesPermanentes(atribuicoes);
+        return atribuicoes;
     }
 }

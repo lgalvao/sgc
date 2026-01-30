@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.util.FormatadorData;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.mapper.ProcessoDetalheMapper;
 import sgc.processo.model.Processo;
@@ -22,6 +24,7 @@ public class ProcessoDetalheBuilder {
 
     private final SubprocessoRepo subprocessoRepo;
     private final ProcessoDetalheMapper processoDetalheMapper;
+    private final UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Transactional(readOnly = true)
     public ProcessoDetalheDto build(Processo processo) {
@@ -59,9 +62,12 @@ public class ProcessoDetalheBuilder {
         if (!(principal instanceof Usuario user)) {
             return false;
         }
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>(
+                usuarioPerfilRepo.findByUsuarioTitulo(user.getTituloEleitoral())
+        );
         return processo.getParticipantes()
                 .stream()
-                .anyMatch(unidade -> user.getTodasAtribuicoes()
+                .anyMatch(unidade -> user.getTodasAtribuicoes(atribuicoes)
                         .stream()
                         .anyMatch(attr -> Objects.equals(attr.getUnidade().getCodigo(), unidade.getCodigo()))
                 );
@@ -79,19 +85,21 @@ public class ProcessoDetalheBuilder {
     private void montarHierarquiaUnidades(
             ProcessoDetalheDto dto, Processo processo, List<Subprocesso> subprocessos) {
         Map<Long, ProcessoDetalheDto.UnidadeParticipanteDto> mapaUnidades = new HashMap<>();
+        Map<Long, Subprocesso> mapaSubprocessos = new HashMap<>();
 
-        // Mapear participantes usando o mapper
-        for (Unidade participante : processo.getParticipantes()) {
-            mapaUnidades.put(
-                    participante.getCodigo(),
-                    processoDetalheMapper.toUnidadeParticipanteDto(participante));
+        // Criar índice de subprocessos por unidade para lookup O(1)
+        for (Subprocesso sp : subprocessos) {
+            mapaSubprocessos.put(sp.getUnidade().getCodigo(), sp);
         }
 
-        // Preencher dados dos subprocessos
-        for (Subprocesso sp : subprocessos) {
+        // Loop 1 consolidado: Mapear participantes E preencher dados dos subprocessos
+        for (Unidade participante : processo.getParticipantes()) {
             ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto =
-                    mapaUnidades.get(sp.getUnidade().getCodigo());
-            if (unidadeDto != null) {
+                    processoDetalheMapper.toUnidadeParticipanteDto(participante);
+            
+            // Preencher dados do subprocesso se existir
+            Subprocesso sp = mapaSubprocessos.get(participante.getCodigo());
+            if (sp != null) {
                 unidadeDto.setSituacaoSubprocesso(sp.getSituacao());
                 unidadeDto.setDataLimite(sp.getDataLimiteEtapa1());
                 unidadeDto.setCodSubprocesso(sp.getCodigo());
@@ -102,22 +110,20 @@ public class ProcessoDetalheBuilder {
                         FormatadorData.formatarData(sp.getDataLimiteEtapa1()));
                 unidadeDto.setSituacaoLabel(sp.getSituacao().getDescricao());
             }
+            
+            mapaUnidades.put(participante.getCodigo(), unidadeDto);
         }
 
-        // Montar a hierarquia (pai/filho)
-        for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
-            ProcessoDetalheDto.UnidadeParticipanteDto pai =
-                    mapaUnidades.get(unidadeDto.getCodUnidadeSuperior());
-            if (pai != null) {
-                pai.getFilhos().add(unidadeDto);
-            }
-        }
-
-        // Adicionar raízes à lista principal do DTO
+        // Loop 2 consolidado: Montar hierarquia E adicionar raízes
         for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
             Long codUnidadeSuperior = unidadeDto.getCodUnidadeSuperior();
-            // Se não tem pai ou o pai não está participando do processo
-            if (!mapaUnidades.containsKey(codUnidadeSuperior)) {
+            ProcessoDetalheDto.UnidadeParticipanteDto pai = mapaUnidades.get(codUnidadeSuperior);
+            
+            if (pai != null) {
+                // Tem pai participando do processo: adicionar como filho
+                pai.getFilhos().add(unidadeDto);
+            } else {
+                // Não tem pai ou pai não participa: é raiz
                 dto.getUnidades().add(unidadeDto);
             }
         }

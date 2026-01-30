@@ -1,31 +1,53 @@
 package sgc.seguranca.acesso;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.lang.reflect.Method;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static sgc.organizacao.model.Perfil.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class SubprocessoAccessPolicyCoverageTest {
 
     @InjectMocks
     private SubprocessoAccessPolicy policy;
+    
+    @Mock
+    private UsuarioPerfilRepo usuarioPerfilRepo;
+    
+    private Map<String, List<UsuarioPerfil>> atribuicoesPorUsuario;
+    
+    @BeforeEach
+    void setUp() {
+        atribuicoesPorUsuario = new HashMap<>();
+        when(usuarioPerfilRepo.findByUsuarioTitulo(anyString())).thenAnswer(inv -> {
+            String titulo = inv.getArgument(0);
+            return atribuicoesPorUsuario.getOrDefault(titulo, Collections.emptyList());
+        });
+    }
 
     @Test
     @DisplayName("canExecute - VERIFICAR_IMPACTOS - Admin com Situação Inválida")
@@ -96,18 +118,26 @@ class SubprocessoAccessPolicyCoverageTest {
         assertNotNull(result);
     }
 
+    private int contadorUsuarios = 0;
+    
     private Usuario criarUsuario(Perfil perfil, Long codUnidade) {
+        String titulo = "titulo-" + (++contadorUsuarios);
         Usuario u = new Usuario();
-        u.setTituloEleitoral("123");
+        u.setTituloEleitoral(titulo);
         Unidade un = new Unidade();
         un.setCodigo(codUnidade);
 
         UsuarioPerfil up = new UsuarioPerfil();
+        up.setUsuario(u);
+        up.setUsuarioTitulo(titulo);
         up.setPerfil(perfil);
         up.setUnidade(un);
         up.setUnidadeCodigo(codUnidade);
+        
+        List<UsuarioPerfil> atribuicoes = new ArrayList<>();
+        atribuicoes.add(up);
+        atribuicoesPorUsuario.put(titulo, atribuicoes);
 
-        u.setAtribuicoesPermanentes(Set.of(up));
         return u;
     }
 

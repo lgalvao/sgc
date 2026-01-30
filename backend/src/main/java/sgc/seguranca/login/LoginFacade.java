@@ -12,10 +12,14 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.seguranca.login.dto.PerfilUnidadeDto;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Serviço responsável pelo fluxo de login: autenticação, autorização e geração
@@ -31,6 +35,7 @@ public class LoginFacade {
     private final ClienteAcessoAd clienteAcessoAd;
     private final UnidadeFacade unidadeService;
     private final sgc.organizacao.mapper.UsuarioMapper usuarioMapper;
+    private final UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Value("${aplicacao.ambiente-testes:false}")
     private boolean ambienteTestes;
@@ -39,12 +44,14 @@ public class LoginFacade {
             GerenciadorJwt gerenciadorJwt,
             @Autowired(required = false) ClienteAcessoAd clienteAcessoAd,
             UnidadeFacade unidadeService,
-            sgc.organizacao.mapper.UsuarioMapper usuarioMapper) {
+            sgc.organizacao.mapper.UsuarioMapper usuarioMapper,
+            UsuarioPerfilRepo usuarioPerfilRepo) {
         this.usuarioService = usuarioService;
         this.gerenciadorJwt = gerenciadorJwt;
         this.clienteAcessoAd = clienteAcessoAd;
         this.unidadeService = unidadeService;
         this.usuarioMapper = usuarioMapper;
+        this.usuarioPerfilRepo = usuarioPerfilRepo;
     }
 
     /**
@@ -123,7 +130,10 @@ public class LoginFacade {
             throw new ErroAutenticacao("Credenciais inválidas");
         }
 
-        return usuario.getTodasAtribuicoes().stream()
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>(
+                usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral())
+        );
+        return usuario.getTodasAtribuicoes(atribuicoes).stream()
                 .filter(a -> a.getUnidade().getSituacao() == sgc.organizacao.model.SituacaoUnidade.ATIVA)
                 .map(atribuicao -> new PerfilUnidadeDto(
                         atribuicao.getPerfil(),

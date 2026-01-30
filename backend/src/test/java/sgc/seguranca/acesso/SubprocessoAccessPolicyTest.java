@@ -1,27 +1,33 @@
 package sgc.seguranca.acesso;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.organizacao.service.HierarquiaService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class SubprocessoAccessPolicyTest {
 
     @InjectMocks
@@ -29,6 +35,20 @@ class SubprocessoAccessPolicyTest {
 
     @Mock
     private HierarquiaService hierarquiaService;
+    
+    @Mock
+    private UsuarioPerfilRepo usuarioPerfilRepo;
+    
+    private Map<String, List<UsuarioPerfil>> atribuicoesPorUsuario;
+    
+    @BeforeEach
+    void setUp() {
+        atribuicoesPorUsuario = new HashMap<>();
+        when(usuarioPerfilRepo.findByUsuarioTitulo(anyString())).thenAnswer(inv -> {
+            String titulo = inv.getArgument(0);
+            return atribuicoesPorUsuario.getOrDefault(titulo, Collections.emptyList());
+        });
+    }
 
     @Test
     @DisplayName("canExecute - VERIFICAR_IMPACTOS - Chefe Mesma Unidade")
@@ -92,7 +112,16 @@ class SubprocessoAccessPolicyTest {
     @DisplayName("canExecute - Hierarquia Titular - OK")
     void canExecute_HierarquiaTitular_OK() {
         Usuario u = criarUsuario(Perfil.CHEFE, 1L);
+        String tituloOriginal = u.getTituloEleitoral();
         u.setTituloEleitoral("123");
+        
+        // Re-configurar o mock com o novo título
+        List<UsuarioPerfil> atribuicoes = atribuicoesPorUsuario.get(tituloOriginal);
+        for (UsuarioPerfil up : atribuicoes) {
+            up.setUsuarioTitulo("123");
+        }
+        atribuicoesPorUsuario.put("123", atribuicoes);
+        
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 1L);
         sp.getUnidade().setTituloTitular("123");
  
@@ -107,7 +136,8 @@ class SubprocessoAccessPolicyTest {
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, 2L);
  
         Unidade sub = sp.getUnidade();
-        Unidade sup = u.getTodasAtribuicoes().iterator().next().getUnidade();
+        List<UsuarioPerfil> atribuicoes = atribuicoesPorUsuario.get(u.getTituloEleitoral());
+        Unidade sup = atribuicoes.get(0).getUnidade();
  
         when(hierarquiaService.isSuperiorImediata(sub, sup)).thenReturn(true);
 
@@ -246,18 +276,26 @@ class SubprocessoAccessPolicyTest {
         assertFalse(policy.canExecute(uChefe, Acao.DISPONIBILIZAR_CADASTRO, sp));
     }
 
+    private int contadorUsuarios = 0;
+    
     private Usuario criarUsuario(Perfil perfil, Long codUnidade) {
+        String titulo = "titulo-" + (++contadorUsuarios);
         Usuario u = new Usuario();
-        u.setTituloEleitoral("123");
+        u.setTituloEleitoral(titulo);
         Unidade un = new Unidade();
         un.setCodigo(codUnidade);
 
         UsuarioPerfil up = new UsuarioPerfil();
+        up.setUsuario(u);
+        up.setUsuarioTitulo(titulo);
         up.setPerfil(perfil);
         up.setUnidade(un);
         up.setUnidadeCodigo(codUnidade);
+        
+        List<UsuarioPerfil> atribuicoes = new ArrayList<>();
+        atribuicoes.add(up);
+        atribuicoesPorUsuario.put(titulo, atribuicoes);
 
-        u.setAtribuicoesPermanentes(Set.of(up));
         return u;
     }
 

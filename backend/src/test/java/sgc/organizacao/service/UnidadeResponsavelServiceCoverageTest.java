@@ -2,6 +2,7 @@ package sgc.organizacao.service;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -132,7 +133,7 @@ class UnidadeResponsavelServiceCoverageTest {
         assertThat(result.get(1L).titularTitulo()).isEqualTo("123");
 
         // Verifica se setAtribuicoesPermanentes foi chamado no chefeCompleto
-        assertThat(chefeCompleto.getTodasAtribuicoes()).contains(perfil);
+        assertThat(chefeCompleto.getTodasAtribuicoes(new HashSet<>())).contains(perfil);
     }
 
     @Test
@@ -214,7 +215,7 @@ class UnidadeResponsavelServiceCoverageTest {
         Map<Long, UnidadeResponsavelDto> result = service.buscarResponsaveisUnidades(List.of(1L));
 
         assertThat(result).isEmpty();
-        assertThat(chefe.getTodasAtribuicoes()).isEmpty();
+        assertThat(chefe.getTodasAtribuicoes(new HashSet<>())).isEmpty();
     }
 
     @Test
@@ -295,6 +296,6 @@ class UnidadeResponsavelServiceCoverageTest {
         assertThat(result).isSameAs(chefeCompleto);
         // Verify carregarAtribuicoesUsuario was called
         verify(usuarioPerfilRepo).findByUsuarioTitulo("123");
-        assertThat(chefeCompleto.getTodasAtribuicoes()).isNotNull();
+        assertThat(chefeCompleto.getTodasAtribuicoes(new HashSet<>())).isNotNull();
     }
 }

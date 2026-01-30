@@ -39,6 +39,7 @@ public class ProcessoInicializador {
     private final sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo;
     private final ApplicationEventPublisher publicadorEventos;
     private final SubprocessoFactory subprocessoFactory;
+    private final ProcessoValidador processoValidador;
 
     /**
      * Inicia um processo de qualquer tipo.

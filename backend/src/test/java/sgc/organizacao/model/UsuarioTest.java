@@ -22,9 +22,8 @@ class UsuarioTest {
         perfil.setPerfil(Perfil.ADMIN);
         permanentes.add(perfil);
 
-        usuario.setAtribuicoesPermanentes(permanentes);
 
-        assertThat(usuario.getTodasAtribuicoes()).containsExactly(perfil);
+        assertThat(usuario.getTodasAtribuicoes(new HashSet<>())).containsExactly(perfil);
     }
 
     @Test
@@ -32,7 +31,6 @@ class UsuarioTest {
     void deveIncluirAtribuicoesTemporariasVigentes() {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("12345");
-        usuario.setAtribuicoesPermanentes(new HashSet<>());
         usuario.setAtribuicoesTemporarias(new HashSet<>());
 
         Unidade unidade = new Unidade();
@@ -46,7 +44,7 @@ class UsuarioTest {
 
         usuario.getAtribuicoesTemporarias().add(temp);
 
-        Set<UsuarioPerfil> todas = usuario.getTodasAtribuicoes();
+        Set<UsuarioPerfil> todas = usuario.getTodasAtribuicoes(new HashSet<>());
         assertThat(todas).hasSize(1);
         assertThat(todas.iterator().next().getPerfil()).isEqualTo(Perfil.GESTOR);
     }
@@ -56,7 +54,6 @@ class UsuarioTest {
     void deveIgnorarAtribuicoesTemporariasExpiradas() {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("12345");
-        usuario.setAtribuicoesPermanentes(new HashSet<>());
         usuario.setAtribuicoesTemporarias(new HashSet<>());
 
         AtribuicaoTemporaria temp = new AtribuicaoTemporaria();
@@ -69,7 +66,7 @@ class UsuarioTest {
 
         usuario.getAtribuicoesTemporarias().add(temp);
 
-        assertThat(usuario.getTodasAtribuicoes()).isEmpty();
+        assertThat(usuario.getTodasAtribuicoes(new HashSet<>())).isEmpty();
     }
 
     @Test
@@ -77,7 +74,6 @@ class UsuarioTest {
     void deveIgnorarAtribuicoesTemporariasFuturas() {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("12345");
-        usuario.setAtribuicoesPermanentes(new HashSet<>());
         usuario.setAtribuicoesTemporarias(new HashSet<>());
 
         AtribuicaoTemporaria temp = new AtribuicaoTemporaria();
@@ -90,7 +86,7 @@ class UsuarioTest {
 
         usuario.getAtribuicoesTemporarias().add(temp);
 
-        assertThat(usuario.getTodasAtribuicoes()).isEmpty();
+        assertThat(usuario.getTodasAtribuicoes(new HashSet<>())).isEmpty();
     }
 
     @Test
@@ -99,7 +95,7 @@ class UsuarioTest {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("12345");
         usuario.setAtribuicoesTemporarias(new HashSet<>());
-        assertThat(usuario.getTodasAtribuicoes()).isEmpty();
+        assertThat(usuario.getTodasAtribuicoes(new HashSet<>())).isEmpty();
     }
 
     @Test
@@ -125,7 +121,6 @@ class UsuarioTest {
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.ADMIN);
         atribuicoes.add(up);
-        usuario.setAtribuicoesPermanentes(atribuicoes);
 
         var authorities = usuario.getAuthorities();
         assertThat(authorities).extracting("authority").containsExactly("ROLE_ADMIN");

@@ -39,17 +39,19 @@ class LoginServiceTest {
     private UsuarioMapper usuarioMapper;
 
     private LoginFacade loginFacade;
+    @Mock
+    private sgc.organizacao.model.UsuarioPerfilRepo usuarioPerfilRepo;
 
     @BeforeEach
     void setUp() {
-        loginFacade = new LoginFacade(usuarioService, gerenciadorJwt, clienteAcessoAd, unidadeService, usuarioMapper);
+        loginFacade = new LoginFacade(usuarioService, gerenciadorJwt, clienteAcessoAd, unidadeService, usuarioMapper, usuarioPerfilRepo);
         ReflectionTestUtils.setField(loginFacade, "ambienteTestes", false);
     }
 
     @Test
     @DisplayName("Linhas 86, 89: Deve falhar autenticação se AD for null e não for ambiente de testes")
     void deveFalharAutenticacaoSemAdEmProducao() {
-        LoginFacade serviceSemAd = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService, usuarioMapper);
+        LoginFacade serviceSemAd = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService, usuarioMapper, usuarioPerfilRepo);
         ReflectionTestUtils.setField(serviceSemAd, "ambienteTestes", false);
 
         boolean result = serviceSemAd.autenticar("123", "senha");
@@ -78,7 +80,6 @@ class LoginServiceTest {
         // Simula busca de autorizações retornando lista vazia ou sem o perfil/unidade
         sgc.organizacao.model.Usuario usuario = new sgc.organizacao.model.Usuario();
         usuario.setTituloEleitoral(titulo);
-        usuario.setAtribuicoesPermanentes(Collections.emptySet());
 
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
 
@@ -89,7 +90,7 @@ class LoginServiceTest {
     @Test
     @DisplayName("Deve autenticar em ambiente de testes sem AD")
     void deveAutenticarEmAmbienteTestesSemAd() {
-        LoginFacade serviceSemAd = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService, usuarioMapper);
+        LoginFacade serviceSemAd = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService, usuarioMapper, usuarioPerfilRepo);
         ReflectionTestUtils.setField(serviceSemAd, "ambienteTestes", true);
 
         boolean result = serviceSemAd.autenticar("123", "senha");

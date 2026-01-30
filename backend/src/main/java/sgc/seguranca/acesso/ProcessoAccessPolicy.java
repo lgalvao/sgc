@@ -1,9 +1,9 @@
 package sgc.seguranca.acesso;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.processo.model.Processo;
 
 import java.util.EnumSet;
@@ -18,8 +18,11 @@ import static sgc.seguranca.acesso.Acao.*;
  * visualização e operações de consulta que podem ser executadas por outros perfis.
  */
 @Component
-@RequiredArgsConstructor
 public class ProcessoAccessPolicy extends AbstractAccessPolicy<Processo> {
+
+    public ProcessoAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo) {
+        super(usuarioPerfilRepo);
+    }
 
     /**
      * Mapeamento de ações para regras de acesso.

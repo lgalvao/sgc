@@ -23,7 +23,6 @@ class UsuarioCoverageTest {
         UsuarioPerfil permanente = new UsuarioPerfil();
         permanente.setUnidadeCodigo(1L);
         permanente.setPerfil(Perfil.GESTOR);
-        u.setAtribuicoesPermanentes(Set.of(permanente));
 
         LocalDateTime agora = LocalDateTime.now();
 
@@ -57,7 +56,7 @@ class UsuarioCoverageTest {
 
         u.setAtribuicoesTemporarias(new HashSet<>(Set.of(tempFutura, tempPassada, tempAtiva, tempAtiva2)));
 
-        Set<UsuarioPerfil> todas = u.getTodasAtribuicoes();
+        Set<UsuarioPerfil> todas = u.getTodasAtribuicoes(new HashSet<>());
 
         // Deve conter: permanente, tempAtiva e tempNull
         assertThat(todas).hasSize(3);
@@ -91,6 +90,6 @@ class UsuarioCoverageTest {
         u.setAtribuicoesTemporarias(null); // Explicitamente nulo
 
         // Deve retornar apenas as permanentes (vazias neste caso) sem lançar NPE
-        assertThat(u.getTodasAtribuicoes()).isEmpty();
+        assertThat(u.getTodasAtribuicoes(new HashSet<>())).isEmpty();
     }
 }

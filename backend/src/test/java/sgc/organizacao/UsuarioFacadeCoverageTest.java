@@ -311,7 +311,6 @@ class UsuarioFacadeCoverageTest {
         up.setUnidadeCodigo(1L);
         up.setUnidade(un);
         up.setPerfil(Perfil.CHEFE);
-        u.setAtribuicoesPermanentes(Set.of(up));
 
         when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(u));
         when(usuarioRepo.findByIdInWithAtribuicoes(List.of("T"))).thenReturn(List.of(u));
@@ -529,7 +528,6 @@ class UsuarioFacadeCoverageTest {
         up3.setUnidade(un2);
         up3.setPerfil(Perfil.CHEFE);
 
-        u.setAtribuicoesPermanentes(Set.of(up1, up2, up3));
 
         when(usuarioRepo.findChefesByUnidadesCodigos(List.of(1L))).thenReturn(List.of(u));
         when(usuarioRepo.findByIdInWithAtribuicoes(List.of("T"))).thenReturn(List.of(u));
@@ -740,7 +738,6 @@ class UsuarioFacadeCoverageTest {
         up.setUnidade(unInativa);
         up.setUnidadeCodigo(2L);
         up.setPerfil(Perfil.CHEFE);
-        u.setAtribuicoesPermanentes(Set.of(up));
 
         when(usuarioRepo.findChefesByUnidadesCodigos(List.of(2L))).thenReturn(List.of(u));
         when(usuarioRepo.findByIdInWithAtribuicoes(List.of("T"))).thenReturn(List.of(u));

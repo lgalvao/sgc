@@ -1,12 +1,12 @@
 package sgc.seguranca.acesso;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.EnumSet;
@@ -21,8 +21,11 @@ import static sgc.seguranca.acesso.Acao.*;
  * (através do mapa), verificando se o usuário é o titular da unidade.
  */
 @Component
-@RequiredArgsConstructor
 public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
+
+    public AtividadeAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo) {
+        super(usuarioPerfilRepo);
+    }
 
     /**
      * Mapeamento de ações para regras de acesso

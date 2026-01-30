@@ -1,25 +1,41 @@
 package sgc.seguranca.acesso;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.organizacao.model.AtribuicaoTemporaria;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class AbstractAccessPolicyTest {
+
+    @Mock
+    private UsuarioPerfilRepo usuarioPerfilRepo;
 
     // Concrete implementation for testing
     static class TestAccessPolicy extends AbstractAccessPolicy<Object> {
+        public TestAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo) {
+            super(usuarioPerfilRepo);
+        }
+        
         @Override
         public boolean canExecute(Usuario usuario, Acao acao, Object recurso) {
             return false;
@@ -43,15 +59,22 @@ class AbstractAccessPolicyTest {
         }
     }
 
-    private final TestAccessPolicy policy = new TestAccessPolicy();
+    private TestAccessPolicy policy;
+
+    @BeforeEach
+    void setUp() {
+        policy = new TestAccessPolicy(usuarioPerfilRepo);
+    }
 
     @Test
     @DisplayName("Deve retornar true se usuário tem perfil permitido")
     void deveRetornarTrueSeTemPerfil() {
         Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123");
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.GESTOR);
-        usuario.setAtribuicoesPermanentes(new HashSet<>(Collections.singletonList(up)));
+        
+        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(List.of(up));
 
         boolean result = policy.testTemPerfilPermitido(usuario, EnumSet.of(Perfil.GESTOR, Perfil.ADMIN));
         assertTrue(result);
@@ -61,9 +84,11 @@ class AbstractAccessPolicyTest {
     @DisplayName("Deve retornar false se usuário não tem perfil permitido")
     void deveRetornarFalseSeNaoTemPerfil() {
         Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123");
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.SERVIDOR);
-        usuario.setAtribuicoesPermanentes(new HashSet<>(Collections.singletonList(up)));
+        
+        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(List.of(up));
 
         boolean result = policy.testTemPerfilPermitido(usuario, EnumSet.of(Perfil.GESTOR, Perfil.ADMIN));
         assertFalse(result);
@@ -73,6 +98,7 @@ class AbstractAccessPolicyTest {
     @DisplayName("Deve considerar atribuições temporárias")
     void deveConsiderarAtribuicoesTemporarias() {
         Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123");
         AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
         atribuicao.setPerfil(Perfil.ADMIN);
         
@@ -86,6 +112,8 @@ class AbstractAccessPolicyTest {
         atribuicao.setUnidade(u);
         
         usuario.setAtribuicoesTemporarias(new HashSet<>(Collections.singletonList(atribuicao)));
+        
+        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(Collections.emptyList());
 
         boolean result = policy.testTemPerfilPermitido(usuario, EnumSet.of(Perfil.ADMIN));
         assertTrue(result);

@@ -6,36 +6,50 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.subprocesso.model.Subprocesso;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static sgc.organizacao.model.Perfil.CHEFE;
 import static sgc.organizacao.model.Perfil.SERVIDOR;
 import static sgc.seguranca.acesso.Acao.CRIAR_ATIVIDADE;
 import static sgc.seguranca.acesso.Acao.LISTAR_SUBPROCESSOS;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @Tag("unit")
 @DisplayName("AtividadeAccessPolicyTest")
 class AtividadeAccessPolicyTest {
 
     @InjectMocks
     private AtividadeAccessPolicy policy;
+    
+    @Mock
+    private UsuarioPerfilRepo usuarioPerfilRepo;
 
     private Usuario usuarioChefe;
     private Usuario usuarioServidor;
     private Atividade atividade;
     private Unidade unidade;
+    private List<UsuarioPerfil> atribuicoesChefe;
+    private List<UsuarioPerfil> atribuicoesServidor;
 
     @BeforeEach
     void setUp() {
@@ -45,10 +59,13 @@ class AtividadeAccessPolicyTest {
         unidade.setTituloTitular("123");
 
         usuarioChefe = criarUsuario("123", "Chefe");
-        adicionarAtribuicao(usuarioChefe, CHEFE, unidade);
+        atribuicoesChefe = adicionarAtribuicao(usuarioChefe, CHEFE, unidade);
 
         usuarioServidor = criarUsuario("456", "Servidor");
-        adicionarAtribuicao(usuarioServidor, SERVIDOR, unidade);
+        atribuicoesServidor = adicionarAtribuicao(usuarioServidor, SERVIDOR, unidade);
+        
+        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(atribuicoesChefe);
+        when(usuarioPerfilRepo.findByUsuarioTitulo("456")).thenReturn(atribuicoesServidor);
 
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(unidade);
@@ -96,19 +113,19 @@ class AtividadeAccessPolicyTest {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(titulo);
         usuario.setNome(nome);
-        usuario.setAtribuicoesPermanentes(new HashSet<>());
         return usuario;
     }
 
-    private void adicionarAtribuicao(Usuario usuario, Perfil perfil, Unidade unidade) {
+    private List<UsuarioPerfil> adicionarAtribuicao(Usuario usuario, Perfil perfil, Unidade unidade) {
         UsuarioPerfil atribuicao = new UsuarioPerfil();
         atribuicao.setUsuario(usuario);
         atribuicao.setUsuarioTitulo(usuario.getTituloEleitoral());
         atribuicao.setPerfil(perfil);
         atribuicao.setUnidade(unidade);
+        atribuicao.setUnidadeCodigo(unidade.getCodigo());
         
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getTodasAtribuicoes());
+        List<UsuarioPerfil> atribuicoes = new ArrayList<>();
         atribuicoes.add(atribuicao);
-        usuario.setAtribuicoesPermanentes(atribuicoes);
+        return atribuicoes;
     }
 }

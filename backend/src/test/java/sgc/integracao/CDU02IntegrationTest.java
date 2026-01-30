@@ -148,7 +148,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
                     .perfil(Perfil.valueOf(perfilStr))
                     .build());
         }
-        usuario.setAtribuicoesPermanentes(perfisSet);
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario, null,
                 usuario.getAuthorities());

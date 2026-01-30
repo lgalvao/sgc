@@ -1,18 +1,15 @@
-import apiClient from "../axios-setup";
+import {apiGet} from "@/utils/apiUtils";
 
 export async function buscarTodasUnidades() {
-    const response = await apiClient.get("/unidades");
-    return response.data;
+    return apiGet("/unidades");
 }
 
 export async function buscarUnidadePorSigla(sigla: string) {
-    const response = await apiClient.get(`/unidades/sigla/${sigla}`);
-    return response.data;
+    return apiGet(`/unidades/sigla/${sigla}`);
 }
 
 export async function buscarUnidadePorCodigo(codigo: number) {
-    const response = await apiClient.get(`/unidades/${codigo}`);
-    return response.data;
+    return apiGet(`/unidades/${codigo}`);
 }
 
 export async function buscarArvoreComElegibilidade(
@@ -23,21 +20,17 @@ export async function buscarArvoreComElegibilidade(
     if (codProcesso) {
         url += `&codProcesso=${codProcesso}`;
     }
-    const response = await apiClient.get(url);
-    return response.data;
+    return apiGet(url);
 }
 
 export async function buscarArvoreUnidade(codigo: number) {
-    const response = await apiClient.get(`/unidades/${codigo}/arvore`);
-    return response.data;
+    return apiGet(`/unidades/${codigo}/arvore`);
 }
 
 export async function buscarSubordinadas(sigla: string) {
-    const response = await apiClient.get(`/unidades/sigla/${sigla}/subordinadas`);
-    return response.data;
+    return apiGet(`/unidades/sigla/${sigla}/subordinadas`);
 }
 
 export async function buscarSuperior(sigla: string) {
-    const response = await apiClient.get(`/unidades/sigla/${sigla}/superior`);
-    return response.data || null;
+    return apiGet(`/unidades/sigla/${sigla}/superior`) || null;
 }
