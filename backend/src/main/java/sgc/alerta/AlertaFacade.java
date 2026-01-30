@@ -1,7 +1,6 @@
 package sgc.alerta;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -21,7 +20,6 @@ import sgc.processo.model.Processo;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Supplier;
 
 /**
  * Facade para gerenciamento de alertas do sistema.

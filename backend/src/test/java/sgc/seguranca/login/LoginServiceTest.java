@@ -15,8 +15,6 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.seguranca.login.dto.EntrarRequest;
 
-import java.util.Collections;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;

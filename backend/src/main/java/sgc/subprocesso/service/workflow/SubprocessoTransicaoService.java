@@ -94,10 +94,9 @@ public class SubprocessoTransicaoService {
             Unidade origem,
             Unidade destino,
             Usuario usuario) {
+                
         registrar(subprocesso, tipo, origem, destino, usuario, null);
     }
-
-    // ===== Execução de Workflow Completo (Consolidado de SubprocessoWorkflowExecutor) =====
 
     /**
      * Executa um workflow completo com análise e transição.

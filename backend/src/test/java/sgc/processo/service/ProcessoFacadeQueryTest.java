@@ -45,6 +45,8 @@ class ProcessoFacadeQueryTest {
     private ProcessoDetalheBuilder processoDetalheBuilder;
     @Mock
     private SubprocessoMapper subprocessoMapper;
+    
+    private static final String MAPEAMENTO = "MAPEAMENTO";
     @Mock
     private ProcessoConsultaService processoConsultaService;
     @Mock
@@ -54,10 +56,8 @@ class ProcessoFacadeQueryTest {
     private ProcessoFacade processoFacade;
 
     @org.junit.jupiter.api.BeforeEach
-    void injectSelf() throws Exception {
-        java.lang.reflect.Field selfField = ProcessoFacade.class.getDeclaredField("self");
-        selfField.setAccessible(true);
-        selfField.set(processoFacade, processoFacade);
+    void injectSelf() {
+        org.springframework.test.util.ReflectionTestUtils.setField(processoFacade, "self", processoFacade);
     }
 
     @Nested
@@ -147,11 +147,11 @@ class ProcessoFacadeQueryTest {
         @DisplayName("Deve listar unidades bloqueadas por tipo")
         void deveListarUnidadesBloqueadasPorTipo() {
             // Arrange
-            when(processoConsultaService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO"))
+            when(processoConsultaService.listarUnidadesBloqueadasPorTipo(MAPEAMENTO))
                     .thenReturn(List.of(1L));
 
             // Act
-            List<Long> bloqueadas = processoFacade.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
+            List<Long> bloqueadas = processoFacade.listarUnidadesBloqueadasPorTipo(MAPEAMENTO);
 
             // Assert
             assertThat(bloqueadas).contains(1L);
@@ -257,14 +257,15 @@ class ProcessoFacadeQueryTest {
             var res = processoFacade.obterContextoCompleto(id);
 
             // Assert
-            assertThat(res).isNotNull();
-            assertThat(res).isEqualTo(detalhes);
+            assertThat(res)
+                .isNotNull()
+                .isEqualTo(detalhes);
             assertThat(res.getElegiveis()).isEmpty();
         }
 
         @Test
         @DisplayName("obterContextoCompleto: sucesso")
-        void obterContextoCompleto_Sucesso() {
+        void obterContextoCompletoSucesso() {
             Processo p = new Processo();
             p.setCodigo(1L);
             when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
@@ -276,15 +277,15 @@ class ProcessoFacadeQueryTest {
         @Test
         @DisplayName("listarUnidadesBloqueadasPorTipo: chama repo")
         void listarUnidadesBloqueadasPorTipo() {
-            when(processoConsultaService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO")).thenReturn(List.of(1L, 2L));
+            when(processoConsultaService.listarUnidadesBloqueadasPorTipo(MAPEAMENTO)).thenReturn(List.of(1L, 2L));
 
-            processoFacade.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
-            verify(processoConsultaService).listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
+            processoFacade.listarUnidadesBloqueadasPorTipo(MAPEAMENTO);
+            verify(processoConsultaService).listarUnidadesBloqueadasPorTipo(MAPEAMENTO);
         }
 
         @Test
         @DisplayName("getMensagemErroUnidadesSemMapa: empty list returns empty")
-        void getMensagemErroUnidadesSemMapa_Empty() {
+        void getMensagemErroUnidadesSemMapaEmpty() {
             // This method is now in ProcessoValidador, not in ProcessoFacade
             // Testing through the facade by creating a process with REVISAO type
 

@@ -13,7 +13,6 @@ import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;

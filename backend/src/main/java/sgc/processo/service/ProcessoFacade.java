@@ -29,7 +29,6 @@ import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static sgc.processo.model.SituacaoProcesso.CRIADO;
 import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
@@ -118,20 +117,6 @@ public class ProcessoFacade {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser editados.");
         }
 
-        // Captura estado anterior para o evento
-        TipoProcesso tipoAnterior = processo.getTipo();
-        Set<String> camposAlterados = new HashSet<>();
-
-        if (!processo.getDescricao().equals(requisicao.descricao())) {
-            camposAlterados.add("descricao");
-        }
-        if (processo.getTipo() != requisicao.tipo()) {
-            camposAlterados.add("tipo");
-        }
-        if (!Objects.equals(processo.getDataLimite(), requisicao.dataLimiteEtapa1())) {
-            camposAlterados.add("dataLimite");
-        }
-
         processo.setDescricao(requisicao.descricao());
         processo.setTipo(requisicao.tipo());
         processo.setDataLimite(requisicao.dataLimiteEtapa1());
@@ -143,16 +128,12 @@ public class ProcessoFacade {
                     });
         }
 
-        Set<Unidade> participantesAtuais = new HashSet<>(processo.getParticipantes());
         Set<Unidade> participantes = new HashSet<>();
         for (Long codigoUnidade : requisicao.unidades()) {
             participantes.add(unidadeService.buscarEntidadePorId(codigoUnidade));
         }
 
-        if (!participantesAtuais.equals(participantes)) {
-            camposAlterados.add("participantes");
-        }
-
+        // Atualiza participantes
         processo.setParticipantes(participantes);
 
         Processo processoAtualizado = processoRepo.saveAndFlush(processo);

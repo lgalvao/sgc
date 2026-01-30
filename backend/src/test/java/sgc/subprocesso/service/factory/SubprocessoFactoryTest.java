@@ -18,8 +18,6 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.SubprocessoRepo;
-
 import java.time.LocalDateTime;
 import java.util.List;
 

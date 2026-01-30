@@ -30,26 +30,29 @@ class NotificacaoEmailServiceTest {
     @InjectMocks
     private NotificacaoEmailService notificacaoServico;
 
+    private static final String RECIPIENT = "recipient@test.com";
+    private static final String TEST_BODY = "Test body";
+
     @Test
     @DisplayName("Deve enviar e-mail HTML")
-    void enviarEmailHtml_deveEnviarComSucesso() {
+    void enviarEmailHtmlDeveEnviarComSucesso() {
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
         when(emailExecutor.enviarEmailAssincrono(anyString(), anyString(), anyString(), anyBoolean())).thenReturn(CompletableFuture.completedFuture(true));
 
-        String para = "recipient@test.com";
+        String para = RECIPIENT;
         String assunto = "Test Subject";
         String corpoHtml = "<h1>Test Body</h1>";
 
         notificacaoServico.enviarEmailHtml(para, assunto, corpoHtml);
 
-        verify(emailExecutor).enviarEmailAssincrono(eq(para), eq(assunto), eq(corpoHtml), eq(true));
+        verify(emailExecutor).enviarEmailAssincrono(para, assunto, corpoHtml, true);
         
         verify(repositorioNotificacao, times(1)).save(any(Notificacao.class));
     }
 
     @Test
     @DisplayName("Não deve enviar e-mail para endereço inválido")
-    void enviarEmailHtml_naoDeveEnviarParaEnderecoInvalido() {
+    void enviarEmailHtmlNaoDeveEnviarParaEnderecoInvalido() {
         String para = "invalid-email";
         String assunto = "Test Subject";
         String corpoHtml = "<h1>Test Body</h1>";
@@ -67,7 +70,7 @@ class NotificacaoEmailServiceTest {
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
         when(emailExecutor.enviarEmailAssincrono(anyString(), anyString(), anyString(), anyBoolean())).thenReturn(CompletableFuture.completedFuture(true));
 
-        String para = "recipient@test.com";
+        String para = RECIPIENT;
         String assunto = "Test Subject Plain";
         String corpo = "This is plain text";
 
@@ -75,7 +78,7 @@ class NotificacaoEmailServiceTest {
         notificacaoServico.enviarEmail(para, assunto, corpo);
 
         // Assert
-        verify(emailExecutor).enviarEmailAssincrono(eq(para), eq(assunto), eq(corpo), eq(false));
+        verify(emailExecutor).enviarEmailAssincrono(para, assunto, corpo, false);
         
         verify(repositorioNotificacao, times(1)).save(any(Notificacao.class));
     }
@@ -103,7 +106,7 @@ class NotificacaoEmailServiceTest {
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
         when(emailExecutor.enviarEmailAssincrono(anyString(), anyString(), anyString(), anyBoolean())).thenReturn(CompletableFuture.completedFuture(true));
 
-        String para = "recipient@test.com";
+        String para = RECIPIENT;
         String assunto = "Test";
         String corpoLongo = "A".repeat(TAMANHO_CORPO_LONGO);
 
@@ -126,13 +129,13 @@ class NotificacaoEmailServiceTest {
         CompletableFuture<Boolean> futureFalho = CompletableFuture.completedFuture(false);
         when(emailExecutor.enviarEmailAssincrono(anyString(), anyString(), anyString(), anyBoolean())).thenReturn(futureFalho);
 
-        String para = "recipient@test.com";
+        String para = RECIPIENT;
         String assunto = "Test";
-        String corpo = "Test body";
+        String corpo = TEST_BODY;
 
         notificacaoServico.enviarEmail(para, assunto, corpo);
 
-        verify(emailExecutor).enviarEmailAssincrono(eq(para), eq(assunto), eq(corpo), eq(false));
+        verify(emailExecutor).enviarEmailAssincrono(para, assunto, corpo, false);
     }
 
     @Test
@@ -143,13 +146,13 @@ class NotificacaoEmailServiceTest {
         futureComErro.completeExceptionally(new RuntimeException("Erro de teste"));
         when(emailExecutor.enviarEmailAssincrono(anyString(), anyString(), anyString(), anyBoolean())).thenReturn(futureComErro);
 
-        String para = "recipient@test.com";
+        String para = RECIPIENT;
         String assunto = "Test";
-        String corpo = "Test body";
+        String corpo = TEST_BODY;
 
         notificacaoServico.enviarEmail(para, assunto, corpo);
 
-        verify(emailExecutor).enviarEmailAssincrono(eq(para), eq(assunto), eq(corpo), eq(false));
+        verify(emailExecutor).enviarEmailAssincrono(para, assunto, corpo, false);
     }
 
     @Test
@@ -157,9 +160,9 @@ class NotificacaoEmailServiceTest {
     void deveCapturaRuntimeException() {
         when(repositorioNotificacao.save(any(Notificacao.class))).thenThrow(new RuntimeException("Erro de teste"));
 
-        String para = "recipient@test.com";
+        String para = RECIPIENT;
         String assunto = "Test";
-        String corpo = "Test body";
+        String corpo = TEST_BODY;
 
         // Não deve lançar exceção, apenas logar
         notificacaoServico.enviarEmail(para, assunto, corpo);

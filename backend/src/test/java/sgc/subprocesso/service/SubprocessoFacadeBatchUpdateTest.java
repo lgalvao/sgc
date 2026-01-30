@@ -6,18 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.List;
-import java.util.Optional;
-
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

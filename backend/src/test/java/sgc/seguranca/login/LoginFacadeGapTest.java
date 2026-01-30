@@ -14,11 +14,7 @@ import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
 import sgc.seguranca.login.dto.EntrarRequest;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
@@ -38,7 +34,7 @@ class LoginFacadeGapTest {
 
     @Test
     @DisplayName("Deve negar acesso se perfil não corresponder (branch coverage)")
-    void deveNegarSePerfilNaoCorresponder() throws Exception {
+    void deveNegarSePerfilNaoCorresponder() {
         // Request pede ADMIN na unidade 1
         EntrarRequest req = new EntrarRequest("123", "ADMIN", 1L);
 
@@ -59,7 +55,7 @@ class LoginFacadeGapTest {
 
     @Test
     @DisplayName("Deve negar acesso se unidade não corresponder (branch coverage)")
-    void deveNegarSeUnidadeNaoCorresponder() throws Exception {
+    void deveNegarSeUnidadeNaoCorresponder() {
         // Request pede ADMIN na unidade 1
         EntrarRequest req = new EntrarRequest("123", "ADMIN", 1L);
 

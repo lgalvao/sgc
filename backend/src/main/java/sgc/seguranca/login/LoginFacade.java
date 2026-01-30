@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
@@ -125,8 +124,6 @@ public class LoginFacade {
     private List<PerfilUnidadeDto> buscarAutorizacoesInterno(String tituloEleitoral) {
         Usuario usuario = usuarioService.carregarUsuarioParaAutenticacao(tituloEleitoral);
         if (usuario == null) {
-            // Lançar ErroAutenticacao em vez de ErroEntidadeNaoEncontrada por questões de segurança
-            // (não revelar se o usuário existe ou não)
             throw new ErroAutenticacao("Credenciais inválidas");
         }
 

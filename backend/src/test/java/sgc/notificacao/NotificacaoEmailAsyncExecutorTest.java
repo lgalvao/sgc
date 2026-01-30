@@ -46,13 +46,17 @@ class NotificacaoEmailAsyncExecutorTest {
         ReflectionTestUtils.setField(executor, "prefixoAssunto", "[SGC]");
     }
 
+    private static final String DESTINATARIO = "dest@teste.com";
+    private static final String ASSUNTO = "Assunto";
+    private static final String CORPO = "Corpo";
+
     @Test
     @DisplayName("Deve enviar email com sucesso na primeira tentativa")
-    void enviarEmailAssincrono_sucessoPrimeiraTentativa() throws ExecutionException, InterruptedException {
+    void enviarEmailAssincronoSucessoPrimeiraTentativa() throws ExecutionException, InterruptedException {
         // Arrange
-        String para = "dest@teste.com";
-        String assunto = "Assunto";
-        String corpo = "Corpo";
+        String para = DESTINATARIO;
+        String assunto = ASSUNTO;
+        String corpo = CORPO;
         boolean html = false;
         
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
@@ -68,11 +72,11 @@ class NotificacaoEmailAsyncExecutorTest {
 
     @Test
     @DisplayName("Deve realizar retentativas e ter sucesso")
-    void enviarEmailAssincrono_sucessoComRetentativa() throws ExecutionException, InterruptedException {
+    void enviarEmailAssincronoSucessoComRetentativa() throws ExecutionException, InterruptedException {
         // Arrange
-        String para = "dest@teste.com";
-        String assunto = "Assunto";
-        String corpo = "Corpo";
+        String para = DESTINATARIO;
+        String assunto = ASSUNTO;
+        String corpo = CORPO;
         boolean html = false;
         
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
@@ -93,11 +97,11 @@ class NotificacaoEmailAsyncExecutorTest {
 
     @Test
     @DisplayName("Deve falhar após exceder tentativas máximas")
-    void enviarEmailAssincrono_falhaAposRetentativas() throws ExecutionException, InterruptedException {
+    void enviarEmailAssincronoFalhaAposRetentativas() throws ExecutionException, InterruptedException {
         // Arrange
-        String para = "dest@teste.com";
-        String assunto = "Assunto";
-        String corpo = "Corpo";
+        String para = DESTINATARIO;
+        String assunto = ASSUNTO;
+        String corpo = CORPO;
         boolean html = false;
         
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
@@ -117,11 +121,11 @@ class NotificacaoEmailAsyncExecutorTest {
 
     @Test
     @DisplayName("Deve lidar com interrupção da thread durante espera")
-    void enviarEmailAssincrono_interrupcaoThread() throws ExecutionException, InterruptedException {
+    void enviarEmailAssincronoInterrupcaoThread() throws ExecutionException, InterruptedException {
         // Arrange
-        String para = "dest@teste.com";
-        String assunto = "Assunto";
-        String corpo = "Corpo";
+        String para = DESTINATARIO;
+        String assunto = ASSUNTO;
+        String corpo = CORPO;
         boolean html = false;
         
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);

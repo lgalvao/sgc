@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
@@ -27,7 +26,6 @@ import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
@@ -87,7 +85,7 @@ class SubprocessoCrudServiceTest {
     @Test
     @DisplayName("Deve lançar exceção se não encontrar")
     void deveLancarExcecaoSeNaoEncontrar() {
-        when(repositorioComum.buscar(eq(Subprocesso.class), eq(1L)))
+        when(repositorioComum.buscar(Subprocesso.class, 1L))
                 .thenThrow(new ErroEntidadeNaoEncontrada("Subprocesso", 1L));
         assertThatThrownBy(() -> service.buscarSubprocesso(1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -179,7 +177,7 @@ class SubprocessoCrudServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao atualizar subprocesso inexistente")
     void deveLancarExcecaoAoAtualizarInexistente() {
-        when(repositorioComum.buscar(eq(Subprocesso.class), eq(1L)))
+        when(repositorioComum.buscar(Subprocesso.class, 1L))
                 .thenThrow(new ErroEntidadeNaoEncontrada("Subprocesso", 1L));
         AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder().build();
 
@@ -200,7 +198,7 @@ class SubprocessoCrudServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao excluir subprocesso inexistente")
     void deveLancarExcecaoAoExcluirInexistente() {
-        when(repositorioComum.buscar(eq(Subprocesso.class), eq(1L)))
+        when(repositorioComum.buscar(Subprocesso.class, 1L))
                 .thenThrow(new ErroEntidadeNaoEncontrada("Subprocesso", 1L));
         assertThatThrownBy(() -> service.excluir(1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -259,7 +257,9 @@ class SubprocessoCrudServiceTest {
         when(subprocessoRepo.save(sp)).thenReturn(sp);
         when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
-        service.atualizar(1L, request);
+        SubprocessoDto resultado = service.atualizar(1L, request);
+        assertThat(resultado).isNotNull();
+        verify(subprocessoRepo).save(sp);
     }
 
     @Test
@@ -274,7 +274,9 @@ class SubprocessoCrudServiceTest {
         when(subprocessoRepo.save(sp)).thenReturn(sp);
         when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
-        service.atualizar(1L, request);
+        SubprocessoDto resultado = service.atualizar(1L, request);
+        assertThat(resultado).isNotNull();
+        verify(subprocessoRepo).save(sp);
     }
 
     @Test
@@ -288,7 +290,9 @@ class SubprocessoCrudServiceTest {
         when(mapaFacade.salvar(any())).thenReturn(new Mapa());
         when(subprocessoMapper.toDto(any())).thenReturn(responseDto);
 
-        service.criar(request);
+        SubprocessoDto resultado = service.criar(request);
+        assertThat(resultado).isNotNull();
+        verify(subprocessoRepo).save(any());
     }
 
     @Test
@@ -310,7 +314,9 @@ class SubprocessoCrudServiceTest {
         when(mapaFacade.salvar(any())).thenReturn(new Mapa());
         when(subprocessoMapper.toDto(any())).thenReturn(responseDto);
 
-        service.criar(request);
+        SubprocessoDto resultado = service.criar(request);
+        assertThat(resultado).isNotNull();
+        verify(subprocessoRepo).save(any());
     }
 
     @Test
@@ -349,7 +355,9 @@ class SubprocessoCrudServiceTest {
         when(subprocessoRepo.save(sp)).thenReturn(sp);
         when(subprocessoMapper.toDto(sp)).thenReturn(responseDto);
 
-        service.atualizar(1L, request);
+        SubprocessoDto resultado = service.atualizar(1L, request);
+        assertThat(resultado).isNotNull();
+        verify(subprocessoRepo).save(sp);
     }
 
     @Test

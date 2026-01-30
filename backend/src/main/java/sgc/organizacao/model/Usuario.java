@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Immutable
@@ -61,21 +60,19 @@ public class Usuario implements UserDetails {
      * @return Conjunto de todas as atribuições (permanentes + temporárias ativas)
      */
     public Set<UsuarioPerfil> getTodasAtribuicoes(Set<UsuarioPerfil> atribuicoesPermanentes) {
-        Set<UsuarioPerfil> todas = new HashSet<>(atribuicoesPermanentes != null ? atribuicoesPermanentes : Set.of());
+        Set<UsuarioPerfil> todas = new HashSet<>(atribuicoesPermanentes);
 
         LocalDateTime now = LocalDateTime.now();
-        if (atribuicoesTemporarias != null) {
-            for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
-                if (!temp.getDataInicio().isAfter(now) && !temp.getDataTermino().isBefore(now)) {
-                    UsuarioPerfil perfil = new UsuarioPerfil()
-                            .setUsuarioTitulo(this.tituloEleitoral)
-                            .setUsuario(this)
-                            .setUnidadeCodigo(temp.getUnidade().getCodigo())
-                            .setUnidade(temp.getUnidade())
-                            .setPerfil(temp.getPerfil());
+        for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
+            if (!temp.getDataInicio().isAfter(now) && !temp.getDataTermino().isBefore(now)) {
+                UsuarioPerfil perfil = new UsuarioPerfil()
+                        .setUsuarioTitulo(this.tituloEleitoral)
+                        .setUsuario(this)
+                        .setUnidadeCodigo(temp.getUnidade().getCodigo())
+                        .setUnidade(temp.getUnidade())
+                        .setPerfil(temp.getPerfil());
 
-                    todas.add(perfil);
-                }
+                todas.add(perfil);
             }
         }
         return todas;

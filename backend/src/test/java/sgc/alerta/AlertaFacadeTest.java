@@ -23,7 +23,6 @@ import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.mapper.AlertaMapper;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaUsuario;
-import sgc.alerta.AlertaService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.TipoUnidade;
