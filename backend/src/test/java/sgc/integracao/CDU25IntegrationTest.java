@@ -57,6 +57,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
     private Unidade unidade2;
     private Subprocesso subprocesso1;
     private Subprocesso subprocesso2;
+    private Processo processo;
 
     @BeforeEach
     void setUp() {
@@ -76,7 +77,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
                 .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
 
         // Create test process
-        Processo processo = ProcessoFixture.processoPadrao();
+        processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -108,8 +109,8 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         // GESTOR of unit 6 (parent of units 8 and 9)
     void aceitarValidacaoEmBloco_deveAceitarSucesso() throws Exception {
         // Given
-        Long codigoContexto = subprocesso1.getCodigo();
-        List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
+        Long codigoContexto = processo.getCodigo();
+        List<Long> subprocessosSelecionados = List.of(unidade1.getCodigo(), unidade2.getCodigo());
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .acao("ACEITAR_VALIDACAO")

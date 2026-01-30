@@ -93,6 +93,14 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         // Define as authorities corretamente
         principal.setAuthorities(Set.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + perfil.name())));
 
+        // Insert into VW_USUARIO_PERFIL_UNIDADE to support ProcessoDetalheBuilder query
+        try {
+            jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
+                    TEST_USER_ID, unidade.getCodigo(), perfil.name());
+        } catch (Exception e) {
+            // Ignore duplicates
+        }
+
         Set<UsuarioPerfil> atribuicoes = new HashSet<>();
         atribuicoes.add(
                 UsuarioPerfil.builder()

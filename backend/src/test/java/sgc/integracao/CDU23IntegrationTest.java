@@ -63,6 +63,7 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
     private Unidade unidade2;
     private Subprocesso subprocesso1;
     private Subprocesso subprocesso2;
+    private Processo processo;
 
     @BeforeEach
     void setUp() {
@@ -86,7 +87,7 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
         usuarioRepo.save(admin);
 
         // Criar Processo
-        Processo processo = ProcessoFixture.processoPadrao();
+        processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -119,8 +120,8 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void homologarCadastroEmBloco_deveHomologarTodasSelecionadas() throws Exception {
         // Given
-        Long codigoContexto = subprocesso1.getCodigo();
-        List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
+        Long codigoContexto = processo.getCodigo();
+        List<Long> subprocessosSelecionados = List.of(unidade1.getCodigo(), unidade2.getCodigo());
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .acao("HOMOLOGAR")

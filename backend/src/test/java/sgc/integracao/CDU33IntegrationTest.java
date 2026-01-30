@@ -59,8 +59,26 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        // Garantir que SEDOC existe
+        if (unidadeRepo.findBySigla("SEDOC").isEmpty()) {
+            Unidade sedoc = new Unidade();
+            sedoc.setSigla("SEDOC");
+            sedoc.setNome("Secretaria de Documentação");
+            sedoc.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
+            sedoc.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+            unidadeRepo.save(sedoc);
+        }
+
         // Obter Unidade
-        Unidade unidade = unidadeRepo.findById(1L).orElseThrow();
+        Unidade unidade = unidadeRepo.findById(1L).orElseGet(() -> {
+            Unidade u = new Unidade();
+            u.setCodigo(1L);
+            u.setSigla("TESTE");
+            u.setNome("Unidade Teste");
+            u.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
+            u.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+            return unidadeRepo.save(u);
+        });
 
         // Criar Processo de REVISAO
         Processo processo = ProcessoFixture.processoPadrao();
@@ -118,7 +136,9 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
         assertThat(movimentacaoExiste).isTrue();
 
         // Verificar se foi criado um alerta
-        boolean alertaExiste = alertaRepo.findAll().stream()
+        List<sgc.alerta.model.Alerta> alerts = alertaRepo.findAll();
+        assertThat(alerts).isNotEmpty();
+        boolean alertaExiste = alerts.stream()
                 .anyMatch(a -> a.getUnidadeDestino() != null &&
                         a.getUnidadeDestino().getCodigo()
                                 .equals(reaberto.getUnidade().getCodigo())

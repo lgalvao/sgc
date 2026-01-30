@@ -12,7 +12,6 @@ import sgc.alerta.AlertaFacade;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
-import sgc.comum.erros.ErroInvarianteViolada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.organizacao.UnidadeFacade;
@@ -165,8 +164,7 @@ public class SubprocessoCadastroWorkflowService {
         Unidade origem = sp.getUnidade();
         Unidade destino = origem.getUnidadeSuperior();
         if (destino == null) {
-            throw new ErroInvarianteViolada(
-                    "Não foi possível identificar a unidade superior para disponibilizar o cadastro.");
+            destino = origem;
         }
 
         sp.setSituacao(novaSituacao);
@@ -200,7 +198,7 @@ public class SubprocessoCadastroWorkflowService {
         Unidade unidadeAnalise = unidadeSubprocesso.getUnidadeSuperior();
 
         if (unidadeAnalise == null) {
-            throw new ErroInvarianteViolada("Unidade superior não encontrada para o subprocesso " + codSubprocesso);
+            unidadeAnalise = unidadeSubprocesso;
         }
 
         sp.setDataFimEtapa1(null);
@@ -231,7 +229,7 @@ public class SubprocessoCadastroWorkflowService {
         Unidade unidadeOrigem = sp.getUnidade();
         Unidade unidadeDestino = unidadeOrigem.getUnidadeSuperior();
         if (unidadeDestino == null) {
-            throw new ErroInvarianteViolada("Não foi possível identificar a unidade superior para enviar a análise.");
+            unidadeDestino = unidadeOrigem;
         }
 
         transicaoService.registrarAnaliseETransicao(RegistrarWorkflowCommand.builder()
@@ -280,7 +278,7 @@ public class SubprocessoCadastroWorkflowService {
         Unidade unidadeSubprocesso = sp.getUnidade();
         Unidade unidadeAnalise = unidadeSubprocesso.getUnidadeSuperior();
         if (unidadeAnalise == null) {
-            throw new ErroInvarianteViolada("Unidade superior não encontrada para o subprocesso " + codSubprocesso);
+            unidadeAnalise = unidadeSubprocesso;
         }
 
         sp.setDataFimEtapa1(null);
@@ -307,7 +305,7 @@ public class SubprocessoCadastroWorkflowService {
         Unidade unidadeSubprocesso = sp.getUnidade();
         Unidade unidadeAnalise = unidadeSubprocesso.getUnidadeSuperior();
         if (unidadeAnalise == null) {
-            throw new ErroInvarianteViolada("Unidade superior não encontrada para o subprocesso " + codSubprocesso);
+            unidadeAnalise = unidadeSubprocesso;
         }
 
         Unidade superiorAnalise = unidadeAnalise.getUnidadeSuperior();

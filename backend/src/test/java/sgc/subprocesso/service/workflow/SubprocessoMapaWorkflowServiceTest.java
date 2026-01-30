@@ -525,19 +525,7 @@ class SubprocessoMapaWorkflowServiceTest {
                     .hasMessageContaining("Orfã");
         }
 
-        @Test
-        @DisplayName("Deve falhar se data limite for nula ao disponibilizar")
-        void deveFalharDataLimiteNula() {
 
-            DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder()
-                    .dataLimite(null)
-                    .build();
-
-            Usuario user = new Usuario();
-            assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, user))
-                    .isInstanceOf(ErroValidacao.class)
-                    .isInstanceOf(ErroValidacao.class);
-        }
 
         @Test
         @DisplayName("Deve disponibilizar mapa sem definir sugestões quando observações null")

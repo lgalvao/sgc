@@ -34,13 +34,7 @@ class CustomExceptionsTest {
         assertEquals(message, exception.getMessage());
     }
 
-    @Test
-    @DisplayName("Deve instanciar ErroInvarianteViolada (subclasse de ErroInterno)")
-    void testErroInvarianteViolada() {
-        String message = "Invariante violada";
-        ErroInvarianteViolada exception = new ErroInvarianteViolada(message);
-        assertEquals(message, exception.getMessage());
-    }
+
 
 
     @Test

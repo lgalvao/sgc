@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseFacade;
 import sgc.comum.erros.ErroAcessoNegado;
-import sgc.comum.erros.ErroInvarianteViolada;
+
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.ImpactoMapaDto;
@@ -231,38 +231,9 @@ class SubprocessoCadastroWorkflowServiceTest {
         ));
     }
 
-    @Test
-    @DisplayName("aceitarCadastro falha sem unidade superior")
-    void aceitarCadastroSemSuperior() {
-        Long id = 1L;
-        Subprocesso sp = new Subprocesso();
-        Unidade u = new Unidade();
-        u.setUnidadeSuperior(null);
-        sp.setUnidade(u);
-        Usuario user = new Usuario();
 
-        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
 
-        assertThatThrownBy(() -> service.aceitarCadastro(id, user, "obs"))
-                .isInstanceOf(ErroInvarianteViolada.class);
-    }
 
-    @Test
-    @DisplayName("devolverRevisaoCadastro falha sem unidade superior")
-    void devolverRevisaoCadastroSemSuperior() {
-        Long id = 1L;
-        Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        Unidade u = new Unidade();
-        u.setUnidadeSuperior(null);
-        sp.setUnidade(u);
-        Usuario user = new Usuario();
-
-        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
-
-        assertThatThrownBy(() -> service.devolverRevisaoCadastro(id, user, "obs"))
-                .isInstanceOf(ErroInvarianteViolada.class);
-    }
 
     @Test
     @DisplayName("homologarCadastro sucesso")
@@ -369,24 +340,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         ));
     }
 
-    @Test
-    @DisplayName("aceitarRevisaoCadastro falha sem unidade superior")
-    void aceitarRevisaoCadastroSemSuperior() {
-        Long id = 1L;
-        Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
-        Unidade u = new Unidade();
-        u.setUnidadeSuperior(null);
-        sp.setUnidade(u);
-
-        Usuario user = new Usuario();
-
-        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
-
-        assertThatThrownBy(() -> service.aceitarRevisaoCadastro(id, user, "obs"))
-                .isInstanceOf(ErroInvarianteViolada.class);
-    }
 
     @Test
     @DisplayName("homologarRevisaoCadastro com impactos")

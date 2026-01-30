@@ -29,7 +29,7 @@ package sgc.comum.erros;
  * mas retornam mensagem genérica ao usuário para não expor detalhes de implementação.
  *
  * @see ErroConfiguracao
- * @see ErroInvarianteViolada
+
  * @see ErroEstadoImpossivel
  */
 public abstract class ErroInterno extends RuntimeException {

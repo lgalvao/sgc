@@ -129,8 +129,8 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void disponibilizarMapaEmBloco_deveDisponibilizarSucesso() throws Exception {
         // Given
-        Long codigoContexto = subprocesso1.getCodigo();
-        List<Long> unidadesSelecionadas = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
+        Long codigoContexto = processo.getCodigo();
+        List<Long> unidadesSelecionadas = List.of(unidade1.getCodigo(), unidade2.getCodigo());
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .subprocessos(unidadesSelecionadas)

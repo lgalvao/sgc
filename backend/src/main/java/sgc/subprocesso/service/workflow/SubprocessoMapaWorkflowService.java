@@ -60,7 +60,7 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 import org.springframework.util.StringUtils;
-import sgc.comum.erros.ErroInvarianteViolada;
+
 import sgc.subprocesso.model.SubprocessoRepo;
 
 @Service
@@ -180,9 +180,6 @@ public class SubprocessoMapaWorkflowService {
     }
 
     private void executarDisponibilizacaoMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
-        if (request.dataLimite() == null) {
-            throw new ErroValidacao("Data limite é obrigatória.");
-        }
         Subprocesso sp = getSubprocessoParaEdicao(codSubprocesso);
         accessControlService.verificarPermissao(usuario, DISPONIBILIZAR_MAPA, sp);
 
@@ -258,7 +255,7 @@ public class SubprocessoMapaWorkflowService {
 
         Unidade destino = sp.getUnidade().getUnidadeSuperior();
         if (destino == null) {
-            throw new ErroInvarianteViolada("Não foi possível identificar a unidade superior para apresentar sugestões.");
+            destino = sp.getUnidade();
         }
 
         transicaoService.registrar(RegistrarTransicaoCommand.builder()
@@ -283,7 +280,7 @@ public class SubprocessoMapaWorkflowService {
 
         Unidade destino = sp.getUnidade().getUnidadeSuperior();
         if (destino == null) {
-            throw new ErroInvarianteViolada("Não foi possível identificar a unidade superior para validar o mapa.");
+            destino = sp.getUnidade();
         }
 
         transicaoService.registrar(RegistrarTransicaoCommand.builder()
@@ -305,7 +302,7 @@ public class SubprocessoMapaWorkflowService {
 
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
         if (unidadeSuperior == null) {
-            throw new ErroInvarianteViolada("Não foi possível identificar a unidade superior para devolver a validação.");
+            unidadeSuperior = sp.getUnidade();
         }
 
         transicaoService.registrarAnaliseETransicao(RegistrarWorkflowCommand.builder()

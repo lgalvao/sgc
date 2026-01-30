@@ -61,6 +61,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
     private Unidade unidade2;
     private Subprocesso subprocesso1;
     private Subprocesso subprocesso2;
+    private Processo processo;
 
     @BeforeEach
     void setUp() {
@@ -80,7 +81,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
         admin.setTituloEleitoral("555555555555");
         usuarioRepo.save(admin);
 
-        Processo processo = ProcessoFixture.processoPadrao();
+        processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -113,8 +114,8 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void homologarValidacaoEmBloco_deveHomologarSucesso() throws Exception {
         // Given
-        Long codigoContexto = subprocesso1.getCodigo();
-        List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
+        Long codigoContexto = processo.getCodigo();
+        List<Long> subprocessosSelecionados = List.of(unidade1.getCodigo(), unidade2.getCodigo());
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .acao("HOMOLOGAR_VALIDACAO")
