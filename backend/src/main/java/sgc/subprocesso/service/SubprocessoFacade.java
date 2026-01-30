@@ -380,9 +380,12 @@ public class SubprocessoFacade {
 
     /**
      * Cria subprocessos para um processo de mapeamento.
+     * <p>
+     * Este método é usado pelo {@link sgc.processo.service.ProcessoInicializador}
+     * durante a inicialização de processos de mapeamento.
      * 
-     * @param processo o processo de mapeamento
-     * @param unidades as unidades para as quais criar subprocessos
+     * @param processo o {@link sgc.processo.model.Processo} de mapeamento
+     * @param unidades as {@link sgc.organizacao.model.Unidade}s para as quais criar subprocessos
      */
     @Transactional
     public void criarParaMapeamento(sgc.processo.model.Processo processo, java.util.Collection<sgc.organizacao.model.Unidade> unidades) {
@@ -391,10 +394,13 @@ public class SubprocessoFacade {
 
     /**
      * Cria um subprocesso para um processo de revisão.
+     * <p>
+     * Este método é usado pelo {@link sgc.processo.service.ProcessoInicializador}
+     * durante a inicialização de processos de revisão.
      * 
-     * @param processo o processo de revisão
-     * @param unidade a unidade para a qual criar o subprocesso
-     * @param unidadeMapa o mapa vigente da unidade
+     * @param processo o {@link sgc.processo.model.Processo} de revisão
+     * @param unidade a {@link sgc.organizacao.model.Unidade} para a qual criar o subprocesso
+     * @param unidadeMapa o {@link sgc.organizacao.model.UnidadeMapa} vigente da unidade
      */
     @Transactional
     public void criarParaRevisao(sgc.processo.model.Processo processo, sgc.organizacao.model.Unidade unidade, sgc.organizacao.model.UnidadeMapa unidadeMapa) {
@@ -403,10 +409,13 @@ public class SubprocessoFacade {
 
     /**
      * Cria um subprocesso para um processo de diagnóstico.
+     * <p>
+     * Este método é usado pelo {@link sgc.processo.service.ProcessoInicializador}
+     * durante a inicialização de processos de diagnóstico.
      * 
-     * @param processo o processo de diagnóstico
-     * @param unidade a unidade para a qual criar o subprocesso
-     * @param unidadeMapa o mapa vigente da unidade
+     * @param processo o {@link sgc.processo.model.Processo} de diagnóstico
+     * @param unidade a {@link sgc.organizacao.model.Unidade} para a qual criar o subprocesso
+     * @param unidadeMapa o {@link sgc.organizacao.model.UnidadeMapa} vigente da unidade
      */
     @Transactional
     public void criarParaDiagnostico(sgc.processo.model.Processo processo, sgc.organizacao.model.Unidade unidade, sgc.organizacao.model.UnidadeMapa unidadeMapa) {
