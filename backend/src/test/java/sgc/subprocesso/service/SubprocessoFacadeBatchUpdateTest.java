@@ -26,6 +26,8 @@ class SubprocessoFacadeBatchUpdateTest {
     private MapaManutencaoService mapaManutencaoService;
     @Mock
     private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
+    @Mock
+    private SubprocessoAjusteMapaService ajusteMapaService;
 
     @InjectMocks
     private SubprocessoFacade facade;

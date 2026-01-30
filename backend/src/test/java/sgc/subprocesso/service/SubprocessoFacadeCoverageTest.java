@@ -45,6 +45,8 @@ class SubprocessoFacadeCoverageTest {
     private MovimentacaoRepo movimentacaoRepo;
     @Mock
     private sgc.mapa.service.CopiaMapaService copiaMapaService;
+    @Mock
+    private SubprocessoAjusteMapaService ajusteMapaService;
 
     @InjectMocks
     private SubprocessoFacade facade;
