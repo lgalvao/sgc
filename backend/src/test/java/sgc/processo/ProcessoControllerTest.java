@@ -644,7 +644,7 @@ class ProcessoControllerTest {
         }
 
         @Test
-        @WithMockUser
+        @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar lista de subprocessos")
         void deveRetornarListaDeSubprocessos() throws Exception {
             // Arrange

@@ -8,6 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroConfiguracao;
+import sgc.configuracao.dto.ParametroRequest;
+import sgc.configuracao.dto.ParametroResponse;
+import sgc.configuracao.mapper.ParametroMapper;
 import sgc.configuracao.model.Parametro;
 
 import java.util.List;
@@ -27,19 +30,28 @@ class ConfiguracaoFacadeTest {
     @Mock
     private ConfiguracaoService configuracaoService;
 
+    @Mock
+    private ParametroMapper parametroMapper;
+
     @Test
     @DisplayName("Deve buscar todos os parâmetros")
     void buscarTodos_sucesso() {
         // Arrange
         Parametro p1 = Parametro.builder().chave("CHAVE_1").valor("VALOR_1").descricao("Desc 1").build();
         Parametro p2 = Parametro.builder().chave("CHAVE_2").valor("VALOR_2").descricao("Desc 2").build();
+
+        ParametroResponse r1 = ParametroResponse.builder().codigo(1L).chave("CHAVE_1").valor("VALOR_1").descricao("Desc 1").build();
+        ParametroResponse r2 = ParametroResponse.builder().codigo(2L).chave("CHAVE_2").valor("VALOR_2").descricao("Desc 2").build();
+
         when(configuracaoService.buscarTodos()).thenReturn(List.of(p1, p2));
+        when(parametroMapper.toResponse(p1)).thenReturn(r1);
+        when(parametroMapper.toResponse(p2)).thenReturn(r2);
 
         // Act
-        List<Parametro> resultado = configuracaoFacade.buscarTodos();
+        List<ParametroResponse> resultado = configuracaoFacade.buscarTodos();
 
         // Assert
-        assertThat(resultado).hasSize(2).contains(p1, p2);
+        assertThat(resultado).hasSize(2).contains(r1, r2);
         verify(configuracaoService).buscarTodos();
     }
 
@@ -77,16 +89,23 @@ class ConfiguracaoFacadeTest {
     @DisplayName("Deve salvar lista de parâmetros")
     void salvar_sucesso() {
         // Arrange
-        Parametro p1 = Parametro.builder().chave("CHAVE_1").valor("VALOR_1").descricao("Desc 1").build();
-        List<Parametro> lista = List.of(p1);
-        when(configuracaoService.salvar(lista)).thenReturn(lista);
+        ParametroRequest req1 = new ParametroRequest(1L, "CHAVE_1", "Desc 1", "VALOR_1");
+        List<ParametroRequest> requests = List.of(req1);
+
+        Parametro p1 = Parametro.builder().codigo(1L).chave("CHAVE_1").valor("VALOR_OLD").descricao("Desc Old").build();
+
+        ParametroResponse resp1 = ParametroResponse.builder().codigo(1L).chave("CHAVE_1").valor("VALOR_1").descricao("Desc 1").build();
+
+        when(configuracaoService.buscarPorId(1L)).thenReturn(p1);
+        when(configuracaoService.salvar(anyList())).thenReturn(List.of(p1));
+        when(parametroMapper.toResponse(p1)).thenReturn(resp1);
 
         // Act
-        List<Parametro> resultado = configuracaoFacade.salvar(lista);
+        List<ParametroResponse> resultado = configuracaoFacade.salvar(requests);
 
         // Assert
-        assertThat(resultado).isEqualTo(lista);
-        verify(configuracaoService).salvar(lista);
+        assertThat(resultado).contains(resp1);
+        verify(configuracaoService).salvar(anyList());
     }
 
     @Test

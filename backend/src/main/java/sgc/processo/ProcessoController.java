@@ -245,6 +245,7 @@ public class ProcessoController {
      * @return Lista de subprocessos do processo.
      */
     @GetMapping("/{codigo}/subprocessos")
+    @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
     @Operation(summary = "Lista todos os subprocessos de um processo")
     public ResponseEntity<List<SubprocessoDto>> listarSubprocessos(@PathVariable Long codigo) {
         List<SubprocessoDto> subprocessos = processoFacade.listarTodosSubprocessos(codigo);
