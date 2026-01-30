@@ -31,8 +31,10 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import sgc.organizacao.model.Usuario;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -69,6 +71,12 @@ class ProcessoFacadeQueryTest {
 
     private ProcessoFacade processoFacade;
 
+    private Usuario criarUsuarioMock() {
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("12345678901");
+        return usuario;
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         processoFacade = new ProcessoFacade(
@@ -98,13 +106,14 @@ class ProcessoFacadeQueryTest {
         @DisplayName("Deve retornar detalhes do processo (DTO)")
         void deveRetornarDetalhesDoProcesso() {
             // Arrange
+            Usuario usuario = criarUsuarioMock();
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
             when(processoConsultaService.buscarPorId(id)).thenReturn(processo);
-            when(processoDetalheBuilder.build(processo)).thenReturn(new ProcessoDetalheDto());
+            when(processoDetalheBuilder.build(eq(processo), any(Usuario.class))).thenReturn(new ProcessoDetalheDto());
 
             // Act
-            var res = processoFacade.obterDetalhes(id);
+            var res = processoFacade.obterDetalhes(id, usuario);
 
             // Assert
             assertThat(res).isNotNull();
@@ -113,8 +122,9 @@ class ProcessoFacadeQueryTest {
         @Test
         @DisplayName("Deve falhar ao obter detalhes de processo inexistente")
         void deveFalharAoObterDetalhesProcessoInexistente() {
+            Usuario usuario = criarUsuarioMock();
             when(processoConsultaService.buscarPorId(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 999L));
-            assertThatThrownBy(() -> processoFacade.obterDetalhes(999L))
+            assertThatThrownBy(() -> processoFacade.obterDetalhes(999L, usuario))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
@@ -274,17 +284,18 @@ class ProcessoFacadeQueryTest {
         @DisplayName("Deve retornar contexto completo do processo")
         void deveRetornarContextoCompleto() {
             // Arrange
+            Usuario usuario = criarUsuarioMock();
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
             ProcessoDetalheDto detalhes = ProcessoDetalheDto.builder().build();
 
             when(processoConsultaService.buscarPorId(id)).thenReturn(processo);
-            when(processoDetalheBuilder.build(processo)).thenReturn(detalhes);
+            when(processoDetalheBuilder.build(eq(processo), any(Usuario.class))).thenReturn(detalhes);
             when(processoConsultaService.listarSubprocessosElegiveis(id))
                     .thenReturn(List.of());
 
             // Act
-            var res = processoFacade.obterContextoCompleto(id);
+            var res = processoFacade.obterContextoCompleto(id, usuario);
 
             // Assert
             assertThat(res)
@@ -296,12 +307,13 @@ class ProcessoFacadeQueryTest {
         @Test
         @DisplayName("obterContextoCompleto: sucesso")
         void obterContextoCompletoSucesso() {
+            Usuario usuario = criarUsuarioMock();
             Processo p = new Processo();
             p.setCodigo(1L);
             when(processoConsultaService.buscarPorId(1L)).thenReturn(p);
-            when(processoDetalheBuilder.build(p)).thenReturn(ProcessoDetalheDto.builder().build());
+            when(processoDetalheBuilder.build(eq(p), any(Usuario.class))).thenReturn(ProcessoDetalheDto.builder().build());
 
-            assertThat(processoFacade.obterDetalhes(1L)).isNotNull();
+            assertThat(processoFacade.obterDetalhes(1L, usuario)).isNotNull();
         }
 
         @Test

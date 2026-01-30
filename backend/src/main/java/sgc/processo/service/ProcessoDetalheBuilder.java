@@ -1,18 +1,16 @@
 package sgc.processo.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.util.FormatadorData;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.mapper.ProcessoDetalheMapper;
 import sgc.processo.model.Processo;
+import sgc.seguranca.acesso.AccessControlService;
+import sgc.seguranca.acesso.Acao;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
@@ -24,10 +22,10 @@ public class ProcessoDetalheBuilder {
 
     private final SubprocessoRepo subprocessoRepo;
     private final ProcessoDetalheMapper processoDetalheMapper;
-    private final UsuarioPerfilRepo usuarioPerfilRepo;
+    private final AccessControlService accessControlService;
 
     @Transactional(readOnly = true)
-    public ProcessoDetalheDto build(Processo processo) {
+    public ProcessoDetalheDto build(Processo processo, Usuario usuario) {
         ProcessoDetalheDto dto = ProcessoDetalheDto.builder()
                 .codigo(processo.getCodigo())
                 .descricao(processo.getDescricao())
@@ -36,15 +34,15 @@ public class ProcessoDetalheBuilder {
                 .dataCriacao(processo.getDataCriacao())
                 .dataFinalizacao(processo.getDataFinalizacao())
                 .dataLimite(processo.getDataLimite())
-                .podeFinalizar(isCurrentUserAdmin())
-                .podeHomologarCadastro(isCurrentUserChefeOuCoordenador(processo))
-                .podeHomologarMapa(isCurrentUserChefeOuCoordenador(processo))
+                .podeFinalizar(accessControlService.podeExecutar(usuario, Acao.FINALIZAR_PROCESSO, processo))
+                .podeHomologarCadastro(accessControlService.podeExecutar(usuario, Acao.HOMOLOGAR_CADASTRO_EM_BLOCO, processo))
+                .podeHomologarMapa(accessControlService.podeExecutar(usuario, Acao.HOMOLOGAR_MAPA_EM_BLOCO, processo))
                 .dataCriacaoFormatada(FormatadorData.formatarData(processo.getDataCriacao()))
                 .dataFinalizacaoFormatada(FormatadorData.formatarData(processo.getDataFinalizacao()))
                 .dataLimiteFormatada(FormatadorData.formatarData(processo.getDataLimite()))
                 .situacaoLabel(processo.getSituacao().getLabel())
                 .tipoLabel(processo.getTipo().getLabel())
-                .unidades(new ArrayList<>()) // Inicializar a lista
+                .unidades(new ArrayList<>())
                 .build();
 
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
@@ -53,34 +51,7 @@ public class ProcessoDetalheBuilder {
         return dto;
     }
 
-    private boolean isCurrentUserChefeOuCoordenador(Processo processo) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return false;
-        }
-        Object principal = authentication.getPrincipal();
-        if (!(principal instanceof Usuario user)) {
-            return false;
-        }
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>(
-                usuarioPerfilRepo.findByUsuarioTituloWithUnidade(user.getTituloEleitoral())
-        );
-        return processo.getParticipantes()
-                .stream()
-                .anyMatch(unidade -> user.getTodasAtribuicoes(atribuicoes)
-                        .stream()
-                        .anyMatch(attr -> Objects.equals(attr.getUnidade().getCodigo(), unidade.getCodigo()))
-                );
-    }
 
-    private boolean isCurrentUserAdmin() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return false;
-        }
-        return authentication.getAuthorities().stream()
-                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
-    }
 
     private void montarHierarquiaUnidades(
             ProcessoDetalheDto dto, Processo processo, List<Subprocesso> subprocessos) {
