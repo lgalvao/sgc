@@ -931,3 +931,5 @@ alter table if exists sgc.ocupacao_critica
     add constraint fk_ocupacao_competencia foreign key (competencia_codigo) references sgc.competencia;
 
 create index if not exists idx_unidade_processo_unidade on sgc.unidade_processo (unidade_codigo);
+create index if not exists idx_processo_situacao_data_finalizacao on sgc.processo (situacao, data_finalizacao);
+create index if not exists idx_subprocesso_situacao on sgc.subprocesso (situacao);
