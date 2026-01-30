@@ -58,7 +58,7 @@ public class UsuarioFacade {
     @Transactional(readOnly = true)
     public Usuario buscarPorId(String titulo) {
         return usuarioRepo.findById(titulo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, titulo));
+                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(ENTIDADE_USUARIO, titulo));
     }
 
     @Transactional(readOnly = true)
@@ -69,7 +69,7 @@ public class UsuarioFacade {
     private Usuario buscarPorLoginInterno(String login) {
         Usuario usuario = usuarioRepo
                 .findByIdWithAtribuicoes(login)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, login));
+                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(ENTIDADE_USUARIO, login));
 
         carregarAtribuicoes(usuario);
         return usuario;
@@ -100,14 +100,14 @@ public class UsuarioFacade {
     @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String sigla) {
         Unidade unidade = unidadeRepo.findBySigla(sigla)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", sigla));
+                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada("Unidade", sigla));
 
         Usuario usuarioSimples = usuarioRepo
                 .chefePorCodUnidade(unidade.getCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Responsável da unidade", sigla));
+                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada("Responsável da unidade", sigla));
 
         Usuario usuarioCompleto = usuarioRepo.findByIdWithAtribuicoes(usuarioSimples.getTituloEleitoral())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_USUARIO, usuarioSimples.getTituloEleitoral()));
+                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(ENTIDADE_USUARIO, usuarioSimples.getTituloEleitoral()));
 
         carregarAtribuicoes(usuarioCompleto);
         return usuarioCompleto;

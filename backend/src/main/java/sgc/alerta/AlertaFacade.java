@@ -1,8 +1,9 @@
 package sgc.alerta;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import sgc.processo.model.Processo;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * Facade para gerenciamento de alertas do sistema.
@@ -31,21 +33,25 @@ import java.util.*;
  * @see AlertaService
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class AlertaFacade {
     private final AlertaService alertaService;
     private final UsuarioFacade usuarioService;
     private final AlertaMapper alertaMapper;
     private final UnidadeFacade unidadeService;
+    
+    // Lazy supplier para SEDOC - evita cache manual e é thread-safe
+    @Getter(lazy = true)
+    private final Unidade sedoc = unidadeService.buscarEntidadePorSigla("SEDOC");
 
-    private @Nullable Unidade sedoc;
-
-    private Unidade getSedoc() {
-        if (sedoc == null) {
-            sedoc = unidadeService.buscarEntidadePorSigla("SEDOC");
-        }
-        return sedoc;
+    public AlertaFacade(AlertaService alertaService, 
+                        UsuarioFacade usuarioService, 
+                        AlertaMapper alertaMapper, 
+                        @Lazy UnidadeFacade unidadeService) {
+        this.alertaService = alertaService;
+        this.usuarioService = usuarioService;
+        this.alertaMapper = alertaMapper;
+        this.unidadeService = unidadeService;
     }
 
     /**
