@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.organizacao.model.UnidadeMapaRepo;
 
+import java.util.List;
+
 /**
  * Serviço especializado para gerenciar mapas vigentes de unidades.
  *
@@ -32,6 +34,15 @@ public class UnidadeMapaService {
      */
     public boolean verificarMapaVigente(Long codigoUnidade) {
         return unidadeMapaRepo.existsById(codigoUnidade);
+    }
+
+    /**
+     * Busca todos os códigos de unidades que possuem mapa vigente.
+     *
+     * @return lista de códigos
+     */
+    public List<Long> buscarTodosCodigosUnidades() {
+        return unidadeMapaRepo.findAllUnidadeCodigos();
     }
 
     /**
