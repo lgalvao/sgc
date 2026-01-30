@@ -116,7 +116,7 @@ public class SubprocessoCrudService {
     public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
         return subprocessoRepo
                 .findByMapaCodigo(codMapa)
-                .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada(
+                .orElseThrow(sgc.comum.erros.ErroEntidadeNaoEncontrada.naoEncontrada(
                         "%s para o mapa com código %d".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codMapa)));
     }
 
@@ -193,7 +193,7 @@ public class SubprocessoCrudService {
     public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
         Subprocesso sp = subprocessoRepo
                 .findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
-                .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada(
+                .orElseThrow(sgc.comum.erros.ErroEntidadeNaoEncontrada.naoEncontrada(
                         "%s para o processo %s e unidade %s".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codProcesso,
                                 codUnidade)));
         return subprocessoMapper.toDto(sp);

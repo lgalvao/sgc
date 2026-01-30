@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {ref} from "vue";
+import {ref, computed} from "vue";
 import {apiClient} from "@/axios-setup";
 import {logger} from "@/utils";
 
@@ -14,6 +14,11 @@ export const useConfiguracoesStore = defineStore("configuracoes", () => {
     const parametros = ref<Parametro[]>([]);
     const loading = ref(false);
     const error = ref<string | null>(null);
+
+    // Map para lookup O(1) de chave -> parametro
+    const parametrosMap = computed(() => 
+        new Map(parametros.value.map(p => [p.chave, p]))
+    );
 
     async function carregarConfiguracoes() {
         loading.value = true;
@@ -46,7 +51,7 @@ export const useConfiguracoesStore = defineStore("configuracoes", () => {
     }
 
     function getValor(chave: string, valorPadrao: string = ""): string {
-        const param = parametros.value.find((p) => p.chave === chave);
+        const param = parametrosMap.value.get(chave);
         return param ? param.valor : valorPadrao;
     }
 

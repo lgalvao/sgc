@@ -4,57 +4,50 @@ import type {PerfilUnidade} from "@/mappers/sgrh";
 import type {Perfil} from "@/types/tipos";
 import * as usuarioService from "../services/usuarioService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
+import {useLocalStorage, removeMultipleFromLocalStorage} from "@/composables/useLocalStorage";
 
 export const usePerfilStore = defineStore("perfil", () => {
-    const usuarioCodigo = ref<string | null>(
-        localStorage.getItem("usuarioCodigo") || null,
-    );
-    const perfilSelecionado = ref<Perfil | null>(
-        (localStorage.getItem("perfilSelecionado") || null) as Perfil | null,
-    );
-    const unidadeSelecionada = ref<number | null>(
-        localStorage.getItem("unidadeSelecionada")
-            ? Number(localStorage.getItem("unidadeSelecionada"))
-            : null,
-    );
-    const unidadeSelecionadaSigla = ref<string | null>(
-        (localStorage.getItem("unidadeSelecionadaSigla") || null) as string | null,
-    );
-    const usuarioNome = ref<string | null>(
-        (localStorage.getItem("usuarioNome") || null) as string | null,
-    );
+    // Estados sincronizados com localStorage usando composable
+    const usuarioCodigo = useLocalStorage<string | null>("usuarioCodigo", null);
+    const perfilSelecionado = useLocalStorage<Perfil | null>("perfilSelecionado", null);
+    const unidadeSelecionada = useLocalStorage<number | null>("unidadeSelecionada", null);
+    const unidadeSelecionadaSigla = useLocalStorage<string | null>("unidadeSelecionadaSigla", null);
+    const usuarioNome = useLocalStorage<string | null>("usuarioNome", null);
+    const perfis = useLocalStorage<Perfil[]>("perfis", []);
+    
+    // Estados não persistidos
     const perfisUnidades = ref<PerfilUnidade[]>([]);
-    const perfis = ref<Perfil[]>(
-        (JSON.parse(localStorage.getItem("perfis") || "[]")) as Perfil[],
-    );
     const { lastError, clearError, withErrorHandling } = useErrorHandler();
 
     const isAdmin = computed(() => perfis.value.includes("ADMIN" as Perfil));
     const isGestor = computed(() => perfis.value.includes("GESTOR" as Perfil));
 
+    // Map para lookup O(1) de perfil -> unidade
+    const perfilUnidadeMap = computed(() => 
+        new Map(perfisUnidades.value.map(pu => [pu.perfil, pu]))
+    );
+
     const unidadeAtual = computed(() => {
         if (!perfilSelecionado.value) return null;
         if (unidadeSelecionada.value) return unidadeSelecionada.value;
 
-        const pu = perfisUnidades.value.find((p) => p.perfil === perfilSelecionado.value);
+        const pu = perfilUnidadeMap.value.get(perfilSelecionado.value);
         return pu ? pu.unidade.codigo : null;
     });
 
     function definirUsuarioCodigo(novoId: string) {
         usuarioCodigo.value = novoId;
-        localStorage.setItem("usuarioCodigo", novoId);
+        // localStorage.setItem removido - sincronização automática
     }
 
     function definirPerfilUnidade(perfil: Perfil, unidadeCodigo: number, unidadeSigla: string, nome?: string) {
         perfilSelecionado.value = perfil;
         unidadeSelecionada.value = unidadeCodigo;
         unidadeSelecionadaSigla.value = unidadeSigla;
-        localStorage.setItem("perfilSelecionado", perfil);
-        localStorage.setItem("unidadeSelecionada", unidadeCodigo.toString());
-        localStorage.setItem("unidadeSelecionadaSigla", unidadeSigla);
+        // localStorage.setItem removido - sincronização automática
         if (nome) {
             usuarioNome.value = nome;
-            localStorage.setItem("usuarioNome", nome);
+            // localStorage.setItem removido - sincronização automática
         }
     }
 
@@ -64,7 +57,7 @@ export const usePerfilStore = defineStore("perfil", () => {
 
     function definirPerfis(novosPerfis: Perfil[]) {
         perfis.value = novosPerfis;
-        localStorage.setItem("perfis", JSON.stringify(novosPerfis));
+        // localStorage.setItem removido - sincronização automática
     }
 
     async function loginCompleto(tituloEleitoral: string, senha: string) {
@@ -135,6 +128,7 @@ export const usePerfilStore = defineStore("perfil", () => {
     }
 
     function logout() {
+        // Limpa estados - remoção do localStorage é automática
         usuarioCodigo.value = null;
         perfilSelecionado.value = null;
         unidadeSelecionada.value = null;
@@ -142,13 +136,9 @@ export const usePerfilStore = defineStore("perfil", () => {
         usuarioNome.value = null;
         perfisUnidades.value = [];
         perfis.value = [];
-        localStorage.removeItem("usuarioCodigo");
-        localStorage.removeItem("perfilSelecionado");
-        localStorage.removeItem("unidadeSelecionada");
-        localStorage.removeItem("unidadeSelecionadaSigla");
-        localStorage.removeItem("usuarioNome");
+        
+        // Apenas jwtToken precisa de remoção manual (não é gerenciado pelo composable)
         localStorage.removeItem("jwtToken");
-        localStorage.removeItem("perfis");
     }
 
     return {

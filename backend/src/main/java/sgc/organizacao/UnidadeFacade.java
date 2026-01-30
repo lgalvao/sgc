@@ -119,7 +119,7 @@ public class UnidadeFacade {
     public Unidade buscarEntidadePorSigla(String sigla) {
         return unidadeRepo
                 .findBySigla(sigla)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com sigla " + sigla + " não encontrada"));
+                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada("Unidade com sigla " + sigla + " não encontrada"));
     }
 
     public UnidadeDto buscarPorCodigo(Long codigo) {
@@ -129,7 +129,7 @@ public class UnidadeFacade {
 
     public Unidade buscarEntidadePorId(Long codigo) {
         Unidade unidade = unidadeRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_UNIDADE, codigo));
+                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(ENTIDADE_UNIDADE, codigo));
         if (unidade.getSituacao() != SituacaoUnidade.ATIVA) {
             throw new ErroEntidadeNaoEncontrada(ENTIDADE_UNIDADE, codigo);
         }
