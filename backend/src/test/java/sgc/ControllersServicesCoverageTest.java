@@ -58,6 +58,8 @@ class ControllersServicesCoverageTest {
     @Mock
     private sgc.mapa.service.MapaVisualizacaoService mapaVisualizacaoService;
     @Mock
+    private sgc.mapa.service.MapaManutencaoService mapaManutencaoService;
+    @Mock
     private sgc.organizacao.UsuarioFacade usuarioService;
     @Mock
     private sgc.organizacao.UnidadeFacade unidadeService;
@@ -73,7 +75,7 @@ class ControllersServicesCoverageTest {
     @BeforeEach
     void setUp() {
         mapaFacade = new MapaFacade(
-                mapaRepo, competenciaRepo, mapaCompletoMapper, mapaSalvamentoService,
+                mapaCompletoMapper, mapaSalvamentoService, mapaManutencaoService,
                 mapaVisualizacaoService, impactoMapaService, repo
         );
 

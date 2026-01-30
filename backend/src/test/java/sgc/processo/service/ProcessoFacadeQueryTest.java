@@ -122,7 +122,7 @@ class ProcessoFacadeQueryTest {
         @DisplayName("Deve listar processos finalizados e ativos")
         void deveListarProcessosFinalizadosEAtivos() {
             // Arrange
-            when(processoRepo.findBySituacaoOrderByDataFinalizacaoDesc(SituacaoProcesso.FINALIZADO))
+            when(processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO))
                     .thenReturn(List.of(ProcessoFixture.processoPadrao()));
             when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO))
                     .thenReturn(List.of(ProcessoFixture.processoPadrao()));
