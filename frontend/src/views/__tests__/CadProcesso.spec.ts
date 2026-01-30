@@ -537,8 +537,8 @@ describe('CadProcesso.vue', () => {
 
         await flushPromises();
 
-        expect(wrapper.vm.alertState.show).toBe(true);
-        expect(wrapper.vm.alertState.body).toContain('Não foi possível carregar');
+        expect((wrapper.vm as any).alertState?.show).toBe(true);
+        expect((wrapper.vm as any).alertState?.body).toContain('Não foi possível carregar');
     });
 
     it('focuses on the first invalid field when validation errors occur', async () => {

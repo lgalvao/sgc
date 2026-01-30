@@ -138,7 +138,7 @@ const erroUsuario = ref("");
 
 onMounted(async () => {
   try {
-    unidade.value = await buscarUnidadePorCodigo(codUnidade.value);
+    unidade.value = (await buscarUnidadePorCodigo(codUnidade.value)) as Unidade;
     if (unidade.value) {
       usuarios.value = await buscarUsuariosPorUnidade(unidade.value.codigo);
     }

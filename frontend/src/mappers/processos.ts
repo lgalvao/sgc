@@ -6,11 +6,14 @@ export function mapUnidadeParticipanteDtoToFrontend(
 ): UnidadeParticipante {
     return {
         ...dto,
-        codUnidade: dto.codigo, // Mapear 'codigo' do DTO para 'codUnidade' no frontend
+        codUnidade: dto.codigo,
+        codSubprocesso: dto.codSubprocesso || 0,
+        situacaoSubprocesso: (dto.situacaoSubprocesso as any) || 'CRIADO',
+        dataLimite: dto.dataLimite || '',
         filhos: dto.filhos
             ? dto.filhos.map(mapUnidadeParticipanteDtoToFrontend)
             : [],
-    };
+    } as UnidadeParticipante;
 }
 
 export function mapProcessoDetalheDtoToFrontend(dto: ProcessoDetalheDto): Processo {

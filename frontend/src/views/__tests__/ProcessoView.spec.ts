@@ -187,7 +187,13 @@ describe("ProcessoView.vue", () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();
         const coreStore = useProcessosCoreStore();
-        coreStore.$patch({ lastError: { message: "Erro ao carregar", details: "Detalhes do erro" } });
+        coreStore.$patch({ 
+            lastError: { 
+                kind: 'unexpected' as const, 
+                message: "Erro ao carregar", 
+                details: { info: "Detalhes do erro" } as Record<string, any>
+            } 
+        });
 
         await nextTick();
         await flushPromises();

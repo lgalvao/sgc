@@ -16,6 +16,7 @@ describe('CompetenciaCard Coverage', () => {
                 competencia: {
                     codigo: 1,
                     descricao: 'Competencia Teste',
+                    atividades: [],
                     atividadesAssociadas: [999] // Invalid ID
                 },
                 atividades: [], // Empty list
@@ -35,6 +36,7 @@ describe('CompetenciaCard Coverage', () => {
                 competencia: {
                     codigo: 1,
                     descricao: 'Competencia Teste',
+                    atividades: [],
                     atividadesAssociadas: [999]
                 },
                 atividades: [],

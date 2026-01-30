@@ -29,6 +29,7 @@ describe("CompetenciaCard.vue", () => {
   const mockCompetencia: Competencia = {
     codigo: 10,
     descricao: "Competencia Teste",
+    atividades: [],
     atividadesAssociadas: [101, 102],
   };
 

@@ -5,6 +5,7 @@ import {
     mapMapaCompletoDtoToModel,
     mapMapaDtoToModel
 } from '../mapas';
+import { TipoImpactoAtividade } from '@/types/tipos';
 
 describe('mappers/mapas.ts', () => {
     describe('mapMapaDtoToModel', () => {
@@ -94,11 +95,11 @@ describe('mappers/mapas.ts', () => {
                 totalAtividadesRemovidas: 2,
                 totalAtividadesAlteradas: 3,
                 totalCompetenciasImpactadas: 1,
-                atividadesInseridas: [{ codigo: 1, descricao: 'Nova' }],
-                atividadesRemovidas: [{ codigo: 2, descricao: 'Removida' }],
-                atividadesAlteradas: [{ codigo: 3, descricao: 'Alterada' }],
+                atividadesInseridas: [{ codigo: 1, descricao: 'Nova', tipoImpacto: 'INSERIDA' as TipoImpactoAtividade, competenciasVinculadas: [] }],
+                atividadesRemovidas: [{ codigo: 2, descricao: 'Removida', tipoImpacto: 'REMOVIDA' as TipoImpactoAtividade, competenciasVinculadas: [] }],
+                atividadesAlteradas: [{ codigo: 3, descricao: 'Alterada', tipoImpacto: 'ALTERADA' as TipoImpactoAtividade, competenciasVinculadas: [] }],
                 competenciasImpactadas: [
-                    { codigo: 1, descricao: 'Comp', atividadesAfetadas: [1], tipoImpacto: 'ADICIONADA' }
+                    { codigo: 1, descricao: 'Comp', atividadesAfetadas: [1], tipoImpacto: ['ADICIONADA'] }
                 ]
             };
 
@@ -117,7 +118,13 @@ describe('mappers/mapas.ts', () => {
         });
 
         it('retorna arrays vazios quando campos são undefined', () => {
-            const dto = { temImpactos: false };
+            const dto = {
+                temImpactos: false,
+                totalAtividadesInseridas: 0,
+                totalAtividadesRemovidas: 0,
+                totalAtividadesAlteradas: 0,
+                totalCompetenciasImpactadas: 0
+            };
             const result = mapImpactoMapaDtoToModel(dto);
             expect(result.atividadesInseridas).toEqual([]);
             expect(result.atividadesRemovidas).toEqual([]);
@@ -128,8 +135,12 @@ describe('mappers/mapas.ts', () => {
         it('retorna array vazio para atividadesAfetadas quando undefined', () => {
             const dto = {
                 temImpactos: true,
+                totalAtividadesInseridas: 0,
+                totalAtividadesRemovidas: 0,
+                totalAtividadesAlteradas: 0,
+                totalCompetenciasImpactadas: 1,
                 competenciasImpactadas: [
-                    { codigo: 1, descricao: 'Comp', tipoImpacto: 'REMOVIDA' } // sem atividadesAfetadas
+                    { codigo: 1, descricao: 'Comp', tipoImpacto: ['REMOVIDA'] } // sem atividadesAfetadas
                 ]
             };
 
