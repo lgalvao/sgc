@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {ref} from "vue";
+import {ref, computed} from "vue";
 import {buscarTodosUsuarios} from "@/services/usuarioService";
 import type {Usuario} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
@@ -10,17 +10,26 @@ export const useUsuariosStore = defineStore("usuarios", () => {
     const error = ref<string | null>(null);
     const { lastError, clearError: clearNormalizedError, withErrorHandling } = useErrorHandler();
 
+    // Maps para lookup O(1)
+    const usuariosPorTituloMap = computed(() => 
+        new Map(usuarios.value.map(u => [u.tituloEleitoral, u]))
+    );
+
+    const usuariosPorCodigoMap = computed(() => 
+        new Map(usuarios.value.map(u => [u.codigo, u]))
+    );
+
     function clearError() {
         clearNormalizedError();
         error.value = null;
     }
 
     function obterUsuarioPorTitulo(titulo: string): Usuario | undefined {
-        return usuarios.value.find((u) => u.tituloEleitoral === titulo);
+        return usuariosPorTituloMap.value.get(titulo);
     }
 
     function obterUsuarioPorId(id: number): Usuario | undefined {
-        return usuarios.value.find((u) => u.codigo === id);
+        return usuariosPorCodigoMap.value.get(id);
     }
 
     async function buscarUsuarios() {
