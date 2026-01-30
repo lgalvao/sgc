@@ -86,7 +86,7 @@ class EntrarReqValidationTest {
         @DisplayName("Deve rejeitar título eleitoral muito longo")
         void deveRejeitarTituloMuitoLongo() {
             EntrarRequest req = EntrarRequest.builder()
-                    .tituloEleitoral("a".repeat(21))  // > 20 caracteres
+                    .tituloEleitoral("1".repeat(13))  // > 12 caracteres
                     .perfil("ADMIN")
                     .unidadeCodigo(1L)
                     .build();
@@ -103,7 +103,7 @@ class EntrarReqValidationTest {
         @DisplayName("Deve aceitar título eleitoral no limite máximo")
         void deveAceitarTituloNoLimite() {
             EntrarRequest req = EntrarRequest.builder()
-                    .tituloEleitoral("a".repeat(20))  // exatamente 20 caracteres
+                    .tituloEleitoral("1".repeat(12))  // exatamente 12 caracteres
                     .perfil("ADMIN")
                     .unidadeCodigo(1L)
                     .build();
