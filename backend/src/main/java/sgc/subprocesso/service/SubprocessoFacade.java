@@ -72,6 +72,7 @@ public class SubprocessoFacade {
     private final SubprocessoAtividadeService atividadeService;
     private final SubprocessoContextoService contextoService;
     private final SubprocessoPermissaoCalculator permissaoCalculator;
+    private final sgc.subprocesso.service.factory.SubprocessoFactory subprocessoFactory;
 
     // Utility services
     private final UsuarioFacade usuarioService;
@@ -373,5 +374,42 @@ public class SubprocessoFacade {
     @Transactional
     public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
         atividadeService.importarAtividades(codSubprocessoDestino, codSubprocessoOrigem);
+    }
+
+    // ===== Factory Methods (usados por ProcessoInicializador) =====
+
+    /**
+     * Cria subprocessos para um processo de mapeamento.
+     * 
+     * @param processo o processo de mapeamento
+     * @param unidades as unidades para as quais criar subprocessos
+     */
+    @Transactional
+    public void criarParaMapeamento(sgc.processo.model.Processo processo, java.util.Collection<sgc.organizacao.model.Unidade> unidades) {
+        subprocessoFactory.criarParaMapeamento(processo, unidades);
+    }
+
+    /**
+     * Cria um subprocesso para um processo de revisão.
+     * 
+     * @param processo o processo de revisão
+     * @param unidade a unidade para a qual criar o subprocesso
+     * @param unidadeMapa o mapa vigente da unidade
+     */
+    @Transactional
+    public void criarParaRevisao(sgc.processo.model.Processo processo, sgc.organizacao.model.Unidade unidade, sgc.organizacao.model.UnidadeMapa unidadeMapa) {
+        subprocessoFactory.criarParaRevisao(processo, unidade, unidadeMapa);
+    }
+
+    /**
+     * Cria um subprocesso para um processo de diagnóstico.
+     * 
+     * @param processo o processo de diagnóstico
+     * @param unidade a unidade para a qual criar o subprocesso
+     * @param unidadeMapa o mapa vigente da unidade
+     */
+    @Transactional
+    public void criarParaDiagnostico(sgc.processo.model.Processo processo, sgc.organizacao.model.Unidade unidade, sgc.organizacao.model.UnidadeMapa unidadeMapa) {
+        subprocessoFactory.criarParaDiagnostico(processo, unidade, unidadeMapa);
     }
 }

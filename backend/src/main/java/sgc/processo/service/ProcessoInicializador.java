@@ -14,7 +14,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.service.factory.SubprocessoFactory;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class ProcessoInicializador {
     private final UnidadeRepo unidadeRepo;
     private final sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo;
     private final ApplicationEventPublisher publicadorEventos;
-    private final SubprocessoFactory subprocessoFactory;
+    private final SubprocessoFacade subprocessoFacade;
     private final ProcessoValidador processoValidador;
 
     /**
@@ -138,7 +138,7 @@ public class ProcessoInicializador {
                 .collect(Collectors.toMap(sgc.organizacao.model.UnidadeMapa::getUnidadeCodigo, m -> m));
 
         if (tipo == TipoProcesso.MAPEAMENTO) {
-            subprocessoFactory.criarParaMapeamento(processo, unidadesParaProcessar);
+            subprocessoFacade.criarParaMapeamento(processo, unidadesParaProcessar);
         } else if (tipo == TipoProcesso.REVISAO) {
             // Batch fetch units to avoid N+1 queries
             List<Unidade> unidades = unidadeRepo.findAllById(codigosUnidades);
@@ -151,13 +151,13 @@ public class ProcessoInicializador {
                     throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
                 }
                 sgc.organizacao.model.UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
-                subprocessoFactory.criarParaRevisao(processo, unidade, um);
+                subprocessoFacade.criarParaRevisao(processo, unidade, um);
             }
         } else {
             // Caso DIAGNOSTICO
             for (Unidade unidade : unidadesParaProcessar) {
                 sgc.organizacao.model.UnidadeMapa um = mapaUnidadeMapa.get(unidade.getCodigo());
-                subprocessoFactory.criarParaDiagnostico(processo, unidade, um);
+                subprocessoFacade.criarParaDiagnostico(processo, unidade, um);
             }
         }
     }
