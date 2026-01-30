@@ -8,10 +8,12 @@ import { flattenTree } from "@/utils";
 import * as processoService from "@/services/processoService";
 import * as subprocessoService from "@/services/subprocessoService";
 import { useProcessosCoreStore } from "./core";
+import { useFeedbackStore } from "@/stores/feedback";
 
 export const useProcessosWorkflowStore = defineStore("processos-workflow", () => {
     const { lastError, clearError, withErrorHandling } = useErrorHandler();
     const coreStore = useProcessosCoreStore();
+    const feedbackStore = useFeedbackStore();
 
     async function iniciarProcesso(idProcesso: number, tipo: TipoProcesso, unidadesIds: number[]) {
         return withErrorHandling(async () => {
@@ -141,6 +143,13 @@ export const useProcessosWorkflowStore = defineStore("processos-workflow", () =>
         });
     }
 
+    async function enviarLembrete(codProcesso: number, unidadeCodigo: number) {
+        return withErrorHandling(async () => {
+            await processoService.enviarLembrete(codProcesso, unidadeCodigo);
+            feedbackStore.show("Lembrete enviado", "Lembrete de prazo enviado com sucesso.", "success");
+        });
+    }
+
     return {
         lastError,
         clearError,
@@ -153,5 +162,6 @@ export const useProcessosWorkflowStore = defineStore("processos-workflow", () =>
         homologarValidacao,
         aceitarValidacao,
         executarAcaoBloco,
+        enviarLembrete,
     };
 });

@@ -1,6 +1,10 @@
 import {defineStore} from "pinia";
 import {ref, computed} from "vue";
-import {buscarTodosUsuarios} from "@/services/usuarioService";
+import {
+    buscarTodosUsuarios,
+    buscarUsuariosPorUnidade as serviceBuscarUsuariosPorUnidade,
+    buscarUsuarioPorTitulo as serviceBuscarUsuarioPorTitulo,
+} from "@/services/usuarioService";
 import type {Usuario} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 
@@ -48,6 +52,31 @@ export const useUsuariosStore = defineStore("usuarios", () => {
         });
     }
 
+    async function buscarUsuariosPorUnidade(codigoUnidade: number): Promise<Usuario[]> {
+        isLoading.value = true;
+        error.value = null;
+        return withErrorHandling(async () => {
+            const response = await serviceBuscarUsuariosPorUnidade(codigoUnidade);
+            return response;
+        }, () => {
+            error.value = lastError.value?.message || "Erro ao buscar usuários da unidade";
+        }).finally(() => {
+            isLoading.value = false;
+        }) as Promise<Usuario[]>;
+    }
+
+    async function buscarUsuarioPorTitulo(titulo: string): Promise<Usuario | undefined> {
+        isLoading.value = true;
+        error.value = null;
+        return withErrorHandling(async () => {
+            return await serviceBuscarUsuarioPorTitulo(titulo);
+        }, () => {
+            error.value = lastError.value?.message || "Erro ao buscar usuário";
+        }).finally(() => {
+            isLoading.value = false;
+        }) as Promise<Usuario | undefined>;
+    }
+
     return {
         usuarios,
         isLoading,
@@ -57,5 +86,7 @@ export const useUsuariosStore = defineStore("usuarios", () => {
         obterUsuarioPorTitulo,
         obterUsuarioPorId,
         buscarUsuarios,
+        buscarUsuariosPorUnidade,
+        buscarUsuarioPorTitulo,
     };
 });

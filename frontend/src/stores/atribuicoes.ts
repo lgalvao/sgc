@@ -1,6 +1,10 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
-import {buscarTodasAtribuicoes} from "@/services/atribuicaoTemporariaService";
+import {
+    buscarTodasAtribuicoes,
+    criarAtribuicaoTemporaria as serviceCriarAtribuicao,
+    type CriarAtribuicaoTemporariaRequest,
+} from "@/services/atribuicaoTemporariaService";
 import type {AtribuicaoTemporaria} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {logger} from "@/utils";
@@ -59,6 +63,22 @@ export const useAtribuicaoTemporariaStore = defineStore(
             });
         }
 
+        async function criarAtribuicaoTemporaria(
+            codUnidade: number,
+            request: CriarAtribuicaoTemporariaRequest
+        ) {
+            isLoading.value = true;
+            error.value = null;
+            await withErrorHandling(async () => {
+                await serviceCriarAtribuicao(codUnidade, request);
+                await buscarAtribuicoes();
+            }, () => {
+                error.value = lastError.value?.message || "Erro ao criar atribuição";
+            }).finally(() => {
+                isLoading.value = false;
+            });
+        }
+
         return {
             atribuicoes,
             isLoading,
@@ -68,6 +88,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
             obterAtribuicoesPorServidor,
             obterAtribuicoesPorUnidade,
             buscarAtribuicoes,
+            criarAtribuicaoTemporaria,
         };
     },
 );

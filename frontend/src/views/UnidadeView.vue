@@ -84,7 +84,7 @@ import {useAtribuicaoTemporariaStore} from "@/stores/atribuicoes";
 import {useMapasStore} from "@/stores/mapas";
 import {usePerfilStore} from "@/stores/perfil";
 import {useUnidadesStore} from "@/stores/unidades";
-import {buscarUsuarioPorTitulo} from "@/services/usuarioService";
+import {useUsuariosStore} from "@/stores/usuarios";
 import type {MapaCompleto, Responsavel, Unidade, Usuario,} from "@/types/tipos";
 import TreeTable from "../components/TreeTableView.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
@@ -97,6 +97,7 @@ const unidadesStore = useUnidadesStore();
 const perfilStore = usePerfilStore();
 const mapasStore = useMapasStore();
 const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
+const usuariosStore = useUsuariosStore();
 
 const titular = ref<Usuario | null>(null);
 
@@ -108,7 +109,7 @@ onMounted(async () => {
 
   if (unidadesStore.unidade?.tituloTitular) {
     try {
-      titular.value = await buscarUsuarioPorTitulo(unidadesStore.unidade.tituloTitular);
+      titular.value = await usuariosStore.buscarUsuarioPorTitulo(unidadesStore.unidade.tituloTitular) || null;
     } catch (e) {
       logger.error("Erro ao buscar titular:", e);
     }

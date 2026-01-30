@@ -91,7 +91,7 @@ import {logger} from '@/utils';
 import {useMapasStore} from '@/stores/mapas';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useFeedbackStore} from '@/stores/feedback';
-import {diagnosticoService} from '@/services/diagnosticoService';
+import {useDiagnosticosStore} from '@/stores/diagnosticos';
 import type {Competencia} from '@/types/tipos';
 
 const OPCOES_NIVEL = [
@@ -109,6 +109,7 @@ const router = useRouter();
 const mapasStore = useMapasStore();
 const unidadesStore = useUnidadesStore();
 const feedbackStore = useFeedbackStore();
+const diagnosticosStore = useDiagnosticosStore();
 
 const loading = ref(true);
 const codSubprocesso = computed(() => Number(route.params.codSubprocesso || route.params.codProcesso)); // Ajuste conforme rota
@@ -141,13 +142,11 @@ onMounted(async () => {
     loading.value = true;
     await unidadesStore.buscarUnidade(siglaUnidade.value);
 
-    // Busca o mapa para ter as competências
     await mapasStore.buscarMapaCompleto(codSubprocesso.value);
 
-    // Busca avaliações existentes
-    const existentes = await diagnosticoService.buscarMinhasAvaliacoes(codSubprocesso.value);
+    await diagnosticosStore.buscarMinhasAvaliacoes(codSubprocesso.value);
+    const existentes = diagnosticosStore.avaliacoes;
 
-    // Inicializa estado local
     competencias.value.forEach(comp => {
       const existente = existentes.find(e => e.competenciaCodigo === comp.codigo);
       avaliacoes.value[comp.codigo] = {
@@ -170,7 +169,7 @@ async function salvar(competenciaCodigo: number, importancia: string, dominio: s
 
   try {
     avaliacoes.value[competenciaCodigo].salvo = false;
-    await diagnosticoService.salvarAvaliacao(
+    await diagnosticosStore.salvarAvaliacao(
         codSubprocesso.value,
         competenciaCodigo,
         importancia,
@@ -188,7 +187,7 @@ async function concluirAutoavaliacao() {
   if (!podeConcluir.value) return;
 
   try {
-    await diagnosticoService.concluirAutoavaliacao(codSubprocesso.value);
+    await diagnosticosStore.concluirAutoavaliacao(codSubprocesso.value);
     feedbackStore.show('Sucesso', 'Autoavaliação concluída com sucesso!', 'success');
     await router.push('/painel');
   } catch (error: any) {

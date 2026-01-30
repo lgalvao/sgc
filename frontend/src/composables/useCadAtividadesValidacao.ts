@@ -4,7 +4,6 @@ import { useSubprocessosStore } from "@/stores/subprocessos";
 import { useFeedbackStore } from "@/stores/feedback";
 import type { ErroValidacao, SubprocessoDetalhe } from "@/types/tipos";
 import { SituacaoSubprocesso } from "@/types/tipos";
-import * as subprocessoService from "@/services/subprocessoService";
 
 export interface CadAtividadesValidacao {
     loadingValidacao: Ref<boolean>;
@@ -85,10 +84,10 @@ export function useCadAtividadesValidacao(): CadAtividadesValidacao {
             errosValidacao.value = [];
             erroGlobal.value = null;
             try {
-                const resultado = await subprocessoService.validarCadastro(codSubprocesso);
-                if (resultado.valido) {
+                const resultado = await subprocessosStore.validarCadastro(codSubprocesso);
+                if (resultado && resultado.valido) {
                     mostrarModal.value = true;
-                } else {
+                } else if (resultado) {
                     errosValidacao.value = resultado.erros;
 
                     const erroSemAtividade = resultado.erros.find((e) => !e.atividadeCodigo);

@@ -15,7 +15,12 @@ import {
     buscarContextoEdicao as serviceBuscarContextoEdicao,
     buscarSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
+    validarCadastro as serviceValidarCadastro,
 } from "@/services/subprocessoService";
+import {
+    reabrirCadastro as serviceReabrirCadastro,
+    reabrirRevisaoCadastro as serviceReabrirRevisaoCadastro,
+} from "@/services/processoService";
 import { usePerfilStore } from "@/stores/perfil";
 import { useProcessosStore } from "@/stores/processos";
 import { useFeedbackStore } from "@/stores/feedback";
@@ -157,6 +162,28 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         }
     }
 
+    async function validarCadastro(codSubprocesso: number) {
+        return withErrorHandling(async () => {
+            return await serviceValidarCadastro(codSubprocesso);
+        });
+    }
+
+    async function reabrirCadastro(codSubprocesso: number, justificativa: string) {
+        return _executarAcao(
+            () => serviceReabrirCadastro(codSubprocesso, justificativa),
+            "Cadastro reaberto",
+            "Erro ao reabrir cadastro",
+        );
+    }
+
+    async function reabrirRevisaoCadastro(codSubprocesso: number, justificativa: string) {
+        return _executarAcao(
+            () => serviceReabrirRevisaoCadastro(codSubprocesso, justificativa),
+            "Revisão de cadastro reaberta",
+            "Erro ao reabrir revisão",
+        );
+    }
+
     return {
         subprocessoDetalhe,
         lastError,
@@ -166,6 +193,9 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         buscarContextoEdicao,
         buscarSubprocessoPorProcessoEUnidade,
         atualizarStatusLocal,
+        validarCadastro,
+        reabrirCadastro,
+        reabrirRevisaoCadastro,
         disponibilizarCadastro: (codSubrocesso: number) =>
             _executarAcao(
                 () => disponibilizarCadastro(codSubrocesso),
