@@ -1,5 +1,5 @@
-import apiClient from "../axios-setup";
+import {apiPost} from "@/utils/apiUtils";
 
 export async function marcarComoLido(codAlerta: number): Promise<void> {
-    await apiClient.post(`/alertas/${codAlerta}/marcar-como-lido`);
+    await apiPost<void>(`/alertas/${codAlerta}/marcar-como-lido`);
 }
