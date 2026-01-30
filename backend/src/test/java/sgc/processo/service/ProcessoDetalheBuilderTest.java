@@ -41,6 +41,9 @@ class ProcessoDetalheBuilderTest {
     @Mock
     private ProcessoDetalheMapper processoDetalheMapper;
 
+    @Mock
+    private sgc.organizacao.model.UsuarioPerfilRepo usuarioPerfilRepo;
+
     @InjectMocks
     private ProcessoDetalheBuilder builder;
 
@@ -280,6 +283,7 @@ class ProcessoDetalheBuilderTest {
         when(auth.isAuthenticated()).thenReturn(true);
 
         sgc.organizacao.model.Usuario usuario = new sgc.organizacao.model.Usuario();
+        usuario.setTituloEleitoral("12345678901");
         sgc.organizacao.model.UsuarioPerfil atribuicao = new sgc.organizacao.model.UsuarioPerfil();
         Unidade u2 = new Unidade();
         u2.setCodigo(2L); // Different unit
@@ -287,6 +291,7 @@ class ProcessoDetalheBuilderTest {
 
         when(auth.getPrincipal()).thenReturn(usuario);
         when(securityContext.getAuthentication()).thenReturn(auth);
+        when(usuarioPerfilRepo.findByUsuarioTitulo("12345678901")).thenReturn(List.of(atribuicao));
         SecurityContextHolder.setContext(securityContext);
 
         ProcessoDetalheDto dto = builder.build(processo);
