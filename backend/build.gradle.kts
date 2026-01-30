@@ -117,7 +117,7 @@ tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
 }
 
 tasks.withType<Test> {
-    ignoreFailures = true
+    ignoreFailures = false
     useJUnitPlatform()
 
     testLogging {

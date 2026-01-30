@@ -162,8 +162,13 @@ public class SubprocessoCadastroWorkflowService {
         validarRequisitosNegocioParaDisponibilizacao(codSubprocesso);
 
         Unidade origem = sp.getUnidade();
+        if (origem == null) {
+            throw new IllegalStateException("Subprocesso sem unidade vinculada: " + codSubprocesso);
+        }
+
         Unidade destino = origem.getUnidadeSuperior();
         if (destino == null) {
+            log.warn("Unidade {} não possui superior. Usando a própria unidade como destino.", origem.getSigla());
             destino = origem;
         }
 
@@ -172,11 +177,13 @@ public class SubprocessoCadastroWorkflowService {
         subprocessoRepo.save(sp);
 
         analiseFacade.removerPorSubprocesso(sp.getCodigo());
+        
+        final Unidade destinoFinal = destino; // Effectively final for builder if needed
         transicaoService.registrar(RegistrarTransicaoCommand.builder()
                 .sp(sp)
                 .tipo(transicao)
                 .origem(origem)
-                .destino(destino)
+                .destino(destinoFinal)
                 .usuario(usuario)
                 .build());
     }

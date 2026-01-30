@@ -194,11 +194,20 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
             var competencia = competenciaRepo.save(Competencia.builder().descricao("Competência de Teste").mapa(sp.getMapa()).build());
             var atividade = Atividade.builder().mapa(sp.getMapa()).descricao("Atividade de Teste").build();
 
+            // Establish Many-to-Many - assuming unidirectional or manually syncing:
+            // Since it's a test, simply saving Atividade with Competencia might be enough if Cascade works, 
+            // but safer to save separately and link.
+            atividade = atividadeRepo.save(atividade); // Get ID
+            
+            // Link Competencia - Atividade
             atividade.getCompetencias().add(competencia);
-            atividadeRepo.save(atividade);
-            competencia.getAtividades().add(atividade);
-            competenciaRepo.save(competencia);
-            conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento de Teste").atividade(atividade).build());
+            atividade = atividadeRepo.save(atividade);
+            
+            // Link Conhecimento
+            conhecimentoRepo.save(Conhecimento.builder()
+                    .descricao("Conhecimento de Teste")
+                    .atividade(atividade) // Use saved instance with ID
+                    .build());
 
             entityManager.flush();
             entityManager.clear();

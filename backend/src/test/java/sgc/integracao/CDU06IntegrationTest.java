@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import jakarta.persistence.PersistenceContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,14 +36,12 @@ import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import sgc.organizacao.model.UsuarioRepo;
 
 @Tag("integration")
@@ -62,6 +61,12 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private UsuarioRepo usuarioRepo;
+
+    @Autowired
+    private sgc.organizacao.model.UsuarioPerfilRepo usuarioPerfilRepo;
+
+    @PersistenceContext
+    private jakarta.persistence.EntityManager entityManager;
 
     private Processo processo;
     private Unidade unidade;
@@ -94,19 +99,26 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         Usuario principal = UsuarioFixture.usuarioPadrao();
         principal.setTituloEleitoral(TEST_USER_ID);
         principal.setUnidadeLotacao(unidade);
-
-        // Persist user to DB so that logic depending on Usuario entity works
         usuarioRepo.save(principal);
-
-        // Define as authorities corretamente
         principal.setAuthorities(Set.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + perfil.name())));
 
         // Insert into VW_USUARIO_PERFIL_UNIDADE to support ProcessoDetalheBuilder query
         try {
-            jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-                    TEST_USER_ID, unidade.getCodigo(), perfil.name());
+            var up = sgc.organizacao.model.UsuarioPerfil.builder()
+                    .usuarioTitulo(TEST_USER_ID)
+                    .unidadeCodigo(unidade.getCodigo())
+                    .perfil(perfil)
+                    .build();
+            usuarioPerfilRepo.save(up);
+            System.out.println("DEBUG: Saved UsuarioPerfil via Repo: " + up);
         } catch (Exception e) {
-            // Ignore duplicates
+             System.err.println("DEBUG: Failed to save UsuarioPerfil via Repo: " + e.getMessage());
+             e.printStackTrace();
+        }
+        
+        if (entityManager != null) {
+            entityManager.flush();
+            entityManager.clear();
         }
 
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
@@ -198,6 +210,14 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build());
+
+        var perfis = usuarioPerfilRepo.findByUsuarioTituloWithUnidade(TEST_USER_ID);
+        System.out.println("DEBUG: Perfis encontrados: " + perfis.size());
+        if (!perfis.isEmpty()) {
+            System.out.println("DEBUG: Perfil: " + perfis.get(0).getPerfil() + " - Unidade: " + perfis.get(0).getUnidade().getCodigo());
+        } else {
+             throw new IllegalStateException("DEBUG: Nenhum perfil encontrado para o usuário " + TEST_USER_ID + ". Setup de teste falhou em persistir permissões.");
+        }
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
                 .andExpect(status().isOk())
