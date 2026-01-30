@@ -52,7 +52,7 @@ describe("useUsuariosStore", () => {
             vi.mocked(usuarioService.buscarTodosUsuarios).mockRejectedValue(
                 new Error("Failed"),
             );
-            await context.store.buscarUsuarios();
+            await expect(context.store.buscarUsuarios()).rejects.toThrow("Failed");
             expect(context.store.error).toContain("Failed");
         });
     });

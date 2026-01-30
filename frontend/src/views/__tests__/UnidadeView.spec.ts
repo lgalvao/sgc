@@ -149,11 +149,6 @@ describe('UnidadeView.vue', () => {
         return { wrapper: context.wrapper, unidadesStore, atribuicaoStore, perfilStore, usuariosStore, mapasStore };
     };
 
-    beforeEach(() => {
-        vi.clearAllMocks();
-        (buscarUsuarioPorTitulo as any).mockResolvedValue(mockUsuario);
-    });
-
     it('fetches data on mount', async () => {
         const { unidadesStore, atribuicaoStore } = createWrapper();
         expect(unidadesStore.buscarArvoreUnidade).toHaveBeenCalledWith(1);

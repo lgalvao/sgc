@@ -170,7 +170,7 @@ describe('Subprocessos Store', () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
             (buscarSubprocessoDetalhe as any).mockRejectedValue(new Error('Erro backend'));
 
-            await store.buscarSubprocessoDetalhe(1);
+            await expect(store.buscarSubprocessoDetalhe(1)).rejects.toThrow('Erro backend');
 
             expect(store.subprocessoDetalhe).toBeNull();
             expect(store.lastError).toBeTruthy();
