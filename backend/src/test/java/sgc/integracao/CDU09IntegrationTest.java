@@ -149,7 +149,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         // No need to save subprocesso again as it is the inverse side, but updating the object is good for consistency.
 
         // 5. Autenticar
-        autenticarUsuario(usuarioChefe);
+        autenticarUsuario(usuarioChefe, Perfil.CHEFE);
     }
 
     private void setupUsuarioPerfil(Usuario usuario, Unidade unidade, Perfil perfil) {
@@ -177,7 +177,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         unidade.setMatriculaTitular(usuario.getMatricula());
     }
 
-    private void autenticarUsuario(Usuario usuario) {
+    private void autenticarUsuario(Usuario usuario, Perfil perfil) {
+        usuario.setAuthorities(Set.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + perfil.name())));
         Authentication auth = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
@@ -256,7 +257,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
             outraUnidade = unidadeRepo.save(outraUnidade);
 
             setupUsuarioPerfil(outroChefe, outraUnidade, Perfil.CHEFE);
-            autenticarUsuario(outroChefe);
+            autenticarUsuario(outroChefe, Perfil.CHEFE);
 
             mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", subprocessoMapeamento.getCodigo()).with(csrf()))
                     .andExpect(status().isForbidden());

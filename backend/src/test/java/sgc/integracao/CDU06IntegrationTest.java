@@ -90,6 +90,9 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         principal.setTituloEleitoral(TEST_USER_ID);
         principal.setUnidadeLotacao(unidade);
 
+        // Define as authorities corretamente
+        principal.setAuthorities(Set.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + perfil.name())));
+
         Set<UsuarioPerfil> atribuicoes = new HashSet<>();
         atribuicoes.add(
                 UsuarioPerfil.builder()

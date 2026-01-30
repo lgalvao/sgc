@@ -147,12 +147,14 @@ public class ProcessoController {
      * @return Um {@link ResponseEntity} com o {@link ProcessoDetalheDto}.
      */
     @GetMapping("/{codigo}/detalhes")
+    @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
     public ResponseEntity<ProcessoDetalheDto> obterDetalhes(@PathVariable Long codigo) {
         ProcessoDetalheDto detalhes = processoFacade.obterDetalhes(codigo);
         return ResponseEntity.ok(detalhes);
     }
 
     @GetMapping("/{codigo}/contexto-completo")
+    @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
     @Operation(summary = "Obtém o contexto completo para visualização de processo (BFF)")
     public ResponseEntity<ProcessoDetalheDto> obterContextoCompleto(@PathVariable Long codigo) {
         return ResponseEntity.ok(processoFacade.obterContextoCompleto(codigo));

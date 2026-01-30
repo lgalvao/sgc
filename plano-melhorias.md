@@ -1,8 +1,8 @@
 # 📊 Plano de Melhorias - Sistema SGC
 
 **Data:** 2026-01-30  
-**Executor:** Análise Aprofundada por GitHub Copilot  
-**Contexto:** Sistema com ~500 usuários totais, máximo 10 usuários simultâneos
+**Executor:** Análise Aprofundada por Antigravity (Atualizado)  
+**Contexto:** Sistema com ~500 usuários totais, máximo 10 usuários simultâneos. Refatorações recentes em Controllers e Pacotes já foram aplicadas.
 
 ---
 
@@ -81,26 +81,21 @@ if (subprocesso.getStatus() != StatusSubprocesso.PENDENTE) {
 
 **Problema:** `SubprocessoAccessPolicy` e `AtividadeAccessPolicy` (e outras) reimplementam a mesma lógica complexa de verificação de hierarquia e titularidade (`TITULAR_UNIDADE`). A `AbstractAccessPolicy` existe mas não centraliza essas regras comuns adequadamente.
 
-```java
-// ProcessoAccessPolicy.java
-private boolean verificarHierarquia(Usuario usuario, String codigoUnidade) {
-    if (usuario.hasRole("ADMIN")) return true;
-    return hierarchyService.isSubordinateOrSame(usuario.getCodigoUnidade(), codigoUnidade);
-}
+> **Nota:** A `ProcessoAccessPolicy` foi refatorada e simplificada, não apresentando mais este problema. O foco agora é na duplicação entre Subprocesso e Atividade.
 
-// SubprocessoAccessPolicy.java - CÓDIGO IDÊNTICO
-private boolean verificarHierarquia(Usuario usuario, String codigoUnidade) {
-    if (usuario.hasRole("ADMIN")) return true;
-    return hierarchyService.isSubordinateOrSame(usuario.getCodigoUnidade(), codigoUnidade);
-}
+```java
+// SubprocessoAccessPolicy.java
+private boolean verificarHierarquia(Usuario usuario, String codigoUnidade) { ... }
+
+// AtividadeAccessPolicy.java - LÓGICA DE 'TITULAR_UNIDADE' DUPLICADA
 ```
 
 **Impacto:**
-- 🔴 Código idêntico em 4 classes (~80 linhas duplicadas)
-- Violação do DRY (Don't Repeat Yourself)
-- Manutenção 4x mais custosa
+- 🔴 Código duplicado mantendo regras de negócio críticas
+- Risco de inconsistência em regras de acesso
+- Manutenção duplicada
 
-**Solução:** Criar `AbstractAccessPolicy` com lógica comum.
+**Solução:** Mover lógica comum de hierarquia e titularidade para `AbstractAccessPolicy`.
 
 ---
 
@@ -214,29 +209,11 @@ public class ProcessoFacade {
 
 ---
 
-#### 1.2.2 Organização de Pacotes Inconsistente
+#### 1.2.2 Organização de Pacotes Inconsistente (✅ RESOLVIDO)
 
-**Problema:** Estrutura de pacotes varia entre domínios.
+**Status:** ✅ **RESOLVIDO**. O pacote `subprocesso` foi reorganizado seguindo uma estrutura clara (`api`, `service`, `model`, `dto`), alinhando-se melhor com o restante do projeto.
 
-```
-processo/
-  ├── controller/
-  ├── service/
-  ├── facade/
-  └── dto/
-
-subprocesso/
-  ├── api/          # ← Diferente!
-  ├── aplicacao/    # ← Diferente!
-  └── dominio/      # ← Diferente!
-```
-
-**Impacto:**
-- 🟠 Navegação difícil
-- Curva de aprendizado alta
-- Inconsistência arquitetural
-
-**Solução:** Padronizar estrutura em todos os domínios.
+**Ação:** Manter o padrão atual para novos módulos.
 
 ---
 
@@ -357,23 +334,11 @@ public Analise buscar(@PathVariable String codigo) {
 
 ---
 
-#### 1.3.4 Violação ADR-005 (Controller Organization)
+#### 1.3.4 Violação ADR-005 (Controller Organization) (✅ RESOLVIDO)
 
-**Problema:** Controllers consolidados em arquivos grandes ao invés de separados por workflow phase.
+**Status:** ✅ **RESOLVIDO**. O `ProcessoController` foi refatorado e agora possui ~280 linhas, delegando lógica de inicialização para Strategies e lógica de negócio para a `ProcessoFacade`. A estrutura está limpa e coesa.
 
-```java
-// ProcessoController.java - 850 linhas!
-// Mistura CRUD + Cadastro + Mapa + Validação + Workflow
-```
-
-**ADR-005 especifica:** Controllers organizados por workflow phase (~200-300 linhas cada).
-
-**Impacto:**
-- 🟠 4 controllers > 500 linhas
-- Dificulta navegação
-- Documentação Swagger confusa
-
-**Solução:** Dividir em ProcessoCrudController, ProcessoCadastroController, ProcessoMapaController, ProcessoValidacaoController.
+**Ação:** Garantir que novos controllers sigam este exemplo (ex: `Subprocesso` já está dividido).
 
 ---
 

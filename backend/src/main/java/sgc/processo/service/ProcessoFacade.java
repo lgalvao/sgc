@@ -100,7 +100,6 @@ public class ProcessoFacade {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
     public ProcessoDetalheDto obterContextoCompleto(Long codigo) {
         ProcessoDetalheDto detalhes = self.obterDetalhes(codigo);
         List<SubprocessoElegivelDto> elegiveis = self.listarSubprocessosElegiveis(codigo);
@@ -110,7 +109,6 @@ public class ProcessoFacade {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codProcesso)")
     public ProcessoDetalheDto obterDetalhes(Long codProcesso) {
         Processo processo = buscarPorId(codProcesso);
 
