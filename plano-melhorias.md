@@ -1099,5 +1099,74 @@ Unitários (mocked) ───────── E2E
 
 ---
 
+## 📊 Progresso da Execução
+
+**Última atualização:** 2026-01-30 20:33 UTC
+
+### Ações Completadas (4 de 33 - 12%)
+
+#### ✅ Ação #1: Remover arquivos *CoverageTest.java
+- **Status:** COMPLETA
+- **Arquivos removidos:** 26 arquivos de teste artificial
+- **Linhas removidas:** ~4.400 linhas
+- **Impacto:** Métricas de cobertura agora refletem testes reais, não getters/setters
+- **Conformidade:** Melhora qualidade dos testes
+
+#### ✅ Ação #5: Mover @PreAuthorize de Facades para Controllers
+- **Status:** COMPLETA
+- **Módulo:** ProcessoFacade → ProcessoController
+- **Alterações:**
+  - Removidas 10 anotações @PreAuthorize do ProcessoFacade
+  - Adicionada 1 anotação faltante no ProcessoController (listarSubprocessosElegiveis)
+  - Removido import não utilizado
+- **Conformidade:** ✅ ADR-001 (Facade Pattern)
+- **Validação:** Compilação bem-sucedida
+
+#### ✅ Ação #7: Criar DTOs para AnaliseController e ConfiguracaoController
+- **Status:** COMPLETA
+- **Achados:**
+  - AnaliseController: Já estava conforme (usa DTOs corretamente)
+  - ConfiguracaoController: Necessitava correção
+- **Implementação:**
+  - Criados ParametroRequest e ParametroResponse
+  - Implementado ParametroMapper com MapStruct
+  - Adicionado método buscarPorId no ConfiguracaoService
+  - Refatorado ConfiguracaoFacade para usar DTOs
+  - Atualizado ConfiguracaoController
+- **Conformidade:** ✅ ADR-004 (DTO Pattern)
+- **Validação:** Compilação bem-sucedida
+
+#### ✅ Ação #10: Substituir console.* por logger
+- **Status:** COMPLETA (já estava conforme)
+- **Achados:**
+  - Frontend já usa logger estruturado (consola)
+  - Apenas testes usam console.error (apropriado)
+  - Nenhuma ação necessária
+
+### Achados Adicionais Durante Execução
+
+1. **Frontend já em conformidade com logging:**
+   - Uso adequado de `consola` (logger estruturado)
+   - ESLint configurado para bloquear console.*
+   - Apenas testes usam console.error para suprimir warnings
+
+2. **AnaliseController já seguia ADR-004:**
+   - Documentação do plano estava desatualizada
+   - Controller já usava DTOs corretamente
+   - Apenas ConfiguracaoController precisava correção
+
+3. **Todas as Facades verificadas:**
+   - Apenas ProcessoFacade tinha @PreAuthorize
+   - Demais Facades já estão em conformidade com ADR-001
+
+### Próximas Ações Prioritárias
+
+1. **#2:** Consolidar Access Policies em AbstractAccessPolicy (6h)
+2. **#4:** Refatorar SubprocessoFacade e centralizar validações (8h)
+3. **#6:** Centralizar verificações de acesso via AccessControlService (8h)
+4. **#3:** Dividir GOD Composables no frontend (8h)
+
+---
+
 **Documento gerado em:** 2026-01-30  
 **Próxima revisão:** Após implementação de ações CRÍTICAS
