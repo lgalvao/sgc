@@ -2,6 +2,9 @@ package sgc.configuracao;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import sgc.configuracao.dto.ParametroRequest;
+import sgc.configuracao.dto.ParametroResponse;
+import sgc.configuracao.mapper.ParametroMapper;
 import sgc.configuracao.model.Parametro;
 
 import java.util.List;
@@ -19,14 +22,17 @@ import java.util.List;
 public class ConfiguracaoFacade {
 
     private final ConfiguracaoService configuracaoService;
+    private final ParametroMapper parametroMapper;
 
     /**
      * Busca todos os parâmetros de configuração.
      *
      * @return lista com todos os parâmetros
      */
-    public List<Parametro> buscarTodos() {
-        return configuracaoService.buscarTodos();
+    public List<ParametroResponse> buscarTodos() {
+        return configuracaoService.buscarTodos().stream()
+                .map(parametroMapper::toResponse)
+                .toList();
     }
 
     /**
@@ -42,11 +48,24 @@ public class ConfiguracaoFacade {
     /**
      * Salva uma lista de parâmetros.
      *
-     * @param parametros lista de parâmetros a salvar
-     * @return lista de parâmetros salvos
+     * @param requests lista de DTOs de parâmetros a salvar
+     * @return lista de DTOs de parâmetros salvos
      */
-    public List<Parametro> salvar(List<Parametro> parametros) {
-        return configuracaoService.salvar(parametros);
+    public List<ParametroResponse> salvar(List<ParametroRequest> requests) {
+        // Buscar parâmetros existentes e atualizar com dados das requests
+        List<Parametro> parametros = requests.stream()
+                .map(request -> {
+                    Parametro parametro = configuracaoService.buscarPorId(request.codigo());
+                    parametroMapper.atualizarEntidade(request, parametro);
+                    return parametro;
+                })
+                .toList();
+        
+        List<Parametro> parametrosSalvos = configuracaoService.salvar(parametros);
+        
+        return parametrosSalvos.stream()
+                .map(parametroMapper::toResponse)
+                .toList();
     }
 
     /**

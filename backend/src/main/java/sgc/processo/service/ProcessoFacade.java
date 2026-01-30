@@ -2,7 +2,6 @@ package sgc.processo.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,21 +69,18 @@ public class ProcessoFacade {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
     public ProcessoDto criar(CriarProcessoRequest req) {
         Processo processoSalvo = processoManutencaoService.criar(req);
         return processoMapper.toDto(processoSalvo);
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
     public ProcessoDto atualizar(Long codigo, AtualizarProcessoRequest requisicao) {
         Processo processoAtualizado = processoManutencaoService.atualizar(codigo, requisicao);
         return processoMapper.toDto(processoAtualizado);
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
     public void apagar(Long codigo) {
         processoManutencaoService.apagar(codigo);
     }
@@ -140,31 +136,26 @@ public class ProcessoFacade {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
     public List<String> iniciarProcessoMapeamento(Long codigo, List<Long> codsUnidades) {
         return processoInicializador.iniciar(codigo, codsUnidades);
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
     public List<String> iniciarProcessoRevisao(Long codigo, List<Long> codigosUnidades) {
         return processoInicializador.iniciar(codigo, codigosUnidades);
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
     public List<String> iniciarProcessoDiagnostico(Long codigo, List<Long> codsUnidades) {
         return processoInicializador.iniciar(codigo, codsUnidades);
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
     public void finalizar(Long codigo) {
         processoFinalizador.finalizar(codigo);
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
     public void enviarLembrete(Long codProcesso, Long unidadeCodigo) {
         Processo processo = self.buscarEntidadePorId(codProcesso);
         Unidade unidade = unidadeService.buscarEntidadePorId(unidadeCodigo);
@@ -191,7 +182,6 @@ public class ProcessoFacade {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     public List<SubprocessoElegivelDto> listarSubprocessosElegiveis(Long codProcesso) {
         return processoConsultaService.listarSubprocessosElegiveis(codProcesso);
     }
@@ -204,7 +194,6 @@ public class ProcessoFacade {
     }
 
     @Transactional
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     public void executarAcaoEmBloco(Long codProcesso, AcaoEmBlocoRequest req) {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
 
