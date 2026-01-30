@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {
@@ -53,9 +53,9 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await cleanup.limpar(request);
     });
 
-    test('Preparacao: Criar processo e homologar cadastro de atividades', async ({page}) => {
+    test('Preparacao: Criar processo e homologar cadastro de atividades', async ({page, autenticadoComoAdmin, autenticadoComoGestorCoord22, autenticadoComoChefeSecao221}) => {
         // 1. Admin cria e inicia processo
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -79,7 +79,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByText('Processo iniciado')).toBeVisible();
 
         // 2. Chefe adiciona atividades e conhecimentos
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+        
 
         await acessarSubprocessoChefeDireto(page, descProcesso);
         await navegarParaAtividades(page);
@@ -94,7 +94,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // 3. Gestor aceita
-        await login(page, USUARIO_GESTOR, SENHA_GESTOR);
+        
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
@@ -111,8 +111,8 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);
     });
 
-    test('CT-00 e CT-01: Acessar Edição de Mapa e verificar elementos', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('CT-00 e CT-01: Acessar Edição de Mapa e verificar elementos', async ({page, autenticadoComoAdmin}) => {
+        
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
 
@@ -132,8 +132,8 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
     });
 
-    test('CT-02: Criar Competência', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('CT-02: Criar Competência', async ({page, autenticadoComoAdmin}) => {
+        
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
 
@@ -147,8 +147,8 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeEnabled();
     });
 
-    test('CT-03: Editar Competência', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('CT-03: Editar Competência', async ({page, autenticadoComoAdmin}) => {
+        
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
 
@@ -162,8 +162,8 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await verificarCompetenciaNoMapa(page, newDesc, [ATIVIDADE_1, ATIVIDADE_2]);
     });
 
-    test('CT-05: Validar Cancelamento da Exclusão', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('CT-05: Validar Cancelamento da Exclusão', async ({page, autenticadoComoAdmin}) => {
+        
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
 
@@ -174,8 +174,8 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByText(compDesc).first()).toBeVisible();
     });
 
-    test('CT-04: Excluir Competência com Confirmação', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('CT-04: Excluir Competência com Confirmação', async ({page, autenticadoComoAdmin}) => {
+        
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
 
@@ -187,9 +187,9 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
     });
 
-    test('CT-06: Navegar para Disponibilização', async ({page}) => {
+    test('CT-06: Navegar para Disponibilização', async ({page, autenticadoComoAdmin}) => {
         // Recriar uma competência para poder disponibilizar
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
 

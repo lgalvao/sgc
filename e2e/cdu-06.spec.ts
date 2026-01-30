@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso, verificarDetalhesProcesso, verificarUnidadeParticipante} from './helpers/helpers-processos';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
@@ -13,12 +13,9 @@ test.describe('CDU-06 - Detalhar processo', () => {
 
     test.afterEach(async ({request}) => await cleanup.limpar(request));
 
-    test('Deve exibir detalhes do processo para ADMIN', async ({page}) => {
+    test('Deve exibir detalhes do processo para ADMIN', async ({page, autenticadoComoAdmin}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-06 ${timestamp}`;
-
-        // Login ADMIN
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         // Criar e iniciar processo
         await criarProcesso(page, {

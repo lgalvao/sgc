@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
@@ -51,8 +51,8 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     // PREPARAÇÃO - Criar processo com mapa criado
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, autenticadoComoChefeSecao221}) => {
+        
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -74,8 +74,8 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
-        await login(page, USUARIO_CHEFE_1, SENHA_CHEFE_1);
+    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoAdmin}) => {
+        
 
         await page.getByText(descProcesso).click();
         await navegarParaAtividades(page);
@@ -90,7 +90,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     });
 
     test('Preparacao 3: Admin homologa cadastro e cria competências', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);
@@ -116,9 +116,9 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     // TESTES PRINCIPAIS - CDU-24
     // ========================================================================
 
-    test('Cenario 1: ADMIN visualiza botão Disponibilizar Mapas em Bloco', async ({page}) => {
+    test('Cenario 1: ADMIN visualiza botão Disponibilizar Mapas em Bloco', async ({page, autenticadoComoAdmin}) => {
         // CDU-24: Passos 1-4
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         await page.getByText(descProcesso).click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
@@ -132,9 +132,9 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         }
     });
 
-    test('Cenario 2: Modal de disponibilização inclui campo de data limite', async ({page}) => {
+    test('Cenario 2: Modal de disponibilização inclui campo de data limite', async ({page, autenticadoComoAdmin}) => {
         // CDU-24: Passo 5 - Modal inclui campo de data limite obrigatório
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         await page.getByText(descProcesso).click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
@@ -163,9 +163,9 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         }
     });
 
-    test('Cenario 3: Cancelar disponibilização em bloco', async ({page}) => {
+    test('Cenario 3: Cancelar disponibilização em bloco', async ({page, autenticadoComoAdmin}) => {
         // CDU-24: Passo 6 - Cancelar
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         await page.getByText(descProcesso).click();
 

@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import * as AtividadeHelpers from './helpers/helpers-atividades';
@@ -15,12 +15,12 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         await resetDatabase(request);
     });
 
-    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({page}) => {
+    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({page, autenticadoComoAdmin}) => {
         const timestamp = Date.now();
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
 
         await test.step('1. Setup: Criar Processo de Mapeamento', async () => {
-            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+            
             await criarProcesso(page, {
                 descricao: descricaoProcesso,
                 tipo: 'MAPEAMENTO',
@@ -79,7 +79,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
     });
 
-    test('Cenário 2: Processo de Revisão (Botão Impacto)', async ({page}) => {
+    test('Cenário 2: Processo de Revisão (Botão Impacto)', async ({page, autenticadoComoAdmin}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-08 Rev ${timestamp}`;
         const UNIDADE_REVISAO = 'ASSESSORIA_12';
@@ -87,7 +87,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const SENHA_REVISAO = USUARIOS.CHEFE_ASSESSORIA_12.senha;
 
         await test.step('Setup: Criar Processo de Revisão', async () => {
-            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+            
             await criarProcesso(page, {
                 descricao,
                 tipo: 'REVISAO',

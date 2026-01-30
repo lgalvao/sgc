@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {resetDatabase} from './hooks/hooks-limpeza';
 
@@ -29,9 +29,9 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
     // CENÁRIO 1: Navegação para página de histórico
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para página de histórico', async ({page}) => {
+    test('Cenario 1: ADMIN navega para página de histórico', async ({page, autenticadoComoAdmin, autenticadoComoGestorCoord22, autenticadoComoChefeSecao221}) => {
         // CDU-29: Passos 1-2
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         // Passo 1: Clicar em Histórico na navbar
         await page.getByRole('link', {name: /Histórico/i}).click();
@@ -41,8 +41,8 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
         await expect(page.getByRole('heading', {name: /Histórico/i})).toBeVisible();
     });
 
-    test('Cenario 2: GESTOR pode acessar histórico', async ({page}) => {
-        await login(page, USUARIO_GESTOR, SENHA_GESTOR);
+    test('Cenario 2: GESTOR pode acessar histórico', async ({page, autenticadoComoAdmin}) => {
+        
 
         // Navegar para histórico
         await page.getByRole('link', {name: /Histórico/i}).click();
@@ -52,7 +52,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
     });
 
     test('Cenario 3: CHEFE pode acessar histórico', async ({page}) => {
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+        
 
         // Navegar para histórico
         await page.getByRole('link', {name: /Histórico/i}).click();
@@ -67,7 +67,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
 
     test('Cenario 4: Tabela apresenta colunas corretas', async ({page}) => {
         // CDU-29: Passo 2 - Verificar colunas da tabela
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         await page.getByRole('link', {name: /Histórico/i}).click();
         await expect(page).toHaveURL(/\/historico/);

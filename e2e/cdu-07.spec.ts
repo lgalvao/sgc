@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso, verificarDetalhesSubprocesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
@@ -15,12 +15,12 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
 
     test.afterEach(async ({request}) => await cleanup.limpar(request));
 
-    test('Deve exibir detalhes do subprocesso para CHEFE', async ({page}) => {
+    test('Deve exibir detalhes do subprocesso para CHEFE', async ({page, autenticadoComoAdmin}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-07 ${timestamp}`;
 
         // 1. ADMIN cria e inicia processo
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        
 
         await criarProcesso(page, {
             descricao,

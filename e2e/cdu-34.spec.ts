@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao';
@@ -41,8 +41,8 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao: Admin cria e inicia processo', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
+        
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -68,17 +68,17 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para detalhes do processo', async ({page}) => {
+    test('Cenario 1: ADMIN navega para detalhes do processo', async ({page, autenticadoComoAdmin}) => {
         // CDU-34: Passo 1
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         await page.getByText(descProcesso).click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
     });
 
-    test('Cenario 2: Verificar indicadores de prazo', async ({page}) => {
+    test('Cenario 2: Verificar indicadores de prazo', async ({page, autenticadoComoAdmin}) => {
         // CDU-34: Passo 2 - Sistema exibe indicadores de prazo
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         await page.getByText(descProcesso).click();
 
@@ -92,9 +92,9 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         // Isso depende da implementação visual
     });
 
-    test('Cenario 3: Verificar opção de enviar lembrete', async ({page}) => {
+    test('Cenario 3: Verificar opção de enviar lembrete', async ({page, autenticadoComoAdmin}) => {
         // CDU-34: Passo 4
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);

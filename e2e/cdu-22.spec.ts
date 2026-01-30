@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
@@ -52,8 +52,8 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, autenticadoComoGestorCoord22, autenticadoComoChefeSecao221}) => {
+        
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -76,7 +76,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     });
 
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
-        await login(page, USUARIO_CHEFE_1, SENHA_CHEFE_1);
+        
 
         await page.getByText(descProcesso).click();
         await navegarParaAtividades(page);
@@ -95,7 +95,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     // ========================================================================
 
     test('Cenario 1: GESTOR visualiza botão Aceitar em Bloco', async ({page}) => {
-        await login(page, USUARIO_GESTOR, SENHA_GESTOR);
+        
 
         await page.getByText(descProcesso).click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
@@ -108,8 +108,8 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         }
     });
 
-    test('Cenario 2: GESTOR abre modal de aceite em bloco', async ({page}) => {
-        await login(page, USUARIO_GESTOR, SENHA_GESTOR);
+    test('Cenario 2: GESTOR abre modal de aceite em bloco', async ({page, autenticadoComoGestorCoord22}) => {
+        
 
         await page.getByText(descProcesso).click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
@@ -129,8 +129,8 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         }
     });
 
-    test('Cenario 3: Cancelar aceite em bloco permanece na tela', async ({page}) => {
-        await login(page, USUARIO_GESTOR, SENHA_GESTOR);
+    test('Cenario 3: Cancelar aceite em bloco permanece na tela', async ({page, autenticadoComoGestorCoord22}) => {
+        
 
         await page.getByText(descProcesso).click();
 

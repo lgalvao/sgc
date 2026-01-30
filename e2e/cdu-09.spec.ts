@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
@@ -28,8 +28,8 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
     test.afterAll(async ({request}) => await cleanup.limpar(request));
 
-    test('Preparacao: Admin cria e inicia processo', async ({page}) => {
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
+        
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -56,7 +56,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await verificarPaginaPainel(page);
     });
 
-    test('Cenario 1: Validacao - Atividade sem conhecimento', async ({page}) => {
+    test('Cenario 1: Validacao - Atividade sem conhecimento', async ({page, autenticadoComoAdmin}) => {
         // Login como Chefe
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
@@ -121,7 +121,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
     test('Cenario 3: Devolucao e Historico de Analise', async ({page}) => {
         // 1. Admin devolve o cadastro
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         // Entrar no cadastro de atividades (visualização)

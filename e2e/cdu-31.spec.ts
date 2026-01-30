@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {resetDatabase} from './hooks/hooks-limpeza';
 
@@ -25,9 +25,9 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
     // CENÁRIO 1: Navegação para configurações
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para configurações', async ({page}) => {
+    test('Cenario 1: ADMIN navega para configurações', async ({page, autenticadoComoAdmin}) => {
         // CDU-31: Passos 1-2
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         // Passo 1: Clicar no botão de engrenagem
         await page.getByTestId('btn-configuracoes').click();
@@ -41,8 +41,8 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
     // CENÁRIO 2: Visualizar configurações atuais
     // ========================================================================
 
-    test('Cenario 2: Tela exibe configurações editáveis', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Cenario 2: Tela exibe configurações editáveis', async ({page, autenticadoComoAdmin}) => {
+        
 
         await page.getByTestId('btn-configuracoes').click();
         await expect(page).toHaveURL(/\/configuracoes/);
@@ -60,9 +60,9 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
     // CENÁRIO 3: Salvar configurações
     // ========================================================================
 
-    test('Cenario 3: ADMIN salva configurações com sucesso', async ({page}) => {
+    test('Cenario 3: ADMIN salva configurações com sucesso', async ({page, autenticadoComoAdmin}) => {
         // CDU-31: Passos 3-4
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         await page.getByTestId('btn-configuracoes').click();
         await expect(page).toHaveURL(/\/configuracoes/);

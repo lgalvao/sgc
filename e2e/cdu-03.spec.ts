@@ -1,5 +1,4 @@
-import {expect, test} from './fixtures/base';
-import {login, USUARIOS} from './helpers/helpers-auth';
+import {expect, test} from './fixtures/auth-fixtures';
 import {criarProcesso} from './helpers/helpers-processos';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
@@ -8,16 +7,15 @@ test.describe('CDU-03 - Manter Processo', () => {
 
     test.beforeAll(async ({request}) => await resetDatabase(request));
 
-    test.beforeEach(async ({page}) => {
+    test.beforeEach(async () => {
         cleanup = useProcessoCleanup();
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
     });
 
     test.afterEach(async ({request}) => {
         await cleanup.limpar(request);
     });
 
-    test('Deve validar campos obrigatórios', async ({page}) => {
+    test('Deve validar campos obrigatórios', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
 
@@ -43,7 +41,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page.getByTestId('btn-processo-iniciar')).toBeEnabled();
     });
 
-    test('Deve editar um processo existente', async ({page}) => {
+    test('Deve editar um processo existente', async ({page, autenticadoComoAdmin}) => {
         const descricaoOriginal = `Processo para Edição - ${Date.now()}`;
         // Cria um processo inicial
         await criarProcesso(page, {
@@ -80,7 +78,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page.getByText(descricaoOriginal, {exact: true})).not.toBeVisible();
     });
 
-    test('Deve remover um processo', async ({page}) => {
+    test('Deve remover um processo', async ({page, autenticadoComoAdmin}) => {
         const descricao = `Processo para Remoção - ${Date.now()}`;
         await criarProcesso(page, {
             descricao: descricao,

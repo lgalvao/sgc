@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {resetDatabase} from './hooks/hooks-limpeza';
 
@@ -25,8 +25,8 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para página de relatórios', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Cenario 1: ADMIN navega para página de relatórios', async ({page, autenticadoComoAdmin}) => {
+        
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
 
@@ -34,8 +34,8 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         await expect(page.getByRole('heading', {name: /Relatórios/i})).toBeVisible();
     });
 
-    test('Cenario 2: Página exibe card de relatório de mapas', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Cenario 2: Página exibe card de relatório de mapas', async ({page, autenticadoComoAdmin}) => {
+        
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
         await expect(page).toHaveURL(/\/relatorios/);
@@ -43,8 +43,8 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         await expect(page.getByTestId('card-relatorio-mapas')).toBeVisible();
     });
 
-    test('Cenario 3: Abrir modal de Mapas Vigentes', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Cenario 3: Abrir modal de Mapas Vigentes', async ({page, autenticadoComoAdmin}) => {
+        
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
         await expect(page).toHaveURL(/\/relatorios/);
@@ -56,8 +56,8 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         await expect(modal.getByRole('heading', {name: /Mapas Vigentes/i})).toBeVisible();
     });
 
-    test('Cenario 4: Botão de exportação está disponível', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Cenario 4: Botão de exportação está disponível', async ({page, autenticadoComoAdmin}) => {
+        
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
         await page.getByTestId('card-relatorio-mapas').click();

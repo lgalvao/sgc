@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
@@ -20,7 +20,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await cleanup.limpar(request);
         });
 
-        test('Deve exibir seções de Processos e Alertas', async ({page}) => {
+        test('Deve exibir seções de Processos e Alertas', async ({page, autenticadoComoGestor}) => {
             await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();
             await expect(page.getByTestId('txt-painel-titulo-processos')).toHaveText('Processos');
 
@@ -146,13 +146,11 @@ test.describe('CDU-02 - Visualizar Painel', () => {
     });
 
     test.describe('Como GESTOR', () => {
-        test.beforeEach(async ({page}) => await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha));
-
-        test('Não deve exibir botão "Criar processo"', async ({page}) => {
+        test('Não deve exibir botão "Criar processo"', async ({page, autenticadoComoGestor}) => {
             await expect(page.getByTestId('btn-painel-criar-processo')).not.toBeVisible();
         });
 
-        test('Deve exibir mensagem quando não há processos', async ({page}) => {
+        test('Deve exibir mensagem quando não há processos', async ({page, autenticadoComoGestor}) => {
             const tabela = page.getByTestId('tbl-processos');
             await expect(tabela).toBeVisible();
 
