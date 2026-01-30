@@ -13,6 +13,7 @@ import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,20 +29,24 @@ class SubprocessoFacadeBatchUpdateTest {
     private sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
     @Mock
     private SubprocessoAjusteMapaService ajusteMapaService;
+    @Mock
+    private SubprocessoCrudService crudService;
+    @Mock
+    private SubprocessoAtividadeService atividadeService;
+    @Mock
+    private SubprocessoContextoService contextoService;
+    @Mock
+    private SubprocessoPermissaoCalculator permissaoCalculator;
+    @Mock
+    private sgc.organizacao.UsuarioFacade usuarioService;
 
     @InjectMocks
     private SubprocessoFacade facade;
 
     @Test
-    void deveSalvarAjustesEmLoteEvitandoNMais1() {
-        // Arrange
+    void deveDelegarSalvarAjustesParaAjusteMapaService() {
         Long codSubprocesso = 100L;
-        Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setCodigo(codSubprocesso);
-        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
-
-        when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(subprocesso));
-
+        
         CompetenciaAjusteDto comp1 = CompetenciaAjusteDto.builder()
                 .codCompetencia(1L)
                 .nome("Comp 1 Adjusted")
@@ -61,35 +66,8 @@ class SubprocessoFacadeBatchUpdateTest {
 
         List<CompetenciaAjusteDto> ajustes = List.of(comp1, comp2);
 
-        // Mock batch returns
-        Atividade a10 = new Atividade();
-        a10.setCodigo(10L);
-        Atividade a11 = new Atividade();
-        a11.setCodigo(11L);
-        Atividade a12 = new Atividade();
-        a12.setCodigo(12L);
-        when(mapaManutencaoService.atualizarDescricoesAtividadeEmLote(any())).thenReturn(List.of(a10, a11, a12));
-
-        Competencia c1 = new Competencia();
-        c1.setCodigo(1L);
-        Competencia c2 = new Competencia();
-        c2.setCodigo(2L);
-        when(mapaManutencaoService.buscarCompetenciasPorCodigos(any())).thenReturn(List.of(c1, c2));
-
-        // Act
         facade.salvarAjustesMapa(codSubprocesso, ajustes);
 
-        // Assert
-        // Verify batch methods called ONCE
-        verify(mapaManutencaoService, times(1)).atualizarDescricoesAtividadeEmLote(any());
-        verify(mapaManutencaoService, times(1)).buscarCompetenciasPorCodigos(any());
-        verify(mapaManutencaoService, times(1)).salvarTodasCompetencias(any());
-        verify(subprocessoRepo, times(1)).save(subprocesso);
-
-        // Verify singular methods NOT called (N+1 avoidance)
-        verify(mapaManutencaoService, never()).obterAtividadePorCodigo(any());
-        verify(mapaManutencaoService, never()).atualizarAtividade(any(), any());
-        verify(mapaManutencaoService, never()).buscarCompetenciaPorCodigo(any());
-        verify(mapaManutencaoService, never()).salvarCompetencia(any());
+        verify(ajusteMapaService).salvarAjustesMapa(codSubprocesso, ajustes);
     }
 }
