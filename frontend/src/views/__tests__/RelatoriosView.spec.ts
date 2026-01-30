@@ -209,6 +209,6 @@ describe('RelatoriosView.vue', () => {
     }, stubsLocal);
 
     const wrapper = mount(RelatoriosView, mountOptions);
-    expect(wrapper.vm.mapasVigentes).toHaveLength(0);
+    expect((wrapper.vm as any).mapasVigentes).toHaveLength(0);
   });
 });

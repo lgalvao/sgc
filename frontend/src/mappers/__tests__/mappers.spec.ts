@@ -2,6 +2,7 @@ import {describe, expect, it} from "vitest";
 import {mapVWUsuariosArray, mapVWUsuarioToUsuario,} from "@/mappers/usuarios";
 import {mapUnidade, mapUnidadesArray, mapUnidadeSnapshot,} from "@/mappers/unidades";
 import type {Alerta, Mapa, MapaAjuste} from "@/types/tipos";
+import { TipoImpactoAtividade } from "@/types/tipos";
 import {mapAlertaDtoToFrontend} from "../alertas";
 import {
     mapAtividadeToModel,
@@ -124,10 +125,10 @@ describe("mappers/mapas", () => {
     it("mapImpactoMapaDtoToModel deve mapear campos de impacto incluindo mudanças de atividade", () => {
         const dto = {
             temImpactos: true,
-            competenciasImpactadas: [{codigo: 1, atividadesAfetadas: ["A1"]}],
-            atividadesInseridas: [{codigo: 1, descricao: "New"}],
-            atividadesRemovidas: [{codigo: 2, descricao: "Old"}],
-            atividadesAlteradas: [{codigo: 3, descricao: "Changed"}],
+            competenciasImpactadas: [{codigo: 1, descricao: "Comp", atividadesAfetadas: [1], tipoImpacto: ["ADICIONADA"]}],
+            atividadesInseridas: [{codigo: 1, descricao: "New", tipoImpacto: TipoImpactoAtividade.INSERIDA, competenciasVinculadas: []}],
+            atividadesRemovidas: [{codigo: 2, descricao: "Old", tipoImpacto: TipoImpactoAtividade.REMOVIDA, competenciasVinculadas: []}],
+            atividadesAlteradas: [{codigo: 3, descricao: "Changed", tipoImpacto: TipoImpactoAtividade.ALTERADA, competenciasVinculadas: []}],
             totalAtividadesInseridas: 1,
             totalAtividadesRemovidas: 1,
             totalAtividadesAlteradas: 1,
@@ -135,7 +136,7 @@ describe("mappers/mapas", () => {
         };
         const model = mapImpactoMapaDtoToModel(dto);
         expect(model.temImpactos).toBe(true);
-        expect(model.competenciasImpactadas[0].atividadesAfetadas).toContain("A1");
+        expect(model.competenciasImpactadas[0].atividadesAfetadas).toHaveLength(1);
         expect(model.atividadesInseridas).toHaveLength(1);
         expect(model.atividadesInseridas[0].descricao).toBe("New");
         expect(model.atividadesRemovidas).toHaveLength(1);
@@ -177,7 +178,7 @@ describe("mappers/sgrh", () => {
 
     it("mapUsuarioToFrontend deve mapear corretamente", () => {
         const dto = {
-            tituloEleitoral: 123,
+            tituloEleitoral: "123",
             nome: "Usuário Teste",
             email: "test@test.com",
             ramal: "1234",
@@ -185,7 +186,7 @@ describe("mappers/sgrh", () => {
             perfis: ["CHEFE"],
         };
         const model = mapUsuarioToFrontend(dto);
-        expect(model.tituloEleitoral).toBe(123);
+        expect(model.tituloEleitoral).toBe("123");
         expect(model.nome).toBe("Usuário Teste");
         expect(model.unidade.sigla).toBe("UT");
         expect(model.perfis).toContain("CHEFE");
@@ -193,13 +194,14 @@ describe("mappers/sgrh", () => {
 
     it("LoginResponseToFrontend deve mapear corretamente", () => {
         const dto = {
-            tituloEleitoral: 123456,
+            tituloEleitoral: "123456",
+            nome: "Usuário Teste",
             perfil: "GESTOR",
             unidadeCodigo: 10,
             token: "abc.def.ghi",
         };
         const model = LoginResponseToFrontend(dto);
-        expect(model.tituloEleitoral).toBe(123456);
+        expect(model.tituloEleitoral).toBe("123456");
         expect(model.perfil).toBe("GESTOR");
         expect(model.unidadeCodigo).toBe(10);
         expect(model.token).toBe("abc.def.ghi");
@@ -210,10 +212,12 @@ describe("mappers/sgrh", () => {
             {
                 perfil: "GESTOR",
                 unidade: {codigo: 1, nome: "Unidade 1", sigla: "U1"},
+                siglaUnidade: "U1",
             },
             {
                 perfil: "SERVIDOR",
                 unidade: {codigo: 2, nome: "Unidade 2", sigla: "U2"},
+                siglaUnidade: "U2",
             },
         ];
         const result = perfisUnidadesParaDominio(backendData);

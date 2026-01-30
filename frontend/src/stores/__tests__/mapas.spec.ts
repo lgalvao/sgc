@@ -189,6 +189,7 @@ describe("useMapasStore", () => {
             const competencia = {
                 descricao: "Nova Competencia",
                 codigo: 0,
+                atividades: [],
                 atividadesAssociadas: [],
             };
             const mockResponse: MapaCompleto = {
@@ -222,6 +223,7 @@ describe("useMapasStore", () => {
             const competencia = {
                 descricao: "Nova Competencia",
                 codigo: 0,
+                atividades: [],
                 atividadesAssociadas: [],
             };
             vi.mocked(subprocessoService.adicionarCompetencia).mockRejectedValue(new Error("Fail"));
@@ -235,6 +237,7 @@ describe("useMapasStore", () => {
             const competencia = {
                 codigo: 1,
                 descricao: "Competencia Atualizada",
+                atividades: [],
                 atividadesAssociadas: [],
             };
             const mockResponse: MapaCompleto = {
@@ -268,6 +271,7 @@ describe("useMapasStore", () => {
             const competencia = {
                 codigo: 0, // ID Inválido
                 descricao: "Sem ID",
+                atividades: [],
                 atividadesAssociadas: [],
             };
 
@@ -281,6 +285,7 @@ describe("useMapasStore", () => {
             const competencia = {
                 codigo: 1,
                 descricao: "Competencia Atualizada",
+                atividades: [],
                 atividadesAssociadas: [],
             };
             vi.mocked(subprocessoService.atualizarCompetencia).mockRejectedValue(new Error("Fail"));

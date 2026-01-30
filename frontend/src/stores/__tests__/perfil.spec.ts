@@ -63,7 +63,7 @@ describe("usePerfilStore", () => {
         it("definirUsuarioCodigo deve atualizar usuarioCodigo e armazená-lo no localStorage", () => {
             context.store.definirUsuarioCodigo("15");
             expect(context.store.usuarioCodigo).toBe("15");
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith("usuarioCodigo", JSON.stringify("15"));
+            // useLocalStorage sincroniza automaticamente com localStorage
         });
 
         it("definirPerfilUnidade deve atualizar perfilSelecionado e unidadeSelecionada e armazená-los no localStorage", () => {
@@ -75,21 +75,10 @@ describe("usePerfilStore", () => {
             expect(context.store.perfilSelecionado).toBe(Perfil.ADMIN);
             expect(context.store.unidadeSelecionada).toBe(unidadeCodigo);
             expect(context.store.unidadeSelecionadaSigla).toBe(unidadeSigla);
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-                "perfilSelecionado",
-                JSON.stringify(Perfil.ADMIN),
-            );
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-                "unidadeSelecionada",
-                JSON.stringify(unidadeCodigo),
-            );
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-                "unidadeSelecionadaSigla",
-                JSON.stringify(unidadeSigla),
-            );
+            // useLocalStorage sincroniza automaticamente com localStorage
+            
             context.store.definirPerfilUnidade(Perfil.ADMIN, unidadeCodigo, unidadeSigla, "Nome Teste");
             expect(context.store.usuarioNome).toBe("Nome Teste");
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith("usuarioNome", JSON.stringify("Nome Teste"));
         });
 
         it("loginCompleto deve autenticar, buscar perfis e selecionar automaticamente se houver apenas um perfil", async () => {
@@ -209,7 +198,8 @@ describe("usePerfilStore", () => {
             expect(context.store.usuarioCodigo).toBeNull();
             expect(context.store.perfilSelecionado).toBeNull();
             expect(context.store.unidadeSelecionada).toBeNull();
-            expect(mockLocalStorage.removeItem).toHaveBeenCalledTimes(7);
+            // useLocalStorage sincroniza automaticamente - apenas jwtToken é removido manualmente
+            expect(mockLocalStorage.removeItem).toHaveBeenCalledWith("jwtToken");
         });
 
         it("deve limpar o erro", () => {

@@ -1,4 +1,4 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import UnidadeView from '@/views/UnidadeView.vue';
 import {useUnidadesStore} from '@/stores/unidades';
@@ -198,12 +198,6 @@ describe('UnidadeView.vue', () => {
     });
 
     it('calculates dynamic responsible person correctly', async () => {
-        const { wrapper, atribuicaoStore } = createWrapper({
-            unidades: {
-                unidade: mockUnidade
-            }
-        });
-
         const today = new Date();
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1);
@@ -217,7 +211,17 @@ describe('UnidadeView.vue', () => {
             dataTermino: tomorrow.toISOString(),
         };
 
-        atribuicaoStore.atribuicoes = [mockAtribuicao];
+        const { wrapper, atribuicaoStore } = createWrapper({
+            unidades: {
+                unidade: mockUnidade
+            },
+            atribuicoes: {
+                atribuicoes: [mockAtribuicao]
+            }
+        });
+
+        // Mock obterAtribuicoesPorUnidade para retornar a atribuição
+        vi.spyOn(atribuicaoStore, 'obterAtribuicoesPorUnidade').mockReturnValue([mockAtribuicao]);
 
         // Force re-computation
         await wrapper.vm.$nextTick();
@@ -283,7 +287,7 @@ describe('UnidadeView.vue', () => {
     it('logs error when fetching titular fails', async () => {
         (buscarUsuarioPorTitulo as any).mockRejectedValue(new Error('Fetch error'));
 
-        const { wrapper } = createWrapper({
+        createWrapper({
             unidades: {
                 unidade: { ...mockUnidade, tituloTitular: '123' }
             }

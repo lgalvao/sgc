@@ -89,25 +89,25 @@ export const useUnidadesStore = defineStore("unidades", () => {
     async function obterUnidadesSubordinadas(siglaUnidade: string): Promise<string[]> {
         isLoading.value = true;
         return withErrorHandling(async () => {
-            return await serviceBuscarSubordinadas(siglaUnidade);
+            return await serviceBuscarSubordinadas(siglaUnidade) as string[];
         }).catch((err: any) => {
             error.value = lastError.value?.message || "Erro ao buscar subordinadas";
             throw err;
         }).finally(() => {
             isLoading.value = false;
-        });
+        }) as Promise<string[]>;
     }
 
     async function obterUnidadeSuperior(siglaUnidade: string): Promise<string | null> {
         isLoading.value = true;
         return withErrorHandling(async () => {
-            return await serviceBuscarSuperior(siglaUnidade);
+            return await serviceBuscarSuperior(siglaUnidade) as string | null;
         }).catch((err: any) => {
             error.value = lastError.value?.message || "Erro ao buscar superior";
             throw err;
         }).finally(() => {
             isLoading.value = false;
-        });
+        }) as Promise<string | null>;
     }
 
     return {

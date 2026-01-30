@@ -62,6 +62,10 @@ export interface UnidadeParticipanteDto {
     codigo: number;
     sigla?: string;
     nome?: string;
+    codSubprocesso?: number;
+    situacaoSubprocesso?: string;
+    dataLimite?: string;
+    mapaCodigo?: number;
     filhos?: UnidadeParticipanteDto[];
 }
 

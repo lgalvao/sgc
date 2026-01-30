@@ -176,8 +176,9 @@ describe('SubprocessoView.vue', () => {
 
     const header = wrapper.findComponent(SubprocessoHeaderStub);
     await header.vm.$emit('alterar-data-limite');
+    await (wrapper.vm as any).$nextTick();
 
-    expect((wrapper.vm as any).mostrarModalAlterarDataLimite).toBe(true);
+    expect((wrapper.vm as any).modals.modals.alterarDataLimite.value.isOpen).toBe(true);
   });
 
   it('shows error when opening date limit modal is not allowed', async () => {
@@ -191,8 +192,9 @@ describe('SubprocessoView.vue', () => {
 
     const header = wrapper.findComponent(SubprocessoHeaderStub);
     await header.vm.$emit('alterar-data-limite');
+    await (wrapper.vm as any).$nextTick();
 
-    expect((wrapper.vm as any).mostrarModalAlterarDataLimite).toBe(false);
+    expect((wrapper.vm as any).modals.modals.alterarDataLimite.value.isOpen).toBe(false);
     expect(feedbackStore.show).toHaveBeenCalledWith(expect.any(String), expect.stringContaining('não tem permissão'), 'danger');
   });
 
@@ -202,7 +204,7 @@ describe('SubprocessoView.vue', () => {
     await (wrapper.vm as any).$nextTick();
 
     // Open modal
-    (wrapper.vm as any).mostrarModalAlterarDataLimite = true;
+    (wrapper.vm as any).modals.open('alterarDataLimite');
     await (wrapper.vm as any).$nextTick();
 
     // Confirm
@@ -212,7 +214,7 @@ describe('SubprocessoView.vue', () => {
     await flushPromises();
 
     expect(store.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(1, { novaData: '2024-01-01' });
-    expect((wrapper.vm as any).mostrarModalAlterarDataLimite).toBe(false);
+    expect((wrapper.vm as any).modals.modals.alterarDataLimite.value.isOpen).toBe(false);
     expect(feedbackStore.show).toHaveBeenCalledWith(expect.any(String), expect.stringContaining('sucesso'), 'success');
   });
 
@@ -236,8 +238,10 @@ describe('SubprocessoView.vue', () => {
     // Trigger Reabertura
     const header = wrapper.findComponent(SubprocessoHeaderStub);
     await header.vm.$emit('reabrir-cadastro');
+    await (wrapper.vm as any).$nextTick();
+    
     expect((wrapper.vm as any).tipoReabertura).toBe('cadastro');
-    expect((wrapper.vm as any).mostrarModalReabrir).toBe(true);
+    expect((wrapper.vm as any).modals.modals.reabrir.value.isOpen).toBe(true);
 
     // Preencher justificativa
     const textarea = wrapper.find('textarea');

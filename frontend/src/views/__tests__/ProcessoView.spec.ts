@@ -91,6 +91,7 @@ describe("ProcessoView.vue", () => {
     let processosStore: any;
     let feedbackStore: any;
     let perfilStore: any;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let router: any;
 
     const commonStubs = {
@@ -187,7 +188,13 @@ describe("ProcessoView.vue", () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();
         const coreStore = useProcessosCoreStore();
-        coreStore.$patch({ lastError: { message: "Erro ao carregar", details: "Detalhes do erro" } });
+        coreStore.$patch({ 
+            lastError: { 
+                kind: 'unexpected' as const, 
+                message: "Erro ao carregar", 
+                details: { info: "Detalhes do erro" } as Record<string, any>
+            } 
+        });
 
         await nextTick();
         await flushPromises();
@@ -440,11 +447,18 @@ describe("ProcessoView.vue", () => {
     });
 
      it("não deve redirecionar para detalhes da unidade se não tiver permissão (Servidor de outra unidade)", async () => {
+        mocks.push.mockClear(); // Limpa chamadas anteriores
+        
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        perfilStore.$patch({ perfilSelecionado: Perfil.SERVIDOR, unidadeSelecionada: 999 });
+        // Servidor não tem isAdmin nem isGestor - precisa definir perfis vazios
+        perfilStore.$patch({ 
+            perfilSelecionado: Perfil.SERVIDOR, 
+            unidadeSelecionada: 999,
+            perfis: [Perfil.SERVIDOR] // Lista de perfis do usuário
+        });
         processosStore.$patch({ processoDetalhe: mockProcesso });
 
         await nextTick();
@@ -454,7 +468,7 @@ describe("ProcessoView.vue", () => {
 
         await treeTable.vm.$emit("row-click", { codigo: 101, unidadeAtual: "UNI1", clickable: true });
 
-        expect(router.push).not.toHaveBeenCalled();
+        expect(mocks.push).not.toHaveBeenCalled();
     });
 
     // --- Finalização ---

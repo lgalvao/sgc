@@ -375,7 +375,7 @@ describe("VisAtividades.vue", () => {
                 unidades: [{
                     sigla: "U1",
                     codSubprocesso: 10,
-                    situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADO
+                    situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
                 }]
             });
         });
