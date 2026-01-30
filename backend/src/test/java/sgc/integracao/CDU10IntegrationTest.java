@@ -46,6 +46,7 @@ import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.processo.model.Processo;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Tag("integration")
 @SpringBootTest
@@ -167,7 +168,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     }
 
     private void autenticarUsuario(Usuario usuario, Perfil perfil) {
-        usuario.setAuthorities(Set.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + perfil.name())));
+        usuario.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_" + perfil.name())));
         Authentication auth = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
     }

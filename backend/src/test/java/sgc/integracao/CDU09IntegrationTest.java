@@ -56,6 +56,7 @@ import jakarta.persistence.EntityManager;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.subprocesso.model.MovimentacaoRepo;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Tag("integration")
 @SpringBootTest
@@ -179,7 +180,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     }
 
     private void autenticarUsuario(Usuario usuario, Perfil perfil) {
-        usuario.setAuthorities(Set.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + perfil.name())));
+        usuario.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_" + perfil.name())));
         Authentication auth = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
     }

@@ -42,6 +42,8 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import sgc.organizacao.model.UsuarioRepo;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -57,6 +59,9 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
 
     @MockitoBean
     private UsuarioFacade usuarioService;
+
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
     private Processo processo;
     private Unidade unidade;
@@ -90,6 +95,9 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         principal.setTituloEleitoral(TEST_USER_ID);
         principal.setUnidadeLotacao(unidade);
 
+        // Persist user to DB so that logic depending on Usuario entity works
+        usuarioRepo.save(principal);
+
         // Define as authorities corretamente
         principal.setAuthorities(Set.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + perfil.name())));
 
@@ -100,14 +108,6 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         } catch (Exception e) {
             // Ignore duplicates
         }
-
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>();
-        atribuicoes.add(
-                UsuarioPerfil.builder()
-                        .usuario(principal)
-                        .unidade(unidade)
-                        .perfil(perfil)
-                        .build());
 
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                 principal, null, principal.getAuthorities());

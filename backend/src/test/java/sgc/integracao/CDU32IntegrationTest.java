@@ -36,6 +36,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.security.test.context.support.WithMockUser;
 import sgc.integracao.mocks.TestThymeleafConfig;
+import sgc.alerta.model.Alerta;
+import sgc.organizacao.model.SituacaoUnidade;
+import sgc.organizacao.model.TipoUnidade;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -64,8 +67,8 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
             Unidade sedoc = new Unidade();
             sedoc.setSigla("SEDOC");
             sedoc.setNome("Secretaria de Documentação");
-            sedoc.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
-            sedoc.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+            sedoc.setSituacao(SituacaoUnidade.ATIVA);
+            sedoc.setTipo(TipoUnidade.OPERACIONAL);
             unidadeRepo.save(sedoc);
         }
 
@@ -75,8 +78,8 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
             u.setCodigo(1L);
             u.setSigla("TESTE");
             u.setNome("Unidade Teste");
-            u.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
-            u.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+            u.setSituacao(SituacaoUnidade.ATIVA);
+            u.setTipo(TipoUnidade.OPERACIONAL);
             return unidadeRepo.save(u);
         });
 
@@ -136,7 +139,7 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
         assertThat(movimentacaoExiste).isTrue();
 
         // Verificar se foi criado um alerta
-        List<sgc.alerta.model.Alerta> alerts = alertaRepo.findAll();
+        List<Alerta> alerts = alertaRepo.findAll();
         assertThat(alerts).isNotEmpty();
         boolean alertaExiste = alerts.stream()
                 .anyMatch(a -> a.getUnidadeDestino() != null &&
