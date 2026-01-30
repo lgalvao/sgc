@@ -49,19 +49,19 @@
   <SubprocessoModal
       :data-limite-atual="dataLimite"
       :etapa-atual="subprocesso?.etapaAtual || null"
-      :loading="isLoadingDataLimite"
-      :mostrar-modal="mostrarModalAlterarDataLimite"
+      :loading="loading.isLoading('dataLimite')"
+      :mostrar-modal="modals.isOpen('alterarDataLimite')"
       @fechar-modal="fecharModalAlterarDataLimite"
       @confirmar-alteracao="confirmarAlteracaoDataLimite"
   />
 
   <!-- Modal para reabrir cadastro/revisão -->
   <ModalConfirmacao
-      v-model="mostrarModalReabrir"
+      v-model="modals.modals.reabrir.value.isOpen"
       :titulo="tipoReabertura === 'cadastro' ? 'Reabrir cadastro' : 'Reabrir Revisão'"
       variant="warning"
       ok-title="Confirmar Reabertura"
-      :loading="loadingReabertura"
+      :loading="loading.isLoading('reabertura')"
       :ok-disabled="!justificativaReabertura.trim()"
       :auto-close="false"
       test-id-confirmar="btn-confirmar-reabrir"
@@ -88,6 +88,8 @@ import TabelaMovimentacoes from "@/components/TabelaMovimentacoes.vue";
 import {useMapasStore} from "@/stores/mapas";
 import {useFeedbackStore} from "@/stores/feedback";
 import {enviarLembrete, reabrirCadastro, reabrirRevisaoCadastro} from "@/services/processoService";
+import {useModalManager} from "@/composables/useModalManager";
+import {useLoadingManager} from "@/composables/useLoadingManager";
 
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso,} from "@/types/tipos";
@@ -99,10 +101,10 @@ const subprocessosStore = useSubprocessosStore();
 const mapaStore = useMapasStore();
 const feedbackStore = useFeedbackStore();
 
-const mostrarModalAlterarDataLimite = ref(false);
-const isLoadingDataLimite = ref(false);
-const mostrarModalReabrir = ref(false);
-const loadingReabertura = ref(false);
+// Gerenciamento simplificado de modals e loading com composables
+const modals = useModalManager(['alterarDataLimite', 'reabrir']);
+const loading = useLoadingManager(['dataLimite', 'reabertura']);
+
 const tipoReabertura = ref<'cadastro' | 'revisao'>('cadastro');
 const justificativaReabertura = ref('');
 const codSubprocesso = ref<number | null>(null);
@@ -135,14 +137,14 @@ onMounted(async () => {
 
 function abrirModalAlterarDataLimite() {
   if (subprocesso.value?.permissoes.podeAlterarDataLimite) {
-    mostrarModalAlterarDataLimite.value = true;
+    modals.open('alterarDataLimite');
   } else {
     feedbackStore.show("Ação não permitida", "Você não tem permissão para alterar a data limite.", "danger");
   }
 }
 
 function fecharModalAlterarDataLimite() {
-  mostrarModalAlterarDataLimite.value = false;
+  modals.close('alterarDataLimite');
 }
 
 async function confirmarAlteracaoDataLimite(novaData: string) {
@@ -150,36 +152,35 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
     return;
   }
 
-  isLoadingDataLimite.value = true;
-  try {
-    await subprocessosStore.alterarDataLimiteSubprocesso(
-        subprocesso.value.unidade.codigo,
-        {novaData},
-    );
-    fecharModalAlterarDataLimite();
-    feedbackStore.show("Data limite alterada", "A data limite foi alterada com sucesso!", "success");
-  } catch {
-    feedbackStore.show("Erro ao alterar data limite", "Não foi possível alterar a data limite.", "danger");
-  } finally {
-    isLoadingDataLimite.value = false;
-  }
+  await loading.withLoading('dataLimite', async () => {
+    try {
+      await subprocessosStore.alterarDataLimiteSubprocesso(
+          subprocesso.value!.unidade.codigo,
+          {novaData},
+      );
+      fecharModalAlterarDataLimite();
+      feedbackStore.show("Data limite alterada", "A data limite foi alterada com sucesso!", "success");
+    } catch {
+      feedbackStore.show("Erro ao alterar data limite", "Não foi possível alterar a data limite.", "danger");
+    }
+  });
 }
 
 // CDU-32/33: Reabrir cadastro/revisão
 function abrirModalReabrirCadastro() {
   tipoReabertura.value = 'cadastro';
   justificativaReabertura.value = '';
-  mostrarModalReabrir.value = true;
+  modals.open('reabrir');
 }
 
 function abrirModalReabrirRevisao() {
   tipoReabertura.value = 'revisao';
   justificativaReabertura.value = '';
-  mostrarModalReabrir.value = true;
+  modals.open('reabrir');
 }
 
 function fecharModalReabrir() {
-  mostrarModalReabrir.value = false;
+  modals.close('reabrir');
   justificativaReabertura.value = '';
 }
 
@@ -189,23 +190,22 @@ async function confirmarReabertura() {
     return;
   }
 
-  loadingReabertura.value = true;
-  try {
-    if (tipoReabertura.value === 'cadastro') {
-      await reabrirCadastro(codSubprocesso.value, justificativaReabertura.value);
-      feedbackStore.show("Cadastro reaberto", "O cadastro foi reaberto com sucesso.", "success");
-    } else {
-      await reabrirRevisaoCadastro(codSubprocesso.value, justificativaReabertura.value);
-      feedbackStore.show("Revisão reaberta", "A revisão de cadastro foi reaberta com sucesso.", "success");
+  await loading.withLoading('reabertura', async () => {
+    try {
+      if (tipoReabertura.value === 'cadastro') {
+        await reabrirCadastro(codSubprocesso.value!, justificativaReabertura.value);
+        feedbackStore.show("Cadastro reaberto", "O cadastro foi reaberto com sucesso.", "success");
+      } else {
+        await reabrirRevisaoCadastro(codSubprocesso.value!, justificativaReabertura.value);
+        feedbackStore.show("Revisão reaberta", "A revisão de cadastro foi reaberta com sucesso.", "success");
+      }
+      fecharModalReabrir();
+      // Recarregar dados do subprocesso
+      await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value!);
+    } catch {
+      feedbackStore.show("Erro", "Não foi possível reabrir. Tente novamente.", "danger");
     }
-    fecharModalReabrir();
-    // Recarregar dados do subprocesso
-    await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
-  } catch {
-    feedbackStore.show("Erro", "Não foi possível reabrir. Tente novamente.", "danger");
-  } finally {
-    loadingReabertura.value = false;
-  }
+  });
 }
 
 // CDU-34: Enviar lembrete
