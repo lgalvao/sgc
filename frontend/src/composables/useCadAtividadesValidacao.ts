@@ -18,6 +18,12 @@ export interface CadAtividadesValidacao {
     confirmarDisponibilizacao: (codSubprocesso: number | null, isRevisao: boolean, mostrarModal: Ref<boolean>, router: Router) => Promise<void>;
 }
 
+/**
+ * Composable para gerenciamento de validação do cadastro de atividades.
+ * 
+ * IMPORTANTE: Este composable deve ser instanciado apenas uma vez por componente,
+ * pois mantém um Map interno (atividadeRefs) para rastrear referências DOM.
+ */
 export function useCadAtividadesValidacao(): CadAtividadesValidacao {
     const subprocessosStore = useSubprocessosStore();
     const feedbackStore = useFeedbackStore();
