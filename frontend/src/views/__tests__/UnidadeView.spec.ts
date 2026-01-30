@@ -198,12 +198,6 @@ describe('UnidadeView.vue', () => {
     });
 
     it('calculates dynamic responsible person correctly', async () => {
-        const { wrapper, atribuicaoStore } = createWrapper({
-            unidades: {
-                unidade: mockUnidade
-            }
-        });
-
         const today = new Date();
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1);
@@ -217,7 +211,17 @@ describe('UnidadeView.vue', () => {
             dataTermino: tomorrow.toISOString(),
         };
 
-        atribuicaoStore.atribuicoes = [mockAtribuicao];
+        const { wrapper, atribuicaoStore } = createWrapper({
+            unidades: {
+                unidade: mockUnidade
+            },
+            atribuicoes: {
+                atribuicoes: [mockAtribuicao]
+            }
+        });
+
+        // Mock obterAtribuicoesPorUnidade para retornar a atribuição
+        vi.spyOn(atribuicaoStore, 'obterAtribuicoesPorUnidade').mockReturnValue([mockAtribuicao]);
 
         // Force re-computation
         await wrapper.vm.$nextTick();

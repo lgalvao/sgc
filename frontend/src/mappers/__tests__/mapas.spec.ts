@@ -114,7 +114,7 @@ describe('mappers/mapas.ts', () => {
             expect(result.atividadesRemovidas).toHaveLength(1);
             expect(result.atividadesAlteradas).toHaveLength(1);
             expect(result.competenciasImpactadas).toHaveLength(1);
-            expect(result.competenciasImpactadas[0].tiposImpacto).toBe('ADICIONADA');
+            expect(result.competenciasImpactadas[0].tiposImpacto).toEqual(['ADICIONADA']);
         });
 
         it('retorna arrays vazios quando campos são undefined', () => {

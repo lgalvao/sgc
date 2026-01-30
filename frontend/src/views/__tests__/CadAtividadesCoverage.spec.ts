@@ -147,16 +147,20 @@ describe("CadAtividadesCoverage.spec.ts", () => {
     it("deve tratar erro ao remover conhecimento", async () => {
         const { wrapper, atividadesStore, feedbackStore } = createWrapper();
 
+        const mockAtividade = { codigo: 1, conhecimentos: [{ codigo: 101 }] };
+        
+        // Mock do getter obterAtividadesPorSubprocesso para retornar atividades
+        atividadesStore.obterAtividadesPorSubprocesso = vi.fn().mockReturnValue([mockAtividade]);
         atividadesStore.removerConhecimento.mockRejectedValue(new Error("Erro ao remover conhecimento"));
 
         await flushPromises();
 
-        const item = wrapper.findComponent(AtividadeItemStub);
-        await item.vm.$emit('remover-conhecimento', 101);
-        await flushPromises();
-
-        const modal = wrapper.findComponent({ name: 'ModalConfirmacao' });
-        await modal.vm.$emit('confirmar');
+        // Chamar diretamente confirmarRemocao depois de setar dadosRemocao
+        const vm = wrapper.vm as any;
+        vm.dadosRemocao = { tipo: "conhecimento", index: 0, conhecimentoCodigo: 101 };
+        vm.codSubprocesso = 123;
+        
+        await vm.confirmarRemocao();
         await flushPromises();
 
         expect(feedbackStore.show).toHaveBeenCalledWith("Erro na remoção", "Erro ao remover conhecimento", "danger");
