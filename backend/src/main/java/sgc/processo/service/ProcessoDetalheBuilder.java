@@ -63,7 +63,7 @@ public class ProcessoDetalheBuilder {
             return false;
         }
         Set<UsuarioPerfil> atribuicoes = new HashSet<>(
-                usuarioPerfilRepo.findByUsuarioTitulo(user.getTituloEleitoral())
+                usuarioPerfilRepo.findByUsuarioTituloWithUnidade(user.getTituloEleitoral())
         );
         return processo.getParticipantes()
                 .stream()

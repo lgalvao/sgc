@@ -291,7 +291,7 @@ class ProcessoDetalheBuilderTest {
 
         when(auth.getPrincipal()).thenReturn(usuario);
         when(securityContext.getAuthentication()).thenReturn(auth);
-        when(usuarioPerfilRepo.findByUsuarioTitulo("12345678901")).thenReturn(List.of(atribuicao));
+        when(usuarioPerfilRepo.findByUsuarioTituloWithUnidade("12345678901")).thenReturn(List.of(atribuicao));
         SecurityContextHolder.setContext(securityContext);
 
         ProcessoDetalheDto dto = builder.build(processo);
