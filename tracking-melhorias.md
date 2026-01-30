@@ -10,10 +10,10 @@
 
 | Prioridade | Total | Completo | Em Progresso | Pendente |
 |-----------|-------|----------|--------------|----------|
-| 🔴 CRÍTICA | 13 | 0 | 0 | 13 |
+| 🔴 CRÍTICA | 13 | 3 | 0 | 10 |
 | 🟠 MÉDIA | 14 | 0 | 0 | 14 |
 | 🟡 BAIXA | 6 | 0 | 0 | 6 |
-| **TOTAL** | **33** | **0** | **0** | **33** |
+| **TOTAL** | **33** | **3** | **0** | **30** |
 
 ---
 
@@ -21,16 +21,16 @@
 
 ### Quick Wins e Segurança (13 ações)
 
-- [ ] **#1** Remover arquivos `*CoverageTest.java` (27+ arquivos) - 2h
+- [x] **#1** Remover arquivos `*CoverageTest.java` (27+ arquivos) - 2h
 - [ ] **#2** Consolidar Access Policies em AbstractAccessPolicy - 6h
 - [ ] **#3** Dividir GOD Composables (useCadAtividadesLogic) - 8h
 - [ ] **#4** Refatorar SubprocessoFacade e centralizar validações - 8h
-- [ ] **#5** Mover @PreAuthorize de Facades para Controllers - 6h
+- [x] **#5** Mover @PreAuthorize de Facades para Controllers - 6h
 - [ ] **#6** Centralizar verificações de acesso via AccessControlService - 8h
 - [ ] **#7** Criar DTOs para AnaliseController e ConfiguracaoController - 4h
 - [ ] **#8** Eliminar ciclos de dependência via Events - 2h
 - [ ] **#9** Padronizar acesso a services (View→Store→Service→API) - 4h
-- [ ] **#10** Substituir console.* por logger - 3h
+- [x] **#10** Substituir console.* por logger - 3h
 - [ ] **#11** Adotar fixtures E2E (36 arquivos) - 6h
 - [ ] **#12** Reduzir over-mocking (46 arquivos) - 5h
 
@@ -89,7 +89,17 @@
 **Início da Execução**
 - ✅ Leitura do plano-melhorias.md completo
 - ✅ Criação do arquivo tracking-melhorias.md
-- 🔄 Iniciando ação #1: Remover arquivos *CoverageTest.java
+- ✅ **Ação #1 COMPLETA**: Removidos 26 arquivos *CoverageTest.java
+  - Impacto: Métricas de cobertura agora refletem testes reais
+  - Redução: ~2000+ linhas de código de teste sem valor
+- ✅ **Ação #10 COMPLETA**: Console.* por logger no frontend
+  - Verificado: Frontend já estava usando logger corretamente (consola)
+  - Apenas testes usam console.error (apropriado)
+- ✅ **Ação #5 COMPLETA**: @PreAuthorize movido de Facades para Controllers
+  - ProcessoFacade: Removidas 10 anotações @PreAuthorize
+  - ProcessoController: Adicionada 1 anotação faltante em listarSubprocessosElegiveis
+  - Conformidade com ADR-001: Controllers definem segurança, Facades orquestram lógica
+  - Compilação: ✅ Bem-sucedida com Java 21
 
 ---
 

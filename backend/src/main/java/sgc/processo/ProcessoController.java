@@ -228,6 +228,7 @@ public class ProcessoController {
      * @return Lista de DTOs representando os subprocessos elegíveis.
      */
     @GetMapping("/{codigo}/subprocessos-elegiveis")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @Operation(summary = "Lista subprocessos elegíveis para ações em bloco")
     public ResponseEntity<List<SubprocessoElegivelDto>> listarSubprocessosElegiveis(
             @PathVariable Long codigo) {
