@@ -56,6 +56,7 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;

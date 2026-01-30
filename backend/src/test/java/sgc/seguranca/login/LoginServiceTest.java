@@ -78,7 +78,6 @@ class LoginServiceTest {
         // Simula busca de autorizações retornando lista vazia ou sem o perfil/unidade
         sgc.organizacao.model.Usuario usuario = new sgc.organizacao.model.Usuario();
         usuario.setTituloEleitoral(titulo);
-        usuario.setAtribuicoesPermanentes(Collections.emptySet());
 
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
 

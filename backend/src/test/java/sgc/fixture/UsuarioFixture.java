@@ -35,9 +35,8 @@ public class UsuarioFixture {
         up.setUnidadeCodigo(unidade.getCodigo());
         up.setPerfil(perfil);
 
-        Set<UsuarioPerfil> atribuicoes = usuario.getTodasAtribuicoes();
+        Set<UsuarioPerfil> atribuicoes = usuario.getTodasAtribuicoes(new HashSet<>());
         atribuicoes.add(up);
-        usuario.setAtribuicoesPermanentes(atribuicoes);
     }
 
     public static Usuario usuarioComTitulo(String titulo) {

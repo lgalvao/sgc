@@ -115,7 +115,6 @@ class LoginFacadeCoverageTest {
         p2.setUnidade(u2);
         p2.setUnidadeCodigo(2L);
 
-        usuario.setAtribuicoesPermanentes(Set.of(p1, p2));
 
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
 
@@ -153,7 +152,6 @@ class LoginFacadeCoverageTest {
         UsuarioPerfil p1 = new UsuarioPerfil();
         p1.setPerfil(Perfil.SERVIDOR);
         p1.setUnidade(u1);
-        usuario.setAtribuicoesPermanentes(Set.of(p1));
 
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
         when(gerenciadorJwt.gerarToken(titulo, Perfil.SERVIDOR, codUnidade)).thenReturn("jwt-token");
@@ -184,7 +182,6 @@ class LoginFacadeCoverageTest {
         UsuarioPerfil p1 = new UsuarioPerfil();
         p1.setPerfil(Perfil.SERVIDOR);
         p1.setUnidade(u1);
-        usuario.setAtribuicoesPermanentes(Set.of(p1));
 
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
 
@@ -226,7 +223,6 @@ class LoginFacadeCoverageTest {
         p2.setUnidade(uInativa);
         p2.setUsuarioTitulo(titulo);
 
-        usuario.setAtribuicoesPermanentes(new java.util.HashSet<>(java.util.List.of(p1, p2)));
 
         when(usuarioService.carregarUsuarioParaAutenticacao(titulo)).thenReturn(usuario);
 

@@ -14,6 +14,7 @@ import sgc.organizacao.service.HierarquiaService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -107,7 +108,7 @@ class SubprocessoAccessPolicyTest {
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, 2L);
  
         Unidade sub = sp.getUnidade();
-        Unidade sup = u.getTodasAtribuicoes().iterator().next().getUnidade();
+        Unidade sup = u.getTodasAtribuicoes(new HashSet<>()).iterator().next().getUnidade();
  
         when(hierarquiaService.isSuperiorImediata(sub, sup)).thenReturn(true);
 
@@ -257,7 +258,6 @@ class SubprocessoAccessPolicyTest {
         up.setUnidade(un);
         up.setUnidadeCodigo(codUnidade);
 
-        u.setAtribuicoesPermanentes(Set.of(up));
         return u;
     }
 

@@ -47,10 +47,10 @@ class LoginFacadeGapTest {
         when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
         
         // Mock unidadeService
-        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(usuario.getTodasAtribuicoes().iterator().next().getUnidade());
+        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(usuario.getTodasAtribuicoes(new HashSet<>()).iterator().next().getUnidade());
         
         // Mock mapper (para evitar NPE no stream map)
-        when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(usuario.getTodasAtribuicoes().iterator().next().getUnidade()))
+        when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(usuario.getTodasAtribuicoes(new HashSet<>()).iterator().next().getUnidade()))
             .thenReturn(sgc.organizacao.dto.UnidadeDto.builder().codigo(1L).build());
 
         assertThatThrownBy(() -> loginFacade.entrar(req))
@@ -68,10 +68,10 @@ class LoginFacadeGapTest {
         when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
 
         // Mock unidadeService
-        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(usuario.getTodasAtribuicoes().iterator().next().getUnidade());
+        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(usuario.getTodasAtribuicoes(new HashSet<>()).iterator().next().getUnidade());
 
         // Mock mapper
-        when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(usuario.getTodasAtribuicoes().iterator().next().getUnidade()))
+        when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(usuario.getTodasAtribuicoes(new HashSet<>()).iterator().next().getUnidade()))
             .thenReturn(sgc.organizacao.dto.UnidadeDto.builder().codigo(2L).build());
 
         assertThatThrownBy(() -> loginFacade.entrar(req))
@@ -91,7 +91,6 @@ class LoginFacadeGapTest {
         up.setUnidade(unidade);
         up.setUsuario(u);
 
-        u.setAtribuicoesPermanentes(Set.of(up));
         return u;
     }
 }

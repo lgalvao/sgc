@@ -36,7 +36,6 @@ public class WithMockGestorSecurityContextFactory
                 // Carregar atribuições do banco de dados se o usuário existir
                 if (principal != null && usuarioPerfilRepo != null) {
                     var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(tituloGestor);
-                    principal.setAtribuicoesPermanentes(new HashSet<>(atribuicoes));
                 }
             } catch (Exception e) {
                 System.err.println(e.getMessage());
@@ -58,10 +57,9 @@ public class WithMockGestorSecurityContextFactory
                             .unidade(u)
                             .perfil(Perfil.GESTOR)
                             .build());
-            principal.setAtribuicoesPermanentes(atribuicoes);
 
         } else {
-            Set<sgc.organizacao.model.UsuarioPerfil> atribuicoes = new HashSet<>(principal.getTodasAtribuicoes());
+            Set<sgc.organizacao.model.UsuarioPerfil> atribuicoes = new HashSet<>(principal.getTodasAtribuicoes(new HashSet<>()));
             if (atribuicoes.stream()
                     .noneMatch(a -> a.getPerfil() == Perfil.GESTOR)) {
                 // Usuário existe mas não tem perfil GESTOR, adicionar com sua unidade de lotação
@@ -72,7 +70,6 @@ public class WithMockGestorSecurityContextFactory
                                 .unidade(unidade)
                                 .perfil(Perfil.GESTOR)
                                 .build());
-                principal.setAtribuicoesPermanentes(atribuicoes);
             }
         }
 

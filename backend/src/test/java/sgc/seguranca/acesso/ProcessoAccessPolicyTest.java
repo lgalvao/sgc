@@ -74,7 +74,6 @@ class ProcessoAccessPolicyTest {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(titulo);
         usuario.setNome(nome);
-        usuario.setAtribuicoesPermanentes(new HashSet<>());
         return usuario;
     }
 
@@ -83,8 +82,7 @@ class ProcessoAccessPolicyTest {
         atribuicao.setUsuario(usuario);
         atribuicao.setPerfil(perfil);
         
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getTodasAtribuicoes());
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getTodasAtribuicoes(new HashSet<>()));
         atribuicoes.add(atribuicao);
-        usuario.setAtribuicoesPermanentes(atribuicoes);
     }
 }

@@ -140,9 +140,14 @@ public class UnidadeResponsavelService {
         carregarAtribuicoesEmLote(chefesCompletos);
 
         Map<Long, List<Usuario>> chefesPorUnidade = chefesCompletos.stream()
-                .flatMap(u -> u.getTodasAtribuicoes().stream()
-                        .filter(a -> a.getPerfil() == Perfil.CHEFE && unidadesCodigos.contains(a.getUnidadeCodigo()))
-                        .map(a -> new AbstractMap.SimpleEntry<>(a.getUnidadeCodigo(), u)))
+                .flatMap(u -> {
+                    Set<UsuarioPerfil> atribuicoes = new HashSet<>(
+                            usuarioPerfilRepo.findByUsuarioTitulo(u.getTituloEleitoral())
+                    );
+                    return u.getTodasAtribuicoes(atribuicoes).stream()
+                            .filter(a -> a.getPerfil() == Perfil.CHEFE && unidadesCodigos.contains(a.getUnidadeCodigo()))
+                            .map(a -> new AbstractMap.SimpleEntry<>(a.getUnidadeCodigo(), u));
+                })
                 .collect(groupingBy(Map.Entry::getKey, mapping(Map.Entry::getValue, toList())));
 
         return chefesPorUnidade.entrySet().stream()
@@ -155,28 +160,13 @@ public class UnidadeResponsavelService {
     // ============ Métodos Privados (Carregamento de Atribuições) ============
 
     private void carregarAtribuicoesUsuario(Usuario usuario) {
-        List<UsuarioPerfil> atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral());
-        usuario.setAtribuicoesPermanentes(new HashSet<>(atribuicoes));
+        // Atribuições carregadas diretamente quando necessário via usuarioPerfilRepo
+        // Cache removido conforme simplificação Fase 1
     }
 
     private void carregarAtribuicoesEmLote(List<Usuario> usuarios) {
-        if (usuarios.isEmpty()) return;
-
-        List<String> titulos = usuarios.stream()
-                .map(Usuario::getTituloEleitoral)
-                .toList();
-
-        List<UsuarioPerfil> todasAtribuicoes = usuarioPerfilRepo.findByUsuarioTituloIn(titulos);
-
-        Map<String, Set<UsuarioPerfil>> atribuicoesPorUsuario = todasAtribuicoes.stream()
-                .collect(groupingBy(UsuarioPerfil::getUsuarioTitulo, toSet()));
-
-        for (Usuario usuario : usuarios) {
-            Set<UsuarioPerfil> atribuicoes = atribuicoesPorUsuario.getOrDefault(
-                    usuario.getTituloEleitoral(), new HashSet<>()
-            );
-            usuario.setAtribuicoesPermanentes(atribuicoes);
-        }
+        // Atribuições carregadas diretamente quando necessário via usuarioPerfilRepo
+        // Cache removido conforme simplificação Fase 1
     }
 
     private UnidadeResponsavelDto montarResponsavelDto(Long unidadeCodigo, List<Usuario> chefes) {

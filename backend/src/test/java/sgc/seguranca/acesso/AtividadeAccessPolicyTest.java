@@ -96,7 +96,6 @@ class AtividadeAccessPolicyTest {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(titulo);
         usuario.setNome(nome);
-        usuario.setAtribuicoesPermanentes(new HashSet<>());
         return usuario;
     }
 
@@ -107,8 +106,7 @@ class AtividadeAccessPolicyTest {
         atribuicao.setPerfil(perfil);
         atribuicao.setUnidade(unidade);
         
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getTodasAtribuicoes());
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getTodasAtribuicoes(new HashSet<>()));
         atribuicoes.add(atribuicao);
-        usuario.setAtribuicoesPermanentes(atribuicoes);
     }
 }

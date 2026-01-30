@@ -107,7 +107,6 @@ class SubprocessoAccessPolicyCoverageTest {
         up.setUnidade(un);
         up.setUnidadeCodigo(codUnidade);
 
-        u.setAtribuicoesPermanentes(Set.of(up));
         return u;
     }
 

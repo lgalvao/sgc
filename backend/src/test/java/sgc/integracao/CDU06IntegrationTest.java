@@ -96,7 +96,6 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
                         .unidade(unidade)
                         .perfil(perfil)
                         .build());
-        principal.setAtribuicoesPermanentes(atribuicoes);
 
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                 principal, null, principal.getAuthorities());

@@ -20,6 +20,10 @@ class AbstractAccessPolicyTest {
 
     // Concrete implementation for testing
     static class TestAccessPolicy extends AbstractAccessPolicy<Object> {
+        public TestAccessPolicy(sgc.organizacao.model.UsuarioPerfilRepo usuarioPerfilRepo) {
+            super(usuarioPerfilRepo);
+        }
+        
         @Override
         public boolean canExecute(Usuario usuario, Acao acao, Object recurso) {
             return false;
@@ -43,7 +47,7 @@ class AbstractAccessPolicyTest {
         }
     }
 
-    private final TestAccessPolicy policy = new TestAccessPolicy();
+    private final TestAccessPolicy policy = new TestAccessPolicy(null);
 
     @Test
     @DisplayName("Deve retornar true se usuário tem perfil permitido")
@@ -51,7 +55,6 @@ class AbstractAccessPolicyTest {
         Usuario usuario = new Usuario();
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.GESTOR);
-        usuario.setAtribuicoesPermanentes(new HashSet<>(Collections.singletonList(up)));
 
         boolean result = policy.testTemPerfilPermitido(usuario, EnumSet.of(Perfil.GESTOR, Perfil.ADMIN));
         assertTrue(result);
@@ -63,7 +66,6 @@ class AbstractAccessPolicyTest {
         Usuario usuario = new Usuario();
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.SERVIDOR);
-        usuario.setAtribuicoesPermanentes(new HashSet<>(Collections.singletonList(up)));
 
         boolean result = policy.testTemPerfilPermitido(usuario, EnumSet.of(Perfil.GESTOR, Perfil.ADMIN));
         assertFalse(result);

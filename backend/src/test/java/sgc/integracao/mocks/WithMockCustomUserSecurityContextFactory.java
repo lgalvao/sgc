@@ -57,7 +57,6 @@ public class WithMockCustomUserSecurityContextFactory
                                 .unidade(finalUnidade)
                                 .perfil(Perfil.valueOf(p))
                                 .build()));
-        principal.setAtribuicoesPermanentes(atribuicoes);
 
         if (dbAvailable && usuarioRepo != null) {
             try {

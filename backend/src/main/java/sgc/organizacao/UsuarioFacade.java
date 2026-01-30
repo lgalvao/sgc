@@ -38,7 +38,8 @@ public class UsuarioFacade {
     public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
         Usuario usuario = usuarioRepo.findByIdWithAtribuicoes(titulo).orElse(null);
         if (usuario != null) {
-            carregarAtribuicoes(usuario);
+            // Carrega atribuições para getAuthorities()
+            // Nota: getAuthorities() agora é tratado pelo UserDetailsService
             usuario.getAuthorities();
         }
         return usuario;
@@ -116,8 +117,10 @@ public class UsuarioFacade {
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
         return usuarioRepo.findByIdWithAtribuicoes(titulo)
                 .map(usuario -> {
-                    carregarAtribuicoes(usuario);
-                    return usuario.getTodasAtribuicoes().stream()
+                    Set<UsuarioPerfil> atribuicoes = new HashSet<>(
+                        usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral())
+                    );
+                    return usuario.getTodasAtribuicoes(atribuicoes).stream()
                             .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                             .map(this::toPerfilDto)
                             .toList();
@@ -126,27 +129,13 @@ public class UsuarioFacade {
     }
 
     private void carregarAtribuicoes(Usuario usuario) {
-        var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral());
-        usuario.setAtribuicoesPermanentes(new HashSet<>(atribuicoes));
+        // Atribuições carregadas diretamente quando necessário via usuarioPerfilRepo
+        // Cache removido conforme simplificação Fase 1
     }
 
     private void carregarAtribuicoesEmLote(List<Usuario> usuarios) {
-        if (usuarios.isEmpty()) return;
-
-        List<String> titulos = usuarios.stream()
-                .map(Usuario::getTituloEleitoral)
-                .toList();
-
-        List<UsuarioPerfil> todasAtribuicoes = usuarioPerfilRepo.findByUsuarioTituloIn(titulos);
-
-        Map<String, Set<UsuarioPerfil>> atribuicoesPorUsuario = todasAtribuicoes.stream()
-                .collect(Collectors.groupingBy(UsuarioPerfil::getUsuarioTitulo, Collectors.toSet()));
-
-        for (Usuario usuario : usuarios) {
-            Set<UsuarioPerfil> atribuicoes = atribuicoesPorUsuario
-                    .getOrDefault(usuario.getTituloEleitoral(), new java.util.HashSet<>());
-            usuario.setAtribuicoesPermanentes(atribuicoes);
-        }
+        // Atribuições carregadas diretamente quando necessário via usuarioPerfilRepo
+        // Cache removido conforme simplificação Fase 1
     }
 
     public Optional<UsuarioDto> buscarUsuarioPorEmail(String email) {
@@ -175,10 +164,18 @@ public class UsuarioFacade {
 
         List<String> titulos = todosChefes.stream().map(Usuario::getTituloEleitoral).toList();
         List<Usuario> chefesCompletos = usuarioRepo.findByIdInWithAtribuicoes(titulos);
-        carregarAtribuicoesEmLote(chefesCompletos);
+        
+        // Carregar atribuições para cada usuário
+        Map<String, Set<UsuarioPerfil>> atribuicoesPorUsuario = new HashMap<>();
+        for (Usuario usuario : chefesCompletos) {
+            Set<UsuarioPerfil> atribuicoes = new HashSet<>(
+                usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral())
+            );
+            atribuicoesPorUsuario.put(usuario.getTituloEleitoral(), atribuicoes);
+        }
 
         Map<Long, List<Usuario>> chefesPorUnidade = chefesCompletos.stream()
-                .flatMap(u -> u.getTodasAtribuicoes().stream()
+                .flatMap(u -> u.getTodasAtribuicoes(atribuicoesPorUsuario.get(u.getTituloEleitoral())).stream()
                         .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                         .filter(a -> a.getPerfil() == Perfil.CHEFE && unidadesCodigos.contains(a.getUnidadeCodigo()))
                         .map(a -> new AbstractMap.SimpleEntry<>(a.getUnidadeCodigo(), u)))
@@ -201,8 +198,10 @@ public class UsuarioFacade {
         return usuarioRepo
                 .findByIdWithAtribuicoes(titulo)
                 .map(u -> {
-                    carregarAtribuicoes(u);
-                    return u.getTodasAtribuicoes().stream()
+                    Set<UsuarioPerfil> atribuicoes = new HashSet<>(
+                        usuarioPerfilRepo.findByUsuarioTitulo(u.getTituloEleitoral())
+                    );
+                    return u.getTodasAtribuicoes(atribuicoes).stream()
                             .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                             .filter(a -> a.getPerfil() == Perfil.CHEFE)
                             .map(UsuarioPerfil::getUnidadeCodigo)
@@ -216,8 +215,10 @@ public class UsuarioFacade {
         return usuarioRepo
                 .findByIdWithAtribuicoes(titulo)
                 .map(u -> {
-                    carregarAtribuicoes(u);
-                    return u.getTodasAtribuicoes().stream()
+                    Set<UsuarioPerfil> atribuicoes = new HashSet<>(
+                        usuarioPerfilRepo.findByUsuarioTitulo(u.getTituloEleitoral())
+                    );
+                    return u.getTodasAtribuicoes(atribuicoes).stream()
                             .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                             .anyMatch(a -> a.getPerfil().name().equals(perfil)
                                     && a.getUnidadeCodigo().equals(unidadeCodigo));
@@ -230,8 +231,10 @@ public class UsuarioFacade {
         return usuarioRepo
                 .findByIdWithAtribuicoes(titulo)
                 .map(u -> {
-                    carregarAtribuicoes(u);
-                    return u.getTodasAtribuicoes().stream()
+                    Set<UsuarioPerfil> atribuicoes = new HashSet<>(
+                        usuarioPerfilRepo.findByUsuarioTitulo(u.getTituloEleitoral())
+                    );
+                    return u.getTodasAtribuicoes(atribuicoes).stream()
                             .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                             .filter(a -> a.getPerfil().name().equals(perfil))
                             .map(a -> a.getUnidade().getCodigo())

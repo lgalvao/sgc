@@ -1,9 +1,14 @@
 package sgc.seguranca.acesso;
 
+import lombok.RequiredArgsConstructor;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Classe base abstrata para políticas de acesso, centralizando lógica comum
@@ -11,8 +16,10 @@ import java.util.EnumSet;
  *
  * @param <T> O tipo do recurso protegido.
  */
+@RequiredArgsConstructor
 public abstract class AbstractAccessPolicy<T> implements AccessPolicy<T> {
 
+    protected final UsuarioPerfilRepo usuarioPerfilRepo;
     protected String ultimoMotivoNegacao = "";
 
     @Override
@@ -40,7 +47,10 @@ public abstract class AbstractAccessPolicy<T> implements AccessPolicy<T> {
     }
 
     protected boolean temPerfilPermitido(Usuario usuario, EnumSet<Perfil> perfisPermitidos) {
-        return usuario.getTodasAtribuicoes().stream()
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>(
+                usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral())
+        );
+        return usuario.getTodasAtribuicoes(atribuicoes).stream()
                 .anyMatch(a -> perfisPermitidos.contains(a.getPerfil()));
     }
 

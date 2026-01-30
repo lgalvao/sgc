@@ -1,10 +1,10 @@
 package sgc.seguranca.acesso;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 
 import java.util.EnumSet;
 import java.util.Map;
@@ -19,8 +19,11 @@ import static sgc.seguranca.acesso.Acao.*;
  * casos administrativos ou de manutenção.
  */
 @Component
-@RequiredArgsConstructor
 public class MapaAccessPolicy extends AbstractAccessPolicy<Mapa> {
+
+    public MapaAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo) {
+        super(usuarioPerfilRepo);
+    }
 
     /**
      * Mapeamento de ações para regras de acesso.

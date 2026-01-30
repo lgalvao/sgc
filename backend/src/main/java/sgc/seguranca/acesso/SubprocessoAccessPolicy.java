@@ -1,19 +1,14 @@
 package sgc.seguranca.acesso;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.*;
 import sgc.organizacao.service.HierarquiaService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+
+
 
 import static sgc.organizacao.model.Perfil.*;
 import static sgc.seguranca.acesso.Acao.*;
@@ -28,7 +23,6 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
  * - Regras específicas de cada CDU
  */
 @Component
-@RequiredArgsConstructor
 public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
     /**
      * Ações que ADMIN pode executar sem restrição de hierarquia.
@@ -224,6 +218,11 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                     RequisitoHierarquia.MESMA_UNIDADE)));
     private final HierarquiaService hierarquiaService;
 
+    public SubprocessoAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo, HierarquiaService hierarquiaService) {
+        super(usuarioPerfilRepo);
+        this.hierarquiaService = hierarquiaService;
+    }
+
     @Override
     public boolean canExecute(Usuario usuario, Acao acao, Subprocesso sp) {
         // Caso especial: VERIFICAR_IMPACTOS tem regras diferentes por perfil
@@ -328,13 +327,19 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
      * Verifica se o usuário possui o perfil especificado.
      */
     private boolean temPerfil(Usuario usuario, Perfil perfil) {
-        return usuario.getTodasAtribuicoes().stream()
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>(
+                usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral())
+        );
+        return usuario.getTodasAtribuicoes(atribuicoes).stream()
                 .anyMatch(a -> a.getPerfil() == perfil);
     }
 
     private boolean verificaHierarquia(Usuario usuario, Subprocesso sp, RequisitoHierarquia requisito) {
         final Unidade unidadeSp = sp.getUnidade();
-        final Set<UsuarioPerfil> todasAtribuicoes = usuario.getTodasAtribuicoes();
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>(
+                usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral())
+        );
+        final Set<UsuarioPerfil> todasAtribuicoes = usuario.getTodasAtribuicoes(atribuicoes);
         final Long codUnidade = unidadeSp.getCodigo();
 
         return switch (requisito) {
