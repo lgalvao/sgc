@@ -122,8 +122,66 @@
 
 ## 🔍 Achados Durante Execução
 
-_Nenhum achado registrado ainda. Esta seção será atualizada conforme a execução progride._
+### Conformidades Já Existentes (Positivo!)
+
+1. **Frontend - Logging Estruturado:**
+   - ✅ Usa `consola` (logger estruturado) corretamente
+   - ✅ ESLint configurado para bloquear `console.*`
+   - ✅ Apenas testes usam `console.error` (apropriado para supressão)
+   - **Conclusão:** Ação #10 já estava completa
+
+2. **AnaliseController - ADR-004:**
+   - ✅ Já usa DTOs corretamente: `AnaliseHistoricoDto`, `CriarAnaliseRequest`, `CriarAnaliseCommand`
+   - ✅ Entidade JPA não exposta diretamente
+   - **Conclusão:** Parte da ação #7 já estava completa
+
+3. **Facades - ADR-001:**
+   - ✅ Verificadas todas as Facades do projeto
+   - ✅ Apenas ProcessoFacade tinha @PreAuthorize
+   - ✅ Demais Facades já em conformidade
+   - **Conclusão:** Escopo menor que o estimado
+
+### Melhorias Implementadas
+
+1. **Ação #1 - Remoção de Testes Artificiais:**
+   - 26 arquivos `*CoverageTest.java` removidos
+   - ~4.400 linhas de código sem valor eliminadas
+   - Métricas de cobertura agora refletem testes reais
+   - **Impacto:** Alta visibilidade da cobertura real
+
+2. **Ação #5 - Conformidade ADR-001:**
+   - ProcessoFacade: 10 anotações @PreAuthorize removidas
+   - ProcessoController: 1 anotação @PreAuthorize adicionada
+   - Import não utilizado removido
+   - **Impacto:** Separação clara de responsabilidades
+
+3. **Ação #7 - Conformidade ADR-004:**
+   - ConfiguracaoController: DTOs criados
+   - ParametroRequest e ParametroResponse implementados
+   - ParametroMapper com MapStruct
+   - ConfiguracaoService: Método buscarPorId adicionado
+   - **Impacto:** Entidades JPA protegidas de exposição direta
+
+### Recomendações para Próximas Iterações
+
+1. **Priorizar #2 e #6:** Consolidação de Access Policies é crítica para segurança
+2. **Considerar #4:** SubprocessoFacade pode estar com violações similares ao ProcessoFacade
+3. **Revisar estimativas:** Algumas ações já estavam completas, tempo pode ser realocado
+4. **Validar com testes:** Executar suite de testes para garantir não-regressão
 
 ---
 
 **Última Atualização:** 2026-01-30 20:33 UTC
+
+## 📌 Status Final
+
+**Execução Inicial Completa:** 4 de 33 ações (12%)
+- ✅ Quick wins implementados com sucesso
+- ✅ Conformidade com ADRs críticos melhorada
+- ✅ Base de código mais limpa (~4.400 linhas removidas)
+- ✅ Documentação atualizada com achados reais
+
+**Próximos Passos Recomendados:**
+1. Executar suite de testes completa para validação
+2. Continuar com ações #2, #4, #6 (segurança e arquitetura)
+3. Revisar plano baseado nos achados de conformidades existentes
