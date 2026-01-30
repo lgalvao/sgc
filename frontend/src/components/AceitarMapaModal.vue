@@ -35,6 +35,7 @@
             <BButton
                 data-testid="btn-aceite-mapa-cancelar"
                 variant="secondary"
+                :disabled="loading"
                 @click="$emit('fecharModal')"
             >
                 <i class="bi bi-x-circle me-1" aria-hidden="true" />
@@ -43,17 +44,19 @@
             <BButton
                 data-testid="btn-aceite-mapa-confirmar"
                 variant="success"
+                :disabled="loading"
                 @click="$emit('confirmarAceitacao', observacao)"
             >
-                <i class="bi bi-check-circle me-1" aria-hidden="true" />
-                Aceitar
+                <BSpinner v-if="loading" small class="me-1" aria-hidden="true" />
+                <i v-else class="bi bi-check-circle me-1" aria-hidden="true" />
+                {{ loading ? 'Processando...' : 'Aceitar' }}
             </BButton>
         </template>
     </BModal>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BFormTextarea, BModal} from "bootstrap-vue-next";
+import {BButton, BFormTextarea, BModal, BSpinner} from "bootstrap-vue-next";
 import {computed, ref} from "vue";
 
 interface Props {
