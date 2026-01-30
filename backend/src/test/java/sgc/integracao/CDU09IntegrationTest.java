@@ -1,7 +1,5 @@
 package sgc.integracao;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -45,7 +43,6 @@ import sgc.mapa.model.ConhecimentoRepo;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
 import sgc.organizacao.model.UsuarioRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
@@ -77,6 +74,10 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     private ConhecimentoRepo conhecimentoRepo;
     @Autowired
     private AlertaRepo alertaRepo;
+
+    @Autowired
+    private sgc.organizacao.model.UsuarioPerfilRepo usuarioPerfilRepo;
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
@@ -155,21 +156,19 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     }
 
     private void setupUsuarioPerfil(Usuario usuario, Unidade unidade, Perfil perfil) {
-        // Insert na ATRIBUICAO_TEMPORARIA (refletirá nas views)
-        jdbcTemplate.update("INSERT INTO SGC.ATRIBUICAO_TEMPORARIA (usuario_titulo, unidade_codigo, data_inicio, data_termino) VALUES (?, ?, ?, ?)",
-                usuario.getTituloEleitoral(), unidade.getCodigo(), LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1));
-
-        // Atualizar objeto em memória para autenticação do Spring Security
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setUsuario(usuario);
-        up.setUsuarioTitulo(usuario.getTituloEleitoral());
-        up.setUnidade(unidade);
-        up.setUnidadeCodigo(unidade.getCodigo());
-        up.setPerfil(perfil);
-
-        Set<UsuarioPerfil> atribuicoes = usuario.getTodasAtribuicoes(new HashSet<>());
-        atribuicoes = new HashSet<>(atribuicoes); // Create mutable copy
-        atribuicoes.add(up);
+        try {
+            var up = sgc.organizacao.model.UsuarioPerfil.builder()
+                    .usuarioTitulo(usuario.getTituloEleitoral())
+                    .unidadeCodigo(unidade.getCodigo())
+                    .perfil(perfil)
+                    .build();
+            usuarioPerfilRepo.save(up);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        entityManager.flush();
+        entityManager.clear();
     }
 
     private void definirTitular(Unidade unidade, Usuario usuario) {

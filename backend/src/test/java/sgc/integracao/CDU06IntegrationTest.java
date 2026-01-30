@@ -110,9 +110,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
                     .perfil(perfil)
                     .build();
             usuarioPerfilRepo.save(up);
-            System.out.println("DEBUG: Saved UsuarioPerfil via Repo: " + up);
         } catch (Exception e) {
-             System.err.println("DEBUG: Failed to save UsuarioPerfil via Repo: " + e.getMessage());
              e.printStackTrace();
         }
         
@@ -210,14 +208,6 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build());
-
-        var perfis = usuarioPerfilRepo.findByUsuarioTituloWithUnidade(TEST_USER_ID);
-        System.out.println("DEBUG: Perfis encontrados: " + perfis.size());
-        if (!perfis.isEmpty()) {
-            System.out.println("DEBUG: Perfil: " + perfis.get(0).getPerfil() + " - Unidade: " + perfis.get(0).getUnidade().getCodigo());
-        } else {
-             throw new IllegalStateException("DEBUG: Nenhum perfil encontrado para o usuário " + TEST_USER_ID + ". Setup de teste falhou em persistir permissões.");
-        }
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
                 .andExpect(status().isOk())
