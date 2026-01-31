@@ -33,7 +33,7 @@
           >
             <template #cell(dataHora)="{ item, index }">
               <span :data-testid="`cell-dataHora-${index}`">
-                {{ formatarData((item as Analise).dataHora) }}
+                {{ formatDateTimeBR((item as Analise).dataHora) }}
               </span>
             </template>
             <template #cell(unidade)="{ item, index }">
@@ -69,9 +69,8 @@
 
 <script lang="ts" setup>
 import {BAlert, BButton, BModal, BTable} from "bootstrap-vue-next";
-import {format} from "date-fns";
-import {ptBR} from "date-fns/locale";
 import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
+import {formatDateTimeBR} from "@/utils/dateUtils";
 
 type Analise = AnaliseCadastro | AnaliseValidacao;
 
@@ -95,10 +94,6 @@ const fields = [
  */
 function fechar() {
   emit("fechar");
-}
-
-function formatarData(data: string): string {
-  return format(new Date(data), "dd/MM/yyyy HH:mm:ss", {locale: ptBR});
 }
 </script>
 

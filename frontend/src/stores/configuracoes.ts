@@ -1,6 +1,7 @@
 import {defineStore} from "pinia";
 import {ref, computed} from "vue";
 import {logger} from "@/utils";
+import {useSingleLoading} from "@/composables/useLoadingManager";
 import {
     buscarConfiguracoes as serviceBuscarConfiguracoes,
     salvarConfiguracoes as serviceSalvarConfiguracoes,
@@ -11,7 +12,7 @@ export type { Parametro };
 
 export const useConfiguracoesStore = defineStore("configuracoes", () => {
     const parametros = ref<Parametro[]>([]);
-    const loading = ref(false);
+    const loading = useSingleLoading();
     const error = ref<string | null>(null);
 
     // Map para lookup O(1) de chave -> parametro
@@ -20,31 +21,29 @@ export const useConfiguracoesStore = defineStore("configuracoes", () => {
     );
 
     async function carregarConfiguracoes() {
-        loading.value = true;
         error.value = null;
-        try {
-            parametros.value = await serviceBuscarConfiguracoes();
-        } catch (e: any) {
-            logger.error("Erro ao carregar configurações:", e);
-            error.value = "Não foi possível carregar as configurações.";
-        } finally {
-            loading.value = false;
-        }
+        await loading.withLoading(async () => {
+            try {
+                parametros.value = await serviceBuscarConfiguracoes();
+            } catch (e: any) {
+                logger.error("Erro ao carregar configurações:", e);
+                error.value = "Não foi possível carregar as configurações.";
+            }
+        });
     }
 
     async function salvarConfiguracoes(novosParametros: Parametro[]) {
-        loading.value = true;
         error.value = null;
-        try {
-            parametros.value = await serviceSalvarConfiguracoes(novosParametros);
-            return true;
-        } catch (e: any) {
-            logger.error("Erro ao salvar configurações:", e);
-            error.value = "Não foi possível salvar as configurações.";
-            return false;
-        } finally {
-            loading.value = false;
-        }
+        return loading.withLoading(async () => {
+            try {
+                parametros.value = await serviceSalvarConfiguracoes(novosParametros);
+                return true;
+            } catch (e: any) {
+                logger.error("Erro ao salvar configurações:", e);
+                error.value = "Não foi possível salvar as configurações.";
+                return false;
+            }
+        });
     }
 
     function getValor(chave: string, valorPadrao: string = ""): string {
@@ -65,7 +64,7 @@ export const useConfiguracoesStore = defineStore("configuracoes", () => {
 
     return {
         parametros,
-        loading,
+        loading: loading.isLoading,
         error,
         carregarConfiguracoes,
         salvarConfiguracoes,

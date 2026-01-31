@@ -7,22 +7,22 @@ import {
     diagnosticoService
 } from "@/services/diagnosticoService";
 import { useErrorHandler } from "@/composables/useErrorHandler";
+import { useSingleLoading } from "@/composables/useLoadingManager";
 
 export const useDiagnosticosStore = defineStore("diagnosticos", () => {
     const diagnostico = ref<DiagnosticoDto | null>(null);
     const avaliacoes = ref<AvaliacaoServidorDto[]>([]);
     const ocupacoes = ref<OcupacaoCriticaDto[]>([]);
-    const isLoading = ref(false);
+    const loading = useSingleLoading();
     const { lastError, clearError, withErrorHandling } = useErrorHandler();
 
     async function buscarDiagnostico(subprocessoId: number) {
-        isLoading.value = true;
-        await withErrorHandling(async () => {
-            diagnostico.value = await diagnosticoService.buscarDiagnostico(subprocessoId);
-        }, () => {
-            diagnostico.value = null;
-        }).finally(() => {
-            isLoading.value = false;
+        await loading.withLoading(async () => {
+            await withErrorHandling(async () => {
+                diagnostico.value = await diagnosticoService.buscarDiagnostico(subprocessoId);
+            }, () => {
+                diagnostico.value = null;
+            });
         });
     }
 
@@ -111,7 +111,7 @@ export const useDiagnosticosStore = defineStore("diagnosticos", () => {
         diagnostico,
         avaliacoes,
         ocupacoes,
-        isLoading,
+        isLoading: loading.isLoading,
         lastError,
         clearError,
         buscarDiagnostico,

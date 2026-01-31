@@ -38,10 +38,10 @@
               </td>
               <td>
                 <span :class="['badge', getBadgeClass(proc.tipo)]">
-                  {{ formatarTipo(proc.tipo) }}
+                  {{ formatarTipoProcesso(proc.tipo) }}
                 </span>
               </td>
-              <td>{{ formatarData(proc.dataFinalizacao) }}</td>
+              <td>{{ formatDateBR(proc.dataFinalizacao) }}</td>
               <td>
                 <BButton
                   size="sm"
@@ -67,6 +67,8 @@ import PageHeader from '@/components/layout/PageHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import {useProcessosStore} from '@/stores/processos';
 import {logger} from '@/utils';
+import {formatarTipoProcesso} from '@/utils/formatters';
+import {formatDateBR} from '@/utils/dateUtils';
 
 const router = useRouter();
 const processosStore = useProcessosStore();
@@ -88,15 +90,6 @@ function verDetalhes(codigo: number) {
   router.push(`/processos/${codigo}`);
 }
 
-function formatarTipo(tipo: string): string {
-  const map: Record<string, string> = {
-    'MAPEAMENTO': 'Mapeamento',
-    'REVISAO': 'Revisão',
-    'DIAGNOSTICO': 'Diagnóstico'
-  };
-  return map[tipo] || tipo;
-}
-
 function getBadgeClass(tipo: string): string {
   const map: Record<string, string> = {
     'MAPEAMENTO': 'bg-primary',
@@ -104,11 +97,6 @@ function getBadgeClass(tipo: string): string {
     'DIAGNOSTICO': 'bg-warning text-dark'
   };
   return map[tipo] || 'bg-secondary';
-}
-
-function formatarData(data: string): string {
-  if (!data) return '-';
-  return new Date(data).toLocaleDateString('pt-BR');
 }
 
 onMounted(() => {
