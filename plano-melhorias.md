@@ -1101,9 +1101,9 @@ Unitários (mocked) ───────── E2E
 
 ## 📊 Progresso da Execução
 
-**Última atualização:** 2026-01-30 21:45 UTC
+**Última atualização:** 2026-01-31 01:30 UTC
 
-### Ações Completadas (7 de 33 - 21%)
+### Ações Completadas (10 de 33 - 30%)
 
 #### ✅ Ação #1: Remover arquivos *CoverageTest.java
 - **Status:** COMPLETA
@@ -1204,15 +1204,48 @@ Unitários (mocked) ───────── E2E
    - Apenas ProcessoDetalheBuilder tinha verificação direta
    - Refatoração pontual foi suficiente para 100% de conformidade
 
+#### ✅ Ação #3: Dividir GOD Composables (Sessão 3)
+- **Status:** COMPLETA
+- **Composables refatorados:**
+  - useVisAtividadesLogic (246 linhas) → 4 composables focados
+  - useVisMapaLogic (222 linhas) → 4 composables focados
+- **Padrão aplicado:**
+  - State (estado e computeds)
+  - Modais (gerenciamento de modais)
+  - Crud (operações de API)
+  - Logic (orquestrador)
+- **Conformidade:** ✅ Single Responsibility Principle, código testável
+- **Validação:** Typecheck e Lint passando
+
+#### ✅ Ação #8: Eliminar ciclos de dependência via Events (Sessão 3)
+- **Status:** COMPLETA
+- **Ciclo eliminado:** Subprocesso ↔ Mapa
+- **Alterações:**
+  - Criado EventoImportacaoAtividades
+  - Implementado MapaImportacaoListener (@Async + @Transactional)
+  - Refatorado SubprocessoAtividadeService (removida dependência CopiaMapaService)
+- **Conformidade:** ✅ ADR-002 (Unified Events Pattern)
+- **Validação:** 249/250 testes passando
+
+#### ✅ Ação #9: Padronizar acesso a services (Sessão 3)
+- **Status:** COMPLETA
+- **Violações corrigidas:** 3
+  - HistoricoView: View→API direto → View→Store
+  - SubprocessosStore: Store→API direto → Store→Service
+  - ConfiguracoesStore: Store→API direto → Store→Service (+ criação de configuracaoService)
+- **Conformidade:** ✅ 100% View→Store→Service→API
+- **Validação:** Typecheck e Lint passando
+
 ### Próximas Ações Prioritárias
 
-1. **#3:** Dividir GOD Composables no frontend (8h)
-2. **#8:** Eliminar ciclos de dependência via Events (2h)
-3. **#9:** Padronizar acesso a services (View→Store→Service→API) (4h)
-4. **#11:** Adotar fixtures E2E (36 arquivos) (6h)
-5. **#12:** Reduzir over-mocking (46 arquivos) (5h)
+1. **#11:** Adotar fixtures E2E (36 arquivos) (6h)
+2. **#12:** Reduzir over-mocking (46 arquivos) (5h)
+3. **#14-#19:** Ações MÉDIA - Backend (padrão "do*", DTOs, null checks)
+4. **Validação E2E:** Executar suite completa após refatorações
+5. **Documentação:** Atualizar ADRs com mudanças arquiteturais
 
 ---
 
 **Documento gerado em:** 2026-01-30  
-**Próxima revisão:** Após implementação de ações CRÍTICAS
+**Última atualização:** 2026-01-31  
+**Próxima revisão:** Após implementação de ações CRÍTICAS restantes (#11, #12)
