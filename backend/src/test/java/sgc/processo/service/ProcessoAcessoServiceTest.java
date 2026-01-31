@@ -14,6 +14,7 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.testutils.UnidadeTestBuilder;
 
 import java.util.List;
 
@@ -83,14 +84,9 @@ class ProcessoAcessoServiceTest {
         ));
 
         // Mock hierarquia: 100 -> 101 -> 102
-        Unidade u100 = new Unidade();
-        u100.setCodigo(100L);
-        Unidade u101 = new Unidade();
-        u101.setCodigo(101L);
-        u101.setUnidadeSuperior(u100);
-        Unidade u102 = new Unidade();
-        u102.setCodigo(102L);
-        u102.setUnidadeSuperior(u101);
+        Unidade u100 = UnidadeTestBuilder.umaDe().comCodigo("100").build();
+        Unidade u101 = UnidadeTestBuilder.umaDe().comCodigo("101").comSuperior(u100).build();
+        Unidade u102 = UnidadeTestBuilder.umaDe().comCodigo("102").comSuperior(u101).build();
 
         when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(u100, u101, u102));
 
@@ -105,19 +101,11 @@ class ProcessoAcessoServiceTest {
     @Test
     @DisplayName("Deve encontrar corretamente todos os descendentes")
     void deveBuscarCodigosDescendentes() {
-        Unidade u1 = new Unidade();
-        u1.setCodigo(1L);
-        Unidade u2 = new Unidade();
-        u2.setCodigo(2L);
-        u2.setUnidadeSuperior(u1);
-        Unidade u3 = new Unidade();
-        u3.setCodigo(3L);
-        u3.setUnidadeSuperior(u1);
-        Unidade u4 = new Unidade();
-        u4.setCodigo(4L);
-        u4.setUnidadeSuperior(u2);
-        Unidade u5 = new Unidade();
-        u5.setCodigo(5L); // Independente
+        Unidade u1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
+        Unidade u2 = UnidadeTestBuilder.umaDe().comCodigo("2").comSuperior(u1).build();
+        Unidade u3 = UnidadeTestBuilder.umaDe().comCodigo("3").comSuperior(u1).build();
+        Unidade u4 = UnidadeTestBuilder.umaDe().comCodigo("4").comSuperior(u2).build();
+        Unidade u5 = UnidadeTestBuilder.umaDe().comCodigo("5").build(); // Independente
 
         when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(u1, u2, u3, u4, u5));
 
@@ -164,10 +152,8 @@ class ProcessoAcessoServiceTest {
     @DisplayName("Deve lidar com ciclos na hierarquia (evitar loop infinito)")
     void deveEvitarCicloInifinitoEmHierarquia() {
         // U1 -> U2 -> U1
-        Unidade u1 = new Unidade();
-        u1.setCodigo(1L);
-        Unidade u2 = new Unidade();
-        u2.setCodigo(2L);
+        Unidade u1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
+        Unidade u2 = UnidadeTestBuilder.umaDe().comCodigo("2").build();
 
         u1.setUnidadeSuperior(u2);
         u2.setUnidadeSuperior(u1);
@@ -195,10 +181,8 @@ class ProcessoAcessoServiceTest {
                 PerfilDto.builder().unidadeCodigo(200L).build()
         ));
 
-        Unidade u100 = new Unidade();
-        u100.setCodigo(100L);
-        Unidade u200 = new Unidade();
-        u200.setCodigo(200L);
+        Unidade u100 = UnidadeTestBuilder.umaDe().comCodigo("100").build();
+        Unidade u200 = UnidadeTestBuilder.umaDe().comCodigo("200").build();
 
         when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(u100, u200));
 

@@ -33,6 +33,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
+import sgc.testutils.UnidadeTestBuilder;
 import org.springframework.data.domain.Sort;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,6 +51,13 @@ class PainelServiceTest {
     @InjectMocks
     private PainelFacade painelService;
 
+    private Unidade criarUnidade(Long codigo, String sigla) {
+        return UnidadeTestBuilder.umaDe()
+                .comCodigo(codigo.toString())
+                .comSigla(sigla)
+                .build();
+    }
+
     private Processo criarProcessoMock(Long codigo) {
         Processo p = new Processo();
         p.setCodigo(codigo);
@@ -58,9 +66,7 @@ class PainelServiceTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         p.setDataCriacao(LocalDateTime.now());
 
-        Unidade participante = new Unidade();
-        participante.setCodigo(1L);
-        participante.setSigla("PART");
+        Unidade participante = criarUnidade(1L, "PART");
         p.setParticipantes(Set.of(participante));
 
         return p;
@@ -107,8 +113,7 @@ class PainelServiceTest {
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             p.setTipo(TipoProcesso.MAPEAMENTO);
 
-            Unidade u = new Unidade();
-            u.setCodigo(1L);
+            Unidade u = criarUnidade(1L, "U1");
             p.setParticipantes(Set.of(u));
 
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
@@ -142,10 +147,6 @@ class PainelServiceTest {
         @Test
         @DisplayName("listarProcessos deve calcular link correto para CHEFE")
         void listarProcessos_LinkChefe() {
-            Unidade u = new Unidade();
-            u.setCodigo(1L);
-            u.setSigla("U1");
-
             Processo p = criarProcessoMock(1L);
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
                     .thenReturn(new PageImpl<>(List.of(p)));
@@ -171,8 +172,7 @@ class PainelServiceTest {
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             p.setTipo(TipoProcesso.MAPEAMENTO);
 
-            Unidade u = new Unidade();
-            u.setCodigo(1L);
+            Unidade u = criarUnidade(1L, "U1");
             p.setParticipantes(Set.of(u));
 
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
@@ -204,8 +204,7 @@ class PainelServiceTest {
             p.setTipo(TipoProcesso.MAPEAMENTO);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-            Unidade u = new Unidade();
-            u.setCodigo(1L);
+            Unidade u = criarUnidade(1L, "U1");
             p.setParticipantes(Set.of(u));
 
             when(processoFacade.listarPorParticipantesIgnorandoCriado(any(), any()))
@@ -227,8 +226,7 @@ class PainelServiceTest {
         @Test
         @DisplayName("listarProcessos deve tratar exceção ao formatar unidades participantes")
         void listarProcessos_FormatarUnidadesException() {
-            Unidade u = new Unidade();
-            u.setCodigo(1L);
+            Unidade u = criarUnidade(1L, "U1");
 
             Processo p = criarProcessoMock(1L);
             p.setParticipantes(Set.of(u));
@@ -245,8 +243,7 @@ class PainelServiceTest {
         @Test
         @DisplayName("encontrarMaiorIdVisivel deve retornar null se unidade for null ou não participante")
         void encontrarMaiorIdVisivel_CasosBorda() {
-            Unidade u = new Unidade();
-            u.setCodigo(999L);
+            Unidade u = criarUnidade(999L, "U999");
 
             Processo p = criarProcessoMock(1L);
             p.setParticipantes(Set.of(u));
@@ -263,13 +260,12 @@ class PainelServiceTest {
         @Test
         @DisplayName("formatarUnidadesParticipantes: deve formatar corretamente e agrupar hierarquia")
         void formatarUnidadesParticipantes_Complexa() {
-            Unidade pai = new Unidade();
-            pai.setCodigo(1L);
-            pai.setSigla("PAI");
-            Unidade filho = new Unidade();
-            filho.setCodigo(2L);
-            filho.setSigla("FILHO");
-            filho.setUnidadeSuperior(pai);
+            Unidade pai = criarUnidade(1L, "PAI");
+            Unidade filho = UnidadeTestBuilder.umaDe()
+                    .comCodigo("2")
+                    .comSigla("FILHO")
+                    .comSuperior(pai)
+                    .build();
 
             when(unidadeService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
             when(unidadeService.buscarIdsDescendentes(2L)).thenReturn(Collections.emptyList());
@@ -290,13 +286,12 @@ class PainelServiceTest {
         @Test
         @DisplayName("formatarUnidadesParticipantes: deve mostrar filho se pai não participa")
         void formatarUnidadesParticipantes_FilhoSemPai() {
-            Unidade pai = new Unidade();
-            pai.setCodigo(1L);
-            pai.setSigla("PAI");
-            Unidade filho = new Unidade();
-            filho.setCodigo(2L);
-            filho.setSigla("FILHO");
-            filho.setUnidadeSuperior(pai);
+            Unidade pai = criarUnidade(1L, "PAI");
+            Unidade filho = UnidadeTestBuilder.umaDe()
+                    .comCodigo("2")
+                    .comSigla("FILHO")
+                    .comSuperior(pai)
+                    .build();
 
             Processo p = new Processo();
             p.setCodigo(100L);
@@ -314,9 +309,7 @@ class PainelServiceTest {
         @Test
         @DisplayName("Deve tratar exceção ao buscar unidade visível no formatarUnidadesParticipantes")
         void excecaoEmSelecionarIdsVisiveis() {
-            Unidade part = new Unidade();
-            part.setCodigo(99L);
-            part.setSigla("U99");
+            Unidade part = criarUnidade(99L, "U99");
 
             Processo p = new Processo();
             p.setCodigo(1L);
@@ -349,8 +342,7 @@ class PainelServiceTest {
         @Test
         @DisplayName("selecionarIdsVisiveis deve ignorar unidade se buscarEntidadePorId falhar")
         void selecionarIdsVisiveis_CatchException() {
-            Unidade u = new Unidade();
-            u.setCodigo(999L);
+            Unidade u = criarUnidade(999L, "U999");
 
             Processo p = criarProcessoMock(1L);
             p.setParticipantes(Set.of(u));
@@ -396,8 +388,7 @@ class PainelServiceTest {
             p.setCodigo(123L);
             alerta.setProcesso(p);
 
-            Unidade u = new Unidade();
-            u.setSigla("U1");
+            Unidade u = criarUnidade(1L, "U1");
             alerta.setUnidadeOrigem(u);
             alerta.setUnidadeDestino(u);
 
@@ -427,8 +418,7 @@ class PainelServiceTest {
             p.setCodigo(123L);
             alerta.setProcesso(p);
 
-            Unidade u = new Unidade();
-            u.setSigla("U1");
+            Unidade u = criarUnidade(1L, "U1");
             alerta.setUnidadeOrigem(u);
             alerta.setUnidadeDestino(u);
 

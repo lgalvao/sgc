@@ -23,6 +23,7 @@ import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.testutils.UnidadeTestBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -83,17 +84,26 @@ class EventoProcessoListenerTest {
         return p;
     }
 
+    /**
+     * Cria uma unidade com tipo e código customizado usando TestBuilder.
+     * Elimina a necessidade de múltiplas linhas de setup.
+     */
+    private Unidade criarUnidade(Long codigo, TipoUnidade tipo) {
+        return UnidadeTestBuilder.umaDe()
+                .comCodigo(String.valueOf(codigo))
+                .comTipo(tipo)
+                .build();
+    }
+
     @Test
     @DisplayName("Deve disparar e-mails ao iniciar processo")
     void deveDispararEmailsAoIniciar() {
         Processo processo = criarProcesso(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(10L);
+        Unidade unidade = criarUnidade(10L, TipoUnidade.OPERACIONAL);
         unidade.setSigla("U1");
         unidade.setNome("Unidade 1");
-        unidade.setTipo(TipoUnidade.OPERACIONAL);
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(100L);
@@ -135,9 +145,7 @@ class EventoProcessoListenerTest {
     void deveCobrirExcecaoTipoUnidadeRaizEInvalido() {
         Processo processo = criarProcesso(1L);
         Subprocesso s = new Subprocesso();
-        Unidade u = new Unidade();
-        u.setCodigo(1L);
-        u.setTipo(TipoUnidade.RAIZ);
+        Unidade u = criarUnidade(1L, TipoUnidade.RAIZ);
         s.setUnidade(u);
 
         // Testa ErroEstadoImpossivel ao criar corpo
@@ -160,9 +168,7 @@ class EventoProcessoListenerTest {
         Processo processo = criarProcesso(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
-        Unidade u = new Unidade();
-        u.setCodigo(10L);
-        u.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade u = criarUnidade(10L, TipoUnidade.OPERACIONAL);
         Subprocesso s = new Subprocesso();
         s.setUnidade(u);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
@@ -195,13 +201,9 @@ class EventoProcessoListenerTest {
         Processo processo = criarProcesso(2L);
         when(processoFacade.buscarEntidadePorId(2L)).thenReturn(processo);
 
-        Unidade operacional = new Unidade();
-        operacional.setCodigo(1L);
-        operacional.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade operacional = criarUnidade(1L, TipoUnidade.OPERACIONAL);
         operacional.setSigla("OP");
-        Unidade intermediaria = new Unidade();
-        intermediaria.setCodigo(2L);
-        intermediaria.setTipo(TipoUnidade.INTERMEDIARIA);
+        Unidade intermediaria = criarUnidade(2L, TipoUnidade.INTERMEDIARIA);
         intermediaria.setSigla("INT");
 
         processo.setParticipantes(Set.of(operacional, intermediaria));
@@ -222,9 +224,7 @@ class EventoProcessoListenerTest {
         verify(notificacaoEmailService, never()).enviarEmailHtml(eq("int@mail.com"), anyString(), any());
 
         // 2. Intermediária com subordinadas (sucesso)
-        Unidade sub = new Unidade();
-        sub.setCodigo(21L);
-        sub.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade sub = criarUnidade(21L, TipoUnidade.OPERACIONAL);
         sub.setUnidadeSuperior(intermediaria);
         sub.setSigla("SUB");
         processo.setParticipantes(Set.of(operacional, intermediaria, sub));
@@ -251,9 +251,7 @@ class EventoProcessoListenerTest {
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
         Subprocesso s = new Subprocesso();
-        Unidade u = new Unidade();
-        u.setCodigo(1L);
-        u.setTipo(TipoUnidade.SEM_EQUIPE);
+        Unidade u = criarUnidade(1L, TipoUnidade.SEM_EQUIPE);
         s.setUnidade(u);
 
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
@@ -273,9 +271,7 @@ class EventoProcessoListenerTest {
         Processo processo = criarProcesso(2L);
         when(processoFacade.buscarEntidadePorId(2L)).thenReturn(processo);
 
-        Unidade raiz = new Unidade();
-        raiz.setCodigo(1L);
-        raiz.setTipo(TipoUnidade.RAIZ);
+        Unidade raiz = criarUnidade(1L, TipoUnidade.RAIZ);
 
         processo.setParticipantes(Set.of(raiz));
 
@@ -321,9 +317,7 @@ class EventoProcessoListenerTest {
         Processo processo = criarProcesso(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
-        Unidade u = new Unidade();
-        u.setCodigo(10L);
-        u.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade u = criarUnidade(10L, TipoUnidade.OPERACIONAL);
         Subprocesso s = new Subprocesso();
         s.setCodigo(100L);
         s.setUnidade(u);
@@ -346,12 +340,8 @@ class EventoProcessoListenerTest {
         Processo processo = criarProcesso(3L);
         when(processoFacade.buscarEntidadePorId(3L)).thenReturn(processo);
 
-        Unidade u1 = new Unidade();
-        u1.setCodigo(1L);
-        u1.setTipo(TipoUnidade.OPERACIONAL);
-        Unidade u2 = new Unidade();
-        u2.setCodigo(2L);
-        u2.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade u1 = criarUnidade(1L, TipoUnidade.OPERACIONAL);
+        Unidade u2 = criarUnidade(2L, TipoUnidade.OPERACIONAL);
 
         processo.setParticipantes(Set.of(u1, u2));
 
@@ -372,12 +362,8 @@ class EventoProcessoListenerTest {
         Processo processo = criarProcesso(4L);
         when(processoFacade.buscarEntidadePorId(4L)).thenReturn(processo);
 
-        Unidade u1 = new Unidade();
-        u1.setCodigo(1L);
-        u1.setTipo(TipoUnidade.OPERACIONAL);
-        Unidade u2 = new Unidade();
-        u2.setCodigo(2L);
-        u2.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade u1 = criarUnidade(1L, TipoUnidade.OPERACIONAL);
+        Unidade u2 = criarUnidade(2L, TipoUnidade.OPERACIONAL);
 
         processo.setParticipantes(Set.of(u1, u2));
 
@@ -403,9 +389,7 @@ class EventoProcessoListenerTest {
     void deveLancarExcecaoParaSemEquipe() {
         Processo processo = criarProcesso(1L);
         Subprocesso s = new Subprocesso();
-        Unidade u = new Unidade();
-        u.setCodigo(1L);
-        u.setTipo(TipoUnidade.SEM_EQUIPE);
+        Unidade u = criarUnidade(1L, TipoUnidade.SEM_EQUIPE);
         s.setUnidade(u);
 
         assertThatThrownBy(() -> listener.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, processo, s))
@@ -419,23 +403,17 @@ class EventoProcessoListenerTest {
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
         // Unidade 1: Titular null no mapa
-        Unidade u1 = new Unidade();
-        u1.setCodigo(1L);
-        u1.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade u1 = criarUnidade(1L, TipoUnidade.OPERACIONAL);
         Subprocesso s1 = new Subprocesso();
         s1.setUnidade(u1);
 
         // Unidade 2: Titular com email null
-        Unidade u2 = new Unidade();
-        u2.setCodigo(2L);
-        u2.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade u2 = criarUnidade(2L, TipoUnidade.OPERACIONAL);
         Subprocesso s2 = new Subprocesso();
         s2.setUnidade(u2);
 
         // Unidade 3: Titular com email blank
-        Unidade u3 = new Unidade();
-        u3.setCodigo(3L);
-        u3.setTipo(TipoUnidade.OPERACIONAL);
+        Unidade u3 = criarUnidade(3L, TipoUnidade.OPERACIONAL);
         Subprocesso s3 = new Subprocesso();
         s3.setUnidade(u3);
 
