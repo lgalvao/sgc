@@ -2,14 +2,17 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.mapa.evento.EventoImportacaoAtividades;
 import sgc.mapa.model.Atividade;
-import sgc.mapa.service.CopiaMapaService;
 import sgc.mapa.service.MapaManutencaoService;
+import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ConhecimentoVisualizacaoDto;
+import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -18,8 +21,6 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.List;
-import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
 
 /**
  * Service responsável por operações relacionadas a atividades de subprocessos.
@@ -27,7 +28,7 @@ import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
  * <p>Extrai lógica de manipulação de atividades que estava em métodos privados de {@link SubprocessoFacade}.
  * Responsabilidades:
  * <ul>
- *   <li>Importar atividades entre subprocessos</li>
+ *   <li>Importar atividades entre subprocessos (via eventos)</li>
  *   <li>Listar atividades de um subprocesso para visualização</li>
  *   <li>Transformar atividades em DTOs para visualização</li>
  * </ul>
@@ -40,7 +41,7 @@ class SubprocessoAtividadeService {
     private final SubprocessoRepo subprocessoRepo;
     private final SubprocessoCrudService crudService;
     private final MapaManutencaoService mapaManutencaoService;
-    private final CopiaMapaService copiaMapaService;
+    private final ApplicationEventPublisher eventPublisher;
     private final MovimentacaoRepo movimentacaoRepo;
 
     /**
@@ -51,12 +52,13 @@ class SubprocessoAtividadeService {
      *   <li>Destino deve estar em NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO ou REVISAO_CADASTRO_EM_ANDAMENTO</li>
      *   <li>Se destino está em NAO_INICIADO, atualiza situação para cadastro em andamento</li>
      *   <li>Registra movimentação da importação</li>
+     *   <li>Publica evento {@link EventoImportacaoAtividades} para desacoplar do módulo mapa</li>
      * </ul>
      * 
      * @param codSubprocessoDestino código do subprocesso de destino
      * @param codSubprocessoOrigem código do subprocesso de origem
      * @throws ErroEntidadeNaoEncontrada se algum subprocesso não existe
-     * @throws sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida se destino está em situação inválida
+     * @throws ErroAtividadesEmSituacaoInvalida se destino está em situação inválida
      */
     @Transactional
     public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
@@ -78,9 +80,12 @@ class SubprocessoAtividadeService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
                         "Subprocesso de origem não encontrado: %d".formatted(codSubprocessoOrigem)));
 
-        copiaMapaService.importarAtividadesDeOutroMapa(
-                spOrigem.getMapa().getCodigo(),
-                spDestino.getMapa().getCodigo());
+        // Publica evento para importação assíncrona (desacoplamento do módulo mapa)
+        eventPublisher.publishEvent(EventoImportacaoAtividades.builder()
+                .codigoMapaOrigem(spOrigem.getMapa().getCodigo())
+                .codigoMapaDestino(spDestino.getMapa().getCodigo())
+                .codigoSubprocesso(codSubprocessoDestino)
+                .build());
 
         if (spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
             var tipoProcesso = spDestino.getProcesso().getTipo();
@@ -107,7 +112,8 @@ class SubprocessoAtividadeService {
                 .descricao(descMovimentacao)
                 .build());
 
-        log.info("Atividades importadas do subprocesso {} para {}", codSubprocessoOrigem, codSubprocessoDestino);
+        log.info("Evento de importação de atividades publicado: subprocesso {} -> {}", 
+                codSubprocessoOrigem, codSubprocessoDestino);
     }
 
     /**
