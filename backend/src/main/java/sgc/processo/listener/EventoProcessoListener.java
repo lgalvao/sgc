@@ -5,7 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.notificacao.NotificacaoEmailService;
@@ -70,9 +72,9 @@ public class EventoProcessoListener {
      *
      * @param evento O evento contendo os detalhes do processo que foi iniciado.
      */
-    @EventListener
+    @TransactionalEventListener
     @Async
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void aoIniciarProcesso(EventoProcessoIniciado evento) {
         try {
             processarInicioProcesso(evento);
@@ -92,9 +94,9 @@ public class EventoProcessoListener {
      *
      * @param evento O evento contendo os detalhes do processo que foi finalizado.
      */
-    @EventListener
+    @TransactionalEventListener
     @Async
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void aoFinalizarProcesso(EventoProcessoFinalizado evento) {
         try {
             processarFinalizacaoProcesso(evento);

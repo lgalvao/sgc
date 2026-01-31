@@ -84,7 +84,7 @@ public class SubprocessoCrudService {
         return SubprocessoSituacaoDto.builder()
                 .codigo(subprocesso.getCodigo())
                 .situacao(subprocesso.getSituacao())
-                .situacaoLabel(subprocesso.getSituacao() != null ? subprocesso.getSituacao().name() : null)
+                .situacaoLabel(subprocesso.getSituacao() != null ? subprocesso.getSituacao().getDescricao() : null)
                 .build();
     }
 

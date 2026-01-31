@@ -60,7 +60,7 @@ public class E2eController {
 
     private void executeDatabaseReset(Connection conn) throws Exception {
         try (java.sql.Statement stmt = conn.createStatement()) {
-            log.info("Desabilitando integridade referencial");
+            log.debug("Desabilitando integridade referencial");
             stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
 
             List<String> tables = jdbcTemplate.queryForList(
@@ -76,7 +76,7 @@ public class E2eController {
             log.info("Executando script de seed: {}", seedResource.getFilename());
             ScriptUtils.executeSqlScript(conn, seedResource);
 
-            log.info("Reabilitando integridade referencial");
+            log.debug("Reabilitando integridade referencial");
             stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
         }
     }

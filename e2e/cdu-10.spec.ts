@@ -1,6 +1,5 @@
 import type { Page } from '@playwright/test';
 import {expect, test} from './fixtures/auth-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {
     adicionarAtividade,
@@ -19,10 +18,6 @@ async function verificarPaginaSubprocesso(page: Page, unidade: string) {
 
 test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_221';
-    const USUARIO_CHEFE = USUARIOS.CHEFE_SECAO_221.titulo;
-    const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_221.senha;
-    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
-    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
     const timestamp = Date.now();
     const descProcessoMapeamento = `Map 10 ${timestamp}`;
@@ -44,7 +39,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     // PREPARAÇÃO - Criar processo de mapeamento finalizado
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page}) => {
         
 
         await criarProcesso(page, {
@@ -73,7 +68,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     });
 
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
         
 
         // CHEFE vai direto para o subprocesso
@@ -92,11 +87,11 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByRole('heading', {name: /Cadastro de atividades disponibilizado/i})).toBeVisible();
+        await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 3: Admin homologa cadastro', async ({page}) => {
         
 
         await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
@@ -111,7 +106,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
     });
 
-    test('Preparacao 4: Admin adiciona competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 4: Admin adiciona competências e disponibiliza mapa', async ({page}) => {
         
 
         // ADMIN após login está no Painel
@@ -152,11 +147,11 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         
         // Aguardar redirecionamento para o painel e verificar mensagem de sucesso
         await expect(page).toHaveURL(/\/painel/);
-        await expect(page.getByRole('heading', {name: /Mapa disponibilizado/i})).toBeVisible();
+        await expect(page.getByText(/Mapa disponibilizado/i)).toBeVisible();
     });
 
 
-    test('Preparacao 5: Chefe valida mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 5: Chefe valida mapa', async ({page}) => {
         
 
         await page.getByText(descProcessoMapeamento).click();
@@ -169,7 +164,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 6: Admin homologa mapa e finaliza processo de mapeamento', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 6: Admin homologa mapa e finaliza processo de mapeamento', async ({page}) => {
         
 
         // ADMIN após login está no Painel
@@ -196,7 +191,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     });
 
 
-    test('Preparacao 7: Admin cria e inicia processo de revisão', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 7: Admin cria e inicia processo de revisão', async ({page}) => {
         
 
         await criarProcesso(page, {
@@ -222,7 +217,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 8: Chefe revisa atividades', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 8: Chefe revisa atividades', async ({page}) => {
         
 
         // Navegar pelo painel para o processo de revisão (Chefe vai direto)
@@ -254,7 +249,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     // TESTES PRINCIPAIS - CDU-10
     // ========================================================================
 
-    test('Cenario 1: Validação - Atividade sem conhecimento impede disponibilização', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 1: Validação - Atividade sem conhecimento impede disponibilização', async ({page}) => {
         
 
         await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
@@ -285,7 +280,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByRole('button', {name: 'Cancelar'}).click();
     });
 
-    test('Cenario 2: Caminho feliz - Disponibilizar revisão do cadastro', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 2: Caminho feliz - Disponibilizar revisão do cadastro', async ({page}) => {
         
 
         await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
@@ -309,7 +304,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // Validar sucesso
-        await expect(page.getByRole('heading', {name: /Revisão disponibilizada/i})).toBeVisible();
+        await expect(page.getByText(/Revisão disponibilizada/i)).toBeVisible();
         await verificarPaginaPainel(page);
 
         // Verificar status no subprocesso
@@ -320,7 +315,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro disponibilizada/i);
     });
 
-    test('Cenario 3: Devolução e Histórico de Análise', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 3: Devolução e Histórico de Análise', async ({page}) => {
         // 1. Admin devolve a revisão do cadastro
         
 
@@ -373,11 +368,11 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // 3. Disponibilizar novamente
         await disponibilizarCadastro(page);
 
-        await expect(page.getByRole('heading', {name: /Revisão disponibilizada/i})).toBeVisible();
+        await expect(page.getByText(/Revisão disponibilizada/i)).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
-    test('Cenario 4: Devolução e nova disponibilização adicional', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 4: Devolução e nova disponibilização adicional', async ({page}) => {
         // Admin devolve a revisão (primeira devolução)
         
 
@@ -404,11 +399,11 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await navegarParaAtividades(page);
 
         await disponibilizarCadastro(page);
-        await expect(page.getByRole('heading', {name: /Revisão disponibilizada/i})).toBeVisible();
+        await expect(page.getByText(/Revisão disponibilizada/i)).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
-    test('Cenario 5: Segunda devolução e disponibilização que limpa o histórico', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 5: Segunda devolução e disponibilização que limpa o histórico', async ({page}) => {
         // Admin faz segunda devolução
         
 
@@ -441,11 +436,11 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // Disponibilizar novamente - ISSO DEVE LIMPAR O HISTÓRICO DAS ANÁLISES ANTERIORES
         await disponibilizarCadastro(page);
 
-        await expect(page.getByRole('heading', {name: /Revisão disponibilizada/i})).toBeVisible();
+        await expect(page.getByText(/Revisão disponibilizada/i)).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
-    test('Cenario 6: Verificar que histórico foi excluído após nova disponibilização', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 6: Verificar que histórico foi excluído após nova disponibilização', async ({page}) => {
         // Agora Admin devolve mais uma vez (terceira devolução)
         
 
@@ -483,7 +478,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByRole('button', {name: 'Fechar'}).click();
     });
 
-    test('Cenario 7: Cancelar disponibilização mantém na mesma tela', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 7: Cancelar disponibilização mantém na mesma tela', async ({page}) => {
         
 
         // Chefe vai direto

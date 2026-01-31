@@ -1,6 +1,5 @@
 import type { Page } from '@playwright/test';
 import {expect, test} from './fixtures/auth-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
@@ -31,10 +30,6 @@ async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
  */
 test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     const UNIDADE_1 = 'SECAO_221';
-    const USUARIO_CHEFE_1 = USUARIOS.CHEFE_SECAO_221.titulo;
-    const SENHA_CHEFE_1 = USUARIOS.CHEFE_SECAO_221.senha;
-    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
-    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-26 ${timestamp}`;
@@ -57,7 +52,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 1: Admin cria e inicia processo', async ({page}) => {
         
 
         await criarProcesso(page, {
@@ -80,7 +75,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -95,7 +90,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro e cria mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 3: Admin homologa cadastro e cria mapa', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -112,7 +107,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 4: Chefe valida o mapa', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 4: Chefe valida o mapa', async ({page}) => {
         
 
         await acessarSubprocessoChefe(page, descProcesso);
@@ -142,7 +137,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         }
     });
 
-    test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -163,7 +158,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         }
     });
 
-    test('Cenario 3: Cancelar homologação de mapa em bloco', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 3: Cancelar homologação de mapa em bloco', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();

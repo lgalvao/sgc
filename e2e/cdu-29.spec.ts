@@ -1,6 +1,4 @@
-import type { Page } from '@playwright/test';
 import {expect, test} from './fixtures/auth-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 
 /**
@@ -15,12 +13,6 @@ import {resetDatabase} from './hooks/hooks-limpeza.js';
  * 4. Sistema apresenta Detalhes do processo sem botões de ação
  */
 test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
-    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
-    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
-    const USUARIO_GESTOR = USUARIOS.GESTOR_COORD_22.titulo;
-    const SENHA_GESTOR = USUARIOS.GESTOR_COORD_22.senha;
-    const USUARIO_CHEFE = USUARIOS.CHEFE_SECAO_221.titulo;
-    const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_221.senha;
 
     test.beforeAll(async ({request}) => {
         await resetDatabase(request);
@@ -30,7 +22,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
     // CENÁRIO 1: Navegação para página de histórico
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para página de histórico', async ({page, autenticadoComoAdmin, autenticadoComoGestorCoord22, autenticadoComoChefeSecao221}) => {
+    test('Cenario 1: ADMIN navega para página de histórico', async ({page}) => {
         // CDU-29: Passos 1-2
         
 
@@ -42,7 +34,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
         await expect(page.getByRole('heading', {name: /Histórico/i})).toBeVisible();
     });
 
-    test('Cenario 2: GESTOR pode acessar histórico', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 2: GESTOR pode acessar histórico', async ({page}) => {
         
 
         // Navegar para histórico

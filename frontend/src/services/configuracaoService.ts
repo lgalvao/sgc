@@ -1,7 +1,7 @@
 import apiClient from "@/axios-setup";
 
 export interface Parametro {
-    id?: number;
+    codigo?: number;
     chave: string;
     descricao: string;
     valor: string;

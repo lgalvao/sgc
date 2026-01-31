@@ -91,6 +91,7 @@ export async function navegarParaSubprocesso(
     siglaUnidade: string
 ): Promise<void> {
     // Aguardar o cabeçalho do processo (v-if="processo") para garantir carregamento inicial
+    await expect(page.getByText('Carregando detalhes do processo...').first()).toBeHidden();
     await expect(page.getByTestId('processo-info')).toBeVisible();
 
     const tabela = page.getByTestId('tbl-tree');
@@ -100,5 +101,5 @@ export async function navegarParaSubprocesso(
     await expect(celula).toBeVisible();
     await celula.click();
     
-    await expect(page).toHaveURL(new RegExp(`/processo/\\d+/${siglaUnidade}$`));
+    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
 }

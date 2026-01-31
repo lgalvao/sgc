@@ -1,7 +1,7 @@
 <template>
   <BContainer class="mt-4">
     <PageHeader title="Atividades e conhecimentos">
-      <template #subtitle>
+      <template #default>
         <div class="d-flex align-items-center gap-2">
           <BButton
               aria-label="Voltar"

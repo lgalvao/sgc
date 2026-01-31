@@ -11,8 +11,8 @@ export const useAtividadesStore = defineStore("atividades", () => {
     const atividadesPorSubprocesso = ref(new Map<number, Atividade[]>());
     const { lastError, clearError, withErrorHandling } = useErrorHandler();
 
-    function obterAtividadesPorSubprocesso(codSubrocesso: number): Atividade[] {
-        return atividadesPorSubprocesso.value.get(codSubrocesso) || [];
+    function obterAtividadesPorSubprocesso(codSubprocesso: number): Atividade[] {
+        return atividadesPorSubprocesso.value.get(codSubprocesso) || [];
     }
 
     function setAtividadesParaSubprocesso(codSubprocesso: number, atividades: Atividade[]) {
@@ -23,7 +23,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
      * Atualiza o estado local com dados retornados pela operação CRUD.
      * Elimina a necessidade de chamadas extras ao backend.
      */
-    function atualizarDadosLocais(codSubprocesso: number, response: AtividadeOperacaoResponse) {
+    async function atualizarDadosLocais(codSubprocesso: number, response: AtividadeOperacaoResponse) {
         // Atualizar lista de atividades no cache local
         if (response.atividadesAtualizadas) {
             const atividades = response.atividadesAtualizadas.map(mapAtividadeVisualizacaoToModel);
@@ -33,14 +33,17 @@ export const useAtividadesStore = defineStore("atividades", () => {
         // Atualizar status do subprocesso
         const subprocessosStore = useSubprocessosStore();
         subprocessosStore.atualizarStatusLocal(response.subprocesso);
+        
+        // Refresh permissions because situation changed
+        await subprocessosStore.buscarPermissoes(codSubprocesso);
     }
 
-    async function buscarAtividadesParaSubprocesso(codSubrocesso: number) {
+    async function buscarAtividadesParaSubprocesso(codSubprocesso: number) {
         return withErrorHandling(async () => {
-            const atividades = await subprocessoService.listarAtividades(codSubrocesso);
-            atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
+            const atividades = await subprocessoService.listarAtividades(codSubprocesso);
+            atividadesPorSubprocesso.value.set(codSubprocesso, atividades);
         }, () => {
-            atividadesPorSubprocesso.value.set(codSubrocesso, []);
+            atividadesPorSubprocesso.value.set(codSubprocesso, []);
         });
     }
 
@@ -52,75 +55,75 @@ export const useAtividadesStore = defineStore("atividades", () => {
         return withErrorHandling(async () => {
             const response = await atividadeService.criarAtividade(request, codMapa);
             // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
-            atualizarDadosLocais(codSubprocesso, response);
+            await atualizarDadosLocais(codSubprocesso, response);
             return response.subprocesso;
         });
     }
 
-    async function removerAtividade(codSubrocesso: number, atividadeId: number) {
+    async function removerAtividade(codSubprocesso: number, atividadeId: number) {
         return withErrorHandling(async () => {
             const response = await atividadeService.excluirAtividade(atividadeId);
             // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
-            atualizarDadosLocais(codSubrocesso, response);
+            await atualizarDadosLocais(codSubprocesso, response);
             return response.subprocesso;
         });
     }
 
     async function adicionarConhecimento(
-        codSubrocesso: number,
+        codSubprocesso: number,
         atividadeId: number,
         request: CriarConhecimentoRequest,
     ) {
         return withErrorHandling(async () => {
             const response = await atividadeService.criarConhecimento(atividadeId, request);
             // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
-            atualizarDadosLocais(codSubrocesso, response);
+            await atualizarDadosLocais(codSubprocesso, response);
             return response.subprocesso;
         });
     }
 
     async function removerConhecimento(
-        codSubrocesso: number,
+        codSubprocesso: number,
         atividadeId: number,
         conhecimentoId: number,
     ) {
         return withErrorHandling(async () => {
             const response = await atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
             // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
-            atualizarDadosLocais(codSubrocesso, response);
+            await atualizarDadosLocais(codSubprocesso, response);
             return response.subprocesso;
         });
     }
 
     async function importarAtividades(
-        codSubrocessoDestino: number,
-        codSubrocessoOrigem: number,
+        codSubprocessoDestino: number,
+        codSubprocessoOrigem: number,
     ) {
         return withErrorHandling(async () => {
             // Nota: importarAtividades não retorna AtividadeOperacaoResponse,
             // então mantemos as chamadas de reload aqui
-            await subprocessoService.importarAtividades(codSubrocessoDestino, codSubrocessoOrigem);
-            await buscarAtividadesParaSubprocesso(codSubrocessoDestino);
+            await subprocessoService.importarAtividades(codSubprocessoDestino, codSubprocessoOrigem);
+            await buscarAtividadesParaSubprocesso(codSubprocessoDestino);
             const subprocessosStore = useSubprocessosStore();
-            await subprocessosStore.buscarSubprocessoDetalhe(codSubrocessoDestino);
+            await subprocessosStore.buscarSubprocessoDetalhe(codSubprocessoDestino);
         });
     }
 
     async function atualizarAtividade(
-        codSubrocesso: number,
+        codSubprocesso: number,
         atividadeId: number,
         data: Atividade,
     ) {
         return withErrorHandling(async () => {
             const response = await atividadeService.atualizarAtividade(atividadeId, data);
             // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
-            atualizarDadosLocais(codSubrocesso, response);
+            await atualizarDadosLocais(codSubprocesso, response);
             return response.subprocesso;
         });
     }
 
     async function atualizarConhecimento(
-        codSubrocesso: number,
+        codSubprocesso: number,
         atividadeId: number,
         conhecimentoId: number,
         data: Conhecimento,
@@ -128,7 +131,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
         return withErrorHandling(async () => {
             const response = await atividadeService.atualizarConhecimento(atividadeId, conhecimentoId, data);
             // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
-            atualizarDadosLocais(codSubrocesso, response);
+            await atualizarDadosLocais(codSubprocesso, response);
             return response.subprocesso;
         });
     }

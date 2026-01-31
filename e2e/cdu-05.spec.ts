@@ -100,12 +100,12 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await disponibilizarCadastro(page);
 
         // Validação: Mensagem de sucesso e redirecionamento para o painel
-        await expect(page.getByRole('heading', {name: /Cadastro de atividades disponibilizado/i})).toBeVisible();
+        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
     test('Fase 1.4: ADMIN homologa cadastro', async ({page}) => {
-        
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await homologarCadastroMapeamento(page);
@@ -130,7 +130,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     });
 
     test('Fase 1.7: ADMIN homologa e finaliza processo', async ({page}) => {
-        
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();

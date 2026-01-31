@@ -240,17 +240,17 @@ async function salvar() {
 
   const paramsToSave: Parametro[] = [];
 
-  const findId = (chave: string) => store.parametros.find(p => p.chave === chave)?.id;
+  const findCodigo = (chave: string) => store.parametros.find(p => p.chave === chave)?.codigo;
 
   paramsToSave.push({
-    id: findId('DIAS_INATIVACAO_PROCESSO'),
+    codigo: findCodigo('DIAS_INATIVACAO_PROCESSO'),
     chave: 'DIAS_INATIVACAO_PROCESSO',
     descricao: 'Dias para inativação de processos',
     valor: form.diasInativacao.toString()
   });
 
   paramsToSave.push({
-    id: findId('DIAS_ALERTA_NOVO'),
+    codigo: findCodigo('DIAS_ALERTA_NOVO'),
     chave: 'DIAS_ALERTA_NOVO',
     descricao: 'Dias para indicação de alerta como novo',
     valor: form.diasAlertaNovo.toString()

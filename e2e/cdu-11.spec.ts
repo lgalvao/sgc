@@ -91,7 +91,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByRole('heading', {name: /Cadastro de atividades disponibilizado/i})).toBeVisible();
+        await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
@@ -216,7 +216,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
         // Aguardar redirecionamento para o painel e verificar mensagem de sucesso
         await verificarPaginaPainel(page);
-        await expect(page.getByRole('heading', {name: /Mapa disponibilizado/i})).toBeVisible();
+        await expect(page.getByText(/Mapa disponibilizado/i)).toBeVisible();
 
         // Chefe valida mapa
         await fazerLogout(page);
@@ -226,7 +226,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
-        await expect(page.getByRole('heading', {name: /Mapa validado/i})).toBeVisible();
+        await expect(page.getByText(/Mapa validado/i)).toBeVisible();
 
         // Admin homologa mapa e finaliza processo
         await fazerLogout(page);

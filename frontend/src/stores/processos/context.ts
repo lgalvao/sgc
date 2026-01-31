@@ -24,7 +24,7 @@ export const useProcessosContextStore = defineStore("processos-context", () => {
         return withErrorHandling(async () => {
             coreStore.setProcessoDetalhe(null); // Limpa estado anterior
             const data = await processoService.buscarContextoCompleto(idProcesso);
-            coreStore.setProcessoDetalhe(data.processo);
+            coreStore.setProcessoDetalhe(data);
             subprocessosElegiveis.value = data.elegiveis;
         });
     }

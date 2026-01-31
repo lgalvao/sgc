@@ -1,6 +1,4 @@
-import type { Page } from '@playwright/test';
 import {expect, test} from './fixtures/auth-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 
 /**
@@ -15,8 +13,6 @@ import {resetDatabase} from './hooks/hooks-limpeza.js';
  * 4. Sistema mostra mensagem de confirmação
  */
 test.describe.serial('CDU-31 - Configurar sistema', () => {
-    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
-    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
     test.beforeAll(async ({request}) => {
         await resetDatabase(request);
@@ -35,7 +31,7 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
 
         // Passo 2: Sistema mostra tela de configurações
         await expect(page).toHaveURL(/\/configuracoes/);
-        await expect(page.getByRole('heading', {name: /Configurações/i})).toBeVisible();
+        await expect(page.getByRole('heading', {name: 'Configurações', exact: true})).toBeVisible();
     });
 
     // ========================================================================
@@ -79,6 +75,6 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
         await page.getByRole('button', {name: /Salvar/i}).click();
 
         // Passo 4: Verificar mensagem de confirmação
-        await expect(page.getByRole('heading', { name: /sucesso/i })).toBeVisible();
+        await expect(page.getByText('Configurações salvas com sucesso!')).toBeVisible();
     });
 });

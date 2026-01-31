@@ -340,6 +340,12 @@ SET titulo_titular           = '141414',
     data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 18;
 
+-- Parâmetros do sistema
+INSERT INTO sgc.parametro (codigo, chave, descricao, valor)
+VALUES (1, 'DIAS_INATIVACAO_PROCESSO', 'Dias para inativação de processos', '30');
+INSERT INTO sgc.parametro (codigo, chave, descricao, valor)
+VALUES (2, 'DIAS_ALERTA_NOVO', 'Dias para indicação de alerta como novo', '3');
+
 -- Dados para teste de Importação (CDU-08)
 -- Processo 200
 INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, descricao, situacao, tipo)

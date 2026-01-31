@@ -84,6 +84,17 @@ public class ProcessoSubprocessoQueryService {
     }
 
     /**
+     * Lista subprocessos por processo e múltiplas situações.
+     *
+     * @param processoId código do processo
+     * @param situacoes  lista de situações
+     * @return lista de subprocessos
+     */
+    public List<Subprocesso> listarPorProcessoESituacoes(Long processoId, List<SituacaoSubprocesso> situacoes) {
+        return subprocessoRepo.findByProcessoCodigoAndSituacaoInWithUnidade(processoId, situacoes);
+    }
+
+    /**
      * Lista todos os subprocessos de um processo.
      *
      * @param processoId código do processo

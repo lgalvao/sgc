@@ -1,7 +1,7 @@
 <template>
   <BContainer class="mt-4">
     <PageHeader title="Atividades e conhecimentos">
-      <template #subtitle>
+      <template #default>
         <div class="unidade-cabecalho mb-0">
           <span class="unidade-sigla">{{ siglaUnidade }}</span>
           <span class="unidade-nome">{{ nomeUnidade }}</span>

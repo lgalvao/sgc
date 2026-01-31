@@ -113,7 +113,15 @@ public class ProcessoConsultaService {
                 .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
 
         if (isAdmin) {
-            return queryService.listarPorProcessoESituacao(codProcesso, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)
+            return queryService.listarPorProcessoESituacoes(codProcesso,
+                            List.of(
+                                    SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                                    SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+                                    SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+                                    SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO,
+                                    SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
+                                    SituacaoSubprocesso.REVISAO_MAPA_VALIDADO
+                            ))
                     .stream()
                     .map(this::toSubprocessoElegivelDto)
                     .toList();

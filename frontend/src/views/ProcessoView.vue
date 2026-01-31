@@ -14,7 +14,7 @@
     </BAlert>
 
     <div v-if="processo">
-      <PageHeader :title="processo.descricao">
+      <PageHeader :title="processo.descricao" title-test-id="processo-info">
         <template #default>
           <BBadge
               class="mb-2"

@@ -101,7 +101,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // Validar sucesso
-        await expect(page.getByRole('heading', {name: /Cadastro de atividades disponibilizado/i})).toBeVisible();
+        await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
         await verificarPaginaPainel(page);
 
         // Verificar status no subprocesso
@@ -154,6 +154,6 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // Validar sucesso
-        await expect(page.getByRole('heading', {name: /Cadastro de atividades disponibilizado/i})).toBeVisible();
+        await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
     });
 });

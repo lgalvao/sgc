@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/base.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
@@ -6,8 +6,8 @@ import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from '
 import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
 import {abrirModalCriarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
-import * as path from 'path';
-import * as fs from 'fs';
+import * as path from 'node:path';
+import * as fs from 'node:fs';
 
 /**
  * Suite de testes dedicada a capturar screenshots de todas as telas do sistema
@@ -371,7 +371,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Tentar disponibilizar - deve mostrar validação inline
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.waitForTimeout(800); // Aguardar scroll automático
+            await page.waitForTimeout(500); // Aguardar scroll automático
 
             // Capturar primeira atividade com erro inline (scroll automático já levou até ela)
             await capturarTela(page, '04-subprocesso', '23-validacao-inline-primeira-atividade', {fullPage: true});
@@ -399,7 +399,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Tentar disponibilizar novamente - ainda deve ter erro na atividade 2
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.waitForTimeout(1000);
+            await page.waitForTimeout(500);
             await capturarTela(page, '04-subprocesso', '27-validacao-apenas-atividade-restante');
 
             // Corrigir segunda atividade
@@ -887,7 +887,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // ========================================================================
     test.describe('14 - Relatórios', () => {
         test('Captura página e modais de relatórios', async ({page}) => {
-            test.setTimeout(60_000);
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Acessar relatórios

@@ -75,6 +75,9 @@ export async function verificarDetalhesProcesso(page: Page, dados: {
     tipo: string,
     situacao: string
 }) {
+    // Aguardar carregamento dos detalhes
+    await expect(page.getByText('Carregando detalhes do processo...').first()).toBeHidden();
+
     // Verificar descrição usando o test-id existente
     await expect(page.getByTestId('processo-info')).toHaveText(dados.descricao);
 
@@ -127,7 +130,7 @@ export async function extrairProcessoId(page: Page): Promise<number> {
     ];
     
     for (const pattern of patterns) {
-        const match = url.match(pattern);
+        const match = RegExp(pattern).exec(url);
         if (match?.[1]) {
             return parseInt(match[1]);
         }

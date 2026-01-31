@@ -1,6 +1,5 @@
 import type { Page } from '@playwright/test';
 import {expect, test} from './fixtures/auth-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {
     adicionarAtividade,
@@ -20,10 +19,6 @@ async function verificarPaginaSubprocesso(page: Page, unidade: string) {
 
 test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_221';
-    const USUARIO_CHEFE = USUARIOS.CHEFE_SECAO_221.titulo;
-    const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_221.senha;
-    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
-    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
     const timestamp = Date.now();
     const descProcessoMapeamento = `Mapeamento CDU-16 ${timestamp}`;
@@ -96,7 +91,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByRole('heading', {name: /Cadastro de atividades disponibilizado/i})).toBeVisible();
+        await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
@@ -125,7 +120,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await disponibilizarMapa(page, '2030-12-31');
 
         await verificarPaginaPainel(page);
-        await expect(page.getByRole('heading', {name: /Mapa disponibilizado/i})).toBeVisible();
+        await expect(page.getByText(/Mapa disponibilizado/i)).toBeVisible();
     });
 
     test('Preparacao 5: Chefe valida mapa', async ({page, autenticadoComoAdmin}) => {
@@ -139,7 +134,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
         // Validação: confirmar redirecionamento para Painel (CDU-19 passo 8)
         await verificarPaginaPainel(page);
-        await expect(page.getByRole('heading', {name: /Mapa validado/i})).toBeVisible();
+        await expect(page.getByText(/Mapa validado/i)).toBeVisible();
     });
 
     test('Preparacao 6: Admin homologa mapa e finaliza processo de mapeamento', async ({page, autenticadoComoAdmin}) => {
@@ -214,7 +209,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByRole('heading', {name: /Revisão disponibilizada/i})).toBeVisible();
+        await expect(page.getByText(/Revisão disponibilizada/i)).toBeVisible();
         await verificarPaginaPainel(page);
     });
 

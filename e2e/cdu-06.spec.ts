@@ -38,7 +38,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
         // Verificar unidade participante
         await verificarUnidadeParticipante(page, {
             sigla: 'ASSESSORIA_12',
-            situacao: 'NAO_INICIADO',
+            situacao: 'Não Iniciado',
             dataLimite: '/'
         });
 

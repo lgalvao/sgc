@@ -1,6 +1,4 @@
-import type { Page } from '@playwright/test';
 import {expect, test} from './fixtures/auth-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
@@ -26,10 +24,6 @@ import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
  */
 test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     const UNIDADE_1 = 'SECAO_221';
-    const USUARIO_CHEFE_1 = USUARIOS.CHEFE_SECAO_221.titulo;
-    const SENHA_CHEFE_1 = USUARIOS.CHEFE_SECAO_221.senha;
-    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
-    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-23 ${timestamp}`;
@@ -51,7 +45,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 1: Admin cria e inicia processo', async ({page}) => {
         
 
         await criarProcesso(page, {
@@ -74,7 +68,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -93,7 +87,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: ADMIN visualiza botão Homologar em Bloco', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN visualiza botão Homologar em Bloco', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -107,7 +101,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         }
     });
 
-    test('Cenario 2: ADMIN abre modal de homologação em bloco', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 2: ADMIN abre modal de homologação em bloco', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -129,7 +123,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         }
     });
 
-    test('Cenario 3: Cancelar homologação em bloco permanece na tela', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 3: Cancelar homologação em bloco permanece na tela', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();

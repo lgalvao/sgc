@@ -1,6 +1,4 @@
-import type { Page } from '@playwright/test';
 import {expect, test} from './fixtures/auth-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
@@ -21,8 +19,6 @@ import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
  */
 test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     const UNIDADE_1 = 'SECAO_221';
-    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
-    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-34 ${timestamp}`;
@@ -42,7 +38,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao: Admin cria e inicia processo', async ({page}) => {
         
 
         await criarProcesso(page, {
@@ -69,7 +65,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para detalhes do processo', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN navega para detalhes do processo', async ({page}) => {
         // CDU-34: Passo 1
         
 
@@ -77,7 +73,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
     });
 
-    test('Cenario 2: Verificar indicadores de prazo', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 2: Verificar indicadores de prazo', async ({page}) => {
         // CDU-34: Passo 2 - Sistema exibe indicadores de prazo
         
 
@@ -93,7 +89,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         // Isso depende da implementação visual
     });
 
-    test('Cenario 3: Verificar opção de enviar lembrete', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 3: Verificar opção de enviar lembrete', async ({page}) => {
         // CDU-34: Passo 4
         
 
@@ -104,7 +100,9 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         const btnLembrete = page.getByRole('button', {name: /Lembrete|Enviar lembrete/i});
         const btnVisivel = await btnLembrete.isVisible().catch(() => false);
 
-        if (!btnVisivel) {
+        if (btnVisivel) {
+            await expect(btnLembrete).toBeEnabled();
+        } else {
             // Verificar no menu "Mais ações"
             const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
             if (await btnMaisAcoes.isVisible().catch(() => false)) {
@@ -114,8 +112,6 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
                 const itemVisivel = await itemLembrete.isVisible().catch(() => false);
                 console.log('Opção Enviar lembrete disponível:', itemVisivel);
             }
-        } else {
-            await expect(btnLembrete).toBeEnabled();
         }
     });
 });

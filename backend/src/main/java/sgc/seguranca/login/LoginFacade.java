@@ -9,7 +9,9 @@ import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
 import sgc.organizacao.service.UsuarioPerfilService;
@@ -19,8 +21,6 @@ import sgc.seguranca.login.dto.PerfilUnidadeDto;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import sgc.organizacao.mapper.UsuarioMapper;
-import sgc.organizacao.model.SituacaoUnidade;
 
 /**
  * Serviço responsável pelo fluxo de login: autenticação, autorização e geração
@@ -62,15 +62,9 @@ public class LoginFacade {
      */
     public boolean autenticar(String tituloEleitoral, String senha) {
         if (ambienteTestes) {
-            log.info("Autenticação em ambiente de testes/homologação para o usuário {}", tituloEleitoral);
+            log.info("Usuário autenticado: {}", tituloEleitoral);
             return true;
         }
-
-        if (clienteAcessoAd == null) {
-            log.warn("Cliente AD não configurado e ambiente não é de testes.");
-            return false;
-        }
-
         try {
             return clienteAcessoAd.autenticar(tituloEleitoral, senha);
         } catch (ErroAutenticacao e) {

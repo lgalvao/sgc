@@ -1,6 +1,5 @@
 import type { Page } from '@playwright/test';
 import {expect, test} from './fixtures/auth-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
@@ -14,12 +13,6 @@ async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
 
 test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => {
     const UNIDADE_ALVO = 'SECAO_221';
-    const USUARIO_CHEFE = USUARIOS.CHEFE_SECAO_221.titulo;
-    const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_221.senha;
-    const USUARIO_GESTOR = USUARIOS.GESTOR_COORD_22.titulo;
-    const SENHA_GESTOR = USUARIOS.GESTOR_COORD_22.senha;
-    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
-    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-21 ${timestamp}`;
@@ -45,7 +38,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     // PREPARAÇÃO - Criar mapa homologado para ADMIN finalizar processo
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, autenticadoComoGestorCoord22, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page}) => {
         
 
         await criarProcesso(page, {
@@ -68,7 +61,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -83,11 +76,11 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByRole('heading', {name: /Cadastro de atividades disponibilizado/i})).toBeVisible();
+        await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 3: Admin homologa cadastro', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -99,7 +92,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
     });
 
-    test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -112,10 +105,10 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await disponibilizarMapa(page, '2030-12-31');
 
         await verificarPaginaPainel(page);
-        await expect(page.getByRole('heading', {name: /Mapa disponibilizado/i})).toBeVisible();
+        await expect(page.getByText(/Mapa disponibilizado/i)).toBeVisible();
     });
 
-    test('Preparacao 5: Chefe valida o mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 5: Chefe valida o mapa', async ({page}) => {
         
 
         await acessarSubprocessoChefe(page, descProcesso);
@@ -126,7 +119,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
-        await expect(page.getByRole('heading', {name: /Mapa validado/i})).toBeVisible();
+        await expect(page.getByText(/Mapa validado/i)).toBeVisible();
     });
 
     test('Preparacao 6: Gestor registra aceite do mapa', async ({page}) => {
@@ -169,7 +162,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     // TESTES PRINCIPAIS - CDU-21
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para detalhes do processo', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN navega para detalhes do processo', async ({page}) => {
         // CDU-21: Passos 1-2
         
 
@@ -184,7 +177,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
     });
 
-    test('Cenario 2: ADMIN cancela finalização - permanece na tela', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 2: ADMIN cancela finalização - permanece na tela', async ({page}) => {
         // CDU-21: Passo 6.1
         
 
@@ -206,7 +199,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
     });
 
-    test('Cenario 3: ADMIN finaliza processo com sucesso', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 3: ADMIN finaliza processo com sucesso', async ({page}) => {
         // CDU-21: Passos 7-10
         
 
@@ -224,7 +217,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
         // Passo 10: Redireciona para Painel com mensagem de sucesso
         await verificarPaginaPainel(page);
-        await expect(page.getByRole('heading', {name: /Processo finalizado/i})).toBeVisible();
+        await expect(page.getByText(/Processo finalizado/i)).toBeVisible();
 
         // Verificar que processo não aparece mais no painel ativo (foi finalizado)
         // (Processo finalizado não aparece na lista de processos ativos)

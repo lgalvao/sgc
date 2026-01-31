@@ -1,6 +1,4 @@
-import type { Page } from '@playwright/test';
 import {expect, test} from './fixtures/auth-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 
 /**
@@ -18,8 +16,6 @@ import {resetDatabase} from './hooks/hooks-limpeza.js';
  * - Um administrador não pode remover seu próprio acesso
  */
 test.describe.serial('CDU-30 - Manter Administradores', () => {
-    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
-    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
     test.beforeAll(async ({request}) => {
         await resetDatabase(request);
