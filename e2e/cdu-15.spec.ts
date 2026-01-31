@@ -38,9 +38,8 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     const CONHECIMENTO_1 = `Conhecimento 1 ${timestamp}`;
     const CONHECIMENTO_2 = `Conhecimento 2 ${timestamp}`;
 
-    test('Preparacao: Criar processo e homologar cadastro de atividades', async ({page, cleanupAutomatico}) => {
+    test('Preparacao: Criar processo e homologar cadastro de atividades', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         // 1. Admin cria e inicia processo
-        
 
         await criarProcesso(page, {
             descricao: descProcesso,

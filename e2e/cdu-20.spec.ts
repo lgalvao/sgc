@@ -38,8 +38,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     // PREPARAÇÃO - Criar mapa validado para GESTOR/ADMIN analisar
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page}) => {
-        
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin}) => {
 
         await criarProcesso(page, {
             descricao: descProcesso,

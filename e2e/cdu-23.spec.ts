@@ -45,7 +45,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page}) => {
+    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
         
 
         await criarProcesso(page, {

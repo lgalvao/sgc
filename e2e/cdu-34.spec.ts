@@ -38,7 +38,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao: Admin cria e inicia processo', async ({page}) => {
+    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
         
 
         await criarProcesso(page, {
