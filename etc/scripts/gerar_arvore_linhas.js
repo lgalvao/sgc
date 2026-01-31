@@ -1,6 +1,6 @@
-const {execSync} = require('node:child_process');
-const fs = require('node:fs');
-const path = require('node:path');
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
 
 function getFiles() {
     const output = execSync('git ls-files', {encoding: 'utf-8', maxBuffer: 1024 * 1024 * 10});

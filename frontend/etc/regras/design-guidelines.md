@@ -1096,4 +1096,4 @@ What is the action?
 
 **Last Updated:** Janeiro 2026  
 **Maintained by:** Development Team  
-**Questions?** Consult [AGENTS.md](../AGENTS.md) e [DOCUMENTACAO.md](../DOCUMENTACAO.md) para diretrizes do projeto.
+**Questions?** Consult [AGENTS.md](../../../AGENTS.md) e [DOCUMENTACAO.md](../../../DOCUMENTACAO.md) para diretrizes do projeto.

@@ -48,11 +48,11 @@ frontend/coverage/
 .jqwik-database
 
 # Playwright E2E test results
-test-results/
-playwright-report/
+!test-results/
+!playwright-report/
 .playwright/
 screenshots/
-e2e/server.log
+!e2e/server.log
 
 
 # Snyk Security Extension - AI Rules (auto-generated)

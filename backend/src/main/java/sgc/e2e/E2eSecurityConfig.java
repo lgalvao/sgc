@@ -61,6 +61,7 @@ public class E2eSecurityConfig {
                         .permitAll())
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/e2e/**")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
                 .httpBasic(AbstractHttpConfigurer::disable)

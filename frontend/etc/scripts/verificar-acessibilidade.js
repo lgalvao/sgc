@@ -1,8 +1,8 @@
 /* eslint-disable */
-const { spawn } = require('node:child_process');
-const fs = require('node:fs');
-const path = require('node:path');
-const chromeLauncher = require('chrome-launcher');
+import { spawn } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import * as chromeLauncher from 'chrome-launcher';
 
 async function run() {
     console.log('Starting e2e/lifecycle.js...');
@@ -57,7 +57,7 @@ async function run() {
 
         let chromePath;
         try {
-            const { chromium } = require('@playwright/test');
+            const { chromium } = await import('@playwright/test');
             const candidatePath = chromium.executablePath();
 
             // Check if the candidate path actually exists
