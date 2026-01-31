@@ -3,11 +3,13 @@
 **Data de Conclusão:** 2026-01-31  
 **Status:** 97% Completo (32/33 ações)
 
+> **Nota:** Este é um resumo consolidado. Para o planejamento detalhado e relatórios de execução, consulte a pasta [docs/historico/](docs/historico/).
+
 ---
 
 ## 📊 Visão Geral
 
-Este documento resume a execução completa do Plano de Melhorias do Sistema de Gestão de Competências (SGC), baseado no `plano-melhorias.md` e rastreado em `tracking-melhorias.md`.
+Este documento resume a execução completa do Plano de Melhorias do Sistema de Gestão de Competências (SGC), baseado no [plano-melhorias.md](docs/historico/plano-melhorias.md) e rastreado em [tracking-melhorias.md](docs/historico/tracking-melhorias.md).
 
 ### Estatísticas Finais
 
@@ -312,21 +314,26 @@ Testes E2E do frontend já cobrem muitos cenários de integração através da U
 
 ---
 
-## 📞 Contato e Suporte
+## 📞 Referências e Documentação
 
-Para dúvidas sobre as melhorias implementadas:
+### Documentação de Melhorias
 
-1. **Consultar Guias:**
-   - `frontend/ESTRATEGIA-ERROS.md`
-   - `frontend/GUIA-COMPOSABLES.md`
-   - `backend/GUIA-MELHORIAS-TESTES.md`
-   - `backend/GUIA-JAVADOC-EXCECOES.md`
+* **[docs/historico/plano-melhorias.md](docs/historico/plano-melhorias.md)** - Plano original de 33 ações
+* **[docs/historico/tracking-melhorias.md](docs/historico/tracking-melhorias.md)** - Log completo de execução
+* **[docs/historico/](docs/historico/)** - Relatórios de sessões individuais
 
-2. **Revisar ADRs:**
-   - Pasta `/etc/adrs/` contém decisões arquiteturais
+### Guias Criados
 
-3. **Tracking de Execução:**
-   - `tracking-melhorias.md` tem log completo de todas as sessões
+1. **[frontend/ESTRATEGIA-ERROS.md](frontend/ESTRATEGIA-ERROS.md)**
+2. **[frontend/GUIA-COMPOSABLES.md](frontend/GUIA-COMPOSABLES.md)**
+3. **[backend/GUIA-MELHORIAS-TESTES.md](backend/GUIA-MELHORIAS-TESTES.md)**
+4. **[backend/GUIA-JAVADOC-EXCECOES.md](backend/GUIA-JAVADOC-EXCECOES.md)**
+
+### Arquitetura
+
+* **[DOCUMENTACAO.md](DOCUMENTACAO.md)** - Índice completo da documentação
+* **[AGENTS.md](AGENTS.md)** - Convenções e padrões
+* **[backend/etc/docs/adr/](backend/etc/docs/adr/)** - Decisões arquiteturais (ADRs)
 
 ---
 

@@ -142,3 +142,11 @@ Para detalhes técnicos e exemplos de código, consulte:
 * **Módulo-Específico:**
     * `README.md` de cada módulo e diretório para responsabilidades específicas
     * `package-info.java` em cada pacote para documentação detalhada
+
+## 7. Navegação da Documentação
+
+Para um índice completo e organizado de toda a documentação do projeto, consulte:
+
+* **[DOCUMENTACAO.md](/DOCUMENTACAO.md)** - Índice centralizado com todos os documentos por categoria
+
+Este índice facilita a navegação entre documentos de arquitetura, padrões, testes, ADRs e guias específicos.

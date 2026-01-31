@@ -22,15 +22,17 @@ O projeto segue uma arquitetura **Modular Monolith** no backend e **Component-Ba
 
 ### Documentação Detalhada
 
-A documentação técnica foi desacoplada deste README para facilitar a manutenção e evitar duplicação. Consulte os
-documentos abaixo para detalhes sobre padrões, arquitetura e regras:
+A documentação técnica foi desacoplada deste README para facilitar a manutenção e evitar duplicação.
+
+**📚 [DOCUMENTACAO.md](DOCUMENTACAO.md)** - Índice completo de toda a documentação do projeto organizada por categoria.
+
+**Documentação Essencial:**
 
 * **[AGENTS.md](AGENTS.md)**: **Leitura obrigatória** para desenvolvedores e agentes de IA. Contém convenções de código,
   padrões de projeto e regras fundamentais.
 * **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos e comunicação.
 * **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
-* **[backend/etc/regras/](/backend/etc/regras)**: Guias de padrões do Backend.
-* **[frontend/etc/regras/](/frontend/etc/regras)**: Guias de padrões do Frontend.
+* **[RESUMO-MELHORIAS.md](RESUMO-MELHORIAS.md)**: Resumo consolidado das melhorias realizadas em 2026-01.
 
 ---
 
