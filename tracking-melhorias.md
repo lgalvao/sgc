@@ -526,7 +526,54 @@
 - ✅ Ação #15: Completa (taxonomia de DTOs correta)
 
 **Próximos Passos Recomendados:**
-1. Ação #24: Extrair lógica de views para composables (8 views)
-2. Ação #25: Definir estratégia de erro padrão
-3. Ações de testes (#26, #27): Dividir asserts, refatorar testes de implementação
-4. Ações BAIXA (#28-#33): Validações, documentação, provide/inject, testes integração
+1. **Ação #24:** Extrair lógica de views para composables (8 views) - 5h
+   - Views candidatas: ProcessoView (26 funções), ConfiguracoesView (19), UnidadeView (18)
+2. **Ação #25:** Definir estratégia de erro padrão - 2h
+   - Consolidar padrões de BAlert vs Toast vs normalizeError
+3. **Ação #26:** Dividir testes com múltiplos asserts - 4h
+   - Focar em testes que testam múltiplos cenários (não múltiplas propriedades)
+4. **Ação #27:** Refatorar testes de implementação - 2h
+   - Identificar testes que dependem de detalhes de implementação
+5. **Ações BAIXA (#28-#33):** 19h estimadas
+   - Priorizar documentação e testes de integração
+
+---
+
+## 📊 Resumo Executivo - Sessão 8
+
+### Conquistas Principais
+
+**✅ 70% do Plano Completo (23/33 ações)**
+- 100% das ações CRÍTICAS ✅
+- 71% das ações MÉDIA ✅
+- 0% das ações BAIXA (conforme planejado)
+
+### Impacto Técnico
+
+**Arquitetura:**
+- ✅ ADRs 001-005: 100% em conformidade
+- ✅ Estrutura de pacotes: 100% padronizada
+- ✅ Padrão View→Store→Service→API: 100%
+- ✅ DTOs: Taxonomia correta (ADR-004)
+
+**Qualidade de Código:**
+- ✅ ~5.261 linhas refatoradas/removidas
+- ✅ Formatters centralizados: 100%
+- ✅ Loading state: Unificado com useSingleLoading
+- ✅ Verificações null: Apropriadas e não redundantes
+
+**Descobertas Importantes:**
+1. **Ação #21 (Reset state):** Padrão já consistente - não necessária
+2. **Ação #16 (Null checks):** Código já limpo - validações apropriadas
+3. **Ação #17 (Pacotes):** Estrutura já 100% padronizada
+4. **Ação #15 (DTOs):** Taxonomia correta - sem duplicação real
+
+### Próxima Fase
+
+**Foco Recomendado:**
+1. **Frontend:** Extrair lógica de views (#24) + Estratégia de erro (#25) = 7h
+2. **Testes:** Melhorar qualidade de testes (#26, #27) = 6h
+3. **Documentação:** JavaDocs e padrões (#29) = 4h
+4. **TOTAL:** ~17h de trabalho restante de prioridade MÉDIA/BAIXA
+
+**Observação:** O projeto está em excelente estado arquitetural. As ações restantes são refinamentos e melhorias incrementais, não correções críticas.
