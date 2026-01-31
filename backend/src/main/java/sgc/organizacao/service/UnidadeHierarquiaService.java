@@ -60,6 +60,28 @@ public class UnidadeHierarquiaService {
      * @return lista de códigos de descendentes (filhos, netos, etc.)
      */
     public List<Long> buscarIdsDescendentes(Long codigoUnidade) {
+        return buscarDescendentes(codigoUnidade, buscarMapaHierarquia());
+    }
+
+    /**
+     * Busca todos os IDs de unidades descendentes usando um mapa pré-carregado.
+     *
+     * @param codigoUnidade código da unidade raiz
+     * @param mapPaiFilhos mapa de hierarquia (Pai -> Lista de Filhos)
+     * @return lista de códigos de descendentes
+     */
+    public List<Long> buscarDescendentes(Long codigoUnidade, Map<Long, List<Long>> mapPaiFilhos) {
+        List<Long> descendentes = new ArrayList<>();
+        coletarDescendentes(codigoUnidade, mapPaiFilhos, descendentes);
+        return descendentes;
+    }
+
+    /**
+     * Constrói o mapa de hierarquia (Pai -> Lista de Filhos) buscando todas as unidades.
+     *
+     * @return mapa onde a chave é o código da unidade pai e o valor é a lista de códigos das unidades filhas
+     */
+    public Map<Long, List<Long>> buscarMapaHierarquia() {
         List<Unidade> todas = unidadeRepo.findAllWithHierarquia();
 
         Map<Long, List<Long>> mapPaiFilhos = new HashMap<>();
@@ -68,10 +90,7 @@ public class UnidadeHierarquiaService {
                     mapPaiFilhos.computeIfAbsent(superior.getCodigo(), k -> new ArrayList<>()).add(u.getCodigo())
             );
         }
-
-        List<Long> descendentes = new ArrayList<>();
-        coletarDescendentes(codigoUnidade, mapPaiFilhos, descendentes);
-        return descendentes;
+        return mapPaiFilhos;
     }
 
     /**

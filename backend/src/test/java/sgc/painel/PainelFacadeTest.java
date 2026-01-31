@@ -21,6 +21,7 @@ import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -50,6 +51,7 @@ class PainelFacadeTest {
         Processo p = criarProcesso(1L, SituacaoProcesso.CRIADO);
         Page<Processo> page = new PageImpl<>(List.of(p));
         when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(page);
+        when(unidadeFacade.buscarMapaHierarquia()).thenReturn(new HashMap<>());
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
 
@@ -62,7 +64,8 @@ class PainelFacadeTest {
     void deveListarProcessosGestor() {
         Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);
         Page<Processo> page = new PageImpl<>(List.of(p));
-        when(unidadeFacade.buscarIdsDescendentes(100L)).thenReturn(List.of(101L));
+        when(unidadeFacade.buscarMapaHierarquia()).thenReturn(new HashMap<>());
+        when(unidadeFacade.buscarIdsDescendentes(eq(100L), anyMap())).thenReturn(List.of(101L));
         when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class))).thenReturn(page);
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.GESTOR, 100L, PageRequest.of(0, 10));
@@ -81,13 +84,14 @@ class PainelFacadeTest {
         // Mas listarProcessos chama unidadeService.buscarIdsDescendentes para GESTOR.
         // Para CHEFE chama apenas para propria unidade.
 
+        when(unidadeFacade.buscarMapaHierarquia()).thenReturn(new HashMap<>());
         when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class))).thenReturn(page);
         when(unidadeFacade.buscarPorCodigo(100L)).thenThrow(new RuntimeException("Erro"));
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.CHEFE, 100L, PageRequest.of(0, 10));
 
-        // Link deve ser null
-        assertThat(result.getContent().getFirst().linkDestino()).isNull();
+        // Link deve ser vazio (catch retorna "")
+        assertThat(result.getContent().getFirst().linkDestino()).isEmpty();
     }
 
     @Test

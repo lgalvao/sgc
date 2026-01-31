@@ -51,20 +51,23 @@ public class PainelFacade {
         Pageable sortedPageable = garantirOrdenacaoPadrao(pageable);
         Page<Processo> processos;
 
+        // Pré-carrega o mapa da hierarquia para evitar N+1 selects
+        Map<Long, List<Long>> mapaPaiFilhos = unidadeService.buscarMapaHierarquia();
+
         if (perfil == Perfil.ADMIN) {
             processos = processoFacade.listarTodos(sortedPageable);
         } else {
             List<Long> codigosUnidades = new ArrayList<>();
             // GESTOR vê processos da unidade e subordinadas
             if (perfil == Perfil.GESTOR) {
-                codigosUnidades.addAll(unidadeService.buscarIdsDescendentes(codigoUnidade));
+                codigosUnidades.addAll(unidadeService.buscarIdsDescendentes(codigoUnidade, mapaPaiFilhos));
             }
             // Os demais perfis veem apenas processos da própria unidade
             codigosUnidades.add(codigoUnidade);
 
             processos = processoFacade.listarPorParticipantesIgnorandoCriado(codigosUnidades, sortedPageable);
         }
-        return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade));
+        return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade, mapaPaiFilhos));
     }
 
     private Pageable garantirOrdenacaoPadrao(Pageable pageable) {
@@ -113,7 +116,7 @@ public class PainelFacade {
                 });
     }
 
-    private ProcessoResumoDto paraProcessoResumoDto(Processo processo, Perfil perfil, Long codigoUnidade) {
+    private ProcessoResumoDto paraProcessoResumoDto(Processo processo, Perfil perfil, Long codigoUnidade, Map<Long, List<Long>> mapaPaiFilhos) {
         Set<Unidade> participantes = processo.getParticipantes();
 
         // As invariantes de BD e o @NullMarked garantem que participantes nunca é null e processos no painel têm ao menos um participante.
@@ -123,7 +126,7 @@ public class PainelFacade {
         String nomeUnidMapeado = participante.getNome();
 
         String linkDestino = calcularLinkDestinoProcesso(processo, perfil, codigoUnidade);
-        String unidadesParticipantes = formatarUnidadesParticipantes(participantes);
+        String unidadesParticipantes = formatarUnidadesParticipantes(participantes, mapaPaiFilhos);
 
         return ProcessoResumoDto.builder()
                 .codigo(processo.getCodigo())
@@ -139,13 +142,13 @@ public class PainelFacade {
                 .build();
     }
 
-    private String formatarUnidadesParticipantes(Set<Unidade> participantes) {
+    private String formatarUnidadesParticipantes(Set<Unidade> participantes, Map<Long, List<Long>> mapaPaiFilhos) {
         Map<Long, Unidade> participantesPorCodigo =
                 participantes.stream().collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
 
         Set<Long> participantesIds = participantesPorCodigo.keySet();
 
-        Set<Long> unidadesVisiveis = selecionarIdsVisiveis(participantesIds, participantesPorCodigo);
+        Set<Long> unidadesVisiveis = selecionarIdsVisiveis(participantesIds, participantesPorCodigo, mapaPaiFilhos);
         return unidadesVisiveis.stream()
                 .map(participantesPorCodigo::get)
                 .map(Unidade::getSigla)
@@ -153,20 +156,20 @@ public class PainelFacade {
                 .collect(Collectors.joining(", "));
     }
 
-    private Set<Long> selecionarIdsVisiveis(Set<Long> participantesIds, Map<Long, Unidade> participantesPorCodigo) {
+    private Set<Long> selecionarIdsVisiveis(Set<Long> participantesIds, Map<Long, Unidade> participantesPorCodigo, Map<Long, List<Long>> mapaPaiFilhos) {
         Set<Long> visiveis = new LinkedHashSet<>();
         for (Long unidadeId : participantesIds) {
             Unidade unidade = participantesPorCodigo.get(unidadeId);
-            Long candidato = encontrarMaiorIdVisivel(unidade, participantesIds);
+            Long candidato = encontrarMaiorIdVisivel(unidade, participantesIds, mapaPaiFilhos);
             visiveis.add(candidato);
         }
         return visiveis;
     }
 
-    private Long encontrarMaiorIdVisivel(Unidade unidade, Set<Long> participantesIds) {
+    private Long encontrarMaiorIdVisivel(Unidade unidade, Set<Long> participantesIds, Map<Long, List<Long>> mapaPaiFilhos) {
         Unidade atual = unidade;
         while (true) {
-            if (!todasSubordinadasParticipam(atual.getCodigo(), participantesIds)) {
+            if (!todasSubordinadasParticipam(atual.getCodigo(), participantesIds, mapaPaiFilhos)) {
                 return atual.getCodigo();
             }
             Unidade superior = atual.getUnidadeSuperior();
@@ -177,8 +180,8 @@ public class PainelFacade {
         }
     }
 
-    private boolean todasSubordinadasParticipam(Long codigo, Set<Long> participantesIds) {
-        for (Long subordinadaId : unidadeService.buscarIdsDescendentes(codigo)) {
+    private boolean todasSubordinadasParticipam(Long codigo, Set<Long> participantesIds, Map<Long, List<Long>> mapaPaiFilhos) {
+        for (Long subordinadaId : unidadeService.buscarIdsDescendentes(codigo, mapaPaiFilhos)) {
             if (!participantesIds.contains(subordinadaId)) return false;
         }
         return true;
