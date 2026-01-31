@@ -38,8 +38,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     // PREPARAÇÃO - Criar mapa homologado para ADMIN finalizar processo
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page}) => {
-        
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin}) => {
 
         await criarProcesso(page, {
             descricao: descProcesso,

@@ -46,7 +46,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     // PREPARAÇÃO - Criar processo com mapa criado
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page}) => {
+    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
         
 
         await criarProcesso(page, {
