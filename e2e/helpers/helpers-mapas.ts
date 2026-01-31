@@ -1,5 +1,5 @@
 import {expect, type Page} from '@playwright/test';
-import {calcularDataLimite} from './helpers-processos';
+import {calcularDataLimite} from './helpers-processos.js';
 
 export async function navegarParaMapa(page: Page) {
     const testId = 'card-subprocesso-mapa';

@@ -26,7 +26,7 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para página de relatórios', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 1: ADMIN navega para página de relatórios', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
@@ -35,7 +35,7 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
         await expect(page.getByRole('heading', {name: /Relatórios/i})).toBeVisible();
     });
 
-    test('Cenario 2: Página exibe card de relatório de andamento', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 2: Página exibe card de relatório de andamento', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
@@ -44,7 +44,7 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
         await expect(page.getByTestId('card-relatorio-andamento')).toBeVisible();
     });
 
-    test('Cenario 3: Abrir modal de Andamento Geral', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 3: Abrir modal de Andamento Geral', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
@@ -57,7 +57,7 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
         await expect(modal.getByRole('heading', {name: /Andamento Geral/i})).toBeVisible();
     });
 
-    test('Cenario 4: Modal contém tabela de dados', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 4: Modal contém tabela de dados', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
@@ -71,7 +71,7 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
         await expect(tabela).toBeVisible();
     });
 
-    test('Cenario 5: Botão de exportação está disponível', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 5: Botão de exportação está disponível', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
@@ -81,7 +81,7 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
         await expect(page.getByRole('button', {name: /Exportar CSV/i})).toBeVisible();
     });
 
-    test('Cenario 6: Filtros estão disponíveis', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 6: Filtros estão disponíveis', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByRole('link', {name: /Relatórios/i}).click();

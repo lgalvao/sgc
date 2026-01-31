@@ -1,6 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {fazerLogout} from './helpers/helpers-navegacao.js';
+import {criarProcesso, verificarProcessoNaTabela, extrairProcessoId} from './helpers/helpers-processos.js';
 import type { Page } from '@playwright/test';
 import type { useProcessoCleanup } from './hooks/hooks-limpeza.js';
 
@@ -31,8 +32,8 @@ test.describe('CDU-02 - Visualizar Painel', () => {
 
             // Capturar ID do processo para cleanup
             await page.getByText(descricaoProcesso).click();
-            await expect(page).toHaveURL(/processo\/cadastro\?codProcesso=\d+/);
-            const processoId = Number.parseInt(new RegExp(/codProcesso=(\d+)/).exec(page.url())?.[1] || '0');
+            await expect(page).toHaveURL(/processo\/cadastro/);
+            const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanupAutomatico.registrar(processoId);
             await page.goto('/painel');
 
@@ -56,8 +57,8 @@ test.describe('CDU-02 - Visualizar Painel', () => {
 
             // Capturar ID do processo para cleanup
             await page.getByText(descricaoProcesso).click();
-            await expect(page).toHaveURL(/processo\/cadastro\?codProcesso=\d+/);
-            const processoId = Number.parseInt(new RegExp(/codProcesso=(\d+)/).exec(page.url())?.[1] || '0');
+            await expect(page).toHaveURL(/processo\/cadastro/);
+            const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanupAutomatico.registrar(processoId);
             await page.goto('/painel');
 
@@ -65,8 +66,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await expect(page.getByText(descricaoProcesso)).toBeVisible();
 
             // Faz logout e login como GESTOR
-            await page.evaluate(() => localStorage.clear());
-            await expect(page).toHaveURL('/login');
+            await fazerLogout(page);
             await login(page,
                 USUARIOS.GESTOR_COORD.titulo,
                 USUARIOS.GESTOR_COORD.senha
@@ -122,7 +122,8 @@ test.describe('CDU-02 - Visualizar Painel', () => {
 
             // Capturar ID do processo para cleanup
             await page.getByText(descricaoProcesso).click();
-            const processoId = Number.parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+            await expect(page).toHaveURL(/processo\/cadastro/);
+            const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanupAutomatico.registrar(processoId);
             await page.goto('/painel');
 

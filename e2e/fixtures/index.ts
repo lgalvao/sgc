@@ -7,7 +7,7 @@
  * 
  * ### 1. Testes Simples (apenas autenticação)
  * ```typescript
- * import {test, expect} from './fixtures/auth-fixtures';
+ * import {test, expect} from './fixtures/auth-fixtures.js';
  * 
  * test('Teste básico', async ({page, autenticadoComoAdmin}) => {
  *   // Apenas login automático
@@ -16,7 +16,7 @@
  * 
  * ### 2. Testes com Processo (criação + cleanup)
  * ```typescript
- * import {test, expect} from './fixtures/processo-fixtures';
+ * import {test, expect} from './fixtures/processo-fixtures.js';
  * 
  * test('Teste com processo', async ({page, processoFixture, cleanup}) => {
  *   // Processo criado automaticamente!
@@ -26,7 +26,7 @@
  * 
  * ### 3. Testes Completos (database + auth + cleanup)
  * ```typescript
- * import {test, expect} from './fixtures/complete-fixtures';
+ * import {test, expect} from './fixtures/complete-fixtures.js';
  * 
  * test('Teste completo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
  *   // Database resetada + login + cleanup configurado!
@@ -37,7 +37,7 @@
  * 
  * ### 4. Database Reset Manual
  * ```typescript
- * import {test, expect} from './fixtures/database-fixtures';
+ * import {test, expect} from './fixtures/database-fixtures.js';
  * 
  * test('Com reset', async ({page, databaseResetada}) => {
  *   // Database limpa antes do teste
@@ -46,14 +46,14 @@
  */
 
 // Re-exportar todas as fixtures
-export {test as authTest, expect} from './auth-fixtures';
-export {test as databaseTest} from './database-fixtures';
-export {test as processoTest, criarMultiplosProcessos} from './processo-fixtures';
-export {test as completeTest} from './complete-fixtures';
+export {test as authTest, expect} from './auth-fixtures.js';
+export {test as databaseTest} from './database-fixtures.js';
+export {test as processoTest, criarMultiplosProcessos} from './processo-fixtures.js';
+export {test as completeTest} from './complete-fixtures.js';
 
 // Re-exportar tipos úteis
-export type {ProcessoContext} from './processo-fixtures';
+export type {ProcessoContext} from './processo-fixtures.js';
 
 // Re-exportar fixtures base
-export * from './base';
-export * from './fixtures-processos';
+export * from './base.js';
+export * from './fixtures-processos.js';

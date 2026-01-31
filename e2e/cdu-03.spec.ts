@@ -23,6 +23,10 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByTestId('inp-processo-data-limite').fill(dataLimite.toISOString().split('T')[0]);
         await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
 
+        // Seleciona tipo - botões ainda devem estar desativados (falta unidade)
+        await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
+        await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
+
         // Seleciona unidade - agora botões devem estar habilitados
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();

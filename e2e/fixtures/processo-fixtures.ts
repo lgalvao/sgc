@@ -1,7 +1,7 @@
 import type {APIRequestContext, Page} from '@playwright/test';
-import {test as base} from './auth-fixtures';
-import {criarProcesso} from '../helpers/helpers-processos';
-import {resetDatabase, useProcessoCleanup} from '../hooks/hooks-limpeza';
+import {test as base} from './auth-fixtures.js';
+import {criarProcesso} from '../helpers/helpers-processos.js';
+import {resetDatabase, useProcessoCleanup} from '../hooks/hooks-limpeza.js';
 
 /**
  * Contexto de fixture com processo criado automaticamente
@@ -27,7 +27,7 @@ export interface ProcessoContext {
  *
  * @example
  * ```typescript
- * import {test, expect} from './fixtures/processo-fixtures';
+ * import {test, expect} from './fixtures/processo-fixtures.js';
  *
  * test('Deve editar processo', async ({page, processoFixture}) => {
  *   // Já tem um processo criado e registrado para cleanup!
@@ -83,7 +83,7 @@ export const test = base.extend<ProcessoContext>({
     }
 });
 
-export {expect} from './auth-fixtures';
+export {expect} from './auth-fixtures.js';
 
 /**
  * Helper para criar múltiplos processos em um teste

@@ -8,7 +8,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
     const CHEFE_UNIDADE = USUARIOS.CHEFE_SECAO_121.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_121.senha;
 
-    test('Deve exibir detalhes do subprocesso para CHEFE', (async ({page: Page, autenticadoComoAdmin: void, cleanupAutomatico: any}) => {
+    test('Deve exibir detalhes do subprocesso para CHEFE', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-07 ${timestamp}`;
 

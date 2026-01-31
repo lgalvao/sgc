@@ -53,7 +53,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', (async ({page: Page, autenticadoComoAdmin: void, autenticadoComoGestorCoord22: void, autenticadoComoChefeSecao221: void}) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, autenticadoComoGestorCoord22, autenticadoComoChefeSecao221}) => {
         
 
         await criarProcesso(page, {
@@ -67,7 +67,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanup.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -76,7 +76,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', (async ({page: Page}) => {
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -95,7 +95,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: GESTOR visualiza botão Aceitar em Bloco', (async ({page: Page}) => {
+    test('Cenario 1: GESTOR visualiza botão Aceitar em Bloco', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -109,7 +109,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         }
     });
 
-    test('Cenario 2: GESTOR abre modal de aceite em bloco', (async ({page: Page, autenticadoComoGestorCoord22: void}) => {
+    test('Cenario 2: GESTOR abre modal de aceite em bloco', async ({page, autenticadoComoGestorCoord22}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -130,7 +130,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         }
     });
 
-    test('Cenario 3: Cancelar aceite em bloco permanece na tela', (async ({page: Page, autenticadoComoGestorCoord22: void}) => {
+    test('Cenario 3: Cancelar aceite em bloco permanece na tela', async ({page, autenticadoComoGestorCoord22}) => {
         
 
         await page.getByText(descProcesso).click();

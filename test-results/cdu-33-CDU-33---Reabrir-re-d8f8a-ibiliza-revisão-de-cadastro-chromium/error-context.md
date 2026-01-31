@@ -1,0 +1,72 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link "Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link "Minha unidade" [ref=e14] [cursor=pointer]:
+                  - /url: /unidade/1
+                  - generic [ref=e15]: 
+                  - text: Minha unidade
+              - listitem [ref=e16]:
+                - link "Relatórios" [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link "Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "ADMIN - SEDOC" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: ADMIN - SEDOC
+              - listitem "Configurações do sistema" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: /configuracoes
+                  - generic [ref=e30]: 
+              - listitem "Sair" [ref=e31]:
+                - link [ref=e32] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e33]: 
+      - generic [ref=e36]:
+        - button "Voltar" [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]: 
+        - navigation "breadcrumb" [ref=e39]:
+          - list [ref=e40]:
+            - listitem [ref=e41]:
+              - link "Início" [ref=e42] [cursor=pointer]:
+                - /url: /painel
+                - img "Início" [ref=e43]: 
+            - listitem [ref=e44]:
+              - text: ›
+              - generic [ref=e45]: Detalhes do processo
+      - main [ref=e46]:
+        - generic [ref=e48]:
+          - status [ref=e49]:
+            - generic [ref=e50]: Carregando detalhes do processo...
+          - paragraph [ref=e51]: Carregando detalhes do processo...
+      - contentinfo [ref=e52]:
+        - generic [ref=e53]:
+          - generic [ref=e54]: Versão 1.0.0
+          - generic [ref=e55]: © SESEL/COSIS/TRE-PE
+  - text: 
+```

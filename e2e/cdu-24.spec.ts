@@ -1,6 +1,4 @@
-import type { Page } from '@playwright/test';
 import {expect, test} from './fixtures/auth-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
@@ -26,10 +24,6 @@ import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
  */
 test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     const UNIDADE_1 = 'SECAO_221';
-    const USUARIO_CHEFE_1 = USUARIOS.CHEFE_SECAO_221.titulo;
-    const SENHA_CHEFE_1 = USUARIOS.CHEFE_SECAO_221.senha;
-    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
-    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-24 ${timestamp}`;
@@ -52,7 +46,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     // PREPARAÇÃO - Criar processo com mapa criado
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo', (async ({page: Page, autenticadoComoAdmin: void, autenticadoComoChefeSecao221: void}) => {
+    test('Preparacao 1: Admin cria e inicia processo', async ({page}) => {
         
 
         await criarProcesso(page, {
@@ -66,7 +60,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanup.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -75,7 +69,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -90,7 +84,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro e cria competências', (async ({page: Page}) => {
+    test('Preparacao 3: Admin homologa cadastro e cria competências', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -117,7 +111,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     // TESTES PRINCIPAIS - CDU-24
     // ========================================================================
 
-    test('Cenario 1: ADMIN visualiza botão Disponibilizar Mapas em Bloco', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 1: ADMIN visualiza botão Disponibilizar Mapas em Bloco', async ({page}) => {
         // CDU-24: Passos 1-4
         
 
@@ -133,7 +127,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         }
     });
 
-    test('Cenario 2: Modal de disponibilização inclui campo de data limite', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 2: Modal de disponibilização inclui campo de data limite', async ({page}) => {
         // CDU-24: Passo 5 - Modal inclui campo de data limite obrigatório
         
 
@@ -164,7 +158,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         }
     });
 
-    test('Cenario 3: Cancelar disponibilização em bloco', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 3: Cancelar disponibilização em bloco', async ({page}) => {
         // CDU-24: Passo 6 - Cancelar
         
 

@@ -42,7 +42,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao: Admin cria e inicia processo', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
         
 
         await criarProcesso(page, {
@@ -56,7 +56,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanup.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -69,7 +69,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para detalhes do processo', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 1: ADMIN navega para detalhes do processo', async ({page, autenticadoComoAdmin}) => {
         // CDU-34: Passo 1
         
 
@@ -77,7 +77,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
     });
 
-    test('Cenario 2: Verificar indicadores de prazo', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 2: Verificar indicadores de prazo', async ({page, autenticadoComoAdmin}) => {
         // CDU-34: Passo 2 - Sistema exibe indicadores de prazo
         
 
@@ -93,7 +93,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         // Isso depende da implementação visual
     });
 
-    test('Cenario 3: Verificar opção de enviar lembrete', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 3: Verificar opção de enviar lembrete', async ({page, autenticadoComoAdmin}) => {
         // CDU-34: Passo 4
         
 

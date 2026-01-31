@@ -10,7 +10,7 @@ test.describe('UI Consistency & Accessibility', () => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
     });
 
-    test('All views have consistent page headers', (async ({page: Page}) => {
+    test('All views have consistent page headers', async ({page}) => {
         const views = [
             '/painel',
             '/configuracoes',
@@ -36,7 +36,7 @@ test.describe('UI Consistency & Accessibility', () => {
         }
     });
 
-    test('Interactive elements are keyboard accessible (Tab navigation)', (async ({page: Page}) => {
+    test('Interactive elements are keyboard accessible (Tab navigation)', async ({page}) => {
         await page.goto('/painel');
 
         // Ensure body is focused

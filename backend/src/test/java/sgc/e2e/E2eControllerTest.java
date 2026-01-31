@@ -4,8 +4,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-import javax.sql.DataSource;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,9 +47,6 @@ class E2eControllerTest {
     @Autowired
     private NamedParameterJdbcTemplate namedJdbcTemplate;
 
-    @Autowired
-    private DataSource dataSource;
-
     @Mock
     private ProcessoFacade processoFacade;
 
@@ -68,7 +63,7 @@ class E2eControllerTest {
         MockitoAnnotations.openMocks(this);
         // Default behavior for resource loader (file found in first path)
         mockResourceLoader("file:../e2e/setup/seed.sql", true);
-        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, dataSource, processoFacade, unidadeFacade, resourceLoader);
+        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
     }
 
     private void mockResourceLoader(String path, boolean exists) {
@@ -163,7 +158,7 @@ class E2eControllerTest {
 
     @Test
     @DisplayName("Deve resetar o banco de dados truncando tabelas")
-    void deveResetarBancoTruncandoTabelas() throws SQLException {
+    void deveResetarBancoTruncandoTabelas() {
         // Arrange
         mockResourceLoader("file:../e2e/setup/seed.sql", true);
 
@@ -195,13 +190,12 @@ class E2eControllerTest {
         // Usa mocks de DB para focar na lógica de recursos e evitar erros de SQL
         JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
         NamedParameterJdbcTemplate mockNamed = Mockito.mock(NamedParameterJdbcTemplate.class);
-        DataSource mockDs = Mockito.mock(DataSource.class);
-
         // Simula erro ao conectar para evitar execução do script (que trava com mocks)
         // O teste foca apenas na lógica de seleção do recurso (mockResourceLoader)
-        when(mockDs.getConnection()).thenThrow(new SQLException("Stop here"));
+        // Não precisamos mais do mock do DataSource se usarmos null no construtor
 
-        E2eController localController = new E2eController(mockJdbc, mockNamed, mockDs, processoFacade, unidadeFacade, resourceLoader);
+
+        E2eController localController = new E2eController(mockJdbc, mockNamed, processoFacade, unidadeFacade, resourceLoader);
 
         mockResourceLoader("file:../e2e/setup/seed.sql", false);
         mockResourceLoader("file:e2e/setup/seed.sql", true);
@@ -218,7 +212,7 @@ class E2eControllerTest {
     void deveLancarErroSeSeedNaoEncontrado() {
         // Usa mocks de DB
         JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
-        E2eController localController = new E2eController(mockJdbc, namedJdbcTemplate, dataSource, processoFacade, unidadeFacade, resourceLoader);
+        E2eController localController = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
 
         mockResourceLoader("file:../e2e/setup/seed.sql", false);
         mockResourceLoader("file:e2e/setup/seed.sql", false);
@@ -310,7 +304,7 @@ class E2eControllerTest {
         JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
         Mockito.doThrow(new RuntimeException("Error")).when(mockJdbc).execute(any(String.class));
 
-        E2eController localController = new E2eController(mockJdbc, namedJdbcTemplate, dataSource, processoFacade, unidadeFacade, resourceLoader);
+        E2eController localController = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
 
         var exception = Assertions.assertThrows(RuntimeException.class, localController::resetDatabase);
         Assertions.assertNotNull(exception);

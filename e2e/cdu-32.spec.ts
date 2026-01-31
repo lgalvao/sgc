@@ -48,7 +48,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo', (async ({page: Page, autenticadoComoAdmin: void, autenticadoComoChefeSecao221: void}) => {
+    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
         
 
         await criarProcesso(page, {
@@ -62,7 +62,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanup.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -71,7 +71,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -90,7 +90,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para subprocesso disponibilizado', (async ({page: Page}) => {
+    test('Cenario 1: ADMIN navega para subprocesso disponibilizado', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -100,7 +100,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
             .toHaveText(/Cadastro disponibilizado/i);
     });
 
-    test('Cenario 2: ADMIN visualiza botão Reabrir cadastro', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 2: ADMIN visualiza botão Reabrir cadastro', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -114,7 +114,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         }
     });
 
-    test('Cenario 3: ADMIN abre modal de reabertura de cadastro', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 3: ADMIN abre modal de reabertura de cadastro', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -133,7 +133,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         }
     });
 
-    test('Cenario 4: Botão confirmar desabilitado sem justificativa', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 4: Botão confirmar desabilitado sem justificativa', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByText(descProcesso).click();

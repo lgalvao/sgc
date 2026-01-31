@@ -6,7 +6,6 @@ import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from '
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
-import {Page} from '@playwright/test';
 
 async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
     await page.getByText(descProcesso).click();
@@ -61,7 +60,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo', (async ({page: Page, autenticadoComoAdmin: void, autenticadoComoGestorCoord22: void, autenticadoComoChefeSecao221: void}) => {
+    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, autenticadoComoGestorCoord22, autenticadoComoChefeSecao221}) => {
         
 
         await criarProcesso(page, {
@@ -75,7 +74,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanup.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -84,7 +83,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -99,7 +98,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro e cria mapa', (async ({page: Page, autenticadoComoChefeSecao221: void}) => {
+    test('Preparacao 3: Admin homologa cadastro e cria mapa', async ({page, autenticadoComoChefeSecao221}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -116,7 +115,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 4: Chefe valida o mapa', (async ({page: Page}) => {
+    test('Preparacao 4: Chefe valida o mapa', async ({page}) => {
         
 
         await acessarSubprocessoChefe(page, descProcesso);
@@ -132,7 +131,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: GESTOR acessa processo com mapa validado', (async ({page: Page}) => {
+    test('Cenario 1: GESTOR acessa processo com mapa validado', async ({page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -146,7 +145,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         }
     });
 
-    test('Cenario 2: GESTOR abre modal de aceite de mapa em bloco', (async ({page: Page, autenticadoComoGestorCoord22: void}) => {
+    test('Cenario 2: GESTOR abre modal de aceite de mapa em bloco', async ({page, autenticadoComoGestorCoord22}) => {
         
 
         await page.getByText(descProcesso).click();

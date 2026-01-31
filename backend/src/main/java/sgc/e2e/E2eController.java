@@ -24,9 +24,7 @@ import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,53 +42,64 @@ public class E2eController {
 
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
-    private final DataSource dataSource;
     private final ProcessoFacade processoFacade;
     private final UnidadeFacade unidadeFacade;
     private final ResourceLoader resourceLoader;
 
     @PostMapping("/reset-database")
-    public void resetDatabase() throws SQLException {
-        try (Connection conn = dataSource.getConnection()) {
-            try (java.sql.Statement stmt = conn.createStatement()) {
-                stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
-
-                List<String> tables = new java.util.ArrayList<>();
-                try (java.sql.ResultSet rs =
-                             stmt.executeQuery(
-                                     "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'SGC'")) {
-                    while (rs.next()) {
-                        tables.add(rs.getString("TABLE_NAME"));
-                    }
-                }
-
-                for (String table : tables) {
-                    if (table.matches("^\\w+$")) {
-                        stmt.execute("TRUNCATE TABLE sgc." + table);
-                    } else {
-                        log.warn("Nome de tabela suspeito ignorado no reset: {}", table);
-                    }
-                }
-
-                stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
-            }
-
-            Resource seedResource = resourceLoader.getResource("file:../e2e/setup/seed.sql");
-            if (!seedResource.exists()) {
-                seedResource = resourceLoader.getResource("file:e2e/setup/seed.sql");
-            }
-            if (!seedResource.exists()) {
-                throw new ErroConfiguracao("Arquivo seed.sql não encontrado");
-            }
-
-            ScriptUtils.executeSqlScript(conn, seedResource);
+    public void resetDatabase() {
+        log.info("Iniciando reset do banco de dados para E2E...");
+        try (Connection conn = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection()) {
+            executeDatabaseReset(conn);
+            log.info("Reset do banco de dados concluído com sucesso.");
         } catch (Exception e) {
-            log.error("Error resetting database", e);
-            if (e instanceof SQLException) {
-                throw (SQLException) e;
-            }
-            throw new RuntimeException(e);
+            log.error("Erro crítico ao resetar banco de dados", e);
+            throw new ErroConfiguracao("Falha no reset do banco: " + e.getMessage());
         }
+    }
+
+    private void executeDatabaseReset(Connection conn) throws Exception {
+        try (java.sql.Statement stmt = conn.createStatement()) {
+            log.info("Desabilitando integridade referencial");
+            stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
+
+            List<String> tables = jdbcTemplate.queryForList(
+                    "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE UPPER(TABLE_SCHEMA) = 'SGC'",
+                    String.class);
+
+            log.info("Limpando {} tabelas no schema SGC", tables.size());
+            for (String table : tables) {
+                limparTabela(stmt, table);
+            }
+
+            Resource seedResource = getSeedResource();
+            log.info("Executando script de seed: {}", seedResource.getFilename());
+            ScriptUtils.executeSqlScript(conn, seedResource);
+
+            log.info("Reabilitando integridade referencial");
+            stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
+        }
+    }
+
+    private void limparTabela(java.sql.Statement stmt, String table) throws java.sql.SQLException {
+        log.debug("Limpando tabela: sgc.{}", table);
+        try {
+            stmt.execute("TRUNCATE TABLE sgc." + table + " RESTART IDENTITY");
+        } catch (Exception e) {
+            log.warn("Não foi possível truncar tabela {}, tentando DELETE: {}", table, e.getMessage());
+            stmt.execute("DELETE FROM sgc." + table);
+        }
+    }
+
+    private Resource getSeedResource() {
+        Resource seedResource = resourceLoader.getResource("file:../e2e/setup/seed.sql");
+        if (!seedResource.exists()) {
+            seedResource = resourceLoader.getResource("file:e2e/setup/seed.sql");
+        }
+        if (!seedResource.exists()) {
+            throw new ErroConfiguracao("Arquivo seed.sql não encontrado");
+        }
+        return seedResource;
     }
 
     @PostMapping("/processo/{codigo}/limpar")
@@ -189,6 +198,9 @@ public class E2eController {
 
         // Buscar unidade pela sigla
         UnidadeDto unidade = unidadeFacade.buscarPorSigla(request.unidadeSigla());
+        if (unidade == null) {
+            throw new ErroEntidadeNaoEncontrada("Unidade", request.unidadeSigla());
+        }
 
         // Calcular data limite
         int diasLimite = Objects.requireNonNullElse(request.diasLimite(), 30);

@@ -2,7 +2,7 @@
   <BContainer class="mt-4">
     <!-- Tabela de Processos -->
     <div class="mb-5">
-      <PageHeader title="Processos">
+      <PageHeader title="Processos" title-test-id="txt-painel-titulo-processos">
         <template #actions>
           <BButton
               v-if="perfil.isAdmin"
@@ -25,7 +25,7 @@
     </div>
 
     <div>
-      <PageHeader title="Alertas" />
+      <PageHeader title="Alertas" title-test-id="txt-painel-titulo-alertas" />
       <TabelaAlertas
           :alertas="alertas"
           @ordenar="ordenarAlertasPor"

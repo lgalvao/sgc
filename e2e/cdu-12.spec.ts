@@ -61,7 +61,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await expect(linhaProcesso).toBeVisible();
         await linhaProcesso.click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
-        codProcessoMapeamento = Number.Number.parseInt(new RegExp(/(?:codProcesso=|\/cadastro\/)(\d+)/).exec(page.url())?.[1] || '0');
+        codProcessoMapeamento = Number.parseInt(new RegExp(/(?:codProcesso=|\/cadastro\/)(\d+)/).exec(page.url())?.[1] || '0');
         if (codProcessoMapeamento > 0) cleanup.registrar(codProcessoMapeamento);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -161,7 +161,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
     });
 
-    test('Preparacao 2: Iniciar Processo de Revisão', (async ({page: Page, autenticadoComoAdmin: void, autenticadoComoChefeSecao221: void}) => {
+    test('Preparacao 2: Iniciar Processo de Revisão', async ({page, autenticadoComoAdmin}) => {
         
         await criarProcesso(page, {
             descricao: descProcessoRevisao,
@@ -175,7 +175,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await expect(linhaProcesso).toBeVisible();
         await linhaProcesso.click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
-        processoRevisaoId = Number.Number.parseInt(new RegExp(/(?:codProcesso=|\/cadastro\/)(\d+)/).exec(page.url())?.[1] || '0');
+        processoRevisaoId = Number.parseInt(new RegExp(/(?:codProcesso=|\/cadastro\/)(\d+)/).exec(page.url())?.[1] || '0');
         if (processoRevisaoId > 0) cleanup.registrar(processoRevisaoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -186,7 +186,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     // TESTES CDU-12
     // ========================================================================
 
-    test('Cenario 1: Verificar Sem Impactos (Estado Inicial)', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 1: Verificar Sem Impactos (Estado Inicial)', async ({page, autenticadoComoChefeSecao221}) => {
         
 
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
@@ -201,7 +201,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await expect(page.getByText('Nenhum impacto detectado no mapa.')).toBeVisible();
     });
 
-    test('Cenario 2: Verificar Impacto de Inclusão de Atividade', (async ({page: Page, autenticadoComoChefeSecao221: void}) => {
+    test('Cenario 2: Verificar Impacto de Inclusão de Atividade', async ({page, autenticadoComoChefeSecao221}) => {
         
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -223,7 +223,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fecharModalImpacto(page);
     });
 
-    test('Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)', (async ({page: Page, autenticadoComoChefeSecao221: void}) => {
+    test('Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)', async ({page, autenticadoComoChefeSecao221}) => {
         
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -248,7 +248,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fecharModalImpacto(page);
     });
 
-    test('Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)', (async ({page: Page, autenticadoComoChefeSecao221: void}) => {
+    test('Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)', async ({page, autenticadoComoChefeSecao221}) => {
         
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -273,7 +273,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fecharModalImpacto(page);
     });
 
-    test('Cenario 5: Verificar visualização pelo Admin (Somente Leitura)', (async ({page: Page, autenticadoComoChefeSecao221: void}) => {
+    test('Cenario 5: Verificar visualização pelo Admin (Somente Leitura)', async ({page, autenticadoComoChefeSecao221}) => {
         // Chefe disponibiliza a revisão
         
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);

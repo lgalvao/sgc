@@ -30,7 +30,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
     // CENÁRIO 1: ADMIN navega para árvore de unidades
     // ========================================================================
 
-    test('Cenario 1: ADMIN acessa menu de Unidades', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 1: ADMIN acessa menu de Unidades', async ({page, autenticadoComoAdmin}) => {
         // CDU-28: Passos 1-2
         
 
@@ -47,7 +47,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
     // CENÁRIO 2: ADMIN seleciona uma unidade
     // ========================================================================
 
-    test('Cenario 2: ADMIN seleciona unidade na árvore', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 2: ADMIN seleciona unidade na árvore', async ({page, autenticadoComoAdmin}) => {
         // CDU-28: Passos 3-4
         
 
@@ -64,7 +64,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
                 await unidade.click();
 
                 // Verificar que página de detalhes da unidade carregou
-                await expect(page.getByText(/Detalhes|Dados da unidade/i)).toBeVisible({timeout: 5000}).catch(() => {
+                await expect(page.getByText(/Detalhes|Dados da unidade/i)).toBeVisible().catch(() => {
                     // Log para debug
                     console.log('Página de detalhes da unidade não encontrada');
                 });
@@ -76,7 +76,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
     // CENÁRIO 3: Verificar opção de criar atribuição
     // ========================================================================
 
-    test('Cenario 3: Verificar botão de criar atribuição', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 3: Verificar botão de criar atribuição', async ({page, autenticadoComoAdmin}) => {
         // CDU-28: Passo 5
         
 

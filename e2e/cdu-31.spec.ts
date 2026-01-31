@@ -26,7 +26,7 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
     // CENÁRIO 1: Navegação para configurações
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para configurações', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 1: ADMIN navega para configurações', async ({page, autenticadoComoAdmin}) => {
         // CDU-31: Passos 1-2
         
 
@@ -42,7 +42,7 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
     // CENÁRIO 2: Visualizar configurações atuais
     // ========================================================================
 
-    test('Cenario 2: Tela exibe configurações editáveis', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 2: Tela exibe configurações editáveis', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByTestId('btn-configuracoes').click();
@@ -61,7 +61,7 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
     // CENÁRIO 3: Salvar configurações
     // ========================================================================
 
-    test('Cenario 3: ADMIN salva configurações com sucesso', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 3: ADMIN salva configurações com sucesso', async ({page, autenticadoComoAdmin}) => {
         // CDU-31: Passos 3-4
         
 
@@ -79,6 +79,6 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
         await page.getByRole('button', {name: /Salvar/i}).click();
 
         // Passo 4: Verificar mensagem de confirmação
-        await expect(page.getByRole('heading', { name: /sucesso/i })).toBeVisible({timeout: 5000});
+        await expect(page.getByRole('heading', { name: /sucesso/i })).toBeVisible();
     });
 });

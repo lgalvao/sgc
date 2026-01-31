@@ -1,5 +1,5 @@
-import {test as base} from './processo-fixtures';
-import {resetDatabase, useProcessoCleanup} from '../hooks/hooks-limpeza';
+import {test as base} from './processo-fixtures.js';
+import {resetDatabase, useProcessoCleanup} from '../hooks/hooks-limpeza.js';
 
 /**
  * Fixture completa que combina:
@@ -11,7 +11,7 @@ import {resetDatabase, useProcessoCleanup} from '../hooks/hooks-limpeza';
  *
  * @example
  * ```typescript
- * import {test, expect} from './fixtures/complete-fixtures';
+ * import {test, expect} from './fixtures/complete-fixtures.js';
  *
  * test('Deve criar e editar processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
  *   // Database resetada, usuário logado, cleanup automático!
@@ -53,4 +53,4 @@ export const testWithCleanup = test.extend<{
 
 // Export alias
 export {testWithCleanup as test};
-export {expect} from './auth-fixtures';
+export {expect} from './auth-fixtures.js';

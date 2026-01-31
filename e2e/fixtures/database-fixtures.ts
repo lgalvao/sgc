@@ -1,5 +1,5 @@
-import {test as base} from './auth-fixtures';
-import {resetDatabase} from '../hooks/hooks-limpeza';
+import {test as base} from './auth-fixtures.js';
+import {resetDatabase} from '../hooks/hooks-limpeza.js';
 
 /**
  * Fixture que garante reset de database antes de cada teste.
@@ -11,7 +11,7 @@ import {resetDatabase} from '../hooks/hooks-limpeza';
  *
  * @example
  * ```typescript
- * import {test, expect} from './fixtures/database-fixtures';
+ * import {test, expect} from './fixtures/database-fixtures.js';
  *
  * test('Deve criar processo em banco limpo', async ({page, autenticadoComoAdmin}) => {
  *   // Database já foi resetada automaticamente!
@@ -27,4 +27,4 @@ test.beforeAll(async ({request}) => {
     await resetDatabase(request);
 });
 
-export {expect} from './auth-fixtures';
+export {expect} from './auth-fixtures.js';

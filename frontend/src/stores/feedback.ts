@@ -9,9 +9,8 @@ export interface FeedbackMessage {
     autoHideDelay?: number;
 }
 
-// Interface simplificada do Toast Controller do bootstrap-vue-next
 export interface ToastController {
-    show: (options: any) => void;
+    create: (options: any) => void;
 }
 
 export const useFeedbackStore = defineStore('feedback', () => {
@@ -30,7 +29,7 @@ export const useFeedbackStore = defineStore('feedback', () => {
 
     function show(title: string, message: string, variant: 'success' | 'danger' | 'warning' | 'info' = 'info', autoHideDelay = 3000) {
         if (toast.value) {
-            toast.value.show({
+            toast.value.create({
                 props: {
                     title,
                     body: message,

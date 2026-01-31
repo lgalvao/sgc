@@ -1,4 +1,3 @@
-import type { Page } from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 
 /**
@@ -15,7 +14,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
  */
 test.describe('CDU-18: Visualizar mapa de competências', () => {
 
-    test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({page, autenticadoComoAdmin}) => {
         await test.step('1. Login como ADMIN', async () => {
             // Já autenticado via fixture
         });
@@ -64,7 +63,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
         });
     });
 
-    test('Cenário 2: CHEFE visualiza mapa da própria unidade', (async ({page: Page, autenticadoComoChefeAssessoria12: void}) => {
+    test('Cenário 2: CHEFE visualiza mapa da própria unidade', async ({page, autenticadoComoChefeAssessoria12}) => {
         await test.step('1. Login como CHEFE_ASSESSORIA_12', async () => {
             // Já autenticado via fixture
         });

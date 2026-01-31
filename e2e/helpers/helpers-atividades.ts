@@ -107,7 +107,7 @@ export async function disponibilizarCadastro(page: Page) {
 }
 
 export async function verificarSituacaoSubprocesso(page: Page, situacao: string) {
-    await expect(page.getByTestId('cad-atividades__txt-badge-situacao')).toHaveText(new RegExp(situacao, 'i'), {timeout: 15000});
+    await expect(page.getByTestId('cad-atividades__txt-badge-situacao')).toHaveText(new RegExp(situacao, 'i'));
 }
 
 export async function verificarBotaoImpactoDropdown(page: Page) {

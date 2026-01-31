@@ -43,7 +43,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     const CONHECIMENTO_1 = `Conhecimento 1 ${timestamp}`;
     const CONHECIMENTO_2 = `Conhecimento 2 ${timestamp}`;
 
-    test('Preparacao: Criar processo e homologar cadastro de atividades', (async ({page: Page, autenticadoComoAdmin: void, autenticadoComoGestorCoord22: void, autenticadoComoChefeSecao221: void, cleanupAutomatico: any}) => {
+    test('Preparacao: Criar processo e homologar cadastro de atividades', async ({page, autenticadoComoAdmin, autenticadoComoGestorCoord22, autenticadoComoChefeSecao221, cleanupAutomatico}) => {
         // 1. Admin cria e inicia processo
         
 
@@ -101,7 +101,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);
     });
 
-    test('CT-00 e CT-01: Acessar Edição de Mapa e verificar elementos', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('CT-00 e CT-01: Acessar Edição de Mapa e verificar elementos', async ({page, autenticadoComoAdmin}) => {
         
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
@@ -122,7 +122,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
     });
 
-    test('CT-02: Criar Competência', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('CT-02: Criar Competência', async ({page, autenticadoComoAdmin}) => {
         
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -137,7 +137,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeEnabled();
     });
 
-    test('CT-03: Editar Competência', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('CT-03: Editar Competência', async ({page, autenticadoComoAdmin}) => {
         
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -152,7 +152,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await verificarCompetenciaNoMapa(page, newDesc, [ATIVIDADE_1, ATIVIDADE_2]);
     });
 
-    test('CT-05: Validar Cancelamento da Exclusão', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('CT-05: Validar Cancelamento da Exclusão', async ({page, autenticadoComoAdmin}) => {
         
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -164,7 +164,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByText(compDesc).first()).toBeVisible();
     });
 
-    test('CT-04: Excluir Competência com Confirmação', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('CT-04: Excluir Competência com Confirmação', async ({page, autenticadoComoAdmin}) => {
         
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -177,7 +177,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
     });
 
-    test('CT-06: Navegar para Disponibilização', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('CT-06: Navegar para Disponibilização', async ({page, autenticadoComoAdmin}) => {
         // Recriar uma competência para poder disponibilizar
         
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);

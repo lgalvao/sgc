@@ -3,7 +3,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 
 test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
-    test('Deve iniciar um processo com sucesso', (async ({page: Page, autenticadoComoAdmin: void, cleanupAutomatico: any}) => {
+    test('Deve iniciar um processo com sucesso', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         const descricao = `Processo para Iniciar - ${Date.now()}`;
 
         // 1. Cria processo em estado 'Criado'

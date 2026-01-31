@@ -1,5 +1,5 @@
-import {test as base} from './base';
-import {login, loginComPerfil, USUARIOS} from '../helpers/helpers-auth';
+import {test as base} from './base.js';
+import {login, loginComPerfil, USUARIOS} from '../helpers/helpers-auth.js';
 
 /**
  * Fixtures de autenticação para testes E2E.
@@ -8,7 +8,7 @@ import {login, loginComPerfil, USUARIOS} from '../helpers/helpers-auth';
  * 
  * @example
  * ```typescript
- * import {test, expect} from './fixtures/auth-fixtures';
+ * import {test, expect} from './fixtures/auth-fixtures.js';
  * 
  * test('Deve criar processo', async ({page, autenticadoComoAdmin}) => {
  *   // Já está logado como ADMIN!
@@ -103,4 +103,4 @@ export const test = base.extend<{
     },
 });
 
-export {expect} from './base';
+export {expect} from './base.js';

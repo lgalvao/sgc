@@ -1,5 +1,5 @@
 import {expect, type Page} from '@playwright/test';
-import {fazerLogout, verificarPaginaPainel} from './helpers-navegacao';
+import {fazerLogout, verificarPaginaPainel} from './helpers-navegacao.js';
 
 // Re-exportar para manter compatibilidade com imports existentes
 export {fazerLogout, verificarPaginaPainel};

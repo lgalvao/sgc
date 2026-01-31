@@ -29,7 +29,7 @@ test.describe.serial('CDU-30 - Manter Administradores', () => {
     // CENÁRIO 1: Navegação para página de administradores
     // ========================================================================
 
-    test('Cenario 1: ADMIN acessa página de configurações', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 1: ADMIN acessa página de configurações', async ({page, autenticadoComoAdmin}) => {
         
 
         // Acessar configurações
@@ -41,7 +41,7 @@ test.describe.serial('CDU-30 - Manter Administradores', () => {
     // CENÁRIO 2: Verificar seção de administradores
     // ========================================================================
 
-    test('Cenario 2: Página de configurações contém seção de administradores', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 2: Página de configurações contém seção de administradores', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByTestId('btn-configuracoes').click();
@@ -69,7 +69,7 @@ test.describe.serial('CDU-30 - Manter Administradores', () => {
     // CENÁRIO 3: Verificar lista de administradores
     // ========================================================================
 
-    test('Cenario 3: Lista de administradores é exibida', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 3: Lista de administradores é exibida', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByTestId('btn-configuracoes').click();

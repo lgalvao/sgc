@@ -6,7 +6,7 @@ import {criarProcesso, verificarDetalhesProcesso, verificarUnidadeParticipante} 
 test.describe('CDU-06 - Detalhar processo', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_12';
 
-    test('Deve exibir detalhes do processo para ADMIN', (async ({page: Page, autenticadoComoAdmin: void, cleanupAutomatico: any}) => {
+    test('Deve exibir detalhes do processo para ADMIN', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-06 ${timestamp}`;
 
@@ -46,7 +46,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
     });
 
-    test('Deve exibir detalhes do processo para GESTOR', (async ({page: Page, cleanupAutomatico: any}) => {
+    test('Deve exibir detalhes do processo para GESTOR', async ({page, cleanupAutomatico}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-06 Gestor ${timestamp}`;
         const UNIDADE_PROCESSO = 'SECAO_111';

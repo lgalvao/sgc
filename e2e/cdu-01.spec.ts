@@ -7,14 +7,14 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await page.goto('/login');
     });
 
-    test('Deve exibir erro com credenciais inválidas', async ({page, autenticadoComoAdmin, autenticadoComoGestor}: {page: Page, autenticadoComoAdmin: void, autenticadoComoGestor: void}) => {
+    test('Deve exibir erro com credenciais inválidas', async ({page}: {page: Page}) => {
         await autenticar(page, USUARIOS.INVALIDO.titulo, USUARIOS.INVALIDO.senha);
         await expect(page.getByText('Título ou senha inválidos.')).toBeVisible();
     });
 
     test('Deve realizar login com sucesso (Perfil Único)', async ({page}: {page: Page}) => {
         // Usuário 222222 (GESTOR_COORD_11) tem apenas um perfil
-        
+        await autenticar(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
 
         // Verifica que o usuário está logado
         await expect(page.getByText('GESTOR - COORD_11')).toBeVisible();
@@ -32,9 +32,8 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByText('ADMIN - SEDOC')).toBeVisible();
     });
 
-    test('Deve exibir barra de navegação após login', async ({page}: {page: Page}) => {
-        // Login como ADMIN (191919)
-        
+    test('Deve exibir barra de navegação após login', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
+        // Login como ADMIN (191919) via fixture
 
         // Verifica Barra de Navegação
         await expect(page.getByRole('link', {name: 'SGC'})).toBeVisible();

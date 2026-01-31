@@ -29,8 +29,7 @@ export async function limparNotificacoes(page: Page): Promise<void> {
         }
     }
 
-    // Aguardar que fiquem ocultos (autoHideDelay padrão é 3000ms)
-    await notificacao.waitFor({state: 'hidden', timeout: 5000}).catch(() => {
+    await notificacao.waitFor({state: 'hidden'}).catch(() => {
         // Ignorar se não sumir no tempo previsto
     });
 }
@@ -92,10 +91,10 @@ export async function navegarParaSubprocesso(
     siglaUnidade: string
 ): Promise<void> {
     // Aguardar o cabeçalho do processo (v-if="processo") para garantir carregamento inicial
-    await expect(page.getByTestId('processo-info')).toBeVisible({timeout: 10000});
+    await expect(page.getByTestId('processo-info')).toBeVisible();
 
     const tabela = page.getByTestId('tbl-tree');
-    await expect(tabela).toBeVisible({timeout: 10000});
+    await expect(tabela).toBeVisible();
     
     const celula = tabela.getByRole('cell', {name: siglaUnidade}).first();
     await expect(celula).toBeVisible();

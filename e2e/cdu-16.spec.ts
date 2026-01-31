@@ -13,7 +13,6 @@ import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/h
 import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
-import {Page} from '@playwright/test';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}$`));
@@ -55,7 +54,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     // PREPARAÇÃO - Criar mapa vigente (processo de mapeamento completo)
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', (async ({page: Page, autenticadoComoAdmin: void, autenticadoComoChefeSecao221: void}) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin}) => {
         
 
         await criarProcesso(page, {
@@ -69,7 +68,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoMapeamento)});
         await linhaProcesso.click();
 
-        processoMapeamentoId = Number.Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoMapeamentoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoMapeamentoId > 0) cleanup.registrar(processoMapeamentoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -78,7 +77,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoAdmin}) => {
         
 
         await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
@@ -101,7 +100,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro', (async ({page: Page, autenticadoComoChefeSecao221: void}) => {
+    test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoAdmin}) => {
         
 
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
@@ -112,7 +111,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
     });
 
-    test('Preparacao 4: Admin cria competências e disponibiliza mapa', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
         
 
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
@@ -129,7 +128,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await expect(page.getByRole('heading', {name: /Mapa disponibilizado/i})).toBeVisible();
     });
 
-    test('Preparacao 5: Chefe valida mapa', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Preparacao 5: Chefe valida mapa', async ({page, autenticadoComoAdmin}) => {
         
 
         await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
@@ -143,7 +142,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await expect(page.getByRole('heading', {name: /Mapa validado/i})).toBeVisible();
     });
 
-    test('Preparacao 6: Admin homologa mapa e finaliza processo de mapeamento', (async ({page: Page, autenticadoComoChefeSecao221: void}) => {
+    test('Preparacao 6: Admin homologa mapa e finaliza processo de mapeamento', async ({page, autenticadoComoAdmin}) => {
         
 
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
@@ -167,7 +166,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 7: Admin cria e inicia processo de revisão', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Preparacao 7: Admin cria e inicia processo de revisão', async ({page, autenticadoComoAdmin}) => {
         
 
         await criarProcesso(page, {
@@ -181,7 +180,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoRevisao)});
         await linhaProcesso.click();
 
-        processoRevisaoId = Number.Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoRevisaoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoRevisaoId > 0) cleanup.registrar(processoRevisaoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -190,7 +189,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 8: Chefe revisa atividades com alterações', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Preparacao 8: Chefe revisa atividades com alterações', async ({page, autenticadoComoAdmin}) => {
         
 
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
@@ -219,7 +218,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 9: Admin homologa revisão do cadastro', (async ({page: Page}) => {
+    test('Preparacao 9: Admin homologa revisão do cadastro', async ({page}) => {
         // Esta homologação leva o subprocesso ao estado "Revisão do cadastro homologada"
         // que é a pré-condição para CDU-16
         
@@ -241,7 +240,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     // TESTES PRINCIPAIS - CDU-16
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para tela de edição do mapa', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 1: ADMIN navega para tela de edição do mapa', async ({page, autenticadoComoAdmin}) => {
         // CDU-16: Passo 1-6
         
 
@@ -273,7 +272,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await expect(page.getByText(competencia2)).toBeVisible();
     });
 
-    test('Cenario 2: ADMIN visualiza impactos no mapa', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 2: ADMIN visualiza impactos no mapa', async ({page, autenticadoComoAdmin}) => {
         // CDU-16: Passo 7-8
         
 
@@ -306,7 +305,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await expect(modal).toBeHidden();
     });
 
-    test('Cenario 3: ADMIN pode abrir modal para editar competência', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 3: ADMIN pode abrir modal para editar competência', async ({page, autenticadoComoAdmin}) => {
         // CDU-16: Passo 9 - ADMIN pode acessar edição de competências
         
 
@@ -333,7 +332,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await expect(modal).toBeHidden();
     });
 
-    test('Cenario 4: ADMIN associa atividade não vinculada a nova competência', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenario 4: ADMIN associa atividade não vinculada a nova competência', async ({page, autenticadoComoAdmin}) => {
         // CDU-16: Passo 9.1 - ADMIN deve associar todas as atividades não associadas
         
 

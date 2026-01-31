@@ -1,0 +1,86 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e4]:
+    - navigation [ref=e5]:
+      - generic [ref=e6]:
+        - link "SGC" [ref=e7] [cursor=pointer]:
+          - /url: /painel
+        - generic [ref=e8]:
+          - list [ref=e9]:
+            - listitem [ref=e10]:
+              - link "Painel" [ref=e11] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e12]: 
+                - text: Painel
+            - listitem [ref=e13]:
+              - link "Minha unidade" [ref=e14] [cursor=pointer]:
+                - /url: /unidade/18
+                - generic [ref=e15]: 
+                - text: Minha unidade
+            - listitem [ref=e16]:
+              - link "Relatórios" [ref=e17] [cursor=pointer]:
+                - /url: /relatorios
+                - generic [ref=e18]: 
+                - text: Relatórios
+            - listitem [ref=e19]:
+              - link "Histórico" [ref=e20] [cursor=pointer]:
+                - /url: /historico
+                - generic [ref=e21]: 
+                - text: Histórico
+          - list [ref=e22]:
+            - listitem [ref=e23]:
+              - link "CHEFE - SECAO_221" [ref=e24]:
+                - /url: "#"
+                - generic [ref=e25]:
+                  - generic [ref=e26]: 
+                  - generic [ref=e27]: CHEFE - SECAO_221
+            - listitem "Sair" [ref=e28]:
+              - link [ref=e29] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e30]: 
+    - main [ref=e31]:
+      - generic [ref=e32]:
+        - generic [ref=e33]:
+          - heading "Processos" [level=2] [ref=e36]
+          - generic "Lista de processos cadastrados" [ref=e38]:
+            - table [ref=e39]:
+              - rowgroup [ref=e40]:
+                - row "Descrição Tipo Unidades Situação" [ref=e41]:
+                  - columnheader "Descrição" [ref=e42] [cursor=pointer]
+                  - columnheader "Tipo" [ref=e43] [cursor=pointer]
+                  - columnheader "Unidades" [ref=e44]
+                  - columnheader "Situação" [ref=e45] [cursor=pointer]
+              - rowgroup [ref=e46]:
+                - row [ref=e47] [cursor=pointer]:
+                  - cell [ref=e48]:
+                    - alert [ref=e49]:
+                      - region "Estado vazio" [ref=e51]:
+                        - generic [ref=e52]: 
+                        - paragraph [ref=e53]: Nenhum processo encontrado
+                        - paragraph [ref=e54]: Os processos em que sua unidade participa aparecerão aqui.
+        - generic [ref=e55]:
+          - heading "Alertas" [level=2] [ref=e58]
+          - table [ref=e61]:
+            - rowgroup [ref=e62]:
+              - row "Data/Hora Descrição Processo Origem" [ref=e63]:
+                - columnheader "Data/Hora" [ref=e64] [cursor=pointer]
+                - columnheader "Descrição" [ref=e65]
+                - columnheader "Processo" [ref=e66] [cursor=pointer]
+                - columnheader "Origem" [ref=e67]
+            - rowgroup [ref=e68]:
+              - row [ref=e69] [cursor=pointer]:
+                - cell [ref=e70]:
+                  - alert [ref=e71]:
+                    - region "Estado vazio" [ref=e73]:
+                      - generic [ref=e74]: 
+                      - paragraph [ref=e75]: Tudo limpo!
+                      - paragraph [ref=e76]: Você não tem novos alertas no momento.
+    - contentinfo [ref=e77]:
+      - generic [ref=e78]:
+        - generic [ref=e79]: Versão 1.0.0
+        - generic [ref=e80]: © SESEL/COSIS/TRE-PE
+```

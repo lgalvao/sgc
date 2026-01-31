@@ -135,7 +135,7 @@ describe("App.vue", () => {
     });
 
     it("deve inicializar feedbackStore com instância do toast", () => {
-        const mockToast = { show: vi.fn() };
+        const mockToast = { create: vi.fn() };
         (useToast as any).mockReturnValue(mockToast);
         (useRoute as any).mockReturnValue({path: "/painel", fullPath: "/painel"});
 

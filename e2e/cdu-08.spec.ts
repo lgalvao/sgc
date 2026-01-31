@@ -1,4 +1,3 @@
-import type { Page } from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
@@ -11,7 +10,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 
-    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({page, autenticadoComoAdmin}) => {
         const timestamp = Date.now();
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
 
@@ -75,7 +74,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
     });
 
-    test('Cenário 2: Processo de Revisão (Botão Impacto)', (async ({page: Page, autenticadoComoAdmin: void}) => {
+    test('Cenário 2: Processo de Revisão (Botão Impacto)', async ({page, autenticadoComoAdmin}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-08 Rev ${timestamp}`;
         const UNIDADE_REVISAO = 'ASSESSORIA_12';
