@@ -147,8 +147,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 descricao: desc,
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
-                unidade: 'COORD_21', // Unidade do Gestor
-                expandir: ['SECRETARIA_2'],
+                unidade: 'COORD_11', // Unidade do Gestor COORD_11
+                expandir: ['SECRETARIA_1'],
                 iniciar: true
             });
             await page.getByTestId('btn-logout').click();
