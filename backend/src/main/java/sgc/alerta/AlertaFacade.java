@@ -69,10 +69,6 @@ public class AlertaFacade {
      */
     @Transactional
     public Alerta criarAlertaSedoc(Processo processo, Unidade destino, String descricao) {
-        return doCriarAlertaSedoc(processo, destino, descricao);
-    }
-
-    private Alerta doCriarAlertaSedoc(Processo processo, Unidade destino, String descricao) {
         return criarAlerta(processo, getSedoc(), destino, descricao);
     }
 
@@ -123,12 +119,12 @@ public class AlertaFacade {
 
         // Alertas operacionais
         for (Unidade unidade : unidadesOperacionais) {
-            alertasCriados.add(doCriarAlertaSedoc(processo, unidade, "Início do processo"));
+            alertasCriados.add(criarAlertaSedoc(processo, unidade, "Início do processo"));
         }
 
         // Alertas intermediários (consolidados)
         for (Unidade unidade : unidadesIntermediarias.values()) {
-            Alerta alerta = doCriarAlertaSedoc(processo, unidade, "Início do processo em unidades subordinadas");
+            Alerta alerta = criarAlertaSedoc(processo, unidade, "Início do processo em unidades subordinadas");
             alertasCriados.add(alerta);
         }
 
@@ -204,10 +200,6 @@ public class AlertaFacade {
      */
     @Transactional(readOnly = true)
     public List<AlertaDto> listarAlertasPorUsuario(String usuarioTitulo) {
-        return doListarAlertasPorUsuario(usuarioTitulo);
-    }
-
-    private List<AlertaDto> doListarAlertasPorUsuario(String usuarioTitulo) {
         Usuario usuario = usuarioService.buscarPorId(usuarioTitulo);
         Unidade lotacao = usuario.getUnidadeLotacao();
 
@@ -239,7 +231,7 @@ public class AlertaFacade {
      */
     @Transactional(readOnly = true)
     public List<AlertaDto> listarAlertasNaoLidos(String usuarioTitulo) {
-        return doListarAlertasPorUsuario(usuarioTitulo).stream()
+        return listarAlertasPorUsuario(usuarioTitulo).stream()
                 .filter(dto -> dto.getDataHoraLeitura() == null)
                 .toList();
     }
@@ -258,24 +250,24 @@ public class AlertaFacade {
     @Transactional
     public void criarAlertaReaberturaCadastro(Processo processo, Unidade unidade, String justificativa) {
         String descricao = "Cadastro de atividades reaberto pela SEDOC. Justificativa: %s".formatted(justificativa);
-        doCriarAlertaSedoc(processo, unidade, descricao);
+        criarAlertaSedoc(processo, unidade, descricao);
     }
 
     @Transactional
     public void criarAlertaReaberturaCadastroSuperior(Processo processo, Unidade superior, Unidade subordinada) {
         String descricao = "Cadastro da unidade %s reaberto pela SEDOC".formatted(subordinada.getSigla());
-        doCriarAlertaSedoc(processo, superior, descricao);
+        criarAlertaSedoc(processo, superior, descricao);
     }
 
     @Transactional
     public void criarAlertaReaberturaRevisao(Processo processo, Unidade unidade, String justificativa) {
         String descricao = "Revisão de cadastro da unidade %s reaberta pela SEDOC. Justificativa: %s".formatted(unidade.getSigla(), justificativa);
-        doCriarAlertaSedoc(processo, unidade, descricao);
+        criarAlertaSedoc(processo, unidade, descricao);
     }
 
     @Transactional
     public void criarAlertaReaberturaRevisaoSuperior(Processo processo, Unidade superior, Unidade subordinada) {
         String descricao = "Revisão de cadastro da unidade %s reaberta pela SEDOC".formatted(subordinada.getSigla());
-        doCriarAlertaSedoc(processo, superior, descricao);
+        criarAlertaSedoc(processo, superior, descricao);
     }
 }
