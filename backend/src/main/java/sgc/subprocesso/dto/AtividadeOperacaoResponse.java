@@ -2,6 +2,7 @@ package sgc.subprocesso.dto;
 
 import lombok.Builder;
 import org.jspecify.annotations.Nullable;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
 
 import java.util.List;
 
@@ -16,9 +17,9 @@ import java.util.List;
  */
 @Builder
 public record AtividadeOperacaoResponse(
-        @Nullable AtividadeVisualizacaoDto atividade,
+        @Nullable AtividadeDto atividade,
 
                 SubprocessoSituacaoDto subprocesso,
 
-                List<AtividadeVisualizacaoDto> atividadesAtualizadas) {
+                List<AtividadeDto> atividadesAtualizadas) {
 }

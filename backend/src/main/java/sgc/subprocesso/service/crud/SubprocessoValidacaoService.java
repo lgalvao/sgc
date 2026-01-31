@@ -128,11 +128,11 @@ public class SubprocessoValidacaoService {
      * @param subprocesso Subprocesso a validar (não pode ser null)
      * @param permitidas Conjunto de situações permitidas (não pode ser vazio)
      * @throws ErroValidacao se a situação atual não está entre as permitidas
-     * @throws IllegalArgumentException se subprocesso for null ou situação for null
+     * @throws IllegalArgumentException se situação do subprocesso for null
      */
     public void validarSituacaoPermitida(@NonNull Subprocesso subprocesso, @NonNull Set<SituacaoSubprocesso> permitidas) {
-        if (subprocesso == null || subprocesso.getSituacao() == null) {
-            throw new IllegalArgumentException("Subprocesso e sua situação não podem ser nulos");
+        if (subprocesso.getSituacao() == null) {
+            throw new IllegalArgumentException("Situação do subprocesso não pode ser nula");
         }
         
         if (permitidas.isEmpty()) {

@@ -14,7 +14,7 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.dto.CompetenciaRequest;
@@ -133,7 +133,7 @@ public class SubprocessoFacade {
     }
 
     @Transactional(readOnly = true)
-    public List<AtividadeVisualizacaoDto> listarAtividadesSubprocesso(Long codigo) {
+    public List<AtividadeDto> listarAtividadesSubprocesso(Long codigo) {
         return atividadeService.listarAtividadesSubprocesso(codigo);
     }
 

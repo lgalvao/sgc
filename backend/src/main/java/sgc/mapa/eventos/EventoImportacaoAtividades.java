@@ -1,4 +1,4 @@
-package sgc.mapa.evento;
+package sgc.mapa.eventos;
 
 import lombok.Builder;
 import lombok.Getter;

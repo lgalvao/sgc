@@ -6,12 +6,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.evento.EventoImportacaoAtividades;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
+import sgc.mapa.dto.visualizacao.ConhecimentoDto;
+import sgc.mapa.eventos.EventoImportacaoAtividades;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
-import sgc.subprocesso.dto.ConhecimentoVisualizacaoDto;
 import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
@@ -123,7 +123,7 @@ class SubprocessoAtividadeService {
      * @return lista de atividades com seus conhecimentos
      */
     @Transactional(readOnly = true)
-    public List<AtividadeVisualizacaoDto> listarAtividadesSubprocesso(Long codSubprocesso) {
+    public List<AtividadeDto> listarAtividadesSubprocesso(Long codSubprocesso) {
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
         List<Atividade> todasAtividades = mapaManutencaoService
                 .buscarAtividadesPorMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
@@ -136,15 +136,15 @@ class SubprocessoAtividadeService {
      * @param atividade atividade a transformar
      * @return DTO com dados da atividade e seus conhecimentos
      */
-    private AtividadeVisualizacaoDto mapAtividadeToDto(Atividade atividade) {
-        List<ConhecimentoVisualizacaoDto> conhecimentosDto = atividade.getConhecimentos().stream()
-                .map(c -> ConhecimentoVisualizacaoDto.builder()
+    private AtividadeDto mapAtividadeToDto(Atividade atividade) {
+        List<ConhecimentoDto> conhecimentosDto = atividade.getConhecimentos().stream()
+                .map(c -> ConhecimentoDto.builder()
                         .codigo(c.getCodigo())
                         .descricao(c.getDescricao())
                         .build())
                 .toList();
 
-        return AtividadeVisualizacaoDto.builder()
+        return AtividadeDto.builder()
                 .codigo(atividade.getCodigo())
                 .descricao(atividade.getDescricao())
                 .conhecimentos(conhecimentosDto)
