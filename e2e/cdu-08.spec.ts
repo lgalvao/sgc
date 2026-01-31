@@ -1,19 +1,14 @@
-import {expect, test} from './fixtures/auth-fixtures';
+import {expect, test} from './fixtures/complete-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import * as AtividadeHelpers from './helpers/helpers-atividades';
 import {fazerLogout} from './helpers/helpers-navegacao';
 import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
-import {resetDatabase} from './hooks/hooks-limpeza';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_11';
     const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
-
-    test.beforeEach(async ({request}) => {
-        await resetDatabase(request);
-    });
 
     test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({page, autenticadoComoAdmin}) => {
         const timestamp = Date.now();

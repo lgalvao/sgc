@@ -12,6 +12,8 @@ import org.springframework.boot.DefaultApplicationArguments;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.ValidadorDadosOrgService;
+import sgc.testutils.UnidadeTestBuilder;
+import sgc.testutils.UsuarioTestBuilder;
 
 import java.util.List;
 
@@ -33,21 +35,19 @@ class ValidadorDadosOrgServiceTest {
     private ValidadorDadosOrgService validador;
 
     private Unidade criarUnidadeValida(Long codigo, String sigla, TipoUnidade tipo) {
-        Unidade u = new Unidade();
-        u.setCodigo(codigo);
-        u.setSigla(sigla);
-        u.setTipo(tipo);
-        u.setSituacao(SituacaoUnidade.ATIVA);
-        u.setTituloTitular("TITULO_" + codigo);
-        return u;
+        return UnidadeTestBuilder.umaDe()
+                .comCodigo(String.valueOf(codigo))
+                .comSigla(sigla)
+                .comTipo(tipo)
+                .comTituloTitular("TITULO_" + codigo)
+                .build();
     }
 
     private Usuario criarUsuarioValido(String titulo) {
-        Usuario u = new Usuario();
-        u.setTituloEleitoral(titulo);
-        u.setNome("Nome " + titulo);
-        u.setEmail(titulo.toLowerCase() + "@email.com");
-        return u;
+        return UsuarioTestBuilder.umDe()
+                .comTitulo(titulo)
+                .comNome("Nome " + titulo)
+                .build();
     }
 
     @Nested

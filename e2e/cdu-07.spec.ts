@@ -1,21 +1,13 @@
-import {expect, test} from './fixtures/auth-fixtures';
+import {expect, test} from './fixtures/complete-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso, verificarDetalhesSubprocesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe('CDU-07 - Detalhar subprocesso', () => {
     const UNIDADE_ALVO = 'SECAO_121';
     const CHEFE_UNIDADE = USUARIOS.CHEFE_SECAO_121.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_121.senha;
-    let cleanup: ReturnType<typeof useProcessoCleanup>;
 
-    test.beforeAll(async ({request}) => await resetDatabase(request));
-
-    test.beforeEach(() => cleanup = useProcessoCleanup());
-
-    test.afterEach(async ({request}) => await cleanup.limpar(request));
-
-    test('Deve exibir detalhes do subprocesso para CHEFE', async ({page, autenticadoComoAdmin}) => {
+    test('Deve exibir detalhes do subprocesso para CHEFE', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-07 ${timestamp}`;
 
@@ -53,7 +45,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
 
         // Capturar ID do processo para cleanup
         const processoId = parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
-        if (processoId > 0) cleanup.registrar(processoId);
+        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         // 3. Verificar seções da tela
 
