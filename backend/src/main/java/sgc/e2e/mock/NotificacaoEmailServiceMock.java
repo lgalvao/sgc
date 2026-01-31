@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import sgc.notificacao.NotificacaoEmailService;
 
 /**
- * Mock do serviço de notificações. Herda de NotificacaoEmailService para compatibilidade total.
+ * Mock do serviço de notificações.
  * Sobrescreve apenas os métodos públicos para evitar envio real de e-mails.
  */
 @Service

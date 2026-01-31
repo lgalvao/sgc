@@ -1,9 +1,11 @@
-import {expect, test} from './fixtures/complete-fixtures';
-import {criarProcesso} from './helpers/helpers-processos';
+import {expect, test} from './fixtures/complete-fixtures.js';
+import {criarProcesso} from './helpers/helpers-processos.js';
+import type { Page } from '@playwright/test';
+import type { useProcessoCleanup } from './hooks/hooks-limpeza.js';
 
 test.describe('CDU-03 - Manter Processo', () => {
 
-    test('Deve validar campos obrigatórios', async ({page, autenticadoComoAdmin}) => {
+    test('Deve validar campos obrigatórios', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
 
@@ -29,7 +31,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page.getByTestId('btn-processo-iniciar')).toBeEnabled();
     });
 
-    test('Deve editar um processo existente', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Deve editar um processo existente', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {page: Page, autenticadoComoAdmin: void, cleanupAutomatico: ReturnType<typeof useProcessoCleanup>}) => {
         const descricaoOriginal = `Processo para Edição - ${Date.now()}`;
         // Cria um processo inicial
         await criarProcesso(page, {
@@ -44,7 +46,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByText(descricaoOriginal).click();
         await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/);
         const url = new URL(page.url());
-        const processoId = parseInt(url.searchParams.get('codProcesso') || '0');
+        const processoId = Number.parseInt(url.searchParams.get('codProcesso') || '0');
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         // Verifica que os dados foram carregados
@@ -66,7 +68,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page.getByText(descricaoOriginal, {exact: true})).not.toBeVisible();
     });
 
-    test('Deve remover um processo', async ({page, autenticadoComoAdmin}) => {
+    test('Deve remover um processo', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
         const descricao = `Processo para Remoção - ${Date.now()}`;
         await criarProcesso(page, {
             descricao: descricao,

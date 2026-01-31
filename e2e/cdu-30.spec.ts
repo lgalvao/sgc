@@ -1,6 +1,7 @@
-import {expect, test} from './fixtures/auth-fixtures';
-import {login, USUARIOS} from './helpers/helpers-auth';
-import {resetDatabase} from './hooks/hooks-limpeza';
+import type { Page } from '@playwright/test';
+import {expect, test} from './fixtures/auth-fixtures.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {resetDatabase} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-30 - Manter Administradores
@@ -28,7 +29,7 @@ test.describe.serial('CDU-30 - Manter Administradores', () => {
     // CENÁRIO 1: Navegação para página de administradores
     // ========================================================================
 
-    test('Cenario 1: ADMIN acessa página de configurações', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN acessa página de configurações', (async ({page: Page, autenticadoComoAdmin: void}) => {
         
 
         // Acessar configurações
@@ -40,7 +41,7 @@ test.describe.serial('CDU-30 - Manter Administradores', () => {
     // CENÁRIO 2: Verificar seção de administradores
     // ========================================================================
 
-    test('Cenario 2: Página de configurações contém seção de administradores', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 2: Página de configurações contém seção de administradores', (async ({page: Page, autenticadoComoAdmin: void}) => {
         
 
         await page.getByTestId('btn-configuracoes').click();
@@ -68,7 +69,7 @@ test.describe.serial('CDU-30 - Manter Administradores', () => {
     // CENÁRIO 3: Verificar lista de administradores
     // ========================================================================
 
-    test('Cenario 3: Lista de administradores é exibida', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 3: Lista de administradores é exibida', (async ({page: Page, autenticadoComoAdmin: void}) => {
         
 
         await page.getByTestId('btn-configuracoes').click();

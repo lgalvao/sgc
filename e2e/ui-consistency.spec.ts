@@ -1,5 +1,6 @@
-import { expect, test } from './fixtures/base';
-import { login, USUARIOS } from './helpers/helpers-auth';
+import type { Page } from '@playwright/test';
+import { expect, test } from './fixtures/base.js';
+import { login, USUARIOS } from './helpers/helpers-auth.js';
 
 test.describe('UI Consistency & Accessibility', () => {
 
@@ -9,7 +10,7 @@ test.describe('UI Consistency & Accessibility', () => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
     });
 
-    test('All views have consistent page headers', async ({ page }) => {
+    test('All views have consistent page headers', (async ({page: Page}) => {
         const views = [
             '/painel',
             '/configuracoes',
@@ -35,7 +36,7 @@ test.describe('UI Consistency & Accessibility', () => {
         }
     });
 
-    test('Interactive elements are keyboard accessible (Tab navigation)', async ({ page }) => {
+    test('Interactive elements are keyboard accessible (Tab navigation)', (async ({page: Page}) => {
         await page.goto('/painel');
 
         // Ensure body is focused

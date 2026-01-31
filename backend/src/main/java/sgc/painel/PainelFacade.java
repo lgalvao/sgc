@@ -108,19 +108,17 @@ public class PainelFacade {
 
         return alertasPage.map(
                 alerta -> {
-                    LocalDateTime dataHoraLeitura = alertaService
-                            .obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo)
-                            .orElse(null);
+                    LocalDateTime dataHoraLeitura = alertaService.obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo).orElse(null);
                     return paraAlertaDto(alerta, dataHoraLeitura);
                 });
     }
 
     private ProcessoResumoDto paraProcessoResumoDto(Processo processo, Perfil perfil, Long codigoUnidade) {
         Set<Unidade> participantes = processo.getParticipantes();
-        
+
         // As invariantes de BD e o @NullMarked garantem que participantes nunca é null e processos no painel têm ao menos um participante.
         Unidade participante = participantes.iterator().next();
-        
+
         Long codUnidMapeado = participante.getCodigo();
         String nomeUnidMapeado = participante.getNome();
 
@@ -198,7 +196,7 @@ public class PainelFacade {
             return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
         } catch (Exception e) {
             log.warn("Erro ao calcular link de destino para o processo {}: {}", processo.getCodigo(), e.getMessage());
-            return null;
+            return "";
         }
     }
 

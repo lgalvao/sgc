@@ -35,7 +35,6 @@ import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
 import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
 
@@ -68,8 +67,6 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
     private SubprocessoCadastroWorkflowService cadastroWorkflowService;
     @Autowired
     private SubprocessoMapaWorkflowService mapaWorkflowService;
-    @Autowired
-    private SubprocessoAdminWorkflowService adminWorkflowService;
     @Autowired
     private MapaManutencaoService mapaManutencaoService;
     @Autowired

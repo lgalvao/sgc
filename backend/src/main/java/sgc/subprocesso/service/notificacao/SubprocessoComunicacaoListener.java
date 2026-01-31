@@ -48,7 +48,8 @@ public class SubprocessoComunicacaoListener {
 
     private void criarAlerta(Subprocesso sp, EventoTransicaoSubprocesso evento) {
         TipoTransicao tipo = evento.getTipo();
-        String descricao = tipo.formatarAlerta(sp.getUnidade().getSigla());
+        String sigla = sp.getUnidade().getSigla();
+        String descricao = tipo.formatarAlerta(sigla);
 
         alertaService.criarAlertaTransicao(
                 sp.getProcesso(),

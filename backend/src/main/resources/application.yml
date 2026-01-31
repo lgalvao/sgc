@@ -57,7 +57,7 @@ logging:
     org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR
     sgc: INFO
 aplicacao:
-  ambiente-testes: false
+  ambiente-testes: true
   acesso-ad:
     base-url: https://sedesenvdev01.tre-pe.gov.br/acessoAD
     codigo-sistema: SGC

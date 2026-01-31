@@ -12,8 +12,6 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
 
 import java.util.Collections;

@@ -231,12 +231,12 @@ void deveLogarAcaoDeSeguranca() {
 
 ### Diferença Fundamental
 
-| ❌ Testa Implementação | ✅ Testa Comportamento |
-|----------------------|----------------------|
+| ❌ Testa Implementação                | ✅ Testa Comportamento                                      |
+|--------------------------------------|------------------------------------------------------------|
 | `verify(repo, times(1)).save(any())` | `assertEquals(StatusProcesso.ATIVO, processo.getStatus())` |
-| `verify(mapper).toDto(any())` | `assertNotNull(response.getTitulo())` |
-| `verify(validator).validar(any())` | `assertThrows(ErroValidacao.class, ...)` |
-| Quebra com refatoração | Quebra apenas com mudança de comportamento |
+| `verify(mapper).toDto(any())`        | `assertNotNull(response.getTitulo())`                      |
+| `verify(validator).validar(any())`   | `assertThrows(ErroValidacao.class, ...)`                   |
+| Quebra com refatoração               | Quebra apenas com mudança de comportamento                 |
 
 ---
 

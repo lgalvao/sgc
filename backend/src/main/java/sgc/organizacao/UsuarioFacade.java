@@ -31,8 +31,6 @@ import static java.util.stream.Collectors.toMap;
 @Slf4j
 @RequiredArgsConstructor
 public class UsuarioFacade {
-    private static final String ENTIDADE_USUARIO = "Usuário";
-
     private final UsuarioConsultaService usuarioConsultaService;
     private final UsuarioPerfilService usuarioPerfilService;
     private final AdministradorService administradorService;

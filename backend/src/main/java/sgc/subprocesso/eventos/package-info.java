@@ -91,7 +91,7 @@
  * criar muitos eventos separados.
  *
  * @see sgc.processo.eventos Eventos de processo (eventos separados)
- * @see sgc.mapa.evento Eventos de mapa
+ * @see sgc.mapa.eventos Eventos de mapa
  * @since 1.0
  */
 @NullMarked

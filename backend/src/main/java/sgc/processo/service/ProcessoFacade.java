@@ -50,8 +50,6 @@ public class ProcessoFacade {
     private final ProcessoAcessoService processoAcessoService;
     private final ProcessoFinalizador processoFinalizador;
 
-    private static final String ENTIDADE_PROCESSO = "Processo";
-
     /**
      * Busca um processo por ID ou lança exceção se não encontrado.
      */

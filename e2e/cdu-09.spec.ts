@@ -1,9 +1,10 @@
-import {expect, test} from './fixtures/complete-fixtures';
-import {login, USUARIOS} from './helpers/helpers-auth';
-import {criarProcesso} from './helpers/helpers-processos';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
-import {abrirHistoricoAnalise, acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
-import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
+import type { Page } from '@playwright/test';
+import {expect, test} from './fixtures/complete-fixtures.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {criarProcesso} from './helpers/helpers-processos.js';
+import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {abrirHistoricoAnalise, acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
+import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {Page} from '@playwright/test';
 
 async function verificarPaginaSubprocesso(page: Page) {
@@ -18,7 +19,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
     const timestamp = Date.now();
     const descProcesso = `Proc 9 ${timestamp}`;
 
-    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Preparacao: Admin cria e inicia processo', (async ({page: Page, autenticadoComoAdmin: void, cleanupAutomatico: any}) => {
         
 
         await criarProcesso(page, {
@@ -38,7 +39,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
 
         // Capturar ID do processo para cleanup
-        const processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        const processoId = Number.Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -46,7 +47,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await verificarPaginaPainel(page);
     });
 
-    test('Cenario 1: Validacao - Atividade sem conhecimento', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 1: Validacao - Atividade sem conhecimento', (async ({page: Page, autenticadoComoAdmin: void}) => {
         // Login como Chefe
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
@@ -81,7 +82,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.getByRole('button', {name: 'Cancelar'}).click();
     });
 
-    test('Cenario 2: Caminho feliz - Disponibilizar Cadastro', async ({page}) => {
+    test('Cenario 2: Caminho feliz - Disponibilizar Cadastro', (async ({page: Page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcesso);
         await navegarParaAtividades(page);
@@ -109,7 +110,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
     });
 
-    test('Cenario 3: Devolucao e Historico de Analise', async ({page}) => {
+    test('Cenario 3: Devolucao e Historico de Analise', (async ({page: Page}) => {
         // 1. Admin devolve o cadastro
         
 

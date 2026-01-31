@@ -47,7 +47,6 @@ class AnaliseControllerTest {
     private static final String API_SUBPROCESSOS_1_ANALISES_VALIDACAO = "/api/subprocessos/1/analises-validacao";
     private static final String API_SUBPROCESSOS_99_ANALISES_VALIDACAO = "/api/subprocessos/99/analises-validacao";
     private static final String NOVA_ANALISE_DE_VALIDACAO = "Nova análise de validação";
-    private static final String ANALISE_DE_VALIDACAO = "Análise de validação";
 
     @Autowired
     private MockMvc mockMvc;

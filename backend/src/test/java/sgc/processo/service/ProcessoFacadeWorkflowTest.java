@@ -20,7 +20,6 @@ import sgc.processo.model.Processo;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.service.SubprocessoFacade;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 
@@ -60,7 +59,7 @@ class ProcessoFacadeWorkflowTest {
     private ProcessoFacade processoFacade;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         processoFacade = new ProcessoFacade(
             processoConsultaService,
             processoManutencaoService,

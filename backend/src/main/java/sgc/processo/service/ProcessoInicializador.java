@@ -6,6 +6,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeMapa;
+import sgc.organizacao.model.UnidadeMapaRepo;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.erros.ErroUnidadesNaoDefinidas;
@@ -17,16 +19,10 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static sgc.processo.model.SituacaoProcesso.CRIADO;
-import java.util.Map;
-import sgc.organizacao.model.UnidadeMapa;
-import sgc.organizacao.model.UnidadeMapaRepo;
 
 /**
  * Serviço responsável pela inicialização de processos.
@@ -68,7 +64,7 @@ public class ProcessoInicializador {
                 throw new ErroUnidadesNaoDefinidas("A lista de unidades é obrigatória para iniciar o processo de revisão.");
             }
             codigosUnidades = codsUnidadesParam;
-            unidadesParaProcessar = null; // Será buscado individualmente via Repo se necessário
+            unidadesParaProcessar = Set.of(); // Será buscado individualmente via Repo se necessário
         } else {
             // Mapeamento e Diagnóstico usam participantes do processo
             Set<Unidade> participantes = processo.getParticipantes();

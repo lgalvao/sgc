@@ -1,8 +1,9 @@
-import {expect, test} from './fixtures/complete-fixtures';
-import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
+import type { Page } from '@playwright/test';
+import {expect, test} from './fixtures/complete-fixtures.js';
+import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 
 test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
-    test('Deve iniciar um processo com sucesso', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Deve iniciar um processo com sucesso', (async ({page: Page, autenticadoComoAdmin: void, cleanupAutomatico: any}) => {
         const descricao = `Processo para Iniciar - ${Date.now()}`;
 
         // 1. Cria processo em estado 'Criado'
@@ -19,7 +20,7 @@ test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
         await expect(page).toHaveURL(/\/processo\/cadastro/);
 
         // Capturar ID do processo para cleanup
-        const processoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+        const processoId = Number.parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         // Aguarda carregamento dos dados

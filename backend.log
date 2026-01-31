@@ -1,0 +1,27 @@
+INFO  sgc.Sgc.logStarting:54 - Starting Sgc v1.0.0 using Java 25.0.1 with PID 90499 (/Users/leonardo/sgc/backend/build/libs/backend-1.0.0.jar started by leonardo in /Users/leonardo/sgc/backend)
+INFO  sgc.Sgc.logStartupProfileInfo:658 - The following 1 profile is active: "e2e"
+INFO  o.a.c.core.StandardService.log:168 - Starting service [Tomcat]
+INFO  o.a.c.core.StandardEngine.log:168 - Starting Servlet engine: [Apache Tomcat/11.0.15]
+WARN  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão.
+INFO  s.e.m.NotificacaoEmailServiceMock.<init>:21 - NotificacaoEmailServiceMock ATIVADO - E-mails serão mockados
+INFO  sgc.Sgc.logStarted:60 - Started Sgc in 4.326 seconds (process running for 4.658)
+INFO  s.o.s.ValidadorDadosOrgService.run:53 - Validando integridade dos dados organizacionais...
+INFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
+INFO  o.a.c.c.C.[.[localhost].[/].log:168 - Initializing Spring DispatcherServlet 'dispatcherServlet'
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.
+WARN  s.seguranca.login.LoginFacade.autenticar:72 - Cliente AD não configurado e ambiente não é de testes.

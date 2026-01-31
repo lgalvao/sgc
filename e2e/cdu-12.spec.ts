@@ -1,6 +1,7 @@
-import {expect, test} from './fixtures/auth-fixtures';
-import {login, USUARIOS} from './helpers/helpers-auth';
-import {criarProcesso} from './helpers/helpers-processos';
+import type { Page } from '@playwright/test';
+import {expect, test} from './fixtures/auth-fixtures.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {criarProcesso} from './helpers/helpers-processos.js';
 import {
     abrirModalImpacto,
     adicionarAtividade,
@@ -11,11 +12,11 @@ import {
     removerAtividade,
     verificarBotaoImpactoDireto,
     verificarBotaoImpactoDropdown
-} from './helpers/helpers-atividades';
-import {fazerLogout, limparNotificacoes, navegarParaSubprocesso} from './helpers/helpers-navegacao';
-import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
-import {criarCompetencia} from './helpers/helpers-mapas';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+} from './helpers/helpers-atividades.js';
+import {fazerLogout, limparNotificacoes, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
+import {criarCompetencia} from './helpers/helpers-mapas.js';
+import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_221';
@@ -60,7 +61,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await expect(linhaProcesso).toBeVisible();
         await linhaProcesso.click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
-        codProcessoMapeamento = Number.parseInt(new RegExp(/(?:codProcesso=|\/cadastro\/)(\d+)/).exec(page.url())?.[1] || '0');
+        codProcessoMapeamento = Number.Number.parseInt(new RegExp(/(?:codProcesso=|\/cadastro\/)(\d+)/).exec(page.url())?.[1] || '0');
         if (codProcessoMapeamento > 0) cleanup.registrar(codProcessoMapeamento);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -160,7 +161,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
     });
 
-    test('Preparacao 2: Iniciar Processo de Revisão', async ({page, autenticadoComoAdmin, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 2: Iniciar Processo de Revisão', (async ({page: Page, autenticadoComoAdmin: void, autenticadoComoChefeSecao221: void}) => {
         
         await criarProcesso(page, {
             descricao: descProcessoRevisao,
@@ -174,7 +175,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await expect(linhaProcesso).toBeVisible();
         await linhaProcesso.click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
-        processoRevisaoId = Number.parseInt(new RegExp(/(?:codProcesso=|\/cadastro\/)(\d+)/).exec(page.url())?.[1] || '0');
+        processoRevisaoId = Number.Number.parseInt(new RegExp(/(?:codProcesso=|\/cadastro\/)(\d+)/).exec(page.url())?.[1] || '0');
         if (processoRevisaoId > 0) cleanup.registrar(processoRevisaoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -185,7 +186,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     // TESTES CDU-12
     // ========================================================================
 
-    test('Cenario 1: Verificar Sem Impactos (Estado Inicial)', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 1: Verificar Sem Impactos (Estado Inicial)', (async ({page: Page, autenticadoComoAdmin: void}) => {
         
 
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
@@ -200,7 +201,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await expect(page.getByText('Nenhum impacto detectado no mapa.')).toBeVisible();
     });
 
-    test('Cenario 2: Verificar Impacto de Inclusão de Atividade', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 2: Verificar Impacto de Inclusão de Atividade', (async ({page: Page, autenticadoComoChefeSecao221: void}) => {
         
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -222,7 +223,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fecharModalImpacto(page);
     });
 
-    test('Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)', (async ({page: Page, autenticadoComoChefeSecao221: void}) => {
         
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -247,7 +248,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fecharModalImpacto(page);
     });
 
-    test('Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)', (async ({page: Page, autenticadoComoChefeSecao221: void}) => {
         
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -272,7 +273,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fecharModalImpacto(page);
     });
 
-    test('Cenario 5: Verificar visualização pelo Admin (Somente Leitura)', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 5: Verificar visualização pelo Admin (Somente Leitura)', (async ({page: Page, autenticadoComoChefeSecao221: void}) => {
         // Chefe disponibiliza a revisão
         
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);

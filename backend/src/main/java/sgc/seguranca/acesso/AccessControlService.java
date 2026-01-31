@@ -88,7 +88,9 @@ public class AccessControlService {
             case Processo p -> motivoPolicy = processoAccessPolicy.getMotivoNegacao();
             case Atividade a -> motivoPolicy = atividadeAccessPolicy.getMotivoNegacao();
             case Mapa m -> motivoPolicy = mapaAccessPolicy.getMotivoNegacao();
-            default -> {}
+            default -> {
+                // Outros tipos de recursos não possuem policies específicas
+            }
         }
 
         if (motivoPolicy != null && !motivoPolicy.isBlank()) {

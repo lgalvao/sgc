@@ -1,9 +1,10 @@
-import {expect, test} from './fixtures/auth-fixtures';
-import {login, USUARIOS} from './helpers/helpers-auth';
-import {criarProcesso} from './helpers/helpers-processos';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
-import {verificarPaginaPainel} from './helpers/helpers-navegacao';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+import type { Page } from '@playwright/test';
+import {expect, test} from './fixtures/auth-fixtures.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {criarProcesso} from './helpers/helpers-processos.js';
+import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-22 - Aceitar cadastros em bloco
@@ -52,7 +53,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, autenticadoComoGestorCoord22, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', (async ({page: Page, autenticadoComoAdmin: void, autenticadoComoGestorCoord22: void, autenticadoComoChefeSecao221: void}) => {
         
 
         await criarProcesso(page, {
@@ -66,7 +67,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = Number.Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanup.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -75,7 +76,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', (async ({page: Page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -94,7 +95,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: GESTOR visualiza botão Aceitar em Bloco', async ({page}) => {
+    test('Cenario 1: GESTOR visualiza botão Aceitar em Bloco', (async ({page: Page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -108,7 +109,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         }
     });
 
-    test('Cenario 2: GESTOR abre modal de aceite em bloco', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 2: GESTOR abre modal de aceite em bloco', (async ({page: Page, autenticadoComoGestorCoord22: void}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -129,7 +130,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         }
     });
 
-    test('Cenario 3: Cancelar aceite em bloco permanece na tela', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 3: Cancelar aceite em bloco permanece na tela', (async ({page: Page, autenticadoComoGestorCoord22: void}) => {
         
 
         await page.getByText(descProcesso).click();

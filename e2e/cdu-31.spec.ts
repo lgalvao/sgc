@@ -1,6 +1,7 @@
-import {expect, test} from './fixtures/auth-fixtures';
-import {login, USUARIOS} from './helpers/helpers-auth';
-import {resetDatabase} from './hooks/hooks-limpeza';
+import type { Page } from '@playwright/test';
+import {expect, test} from './fixtures/auth-fixtures.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {resetDatabase} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-31 - Configurar sistema
@@ -25,7 +26,7 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
     // CENÁRIO 1: Navegação para configurações
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para configurações', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN navega para configurações', (async ({page: Page, autenticadoComoAdmin: void}) => {
         // CDU-31: Passos 1-2
         
 
@@ -41,7 +42,7 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
     // CENÁRIO 2: Visualizar configurações atuais
     // ========================================================================
 
-    test('Cenario 2: Tela exibe configurações editáveis', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 2: Tela exibe configurações editáveis', (async ({page: Page, autenticadoComoAdmin: void}) => {
         
 
         await page.getByTestId('btn-configuracoes').click();
@@ -60,7 +61,7 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
     // CENÁRIO 3: Salvar configurações
     // ========================================================================
 
-    test('Cenario 3: ADMIN salva configurações com sucesso', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 3: ADMIN salva configurações com sucesso', (async ({page: Page, autenticadoComoAdmin: void}) => {
         // CDU-31: Passos 3-4
         
 

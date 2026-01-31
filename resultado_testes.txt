@@ -1,0 +1,408 @@
+
+> sgc-e2e@1.0.0 test:e2e
+> playwright test
+
+
+Running 242 tests using 1 worker
+
+[1A[2K[1/242] [chromium] › e2e/captura-telas.spec.ts:58:9 › Captura de Telas - Sistema SGC › 01 - Autenticação › Captura telas de login
+[1A[2K  1) [chromium] › e2e/captura-telas.spec.ts:58:9 › Captura de Telas - Sistema SGC › 01 - Autenticação › Captura telas de login 
+
+    [31mTest timeout of 15000ms exceeded.[39m
+
+    Error: locator.fill: Test timeout of 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('inp-login-usuario')[22m
+
+
+      61 |
+      62 |             // Erro de credenciais inválidas
+    > 63 |             await page.getByTestId('inp-login-usuario').fill(USUARIOS.INVALIDO.titulo);
+         |                                                         ^
+      64 |             await page.getByTestId('inp-login-senha').fill(USUARIOS.INVALIDO.senha);
+      65 |             await page.getByTestId('btn-login-entrar').click();
+      66 |             await page.waitForTimeout(500);
+        at /Users/leonardo/sgc/e2e/captura-telas.spec.ts:63:57
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/captura-telas-Captura-de-T-69201-ação-Captura-telas-de-login-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[2/242] [chromium] › e2e/captura-telas.spec.ts:84:9 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel ADMIN
+[1A[2K[chromium] › e2e/captura-telas.spec.ts:84:9 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel ADMIN
+[BROWSER ERROR] Failed to load resource: the server responded with a status of 403 ()
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[NETWORK ERROR] 403 POST http://localhost:10000/api/usuarios/autenticar
+
+[1A[2K[NETWORK BODY] {"timestamp":"2026-01-31T17:41:16.446Z","status":403,"error":"Forbidden","message":"Forbidden","path":"/api/usuarios/autenticar"}
+
+[1A[2K[BROWSER ERROR] %cerror%c Erro no login: 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+[1A[2K  2) [chromium] › e2e/captura-telas.spec.ts:84:9 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel ADMIN 
+
+    [31mTest timeout of 15000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 15000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "/painel" until "load"
+    ============================================================
+
+       at helpers/helpers-auth.ts:33
+
+      31 |     await page.goto('/login');
+      32 |     await autenticar(page, usuario, senha);
+    > 33 |     await page.waitForURL('/painel');
+         |                ^
+      34 | }
+      35 |
+      36 | export async function loginComPerfil(page: Page, usuario: string, senha: string, perfilUnidade: string) {
+        at login (/Users/leonardo/sgc/e2e/helpers/helpers-auth.ts:33:16)
+        at /Users/leonardo/sgc/e2e/captura-telas.spec.ts:85:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/captura-telas-Captura-de-T-154a4-ncipal-Captura-painel-ADMIN-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/captura-telas-Captura-de-T-154a4-ncipal-Captura-painel-ADMIN-chromium/error-context.md
+
+
+[1A[2K[3/242] [chromium] › e2e/captura-telas.spec.ts:141:9 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel GESTOR
+[1A[2K[chromium] › e2e/captura-telas.spec.ts:141:9 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel GESTOR
+[BROWSER ERROR] Failed to load resource: the server responded with a status of 403 ()
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[NETWORK ERROR] 403 POST http://localhost:10000/api/usuarios/autenticar
+
+[1A[2K[NETWORK BODY] {"timestamp":"2026-01-31T17:41:32.206Z","status":403,"error":"Forbidden","message":"Forbidden","path":"/api/usuarios/autenticar"}
+
+[1A[2K[BROWSER ERROR] %cerror%c Erro no login: 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+[1A[2K  3) [chromium] › e2e/captura-telas.spec.ts:141:9 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel GESTOR 
+
+    [31mTest timeout of 15000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 15000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "/painel" until "load"
+    ============================================================
+
+       at helpers/helpers-auth.ts:33
+
+      31 |     await page.goto('/login');
+      32 |     await autenticar(page, usuario, senha);
+    > 33 |     await page.waitForURL('/painel');
+         |                ^
+      34 | }
+      35 |
+      36 | export async function loginComPerfil(page: Page, usuario: string, senha: string, perfilUnidade: string) {
+        at login (/Users/leonardo/sgc/e2e/helpers/helpers-auth.ts:33:16)
+        at /Users/leonardo/sgc/e2e/captura-telas.spec.ts:143:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/captura-telas-Captura-de-T-ec051-cipal-Captura-painel-GESTOR-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/captura-telas-Captura-de-T-ec051-cipal-Captura-painel-GESTOR-chromium/error-context.md
+
+
+[1A[2K[4/242] [chromium] › e2e/captura-telas.spec.ts:161:9 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel CHEFE
+[1A[2K[chromium] › e2e/captura-telas.spec.ts:161:9 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel CHEFE
+[BROWSER ERROR] Failed to load resource: the server responded with a status of 403 ()
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[NETWORK ERROR] 403 POST http://localhost:10000/api/usuarios/autenticar
+
+[1A[2K[NETWORK BODY] {"timestamp":"2026-01-31T17:41:47.985Z","status":403,"error":"Forbidden","message":"Forbidden","path":"/api/usuarios/autenticar"}
+
+[1A[2K[BROWSER ERROR] %cerror%c Erro no login: 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+[1A[2K  4) [chromium] › e2e/captura-telas.spec.ts:161:9 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel CHEFE 
+
+    [31mTest timeout of 15000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 15000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "/painel" until "load"
+    ============================================================
+
+       at helpers/helpers-auth.ts:33
+
+      31 |     await page.goto('/login');
+      32 |     await autenticar(page, usuario, senha);
+    > 33 |     await page.waitForURL('/painel');
+         |                ^
+      34 | }
+      35 |
+      36 | export async function loginComPerfil(page: Page, usuario: string, senha: string, perfilUnidade: string) {
+        at login (/Users/leonardo/sgc/e2e/helpers/helpers-auth.ts:33:16)
+        at /Users/leonardo/sgc/e2e/captura-telas.spec.ts:163:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/captura-telas-Captura-de-T-02376-ncipal-Captura-painel-CHEFE-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/captura-telas-Captura-de-T-02376-ncipal-Captura-painel-CHEFE-chromium/error-context.md
+
+
+[1A[2K[5/242] [chromium] › e2e/captura-telas.spec.ts:183:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura criação e detalhamento de processo
+[1A[2K[chromium] › e2e/captura-telas.spec.ts:183:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura criação e detalhamento de processo
+[BROWSER ERROR] Failed to load resource: the server responded with a status of 403 ()
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[NETWORK ERROR] 403 POST http://localhost:10000/api/usuarios/autenticar
+
+[1A[2K[NETWORK BODY] {"timestamp":"2026-01-31T17:42:03.769Z","status":403,"error":"Forbidden","message":"Forbidden","path":"/api/usuarios/autenticar"}
+
+[1A[2K[BROWSER ERROR] %cerror%c Erro no login: 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+[1A[2K  5) [chromium] › e2e/captura-telas.spec.ts:183:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura criação e detalhamento de processo 
+
+    [31mTest timeout of 15000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 15000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "/painel" until "load"
+    ============================================================
+
+       at helpers/helpers-auth.ts:33
+
+      31 |     await page.goto('/login');
+      32 |     await autenticar(page, usuario, senha);
+    > 33 |     await page.waitForURL('/painel');
+         |                ^
+      34 | }
+      35 |
+      36 | export async function loginComPerfil(page: Page, usuario: string, senha: string, perfilUnidade: string) {
+        at login (/Users/leonardo/sgc/e2e/helpers/helpers-auth.ts:33:16)
+        at /Users/leonardo/sgc/e2e/captura-telas.spec.ts:184:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/captura-telas-Captura-de-T-71937--e-detalhamento-de-processo-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/captura-telas-Captura-de-T-71937--e-detalhamento-de-processo-chromium/error-context.md
+
+
+[1A[2K[6/242] [chromium] › e2e/captura-telas.spec.ts:222:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura validações de formulário
+[1A[2K[chromium] › e2e/captura-telas.spec.ts:222:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura validações de formulário
+[BROWSER ERROR] Failed to load resource: the server responded with a status of 403 ()
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[NETWORK ERROR] 403 POST http://localhost:10000/api/usuarios/autenticar
+
+[1A[2K[NETWORK BODY] {"timestamp":"2026-01-31T17:42:19.530Z","status":403,"error":"Forbidden","message":"Forbidden","path":"/api/usuarios/autenticar"}
+
+[1A[2K[BROWSER ERROR] %cerror%c Erro no login: 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+[1A[2K  6) [chromium] › e2e/captura-telas.spec.ts:222:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura validações de formulário 
+
+    [31mTest timeout of 15000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 15000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "/painel" until "load"
+    ============================================================
+
+       at helpers/helpers-auth.ts:33
+
+      31 |     await page.goto('/login');
+      32 |     await autenticar(page, usuario, senha);
+    > 33 |     await page.waitForURL('/painel');
+         |                ^
+      34 | }
+      35 |
+      36 | export async function loginComPerfil(page: Page, usuario: string, senha: string, perfilUnidade: string) {
+        at login (/Users/leonardo/sgc/e2e/helpers/helpers-auth.ts:33:16)
+        at /Users/leonardo/sgc/e2e/captura-telas.spec.ts:223:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/captura-telas-Captura-de-T-7adac-ra-validações-de-formulário-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/captura-telas-Captura-de-T-7adac-ra-validações-de-formulário-chromium/error-context.md
+
+
+[1A[2K[7/242] [chromium] › e2e/captura-telas.spec.ts:255:9 › Captura de Telas - Sistema SGC › 04 - Subprocesso e Atividades › Captura fluxo completo de atividades
+[1A[2K[chromium] › e2e/captura-telas.spec.ts:255:9 › Captura de Telas - Sistema SGC › 04 - Subprocesso e Atividades › Captura fluxo completo de atividades
+[BROWSER ERROR] Failed to load resource: the server responded with a status of 403 ()
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[NETWORK ERROR] 403 POST http://localhost:10000/api/usuarios/autenticar
+
+[1A[2K[NETWORK BODY] {"timestamp":"2026-01-31T17:42:35.228Z","status":403,"error":"Forbidden","message":"Forbidden","path":"/api/usuarios/autenticar"}
+
+[1A[2K[BROWSER ERROR] %cerror%c Erro no login: 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+[1A[2K  7) [chromium] › e2e/captura-telas.spec.ts:255:9 › Captura de Telas - Sistema SGC › 04 - Subprocesso e Atividades › Captura fluxo completo de atividades 
+
+    [31mTest timeout of 15000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 15000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "/painel" until "load"
+    ============================================================
+
+       at helpers/helpers-auth.ts:33
+
+      31 |     await page.goto('/login');
+      32 |     await autenticar(page, usuario, senha);
+    > 33 |     await page.waitForURL('/painel');
+         |                ^
+      34 | }
+      35 |
+      36 | export async function loginComPerfil(page: Page, usuario: string, senha: string, perfilUnidade: string) {
+        at login (/Users/leonardo/sgc/e2e/helpers/helpers-auth.ts:33:16)
+        at /Users/leonardo/sgc/e2e/captura-telas.spec.ts:260:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/captura-telas-Captura-de-T-32b7b-luxo-completo-de-atividades-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/captura-telas-Captura-de-T-32b7b-luxo-completo-de-atividades-chromium/error-context.md
+
+
+[1A[2K[8/242] [chromium] › e2e/captura-telas.spec.ts:322:9 › Captura de Telas - Sistema SGC › 04 - Subprocesso e Atividades › Captura estados de validação inline de atividades
+[1A[2K[chromium] › e2e/captura-telas.spec.ts:322:9 › Captura de Telas - Sistema SGC › 04 - Subprocesso e Atividades › Captura estados de validação inline de atividades
+[BROWSER ERROR] Failed to load resource: the server responded with a status of 403 ()
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[NETWORK ERROR] 403 POST http://localhost:10000/api/usuarios/autenticar
+
+[1A[2K[NETWORK BODY] {"timestamp":"2026-01-31T17:42:50.915Z","status":403,"error":"Forbidden","message":"Forbidden","path":"/api/usuarios/autenticar"}
+
+[1A[2K[BROWSER ERROR] %cerror%c Erro no login: 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+[1A[2K  8) [chromium] › e2e/captura-telas.spec.ts:322:9 › Captura de Telas - Sistema SGC › 04 - Subprocesso e Atividades › Captura estados de validação inline de atividades 
+
+    [31mTest timeout of 15000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 15000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "/painel" until "load"
+    ============================================================
+
+       at helpers/helpers-auth.ts:33
+
+      31 |     await page.goto('/login');
+      32 |     await autenticar(page, usuario, senha);
+    > 33 |     await page.waitForURL('/painel');
+         |                ^
+      34 | }
+      35 |
+      36 | export async function loginComPerfil(page: Page, usuario: string, senha: string, perfilUnidade: string) {
+        at login (/Users/leonardo/sgc/e2e/helpers/helpers-auth.ts:33:16)
+        at /Users/leonardo/sgc/e2e/captura-telas.spec.ts:326:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/captura-telas-Captura-de-T-52d5c-idação-inline-de-atividades-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/captura-telas-Captura-de-T-52d5c-idação-inline-de-atividades-chromium/error-context.md
+
+
+[1A[2K[9/242] [chromium] › e2e/captura-telas.spec.ts:422:9 › Captura de Telas - Sistema SGC › 05 - Mapa de Competências › Captura fluxo de mapa de competências
+[1A[2K[chromium] › e2e/captura-telas.spec.ts:422:9 › Captura de Telas - Sistema SGC › 05 - Mapa de Competências › Captura fluxo de mapa de competências
+[Browser Console] error: Failed to load resource: the server responded with a status of 403 ()
+
+[1A[2K[BROWSER ERROR] Failed to load resource: the server responded with a status of 403 ()
+
+[1A[2K[Browser Console] warning: [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[Browser Console] error: %cerror%c Erro no login: 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      AxiosError: Request failed with status code 403
+    at settle (http://localhost:5173/node_modules/.vite/deps/axios.js?v=3b28c18e:1267:12)
+    at XMLHttpRequest.onloadend (http://localhost:5173/node_modules/.vite/deps/axios.js?v=3b28c18e:1616:7)
+    at Axios.request (http://localhost:5173/node_modules/.vite/deps/axios.js?v=3b28c18e:2233:41)
+    at async Module.autenticar (http://localhost:5173/src/services/usuarioService.ts:6:20)
+    at async http://localhost:5173/src/stores/perfil.ts:45:27
+    at async withErrorHandling (http://localhost:5173/src/composables/useErrorHandler.ts:11:14)
+    at async handleLogin (http://localhost:5173/src/views/LoginView.vue:59:39)
+
+[1A[2K[Browser Console] warning: [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[BROWSER WARNING] [BootstrapVueNext] useToast: The `show` method is deprecated. Use the `create` method instead.
+
+[1A[2K[NETWORK ERROR] 403 POST http://localhost:10000/api/usuarios/autenticar
+
+[1A[2K[NETWORK BODY] {"timestamp":"2026-01-31T17:43:06.734Z","status":403,"error":"Forbidden","message":"Forbidden","path":"/api/usuarios/autenticar"}
+
+[1A[2K[BROWSER ERROR] %cerror%c Erro no login: 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+

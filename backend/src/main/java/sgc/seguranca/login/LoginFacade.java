@@ -29,8 +29,6 @@ import sgc.organizacao.model.SituacaoUnidade;
 @Service
 @Slf4j
 public class LoginFacade {
-    private static final String ENTIDADE_USUARIO = "Usuário";
-
     private final UsuarioFacade usuarioService;
     private final GerenciadorJwt gerenciadorJwt;
     private final ClienteAcessoAd clienteAcessoAd;
@@ -38,7 +36,7 @@ public class LoginFacade {
     private final UsuarioMapper usuarioMapper;
     private final UsuarioPerfilService usuarioPerfilService;
 
-    @Value("${aplicacao.ambiente-testes:false}")
+    @Value("${aplicacao.ambiente-testes:true}")
     private boolean ambienteTestes;
 
     public LoginFacade(UsuarioFacade usuarioService,

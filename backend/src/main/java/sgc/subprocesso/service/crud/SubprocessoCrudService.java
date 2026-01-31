@@ -3,8 +3,9 @@ package sgc.subprocesso.service.crud;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import sgc.subprocesso.service.factory.SubprocessoFactory;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
+import sgc.mapa.model.Mapa;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -13,11 +14,7 @@ import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.repo.ComumRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.model.Processo;
-import sgc.mapa.model.Mapa;
+import sgc.subprocesso.service.factory.SubprocessoFactory;
 
 import java.util.List;
 import java.util.Objects;

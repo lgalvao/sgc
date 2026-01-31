@@ -1,13 +1,10 @@
 package sgc.subprocesso.service.workflow;
 
-import java.util.List;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import sgc.alerta.AlertaFacade;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.model.TipoAcaoAnalise;
@@ -18,33 +15,22 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import static sgc.seguranca.acesso.Acao.ACEITAR_CADASTRO;
-import static sgc.seguranca.acesso.Acao.ACEITAR_REVISAO_CADASTRO;
-import static sgc.seguranca.acesso.Acao.DEVOLVER_CADASTRO;
-import static sgc.seguranca.acesso.Acao.DEVOLVER_REVISAO_CADASTRO;
-import static sgc.seguranca.acesso.Acao.DISPONIBILIZAR_CADASTRO;
-import static sgc.seguranca.acesso.Acao.DISPONIBILIZAR_REVISAO_CADASTRO;
-import static sgc.seguranca.acesso.Acao.HOMOLOGAR_CADASTRO;
-import static sgc.seguranca.acesso.Acao.HOMOLOGAR_REVISAO_CADASTRO;
-
 import sgc.seguranca.acesso.Acao;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.dto.RegistrarWorkflowCommand;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
+
 import java.time.LocalDateTime;
-import sgc.subprocesso.model.SubprocessoRepo;
+import java.util.List;
+
+import static sgc.seguranca.acesso.Acao.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service
 @Slf4j

@@ -1,10 +1,11 @@
-import {expect, test} from './fixtures/base';
-import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth';
-import {criarProcesso} from './helpers/helpers-processos';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
-import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
-import {abrirModalCriarCompetencia, navegarParaMapa} from './helpers/helpers-mapas';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+import type { Page } from '@playwright/test';
+import {expect, test} from './fixtures/base.js';
+import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {criarProcesso} from './helpers/helpers-processos.js';
+import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
+import {abrirModalCriarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
+import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 import * as path from 'path';
 import * as fs from 'fs';
 import {Page} from "@playwright/test";
@@ -55,7 +56,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     });
 
     test.describe('01 - Autenticação', () => {
-        test('Captura telas de login', async ({page}) => {
+        test('Captura telas de login', (async ({page: Page}) => {
+            await page.goto('/login');
             // Tela de login inicial
             await capturarTela(page, '01-seguranca', '01-login-inicial');
 
@@ -81,7 +83,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     });
 
     test.describe('02 - Painel Principal', () => {
-        test('Captura painel ADMIN', async ({page}) => {
+        test('Captura painel ADMIN', (async ({page: Page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Painel inicial vazio
@@ -126,7 +128,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Capturar ID para cleanup
             await page.getByText(descricaoProcesso).click();
             await expect(page).toHaveURL(/codProcesso=\d+/);
-            const processoId = Number.parseInt(new RegExp(/codProcesso=(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId = Number.Number.parseInt(new RegExp(/codProcesso=(\d+)/).exec(page.url())?.[1] || '0');
             if (processoId > 0) cleanup.registrar(processoId);
             await page.goto('/painel');
 
@@ -138,7 +140,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '02-painel', '07-painel-hover-processo');
         });
 
-        test('Captura painel GESTOR', async ({page}) => {
+        test('Captura painel GESTOR', (async ({page: Page}) => {
             // Criar processo para o Gestor primeiro como ADMIN
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             const desc = `Processo Gestor ${Date.now()}`;
@@ -158,7 +160,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '02-painel', '10-painel-gestor', {fullPage: true});
         });
 
-        test('Captura painel CHEFE', async ({page}) => {
+        test('Captura painel CHEFE', (async ({page: Page}) => {
             // Criar processo para o Chefe primeiro como ADMIN
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             const desc = `Processo Chefe ${Date.now()}`;
@@ -180,7 +182,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     });
 
     test.describe('03 - Fluxo de Processo', () => {
-        test('Captura criação e detalhamento de processo', async ({page}) => {
+        test('Captura criação e detalhamento de processo', (async ({page: Page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             const descricao = `Processo Detalhado ${Date.now()}`;
@@ -194,7 +196,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Capturar ID para cleanup
             await page.getByText(descricao).click();
-            const processoId = Number.parseInt(new RegExp(/codProcesso=(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId = Number.Number.parseInt(new RegExp(/codProcesso=(\d+)/).exec(page.url())?.[1] || '0');
             if (processoId > 0) cleanup.registrar(processoId);
 
             // Tela de edição de processo
@@ -219,7 +221,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByRole('button', {name: 'Cancelar'}).click();
         });
 
-        test('Captura validações de formulário', async ({page}) => {
+        test('Captura validações de formulário', (async ({page: Page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             await page.getByTestId('btn-painel-criar-processo').click();
@@ -252,7 +254,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     });
 
     test.describe('04 - Subprocesso e Atividades', () => {
-        test('Captura fluxo completo de atividades', async ({page}) => {
+        test('Captura fluxo completo de atividades', (async ({page: Page}) => {
             const descricao = `Proc Atividades ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_211';
 
@@ -269,7 +271,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             const linhaProcesso = page.locator('tr').filter({has: page.getByText(descricao)});
             await linhaProcesso.click();
-            const processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId = Number.Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
             if (processoId > 0) cleanup.registrar(processoId);
 
             await page.getByTestId('btn-processo-iniciar').click();
@@ -319,7 +321,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '04-subprocesso', '09-cadastro-atividades-disponibilizado', {fullPage: true});
         });
 
-        test('Captura estados de validação inline de atividades', async ({page}) => {
+        test('Captura estados de validação inline de atividades', (async ({page: Page}) => {
             const descricao = `Proc Validação ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_212';
 
@@ -335,7 +337,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             const linhaProcesso = page.locator('tr').filter({has: page.getByText(descricao)});
             await linhaProcesso.click();
-            const processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId = Number.Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
             if (processoId > 0) cleanup.registrar(processoId);
 
             await page.getByTestId('btn-processo-iniciar').click();
@@ -419,7 +421,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     });
 
     test.describe('05 - Mapa de Competências', () => {
-        test('Captura fluxo de mapa de competências', async ({page}) => {
+        test('Captura fluxo de mapa de competências', (async ({page: Page}) => {
             test.setTimeout(180_000); // Teste complexo com múltiplos logins e uploads
             
             page.on('console', msg => {
@@ -444,7 +446,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             const linhaProcesso = page.locator('tr').filter({has: page.getByText(descricao)});
             await linhaProcesso.click();
-            const processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId = Number.Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
             if (processoId > 0) cleanup.registrar(processoId);
 
             await page.getByTestId('btn-processo-iniciar').click();
@@ -531,7 +533,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     });
 
     test.describe('06 - Navegação e Menus', () => {
-        test('Captura elementos de navegação', async ({page}) => {
+        test('Captura elementos de navegação', (async ({page: Page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Menu principal
@@ -566,7 +568,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     });
 
     test.describe('07 - Estados e Situações', () => {
-        test('Captura diferentes estados de processo', async ({page}) => {
+        test('Captura diferentes estados de processo', (async ({page: Page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Processo CRIADO
@@ -580,7 +582,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
 
             await page.getByText(processosCriado).click();
-            const processoId1 = Number.parseInt(new RegExp(/codProcesso=(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId1 = Number.Number.parseInt(new RegExp(/codProcesso=(\d+)/).exec(page.url())?.[1] || '0');
             if (processoId1 > 0) cleanup.registrar(processoId1);
             await page.goto('/painel');
 
@@ -597,7 +599,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 iniciar: true
             });
 
-            const processoId2 = Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId2 = Number.Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
             if (processoId2 > 0) cleanup.registrar(processoId2);
 
             await capturarTela(page, '07-estados', '02-processo-em-andamento');
@@ -605,7 +607,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     });
 
     test.describe('08 - Responsividade (Tamanhos de Tela)', () => {
-        test('Captura em diferentes resoluções', async ({page}) => {
+        test('Captura em diferentes resoluções', (async ({page: Page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Desktop padrão (1920x1080)
@@ -630,7 +632,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // SEÇÃO 09 - OPERAÇÕES EM BLOCO (CDUs 22-26)
     // ========================================================================
     test.describe('09 - Operações em Bloco', () => {
-        test('Captura fluxo de aceitar cadastros em bloco', async ({page}) => {
+        test('Captura fluxo de aceitar cadastros em bloco', (async ({page: Page}) => {
             // Prepara cenário: criar processo com unidades subordinadas e disponibilizar cadastros
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
@@ -653,7 +655,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByText(descricao).click();
             
             // Capturar ID para cleanup (após navegar para o subprocesso)
-            const processoId = Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId = Number.Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
             if (processoId > 0) cleanup.registrar(processoId);
             await navegarParaAtividades(page);
             await adicionarAtividade(page, 'Atividade Bloco 1');
@@ -728,7 +730,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // SEÇÃO 10 - GESTÃO DE SUBPROCESSOS (CDUs 27, 32-34)
     // ========================================================================
     test.describe('10 - Gestão de Subprocessos', () => {
-        test('Captura modais de gestão de subprocesso', async ({page}) => {
+        test('Captura modais de gestão de subprocesso', (async ({page: Page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             const descricao = `Processo Gestão ${Date.now()}`;
@@ -746,7 +748,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page).toHaveURL(/\/processo\/\d+/);
 
             // Registrar para cleanup
-            const processoId = Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId = Number.Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
             if (processoId > 0) cleanup.registrar(processoId);
 
             // Acessar subprocesso
@@ -785,7 +787,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // SEÇÃO 11 - GESTÃO DE UNIDADES E ATRIBUIÇÕES (CDU-28)
     // ========================================================================
     test.describe('11 - Gestão de Unidades', () => {
-        test('Captura página de unidades e atribuição temporária', async ({page}) => {
+        test('Captura página de unidades e atribuição temporária', (async ({page: Page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Navegar para página de unidades
@@ -827,7 +829,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // SEÇÃO 12 - HISTÓRICO DE PROCESSOS (CDU-29)
     // ========================================================================
     test.describe('12 - Histórico', () => {
-        test('Captura seção de histórico', async ({page}) => {
+        test('Captura seção de histórico', (async ({page: Page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Acessar seção de histórico
@@ -850,7 +852,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // SEÇÃO 13 - CONFIGURAÇÕES E ADMINISTRADORES (CDUs 30-31)
     // ========================================================================
     test.describe('13 - Configurações', () => {
-        test('Captura página de configurações e administradores', async ({page}) => {
+        test('Captura página de configurações e administradores', (async ({page: Page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Acessar configurações
@@ -887,7 +889,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // SEÇÃO 14 - RELATÓRIOS (CDUs 35-36)
     // ========================================================================
     test.describe('14 - Relatórios', () => {
-        test('Captura página e modais de relatórios', async ({page}) => {
+        test('Captura página e modais de relatórios', (async ({page: Page}) => {
             test.setTimeout(60_000);
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 

@@ -2,6 +2,7 @@ package sgc.mapa.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -58,7 +59,8 @@ public class MapaSalvamentoService {
     public MapaCompletoDto salvarMapaCompleto(Long codMapa, SalvarMapaRequest request) {
         Mapa mapa = repo.buscar(Mapa.class, codMapa);
 
-        atualizarObservacoes(mapa, request.observacoes());
+        String observacoes = request.observacoes();
+        atualizarObservacoes(mapa, observacoes);
 
         ContextoSalvamento contexto = prepararContexto(codMapa, request);
         removerCompetenciasObsoletas(contexto);
@@ -70,7 +72,7 @@ public class MapaSalvamentoService {
         return mapaCompletoMapper.toDto(mapa, null, competenciasSalvas);
     }
 
-    private void atualizarObservacoes(Mapa mapa, String observacoes) {
+    private void atualizarObservacoes(Mapa mapa, @Nullable String observacoes) {
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(observacoes);
         mapa.setObservacoesDisponibilizacao(sanitizedObservacoes);
         mapaRepo.save(mapa);

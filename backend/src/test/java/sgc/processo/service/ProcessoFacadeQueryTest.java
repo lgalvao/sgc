@@ -23,7 +23,6 @@ import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.service.SubprocessoFacade;
 
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +30,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-import static org.mockito.ArgumentMatchers.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import sgc.organizacao.model.Usuario;
@@ -78,7 +76,7 @@ class ProcessoFacadeQueryTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         processoFacade = new ProcessoFacade(
             processoConsultaService,
             processoManutencaoService,

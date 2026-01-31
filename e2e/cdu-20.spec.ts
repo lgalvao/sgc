@@ -1,10 +1,11 @@
-import {expect, test} from './fixtures/auth-fixtures';
-import {login, USUARIOS} from './helpers/helpers-auth';
-import {criarProcesso} from './helpers/helpers-processos';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
-import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas';
-import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+import type { Page } from '@playwright/test';
+import {expect, test} from './fixtures/auth-fixtures.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {criarProcesso} from './helpers/helpers-processos.js';
+import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
+import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 import {Page} from '@playwright/test';
 
 async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
@@ -45,7 +46,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     // PREPARAÇÃO - Criar mapa validado para GESTOR/ADMIN analisar
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, autenticadoComoGestorCoord22, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', (async ({page: Page, autenticadoComoAdmin: void, autenticadoComoGestorCoord22: void, autenticadoComoChefeSecao221: void}) => {
         
 
         await criarProcesso(page, {
@@ -59,7 +60,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = Number.Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanup.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -68,7 +69,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', (async ({page: Page, autenticadoComoAdmin: void}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -87,7 +88,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 3: Admin homologa cadastro', (async ({page: Page, autenticadoComoChefeSecao221: void}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -99,7 +100,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
     });
 
-    test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 4: Admin cria competências e disponibiliza mapa', (async ({page: Page, autenticadoComoAdmin: void}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -115,7 +116,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await expect(page.getByRole('heading', {name: /Mapa disponibilizado/i})).toBeVisible();
     });
 
-    test('Preparacao 5: Chefe valida o mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 5: Chefe valida o mapa', (async ({page: Page, autenticadoComoAdmin: void}) => {
         
 
         await acessarSubprocessoChefe(page, descProcesso);
@@ -134,7 +135,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     // TESTES PRINCIPAIS - CDU-20
     // ========================================================================
 
-    test('Cenario 1: GESTOR navega para visualização do mapa validado', async ({page}) => {
+    test('Cenario 1: GESTOR navega para visualização do mapa validado', (async ({page: Page}) => {
         // CDU-20: Passos 1-4
         
 
@@ -158,7 +159,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeVisible();
     });
 
-    test('Cenario 2: GESTOR cancela aceite - permanece na tela', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 2: GESTOR cancela aceite - permanece na tela', (async ({page: Page, autenticadoComoGestorCoord22: void}) => {
         // CDU-20: Passo 9.3
         
 
@@ -181,7 +182,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeVisible();
     });
 
-    test('Cenario 3: GESTOR registra aceite do mapa', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 3: GESTOR registra aceite do mapa', (async ({page: Page, autenticadoComoGestorCoord22: void}) => {
         // CDU-20: Passos 9.4-9.9
         
 
@@ -208,7 +209,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
             .toHaveText(/Mapa validado/i);
     });
 
-    test('Cenario 4: ADMIN homologa o mapa', async ({page}) => {
+    test('Cenario 4: ADMIN homologa o mapa', (async ({page: Page}) => {
         // CDU-20: Passos 10.1-10.6
         
 

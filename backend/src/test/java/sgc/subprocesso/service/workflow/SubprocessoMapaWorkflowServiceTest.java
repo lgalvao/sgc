@@ -35,7 +35,6 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.CompetenciaRequest;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
-import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -87,7 +86,8 @@ class SubprocessoMapaWorkflowServiceTest {
     void deveFalharSubprocessoInexistente() {
         when(crudService.buscarSubprocesso(999L))
                 .thenThrow(new ErroEntidadeNaoEncontrada("Subprocesso", 999L));
-        assertThatThrownBy(() -> service.adicionarCompetencia(999L, CompetenciaRequest.builder().build()))
+        CompetenciaRequest request = CompetenciaRequest.builder().build();
+        assertThatThrownBy(() -> service.adicionarCompetencia(999L, request))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 

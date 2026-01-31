@@ -51,25 +51,28 @@ public class E2eController {
 
     @PostMapping("/reset-database")
     public void resetDatabase() throws SQLException {
-        try {
-            jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
+        try (Connection conn = dataSource.getConnection()) {
+            try (java.sql.Statement stmt = conn.createStatement()) {
+                stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
 
-            try {
-                List<String> tables =
-                        jdbcTemplate.queryForList(
-                                "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA ="
-                                        + " 'SGC'",
-                                String.class);
+                List<String> tables = new java.util.ArrayList<>();
+                try (java.sql.ResultSet rs =
+                             stmt.executeQuery(
+                                     "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'SGC'")) {
+                    while (rs.next()) {
+                        tables.add(rs.getString("TABLE_NAME"));
+                    }
+                }
 
                 for (String table : tables) {
                     if (table.matches("^\\w+$")) {
-                        jdbcTemplate.execute("TRUNCATE TABLE sgc." + table);
+                        stmt.execute("TRUNCATE TABLE sgc." + table);
                     } else {
                         log.warn("Nome de tabela suspeito ignorado no reset: {}", table);
                     }
                 }
-            } finally {
-                jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
+
+                stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
             }
 
             Resource seedResource = resourceLoader.getResource("file:../e2e/setup/seed.sql");
@@ -80,12 +83,13 @@ public class E2eController {
                 throw new ErroConfiguracao("Arquivo seed.sql não encontrado");
             }
 
-            try (Connection conn = dataSource.getConnection()) {
-                ScriptUtils.executeSqlScript(conn, seedResource);
-            }
-        } catch (RuntimeException | SQLException e) {
+            ScriptUtils.executeSqlScript(conn, seedResource);
+        } catch (Exception e) {
             log.error("Error resetting database", e);
-            throw e;
+            if (e instanceof SQLException) {
+                throw (SQLException) e;
+            }
+            throw new RuntimeException(e);
         }
     }
 

@@ -1,6 +1,7 @@
-import {expect, test} from './fixtures/auth-fixtures';
-import {login, USUARIOS} from './helpers/helpers-auth';
-import {resetDatabase} from './hooks/hooks-limpeza';
+import type { Page } from '@playwright/test';
+import {expect, test} from './fixtures/auth-fixtures.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {resetDatabase} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-28 - Manter atribuição temporária
@@ -29,7 +30,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
     // CENÁRIO 1: ADMIN navega para árvore de unidades
     // ========================================================================
 
-    test('Cenario 1: ADMIN acessa menu de Unidades', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN acessa menu de Unidades', (async ({page: Page, autenticadoComoAdmin: void}) => {
         // CDU-28: Passos 1-2
         
 
@@ -46,7 +47,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
     // CENÁRIO 2: ADMIN seleciona uma unidade
     // ========================================================================
 
-    test('Cenario 2: ADMIN seleciona unidade na árvore', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 2: ADMIN seleciona unidade na árvore', (async ({page: Page, autenticadoComoAdmin: void}) => {
         // CDU-28: Passos 3-4
         
 
@@ -75,7 +76,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
     // CENÁRIO 3: Verificar opção de criar atribuição
     // ========================================================================
 
-    test('Cenario 3: Verificar botão de criar atribuição', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 3: Verificar botão de criar atribuição', (async ({page: Page, autenticadoComoAdmin: void}) => {
         // CDU-28: Passo 5
         
 

@@ -1,13 +1,14 @@
-import {expect, test} from './fixtures/complete-fixtures';
-import {login, USUARIOS} from './helpers/helpers-auth';
-import {criarProcesso, verificarDetalhesSubprocesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
+import type { Page } from '@playwright/test';
+import {expect, test} from './fixtures/complete-fixtures.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {criarProcesso, verificarDetalhesSubprocesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 
 test.describe('CDU-07 - Detalhar subprocesso', () => {
     const UNIDADE_ALVO = 'SECAO_121';
     const CHEFE_UNIDADE = USUARIOS.CHEFE_SECAO_121.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_121.senha;
 
-    test('Deve exibir detalhes do subprocesso para CHEFE', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Deve exibir detalhes do subprocesso para CHEFE', (async ({page: Page, autenticadoComoAdmin: void, cleanupAutomatico: any}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-07 ${timestamp}`;
 
@@ -44,7 +45,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_121$/);
 
         // Capturar ID do processo para cleanup
-        const processoId = parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
+        const processoId = Number.parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         // 3. Verificar seções da tela

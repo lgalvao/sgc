@@ -1,0 +1,7 @@
+[BACKEND] WARN  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão.
+[BACKEND] INFO  s.o.s.ValidadorDadosOrgService.run:53 - Validando integridade dos dados organizacionais...
+[BACKEND] INFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:67 - Autenticação em ambiente de testes/homologação para o usuário 1
+[BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroAutenticacao:128 - Erro de autenticação: Sessão expirada ou inválida. Faça login novamente.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:67 - Autenticação em ambiente de testes/homologação para o usuário 1
+[BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroAutenticacao:128 - Erro de autenticação: Sessão expirada ou inválida. Faça login novamente.

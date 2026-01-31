@@ -1,6 +1,7 @@
-import {expect, test} from './fixtures/auth-fixtures';
-import {login, USUARIOS} from './helpers/helpers-auth';
-import {resetDatabase} from './hooks/hooks-limpeza';
+import type { Page } from '@playwright/test';
+import {expect, test} from './fixtures/auth-fixtures.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {resetDatabase} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-29 - Consultar histórico de processos
@@ -29,7 +30,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
     // CENÁRIO 1: Navegação para página de histórico
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para página de histórico', async ({page, autenticadoComoAdmin, autenticadoComoGestorCoord22, autenticadoComoChefeSecao221}) => {
+    test('Cenario 1: ADMIN navega para página de histórico', (async ({page: Page, autenticadoComoAdmin: void, autenticadoComoGestorCoord22: void, autenticadoComoChefeSecao221: void}) => {
         // CDU-29: Passos 1-2
         
 
@@ -41,7 +42,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
         await expect(page.getByRole('heading', {name: /Histórico/i})).toBeVisible();
     });
 
-    test('Cenario 2: GESTOR pode acessar histórico', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 2: GESTOR pode acessar histórico', (async ({page: Page, autenticadoComoAdmin: void}) => {
         
 
         // Navegar para histórico
@@ -51,7 +52,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
         await expect(page.getByRole('heading', {name: /Histórico/i})).toBeVisible();
     });
 
-    test('Cenario 3: CHEFE pode acessar histórico', async ({page}) => {
+    test('Cenario 3: CHEFE pode acessar histórico', (async ({page: Page}) => {
         
 
         // Navegar para histórico
@@ -65,7 +66,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
     // CENÁRIO 4: Verificar estrutura da tabela de processos finalizados
     // ========================================================================
 
-    test('Cenario 4: Tabela apresenta colunas corretas', async ({page}) => {
+    test('Cenario 4: Tabela apresenta colunas corretas', (async ({page: Page}) => {
         // CDU-29: Passo 2 - Verificar colunas da tabela
         
 

@@ -226,7 +226,9 @@ const handleLogin = async () => {
       if (sucessoAutenticacao) {
         if (perfilStore.perfisUnidades.length > 1) {
           loginStep.value = 2;
-          return;
+          // Não retornar aqui para garantir que o finally execute corretamente (embora o try/finally garanta, é bom ser explícito no fluxo)
+          // Na verdade, o return dentro do try executa o finally antes de retornar.
+          // O problema pode ser outro.
         } else if (perfilStore.perfisUnidades.length === 1) {
           await router.push("/painel");
         } else {

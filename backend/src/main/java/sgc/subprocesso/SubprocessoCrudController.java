@@ -9,12 +9,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.model.Perfil;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.net.URI;
 import java.util.List;
-import sgc.organizacao.model.Perfil;
 
 @RestController
 @RequestMapping("/api/subprocessos")
@@ -78,7 +78,8 @@ public class SubprocessoCrudController {
             @PathVariable Long codigo,
             @RequestParam(required = false) Perfil perfil,
             @RequestParam(required = false) Long unidadeUsuario) {
-        return subprocessoFacade.obterDetalhes(codigo, null);
+
+        return subprocessoFacade.obterDetalhes(codigo, perfil);
     }
 
     /**

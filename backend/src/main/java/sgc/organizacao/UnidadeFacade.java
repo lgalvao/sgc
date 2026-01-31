@@ -38,8 +38,6 @@ public class UnidadeFacade {
     private final UnidadeMapaService mapaService;
     private final UnidadeResponsavelService responsavelService;
 
-    private static final String ENTIDADE_UNIDADE = "Unidade";
-
     public List<UnidadeDto> buscarArvoreHierarquica() {
         return hierarquiaService.buscarArvoreHierarquica();
     }

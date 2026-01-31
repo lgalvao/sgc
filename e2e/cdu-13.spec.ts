@@ -1,13 +1,14 @@
-import {expect, test} from './fixtures/auth-fixtures';
-import {login, USUARIOS} from './helpers/helpers-auth';
-import {criarProcesso} from './helpers/helpers-processos';
+import type { Page } from '@playwright/test';
+import {expect, test} from './fixtures/auth-fixtures.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {criarProcesso} from './helpers/helpers-processos.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
     navegarParaAtividades,
     navegarParaAtividadesVisualizacao
-} from './helpers/helpers-atividades';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+} from './helpers/helpers-atividades.js';
+import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 import {
     abrirHistoricoAnalise,
     abrirHistoricoAnaliseVisualizacao,
@@ -20,8 +21,8 @@ import {
     devolverCadastroMapeamento,
     fecharHistoricoAnalise,
     homologarCadastroMapeamento,
-} from './helpers/helpers-analise';
-import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
+} from './helpers/helpers-analise.js';
+import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_221';
@@ -50,7 +51,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao 1: ADMIN cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, autenticadoComoGestorCoord22, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 1: ADMIN cria e inicia processo de mapeamento', (async ({page: Page, autenticadoComoAdmin: void, autenticadoComoGestorCoord22: void, autenticadoComoChefeSecao221: void}) => {
         
 
         await criarProcesso(page, {
@@ -66,7 +67,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await linhaProcesso.click();
 
         // Capturar ID do processo para cleanup
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = Number.Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanup.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -74,7 +75,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: CHEFE preenche atividades e disponibiliza', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 2: CHEFE preenche atividades e disponibiliza', (async ({page: Page, autenticadoComoAdmin: void}) => {
         
 
         await acessarSubprocessoChefeDireto(page, descProcesso);
@@ -103,7 +104,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     // CENÁRIOS DE TESTE
     // ========================================================================
 
-    test('Cenario 1: GESTOR visualiza histórico de análise (vazio inicialmente)', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 1: GESTOR visualiza histórico de análise (vazio inicialmente)', (async ({page: Page, autenticadoComoChefeSecao221: void}) => {
         
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -119,7 +120,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await fecharHistoricoAnalise(page);
     });
 
-    test('Cenario 2: GESTOR devolve cadastro para ajustes COM observação', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 2: GESTOR devolve cadastro para ajustes COM observação', (async ({page: Page, autenticadoComoGestorCoord22: void}) => {
         
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -129,7 +130,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await devolverCadastroMapeamento(page, 'Favor incluir mais detalhes nos conhecimentos');
     });
 
-    test('Cenario 3: CHEFE visualiza histórico após devolução e disponibiliza novamente', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 3: CHEFE visualiza histórico após devolução e disponibiliza novamente', (async ({page: Page, autenticadoComoGestorCoord22: void}) => {
         
 
         await acessarSubprocessoChefeDireto(page, descProcesso);
@@ -154,7 +155,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await verificarPaginaPainel(page);
     });
 
-    test('Cenario 4: GESTOR cancela devolução', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 4: GESTOR cancela devolução', (async ({page: Page, autenticadoComoChefeSecao221: void}) => {
         
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -167,7 +168,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
     });
 
-    test('Cenario 5: GESTOR registra aceite COM observação', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 5: GESTOR registra aceite COM observação', (async ({page: Page, autenticadoComoGestorCoord22: void}) => {
         
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -177,7 +178,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await aceitarCadastroMapeamento(page, 'Cadastro aprovado conforme análise');
     });
 
-    test('Cenario 6: ADMIN devolve para nova rodada de aceite', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 6: ADMIN devolve para nova rodada de aceite', (async ({page: Page, autenticadoComoGestorCoord22: void}) => {
         // Devolver para permitir novo aceite sem observação
         
 
@@ -199,7 +200,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await verificarPaginaPainel(page);
     });
 
-    test('Cenario 7: GESTOR registra aceite com observação padrão', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 7: GESTOR registra aceite com observação padrão', (async ({page: Page, autenticadoComoAdmin: void}) => {
         
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -209,7 +210,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await aceitarCadastroMapeamento(page);
     });
 
-    test('Cenario 8: ADMIN visualiza histórico com múltiplas análises', async ({page}) => {
+    test('Cenario 8: ADMIN visualiza histórico com múltiplas análises', (async ({page: Page}) => {
         
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
@@ -237,7 +238,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await fecharHistoricoAnalise(page);
     });
 
-    test('Cenario 9: ADMIN cancela homologação', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 9: ADMIN cancela homologação', (async ({page: Page, autenticadoComoAdmin: void}) => {
         
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
@@ -250,7 +251,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
     });
 
-    test('Cenario 10: ADMIN homologa cadastro', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 10: ADMIN homologa cadastro', (async ({page: Page, autenticadoComoAdmin: void}) => {
         
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);

@@ -1,10 +1,12 @@
-import {expect, test} from './fixtures/complete-fixtures';
-import {login, USUARIOS} from './helpers/helpers-auth';
-import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
+import {expect, test} from './fixtures/complete-fixtures.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import type { Page } from '@playwright/test';
+import type { useProcessoCleanup } from './hooks/hooks-limpeza.js';
 
 test.describe('CDU-02 - Visualizar Painel', () => {
     test.describe('Como ADMIN', () => {
-        test('Deve exibir seções de Processos e Alertas', async ({page, autenticadoComoAdmin}) => {
+        test('Deve exibir seções de Processos e Alertas', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
             await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();
             await expect(page.getByTestId('txt-painel-titulo-processos')).toHaveText('Processos');
 
@@ -12,11 +14,11 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');
         });
 
-        test('Deve exibir botão "Criar processo"', async ({page, autenticadoComoAdmin}) => {
+        test('Deve exibir botão "Criar processo"', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
             await expect(page.getByTestId('btn-painel-criar-processo')).toBeVisible();
         });
 
-        test('Deve criar processo e visualizá-lo na tabela', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+        test('Deve criar processo e visualizá-lo na tabela', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {page: Page, autenticadoComoAdmin: void, cleanupAutomatico: ReturnType<typeof useProcessoCleanup>}) => {
             const descricaoProcesso = `Processo E2E - ${Date.now()}`;
 
             await criarProcesso(page, {
@@ -41,7 +43,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             });
         });
 
-        test('Processos "Criado" devem aparecer apenas para ADMIN', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+        test('Processos "Criado" devem aparecer apenas para ADMIN', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {page: Page, autenticadoComoAdmin: void, cleanupAutomatico: ReturnType<typeof useProcessoCleanup>}) => {
             const descricaoProcesso = `Processo Criado - ${Date.now()}`;
 
             await criarProcesso(page, {
@@ -74,7 +76,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await expect(page.getByText(descricaoProcesso)).not.toBeVisible();
         });
 
-        test('Não deve incluir unidades INTERMEDIARIAS na seleção', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+        test('Não deve incluir unidades INTERMEDIARIAS na seleção', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {page: Page, autenticadoComoAdmin: void, cleanupAutomatico: ReturnType<typeof useProcessoCleanup>}) => {
             await page.getByTestId('btn-painel-criar-processo').click();
             await expect(page).toHaveURL(/\/processo\/cadastro/);
 
@@ -120,7 +122,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
 
             // Capturar ID do processo para cleanup
             await page.getByText(descricaoProcesso).click();
-            const processoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+            const processoId = Number.parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
             if (processoId > 0) cleanupAutomatico.registrar(processoId);
             await page.goto('/painel');
 
@@ -130,11 +132,11 @@ test.describe('CDU-02 - Visualizar Painel', () => {
     });
 
     test.describe('Como GESTOR', () => {
-        test('Não deve exibir botão "Criar processo"', async ({page, autenticadoComoGestor}) => {
+        test('Não deve exibir botão "Criar processo"', async ({page, autenticadoComoGestor}: {page: Page, autenticadoComoGestor: void}) => {
             await expect(page.getByTestId('btn-painel-criar-processo')).not.toBeVisible();
         });
 
-        test('Deve exibir mensagem quando não há processos', async ({page, autenticadoComoGestor}) => {
+        test('Deve exibir mensagem quando não há processos', async ({page, autenticadoComoGestor}: {page: Page, autenticadoComoGestor: void}) => {
             const tabela = page.getByTestId('tbl-processos');
             await expect(tabela).toBeVisible();
 
@@ -145,7 +147,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             }
         });
 
-        test('Deve exibir tabela de alertas vazia', async ({page, autenticadoComoGestor}) => {
+        test('Deve exibir tabela de alertas vazia', async ({page, autenticadoComoGestor}: {page: Page, autenticadoComoGestor: void}) => {
             const tabelaAlertas = page.getByTestId('tbl-alertas');
             await expect(tabelaAlertas).toBeVisible();
 

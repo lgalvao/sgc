@@ -23,17 +23,11 @@ import java.util.stream.Collectors;
  * em unidades organizacionais e perfis de usuário.
  * </p>
  *
- * <p><b>Refatoração v3.0:</b> Removido uso de @Lazy e dependência circular.
- * Agora utiliza {@link ProcessoSubprocessoQueryService} para queries de leitura,
- * eliminando acoplamento bidirecional com SubprocessoFacade.</p>
- *
- * @since 3.0.0 - Removido @Lazy, introduzido Query Service Pattern
  */
 @Service
 @Slf4j
 @RequiredArgsConstructor
 class ProcessoAcessoService {
-
     private final UnidadeFacade unidadeService;
     private final UsuarioFacade usuarioService;
     private final ProcessoSubprocessoQueryService queryService;

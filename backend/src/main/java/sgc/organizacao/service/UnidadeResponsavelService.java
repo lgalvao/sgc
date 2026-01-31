@@ -169,7 +169,7 @@ public class UnidadeResponsavelService {
 
     private void carregarAtribuicoesUsuario(Usuario usuario) {
         Set<UsuarioPerfil> permanentes = new HashSet<>(usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral()));
-        Set<UsuarioPerfil> todas = usuario.getTodasAtribuicoes(permanentes);
+        usuario.getTodasAtribuicoes(permanentes);
     }
 
     private void carregarAtribuicoesEmLote(List<Usuario> usuarios) {

@@ -54,7 +54,7 @@
  * </ul>
  *
  * @see sgc.subprocesso.eventos Eventos de subprocesso (usa padrão unificado)
- * @see sgc.mapa.evento Eventos de mapa
+ * @see sgc.mapa.eventos Eventos de mapa
  * @since 1.0
  */
 @NullMarked

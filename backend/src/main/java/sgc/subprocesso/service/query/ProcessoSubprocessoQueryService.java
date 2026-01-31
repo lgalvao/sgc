@@ -9,11 +9,11 @@ import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.List;
 
+import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO;
+import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
+
 /**
  * Serviço de consulta compartilhado para queries que envolvem Processo e Subprocesso.
- *
- * <p>Este serviço quebra a dependência circular entre ProcessoFacade e SubprocessoFacade,
- * permitindo que ambos os módulos consultem dados sem depender diretamente um do outro.
  *
  * <p><b>Padrão:</b> Query Service Pattern (CQRS simplificado)
  * <ul>
@@ -23,25 +23,11 @@ import java.util.List;
  *   <li>Independente de módulos de domínio</li>
  * </ul>
  *
- * <p><b>Antes (com @Lazy):</b>
- * <pre>
- * ProcessoFacade → @Lazy SubprocessoFacade → ... → ProcessoFacade
- * </pre>
- *
- * <p><b>Depois (sem ciclo):</b>
- * <pre>
- * ProcessoFacade → ProcessoSubprocessoQueryService ← SubprocessoFacade
- * </pre>
- *
- * @since 3.0.0 - Introduzido para eliminar dependências circulares
- * @see sgc.processo.service.ProcessoValidador
- * @see sgc.processo.service.ProcessoAcessoService
  */
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ProcessoSubprocessoQueryService {
-
     private final SubprocessoRepo subprocessoRepo;
 
     /**
@@ -67,17 +53,11 @@ public class ProcessoSubprocessoQueryService {
     public ValidationResult validarSubprocessosParaFinalizacao(Long processoId) {
         long total = subprocessoRepo.countByProcessoCodigo(processoId);
 
-        if (total == 0) {
-            return ValidationResult.ofInvalido(
-                    "O processo não possui subprocessos para finalizar"
-            );
-        }
+        if (total == 0) return ValidationResult.ofInvalido("O processo não possui subprocessos para finalizar");
 
         long homologados = subprocessoRepo.countByProcessoCodigoAndSituacaoIn(
                 processoId,
-                List.of(
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-                        SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO
+                List.of(MAPEAMENTO_MAPA_HOMOLOGADO, REVISAO_MAPA_HOMOLOGADO
                 )
         );
 
@@ -116,9 +96,9 @@ public class ProcessoSubprocessoQueryService {
     /**
      * Lista subprocessos por processo, unidade e situações.
      *
-     * @param processoId   código do processo
-     * @param unidadeId    código da unidade
-     * @param situacoes    situações dos subprocessos
+     * @param processoId código do processo
+     * @param unidadeId  código da unidade
+     * @param situacoes  situações dos subprocessos
      * @return lista de subprocessos
      */
     public List<Subprocesso> listarPorProcessoUnidadeESituacoes(
@@ -130,7 +110,7 @@ public class ProcessoSubprocessoQueryService {
     /**
      * Resultado de validação imutável.
      *
-     * @param valido  indica se a validação passou
+     * @param valido   indica se a validação passou
      * @param mensagem mensagem de erro (presente apenas se inválido)
      */
     public record ValidationResult(boolean valido, String mensagem) {

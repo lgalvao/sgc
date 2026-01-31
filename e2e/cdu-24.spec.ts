@@ -1,10 +1,11 @@
-import {expect, test} from './fixtures/auth-fixtures';
-import {login, USUARIOS} from './helpers/helpers-auth';
-import {criarProcesso} from './helpers/helpers-processos';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
-import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas';
-import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+import type { Page } from '@playwright/test';
+import {expect, test} from './fixtures/auth-fixtures.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {criarProcesso} from './helpers/helpers-processos.js';
+import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
+import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-24 - Disponibilizar mapas de competências em bloco
@@ -51,7 +52,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     // PREPARAÇÃO - Criar processo com mapa criado
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 1: Admin cria e inicia processo', (async ({page: Page, autenticadoComoAdmin: void, autenticadoComoChefeSecao221: void}) => {
         
 
         await criarProcesso(page, {
@@ -65,7 +66,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = Number.Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanup.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -74,7 +75,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 2: Chefe disponibiliza cadastro', (async ({page: Page, autenticadoComoAdmin: void}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -89,7 +90,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro e cria competências', async ({page}) => {
+    test('Preparacao 3: Admin homologa cadastro e cria competências', (async ({page: Page}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -116,7 +117,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     // TESTES PRINCIPAIS - CDU-24
     // ========================================================================
 
-    test('Cenario 1: ADMIN visualiza botão Disponibilizar Mapas em Bloco', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN visualiza botão Disponibilizar Mapas em Bloco', (async ({page: Page, autenticadoComoAdmin: void}) => {
         // CDU-24: Passos 1-4
         
 
@@ -132,7 +133,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         }
     });
 
-    test('Cenario 2: Modal de disponibilização inclui campo de data limite', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 2: Modal de disponibilização inclui campo de data limite', (async ({page: Page, autenticadoComoAdmin: void}) => {
         // CDU-24: Passo 5 - Modal inclui campo de data limite obrigatório
         
 
@@ -163,7 +164,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         }
     });
 
-    test('Cenario 3: Cancelar disponibilização em bloco', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 3: Cancelar disponibilização em bloco', (async ({page: Page, autenticadoComoAdmin: void}) => {
         // CDU-24: Passo 6 - Cancelar
         
 

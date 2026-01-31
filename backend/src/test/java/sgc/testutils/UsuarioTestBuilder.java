@@ -1,11 +1,7 @@
 package sgc.testutils;
 
-import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Builder para criação de objetos Usuario em testes.
@@ -16,7 +12,6 @@ public class UsuarioTestBuilder {
     private String tituloEleitoral = "999999";
     private String nome = "Usuário de Teste";
     private Unidade unidadeLotacao = null;
-    private final Set<Perfil> perfis = new HashSet<>();
 
     public static UsuarioTestBuilder umDe() {
         return new UsuarioTestBuilder();

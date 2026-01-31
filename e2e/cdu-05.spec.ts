@@ -1,19 +1,20 @@
-import {expect, test} from './fixtures/complete-fixtures';
-import {login, USUARIOS} from './helpers/helpers-auth';
-import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
-import {verificarPaginaPainel} from './helpers/helpers-navegacao';
+import type { Page } from '@playwright/test';
+import {expect, test} from './fixtures/complete-fixtures.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {
     acessarSubprocessoAdmin,
     acessarSubprocessoChefeDireto,
     homologarCadastroMapeamento,
-} from './helpers/helpers-analise';
+} from './helpers/helpers-analise.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
     disponibilizarCadastro,
     navegarParaAtividades,
-} from './helpers/helpers-atividades';
-import {criarCompetencia, disponibilizarMapa, navegarParaMapa,} from './helpers/helpers-mapas';
+} from './helpers/helpers-atividades.js';
+import {criarCompetencia, disponibilizarMapa, navegarParaMapa,} from './helpers/helpers-mapas.js';
 import type {Page} from '@playwright/test';
 
 
@@ -81,16 +82,16 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     // TESTE PRINCIPAL
     // ========================================================================
 
-    test('Fase 1.1: ADMIN cria e inicia processo de Mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Fase 1.1: ADMIN cria e inicia processo de Mapeamento', (async ({page: Page, autenticadoComoAdmin: void, cleanupAutomatico: any}) => {
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
         // Capturar ID do processo para cleanup
         await page.goto('/painel');
         await page.getByText(descProcMapeamento).first().click();
-        const processoMapeamentoId = parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
+        const processoMapeamentoId = Number.parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
         if (processoMapeamentoId > 0) cleanupAutomatico.registrar(processoMapeamentoId);
     });
 
-    test('Fase 1.2: CHEFE adiciona atividades e conhecimentos', async ({page}) => {
+    test('Fase 1.2: CHEFE adiciona atividades e conhecimentos', (async ({page: Page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
@@ -102,7 +103,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await adicionarConhecimento(page, descAtividade, 'Conhecimento Teste');
     });
 
-    test('Fase 1.3: CHEFE disponibiliza cadastro', async ({page}) => {
+    test('Fase 1.3: CHEFE disponibiliza cadastro', (async ({page: Page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -113,14 +114,14 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Fase 1.4: ADMIN homologa cadastro', async ({page}) => {
+    test('Fase 1.4: ADMIN homologa cadastro', (async ({page: Page}) => {
         
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await homologarCadastroMapeamento(page);
     });
 
-    test('Fase 1.5: ADMIN adiciona competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Fase 1.5: ADMIN adiciona competências e disponibiliza mapa', (async ({page: Page, autenticadoComoAdmin: void}) => {
         
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -129,7 +130,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Fase 1.6: CHEFE valida mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Fase 1.6: CHEFE valida mapa', (async ({page: Page, autenticadoComoAdmin: void}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -138,7 +139,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Fase 1.7: ADMIN homologa e finaliza processo', async ({page}) => {
+    test('Fase 1.7: ADMIN homologa e finaliza processo', (async ({page: Page}) => {
         
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -153,7 +154,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Fase 2: Iniciar processo de Revisão', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Fase 2: Iniciar processo de Revisão', (async ({page: Page, autenticadoComoAdmin: void, cleanupAutomatico: any}) => {
         // Login as Admin
         
 
@@ -169,7 +170,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Capturar ID do processo para cleanup
         await page.getByText(descProcRevisao).click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
-        const processoRevisaoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+        const processoRevisaoId = Number.parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
         if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);
 
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcRevisao);
