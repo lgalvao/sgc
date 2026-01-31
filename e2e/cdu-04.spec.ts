@@ -1,5 +1,4 @@
-import {expect, test} from './fixtures/base';
-import {login, USUARIOS} from './helpers/helpers-auth';
+import {expect, test} from './fixtures/auth-fixtures';
 import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
@@ -8,14 +7,13 @@ test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
 
     test.beforeAll(async ({request}) => await resetDatabase(request));
 
-    test.beforeEach(async ({page}) => {
+    test.beforeEach(async () => {
         cleanup = useProcessoCleanup();
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
     });
 
     test.afterEach(async ({request}) => await cleanup.limpar(request));
 
-    test('Deve iniciar um processo com sucesso', async ({page}) => {
+    test('Deve iniciar um processo com sucesso', async ({page, autenticadoComoAdmin}) => {
         const descricao = `Processo para Iniciar - ${Date.now()}`;
 
         // 1. Cria processo em estado 'Criado'

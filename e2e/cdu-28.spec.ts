@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {resetDatabase} from './hooks/hooks-limpeza';
 
@@ -29,9 +29,9 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
     // CENÁRIO 1: ADMIN navega para árvore de unidades
     // ========================================================================
 
-    test('Cenario 1: ADMIN acessa menu de Unidades', async ({page}) => {
+    test('Cenario 1: ADMIN acessa menu de Unidades', async ({page, autenticadoComoAdmin}) => {
         // CDU-28: Passos 1-2
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         // Para ADMIN, o menu mostra "Unidades" em vez de "Minha unidade"
         const linkUnidades = page.getByRole('link', {name: /Unidades/i});
@@ -46,9 +46,9 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
     // CENÁRIO 2: ADMIN seleciona uma unidade
     // ========================================================================
 
-    test('Cenario 2: ADMIN seleciona unidade na árvore', async ({page}) => {
+    test('Cenario 2: ADMIN seleciona unidade na árvore', async ({page, autenticadoComoAdmin}) => {
         // CDU-28: Passos 3-4
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         const linkUnidades = page.getByRole('link', {name: /Unidades/i});
         if (await linkUnidades.isVisible().catch(() => false)) {
@@ -75,9 +75,9 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
     // CENÁRIO 3: Verificar opção de criar atribuição
     // ========================================================================
 
-    test('Cenario 3: Verificar botão de criar atribuição', async ({page}) => {
+    test('Cenario 3: Verificar botão de criar atribuição', async ({page, autenticadoComoAdmin}) => {
         // CDU-28: Passo 5
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         const linkUnidades = page.getByRole('link', {name: /Unidades/i});
         if (await linkUnidades.isVisible().catch(() => false)) {

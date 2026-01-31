@@ -32,8 +32,40 @@ Encapsulam a complexidade de automação e interações com a página.
 
 Define dados de teste e extensões do objeto `test` do Playwright.
 
-* **`base.ts`**: Extensão base do Playwright com configurações globais e listeners de log.
-* **`fixtures-processos.ts`**: Massa de dados para testes de processos.
+* **`base.ts`**: Extensão base do Playwright com configurações globais e listeners de log/erro.
+* **`auth-fixtures.ts`**: ⭐ Fixtures de autenticação prontas para uso. Elimina duplicação de código de login.
+* **`fixtures-processos.ts`**: Helpers para criação de processos via API (em desenvolvimento).
+
+**💡 Uso de Auth Fixtures:**
+
+```typescript
+import {test, expect} from './fixtures/auth-fixtures';
+
+// ❌ ANTES (duplicação)
+test.beforeEach(async ({page}) => {
+  await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+});
+
+test('Deve criar processo', async ({page}) => {
+  // teste...
+});
+
+// ✅ DEPOIS (usando fixture)
+test('Deve criar processo', async ({page, autenticadoComoAdmin}) => {
+  // Já está logado como ADMIN!
+  // teste...
+});
+```
+
+**Fixtures Disponíveis:**
+* `autenticadoComoAdmin` - Admin único perfil (191919)
+* `autenticadoComoGestor` - Gestor COORD_11 (222222)
+* `autenticadoComoChefeSecao111` - Chefe Seção 111 (333333)
+* `autenticadoComoChefeSecao211` - Chefe Seção 211 (101010)
+* `autenticadoComoChefeSecao212` - Chefe Seção 212 (181818)
+* `autenticadoComoChefeSecao221` - Chefe Seção 221 (141414)
+* `autenticadoComoChefeAssessoria11` - Chefe Assessoria 11 (555555)
+* E outras (veja `auth-fixtures.ts` para lista completa)
 
 ### 4. Setup e Hooks (`/setup`, `/hooks`)
 
@@ -77,3 +109,4 @@ Consulte `backend/src/main/java/sgc/e2e/README.md` para mais detalhes.
 * **Seletores Resilientes:** Use sempre `data-testid="..."` em vez de classes CSS ou XPaths frágeis.
 * **Idempotência:** Cada teste deve ser independente. Use os hooks `beforeEach` para limpar/resetar o estado.
 * **Determinismo:** Evite `page.waitForTimeout()`. Use esperas explícitas por elementos ou respostas de rede.
+* **Auth Fixtures:** Use sempre as fixtures de autenticação (`autenticadoComoAdmin`, etc.) em vez de chamar `login()` manualmente. Isso reduz duplicação e torna os testes mais legíveis.

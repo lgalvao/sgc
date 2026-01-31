@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {
@@ -160,8 +160,8 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
     });
 
-    test('Preparacao 2: Iniciar Processo de Revisão', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Preparacao 2: Iniciar Processo de Revisão', async ({page, autenticadoComoAdmin, autenticadoComoChefeSecao221}) => {
+        
         await criarProcesso(page, {
             descricao: descProcessoRevisao,
             tipo: 'REVISAO',
@@ -185,8 +185,8 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     // TESTES CDU-12
     // ========================================================================
 
-    test('Cenario 1: Verificar Sem Impactos (Estado Inicial)', async ({page}) => {
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+    test('Cenario 1: Verificar Sem Impactos (Estado Inicial)', async ({page, autenticadoComoAdmin}) => {
+        
 
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
 
@@ -200,8 +200,8 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await expect(page.getByText('Nenhum impacto detectado no mapa.')).toBeVisible();
     });
 
-    test('Cenario 2: Verificar Impacto de Inclusão de Atividade', async ({page}) => {
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+    test('Cenario 2: Verificar Impacto de Inclusão de Atividade', async ({page, autenticadoComoChefeSecao221}) => {
+        
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
@@ -222,8 +222,8 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fecharModalImpacto(page);
     });
 
-    test('Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)', async ({page}) => {
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+    test('Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)', async ({page, autenticadoComoChefeSecao221}) => {
+        
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
@@ -247,8 +247,8 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fecharModalImpacto(page);
     });
 
-    test('Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)', async ({page}) => {
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+    test('Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)', async ({page, autenticadoComoChefeSecao221}) => {
+        
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
@@ -272,9 +272,9 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fecharModalImpacto(page);
     });
 
-    test('Cenario 5: Verificar visualização pelo Admin (Somente Leitura)', async ({page}) => {
+    test('Cenario 5: Verificar visualização pelo Admin (Somente Leitura)', async ({page, autenticadoComoChefeSecao221}) => {
         // Chefe disponibiliza a revisão
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+        
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
@@ -282,7 +282,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
         // Admin acessa
         await fazerLogout(page);
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
         await expect(page.locator('tr', {has: page.getByText(descProcessoRevisao)})).toBeVisible();
         await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
         await expect(page).toHaveURL(/\/processo\/\d+/);

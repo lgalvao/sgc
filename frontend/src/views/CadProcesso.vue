@@ -197,7 +197,6 @@ import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
-import * as processoService from "@/services/processoService";
 import {logger} from "@/utils";
 import {useProcessoForm} from "@/composables/useProcessoForm";
 
@@ -431,10 +430,9 @@ async function confirmarRemocao() {
   if (processoEditando.value) {
     isLoading.value = true;
     try {
-      await processoService.excluirProcesso(processoEditando.value.codigo);
+      await processosStore.removerProcesso(processoEditando.value.codigo);
       await router.push("/painel");
       if (!processoEditando.value) {
-        // Only clear fields if it was a new process
         limparCampos();
       }
       fecharModalRemocao();

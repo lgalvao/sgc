@@ -112,18 +112,21 @@ import {
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {logger} from "@/utils";
-import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";
-import {buscarUnidadePorCodigo} from "@/services/unidadeService";
-import {buscarUsuariosPorUnidade} from "@/services/usuarioService";
 import type {Unidade, Usuario} from "@/types/tipos";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
 import {useFeedbackStore} from "@/stores/feedback";
+import {useUnidadesStore} from "@/stores/unidades";
+import {useUsuariosStore} from "@/stores/usuarios";
+import {useAtribuicaoTemporariaStore} from "@/stores/atribuicoes";
 
 const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter();
 const feedbackStore = useFeedbackStore();
+const unidadesStore = useUnidadesStore();
+const usuariosStore = useUsuariosStore();
+const atribuicoesStore = useAtribuicaoTemporariaStore();
 const codUnidade = computed(() => props.codUnidade);
 
 const unidade = ref<Unidade | null>(null);
@@ -138,9 +141,10 @@ const erroUsuario = ref("");
 
 onMounted(async () => {
   try {
-    unidade.value = (await buscarUnidadePorCodigo(codUnidade.value)) as Unidade;
+    await unidadesStore.buscarUnidadePorCodigo(codUnidade.value);
+    unidade.value = unidadesStore.unidade as Unidade;
     if (unidade.value) {
-      usuarios.value = await buscarUsuariosPorUnidade(unidade.value.codigo);
+      usuarios.value = await usuariosStore.buscarUsuariosPorUnidade(unidade.value.codigo);
     }
   } catch (error) {
     erroUsuario.value = "Falha ao carregar dados da unidade ou usuários.";
@@ -156,16 +160,15 @@ async function criarAtribuicao() {
   isLoading.value = true;
 
   try {
-    await criarAtribuicaoTemporaria(unidade.value.codigo, {
+    await atribuicoesStore.criarAtribuicaoTemporaria(unidade.value.codigo, {
       tituloEleitoralUsuario: usuarioSelecionado.value,
-      dataInicio: dataInicio.value || undefined, // Envia undefined se vazio para usar padrão do backend
+      dataInicio: dataInicio.value || undefined,
       dataTermino: dataTermino.value,
       justificativa: justificativa.value,
     });
 
     feedbackStore.show('Sucesso', 'Atribuição criada com sucesso!', 'success');
 
-    // Reset form
     usuarioSelecionado.value = null;
     dataInicio.value = "";
     dataTermino.value = "";

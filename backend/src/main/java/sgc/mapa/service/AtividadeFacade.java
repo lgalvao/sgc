@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Objects;
 
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.RequiredArgsConstructor;
 import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.model.Atividade;
@@ -39,9 +39,12 @@ import sgc.mapa.dto.CriarConhecimentoRequest;
  *
  * <p><b>IMPORTANTE:</b> Este Facade é o ponto de entrada único para operações de atividades.
  * Controllers devem usar APENAS este Facade, nunca acessar Services diretamente.
+ *
+ * <p><b>Nota sobre Injeção de Dependências:</b>
+ * SubprocessoFacade é injetado com @Lazy para quebrar dependência circular:
+ * AtividadeFacade → SubprocessoFacade → MapaFacade/MapaManutencaoService → AtividadeFacade
  */
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class AtividadeFacade {
     private static final String MAPA_NAO_PODE_SER_NULO = "Mapa não pode ser nulo";
@@ -52,6 +55,24 @@ public class AtividadeFacade {
     private final UsuarioFacade usuarioService;
     private final MapaFacade mapaFacade;
     private final ApplicationEventPublisher eventPublisher;
+
+    /**
+     * Constructor com @Lazy para quebrar dependência circular.
+     */
+    public AtividadeFacade(
+            MapaManutencaoService mapaManutencaoService,
+            @Lazy SubprocessoFacade subprocessoFacade,
+            AccessControlService accessControlService,
+            UsuarioFacade usuarioService,
+            MapaFacade mapaFacade,
+            ApplicationEventPublisher eventPublisher) {
+        this.mapaManutencaoService = mapaManutencaoService;
+        this.subprocessoFacade = subprocessoFacade;
+        this.accessControlService = accessControlService;
+        this.usuarioService = usuarioService;
+        this.mapaFacade = mapaFacade;
+        this.eventPublisher = eventPublisher;
+    }
 
     // ===== Consultas =====
 

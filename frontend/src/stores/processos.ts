@@ -64,6 +64,7 @@ export const useProcessosStore = defineStore("processos", () => {
         homologarValidacao: workflow.homologarValidacao,
         aceitarValidacao: workflow.aceitarValidacao,
         executarAcaoBloco: workflow.executarAcaoBloco,
+        enviarLembrete: workflow.enviarLembrete,
 
         // Context State & Actions
         subprocessosElegiveis,

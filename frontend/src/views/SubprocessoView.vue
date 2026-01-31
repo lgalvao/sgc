@@ -87,16 +87,17 @@ import SubprocessoModal from "@/components/SubprocessoModal.vue";
 import TabelaMovimentacoes from "@/components/TabelaMovimentacoes.vue";
 import {useMapasStore} from "@/stores/mapas";
 import {useFeedbackStore} from "@/stores/feedback";
-import {enviarLembrete, reabrirCadastro, reabrirRevisaoCadastro} from "@/services/processoService";
 import {useModalManager} from "@/composables/useModalManager";
 import {useLoadingManager} from "@/composables/useLoadingManager";
 
 import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useProcessosStore} from "@/stores/processos";
 import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso,} from "@/types/tipos";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
 const subprocessosStore = useSubprocessosStore();
+const processosStore = useProcessosStore();
 
 const mapaStore = useMapasStore();
 const feedbackStore = useFeedbackStore();
@@ -191,32 +192,28 @@ async function confirmarReabertura() {
   }
 
   await loading.withLoading('reabertura', async () => {
-    try {
-      if (tipoReabertura.value === 'cadastro') {
-        await reabrirCadastro(codSubprocesso.value!, justificativaReabertura.value);
-        feedbackStore.show("Cadastro reaberto", "O cadastro foi reaberto com sucesso.", "success");
-      } else {
-        await reabrirRevisaoCadastro(codSubprocesso.value!, justificativaReabertura.value);
-        feedbackStore.show("Revisão reaberta", "A revisão de cadastro foi reaberta com sucesso.", "success");
-      }
+    let sucesso = false;
+    if (tipoReabertura.value === 'cadastro') {
+      sucesso = await subprocessosStore.reabrirCadastro(codSubprocesso.value!, justificativaReabertura.value);
+    } else {
+      sucesso = await subprocessosStore.reabrirRevisaoCadastro(codSubprocesso.value!, justificativaReabertura.value);
+    }
+
+    if (sucesso) {
       fecharModalReabrir();
-      // Recarregar dados do subprocesso
       await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value!);
-    } catch {
-      feedbackStore.show("Erro", "Não foi possível reabrir. Tente novamente.", "danger");
+    }
+
+    if (sucesso) {
+      fecharModalReabrir();
+      await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value!);
     }
   });
 }
 
-// CDU-34: Enviar lembrete
 async function confirmarEnviarLembrete() {
   if (!subprocesso.value) return;
-
-  try {
-    await enviarLembrete(props.codProcesso, subprocesso.value.unidade.codigo);
-    feedbackStore.show("Lembrete enviado", "O lembrete de prazo foi enviado com sucesso.", "success");
-  } catch {
-    feedbackStore.show("Erro", "Não foi possível enviar o lembrete.", "danger");
-  }
+  
+  await processosStore.enviarLembrete(props.codProcesso, subprocesso.value.unidade.codigo);
 }
 </script>

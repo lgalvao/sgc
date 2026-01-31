@@ -106,14 +106,16 @@ import {useRoute} from 'vue-router';
 import {BButton, BCard, BContainer, BSpinner} from 'bootstrap-vue-next';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import {useFeedbackStore} from '@/stores/feedback';
-import {type DiagnosticoDto, diagnosticoService, type ServidorDiagnosticoDto} from '@/services/diagnosticoService';
+import {useDiagnosticosStore} from '@/stores/diagnosticos';
+import type {DiagnosticoDto, ServidorDiagnosticoDto} from '@/services/diagnosticoService';
 
 const route = useRoute();
 const feedbackStore = useFeedbackStore();
+const diagnosticosStore = useDiagnosticosStore();
 
 const loading = ref(true);
 const codSubprocesso = computed(() => Number(route.params.codSubprocesso));
-const diagnostico = ref<DiagnosticoDto | null>(null);
+const diagnostico = computed<DiagnosticoDto | null>(() => diagnosticosStore.diagnostico);
 
 const totalServidoresConcluidos = computed(() =>
     diagnostico.value?.servidores.filter(s =>
@@ -135,7 +137,7 @@ const progressoGeral = computed(() => {
 onMounted(async () => {
   try {
     loading.value = true;
-    diagnostico.value = await diagnosticoService.buscarDiagnostico(codSubprocesso.value);
+    await diagnosticosStore.buscarDiagnostico(codSubprocesso.value);
   } catch (error) {
     feedbackStore.show('Erro', 'Erro ao carregar monitoramento: ' + error, 'danger');
   } finally {

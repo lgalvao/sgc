@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
@@ -60,8 +60,8 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, autenticadoComoGestorCoord22, autenticadoComoChefeSecao221}) => {
+        
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -83,8 +83,8 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
-        await login(page, USUARIO_CHEFE_1, SENHA_CHEFE_1);
+    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoAdmin}) => {
+        
 
         await page.getByText(descProcesso).click();
         await navegarParaAtividades(page);
@@ -98,8 +98,8 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro e cria mapa', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Preparacao 3: Admin homologa cadastro e cria mapa', async ({page, autenticadoComoChefeSecao221}) => {
+        
 
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);
@@ -116,7 +116,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     });
 
     test('Preparacao 4: Chefe valida o mapa', async ({page}) => {
-        await login(page, USUARIO_CHEFE_1, SENHA_CHEFE_1);
+        
 
         await acessarSubprocessoChefe(page, descProcesso);
 
@@ -132,7 +132,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     // ========================================================================
 
     test('Cenario 1: GESTOR acessa processo com mapa validado', async ({page}) => {
-        await login(page, USUARIO_GESTOR, SENHA_GESTOR);
+        
 
         await page.getByText(descProcesso).click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
@@ -145,8 +145,8 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         }
     });
 
-    test('Cenario 2: GESTOR abre modal de aceite de mapa em bloco', async ({page}) => {
-        await login(page, USUARIO_GESTOR, SENHA_GESTOR);
+    test('Cenario 2: GESTOR abre modal de aceite de mapa em bloco', async ({page, autenticadoComoGestorCoord22}) => {
+        
 
         await page.getByText(descProcesso).click();
 

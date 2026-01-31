@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {autenticar, login, loginComPerfil, USUARIOS} from './helpers/helpers-auth';
 
 test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
@@ -6,14 +6,14 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await page.goto('/login');
     });
 
-    test('Deve exibir erro com credenciais inválidas', async ({page}) => {
+    test('Deve exibir erro com credenciais inválidas', async ({page, autenticadoComoAdmin, autenticadoComoGestor}) => {
         await autenticar(page, USUARIOS.INVALIDO.titulo, USUARIOS.INVALIDO.senha);
         await expect(page.getByText('Título ou senha inválidos.')).toBeVisible();
     });
 
     test('Deve realizar login com sucesso (Perfil Único)', async ({page}) => {
         // Usuário 222222 (GESTOR_COORD_11) tem apenas um perfil
-        await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
+        
 
         // Verifica que o usuário está logado
         await expect(page.getByText('GESTOR - COORD_11')).toBeVisible();
@@ -33,7 +33,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
 
     test('Deve exibir barra de navegação após login', async ({page}) => {
         // Login como ADMIN (191919)
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        
 
         // Verifica Barra de Navegação
         await expect(page.getByRole('link', {name: 'SGC'})).toBeVisible();
@@ -43,9 +43,9 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByText('Histórico')).toBeVisible();
     });
 
-    test('Deve exibir informações do usuário e controles', async ({page}) => {
+    test('Deve exibir informações do usuário e controles', async ({page, autenticadoComoAdmin}) => {
         // Login como ADMIN (191919)
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        
 
         // Verifica Informações do Usuário
         await expect(page.getByText('ADMIN - SEDOC')).toBeVisible();
@@ -57,9 +57,9 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByTestId('btn-logout')).toBeVisible();
     });
 
-    test('Deve exibir rodapé', async ({page}) => {
+    test('Deve exibir rodapé', async ({page, autenticadoComoAdmin}) => {
         // Login como ADMIN (191919)
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        
 
         // Verifica Rodapé
         await expect(page.getByText('© SESEL/COSIS/TRE-PE')).toBeVisible();

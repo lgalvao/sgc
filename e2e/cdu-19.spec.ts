@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
@@ -37,8 +37,8 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     // PREPARAÇÃO - Criar mapa disponibilizado para CHEFE validar
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, autenticadoComoChefeSecao221}) => {
+        
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -60,8 +60,8 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoAdmin}) => {
+        
 
         await page.getByText(descProcesso).click();
         await navegarParaAtividades(page);
@@ -79,8 +79,8 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoChefeSecao221}) => {
+        
 
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_221');
@@ -91,8 +91,8 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
     });
 
-    test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
+        
 
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_221');
@@ -115,7 +115,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 
     test('Cenario 1: CHEFE navega para visualização do mapa', async ({page}) => {
         // CDU-19: Passos 1-2
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+        
 
         // Passo 1: CHEFE escolhe o processo
         await expect(page.getByText(descProcesso)).toBeVisible();
@@ -136,9 +136,9 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await expect(page.getByTestId('btn-mapa-validar')).toBeVisible();
     });
 
-    test('Cenario 2: CHEFE cancela validação - permanece na tela', async ({page}) => {
+    test('Cenario 2: CHEFE cancela validação - permanece na tela', async ({page, autenticadoComoChefeSecao221}) => {
         // CDU-19: Passo 5.1.1
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+        
 
         await page.getByText(descProcesso).click();
         await page.getByTestId('card-subprocesso-mapa').click();
@@ -159,9 +159,9 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await expect(page.getByTestId('btn-mapa-validar')).toBeVisible();
     });
 
-    test('Cenario 3: CHEFE valida mapa com sucesso', async ({page}) => {
+    test('Cenario 3: CHEFE valida mapa com sucesso', async ({page, autenticadoComoChefeSecao221}) => {
         // CDU-19: Passos 5.2-5.6, 6-8
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+        
 
         await page.getByText(descProcesso).click();
         await page.getByTestId('card-subprocesso-mapa').click();

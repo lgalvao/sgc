@@ -1,5 +1,4 @@
-import {expect, test} from './fixtures/base';
-import {login, USUARIOS} from './helpers/helpers-auth';
+import {expect, test} from './fixtures/auth-fixtures';
 import {resetDatabase} from './hooks/hooks-limpeza';
 
 /**
@@ -20,9 +19,9 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
         await resetDatabase(request);
     });
 
-    test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({page}) => {
+    test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({page, autenticadoComoAdmin}) => {
         await test.step('1. Login como ADMIN', async () => {
-            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+            // Já autenticado via fixture
         });
 
         await test.step('2. Navegar para processo finalizado com mapa', async () => {
@@ -69,9 +68,9 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
         });
     });
 
-    test('Cenário 2: CHEFE visualiza mapa da própria unidade', async ({page}) => {
+    test('Cenário 2: CHEFE visualiza mapa da própria unidade', async ({page, autenticadoComoChefeAssessoria12}) => {
         await test.step('1. Login como CHEFE_ASSESSORIA_12', async () => {
-            await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
+            // Já autenticado via fixture
         });
 
         await test.step('2. Navegar para processo via painel', async () => {

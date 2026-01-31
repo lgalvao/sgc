@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/base';
+import {expect, test} from './fixtures/auth-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
@@ -47,8 +47,8 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, autenticadoComoChefeSecao221}) => {
+        
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -70,8 +70,8 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza revisão de cadastro', async ({page}) => {
-        await login(page, USUARIO_CHEFE_1, SENHA_CHEFE_1);
+    test('Preparacao 2: Chefe disponibiliza revisão de cadastro', async ({page, autenticadoComoAdmin}) => {
+        
 
         await page.getByText(descProcesso).click();
         await navegarParaAtividades(page);
@@ -90,7 +90,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     // ========================================================================
 
     test('Cenario 1: ADMIN navega para subprocesso de revisão', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
 
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);
@@ -98,8 +98,8 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toBeVisible();
     });
 
-    test('Cenario 2: ADMIN visualiza botão Reabrir Revisão', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Cenario 2: ADMIN visualiza botão Reabrir Revisão', async ({page, autenticadoComoAdmin}) => {
+        
 
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);
@@ -112,8 +112,8 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         }
     });
 
-    test('Cenario 3: ADMIN abre modal de reabertura de revisão', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    test('Cenario 3: ADMIN abre modal de reabertura de revisão', async ({page, autenticadoComoAdmin}) => {
+        
 
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);
