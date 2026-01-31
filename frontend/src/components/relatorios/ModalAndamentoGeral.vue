@@ -36,7 +36,7 @@
           <td>{{ processo.descricao }}</td>
           <td>{{ processo.tipo }}</td>
           <td>{{ processo.situacao }}</td>
-          <td>{{ formatarData(new Date(processo.dataLimite)) }}</td>
+          <td>{{ formatDateBR(new Date(processo.dataLimite)) }}</td>
           <td>{{ processo.unidadeNome }}</td>
           <td>{{ calcularPercentualConcluido() }}%</td>
         </tr>
@@ -67,10 +67,6 @@ const modelValueComputed = computed({
   set: (val) => emit('update:modelValue', val),
 });
 
-const formatarData = (data: Date) => {
-  return formatDateBR(data);
-};
-
 const calcularPercentualConcluido = () => {
   // A lógica de percentual concluído precisa ser reavaliada com os novos DTOs.
   // Por enquanto, retornaremos um valor fixo ou uma lógica simplificada.
@@ -82,7 +78,7 @@ function exportar() {
     Descricao: processo.descricao,
     Tipo: processo.tipo,
     Situacao: processo.situacao,
-    "Data Limite": formatarData(new Date(processo.dataLimite)),
+    "Data Limite": formatDateBR(new Date(processo.dataLimite)),
     Unidade: processo.unidadeNome,
     "% Concluido": calcularPercentualConcluido(),
   }));
