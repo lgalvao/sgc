@@ -57,4 +57,3 @@ export type {ProcessoContext} from './processo-fixtures.js';
 // Re-exportar fixtures base
 export * from './base.js';
 export * from './fixtures-processos.js';
-◊
