@@ -50,7 +50,7 @@
                   {{ diagnostico.status }}
                 </span>
           </td>
-          <td>{{ formatarData(diagnostico.data) }}</td>
+          <td>{{ formatDateBR(diagnostico.data) }}</td>
         </tr>
         </tbody>
       </table>
@@ -103,10 +103,6 @@ const getClasseStatus = (status: string) => {
   }
 };
 
-const formatarData = (data: Date) => {
-  return formatDateBR(data);
-};
-
 function exportar() {
   const dados = props.diagnosticos.map((diag) => ({
     Processo: diag.processo,
@@ -116,7 +112,7 @@ function exportar() {
     "Dominio Medio": diag.dominioMedio,
     "Competencias Criticas": diag.competenciasCriticas.join("; "),
     Status: diag.status,
-    "Data Diagnostico": formatarData(diag.data),
+    "Data Diagnostico": formatDateBR(diag.data),
   }));
 
   const csv = gerarCSV(dados);

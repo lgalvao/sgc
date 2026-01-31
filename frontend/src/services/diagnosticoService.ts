@@ -1,4 +1,4 @@
-import apiClient from '../axios-setup';
+import apiClient from '@/axios-setup';
 
 export interface DiagnosticoDto {
     codigo: number;
