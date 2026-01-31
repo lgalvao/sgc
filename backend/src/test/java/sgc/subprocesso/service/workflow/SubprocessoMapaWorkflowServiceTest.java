@@ -185,7 +185,7 @@ class SubprocessoMapaWorkflowServiceTest {
                     .build();
 
             doThrow(new ErroValidacao("Situação inválida"))
-                    .when(validacaoService).validarSituacaoPermitida(eq(sp), anyString(), any());
+                    .when(validacaoService).validarSituacaoPermitida(eq(sp), anyString(), any(SituacaoSubprocesso[].class));
 
             assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, req))
                     .isInstanceOf(ErroValidacao.class);

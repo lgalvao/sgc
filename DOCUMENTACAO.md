@@ -60,12 +60,12 @@ Este documento serve como índice centralizado de toda a documentação técnica
 
 ### 🧪 Testes
 
-| Documento                                                                                          | Descrição                                           |
-|----------------------------------------------------------------------------------------------------|-----------------------------------------------------|
-| **[e2e/README.md](e2e/README.md)**                                                                 | Documentação completa dos testes E2E com Playwright |
-| **[e2e/FIXTURES-MIGRATION-GUIDE.md](e2e/FIXTURES-MIGRATION-GUIDE.md)**                             | Guia de migração para fixtures reutilizáveis        |
-| **[backend/src/test/java/sgc/testutils/README.md](backend/src/test/java/sgc/testutils/README.md)** | Utilitários de teste do backend                     |
-| **[frontend/src/test-utils/README.md](frontend/src/test-utils/README.md)**                         | Utilitários de teste do frontend                    |
+| Documento                                                                                          | Descrição                                    |
+|----------------------------------------------------------------------------------------------------|----------------------------------------------|
+| **[e2e/README.md](e2e/README.md)**                                                                 | Documentação dos testes E2E com Playwright   |
+| **[e2e/FIXTURES-MIGRATION-GUIDE.md](e2e/FIXTURES-MIGRATION-GUIDE.md)**                             | Guia de migração para fixtures reutilizáveis |
+| **[backend/src/test/java/sgc/testutils/README.md](backend/src/test/java/sgc/testutils/README.md)** | Utilitários de teste do backend              |
+| **[frontend/src/test-utils/README.md](frontend/src/test-utils/README.md)**                         | Utilitários de teste do frontend             |
 
 ---
 
@@ -105,15 +105,6 @@ Cada módulo possui um README.md detalhando suas responsabilidades:
 - [composables/](frontend/src/composables/README.md) - Lógica reutilizável
 - [mappers/](frontend/src/mappers/README.md) - Transformação de dados
 - [constants/](frontend/src/constants/README.md) - Constantes da aplicação
-
----
-
-### 📜 Histórico e Melhorias
-
-| Documento                                      | Descrição                                                  |
-|------------------------------------------------|------------------------------------------------------------|
-| **[RESUMO-MELHORIAS.md](RESUMO-MELHORIAS.md)** | Resumo consolidado das melhorias de 2026-01 (97% completo) |
-| **[docs/historico/](docs/historico/)**         | Arquivo de planejamento, tracking e relatórios de execução |
 
 ---
 
