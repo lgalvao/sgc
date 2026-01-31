@@ -35,7 +35,7 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
      * @param mapaCodigo Código do mapa
      */
     @EntityGraph(attributePaths = {"atividades"})
-    void findByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
+    List<Competencia> findByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
 
     /**
      * Busca dados projetados (id, descricao, id_atividade) das competências de um mapa.

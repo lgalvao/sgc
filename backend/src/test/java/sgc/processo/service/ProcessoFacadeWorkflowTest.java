@@ -75,10 +75,6 @@ class ProcessoFacadeWorkflowTest {
             processoAcessoService,
             processoFinalizador
         );
-
-        Field selfField = ProcessoFacade.class.getDeclaredField("self");
-        selfField.setAccessible(true);
-        selfField.set(processoFacade, processoFacade);
     }
 
     @Nested

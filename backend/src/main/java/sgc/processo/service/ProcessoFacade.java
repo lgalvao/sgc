@@ -2,33 +2,32 @@ package sgc.processo.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import sgc.alerta.AlertaFacade;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.*;
 import sgc.processo.erros.ErroProcesso;
-
 import sgc.processo.mapper.ProcessoMapper;
+import sgc.processo.model.AcaoProcesso;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 
-import java.util.*;
 import java.time.format.DateTimeFormatter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import sgc.alerta.AlertaFacade;
-import sgc.processo.model.AcaoProcesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Orquestra operações de Processo.
@@ -47,10 +46,6 @@ public class ProcessoFacade {
     private final UsuarioFacade usuarioService;
     private final ProcessoInicializador processoInicializador;
     private final AlertaFacade alertaService;
-    
-    @Autowired
-    @Lazy
-    private ProcessoFacade self;
 
     private final ProcessoAcessoService processoAcessoService;
     private final ProcessoFinalizador processoFinalizador;
@@ -97,8 +92,8 @@ public class ProcessoFacade {
 
     @Transactional(readOnly = true)
     public ProcessoDetalheDto obterContextoCompleto(Long codigo, Usuario usuario) {
-        ProcessoDetalheDto detalhes = self.obterDetalhes(codigo, usuario);
-        List<SubprocessoElegivelDto> elegiveis = self.listarSubprocessosElegiveis(codigo);
+        ProcessoDetalheDto detalhes = obterDetalhes(codigo, usuario);
+        List<SubprocessoElegivelDto> elegiveis = listarSubprocessosElegiveis(codigo);
 
         detalhes.getElegiveis().addAll(elegiveis);
         return detalhes;
@@ -125,9 +120,9 @@ public class ProcessoFacade {
                 .toList();
     }
 
-    public void listarTodos(
+    public Page<Processo> listarTodos(
             Pageable pageable) {
-        processoConsultaService.listarTodos(pageable);
+        return processoConsultaService.listarTodos(pageable);
     }
 
     public Page<Processo> listarPorParticipantesIgnorandoCriado(
@@ -157,7 +152,7 @@ public class ProcessoFacade {
 
     @Transactional
     public void enviarLembrete(Long codProcesso, Long unidadeCodigo) {
-        Processo processo = self.buscarEntidadePorId(codProcesso);
+        Processo processo = buscarEntidadePorId(codProcesso);
         Unidade unidade = unidadeService.buscarEntidadePorId(unidadeCodigo);
 
         // Verifica se unidade participa do processo

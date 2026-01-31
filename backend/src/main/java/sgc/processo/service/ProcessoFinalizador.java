@@ -1,11 +1,12 @@
 package sgc.processo.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
@@ -15,7 +16,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,35 +27,23 @@ import java.util.Optional;
  * <p>Coordena todas as etapas necessárias para finalizar um processo,
  * incluindo validações, publicação de mapas vigentes e eventos.</p>
  *
- * <p><b>Nota sobre Injeção de Dependências:</b>
- * SubprocessoFacade é injetado com @Lazy para quebrar dependência circular:
- * ProcessoFacade → ProcessoFinalizador → SubprocessoFacade → ... → ProcessoFacade
+ * <p><b>Refatoração v3.0:</b> Removido uso de @Lazy e dependência circular.
+ * Agora utiliza {@link ProcessoSubprocessoQueryService} para queries de leitura,
+ * eliminando acoplamento bidirecional com SubprocessoFacade.</p>
+ *
+ * @since 3.0.0 - Removido @Lazy, introduzido Query Service Pattern
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 class ProcessoFinalizador {
 
     private final ProcessoRepo processoRepo;
     private final UnidadeFacade unidadeService;
-    private final SubprocessoFacade subprocessoFacade;
+    private final ProcessoSubprocessoQueryService queryService;
     private final ProcessoValidador processoValidador;
     private final ApplicationEventPublisher publicadorEventos;
 
-    /**
-     * Constructor com @Lazy para quebrar dependência circular.
-     */
-    public ProcessoFinalizador(
-            ProcessoRepo processoRepo,
-            UnidadeFacade unidadeService,
-            @Lazy SubprocessoFacade subprocessoFacade,
-            ProcessoValidador processoValidador,
-            ApplicationEventPublisher publicadorEventos) {
-        this.processoRepo = processoRepo;
-        this.unidadeService = unidadeService;
-        this.subprocessoFacade = subprocessoFacade;
-        this.processoValidador = processoValidador;
-        this.publicadorEventos = publicadorEventos;
-    }
 
     /**
      * Finaliza um processo, validando e tornando os mapas vigentes.
@@ -93,7 +81,7 @@ class ProcessoFinalizador {
      */
     private void tornarMapasVigentes(Processo processo) {
         log.info("Mapa vigente definido para o processo {}", processo.getCodigo());
-        List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(processo.getCodigo());
+        List<Subprocesso> subprocessos = queryService.listarEntidadesPorProcesso(processo.getCodigo());
 
         for (Subprocesso subprocesso : subprocessos) {
             Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())

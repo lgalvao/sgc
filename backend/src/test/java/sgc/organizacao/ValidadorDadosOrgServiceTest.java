@@ -44,10 +44,12 @@ class ValidadorDadosOrgServiceTest {
     }
 
     private Usuario criarUsuarioValido(String titulo) {
-        return UsuarioTestBuilder.umDe()
+        Usuario u = UsuarioTestBuilder.umDe()
                 .comTitulo(titulo)
                 .comNome("Nome " + titulo)
                 .build();
+        u.setEmail(titulo.toLowerCase() + "@email.com");
+        return u;
     }
 
     @Nested

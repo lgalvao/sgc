@@ -1,8 +1,8 @@
 package sgc.alerta;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,10 +27,14 @@ import java.util.*;
  * e gerenciar a visualização/leitura de alertas por usuários. Delega operações
  * de persistência para {@link AlertaService}.
  *
+ * <p><b>Refatoração v3.0:</b> Removido @Lazy - não há ciclo de dependência real
+ * com UnidadeFacade. Mantido @Getter(lazy=true) para cache de SEDOC.</p>
+ *
  * @see AlertaService
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AlertaFacade {
     private final AlertaService alertaService;
     private final UsuarioFacade usuarioService;
@@ -41,26 +45,19 @@ public class AlertaFacade {
     @Getter(lazy = true)
     private final Unidade sedoc = unidadeService.buscarEntidadePorSigla("SEDOC");
 
-    public AlertaFacade(AlertaService alertaService, 
-                        UsuarioFacade usuarioService, 
-                        AlertaMapper alertaMapper, 
-                        @Lazy UnidadeFacade unidadeService) {
-        this.alertaService = alertaService;
-        this.usuarioService = usuarioService;
-        this.alertaMapper = alertaMapper;
-        this.unidadeService = unidadeService;
-    }
 
     /**
      * Criar e persistir um alerta.
      */
     private Alerta criarAlerta(Processo processo, Unidade origem, Unidade destino, String descricao) {
-        return alertaService.salvar(new Alerta()
-                .setProcesso(processo)
-                .setDataHora(LocalDateTime.now())
-                .setUnidadeOrigem(origem)
-                .setUnidadeDestino(destino)
-                .setDescricao(descricao));
+        Alerta alerta = Alerta.builder()
+                .processo(processo)
+                .dataHora(LocalDateTime.now())
+                .unidadeOrigem(origem)
+                .unidadeDestino(destino)
+                .descricao(descricao)
+                .build();
+        return alertaService.salvar(alerta);
     }
 
     /**
@@ -238,12 +235,12 @@ public class AlertaFacade {
     /**
      * Lista alertas destinados a uma unidade específica.
      */
-    public void listarPorUnidade(Long codigoUnidade, Pageable pageable) {
-        alertaService.buscarPorUnidadeDestino(codigoUnidade, pageable);
+    public org.springframework.data.domain.Page<Alerta> listarPorUnidade(Long codigoUnidade, Pageable pageable) {
+        return alertaService.buscarPorUnidadeDestino(codigoUnidade, pageable);
     }
 
-    public void obterDataHoraLeitura(Long codigoAlerta, String usuarioTitulo) {
-        alertaService.obterDataHoraLeitura(codigoAlerta, usuarioTitulo);
+    public Optional<LocalDateTime> obterDataHoraLeitura(Long codigoAlerta, String usuarioTitulo) {
+        return alertaService.obterDataHoraLeitura(codigoAlerta, usuarioTitulo);
     }
 
     @Transactional

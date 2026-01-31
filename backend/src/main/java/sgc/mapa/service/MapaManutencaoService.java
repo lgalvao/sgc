@@ -158,8 +158,8 @@ public class MapaManutencaoService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência", codCompetencia));
     }
 
-    public void buscarCompetenciasPorCodMapa(Long codMapa) {
-        competenciaRepo.findByMapaCodigo(codMapa);
+    public List<Competencia> buscarCompetenciasPorCodMapa(Long codMapa) {
+        return competenciaRepo.findByMapaCodigo(codMapa);
     }
 
     public List<Competencia> buscarCompetenciasPorCodMapaSemRelacionamentos(Long codMapa) {

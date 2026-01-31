@@ -19,7 +19,8 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
+import sgc.processo.model.TipoProcesso;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +28,8 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
-import sgc.processo.model.TipoProcesso;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -41,7 +43,7 @@ class ProcessoConsultaServiceTest {
     private ProcessoRepo processoRepo;
 
     @Mock
-    private SubprocessoFacade subprocessoFacade;
+    private ProcessoSubprocessoQueryService queryService;
 
     @Mock
     private UsuarioFacade usuarioService;
@@ -113,7 +115,7 @@ class ProcessoConsultaServiceTest {
         Subprocesso s1 = Subprocesso.builder().situacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).unidade(Unidade.builder().nome("U1").sigla("S1").build()).build();
         s1.setCodigo(1L);
 
-        when(subprocessoFacade.listarPorProcessoESituacao(1L, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)).thenReturn(List.of(s1));
+        when(queryService.listarPorProcessoESituacao(1L, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)).thenReturn(List.of(s1));
 
         List<SubprocessoElegivelDto> res = processoConsultaService.listarSubprocessosElegiveis(1L);
 
@@ -138,7 +140,7 @@ class ProcessoConsultaServiceTest {
                 PerfilDto.builder().unidadeCodigo(100L).build()
         ));
 
-        when(subprocessoFacade.listarPorProcessoUnidadeESituacoes(eq(1L), eq(100L), anyList())).thenReturn(List.of(s1, s2));
+        when(queryService.listarPorProcessoUnidadeESituacoes(eq(1L), eq(100L), anyList())).thenReturn(List.of(s1, s2));
 
         List<SubprocessoElegivelDto> res = processoConsultaService.listarSubprocessosElegiveis(1L);
 

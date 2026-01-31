@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +19,9 @@ import java.io.IOException;
 /**
  * Filtro de segurança que valida tokens JWT em cada requisição.
  * Extrai o token do header Authorization e configura o contexto de segurança.
+ *
+ * <p><b>Refatoração v3.0:</b> Removido @Lazy - filtros são instanciados após
+ * o contexto de aplicação estar completo, não há necessidade de lazy loading.</p>
  */
 @Component
 @Profile({"!test", "secure-test"})
@@ -27,7 +29,6 @@ import java.io.IOException;
 @Slf4j
 public class FiltroJwt extends OncePerRequestFilter {
     private final GerenciadorJwt gerenciadorJwt;
-    @Lazy
     private final UsuarioFacade usuarioService;
 
     @Override

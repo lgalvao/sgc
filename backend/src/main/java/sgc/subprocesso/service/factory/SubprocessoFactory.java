@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import sgc.subprocesso.model.SubprocessoRepo;
 
+import sgc.subprocesso.dto.CriarSubprocessoRequest;
+
 /**
  * Factory para criação de entidades Subprocesso.
  *
@@ -40,6 +42,34 @@ public class SubprocessoFactory {
     private final MapaRepo mapaRepo;
     private final MovimentacaoRepo movimentacaoRepo;
     private final CopiaMapaService servicoDeCopiaDeMapa;
+
+    public Subprocesso criar(CriarSubprocessoRequest request) {
+        Processo processo = Processo.builder()
+                .codigo(request.codProcesso())
+                .build();
+
+        Unidade unidade = Unidade.builder()
+                .codigo(request.codUnidade())
+                .build();
+
+        Subprocesso entity = Subprocesso.builder()
+                .processo(processo)
+                .unidade(unidade)
+                .dataLimiteEtapa1(request.dataLimiteEtapa1())
+                .dataLimiteEtapa2(request.dataLimiteEtapa2())
+                .mapa(null)
+                .build();
+
+        Subprocesso subprocessoSalvo = subprocessoRepo.save(entity);
+
+        Mapa mapa = Mapa.builder()
+                .subprocesso(subprocessoSalvo)
+                .build();
+        Mapa mapaSalvo = mapaRepo.save(mapa);
+
+        subprocessoSalvo.setMapa(mapaSalvo);
+        return subprocessoRepo.save(subprocessoSalvo);
+    }
 
     /**
      * Cria subprocessos para processo de mapeamento em lote.

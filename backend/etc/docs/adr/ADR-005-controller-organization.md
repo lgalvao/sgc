@@ -195,5 +195,5 @@ Controllers seguem padrões:
 
 - [ADR-001: Facade Pattern](/etc/docs/adr/ADR-001-facade-pattern.md)
 - [ARCHITECTURE.md](/etc/docsdocs/ARCHITECTURE.md)
-- [Backend Patterns](/etc/regras/backend-padroes.md)
+- [Backend Patterns](/etc/docs/backend-padroes.md)
 - [Refactoring Plan](/refactoring-plan.md) - Fase 5

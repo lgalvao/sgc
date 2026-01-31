@@ -1,16 +1,16 @@
 package sgc.processo.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,31 +23,20 @@ import java.util.stream.Collectors;
  * em unidades organizacionais e perfis de usuário.
  * </p>
  *
- * <p>
- * <b>Nota sobre Injeção de Dependências:</b>
- * SubprocessoFacade é injetado com @Lazy para quebrar dependência circular:
- * ProcessoFacade → ProcessoAcessoService → SubprocessoFacade → ... →
- * ProcessoFacade
+ * <p><b>Refatoração v3.0:</b> Removido uso de @Lazy e dependência circular.
+ * Agora utiliza {@link ProcessoSubprocessoQueryService} para queries de leitura,
+ * eliminando acoplamento bidirecional com SubprocessoFacade.</p>
+ *
+ * @since 3.0.0 - Removido @Lazy, introduzido Query Service Pattern
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 class ProcessoAcessoService {
 
     private final UnidadeFacade unidadeService;
     private final UsuarioFacade usuarioService;
-    private final SubprocessoFacade subprocessoFacade;
-
-    /**
-     * Constructor com @Lazy para quebrar dependência circular.
-     */
-    public ProcessoAcessoService(
-            UnidadeFacade unidadeService,
-            UsuarioFacade usuarioService,
-            @Lazy SubprocessoFacade subprocessoFacade) {
-        this.unidadeService = unidadeService;
-        this.usuarioService = usuarioService;
-        this.subprocessoFacade = subprocessoFacade;
-    }
+    private final ProcessoSubprocessoQueryService queryService;
 
     /**
      * Verifica se o usuário autenticado tem acesso ao processo.
@@ -92,7 +81,7 @@ class ProcessoAcessoService {
             todasUnidadesAcesso.addAll(buscarDescendentesNoMapa(codUnidade, mapaPorPai));
         }
 
-        return subprocessoFacade.verificarAcessoUnidadeAoProcesso(codProcesso, new ArrayList<>(todasUnidadesAcesso));
+        return queryService.verificarAcessoUnidadeAoProcesso(codProcesso, new ArrayList<>(todasUnidadesAcesso));
     }
 
     /**

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface UsuarioRepo extends JpaRepository<Usuario, String> {
-    void findByEmail(String email);
+    Optional<Usuario> findByEmail(String email);
 
     List<Usuario> findByUnidadeLotacaoCodigo(Long codigoUnidade);
 
@@ -33,7 +33,7 @@ public interface UsuarioRepo extends JpaRepository<Usuario, String> {
     @Query("""
             SELECT u FROM Usuario u LEFT JOIN FETCH u.atribuicoesTemporarias WHERE u.tituloEleitoral = :titulo
             """)
-    void findByIdWithAtribuicoes(@Param("titulo") String titulo);
+    Optional<Usuario> findByIdWithAtribuicoes(@Param("titulo") String titulo);
 
     @Query("""
             SELECT DISTINCT u FROM Usuario u

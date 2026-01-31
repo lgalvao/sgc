@@ -1,8 +1,8 @@
 package sgc.testutils;
 
+import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.SituacaoUnidade;
 
 /**
  * Builder para criação de objetos Unidade em testes.
@@ -22,7 +22,7 @@ import sgc.organizacao.model.SituacaoUnidade;
  * ```
  */
 public class UnidadeTestBuilder {
-    private String codigo = "UNIDADE_TEST";
+    private String codigo = "UNIDADE_TEST"; // may be non-numeric sigla-like code
     private String sigla = "UNIDADE_TEST";
     private String nome = "Unidade de Teste";
     private TipoUnidade tipo = TipoUnidade.OPERACIONAL;
@@ -31,6 +31,13 @@ public class UnidadeTestBuilder {
 
     public static UnidadeTestBuilder umaDe() {
         return new UnidadeTestBuilder();
+    }
+
+    /**
+     * Alias/fixture para a assessoria frequentemente usada nos testes
+     */
+    public static UnidadeTestBuilder assessoria() {
+        return operacional();
     }
 
     /**
@@ -101,7 +108,16 @@ public class UnidadeTestBuilder {
 
     public Unidade build() {
         Unidade unidade = new Unidade();
-        unidade.setCodigo(codigo);
+        // Try to set numeric id if codigo is numeric; otherwise prefer leaving id null
+        // and rely on sigla to identify the unit in tests that use human codes like "SEDOC".
+        if (codigo != null) {
+            try {
+                Long codigoLong = Long.parseLong(codigo);
+                unidade.setCodigo(codigoLong);
+            } catch (NumberFormatException ex) {
+                // not a numeric id, don't set codigo (it's generated). Use sigla instead.
+            }
+        }
         unidade.setSigla(sigla);
         unidade.setNome(nome);
         unidade.setTipo(tipo);

@@ -7,22 +7,28 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.alerta.AlertaFacade;
 import sgc.analise.AnaliseFacade;
 import sgc.comum.erros.ErroAcessoNegado;
-
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.eventos.TipoTransicao;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 import sgc.testutils.UnidadeTestBuilder;
 import sgc.testutils.UsuarioTestBuilder;
@@ -34,13 +40,6 @@ import java.util.Objects;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-import sgc.alerta.AlertaFacade;
-import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UsuarioFacade;
-import sgc.seguranca.acesso.AccessControlService;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -108,7 +107,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         verify(transicaoService).registrar(argThat(cmd ->
                 cmd.sp().equals(sp) &&
                         cmd.tipo() == TipoTransicao.CADASTRO_DISPONIBILIZADO &&
-                        cmd.usuario().equals(user)
+                        Objects.equals(cmd.usuario(), user)
         ));
     }
 

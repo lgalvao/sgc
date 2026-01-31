@@ -29,9 +29,6 @@ import static java.util.stream.Collectors.*;
  *   <li>Consultas em lote de responsáveis</li>
  * </ul>
  *
- * <p>Este serviço foi extraído de UnidadeFacade para respeitar o
- * Single Responsibility Principle (SRP).
- *
  */
 @Service
 @RequiredArgsConstructor
@@ -168,5 +165,18 @@ public class UnidadeResponsavelService {
                 .substitutoTitulo(substituto != null ? substituto.getTituloEleitoral() : null)
                 .substitutoNome(substituto != null ? substituto.getNome() : null)
                 .build();
+    }
+
+    private void carregarAtribuicoesUsuario(Usuario usuario) {
+        Set<UsuarioPerfil> permanentes = new HashSet<>(usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral()));
+        Set<UsuarioPerfil> todas = usuario.getTodasAtribuicoes(permanentes);
+    }
+
+    private void carregarAtribuicoesEmLote(List<Usuario> usuarios) {
+        if (usuarios == null || usuarios.isEmpty()) return;
+        for (Usuario u : usuarios) {
+            Set<UsuarioPerfil> permanentes = new HashSet<>(usuarioPerfilRepo.findByUsuarioTitulo(u.getTituloEleitoral()));
+            u.getTodasAtribuicoes(permanentes);
+        }
     }
 }

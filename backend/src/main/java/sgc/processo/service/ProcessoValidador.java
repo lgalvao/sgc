@@ -1,23 +1,19 @@
 package sgc.processo.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
 import java.util.Optional;
-
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
 
 /**
  * Serviço responsável pelas validações de regras de negócio de Processo.
@@ -25,26 +21,19 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
  * <p>Centraliza todas as validações complexas relacionadas a processos,
  * incluindo validação de unidades, subprocessos e regras de finalização.</p>
  *
- * <p><b>Nota sobre Injeção de Dependências:</b>
- * SubprocessoFacade é injetado com @Lazy para quebrar dependência circular:
- * ProcessoFacade → ProcessoValidador → SubprocessoFacade → ... → ProcessoFacade
+ * <p><b>Refatoração v3.0:</b> Removido uso de @Lazy e dependência circular.
+ * Agora utiliza {@link ProcessoSubprocessoQueryService} para queries de leitura,
+ * eliminando acoplamento bidirecional com SubprocessoFacade.</p>
+ *
+ * @since 3.0.0 - Removido @Lazy, introduzido Query Service Pattern
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 class ProcessoValidador {
 
     private final UnidadeFacade unidadeService;
-    private final SubprocessoFacade subprocessoFacade;
-
-    /**
-     * Constructor com @Lazy para quebrar dependência circular.
-     */
-    public ProcessoValidador(
-            UnidadeFacade unidadeService,
-            @Lazy SubprocessoFacade subprocessoFacade) {
-        this.unidadeService = unidadeService;
-        this.subprocessoFacade = subprocessoFacade;
-    }
+    private final ProcessoSubprocessoQueryService queryService;
 
     /**
      * Valida se todas as unidades especificadas possuem mapa vigente.
@@ -88,26 +77,21 @@ class ProcessoValidador {
     /**
      * Valida se todos os subprocessos de um processo estão homologados.
      *
+     * <p>Utiliza query otimizada ao invés de carregar todas as entidades Subprocesso,
+     * melhorando performance e reduzindo consumo de memória.</p>
+     *
      * @param processo processo a validar
      * @throws ErroProcesso se algum subprocesso não estiver homologado
      */
     public void validarTodosSubprocessosHomologados(Processo processo) {
-        List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(processo.getCodigo());
-        List<String> pendentes = subprocessos.stream().filter(sp -> sp.getSituacao() != MAPEAMENTO_MAPA_HOMOLOGADO
-                        && sp.getSituacao() != REVISAO_MAPA_HOMOLOGADO)
-                .map(sp -> {
-                    String identificador = sp.getUnidade().getSigla();
-                    return String.format("%s (Situação: %s)", identificador, sp.getSituacao());
-                })
-                .toList();
+        var resultado = queryService.validarSubprocessosParaFinalizacao(processo.getCodigo());
 
-        if (!pendentes.isEmpty()) {
-            String mensagem = String.format("Não é possível encerrar o processo. Unidades pendentes de"
-                            + " homologação:%n- %s",
-                    String.join("%n- ", pendentes));
-            log.warn("Validação de finalização falhou: {} subprocessos não homologados.", pendentes.size());
-            throw new ErroProcesso(mensagem);
+        if (!resultado.valido()) {
+            log.warn("Validação de finalização falhou para processo {}: {}",
+                    processo.getCodigo(), resultado.mensagem());
+            throw new ErroProcesso(resultado.mensagem());
         }
-        log.info("Homologados {} subprocessos.", subprocessos.size());
+
+        log.info("Todos os subprocessos do processo {} estão homologados", processo.getCodigo());
     }
 }

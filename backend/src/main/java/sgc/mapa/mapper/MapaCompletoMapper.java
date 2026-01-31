@@ -5,19 +5,19 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
+import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.Set;
-import sgc.mapa.model.Atividade;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface MapaCompletoMapper {
-    default void toDto(Mapa mapa, Long codSubprocesso, List<Competencia> competencias) {
-        MapaCompletoDto.builder()
+    default MapaCompletoDto toDto(Mapa mapa, Long codSubprocesso, List<Competencia> competencias) {
+        return MapaCompletoDto.builder()
                 .codigo(mapa.getCodigo())
                 .subprocessoCodigo(codSubprocesso)
                 .observacoes(mapa.getObservacoesDisponibilizacao())

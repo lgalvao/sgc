@@ -86,7 +86,6 @@ class ConfiguracaoFacadeTest {
         ParametroRequest req = new ParametroRequest(1L, "CHAVE_1", "VALOR_1", "Desc 1");
         Parametro p1 = Parametro.builder().chave("CHAVE_1").valor("VALOR_1").descricao("Desc 1").build();
         List<ParametroRequest> lista = List.of(req);
-        when(configuracaoService.buscarPorChave("CHAVE_1")).thenReturn(p1);
         when(configuracaoService.salvar(any())).thenReturn(List.of(p1));
         when(parametroMapper.toResponse(any())).thenReturn(mock(ParametroResponse.class));
 

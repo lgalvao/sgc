@@ -1,7 +1,7 @@
 package sgc.processo.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.processo.dto.SubprocessoElegivelDto;
@@ -18,7 +19,6 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.*;
 
@@ -30,31 +30,21 @@ import java.util.*;
  * listagens filtradas, verificações de elegibilidade e queries específicas.
  * </p>
  *
- * <p>
- * <b>Nota sobre Injeção de Dependências:</b>
- * SubprocessoFacade é injetado com @Lazy para quebrar dependência circular:
- * ProcessoFacade → ProcessoConsultaService → SubprocessoFacade → ... →
- * ProcessoFacade
+ * <p><b>Refatoração v3.0:</b> Removido uso de @Lazy e dependência circular.
+ * Agora utiliza {@link ProcessoSubprocessoQueryService} para queries de leitura,
+ * eliminando acoplamento bidirecional com SubprocessoFacade.</p>
+ *
+ * @since 3.0.0 - Removido @Lazy, introduzido Query Service Pattern
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ProcessoConsultaService {
     private final ProcessoRepo processoRepo;
-    private final SubprocessoFacade subprocessoFacade;
+    private final ProcessoSubprocessoQueryService queryService;
     private final UsuarioFacade usuarioService;
     private static final String ENTIDADE_PROCESSO = "Processo";
 
-    /**
-     * Constructor com @Lazy para quebrar dependência circular.
-     */
-    public ProcessoConsultaService(
-            ProcessoRepo processoRepo,
-            @Lazy SubprocessoFacade subprocessoFacade,
-            UsuarioFacade usuarioService) {
-        this.processoRepo = processoRepo;
-        this.subprocessoFacade = subprocessoFacade;
-        this.usuarioService = usuarioService;
-    }
 
     public Processo buscarPorId(Long id) {
         return processoRepo.findById(id)
@@ -123,7 +113,7 @@ public class ProcessoConsultaService {
                 .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
 
         if (isAdmin) {
-            return subprocessoFacade.listarPorProcessoESituacao(codProcesso, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)
+            return queryService.listarPorProcessoESituacao(codProcesso, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)
                     .stream()
                     .map(this::toSubprocessoElegivelDto)
                     .toList();
@@ -136,7 +126,7 @@ public class ProcessoConsultaService {
             return List.of();
         }
 
-        return subprocessoFacade.listarPorProcessoUnidadeESituacoes(codProcesso, codUnidadeUsuario,
+        return queryService.listarPorProcessoUnidadeESituacoes(codProcesso, codUnidadeUsuario,
                 List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
                         SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA))
                 .stream()

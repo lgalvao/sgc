@@ -14,7 +14,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +34,7 @@ class ProcessoValidadorTest {
     private UnidadeFacade unidadeService;
 
     @Mock
-    private SubprocessoFacade subprocessoFacade;
+    private ProcessoSubprocessoQueryService queryService;
 
     @InjectMocks
     private ProcessoValidador validador;
@@ -77,13 +77,8 @@ class ProcessoValidadorTest {
         Processo p = new Processo();
         p.setCodigo(1L);
 
-        Subprocesso sp1 = new Subprocesso();
-        sp1.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-
-        Subprocesso sp2 = new Subprocesso();
-        sp2.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
-
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
+        when(queryService.validarSubprocessosParaFinalizacao(1L))
+                .thenReturn(ProcessoSubprocessoQueryService.ValidationResult.ofValido());
 
         // Should not throw exception
         Assertions.assertDoesNotThrow(() -> validador.validarTodosSubprocessosHomologados(p));

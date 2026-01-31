@@ -13,7 +13,7 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
 import sgc.testutils.UnidadeTestBuilder;
 
 import java.util.List;
@@ -39,7 +39,7 @@ class ProcessoAcessoServiceTest {
     private UsuarioFacade usuarioService;
 
     @Mock
-    private SubprocessoFacade subprocessoFacade;
+    private ProcessoSubprocessoQueryService queryService;
 
     @Test
     @DisplayName("Deve negar acesso se authentication for null")
@@ -90,7 +90,7 @@ class ProcessoAcessoServiceTest {
 
         when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(u100, u101, u102));
 
-        when(subprocessoFacade.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenAnswer(invocation -> {
+        when(queryService.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenAnswer(invocation -> {
             List<Long> ids = invocation.getArgument(1);
             return ids.contains(100L) && ids.contains(101L) && ids.contains(102L);
         });
@@ -188,7 +188,7 @@ class ProcessoAcessoServiceTest {
 
         // Mock verification:
         // Se a lista de IDs conter 200, acesso é permitido. Se tiver apenas 100, negado.
-        when(subprocessoFacade.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenAnswer(invocation -> {
+        when(queryService.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenAnswer(invocation -> {
             List<Long> ids = invocation.getArgument(1);
             return ids.contains(200L);
         });

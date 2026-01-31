@@ -1,13 +1,10 @@
 package sgc.subprocesso.service.crud;
 
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Lazy;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UsuarioFacade;
+import sgc.subprocesso.service.factory.SubprocessoFactory;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -15,15 +12,16 @@ import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.mapa.model.Mapa;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Serviço especializado para operações CRUD básicas de Subprocesso.
@@ -37,44 +35,23 @@ import sgc.subprocesso.model.SubprocessoRepo;
  * Acesso externo deve ser feito via
  * {@link sgc.subprocesso.service.SubprocessoFacade}.
  *
- * <p>
- * <b>Nota sobre Injeção de Dependências:</b>
- * MapaFacade é injetado com @Lazy para quebrar a dependência circular:
- * SubprocessoFacade → SubprocessoCrudService → MapaFacade →
- * MapaVisualizacaoService → SubprocessoFacade
+ * <p><b>Refatoração v3.0:</b> Removido uso de @Lazy e dependência em MapaFacade.
+ * A criação do mapa agora é responsabilidade de SubprocessoFactory.</p>
  *
- * @since 2.0.0 - Tornado package-private na consolidação arquitetural Sprint 2
+ * @since 3.0.0 - Removido @Lazy e MapaFacade
  */
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class SubprocessoCrudService {
     private static final String MSG_SUBPROCESSO_NAO_ENCONTRADO = "Subprocesso não encontrado";
     private final SubprocessoRepo subprocessoRepo;
     private final ComumRepo repositorioComum;
     private final SubprocessoMapper subprocessoMapper;
-    private final MapaFacade mapaFacade;
+    private final SubprocessoFactory subprocessoFactory;
 
-    /**
-     * Constructor with @Lazy injection to break circular dependency.
-     *
-     * @param mapaFacade injetado com @Lazy para evitar
-     *                   BeanCurrentlyInCreationException
-     */
-    public SubprocessoCrudService(
-            SubprocessoRepo subprocessoRepo,
-            ComumRepo repositorioComum,
-            SubprocessoMapper subprocessoMapper,
-            @Lazy MapaFacade mapaFacade,
-            ApplicationEventPublisher eventPublisher,
-            UsuarioFacade usuarioService) {
-        this.subprocessoRepo = subprocessoRepo;
-        this.repositorioComum = repositorioComum;
-        this.subprocessoMapper = subprocessoMapper;
-        this.mapaFacade = mapaFacade;
-    }
-
-    public void buscarSubprocesso(Long codigo) {
-        repositorioComum.buscar(Subprocesso.class, codigo);
+    public Subprocesso buscarSubprocesso(Long codigo) {
+        return repositorioComum.buscar(Subprocesso.class, codigo);
     }
 
     /**
@@ -123,28 +100,7 @@ public class SubprocessoCrudService {
     }
 
     public SubprocessoDto criar(CriarSubprocessoRequest request) {
-        var entity = new Subprocesso();
-        var processo = new Processo();
-        processo.setCodigo(request.codProcesso());
-        entity.setProcesso(processo);
-
-        var unidade = new Unidade();
-        unidade.setCodigo(request.codUnidade());
-        entity.setUnidade(unidade);
-        entity.setDataLimiteEtapa1(request.dataLimiteEtapa1());
-        entity.setDataLimiteEtapa2(request.dataLimiteEtapa2());
-        entity.setMapa(null);
-
-        var subprocessoSalvo = subprocessoRepo.save(entity);
-
-        Mapa mapa = Mapa.builder()
-                .subprocesso(subprocessoSalvo)
-                .build();
-        Mapa mapaSalvo = mapaFacade.salvar(mapa);
-
-        subprocessoSalvo.setMapa(mapaSalvo);
-        var salvo = subprocessoRepo.save(subprocessoSalvo);
-
+        Subprocesso salvo = subprocessoFactory.criar(request);
         return subprocessoMapper.toDto(salvo);
     }
 

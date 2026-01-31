@@ -24,7 +24,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -39,7 +39,7 @@ class ProcessoFinalizadorTest {
     @Mock
     private UnidadeFacade unidadeService;
     @Mock
-    private SubprocessoFacade subprocessoFacade;
+    private ProcessoSubprocessoQueryService queryService;
     @Mock
     private ProcessoValidador processoValidador;
     @Mock
@@ -62,7 +62,7 @@ class ProcessoFinalizadorTest {
         Mapa m = new Mapa();
         s.setMapa(m);
 
-        when(subprocessoFacade.listarEntidadesPorProcesso(codigo)).thenReturn(List.of(s));
+        when(queryService.listarEntidadesPorProcesso(codigo)).thenReturn(List.of(s));
 
         finalizador.finalizar(codigo);
 
