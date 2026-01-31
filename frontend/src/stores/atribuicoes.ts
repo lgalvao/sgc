@@ -7,13 +7,14 @@ import {
 } from "@/services/atribuicaoTemporariaService";
 import type {AtribuicaoTemporaria} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
+import {useSingleLoading} from "@/composables/useLoadingManager";
 import {logger} from "@/utils";
 
 export const useAtribuicaoTemporariaStore = defineStore(
     "atribuicaoTemporaria",
     () => {
         const atribuicoes = ref<AtribuicaoTemporaria[]>([]);
-        const isLoading = ref(false);
+        const loading = useSingleLoading();
         const error = ref<string | null>(null); // Keeping for backward compatibility
         const { lastError, clearError: clearNormalizedError, withErrorHandling } = useErrorHandler();
 
@@ -35,31 +36,30 @@ export const useAtribuicaoTemporariaStore = defineStore(
         }
 
         async function buscarAtribuicoes() {
-            isLoading.value = true;
             error.value = null;
-            await withErrorHandling(async () => {
-                const response = await buscarTodasAtribuicoes();
-                // response is the array directly from the service
-                const data = Array.isArray(response) ? response : (response as any).data;
-                
-                if (Array.isArray(data)) {
-                    atribuicoes.value = data.map((a: any) => ({
-                        codigo: a.id,
-                        dataInicio: new Date(a.dataInicio).toISOString(),
-                        dataFim: new Date(a.dataTermino).toISOString(),
-                        dataTermino: new Date(a.dataTermino).toISOString(),
-                        usuario: a.usuario || a.servidor, // Handle both just in case
-                        unidade: a.unidade,
-                        justificativa: a.justificativa
-                    })) as AtribuicaoTemporaria[];
-                } else {
-                    logger.error("Expected array but got:", data);
-                    atribuicoes.value = [];
-                }
-            }, () => {
-                error.value = lastError.value?.message || "Erro ao buscar atribuições";
-            }).finally(() => {
-                isLoading.value = false;
+            await loading.withLoading(async () => {
+                await withErrorHandling(async () => {
+                    const response = await buscarTodasAtribuicoes();
+                    // response is the array directly from the service
+                    const data = Array.isArray(response) ? response : (response as any).data;
+                    
+                    if (Array.isArray(data)) {
+                        atribuicoes.value = data.map((a: any) => ({
+                            codigo: a.id,
+                            dataInicio: new Date(a.dataInicio).toISOString(),
+                            dataFim: new Date(a.dataTermino).toISOString(),
+                            dataTermino: new Date(a.dataTermino).toISOString(),
+                            usuario: a.usuario || a.servidor, // Handle both just in case
+                            unidade: a.unidade,
+                            justificativa: a.justificativa
+                        })) as AtribuicaoTemporaria[];
+                    } else {
+                        logger.error("Expected array but got:", data);
+                        atribuicoes.value = [];
+                    }
+                }, () => {
+                    error.value = lastError.value?.message || "Erro ao buscar atribuições";
+                });
             });
         }
 
@@ -67,21 +67,20 @@ export const useAtribuicaoTemporariaStore = defineStore(
             codUnidade: number,
             request: CriarAtribuicaoTemporariaRequest
         ) {
-            isLoading.value = true;
             error.value = null;
-            await withErrorHandling(async () => {
-                await serviceCriarAtribuicao(codUnidade, request);
-                await buscarAtribuicoes();
-            }, () => {
-                error.value = lastError.value?.message || "Erro ao criar atribuição";
-            }).finally(() => {
-                isLoading.value = false;
+            await loading.withLoading(async () => {
+                await withErrorHandling(async () => {
+                    await serviceCriarAtribuicao(codUnidade, request);
+                    await buscarAtribuicoes();
+                }, () => {
+                    error.value = lastError.value?.message || "Erro ao criar atribuição";
+                });
             });
         }
 
         return {
             atribuicoes,
-            isLoading,
+            isLoading: loading.isLoading,
             error,
             lastError,
             clearError,

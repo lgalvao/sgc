@@ -7,10 +7,11 @@ import {
 } from "@/services/usuarioService";
 import type {Usuario} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
+import {useSingleLoading} from "@/composables/useLoadingManager";
 
 export const useUsuariosStore = defineStore("usuarios", () => {
     const usuarios = ref<Usuario[]>([]);
-    const isLoading = ref(false);
+    const loading = useSingleLoading();
     const error = ref<string | null>(null);
     const { lastError, clearError: clearNormalizedError, withErrorHandling } = useErrorHandler();
 
@@ -37,49 +38,46 @@ export const useUsuariosStore = defineStore("usuarios", () => {
     }
 
     async function buscarUsuarios() {
-        isLoading.value = true;
         error.value = null;
-        await withErrorHandling(async () => {
-            const response = await buscarTodosUsuarios();
-            usuarios.value = (response as any).map((u: any) => ({
-                ...u,
-                unidade: {sigla: u.unidade},
-            })) as Usuario[];
-        }, () => {
-            error.value = lastError.value?.message || "Erro ao buscar usuários";
-        }).finally(() => {
-            isLoading.value = false;
+        await loading.withLoading(async () => {
+            await withErrorHandling(async () => {
+                const response = await buscarTodosUsuarios();
+                usuarios.value = (response as any).map((u: any) => ({
+                    ...u,
+                    unidade: {sigla: u.unidade},
+                })) as Usuario[];
+            }, () => {
+                error.value = lastError.value?.message || "Erro ao buscar usuários";
+            });
         });
     }
 
     async function buscarUsuariosPorUnidade(codigoUnidade: number): Promise<Usuario[]> {
-        isLoading.value = true;
         error.value = null;
-        return withErrorHandling(async () => {
-            const response = await serviceBuscarUsuariosPorUnidade(codigoUnidade);
-            return response;
-        }, () => {
-            error.value = lastError.value?.message || "Erro ao buscar usuários da unidade";
-        }).finally(() => {
-            isLoading.value = false;
-        }) as Promise<Usuario[]>;
+        return loading.withLoading(async () => {
+            return withErrorHandling(async () => {
+                const response = await serviceBuscarUsuariosPorUnidade(codigoUnidade);
+                return response;
+            }, () => {
+                error.value = lastError.value?.message || "Erro ao buscar usuários da unidade";
+            }) as Promise<Usuario[]>;
+        });
     }
 
     async function buscarUsuarioPorTitulo(titulo: string): Promise<Usuario | undefined> {
-        isLoading.value = true;
         error.value = null;
-        return withErrorHandling(async () => {
-            return await serviceBuscarUsuarioPorTitulo(titulo);
-        }, () => {
-            error.value = lastError.value?.message || "Erro ao buscar usuário";
-        }).finally(() => {
-            isLoading.value = false;
-        }) as Promise<Usuario | undefined>;
+        return loading.withLoading(async () => {
+            return withErrorHandling(async () => {
+                return await serviceBuscarUsuarioPorTitulo(titulo);
+            }, () => {
+                error.value = lastError.value?.message || "Erro ao buscar usuário";
+            }) as Promise<Usuario | undefined>;
+        });
     }
 
     return {
         usuarios,
-        isLoading,
+        isLoading: loading.isLoading,
         error,
         lastError,
         clearError,
