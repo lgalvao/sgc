@@ -60,31 +60,23 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from 'vue';
+import {computed, onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {BButton, BCard, BContainer} from 'bootstrap-vue-next';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';
-import {apiClient} from '@/axios-setup';
+import {useProcessosStore} from '@/stores/processos';
 import {logger} from '@/utils';
 
-interface ProcessoResumo {
-  codigo: number;
-  descricao: string;
-  tipo: string;
-  dataFinalizacao: string;
-  // participantes: ... (se necessário agregar, mas o backend pode não mandar simples)
-}
-
 const router = useRouter();
-const processos = ref<ProcessoResumo[]>([]);
+const processosStore = useProcessosStore();
+const processos = computed(() => processosStore.processosFinalizados);
 const loading = ref(false);
 
 async function carregarHistorico() {
   loading.value = true;
   try {
-    const response = await apiClient.get<ProcessoResumo[]>('/processos/finalizados');
-    processos.value = response.data;
+    await processosStore.buscarProcessosFinalizados();
   } catch (e) {
     logger.error("Erro ao carregar histórico:", e);
   } finally {
