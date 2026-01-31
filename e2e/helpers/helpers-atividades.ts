@@ -115,7 +115,8 @@ export async function verificarBotaoImpactoDropdown(page: Page) {
     await expect(btnMaisAcoes).toBeVisible();
     await btnMaisAcoes.click();
     await expect(page.getByTestId('cad-atividades__btn-impactos-mapa')).toBeVisible();
-    await page.keyboard.press('Escape'); // Fecha o dropdown
+    // Fechar clicando novamente ou fora
+    await btnMaisAcoes.click();
 }
 
 export async function verificarBotaoImpactoDireto(page: Page) {
@@ -125,14 +126,13 @@ export async function verificarBotaoImpactoDireto(page: Page) {
 export async function verificarBotaoImpactoAusente(page: Page) {
     const btnImpacto = page.getByTestId('cad-atividades__btn-impactos-mapa');
     
-    // Se o botão for um item de menu (dentro de Mais ações)
     const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
     if (await btnMaisAcoes.isVisible()) {
         await btnMaisAcoes.click();
         await expect(btnImpacto).toBeHidden();
-        await page.keyboard.press('Escape');
+        // Clicar novamente para fechar
+        await btnMaisAcoes.click();
     } else {
-        // Se for um botão direto
         await expect(btnImpacto).toBeHidden();
     }
 }

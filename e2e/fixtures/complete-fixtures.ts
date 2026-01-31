@@ -25,11 +25,18 @@ import {resetDatabase, useProcessoCleanup} from '../hooks/hooks-limpeza.js';
  * ```
  */
 
-// Adicionar reset de database como beforeAll
+// Adicionar reset de database como beforeEach (uma vez por arquivo)
 const test = base;
 
-test.beforeAll(async ({request}) => {
-    await resetDatabase(request);
+let lastResetFile: string | undefined;
+
+test.beforeEach(async ({request}, testInfo) => {
+    // Garante que o banco seja resetado apenas na primeira vez que o arquivo de teste é executado
+    // Se o worker for reiniciado (ex: após timeout), lastResetFile estará undefined e resetará novamente.
+    if (lastResetFile !== testInfo.file) {
+        await resetDatabase(request);
+        lastResetFile = testInfo.file;
+    }
 });
 
 // Extend para adicionar cleanup automático

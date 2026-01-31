@@ -22,9 +22,14 @@ import {resetDatabase} from '../hooks/hooks-limpeza.js';
  */
 export const test = base;
 
-// Hook global para reset de database antes de todos os testes
-test.beforeAll(async ({request}) => {
-    await resetDatabase(request);
+let lastResetFile: string | undefined;
+
+// Hook para reset de database (uma vez por arquivo)
+test.beforeEach(async ({request}, testInfo) => {
+    if (lastResetFile !== testInfo.file) {
+        await resetDatabase(request);
+        lastResetFile = testInfo.file;
+    }
 });
 
 export {expect} from './auth-fixtures.js';

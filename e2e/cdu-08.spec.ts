@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso} from './helpers/helpers-processos.js';
+import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import * as AtividadeHelpers from './helpers/helpers-atividades.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
 import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
@@ -10,7 +10,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 
-    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({page, autenticadoComoAdmin}) => {
+    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         const timestamp = Date.now();
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
 
@@ -24,6 +24,13 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
                 expandir: ['SECRETARIA_1'],
                 iniciar: true
             });
+
+            // Capturar ID para cleanup
+            await page.getByText(descricaoProcesso).first().click();
+            await expect(page).toHaveURL(/\/processo\/\d+/);
+            const processoId = await extrairProcessoId(page);
+            if (processoId > 0) cleanupAutomatico.registrar(processoId);
+
             await fazerLogout(page);
         });
 

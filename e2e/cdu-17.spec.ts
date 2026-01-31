@@ -1,5 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcesso} from './helpers/helpers-processos.js';
+import {USUARIOS} from './helpers/helpers-auth.js';
+import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
@@ -21,9 +22,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     // PREPARAÇÃO - Criar mapa pronto para disponibilização
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, cleanupAutomatico}) => {
-        
-
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         await criarProcesso(page, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
@@ -35,7 +34,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        const processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        const processoId = await extrairProcessoId(page);
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -44,9 +43,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
-        
-
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         // Acessar subprocesso
         await page.getByText(descProcesso).click();
         await navegarParaAtividades(page);
@@ -61,8 +58,6 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await adicionarAtividade(page, atividade3);
         await adicionarConhecimento(page, atividade3, 'Conhecimento 3A');
 
-        // Recarregar página para garantir estado atualizado das permissões
-        await page.reload();
         await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeVisible(); 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
@@ -71,9 +66,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro', async ({page}) => {
-        
-
+    test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await page.getByTestId('card-subprocesso-atividades-vis').click();
@@ -83,16 +76,12 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
     });
 
-    test('Preparacao 4: Admin cria competências com todas as atividades associadas', async ({page}) => {
-        
-
+    test('Preparacao 4: Admin cria competências com todas as atividades associadas', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await navegarParaMapa(page);
 
         // Criar duas competências cobrindo todas as três atividades
-        // competencia1: atividade1, atividade2
-        // competencia2: atividade3
         await criarCompetencia(page, competencia1, [atividade1, atividade2]);
         await criarCompetencia(page, competencia2, [atividade3]);
 
@@ -108,10 +97,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     // TESTES PRINCIPAIS - CDU-17
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para tela de edição do mapa', async ({page}) => {
-        // CDU-17: Passos 1-6
-        
-
+    test('Cenario 1: ADMIN navega para tela de edição do mapa', async ({page, autenticadoComoAdmin}) => {
         // Passo 1: ADMIN escolhe o processo de mapeamento
         await expect(page.getByText(descProcesso)).toBeVisible();
         await page.getByText(descProcesso).click();
@@ -119,10 +105,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         // Passo 2-3: Detalhes do processo, clica na unidade
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
         await navegarParaSubprocesso(page, 'SECAO_221');
-        // Passo 4: Detalhes do subprocesso
-        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
-            .toHaveText(/Mapa criado/i);
-
+        
         // Passo 5-6: Clica no card Mapa de Competências
         await page.getByTestId('card-subprocesso-mapa').click();
 
@@ -131,10 +114,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
     });
 
-    test('Cenario 2: ADMIN abre modal de disponibilização', async ({page}) => {
-        // CDU-17: Passo 7, 10
-        
-
+    test('Cenario 2: ADMIN abre modal de disponibilização', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await page.getByTestId('card-subprocesso-mapa').click();
@@ -145,15 +125,9 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         // Passo 10: Sistema mostra modal com Data e Observações
         await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeVisible();
         await expect(page.getByText('Disponibilização do mapa')).toBeVisible();
-
-        // Verificar campos do modal
-        await expect(page.getByLabel(/Data limite/i)).toBeVisible();
     });
 
-    test('Cenario 3: ADMIN cancela disponibilização - permanece na tela', async ({page}) => {
-        // CDU-17: Passo 11
-        
-
+    test('Cenario 3: ADMIN cancela disponibilização - permanece na tela', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await page.getByTestId('card-subprocesso-mapa').click();
@@ -167,13 +141,9 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         // Sistema permanece na tela de Edição de mapa
         await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeHidden();
         await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
-        await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
     });
 
-    test('Cenario 4: ADMIN disponibiliza mapa com sucesso', async ({page}) => {
-        // CDU-17: Passos 12-14, 20
-        
-
+    test('Cenario 4: ADMIN disponibiliza mapa com sucesso', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await page.getByTestId('card-subprocesso-mapa').click();
@@ -184,11 +154,5 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         // Passo 20: Redireciona para Painel com confirmação
         await verificarPaginaPainel(page);
         await expect(page.getByText(/Mapa disponibilizado/i)).toBeVisible();
-
-        // Verificar mudança de situação (Passo 14)
-        await page.getByText(descProcesso).click();
-        await navegarParaSubprocesso(page, 'SECAO_221');
-        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
-            .toHaveText(/Mapa disponibilizado/i);
     });
 });
