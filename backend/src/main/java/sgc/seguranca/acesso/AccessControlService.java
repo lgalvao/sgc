@@ -1,10 +1,9 @@
 package sgc.seguranca.acesso;
 
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
+import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroAcessoNegado;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
@@ -82,6 +81,17 @@ public class AccessControlService {
     private <T> String obterMotivoNegacao(@Nullable Usuario usuario, Acao acao, T recurso) {
         if (usuario == null) return "Usuário não autenticado não pode executar a ação: " + acao.getDescricao();
 
+        String motivoPolicy = getMotivoPolicy(recurso);
+
+        if (motivoPolicy != null && !motivoPolicy.isBlank()) {
+            return motivoPolicy;
+        }
+
+        return String.format("Usuário '%s' não tem permissão para executar a ação '%s'",
+                usuario.getTituloEleitoral(), acao.getDescricao());
+    }
+
+    private <T> @Nullable String getMotivoPolicy(T recurso) {
         String motivoPolicy = null;
         switch (recurso) {
             case Subprocesso sp -> motivoPolicy = subprocessoAccessPolicy.getMotivoNegacao();
@@ -92,12 +102,6 @@ public class AccessControlService {
                 // Outros tipos de recursos não possuem policies específicas
             }
         }
-
-        if (motivoPolicy != null && !motivoPolicy.isBlank()) {
-            return motivoPolicy;
-        }
-
-        return String.format("Usuário '%s' não tem permissão para executar a ação '%s'",
-                usuario.getTituloEleitoral(), acao.getDescricao());
+        return motivoPolicy;
     }
 }

@@ -23,7 +23,6 @@ class ClassMetrics {
         this.methodsMissed = parseInt(data.METHOD_MISSED || 0, 10);
     }
 
-    get totalInstructions() { return this.instructionsCovered + this.instructionsMissed; }
     get totalBranches() { return this.branchesCovered + this.branchesMissed; }
     get totalLines() { return this.linesCovered + this.linesMissed; }
     get totalComplexity() { return this.complexityCovered + this.complexityMissed; }

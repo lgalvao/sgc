@@ -1,5 +1,5 @@
-import { ref, type Ref } from 'vue';
-import { logger } from '@/utils';
+import {ref, type Ref} from 'vue';
+import {logger} from '@/utils';
 
 /**
  * Estado de uma modal individual
@@ -122,47 +122,5 @@ export function useModalManager(modalNames: string[]): ModalManager {
         isOpen,
         getData,
         closeAll
-    };
-}
-
-/**
- * Versão simplificada para gerenciar uma única modal
- * 
- * @example
- * ```ts
- * const { isOpen, open, close, data } = useSingleModal();
- * 
- * open({ userId: 123 });
- * if (isOpen.value) { ... }
- * close();
- * ```
- */
-export function useSingleModal<T = any>() {
-    const isOpen = ref(false);
-    const data = ref<T | undefined>();
-
-    const open = (modalData?: T) => {
-        isOpen.value = true;
-        data.value = modalData;
-    };
-
-    const close = () => {
-        isOpen.value = false;
-        data.value = undefined;
-    };
-
-    const toggle = () => {
-        isOpen.value = !isOpen.value;
-        if (!isOpen.value) {
-            data.value = undefined;
-        }
-    };
-
-    return {
-        isOpen,
-        data,
-        open,
-        close,
-        toggle
     };
 }

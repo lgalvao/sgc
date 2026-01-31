@@ -56,6 +56,7 @@ logging:
     org.springframework: ERROR
     org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR
     sgc: INFO
+    sgc.seguranca.acesso.SubprocessoAccessPolicy: DEBUG
 aplicacao:
   ambiente-testes: true
   acesso-ad:

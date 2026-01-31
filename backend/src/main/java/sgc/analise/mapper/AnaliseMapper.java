@@ -6,12 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.model.Analise;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 
 /**
  * Mapper para converter a entidade {@link Analise} em DTOs.
  */
+@SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Mapper(componentModel = "spring")
 public abstract class AnaliseMapper {
     @Autowired

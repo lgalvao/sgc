@@ -66,16 +66,6 @@ export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcess
 }
 
 /**
- * Acessa subprocesso como CHEFE (selecionando unidade na lista)
- */
-export async function acessarSubprocessoChefeComSelecao(page: Page, descricaoProcesso: string, siglaUnidade: string = 'SECAO_221') {
-    await page.getByText(descricaoProcesso).click();
-    await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-    await page.getByRole('row', {name: new RegExp(siglaUnidade, 'i')}).click();
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/\w+$`));
-}
-
-/**
  * Acessa subprocesso como ADMIN (via lista de unidades)
  */
 export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: string, siglaUnidade: string) {
@@ -232,32 +222,6 @@ export async function homologarCadastroMapeamento(page: Page) {
 
     // Sistema redireciona para Detalhes do subprocesso após homologação (CDU-13 passo 11.7)
     await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
-}
-
-/**
- * Homologa revisão (ADMIN) - Detecta automaticamente se há impactos ou não
- */
-export async function homologarCadastroRevisaoSemImpacto(page: Page) {
-    await page.getByTestId('btn-acao-analisar-principal').click();
-
-    // Aguardar modal aparecer
-    await expect(page.getByRole('dialog')).toBeVisible();
-
-    // Caminho SEM impactos (CDU-14 passo 12.2)
-    await expect(page.getByText(/A revisão do cadastro não produziu nenhum impacto no mapa de competência da unidade/i)).toBeVisible();
-    await expect(page.getByText(/Confirma a manutenção do mapa de competências vigente/i)).toBeVisible();
-
-    await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado sem ressalvas');
-
-    await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Revisão homologada/i).first()).toBeVisible();
-
-    // Verifica redirecionamento para tela de detalhes do subprocesso
-    await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
-
-    // Verificar situação após homologação
-    await expect(page.getByTestId('subprocesso-header__txt-situacao'))
-        .toHaveText(/Mapa homologado/i);
 }
 
 export async function homologarCadastroRevisaoComImpacto(page: Page) {

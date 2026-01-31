@@ -1,7 +1,7 @@
-import type {APIRequestContext, Page} from '@playwright/test';
+import type {Page} from '@playwright/test';
 import {test as base} from './auth-fixtures.js';
 import {criarProcesso} from '../helpers/helpers-processos.js';
-import {resetDatabase, useProcessoCleanup} from '../hooks/hooks-limpeza.js';
+import {useProcessoCleanup} from '../hooks/hooks-limpeza.js';
 
 /**
  * Contexto de fixture com processo criado automaticamente
