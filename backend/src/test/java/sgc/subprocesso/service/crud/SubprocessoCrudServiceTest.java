@@ -17,7 +17,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaFacade;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -31,6 +30,7 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.factory.SubprocessoFactory;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
@@ -43,7 +43,7 @@ class SubprocessoCrudServiceTest {
     @Mock
     private SubprocessoMapper subprocessoMapper;
     @Mock
-    private MapaFacade mapaFacade;
+    private SubprocessoFactory subprocessoFactory;
     @Mock
     private ApplicationEventPublisher eventPublisher;
     @Mock
@@ -72,9 +72,9 @@ class SubprocessoCrudServiceTest {
         CriarSubprocessoRequest request = CriarSubprocessoRequest.builder().codProcesso(1L).codUnidade(1L).build();
         SubprocessoDto responseDto = SubprocessoDto.builder().build();
         Subprocesso entity = criarSubprocessoCompleto();
-        when(subprocessoRepo.save(any())).thenReturn(entity);
-        when(mapaFacade.salvar(any())).thenReturn(new Mapa());
-        when(subprocessoMapper.toDto(any())).thenReturn(responseDto);
+
+        when(subprocessoFactory.criar(request)).thenReturn(entity);
+        when(subprocessoMapper.toDto(entity)).thenReturn(responseDto);
 
         assertThat(service.criar(request)).isNotNull();
     }
@@ -291,13 +291,11 @@ class SubprocessoCrudServiceTest {
         SubprocessoDto responseDto = SubprocessoDto.builder().build();
         Subprocesso entity = criarSubprocessoCompleto();
 
-        when(subprocessoRepo.save(any())).thenReturn(entity);
-        when(mapaFacade.salvar(any())).thenReturn(new Mapa());
-        when(subprocessoMapper.toDto(any())).thenReturn(responseDto);
+        when(subprocessoFactory.criar(request)).thenReturn(entity);
+        when(subprocessoMapper.toDto(entity)).thenReturn(responseDto);
 
         SubprocessoDto resultado = service.criar(request);
         assertThat(resultado).isNotNull();
-        verify(subprocessoRepo, times(2)).save(any());
     }
 
     @Test
@@ -315,13 +313,11 @@ class SubprocessoCrudServiceTest {
         uni.setCodigo(200L);
         entity.setUnidade(uni);
 
-        when(subprocessoRepo.save(any())).thenReturn(entity);
-        when(mapaFacade.salvar(any())).thenReturn(new Mapa());
-        when(subprocessoMapper.toDto(any())).thenReturn(responseDto);
+        when(subprocessoFactory.criar(request)).thenReturn(entity);
+        when(subprocessoMapper.toDto(entity)).thenReturn(responseDto);
 
         SubprocessoDto resultado = service.criar(request);
         assertThat(resultado).isNotNull();
-        verify(subprocessoRepo, times(2)).save(any());
     }
 
     @Test

@@ -178,14 +178,17 @@ class SubprocessoMapaWorkflowServiceTest {
         @Test
         @DisplayName("Deve falhar ao editar mapa em situação inválida")
         void deveFalharEditarMapaSituacaoInvalida() {
-            mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
             SalvarMapaRequest req = SalvarMapaRequest.builder()
                     .competencias(List.of(CompetenciaMapaDto.builder().build()))
                     .build();
 
+            doThrow(new ErroValidacao("Situação inválida"))
+                    .when(validacaoService).validarSituacaoPermitida(eq(sp), anyString(), any());
+
             assertThatThrownBy(() -> service.salvarMapaSubprocesso(1L, req))
-                    .isInstanceOf(ErroMapaEmSituacaoInvalida.class);
+                    .isInstanceOf(ErroValidacao.class);
         }
 
         @Test
