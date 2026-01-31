@@ -1,19 +1,7 @@
-import {expect, test} from './fixtures/auth-fixtures';
+import {expect, test} from './fixtures/complete-fixtures';
 import {criarProcesso} from './helpers/helpers-processos';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe('CDU-03 - Manter Processo', () => {
-    let cleanup: ReturnType<typeof useProcessoCleanup>;
-
-    test.beforeAll(async ({request}) => await resetDatabase(request));
-
-    test.beforeEach(async () => {
-        cleanup = useProcessoCleanup();
-    });
-
-    test.afterEach(async ({request}) => {
-        await cleanup.limpar(request);
-    });
 
     test('Deve validar campos obrigatórios', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('btn-painel-criar-processo').click();
@@ -41,7 +29,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page.getByTestId('btn-processo-iniciar')).toBeEnabled();
     });
 
-    test('Deve editar um processo existente', async ({page, autenticadoComoAdmin}) => {
+    test('Deve editar um processo existente', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         const descricaoOriginal = `Processo para Edição - ${Date.now()}`;
         // Cria um processo inicial
         await criarProcesso(page, {
@@ -57,7 +45,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/);
         const url = new URL(page.url());
         const processoId = parseInt(url.searchParams.get('codProcesso') || '0');
-        if (processoId > 0) cleanup.registrar(processoId);
+        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         // Verifica que os dados foram carregados
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricaoOriginal);

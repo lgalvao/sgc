@@ -1,0 +1,59 @@
+/**
+ * Índice central de fixtures E2E.
+ * 
+ * Exporta todas as fixtures disponíveis para simplificar importações.
+ * 
+ * ## Guia de Uso
+ * 
+ * ### 1. Testes Simples (apenas autenticação)
+ * ```typescript
+ * import {test, expect} from './fixtures/auth-fixtures';
+ * 
+ * test('Teste básico', async ({page, autenticadoComoAdmin}) => {
+ *   // Apenas login automático
+ * });
+ * ```
+ * 
+ * ### 2. Testes com Processo (criação + cleanup)
+ * ```typescript
+ * import {test, expect} from './fixtures/processo-fixtures';
+ * 
+ * test('Teste com processo', async ({page, processoFixture, cleanup}) => {
+ *   // Processo criado automaticamente!
+ *   await page.goto(`/processo/${processoFixture.codigo}`);
+ * });
+ * ```
+ * 
+ * ### 3. Testes Completos (database + auth + cleanup)
+ * ```typescript
+ * import {test, expect} from './fixtures/complete-fixtures';
+ * 
+ * test('Teste completo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+ *   // Database resetada + login + cleanup configurado!
+ *   await criarProcesso(page, {...});
+ *   cleanupAutomatico.registrar(codigo);
+ * });
+ * ```
+ * 
+ * ### 4. Database Reset Manual
+ * ```typescript
+ * import {test, expect} from './fixtures/database-fixtures';
+ * 
+ * test('Com reset', async ({page, databaseResetada}) => {
+ *   // Database limpa antes do teste
+ * });
+ * ```
+ */
+
+// Re-exportar todas as fixtures
+export {test as authTest, expect} from './auth-fixtures';
+export {test as databaseTest} from './database-fixtures';
+export {test as processoTest, criarMultiplosProcessos} from './processo-fixtures';
+export {test as completeTest} from './complete-fixtures';
+
+// Re-exportar tipos úteis
+export type {ProcessoContext} from './processo-fixtures';
+
+// Re-exportar fixtures base
+export * from './base';
+export * from './fixtures-processos';

@@ -24,6 +24,8 @@ import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
+import sgc.testutils.UnidadeTestBuilder;
+import sgc.testutils.UsuarioTestBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -77,11 +79,15 @@ class SubprocessoCadastroWorkflowServiceTest {
     @DisplayName("disponibilizarCadastro sucesso")
     void disponibilizarCadastro() {
         Long id = 1L;
-        Usuario user = new Usuario();
-        user.setTituloEleitoral("123");
-        Unidade u = new Unidade();
+        // Usar builders ao invés de criação manual
+        Usuario user = UsuarioTestBuilder.admin()
+            .comTitulo("123")
+            .build();
+        
+        Unidade u = UnidadeTestBuilder.assessoria().build();
         u.setTituloTitular("123");
         u.setUnidadeSuperior(new Unidade());
+        
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
 

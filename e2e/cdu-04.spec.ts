@@ -1,19 +1,8 @@
-import {expect, test} from './fixtures/auth-fixtures';
+import {expect, test} from './fixtures/complete-fixtures';
 import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
-    let cleanup: ReturnType<typeof useProcessoCleanup>;
-
-    test.beforeAll(async ({request}) => await resetDatabase(request));
-
-    test.beforeEach(async () => {
-        cleanup = useProcessoCleanup();
-    });
-
-    test.afterEach(async ({request}) => await cleanup.limpar(request));
-
-    test('Deve iniciar um processo com sucesso', async ({page, autenticadoComoAdmin}) => {
+    test('Deve iniciar um processo com sucesso', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         const descricao = `Processo para Iniciar - ${Date.now()}`;
 
         // 1. Cria processo em estado 'Criado'
@@ -31,7 +20,7 @@ test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
 
         // Capturar ID do processo para cleanup
         const processoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
-        if (processoId > 0) cleanup.registrar(processoId);
+        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         // Aguarda carregamento dos dados
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricao);

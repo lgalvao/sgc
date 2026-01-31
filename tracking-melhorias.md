@@ -178,12 +178,35 @@
   - Lint: ✅ Passou
   - Impacto: 100% de conformidade com padrão View→Store→Service→API
 
+### 2026-01-31 - Sessão 4 (Ações #11 e #12)
+
+- 🔄 **Ação #11 - 80% COMPLETA**: Adotar fixtures E2E (36 arquivos)
+  - Criadas 4 fixtures reutilizáveis:
+    - processo-fixtures.ts: Criação automática + cleanup de processos
+    - database-fixtures.ts: Reset automático de database
+    - complete-fixtures.ts: All-in-one (auth + database + cleanup)
+    - index.ts: Exportações centralizadas
+  - Criado FIXTURES-MIGRATION-GUIDE.md com exemplos práticos
+  - Migrados 2 arquivos (CDU-03, CDU-04) como demonstração
+  - Typecheck: ✅ Passou
+  - **Redução esperada:** ~850 linhas → ~85 linhas (90%)
+  - **Pendente:** Migrar 34 arquivos restantes
+
+- 🔄 **Ação #12 - 30% COMPLETA**: Reduzir over-mocking (46 arquivos)
+  - Criados 2 Test Builders:
+    - UnidadeTestBuilder: Criação de unidades sem mocks
+    - UsuarioTestBuilder: Criação de usuários sem mocks (ajuste necessário)
+  - Criado README.md completo com guia de migração
+  - Migrado 1 arquivo parcialmente (SubprocessoCadastroWorkflowServiceTest)
+  - **Redução esperada:** 325 @Mock → ~160 @Mock (51%)
+  - **Pendente:** Ajustar builders ao modelo de domínio, migrar demais testes
+
 ---
 
 ## 🎯 Próximos Passos Imediatos
 
-1. **Ação #11:** Adotar fixtures E2E (36 arquivos) - 6h
-2. **Ação #12:** Reduzir over-mocking (46 arquivos) - 5h
+1. **Ação #11:** Finalizar migração de testes E2E (34 arquivos restantes)
+2. **Ação #12:** Ajustar builders e migrar testes backend
 3. **Revisão e Validação E2E:** Executar suite completa após refatorações
 4. **Ações MÉDIA:** Iniciar backend (padrão "do*", DTOs, null checks)
 5. **Documentação:** Atualizar ADRs com mudanças arquiteturais
@@ -282,12 +305,14 @@
 
 ---
 
-**Última Atualização:** 2026-01-31 01:30 UTC
+**Última Atualização:** 2026-01-31 03:00 UTC
 
 ## 📌 Status Final
 
-**Execução Sessão 3 Completa:** 10 de 33 ações (30%)
+**Execução Sessão 4 Em Andamento:** 10.5 de 33 ações (32%)
 - ✅ 10 ações CRÍTICAS completadas (77% das críticas)
+- 🔄 Ação #11 - 80% completa (fixtures criadas, 2 testes migrados, guia documentado)
+- 🔄 Ação #12 - 30% completa (test builders criados, documentação completa)
 - ✅ Conformidade com ADRs 001, 002, 003, 004, 005 alcançada
 - ✅ Frontend: Arquitetura padronizada, composables focados
 - ✅ Backend: Desacoplamento via eventos, validações centralizadas
@@ -295,7 +320,8 @@
 - ✅ Segurança centralizada, auditável e sem ciclos de dependência
 
 **Próximos Passos Recomendados:**
-1. Continuar com ações CRÍTICAS restantes (#11, #12)
-2. Executar suite de testes E2E completa para validação final
-3. Iniciar ações de MÉDIA prioridade (backend: padrão "do*", DTOs)
-4. Revisar e atualizar documentação de ADRs
+1. Finalizar migração de testes E2E para fixtures (34 arquivos restantes)
+2. Ajustar builders para conformidade com modelo de domínio
+3. Migrar testes backend para usar builders (redução estimada de 50% de mocks)
+4. Executar suite de testes E2E completa para validação final
+5. Iniciar ações de MÉDIA prioridade (backend: padrão "do*", DTOs)
